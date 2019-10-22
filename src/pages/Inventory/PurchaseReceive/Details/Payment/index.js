@@ -15,6 +15,7 @@ import Header from './Header'
 import Grid from './Grid'
 import { isPOStatusFinalized } from '../../variables'
 import PaymentDetails from './PaymentDetails'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -28,40 +29,50 @@ const styles = (theme) => ({
   displayName: 'podoPayment',
   enableReinitialize: true,
   mapPropsToValues: ({ podoPayment }) => {
-    return podoPayment
+    let outstandingAmt = 0
+    if (podoPayment.purchaseOrderDetails) {
+      const { outstandingAmount } = podoPayment.purchaseOrderDetails
+      outstandingAmt = outstandingAmount
+    }
+    return {
+      ...podoPayment,
+      outstandingAmt,
+    }
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
 
-    let paymentData = purchaseOrderPayment.map((x, index) => {
-      x.isCancelled = x.isDeleted
-      delete x.isDeleted
+    let paymentData = purchaseOrderPayment
+      .filter((item) => !item.isDeleted)
+      .map((x, index) => {
+        x.isCancelled = x.isDeleted
+        delete x.isDeleted
 
-      if (_.has(x, 'isNew')) {
+        if (_.has(x, 'isNew')) {
+          return {
+            purchaseOrderFK: values.id,
+            sequence: index + 1,
+            clinicPaymentDto: {
+              ...x,
+              id: x.cpId,
+              concurrencyToken: x.cpConcurrencyToken,
+              createdOnBizSessionFK: currentBizSessionInfo.id,
+              clinicPaymentTypeFK: 1,
+              transactionOnBizSessionFK: currentBizSessionInfo.id,
+              // isCancelled: x.isCancelled,
+            },
+          }
+        }
+
         return {
-          purchaseOrderFK: values.id,
-          sequence: index + 1,
+          ...x,
           clinicPaymentDto: {
-            ...x,
-            id: x.cpId,
-            concurrencyToken: x.cpConcurrencyToken,
-            createdOnBizSessionFK: currentBizSessionInfo.id,
-            clinicPaymentTypeFK: 1,
-            transactionOnBizSessionFK: currentBizSessionInfo.id,
+            ...x.clinicPaymentDto,
             // isCancelled: x.isCancelled,
           },
         }
-      }
-
-      return {
-        ...x,
-        clinicPaymentDto: {
-          ...x.clinicPaymentDto,
-          // isCancelled: x.isCancelled,
-        },
-      }
-    })
+      })
 
     dispatch({
       type: 'podoPayment/upsertPodoPayment',
@@ -84,10 +95,6 @@ const styles = (theme) => ({
   },
 })
 class index extends PureComponent {
-  // state = {
-  //   showPODOPaymentModal: false,
-  // }
-
   componentDidMount () {
     this.refreshPodoPayment()
   }
@@ -100,19 +107,39 @@ class index extends PureComponent {
   }
 
   onClickCancelPayment = () => {
-    const { dispatch, values, resetForm } = this.props
+    const { dispatch, values, resetForm, history } = this.props
     resetForm()
     dispatch({
       type: 'purchaseOrderDetails/refresh',
       payload: {
         id: values.id,
       },
-    }).then(setTimeout(() => this.refreshPodoPayment(), 500))
+    }).then(() => {
+      setTimeout(() => this.refreshPodoPayment(), 500)
+      history.push('/inventory/pr')
+    })
   }
 
   // onClickAddPayment = () => this.setState({ showPODOPaymentModal: true })
 
   // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
+
+  recalculateOutstandingAmount = (type, value) => {
+    const { values, setValues } = this.props
+    if (type === 'add') {
+      const outstandingAmt = values.outstandingAmt - value
+      setValues({
+        ...values,
+        outstandingAmt,
+      })
+    } else {
+      const outstandingAmt = values.outstandingAmt + value
+      setValues({
+        ...values,
+        outstandingAmt,
+      })
+    }
+  }
 
   render () {
     const { purchaseOrderDetails } = this.props
@@ -125,7 +152,11 @@ class index extends PureComponent {
       <React.Fragment>
         <GridContainer>
           <Header {...this.props} />
-          <Grid isEditable={!isEditable} {...this.props} />
+          <Grid
+            isEditable={!isEditable}
+            {...this.props}
+            recalculateOutstandingAmount={this.recalculateOutstandingAmount}
+          />
         </GridContainer>
         {/* <CommonModal
           open={showPODOPaymentModal}
@@ -152,17 +183,17 @@ class index extends PureComponent {
         </Button> */}
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
-            onClick={this.props.handleSubmit}
-            disabled={isEditable}
-          />
-          <ProgressButton
             color='danger'
             icon={null}
             disabled={isEditable}
-            onClick={this.onClickCancelPayment}
+            onClick={navigateDirtyCheck(this.onClickCancelPayment)}
           >
             Cancel
           </ProgressButton>
+          <ProgressButton
+            onClick={this.props.handleSubmit}
+            disabled={isEditable}
+          />
         </div>
       </React.Fragment>
     )

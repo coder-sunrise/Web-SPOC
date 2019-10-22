@@ -54,7 +54,7 @@ const styles = (theme) => ({
 //     return diagnosis.entity ? diagnosis.entity : diagnosis.default
 //   },
 //   validationSchema: Yup.object().shape({
-//     diagnosises: Yup.array().of(
+//     corDiagnosis: Yup.array().of(
 //       Yup.object().shape({
 //         diagnosisFK: Yup.number().required(),
 //         // complication: Yup.array().of(Yup.string()).required().min(1),
@@ -66,15 +66,26 @@ const styles = (theme) => ({
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
-@connect(({ diagnosis, components }) => ({
+@connect(({ diagnosis, components, codetable }) => ({
   diagnosis,
   components,
+  codetable,
 }))
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
   //   // console.log(this.state, props)
   // }
+
+  componentDidMount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctComplication',
+      },
+    })
+  }
 
   componentWillReceiveProps (nextProps) {
     if (
@@ -95,7 +106,7 @@ class Diagnosis extends PureComponent {
   addDiagnosis = () => {
     // console.log('addDiagnosis')
     this.arrayHelpers.push({
-      onsetDate: moment(),
+     // onsetDate: moment(),
       uid: getUniqueGUID(),
     })
   }
@@ -114,13 +125,12 @@ class Diagnosis extends PureComponent {
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
 
-            if(values.corDiagnosis.length <= 0){
-               diagnosises = diagnosis.default.corDiagnosis
-            }else{
-               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
+            if (values.corDiagnosis.length <= 0) {
+              diagnosises = diagnosis.default.corDiagnosis
+            } else {
+              diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }
 
-            
             if (diagnosises.length === 0) {
               // if(!values.disabled)
               if (components.ConsultationPage.edit) {
@@ -128,11 +138,13 @@ class Diagnosis extends PureComponent {
                 return null
               }
             }
+        
             return diagnosises.map((v, i) => {
               return (
                 <div key={v.uid}>
                   <Item
                     {...this.props}
+                    ctCompilation={this.props.codetable}
                     index={i}
                     arrayHelpers={arrayHelpers}
                     diagnosises={diagnosises}

@@ -58,7 +58,7 @@ const tagList = [
       .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
     //console.log(restValues)
@@ -72,6 +72,7 @@ const tagList = [
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingDocumentTemplate/query',
@@ -87,7 +88,6 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingDocumentTemplate, setFieldValue } = props
-
 
     return (
       <React.Fragment>
@@ -148,7 +148,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <RichEditor
-                      toolbarHidden={() => true}
+                      // toolbarHidden={() => true}
                       handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}

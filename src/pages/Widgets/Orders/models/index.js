@@ -143,24 +143,27 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        const {finalAdjustments, rows } = state
-        let tempRows = rows
-        
+        const { finalAdjustments, rows } = state
+        const tempRows = [...rows]
 
-        tempRows.map((o , index) => {
-          if (!payload || o.uid === payload.uid) tempRows.splice(index,1)
-          return o
+
+        tempRows.map((a, index) => {
+          if (a.uid === payload.uid) {
+            tempRows.splice(index, 1)
+          }
+          return a
         })
 
         const amount = calculateAmount(tempRows, finalAdjustments)
 
         return {
           ...state,
+          ...amount,
           rows: rows.map((o) => {
             if (!payload || o.uid === payload.uid) o.isDeleted = true
             return o
           }),
-          ...amount,
+          
         }
       },
 

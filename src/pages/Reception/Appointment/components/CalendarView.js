@@ -324,8 +324,6 @@ class CalendarView extends React.PureComponent {
       // })),
     ])
 
-    console.log({ filtered })
-
     return (
       <LoadingWrapper loading={loading} text='Loading appointments...'>
         <DragAndDropCalendar

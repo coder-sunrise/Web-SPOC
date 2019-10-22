@@ -1,12 +1,8 @@
 // material ui icons
+import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import Duplicate from '@material-ui/icons/FileCopy'
 import Print from '@material-ui/icons/Print'
-import { formatMessage } from 'umi/locale'
-import PurchaseOrder from './Details/PurchaseOrder'
-import DeliveryOrder from './Details/DeliveryOrder'
-import Payment from './Details/Payment'
-import moment from 'moment'
 
 export const poSubmitAction = {
   SAVE: 1,
@@ -92,15 +88,6 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const tabbedPaneAvailability = (status) => {
-  const allowedStatus = [
-    // 'Draft',
-    1,
-    4,
-  ]
-  return allowedStatus.indexOf(status) > -1
-}
-
 export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
     // 'Finalized',
@@ -146,7 +133,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'totalAmount', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
-  { name: 'remarks', title: 'Remarks' },
+  { name: 'remark', title: 'Remarks' },
   { name: 'action', title: 'Action' },
 ]
 
@@ -173,45 +160,6 @@ export const ContextMenuOptions = (row) => {
     },
   ]
 }
-
-const addContent = (type, props) => {
-  switch (type) {
-    case 1:
-      return <PurchaseOrder {...props} />
-    case 2:
-      return <DeliveryOrder {...props} />
-    case 3:
-      return <Payment {...props} />
-    default:
-      return <PurchaseOrder {...props} />
-  }
-}
-
-export const PurchaseReceiveDetailOption = (poStatus, props) => [
-  {
-    id: 0,
-    name: formatMessage({
-      id: 'inventory.pr.detail.pod',
-    }),
-    content: addContent(1, props),
-  },
-  {
-    id: 1,
-    name: formatMessage({
-      id: 'inventory.pr.detail.dod',
-    }),
-    content: addContent(2, props),
-    disabled: tabbedPaneAvailability(poStatus),
-  },
-  {
-    id: 2,
-    name: formatMessage({
-      id: 'inventory.pr.detail.payment',
-    }),
-    content: addContent(3, props),
-    disabled: tabbedPaneAvailability(poStatus),
-  },
-]
 
 export const amountProps = {
   style: { margin: 0 },

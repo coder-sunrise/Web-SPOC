@@ -3,15 +3,11 @@ import { connect } from 'dva'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import {
-  Badge,
-  CommonTableGrid,
-  DateFormatter,
-  notification,
-} from '@/components'
+import { CommonTableGrid, DateFormatter, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
+import StatusBadge from './StatusBadge'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
@@ -75,55 +71,7 @@ const columnExtensions = [
   {
     columnName: 'visitStatus',
     width: 180,
-    render: (row) => {
-      const { visitStatus: value } = row
-      // const hasBadge = Object.keys(VISIT_STATUS).map((key) => VISIT_STATUS[key])
-      let color = '#999999'
-      let hasBadge = true
-      switch (value.toUpperCase()) {
-        case VISIT_STATUS.WAITING:
-          color = '#4255BD'
-          break
-        case VISIT_STATUS.DISPENSE:
-        case VISIT_STATUS.BILLING:
-        case VISIT_STATUS.ORDER_UPDATED:
-          color = '#098257'
-          break
-        case VISIT_STATUS.IN_CONS:
-        case VISIT_STATUS.PAUSED:
-          color = '#CF1322'
-          break
-        case VISIT_STATUS.UPCOMING_APPT:
-          color = '#999999'
-          break
-        default:
-          color = '#999999'
-          hasBadge = false
-          break
-      }
-      // return value
-      return hasBadge ? (
-        <Badge
-          style={{
-            padding: 6,
-            fontSize: '.75rem',
-            backgroundColor: color,
-          }}
-          color={color}
-        >
-          {value}
-        </Badge>
-      ) : (
-        <span
-          style={{
-            padding: 8,
-            fontSize: '.875rem',
-          }}
-        >
-          {value}
-        </span>
-      )
-    },
+    render: (row) => <StatusBadge row={row} />,
   },
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
@@ -281,9 +229,7 @@ const Grid = ({
 
   const isAssignedDoctor = (row) => {
     const {
-      doctor: {
-        clinicianProfile: { doctorProfile: assignedDoctorProfile, title, name },
-      },
+      doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
       visitStatus,
     } = row
     const { clinicianProfile: { doctorProfile } } = user.data
@@ -378,16 +324,16 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
-          dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                combineCondition: 'or',
-              },
-            },
-          })
+          // dispatch({
+          //   type: 'codetable/fetchCodes',
+          //   payload: {
+          //     code: 'ctservice',
+          //     filter: {
+          //       'serviceFKNavigation.IsActive': true,
+          //       combineCondition: 'or',
+          //     },
+          //   },
+          // })
 
           dispatch({
             type: `consultation/start`,
@@ -424,9 +370,14 @@ const Grid = ({
                 )
             })
           } else {
-            router.push(
-              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-            )
+            dispatch({
+              type: `consultation/addAutoOrder`,
+            }).then((o) => {
+              if (o)
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                )
+            })
           }
         }
 
@@ -471,7 +422,7 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-  console.log({ queryingFormData })
+
   return (
     <div style={{ minHeight: '76vh' }}>
       <LoadingWrapper

@@ -14,10 +14,10 @@ export default createFormViewModel({
       default: {
         corDiagnosis: [
           {
-            uid: getUniqueGUID(),
-            onsetDate: moment(),
+            // uid: getUniqueGUID(),
+            // onsetDate: moment(),
             // isPersist: false,
-           // remarks: '',
+            // remarks: '',
           },
         ],
       },

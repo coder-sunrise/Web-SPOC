@@ -49,7 +49,7 @@ class FilterBar extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem md={12} lg={8} style={{ position: 'relative' }}>
+          <GridItem md={12} lg={7} style={{ position: 'relative' }}>
             <FastField
               name='search'
               render={(args) => {
@@ -81,7 +81,7 @@ class FilterBar extends PureComponent {
               />
             </div> */}
           </GridItem>
-          <GridItem md={12} lg={4}>
+          <GridItem md={12} lg={5}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 variant='contained'
@@ -102,7 +102,7 @@ class FilterBar extends PureComponent {
                     payload: {
                       group: [
                         {
-                          [`${prefix}patientReferenceNo`]: search,
+                          // [`${prefix}patientReferenceNo`]: search,
                           [`${prefix}name`]: search,
                           [`${prefix}patientAccountNo`]: search,
                           [`${prefix}contactFkNavigation.contactNumber.number`]: search,
@@ -134,7 +134,7 @@ class FilterBar extends PureComponent {
                     }}
                   >
                     <PermIdentity />
-                    New Patient
+                    Register New Patient
                   </Button>
                 )}
               </Authorized>

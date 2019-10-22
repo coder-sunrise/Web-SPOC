@@ -61,6 +61,7 @@ class ReferralLetter extends PureComponent {
 
   render () {
     const {
+      currentType,
       footer,
       handleSubmit,
       classes,
@@ -116,7 +117,7 @@ class ReferralLetter extends PureComponent {
           </GridItem>
 
           <GridItem xs={12} className={classes.editor}>
-            {templateLoader(this.editorReferece, setFieldValue)}
+            {templateLoader(this.editorReferece, setFieldValue, currentType)}
 
             <FastField
               name='content'

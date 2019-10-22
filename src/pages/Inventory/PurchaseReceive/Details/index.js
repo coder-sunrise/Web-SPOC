@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'dva'
 import { CardContainer, Tabs } from '@/components'
-import { PurchaseReceiveDetailOption } from '../variables'
+import { PurchaseReceiveDetailOption } from '../subComponents'
 
 @connect(({ purchaseOrderDetails, clinicSettings, clinicInfo }) => ({
   purchaseOrderDetails,

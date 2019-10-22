@@ -10,6 +10,7 @@ import {
 } from '@/components'
 
 const CoverageCap = ({ values, classes, setFieldValue }) => {
+  console.log({ values })
   const onRadioButtonChange = (event) => {
     const { target } = event
 

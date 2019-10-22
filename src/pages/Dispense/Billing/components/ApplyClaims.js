@@ -7,15 +7,18 @@ import Delete from '@material-ui/icons/Delete'
 // common components
 import {
   Button,
-  EditableTableGrid,
   CommonModal,
+  EditableTableGrid,
   GridContainer,
   GridItem,
   NumberInput,
-  Primary,
+  Popover,
   Select,
   Tooltip,
 } from '@/components'
+// sub components
+import MaxCapInfo from './MaxCapInfo'
+import DeleteWithPopover from './DeleteWithPopover'
 // page modal
 import ApplicableClaims from '../modal/ApplicableClaims'
 import CoPayer from '../modal/CoPayer'
@@ -53,6 +56,14 @@ const styles = (theme) => ({
   },
   rightEndBtn: {
     marginRight: 0,
+  },
+  dangerText: {
+    fontWeight: 500,
+    color: '#cf1322',
+  },
+  currencyText: {
+    fontWeight: 500,
+    color: 'darkblue',
   },
 })
 
@@ -109,7 +120,14 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       let schemeCoverageType = 'percentage'
       let schemeCoverage = 0
       if (scheme.coPaymentByItem.length > 0) {
-        coverage = 0
+        const coPaymentItem = scheme.coPaymentByItem.find(
+          (_coPaymentItem) => _coPaymentItem.itemFk === item.id,
+        )
+
+        coverage = convertAmountToPercentOrCurrency(
+          coPaymentItem.itemValueType,
+          coPaymentItem.itemValue,
+        )
       } else if (scheme.coPaymentByCategory.length > 0) {
         const itemCategory = scheme.coPaymentByCategory.find(
           (category) => category.itemTypeFk === item.invoiceItemTypeFk,
@@ -217,10 +235,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           computeInvoiceItemSubtotal,
           [],
         )
-
-        const _newInvoicePayer = {
-          ...invoicePayer,
-          invoicePayerItems: invoicePayer.invoicePayerItems.map((ip) => {
+        const _newInvoicePayerItems = invoicePayer.invoicePayerItems.map(
+          (ip) => {
             const _existed = previousIndexesInvoiceItemsWithSubtotal.find(
               (_i) => _i.id === ip.id,
             )
@@ -232,7 +248,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
               totalAfterGst:
                 _existed.totalAfterGst - _existed._prevClaimedAmount,
             }
-          }),
+          },
+        )
+        const _newInvoicePayer = {
+          ...invoicePayer,
+          invoicePayerItems: _newInvoicePayerItems,
         }
         return [
           ..._newInvoicePayers,
@@ -292,7 +312,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           _isEditing: true,
           _isValid: true,
           _coverageMaxCap: 0,
-          _balance: null,
+          _balance: 0,
+          _patientMinPayable: 0,
+          _patientMinPayableType: 'ExactAmount',
           copaymentSchemeFK: undefined,
           name: '',
           payerDistributedAmt: 0,
@@ -386,6 +408,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       balance = null,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
+      patientMinCoPaymentAmount = 0,
+      patientMinCoPaymentAmountType = 'ExactAmount',
       id,
     } = schemeConfig
 
@@ -402,14 +426,15 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ...tempInvoicePayer[index],
       _coverageMaxCap: coverageMaxCap,
       _balance: balance,
-      // payerDistributedAmt: overAllCoPaymentValue,
+      _patientMinPayable: patientMinCoPaymentAmount,
+      _patientMinPayableType: patientMinCoPaymentAmountType,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
       invoicePayerItems: newInvoiceItems.map((item) => {
         let claimAmount = item.totalAfterGst
         let proceedForChecking = true
 
-        if (item._claimedAmount === item.totalAfterGst) {
+        if (item._claimedAmount === item.totalAfterGst || balance === null) {
           proceedForChecking = false
           claimAmount = 0
         } else if (item._claimedAmount > 0) {
@@ -436,11 +461,15 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const handleCommitChanges = (index) => ({ rows }) => {
+    const payerDistributedAmt = roundToTwoDecimals(
+      rows.reduce((sum, item) => sum + item.claimAmount, 0),
+    )
     const updatedRow = {
       ...tempInvoicePayer[index],
       invoicePayerItems: [
         ...rows,
       ],
+      payerDistributedAmt,
     }
     _updateTempInvoicePayer(index, updatedRow)
   }
@@ -486,7 +515,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     _updateTempInvoicePayer(index, updatedRow)
   }
 
-  const handleAppliedSchemeRemoveClick = (index) => () => {
+  const handleAppliedSchemeRemoveClick = (index) => {
     const updatedRow = { ...tempInvoicePayer[index], _isDeleted: true }
     _updateTempInvoicePayer(index, updatedRow)
   }
@@ -517,6 +546,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isEditing: true,
       _isValid: true,
       _coverageMaxCap: 0,
+      _patientMinPayable: 0,
+      _patientMinPayableType: 'ExactAmount',
       copaymentSchemeFK: undefined,
       name: '',
       payerDistributedAmt: 0,
@@ -573,7 +604,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           Reset
         </Button>
       </GridItem>
-      <GridItem md={12} style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+      <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer._isDeleted) return null
 
@@ -613,18 +644,39 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                     value={invoicePayer._balance}
                   />
                 </GridItem> */}
-                <GridItem md={8} style={{ marginTop: 8, marginBottom: 8 }}>
+                <GridItem md={2}>
+                  <span>Balance: </span>
+                  {invoicePayer._balance === null ? (
+                    <span className={classes.dangerText}>
+                      Insufficient balance
+                    </span>
+                  ) : (
+                    <span className={classes.currencyText}>
+                      ${invoicePayer._balance}
+                    </span>
+                  )}
+                </GridItem>
+                <GridItem md={6} style={{ marginTop: 8, marginBottom: 8 }}>
                   {invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && (
                     <NumberInput
                       currency
                       text
                       prefix='Max Cap.:'
+                      suffix={
+                        <MaxCapInfo
+                          claimableSchemes={invoicePayer.claimableSchemes}
+                          copaymentSchemeFK={invoicePayer.copaymentSchemeFK}
+                          coPaymentByCategory={invoicePayer.coPaymentByCategory}
+                          coPaymentByItem={invoicePayer.coPaymentByItem}
+                        />
+                      }
                       value={invoicePayer._coverageMaxCap}
                     />
                   )}
                 </GridItem>
+
                 <GridItem md={1} style={{ textAlign: 'right' }}>
-                  <Tooltip title='Remove this scheme'>
+                  {/*  <Tooltip title='Remove this scheme'>
                     <Button
                       size='sm'
                       color='danger'
@@ -633,7 +685,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                     >
                       <Delete />
                     </Button>
-                  </Tooltip>
+                  </Tooltip> */}
+
+                  <DeleteWithPopover
+                    index={index}
+                    onConfirmDelete={handleAppliedSchemeRemoveClick}
+                  />
                 </GridItem>
                 <GridItem md={12}>
                   <EditableTableGrid
@@ -734,6 +791,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           onAddCoPayerClick={handleAddCoPayer}
           invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
+            schemeCoverage: 100,
+            schemeCoverageType: 'Percentage',
             totalAfterGst:
               invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
           }))}
