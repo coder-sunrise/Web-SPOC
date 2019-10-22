@@ -12,6 +12,7 @@ import {
   GridItem,
   SizeContainer,
   NumberInput,
+  notification,
 } from '@/components'
 // sub component
 import Banner from '@/pages/PatientDashboard/Banner'
@@ -154,11 +155,9 @@ class Dispense extends PureComponent {
           }
           else
           {
-            if(confirm('The printing client application didn\'t running up, start it up?'))
-            {
-              const startUp = document.getElementById('a_startup')
-              startUp.click();
-            }
+            notification.error({
+              message: `The printing client application didn\'t running up, please start it.`,
+            })
           }
         }
       }
@@ -182,7 +181,6 @@ class Dispense extends PureComponent {
             <EditOrder {...this.props} />
           )}
         </SizeContainer>
-        <a href="OpenSEMRReportTool:" id="a_startup" style={{display:'none',}}/>
       </div>
     )
   }
