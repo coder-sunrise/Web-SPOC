@@ -240,15 +240,15 @@ const Grid = ({
       })
       return false
     }
-    // ******************
-    // if (visitStatus === 'IN CONS') {
-    //   if (assignedDoctorProfile.id !== doctorProfile.id) {
-    //     notification.error({
-    //       message: `You cannot resume other doctor's consultation.`,
-    //     })
-    //     return false
-    //   }
-    // }
+
+    if (visitStatus === 'IN CONS') {
+      if (assignedDoctorProfile.id !== doctorProfile.id) {
+        notification.error({
+          message: `You cannot resume other doctor's consultation.`,
+        })
+        return false
+      }
+    }
 
     // if (assignedDoctorProfile.id !== doctorProfile.id) {
     //   notification.error({
