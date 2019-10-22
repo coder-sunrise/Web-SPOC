@@ -92,6 +92,13 @@ const saveConsultation = ({
       openConfirmContent: confirmMessage,
       openConfirmText: 'Confirm',
       onConfirmSave: () => {
+  
+        values.corDiagnosis.map((a, index) => {
+          if (a.diagnosisFK === undefined) {
+            values.corDiagnosis.splice(index, 1)
+          }
+          return a
+        })
         const newValues = convertToConsultation(values, {
           orders,
           consultationDocument,
