@@ -107,9 +107,10 @@ class Dispense extends PureComponent {
 
   connectWebSocket()
   {
-    if(this.iswsConnect == false)
+    if(this.iswsConnect === false)
     {
-      this.wsConnection = new window.WebSocket('ws://127.0.0.1:7182')
+      let settings  =  JSON.parse(sessionStorage.getItem('clinicSettings'))
+      this.wsConnection = new window.WebSocket(settings.printToolSocketURL)
       this.wsConnection.onopen =() =>{
         this.iswsConnect = true
       }
@@ -147,7 +148,7 @@ class Dispense extends PureComponent {
         const result = await postPDF(24, {DrugLabelDetails})
         if (result) {
           const base64Result = arrayBufferToBase64(result)
-          if(this.iswsConnect == true)
+          if(this.iswsConnect === true)
           {
             this.wsConnection.send('["' + base64Result + '"]')
           }
