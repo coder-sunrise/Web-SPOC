@@ -299,8 +299,8 @@ class PatientHistory extends Component {
 
     let newArray = []
     if (
-      clinicSettings.settings.ShowConsultationVersioning === false ||
-      clinicSettings.settings.ShowConsultationVersioning === undefined
+      clinicSettings.settings.showConsultationVersioning === false ||
+      clinicSettings.settings.showConsultationVersioning === undefined
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
@@ -364,8 +364,19 @@ class PatientHistory extends Component {
                       }}
                     >
                       <GridContainer>
-                        <GridItem sm={7}>
+                        <GridItem sm={10}>
                           <TextField text value={row.visitPurposeName} />
+                          {row.visitDate && (
+                            <span style={{ position: 'relative' }}>
+                              &nbsp; (
+                              <DatePicker
+                                text
+                                showTime
+                                format='DD MMM YYYY h:mm a'
+                                value={o.signOffDate}
+                              />)
+                            </span>
+                          )}
                         </GridItem>
                       </GridContainer>
                       <GridContainer>
@@ -374,16 +385,6 @@ class PatientHistory extends Component {
                             text
                             value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                           />
-                        </GridItem>
-                        <GridItem sm={5} style={{ textAlign: 'right' }}>
-                          {row.visitDate && (
-                            <DatePicker
-                              text
-                              showTime
-                              format='DD MMM YYYY h:mm a'
-                              value={o.signOffDate}
-                            />
-                          )}
                         </GridItem>
                       </GridContainer>
                     </div>
@@ -406,24 +407,28 @@ class PatientHistory extends Component {
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
-          <GridItem sm={7}>
+          <GridItem sm={10}>
             <p>
               <span>Consultation Visit</span>
+              <span style={{ position: 'relative' }}>
+                &nbsp; (<DatePicker text value={row.visitDate} />)
+              </span>
               <div className={this.props.classes.note}>
                 {row.doctorTitle} {row.doctorName}
               </div>
             </p>
           </GridItem>
-          <GridItem sm={5} style={{ textAlign: 'right' }}>
-            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text value={row.visitDate} />
-            </span>
-            <div className={this.props.classes.note}>&nbsp;</div>
-          </GridItem>
         </GridContainer>
       </div>
     )
   }
+
+  // <GridItem sm={5} style={{ textAlign: 'right' }}>
+  //           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+  //             ( <DatePicker text value={row.visitDate} /> )
+  //           </span>
+  //           <div className={this.props.classes.note}>&nbsp;</div>
+  //         </GridItem>
 
   // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
@@ -493,11 +498,12 @@ class PatientHistory extends Component {
               mode='multiple'
               // maxTagCount={4}
               options={[
-                { name: 'Chief Complaints', value: '1' },
-                { name: 'Plan', value: '2' },
-                { name: 'Diagnosis', value: '3' },
-                { name: 'Consultation Document', value: '4' },
+                { name: 'Clinical Notes', value: '1' },
+                { name: 'Chief Complaints', value: '2' },
+                { name: 'Plan', value: '3' },
+                { name: 'Diagnosis', value: '4' },
                 { name: 'Orders', value: '5' },
+                { name: 'Consultation Document', value: '6' },
                 // { name: 'Result History', value: '6' },
                 { name: 'Invoice', value: '7' },
               ]}
@@ -596,6 +602,7 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
       : ''
+
     return (
       <div {...cfg}>
         <CardContainer
@@ -608,8 +615,8 @@ class PatientHistory extends Component {
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.ShowConsultationVersioning === false ||
-          clinicSettings.settings.ShowConsultationVersioning === undefined ? (
+          0 ? clinicSettings.settings.showConsultationVersioning === false ||
+          clinicSettings.settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion

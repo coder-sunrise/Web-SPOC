@@ -92,7 +92,19 @@ const saveConsultation = ({
       openConfirmContent: confirmMessage,
       openConfirmText: 'Confirm',
       onConfirmSave: () => {
-        const newValues = convertToConsultation(values, {
+
+        const filteredDiagnosis = [...values.corDiagnosis.filter(
+          (diagnosis) => diagnosis.diagnosisFK !== undefined,
+        )]
+
+        const _filteredDiagnosis = {
+          ...values,
+          corDiagnosis: filteredDiagnosis,
+        }
+
+        console.log("test ", _filteredDiagnosis)
+
+        const newValues = convertToConsultation(_filteredDiagnosis, {
           orders,
           consultationDocument,
         })
