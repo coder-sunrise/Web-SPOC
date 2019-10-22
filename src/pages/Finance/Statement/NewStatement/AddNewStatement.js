@@ -301,7 +301,7 @@ class AddNewStatement extends PureComponent {
                       )
                     }
                     return (
-                      <NumberInput percentage label='Admin Charge' {...args} />
+                      <NumberInput percentage label='Admin Charge' max={100} {...args} />
                     )
                   }}
                 />
