@@ -240,7 +240,7 @@ const Grid = ({
       })
       return false
     }
-
+    // ******************
     // if (visitStatus === 'IN CONS') {
     //   if (assignedDoctorProfile.id !== doctorProfile.id) {
     //     notification.error({
@@ -362,6 +362,7 @@ const Grid = ({
               payload: {
                 id: row.visitFK,
                 version,
+                status: 'PAUSED',
               },
             }).then((o) => {
               if (o)
@@ -370,14 +371,17 @@ const Grid = ({
                 )
             })
           } else {
-            dispatch({
-               type: `consultation/addAutoOrder`,
-            }).then((o) => {
-              if (o)
-                router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-                )
-            })
+            // dispatch({
+            //   type: `consultation/addAutoOrder`,
+            // }).then((o) => {
+            //   if (o)
+            //     router.push(
+            //       `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+            //     )
+            // })
+            router.push(
+              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+            )
           }
         }
 
