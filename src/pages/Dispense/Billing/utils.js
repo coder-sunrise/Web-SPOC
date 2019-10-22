@@ -1,5 +1,3 @@
-import { INVOICE_ITEM_TYPE } from '@/utils/constants'
-
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
   preInvoicePayer,
@@ -47,12 +45,11 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   // 3. third priority: overall value
 
   const isSpecificDefined = scheme.coPaymentByItem.find(
-    (_coPaymentItem) => _coPaymentItem.itemFk === invoiceItem.id,
+    (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
   )
-
   if (isSpecificDefined) {
     const coPaymentItem = scheme.coPaymentByItem.find(
-      (_coPaymentItem) => _coPaymentItem.itemFk === invoiceItem.id,
+      (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
     )
 
     coverage = convertAmountToPercentOrCurrency(
@@ -76,11 +73,15 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
     schemeCoverageType = itemCategory.groupValueType
   } else {
     coverage = convertAmountToPercentOrCurrency(
-      scheme.overAllCoPaymentValueType,
-      scheme.overAllCoPaymentValue,
+      scheme.overAllCoPaymentValue
+        ? scheme.overAllCoPaymentValueType
+        : 'Percentage',
+      scheme.overAllCoPaymentValue || 100,
     )
-    schemeCoverage = scheme.overAllCoPaymentValue
-    schemeCoverageType = scheme.overAllCoPaymentValueType
+    schemeCoverage = scheme.overAllCoPaymentValue || 100
+    schemeCoverageType = scheme.overAllCoPaymentValue
+      ? scheme.overAllCoPaymentValueType
+      : 'Percentage'
   }
 
   return { coverage, schemeCoverage, schemeCoverageType }
@@ -142,16 +143,26 @@ export const getApplicableClaimAmount = (
       remainingCoverageMaxCap,
     ]
 
-  const isSpecificDefined = scheme.coPaymentByItem.find(
-    (_coPaymentItem) => _coPaymentItem.itemFk === invoicePayerItem.id,
+  const isSpecificDefined = coPaymentByItem.find(
+    (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
   )
 
   if (isSpecificDefined) {
-    const specificItem = scheme.coPaymentByItem.find(
-      (_coPaymentItem) => _coPaymentItem.itemFk === invoicePayerItem.id,
+    const specificItem = coPaymentByItem.find(
+      (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
     )
     // TODO get coverage amount from specific item object
-    returnClaimAmount = 0
+    const itemRemainingAmount =
+      invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+    if (specificItem.itemValueType.toLowerCase() === 'percentage')
+      returnClaimAmount =
+        itemRemainingAmount * (specificItem.itemGroupValue / 100)
+    else {
+      returnClaimAmount =
+        specificItem.itemValue > itemRemainingAmount
+          ? itemRemainingAmount
+          : specificItem.itemValue
+    }
   } else if (coPaymentByCategory.length > 0) {
     const itemCategory = coPaymentByCategory.find(
       (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
@@ -193,12 +204,11 @@ export const getApplicableClaimAmount = (
 const getItemTypeSubtotal = (list, type) =>
   list.reduce(
     (subtotal, item) =>
-      item.itemTypeFk === type ? subtotal + item.claimAmount : subtotal,
+      item.invoiceItemTypeFk === type ? subtotal + item.claimAmount : subtotal,
     0,
   )
 
 export const validateClaimAmount = (schemeRow, totalPayable) => {
-  let isValid = true
   let invalidMessage = []
 
   const {
@@ -236,7 +246,6 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
         : totalPayable * (_patientMinPayable / 100)
     listOfLimits.push(amount)
   }
-  console.log({ isCoverageMaxCapCheckRequired, _coverageMaxCap })
   if (isCoverageMaxCapCheckRequired) {
     if (_coverageMaxCap > 0) listOfLimits.push(_coverageMaxCap)
   } else {
@@ -285,7 +294,7 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
   )
 
   const maximumLimit = Math.min(listOfLimits)
-  console.log({ maximumLimit, listOfLimits })
+
   if (maximumLimit > 0 && totalClaimAmount > maximumLimit)
     invalidMessage.push('Total claim amount has exceed the maximum limit')
 

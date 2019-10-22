@@ -130,18 +130,30 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    const { dispatch } = this.props
+    const { dispatch, values } = this.props
     const parameters = {
       md2: 'dsps',
-      // pid: patient.id,
-      // qid: '',
+      version: Date.now(),
     }
-    router.push(getAppendUrl(parameters), '/reception/queue/patientdashboard')
+
     dispatch({
-      type: 'billing/closeModal',
+      type: 'dispense/unlock',
       payload: {
-        toDispensePage: true,
+        id: values.visitId,
       },
+    }).then((response) => {
+      if (response) {
+        router.push(
+          getAppendUrl(parameters),
+          '/reception/queue/patientdashboard',
+        )
+        dispatch({
+          type: 'billing/closeModal',
+          payload: {
+            toDispensePage: true,
+          },
+        })
+      }
     })
   }
 
@@ -174,27 +186,11 @@ class Billing extends Component {
 
   shouldDisableCompletePayment = () => {
     const { values } = this.props
-    const { invoicePayers, finalPayable, payments = [] } = values
+    const { invoicePayers, payments = [] } = values
 
     if (payments.length === 0) return true
 
     if (invoicePayers.length === 0) return false
-
-    const minPatientPaymentAmount = invoicePayers.reduce((minAmt, payer) => {
-      const { _patientMinPayable, _patientMinPayableType } = payer
-      const amount =
-        _patientMinPayableType === 'ExactAmount'
-          ? _patientMinPayable
-          : finalPayable * _patientMinPayable / 100
-
-      if (amount <= minAmt) return amount
-
-      return minAmt
-    }, 999)
-
-    const totalPayment = payments[0].totalAmtPaid
-
-    if (totalPayment < minPatientPaymentAmount) return true
 
     return false
   }
