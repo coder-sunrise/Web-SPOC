@@ -106,7 +106,7 @@ class Diagnosis extends PureComponent {
   addDiagnosis = () => {
     // console.log('addDiagnosis')
     this.arrayHelpers.push({
-     // onsetDate: moment(),
+      onsetDate: moment(),
       uid: getUniqueGUID(),
     })
   }
@@ -126,7 +126,7 @@ class Diagnosis extends PureComponent {
             // if (!values || !values.corDiagnosis) return null
 
             if (values.corDiagnosis.length <= 0) {
-              diagnosises = diagnosis.default.corDiagnosis
+              this.addDiagnosis()
             } else {
               diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }

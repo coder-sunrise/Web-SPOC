@@ -25,10 +25,11 @@ const receivingDetailsSchema = Yup.object().shape({
   code: Yup.number().required(),
   name: Yup.number().required(),
   batchNo: Yup.number().when('expiryDate', {
-    is: (v) => v !== undefined,
-    then: Yup.number().required(),
+    is: (v) => v === undefined || v === '',
+    then: Yup.number().nullable(),
+    otherwise: Yup.number().required(),
   }),
-  expiryDate: Yup.date(),
+  expiryDate: Yup.string().nullable(),
 
   // orderQty: Yup.number().required(),
   // bonusQty: Yup.number().required(),

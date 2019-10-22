@@ -219,6 +219,10 @@ const Attachment = ({
     [classes.verticalSpacing]: true,
     [classes.noPadding]: true,
   })
+
+  const clearValue = (e) => {
+    e.target.value = null
+  }
   return (
     <GridContainer>
       {label && (
@@ -256,6 +260,7 @@ const Attachment = ({
           ref={inputEl}
           multiple='multiple'
           onChange={onFileChange}
+          onClick={clearValue}
         />
         {!isReadOnly && (
           <Button

@@ -41,7 +41,7 @@ import avatar from '@/assets/img/faces/marc.jpg'
 import { getAppendUrl } from '@/utils/utils'
 
 import Loading from '@/components/PageLoading/index'
-import Banner from './Banner'   
+import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 
 const styles = (theme) => ({
@@ -127,25 +127,11 @@ class PatientDashboard extends PureComponent {
     // const { visitRegistration = {} } = this.props
     // const { visitInfo = {} } = visitRegistration
 
-    // this.props.dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: {
-    //     code: 'ctservice',
-    //     filter: {
-    //       'serviceFKNavigation.IsActive': true,
-    //       combineCondition: 'or',
-    //     },
-    //   },
-    // })
-
-
     this.props.history.push(
       getAppendUrl({
         md2: 'cons',
       }),
     )
-
-    
 
     const version = Date.now()
     this.props
@@ -164,10 +150,26 @@ class PatientDashboard extends PureComponent {
           //     cid: o.id,
           //   }),
           // )
-
-          router.push(
-            `/reception/queue/patientdashboard?qid=${findGetParameter('qid')}&cid=${o.id}&v=${version}&md2=cons`,
-          )
+          this.props
+            .dispatch({
+              type: 'codetable/fetchCodes',
+              payload: {
+                code: 'ctservice',
+                filter: {
+                  'serviceFKNavigation.IsActive': true,
+                  combineCondition: 'or',
+                },
+              },
+            })
+            .then((v) => {
+              if (v) {
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${findGetParameter(
+                    'qid',
+                  )}&cid=${o.id}&v=${version}&md2=cons`,
+                )
+              }
+            })
       })
   }
 

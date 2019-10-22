@@ -16,8 +16,9 @@ export default createFormViewModel({
     service,
     state: {
       default: {
+        description:'',
         isUserMaintainable: true,
-        schemeTypeFK: 11,
+        schemeTypeFK: 15,
         copayerTypeFK: 1,
         effectiveDates: [
           moment().formatUTC(),

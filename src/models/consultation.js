@@ -80,15 +80,10 @@ export default createFormViewModel({
             },
           })
 
-          // const orderList = yield put({
-          //   type: 'addAutoOrder',
-          // })
-
           yield put({
             type: 'queryDone',
             payload: {
               data: response,
-              // autoOrderList: orderList,
             },
           })
 
@@ -136,17 +131,17 @@ export default createFormViewModel({
       *addAutoOrder ({ payload }, { call, put, select, take }) {
         let orders = []
 
-        const codetable = yield put.resolve({
-          type: 'codetable/fetchCodes',
-          payload: {
-            code: 'ctservice',
-            filter: {
-              'serviceFKNavigation.IsActive': true,
-              combineCondition: 'or',
-            },
-          },
-        })
-        yield take('codetable/fetchCodes/@@end')
+        // const codetable = yield put.resolve({
+        //   type: 'codetable/fetchCodes',
+        //   payload: {
+        //     code: 'ctservice',
+        //     filter: {
+        //       'serviceFKNavigation.IsActive': true,
+        //       combineCondition: 'or',
+        //     },
+        //   },
+        // })
+        // yield take('codetable/fetchCodes/@@end')
         let codetableState = yield select((state) => state.codetable)
 
         const {
