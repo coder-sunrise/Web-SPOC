@@ -17,6 +17,8 @@ const roleAccessRightsMapping = {
     { name: 'settingCompany.edit', rights: 'enable' },
     { name: 'printoutSetting.view', rights: 'enable' },
     { name: 'printoutSetting.edit', rights: 'enable' },
+    { name: 'purchaseOrderDetails.view', rights: 'enable' },
+    { name: 'purchaseOrderDetails.edit', rights: 'enable' },
   ],
   editor: [
     { name: 'editor', rights: 'enable' },

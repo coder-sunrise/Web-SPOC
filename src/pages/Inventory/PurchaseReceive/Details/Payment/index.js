@@ -16,6 +16,7 @@ import Grid from './Grid'
 import { isPOStatusFinalized } from '../../variables'
 import PaymentDetails from './PaymentDetails'
 import { navigateDirtyCheck } from '@/utils/utils'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -152,11 +153,16 @@ class index extends PureComponent {
     const { purchaseOrderDetails } = this.props
     // const { showPODOPaymentModal } = this.state
     const poStatus = purchaseOrderDetails
-      ? purchaseOrderDetails.purchaseOrderStatusFK
+      ? purchaseOrderDetails.purchaseOrder.purchaseOrderStatusFK
       : 1
     const isEditable = isPOStatusFinalized(poStatus)
     return (
-      <React.Fragment>
+      <AuthorizedContext.Provider
+        value={{
+          rights: poStatus !== 5 ? 'enable' : 'disable',
+          // rights: 'disable',
+        }}
+      >
         <GridContainer>
           <Header {...this.props} />
           <Grid
@@ -202,7 +208,7 @@ class index extends PureComponent {
             disabled={isEditable}
           />
         </div>
-      </React.Fragment>
+      </AuthorizedContext.Provider>
     )
   }
 }
