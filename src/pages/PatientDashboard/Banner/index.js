@@ -371,7 +371,7 @@ class Banner extends PureComponent {
                       pid: info.id,
                     })}
                   >
-                    <Tooltip title={name}>
+                    <Tooltip title={name} placement="bottom-start">
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
                     </Tooltip>
                   </Link>
