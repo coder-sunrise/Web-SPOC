@@ -29,7 +29,7 @@ const InvoiceAdjustment = ({
             onConfirm={() => {
               adjustmentList[index].isDeleted = true
               setTimeout(
-                () => handleDeleteInvoiceAdjustment(),
+                () => handleDeleteInvoiceAdjustment(adjustmentList),
                 handleCalcInvoiceSummary(),
                 500,
               )
