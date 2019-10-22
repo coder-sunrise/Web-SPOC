@@ -16,6 +16,7 @@ import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
 
 import classNames from 'classnames'
 import { connect } from 'dva'
+import { Getter, PluginContainer } from '@devexpress/dx-react-core'
 import {
   FilteringState,
   GroupingState,
@@ -57,6 +58,7 @@ import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
+import PatchedTableSelection from './plugins/PatchedTableSelection'
 import { LoadingWrapper } from '@/components/_medisys'
 
 window.$tempGridRow = {}
@@ -926,6 +928,14 @@ class CommonTableGrid extends PureComponent {
                   rowComponent={this.TableRow}
                   {...selectConfig}
                 />
+                // <PatchedTableSelection
+                //   highlightRow
+                //   // selectByRowClick={allowSelectRowByClick}
+                //   showSelectionColumn
+                //   rowComponent={this.TableRow}
+
+                //   {...selectConfig}
+                // />
               )}
 
               {header && <HeaderRow showSortingControls />}

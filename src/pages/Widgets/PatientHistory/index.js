@@ -364,8 +364,19 @@ class PatientHistory extends Component {
                       }}
                     >
                       <GridContainer>
-                        <GridItem sm={7}>
+                        <GridItem sm={10}>
                           <TextField text value={row.visitPurposeName} />
+                          {row.visitDate && (
+                            <span style={{ position: 'relative' }}>
+                              &nbsp; (
+                              <DatePicker
+                                text
+                                showTime
+                                format='DD MMM YYYY h:mm a'
+                                value={o.signOffDate}
+                              />)
+                            </span>
+                          )}
                         </GridItem>
                       </GridContainer>
                       <GridContainer>
@@ -374,16 +385,6 @@ class PatientHistory extends Component {
                             text
                             value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
                           />
-                        </GridItem>
-                        <GridItem sm={5} style={{ textAlign: 'right' }}>
-                          {row.visitDate && (
-                            <DatePicker
-                              text
-                              showTime
-                              format='DD MMM YYYY h:mm a'
-                              value={o.signOffDate}
-                            />
-                          )}
                         </GridItem>
                       </GridContainer>
                     </div>
@@ -406,24 +407,28 @@ class PatientHistory extends Component {
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
-          <GridItem sm={7}>
+          <GridItem sm={10}>
             <p>
               <span>Consultation Visit</span>
+              <span style={{ position: 'relative' }}>
+                &nbsp; (<DatePicker text value={row.visitDate} />)
+              </span>
               <div className={this.props.classes.note}>
                 {row.doctorTitle} {row.doctorName}
               </div>
             </p>
           </GridItem>
-          <GridItem sm={5} style={{ textAlign: 'right' }}>
-            <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-              <DatePicker text value={row.visitDate} />
-            </span>
-            <div className={this.props.classes.note}>&nbsp;</div>
-          </GridItem>
         </GridContainer>
       </div>
     )
   }
+
+  // <GridItem sm={5} style={{ textAlign: 'right' }}>
+  //           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+  //             ( <DatePicker text value={row.visitDate} /> )
+  //           </span>
+  //           <div className={this.props.classes.note}>&nbsp;</div>
+  //         </GridItem>
 
   // eslint-disable-next-line camelcase
   // UNSAFE_componentWillReceiveProps (nextProps) {
@@ -493,7 +498,7 @@ class PatientHistory extends Component {
               mode='multiple'
               // maxTagCount={4}
               options={[
-                { name: 'Clinical Notes', value: '1'},
+                { name: 'Clinical Notes', value: '1' },
                 { name: 'Chief Complaints', value: '2' },
                 { name: 'Plan', value: '3' },
                 { name: 'Diagnosis', value: '4' },

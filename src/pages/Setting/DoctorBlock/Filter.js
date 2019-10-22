@@ -59,7 +59,7 @@ const recurrenceTypes = [
 class Filter extends PureComponent {
   render () {
     const { classes, values } = this.props
-
+    console.log({ values })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -72,13 +72,12 @@ class Filter extends PureComponent {
                   {...args}
                   allValue={-99}
                   allValueOption={{
+                    id: -99,
                     clinicianProfile: {
                       name: 'All',
-                      id: -99,
                     },
                   }}
                   labelField='clinicianProfile.name'
-                  // valueField='clinicianProfile.id'
                   maxTagCount={values.doctorName.length > 1 ? 0 : 1}
                 />
               )}
