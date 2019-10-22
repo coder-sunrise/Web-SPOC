@@ -177,15 +177,19 @@ class FilterBar extends PureComponent {
                     lsteql_purchaseOrderDate: transactionDates
                       ? transactionDates[1]
                       : undefined,
-                    group: [
-                      {
-                        purchaseOrderNo,
-                        invoiceStatusFK,
-                        purchaseOrderStatusFK,
-                        supplierFK,
-                        combineCondition: 'or',
-                      },
-                    ],
+                    purchaseOrderNo,
+                    invoiceStatusFK,
+                    purchaseOrderStatusFK,
+                    supplierFK,
+                    // group: [
+                    //   {
+                    //     purchaseOrderNo,
+                    //     invoiceStatusFK,
+                    //     purchaseOrderStatusFK,
+                    //     supplierFK,
+                    //     combineCondition: 'or',
+                    //   },
+                    // ],
                   },
                 })
               }}
