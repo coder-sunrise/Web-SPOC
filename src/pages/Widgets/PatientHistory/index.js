@@ -162,7 +162,7 @@ class PatientHistory extends Component {
     this.widgets = [
       {
         id: '1',
-        name: 'Clinician Note',
+        name: 'Clinical Notes',
         component: Loadable({
           loader: () => import('./ClinicalNotes'),
           render: (loaded, p) => {

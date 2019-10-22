@@ -123,11 +123,7 @@ class ReferralLetter extends PureComponent {
               name='content'
               render={(args) => {
                 return (
-                  <RichEditor
-                    handlePastedText={() => false}
-                    editorRef={this.setEditorReference}
-                    {...args}
-                  />
+                  <RichEditor editorRef={this.setEditorReference} {...args} />
                 )
               }}
             />

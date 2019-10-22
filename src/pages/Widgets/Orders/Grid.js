@@ -97,6 +97,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       </span>
     )
   })
+
   return (
     <CommonTableGrid
       size='sm'
@@ -240,6 +241,14 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
                       type: 'orders/deleteRow',
                       payload: {
                         uid: row.uid,
+                      },
+                    })
+                    let commitCount = 1000 // uniqueNumber
+                    dispatch({
+                      // force current edit row components to update
+                      type: 'global/updateState',
+                      payload: {
+                        commitCount: (commitCount += 1),
                       },
                     })
                   }}

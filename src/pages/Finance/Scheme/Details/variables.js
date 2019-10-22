@@ -20,7 +20,24 @@ const tabHeader = (tabName, detailsProps) => {
   )
   const returnTabHeader = () => {
     if (detailsProps.errors && !_.isEmpty(detailsProps.errors)) {
-      return errorHeader
+      const {
+        code,
+        name,
+        schemeCategoryFK,
+        copayerFK,
+        coverageMaxCap,
+        effectiveDates,
+      } = detailsProps.errors
+      if (
+        (code || name || schemeCategoryFK || copayerFK || effectiveDates) &&
+        tabName === 'Details'
+      ) {
+        return errorHeader
+      }
+
+      if (coverageMaxCap && tabName === 'Stock') {
+        return errorHeader
+      }
     }
     return <span>{tabName}</span>
   }
@@ -36,7 +53,7 @@ export const SchemeDetailOption = (detailsProps) => [
   },
   {
     id: 1,
-    name: 'Setting',
+    name: tabHeader('Setting', detailsProps),
     content: addContent(2, detailsProps),
   },
 ]

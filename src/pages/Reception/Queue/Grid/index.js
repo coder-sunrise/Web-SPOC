@@ -324,16 +324,16 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
-          dispatch({
-            type: 'codetable/fetchCodes',
-            payload: {
-              code: 'ctservice',
-              filter: {
-                'serviceFKNavigation.IsActive': true,
-                combineCondition: 'or',
-              },
-            },
-          })
+          // dispatch({
+          //   type: 'codetable/fetchCodes',
+          //   payload: {
+          //     code: 'ctservice',
+          //     filter: {
+          //       'serviceFKNavigation.IsActive': true,
+          //       combineCondition: 'or',
+          //     },
+          //   },
+          // })
 
           dispatch({
             type: `consultation/start`,
@@ -370,9 +370,14 @@ const Grid = ({
                 )
             })
           } else {
-            router.push(
-              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-            )
+            dispatch({
+              type: `consultation/addAutoOrder`,
+            }).then((o) => {
+              if (o)
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                )
+            })
           }
         }
 
