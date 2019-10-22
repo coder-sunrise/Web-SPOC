@@ -217,6 +217,25 @@ export default createFormViewModel({
         }
         return response
       },
+      *overwrite ({ payload }, { call, put }) {
+        const response = yield call(service.overwrite, payload.id)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+        }
+        return response
+      },
       *sign ({ payload }, { call, put }) {
         const response = yield call(service.sign, payload)
         if (response) {
@@ -295,8 +314,8 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select }) {
-         // console.log('queryDone', payload)
-        const { data , autoOrderList, page} = payload
+        // console.log('queryDone', payload)
+        const { data, autoOrderList, page } = payload
         if (!data) return null
         let cdRows = []
         consultationDocumentTypes.forEach((p) => {

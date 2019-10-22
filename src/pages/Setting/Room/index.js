@@ -41,10 +41,11 @@ class Room extends PureComponent {
     const cfg = {
       toggleModal: this.toggleModal,
     }
+
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+        <Grid {...this.props} />
         <CommonModal
           open={settingRoom.showModal}
           observe='RoomDetail'
@@ -54,7 +55,7 @@ class Room extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...cfg} {...this.props} />
+          <Detail {...this.props} />
         </CommonModal>
       </CardContainer>
     )
