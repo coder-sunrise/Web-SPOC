@@ -363,19 +363,19 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               h3={
-                <Link
-                  to={getAppendUrl({
-                    md: 'pt',
-                    cmt: 1,
-                    pid: info.id,
-                  })}
-                >
-                  <div>
-                    <Tooltip title={name}>
+                <div>
+                  <Link
+                    to={getAppendUrl({
+                      md: 'pt',
+                      cmt: 1,
+                      pid: info.id,
+                    })}
+                  >
+                    <Tooltip title={name} placement="bottom-start">
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
                     </Tooltip>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               }
               body={
                 <div>

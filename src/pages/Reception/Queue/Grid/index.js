@@ -370,14 +370,17 @@ const Grid = ({
                 )
             })
           } else {
-            dispatch({
-              type: `consultation/addAutoOrder`,
-            }).then((o) => {
-              if (o)
-                router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-                )
-            })
+            // dispatch({
+            //   type: `consultation/addAutoOrder`,
+            // }).then((o) => {
+            //   if (o)
+            //     router.push(
+            //       `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+            //     )
+            // })
+            router.push(
+              `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+            )
           }
         }
 
