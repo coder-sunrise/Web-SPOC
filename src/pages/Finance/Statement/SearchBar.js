@@ -1,7 +1,15 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
-import { withStyles } from '@material-ui/core'
+import {
+  withStyles,
+  Grow,
+  Paper,
+  Popper,
+  ClickAwayListener,
+  MenuItem,
+  MenuList,
+} from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import moment from 'moment'
 import {
@@ -13,7 +21,9 @@ import {
   DateRangePicker,
   CodeSelect,
   ProgressButton,
+  CommonModal,
 } from '@/components'
+import { ReportViewer } from '@/components/_medisys'
 
 const styles = () => ({
   container: {
@@ -48,16 +58,25 @@ const styles = () => ({
 })
 class SearchBar extends PureComponent {
   state = {
-    allStatementDate: false,
-    allStatementDueDate: false,
-    allCompanies: false,
-    isAllDateChecked: false,
-    isAllDueDateChecked: false,
+    showReport: false,
+    showReportSelection: false,
+    reportGroupBy: '',
   }
 
   handleOnChange = (name, checked) => (event) => {
     this.setState({ [name]: !checked })
     // if AllDate is checked, set datetime to max range
+  }
+
+  toggleReport = (v) => {
+    this.setState({ reportGroupBy: v })
+    this.setState((preState) => ({ showReport: !preState.showReport }))
+  }
+
+  toggleReportSelection = () => {
+    this.setState((preState) => ({
+      showReportSelection: !preState.showReportSelection,
+    }))
   }
 
   render () {
@@ -210,23 +229,68 @@ class SearchBar extends PureComponent {
             </Button>
           </GridItem>
           <GridItem xs sm={6} md={6} lg={4} container justify='flex-end'>
-            <Button color='primary'>Print Statement</Button>
-            {/* <Button color='primary' onClick={handleAddNew}>
-                <AddBox />
-                <FormattedMessage id='form.addNew' />
-              </Button> */}
-            {/* <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  history.push('/finance/statement/details')
-                }}
-              >
-                {/* <Add /> */}
-            {/* Add New
-              // </Button> */}
+            <Button
+              color='primary'
+              onClick={this.toggleReportSelection}
+              buttonRef={(node) => {
+                this.anchorElAccount = node
+              }}
+            >
+              Print Statement
+            </Button>
           </GridItem>
         </GridItem>
+        <Popper
+          open={this.state.showReportSelection}
+          anchorEl={this.anchorElAccount}
+          transition
+          disablePortal
+          placement='bottom-end'
+          style={{
+            zIndex: 2,
+            width: 175,
+            left: -10,
+          }}
+        >
+          {({ TransitionProps, placement }) => (
+            <Grow
+              {...TransitionProps}
+              id='menu-list'
+              style={{ transformOrigin: '0 0 -30' }}
+            >
+              <Paper className={classes.dropdown}>
+                <ClickAwayListener onClickAway={this.toggleReportSelection}>
+                  <MenuList role='menu'>
+                    <MenuItem onClick={() => this.toggleReport('Patient')}>
+                      Patient
+                    </MenuItem>
+                    <MenuItem onClick={() => this.toggleReport('Doctor')}>
+                      Doctor
+                    </MenuItem>
+                    <MenuItem onClick={() => this.toggleReport('Item')}>
+                      Item
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
+
+        <CommonModal
+          open={this.state.showReport}
+          onClose={this.toggleReport}
+          title='Statement'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={25}
+            reportParameters={{
+              StatementId: values ? values.id : '',
+              GroupBy: this.state.reportGroupBy,
+            }}
+          />
+        </CommonModal>
       </GridContainer>
     )
   }

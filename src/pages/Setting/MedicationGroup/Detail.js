@@ -31,10 +31,6 @@ const styles = (theme) => ({})
         'The number should between -2,147,483,648 and 2,147,483,647',
       )
       .nullable(),
-    translatedDisplayValue: Yup.number().when('translationLanguage', {
-      is: (v) => v !== undefined,
-      then: Yup.number().required(),
-    }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -124,30 +120,6 @@ class Detail extends PureComponent {
                       rowsMax={4}
                       {...args}
                     />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='translationLanguage'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label='Translation Language'
-                      code='ctLanguage'
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem md={8}>
-              <FastField
-                name='translatedDisplayValue'
-                render={(args) => {
-                  return (
-                    <TextField label='Translated Display Value' {...args} />
                   )
                 }}
               />
