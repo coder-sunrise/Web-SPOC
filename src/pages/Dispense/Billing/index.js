@@ -113,8 +113,7 @@ const bannerStyle = {
       type: 'billing/upsert',
       payload,
     }).then((response) => {
-      const { status } = response
-      if (status === '200') {
+      if (response) {
         resetForm()
         dispatch({
           type: 'billing/closeModal',
