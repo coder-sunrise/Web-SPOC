@@ -104,7 +104,7 @@ const columnExtensions = [
     columnName: 'gender/age',
     render: (row) => {
       const { age = 0, gender = 'U' } = row
-      const ageLabel = age < 0 ? 0 : age
+      const ageLabel = age < 0 ? 0 : age + 1
       return `${gender}/${ageLabel}`
     },
     sortingEnabled: false,
