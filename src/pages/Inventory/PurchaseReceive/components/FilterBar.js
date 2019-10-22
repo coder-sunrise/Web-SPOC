@@ -27,7 +27,7 @@ class FilterBar extends PureComponent {
     const { setFieldValue } = this.props
     const { target } = e
     if (target.value) {
-      setFieldValue('transactionDates', [])
+      // setFieldValue('transactionDates', [])
     } else {
       setFieldValue('transactionDates', [
         moment().format('YYYY-MM-01'),

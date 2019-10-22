@@ -741,7 +741,7 @@ const commonDataReaderTransform = (data, fieldName) => {
             !data[`_${field}In`]
           ) {
             data[`_${field}In`] = true
-            data[field] = moment(v)
+            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
               .add(8, 'hours')
               .format('YYYY-MM-DDTHH:mm:ss')
           }
@@ -779,7 +779,7 @@ const commonDataWriterTransform = (data) => {
           ) {
             // console.log(v, moment(v).add(-8, 'hours'))
             data[`_${field}Out`] = true
-            data[field] = moment(v)
+            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
               .add(-8, 'hours')
               .format('YYYY-MM-DDTHH:mm:ss')
           }
