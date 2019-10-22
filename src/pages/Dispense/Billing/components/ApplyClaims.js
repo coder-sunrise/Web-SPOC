@@ -341,6 +341,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const schemeConfig = flattenSchemes.find((item) => item.id === value)
     const {
       balance = null,
+      copayerFK,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
       patientMinCoPaymentAmount = 0,
@@ -383,7 +384,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         let claimAmount = item.totalAfterGst
         let proceedForChecking = true
 
-        if (item._claimedAmount === item.totalAfterGst || balance === null) {
+        if (
+          item._claimedAmount === item.totalAfterGst ||
+          (copayerFK === 1 && balance === null)
+        ) {
           proceedForChecking = false
           claimAmount = 0
         } else if (item._claimedAmount > 0) {
@@ -441,7 +445,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       _isDeleted: false,
     }
     const invalidMessages = validateClaimAmount(updatedRow, values.finalPayable)
-    console.log({ invalidMessages })
+
     if (invalidMessages.length <= 0) _updateTempInvoicePayer(index, updatedRow)
     else {
       // const suffix = limitType === 'patient' ? '' : 'maximum cap.'
@@ -598,19 +602,34 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                     value={invoicePayer._balance}
                   />
                 </GridItem> */}
-                <GridItem md={2}>
-                  <span>Balance: </span>
-                  {invoicePayer._balance === null ? (
-                    <span className={classes.dangerText}>
-                      Insufficient balance
-                    </span>
-                  ) : (
-                    <span className={classes.currencyText}>
-                      ${invoicePayer._balance}
-                    </span>
-                  )}
-                </GridItem>
-                <GridItem md={6} style={{ marginTop: 8, marginBottom: 8 }}>
+                {invoicePayer.schemeConfig &&
+                invoicePayer.schemeConfig.copayerFK === 1 && (
+                  <GridItem md={2}>
+                    <p>
+                      Balance:
+                      {invoicePayer._balance === null ? (
+                        <span className={classes.dangerText}>
+                          Insufficient balance
+                        </span>
+                      ) : (
+                        <span className={classes.currencyText}>
+                          ${invoicePayer._balance}
+                        </span>
+                      )}
+                    </p>
+                  </GridItem>
+                )}
+                <GridItem
+                  md={
+                    invoicePayer.schemeConfig &&
+                    invoicePayer.schemeConfig.copayerFK === 1 ? (
+                      6
+                    ) : (
+                      8
+                    )
+                  }
+                  style={{ marginTop: 8, marginBottom: 8 }}
+                >
                   {invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && (
                     <NumberInput
                       currency
@@ -620,8 +639,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         <MaxCapInfo
                           claimableSchemes={invoicePayer.claimableSchemes}
                           copaymentSchemeFK={invoicePayer.copaymentSchemeFK}
-                          coPaymentByCategory={invoicePayer.coPaymentByCategory}
-                          coPaymentByItem={invoicePayer.coPaymentByItem}
                         />
                       }
                       value={invoicePayer._coverageMaxCap}

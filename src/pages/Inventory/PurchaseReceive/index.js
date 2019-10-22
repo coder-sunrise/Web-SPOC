@@ -210,7 +210,7 @@ class PurchaseReceive extends Component {
           <CommonModal
             open={showDuplicatePO}
             title='Duplicate Purchase Order'
-            maxWidth='xs'
+            maxWidth='sm'
             onConfirm={this.closeDuplicatePOModal}
             onClose={this.closeDuplicatePOModal}
           >

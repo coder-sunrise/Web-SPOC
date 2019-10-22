@@ -96,14 +96,27 @@ class ApprovedCHAS extends React.Component {
     const rows = []
     selectedRows.map((selected) => {
       const row = list.find((x) => x.id === selected)
+
       return rows.push(row)
     })
+
+    let outstandingPayment = []
+
+    outstandingPayment = rows
+      .filter(
+        (x) =>
+          x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
+      )
+      .map((x) => {
+        x.amountReceived = x.approvedAmount - x.collectedPayment
+        return x
+      })
 
     dispatch({
       type: 'claimSubmissionApproved/updateState',
       payload: {
         entity: {
-          rows,
+          rows: outstandingPayment,
           paymentDate: moment(),
         },
       },
