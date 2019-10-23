@@ -59,7 +59,7 @@ const bannerStyle = {
         billing.entity.invoice.totalAftGst - finalClaim,
       )
 
-      return { ...billing.entity, payments: [], finalClaim, finalPayable }
+      return { ...billing.entity, finalClaim, finalPayable }
     }
     return billing.default
   },
@@ -97,14 +97,14 @@ const bannerStyle = {
                 invoiceItemTypeFk,
                 itemDescription,
                 coverage,
-                totalAfterGst,
+                payableBalance,
                 id,
                 ...restItem
               } = item
               const _invoicePayerItem = {
                 ...restItem,
                 invoiceItemFK: id,
-                payableBalance: totalAfterGst,
+                payableBalance,
                 itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFk],
                 itemName: itemDescription,
               }
@@ -114,7 +114,7 @@ const bannerStyle = {
         return _payer
       }),
     }
-    // console.log({ payload })
+    console.log({ payload })
     dispatch({
       type: 'billing/upsert',
       payload,

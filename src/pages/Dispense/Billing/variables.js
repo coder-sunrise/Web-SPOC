@@ -4,38 +4,38 @@ import { SizeContainer, Tooltip } from '@/components'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 export const SchemeInvoicePayerColumn = [
-  { name: 'invoiceItemTypeFk', title: 'Category' },
-  { name: 'itemCode', title: 'Name' },
+  { name: 'invoiceItemTypeFK', title: 'Category' },
+  { name: 'itemName', title: 'Name' },
   { name: 'coverage', title: 'Coverage' },
-  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
+  { name: 'payableBalance', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
   { name: 'error', title: ' ' },
 ]
 
 export const CompanyInvoicePayerColumn = [
-  { name: 'invoiceItemTypeFk', title: 'Category' },
-  { name: 'itemCode', title: 'Name' },
-  { name: 'totalAfterGst', title: 'Payable Amount ($)' },
+  { name: 'invoiceItemTypeFK', title: 'Category' },
+  { name: 'itemName', title: 'Name' },
+  { name: 'payableBalance', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
   { name: 'error', title: ' ' },
 ]
 
 export const ApplyClaimsColumnExtension = [
   {
-    columnName: 'invoiceItemTypeFk',
+    columnName: 'invoiceItemTypeFK',
     // type: 'codeSelect',
     // code: 'ltinvoiceitemtype',
-    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFk],
+    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFK],
     disabled: true,
   },
-  { columnName: 'itemCode', disabled: true },
+  { columnName: 'itemName', disabled: true },
   {
     columnName: 'coverage',
     align: 'right',
     disabled: true,
   },
   {
-    columnName: 'totalAfterGst',
+    columnName: 'payableBalance',
     type: 'currency',
     currency: true,
     disabled: true,
@@ -65,8 +65,8 @@ export const ApplyClaimsColumnExtension = [
 ]
 
 export const CoPayerColumns = [
-  { name: 'itemCode', title: 'Name' },
-  { name: 'totalAfterGst', title: 'Payable Amount' },
+  { name: 'itemName', title: 'Name' },
+  { name: 'payableBalance', title: 'Payable Amount' },
   {
     name: 'claimAmount',
     title: 'Claim Amount',
@@ -75,11 +75,11 @@ export const CoPayerColumns = [
 
 export const CoPayerColExtensions = [
   {
-    columnName: 'itemCode',
+    columnName: 'itemName',
     disabled: true,
   },
   {
-    columnName: 'totalAfterGst',
+    columnName: 'payableBalance',
     type: 'number',
     currency: true,
     disabled: true,
@@ -93,21 +93,21 @@ export const CoPayerColExtensions = [
 
 export const validationSchema = Yup.object().shape({
   coverage: Yup.string(),
-  totalAfterGst: Yup.number(),
+  payableBalance: Yup.number(),
   claimAmount: Yup.number().when(
     [
       'coverage',
-      'totalAfterGst',
+      'payableBalance',
     ],
-    (coverage, totalAfterGst, schema) => {
+    (coverage, payableBalance, schema) => {
       const isPercentage = coverage.indexOf('%') > 0
       let _absoluteValue = 0
       if (isPercentage) {
         const percentage = parseFloat(coverage.slice(0, -1))
-        _absoluteValue = totalAfterGst * percentage / 100
+        _absoluteValue = payableBalance * percentage / 100
       } else _absoluteValue = coverage.slice(1)
       const message =
-        _absoluteValue === totalAfterGst
+        _absoluteValue === payableBalance
           ? 'Claim Amount cannot exceed Total Payable'
           : `Claim Amount cannot exceed Coverage amount ($${_absoluteValue})`
       return schema.min(0).max(_absoluteValue, message)
