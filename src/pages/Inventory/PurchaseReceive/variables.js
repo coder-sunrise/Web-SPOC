@@ -88,6 +88,16 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
+export const isInvoiceReadOnly = (status) => {
+  const allowedStatus = [
+    // 'Draft',
+    // 'Cancelled',
+    1,
+    4,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
 export const isPOStatusFinalized = (status) => {
   const allowedStatus = [
     // 'Finalized',

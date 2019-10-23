@@ -22,6 +22,7 @@ import {
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
+  isInvoiceReadOnly,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 
@@ -413,16 +414,14 @@ class index extends Component {
   }
 
   render () {
-    // console.log('PORender', this.props)
-    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    const { purchaseOrderDetails, values, setFieldValue } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
-    // console.log(this.props)
     return (
       <div>
-        <POForm isReadOnly={!isPOStatusDraft(poStatus)} {...this.props} />
+        <POForm isReadOnly={isInvoiceReadOnly(poStatus)} setFieldValue={setFieldValue} />
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
