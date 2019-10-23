@@ -31,7 +31,7 @@ class Index extends Component {
     return (
       // <AuthorizedContext.Provider
       //   value={{
-      //     rights: poStatus !== 5 ? 'enable' : 'disable',
+      //     rights: poStatus !== 6 ? 'enable' : 'disable',
       //     // rights: 'disable',
       //   }}
       // >
