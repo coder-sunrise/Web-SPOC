@@ -110,8 +110,8 @@ class AntdNumberInput extends React.PureComponent {
     disabled: false,
     size: 'default',
     allowEmpty: true,
-    max: 999999999999,
-    min: -999999999999,
+    max: 999999.9999,
+    min: -999999.9999,
   }
 
   constructor (props) {

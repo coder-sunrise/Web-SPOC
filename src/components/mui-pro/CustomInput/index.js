@@ -26,6 +26,10 @@ import { control } from '@/components/Decorator'
 class TextField extends React.PureComponent {
   validationCount = 0
 
+  static defaultProps = {
+    autocomplete: 'off',
+  }
+
   constructor (props) {
     super(props)
     // this.myRef = React.createRef()
@@ -246,6 +250,10 @@ TextField.propTypes = {
     PropTypes.object,
     PropTypes.bool,
     PropTypes.string,
+  ]),
+  autocomplete: PropTypes.oneOf([
+    'off',
+    'on',
   ]),
   success: PropTypes.bool,
   white: PropTypes.bool,

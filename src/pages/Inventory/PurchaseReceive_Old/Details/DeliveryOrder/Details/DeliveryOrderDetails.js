@@ -39,8 +39,8 @@ const receivingDetailsSchema = Yup.object().shape({
   //quantityReceived: Yup.number().min(0).required(),
   //totalBonusReceived: Yup.number().min(0).required(),
 
-  currentReceivingQty: Yup.number().min(0).required(),
-  currentReceivingBonusQty: Yup.number().min(0).required(),
+  currentReceivingQty: Yup.number().min(1).required(),
+  currentReceivingBonusQty: Yup.number().min(1).required(),
 })
 
 @withFormikExtend({
@@ -411,7 +411,7 @@ export class DeliveryOrderDetails extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-
+    console.log(rows)
     return (
       <React.Fragment>
         <GridContainer>

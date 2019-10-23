@@ -47,33 +47,33 @@ export default createListViewModel({
         vaccinationGivenDate: moment(),
         quantity: 1,
       },
-      default: {
-        corPrescriptionItemPrecaution: [
-          {
-            action: '1',
-            count: 1,
-            unit: '1',
-            frequency: '1',
-            day: 1,
-            // precaution: '1',
-            operator: '1',
-          },
-        ],
-        descriptions: [
-          {
-            action: '1',
-            count: 1,
-            unit: '1',
-            frequency: '1',
-            day: 1,
-            precaution: '1',
-            operator: '1',
-          },
-        ],
-        quantity: 1,
-        total: 20,
-        totalAfterAdj: 18,
-      },
+      // default: {
+      //   corPrescriptionItemPrecaution: [
+      //     {
+      //       action: '1',
+      //       count: 1,
+      //       unit: '1',
+      //       frequency: '1',
+      //       day: 1,
+      //       // precaution: '1',
+      //       operator: '1',
+      //     },
+      //   ],
+      //   descriptions: [
+      //     {
+      //       action: '1',
+      //       count: 1,
+      //       unit: '1',
+      //       frequency: '1',
+      //       day: 1,
+      //       precaution: '1',
+      //       operator: '1',
+      //     },
+      //   ],
+      //   quantity: 1,
+      //   total: 20,
+      //   totalAfterAdj: 18,
+      // },
     },
     subscriptions: ({ dispatch, history }) => {
       // history.listen(async (loct, method) => {
@@ -154,13 +154,13 @@ export default createListViewModel({
         const tempRows = [
           ...rows,
         ]
-
-        tempRows.map((a, index) => {
-          if (a.uid === payload.uid) {
-            tempRows.splice(index, 1)
-          }
-          return a
-        })
+        if (payload)
+          tempRows.map((a, index) => {
+            if (a.uid === payload.uid) {
+              tempRows.splice(index, 1)
+            }
+            return a
+          })
 
         const amount = calculateAmount(tempRows, finalAdjustments)
 

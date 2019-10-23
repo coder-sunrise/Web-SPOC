@@ -75,7 +75,7 @@ class SchemesGrid extends PureComponent {
               (o) =>
                 !o.isDeleted &&
                 o.schemeTypeFK === val &&
-                st.code !== 'Corporate' &&
+                st.code !== 'CORPORATE' &&
                 o.id !== row.id,
             )
             if (rs.length >= 1) {
@@ -158,7 +158,7 @@ class SchemesGrid extends PureComponent {
               (o) =>
                 !o.isDeleted &&
                 o.coPaymentSchemeFK === val &&
-                st.code === 'Corporate' &&
+                st.code === 'CORPORATE' &&
                 o.id !== row.id,
             )
             if (rs.length >= 1) {
