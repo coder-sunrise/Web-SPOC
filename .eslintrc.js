@@ -1,6 +1,10 @@
 module.exports = {
   parser: 'babel-eslint',
-  extends: ['airbnb', 'prettier', 'plugin:compat/recommended'],
+  extends: [
+    'airbnb',
+    'prettier',
+    'plugin:compat/recommended',
+  ],
   env: {
     browser: true,
     node: true,
@@ -19,7 +23,9 @@ module.exports = {
     'react/jsx-filename-extension': [
       1,
       {
-        extensions: ['.js'],
+        extensions: [
+          '.js',
+        ],
       },
     ],
     'react/jsx-wrap-multilines': 0,
@@ -31,14 +37,21 @@ module.exports = {
     'import/no-unresolved': [
       2,
       {
-        ignore: ['^@/', '^umi/'],
+        ignore: [
+          '^@/',
+          '^umi/',
+        ],
       },
     ],
     'import/no-extraneous-dependencies': [
       2,
       {
         optionalDependencies: true,
-        devDependencies: ['**/tests/**.js', '/mock/**.js', '**/**.test.js'],
+        devDependencies: [
+          '**/tests/**.js',
+          '/mock/**.js',
+          '**/**.test.js',
+        ],
       },
     ],
     'jsx-a11y/no-noninteractive-element-interactions': 0,
@@ -47,16 +60,25 @@ module.exports = {
     'jsx-a11y/anchor-is-valid': 0,
     'linebreak-style': 0,
 
-    semi: [2, 'never'],
+    semi: [
+      2,
+      'never',
+    ],
     'no-console': 0,
-    'comma-dangle': [2, 'always-multiline'],
+    'comma-dangle': [
+      2,
+      'always-multiline',
+    ],
     'max-len': 0,
     'no-use-before-define': 2,
     'react/jsx-first-prop-new-line': 0,
     'react/jsx-filename-extension': 0,
     'react/react-in-jsx-scope': 0,
     'react/prefer-stateless-function': 0,
-    'space-before-function-paren': [2, 'always'],
+    'space-before-function-paren': [
+      2,
+      'always',
+    ],
     'no-unused-expressions': [
       0,
       {
@@ -71,7 +93,10 @@ module.exports = {
       },
     ],
     'no-bitwise': 0,
-    'arrow-body-style': [0, 'never'],
+    'arrow-body-style': [
+      0,
+      'never',
+    ],
     'func-names': 0,
     'prefer-const': 0,
     'no-extend-native': 0,
@@ -80,7 +105,10 @@ module.exports = {
     'no-eval': 0,
     'no-continue': 0,
     'react/jsx-no-bind': 0,
-    'no-unused-vars': [1, { ignoreRestSiblings: true }],
+    'no-unused-vars': [
+      1,
+      { ignoreRestSiblings: true },
+    ],
     'no-underscore-dangle': 0,
     'global-require': 0,
     'import/no-unresolved': 0,
@@ -99,6 +127,10 @@ module.exports = {
     'class-methods-use-this': 0,
   },
   settings: {
-    polyfills: ['fetch', 'promises', 'url'],
+    polyfills: [
+      'fetch',
+      'promises',
+      'url',
+    ],
   },
 }
