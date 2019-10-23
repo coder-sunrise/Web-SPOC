@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-// import * as service from '../services'
+import * as service from '@/pages/Inventory/InventoryAdjustment/services'
+
 import {
   getUniqueId,
   maxReducer,
@@ -110,6 +111,12 @@ export default createListViewModel({
           type: 'calculateAmount',
         })
       },
+
+      *getStockDetails ({ payload }, { call, put }) {
+        const result = yield call(service.queryStockDetails, payload)
+        return result
+        // yield put({ type: 'saveStockDetails', payload: result })
+      },
     },
 
     reducers: {
@@ -144,8 +151,9 @@ export default createListViewModel({
 
       deleteRow (state, { payload }) {
         const { finalAdjustments, rows } = state
-        const tempRows = [...rows]
-
+        const tempRows = [
+          ...rows,
+        ]
 
         tempRows.map((a, index) => {
           if (a.uid === payload.uid) {
@@ -163,7 +171,6 @@ export default createListViewModel({
             if (!payload || o.uid === payload.uid) o.isDeleted = true
             return o
           }),
-          
         }
       },
 
