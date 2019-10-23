@@ -802,6 +802,7 @@ const tenantCodes = [
   'documenttemplate',
   'ctMedicationFrequency',
   'ltinvoiceitemtype',
+  'ctMedicationDosage',
   'coPaymentScheme',
 ]
 
@@ -997,7 +998,7 @@ export const checkIsCodetableAPI = (url) => {
     const isTenantCodes =
       paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
-
+    console.log({ isTenantCodes, isCodetable })
     return isTenantCodes || isCodetable
   } catch (error) {
     console.log({ error })

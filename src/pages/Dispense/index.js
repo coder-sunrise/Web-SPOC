@@ -47,8 +47,8 @@ import { queryDrugLabelDetails } from '@/services/Dispense'
   }),
 )
 class Dispense extends PureComponent {
-  constructor(props){
-    super(props);
+  constructor (props) {
+    super(props)
     this.timer = null
     this.iswsConnect = false
     this.wsConnection = null
@@ -57,12 +57,12 @@ class Dispense extends PureComponent {
     this.setHandleClickPrintDrugLabel()
   }
 
-  componentDidMount() { 
+  componentDidMount () {
     this.setTimerOn()
   }
 
   componentWillUnmount () {
-    this.timer && clearInterval(this.timer); 
+    this.timer && clearInterval(this.timer)
     this.wsConnection.close()
     this.props.dispatch({
       type: 'dispense/updateState',
@@ -97,68 +97,62 @@ class Dispense extends PureComponent {
     )
   }
 
-  setTimerOn()
-  {
-    this.timer = setInterval(() => { 
+  setTimerOn () {
+    this.timer = setInterval(() => {
       this.connectWebSocket()
-    },
-    1000
-    );
+    }, 1000)
   }
 
-  connectWebSocket()
-  {
-    if(this.iswsConnect === false)
-    {
-      let settings  =  JSON.parse(sessionStorage.getItem('clinicSettings'))
-      this.wsConnection = new window.WebSocket(settings.printToolSocketURL)
-      this.wsConnection.onopen =() =>{
-        this.iswsConnect = true
-      }
-
-      this.wsConnection.onclose =() =>{
-        this.iswsConnect = false
-      }
-    }
-  }
-
-  setHandleClickPrintDrugLabel()
-  {
-    this.handleClickPrintDrugLabel = async(row) =>{
+  setHandleClickPrintDrugLabel () {
+    this.handleClickPrintDrugLabel = async (row) => {
       const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
-      const{data} = drugLabelDetails1
-      if(data)
-      {
-        const DrugLabelDetails = [{
-          PatientName: data.name
-          ,PatientReferenceNo: data.patientReferenceNo
-          ,PatientAccountNo: data.patientAccountNo
-          ,ClinicName: data.clinicName
-          ,ClinicAddress: data.clinicAddress
-          ,ClinicOfficeNumber: data.officeNo
-          ,DrugName: data.name
-          ,ConsumptionMethod: data.instruction
-          ,Precaution: data.precaution
-          ,IssuedDate:data.issuedDate
-          ,ExpiryDate: row.expiryDate
-          ,UOM: data.dispenseUOM
-          ,Quantity: data.dispensedQuanity
-          ,BatchNo: row.batchNo
-        }]
-  
-        const result = await postPDF(24, {DrugLabelDetails})
+      const { data } = drugLabelDetails1
+      if (data) {
+        const DrugLabelDetails = [
+          {
+            PatientName: data.name,
+            PatientReferenceNo: data.patientReferenceNo,
+            PatientAccountNo: data.patientAccountNo,
+            ClinicName: data.clinicName,
+            ClinicAddress: data.clinicAddress,
+            ClinicOfficeNumber: data.officeNo,
+            DrugName: data.name,
+            ConsumptionMethod: data.instruction,
+            Precaution: data.precaution,
+            IssuedDate: data.issuedDate,
+            ExpiryDate: row.expiryDate,
+            UOM: data.dispenseUOM,
+            Quantity: data.dispensedQuanity,
+            BatchNo: row.batchNo,
+          },
+        ]
+
+        const result = await postPDF(24, { DrugLabelDetails })
         if (result) {
           const base64Result = arrayBufferToBase64(result)
-          if(this.iswsConnect === true)
-          {
+          if (this.iswsConnect === true) {
             this.wsConnection.send('["' + base64Result + '"]')
-          }
-          else
-          {
+          } else {
             notification.error({
               message: `The printing client application didn\'t running up, please start it.`,
             })
           }
+        }
+      }
+    }
+  }
+
+  connectWebSocket () {
+    if (this.iswsConnect === false) {
+      let settings = JSON.parse(sessionStorage.getItem('clinicSettings'))
+      if (settings.printToolSocketURL) {
+        this.wsConnection = new window.WebSocket(settings.printToolSocketURL)
+        this.wsConnection.onopen = () => {
+          this.iswsConnect = true
+        }
+
+        this.wsConnection.onclose = () => {
+          this.iswsConnect = false
         }
       }
     }
@@ -176,7 +170,10 @@ class Dispense extends PureComponent {
         />
         <SizeContainer size='sm'>
           {!editingOrder ? (
-            <Main {...this.props} handleClickPrintDrugLabel = {this.handleClickPrintDrugLabel} />
+            <Main
+              {...this.props}
+              handleClickPrintDrugLabel={this.handleClickPrintDrugLabel}
+            />
           ) : (
             <EditOrder {...this.props} />
           )}

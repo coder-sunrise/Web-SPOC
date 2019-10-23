@@ -54,8 +54,8 @@ const tagList = [
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     templateContent: Yup.string()
-      .required()
-      .max(2000, 'Message should not exceed 2000 characters'),
+      .required(),
+     // .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -153,9 +153,9 @@ class Detail extends PureComponent {
                       label='Template Message'
                       tagList={tagList}
                       {...args}
-                      onBlur={(html, text) => {
-                        this.props.setFieldValue('templateContent', text)
-                      }}
+                      // onBlur={(html, text) => {
+                      //   this.props.setFieldValue('templateContent', text)
+                      // }}
                     />
                   )
                 }}

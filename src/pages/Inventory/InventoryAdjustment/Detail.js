@@ -22,11 +22,11 @@ const styles = (theme) => ({})
 let commitCount = 1000 // uniqueNumber
 
 @withFormikExtend({
-  mapPropsToValues: ({ inventoryAdjustment, runningNo }) => {
+  mapPropsToValues: ({ inventoryAdjustment }) => {
     const value = inventoryAdjustment.entity || inventoryAdjustment.default
     return {
       ...value,
-      adjustmentTransactionNo: value.adjustmentTransactionNo || runningNo,
+      // adjustmentTransactionNo: value.adjustmentTransactionNo || runningNo,
     }
   },
   validationSchema: Yup.object().shape({
@@ -41,7 +41,7 @@ let commitCount = 1000 // uniqueNumber
       ...restValue
     } = values
 
-    const { dispatch, onConfirm, getRunningNo } = props
+    const { dispatch, onConfirm } = props
 
     const list = inventoryAdjustmentItems || stockList
     const newInventoryAdjustmentItem = list.map((o) => {
@@ -119,7 +119,6 @@ let commitCount = 1000 // uniqueNumber
         dispatch({
           type: 'inventoryAdjustment/query',
         })
-        getRunningNo()
       }
     })
   },
@@ -675,10 +674,50 @@ class Detail extends PureComponent {
       this.filterStockOption(this.state.selectedItem)
     }
 
-    // let filteredStockOptions = []
-    // rows.forEach((o) => {
-    //   const getState = this.type(o.inventoryTypeFK)
-    //   console.log('rowlength', o.batchNo)
+    let tempfilterStockConsumable = [
+      ...this.state.stockConsumable,
+    ]
+    let tempfilterStockMedication = [
+      ...this.state.stockMedication,
+    ]
+    let tempfilterStockVaccination = [
+      ...this.state.stockVaccination,
+    ]
+
+    rows.forEach((o) => {
+      const type = o.inventoryTypeFK
+      console.log({ type, o })
+      if (o.batchNo) {
+        switch (type) {
+          case 1: {
+            tempfilterStockMedication = tempfilterStockMedication.filter(
+              (j) => j.id !== o.batchNo,
+            )
+            break
+          }
+          case 2: {
+            tempfilterStockVaccination = tempfilterStockVaccination.filter(
+              (j) => j.id !== o.batchNo,
+            )
+            break
+          }
+          case 3: {
+            tempfilterStockConsumable = tempfilterStockConsumable.filter(
+              (j) => j.id !== o.batchNo,
+            )
+            break
+          }
+          default:
+        }
+      }
+    })
+    this.setState(() => {
+      return {
+        filterStockMedication: tempfilterStockMedication,
+        filterStockConsumable: tempfilterStockConsumable,
+        filterStockVaccination: tempfilterStockVaccination,
+      }
+    })
 
     //   if (o.batchNo) {
     //     const tempStockOptions = [
@@ -689,7 +728,7 @@ class Detail extends PureComponent {
     //     )
     //     console.log('filteredStockOptions', filteredStockOptions)
 
-    //     this.setState({ [getState.filteredStateName]: filteredStockOptions })
+    //
     //   }
 
     //   return rows
@@ -761,12 +800,10 @@ class Detail extends PureComponent {
   }
 
   changeEditingRowIds = (editingRowIds) => {
-    console.log('editingRowIds', editingRowIds)
     this.setState({ editingRowIds })
   }
 
   render () {
-    console.log('state', this.state)
     const { props } = this
     const { theme, values, handleSubmit, getRunningNo, footer } = props
     const cfg = {}

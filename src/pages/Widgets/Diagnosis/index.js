@@ -138,7 +138,7 @@ class Diagnosis extends PureComponent {
                 return null
               }
             }
-        
+
             return diagnosises.map((v, i) => {
               return (
                 <div key={v.uid}>

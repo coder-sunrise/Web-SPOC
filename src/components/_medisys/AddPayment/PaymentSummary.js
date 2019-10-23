@@ -19,14 +19,7 @@ const PaymentSummary = ({
   paymentList,
 }) => (
   <React.Fragment>
-    <GridItem md={6} className={classes.paymentSummary}>
-      <h4>
-        Outstanding balance after payment:&nbsp;
-        <span style={{ color: 'darkblue', fontWeight: 500 }}>
-          ${parseToTwoDecimalString(outstandingAfterPayment)}
-        </span>
-      </h4>
-    </GridItem>
+    <GridItem md={6} className={classes.paymentSummary} />
     <GridItem md={6} container className={classes.paymentSummary}>
       <GridItem md={6}>Total Payment: </GridItem>
       <GridItem md={6}>

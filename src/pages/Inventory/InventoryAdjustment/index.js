@@ -20,7 +20,7 @@ const styles = (theme) => ({
 }))
 class InventoryAdjustment extends PureComponent {
   state = {
-    runningNo: '',
+    // runningNo: '',
     open: false,
   }
 
@@ -33,14 +33,14 @@ class InventoryAdjustment extends PureComponent {
         ],
       },
     })
-    this.props
-      .dispatch({
-        type: 'inventoryAdjustment/generateRunningNo',
-      })
-      .then((v) => {
-        const { data } = v
-        this.setState({ runningNo: data })
-      })
+    // this.props
+    //   .dispatch({
+    //     type: 'inventoryAdjustment/generateRunningNo',
+    //   })
+    //   .then((v) => {
+    //     const { data } = v
+    //     this.setState({ runningNo: data })
+    //   })
   }
 
   toggleModal = async () => {
@@ -57,7 +57,6 @@ class InventoryAdjustment extends PureComponent {
         open: !prevState.open,
       }
     })
-    console.log('asd', this.state.open)
 
     if (this.state.open) {
       dispatch({
@@ -69,16 +68,16 @@ class InventoryAdjustment extends PureComponent {
     }
   }
 
-  getRunningNo = () => {
-    this.props
-      .dispatch({
-        type: 'inventoryAdjustment/generateRunningNo',
-      })
-      .then((v) => {
-        const { data } = v
-        this.setState({ runningNo: data })
-      })
-  }
+  // getRunningNo = () => {
+  //   this.props
+  //     .dispatch({
+  //       type: 'inventoryAdjustment/generateRunningNo',
+  //     })
+  //     .then((v) => {
+  //       const { data } = v
+  //       this.setState({ runningNo: data })
+  //     })
+  // }
 
   render () {
     const {
@@ -113,8 +112,8 @@ class InventoryAdjustment extends PureComponent {
           <Detail
             {...cfg}
             {...this.props}
-            runningNo={this.state.runningNo}
-            getRunningNo={this.getRunningNo}
+            // runningNo={this.state.runningNo}
+            // getRunningNo={this.getRunningNo}
           />
         </CommonModal>
       </CardContainer>

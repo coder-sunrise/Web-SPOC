@@ -23,7 +23,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 // model
 import model from '../models/billing'
 // utils
-import { getAppendUrl } from '@/utils/utils'
+import { getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 window.g_app.replaceModel(model)
@@ -54,7 +54,12 @@ const bannerStyle = {
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     if (billing.entity) {
-      return { ...billing.entity, payments: [] }
+      const finalClaim = 0
+      const finalPayable = roundToTwoDecimals(
+        billing.entity.invoice.totalAftGst - finalClaim,
+      )
+
+      return { ...billing.entity, payments: [], finalClaim, finalPayable }
     }
     return billing.default
   },
@@ -109,6 +114,7 @@ const bannerStyle = {
         return _payer
       }),
     }
+    // console.log({ payload })
     dispatch({
       type: 'billing/upsert',
       payload,
@@ -187,8 +193,7 @@ class Billing extends Component {
     const { values } = this.props
     const { invoicePayers, payments = [] } = values
 
-    if (payments.length === 0) return true
-
+    // if (payments.length === 0) return true
     if (invoicePayers.length === 0) return false
 
     return false
@@ -284,6 +289,7 @@ class Billing extends Component {
             invoice={{
               ...values.invoice,
               finalPayable: values.invoice.totalAftGst,
+              totalClaim: values.finalClaim,
               outstandingBalance: values.finalPayable,
             }}
           />
