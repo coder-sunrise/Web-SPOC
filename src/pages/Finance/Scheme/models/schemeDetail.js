@@ -132,9 +132,6 @@ export default createFormViewModel({
             }),
           )
         })
-
-        console.log({ data })
-
         return {
           ...state,
           entity: {
@@ -143,9 +140,8 @@ export default createFormViewModel({
               data.effectiveStartDate,
               data.effectiveEndDate,
             ],
-            itemGroupMaxCapacityDtoRdoValue: data.coverageMaxCap
-              ? 'all'
-              : 'sub',
+            itemGroupMaxCapacityDtoRdoValue:
+              data.coverageMaxCap !== null ? 'all' : 'sub',
             itemGroupValueDtoRdoValue: !data.itemGroupValueDto ? 'all' : 'sub',
             rows: itemRows,
           },

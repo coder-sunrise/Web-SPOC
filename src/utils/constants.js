@@ -71,6 +71,7 @@ export const PDPA_CONSENT_TYPE = {
 }
 
 export const INVOICE_ITEM_TYPE = {
+  0: 'Corrupted data',
   1: 'Medication',
   2: 'Consumable',
   3: 'Vaccination',
