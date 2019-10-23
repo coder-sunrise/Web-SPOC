@@ -69,6 +69,7 @@ const ActionButton = ({ row, onClick }) => {
 
   const enableBilling = [
     VISIT_STATUS.BILLING,
+    VISIT_STATUS.COMPLETED,
   ].includes(row.visitStatus)
 
   const newContextMenuOptions = useMemo(

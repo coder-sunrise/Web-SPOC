@@ -34,6 +34,14 @@ const DeleteWithPopover = ({ classes, index, onConfirmDelete }) => {
     <Popover
       title='Remove this scheme'
       trigger='click'
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      transformOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
       visible={show}
       onVisibleChange={toggleVisibleChange}
       content={

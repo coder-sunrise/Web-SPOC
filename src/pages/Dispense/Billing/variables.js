@@ -1,4 +1,6 @@
 import * as Yup from 'yup'
+import Info from '@material-ui/icons/Info'
+import { SizeContainer, Tooltip } from '@/components'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 export const SchemeInvoicePayerColumn = [
@@ -7,6 +9,7 @@ export const SchemeInvoicePayerColumn = [
   { name: 'coverage', title: 'Coverage' },
   { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
+  { name: 'error', title: ' ' },
 ]
 
 export const CompanyInvoicePayerColumn = [
@@ -14,6 +17,7 @@ export const CompanyInvoicePayerColumn = [
   { name: 'itemCode', title: 'Name' },
   { name: 'totalAfterGst', title: 'Payable Amount ($)' },
   { name: 'claimAmount', title: 'Claim Amount ($)' },
+  { name: 'error', title: ' ' },
 ]
 
 export const ApplyClaimsColumnExtension = [
@@ -22,6 +26,7 @@ export const ApplyClaimsColumnExtension = [
     // type: 'codeSelect',
     // code: 'ltinvoiceitemtype',
     render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFk],
+    disabled: true,
   },
   { columnName: 'itemCode', disabled: true },
   {
@@ -35,10 +40,27 @@ export const ApplyClaimsColumnExtension = [
     currency: true,
     disabled: true,
   },
+
   {
-    columnName: 'claimAmount',
-    type: 'currency',
-    currency: true,
+    columnName: 'error',
+
+    editingEnabled: false,
+    sortingEnabled: false,
+    disabled: true,
+    width: 60,
+    render: (row) => {
+      if (row.error)
+        return (
+          <Tooltip title={row.error}>
+            <div>
+              <SizeContainer size='lg'>
+                <Info color='error' />
+              </SizeContainer>
+            </div>
+          </Tooltip>
+        )
+      return <div />
+    },
   },
 ]
 
