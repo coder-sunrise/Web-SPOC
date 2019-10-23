@@ -35,6 +35,7 @@ class EmergencyContact extends PureComponent {
       { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFK },
       {
         columnName: 'accountNo',
+        maxLength: 9,
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {

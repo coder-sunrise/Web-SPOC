@@ -95,7 +95,6 @@ export default class BaseCRUDViewModel {
           { payload = { keepFilter: true }, history },
           { call, put, select },
         ) {
-          // console.log(namespace, queryFnName, payload, service)
           if (!service || !service[queryFnName]) return
           let {
             filter = {},
