@@ -19,7 +19,7 @@ export default ({ current, classes, theme, codetable }) => {
               />)
               {o.corComplication.length > 0 ? <br /> : ''}
               {o.corComplication.length > 0 ? (
-                `[${o.corComplication.map((c, index) => {
+                `Complication: ${o.corComplication.map((c, index) => {
                   let value = ''
                   codetable.ctcomplication.map((b) => {
                     if (c.complicationFK === b.id) {
@@ -29,7 +29,7 @@ export default ({ current, classes, theme, codetable }) => {
                   })
 
                   return value
-                })}]`
+                })}`
               ) : (
                 ''
               )}

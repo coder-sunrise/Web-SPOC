@@ -51,6 +51,7 @@ const DiagnosisItem = ({
   )
 
   const onDiagnosisChange = async (v, op) => {
+
     const { setFieldValue } = form
     if (op) {
       await setFieldValue(
@@ -65,18 +66,18 @@ const DiagnosisItem = ({
 
       setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
 
-      if (op.complication && op.complication.length) {
-        setFieldValue(
-          `corDiagnosis[${index}]complication`,
-          op.complication.map((o) => o.id),
-        )
-        setFieldValue(
-          `corDiagnosis[${index}]corComplication`,
-          op.complication.map((o) => ({
-            complicationFK: o.id,
-          })),
-        )
-      }
+      // if (op.complication && op.complication.length) {
+      //   setFieldValue(
+      //     `corDiagnosis[${index}]complication`,
+      //     op.complication.map((o) => o.id),
+      //   )
+      //   setFieldValue(
+      //     `corDiagnosis[${index}]corComplication`,
+      //     op.complication.map((o) => ({
+      //       complicationFK: o.id,
+      //     })),
+      //   )
+      // }
     }
   }
   const { values } = form
@@ -231,17 +232,14 @@ const DiagnosisItem = ({
                   onClick={() => {
                     // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
-                    form.setFieldValue(
-                      `corDiagnosis[${index}].isPermanentDelete`,
-                      true,
-                    )
+                    form.setFieldValue( `corDiagnosis[${index}].isPermanentDelete`,  true,)
                   }}
                 >
                   Remove Permanently
                 </Button>
               </div>
             }
-            title='Delete Diagnosis'
+            title='Delete Diagnosis' 
             trigger='click'
             visible={show}
             onVisibleChange={() => {
