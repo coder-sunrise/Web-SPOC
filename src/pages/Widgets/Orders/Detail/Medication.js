@@ -91,7 +91,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       ...values,
       subject: currentType.getSubject(values),
     }
-    console.log('medication data ', data)
+
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -103,6 +103,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
 class Medication extends PureComponent {
   state = {
     stockList: [],
+    selectionOptions: [],
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -136,6 +137,9 @@ class Medication extends PureComponent {
             title='Are you sure delete this item?'
             onConfirm={() => {
               arrayHelpers.remove(i)
+              setTimeout(() => {
+                this.calcualteQuantity()
+              }, 1)
             }}
             // okText='Yes'
             // cancelText='No'
@@ -163,14 +167,14 @@ class Medication extends PureComponent {
   }
 
   calcualteQuantity = () => {
-    const { codetable, setFieldValue } = this.props
+    const { codetable, setFieldValue, values } = this.props
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
 
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
 
-    let dosageValue = 0
+    let dosageMultiplier = 0
     let multipler = 0
     let newTotalQuantity = 0
 
@@ -182,7 +186,7 @@ class Medication extends PureComponent {
       ) {
         for (let a = 0; a < dosageUsageList.length; a++) {
           if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
-            dosageValue = dosageUsageList[a].name
+            dosageMultiplier = dosageUsageList[a].multiplier
           }
         }
 
@@ -196,25 +200,40 @@ class Medication extends PureComponent {
         }
 
         newTotalQuantity +=
-          dosageValue * multipler * prescriptionItem[i].duration
+          dosageMultiplier * multipler * prescriptionItem[i].duration
       }
     }
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
-    setFieldValue('totalPrice', rounded)
-    this.updateTotalPrice(rounded)
+
+    const total = newTotalQuantity * values.unitPrice
+    setFieldValue('totalPrice', total)
+    this.updateTotalPrice(total)
   }
 
   changeMedication = (v, op = {}) => {
-    console.log(v, op)
+    // console.log(v, op)
+    const { form } = this.descriptionArrayHelpers
+    const prescriptionItem = form.values.corPrescriptionItemInstruction
+    let tempArray = [
+      ...this.state.stockList,
+    ]
+    tempArray = tempArray.filter((o) => o.inventoryItemFK === v)
+    this.setState(() => {
+      return { selectionOptions: tempArray }
+    })
     const { setFieldValue, values, codetable } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
 
-    let dosageValue = 0
+    let dosageMultiplier = 0
     let multipler = 0
     let newTotalQuantity = 0
+    let totalFirstItem = 0
+
+    setFieldValue('batchNo', undefined)
+    setFieldValue('expiryDate', undefined)
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
@@ -239,7 +258,7 @@ class Medication extends PureComponent {
     if (op.duration && op.medicationFrequency.id && op.prescribingDosage.id) {
       for (let a = 0; a < dosageUsageList.length; a++) {
         if (dosageUsageList[a].id === op.prescribingDosage.id) {
-          dosageValue = dosageUsageList[a].name
+          dosageMultiplier = dosageUsageList[a].multiplier
         }
       }
 
@@ -249,13 +268,43 @@ class Medication extends PureComponent {
         }
       }
 
-      newTotalQuantity += dosageValue * multipler * op.duration
-
-      let rounded = Math.round(newTotalQuantity * 10) / 10
-      setFieldValue(`quantity`, rounded)
-      setFieldValue('totalPrice', rounded)
-      this.updateTotalPrice(rounded)
+      totalFirstItem += dosageMultiplier * multipler * op.duration
     }
+
+    for (let i = 1; i < prescriptionItem.length; i++) {
+      if (
+        prescriptionItem[i].dosageFK &&
+        prescriptionItem[i].drugFrequencyFK &&
+        prescriptionItem[i].duration
+      ) {
+        for (let a = 0; a < dosageUsageList.length; a++) {
+          if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
+            dosageMultiplier = dosageUsageList[a].multiplier
+          }
+        }
+
+        for (let b = 0; b < medicationFrequencyList.length; b++) {
+          if (
+            medicationFrequencyList[b].id ===
+            prescriptionItem[i].drugFrequencyFK
+          ) {
+            multipler = medicationFrequencyList[b].multiplier
+          }
+        }
+
+        newTotalQuantity +=
+          dosageMultiplier * multipler * prescriptionItem[i].duration
+      }
+    }
+
+    let rounded = Math.round((newTotalQuantity + totalFirstItem) * 10) / 10
+    setFieldValue(`quantity`, rounded)
+
+    // if (values.unitPrice) {
+    //   const total = (newTotalQuantity + totalFirstItem) * values.unitPrice
+    //   setFieldValue('totalPrice', total)
+    //   this.updateTotalPrice(total)
+    // }
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -286,8 +335,8 @@ class Medication extends PureComponent {
 
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * values.quantity)
-      this.updateTotalPrice(op.sellingPrice * values.quantity)
+      setFieldValue('totalPrice', op.sellingPrice * (newTotalQuantity + totalFirstItem))
+      this.updateTotalPrice(op.sellingPrice * (newTotalQuantity + totalFirstItem))
     } else {
       setFieldValue('unitPrice', undefined)
       setFieldValue('totalPrice', undefined)
@@ -321,7 +370,7 @@ class Medication extends PureComponent {
       })
       .then((v) => {
         if (v) {
-          this.setState({ stockList: v })
+          this.setState({ stockList: v.data })
         }
       })
   }
@@ -454,6 +503,7 @@ class Medication extends PureComponent {
                                   // simple
                                   allowClear={false}
                                   code='ctMedicationDosage'
+                                  labelField='displayValue'
                                   {...commonSelectProps}
                                   {...args}
                                   onChange={(v, option = {}) => {
@@ -732,15 +782,18 @@ class Medication extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={2} className={classes.editor}>
-            <FastField
+            <Field
               name='batchNo'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Batch No'
-                    labelField='displayValue'
-                    valueField='displayValue'
-                    options={this.state.stockList}
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectionOptions}
+                    onChange={(e, op = {}) => {
+                      setFieldValue('expiryDate', op.expiryDate)
+                    }}
                     {...args}
                   />
                 )
@@ -751,7 +804,7 @@ class Medication extends PureComponent {
             <FastField
               name='expiryDate'
               render={(args) => {
-                return <DatePicker label='Expire Date' {...args} />
+                return <DatePicker label='Expiry Date' {...args} />
               }}
             />
           </GridItem>
