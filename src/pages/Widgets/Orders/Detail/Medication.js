@@ -91,7 +91,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       ...values,
       subject: currentType.getSubject(values),
     }
-    console.log('medication data ', data)
+
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -214,8 +214,6 @@ class Medication extends PureComponent {
 
   changeMedication = (v, op = {}) => {
     // console.log(v, op)
-    console.log('hh ', op)
-    console.log("v ", v)
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
     let tempArray = [
@@ -794,7 +792,6 @@ class Medication extends PureComponent {
                     valueField='batchNo'
                     options={this.state.selectionOptions}
                     onChange={(e, op = {}) => {
-                      console.log()
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
                     {...args}
