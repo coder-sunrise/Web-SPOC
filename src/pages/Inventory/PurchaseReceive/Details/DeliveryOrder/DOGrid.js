@@ -1,12 +1,13 @@
 import React from 'react'
-import { CardContainer, CommonTableGrid, Button } from '@/components'
 import Edit from '@material-ui/icons/Edit'
+import { CardContainer, CommonTableGrid, Button } from '@/components'
 
 const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
   const { list } = deliveryOrderDetails
   const editRow = (row, e) => {
     onEditDeliveryOrderClicked(row)
   }
+  console.log(list)
 
   return (
     <CommonTableGrid

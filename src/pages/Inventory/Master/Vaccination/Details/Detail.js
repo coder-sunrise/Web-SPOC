@@ -181,7 +181,7 @@ const Detail = ({
         <GridItem xs={1} />
 
         <GridItem xs={12} md={6}>
-          <GridContainer>
+          <GridContainer style={{ height: 'auto' }}>
             <GridItem xs={2} />
             <GridItem xs={10}>
               <FastField

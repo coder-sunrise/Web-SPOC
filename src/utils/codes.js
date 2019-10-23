@@ -747,6 +747,13 @@ const orderTypes = [
     filter: (r) => !r.stockDrugFK,
     getSubject: (r) => r.drugName,
   },
+  {
+    name: 'Package',
+    value: '6',
+    // prop: 'corPrescriptionItem',
+    // filter: (r) => !r.stockDrugFK,
+    // getSubject: (r) => r.drugName,
+  },
 ]
 const buttonTypes = [
   'RegularButton',
