@@ -36,10 +36,14 @@ const paymentListSchema = Yup.object().shape({
     paymentModeFK: Yup.number().required(),
     rows: Yup.array().of(paymentListSchema),
   }),
+  handleSubmit: (values, { props }) => {
+    const { dispatch } = props
+    console.log({ values, props })
+  },
 })
 class CollectPaymentModal extends PureComponent {
   calculateSummarySubTotal = () => {
-    const { values } = this.props
+    const { values, setFieldValue } = this.props
     const { rows } = values
     let invoiceAmountSubTotal = 0
     let claimAmountSubTotal = 0
@@ -57,6 +61,10 @@ class CollectPaymentModal extends PureComponent {
         return payment
       })
     }
+    setTimeout(
+      () => setFieldValue('totalAmtPaid', amountReceivedSubTotal),
+      100,
+    )
 
     return {
       invoiceAmountSubTotal,
@@ -68,6 +76,7 @@ class CollectPaymentModal extends PureComponent {
   }
 
   render () {
+    // console.log(this.props)
     const { classes, values, footer } = this.props
     const { rows } = values
 
@@ -160,7 +169,7 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={invoiceAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
@@ -168,7 +177,7 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={claimAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
@@ -176,7 +185,7 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={approvedAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
@@ -184,17 +193,30 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={collectedPayment}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
                       </Table.Cell>,
                       <Table.Cell colSpan={1} key={1}>
-                        <NumberInput
+                        {/* <NumberInput
                           value={amountReceivedSubTotal}
                           disabled
                           currency
                           {...amountProps}
+                        /> */}
+                        <FastField
+                          name='totalAmtPaid'
+                          render={(args) => {
+                            return (
+                              <NumberInput
+                                text
+                                label={undefined}
+                                currency
+                                {...args}
+                              />
+                            )
+                          }}
                         />
                       </Table.Cell>,
                     ]

@@ -14,6 +14,7 @@ import {
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
 import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -73,46 +74,53 @@ class index extends Component {
     const { showDeliveryOrderDetails } = this.state
 
     return (
-      <div>
-        <GridContainer>
-          <GridItem xs={12} md={12}>
-            <h4 style={{ fontWeight: 'bold' }}>
-              {formatMessage({
-                id: 'inventory.pr.detail.dod.do',
-              })}
-            </h4>
-          </GridItem>
-          <DOGrid
-            onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
-            {...this.props}
-          />
-          <CommonModal
-            open={showDeliveryOrderDetails}
-            title='Delivery Order Details'
-            maxWidth='xl'
-            bodyNoPadding
-            onConfirm={this.closeDODetailsModal}
-            onClose={this.closeDODetailsModal}
-          >
-            <DODetails
-              refreshDeliveryOrder={this.refreshDeliveryOrder}
+      <AuthorizedContext.Provider
+        value={{
+          rights: poStatus !== 6 ? 'enable' : 'disable',
+          // rights: 'disable',
+        }}
+      >
+        <div>
+          <GridContainer>
+            <GridItem xs={12} md={12}>
+              <h4 style={{ fontWeight: 'bold' }}>
+                {formatMessage({
+                  id: 'inventory.pr.detail.dod.do',
+                })}
+              </h4>
+            </GridItem>
+            <DOGrid
+              onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
               {...this.props}
             />
-          </CommonModal>
-          <Button
-            // disabled={isPOStatusFulfilled(poStatus)}
-            onClick={this.onAddDeliveryOrderClicked}
-            // hideIfNoEditRights
-            color='info'
-            link
-          >
-            <Add />
-            {formatMessage({
-              id: 'inventory.pr.detail.dod.addDeliveryOrder',
-            })}
-          </Button>
-        </GridContainer>
-      </div>
+            <CommonModal
+              open={showDeliveryOrderDetails}
+              title='Delivery Order Details'
+              maxWidth='xl'
+              bodyNoPadding
+              onConfirm={this.closeDODetailsModal}
+              onClose={this.closeDODetailsModal}
+            >
+              <DODetails
+                refreshDeliveryOrder={this.refreshDeliveryOrder}
+                {...this.props}
+              />
+            </CommonModal>
+            <Button
+              // disabled={isPOStatusFulfilled(poStatus)}
+              onClick={this.onAddDeliveryOrderClicked}
+              // hideIfNoEditRights
+              color='info'
+              link
+            >
+              <Add />
+              {formatMessage({
+                id: 'inventory.pr.detail.dod.addDeliveryOrder',
+              })}
+            </Button>
+          </GridContainer>
+        </div>
+      </AuthorizedContext.Provider>
     )
   }
 }

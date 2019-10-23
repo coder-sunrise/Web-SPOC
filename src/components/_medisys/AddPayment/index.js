@@ -51,9 +51,35 @@ import { PAYMENT_MODE } from '@/utils/constants'
       [
         'totalAmtPaid',
         'collectableAmount',
+        'outstandingAfterPayment',
       ],
-      (totalAmtPaid, collectableAmount, schema) => {
-        if (totalAmtPaid - collectableAmount > 0)
+      (totalAmtPaid, collectableAmount, outstandingAfterPayment, schema) => {
+        if (outstandingAfterPayment === 0)
+          return schema.of(
+            Yup.object().shape({
+              id: Yup.number(),
+              paymentModeFK: Yup.number().required(),
+              amt: Yup.number().min(0).required(),
+              creditCardTypeFK: Yup.string().when('paymentModeFK', {
+                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+                then: Yup.string().required(),
+              }),
+              creditCardNo: Yup.string().when('paymentModeFK', {
+                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+                then: Yup.string().required(),
+              }),
+              chequeNo: Yup.number().when('paymentModeFK', {
+                is: (val) => val === PAYMENT_MODE.CHEQUE,
+                then: Yup.number().required(),
+              }),
+              referrenceNo: Yup.string().when('paymentModeFK', {
+                is: (val) => val === PAYMENT_MODE.GIRO,
+                then: Yup.string().required(),
+              }),
+            }),
+          )
+
+        if (outstandingAfterPayment < 0)
           return schema.of(
             Yup.object().shape({
               id: Yup.number(),
@@ -65,7 +91,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
                     ? Yup.number()
                         .min(0)
                         .max(
-                          collectableAmount,
+                          0.01,
                           'Total amount paid cannot exceed collectable amount',
                         )
                         .required()
@@ -89,30 +115,6 @@ import { PAYMENT_MODE } from '@/utils/constants'
               }),
             }),
           )
-
-        return schema.of(
-          Yup.object().shape({
-            id: Yup.number(),
-            paymentModeFK: Yup.number().required(),
-            amt: Yup.number().min(0).required(),
-            creditCardTypeFK: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
-            }),
-            creditCardNo: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
-            }),
-            chequeNo: Yup.number().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CHEQUE,
-              then: Yup.number().required(),
-            }),
-            referrenceNo: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.GIRO,
-              then: Yup.string().required(),
-            }),
-          }),
-        )
       },
     ),
   }),
@@ -142,23 +144,48 @@ import { PAYMENT_MODE } from '@/utils/constants'
   },
 })
 class AddPayment extends Component {
+  componentDidMount () {
+    const { values, setFieldValue } = this.props
+    const { paymentList, collectableAmount } = values
+    const totalPaid = paymentList.reduce(
+      (total, payment) => total + (payment.amt || 0),
+      0,
+    )
+
+    setFieldValue(
+      'outstandingAfterPayment',
+      roundToTwoDecimals(collectableAmount - totalPaid),
+    )
+  }
+
   onPaymentTypeClick = (event) => {
     const { values, setFieldValue } = this.props
     const { currentTarget: { id: type } } = event
     const paymentMode = Object.keys(PAYMENT_MODE).find(
       (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
     )
+    const amount =
+      values.paymentList.length === 0 ? values.collectableAmount : null
     const payment = {
       id: getLargestID(values.paymentList) + 1,
       paymentModeFK: parseInt(type, 10),
       paymentMode,
       ...InitialValue[type],
+      amt: amount,
     }
     const newPaymentList = [
       ...values.paymentList,
       payment,
     ]
     setFieldValue('paymentList', newPaymentList)
+    if (values.paymentList.length === 0) {
+      setFieldValue('outstandingAfterPayment', 0)
+      setFieldValue('totalAmtPaid', amount)
+
+      if (parseInt(type, 10) === PAYMENT_MODE.CASH) {
+        setFieldValue('cashReceived', amount)
+      }
+    }
   }
 
   onDeleteClick = (event) => {
@@ -198,7 +225,7 @@ class AddPayment extends Component {
       setFieldValue('cashReceived', cashPayment.amt)
 
       if (totalPaid > collectableAmount && cashPayment) {
-        cashReturned = totalPaid - collectableAmount
+        cashReturned = roundToTwoDecimals(totalPaid - collectableAmount)
         setFieldValue('cashReturned', cashReturned)
       }
     }
@@ -222,7 +249,10 @@ class AddPayment extends Component {
 
     return (
       <div>
-        <PayerHeader invoice={invoice} />
+        <PayerHeader
+          invoice={invoice}
+          outstandingAfterPayment={values.outstandingAfterPayment}
+        />
         <React.Fragment>
           <PaymentType
             disableCash={values.paymentList.reduce(

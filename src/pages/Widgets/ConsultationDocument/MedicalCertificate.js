@@ -8,12 +8,14 @@ import {
   CodeSelect,
   DatePicker,
   DateRangePicker,
+  notification,
   NumberInput,
   withFormikExtend,
   FastField,
   Field,
   ClinicianSelect,
 } from '@/components'
+import * as service from '@/services/common'
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument }) => {
@@ -51,6 +53,21 @@ import {
   displayName: 'AddConsultationDocument',
 })
 class MedicalCertificate extends PureComponent {
+  componentDidMount () {
+    const { setFieldValue, values } = this.props
+
+    if (values.mcReferenceNo === '-')
+      service.runningNumber('coa').then((o) => {
+        if (o && o.data) {
+          setFieldValue('mcReferenceNo', o.data)
+        } else {
+          notification.error({
+            message: 'Generate Reference Number fail',
+          })
+        }
+      })
+  }
+
   onDaysChange = (e) => {
     const { values, setFieldValue } = this.props
     if (e.target.value) {
@@ -73,6 +90,7 @@ class MedicalCertificate extends PureComponent {
 
   render () {
     const { footer, handleSubmit, classes, values } = this.props
+    console.log({ values })
     return (
       <div>
         {values.mcReferenceNo && (

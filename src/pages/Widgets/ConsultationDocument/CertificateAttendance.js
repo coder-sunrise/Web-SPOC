@@ -73,7 +73,7 @@ class CertificateAttendance extends PureComponent {
 
   render () {
     const { footer, handleSubmit, classes, values } = this.props
-    console.log({ props: this.props })
+
     return (
       <div>
         {values.referenceNo && (

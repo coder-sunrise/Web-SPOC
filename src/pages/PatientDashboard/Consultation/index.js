@@ -103,8 +103,6 @@ const saveConsultation = ({
           corDiagnosis: filteredDiagnosis,
         }
 
-        console.log('test ', _filteredDiagnosis)
-
         const newValues = convertToConsultation(_filteredDiagnosis, {
           orders,
           consultationDocument,
