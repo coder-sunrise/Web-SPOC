@@ -45,9 +45,7 @@ const InvoiceSummary = ({
           <GridContainer justify='space-between'>
             <GridItem md={6}>
               <h5>
-                GST ({parseToTwoDecimalString(
-                  roundToTwoDecimals(gstValue * 100),
-                )}%)
+                GST ({parseToTwoDecimalString(roundToTwoDecimals(gstValue))}%)
               </h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
