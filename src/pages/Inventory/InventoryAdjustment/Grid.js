@@ -59,30 +59,31 @@ class Grid extends PureComponent {
       },
       {
         columnName: 'remarks',
-        width:350
+        width: 350,
       },
     ],
   }
 
   editRow = async (row) => {
-    const { dispatch, inventoryAdjustment } = this.props
-    console.log('row', row)
-    const { list } = inventoryAdjustment
-    console.log('list', list)
+    const { dispatch, inventoryAdjustment, toggleModal } = this.props
 
-    await this.props.dispatch({
-      type: 'inventoryAdjustment/queryOne',
-      payload: {
-        id: row.id,
-      },
-    })
-
-    dispatch({
-      type: 'inventoryAdjustment/updateState',
-      payload: {
-        showModal: true,
-      },
-    })
+    await this.props
+      .dispatch({
+        type: 'inventoryAdjustment/queryOne',
+        payload: {
+          id: row.id,
+        },
+      })
+      .then(() => {
+        console.log('hihi')
+        toggleModal()
+        // dispatch({
+        //   type: 'inventoryAdjustment/updateState',
+        //   payload: {
+        //     showModal: true,
+        //   },
+        // })
+      })
   }
 
   cancelRow = (row) => {
