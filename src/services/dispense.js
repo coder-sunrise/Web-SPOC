@@ -56,4 +56,11 @@ module.exports = {
     })
     return r
   },
+  
+  queryDrugLabelDetails: async (visitInvoiceDrugId) => {
+    const r = await request(`${url}/DrugLabel/${visitInvoiceDrugId}`, {
+    method: 'GET',
+    })
+  return r
+  },
 }
