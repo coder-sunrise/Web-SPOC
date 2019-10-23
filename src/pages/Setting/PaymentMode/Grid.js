@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
-import { Tooltip } from '@material-ui/core'
 import { status } from '@/utils/codes'
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 
 class Grid extends PureComponent {
   configs = {

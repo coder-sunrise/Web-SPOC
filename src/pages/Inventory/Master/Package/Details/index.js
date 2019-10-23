@@ -256,11 +256,11 @@ export default compose(
       const newServicePackageArray = servicePackageItem.map((o) => {
         return {
           ...o,
-          serviceCenterServiceFK: o.tempServiceCenterServiceFK,
+          serviceCenterServiceFK:
+            o.tempServiceCenterServiceFK || o.serviceCenterServiceFK,
           // serviceName: o.tempServiceName,
         }
       })
-
       dispatch({
         type: 'packDetail/upsert',
         payload: {

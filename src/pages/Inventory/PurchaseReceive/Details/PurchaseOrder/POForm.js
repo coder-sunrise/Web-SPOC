@@ -10,6 +10,7 @@ import {
   DatePicker,
   OutlinedTextField,
   CodeSelect,
+  NumberInput,
   Field,
 } from '@/components'
 
@@ -275,7 +276,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                 name={`${prefix}.contactNo`}
                 render={(args) => {
                   return (
-                    <TextField
+                    <NumberInput
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactNo',
                       })}
@@ -291,7 +292,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                 name={`${prefix}.faxNo`}
                 render={(args) => {
                   return (
-                    <TextField
+                    <NumberInput
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.faxNo',
                       })}
