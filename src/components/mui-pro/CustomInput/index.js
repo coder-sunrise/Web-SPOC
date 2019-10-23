@@ -237,7 +237,7 @@ class TextField extends React.PureComponent {
 }
 
 TextField.propTypes = {
-  label: PropTypes.node,
+  label: PropTypes.string,
   labelProps: PropTypes.object,
   inputProps: PropTypes.object,
   formControlProps: PropTypes.object,

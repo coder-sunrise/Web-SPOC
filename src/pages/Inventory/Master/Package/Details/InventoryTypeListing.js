@@ -171,12 +171,6 @@ const InventoryTypeListing = ({
     setRowChanges,
   ] = useState({})
 
-  const getServiceId = (serviceCenterServiceFK) => {
-    return serviceCenterServicess.find(
-      (o) => o.serviceCenter_ServiceId === serviceCenterServiceFK,
-    )
-  }
-
   const fetchCodes = async () => {
     await dispatch({
       type: 'codetable/fetchCodes',
@@ -184,14 +178,22 @@ const InventoryTypeListing = ({
         code: 'ctservice',
       },
     }).then((list) => {
-      console.log({ list })
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
       )
-      console.log({ services, serviceCenters, serviceCenterServices })
       setServicess(services)
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
+      if (
+        packDetail.entity &&
+        packDetail.entity.servicePackageItem.length > 0
+      ) {
+        servicePackageItem.forEach((o) => {
+          o.serviceName = serviceCenterServices.find(
+            (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+          ).serviceCenterId
+        })
+      }
     })
 
     podoOrderType.forEach((x) => {
@@ -202,7 +204,6 @@ const InventoryTypeListing = ({
         },
       }).then((list) => {
         const { inventoryItemList } = getInventoryItemList(list)
-        console.log(x.stateName)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -300,13 +301,7 @@ const InventoryTypeListing = ({
       setFieldValue('consumablePackageItem', consumableRows)
       setFieldValue('vaccinationPackageItem', vaccinationRows)
       setFieldValue('servicePackageItem', serviceRows)
-      console.log({
-        medicationRows,
-        consumableRows,
-        vaccinationRows,
-        serviceRows,
-        total,
-      })
+
       setTotalPrice(total)
 
       setValues({
@@ -337,8 +332,6 @@ const InventoryTypeListing = ({
   useEffect(
     () => {
       if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
-        console.log('serviceRows', serviceRows, serviceCenterServicess)
-
         const newServiceRows = serviceRows.map((o) => {
           if (o.tempServiceCenterServiceFK) {
             return {
@@ -356,7 +349,6 @@ const InventoryTypeListing = ({
           }
         })
 
-        console.log('test', newServiceRows)
         setServiceRows(newServiceRows)
 
         dispatch({
@@ -401,7 +393,6 @@ const InventoryTypeListing = ({
         }
       })
 
-      console.log('newArray', newArray)
       switch (type) {
         case 'medicationPackageItem': {
           return setMedicationRows(newArray)
@@ -472,9 +463,7 @@ const InventoryTypeListing = ({
     }
   }
 
-  const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {
-    console.log('elphant', rows)
-  }
+  const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {}
 
   const getServiceCenterService = () => {
     if (!serviceCenterFK || !serviceFK) {
@@ -506,9 +495,7 @@ const InventoryTypeListing = ({
     row.subTotal = value * row.unitPrice
   }
 
-  const onRowChangesChange = (rows) => {
-    console.log('test', rows)
-  }
+  const onRowChangesChange = (rows) => {}
 
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
@@ -525,19 +512,16 @@ const InventoryTypeListing = ({
         if (quantity && unitPrice) {
           return quantity * unitPrice
         }
-        return undefined
+        return 0.0
       }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
-          console.log('abc', price)
           getServiceCenterService()
-          console.log('addedRows', addedRows)
           const returnRow = addedRows.map((row) => ({
             ...row,
             unitPrice: price,
             subTotal: total(),
           }))
-          console.log('returnRow', returnRow)
           return returnRow
         }
 
@@ -551,14 +535,10 @@ const InventoryTypeListing = ({
       if (selectedItem) {
         return addedRows.map((row) => ({
           ...row,
-          unitPrice: selectedItem.sellingPrice
-            ? selectedItem.sellingPrice
-            : selectedItem.unitPrice,
           subTotal: total(),
         }))
       }
     }
-    console.log('addedRows', addedRows)
     return addedRows
   }
 
@@ -566,8 +546,16 @@ const InventoryTypeListing = ({
     const { option, row } = e
     const { sellingPrice } = option
     setSelectedItem(option)
+    row.quantity = undefined
+    row.unitPrice = sellingPrice
 
-    return { ...row, unitPrice: sellingPrice }
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
 
   const medicationProps = {
@@ -710,9 +698,16 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceName',
         type: 'select',
-        options: serviceCenterss.filter(
-          (o) => !serviceFK || o.services.find((m) => m.value === serviceFK),
-        ),
+        options: (row) => {
+          return serviceCenterss.filter(
+            (o) =>
+              !serviceFK ||
+              o.services.find(
+                (m) => m.value === serviceFK || m.value === row.serviceName,
+              ),
+          )
+        },
+
         onChange: (e) => {
           setServiceCenterFK(e.val)
           dispatch({

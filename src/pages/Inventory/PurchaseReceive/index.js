@@ -10,7 +10,7 @@ import {
   Button,
   notification,
 } from '@/components'
-import { LoadingWrapper } from '@/components/_medisys'
+import { LoadingWrapper, ReportViewer } from '@/components/_medisys'
 import FilterBar from './components/FilterBar'
 import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
 import WriteOff from './components/Modal/WriteOff'
@@ -42,6 +42,8 @@ class PurchaseReceive extends Component {
     showDuplicatePO: false,
     selectedRows: [],
     isLoading: false,
+    showReport: false,
+    selectedRowId: '',
   }
 
   componentDidMount () {
@@ -53,6 +55,11 @@ class PurchaseReceive extends Component {
     //     ],
     //   },
     // })
+  }
+
+  printPOReport = (rowId) => {
+    this.setState({ selectedRowId: rowId })
+    this.toggleReport()
   }
 
   onSelectionChange = (selection) => this.setState({ selectedRows: selection })
@@ -150,6 +157,12 @@ class PurchaseReceive extends Component {
     }
   }
 
+  toggleReport = () => {
+    this.setState((preState) => ({
+      showReport: !preState.showReport,
+    }))
+  }
+
   render () {
     const { classes, dispatch } = this.props
     const actionProps = {
@@ -157,6 +170,7 @@ class PurchaseReceive extends Component {
       handleDuplicatePO: this.onDuplicatePOClick,
       handleNavigate: this.onNavigate,
       handleOnSelectionChange: this.onSelectionChange,
+      handlePrintPOReport: this.printPOReport,
     }
     const {
       showWriteOff,
@@ -196,7 +210,7 @@ class PurchaseReceive extends Component {
           <CommonModal
             open={showDuplicatePO}
             title='Duplicate Purchase Order'
-            maxWidth='xs'
+            maxWidth='sm'
             onConfirm={this.closeDuplicatePOModal}
             onClose={this.closeDuplicatePOModal}
           >
@@ -212,6 +226,20 @@ class PurchaseReceive extends Component {
             </Button>
           </GridItem>
         </LoadingWrapper>
+
+        <CommonModal
+          open={this.state.showReport}
+          onClose={this.toggleReport}
+          title='Purchase Order'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={26}
+            reportParameters={{
+              PurchaseOrderId: this.state.selectedRowId,
+            }}
+          />
+        </CommonModal>
       </CardContainer>
     )
   }

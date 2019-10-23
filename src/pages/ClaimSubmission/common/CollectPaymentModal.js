@@ -8,7 +8,6 @@ import styles from './styles'
 import {
   CommonTableGrid,
   SizeContainer,
-  Field,
   NumberInput,
   withFormikExtend,
   GridContainer,
@@ -37,14 +36,19 @@ const paymentListSchema = Yup.object().shape({
     paymentModeFK: Yup.number().required(),
     rows: Yup.array().of(paymentListSchema),
   }),
+  handleSubmit: (values, { props }) => {
+    const { dispatch } = props
+    console.log({ values, props })
+  },
 })
 class CollectPaymentModal extends PureComponent {
   calculateSummarySubTotal = () => {
-    const { values } = this.props
+    const { values, setFieldValue } = this.props
     const { rows } = values
     let invoiceAmountSubTotal = 0
     let claimAmountSubTotal = 0
     let approvedAmountSubTotal = 0
+    let collectedPayment = 0
     let amountReceivedSubTotal = 0
 
     if (rows || rows.length > 0) {
@@ -52,20 +56,27 @@ class CollectPaymentModal extends PureComponent {
         invoiceAmountSubTotal += payment.invoiceAmount || 0
         claimAmountSubTotal += payment.claimAmount || 0
         approvedAmountSubTotal += payment.approvedAmount || 0
+        collectedPayment += payment.collectedPayment || 0
         amountReceivedSubTotal += payment.amountReceived || 0
         return payment
       })
     }
+    setTimeout(
+      () => setFieldValue('totalAmtPaid', amountReceivedSubTotal),
+      100,
+    )
 
     return {
       invoiceAmountSubTotal,
       claimAmountSubTotal,
       approvedAmountSubTotal,
+      collectedPayment,
       amountReceivedSubTotal,
     }
   }
 
   render () {
+    // console.log(this.props)
     const { classes, values, footer } = this.props
     const { rows } = values
 
@@ -88,6 +99,10 @@ class CollectPaymentModal extends PureComponent {
               },
               {
                 columnName: 'approvedAmount',
+                type: 'currency',
+              },
+              {
+                columnName: 'collectedPayment',
                 type: 'currency',
               },
               {
@@ -137,6 +152,7 @@ class CollectPaymentModal extends PureComponent {
                       invoiceAmountSubTotal,
                       claimAmountSubTotal,
                       approvedAmountSubTotal,
+                      collectedPayment,
                       amountReceivedSubTotal,
                     } = this.calculateSummarySubTotal()
                     const newChildren = [
@@ -153,7 +169,7 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={invoiceAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
@@ -161,7 +177,7 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={claimAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
@@ -169,17 +185,38 @@ class CollectPaymentModal extends PureComponent {
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
                           value={approvedAmountSubTotal}
-                          disabled
+                          text
                           currency
                           {...amountProps}
                         />
                       </Table.Cell>,
                       <Table.Cell colSpan={1} key={1}>
                         <NumberInput
+                          value={collectedPayment}
+                          text
+                          currency
+                          {...amountProps}
+                        />
+                      </Table.Cell>,
+                      <Table.Cell colSpan={1} key={1}>
+                        {/* <NumberInput
                           value={amountReceivedSubTotal}
                           disabled
                           currency
                           {...amountProps}
+                        /> */}
+                        <FastField
+                          name='totalAmtPaid'
+                          render={(args) => {
+                            return (
+                              <NumberInput
+                                text
+                                label={undefined}
+                                currency
+                                {...args}
+                              />
+                            )
+                          }}
                         />
                       </Table.Cell>,
                     ]

@@ -49,6 +49,13 @@ export default createListViewModel({
           yield take('user/fetchCurrent/@@end')
           user = yield select((state) => state.user.data)
           userRole = user.clinicianProfile.userProfile.role
+
+          yield put({
+            type: 'codetable/fetchCodes',
+            payload: {
+              code: 'clinicianprofile',
+            },
+          })
         }
         yield put({
           type: 'updateState',

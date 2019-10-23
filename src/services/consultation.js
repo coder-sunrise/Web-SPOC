@@ -36,11 +36,18 @@ module.exports = {
     })
     return r
   },
+  overwrite: async (id) => {
+    const r = await request(`${url}/overwrite/${id}`, {
+      method: 'PUT',
+    })
+    return r
+  },
   sign: async (params) => {
     const r = await request(`${url}/sign/${params.id}`, {
       method: 'PUT',
       body: params,
     })
+
     return r
   },
   editOrder: async (id) => {

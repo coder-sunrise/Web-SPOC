@@ -37,7 +37,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ claimSubmissionApproved }) => ({
+@connect(({ claimSubmission, claimSubmissionApproved }) => ({
+  claimSubmission,
   claimSubmissionApproved,
 }))
 @withFormik({
@@ -59,8 +60,13 @@ class ApprovedCHAS extends React.Component {
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  handleSelectionChange = (selection) =>
-    this.setState({ selectedRows: selection })
+  handleSelectionChange = (selection) => {
+    this.setState({
+      selectedRows: [
+        selection.pop(),
+      ],
+    })
+  }
 
   refreshDataGrid = () => {
     this.props.dispatch({
@@ -96,19 +102,45 @@ class ApprovedCHAS extends React.Component {
     const rows = []
     selectedRows.map((selected) => {
       const row = list.find((x) => x.id === selected)
+
+      // Dev: CollectPaymentModal purpose (Pls delete after complete) -Start
+      row.approvedAmount = Math.floor(Math.random() * 100 + 1)
+      row.collectedPayment = Math.floor(Math.random() * row.approvedAmount + 1)
+      // Dev: CollectPaymentModal purpose (Pls delete after complete) -End
+
       return rows.push(row)
     })
 
+    let outstandingPayment = []
+
+    outstandingPayment = rows
+      .filter(
+        (x) =>
+          x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
+      )
+      .map((x) => {
+        x.amountReceived = x.approvedAmount - x.collectedPayment
+        return x
+      })
+
     dispatch({
-      type: 'claimSubmissionApproved/updateState',
+      type: 'claimSubmission/queryById',
       payload: {
-        entity: {
-          rows,
-          paymentDate: moment(),
-        },
+        id: rows[0].id,
       },
+    }).then((r) => {      
+      dispatch({
+        type: 'claimSubmissionApproved/updateState',
+        payload: {
+          entity: {
+            rows: outstandingPayment,
+            paymentDate: moment(),
+            invoicePayerFK: r.payload.invoicePayerFK,
+          },
+        },
+      })
+      this.setState({ showCollectPayment: true })
     })
-    this.setState({ showCollectPayment: true })
   }
 
   onCloseCollectPayment = () => this.setState({ showCollectPayment: false })

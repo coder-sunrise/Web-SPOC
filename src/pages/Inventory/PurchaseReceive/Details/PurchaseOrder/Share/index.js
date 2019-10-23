@@ -15,6 +15,7 @@ import {
   Button,
   FieldArray,
   FastField,
+  Field,
 } from '@/components'
 
 @connect(({ clinicSettings }) => ({
@@ -24,6 +25,7 @@ class InvoiceSummary extends PureComponent {
   state = {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
+    isGSTInclusiveChecked: false,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -44,19 +46,28 @@ class InvoiceSummary extends PureComponent {
     return null
   }
 
-  onChangeGstToggle = (isCheckboxClicked = false) => {
+  onChangeGstToggle = (isCheckboxClicked = false, e) => {
     const { settingGSTEnable } = this.state
     const { setFieldValue, prefix, handleCalcInvoiceSummary } = this.props
     if (!isCheckboxClicked) {
       if (!settingGSTEnable) {
         setFieldValue(`${prefix}IsGSTInclusive`, false)
       }
+    } else if (e.target.value) {
+      this.setState({ isGSTInclusiveChecked: true })
+    } else {
+      this.setState({ isGSTInclusiveChecked: false })
     }
+
     setTimeout(() => handleCalcInvoiceSummary(), 1)
   }
 
   render () {
-    const { settingGSTEnable, settingGSTPercentage } = this.state
+    const {
+      settingGSTEnable,
+      settingGSTPercentage,
+      isGSTInclusiveChecked,
+    } = this.state
     const {
       toggleInvoiceAdjustment,
       handleDeleteInvoiceAdjustment,
@@ -67,7 +78,6 @@ class InvoiceSummary extends PureComponent {
       handleCalcInvoiceSummary,
       setFieldValue,
     } = this.props
-
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
         <GridContainer style={{ paddingBottom: 8 }}>
@@ -98,20 +108,22 @@ class InvoiceSummary extends PureComponent {
             if (!adjustmentList) return null
             return adjustmentList.map((v, i) => {
               if (!v.adjustmentList) {
-                return (
-                  <InvoiceAdjustment
-                    key={v.id}
-                    index={i}
-                    adjustmentList={adjustmentList}
-                    handleCalcInvoiceSummary={handleCalcInvoiceSummary}
-                    adjustmentListName={adjustmentListName}
-                    setFieldValue={setFieldValue}
-                    handleDeleteInvoiceAdjustment={
-                      handleDeleteInvoiceAdjustment
-                    }
-                    {...amountProps}
-                  />
-                )
+                if (v.isDeleted === false) {
+                  return (
+                    <InvoiceAdjustment
+                      key={v.id}
+                      index={i}
+                      adjustmentList={adjustmentList}
+                      handleCalcInvoiceSummary={handleCalcInvoiceSummary}
+                      adjustmentListName={adjustmentListName}
+                      setFieldValue={setFieldValue}
+                      handleDeleteInvoiceAdjustment={
+                        handleDeleteInvoiceAdjustment
+                      }
+                      {...amountProps}
+                    />
+                  )
+                }
               }
               return null
             })
@@ -123,13 +135,14 @@ class InvoiceSummary extends PureComponent {
             <GridItem xs={2} md={9} />
             <GridItem xs={4} md={2}>
               <span> {`GST (${settingGSTPercentage}%): `}</span>
-              <FastField
+              <Field
                 name={`${prefix}IsGSTEnabled`}
                 render={(args) => (
                   <Switch
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
+                    disabled={isGSTInclusiveChecked}
                     {...args}
                   />
                 )}
@@ -160,7 +173,7 @@ class InvoiceSummary extends PureComponent {
                           label={formatMessage({
                             id: 'inventory.pr.detail.pod.summary.inclusiveGST',
                           })}
-                          onChange={() => this.onChangeGstToggle(true)}
+                          onChange={(e) => this.onChangeGstToggle(true, e)}
                           {...args}
                         />
                       </Tooltip>

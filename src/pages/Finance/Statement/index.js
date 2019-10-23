@@ -17,7 +17,13 @@ import {
   DialogContent,
   DialogContentText,
 } from '@material-ui/core'
-import { Button, CommonTableGrid, Tooltip, dateFormatLong } from '@/components'
+import {
+  Button,
+  CommonTableGrid,
+  Tooltip,
+  dateFormatLong,
+  CardContainer,
+} from '@/components'
 // sub components
 import SearchBar from './SearchBar'
 import AddNewStatement from './NewStatement/AddNewStatement'
@@ -181,7 +187,7 @@ class Statement extends PureComponent {
     }
     const { rows, columns } = this.state
     return (
-      <React.Fragment>
+      <CardContainer hideHeader>
         <SearchBar
           history={history}
           handleSearch={this.handleSearch}
@@ -288,7 +294,7 @@ class Statement extends PureComponent {
             </Button>
           </DialogActions>
         </Dialog>
-      </React.Fragment>
+      </CardContainer>
     )
   }
 }

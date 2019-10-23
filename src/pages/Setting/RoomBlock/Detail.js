@@ -121,7 +121,6 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
     },
   ),
   handleSubmit: (values, { props, resetForm }) => {
-    console.log('submit')
     const { dispatch, onClose, onConfirm } = props
     const {
       restRoomBlock,
@@ -135,14 +134,13 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       recurrenceDto,
       ...restValues
     } = values
-
     try {
       const roomBlock = {
         ...restRoomBlock,
         eventDate,
         eventTime,
         recordClinicFK: 1,
-        roomBlockGroupFK,
+        roomBlockGroupFK: restValues.id,
         remarks,
         // startDateTime: startDate.formatUTC(),
         // endDateTime: endDate.formatUTC(),
@@ -180,11 +178,11 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       })
 
       let payload = {
+        ...restValues,
         roomBlockGroupFK,
         isEnableRecurrence,
         roomBlock: roomBlocks,
         recordClinicFK: 1,
-        ...restValues,
       }
       if (isEnableRecurrence)
         payload = {
@@ -243,7 +241,6 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, values } = props
-    console.log('props', this.props)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>

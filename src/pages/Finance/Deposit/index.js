@@ -25,8 +25,6 @@ class Deposit extends PureComponent {
   }
 
   queryDepositListing = () => {
-    console.log('asasdsd')
-
     this.props.dispatch({
       type: 'deposit/query',
       payload: {
@@ -42,9 +40,6 @@ class Deposit extends PureComponent {
     const { classes, ...restProps } = props
     return (
       <CardContainer hideHeader>
-        <h4 className={classes.header}>
-          {formatMessage({ id: 'finance.deposit.title' })}
-        </h4>
         <FilterBar
           queryDepositListing={this.queryDepositListing}
           {...restProps}

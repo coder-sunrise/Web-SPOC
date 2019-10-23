@@ -101,6 +101,9 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   displayName: 'OrderPage',
 })
 class Medication extends PureComponent {
+  state = {
+    stockList: [],
+  }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
@@ -345,6 +348,21 @@ class Medication extends PureComponent {
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
     }
+  }
+
+  componentDidMount () {
+    this.props
+      .dispatch({
+        type: 'orders/getStockDetails',
+        payload: {
+          id: 1,
+        },
+      })
+      .then((v) => {
+        if (v) {
+          this.setState({ stockList: v })
+        }
+      })
   }
 
   render () {
@@ -757,7 +775,15 @@ class Medication extends PureComponent {
             <FastField
               name='batchNo'
               render={(args) => {
-                return <TextField label='Batch No' rowsMax='1' {...args} />
+                return (
+                  <Select
+                    label='Batch No'
+                    labelField='displayValue'
+                    valueField='displayValue'
+                    options={this.state.stockList}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

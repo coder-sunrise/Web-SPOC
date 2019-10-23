@@ -5,4 +5,5 @@ export const amountProps = {
   disabled: true,
   rightAlign: true,
   normalText: true,
+  percentage: false,
 }

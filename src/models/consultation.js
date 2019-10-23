@@ -221,6 +221,25 @@ export default createFormViewModel({
         }
         return response
       },
+      *overwrite ({ payload }, { call, put }) {
+        const response = yield call(service.overwrite, payload.id)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: response,
+              version: payload.version,
+            },
+          })
+          yield put({
+            type: 'queryDone',
+            payload: {
+              data: response,
+            },
+          })
+        }
+        return response
+      },
       *sign ({ payload }, { call, put }) {
         const response = yield call(service.sign, payload)
         if (response) {

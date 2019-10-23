@@ -18,7 +18,7 @@ const ActionButton = ({ row, onClick }) => {
 
   if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
     return (
-      <Tooltip title='More Actions'>
+      <Tooltip title='More Options'>
         <div>
           <GridButton
             row={row}
@@ -92,6 +92,7 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: isStatusInProgress,
+              hidden: !isStatusWaiting,
             }
           case 6: // resume consultation
             return {
@@ -115,7 +116,7 @@ const ActionButton = ({ row, onClick }) => {
     ],
   )
   return (
-    <Tooltip title='More Actions'>
+    <Tooltip title='More Options'>
       <div>
         <GridButton
           row={row}

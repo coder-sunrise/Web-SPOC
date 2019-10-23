@@ -81,7 +81,12 @@ const PaymentCard = ({
           payments
             .sort((a, b) => moment(a.date) - moment(b.date))
             .map((payment) => (
-              <PaymentRow {...payment} handleVoidClick={handleVoidClick} readOnly={readOnly} />
+              <PaymentRow
+                {...payment}
+                handleVoidClick={handleVoidClick}
+                handlePrinterClick={handlePrinterClick}
+                readOnly={readOnly}
+              />
             ))
         ) : (
           ''
@@ -93,6 +98,7 @@ const PaymentCard = ({
             type={payerType}
             invoicePayerFK={invoicePayerFK}
             readOnly={readOnly}
+            handlePrinterClick={handlePrinterClick}
             {...buttonActions}
           />
         </GridItem>
