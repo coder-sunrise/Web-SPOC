@@ -24,10 +24,10 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
   name: Yup.number().required(),
-  batchNo: Yup.number().when('expiryDate', {
+  batchNo: Yup.array().when('expiryDate', {
     is: (v) => v === undefined || v === '',
     then: Yup.number().nullable(),
-    otherwise: Yup.number().required(),
+    otherwise: Yup.array().required(),
   }),
   expiryDate: Yup.string().nullable(),
 
@@ -78,8 +78,8 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        // batchNo: x.batchNo[0],
-        // expiryDate: x.expiryDate,
+        batchNo: x.batchNo[0],
+        expiryDate: x.expiryDate,
         sortOrder: index + 1,
       }
     })
@@ -463,7 +463,7 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    // console.log('DODetails', this.props)
+    console.log('DODetails', this.props)
     const isEditable = true
     const { props } = this
     const { footer, values, theme, refreshDeliveryOrder } = props
@@ -583,6 +583,9 @@ class DODetails extends PureComponent {
           },
           onChange: (e) => {
             this.handleSelectedBatch(e)
+          },
+          render: (row) => {
+            return <TextField text value={row.batchNo[0]} />
           },
         },
         {
