@@ -739,6 +739,7 @@ class Medication extends PureComponent {
                   <Select
                     label='Batch No'
                     labelField='displayValue'
+                    valueField='displayValue'
                     options={this.state.stockList}
                     {...args}
                   />
