@@ -213,12 +213,11 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-<<<<<<< HEAD
     // console.log(v, op)
     console.log('hh ', op)
+    console.log("v ", v)
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
-=======
     let tempArray = [
       ...this.state.stockList,
     ]
@@ -226,7 +225,6 @@ class Medication extends PureComponent {
     this.setState(() => {
       return { selectionOptions: tempArray }
     })
->>>>>>> dev_wongkaisian
     const { setFieldValue, values, codetable } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
@@ -796,6 +794,7 @@ class Medication extends PureComponent {
                     valueField='batchNo'
                     options={this.state.selectionOptions}
                     onChange={(e, op = {}) => {
+                      console.log()
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
                     {...args}
