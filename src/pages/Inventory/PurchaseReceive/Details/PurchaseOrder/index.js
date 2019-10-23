@@ -22,6 +22,7 @@ import {
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
+  isInvoiceReadOnly,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 import AuthorizedContext from '@/components/Context/Authorized'
@@ -442,7 +443,10 @@ class index extends Component {
             // rights: 'disable',
           }}
         >
-          <POForm isReadOnly={!isPOStatusDraft(poStatus)} {...this.props} />
+          <POForm
+            isReadOnly={isInvoiceReadOnly(poStatus)}
+            setFieldValue={setFieldValue}
+          />
         </AuthorizedContext.Provider>
 
         <POGrid

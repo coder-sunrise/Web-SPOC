@@ -39,10 +39,8 @@ class CHAS extends React.Component {
 
   navigateToInvoiceDetails = (row) => {
     const { history } = this.props
-    const { invoiceNo } = row
-    const processedInvoiceNo = invoiceNo.replace('/', '-')
-
-    history.push(`/claim-submission/chas/invoice/${processedInvoiceNo}`)
+    const { invoiceFK } = row
+    history.push(`/claim-submission/chas/invoice/details?id=${invoiceFK}`)
   }
 
   handleContextMenuItemClick = (row, id, allowEdit = false) => {
@@ -59,7 +57,15 @@ class CHAS extends React.Component {
         })
         break
       case '1':
-        this.navigateToInvoiceDetails(row.id)
+        // this.navigateToInvoiceDetails(row)
+        dispatch({
+          type: 'claimSubmission/queryById',
+          payload: {
+            id: row.id,
+          },
+        }).then((r) => {
+          if (r) this.navigateToInvoiceDetails(r.payload)
+        })
         break
       default:
         break
