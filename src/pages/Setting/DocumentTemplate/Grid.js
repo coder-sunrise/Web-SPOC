@@ -13,7 +13,6 @@ class Grid extends PureComponent {
   editRow = (row, e) => {
     const { dispatch, settingDocumentTemplate } = this.props
 
-    
     const { list } = settingDocumentTemplate
 
     dispatch({
@@ -74,9 +73,14 @@ class Grid extends PureComponent {
           {
             columnName: 'templateContent',
             render: (row) => {
-              //return htmlToText.fromString(row.templateMessage)
+              // return htmlToText.fromString(row.templateMessage)
+              let e = document.createElement('div')
+              e.innerHTML = row.templateContent
+              let htmlData =
+                e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue
+
               const templateMessageProps = {
-                templateContent: htmlToText.fromString(row.templateContent),
+                templateContent: htmlToText.fromString(htmlData),
               }
 
               return <MouseOverPopover {...templateMessageProps} />
@@ -95,7 +99,7 @@ class Grid extends PureComponent {
           {
             columnName: 'action',
             sortingEnabled: false,
-            render: (row) => {  
+            render: (row) => {
               return (
                 <Tooltip title='Edit Document Template' placement='top-end'>
                   <Button
@@ -105,7 +109,7 @@ class Grid extends PureComponent {
                     }}
                     justIcon
                     color='primary'
-                    style={{ marginRight: 0}}
+                    style={{ marginRight: 0 }}
                   >
                     <Edit />
                   </Button>

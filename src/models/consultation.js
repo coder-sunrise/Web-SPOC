@@ -99,6 +99,8 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation paused`,
           })
+
+      
           yield put({ type: 'closeModal' })
         }
         return response
@@ -226,6 +228,7 @@ export default createFormViewModel({
             message: `Consultation signed`,
           })
           yield put({ type: 'closeModal' })
+          console.log("payload ", payload)
         }
         return response
       },

@@ -802,6 +802,7 @@ const tenantCodes = [
   'documenttemplate',
   'ctMedicationFrequency',
   'ltinvoiceitemtype',
+  'ctMedicationDosage',
 ]
 
 // const codes = [
