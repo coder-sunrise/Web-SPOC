@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react'
-import { Tooltip } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import FromToTime from './FromToTime'
 
 export default class Grid extends PureComponent {

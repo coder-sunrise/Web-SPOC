@@ -1,6 +1,7 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
-// import * as service from '../services'
+import * as service from '@/pages/Inventory/InventoryAdjustment/services'
+
 import {
   getUniqueId,
   maxReducer,
@@ -46,33 +47,33 @@ export default createListViewModel({
         vaccinationGivenDate: moment(),
         quantity: 1,
       },
-      default: {
-        corPrescriptionItemPrecaution: [
-          {
-            action: '1',
-            count: 1,
-            unit: '1',
-            frequency: '1',
-            day: 1,
-            // precaution: '1',
-            operator: '1',
-          },
-        ],
-        descriptions: [
-          {
-            action: '1',
-            count: 1,
-            unit: '1',
-            frequency: '1',
-            day: 1,
-            precaution: '1',
-            operator: '1',
-          },
-        ],
-        quantity: 1,
-        total: 20,
-        totalAfterAdj: 18,
-      },
+      // default: {
+      //   corPrescriptionItemPrecaution: [
+      //     {
+      //       action: '1',
+      //       count: 1,
+      //       unit: '1',
+      //       frequency: '1',
+      //       day: 1,
+      //       // precaution: '1',
+      //       operator: '1',
+      //     },
+      //   ],
+      //   descriptions: [
+      //     {
+      //       action: '1',
+      //       count: 1,
+      //       unit: '1',
+      //       frequency: '1',
+      //       day: 1,
+      //       precaution: '1',
+      //       operator: '1',
+      //     },
+      //   ],
+      //   quantity: 1,
+      //   total: 20,
+      //   totalAfterAdj: 18,
+      // },
     },
     subscriptions: ({ dispatch, history }) => {
       // history.listen(async (loct, method) => {
@@ -110,6 +111,12 @@ export default createListViewModel({
           type: 'calculateAmount',
         })
       },
+
+      *getStockDetails ({ payload }, { call, put }) {
+        const result = yield call(service.queryStockDetails, payload)
+        return result
+        // yield put({ type: 'saveStockDetails', payload: result })
+      },
     },
 
     reducers: {
@@ -144,15 +151,16 @@ export default createListViewModel({
 
       deleteRow (state, { payload }) {
         const { finalAdjustments, rows } = state
-        const tempRows = [...rows]
-
-
-        tempRows.map((a, index) => {
-          if (a.uid === payload.uid) {
-            tempRows.splice(index, 1)
-          }
-          return a
-        })
+        const tempRows = [
+          ...rows,
+        ]
+        if (payload)
+          tempRows.map((a, index) => {
+            if (a.uid === payload.uid) {
+              tempRows.splice(index, 1)
+            }
+            return a
+          })
 
         const amount = calculateAmount(tempRows, finalAdjustments)
 
@@ -163,7 +171,6 @@ export default createListViewModel({
             if (!payload || o.uid === payload.uid) o.isDeleted = true
             return o
           }),
-          
         }
       },
 

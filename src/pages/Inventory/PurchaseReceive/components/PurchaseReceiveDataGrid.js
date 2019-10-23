@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { formatMessage } from 'umi/locale'
-import { CommonTableGrid, Tooltip } from '@/components'
+import { CommonTableGrid, Tooltip, notification } from '@/components'
 import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
-import { notification } from '@/components'
 
 const PurchaseReceiveDataGrid = ({
   selectedRows,
@@ -57,6 +56,10 @@ const PurchaseReceiveDataGrid = ({
               return <p />
             return <p>{invoiceStatus}</p>
           },
+        },
+        {
+          columnName: 'supplier',
+          sortBy: 'supplierFKNavigation.displayValue',
         },
         {
           columnName: 'purchaseOrderDate',

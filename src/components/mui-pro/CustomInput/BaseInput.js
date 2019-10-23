@@ -39,6 +39,7 @@ const _config = {
       'disabled',
       'inputComponent',
       'maxLength',
+      'autocomplete',
     ],
   },
 }

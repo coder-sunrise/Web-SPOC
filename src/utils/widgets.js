@@ -139,6 +139,11 @@ const widgets = [
     }),
     model: 'consultationDocument',
     layoutConfig: {},
+    // onRemove: () => {
+    //   window.g_app._store.dispatch({
+    //     type: 'consultationDocument/deleteRow',
+    //   })
+    // },
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
@@ -268,17 +273,17 @@ const widgets = [
       </Tooltip>
     ),
   },
-  {
-    id: '1001',
-    name: 'Test Widget',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/TestWidget'),
-      loading: Loading,
-    }),
-    layoutConfig: {
-      style: {},
-    },
-  },
+  // {
+  //   id: '1001',
+  //   name: 'Test Widget',
+  //   component: Loadable({
+  //     loader: () => import('@/pages/Widgets/TestWidget'),
+  //     loading: Loading,
+  //   }),
+  //   layoutConfig: {
+  //     style: {},
+  //   },
+  // },
   // {
   //   id: '1002',
   //   name: 'Dental Chart',

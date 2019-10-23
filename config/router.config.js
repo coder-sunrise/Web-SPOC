@@ -792,6 +792,12 @@ const routes = [
             // mini: 'C',
             component: './Development/Control',
           },
+          {
+            path: '/development/test',
+            name: 'Test',
+            // mini: 'C',
+            component: './Development/Control',
+          },
           // {
           //   path: '/development/imageeditor',
           //   name: 'TUIImageEditor',

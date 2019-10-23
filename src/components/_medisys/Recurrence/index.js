@@ -62,6 +62,7 @@ const Recurrence = ({
   const _labelSize = labelSize[size]
   const blockSize = (12 - _labelSize) / 2
   const _inputSize = block ? blockSize : inputSize[size]
+
   return (
     <Fragment>
       <FastField
@@ -167,7 +168,7 @@ const Recurrence = ({
                     render={(args) => (
                       <DatePicker
                         disabled={disabled}
-                        recurrenceRestrict
+                        recurrenceRestrict={appointmentDate}
                         {...args}
                       />
                     )}

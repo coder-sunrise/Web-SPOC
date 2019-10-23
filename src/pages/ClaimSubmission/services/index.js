@@ -5,6 +5,7 @@ const url = '/api/InvoiceClaim'
 const countUrl = '/api/InvoiceClaim/Count'
 const chasClaimUrl = '/api/InvoiceClaim/SubmitChasClaim'
 const chasClaimStatusUrl = '/api/InvoiceClaim/Status'
+const bizSessionAPIURL = '/api/bizsession'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),
@@ -23,4 +24,5 @@ module.exports = {
 
     return r
   },
+  getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
 }

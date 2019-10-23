@@ -40,6 +40,7 @@ const DispenseDetails = ({
   values,
   dispatch,
   viewOnly = false,
+  handleClickPrintDrugLabel
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
@@ -54,7 +55,7 @@ const DispenseDetails = ({
               title='Prescription'
               height={200}
               columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(viewOnly)}
+                          colExtensions={PrescriptionColumnExtensions(viewOnly, handleClickPrintDrugLabel)}
               data={prescription}
             />
           </GridItem>
@@ -92,6 +93,7 @@ const DispenseDetails = ({
                   gstAmtField: 'gstAmount',
                 }}
                 onValueChanged={(v) => {
+                  console.log(v)
                   setFieldValue(
                     'invoice.invoiceTotalAftGST',
                     v.summary.totalWithGST,

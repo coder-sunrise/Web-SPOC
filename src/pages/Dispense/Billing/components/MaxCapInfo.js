@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 // material ui
-import { Popover, withStyles } from '@material-ui/core'
+import { Divider, Popover, withStyles } from '@material-ui/core'
 import Info from '@material-ui/icons/Info'
 // common components
 import { GridContainer, GridItem } from '@/components'
@@ -128,17 +128,23 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
             <GridItem md={2}>
               <span className={classes.blueText}>{patientMinPayable}</span>
             </GridItem>
+            <GridItem md={12} className={classes.noPaddingLeft}>
+              <Divider />
+            </GridItem>
           </GridContainer>
           <GridContainer>
             {categoriesMaxCap.map((categoryMaxCap) => (
               <React.Fragment>
                 <GridItem md={10} className={classes.noPaddingLeft}>
-                  <span>{categoryMaxCap.type} Max. Cap.:</span>
+                  <span>{categoryMaxCap.type} Max. Cap:</span>
                 </GridItem>
                 <GridItem md={2} className={classes.rightAlign}>
                   <span className={classes.blueText}>
                     ${categoryMaxCap.value}
                   </span>
+                </GridItem>
+                <GridItem md={12} className={classes.noPaddingLeft}>
+                  <Divider />
                 </GridItem>
               </React.Fragment>
             ))}

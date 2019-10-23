@@ -22,8 +22,10 @@ import {
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
+  isInvoiceReadOnly,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 // @connect(({ clinicSettings }) => ({
 //   clinicSettings,
@@ -48,6 +50,7 @@ class index extends Component {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
     showReport: false,
+    inclusiveGSTChecked: false,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -69,6 +72,10 @@ class index extends Component {
   }
 
   componentDidMount () {
+    this.getPOdata()
+  }
+
+  getPOdata = () => {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails
     switch (type) {
@@ -161,7 +168,7 @@ class index extends Component {
             type: `formik/clean`,
             payload: 'purchaseOrderDetails',
           })
-          history.push('/inventory/pr')
+          this.getPOdata()
         }
       })
       validation = true
@@ -413,99 +420,132 @@ class index extends Component {
     }))
   }
 
+  setInclusiveGSTChecked = () => {
+    this.setState({ inclusiveGSTChecked: true })
+  }
+
   render () {
-    // console.log('PORender', this.props)
     const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled } = purchaseOrder || false
-    // console.log(this.props)
+    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     return (
+      // <AuthorizedContext.Provider
+      //   value={{
+      //     rights: poStatus !== 6 ? 'enable' : 'disable',
+      //     // rights: 'disable',
+      //   }}
+      // >
       <div>
-        <POForm isReadOnly={!isPOStatusDraft(poStatus)} {...this.props} />
+        <AuthorizedContext.Provider
+          value={{
+            rights: poStatus !== 6 ? 'enable' : 'disable',
+            // rights: 'disable',
+          }}
+        >
+          <POForm
+            isReadOnly={isInvoiceReadOnly(poStatus)}
+            setFieldValue={setFieldValue}
+          />
+        </AuthorizedContext.Provider>
+
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
           {...this.props}
         />
-        <POSummary
-          toggleInvoiceAdjustment={this.showInvoiceAdjustment}
-          handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
-          handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
-          prefix='purchaseOrder.'
-          adjustmentListName='purchaseOrderAdjustment'
-          adjustmentList={purchaseOrderAdjustment}
-          IsGSTEnabled={IsGSTEnabled}
-          setFieldValue={setFieldValue}
-          // {...this.props}
-        />
-
-        <GridContainer
-          style={{
-            marginTop: 20,
-            display: 'flex',
-            justifyContent: 'flex-end',
+        <AuthorizedContext.Provider
+          value={{
+            rights: poStatus !== 6 ? 'enable' : 'disable',
+            // rights: 'disable',
           }}
         >
-          {isPOStatusDraft(poStatus) && type === 'edit' ? (
-            <ProgressButton
-              color='danger'
-              icon={null}
-              onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.cancelpo',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
-          )}
-          <ProgressButton
-            color='primary'
-            icon={null}
-            onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
-          >
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.save',
-            })}
-          </ProgressButton>
-          {!isPOStatusDraft(poStatus) ? (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() =>
-                this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
-              disabled={!isPOStatusFulfilled(poStatus)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.complete',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
-          )}
-          {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() =>
-                this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.finalize',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
-          )}
+          <POSummary
+            toggleInvoiceAdjustment={this.showInvoiceAdjustment}
+            handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
+            handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
+            prefix='purchaseOrder.'
+            adjustmentListName='purchaseOrderAdjustment'
+            adjustmentList={purchaseOrderAdjustment}
+            IsGSTEnabled={IsGSTEnabled}
+            setInclusiveGSTChecked={this.setInclusiveGSTChecked}
+            inclusiveGSTChecked={this.state.inclusiveGSTChecked}
+            setFieldValue={setFieldValue}
+            // {...this.props}
+          />
 
-          <ProgressButton color='info' icon={null} onClick={this.toggleReport}>
-            {formatMessage({
-              id: 'inventory.pr.detail.print',
-            })}
-          </ProgressButton>
-        </GridContainer>
+          <GridContainer
+            style={{
+              marginTop: 20,
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            {isPOStatusDraft(poStatus) && type === 'edit' ? (
+              <ProgressButton
+                color='danger'
+                icon={null}
+                onClick={() =>
+                  this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+              >
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.cancelpo',
+                })}
+              </ProgressButton>
+            ) : (
+              ''
+            )}
+            <ProgressButton
+              color='primary'
+              icon={null}
+              onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.save',
+              })}
+            </ProgressButton>
+            {!isPOStatusDraft(poStatus) ? (
+              <ProgressButton
+                color='success'
+                icon={null}
+                onClick={() =>
+                  this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+                disabled={!isPOStatusFulfilled(poStatus)}
+              >
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.complete',
+                })}
+              </ProgressButton>
+            ) : (
+              ''
+            )}
+            {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+              <ProgressButton
+                color='success'
+                icon={null}
+                onClick={() =>
+                  this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+              >
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.finalize',
+                })}
+              </ProgressButton>
+            ) : (
+              ''
+            )}
+
+            <ProgressButton
+              color='info'
+              icon={null}
+              onClick={this.toggleReport}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.print',
+              })}
+            </ProgressButton>
+          </GridContainer>
+        </AuthorizedContext.Provider>
 
         <CommonModal
           open={this.state.showReport}
@@ -521,6 +561,7 @@ class index extends Component {
           />
         </CommonModal>
       </div>
+      // </AuthorizedContext.Provider>
     )
   }
 }

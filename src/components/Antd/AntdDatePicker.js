@@ -215,7 +215,7 @@ class AntdDatePicker extends PureComponent {
     if (recurrenceRestrict) {
       return (
         current &&
-        (current < moment().endOf('day') ||
+        (current < moment(recurrenceRestrict).endOf('day') ||
           current > moment().add(3, 'months').startOf('day'))
       )
     }

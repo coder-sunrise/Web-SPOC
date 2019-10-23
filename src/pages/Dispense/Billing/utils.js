@@ -33,7 +33,7 @@ export const computeTotalForAllSavedClaim = (sum, payer) =>
     : sum
 
 export const convertAmountToPercentOrCurrency = (type, amount) =>
-  type.toLowerCase() === 'percentage' ? `${amount}%` : `$${amount}`
+  type.toLowerCase() === 'percentage' ? `${amount}%` : `$${amount.toFixed(2)}`
 
 export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   let coverage = 0
@@ -56,7 +56,7 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
       coPaymentItem.itemValueType,
       coPaymentItem.itemValue,
     )
-    schemeCoverage = coverage
+    schemeCoverage = coPaymentItem.itemValue
     schemeCoverageType = coPaymentItem.itemValueType
     return { coverage, schemeCoverage, schemeCoverageType }
   }
@@ -85,44 +85,6 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   }
 
   return { coverage, schemeCoverage, schemeCoverageType }
-
-  // let coverage = 0
-  // let schemeCoverageType = 'Percentage'
-  // let schemeCoverage = 0
-
-  // get coverage amount
-  // 1. first priority: coPaymentByItem
-  // 2. second priority: coPaymentByCategory
-  // 3. third priority: overall value
-  // if (scheme.coPaymentByItem.length > 0) {
-  //   const coPaymentItem = scheme.coPaymentByItem.find(
-  //     (_coPaymentItem) => _coPaymentItem.itemFk === item.id,
-  //   )
-
-  //   coverage = convertAmountToPercentOrCurrency(
-  //     coPaymentItem.itemValueType,
-  //     coPaymentItem.itemValue,
-  //   )
-  // } else if (scheme.coPaymentByCategory.length > 0) {
-  //   // use coverage
-  //   const itemCategory = scheme.coPaymentByCategory.find(
-  //     (category) => category.itemTypeFk === item.invoiceItemTypeFk,
-  //   )
-  //   coverage = convertAmountToPercentOrCurrency(
-  //     itemCategory.groupValueType,
-  //     itemCategory.itemGroupValue,
-  //   )
-
-  //   schemeCoverage = itemCategory.itemGroupValue
-  //   schemeCoverageType = itemCategory.groupValueType
-  // } else {
-  //   schemeCoverageType = scheme.overAllCoPaymentValueType
-  //   schemeCoverage = scheme.overAllCoPaymentValue
-  //   coverage = convertAmountToPercentOrCurrency(
-  //     scheme.overAllCoPaymentValueType,
-  //     scheme.overAllCoPaymentValue,
-  //   )
-  // }
 }
 
 export const getApplicableClaimAmount = (
@@ -134,10 +96,12 @@ export const getApplicableClaimAmount = (
     coPaymentByCategory,
     coPaymentByItem,
     isCoverageMaxCapCheckRequired,
+    overAllCoPaymentValue,
+    overAllCoPaymentValueType,
   } = scheme
   let returnClaimAmount = 0
 
-  if (invoicePayerItem.totalAfterGst === 0)
+  if (invoicePayerItem.payableBalance === 0)
     return [
       0,
       remainingCoverageMaxCap,
@@ -153,7 +117,7 @@ export const getApplicableClaimAmount = (
     )
     // TODO get coverage amount from specific item object
     const itemRemainingAmount =
-      invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+      invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
     if (specificItem.itemValueType.toLowerCase() === 'percentage')
       returnClaimAmount =
         itemRemainingAmount * (specificItem.itemGroupValue / 100)
@@ -168,7 +132,7 @@ export const getApplicableClaimAmount = (
       (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
     )
     const itemRemainingAmount =
-      invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+      invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
 
     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
       returnClaimAmount =
@@ -180,8 +144,13 @@ export const getApplicableClaimAmount = (
           : itemCategory.itemGroupValue
     }
   } else {
+    const itemRemainingAmount =
+      invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
+
     returnClaimAmount =
-      invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
+      overAllCoPaymentValueType.toLowerCase() === 'percentage'
+        ? itemRemainingAmount * (overAllCoPaymentValue / 100)
+        : overAllCoPaymentValue
   }
 
   if (isCoverageMaxCapCheckRequired) {
@@ -194,6 +163,8 @@ export const getApplicableClaimAmount = (
       returnClaimAmount = remainingCoverageMaxCap
     }
   }
+  if (returnClaimAmount > invoicePayerItem.payableBalance)
+    returnClaimAmount = invoicePayerItem.payableBalance
 
   return [
     returnClaimAmount,
@@ -211,16 +182,13 @@ const getItemTypeSubtotal = (list, type) =>
 export const validateClaimAmount = (schemeRow, totalPayable) => {
   let invalidMessage = []
 
-  const {
-    _balance,
-    _patientMinPayable,
-    _patientMinPayableType,
-    _coverageMaxCap,
-    schemeConfig,
-    invoicePayerItems,
-  } = schemeRow
+  const { schemeConfig, invoicePayerItems } = schemeRow
 
   const {
+    balance,
+    coverageMaxCap,
+    patientMinCoPaymentAmount,
+    patientMinCoPaymentAmountType,
     medicationCoverageMaxCap,
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
@@ -237,17 +205,17 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
 
   const listOfLimits = []
 
-  if (_balance > 0) listOfLimits.push(_balance)
+  if (balance !== null && balance > 0) listOfLimits.push(balance)
 
-  if (_patientMinPayable > 0) {
+  if (patientMinCoPaymentAmount > 0) {
     const amount =
-      _patientMinPayableType === 'ExactAmount'
-        ? _patientMinPayable
-        : totalPayable * (_patientMinPayable / 100)
-    listOfLimits.push(amount)
+      patientMinCoPaymentAmountType === 'ExactAmount'
+        ? patientMinCoPaymentAmount
+        : totalPayable * (patientMinCoPaymentAmount / 100)
+    listOfLimits.push(totalPayable - amount)
   }
   if (isCoverageMaxCapCheckRequired) {
-    if (_coverageMaxCap > 0) listOfLimits.push(_coverageMaxCap)
+    if (coverageMaxCap > 0) listOfLimits.push(coverageMaxCap)
   } else {
     // check for each item category
     // return isValid = false early
@@ -299,4 +267,20 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
     invalidMessage.push('Total claim amount has exceed the maximum limit')
 
   return invalidMessage
+}
+
+export const validateInvoicePayerItems = (invoicePayerItems) => {
+  const returnData = invoicePayerItems.map((item) => {
+    let maxAmount
+    if (item.schemeCoverageType.toLowerCase() === 'percentage') {
+      maxAmount = item.payableBalance * item.schemeCoverage / 100
+    } else maxAmount = item.payableBalance
+
+    if (item.claimAmount > maxAmount) {
+      return { ...item, error: 'Claim Amount cannot exceed Total Payable' }
+    }
+
+    return { ...item, error: undefined }
+  })
+  return returnData
 }
