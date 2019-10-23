@@ -103,6 +103,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
 class Medication extends PureComponent {
   state = {
     stockList: [],
+    selectionOptions: [],
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -207,7 +208,13 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    console.log(v, op)
+    let tempArray = [
+      ...this.state.stockList,
+    ]
+    tempArray = tempArray.filter((o) => o.inventoryItemFK === v)
+    this.setState(() => {
+      return { selectionOptions: tempArray }
+    })
     const { setFieldValue, values, codetable } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
@@ -215,6 +222,9 @@ class Medication extends PureComponent {
     let dosageValue = 0
     let multipler = 0
     let newTotalQuantity = 0
+
+    setFieldValue('batchNo', undefined)
+    setFieldValue('expiryDate', undefined)
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
@@ -321,7 +331,7 @@ class Medication extends PureComponent {
       })
       .then((v) => {
         if (v) {
-          this.setState({ stockList: v })
+          this.setState({ stockList: v.data })
         }
       })
   }
@@ -732,15 +742,18 @@ class Medication extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={2} className={classes.editor}>
-            <FastField
+            <Field
               name='batchNo'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
                     label='Batch No'
-                    labelField='displayValue'
-                    valueField='displayValue'
-                    options={this.state.stockList}
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectionOptions}
+                    onChange={(e, op = {}) => {
+                      setFieldValue('expiryDate', op.expiryDate)
+                    }}
                     {...args}
                   />
                 )
