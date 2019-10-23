@@ -10,6 +10,7 @@ import {
   DatePicker,
   OutlinedTextField,
   CodeSelect,
+  Field,
 } from '@/components'
 
 const prefix = 'purchaseOrder'
@@ -101,7 +102,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.invoiceDate`}
                 render={(args) => {
                   return (
@@ -109,7 +110,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceDate',
                       })}
-                      // disabled={isReadOnly}
+                      disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -177,7 +178,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.invoiceNo`}
                 render={(args) => {
                   return (
@@ -185,7 +186,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceNo',
                       })}
-                      // disabled={isReadOnly}
+                      disabled={isReadOnly}
                       {...args}
                     />
                   )
