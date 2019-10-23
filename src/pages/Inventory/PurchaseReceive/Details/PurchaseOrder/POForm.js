@@ -143,7 +143,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
         <GridItem xs={12} md={5}>
           <GridContainer>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.purchaseOrderDate`}
                 render={(args) => {
                   return (
