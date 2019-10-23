@@ -92,6 +92,7 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: isStatusInProgress,
+              hidden: !isStatusWaiting,
             }
           case 6: // resume consultation
             return {

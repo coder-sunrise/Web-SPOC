@@ -135,6 +135,7 @@ const gridHeight = window.innerHeight - 250
 
 const Grid = ({
   dispatch,
+  codetable,
   user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
@@ -324,7 +325,6 @@ const Grid = ({
         const valid = isAssignedDoctor(row)
         if (valid) {
           const version = Date.now()
-          
 
           dispatch({
             type: `consultation/start`,
@@ -334,23 +334,22 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
-            dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'ctservice',
-                filter: {
-                  'serviceFKNavigation.IsActive': true,
-                  combineCondition: 'or',
+              dispatch({
+                type: 'codetable/fetchCodes',
+                payload: {
+                  code: 'ctservice',
+                  filter: {
+                    'serviceFKNavigation.IsActive': true,
+                    combineCondition: 'or',
+                  },
                 },
-              },
-            }).then((v) => { 
-              if(v) {
-                router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-                )
-              }
-            })
-              
+              }).then((v) => {
+                if (v) {
+                  router.push(
+                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                  )
+                }
+              })
           })
         }
         break
@@ -410,9 +409,38 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
-              router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-              )
+              if (o.updateByUserFK !== user.data.id) {
+                const { clinicianprofile } = codetable
+                const editingUser = clinicianprofile.find(
+                  (m) => m.userProfileFK === o.updateByUserFK,
+                ) || {
+                  name: 'Someone',
+                }
+                dispatch({
+                  type: 'global/updateAppState',
+                  payload: {
+                    openConfirm: true,
+                    openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                    onConfirmSave: () => {
+                      dispatch({
+                        type: `consultation/overwrite`,
+                        payload: {
+                          id: row.visitFK,
+                          version,
+                        },
+                      }).then((c) => {
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${row.id}&cid=${c.id}&v=${version}&md2=cons`,
+                        )
+                      })
+                    },
+                  },
+                })
+              } else {
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                )
+              }
           })
         }
         break
@@ -466,17 +494,20 @@ const Grid = ({
   )
 }
 
-export default connect(({ queueLog, calendar, global, loading, user }) => ({
-  user,
-  filter: queueLog.currentFilter,
-  selfOnly: queueLog.selfOnly,
-  queueList: queueLog.list || [],
-  calendarEvents: calendar.list || [],
-  showingVisitRegistration: global.showVisitRegistration,
-  queryingList:
-    loading.effects['queueLog/refresh'] ||
-    loading.effects['queueLog/getSessionInfo'] ||
-    loading.effects['queueLog/query'] ||
-    loading.effects['calendar/getCalendarList'],
-  queryingFormData: loading.effects['dispense/initState'],
-}))(Grid)
+export default connect(
+  ({ queueLog, calendar, global, loading, user, codetable }) => ({
+    user,
+    codetable,
+    filter: queueLog.currentFilter,
+    selfOnly: queueLog.selfOnly,
+    queueList: queueLog.list || [],
+    calendarEvents: calendar.list || [],
+    showingVisitRegistration: global.showVisitRegistration,
+    queryingList:
+      loading.effects['queueLog/refresh'] ||
+      loading.effects['queueLog/getSessionInfo'] ||
+      loading.effects['queueLog/query'] ||
+      loading.effects['calendar/getCalendarList'],
+    queryingFormData: loading.effects['dispense/initState'],
+  }),
+)(Grid)

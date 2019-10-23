@@ -24,6 +24,7 @@ const styles = (theme) => ({})
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+
     dispatch({
       type: 'settingRoom/upsert',
       payload: {
@@ -34,7 +35,6 @@ const styles = (theme) => ({})
       },
     }).then((r) => {
       if (r) {
-        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'settingRoom/query',
@@ -45,11 +45,9 @@ const styles = (theme) => ({})
   displayName: 'RoomDetail',
 })
 class Detail extends PureComponent {
-  state = {}
-
   render () {
     const { props } = this
-    const { classes, theme, footer, values } = props
+    let { classes, theme, footer, values } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -58,20 +56,24 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocused
-                    disabled={!!values.id}
-                    {...args}
-                  />
-                )}
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Code'
+                      autoFocused
+                      disabled={!!values.id}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={(args) => {
+                  return <TextField label='Display Value' {...args} />
+                }}
               />
             </GridItem>
             <GridItem md={6}>
