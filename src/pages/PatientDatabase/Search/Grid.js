@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { AccountCircle } from '@material-ui/icons'
 import { getAppendUrl } from '@/utils/utils'
 import { statusString } from '@/utils/codes'

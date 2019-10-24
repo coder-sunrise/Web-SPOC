@@ -9,8 +9,9 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
   const { rows: orderRows = [], finalAdjustments = [] } = orders
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p) => {
-    values[p.prop] = (values[p.prop] || [])
-      .concat(orderRows.filter((o) => o.type === p.value))
+    values[p.prop] = orderRows.filter((o) => o.type === p.value)
+    // (values[p.prop] || [])
+    //   .concat(orderRows.filter((o) => o.type === p.value))
   })
   return values
 }

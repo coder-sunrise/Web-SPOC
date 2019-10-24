@@ -288,7 +288,6 @@ export default createFormViewModel({
             type: 'queryDone',
             payload: {
               data: response,
-              page: 'edit order',
             },
           })
         }
@@ -319,26 +318,19 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        console.log('queryDone', payload)
+        // console.log('queryDone', payload)
         const { data, autoOrderList, page, status } = payload
-        let visitRegistration = yield select((st) => st.visitRegistration)
-        let { entity } = visitRegistration
-        if (!entity || Object.values(entity).length === 0) {
-          yield take('visitRegistration/query/@@end')
-          visitRegistration = yield select((st) => st.visitRegistration)
+        // let visitRegistration = yield select((st) => st.visitRegistration)
+        // let { entity } = visitRegistration
+        // if (!entity || Object.values(entity).length === 0) {
+        //   yield take('visitRegistration/query/@@end')
+        //   visitRegistration = yield select((st) => st.visitRegistration)
 
-          entity = visitRegistration.entity
-        }
+        //   entity = visitRegistration.entity
+        // }
 
-        const { visit } = entity
-        const { visitStatus } = visit
-        let orderList = []
-
-        if (visitStatus === 'IN CONS' && status !== 'PAUSED') {
-          orderList = yield put.resolve({
-            type: 'addAutoOrder',
-          })
-        }
+        // const { visit } = entity
+        // const { visitStatus } = visit
 
         if (!data) return null
         let cdRows = []
@@ -380,14 +372,23 @@ export default createFormViewModel({
             )
           })
         }
-
+        // let orderList = []
+        // if (
+        //   oRows.length === 0 &&
+        //   visitStatus === 'IN CONS' &&
+        //   status !== 'PAUSED'
+        // ) {
+        //   orderList = yield put.resolve({
+        //     type: 'addAutoOrder',
+        //   })
+        // }
         yield put({
           type: 'orders/updateState',
           payload: {
-            rows:
-              orderList.length === 0
-                ? _.sortBy(oRows, 'sequence')
-                : _.sortBy(orderList, 'sequence'),
+            rows: _.sortBy(oRows, 'sequence'),
+            // orderList.length === 0
+            //   ? _.sortBy(oRows, 'sequence')
+            //   : _.sortBy(orderList, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,

@@ -371,7 +371,7 @@ class Banner extends PureComponent {
                       pid: info.id,
                     })}
                   >
-                    <Tooltip title={name} placement="bottom-start">
+                    <Tooltip title={name} placement='bottom-start'>
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
                     </Tooltip>
                   </Link>
@@ -437,7 +437,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (

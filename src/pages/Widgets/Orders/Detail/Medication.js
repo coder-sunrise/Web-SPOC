@@ -47,6 +47,10 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       ...(orders.entity || orders.defaultMedication),
       type,
     }
+    if (type === '5') {
+      v.drugCode = 'MISC'
+    }
+
     return v
   },
   enableReinitialize: true,
@@ -335,8 +339,13 @@ class Medication extends PureComponent {
 
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * (newTotalQuantity + totalFirstItem))
-      this.updateTotalPrice(op.sellingPrice * (newTotalQuantity + totalFirstItem))
+      setFieldValue(
+        'totalPrice',
+        op.sellingPrice * (newTotalQuantity + totalFirstItem),
+      )
+      this.updateTotalPrice(
+        op.sellingPrice * (newTotalQuantity + totalFirstItem),
+      )
     } else {
       setFieldValue('unitPrice', undefined)
       setFieldValue('totalPrice', undefined)

@@ -100,20 +100,6 @@ export default createFormViewModel({
             })
           }
         }, 1)
-
-        // if (
-        //   query.new ||
-        //   pathname === '/patientdb/new' ||
-        //   pathname === '/reception/queue'
-        // ) {
-        //   dispatch({
-        //     type: 'updateState',
-        //     payload: {
-        //       currentId: undefined,
-        //       entity: null,
-        //     },
-        //   })
-        // }
       })
     },
     effects: {

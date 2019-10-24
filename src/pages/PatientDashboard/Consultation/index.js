@@ -20,7 +20,6 @@ import {
   Divider,
   Fab,
   Slide,
-  Tooltip,
   Drawer,
 } from '@material-ui/core'
 import PlayArrow from '@material-ui/icons/PlayArrow'
@@ -92,21 +91,20 @@ const saveConsultation = ({
       openConfirmContent: confirmMessage,
       openConfirmText: 'Confirm',
       onConfirmSave: () => {
-        const filteredDiagnosis = [
-          ...values.corDiagnosis.filter(
-            (diagnosis) => diagnosis.diagnosisFK !== undefined,
-          ),
-        ]
-
-        const _filteredDiagnosis = {
-          ...values,
-          corDiagnosis: filteredDiagnosis,
-        }
-
-        const newValues = convertToConsultation(_filteredDiagnosis, {
-          orders,
-          consultationDocument,
-        })
+        const newValues = convertToConsultation(
+          {
+            ...values,
+            corDiagnosis: [
+              ...values.corDiagnosis.filter(
+                (diagnosis) => diagnosis.diagnosisFK !== undefined,
+              ),
+            ],
+          },
+          {
+            orders,
+            consultationDocument,
+          },
+        )
         newValues.duration = Math.floor(
           Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
         )
@@ -505,7 +503,7 @@ class Consultation extends PureComponent {
 
   loadTemplate = (v) => {
     const exist = this.props.values
-    // console.log(exist, v)
+    console.log(exist, v)
     // v.id = exist.id
     // v.concurrencyToken = exist.concurrencyToken
     const mergeArrayProps = [
