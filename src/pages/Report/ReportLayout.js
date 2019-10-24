@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { connect } from 'dva'
 // printjs
 import printJS from 'print-js'
 // ant design
@@ -29,6 +30,7 @@ const ReportLayoutWrapper = ({
   loaded = false,
   fileName = 'Report',
   reportParameters = {},
+  global,
 }) => {
   const [
     isExporting,
@@ -64,18 +66,19 @@ const ReportLayoutWrapper = ({
     }
     setIsExporting(false)
   }
-
+  let loadingText = `Generating ${fileName}...`
+  if (isExporting) loadingText = `Exporting ${fileName}...`
   return (
-    <LoadingWrapper loading={loading} text={`Generating ${fileName}...`}>
+    <LoadingWrapper loading={loading || isExporting} text={loadingText}>
       <BodyWrapper simple={simple}>
         <div style={{ textAlign: 'right' }}>
           <Dropdown
-            disabled={!loaded}
+            disabled={!loaded || isExporting}
             overlay={
               <Menu>
                 <Menu.Item
                   key='export-pdf'
-                  disabled={!loaded}
+                  disabled={!loaded || isExporting}
                   id='pdf'
                   onClick={onExportPDFClick}
                 >
@@ -83,7 +86,7 @@ const ReportLayoutWrapper = ({
                 </Menu.Item>
                 <Menu.Item
                   key='export-excel'
-                  disabled={!loaded}
+                  disabled={!loaded || isExporting}
                   id='excel'
                   onClick={onExportExcelClick}
                 >
@@ -95,7 +98,7 @@ const ReportLayoutWrapper = ({
               'click',
             ]}
           >
-            <Button color='info' size='sm' disabled={!loaded}>
+            <Button color='info' size='sm' disabled={!loaded || isExporting}>
               <SolidExpandMore />
               Export As
             </Button>
@@ -104,7 +107,7 @@ const ReportLayoutWrapper = ({
             color='info'
             size='sm'
             justIcon
-            disabled={!loaded}
+            disabled={!loaded || isExporting}
             onClick={onPrintClick}
           >
             <Print />
@@ -116,4 +119,4 @@ const ReportLayoutWrapper = ({
   )
 }
 
-export default ReportLayoutWrapper
+export default connect(({ global }) => ({ global }))(ReportLayoutWrapper)

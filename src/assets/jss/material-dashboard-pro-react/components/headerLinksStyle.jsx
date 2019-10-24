@@ -45,6 +45,7 @@ const headerLinksStyle = (theme) => ({
       margin: '5px 15px 0',
       width: 'auto',
       height: 'auto',
+      marginRight: 0,
       '& svg': {
         width: '30px',
         height: '24px',
@@ -152,7 +153,15 @@ const headerLinksStyle = (theme) => ({
   },
   username: {
     marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  clinicShortCode: {
+    display: 'inline-block',
+    marginLeft: theme.spacing(1),
     marginRight: theme.spacing(2.5),
+    '& > span': {
+      fontSize: '1rem',
+    },
   },
 })
 

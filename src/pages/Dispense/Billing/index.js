@@ -294,6 +294,7 @@ class Billing extends Component {
           open={showAddPaymentModal}
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
+          observe='AddPaymentForm'
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}

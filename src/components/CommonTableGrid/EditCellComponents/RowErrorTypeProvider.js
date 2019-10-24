@@ -23,14 +23,34 @@ const RowErrorStyles = () => ({
   },
 })
 
-const ListTypeError = ({ errors }) => {
-  // console.log({ errors })
+const replaceSubstr = (originalString, index, replacement) => {
+  return (
+    originalString.substr(0, index) +
+    replacement +
+    originalString.substr(index + replacement.length)
+  )
+}
 
+const ListTypeError = ({ errors }) => {
+  const regex = /(?=(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{4}(?=\b)|\d{1,2}(?=st|nd|rd|th|\b)))\w*\W*(\d{1,2}(?=st|nd|rd|th|\b)|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\D*(\d{4}(?=\b)|\d{1,2}(?=st|nd|rd|th|\b))/
   return (
     <ul>
-      {errors.map((error, index) => (
-        <li key={`rowError-${index}`}>{error.conflictContent}</li>
-      ))}
+      {errors.map((error, index) => {
+        const matched = error.conflictContent.match(regex)
+        let parsed = error.conflictContent
+        if (matched) {
+          const dateStr = matched && matched.length > 0 ? matched[1] : ''
+
+          const dateAfterAddOne = parseInt(dateStr, 10) + 1
+          const indexOfDate = error.conflictContent.indexOf(dateStr)
+          parsed = replaceSubstr(
+            error.conflictContent,
+            indexOfDate,
+            `${dateAfterAddOne}`,
+          )
+        }
+        return <li key={`rowError-${index}`}>{parsed}</li>
+      })}
     </ul>
   )
 }

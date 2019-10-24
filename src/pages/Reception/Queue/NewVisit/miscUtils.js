@@ -86,7 +86,6 @@ export const formikMapPropsToValues = ({
       visitPurposeFK: 1,
       visitStatus: VISIT_STATUS.WAITING,
       doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
-      temperatureC: 0.0,
       ...visitEntries,
     }
   } catch (error) {

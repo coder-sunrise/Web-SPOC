@@ -626,7 +626,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
-  console.log({ tempInvoicePayer })
   return (
     <React.Fragment>
       <GridItem md={2}>

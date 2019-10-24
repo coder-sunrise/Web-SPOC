@@ -152,7 +152,8 @@ export const mapPropsToValues = ({
         const _mobileContact = contactNumbers.find(
           (item) => item.numberTypeFK === 1,
         )
-        if (_mobileContact) patientContactNo = _mobileContact.number
+        if (_mobileContact)
+          patientContactNo = parseInt(_mobileContact.number, 10)
         patientName = name
         patientAccountNo = accNo
       }
