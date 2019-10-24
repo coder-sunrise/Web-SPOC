@@ -9,6 +9,7 @@ import {
   Table,
   TableEditColumn,
   PagingPanel,
+  TableInlineCellEditing,
 } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'

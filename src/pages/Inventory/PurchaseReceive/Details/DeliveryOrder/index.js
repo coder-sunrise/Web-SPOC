@@ -41,6 +41,7 @@ class index extends Component {
   }
 
   refreshDeliveryOrder = () => {
+    console.log('refreshDeliveryOrder')
     this.props.dispatch({
       type: 'deliveryOrderDetails/getOutstandingPOItem',
       payload: this.props.purchaseOrderDetails,

@@ -25,9 +25,9 @@ export default createListViewModel({
       })
     },
     effects: {
-      *generateRunningNo ({ payload }, { call, put }) {
-        return yield call(service.getRunningNo)
-      },
+      // *generateRunningNo ({ payload }, { call, put }) {
+      //   return yield call(service.getRunningNo)
+      // },
 
       *getStockDetails ({ payload }, { call, put }) {
         const result = yield call(service.queryStockDetails, payload)

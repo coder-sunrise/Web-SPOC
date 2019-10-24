@@ -1,10 +1,10 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services/deliveryOrder'
 import moment from 'moment'
+import _ from 'lodash'
+import * as service from '../services/deliveryOrder'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
 import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
-import _ from 'lodash'
 
 const InitialPurchaseOrder = {
   purchaseOrder: {
@@ -55,6 +55,15 @@ export default createFormViewModel({
 
         if (response.status === '200') {
           const { data } = response
+          console.log(data)
+          if (data.deliveryOrderItem) {
+            data.deliveryOrderItem = data.deliveryOrderItem.map((x) => ({
+              ...x,
+              maxCurrentReceivingQty: x.orderQty - x.totalQtyReceived,
+              maxCurrentReceivingBonusQty:
+                x.bonusQuantity - x.totalBonusReceived,
+            }))
+          }
           return yield put({
             type: 'setDeliveryOrder',
             payload: { data },
@@ -64,21 +73,22 @@ export default createFormViewModel({
         return false
       },
       *getOutstandingPOItem ({ payload }, { call, put }) {
+        console.log(payload)
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
           (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
         )
+
+        console.log(tempList)
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
             return {
               ...x,
               orderQuantity: x.orderQuantity,
               totalBonusReceived: x.bonusReceived,
-              currentReceivingQty: x.orderQuantity - x.quantityReceived,
-              currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
-              maxCurrentReceivingQty: x.orderQuantity - x.quantityReceived,
-              maxCurrentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
+              currentReceivingQty: x.orderQuantity - x.totalQtyReceived,
+              currentReceivingBonusQty: x.bonusQty - x.bonusReceived,
             }
           })
         }

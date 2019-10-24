@@ -16,6 +16,7 @@ export default createFormViewModel({
       defaultMedicalCertificate: {
         type: '3',
         mcDays: 1,
+        mcReferenceNo: '-',
         mcStartEndDate: [
           moment().formatUTC(),
           moment(),

@@ -191,7 +191,8 @@ class Layout extends PureComponent {
     // console.log('userDefaultLayout', userDefaultLayout)
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
-    } else if (!localStorage.getItem('consultationLayout')) {
+    } else if (true) {
+      // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
     } else {
       defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))

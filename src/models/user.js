@@ -5,11 +5,14 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
-  // if (name === 'reception/queue') {
-  //   return [
-  //     { name, rights: 'disable' },
-  //   ]
-  // }
+
+  // for testing only
+  if (rights === 'hidden') {
+    return [
+      { name, rights: 'enable' },
+    ]
+  }
+
   if (type === 'Module') {
     return [
       {

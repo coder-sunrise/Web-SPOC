@@ -69,7 +69,7 @@ const receivingDetailsSchema = Yup.object().shape({
       onConfirm,
     } = props
     const { list } = deliveryOrderDetails
-
+    console.log(rows)
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
@@ -297,15 +297,15 @@ class DODetails extends PureComponent {
 
   handleSelectedBatch = (e) => {
     // console.log('handleSelectedBatch', e)
-    // const { option, row } = e
-    // if (option) {
-    //   const { expiryDate, stock, value, batchNo } = option
-    //   row.batchNo = value
-    //   row.expiryDate = expiryDate
-    //   row.stock = stock
-    //   row.batchNoString = batchNo
-    //   this.setState({ selectedItem: e })
-    // }
+    console.log(e)
+    const { option, row, val } = e
+    if (val) {
+      row.batchNo = val[0]
+    }
+    if (option) {
+      const { expiryDate, stock, value, batchNo } = option
+      row.batchNo = value
+    }
     // this.props.dispatch({
     //   // force current edit row components to update
     //   type: 'global/updateState',
@@ -582,7 +582,8 @@ class DODetails extends PureComponent {
             return this.stockOptions(row)
           },
           onChange: (e) => {
-            this.handleSelectedBatch(e)
+            console.log(e)
+            // this.handleSelectedBatch(e)
           },
         },
         {

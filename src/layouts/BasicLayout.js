@@ -137,6 +137,10 @@ class BasicLayout extends React.PureComponent {
       }
 
       dispatch({
+        type: 'codetable/fetchAllCachedCodetable',
+      })
+
+      dispatch({
         type: 'clinicInfo/query',
         payload: localStorage.getItem('clinicCode'),
       })

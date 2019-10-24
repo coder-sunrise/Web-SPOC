@@ -7,9 +7,13 @@ export default (theme) => ({
   leftAlignText: {
     textAlign: 'left',
   },
+  rightAlignText: {
+    textAlign: 'right',
+  },
   centerText: {
     textAlign: 'center',
   },
+  currencyText: { color: 'darkblue', fontWeight: 500 },
   boldText: {
     fontWeight: 'bold',
   },

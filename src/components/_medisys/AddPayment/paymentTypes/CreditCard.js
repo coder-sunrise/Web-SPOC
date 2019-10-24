@@ -59,7 +59,14 @@ const CreditCard = ({
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].creditCardNo`}
-            render={(args) => <TextField label='Card No.' {...args} />}
+            render={(args) => (
+              <NumberInput
+                inputProps={{ maxLength: 4 }}
+                maxLength={4}
+                label='Card No.'
+                {...args}
+              />
+            )}
           />
         </GridItem>
       </GridContainer>
