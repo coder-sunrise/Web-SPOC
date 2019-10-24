@@ -53,6 +53,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       sequence: rows.length,
       ...values,
       subject: currentType.getSubject(values),
+      isDeleted: false,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -183,6 +184,7 @@ class Vaccination extends PureComponent {
                 return (
                   <CodeSelect
                     label='Dosage'
+                    labelField='displayValue'
                     allowClear={false}
                     code='ctMedicationDosage'
                     {...args}

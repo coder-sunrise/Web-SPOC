@@ -43,10 +43,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    // quantity: Yup.number().required(),
     quantity: Yup.number() 
-      .min(1, 'Quantity must be between 1 and 999')
-      .max(999, 'Quantity must be between 1 and 999'),
+      .min(0.1, 'Quantity must be between 0.1 and 999')
+      .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
@@ -84,6 +83,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       sequence: rows.length,
       ...values,
       subject: currentType.getSubject(values),
+      isDeleted: false,
     }
 
     dispatch({
