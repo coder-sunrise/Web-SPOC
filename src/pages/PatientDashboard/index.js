@@ -150,26 +150,12 @@ class PatientDashboard extends PureComponent {
           //     cid: o.id,
           //   }),
           // )
-          this.props
-            .dispatch({
-              type: 'codetable/fetchCodes',
-              payload: {
-                code: 'ctservice',
-                filter: {
-                  'serviceFKNavigation.IsActive': true,
-                  combineCondition: 'or',
-                },
-              },
-            })
-            .then((v) => {
-              if (v) {
-                router.push(
-                  `/reception/queue/patientdashboard?qid=${findGetParameter(
-                    'qid',
-                  )}&cid=${o.id}&v=${version}&md2=cons`,
-                )
-              }
-            })
+
+          router.push(
+            `/reception/queue/patientdashboard?qid=${findGetParameter(
+              'qid',
+            )}&cid=${o.id}&v=${version}&md2=cons`,
+          )
       })
   }
 

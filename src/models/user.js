@@ -38,7 +38,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    if (name === 'statement.statementdetails') {
+    if (name === 'scheme.schemedetails') {
       return [
         { name, rights: 'hidden' },
       ]

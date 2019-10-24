@@ -183,12 +183,14 @@ class Details extends PureComponent {
     } = props
     const { type, entity } = orders
     // console.log(values)
+    
     const cfg = {
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
       type,
       ...props,
     }
+
     return (
       <div>
         <div className={classes.detail}>
