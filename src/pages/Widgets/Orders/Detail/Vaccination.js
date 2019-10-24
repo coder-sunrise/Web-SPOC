@@ -185,6 +185,8 @@ class Vaccination extends PureComponent {
                     label='Dosage'
                     allowClear={false}
                     code='ctMedicationDosage'
+                    labelField='displayValue'
+                    valueFiled='id'
                     {...args}
                   />
                 )
