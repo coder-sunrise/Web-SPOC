@@ -4,7 +4,7 @@ import request from '@/utils/request'
 const url = '/api/InvoiceClaim'
 const countUrl = '/api/InvoiceClaim/Count'
 const chasClaimUrl = '/api/InvoiceClaim/SubmitChasClaim'
-const chasClaimStatusUrl = '/api/InvoiceClaim/Status'
+const chasClaimStatusUrl = '/api/InvoiceClaim/RefreshStatus'
 const bizSessionAPIURL = '/api/bizsession'
 
 module.exports = {
@@ -21,7 +21,6 @@ module.exports = {
       method: 'PUT',
       body: params,
     })
-
     return r
   },
   getBizSession: (params) => service.queryList(bizSessionAPIURL, params),

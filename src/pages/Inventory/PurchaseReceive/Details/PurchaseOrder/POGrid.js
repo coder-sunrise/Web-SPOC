@@ -152,8 +152,8 @@ class Grid extends PureComponent {
         }
 
         const calcTotalPrice = () => {
-          if (tempOrderQty >= 1 && selectedItem.sellingPrice) {
-            return tempOrderQty * selectedItem.sellingPrice
+          if (tempOrderQty >= 1 && tempUnitPrice) {
+            return tempOrderQty * tempUnitPrice
           }
           return undefined
         }
@@ -329,7 +329,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          disabled: true,
+          // disabled: true,
         },
         {
           columnName: 'totalPrice',
