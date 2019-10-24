@@ -250,42 +250,7 @@ class Detail extends PureComponent {
   componentDidMount = async () => {
     const { dispatch, values, inventoryAdjustment, setValues } = this.props
     await this.initializeStateItemList()
-    const type = (v) => {
-      switch (v) {
-        case 1:
-          return {
-            typeName: 'medication',
-            codeName: 'medicationCode',
-            nameName: 'medicationName',
-            stockFK: 'medicationStockFK',
-            itemFK: 'inventoryMedicationFK',
-            stateName: 'stockMedication',
-            filterStateName: 'filterStockMedication',
-          }
-        case 2:
-          return {
-            typeName: 'vaccination',
-            codeName: 'vaccinationCode',
-            nameName: 'vaccinationName',
-            stockFK: 'vaccinationStockFK',
-            itemFK: 'inventoryVaccinationFK',
-            stateName: 'stockVaccination',
-            filterStateName: 'filterStockVaccination',
-          }
-        case 3:
-          return {
-            typeName: 'consumable',
-            codeName: 'consumableCode',
-            nameName: 'consumableName',
-            stockFK: 'consumableStockFK',
-            itemFK: 'inventoryConsumableFK',
-            stateName: 'stockConsumable',
-            filterStateName: 'filterStockConsumable',
-          }
-        default:
-          return {}
-      }
-    }
+
     dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -295,7 +260,7 @@ class Detail extends PureComponent {
     })
     if (values.stockList) {
       const newStockList = values.stockList.map((o) => {
-        const getType = type(o.inventoryTypeFK)
+        const getType = this.type(o.inventoryTypeFK)
         // const stockId = o[getType.typeName][getType.stockFK]
         this.setState((prevState) => {
           return {
@@ -318,7 +283,7 @@ class Detail extends PureComponent {
       const { inventoryAdjustmentItems } = inventoryAdjustment.entity
       if (inventoryAdjustmentItems) {
         const newList = inventoryAdjustmentItems.map((o) => {
-          const getType = type(o.inventoryTypeFK)
+          const getType = this.type(o.inventoryTypeFK)
           return {
             ...o,
             code: o[getType.typeName][getType.itemFK],
@@ -335,7 +300,7 @@ class Detail extends PureComponent {
         })
         this.setState({ inventoryAdjustmentItems: newList })
         values.inventoryAdjustmentItems.forEach((o) => {
-          const getType = type(o.inventoryTypeFK)
+          const getType = this.type(o.inventoryTypeFK)
           const stockId = o[getType.typeName][getType.stockFK]
           this.setState((prevState) => {
             return {
@@ -461,19 +426,47 @@ class Detail extends PureComponent {
       const tempStockMedication = [
         ...this.state.stockMedication,
       ]
+
       const filteredTempStockMedication = tempStockMedication.filter(
         (o) => o.inventoryItemFK === row.code,
       )
 
       let filteredStockOptions = filteredTempStockMedication
+
       if (row.id) {
-        const edittingBatchNo = this.state.stockMedication.find(
+        const getType = this.type(row.inventoryTypeFK)
+        const value = row[getType.typeName]
+          ? row[getType.typeName].batchNo
+          : undefined
+
+        const results = filteredStockOptions.filter(
+          ({ value: id1 }) => !x.some(({ value: id2 }) => id2 === id1),
+        )
+
+        const edittingBatchNo = filteredStockOptions.find(
+          (o) => o.batchNo === value,
+        )
+
+        const edittingBatchNo1 = this.state.stockMedication.find(
           (o) => o.id === row.batchNo,
         )
 
         filteredStockOptions = [
           ...x,
           edittingBatchNo,
+        ]
+
+        filteredStockOptions = [
+          ...new Set(filteredStockOptions),
+        ]
+
+        const temp = filteredStockOptions.filter(
+          ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
+        )
+
+        filteredStockOptions = [
+          ...temp,
+          edittingBatchNo1,
         ]
       }
 
@@ -540,8 +533,8 @@ class Detail extends PureComponent {
       const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
         return {
-          [getState.filteredStateName]: prevState[
-            getState.filteredStateName
+          [getState.filterStateName]: prevState[
+            getState.filterStateName
           ].filter((o) => o.id !== row.batchNo),
         }
       })
@@ -559,6 +552,8 @@ class Detail extends PureComponent {
       row.batchNoString = batchNo
     }
 
+    // this.filterStockOption(e)
+
     this.props.dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -572,18 +567,33 @@ class Detail extends PureComponent {
     switch (v) {
       case 1:
         return {
+          typeName: 'medication',
+          codeName: 'medicationCode',
+          nameName: 'medicationName',
+          stockFK: 'medicationStockFK',
+          itemFK: 'inventoryMedicationFK',
           stateName: 'stockMedication',
-          filteredStateName: 'filterStockMedication',
+          filterStateName: 'filterStockMedication',
         }
       case 2:
         return {
+          typeName: 'vaccination',
+          codeName: 'vaccinationCode',
+          nameName: 'vaccinationName',
+          stockFK: 'vaccinationStockFK',
+          itemFK: 'inventoryVaccinationFK',
           stateName: 'stockVaccination',
-          filteredStateName: 'filterStockVaccination',
+          filterStateName: 'filterStockVaccination',
         }
       case 3:
         return {
+          typeName: 'consumable',
+          codeName: 'consumableCode',
+          nameName: 'consumableName',
+          stockFK: 'consumableStockFK',
+          itemFK: 'inventoryConsumableFK',
           stateName: 'stockConsumable',
-          filteredStateName: 'filterStockConsumable',
+          filterStateName: 'filterStockConsumable',
         }
       default:
         return {}
@@ -607,7 +617,7 @@ class Detail extends PureComponent {
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
         const getState = this.type(row.inventoryTypeFK)
-        const defaultStock = this.state[getState.filteredStateName].find(
+        const defaultStock = this.state[getState.filterStateName].find(
           (j) =>
             j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
         )
@@ -650,8 +660,8 @@ class Detail extends PureComponent {
         )
         this.setState((prevState) => {
           return {
-            [getState.filteredStateName]: [
-              ...prevState[getState.filteredStateName],
+            [getState.filterStateName]: [
+              ...prevState[getState.filterStateName],
               stockItem,
             ],
           }
@@ -686,7 +696,6 @@ class Detail extends PureComponent {
 
     rows.forEach((o) => {
       const type = o.inventoryTypeFK
-      console.log({ type, o })
       if (o.batchNo) {
         switch (type) {
           case 1: {

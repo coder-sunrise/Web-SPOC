@@ -55,9 +55,13 @@ const styles = (theme) => ({
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  notDirtyDuration: 3,
-  mapPropsToValues: ({ printoutSetting }) =>
-    printoutSetting.entity || printoutSetting.default,
+  notDirtyDuration: 0.3,
+  mapPropsToValues: ({ printoutSetting }) => {
+    const returnValue = printoutSetting.entity || printoutSetting.default
+    return {
+      ...returnValue,
+    }
+  },
 
   validationSchema: Yup.object().shape({
     customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
@@ -80,7 +84,7 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, history } = props
-    const { customLetterHeadImage, footerDisclaimerImage } = values
+    const { customLetterHeadImage, footerDisclaimerImage, reportFK } = values
     const noHeaderBase64 = (v) => {
       if (v) return v.split(',')[1] || v
       return undefined
@@ -95,7 +99,12 @@ const styles = (theme) => ({
       },
     }).then((r) => {
       if (r) {
-        resetForm()
+        dispatch({
+          type: 'printoutSetting/query',
+          payload: {
+            id: reportFK,
+          },
+        })
       }
     })
   },
@@ -111,6 +120,8 @@ class printoutSetting extends PureComponent {
         entity: undefined,
       },
     })
+
+    this.getSelectedReportSetting(1)
   }
 
   setImageBase64 = (type, v) => {
@@ -216,6 +227,7 @@ class printoutSetting extends PureComponent {
                   <CodeSelect
                     label='Select Printout'
                     code='report'
+                    allowClear={false}
                     {...args}
                     onChange={(e) => this.checkFormIsDirty(e)}
                   />

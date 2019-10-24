@@ -117,6 +117,8 @@ export default {
   'inventory.pr.detail.pod.summary.gst': 'GST (7.00%): ',
   'inventory.pr.detail.pod.summary.inclusiveGST': 'Inclusive GST',
   'inventory.pr.detail.pod.summary.total': 'Total: ',
+  'inventory.pr.detail.pod.summary.adjustment.minAdjustment': 'Adjustment cannot be zero',
+  'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount': 'Adjustment is larger than total amount. Please amend',
 
   'inventory.pr.detail.dod.do': 'Delivery Order',
   'inventory.pr.detail.dod.addDeliveryOrder': 'Add Delivery Order',

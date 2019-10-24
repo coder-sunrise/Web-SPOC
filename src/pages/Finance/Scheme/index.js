@@ -20,13 +20,7 @@ const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
     })
   }, [])
   return (
-    <CardContainer
-      hideHeader
-      style={{
-        marginLeft: 5,
-        marginRight: 5,
-      }}
-    >
+    <CardContainer hideHeader>
       <FilterBar {...props} />
       <Grid {...props} />
     </CardContainer>
