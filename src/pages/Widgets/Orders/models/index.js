@@ -154,15 +154,14 @@ export default createListViewModel({
         const tempRows = [
           ...rows,
         ]
+        let filteredRow = []
         if (payload)
-          tempRows.map((a, index) => {
-            if (a.uid === payload.uid) {
-              tempRows.splice(index, 1)
-            }
-            return a
-          })
+         filteredRow = tempRows.filter(
+          (orderRow) => (orderRow.uid !== payload.uid && orderRow.isDeleted === false),
+        )
 
-        const amount = calculateAmount(tempRows, finalAdjustments)
+
+        const amount = calculateAmount(filteredRow, finalAdjustments)
 
         return {
           ...state,
