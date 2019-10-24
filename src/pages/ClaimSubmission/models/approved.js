@@ -42,6 +42,13 @@ export default createListViewModel({
         }
         return false
       },
+      *getAllBizSession ({ payload }, { put, call }) {
+        const response = yield call(service.getBizSession, payload)
+        yield put({
+          type: 'setAllBizSession',
+          payload: response.status === '200' ? response.data : {},
+        })
+      },
       *getApprovedStatus ({ payload }, { put, call }) {
         const response = yield call(service.getStatus, payload)
         const { data, status } = response
@@ -82,6 +89,15 @@ export default createListViewModel({
 
         return false
       },
+
+      *submitInvoicePayment ({ payload }, { put, call }) {
+        const response = yield call(service.postInvoicePayment, payload)
+        const { data, status } = response
+        // if (status === '200') {
+        //   return data
+        // }
+        // return false
+      },
     },
     reducers: {
       queryDone (st, { payload }) {
@@ -98,6 +114,19 @@ export default createListViewModel({
           currentBizSessionInfo: {
             ...payload,
           },
+        }
+      },
+
+      setAllBizSession (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          bizSessionList: data.map((x) => {
+            return {
+              value: x.id,
+              name: x.sessionNo,
+            }
+          }),
         }
       },
     },

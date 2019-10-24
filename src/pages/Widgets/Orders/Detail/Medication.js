@@ -30,17 +30,8 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
-const corPrescriptionItemInstructionSchema = Yup.object().shape({
-  usageMethodFK: Yup.number().required(),
-  dosageFK: Yup.number().required(),
-  prescribeUOMFK: Yup.number().required(),
-  drugFrequencyFK: Yup.number().required(),
-  duration: Yup.number().required(),
-  sequence: Yup.number().required(),
-  stepdose: Yup.string().required(),
-})
 
-@connect(({ codetable }) => ({  codetable }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
     const v = {
@@ -52,10 +43,9 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    // quantity: Yup.number().required(),
-    quantity: Yup.number()
-      .min(1, 'Quantity must be at least 1')
-      .max(999, 'Quantity must be at least 1'),
+    quantity: Yup.number() 
+      .min(0.1, 'Quantity must be between 0.1 and 999')
+      .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
@@ -93,6 +83,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       sequence: rows.length,
       ...values,
       subject: currentType.getSubject(values),
+      isDeleted: false,
     }
 
     dispatch({
@@ -400,7 +391,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log("------------ ", this.props)
+
     return (
       <div>
         <GridContainer>
@@ -592,8 +583,8 @@ class Medication extends PureComponent {
                           'corPrescriptionItemInstruction',
                           'Add step dose',
                           {
-                            drugFrequencyFK: 1,
-                            duration: 1,
+                           // drugFrequencyFK: 1,
+                           // duration: 1,
                             stepdose: 'AND',
                             sequence: i + 1,
                           },
