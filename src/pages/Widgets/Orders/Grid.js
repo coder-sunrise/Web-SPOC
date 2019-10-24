@@ -12,6 +12,8 @@ import {
   Popconfirm,
   Tooltip,
   NumberInput,
+  Select,
+  CodeSelect,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
@@ -188,7 +190,24 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
         },
       }}
       columnExtensions={[
-        { columnName: 'type', type: 'select', options: orderTypes },
+        {
+          columnName: 'type',
+          // type: 'select',
+          // options: orderTypes,
+          render: (r) => {
+            return (
+              <div>
+                <Select
+                  text
+                  options={orderTypes}
+                  labelField='name'
+                  value={r.type}
+                />
+                {r.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+              </div>
+            )
+          },
+        },
         {
           columnName: 'adjAmount',
           type: 'currency',

@@ -35,11 +35,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    // if (name === 'patientdashboard.editconsultation') {
-    //   return [
-    //     { name, rights: 'hidden' },
-    //   ]
-    // }
+    if (name === 'statement.statementdetails') {
+      return [
+        { name, rights: 'hidden' },
+      ]
+    }
     return [
       {
         name,

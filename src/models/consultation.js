@@ -194,6 +194,7 @@ export default createFormViewModel({
             uid: getUniqueId(),
             weightage: 0,
             totalAfterOverallAdjustment: 0,
+            isDeleted: false,
           }
 
           orders.push(rowRecord)
