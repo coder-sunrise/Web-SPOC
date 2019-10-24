@@ -198,7 +198,7 @@ class Main extends Component {
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              Print All Label
+              Print Drug Label
             </Button>
             <Button color='primary' size='sm'>
               <Print />
