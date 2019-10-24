@@ -24,10 +24,7 @@ const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
     <Authorized authority='scheme.schemedetails'>
       <CardContainer
         hideHeader
-        style={{
-          marginLeft: 5,
-          marginRight: 5,
-        }}
+       
       >
         <FilterBar {...props} />
         <Grid {...props} />
