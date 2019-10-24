@@ -6,8 +6,8 @@
 trigger: none
 
 schedules:
-- cron: '5 4 * * *'
-  displayName: 'Daily Build'
+- cron: '0 10 * * *'
+  displayName: 'Nightly Build'
   branches:
     include:
     - dev
