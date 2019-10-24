@@ -134,6 +134,25 @@ class index extends Component {
       validation = false
       this.props.handleSubmit()
     } else {
+      const submit = () => {
+        dispatch({
+          type: dispatchType,
+          payload: {
+            ...processedPayload,
+          },
+        }).then((r) => {
+          if (r) {
+            dispatch({
+              type: `formik/clean`,
+              payload: 'purchaseOrderDetails',
+            })
+            this.getPOdata()
+          }
+        })
+        validation = true
+        return validation
+      }
+
       switch (action) {
         case poSubmitAction.SAVE:
           processedPayload = this.processSubmitPayload(true)
@@ -148,7 +167,18 @@ class index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 5)
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              openConfirmContent: 'Are you sure want to complete PO?',
+              onConfirmDiscard: () => {
+                processedPayload = this.processSubmitPayload(false, 5)
+                submit()
+              },
+              openConfirmText: 'Complete PO',
+            },
+          })
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
@@ -157,21 +187,7 @@ class index extends Component {
         // case block
       }
 
-      dispatch({
-        type: dispatchType,
-        payload: {
-          ...processedPayload,
-        },
-      }).then((r) => {
-        if (r) {
-          dispatch({
-            type: `formik/clean`,
-            payload: 'purchaseOrderDetails',
-          })
-          this.getPOdata()
-        }
-      })
-      validation = true
+      submit()
     }
     return validation
   }

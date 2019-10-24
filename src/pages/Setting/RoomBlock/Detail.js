@@ -335,12 +335,14 @@ class Detail extends PureComponent {
               />
             </GridItem>
             <GridItem md={12}>
-              <Recurrence
-                block
-                disabled={values.id !== undefined}
-                formValues={values}
-                recurrenceDto={values.recurrenceDto}
-              />
+              {values.isEnableRecurrence && (
+                <Recurrence
+                  block
+                  disabled={values.id !== undefined}
+                  formValues={values}
+                  recurrenceDto={values.recurrenceDto}
+                />
+              )}
             </GridItem>
           </GridContainer>
         </div>
