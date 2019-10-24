@@ -20,11 +20,11 @@ const InvoiceAdjustment = ({
 }) => {
   const { adjType, adjRemark, adjValue } = adjustmentList[index]
 
-  if(adjType === 'Percentage') {
-    amountProps.currency   = false
+  if (adjType === 'Percentage') {
+    amountProps.currency = false
     amountProps.percentage = true
-  }else if(adjType === 'Currency'){
-    amountProps.currency   = true
+  } else if (adjType === 'Currency') {
+    amountProps.currency = true
     amountProps.percentage = false
   }
   return (
@@ -51,7 +51,7 @@ const InvoiceAdjustment = ({
         </GridItem>
       </GridItem>
       <GridItem xs={5} md={1}>
-        <NumberInput defaultValue={adjValue} {...amountProps} />
+        <NumberInput value={adjValue} {...amountProps} />
       </GridItem>
     </GridContainer>
   )
