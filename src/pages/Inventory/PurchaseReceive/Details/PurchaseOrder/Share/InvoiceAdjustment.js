@@ -51,7 +51,7 @@ const InvoiceAdjustment = ({
         </GridItem>
       </GridItem>
       <GridItem xs={5} md={1}>
-        <NumberInput defaultValue={adjValue} {...amountProps} />
+        <NumberInput defaultValue={adjValue} value={adjValue} {...amountProps} />
       </GridItem>
     </GridContainer>
   )
