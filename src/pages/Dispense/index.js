@@ -25,7 +25,7 @@ import style from './style'
 import { getAppendUrl } from '@/utils/utils'
 import { postPDF } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
-import { queryDrugLabelDetails } from '@/services/Dispense'
+import { queryDrugLabelDetails } from '@/services/dispense'
 // model
 @connect(
   ({

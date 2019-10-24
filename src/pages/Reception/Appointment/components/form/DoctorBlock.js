@@ -312,7 +312,9 @@ export default compose(
         const start = moment(doctorBlock.startDateTime)
         const end = moment(doctorBlock.endDateTime)
         const hour = end.diff(start, 'hour')
-        const minute = end.format(timeFormat24Hour).split(':')[1]
+        console.log({ start, end, endDiff: end.diff(start, 'minute') })
+        // const minute = end.format(timeFormat24Hour).split(':')[1]
+        const minute = (end.diff(start, 'minute') / 60 - hour) * 60
 
         return {
           ...restValues,
