@@ -261,8 +261,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       },
       [],
     )
-    console.log({ _newTempInvoicePayer })
     setTempInvoicePayer(_newTempInvoicePayer)
+    // refTempInvociePayer.current = tempInvoicePayer
   }
 
   const _isSubtotalLessThanZero = (index) => {
@@ -287,14 +287,52 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const index = refTempInvociePayer.current.findIndex(
       (item) => item._isEditing,
     )
+    const totalPayableBalance = refTempInvociePayer.current
+      .reduce(flattenInvoicePayersInvoiceItemList, [])
+      .reduce(
+        (largestPayable, item) =>
+          item.payableBalance > largestPayable
+            ? item.payableBalance
+            : largestPayable,
+        0,
+      )
+
+    const currentItemClaimedAmount = refTempInvociePayer.current
+      .reduce(flattenInvoicePayersInvoiceItemList, [])
+      .reduce((remainingClaimable, item) => {
+        if (item.invoiceItemFK && item.invoiceItemFK === id)
+          return remainingClaimable + item.claimAmount
+        if (item.id === id) {
+          return remainingClaimable + item.claimAmount
+        }
+        return remainingClaimable
+      }, 0)
+
     const newTempInvoicePayer = {
       ..._editingInvoicePayer,
-      invoicePayerItems: _editingInvoicePayer.invoicePayerItems.map(
-        (item) =>
-          item.id === id
-            ? { ...item, claimAmount: event.target.value }
-            : { ...item },
-      ),
+      invoicePayerItems: _editingInvoicePayer.invoicePayerItems.map((item) => {
+        const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
+
+        if (_id === id) {
+          const currentClaimAmount = item.claimAmount
+          const toBeChangeAmount = event.target.value
+          if (currentItemClaimedAmount === 0)
+            return { ...item, claimAmount: toBeChangeAmount }
+
+          const eligibleAmount =
+            totalPayableBalance -
+            (currentItemClaimedAmount - currentClaimAmount)
+
+          if (eligibleAmount < 0 || toBeChangeAmount <= eligibleAmount)
+            return { ...item, claimAmount: toBeChangeAmount, error: undefined }
+
+          return {
+            ...item,
+            error: `Cannot claim more than $${currentClaimAmount.toFixed(2)}`,
+          }
+        }
+        return { ...item, error: undefined }
+      }),
     }
     _updateTempInvoicePayer(index, newTempInvoicePayer)
   }
@@ -311,7 +349,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
       setFieldValue('invoicePayers', tempInvoicePayer)
       handleIsEditing(hasEditing())
-      console.log({ tempInvoicePayer })
+
       refTempInvociePayer.current = tempInvoicePayer
     },
     [
@@ -505,8 +543,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const updatedRow = {
       ...tempInvoicePayer[index],
       ...curEditInvoicePayerBackup,
-      _isConfirmed: false,
-      _isEditing: true,
+      _isConfirmed: true,
+      _isEditing: false,
       _isDeleted: false,
     }
     setCurEditInvoicePayerBackup(updatedRow)
@@ -582,6 +620,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
+  console.log({ tempInvoicePayer })
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -627,7 +666,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 <NumberInput
                   currency
                   disabled={shouldDisable}
-                  onChange={handleClaimAmountChange(row.id)}
+                  onChange={handleClaimAmountChange(
+                    row.invoiceItemFK ? row.invoiceItemFK : row.id,
+                  )}
                   value={row.claimAmount}
                 />
               )
@@ -757,7 +798,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         size='sm'
                         color='danger'
                         onClick={handleAppliedSchemeCancelClick(index)}
-                        disabled={invoicePayer.copaymentSchemeFK === undefined}
+                        disabled={
+                          invoicePayer.payerTypeFK ===
+                            INVOICE_PAYER_TYPE.SCHEME &&
+                          invoicePayer.copaymentSchemeFK === undefined
+                        }
                       >
                         Cancel
                       </Button>
@@ -823,13 +868,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           //   payableBalance:
           //     invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
           // }))}
-          invoiceItems={tempInvoicePayer.reduce((invoiceItems, payer) => {
-            const { invoicePayerItems } = payer
-            return [
-              ...invoiceItems,
-              ...invoicePayerItems,
-            ]
-          }, [])}
+          invoiceItems={tempInvoicePayer.reduce(
+            flattenInvoicePayersInvoiceItemList,
+            [],
+          )}
         />
       </CommonModal>
       <CommonModal
