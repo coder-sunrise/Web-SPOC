@@ -228,7 +228,6 @@ const DiagnosisItem = ({
                 <Button
                   color='primary'
                   onClick={() => {
-                    console.log(index)
                     // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
                     form.setFieldValue(
