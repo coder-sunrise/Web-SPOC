@@ -29,7 +29,10 @@ import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/component
 
 import { updateAPIType } from '@/utils/request'
 
-@connect(({ user }) => ({ user }))
+@connect(({ user, clinicInfo }) => ({
+  user,
+  clinicShortCode: clinicInfo.clinicShortCode,
+}))
 class HeaderLinks extends React.Component {
   state = {
     openNotification: false,
@@ -90,7 +93,7 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user } = this.props
+    const { classes, rtlActive, user, clinicShortCode } = this.props
     const { openNotification, openAccount, openDomain, title } = this.state
 
     // console.log(openNotification, openAccount)
@@ -116,6 +119,7 @@ class HeaderLinks extends React.Component {
       user.data && user.data.clinicianProfile
         ? user.data.clinicianProfile.title
         : ''
+
     return (
       <div className={wrapper}>
         {/*
@@ -292,7 +296,7 @@ class HeaderLinks extends React.Component {
                 : classes.links}`}
             />
             <span className={classes.username}>
-              {userTitle} {name}
+              {userTitle} {name} ({clinicShortCode})
             </span>
             <Hidden mdUp implementation='css'>
               <span className={classes.linkText}>

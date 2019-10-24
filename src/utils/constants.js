@@ -108,3 +108,9 @@ export const REPORT_TYPE = {
   26: 'Purchase Order',
   27: 'Patient Label',
 }
+
+export const GENDER = {
+  1: 'MALE',
+  2: 'FEMALE',
+  3: 'UNKNOWN',
+}

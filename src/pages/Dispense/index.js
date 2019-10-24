@@ -63,7 +63,7 @@ class Dispense extends PureComponent {
 
   componentWillUnmount () {
     this.timer && clearInterval(this.timer)
-    this.wsConnection.close()
+    if (this.wsConnection) this.wsConnection.close()
     this.props.dispatch({
       type: 'dispense/updateState',
       payload: {
