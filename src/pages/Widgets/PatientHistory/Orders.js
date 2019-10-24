@@ -17,7 +17,6 @@ export default ({ current }) => (
         // type: 'select',
         // options: orderTypes,
         render: (r) => {
-          console.log("########### ", r)
           return (
             <div>
               {r.type} 

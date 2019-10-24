@@ -10,18 +10,18 @@ import {
 } from '@/utils/utils'
 
 const sharedMedicationValue = {
-  quantity: 1,
+  quantity: 0,
   corPrescriptionItemPrecaution: [
     {},
   ],
   corPrescriptionItemInstruction: [
     {
-      usageMethodFK: 1,
-      dosageFK: 1,
-      prescribeUOMFK: 1,
-      drugFrequencyFK: 1,
-      dispenseUOMFK: 1,
-      duration: 1,
+      // usageMethodFK: 1,
+      // dosageFK: 1,
+      // prescribeUOMFK: 1,
+      // drugFrequencyFK: 1,
+      // dispenseUOMFK: 1,
+      // duration: 1,
       sequence: 0,
       stepdose: 'AND',
     },
