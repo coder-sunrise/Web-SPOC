@@ -63,22 +63,30 @@ const styles = (theme) => ({})
     }
   },
   validationSchema: Yup.object().shape({
-    adjustment: Yup.number().required().min(0.01, formatMessage({
-      id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
-    })),
+    adjustment: Yup.number().required().min(
+      0.01,
+      formatMessage({
+        id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
+      }),
+    ),
     finalAmount: Yup.number()
-      .min(0.01, formatMessage({
-        id: 'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
-      }))
+      .min(
+        0.01,
+        formatMessage({
+          id:
+            'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
+        }),
+      )
       .required(),
+    adjRemark: Yup.string().required(),
     // remarks: Yup.string().required(),
   }),
 
   handleSubmit: (values, { props }) => {
     console.log(values)
 
-    if(values.isMinus && values.adjustment > 0){
-      let minusValue = - values.adjustment
+    if (values.isMinus && values.adjustment > 0) {
+      let minusValue = -values.adjustment
       values.adjustment = minusValue
     }
     const { dispatch, global } = props
@@ -113,7 +121,6 @@ const styles = (theme) => ({})
 })
 class Adjustment extends PureComponent {
   getFinalAmount = ({ value } = {}) => {
-
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
 
@@ -135,12 +142,10 @@ class Adjustment extends PureComponent {
     } else {
       value = -Math.abs(adjustment)
     }
-      v = value
+    v = value
 
     this.getFinalAmount({ value })
   }
-
-
 
   render () {
     const { theme, footer, values, global, errors, ...props } = this.props

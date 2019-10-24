@@ -107,23 +107,21 @@ class InvoiceSummary extends PureComponent {
             this.arrayHelpers = arrayHelpers
             if (!adjustmentList) return null
             return adjustmentList.map((v, i) => {
-              if (!v.adjustmentList) {
-                if (v.isDeleted === false) {
-                  return (
-                    <InvoiceAdjustment
-                      key={v.id}
-                      index={i}
-                      adjustmentList={adjustmentList}
-                      handleCalcInvoiceSummary={handleCalcInvoiceSummary}
-                      adjustmentListName={adjustmentListName}
-                      setFieldValue={setFieldValue}
-                      handleDeleteInvoiceAdjustment={
-                        handleDeleteInvoiceAdjustment
-                      }
-                      {...amountProps}
-                    />
-                  )
-                }
+              if (!v.adjustmentList && v.isDeleted === false) {
+                return (
+                  <InvoiceAdjustment
+                    key={v.id}
+                    index={i}
+                    adjustmentList={adjustmentList}
+                    handleCalcInvoiceSummary={handleCalcInvoiceSummary}
+                    adjustmentListName={adjustmentListName}
+                    setFieldValue={setFieldValue}
+                    handleDeleteInvoiceAdjustment={
+                      handleDeleteInvoiceAdjustment
+                    }
+                    {...amountProps}
+                  />
+                )
               }
               return null
             })
