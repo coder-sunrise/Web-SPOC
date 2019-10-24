@@ -32,7 +32,10 @@ class EmergencyContact extends PureComponent {
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
-      { columnName: 'name', isDisabled: (row) => !!row.nokPatientProfileFK },
+      {
+        columnName: 'name',
+        isDisabled: (row) => !!row.nokPatientProfileFK,
+      },
       {
         columnName: 'accountNo',
         maxLength: 9,
@@ -240,10 +243,21 @@ class EmergencyContact extends PureComponent {
             pager: false,
           }}
           EditingProps={{
+            // defaultNewRow: [
+            //   {
+            //     name: '123',
+            //   },
+            // ],
             showAddCommand: true,
             editingRowIds: this.state.editingRowIds,
             onEditingRowIdsChange: this.onEditingRowIdsChange,
             onCommitChanges: this.commitChanges,
+            // onAddedRowsChange: (rows) => {
+            //   return rows.map((o) => ({
+            //     name: 'dff',
+            //     ...o,
+            //   }))
+            // },
           }}
           {...this.tableParas}
         />
