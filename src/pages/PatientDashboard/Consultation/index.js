@@ -92,10 +92,11 @@ const saveConsultation = ({
       openConfirmContent: confirmMessage,
       openConfirmText: 'Confirm',
       onConfirmSave: () => {
-
-        const filteredDiagnosis = [...values.corDiagnosis.filter(
-          (diagnosis) => diagnosis.diagnosisFK !== undefined,
-        )]
+        const filteredDiagnosis = [
+          ...values.corDiagnosis.filter(
+            (diagnosis) => diagnosis.diagnosisFK !== undefined,
+          ),
+        ]
 
         const _filteredDiagnosis = {
           ...values,
@@ -108,6 +109,12 @@ const saveConsultation = ({
         })
         newValues.duration = Math.floor(
           Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+        )
+        if (!newValues.visitConsultationTemplate) {
+          newValues.visitConsultationTemplate = {}
+        }
+        newValues.visitConsultationTemplate.consultationTemplate = localStorage.getItem(
+          'consultationLayout',
         )
         dispatch({
           type: `consultation/${action}`,

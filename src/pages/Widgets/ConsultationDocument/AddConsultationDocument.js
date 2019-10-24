@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { convertFromHTML } from 'draft-js'
+import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -52,7 +53,7 @@ const loadFromCodes = [
     getter: (v) => {
       const { corDiagnosis = [] } = v
       return corDiagnosis
-        .filter((o) => !o.diagnosisDescription)
+        .filter((o) => !!o.diagnosisDescription)
         .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
         .join('')
     },
@@ -180,7 +181,8 @@ class AddConsultationDocument extends PureComponent {
             const v = option.getter
               ? option.getter(values)
               : Object.byString(values, option.value) || '-'
-            const blocksFromHTML = convertFromHTML(v)
+            console.log(parentProps, option.value)
+            const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
             const { editorState } = editor.props
             editor.update(
               RichEditor.insertBlock(editorState, blocksFromHTML.contentBlocks),

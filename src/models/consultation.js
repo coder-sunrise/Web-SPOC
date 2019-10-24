@@ -194,6 +194,7 @@ export default createFormViewModel({
             uid: getUniqueId(),
             weightage: 0,
             totalAfterOverallAdjustment: 0,
+            isDeleted: false,
           }
 
           orders.push(rowRecord)
@@ -284,7 +285,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-
+          // console.log(response)
           yield put({
             type: 'queryDone',
             payload: {

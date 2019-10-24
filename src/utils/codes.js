@@ -747,6 +747,13 @@ const orderTypes = [
     filter: (r) => !r.stockDrugFK,
     getSubject: (r) => r.drugName,
   },
+  {
+    name: 'Package',
+    value: '6',
+    // prop: 'corPrescriptionItem',
+    // filter: (r) => !r.stockDrugFK,
+    // getSubject: (r) => r.drugName,
+  },
 ]
 const buttonTypes = [
   'RegularButton',
@@ -913,6 +920,15 @@ const _fetchAndSaveCodeTable = async (
   }
 
   return []
+}
+
+export const getAllCodes = async () => {
+  await db.open()
+  const ct = await db.codetable.toArray((code) => {
+    return code.map((_i) => ({ code: _i.code, data: _i.data }))
+  })
+
+  return ct || []
 }
 
 export const getCodes = async (payload) => {

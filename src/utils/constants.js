@@ -71,6 +71,7 @@ export const PDPA_CONSENT_TYPE = {
 }
 
 export const INVOICE_ITEM_TYPE = {
+  0: 'Corrupted data',
   1: 'Medication',
   2: 'Consumable',
   3: 'Vaccination',
@@ -106,4 +107,10 @@ export const REPORT_TYPE = {
   25: 'Statement',
   26: 'Purchase Order',
   27: 'Patient Label',
+}
+
+export const GENDER = {
+  1: 'MALE',
+  2: 'FEMALE',
+  3: 'UNKNOWN',
 }

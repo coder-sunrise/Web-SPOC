@@ -10,6 +10,7 @@ import { withFormik } from 'formik'
 import { Book, Pageview, Edit, Delete } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom components
+import Authorized from '@/utils/Authorized'
 import {
   Dialog,
   DialogTitle,
@@ -187,114 +188,117 @@ class Statement extends PureComponent {
     }
     const { rows, columns } = this.state
     return (
-      <CardContainer hideHeader>
-        <SearchBar
-          history={history}
-          handleSearch={this.handleSearch}
-          handleAddNew={this.toggleAddNewStatementModal}
-          dispatch={dispatch}
-        />
-        <CommonTableGrid
-          style={{ margin: 0 }}
-          type='statement'
-          selection={this.state.selectedRows}
-          onSelectionChange={this.handleSelectionChange}
-          onRowDoubleClick={editRow}
-          rows={rows}
-          columns={columns}
-          FuncProps={{ selectable: true }}
-          columnExtensions={[
-            {
-              columnName: 'company',
-              sortBy: 'CopayerFKNavigation.displayValue',
-            },
-            {
-              columnName: 'payableAmount',
-              type: 'number',
-              currency: true,
-              sortBy: 'totalAmount',
-            },
-            {
-              columnName: 'totalPaid',
-              type: 'number',
-              currency: true,
-              sortBy: 'CollectedAmount',
-            },
-            {
-              columnName: 'outstandingAmount',
-              type: 'number',
-              currency: true,
-            },
-            {
-              columnName: 'statementDate',
-              type: 'date',
-              format: { dateFormatLong },
-            },
-            {
-              columnName: 'dueDate',
-              type: 'date',
-              format: { dateFormatLong },
-              sortBy: 'DueDate',
-            },
-            {
-              columnName: 'action',
-              align: 'center',
-              render: (row) => {
-                return (
-                  <React.Fragment>
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        editRow(row)
-                      }}
-                      justIcon
-                      color='primary'
-                    >
-                      <Edit />
-                    </Button>
-                    <Button
-                      size='sm'
-                      onClick={() => {
-                        this.handleClickOpen(row)
-                      }}
-                      justIcon
-                      color='primary'
-                    >
-                      <Delete />
-                    </Button>
-                  </React.Fragment>
-                )
+      <Authorized authority='statement.statementdetails'>
+        <CardContainer hideHeader>
+          <SearchBar
+            history={history}
+            handleSearch={this.handleSearch}
+            handleAddNew={this.toggleAddNewStatementModal}
+            dispatch={dispatch}
+          />
+          <CommonTableGrid
+            style={{ margin: 0 }}
+            type='statement'
+            selection={this.state.selectedRows}
+            onSelectionChange={this.handleSelectionChange}
+            onRowDoubleClick={editRow}
+            rows={rows}
+            columns={columns}
+            FuncProps={{ selectable: true }}
+            columnExtensions={[
+              {
+                columnName: 'company',
+                sortBy: 'CopayerFKNavigation.displayValue',
               },
-            },
-          ]}
-        />
-        <Dialog
-          open={this.state.open}
-          // onClose={this.handleClose}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
-        >
-          <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
-          <DialogContent>
-            <DialogContentText id='alert-dialog-description'>
-              Cancel this statement - <b>{this.state.selectedStatementNo}</b> ?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} value='false' color='danger'>
-              No
-            </Button>
-            <Button
-              onClick={this.confirmDelete}
-              value='true'
-              color='primary'
-              autoFocus
-            >
-              Yes
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </CardContainer>
+              {
+                columnName: 'payableAmount',
+                type: 'number',
+                currency: true,
+                sortBy: 'totalAmount',
+              },
+              {
+                columnName: 'totalPaid',
+                type: 'number',
+                currency: true,
+                sortBy: 'CollectedAmount',
+              },
+              {
+                columnName: 'outstandingAmount',
+                type: 'number',
+                currency: true,
+              },
+              {
+                columnName: 'statementDate',
+                type: 'date',
+                format: { dateFormatLong },
+              },
+              {
+                columnName: 'dueDate',
+                type: 'date',
+                format: { dateFormatLong },
+                sortBy: 'DueDate',
+              },
+              {
+                columnName: 'action',
+                align: 'center',
+                render: (row) => {
+                  return (
+                    <React.Fragment>
+                      <Button
+                        size='sm'
+                        onClick={() => {
+                          editRow(row)
+                        }}
+                        justIcon
+                        color='primary'
+                      >
+                        <Edit />
+                      </Button>
+                      <Button
+                        size='sm'
+                        onClick={() => {
+                          this.handleClickOpen(row)
+                        }}
+                        justIcon
+                        color='primary'
+                      >
+                        <Delete />
+                      </Button>
+                    </React.Fragment>
+                  )
+                },
+              },
+            ]}
+          />
+          <Dialog
+            open={this.state.open}
+            // onClose={this.handleClose}
+            aria-labelledby='alert-dialog-title'
+            aria-describedby='alert-dialog-description'
+          >
+            <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
+            <DialogContent>
+              <DialogContentText id='alert-dialog-description'>
+                Cancel this statement - <b>{this.state.selectedStatementNo}</b>{' '}
+                ?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleClose} value='false' color='danger'>
+                No
+              </Button>
+              <Button
+                onClick={this.confirmDelete}
+                value='true'
+                color='primary'
+                autoFocus
+              >
+                Yes
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </CardContainer>
+      </Authorized>
     )
   }
 }

@@ -40,7 +40,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   stepdose: Yup.string().required(),
 })
 
-@connect(({ global, codetable }) => ({ global, codetable }))
+@connect(({ codetable }) => ({  codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
     const v = {
@@ -52,7 +52,10 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    quantity: Yup.number().required(),
+    // quantity: Yup.number().required(),
+    quantity: Yup.number()
+      .min(1, 'Quantity must be at least 1')
+      .max(999, 'Quantity must be at least 1'),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
@@ -64,11 +67,11 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       is: (val) => val === '5',
       then: Yup.string().required(),
     }),
-    corPrescriptionItemPrecaution: Yup.array().of(
-      Yup.object().shape({
-        medicationPrecautionFK: Yup.number().required(),
-      }),
-    ),
+    // corPrescriptionItemPrecaution: Yup.array().of(
+    //   Yup.object().shape({
+    //     medicationPrecautionFK: Yup.number().required(),
+    //   }),
+    // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
         usageMethodFK: Yup.number().required(),
@@ -335,8 +338,13 @@ class Medication extends PureComponent {
 
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue('totalPrice', op.sellingPrice * (newTotalQuantity + totalFirstItem))
-      this.updateTotalPrice(op.sellingPrice * (newTotalQuantity + totalFirstItem))
+      setFieldValue(
+        'totalPrice',
+        op.sellingPrice * (newTotalQuantity + totalFirstItem),
+      )
+      this.updateTotalPrice(
+        op.sellingPrice * (newTotalQuantity + totalFirstItem),
+      )
     } else {
       setFieldValue('unitPrice', undefined)
       setFieldValue('totalPrice', undefined)
@@ -392,6 +400,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log("------------ ", this.props)
     return (
       <div>
         <GridContainer>
@@ -700,7 +709,7 @@ class Medication extends PureComponent {
                     label='Quantity'
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
-                    min={0.1}
+                    min={0}
                     format='0.0'
                     onChange={(e) => {
                       if (values.unitPrice) {

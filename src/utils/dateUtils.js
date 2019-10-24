@@ -14,3 +14,6 @@ export const formatDateToText = (value = undefined, parseFormat) => {
   if (moment(value).isValid()) return moment(value).format(serverDateFormat)
   return value
 }
+
+export const calculateAgeFromDOB = (dob) =>
+  Math.floor(moment.duration(moment().diff(dob)).asYears())

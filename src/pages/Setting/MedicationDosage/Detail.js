@@ -125,7 +125,9 @@ class Detail extends PureComponent {
             <GridItem md={12}>
               <FastField
                 name='multiplier'
-                render={(args) => <NumberInput label='Multiplier' {...args} />}
+                render={(args) => (
+                  <NumberInput label='Multiplier' format='0.0000' {...args} />
+                )}
               />
             </GridItem>
             <GridItem md={12}>

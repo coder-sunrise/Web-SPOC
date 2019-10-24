@@ -110,8 +110,8 @@ class AntdNumberInput extends React.PureComponent {
     disabled: false,
     size: 'default',
     allowEmpty: true,
-    max: 999999999999,
-    min: -999999999999,
+    max: 999999.9999,
+    min: -999999.9999,
   }
 
   constructor (props) {
@@ -181,7 +181,6 @@ class AntdNumberInput extends React.PureComponent {
   debouncedOnChange = (value) => {
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
-    // console.log('c', value)
     if (readOnly || loadOnChange) return
     // const { formatter } = this.props
     // if (formatter) {
@@ -382,7 +381,7 @@ class AntdNumberInput extends React.PureComponent {
           )
         : ''
       extraCfg.parser = (v) => {
-        // console.log('parser3', v, this.state.value)
+
         if (!Number(v) && this.state.value === '') return ''
         if (v === '') return v
         if (format) {

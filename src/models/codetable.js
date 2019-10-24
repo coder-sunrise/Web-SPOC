@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import { getCodes } from '@/utils/codes'
+import { getCodes, getAllCodes } from '@/utils/codes'
 
 export default createListViewModel({
   namespace: 'codetable',
@@ -13,6 +13,24 @@ export default createListViewModel({
     },
     subscriptions: {},
     effects: {
+      *fetchAllCachedCodetable (_, { call, put }) {
+        const response = yield call(getAllCodes)
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: response.reduce((allCodetable, codetable) => {
+              // skip snomeddiagnosis codetable
+              if (codetable.code !== 'codetable/ctsnomeddiagnosis') {
+                return {
+                  ...allCodetable,
+                  [codetable.code]: codetable.data,
+                }
+              }
+              return { ...allCodetable }
+            }, {}),
+          })
+        }
+      },
       *refreshCodes ({ payload }, { call, put }) {
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })

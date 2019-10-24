@@ -5,11 +5,14 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
-  // if (name === 'reception/queue') {
-  //   return [
-  //     { name, rights: 'disable' },
-  //   ]
-  // }
+
+  // for testing only
+  if (rights === 'hidden') {
+    return [
+      { name, rights: 'enable' },
+    ]
+  }
+
   if (type === 'Module') {
     return [
       {
@@ -35,11 +38,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    // if (name === 'patientdashboard.editconsultation') {
-    //   return [
-    //     { name, rights: 'hidden' },
-    //   ]
-    // }
+    if (name === 'statement.statementdetails') {
+      return [
+        { name, rights: 'hidden' },
+      ]
+    }
     return [
       {
         name,

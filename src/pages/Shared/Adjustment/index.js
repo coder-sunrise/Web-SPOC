@@ -6,6 +6,7 @@ import { withStyles, Divider, Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import { formatMessage } from 'umi/locale'
 
 import {
   Button,
@@ -62,15 +63,32 @@ const styles = (theme) => ({})
     }
   },
   validationSchema: Yup.object().shape({
-    adjustment: Yup.number().required(),
+    adjustment: Yup.number().required().min(
+      0.01,
+      formatMessage({
+        id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
+      }),
+    ),
     finalAmount: Yup.number()
-      .min(0.01, 'Adjustment is larger than total amount. Please amend')
+      .min(
+        0.01,
+        formatMessage({
+          id:
+            'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
+        }),
+      )
       .required(),
+    adjRemark: Yup.string().required(),
     // remarks: Yup.string().required(),
   }),
 
   handleSubmit: (values, { props }) => {
     console.log(values)
+
+    if (values.isMinus && values.adjustment > 0) {
+      let minusValue = -values.adjustment
+      values.adjustment = minusValue
+    }
     const { dispatch, global } = props
     const { openAdjustmentConfig = {} } = global
     const { callbackConfig, callbackMethod } = openAdjustmentConfig
@@ -103,7 +121,6 @@ const styles = (theme) => ({})
 })
 class Adjustment extends PureComponent {
   getFinalAmount = ({ value } = {}) => {
-    console.log('getFinalAmount')
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
 
@@ -119,27 +136,16 @@ class Adjustment extends PureComponent {
     const { isExactAmount, isMinus, adjustment } = values
     if (!isNumber(adjustment)) return
     let value = adjustment
-    if (isMinus) {
-      value = -Math.abs(adjustment)
-    } else {
+
+    if (!isMinus) {
       value = Math.abs(adjustment)
+    } else {
+      value = -Math.abs(adjustment)
     }
-    setFieldValue('adjustment', value)
+    v = value
 
     this.getFinalAmount({ value })
   }
-
-  // onOperatorChange = (v) => {
-  //   const { values, setFieldValue } = this.props
-  //   const { isExactAmount, isMinus, adjustment } = values
-  //   let value = adjustment
-  //   if (v) {
-  //     value = -Math.abs(adjustment)
-  //   } else {
-  //     value = Math.abs(adjustment)
-  //   }
-  //   this.getFinalAmount({ value })
-  // }
 
   render () {
     const { theme, footer, values, global, errors, ...props } = this.props
@@ -183,6 +189,7 @@ class Adjustment extends PureComponent {
               <Field
                 name='adjustment'
                 render={(args) => {
+                  args.min = 0
                   if (values.isExactAmount) {
                     return (
                       <NumberInput

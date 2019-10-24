@@ -213,7 +213,12 @@ const DiagnosisItem = ({
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
                   Confirm to remove a persist diagnosis?
                 </p>
-                <Button onClick={() => {}} variant='outlined'>
+                <Button
+                  onClick={() => {
+                    setShow(false)
+                  }}
+                  variant='outlined'
+                >
                   Cancel
                 </Button>
                 <Button

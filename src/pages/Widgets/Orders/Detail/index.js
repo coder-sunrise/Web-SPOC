@@ -40,7 +40,7 @@ import Medication from './Medication'
 import Vaccination from './Vaccination'
 import Service from './Service'
 import Consumable from './Consumable'
-import Adjustment from './Adjustment'
+import Package from './Package'
 // import Others from './Others'
 
 const styles = (theme) => ({
@@ -69,7 +69,7 @@ const styles = (theme) => ({
 class Details extends PureComponent {
   state = {}
 
-  footerBtns = ({ onSave }) => {
+  footerBtns = ({ onSave, showAdjustment = true }) => {
     const { classes, orders } = this.props
     const { entity } = orders
     return (
@@ -77,9 +77,15 @@ class Details extends PureComponent {
         <Divider />
 
         <div className={classnames(classes.footer)}>
-          <Button link style={{ float: 'left' }} onClick={this.showAdjustment}>
-            {currencySymbol} Adjustment
-          </Button>
+          {showAdjustment && (
+            <Button
+              link
+              style={{ float: 'left' }}
+              onClick={this.showAdjustment}
+            >
+              {currencySymbol} Adjustment
+            </Button>
+          )}
           {!!entity && (
             <Button
               color='danger'
@@ -211,6 +217,7 @@ class Details extends PureComponent {
             {type === '3' && <Service {...cfg} />}
             {type === '4' && <Consumable {...cfg} />}
             {type === '5' && <Medication {...cfg} openPrescription />}
+            {type === '6' && <Package {...cfg} />}
           </div>
         </div>
       </div>
