@@ -49,7 +49,6 @@ import { queryDrugLabelDetails } from '@/services/dispense'
 class Dispense extends PureComponent {
   constructor (props) {
     super(props)
-    this.timer = null
     this.iswsConnect = false
     this.wsConnection = null
     this.handleClickPrintDrugLabel = null
@@ -57,13 +56,8 @@ class Dispense extends PureComponent {
     this.setHandleClickPrintDrugLabel()
   }
 
-  componentDidMount () {
-    this.setTimerOn()
-  }
-
   componentWillUnmount () {
-    this.timer && clearInterval(this.timer)
-    this.wsConnection.close()
+    if (this.wsConnection) this.wsConnection.close()
     this.props.dispatch({
       type: 'dispense/updateState',
       payload: {
@@ -97,14 +91,9 @@ class Dispense extends PureComponent {
     )
   }
 
-  setTimerOn () {
-    this.timer = setInterval(() => {
-      this.connectWebSocket()
-    }, 1000)
-  }
-
   setHandleClickPrintDrugLabel () {
     this.handleClickPrintDrugLabel = async (row) => {
+      this.connectWebSocket()
       const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
       const { data } = drugLabelDetails1
       if (data) {

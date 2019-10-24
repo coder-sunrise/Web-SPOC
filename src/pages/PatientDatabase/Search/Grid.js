@@ -1,11 +1,7 @@
 import React, { PureComponent } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
-import { Tooltip, withStyles } from '@material-ui/core'
-import { AccountCircle } from '@material-ui/icons'
-import { getAppendUrl } from '@/utils/utils'
 import { statusString } from '@/utils/codes'
-import { Button, CommonModal, CommonTableGrid } from '@/components'
+import { CommonTableGrid } from '@/components'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 class Grid extends PureComponent {
   state = {}
@@ -37,7 +33,8 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'gender/age',
-          render: (row) => `${row.gender.substring(0, 1)}/${row.age + 1}`,
+          render: (row) =>
+            `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
           sortingEnabled: false,
           // sortBy: 'genderFkNavigation.displayValue',
         },
