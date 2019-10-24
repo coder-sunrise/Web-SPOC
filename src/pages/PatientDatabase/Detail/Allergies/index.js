@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import {
   Checkbox,
   Select,
@@ -10,16 +11,30 @@ import {
 
 import AllergyGrid from './AllergyGrid'
 
+@connect(({ global }) => ({ global }))
 class Allergies extends PureComponent {
   state = {}
 
+  isDisableAllergy = () => {
+    return (
+      this.props.global.disableSave === true ||
+      this.props.values.patientAllergy.filter(
+        (o) =>
+          !o.isDeleted && (o.type === 'Allergy' || o.type === 'NonAllergy'),
+      ).length > 0
+    )
+  }
+
   updateValue = (type) => ({ rows }) => {
-    console.log(type, rows)
     let vals = this.props.values.patientAllergy.filter((o) => o.type === type)
     vals = vals.concat(rows)
     this.props.setFieldValue('patientAllergy', vals)
-    if (vals.filter((o) => !o.isDeleted && o.type === 'Allergy').length > 0) {
+    if (this.isDisableAllergy()) {
       this.props.setFieldValue('patientAllergyMetaData[0].noAllergies', false)
+      this.props.setFieldValue(
+        'patientAllergyMetaData[0].isG6PDConfirmed',
+        undefined,
+      )
     }
   }
 
@@ -29,9 +44,7 @@ class Allergies extends PureComponent {
 
   render () {
     const { classes, dispatch, values, schema, ...restProps } = this.props
-    const allergyDisabled =
-      values.patientAllergy.filter((o) => !o.isDeleted && o.type === 'Allergy')
-        .length > 0
+    const allergyDisabled = this.isDisableAllergy()
 
     return (
       <div>
@@ -52,19 +65,22 @@ class Allergies extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={2}>
-            <FastField
+            <Field
               name='patientAllergyMetaData[0].isG6PDConfirmed'
-              render={(args) => (
-                <Select
-                  style={{ top: -25 }}
-                  {...args}
-                  options={[
-                    { name: 'Yes', value: true },
-                    { name: 'No', value: false },
-                  ]}
-                  label='G6PD Deficiency:'
-                />
-              )}
+              render={(args) => {
+                return (
+                  <Select
+                    style={{ top: -25 }}
+                    {...args}
+                    options={[
+                      { name: 'Yes', value: true },
+                      { name: 'No', value: false },
+                    ]}
+                    label='G6PD Deficiency:'
+                    disabled={allergyDisabled}
+                  />
+                )
+              }}
             />
           </GridItem>
 
@@ -78,7 +94,8 @@ class Allergies extends PureComponent {
               title='Allergy'
               isEditable={
                 !values.patientAllergyMetaData[0] ||
-                values.patientAllergyMetaData[0].noAllergies === false
+                (values.patientAllergyMetaData[0].noAllergies || false) ===
+                  false
               }
               setArrayValue={this.updateValue('NonAllergy')}
               schema={schema.patientAllergy._subType}
@@ -95,7 +112,11 @@ class Allergies extends PureComponent {
               rows={this.getRows('NonAllergy')}
               type='NonAllergy'
               title='Medical Alert'
-              isEditable
+              isEditable={
+                !values.patientAllergyMetaData[0] ||
+                (values.patientAllergyMetaData[0].noAllergies || false) ===
+                  false
+              }
               setArrayValue={this.updateValue('Allergy')}
               schema={schema.patientAllergy._subType}
               {...restProps}
