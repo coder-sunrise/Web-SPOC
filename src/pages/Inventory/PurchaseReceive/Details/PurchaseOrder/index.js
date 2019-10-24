@@ -358,6 +358,7 @@ class index extends Component {
               settingGSTPercentage,
               IsGSTEnabled,
               IsGSTInclusive,
+              filteredPurchaseOrderItem.length
             )
 
             if (adj.adjType === 'Percentage') {
