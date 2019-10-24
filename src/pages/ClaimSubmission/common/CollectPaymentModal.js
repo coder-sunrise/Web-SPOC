@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import Yup from '@/utils/yup'
+import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import Yup from '@/utils/yup'
 import styles from './styles'
 import {
   CommonTableGrid,
@@ -16,6 +17,8 @@ import {
   DatePicker,
   CodeSelect,
   OutlinedTextField,
+  Field,
+  Select,
 } from '@/components'
 import { CollectPaymentColumns, amountProps } from './variables'
 
@@ -35,13 +38,31 @@ const paymentListSchema = Yup.object().shape({
     paymentDate: Yup.string().required(),
     paymentModeFK: Yup.number().required(),
     rows: Yup.array().of(paymentListSchema),
+    creditCardTypeFK: Yup.number().when('paymentModeFK', {
+      is: (val) => val === 1,
+      then: Yup.number().required(),
+    }),
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch } = props
-    console.log({ values, props })
+    const { rows, ...restValues } = values
+
+    const payload = {
+      ...values,
+    }
+    dispatch({
+      type: 'claimSubmissionApproved/submitInvoicePayment',
+      payload,
+    })
   },
 })
 class CollectPaymentModal extends PureComponent {
+  state = { isCardPayment: false }
+
+  componentDidMount () {
+    this.getBizList(moment().formatUTC('YYMMDD'))
+  }
+
   calculateSummarySubTotal = () => {
     const { values, setFieldValue } = this.props
     const { rows } = values
@@ -61,10 +82,7 @@ class CollectPaymentModal extends PureComponent {
         return payment
       })
     }
-    setTimeout(
-      () => setFieldValue('totalAmtPaid', amountReceivedSubTotal),
-      100,
-    )
+    setTimeout(() => setFieldValue('totalAmtPaid', amountReceivedSubTotal), 100)
 
     return {
       invoiceAmountSubTotal,
@@ -75,9 +93,53 @@ class CollectPaymentModal extends PureComponent {
     }
   }
 
+  onChangePaymentMode = (event) => {
+    const { setFieldValue } = this.props
+    const selectedValue = event || ''
+
+    if (selectedValue === 1) {
+      this.setState({ isCardPayment: true })
+      setFieldValue('creditCardTypeFK', 1)
+    } else {
+      this.setState({ isCardPayment: false })
+      setFieldValue('creditCardTypeFK', undefined)
+    }
+  }
+
+  getBizList = (e) => {
+    const { dispatch, setFieldValue } = this.props
+    dispatch({
+      type: 'claimSubmissionApproved/getAllBizSession',
+      payload: {
+        sessionNoPrefix: e,
+        pagesize: 999999,
+      },
+    }).then(() => {
+      const { bizSessionList } = this.props.claimSubmissionApproved
+      setFieldValue(
+        'paymentCreatedBizSessionFK',
+        bizSessionList.length === 0 || bizSessionList === undefined
+          ? undefined
+          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
+      )
+    })
+  }
+
+  onChangeDate = (event) => {
+    const { isDeposit } = this.props
+    const selectedDate = moment(event).format('YYMMDD')
+
+    if (isDeposit && selectedDate === moment().format('YYMMDD')) {
+      this.setState({ isSessionRequired: false })
+    } else {
+      this.setState({ isSessionRequired: true })
+      this.getBizList(selectedDate)
+    }
+  }
+
   render () {
-    // console.log(this.props)
-    const { classes, values, footer } = this.props
+    const { classes, values, footer, claimSubmissionApproved } = this.props
+    const { bizSessionList } = claimSubmissionApproved
     const { rows } = values
 
     return (
@@ -228,51 +290,83 @@ class CollectPaymentModal extends PureComponent {
           />
         </GridContainer>
         <GridContainer className={classes.paymentDetails}>
-          <GridItem xs={4}>
-            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-              Payment Details
-            </h4>
+          <GridItem direction='column' xs={12}>
+            <GridItem xs={4}>
+              <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+                Payment Details
+              </h4>
+            </GridItem>
+            <GridItem xs={4}>
+              <FastField
+                name='paymentDate'
+                render={(args) => {
+                  return (
+                    <DatePicker
+                      label='Payment Date'
+                      timeFomat={false}
+                      onChange={this.onChangeDate}
+                      disabledDate={(d) => !d || d.isAfter(moment())}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={4}>
+              <Field
+                name='paymentCreatedBizSessionFK'
+                render={(args) => (
+                  <Select label='Session' options={bizSessionList} {...args} />
+                )}
+              />
+            </GridItem>
+            <GridItem xs={4}>
+              <FastField
+                name='paymentModeFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Payment Mode'
+                      labelField='displayValue'
+                      code='CTPaymentMode'
+                      onChange={(e) => this.onChangePaymentMode(e)}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            {this.state.isCardPayment && (
+              <GridItem xs={4}>
+                <FastField
+                  name='creditCardTypeFK'
+                  render={(args) => (
+                    <CodeSelect
+                      label='Card Type'
+                      code='ctCreditCardType'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+            )}
+            <GridItem xs={4}>
+              <FastField
+                name='remark'
+                render={(args) => {
+                  return (
+                    <OutlinedTextField
+                      label='Remarks'
+                      multiline
+                      rowsMax={2}
+                      rows={2}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
           </GridItem>
-          <GridItem xs={8} />
-          <GridItem xs={4}>
-            <FastField
-              name='paymentDate'
-              render={(args) => {
-                return <DatePicker label='Payment Date' {...args} />
-              }}
-            />
-            <FastField
-              name='paymentModeFK'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    label='Payment Mode'
-                    labelField='displayValue'
-                    code='CTPaymentMode'
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={8} />
-          <GridItem xs={4}>
-            <FastField
-              name='remark'
-              render={(args) => {
-                return (
-                  <OutlinedTextField
-                    label='Remarks'
-                    multiline
-                    rowsMax={2}
-                    rows={2}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-          <GridItem xs={8} />
         </GridContainer>
         {footer &&
           footer({
