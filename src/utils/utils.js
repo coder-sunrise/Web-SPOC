@@ -758,6 +758,7 @@ const calculateItemLevelAdjustment = (
   gstPercentage = 0,
   gstEnabled = false,
   gstIncluded = false,
+  count=0
 ) => {
   let itemLevelAdjustmentAmount = 0
   let itemLevelGSTAmount = 0
@@ -766,7 +767,7 @@ const calculateItemLevelAdjustment = (
     itemLevelAdjustmentAmount = tempSubTotal * (adjValue / 100)
     tempSubTotal += itemLevelAdjustmentAmount
   } else {
-    itemLevelAdjustmentAmount = tempSubTotal / tempInvoiceTotal * adjValue
+    itemLevelAdjustmentAmount = adjValue / count
     tempSubTotal += itemLevelAdjustmentAmount
   }
 

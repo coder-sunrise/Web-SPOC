@@ -520,7 +520,7 @@ const InventoryTypeListing = ({
           getServiceCenterService()
           const returnRow = addedRows.map((row) => ({
             ...row,
-            unitPrice: row.unitPrice || price,
+            unitPrice: unitPrice || price,
             subTotal: total(),
           }))
           return returnRow

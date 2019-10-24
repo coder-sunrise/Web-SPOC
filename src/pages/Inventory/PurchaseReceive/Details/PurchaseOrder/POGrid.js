@@ -122,10 +122,17 @@ class Grid extends PureComponent {
     row.bonusQuantity = 0
     row.totalQuantity = 0
     row.quantityReceived = 0
-
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
+    })
+
+    this.props.dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
     })
 
     return { ...row }
@@ -152,8 +159,8 @@ class Grid extends PureComponent {
         }
 
         const calcTotalPrice = () => {
-          if (tempOrderQty >= 1 && selectedItem.sellingPrice) {
-            return tempOrderQty * selectedItem.sellingPrice
+          if (tempOrderQty >= 1 && tempUnitPrice) {
+            return tempOrderQty * tempUnitPrice
           }
           return undefined
         }
@@ -329,7 +336,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          disabled: true,
+          // disabled: true,
         },
         {
           columnName: 'totalPrice',

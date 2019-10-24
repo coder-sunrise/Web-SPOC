@@ -30,15 +30,6 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
-const corPrescriptionItemInstructionSchema = Yup.object().shape({
-  usageMethodFK: Yup.number().required(),
-  dosageFK: Yup.number().required(),
-  prescribeUOMFK: Yup.number().required(),
-  drugFrequencyFK: Yup.number().required(),
-  duration: Yup.number().required(),
-  sequence: Yup.number().required(),
-  stepdose: Yup.string().required(),
-})
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
@@ -56,7 +47,9 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    quantity: Yup.number().required(),
+    quantity: Yup.number() 
+      .min(0.1, 'Quantity must be between 0.1 and 999')
+      .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
     totalPrice: Yup.number().required(),
     type: Yup.string(),
@@ -68,11 +61,11 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       is: (val) => val === '5',
       then: Yup.string().required(),
     }),
-    corPrescriptionItemPrecaution: Yup.array().of(
-      Yup.object().shape({
-        medicationPrecautionFK: Yup.number().required(),
-      }),
-    ),
+    // corPrescriptionItemPrecaution: Yup.array().of(
+    //   Yup.object().shape({
+    //     medicationPrecautionFK: Yup.number().required(),
+    //   }),
+    // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
         usageMethodFK: Yup.number().required(),
@@ -94,6 +87,7 @@ const corPrescriptionItemInstructionSchema = Yup.object().shape({
       sequence: rows.length,
       ...values,
       subject: currentType.getSubject(values),
+      isDeleted: false,
     }
 
     dispatch({
@@ -401,6 +395,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+
     return (
       <div>
         <GridContainer>
@@ -592,8 +587,8 @@ class Medication extends PureComponent {
                           'corPrescriptionItemInstruction',
                           'Add step dose',
                           {
-                            drugFrequencyFK: 1,
-                            duration: 1,
+                           // drugFrequencyFK: 1,
+                           // duration: 1,
                             stepdose: 'AND',
                             sequence: i + 1,
                           },
@@ -709,7 +704,7 @@ class Medication extends PureComponent {
                     label='Quantity'
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
-                    min={0.1}
+                    min={0}
                     format='0.0'
                     onChange={(e) => {
                       if (values.unitPrice) {

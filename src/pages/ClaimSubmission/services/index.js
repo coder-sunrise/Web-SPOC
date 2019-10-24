@@ -4,8 +4,9 @@ import request from '@/utils/request'
 const url = '/api/InvoiceClaim'
 const countUrl = '/api/InvoiceClaim/Count'
 const chasClaimUrl = '/api/InvoiceClaim/SubmitChasClaim'
-const chasClaimStatusUrl = '/api/InvoiceClaim/Status'
+const chasClaimStatusUrl = '/api/InvoiceClaim/RefreshStatus'
 const bizSessionAPIURL = '/api/bizsession'
+const invoicePayment = '/api/InvoicePayment'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),
@@ -14,14 +15,21 @@ module.exports = {
   upsert: (params) => service.upsert(url, params),
   queryBadgeCount: (params) => service.query(countUrl, params),
   submitChasClaim: (params) => service.upsert(chasClaimUrl, params),
-  // getStatus: (params) => service.upsert(chasClaimStatusUrl, params),
+  postInvoicePayment: async (params) => {
+    const r = await request(`${invoicePayment}`, {
+      method: 'POST',
+      body: [
+        params,
+      ],
+    })
+    return r
+  },
   getStatus: async (params) => {
     let r
     r = await request(chasClaimStatusUrl, {
       method: 'PUT',
       body: params,
     })
-
     return r
   },
   getBizSession: (params) => service.queryList(bizSessionAPIURL, params),

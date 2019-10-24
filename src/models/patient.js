@@ -34,7 +34,7 @@ export default createFormViewModel({
           contactAddress: [
             {
               // Id: getUniqueGUID(),
-              countryFK: 107,
+              countryFK: undefined,
               isPrimary: true,
               isMailing: true,
             },

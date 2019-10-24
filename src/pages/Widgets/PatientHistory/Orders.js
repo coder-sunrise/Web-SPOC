@@ -1,4 +1,4 @@
-import { CommonTableGrid } from '@/components'
+import { CommonTableGrid, Select } from '@/components'
 
 export default ({ current }) => (
   <CommonTableGrid

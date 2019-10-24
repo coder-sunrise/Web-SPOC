@@ -42,7 +42,6 @@ export default ({
                   id: 'reception.queue.visitRegistration.temperature',
                 })}
                 format='0.0'
-                max={200}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.temperature.suffix',
                 })}
@@ -57,7 +56,6 @@ export default ({
               <NumberInput
                 {...args}
                 label='Blood Pressure SYS'
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
@@ -72,7 +70,6 @@ export default ({
               <NumberInput
                 {...args}
                 label='Blood Pressure DIA'
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.mmhg',
                 })}
@@ -89,7 +86,6 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate',
                 })}
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.heartRate.suffix',
                 })}
@@ -103,11 +99,10 @@ export default ({
             render={(args) => (
               <NumberInput
                 {...args}
-                format='0.00'
+                format='0.0'
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.weight',
                 })}
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
@@ -125,7 +120,6 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.height',
                 })}
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}
@@ -145,7 +139,6 @@ export default ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.bmi',
                 })}
-                max={999}
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.bmi.suffix',
                 })}

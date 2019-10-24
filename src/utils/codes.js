@@ -1278,6 +1278,12 @@ export const recurrenceTypes = [
   },
 ]
 
+export const inventoryAdjustmentStatus = [
+  { value: 1, name: 'Draft' },
+  { value: 2, name: 'Finalized' },
+  { value: 3, name: 'Discarded' },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1320,5 +1326,6 @@ module.exports = {
   tagList,
   osBalanceStatus,
   buttonTypes,
+  inventoryAdjustmentStatus,
   ...module.exports,
 }
