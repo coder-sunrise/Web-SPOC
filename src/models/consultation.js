@@ -100,7 +100,6 @@ export default createFormViewModel({
             message: `Consultation paused`,
           })
 
-      
           yield put({ type: 'closeModal' })
         }
         return response
@@ -145,7 +144,7 @@ export default createFormViewModel({
         // })
         // yield take('codetable/fetchCodes/@@end')
         let codetableState = yield select((state) => state.codetable)
-
+        console.log(codetableState)
         const {
           services,
           serviceCenters,
@@ -247,7 +246,7 @@ export default createFormViewModel({
             message: `Consultation signed`,
           })
           yield put({ type: 'closeModal' })
-          console.log("payload ", payload)
+          console.log('payload ', payload)
         }
         return response
       },
@@ -320,12 +319,17 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        // console.log('queryDone', payload)
+        console.log('queryDone', payload)
         const { data, autoOrderList, page, status } = payload
+        let visitRegistration = yield select((st) => st.visitRegistration)
+        let { entity } = visitRegistration
+        if (!entity || Object.values(entity).length === 0) {
+          yield take('visitRegistration/query/@@end')
+          visitRegistration = yield select((st) => st.visitRegistration)
 
-        yield take('visitRegistration/query/@@end')
-        const visitRegistration = yield select((st) => st.visitRegistration)
-        const { entity } = visitRegistration
+          entity = visitRegistration.entity
+        }
+
         const { visit } = entity
         const { visitStatus } = visit
         let orderList = []
