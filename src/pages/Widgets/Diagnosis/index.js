@@ -120,15 +120,13 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
-            let diagnosises = []
+            let diagnosises = values.corDiagnosis || []
 
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
 
             if (values.corDiagnosis.length <= 0) {
               this.addDiagnosis()
-            } else {
-              diagnosises = values.corDiagnosis.filter((o) => !o.isDeleted)
             }
 
             if (diagnosises.length === 0) {
@@ -140,6 +138,7 @@ class Diagnosis extends PureComponent {
             }
 
             return diagnosises.map((v, i) => {
+              if (v.isDeleted === true) return null
               return (
                 <div key={v.uid}>
                   <Item
