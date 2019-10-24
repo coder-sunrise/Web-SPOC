@@ -127,17 +127,17 @@ const bannerStyle = {
       }),
     }
     console.log({ payload })
-    // dispatch({
-    //   type: 'billing/upsert',
-    //   payload,
-    // }).then((response) => {
-    //   if (response) {
-    //     resetForm()
-    //     dispatch({
-    //       type: 'billing/closeModal',
-    //     })
-    //   }
-    // })
+    dispatch({
+      type: 'billing/upsert',
+      payload,
+    }).then((response) => {
+      if (response) {
+        resetForm()
+        dispatch({
+          type: 'billing/closeModal',
+        })
+      }
+    })
   },
 })
 class Billing extends Component {

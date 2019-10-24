@@ -522,6 +522,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     )
     const updatedRow = {
       ...tempInvoicePayer[index],
+      payerDistributedAmt: roundToTwoDecimals(
+        newInvoiceItems.reduce(
+          (subtotal, item) => subtotal + item.claimAmount,
+          0,
+        ),
+      ),
       invoicePayerItems: newInvoiceItems,
       _isConfirmed: !isInvalid,
       _isEditing: isInvalid,
