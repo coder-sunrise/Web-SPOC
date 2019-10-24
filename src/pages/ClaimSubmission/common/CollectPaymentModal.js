@@ -26,8 +26,9 @@ const paymentListSchema = Yup.object().shape({
   amountReceived: Yup.number().required(),
 })
 
-@connect(({ claimSubmissionApproved }) => ({
+@connect(({ claimSubmissionApproved, user }) => ({
   claimSubmissionApproved,
+  user,
 }))
 @withFormikExtend({
   name: 'claimSubmissionCollectPayment',
@@ -44,15 +45,20 @@ const paymentListSchema = Yup.object().shape({
     }),
   }),
   handleSubmit: (values, { props }) => {
-    const { dispatch } = props
-    const { rows, ...restValues } = values
+    const { dispatch, user, closeModal } = props
+    const { paymentCreatedBizSessionFK } = values
+    const paymentReceivedByUserFK = user.data.id
 
     const payload = {
       ...values,
+      paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+      paymentReceivedByUserFK,
     }
     dispatch({
       type: 'claimSubmissionApproved/submitInvoicePayment',
       payload,
+    }).then((r) => {
+      closeModal()
     })
   },
 })

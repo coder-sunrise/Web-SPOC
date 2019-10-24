@@ -93,10 +93,10 @@ export default createListViewModel({
       *submitInvoicePayment ({ payload }, { put, call }) {
         const response = yield call(service.postInvoicePayment, payload)
         const { data, status } = response
-        // if (status === '200') {
-        //   return data
-        // }
-        // return false
+
+        if (response) {
+          notification.success({ message: 'Collected' })
+        }
       },
     },
     reducers: {
