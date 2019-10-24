@@ -53,15 +53,22 @@ const bannerStyle = {
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
-    if (billing.entity) {
-      const finalClaim = 0
-      const finalPayable = roundToTwoDecimals(
-        billing.entity.invoice.totalAftGst - finalClaim,
-      )
+    try {
+      if (billing.entity) {
+        const finalClaim = 0
 
-      return { ...billing.entity, finalClaim, finalPayable }
+        const finalPayable = roundToTwoDecimals(
+          billing.entity.invoice.totalAftGst - finalClaim,
+        )
+
+        return { ...billing.entity, finalClaim, finalPayable }
+      }
+
+      return billing.default
+    } catch (error) {
+      console.log({ error })
+      return billing.default
     }
-    return billing.default
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -88,7 +95,11 @@ const bannerStyle = {
           invoicePayerItems: payer.invoicePayerItems
             .filter((item) => item.claimAmount > 0)
             .map((item) => {
+              if (item.invoiceItemFK) {
+                return { ...item }
+              }
               const {
+                invoiceItemFK,
                 _claimedAmount,
                 disabled,
                 itemCode,
@@ -101,6 +112,7 @@ const bannerStyle = {
                 id,
                 ...restItem
               } = item
+
               const _invoicePayerItem = {
                 ...restItem,
                 invoiceItemFK: id,
@@ -115,17 +127,17 @@ const bannerStyle = {
       }),
     }
     console.log({ payload })
-    dispatch({
-      type: 'billing/upsert',
-      payload,
-    }).then((response) => {
-      if (response) {
-        resetForm()
-        dispatch({
-          type: 'billing/closeModal',
-        })
-      }
-    })
+    // dispatch({
+    //   type: 'billing/upsert',
+    //   payload,
+    // }).then((response) => {
+    //   if (response) {
+    //     resetForm()
+    //     dispatch({
+    //       type: 'billing/closeModal',
+    //     })
+    //   }
+    // })
   },
 })
 class Billing extends Component {
@@ -191,8 +203,8 @@ class Billing extends Component {
 
   shouldDisableCompletePayment = () => {
     const { values } = this.props
-    const { invoicePayers, payments = [] } = values
-
+    const { invoicePayers = [], payments = [], invoice } = values
+    if (invoice === null) return true
     // if (payments.length === 0) return true
     if (invoicePayers.length === 0) return false
 
@@ -213,7 +225,6 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -286,6 +297,7 @@ class Billing extends Component {
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
+            payments={values.payments}
             invoice={{
               ...values.invoice,
               finalPayable: values.invoice.totalAftGst,
