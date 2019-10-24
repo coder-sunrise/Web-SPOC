@@ -157,7 +157,7 @@ export default createListViewModel({
         if (payload) {
           tempRows.map((a, index) => {
             if (a.uid === payload.uid) {
-              tempRows.splice(index, 1)
+              a.isDeleted = true
             }
             return a
           })
@@ -173,7 +173,7 @@ export default createListViewModel({
         }
 
         const amount = calculateAmount(tempRows, finalAdjustments)
-        console.log(tempRows, finalAdjustments, amount)
+        // console.log(tempRows, finalAdjustments, amount)
         return {
           ...state,
           ...amount,

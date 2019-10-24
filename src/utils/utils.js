@@ -884,7 +884,9 @@ const calculateAmount = (
     })
   })
 
-  const totalAfterAdj = rows.map((o) => o[adjustedField]).reduce(sumReducer, 0)
+  const totalAfterAdj = activeRows
+    .map((o) => o[adjustedField])
+    .reduce(sumReducer, 0)
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     notification.error({
@@ -909,8 +911,8 @@ const calculateAmount = (
 
   // console.log(totalAfterAdj, gst)
   const r = {
-    rows: activeRows,
-    adjustments: activeAdjustments.map((o, index) => ({ ...o, index })),
+    rows,
+    adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
       gst,
       total: totalAfterAdj,

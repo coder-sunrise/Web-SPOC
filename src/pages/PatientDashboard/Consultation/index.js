@@ -137,11 +137,11 @@ const saveConsultation = ({
 //   return {
 //     view: {
 //       name: 'consultation.view',
-//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
 //     },
 //     edit: {
 //       name: 'consultation.edit',
-//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
 //     },
 //   }
 // }
@@ -167,7 +167,10 @@ const saveConsultation = ({
   }),
 )
 @withFormikExtend({
-  authority: 'patientdashboard.startresumeconsultation',
+  authority: [
+    'patientdashboard.startresumeconsultation',
+    'patientdashboard.editconsultation',
+  ],
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     // console.log(consultation.entity, consultation.default)
@@ -438,7 +441,7 @@ class Consultation extends PureComponent {
               </h4>
             </GridItem>
             <GridItem>
-              {values.status !== 'Paused' && (
+              {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'
                   onClick={this.discardConsultation}
@@ -448,8 +451,7 @@ class Consultation extends PureComponent {
               )}
               <Authorized authority='patientdashboard.startresumeconsultation'>
                 <React.Fragment>
-                  {values.status !== 'Paused' &&
-                  [
+                  {[
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
@@ -461,7 +463,7 @@ class Consultation extends PureComponent {
                       Pause
                     </ProgressButton>
                   )}
-                  {values.status === 'Paused' && (
+                  {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
                       color='info'
@@ -615,10 +617,15 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(rights)
+    console.log(visit.visitStatus)
     const matches = {
       rights:
-        rights === 'enable' && values.status === 'Paused' ? 'disable' : rights,
+        rights === 'enable' && visit.visitStatus === 'PAUSED'
+          ? 'disable'
+          : rights,
     }
+    // console.log(matches)
+
     return (
       <div className={classes.root} ref={this.container}>
         <Banner

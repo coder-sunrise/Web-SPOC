@@ -70,7 +70,6 @@ export default createFormViewModel({
       },
 
       *start ({ payload }, { call, put }) {
-        console.log('dispense/start')
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {

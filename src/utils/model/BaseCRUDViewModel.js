@@ -157,7 +157,7 @@ export default class BaseCRUDViewModel {
           return data
           // }
         },
-        { type: 'throttle', ms: 2000 },
+        { type: 'throttle', ms: 1000 },
       ],
       // _query: [
       //   function* query (
