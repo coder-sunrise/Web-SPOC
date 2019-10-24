@@ -53,7 +53,7 @@ const styles = () => ({
 class AppointmentDataGrid extends React.Component {
   constructor (props) {
     super(props)
-    const { appointmentDate, data } = this.props
+    const { appointmentDate, data, selectedSlot } = this.props
     const columnExtensions = AppointmentDataColExtensions.map((column) => {
       if (column.columnName === 'isPrimaryClinician') {
         return {
@@ -65,12 +65,38 @@ class AppointmentDataGrid extends React.Component {
       }
 
       if (column.type === 'time') {
-        return {
+        let col = {
           ...column,
           currentDate: appointmentDate
             ? moment(appointmentDate, dateFormat)
             : moment(),
         }
+        // if (column.columnName === 'startTime') {
+        //   console.log(moment())
+        //   if (selectedSlot && selectedSlot.allDay === false) {
+        //     let startTime = ''
+        //     let start = moment(selectedSlot.start)
+        //     startTime = `${start.hour()}:${start.minute()}`
+        //     col = {
+        //       ...col,
+        //       defaultValue: start,
+        //     }
+        //   }
+        // } else if (
+        //   column.columnName === 'endTime' &&
+        //   selectedSlot.allDay === false
+        // ) {
+        //   if (selectedSlot) {
+        //     let endTime = ''
+        //     let end = moment(selectedSlot.end)
+        //     endTime = `${end.hour()}:${end.minute()}`
+        //     col = {
+        //       ...col,
+        //       value: endTime,
+        //     }
+        //   }
+        // }
+        return col
       }
 
       if (column.columnName === 'roomFk') {
@@ -166,7 +192,7 @@ class AppointmentDataGrid extends React.Component {
       handleEditingRowsChange,
       editingRows,
     } = this.props
-
+    console.log(data)
     return (
       <div className={classes.container}>
         <EditableTableGrid
@@ -194,6 +220,13 @@ class AppointmentDataGrid extends React.Component {
             showDeleteCommand: !disabled && data.length !== 1,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,
+            onAddedRowsChange: (row) => {
+              console.log(row)
+              return row.map((o) => ({
+                startTime: '18:00',
+                ...o,
+              }))
+            },
           }}
           schema={validationSchema}
         />

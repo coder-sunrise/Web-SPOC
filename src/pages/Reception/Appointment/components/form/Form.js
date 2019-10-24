@@ -658,6 +658,7 @@ class Form extends React.PureComponent {
       isSubmitting,
       mode,
       conflicts,
+      selectedSlot,
     } = this.props
 
     const {
@@ -674,7 +675,7 @@ class Form extends React.PureComponent {
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
-
+    console.log(datagrid)
     const _datagrid =
       conflicts.length > 0
         ? datagrid
@@ -742,6 +743,7 @@ class Form extends React.PureComponent {
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
                   editingRows={editingRows}
+                  selectedSlot={selectedSlot}
                 />
               </GridItem>
 
