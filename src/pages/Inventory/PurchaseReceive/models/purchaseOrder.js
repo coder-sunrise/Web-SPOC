@@ -21,9 +21,10 @@ export default createFormViewModel({
           purchaseOrderStatusFK: 1,
           shippingAddress: '',
           IsGSTEnabled: false,
-          IsGSTInclusive: false,
+          isGstInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
+          adjustmentAmount: 0,
         },
         rows: [],
         purchaseOrderMedicationItem: [],
@@ -87,9 +88,10 @@ export default createFormViewModel({
           purchaseOrderStatusFK: 1,
           shippingAddress: clinicAddress,
           IsEnabledGST: false,
-          IsGSTInclusive: false,
+          isGstInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
+          adjustmentAmount: 0,
         }
 
         return yield put({
@@ -117,9 +119,10 @@ export default createFormViewModel({
             purchaseOrderStatusFK: 1,
             purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,
             IsEnabledGST: false,
-            IsGSTInclusive: data.isGstInclusive,
+            isGstInclusive: data.isGstInclusive,
             gstAmount: data.gstAmount,
             totalAmount: data.totalAmount,
+            adjustmentAmount: 0,
           },
         })
       },

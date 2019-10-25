@@ -1,6 +1,6 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../Details/DeliveryOrder/services'
 import moment from 'moment'
+import * as service from '../Details/DeliveryOrder/services'
 
 export default createListViewModel({
   namespace: 'purchaseOrderPayment',
@@ -25,7 +25,7 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
-      queryDone(state, { payload }) {
+      queryDone (state, { payload }) {
         const { data } = payload
 
         return {

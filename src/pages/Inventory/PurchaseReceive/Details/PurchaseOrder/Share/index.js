@@ -25,7 +25,6 @@ class InvoiceSummary extends PureComponent {
   state = {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
-    isGSTInclusiveChecked: false,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -47,16 +46,16 @@ class InvoiceSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false, e) => {
-    const { settingGSTEnable } = this.state
-    const { setFieldValue, prefix, handleCalcInvoiceSummary } = this.props
+    const { settingGSTEnable,settingGSTPercentage } = this.state
+    const { setFieldValue, prefix, handleCalcInvoiceSummary, IsGSTEnabled } = this.props
+
+    let GSTValue = IsGSTEnabled ? settingGSTPercentage:0
+    setFieldValue(`${prefix}GSTValue`,GSTValue)
+
     if (!isCheckboxClicked) {
       if (!settingGSTEnable) {
-        setFieldValue(`${prefix}IsGSTInclusive`, false)
+        setFieldValue(`${prefix}isGstInclusive`, false)
       }
-    } else if (e.target.value) {
-      this.setState({ isGSTInclusiveChecked: true })
-    } else {
-      this.setState({ isGSTInclusiveChecked: false })
     }
 
     setTimeout(() => handleCalcInvoiceSummary(), 1)
@@ -66,16 +65,15 @@ class InvoiceSummary extends PureComponent {
     const {
       settingGSTEnable,
       settingGSTPercentage,
-      isGSTInclusiveChecked,
     } = this.state
     const {
       toggleInvoiceAdjustment,
+      handleCalcInvoiceSummary,
       handleDeleteInvoiceAdjustment,
       prefix = '',
       adjustmentListName = '',
       adjustmentList = [],
-      IsGSTEnabled = false,
-      handleCalcInvoiceSummary,
+      IsGSTEnabled,
       setFieldValue,
     } = this.props
     return (
@@ -140,7 +138,7 @@ class InvoiceSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
-                    disabled={isGSTInclusiveChecked}
+                    disabled={`${prefix}isGstInclusive`}
                     {...args}
                   />
                 )}
@@ -158,7 +156,7 @@ class InvoiceSummary extends PureComponent {
             {IsGSTEnabled ? (
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
-                  name={`${prefix}IsGSTInclusive`}
+                  name={`${prefix}isGstInclusive`}
                   render={(args) => {
                     return (
                       <Tooltip

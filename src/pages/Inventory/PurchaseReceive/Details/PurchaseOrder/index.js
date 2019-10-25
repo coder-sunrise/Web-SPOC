@@ -345,10 +345,11 @@ class Index extends Component {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const { values, setFieldValue } = this.props
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
-    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
+    const { IsGSTEnabled, isGstInclusive } = purchaseOrder || false
     let tempInvoiceTotal = 0
     let totalAmount = 0
     let gstAmount = 0
+    let totalAdjustmentAmount = 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
       (x) => !x.isDeleted,
@@ -384,7 +385,7 @@ class Index extends Component {
               settingGSTEnable,
               settingGSTPercentage,
               IsGSTEnabled,
-              IsGSTInclusive,
+              isGstInclusive,
               filteredPurchaseOrderItem.length,
             )
 
@@ -397,12 +398,13 @@ class Index extends Component {
               item.tempSubTotal += itemLevelAmount.itemLevelAdjustmentAmount
             }
 
+            totalAdjustmentAmount = itemLevelAmount.itemLevelAdjustmentAmount
             item.itemLevelGST = itemLevelAmount.itemLevelGSTAmount
 
             // Sum up all itemLevelGST & invoiceTotal at last iteration
             if (Object.is(adjArr.length - 1, adjKey)) {
               // Calculate item level totalAfterAdjustments & totalAfterGst
-              if (IsGSTInclusive) {
+              if (isGstInclusive) {
                 item.totalAfterGst = item.tempSubTotal
                 totalAmount += item.tempSubTotal
               } else {
@@ -423,7 +425,7 @@ class Index extends Component {
         if (settingGSTEnable) {
           if (!IsGSTEnabled) {
             item.itemLevelGST = 0
-          } else if (IsGSTInclusive) {
+          } else if (isGstInclusive) {
             item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 107)
           } else {
             item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 100)
@@ -450,6 +452,10 @@ class Index extends Component {
     setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
     }, 1)
+
+    setTimeout(() => {
+      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
+    })
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -478,7 +484,8 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled } = purchaseOrder || false
+    let { IsGSTEnabled } = purchaseOrder || false
+
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -519,8 +526,6 @@ class Index extends Component {
             adjustmentListName='purchaseOrderAdjustment'
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
-            setInclusiveGSTChecked={this.setInclusiveGSTChecked}
-            inclusiveGSTChecked={this.state.inclusiveGSTChecked}
             setFieldValue={setFieldValue}
             // {...this.props}
           />

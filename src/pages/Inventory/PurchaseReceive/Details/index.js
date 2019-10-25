@@ -36,6 +36,10 @@ class Index extends Component {
       purchaseOrder.exceptedDeliveryDate = null
     }
 
+    if(purchaseOrder && !purchaseOrder.IsGSTEnabled)
+    {
+      purchaseOrder.IsGSTEnabled = purchaseOrder.gstAmount > 0
+    }
 
     return (
       // <AuthorizedContext.Provider
