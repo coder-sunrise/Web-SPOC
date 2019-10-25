@@ -23,7 +23,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   //   ]
   // }
   if (type === 'Module') {
-    if (name === 'inventory/purchasingandre ceiving') {
+    if (name === 'reporst') {
       return [
         { name, rights: 'hidden' },
       ]
@@ -52,7 +52,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    if (name === 'purchasingandreceiving.newpurchasingand receiving') {
+    if (name === 'settings.mastersetting') {
       return [
         { name, rights: 'hidden' },
       ]

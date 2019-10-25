@@ -7,6 +7,8 @@ import Search from '@material-ui/icons/Search'
 import Business from '@material-ui/icons/Business'
 import FolderOpen from '@material-ui/icons/FolderOpen'
 import { withStyles } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
+
 import {
   GridContainer,
   GridItem,
@@ -232,7 +234,7 @@ class SystemSetting extends PureComponent {
     selectedOptions: [],
     active: 0,
   }
-
+ 
   componentDidMount () {}
 
   componentWillUnmount () {}
@@ -241,6 +243,7 @@ class SystemSetting extends PureComponent {
     const { classes, theme } = this.props
 
     return Object.keys(this.group).map((o) => {
+    
       return {
         title: o,
         items: this.group[o],

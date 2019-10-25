@@ -114,31 +114,31 @@ const styles = (theme) => ({
     width: '100%',
   },
 })
-// @withFormikExtend({
-//   // mapPropsToValues: ({ patientHistory }) => {
-//   //   console.log(patientHistory)
-//   //   return patientHistory.entity ? patientHistory.entity : patientHistory.default
-//   // },
-//   // validationSchema: Yup.object().shape({
-//   //   name: Yup.string().required(),
-//   //   dob: Yup.date().required(),
-//   //   patientAccountNo: Yup.string().required(),
-//   //   genderFK: Yup.string().required(),
-//   //   dialect: Yup.string().required(),
-//   //   contact: Yup.object().shape({
-//   //     contactAddress: Yup.array().of(
-//   //       Yup.object().shape({
-//   //         line1: Yup.string().required(),
-//   //         postcode: Yup.number().required(),
-//   //         countryFK: Yup.string().required(),
-//   //       }),
-//   //     ),
-//   //   }),
-//   // }),
+@withFormikExtend({
+  mapPropsToValues: ({ patientHistory }) => {
+    // console.log(patientHistory)
+    // return patientHistory.entity ? patientHistory.entity : patientHistory.default
+  },
+  // validationSchema: Yup.object().shape({
+  //   name: Yup.string().required(),
+  //   dob: Yup.date().required(),
+  //   patientAccountNo: Yup.string().required(),
+  //   genderFK: Yup.string().required(),
+  //   dialect: Yup.string().required(),
+  //   contact: Yup.object().shape({
+  //     contactAddress: Yup.array().of(
+  //       Yup.object().shape({
+  //         line1: Yup.string().required(),
+  //         postcode: Yup.number().required(),
+  //         countryFK: Yup.string().required(),
+  //       }),
+  //     ),
+  //   }),
+  // }),
 
-//   handleSubmit: () => {},
-//   displayName: 'PatientHistory',
-// })
+  // handleSubmit: () => {},
+  // displayName: 'PatientHistory',
+})
 @connect(({ patientHistory, clinicSettings, codetable }) => ({
   patientHistory,
   clinicSettings,
@@ -565,10 +565,11 @@ class PatientHistory extends Component {
               )
               .map((o) => {
                 const Widget = o.component
+                console.log("test ", this.props)
                 return (
                   <div>
                     <h5>{o.name}</h5>
-                    <Widget current={entity || {}} {...this.props} />
+                    <Widget current={entity || {}} {...this.props} setFieldValue={this.props.setFieldValue} />
                   </div>
                 )
               })}
@@ -589,7 +590,7 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-
+    console.log("============ ", this.props)
     const { entity, visitInfo, selected } = patientHistory
     const cfg = {}
     if (mode === 'split') {

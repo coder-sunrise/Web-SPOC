@@ -173,7 +173,7 @@ class PatientDashboard extends PureComponent {
     if (!entity) return null
     const { visit = {} } = entity
     // console.log(visit)
-    // console.log(this.props)
+
     return (
       <div className={classes.root}>
         <Banner
@@ -197,6 +197,7 @@ class PatientDashboard extends PureComponent {
               leftPanel: classes.leftPanel,
               rightPanel: classes.rightPanel,
             }}
+            {...this.props}
           />
         </div>
       </div>

@@ -5,7 +5,7 @@ import { CardContainer } from '@/components'
 import { compose } from 'redux'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
-import Authorized from '@/utils/Authorized'
+
 
 const styles = () => ({})
 const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
@@ -21,7 +21,6 @@ const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
     })
   }, [])
   return (
-    <Authorized authority='scheme.schemedetails'>
       <CardContainer
         hideHeader
        
@@ -29,7 +28,7 @@ const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
         <FilterBar {...props} />
         <Grid {...props} />
       </CardContainer>
-    </Authorized>
+    
   )
 }
 
