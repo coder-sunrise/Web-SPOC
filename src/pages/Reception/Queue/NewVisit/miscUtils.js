@@ -114,6 +114,7 @@ export const formikHandleSubmit = (
     visitInfo: { id = undefined, visit, ...restVisitInfo },
     // patientInfo,
     appointmentFK,
+    roomFK,
   } = visitRegistration
   const bizSessionFK = sessionInfo.id
 
@@ -144,6 +145,7 @@ export const formikHandleSubmit = (
       bizSessionFK,
       visitReferenceNo,
       appointmentFK,
+      roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       visitRemarks: null,
       temperatureC: null,
