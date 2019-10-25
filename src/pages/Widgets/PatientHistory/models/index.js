@@ -83,10 +83,10 @@ export default createListViewModel({
       },
       *queryDone ({ payload }, { call, put, select, take }) {
         let sortedList = payload.data.data
-        ? payload.data.data.filter((o) => o.coHistory.length >= 1)
-        : ''
+          ? payload.data.data.filter((o) => o.coHistory.length >= 1)
+          : ''
 
-        if (sortedList.length > 0 ) {
+        if (sortedList.length > 0) {
           yield put({
             type: 'queryOne',
             payload: sortedList[0].coHistory[0].id,
@@ -95,7 +95,7 @@ export default createListViewModel({
       },
     },
     reducers: {
-      querySingleDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         // const { data } = payload
 
         let sortedPatientHistory = st.list
@@ -104,8 +104,12 @@ export default createListViewModel({
 
         return {
           ...st,
-          selected: sortedPatientHistory.length > 0 ? sortedPatientHistory[0]  : '',
-          selectedSubRow: sortedPatientHistory.length > 0 ? sortedPatientHistory[0].coHistory[0]  : '',
+          selected:
+            sortedPatientHistory.length > 0 ? sortedPatientHistory[0] : '',
+          selectedSubRow:
+            sortedPatientHistory.length > 0
+              ? sortedPatientHistory[0].coHistory[0]
+              : '',
         }
       },
     },

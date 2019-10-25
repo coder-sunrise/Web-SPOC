@@ -3,7 +3,7 @@ import { connect } from 'dva'
 
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
+import Authorized from '@/utils/Authorized'
 import { CardContainer, CommonModal } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
@@ -65,24 +65,30 @@ class Supplier extends PureComponent {
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
     return (
-      <CardContainer hideHeader>
-        <Filter {...cfg} {...this.props} />
-        <Grid {...cfg} {...this.props} />
+      <Authorized authority='scheme.schemedetails'>
+        <CardContainer hideHeader>
+          <Filter {...cfg} {...this.props} />
+          <Grid {...cfg} {...this.props} />
 
-        <CommonModal
-          open={settingCompany.showModal}
-          observe='CompanyDetail'
-          title={
-            settingCompany.entity ? `Edit ${companyType}` : `Add ${companyType}`
-          }
-          maxWidth='md'
-          bodyNoPadding
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-        >
-          <Detail {...cfg} {...this.props} />
-        </CommonModal>
-      </CardContainer>
+          <CommonModal
+            open={settingCompany.showModal}
+            observe='CompanyDetail'
+            title={
+              settingCompany.entity ? (
+                `Edit ${companyType}`
+              ) : (
+                `Add ${companyType}`
+              )
+            }
+            maxWidth='md'
+            bodyNoPadding
+            onClose={this.toggleModal}
+            onConfirm={this.toggleModal}
+          >
+            <Detail {...cfg} {...this.props} />
+          </CommonModal>
+        </CardContainer>
+      </Authorized>
     )
   }
 }

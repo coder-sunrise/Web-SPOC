@@ -22,9 +22,9 @@ class EditOrder extends Component {
     })
     const parameters = {
       pid: patientInfo.id,
-      md2: 'bill',
+      vid: dispense.visitID,
     }
-    router.push(getAppendUrl(parameters, '/reception/queue'))
+    router.push(getAppendUrl(parameters, '/reception/queue/billing'))
     // this.props.history.push(`${location.pathname}/billing`)
   }
 
@@ -33,7 +33,7 @@ class EditOrder extends Component {
     dispatch({
       type: `consultation/editOrder`,
       payload: {
-        id: visitRegistration.entity.visit.id,
+        id: dispense.visitID,
         version: dispense.version,
       },
     }).then((o) => {
@@ -64,6 +64,7 @@ class EditOrder extends Component {
       consultationDocument,
       orders,
       dispatch,
+      dispense,
       visitRegistration,
     } = this.props
     dispatch({
@@ -80,7 +81,7 @@ class EditOrder extends Component {
 
         dispatch({
           type: `dispense/refresh`,
-          payload: visitRegistration.entity.visit.id,
+          payload: dispense.visitID,
         })
         notification.success({
           message: 'Order signed',
@@ -100,7 +101,7 @@ class EditOrder extends Component {
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
-    console.log('edit order', { values: this.props.values })
+    // console.log('edit order', { values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer>

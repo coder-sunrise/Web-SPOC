@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
 import { Badge, withStyles } from '@material-ui/core'
@@ -19,7 +19,7 @@ const styles = (theme) => ({
 @connect(({ claimSubmission }) => ({
   claimSubmission,
 }))
-class ClaimSubmission extends React.Component {
+class ClaimSubmission extends PureComponent {
   componentDidMount () {
     const data = {
       'ClaimCountListDto[0].SchemeType': 'CHAS',
@@ -27,7 +27,6 @@ class ClaimSubmission extends React.Component {
       // 'ClaimCountListDto[1].SchemeType': 'Corporate',
       // 'ClaimCountListDto[1].Status': 'New',
     }
-
     this.props.dispatch({
       type: 'claimSubmission/getClaimCount',
       payload: data,
@@ -42,32 +41,35 @@ class ClaimSubmission extends React.Component {
 
   render () {
     const { classes, claimSubmission } = this.props
-    const { invoiceClaimCount } = claimSubmission || []
+    const { invoiceClaimCount } = claimSubmission
+
     return (
       <GridContainer className={classes.container}>
-        {invoiceClaimCount.map((scheme) => {
-          return (
-            <GridItem md={2}>
-              <Badge
-                badgeContent={scheme.count}
-                color='error'
-                className={classes.badge}
-              >
-                <Button
-                  fullWidth
-                  bigview
-                  color='primary'
-                  variant='outlined'
-                  onClick={this.navigate}
-                  id={scheme.schemeType}
+        <GridItem md={12} container>
+          {invoiceClaimCount.map((scheme) => {
+            return (
+              <GridItem md={2}>
+                <Badge
+                  badgeContent={scheme.count}
+                  color='error'
+                  className={classes.badge}
                 >
-                  <Note />
-                  {scheme.schemeType}
-                </Button>
-              </Badge>
-            </GridItem>
-          )
-        })}
+                  <Button
+                    fullWidth
+                    bigview
+                    color='primary'
+                    variant='outlined'
+                    onClick={this.navigate}
+                    id={scheme.schemeType}
+                  >
+                    <Note />
+                    {scheme.schemeType}
+                  </Button>
+                </Badge>
+              </GridItem>
+            )
+          })}
+        </GridItem>
 
         {/* <GridItem md={2}>
           <Badge badgeContent={5} color='error' className={classes.badge}>

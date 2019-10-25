@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Tooltip } from '@material-ui/core'
 import { Search } from '@material-ui/icons'
 import { suppliers, dispUOMs } from '@/utils/codes'
-import { Button, CommonTableGrid } from '@/components'
+import { Tooltip, Button, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
   state = {

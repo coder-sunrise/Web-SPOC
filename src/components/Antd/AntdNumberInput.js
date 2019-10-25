@@ -110,8 +110,8 @@ class AntdNumberInput extends React.PureComponent {
     disabled: false,
     size: 'default',
     allowEmpty: true,
-    max: 999999.9999,
-    min: -999999.9999,
+    max: 999999999,
+    min: -999999999,
   }
 
   constructor (props) {
@@ -273,6 +273,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (v > this.props.max) {
       newV = this.props.max
     }
+    console.log(v, this.props.max)
     this.setState({
       value: newV === undefined ? '' : newV,
     })

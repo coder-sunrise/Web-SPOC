@@ -163,25 +163,7 @@ class Layout extends PureComponent {
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
-    this.delayedShowBottomPadding = _.debounce((e) => {
-      if (
-        Math.abs(
-          window.mainPanel.scrollHeight -
-            window.mainPanel.scrollTop -
-            window.mainPanel.clientHeight,
-        ) < 10
-      ) {
-        $(this.layoutContainer.current).addClass(
-          this.props.classes.layoutOnDrag,
-        )
-        $(window.mainPanel).scrollTop($(window.mainPanel).scrollTop() + 5)
-      }
-    }, 1000)
-    this.delayedHideBottomPadding = _.debounce((e) => {
-      $(this.layoutContainer.current).removeClass(
-        this.props.classes.layoutOnDrag,
-      )
-    }, 1000)
+
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
@@ -269,49 +251,7 @@ class Layout extends PureComponent {
     }
   }
 
-  componentDidMount () {
-    // create an instance
-    // console.log(this.props)
-    // const { global } = this.props
-    // $(window).trigger('resize')
-    // console.log($(this.container.current).width())
-    // console.log($(this.container.current).innerWidth())
-    // $('.react-resizable-handle').on('mouseover',)
-    const { consultation, dispatch } = this.props
-    // console.log(this.props.values)
-    // dispatch({
-    //   type:'formik/mergeState',
-    //   payload:{
-    //     ConsultationPage:{
-    //       dirty:true
-    //     }
-    //   }
-    // })
-    $(this.layoutContainer.current)
-      .on(
-        'mouseenter',
-        '.react-resizable-handle',
-        this.delayedShowBottomPadding,
-      )
-      .on(
-        'mouseleave',
-        '.react-resizable-handle',
-        this.delayedHideBottomPadding,
-      )
-    // if (consultation) {
-    //   if (consultation.consultationID) {
-    //     dispatch({
-    //       type: 'consultation/query',
-    //       payload: consultation.consultationID,
-    //     })
-    //   } else if (consultation.visitFK) {
-    //     dispatch({
-    //       type: 'consultation/start',
-    //       payload: consultation.visitFK,
-    //     })
-    //   }
-    // }
-  }
+  componentDidMount () {}
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
@@ -643,12 +583,34 @@ class Layout extends PureComponent {
       },
       onResizeStart: (e) => {
         // $(this.layoutContainer.current).addClass(classes.layoutOnDrag)
+        // console.log(e, window, $(window.mainPanel))
+        // $(window.mainPanel).scrollTop($(window.mainPanel).scrollTop() + 5)
         // console.log($(this.layoutContainer.current), classes.layoutOnDrag)
+        const {
+          scrollTop,
+          scrollHeight,
+          offsetHeight,
+        } = this.layoutContainer.current
+        // console.log(scrollTop + offsetHeight, scrollHeight)
+        if (scrollTop + offsetHeight >= scrollHeight - 10) {
+          $(this.layoutContainer.current).addClass(
+            this.props.classes.layoutOnDrag,
+          )
+          this.layoutContainer.current.scrollTo(
+            0,
+            this.layoutContainer.current.scrollHeight,
+          )
+        }
       },
       onResizeStop: (e) => {
         // $(this.layoutContainer.current).removeClass(classes.layoutOnDrag)
+        // console.log(e)
+        $(this.layoutContainer.current).removeClass(
+          this.props.classes.layoutOnDrag,
+        )
       },
     }
+
     // console.log(this.props)
     return (
       <div>
@@ -661,6 +623,7 @@ class Layout extends PureComponent {
               overflowX: 'hidden',
               marginTop: 1,
             }}
+            // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
               {state.currentLayout.widgets.map((id) => {

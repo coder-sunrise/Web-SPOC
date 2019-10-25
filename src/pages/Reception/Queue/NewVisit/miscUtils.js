@@ -80,13 +80,12 @@ export const formikMapPropsToValues = ({
           item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
     }
-     console.log("------- ", doctorProfile )
+
     return {
       queueNo: qNo,
       visitPurposeFK: 1,
       visitStatus: VISIT_STATUS.WAITING,
       doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
-      temperatureC: 0.0,
       ...visitEntries,
     }
   } catch (error) {
@@ -114,6 +113,7 @@ export const formikHandleSubmit = (
     visitInfo: { id = undefined, visit, ...restVisitInfo },
     // patientInfo,
     appointmentFK,
+    roomFK,
   } = visitRegistration
   const bizSessionFK = sessionInfo.id
 
@@ -144,6 +144,7 @@ export const formikHandleSubmit = (
       bizSessionFK,
       visitReferenceNo,
       appointmentFK,
+      roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       visitRemarks: null,
       temperatureC: null,

@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import { connect } from 'dva'
-// material ui
-import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
@@ -14,10 +11,7 @@ import {
   notification,
 } from '@/components'
 // sub component
-// import PatientBanner from './components/PatientBanner'
-import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
-import style from './style'
 // utils
 import {
   getAppendUrl,
@@ -28,11 +22,12 @@ import Yup from '@/utils/yup'
 import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
-  const { dispatch, dispense, visitRegistration, resetForm } = props
+  const { dispatch, dispense, resetForm } = props
 
   dispatch({
     type: `dispense/${effect}`,
-    payload: visitRegistration.entity.visit.id,
+    // payload: visitRegistration.entity.visit.id,
+    payload: dispense.visitID,
   }).then((o) => {
     resetForm(o)
     dispatch({
@@ -98,8 +93,8 @@ const reloadDispense = (props, effect = 'query') => {
     ),
   }),
   handleSubmit: (values, { props, ...restProps }) => {
-    const { dispatch, onConfirm, codetable, visitRegistration } = props
-    const vid = visitRegistration.entity.visit.id
+    const { dispatch, dispense } = props
+    const vid = dispense.visitID
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -122,39 +117,29 @@ const reloadDispense = (props, effect = 'query') => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch, visitRegistration, values } = this.props
+    const { dispatch, dispense, values } = this.props
 
-    // dispatch({
-    //   type: 'dispense/closeModal',
-    //   payload: {
-    //     toBillingPage: true,
-    //   },
-    // })
     dispatch({
       type: 'dispense/finalize',
       payload: {
-        id: visitRegistration.entity.visit.id,
+        id: dispense.visitID,
         values,
       },
     }).then((response) => {
       if (response) {
-        const parameters = {
-          md2: 'bill',
-        }
-        router.push(
-          getAppendUrl(parameters, '/reception/queue/patientdashboard'),
-        )
+        const parameters = {}
+        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
       }
     })
   }
 
   _editOrder = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
+    const { dispatch, dispense } = this.props
 
     dispatch({
       type: `consultation/editOrder`,
       payload: {
-        id: visitRegistration.entity.visit.id,
+        id: dispense.visitID,
         version: dispense.version,
       },
     }).then((o) => {
@@ -180,8 +165,7 @@ class Main extends Component {
   }
 
   render () {
-    const { classes, dispense, handleSubmit } = this.props
-    console.log({ values: this.props.values })
+    const { classes, handleSubmit } = this.props
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -198,7 +182,7 @@ class Main extends Component {
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              Print All Label
+              Print Drug Label
             </Button>
             <Button color='primary' size='sm'>
               <Print />
@@ -206,6 +190,7 @@ class Main extends Component {
             </Button>
           </GridItem>
           <DispenseDetails {...this.props} />
+
           <GridItem justify='flex-end' container className={classes.footerRow}>
             <Authorized authority='queue.dispense.savedispense'>
               <Button color='success' size='sm' onClick={handleSubmit}>

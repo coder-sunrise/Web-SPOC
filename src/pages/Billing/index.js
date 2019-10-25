@@ -17,24 +17,35 @@ import {
 import { AddPayment, LoadingWrapper } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '../DispenseDetails'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // model
-import model from '../models/billing'
+// import model from '../models/billing'
 // utils
-import { getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
+  accordionContainer: {
+    paddingTop: theme.spacing(1.5),
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+  },
   paperContent: {
-    padding: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    padding: theme.spacing(1),
   },
   paymentButton: {
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
     textAlign: 'right',
+  },
+  dispenseContainer: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(2),
   },
 })
 
@@ -50,18 +61,26 @@ const bannerStyle = {
   loading,
 }))
 @withFormikExtend({
+  notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
-    if (billing.entity) {
-      const finalClaim = 0
-      const finalPayable = roundToTwoDecimals(
-        billing.entity.invoice.totalAftGst - finalClaim,
-      )
+    try {
+      if (billing.entity) {
+        const finalClaim = 0
 
-      return { ...billing.entity, finalClaim, finalPayable }
+        const finalPayable = roundToTwoDecimals(
+          billing.entity.invoice.totalAftGst - finalClaim,
+        )
+
+        return { ...billing.entity, finalClaim, finalPayable }
+      }
+
+      return billing.default
+    } catch (error) {
+      console.log({ error })
+      return billing.default
     }
-    return billing.default
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -88,7 +107,11 @@ const bannerStyle = {
           invoicePayerItems: payer.invoicePayerItems
             .filter((item) => item.claimAmount > 0)
             .map((item) => {
+              if (item.invoiceItemFK) {
+                return { ...item }
+              }
               const {
+                invoiceItemFK,
                 _claimedAmount,
                 disabled,
                 itemCode,
@@ -101,6 +124,7 @@ const bannerStyle = {
                 id,
                 ...restItem
               } = item
+
               const _invoicePayerItem = {
                 ...restItem,
                 invoiceItemFK: id,
@@ -135,31 +159,37 @@ class Billing extends Component {
   }
 
   backToDispense = () => {
-    const { dispatch, values } = this.props
-    const parameters = {
-      md2: 'dsps',
-      version: Date.now(),
-    }
-
+    const { dispatch } = this.props
     dispatch({
-      type: 'dispense/unlock',
-      payload: {
-        id: values.visitId,
-      },
-    }).then((response) => {
-      if (response) {
-        router.push(
-          getAppendUrl(parameters),
-          '/reception/queue/patientdashboard',
-        )
-        dispatch({
-          type: 'billing/closeModal',
-          payload: {
-            toDispensePage: true,
-          },
-        })
-      }
+      type: 'billing/backToDispense',
+      // payload: {
+      //   visitID: values.visitId,
+      // },
     })
+    // const parameters = {
+    //   md2: 'dsps',
+    //   v: Date.now(),
+    //   vid: values.visitId,
+    //   pid: billing.patientID,
+    // }
+    // const destinationUrl = getAppendUrl(parameters, '/reception/queue/dispense')
+
+    // dispatch({
+    //   type: 'dispense/unlock',
+    //   payload: {
+    //     id: values.visitId,
+    //   },
+    // }).then((response) => {
+    //   if (response) {
+    //     router.push(destinationUrl)
+    //     // dispatch({
+    //     //   type: 'billing/closeModal',
+    //     //   payload: {
+    //     //     toDispensePage: true,
+    //     //   },
+    //     // })
+    //   }
+    // })
   }
 
   toggleAddPaymentModal = () => {
@@ -178,7 +208,8 @@ class Billing extends Component {
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
-    if (expanded) {
+    const { dispense } = this.props
+    if (!dispense.entity) {
       this.props.dispatch({
         type: 'billing/showDispenseDetails',
       })
@@ -191,8 +222,8 @@ class Billing extends Component {
 
   shouldDisableCompletePayment = () => {
     const { values } = this.props
-    const { invoicePayers, payments = [] } = values
-
+    const { invoicePayers = [], payments = [], invoice } = values
+    if (invoice === null) return true
     // if (payments.length === 0) return true
     if (invoicePayers.length === 0) return false
 
@@ -213,11 +244,10 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
-        <div style={{ padding: 8 }}>
+        <div className={classes.accordionContainer}>
           <LoadingWrapper
             linear
             loading={loading.effects['dispense/initState']}
@@ -230,9 +260,9 @@ class Billing extends Component {
                 {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
-                    <GridContainer direction='column'>
+                    <Paper elevation={3} className={classes.dispenseContainer}>
                       <DispenseDetails viewOnly values={dispense.entity} />
-                    </GridContainer>
+                    </Paper>
                   ),
                 },
               ]}
@@ -283,9 +313,11 @@ class Billing extends Component {
           open={showAddPaymentModal}
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
+          observe='AddPaymentForm'
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
+            payments={values.payments}
             invoice={{
               ...values.invoice,
               finalPayable: values.invoice.totalAftGst,

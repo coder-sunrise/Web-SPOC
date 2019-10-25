@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
@@ -10,10 +11,12 @@ import ActionButton from './ActionButton'
 import StatusBadge from './StatusBadge'
 // utils
 import { getAppendUrl } from '@/utils/utils'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, formatAppointmentTimes } from '../utils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
+import { GENDER } from '@/utils/constants'
 
 const compareQueueNo = (a, b) => {
   const floatA = parseFloat(a)
@@ -103,8 +106,16 @@ const columnExtensions = [
   {
     columnName: 'gender/age',
     render: (row) => {
-      const { age = 0, gender = 'U' } = row
-      const ageLabel = age < 0 ? 0 : age + 1
+      if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+        const { patientProfile } = row
+        const { genderFK, dob } = patientProfile
+        const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+        const age = calculateAgeFromDOB(dob)
+        return `${gender}/${age}`
+      }
+      const { dob, gender = 'U' } = row
+
+      const ageLabel = calculateAgeFromDOB(dob)
       return `${gender}/${ageLabel}`
     },
     sortingEnabled: false,
@@ -293,8 +304,11 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
+              // router.push(
+              //   `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
+              // )
               router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
+                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 
@@ -304,15 +318,11 @@ const Grid = ({
           // billing
           const version = Date.now()
           const parameters = {
-            qid: row.id,
             vid: row.visitFK,
             pid: row.patientProfileFK,
             v: version,
-            md2: 'bill',
           }
-          router.push(
-            getAppendUrl(parameters, '/reception/queue/patientdashboard'),
-          )
+          router.push(getAppendUrl(parameters, '/reception/queue/billing'))
           break
         }
         case '2': // delete visit
@@ -340,22 +350,9 @@ const Grid = ({
               },
             }).then((o) => {
               if (o)
-                dispatch({
-                  type: 'codetable/fetchCodes',
-                  payload: {
-                    code: 'ctservice',
-                    filter: {
-                      'serviceFKNavigation.IsActive': true,
-                      combineCondition: 'or',
-                    },
-                  },
-                }).then((v) => {
-                  if (v) {
-                    router.push(
-                      `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-                    )
-                  }
-                })
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                )
             })
           }
           break
@@ -380,22 +377,9 @@ const Grid = ({
                   )
               })
             } else {
-              dispatch({
-                type: 'codetable/fetchCodes',
-                payload: {
-                  code: 'ctservice',
-                  filter: {
-                    'serviceFKNavigation.IsActive': true,
-                    combineCondition: 'or',
-                  },
-                },
-              }).then((o) => {
-                if (o) {
-                  router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-                  )
-                }
-              })
+              router.push(
+                `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+              )
             }
           }
 
@@ -417,7 +401,6 @@ const Grid = ({
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile } = codetable
-                  console.log({ codetable })
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {
@@ -459,6 +442,9 @@ const Grid = ({
             primaryClinicianFK: row.appointment_Resources.find(
               (item) => item.isPrimaryClinician,
             ).clinicianFK,
+            primaryClinicianRoomFK: row.appointment_Resources.find(
+              (item) => item.isPrimaryClinician,
+            ).roomFk,
           })
           break
         }

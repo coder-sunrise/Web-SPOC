@@ -55,7 +55,7 @@ export default createListViewModel({
       },
     },
     reducers: {
-      querySingleDone (state, { payload }) {
+      queryOneDone (state, { payload }) {
         return { ...state, currentViewDoctorBlock: payload.data }
       },
     },

@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Tooltip } from '@material-ui/core'
 import {
   withFormikExtend,
   Field,
@@ -14,6 +13,7 @@ import {
   CodeSelect,
   ProgressButton,
   DatePicker,
+  Tooltip,
   DateRangePicker,
 } from '@/components'
 
@@ -161,9 +161,9 @@ class Filter extends PureComponent {
                     payload: {
                       group: [
                         {
-                          poNo: poNo,
-                          supplier: supplier,
-                          status: status,
+                          poNo,
+                          supplier,
+                          status,
                           combineCondition: 'or',
                         },
                       ],

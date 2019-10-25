@@ -111,17 +111,7 @@ export const mapPropsToValues = ({
     bookedByUserFK: user.id,
     currentAppointment: {
       appointmentDate: moment(selectedSlot.start).formatUTC(),
-      appointments_Resources: [
-        {
-          id: -99,
-          conflicts: undefined,
-          clinicianFK: undefined,
-          appointmentTypeFK: undefined,
-          isPrimaryClinician: true,
-          startTime: '',
-          endTime: '',
-        },
-      ],
+      appointments_Resources: [],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
     recurrenceDto: { ...initDailyRecurrence },
@@ -152,7 +142,8 @@ export const mapPropsToValues = ({
         const _mobileContact = contactNumbers.find(
           (item) => item.numberTypeFK === 1,
         )
-        if (_mobileContact) patientContactNo = _mobileContact.number
+        if (_mobileContact)
+          patientContactNo = parseInt(_mobileContact.number, 10)
         patientName = name
         patientAccountNo = accNo
       }

@@ -1,3 +1,5 @@
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
   preInvoicePayer,
@@ -182,7 +184,8 @@ const getItemTypeSubtotal = (list, type) =>
 export const validateClaimAmount = (schemeRow, totalPayable) => {
   let invalidMessage = []
 
-  const { schemeConfig, invoicePayerItems } = schemeRow
+  const { schemeConfig, invoicePayerItems, payerTypeFK } = schemeRow
+  if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY) return []
 
   const {
     balance,
@@ -284,3 +287,11 @@ export const validateInvoicePayerItems = (invoicePayerItems) => {
   })
   return returnData
 }
+
+// export const flattenInvoicePayerItems = (invoiceItems, payer) => {
+//   const { invoicePayerItems } = payer
+//   return [
+//     ...invoiceItems,
+//     ...invoicePayerItems,
+//   ]
+// }

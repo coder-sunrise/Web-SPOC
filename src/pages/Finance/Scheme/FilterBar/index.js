@@ -14,6 +14,7 @@ import {
   Select,
 } from '@/components'
 import { status } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   filterBar: {
@@ -133,22 +134,24 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
               <FormattedMessage id='form.search' />
             </Button>
 
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                dispatch({
-                  type: 'schemeDetail/updateState',
-                  payload: {
-                    entity: undefined,
-                  },
-                })
-                history.push('/finance/scheme/details')
-              }}
-            >
-              <Add />
-              Add New
-            </Button>
+            <Authorized authority='scheme.newscheme'>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  dispatch({
+                    type: 'schemeDetail/updateState',
+                    payload: {
+                      entity: undefined,
+                    },
+                  })
+                  history.push('/finance/scheme/details')
+                }}
+              >
+                <Add />
+                Add New
+              </Button>
+            </Authorized>
           </div>
         </GridItem>
       </GridContainer>

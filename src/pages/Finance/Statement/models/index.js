@@ -40,7 +40,7 @@ export default createListViewModel({
         if (response === 204) {
           const res = yield call(service.query, payload)
           yield put({
-            type: 'querySingleDone',
+            type: 'queryOneDone',
             payload: res,
           })
         }
@@ -51,7 +51,7 @@ export default createListViewModel({
         if (response === 204) {
           const res = yield call(service.query, payload)
           yield put({
-            type: 'querySingleDone',
+            type: 'queryOneDone',
             payload: res,
           })
         }
@@ -86,7 +86,7 @@ export default createListViewModel({
         }
       },
 
-      querySingleDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,

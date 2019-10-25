@@ -4,7 +4,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Tooltip, withStyles } from '@material-ui/core'
 import { PanTool, Payment } from '@material-ui/icons'
 import Modal from './Modal'
-
+import Authorized from '@/utils/Authorized'
 import {
   Button,
   CommonModal,
@@ -70,33 +70,37 @@ class Grid extends PureComponent {
         if (column.name === 'action') {
           return (
             <Table.Cell {...props} style={{ paddingRight: 0 }}>
-              <Tooltip title='Deposit' placement='bottom'>
-                <Button
-                  size='sm'
-                  onClick={() => {
-                    this.editRow(row, true)
-                  }}
-                  color='primary'
-                  style={{ marginRight: 5, width: 60, minWidth: 60 }}
-                >
-                  {/* <PanTool /> */}
-                  Deposit
-                </Button>
-              </Tooltip>
-              <Tooltip title='Refund' placement='bottom'>
-                <Button
-                  size='sm'
-                  disabled={row.balance <= 0}
-                  onClick={() => {
-                    this.editRow(row, false)
-                  }}
-                  color='primary'
-                  style={{ marginRight: 5, width: 60, minWidth: 60 }}
-                >
-                  {/* <Payment /> */}
-                  Refund
-                </Button>
-              </Tooltip>
+              <Authorized authority='deposit.deposit'>
+                <Tooltip title='Deposit' placement='bottom'>
+                  <Button
+                    size='sm'
+                    onClick={() => {
+                      this.editRow(row, true)
+                    }}
+                    color='primary'
+                    style={{ marginRight: 5, width: 60, minWidth: 60 }}
+                  >
+                    {/* <PanTool /> */}
+                    Deposit
+                  </Button>
+                </Tooltip>
+              </Authorized>
+              <Authorized authority='deposit.refund'>
+                <Tooltip title='Refund' placement='bottom'>
+                  <Button
+                    size='sm'
+                    disabled={row.balance <= 0}
+                    onClick={() => {
+                      this.editRow(row, false)
+                    }}
+                    color='primary'
+                    style={{ marginRight: 5, width: 60, minWidth: 60 }}
+                  >
+                    {/* <Payment /> */}
+                    Refund
+                  </Button>
+                </Tooltip>
+              </Authorized>
             </Table.Cell>
           )
         }

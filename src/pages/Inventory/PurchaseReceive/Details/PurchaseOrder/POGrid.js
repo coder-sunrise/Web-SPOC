@@ -112,22 +112,29 @@ class Grid extends PureComponent {
     const { option, row } = e
 
     if (type === 'code') {
-      row.name = option.name
+      row.name = option.value
     } else {
-      row.code = option.code
+      row.code = option.value
     }
 
+    row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
     row.bonusQuantity = 0
     row.totalQuantity = 0
     row.quantityReceived = 0
-
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
     })
 
+    this.props.dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
     return { ...row }
   }
 

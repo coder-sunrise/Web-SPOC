@@ -676,15 +676,15 @@ const confirmBeforeReload = (e) => {
 }
 
 const _checkCb = (cb, e) => {
-  console.log('e', e)
   if (typeof cb === 'string') {
     router.push(cb)
   } else if (typeof cb === 'function') {
     cb(e)
   }
 }
+
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-  console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+  console.log('navigate dirty check')
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -758,7 +758,7 @@ const calculateItemLevelAdjustment = (
   gstPercentage = 0,
   gstEnabled = false,
   gstIncluded = false,
-  count=0
+  count = 0,
 ) => {
   let itemLevelAdjustmentAmount = 0
   let itemLevelGSTAmount = 0
@@ -866,22 +866,27 @@ const calculateAmount = (
   } = {},
 ) => {
   let gst = 0
-  const total = rows.map((o) => o[totalField]).reduce(sumReducer, 0)
+  const activeRows = rows.filter((o) => !o.isDeleted)
+  const activeAdjustments = adjustments.filter((o) => !o.isDeleted)
 
-  rows.forEach((r) => {
+  const total = activeRows.map((o) => o[totalField]).reduce(sumReducer, 0)
+
+  activeRows.forEach((r) => {
     r.weightage = r[totalField] / total
     r[adjustedField] = r[totalField]
 
     // console.log(r)
   })
-  adjustments.filter((o) => !o.isDeleted).forEach((fa) => {
-    rows.forEach((r) => {
+  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+    activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
       r[adjustedField] += r.weightage * fa.adjAmount
     })
   })
 
-  const totalAfterAdj = rows.map((o) => o[adjustedField]).reduce(sumReducer, 0)
+  const totalAfterAdj = activeRows
+    .map((o) => o[adjustedField])
+    .reduce(sumReducer, 0)
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     notification.error({
@@ -892,12 +897,12 @@ const calculateAmount = (
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
   if (isEnableGST) {
     if (isGSTInclusive) {
-      rows.forEach((r) => {
+      activeRows.forEach((r) => {
         gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
       })
     } else {
       gst = totalAfterAdj * gSTPercentage
-      rows.forEach((r) => {
+      activeRows.forEach((r) => {
         r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
         r[gstField] = roundToTwoDecimals(r[totalField] * (1 + gSTPercentage))
       })

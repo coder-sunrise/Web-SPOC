@@ -92,7 +92,7 @@ class ChangePassword extends React.PureComponent {
                   <input
                     className='visually-hidden'
                     name='fake_username'
-                    value='fakevalue'
+                    value=''
                   />
                   <TextField
                     {...args}

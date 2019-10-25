@@ -86,7 +86,12 @@ const styles = (theme) => ({
       : Yup.object().shape({
           ...baseValidationRule,
           userProfile: Yup.object().shape({
-            userName: Yup.string().required('Login ID is a required field'),
+            userName: Yup.string()
+              .matches(
+                /(^[a-zA-Z][a-zA-Z0-9.,$;]+$)/,
+                'Must have at least 2 letter, start with alphabet and do not contain whitespace',
+              )
+              .required('Login ID is a required field'),
             password: Yup.string().required('Password is a required field'),
           }),
         })
@@ -186,10 +191,13 @@ class UserProfileForm extends React.PureComponent {
   }
 
   render () {
-    const { classes, footer, handleSubmit, values } = this.props
+    const { classes, errors, footer, handleSubmit, values } = this.props
     const { showChangePassword, canEditDoctorMCR } = this.state
     const isEdit = values.id !== undefined
-
+    const test = /(^[a-zA-Z][a-zA-Z0-9.,$;]+$)/.test(
+      values.userProfile.userName,
+    )
+    console.log({ test })
     return (
       <React.Fragment>
         <GridContainer
