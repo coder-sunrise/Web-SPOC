@@ -47,6 +47,7 @@ const PurchaseReceiveDataGrid = ({
       columnExtensions={[
         {
           columnName: 'invoiceStatus',
+          sortBy: 'invoiceStatusFKNavigation.DisplayValue',
           render: (row) => {
             const { purchaseOrderStatus, invoiceStatus } = row
             if (
@@ -70,10 +71,10 @@ const PurchaseReceiveDataGrid = ({
           type: 'date',
         },
         { columnName: 'totalAmount', type: 'number', currency: true },
-        { columnName: 'outstanding', type: 'number', currency: true },
+        { columnName: 'outstanding', type: 'number', currency: true, sortingEnabled: false, },
         {
-          columnName: 'status',
-          sortingEnabled: false,
+          columnName: 'purchaseOrderStatus',
+          sortBy: 'purchaseOrderStatusFKNavigation.displayValue',
         },
         {
           columnName: 'action',

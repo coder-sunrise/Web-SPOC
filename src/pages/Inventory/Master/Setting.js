@@ -93,7 +93,7 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.dosage',
                 })}
-                labelField='displayValue'
+                labelField='name'
                 code='ctMedicationDosage'
                 {...args}
               />
@@ -108,7 +108,7 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.uom',
                 })}
-                labelField='displayValue'
+                labelField='name'
                 code={
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
@@ -169,7 +169,7 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.usage',
                 })}
-                labelField='displayValue'
+                labelField='name'
                 code={showTransfer ? 'ctMedicationUsage' : 'ctvaccinationusage'}
                 {...args}
               />
@@ -210,7 +210,7 @@ const Setting = ({
                 //   )
                 // }
                 // Fix work item ID: 10993
-                labelField='displayValue'
+                labelField='name'
                 code='ctmedicationunitofmeasurement'
                 {...args}
               />

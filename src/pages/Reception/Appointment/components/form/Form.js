@@ -80,11 +80,7 @@ class Form extends React.PureComponent {
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
-    editingRows: !this.props.values.id
-      ? [
-          -99,
-        ]
-      : [],
+    editingRows: [],
     _tempCallback: undefined,
   }
 
@@ -155,7 +151,7 @@ class Form extends React.PureComponent {
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
-          ...patientProfileDefaultValue.contact.countryFK,
+          ...patientProfileDefaultValue.contact.mobileContactNumber,
           number: values.patientContactNo,
         },
       },
@@ -191,7 +187,8 @@ class Form extends React.PureComponent {
           {
             [`${prefix}name`]: values.patientName,
             [`${prefix}patientAccountNo`]: values.patientName,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo}`,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
+              ''}`,
             combineCondition: 'or',
           },
         ],
@@ -319,7 +316,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  validateDataGrid = () => {
+  validateDataGrid = () => {    
     const { datagrid = [], editingRows } = this.state
 
     let isDataGridValid = true
@@ -602,6 +599,7 @@ class Form extends React.PureComponent {
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
+      pdroomid: primaryDoctorResource.roomFk, // primary clinician id
     }
 
     this.onCloseFormClick()
@@ -659,6 +657,7 @@ class Form extends React.PureComponent {
       isSubmitting,
       mode,
       conflicts,
+      selectedSlot,
     } = this.props
 
     const {
@@ -698,7 +697,10 @@ class Form extends React.PureComponent {
             ...datagrid,
           ]
 
-    const show = loading.effects['patientSearch/query'] || isSubmitting
+    const show =
+      loading.effects['patientSearch/query'] || loading.models.calendar
+
+    console.log({ show, loadingEffects: loading.effects, isSubmitting })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
@@ -743,6 +745,7 @@ class Form extends React.PureComponent {
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
                   editingRows={editingRows}
+                  selectedSlot={selectedSlot}
                 />
               </GridItem>
 

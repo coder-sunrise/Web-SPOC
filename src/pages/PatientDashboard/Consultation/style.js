@@ -12,7 +12,7 @@ const styles = (theme) => ({
     // height: 'auto',
   },
   layoutOnDrag: {
-    marginBottom: 200,
+    paddingBottom: 50,
   },
   container: {
     width: '100%',

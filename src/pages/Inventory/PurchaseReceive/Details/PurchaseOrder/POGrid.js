@@ -112,11 +112,12 @@ class Grid extends PureComponent {
     const { option, row } = e
 
     if (type === 'code') {
-      row.name = option.name
+      row.name = option.value
     } else {
-      row.code = option.code
+      row.code = option.value
     }
 
+    row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
     row.bonusQuantity = 0
@@ -134,7 +135,6 @@ class Grid extends PureComponent {
         commitCount: (commitCount += 1),
       },
     })
-
     return { ...row }
   }
 
@@ -243,7 +243,7 @@ class Grid extends PureComponent {
 
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable } = this.props
+    const { values, isEditable, isWriteOff } = this.props
     const { rows } = values
 
     const tableParas = {
@@ -360,9 +360,9 @@ class Grid extends PureComponent {
               pager: false,
             }}
             EditingProps={{
-              showAddCommand: isEditable,
+              showAddCommand: isEditable || !isWriteOff,
               showEditCommand: false,
-              showDeleteCommand: isEditable,
+              showDeleteCommand: isEditable || !isWriteOff,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
             }}

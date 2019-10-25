@@ -676,15 +676,15 @@ const confirmBeforeReload = (e) => {
 }
 
 const _checkCb = (cb, e) => {
-  console.log('e', e)
   if (typeof cb === 'string') {
     router.push(cb)
   } else if (typeof cb === 'function') {
     cb(e)
   }
 }
+
 const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
-  console.log({ cb, e, handler: window.beforeReloadHandlerAdded })
+  console.log('navigate dirty check')
   if (window.beforeReloadHandlerAdded) {
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
@@ -758,7 +758,7 @@ const calculateItemLevelAdjustment = (
   gstPercentage = 0,
   gstEnabled = false,
   gstIncluded = false,
-  count=0
+  count = 0,
 ) => {
   let itemLevelAdjustmentAmount = 0
   let itemLevelGSTAmount = 0

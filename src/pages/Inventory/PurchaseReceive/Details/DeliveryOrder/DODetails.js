@@ -26,7 +26,7 @@ const receivingDetailsSchema = Yup.object().shape({
   name: Yup.number().required(),
   batchNo: Yup.array().when('expiryDate', {
     is: (v) => v === undefined || v === '',
-    then: Yup.number().nullable(),
+    then: Yup.array().nullable(),
     otherwise: Yup.array().required(),
   }),
   expiryDate: Yup.string().nullable(),
@@ -55,7 +55,8 @@ const receivingDetailsSchema = Yup.object().shape({
   validationSchema: Yup.object().shape({
     deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
-    rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
+    rows: Yup.array().required('At least one item is required.'),
+    // rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
     remark: Yup.string().max(500),
   }),
   handleSubmit: (values, { props }) => {
@@ -69,7 +70,6 @@ const receivingDetailsSchema = Yup.object().shape({
       onConfirm,
     } = props
     const { list } = deliveryOrderDetails
-    console.log(rows)
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
@@ -78,12 +78,11 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        batchNo: x.batchNo[0],
+        batchNo: x.batchNo ? x.batchNo[0] : undefined,
         expiryDate: x.expiryDate,
         sortOrder: index + 1,
       }
     })
-
     dispatch({
       type: 'deliveryOrderDetails/upsert',
       payload: {
@@ -183,11 +182,11 @@ class DODetails extends PureComponent {
 
     let [
       medication,
-      vaccination,
       consumable,
+      vaccination,
     ] = await Promise.all(result)
 
-    this.setOption(medication, vaccination, consumable)
+    this.setOption(medication, consumable, vaccination)
 
     dispatch({
       // force current edit row components to update
@@ -198,8 +197,8 @@ class DODetails extends PureComponent {
     })
   }
 
-  setOption = (m, v, c) => {
-    if (!m.data || !v.data || !c.data) {
+  setOption = (m, c, v) => {
+    if (!m.data || !c.data || !v.data) {
       return
     }
     const mOptions = m.data.map((o) => {
@@ -465,7 +464,14 @@ class DODetails extends PureComponent {
   render () {
     const isEditable = true
     const { props } = this
-    const { footer, values, theme, refreshDeliveryOrder } = props
+    const {
+      footer,
+      values,
+      theme,
+      refreshDeliveryOrder,
+      errors,
+      classes,
+    } = props
     const { rows } = values
     const tableParas = {
       columns: [
@@ -596,7 +602,6 @@ class DODetails extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -670,6 +675,9 @@ class DODetails extends PureComponent {
             </h4>
           </GridItem>
           <div style={{ margin: theme.spacing(2) }}>
+            {errors.rows && (
+              <p className={classes.errorMsgStyle}>{errors.rows}</p>
+            )}
             <EditableTableGrid
               getRowId={(r) => r.uid}
               rows={rows}

@@ -24,7 +24,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         { payload = { keepFilter: true, defaultQuery: false }, history },
         { call, put, select },
       ) {
-        console.log('queryOne', service, payload)
+        // console.log('queryOne', service, payload)
         const response = yield call(service.query, payload)
         // console.log(response)
         const { data, status, message } = response
@@ -36,7 +36,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
             },
           })
           yield put({
-            type: 'querySingleDone',
+            type: 'queryOneDone',
             payload: {
               data,
             },
@@ -114,6 +114,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
     return {
       ...super.reducers(),
       querySuccess (st, { payload = {} }) {
+        // console.log(st)
         const { data, filter = {}, version } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
@@ -132,12 +133,10 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
           filter,
           pagination: {
             ...st.pagination,
-            ...{
-              current: data.currentPage || 1,
-              pagesize: data.pageSize || 10,
-              totalRecords: data.totalRecords,
-              sorting,
-            },
+            current: data.currentPage || 1,
+            pagesize: data.pageSize || 10,
+            totalRecords: data.totalRecords,
+            sorting,
           },
           ...cfg,
           // currentItem: entities[0],

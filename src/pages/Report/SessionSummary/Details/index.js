@@ -24,7 +24,7 @@ const PaymentDetailsColumns = [
   { name: 'paymentMode', title: 'Payment Mode' },
   { name: 'currentCollected', title: 'This Session' },
   { name: 'pastCollected', title: 'Past Session' },
-  { name: 'subTotal', title: 'subTotal' },
+  { name: 'subTotal', title: 'Sub Total' },
 ]
 
 const initialState = {
@@ -54,13 +54,13 @@ const reducer = (state, action) => {
 const reportID = 5
 const fileName = 'Session Summary Report'
 
-const SessionSummary = ({ match }) => {
+const SessionSummary = ({ match, sessionID }) => {
   const [
     state,
     dispatch,
   ] = useReducer(reducer, initialState)
 
-  const values = { sessionID: match.params.id }
+  const values = { sessionID: match ? match.params.id : sessionID }
 
   const asyncGetData = async () => {
     dispatch({

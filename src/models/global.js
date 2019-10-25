@@ -58,13 +58,13 @@ export default createFormViewModel({
           //   },
           // })
         } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              showPatientInfoPanel: false,
-              showConsultationPanel: false,
-            },
-          })
+          // dispatch({
+          //   type: 'updateState',
+          //   payload: {
+          //     showPatientInfoPanel: false,
+          //     showConsultationPanel: false,
+          //   },
+          // })
         }
         // if (typeof window.ga !== 'undefined') {
         //   window.ga('send', 'pageview', pathname + search)

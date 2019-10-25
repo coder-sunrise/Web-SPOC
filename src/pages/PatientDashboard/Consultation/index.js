@@ -111,9 +111,8 @@ const saveConsultation = ({
         if (!newValues.visitConsultationTemplate) {
           newValues.visitConsultationTemplate = {}
         }
-        newValues.visitConsultationTemplate.consultationTemplate = localStorage.getItem(
-          'consultationLayout',
-        )
+        newValues.visitConsultationTemplate.consultationTemplate =
+          localStorage.getItem('consultationLayout') || ''
         dispatch({
           type: `consultation/${action}`,
           payload: newValues,
@@ -617,7 +616,6 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(rights)
-    console.log(visit.visitStatus)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

@@ -27,6 +27,7 @@ import {
   isInvoiceReadOnly,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
@@ -148,7 +149,7 @@ class Index extends Component {
   }
 
   onSubmitButtonClicked = async (action) => {
-    const { dispatch, validateForm } = this.props
+    const { dispatch, validateForm, history } = this.props
     let dispatchType = 'purchaseOrderDetails/upsert'
     let processedPayload = {}
     const isFormValid = await validateForm()
@@ -177,13 +178,35 @@ class Index extends Component {
         return validation
       }
 
+      const openConfirmationModal = (statusCode, content, confirmText) => {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: content,
+            onConfirmDiscard: async () => {
+              processedPayload = this.processSubmitPayload(false, statusCode)
+              await submit()
+              if (statusCode === 4) {
+                history.push('/inventory/pr')
+              }
+            },
+            openConfirmText: confirmText,
+          },
+        })
+      }
+
       switch (action) {
         case poSubmitAction.SAVE:
           processedPayload = this.processSubmitPayload(true)
           break
         case poSubmitAction.CANCEL:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 4)
+          openConfirmationModal(
+            4,
+            'Are you sure want to cancel PO?',
+            'Cancel PO',
+          )
           break
         case poSubmitAction.FINALIZE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
@@ -191,18 +214,11 @@ class Index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent: 'Are you sure want to complete PO?',
-              onConfirmDiscard: () => {
-                processedPayload = this.processSubmitPayload(false, 5)
-                submit()
-              },
-              openConfirmText: 'Complete PO',
-            },
-          })
+          openConfirmationModal(
+            6,
+            'Are you sure want to complete PO?',
+            'Complete PO',
+          )
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
@@ -474,6 +490,10 @@ class Index extends Component {
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
+    const isWriteOff = po
+      ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+      : false
+    console.log('asd', isPOStatusDraft(poStatus))
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -484,24 +504,26 @@ class Index extends Component {
       <div>
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 ? 'enable' : 'disable',
+            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
           <POForm
             isReadOnly={isInvoiceReadOnly(poStatus)}
             setFieldValue={setFieldValue}
+            {...this.props}
           />
         </AuthorizedContext.Provider>
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
+          isWriteOff={isWriteOff}
           {...this.props}
         />
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 ? 'enable' : 'disable',
+            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >

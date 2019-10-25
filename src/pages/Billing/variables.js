@@ -65,6 +65,7 @@ export const ApplyClaimsColumnExtension = [
 ]
 
 export const CoPayerColumns = [
+  { name: 'invoiceItemTypeFK', title: 'Category' },
   { name: 'itemName', title: 'Name' },
   { name: 'payableBalance', title: 'Payable Amount' },
   {
@@ -74,6 +75,13 @@ export const CoPayerColumns = [
 ]
 
 export const CoPayerColExtensions = [
+  {
+    columnName: 'invoiceItemTypeFK',
+    // type: 'codeSelect',
+    // code: 'ltinvoiceitemtype',
+    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFK],
+    disabled: true,
+  },
   {
     columnName: 'itemName',
     disabled: true,

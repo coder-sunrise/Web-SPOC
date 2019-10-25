@@ -358,11 +358,11 @@ class Detail extends PureComponent {
 
     let [
       medication,
-      vaccination,
       consumable,
+      vaccination,
     ] = await Promise.all(result)
 
-    this.setOption(medication, vaccination, consumable)
+    this.setOption(medication, consumable, vaccination)
 
     dispatch({
       // force current edit row components to update
@@ -373,18 +373,11 @@ class Detail extends PureComponent {
     })
   }
 
-  setOption = (m, v, c) => {
-    if (!m.data || !v.data || !c.data) {
+  setOption = (m, c, v) => {
+    if (!m.data || !c.data || !v.data) {
       return
     }
     const mOptions = m.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.id,
-      }
-    })
-    const vOptions = v.data.map((o) => {
       return {
         ...o,
         name: o.batchNo,
@@ -400,12 +393,20 @@ class Detail extends PureComponent {
       }
     })
 
+    const vOptions = v.data.map((o) => {
+      return {
+        ...o,
+        name: o.batchNo,
+        value: o.id,
+      }
+    })
+
     this.setState({ stockMedication: mOptions })
-    this.setState({ stockVaccination: vOptions })
     this.setState({ stockConsumable: cOptions })
+    this.setState({ stockVaccination: vOptions })
     this.setState({ filterStockMedication: mOptions })
-    this.setState({ filterStockVaccination: vOptions })
     this.setState({ filterStockConsumable: cOptions })
+    this.setState({ filterStockVaccination: vOptions })
   }
 
   rowOptions = (row) => {
@@ -482,43 +483,48 @@ class Detail extends PureComponent {
 
       let filteredStockOptions = filteredTempStockMedication
       if (row.id) {
-        const getType = this.type(row.inventoryTypeFK)
-        const value = row[getType.typeName]
-          ? row[getType.typeName].batchNo
-          : undefined
+        // const getType = this.type(row.inventoryTypeFK)
+        // const value = row[getType.typeName]
+        //   ? row[getType.typeName].batchNo
+        //   : undefined
 
-        const results = filteredStockOptions.filter(
-          ({ value: id1 }) => !x.some(({ value: id2 }) => id2 === id1),
+        // const results = filteredStockOptions.filter(
+        //   ({ value: id1 }) => !x.some(({ value: id2 }) => id2 === id1),
+        // )
+
+        // const edittingBatchNo = filteredStockOptions.find(
+        //   (o) => o.batchNo === value,
+        // )
+
+        // const edittingBatchNo1 = this.state.stockMedication.find(
+        //   (o) => o.id === row.batchNo,
+        // )
+
+        // filteredStockOptions = [
+        //   ...x,
+        //   edittingBatchNo,
+        // ]
+
+        // filteredStockOptions = [
+        //   ...new Set(filteredStockOptions),
+        // ]
+
+        // let temp = []
+        // if (!filteredStockOptions.includes(undefined)) {
+        //   temp = filteredStockOptions.filter(
+        //     ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
+        //   )
+        // }
+
+        // filteredStockOptions = [
+        //   ...temp,
+        //   edittingBatchNo1,
+        // ]
+        filteredStockOptions = this.additionalFilteringStock(
+          row,
+          filteredStockOptions,
+          x,
         )
-
-        const edittingBatchNo = filteredStockOptions.find(
-          (o) => o.batchNo === value,
-        )
-
-        const edittingBatchNo1 = this.state.stockMedication.find(
-          (o) => o.id === row.batchNo,
-        )
-
-        filteredStockOptions = [
-          ...x,
-          edittingBatchNo,
-        ]
-
-        filteredStockOptions = [
-          ...new Set(filteredStockOptions),
-        ]
-
-        let temp = []
-        if (!filteredStockOptions.includes(undefined)) {
-          temp = filteredStockOptions.filter(
-            ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
-          )
-        }
-
-        filteredStockOptions = [
-          ...temp,
-          edittingBatchNo1,
-        ]
       }
 
       return row.id ? filteredStockOptions : x
@@ -567,7 +573,6 @@ class Detail extends PureComponent {
           x,
         )
       }
-      console.log({ filteredStockOptions, x })
       return row.id ? filteredStockOptions : x
     }
     return []
@@ -881,7 +886,6 @@ class Detail extends PureComponent {
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
     })
-    console.log('check', this.state)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
