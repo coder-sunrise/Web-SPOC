@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { Edit } from '@material-ui/icons'
 import { Button, CommonTableGrid, Tooltip } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const Grid = ({
   dispatch,
@@ -22,21 +23,23 @@ const Grid = ({
     if (column.name === 'action') {
       return (
         <Table.Cell {...p}>
-          <Tooltip
-            title={`Edit ${namespace.charAt(0).toUpperCase() +
-              namespace.slice(1)}`}
-            placement='bottom'
-          >
-            <Button
-              size='sm'
-              onClick={showDetail(row)}
-              justIcon
-              color='primary'
-              style={{ marginRight: 5 }}
+          <Authorized authority='inventorymaster.inventoryitemdetails'>
+            <Tooltip
+              title={`Edit ${namespace.charAt(0).toUpperCase() +
+                namespace.slice(1)}`}
+              placement='bottom'
             >
-              <Edit />
-            </Button>
-          </Tooltip>
+              <Button
+                size='sm'
+                onClick={showDetail(row)}
+                justIcon
+                color='primary'
+                style={{ marginRight: 5 }}
+              >
+                <Edit />
+              </Button>
+            </Tooltip>
+          </Authorized>
         </Table.Cell>
       )
     }

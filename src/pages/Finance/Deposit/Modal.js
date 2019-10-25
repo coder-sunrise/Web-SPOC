@@ -32,6 +32,7 @@ const style = () => ({
   codetable,
 }))
 @withFormikExtend({
+  authority: 'finance/deposit',
   mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
       const transactionTypeFK = isDeposit ? 1 : 2
