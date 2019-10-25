@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import { connect } from 'dva'
-// material ui
-import { withStyles } from '@material-ui/core'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
@@ -14,10 +11,7 @@ import {
   notification,
 } from '@/components'
 // sub component
-// import PatientBanner from './components/PatientBanner'
-import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from './DispenseDetails'
-import style from './style'
 // utils
 import {
   getAppendUrl,
@@ -28,7 +22,7 @@ import Yup from '@/utils/yup'
 import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
-  const { dispatch, dispense, visitRegistration, resetForm } = props
+  const { dispatch, dispense, resetForm } = props
 
   dispatch({
     type: `dispense/${effect}`,
@@ -99,7 +93,7 @@ const reloadDispense = (props, effect = 'query') => {
     ),
   }),
   handleSubmit: (values, { props, ...restProps }) => {
-    const { dispatch, onConfirm, codetable, dispense } = props
+    const { dispatch, dispense } = props
     const vid = dispense.visitID
     dispatch({
       type: `dispense/save`,
@@ -125,16 +119,9 @@ class Main extends Component {
   makePayment = () => {
     const { dispatch, dispense, values } = this.props
 
-    // dispatch({
-    //   type: 'dispense/closeModal',
-    //   payload: {
-    //     toBillingPage: true,
-    //   },
-    // })
     dispatch({
       type: 'dispense/finalize',
       payload: {
-        // id: visitRegistration.entity.visit.id,
         id: dispense.visitID,
         values,
       },
@@ -142,7 +129,6 @@ class Main extends Component {
       if (response) {
         const parameters = {}
         router.push(getAppendUrl(parameters, '/reception/queue/billing'))
-        // router.push('/receptiom')
       }
     })
   }
@@ -179,7 +165,7 @@ class Main extends Component {
   }
 
   render () {
-    const { classes, dispense, onClose, handleSubmit } = this.props
+    const { classes, handleSubmit } = this.props
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -206,9 +192,6 @@ class Main extends Component {
           <DispenseDetails {...this.props} />
 
           <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Button color='danger' size='sm' onClick={onClose}>
-              Close
-            </Button>
             <Authorized authority='queue.dispense.savedispense'>
               <Button color='success' size='sm' onClick={handleSubmit}>
                 Save Dispense

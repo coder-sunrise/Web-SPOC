@@ -102,26 +102,25 @@ export default createFormViewModel({
           parameters,
           '/reception/queue/dispense',
         )
-        console.log({ destinationUrl })
 
-        // const response = yield put({
-        //   type: 'dispense/unlock',
-        //   payload: {
-        //     id: payload.visitID,
-        //   },
-        // })
+        const response = yield put({
+          type: 'dispense/unlock',
+          payload: {
+            id: billingState.visitID,
+          },
+        })
 
-        // if (response) {
-        //   yield put({
-        //     type: 'updateState',
-        //     payload: {
-        //       entity: null,
-        //       visitID: undefined,
-        //       patientID: undefined,
-        //     },
-        //   })
-        //   router.push(destinationUrl)
-        // }
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: null,
+              visitID: undefined,
+              patientID: undefined,
+            },
+          })
+          router.push(destinationUrl)
+        }
       },
     },
     reducers: {

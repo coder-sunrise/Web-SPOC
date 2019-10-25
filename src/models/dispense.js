@@ -85,16 +85,6 @@ export default createFormViewModel({
           },
         })
         yield take('query/@@end')
-
-        // if (md2 === 'dsps') {
-        //   yield put({
-        //     type: 'global/updateState',
-        //     payload: {
-        //       fullscreen: true,
-        //       showDispensePanel: true,
-        //     },
-        //   })
-        // }
       },
 
       *start ({ payload }, { call, put }) {
