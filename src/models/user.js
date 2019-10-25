@@ -7,13 +7,18 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   const rights = permission.toLowerCase()
 
   // for testing only
-  if (rights === 'hidden') {
-    return [
-      { name, rights: 'enable' },
-    ]
-  }
+  // if (rights === 'hidden') {
+  //   return [
+  //     { name, rights: 'enable' },
+  //   ]
+  // }
 
   if (type === 'Module') {
+    if (name === 'inventory/purchasingandre ceiving') {
+      return [
+        { name, rights: 'hidden' },
+      ]
+    }
     return [
       {
         name,
@@ -38,7 +43,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    if (name === 'scheme.schemedetails') {
+    if (name === 'purchasingandreceiving.newpurchasingand receiving') {
       return [
         { name, rights: 'hidden' },
       ]
