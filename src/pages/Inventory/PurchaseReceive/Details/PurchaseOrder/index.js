@@ -47,7 +47,26 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    return purchaseOrderDetails
+
+    const newPurchaseOrderDetails = purchaseOrderDetails
+
+    if(newPurchaseOrderDetails){
+
+      if(newPurchaseOrderDetails.type && newPurchaseOrderDetails.type === 'dup' && newPurchaseOrderDetails.purchaseOrder){
+        newPurchaseOrderDetails.purchaseOrder.purchaseOrderNo = null
+        newPurchaseOrderDetails.purchaseOrder.invoiceDate = null
+        newPurchaseOrderDetails.purchaseOrder.remark = null
+        newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
+        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
+      }
+
+      if(newPurchaseOrderDetails.purchaseOrder)
+      {
+        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = newPurchaseOrderDetails.purchaseOrder.gstAmount > 0
+      }
+    }
+
+    return newPurchaseOrderDetails
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -495,7 +514,7 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    let { IsGSTEnabled,isGstInclusive } = purchaseOrder || false
+    const { IsGSTEnabled,isGstInclusive } = purchaseOrder || false
 
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF

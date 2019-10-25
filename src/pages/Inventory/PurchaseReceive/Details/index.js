@@ -24,22 +24,9 @@ class Index extends Component {
   }
 
   render () {
-    let { purchaseOrderDetails } = this.props
-    let { purchaseOrder,type } = purchaseOrderDetails
+    const { purchaseOrderDetails } = this.props
+    const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
-
-    if(type && type === 'dup' && purchaseOrder){
-      purchaseOrder.purchaseOrderNo = null
-      purchaseOrder.invoiceDate = null
-      purchaseOrder.remark = null
-      purchaseOrder.invoiceNo = null
-      purchaseOrder.exceptedDeliveryDate = null
-    }
-
-    if(purchaseOrder && !purchaseOrder.IsGSTEnabled)
-    {
-      purchaseOrder.IsGSTEnabled = purchaseOrder.gstAmount > 0
-    }
 
     return (
       // <AuthorizedContext.Provider
