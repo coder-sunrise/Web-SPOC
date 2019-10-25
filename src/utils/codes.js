@@ -711,6 +711,20 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Others',
     prop: 'corOtherDocuments',
+    downloadKey: 'documentid',
+    downloadConfig: {
+      id: 12,
+      key: 'documentid',
+      draft: (row) => {
+        return {
+          DocumentDetails: [
+            {
+              ...row,
+            },
+          ],
+        }
+      },
+    },
   },
 ]
 
