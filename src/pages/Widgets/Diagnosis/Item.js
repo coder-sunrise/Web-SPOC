@@ -83,7 +83,7 @@ const DiagnosisItem = ({
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={12}>
+        <GridItem xs={6}>
           <FastField
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
@@ -211,7 +211,13 @@ const DiagnosisItem = ({
             content={
               <div>
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
-                  Confirm to remove a persist diagnosis?
+                  Confirm to remove a
+                  {form.values.corDiagnosis[index].isPersist === true ? (
+                    ' persist '
+                  ) : (
+                    ' '
+                  )}
+                  diagnosis?
                 </p>
                 <Button
                   onClick={() => {
@@ -258,6 +264,14 @@ const DiagnosisItem = ({
                 justIcon
                 color='danger'
                 size='sm'
+                onClick={() => {
+                  let diagnosis = form.values.corDiagnosis[index]
+                  if (diagnosis && diagnosis.diagnosisFK >= 0) {
+                    setShow(true)
+                  } else {
+                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                  }
+                }}
               >
                 <DeleteIcon />
               </Button>
