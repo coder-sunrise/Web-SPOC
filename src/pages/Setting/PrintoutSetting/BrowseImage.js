@@ -103,7 +103,7 @@ const BrowseImage = (props) => {
   }
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: 'image/jpeg',
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length === 0) {
         return notification.error({ message: 'Please select a image file' })

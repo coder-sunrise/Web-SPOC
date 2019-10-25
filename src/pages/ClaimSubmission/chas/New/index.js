@@ -16,6 +16,7 @@ import {
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
+import Authorized from '@/utils/Authorized'
 // variables
 import {
   NewCHASColumnExtensions,
@@ -127,6 +128,7 @@ class NewCHAS extends React.Component {
                   handleContextMenuItemClick(row, id, true)}
               />
             </GridItem>
+
             <GridItem md={4} className={classes.buttonGroup}>
               <ProgressButton
                 icon={null}
@@ -135,14 +137,16 @@ class NewCHAS extends React.Component {
               >
                 Refresh
               </ProgressButton>
-              <ProgressButton
-                icon={null}
-                color='primary'
-                disabled={selectedRows.length <= 0}
-                onClick={this.onSubmitClaimClicked}
-              >
-                Submit Claim
-              </ProgressButton>
+              <Authorized authority='claimsubmission.submitclaim'>
+                <ProgressButton
+                  icon={null}
+                  color='primary'
+                  disabled={selectedRows.length <= 0}
+                  onClick={this.onSubmitClaimClicked}
+                >
+                  Submit Claim
+                </ProgressButton>
+              </Authorized>
             </GridItem>
           </LoadingWrapper>
         </GridContainer>

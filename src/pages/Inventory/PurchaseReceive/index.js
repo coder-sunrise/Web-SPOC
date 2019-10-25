@@ -16,6 +16,7 @@ import PurchaseReceiveDataGrid from './components/PurchaseReceiveDataGrid'
 import WriteOff from './components/Modal/WriteOff'
 import DuplicatePO from './components/Modal/DuplicatePO'
 import { getPurchaseOrderStatusFK } from './variables'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
