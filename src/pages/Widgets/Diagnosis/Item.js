@@ -51,7 +51,6 @@ const DiagnosisItem = ({
   )
 
   const onDiagnosisChange = async (v, op) => {
-
     const { setFieldValue } = form
     if (op) {
       await setFieldValue(
@@ -177,13 +176,12 @@ const DiagnosisItem = ({
                   {...args}
                   onChange={(value) => {
                     const { setFieldValue } = form
-                    if(value === ''){
+                    if (value === '') {
                       setFieldValue(
                         `corDiagnosis[${index}].onsetDate`,
                         moment(),
                       )
                     }
-                    
                   }}
                 />
               )
@@ -215,7 +213,12 @@ const DiagnosisItem = ({
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
                   Confirm to remove a persist diagnosis?
                 </p>
-                <Button onClick={() => {}} variant='outlined'>
+                <Button
+                  onClick={() => {
+                    setShow(false)
+                  }}
+                  variant='outlined'
+                >
                   Cancel
                 </Button>
                 <Button
@@ -232,32 +235,33 @@ const DiagnosisItem = ({
                   onClick={() => {
                     // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
-                    form.setFieldValue( `corDiagnosis[${index}].isPermanentDelete`,  true,)
+                    form.setFieldValue(
+                      `corDiagnosis[${index}].isPermanentDelete`,
+                      true,
+                    )
                   }}
                 >
                   Remove Permanently
                 </Button>
               </div>
             }
-            title='Delete Diagnosis' 
+            title='Delete Diagnosis'
             trigger='click'
             visible={show}
             onVisibleChange={() => {
               setShow(!show)
             }}
           >
-            {diagnosises.length > 1 && (
-              <Tooltip title='Delete'>
-                <Button
-                  style={{ position: 'absolute', bottom: theme.spacing(1) }}
-                  justIcon
-                  color='danger'
-                  size='sm'
-                >
-                  <DeleteIcon />
-                </Button>
-              </Tooltip>
-            )}
+            <Tooltip title='Delete'>
+              <Button
+                style={{ position: 'absolute', bottom: theme.spacing(1) }}
+                justIcon
+                color='danger'
+                size='sm'
+              >
+                <DeleteIcon />
+              </Button>
+            </Tooltip>
           </Popover>
         </GridItem>
       </GridContainer>

@@ -155,6 +155,7 @@ class Form extends React.PureComponent {
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
+          ...patientProfileDefaultValue.contact.countryFK,
           number: values.patientContactNo,
         },
       },
@@ -698,7 +699,6 @@ class Form extends React.PureComponent {
           ]
 
     const show = loading.effects['patientSearch/query'] || isSubmitting
-    console.log({ values, errors: this.props.errors })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>

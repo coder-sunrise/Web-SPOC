@@ -50,6 +50,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       sequence: rows.length,
       ...values,
       subject: currentType.getSubject(values),
+      isDeleted: false,
     }
     dispatch({
       type: 'orders/upsertRow',

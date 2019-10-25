@@ -43,9 +43,9 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
+    // Routes: [
+    //   'src/pages/Authorized',
+    // ],
     // authority: [
     //   { name: 'admin', rights: 'enable' },
     //   { name: 'user', rights: 'enable' },
@@ -789,6 +789,12 @@ const routes = [
           {
             path: '/development/control',
             name: 'Control',
+            // mini: 'C',
+            component: './Development/Control',
+          },
+          {
+            path: '/development/test',
+            name: 'Test',
             // mini: 'C',
             component: './Development/Control',
           },

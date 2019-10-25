@@ -747,6 +747,13 @@ const orderTypes = [
     filter: (r) => !r.stockDrugFK,
     getSubject: (r) => r.drugName,
   },
+  {
+    name: 'Package',
+    value: '6',
+    // prop: 'corPrescriptionItem',
+    // filter: (r) => !r.stockDrugFK,
+    // getSubject: (r) => r.drugName,
+  },
 ]
 const buttonTypes = [
   'RegularButton',
@@ -915,6 +922,15 @@ const _fetchAndSaveCodeTable = async (
   return []
 }
 
+export const getAllCodes = async () => {
+  await db.open()
+  const ct = await db.codetable.toArray((code) => {
+    return code.map((_i) => ({ code: _i.code, data: _i.data }))
+  })
+
+  return ct || []
+}
+
 export const getCodes = async (payload) => {
   let ctcode
   let params
@@ -998,7 +1014,7 @@ export const checkIsCodetableAPI = (url) => {
     const isTenantCodes =
       paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
-    console.log({ isTenantCodes, isCodetable })
+    // console.log({ isTenantCodes, isCodetable })
     return isTenantCodes || isCodetable
   } catch (error) {
     console.log({ error })
@@ -1262,6 +1278,12 @@ export const recurrenceTypes = [
   },
 ]
 
+export const inventoryAdjustmentStatus = [
+  { value: 1, name: 'Draft' },
+  { value: 2, name: 'Finalized' },
+  { value: 3, name: 'Discarded' },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1304,5 +1326,6 @@ module.exports = {
   tagList,
   osBalanceStatus,
   buttonTypes,
+  inventoryAdjustmentStatus,
   ...module.exports,
 }

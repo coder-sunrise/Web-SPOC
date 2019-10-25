@@ -5,6 +5,7 @@ import { CardContainer } from '@/components'
 import { compose } from 'redux'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
@@ -20,16 +21,15 @@ const Scheme = ({ classes, dispatch, history, copaymentScheme }) => {
     })
   }, [])
   return (
-    <CardContainer
-      hideHeader
-      style={{
-        marginLeft: 5,
-        marginRight: 5,
-      }}
-    >
-      <FilterBar {...props} />
-      <Grid {...props} />
-    </CardContainer>
+    <Authorized authority='scheme.schemedetails'>
+      <CardContainer
+        hideHeader
+       
+      >
+        <FilterBar {...props} />
+        <Grid {...props} />
+      </CardContainer>
+    </Authorized>
   )
 }
 

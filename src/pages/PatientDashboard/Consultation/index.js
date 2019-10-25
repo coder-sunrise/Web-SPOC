@@ -20,7 +20,6 @@ import {
   Divider,
   Fab,
   Slide,
-  Tooltip,
   Drawer,
 } from '@material-ui/core'
 import PlayArrow from '@material-ui/icons/PlayArrow'
@@ -92,22 +91,28 @@ const saveConsultation = ({
       openConfirmContent: confirmMessage,
       openConfirmText: 'Confirm',
       onConfirmSave: () => {
-
-        const filteredDiagnosis = [...values.corDiagnosis.filter(
-          (diagnosis) => diagnosis.diagnosisFK !== undefined,
-        )]
-
-        const _filteredDiagnosis = {
-          ...values,
-          corDiagnosis: filteredDiagnosis,
-        }
-
-        const newValues = convertToConsultation(_filteredDiagnosis, {
-          orders,
-          consultationDocument,
-        })
+        const newValues = convertToConsultation(
+          {
+            ...values,
+            corDiagnosis: [
+              ...values.corDiagnosis.filter(
+                (diagnosis) => diagnosis.diagnosisFK !== undefined,
+              ),
+            ],
+          },
+          {
+            orders,
+            consultationDocument,
+          },
+        )
         newValues.duration = Math.floor(
           Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+        )
+        if (!newValues.visitConsultationTemplate) {
+          newValues.visitConsultationTemplate = {}
+        }
+        newValues.visitConsultationTemplate.consultationTemplate = localStorage.getItem(
+          'consultationLayout',
         )
         dispatch({
           type: `consultation/${action}`,
@@ -132,11 +137,11 @@ const saveConsultation = ({
 //   return {
 //     view: {
 //       name: 'consultation.view',
-//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
 //     },
 //     edit: {
 //       name: 'consultation.edit',
-//       rights: values.status === 'Paused' ? 'disable' : 'enable',
+//       rights: values.status === 'PAUSED' ? 'disable' : 'enable',
 //     },
 //   }
 // }
@@ -162,7 +167,10 @@ const saveConsultation = ({
   }),
 )
 @withFormikExtend({
-  authority: 'patientdashboard.startresumeconsultation',
+  authority: [
+    'patientdashboard.startresumeconsultation',
+    'patientdashboard.editconsultation',
+  ],
   mapPropsToValues: ({ consultation = {} }) => {
     // console.log('mapPropsToValues', consultation.entity, disabled, reset)
     // console.log(consultation.entity, consultation.default)
@@ -433,7 +441,7 @@ class Consultation extends PureComponent {
               </h4>
             </GridItem>
             <GridItem>
-              {values.status !== 'Paused' && (
+              {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'
                   onClick={this.discardConsultation}
@@ -443,8 +451,7 @@ class Consultation extends PureComponent {
               )}
               <Authorized authority='patientdashboard.startresumeconsultation'>
                 <React.Fragment>
-                  {values.status !== 'Paused' &&
-                  [
+                  {[
                     'IN CONS',
                     'WAITING',
                   ].includes(visit.visitStatus) && (
@@ -456,7 +463,7 @@ class Consultation extends PureComponent {
                       Pause
                     </ProgressButton>
                   )}
-                  {values.status === 'Paused' && (
+                  {visit.visitStatus === 'PAUSED' && (
                     <ProgressButton
                       onClick={this.resumeConsultation}
                       color='info'
@@ -498,7 +505,7 @@ class Consultation extends PureComponent {
 
   loadTemplate = (v) => {
     const exist = this.props.values
-    // console.log(exist, v)
+    console.log(exist, v)
     // v.id = exist.id
     // v.concurrencyToken = exist.concurrencyToken
     const mergeArrayProps = [
@@ -610,10 +617,15 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(rights)
+    console.log(visit.visitStatus)
     const matches = {
       rights:
-        rights === 'enable' && values.status === 'Paused' ? 'disable' : rights,
+        rights === 'enable' && visit.visitStatus === 'PAUSED'
+          ? 'disable'
+          : rights,
     }
+    // console.log(matches)
+
     return (
       <div className={classes.root} ref={this.container}>
         <Banner

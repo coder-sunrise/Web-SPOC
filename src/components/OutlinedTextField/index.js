@@ -1,16 +1,13 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import classNames from 'classnames'
-import { extendFunc } from '@/utils/utils'
 import Error from '@material-ui/icons/Error'
-import {
-  InputAdornment,
-  TextField,
-  Tooltip,
-  withStyles,
-} from '@material-ui/core'
+import { InputAdornment, TextField, withStyles } from '@material-ui/core'
 import { CustomInputWrapper } from 'mui-pro-components'
 import Button from '@material-ui/core/Button'
+import { extendFunc } from '@/utils/utils'
+import { Tooltip } from '@/components'
+import { control } from '@/components/Decorator'
 
 const styles = () => ({})
 
@@ -30,7 +27,7 @@ const _config = {
     ],
   },
 }
-
+@control()
 class OutlinedTextField extends PureComponent {
   constructor (props) {
     super(props)

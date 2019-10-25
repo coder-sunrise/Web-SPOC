@@ -111,6 +111,7 @@ class ClinicInfo extends PureComponent {
     } = this.props
     const { primaryClinician, doctorProfile } = this.state
     // console.log(values)
+
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -180,6 +181,18 @@ class ClinicInfo extends PureComponent {
                   label='Primary Clinician MCR Number'
                   disabled
                   {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='clinicShortCode'
+              render={(args) => (
+                <TextField
+                  label='Clinic Short Code'
+                  {...args}
+                  disabled
                 />
               )}
             />

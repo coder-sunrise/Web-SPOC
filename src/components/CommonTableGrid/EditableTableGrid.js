@@ -28,10 +28,11 @@ const styles = (theme) => ({})
 class EditableTableGrid extends PureComponent {
   constructor (props) {
     super(props)
+    const { EditingProps } = props
     this.state = {
       editingRowIds: [],
       deletedRowIds: [],
-      addedRows: this.props.EditingProps.addedRows || [],
+      addedRows: EditingProps.addedRows || EditingProps.defaultNewRow || [],
       // hasError: false,
       // errorRows: [],
     }
@@ -52,6 +53,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onAddedRowsChange = (addedRows) => {
+    // console.log('_onAddedRowsChange', addedRows)
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)

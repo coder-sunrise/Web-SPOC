@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 // import { connect } from 'dva'
+import router from 'umi/router'
 import _ from 'lodash'
+import { withStyles } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
@@ -27,9 +29,19 @@ import {
 import { podoOrderType } from '@/utils/codes'
 import AuthorizedContext from '@/components/Context/Authorized'
 
-// @connect(({ clinicSettings }) => ({
-//   clinicSettings,
-// }))
+const styles = (theme) => ({
+  errorMsgStyle: {
+    margin: theme.spacing(2),
+    color: '#cf1322',
+    fontSize: ' 0.75rem',
+    minHeight: '1em',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: ' 0.03333em',
+  },
+})
+
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
@@ -45,7 +57,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
   }),
   handleSubmit: (values, { props }) => {},
 })
-class index extends Component {
+class Index extends Component {
   state = {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
@@ -75,7 +87,7 @@ class index extends Component {
     this.getPOdata()
   }
 
-  getPOdata = () => {
+  getPOdata = (createdId) => {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails
     switch (type) {
@@ -95,9 +107,20 @@ class index extends Component {
         break
       // Create new order
       default:
-        this.props.dispatch({
-          type: 'purchaseOrderDetails/initializePurchaseOrder',
-        })
+        if (createdId && type === 'new') {
+          router.push(
+            `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
+          )
+          this.props.dispatch({
+            type: 'purchaseOrderDetails/queryPurchaseOrder',
+            payload: { id: createdId, type: 'edit' },
+          })
+        } else {
+          this.props.dispatch({
+            type: 'purchaseOrderDetails/initializePurchaseOrder',
+          })
+        }
+
         break
     }
   }
@@ -125,7 +148,7 @@ class index extends Component {
   }
 
   onSubmitButtonClicked = async (action) => {
-    const { dispatch, history, validateForm } = this.props
+    const { dispatch, validateForm } = this.props
     let dispatchType = 'purchaseOrderDetails/upsert'
     let processedPayload = {}
     const isFormValid = await validateForm()
@@ -134,6 +157,26 @@ class index extends Component {
       validation = false
       this.props.handleSubmit()
     } else {
+      const submit = () => {
+        dispatch({
+          type: dispatchType,
+          payload: {
+            ...processedPayload,
+          },
+        }).then((r) => {
+          if (r) {
+            const { id } = r
+            dispatch({
+              type: `formik/clean`,
+              payload: 'purchaseOrderDetails',
+            })
+            this.getPOdata(id)
+          }
+        })
+        validation = true
+        return validation
+      }
+
       switch (action) {
         case poSubmitAction.SAVE:
           processedPayload = this.processSubmitPayload(true)
@@ -148,7 +191,18 @@ class index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 5)
+          dispatch({
+            type: 'global/updateAppState',
+            payload: {
+              openConfirm: true,
+              openConfirmContent: 'Are you sure want to complete PO?',
+              onConfirmDiscard: () => {
+                processedPayload = this.processSubmitPayload(false, 5)
+                submit()
+              },
+              openConfirmText: 'Complete PO',
+            },
+          })
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
@@ -157,21 +211,7 @@ class index extends Component {
         // case block
       }
 
-      dispatch({
-        type: dispatchType,
-        payload: {
-          ...processedPayload,
-        },
-      }).then((r) => {
-        if (r) {
-          dispatch({
-            type: `formik/clean`,
-            payload: 'purchaseOrderDetails',
-          })
-          this.getPOdata()
-        }
-      })
-      validation = true
+      submit()
     }
     return validation
   }
@@ -242,12 +282,10 @@ class index extends Component {
     } else {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
+      } else if (purchaseOrderStatusFK === 6) {
+        newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else {
-        if (purchaseOrderStatusFK === 6) {
-          newPurchaseOrderStatusFK = purchaseOrderStatusFK
-        } else {
-          newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
-        }
+        newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
       }
 
       purchaseOrderItem = rows.map((x) => {
@@ -342,6 +380,7 @@ class index extends Component {
               settingGSTPercentage,
               IsGSTEnabled,
               IsGSTInclusive,
+              filteredPurchaseOrderItem.length,
             )
 
             if (adj.adjType === 'Percentage') {
@@ -424,11 +463,17 @@ class index extends Component {
   }
 
   render () {
-    const { purchaseOrderDetails, values, dispatch, setFieldValue } = this.props
+    const {
+      purchaseOrderDetails,
+      values,
+      setFieldValue,
+      errors,
+      classes,
+    } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
+    const { IsGSTEnabled } = purchaseOrder || false
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -448,7 +493,7 @@ class index extends Component {
             setFieldValue={setFieldValue}
           />
         </AuthorizedContext.Provider>
-
+        {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
@@ -565,4 +610,4 @@ class index extends Component {
   }
 }
 
-export default index
+export default withStyles(styles, { withTheme: true })(Index)

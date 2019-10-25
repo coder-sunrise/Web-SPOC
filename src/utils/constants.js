@@ -71,11 +71,24 @@ export const PDPA_CONSENT_TYPE = {
 }
 
 export const INVOICE_ITEM_TYPE = {
+  0: 'Corrupted data',
   1: 'Medication',
   2: 'Consumable',
   3: 'Vaccination',
   4: 'Service',
   5: 'Package',
+}
+
+export const INVENTORY_TYPE = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+}
+
+export const INVENTORY_ADJUSTMENT_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  DISCARDED: 3,
 }
 
 export const REPORT_TYPE = {
@@ -106,4 +119,10 @@ export const REPORT_TYPE = {
   25: 'Statement',
   26: 'Purchase Order',
   27: 'Patient Label',
+}
+
+export const GENDER = {
+  1: 'MALE',
+  2: 'FEMALE',
+  3: 'UNKNOWN',
 }

@@ -10,18 +10,18 @@ import {
 } from '@/components'
 
 const CoverageCap = ({ values, classes, setFieldValue }) => {
-  console.log({ values })
+  // console.log({ values })
   const onRadioButtonChange = (event) => {
     const { target } = event
 
-    if (target.value === 'sub') setFieldValue('coverageMaxCap', undefined)
-    else {
+    if (target.value === 'sub') {
+      setFieldValue('coverageMaxCap', undefined)
       setFieldValue(
-        'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
+        'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
         0.0,
       )
       setFieldValue(
-        'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
+        'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
         0.0,
       )
       setFieldValue(
@@ -37,7 +37,34 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
         0.0,
       )
     }
+
+    if (target.value === 'all') {
+      if (!values.id) setFieldValue('itemGroupMaxCapacityDto', {})
+      else {
+        setFieldValue(
+          'itemGroupMaxCapacityDto.medicationMaxCapacity.isDeleted',
+          true,
+        )
+        setFieldValue(
+          'itemGroupMaxCapacityDto.consumableMaxCapacity.isDeleted',
+          true,
+        )
+        setFieldValue(
+          'itemGroupMaxCapacityDto.vaccinationMaxCapacity.isDeleted',
+          true,
+        )
+        setFieldValue(
+          'itemGroupMaxCapacityDto.serviceMaxCapacity.isDeleted',
+          true,
+        )
+        setFieldValue(
+          'itemGroupMaxCapacityDto.packageMaxCapacity.isDeleted',
+          true,
+        )
+      }
+    }
   }
+
   return (
     <GridContainer>
       <GridItem xs={1}>
@@ -74,7 +101,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
                 id: 'finance.scheme.setting.maximumCapAll',
               })}
               currency
-              min={0}
+              // min={1}
             />
           )}
         />

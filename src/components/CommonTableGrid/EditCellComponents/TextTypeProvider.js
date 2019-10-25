@@ -2,10 +2,10 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FastField } from 'formik'
-import { withStyles, Tooltip } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import debounce from 'lodash/debounce'
-import { TextField } from '@/components'
+import { TextField, Tooltip } from '@/components'
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 const styles = (theme) => ({})

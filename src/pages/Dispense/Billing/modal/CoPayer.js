@@ -30,10 +30,10 @@ const styles = (theme) => ({
 })
 
 const validationSchema = Yup.object().shape({
-  totalAfterGst: Yup.number(),
+  payableBalance: Yup.number(),
   claimAmount: Yup.number()
     .min(0)
-    .max(Yup.ref('totalAfterGst'), 'Claim Amount cannot exceed Total Payable'),
+    .max(Yup.ref('payableBalance'), 'Claim Amount cannot exceed Total Payable'),
 })
 
 @connect(({ codetable }) => ({ codetable }))
@@ -42,7 +42,28 @@ class CoPayer extends Component {
     editingRowIds: [],
     selectedRows: [],
     coPayer: undefined,
-    invoiceItems: this.props.invoiceItems || [],
+    invoiceItems:
+      this.props.invoiceItems
+        .reduce((invoiceItems, item) => {
+          const existed = invoiceItems.find((_item) => _item.id === item.id)
+          if (existed)
+            return [
+              ...invoiceItems.filter((_item) => _item.id !== existed.id),
+              {
+                ...item,
+                ...existed,
+                payableBalance: existed.payableBalance - existed.claimAmount,
+              },
+            ]
+          return [
+            ...invoiceItems,
+            {
+              ...item,
+              payableBalance: item.payableBalance - item.claimAmount,
+            },
+          ]
+        }, [])
+        .map((item) => ({ ...item, claimAmount: 0 })) || [],
   }
 
   handleSelectionChange = (selection) => {
@@ -105,7 +126,7 @@ class CoPayer extends Component {
   render () {
     const { classes, onClose } = this.props
     const { selectedRows, invoiceItems } = this.state
-
+    console.log({ invoiceItems: this.props.invoiceItems })
     return (
       <div className={classes.container}>
         <GridContainer>

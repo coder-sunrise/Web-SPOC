@@ -37,7 +37,7 @@ class AmountSummary extends PureComponent {
   constructor (props) {
     super(props)
 
-    const { rows = [], adjustments = [], config } = this.props
+    const { rows = [], adjustments = [], config, onValueChanged } = this.props
     // console.log(rows, adjustments)
     this.state = {
       settingGSTEnable: true,
@@ -71,9 +71,14 @@ class AmountSummary extends PureComponent {
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { rows = [], adjustments = [], config } = nextProps
-    this.setState({
-      ...calculateAmount(rows, adjustments, config),
+    const { rows = [], adjustments = [], config, onValueChanged } = nextProps
+
+    this.setState((prevState) => {
+      const newState = calculateAmount(rows, adjustments, config)
+      if (prevState.summary.totalWithGST !== newState.summary.totalWithGST) {
+        onValueChanged(newState)
+      }
+      return newState
     })
   }
 
@@ -141,7 +146,6 @@ class AmountSummary extends PureComponent {
   render () {
     const { theme, gstInclusiveConfigrable, showAdjustment } = this.props
     const { summary, adjustments } = this.state
-    // console.log(this.state)
     if (!summary) return null
     const {
       totalWithGST,
