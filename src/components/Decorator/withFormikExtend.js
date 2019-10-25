@@ -125,7 +125,6 @@ const withFormikExtend = (props) => (Component) => {
     render () {
       if (!displayName) return <Component {...this.props} />
       // lastVersion = findGetParameter('v')
-
       const rights = {}
       if (authority) {
         if (authority.view) {
