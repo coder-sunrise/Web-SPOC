@@ -63,7 +63,7 @@ export const printRow = async (row, props) => {
           (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
       ) || {}
 
-    row.doctorName = obj.name
+    row.doctorName = (obj.title ? (`${obj.title  } `) : '') + obj.name
     row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
 
     row.patientName = entity.name
@@ -352,10 +352,10 @@ class ConsultationDocument extends PureComponent {
           observe='AddConsultationDocument'
           maxWidth='md'
           bodyNoPadding
-          // showFooter=
-          // footProps={{
-          //   confirmBtnText: 'Save',
-          // }}
+        // showFooter=
+        // footProps={{
+        //   confirmBtnText: 'Save',
+        // }}
         >
           <AddConsultationDocument
             {...this.props}
