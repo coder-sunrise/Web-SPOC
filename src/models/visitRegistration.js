@@ -50,6 +50,12 @@ export default createFormViewModel({
               payload: { appointmentFK: query.apptid },
             })
           }
+          if (query.pdroomid) {
+            dispatch({
+              type: 'updateState',
+              payload: { roomFK: query.pdroomid },
+            })
+          }
           dispatch(openModal)
         }
       })
@@ -68,6 +74,7 @@ export default createFormViewModel({
             'type',
             'apptid',
             'pdid',
+            'pdroomid',
           ]),
         )
         yield put({
