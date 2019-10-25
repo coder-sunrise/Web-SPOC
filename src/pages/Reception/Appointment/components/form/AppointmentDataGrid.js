@@ -65,38 +65,12 @@ class AppointmentDataGrid extends React.Component {
       }
 
       if (column.type === 'time') {
-        let col = {
+        return {
           ...column,
           currentDate: appointmentDate
             ? moment(appointmentDate, dateFormat)
             : moment(),
         }
-        // if (column.columnName === 'startTime') {
-        //   console.log(moment())
-        //   if (selectedSlot && selectedSlot.allDay === false) {
-        //     let startTime = ''
-        //     let start = moment(selectedSlot.start)
-        //     startTime = `${start.hour()}:${start.minute()}`
-        //     col = {
-        //       ...col,
-        //       defaultValue: start,
-        //     }
-        //   }
-        // } else if (
-        //   column.columnName === 'endTime' &&
-        //   selectedSlot.allDay === false
-        // ) {
-        //   if (selectedSlot) {
-        //     let endTime = ''
-        //     let end = moment(selectedSlot.end)
-        //     endTime = `${end.hour()}:${end.minute()}`
-        //     col = {
-        //       ...col,
-        //       value: endTime,
-        //     }
-        //   }
-        // }
-        return col
       }
 
       if (column.columnName === 'roomFk') {
@@ -191,8 +165,21 @@ class AppointmentDataGrid extends React.Component {
       disabled,
       handleEditingRowsChange,
       editingRows,
+      selectedSlot,
     } = this.props
-    console.log(data)
+    let defaultNewRows = []
+
+    if (!data || data.length <= 0) {
+      let defaultNewRow = { isPrimaryClinician: true }
+      if (selectedSlot && selectedSlot.allDay === false) {
+        defaultNewRow = {
+          startTime: moment(selectedSlot.start).format('HH:mm A'),
+          endTime: moment(selectedSlot.end).format('HH:mm A'),
+          ...defaultNewRow,
+        }
+      }
+      defaultNewRows.push(defaultNewRow)
+    }
     return (
       <div className={classes.container}>
         <EditableTableGrid
@@ -220,13 +207,7 @@ class AppointmentDataGrid extends React.Component {
             showDeleteCommand: !disabled && data.length !== 1,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,
-            onAddedRowsChange: (row) => {
-              console.log(row)
-              return row.map((o) => ({
-                startTime: '18:00',
-                ...o,
-              }))
-            },
+            defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />

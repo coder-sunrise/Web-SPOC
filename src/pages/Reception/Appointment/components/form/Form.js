@@ -80,11 +80,7 @@ class Form extends React.PureComponent {
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
-    editingRows: !this.props.values.id
-      ? [
-          -99,
-        ]
-      : [],
+    editingRows: [],
     _tempCallback: undefined,
   }
 
@@ -319,7 +315,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  validateDataGrid = () => {
+  validateDataGrid = () => {    
     const { datagrid = [], editingRows } = this.state
 
     let isDataGridValid = true
@@ -676,7 +672,7 @@ class Form extends React.PureComponent {
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
-    console.log(datagrid)
+
     const _datagrid =
       conflicts.length > 0
         ? datagrid
