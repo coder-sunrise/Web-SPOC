@@ -112,11 +112,12 @@ class Grid extends PureComponent {
     const { option, row } = e
 
     if (type === 'code') {
-      row.name = option.name
+      row.name = option.value
     } else {
-      row.code = option.code
+      row.code = option.value
     }
 
+    row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
     row.bonusQuantity = 0
@@ -134,7 +135,7 @@ class Grid extends PureComponent {
         commitCount: (commitCount += 1),
       },
     })
-
+    console.log({option, row})
     return { ...row }
   }
 
