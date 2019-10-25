@@ -56,6 +56,10 @@ class InvoiceSummary extends PureComponent {
       if (!settingGSTEnable) {
         setFieldValue(`${prefix}isGstInclusive`, false)
       }
+    } else if (e.target.value) {
+      setFieldValue(`${prefix}isGstInclusive`, true)
+    } else {
+      setFieldValue(`${prefix}isGstInclusive`, false)
     }
 
     setTimeout(() => handleCalcInvoiceSummary(), 1)
@@ -75,6 +79,7 @@ class InvoiceSummary extends PureComponent {
       adjustmentList = [],
       IsGSTEnabled,
       setFieldValue,
+      isGstInclusive,
     } = this.props
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
@@ -138,7 +143,7 @@ class InvoiceSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
-                    disabled={`${prefix}isGstInclusive`}
+                    disabled={isGstInclusive}
                     {...args}
                   />
                 )}

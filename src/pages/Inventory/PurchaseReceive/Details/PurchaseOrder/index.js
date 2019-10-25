@@ -398,7 +398,7 @@ class Index extends Component {
               item.tempSubTotal += itemLevelAmount.itemLevelAdjustmentAmount
             }
 
-            totalAdjustmentAmount = itemLevelAmount.itemLevelAdjustmentAmount
+            totalAdjustmentAmount += itemLevelAmount.itemLevelAdjustmentAmount
             item.itemLevelGST = itemLevelAmount.itemLevelGSTAmount
 
             // Sum up all itemLevelGST & invoiceTotal at last iteration
@@ -484,7 +484,7 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    let { IsGSTEnabled } = purchaseOrder || false
+    let { IsGSTEnabled,isGstInclusive } = purchaseOrder || false
 
     return (
       // <AuthorizedContext.Provider
@@ -527,6 +527,7 @@ class Index extends Component {
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
             setFieldValue={setFieldValue}
+            isGstInclusive={isGstInclusive}
             // {...this.props}
           />
 
