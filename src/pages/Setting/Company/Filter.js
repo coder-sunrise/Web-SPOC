@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { status } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 import {
   withFormikExtend,
   FastField,
@@ -16,6 +17,7 @@ import {
 } from '@/components'
 
 @withFormikExtend({
+  authority: 'finance/scheme',
   mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
   handleSubmit: () => {},
   displayName: 'CompanyFilter',
@@ -113,21 +115,22 @@ class Filter extends PureComponent {
                 >
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
-
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    this.props.dispatch({
-                      type: 'settingCompany/updateState',
-                      payload: {
-                        entity: undefined,
-                      },
-                    })
-                    this.props.toggleModal()
-                  }}
-                >
-                  Add New
-                </Button>
+                <Authorized authority='scheme.newscheme'>
+                  <Button
+                    color='primary'
+                    onClick={() => {
+                      this.props.dispatch({
+                        type: 'settingCompany/updateState',
+                        payload: {
+                          entity: undefined,
+                        },
+                      })
+                      this.props.toggleModal()
+                    }}
+                  >
+                    Add New
+                  </Button>
+                </Authorized>
               </div>
             </GridItem>
           </GridContainer>

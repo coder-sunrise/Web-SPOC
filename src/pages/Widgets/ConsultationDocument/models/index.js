@@ -103,7 +103,7 @@ export default createFormViewModel({
         return {
           ...state,
           rows: rows.map((o) => {
-            if (o.uid === payload.id) o.isDeleted = true
+            if (!payload || o.uid === payload.id) o.isDeleted = true
             return o
           }),
         }

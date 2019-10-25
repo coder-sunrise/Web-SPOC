@@ -152,6 +152,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.poDate',
                       })}
+                      allowClear={false}
                       // disabled={!isReadOnly}
                       {...args}
                     />

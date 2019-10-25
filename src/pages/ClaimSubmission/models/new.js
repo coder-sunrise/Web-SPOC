@@ -1,4 +1,4 @@
-import { createListViewModel } from 'medisys-model'
+ import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
 
 export default createListViewModel({

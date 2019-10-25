@@ -80,11 +80,7 @@ class Form extends React.PureComponent {
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
-    editingRows: !this.props.values.id
-      ? [
-          -99,
-        ]
-      : [],
+    editingRows: [],
     _tempCallback: undefined,
   }
 
@@ -155,7 +151,7 @@ class Form extends React.PureComponent {
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
-          ...patientProfileDefaultValue.contact.countryFK,
+          ...patientProfileDefaultValue.contact.mobileContactNumber,
           number: values.patientContactNo,
         },
       },
@@ -319,7 +315,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  validateDataGrid = () => {
+  validateDataGrid = () => {    
     const { datagrid = [], editingRows } = this.state
 
     let isDataGridValid = true
@@ -602,6 +598,7 @@ class Form extends React.PureComponent {
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
+      pdroomid: primaryDoctorResource.roomFk, // primary clinician id
     }
 
     this.onCloseFormClick()
@@ -659,6 +656,7 @@ class Form extends React.PureComponent {
       isSubmitting,
       mode,
       conflicts,
+      selectedSlot,
     } = this.props
 
     const {
@@ -743,6 +741,7 @@ class Form extends React.PureComponent {
                   handleCommitChanges={this.onCommitChanges}
                   handleEditingRowsChange={this.onEditingRowsChange}
                   editingRows={editingRows}
+                  selectedSlot={selectedSlot}
                 />
               </GridItem>
 

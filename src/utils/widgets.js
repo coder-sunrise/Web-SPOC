@@ -138,11 +138,13 @@ const widgets = [
     }),
     model: 'consultationDocument',
     layoutConfig: {},
-    // onRemove: () => {
-    //   window.g_app._store.dispatch({
-    //     type: 'consultationDocument/deleteRow',
-    //   })
-    // },
+
+    onRemove: () => {
+      window.g_app._store.dispatch({
+        type: 'consultationDocument/deleteRow',
+      })
+    },
+
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
