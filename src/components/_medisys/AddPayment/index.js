@@ -38,8 +38,20 @@ import { PAYMENT_MODE } from '@/utils/constants'
     return {
       outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
-      cashReceived: 0,
-      paymentList: payments.length > 0 ? payments[0].paymentModes : [],
+      cashReceived:
+        payments.length > 0 ? payments[0].cashReceived : collectableAmount,
+      paymentList:
+        payments.length > 0
+          ? payments[0].paymentModes
+          : [
+              {
+                paymentMode: 'Cash',
+                paymentModeFK: 1,
+                amt: collectableAmount,
+                remarks: '',
+                sequence: 0,
+              },
+            ],
       cashRounding,
       collectableAmount,
       ...invoice,

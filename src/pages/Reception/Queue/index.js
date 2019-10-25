@@ -24,7 +24,7 @@ import {
 import EmptySession from './EmptySession'
 import DetailsActionBar from './FilterBar'
 import DetailsGrid from './Grid'
-import EndSessionSummary from './SessionSummary'
+import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 import PatientSearchModal from './PatientSearch'
 import { modelKey } from './variables'
 // utils
@@ -246,6 +246,12 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}endSession`,
       sessionID: queueLog.sessionInfo.id,
+    }).then((response) => {
+      const { status } = response
+      if (status === 204)
+        this.setState({
+          showEndSessionSummary: true,
+        })
     })
   }
 
@@ -414,7 +420,7 @@ class Queue extends React.Component {
               onConfirm={this.onEndSessionSummaryClose}
               disableBackdropClick
             >
-              <EndSessionSummary />
+              <EndSessionSummary sessionID={sessionInfo.id} />
             </CommonModal>
           </CardBody>
         </Card>
