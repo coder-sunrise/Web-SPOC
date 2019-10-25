@@ -114,7 +114,7 @@ const columnExtensions = [
         return `${gender}/${age}`
       }
       const { age = 0, gender = 'U' } = row
-      console.log({ row })
+      // console.log({ row })
       const ageLabel = age < 0 ? 0 : age
       return `${gender}/${ageLabel}`
     },

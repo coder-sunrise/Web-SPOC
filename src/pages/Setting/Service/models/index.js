@@ -41,7 +41,7 @@ export default createListViewModel({
           }),
         }
       },
-      querySingleDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         // console.log('single', data)
         return {

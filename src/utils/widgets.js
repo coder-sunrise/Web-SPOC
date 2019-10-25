@@ -272,17 +272,17 @@ const widgets = [
       </Tooltip>
     ),
   },
-  // {
-  //   id: '1001',
-  //   name: 'Test Widget',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/TestWidget'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
+  {
+    id: '1001',
+    name: 'Test Widget',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/TestWidget'),
+      loading: Loading,
+    }),
+    layoutConfig: {
+      style: {},
+    },
+  },
   // {
   //   id: '1002',
   //   name: 'Dental Chart',
