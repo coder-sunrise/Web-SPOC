@@ -24,7 +24,7 @@ import {
 import EmptySession from './EmptySession'
 import DetailsActionBar from './FilterBar'
 import DetailsGrid from './Grid'
-import EndSessionSummary from './SessionSummary'
+import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 import PatientSearchModal from './PatientSearch'
 import { modelKey } from './variables'
 // utils
@@ -134,6 +134,7 @@ class Queue extends React.Component {
     patientID = undefined,
     appointmentID = undefined,
     pdid = undefined,
+    pdroomid = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -142,6 +143,7 @@ class Queue extends React.Component {
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
     if (pdid) parameter.pdid = pdid
+    if (pdroomid) parameter.pdroomid = pdroomid
 
     this.togglePatientSearch(false)
     this.props.history.push(getAppendUrl(parameter))
@@ -151,11 +153,13 @@ class Queue extends React.Component {
     patientID = undefined,
     appointmentID = undefined,
     primaryClinicianFK = undefined,
+    primaryClinicianRoomFK = undefined,
   }) => {
     this.showVisitRegistration({
       patientID,
       appointmentID,
       pdid: primaryClinicianFK,
+      pdroomid: primaryClinicianRoomFK,
     })
   }
 
@@ -242,6 +246,12 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}endSession`,
       sessionID: queueLog.sessionInfo.id,
+    }).then((response) => {
+      const { status } = response
+      if (status === 204)
+        this.setState({
+          showEndSessionSummary: true,
+        })
     })
   }
 
@@ -410,7 +420,7 @@ class Queue extends React.Component {
               onConfirm={this.onEndSessionSummaryClose}
               disableBackdropClick
             >
-              <EndSessionSummary />
+              <EndSessionSummary sessionID={sessionInfo.id} />
             </CommonModal>
           </CardBody>
         </Card>

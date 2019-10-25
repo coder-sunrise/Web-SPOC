@@ -481,6 +481,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         })
 
         setTempInvoicePayer(newInvoicePayers)
+        setInitialState(newInvoicePayers)
         refTempInvociePayer.current = newInvoicePayers
       } else if (claimableSchemes.length > 0) {
         const _invoicePayer = {
@@ -625,8 +626,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ).length < invoice.claimableSchemes
     return isEditing || hasUnappliedScheme
   }
-
-  console.log({ tempInvoicePayer })
+  console.log({ invoice })
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -659,7 +659,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer._isDeleted) return null
-
+          console.log({ invoicePayer })
           const { copaymentSchemeFK, _isConfirmed } = invoicePayer
           const claimAmountColExt = {
             columnName: 'claimAmount',
@@ -711,18 +711,17 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 {invoicePayer.schemeConfig &&
                 invoicePayer.schemeConfig.copayerFK === 1 && (
                   <GridItem md={2}>
-                    <p>
-                      Balance:
-                      {invoicePayer.schemeConfig.balance === null ? (
+                    <div>
+                      {!invoicePayer.schemeConfig.balance ? (
                         <span className={classes.dangerText}>
                           Insufficient balance
                         </span>
                       ) : (
                         <span className={classes.currencyText}>
-                          ${invoicePayer.schemeConfig.balance}
+                          Balace: ${invoicePayer.schemeConfig.balance}
                         </span>
                       )}
-                    </p>
+                    </div>
                   </GridItem>
                 )}
                 <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
@@ -867,17 +866,28 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       >
         <CoPayer
           onAddCoPayerClick={handleAddCoPayer}
-          // invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
-          //   ...invoiceItem,
-          //   schemeCoverage: 100,
-          //   schemeCoverageType: 'Percentage',
-          //   payableBalance:
-          //     invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
-          // }))}
-          invoiceItems={tempInvoicePayer.reduce(
-            flattenInvoicePayersInvoiceItemList,
-            [],
-          )}
+          invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
+            ...invoiceItem,
+            itemName: invoiceItem.itemDescription,
+            schemeCoverage: 100,
+            schemeCoverageType: 'Percentage',
+            payableBalance:
+              invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
+          }))}
+          // invoiceItems={
+          //   tempInvoicePayer.length > 0 ? (
+          //     tempInvoicePayer.reduce(flattenInvoicePayersInvoiceItemList, [])
+          //   ) : (
+          //     invoice.invoiceItems.map((invoiceItem) => ({
+          //       ...invoiceItem,
+          //       claimAmount: 0,
+          //       itemName: invoiceItem.itemDescription,
+          //       schemeCoverage: 100,
+          //       schemeCoverageType: 'Percentage',
+          //       payableBalance: invoiceItem.totalAfterGst,
+          //     }))
+          //   )
+          // }
         />
       </CommonModal>
       <CommonModal
