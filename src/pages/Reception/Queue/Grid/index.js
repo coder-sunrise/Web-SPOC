@@ -319,11 +319,9 @@ const Grid = ({
             vid: row.visitFK,
             pid: row.patientProfileFK,
             v: version,
-            md2: 'bill',
+            md3: 'bill',
           }
-          router.push(
-            getAppendUrl(parameters, '/reception/queue/patientdashboard'),
-          )
+          router.push(getAppendUrl(parameters, '/reception/queue'))
           break
         }
         case '2': // delete visit

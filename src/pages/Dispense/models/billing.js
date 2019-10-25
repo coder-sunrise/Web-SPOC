@@ -33,21 +33,28 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
-        if (pathname === '/reception/queue/patientdashboard') {
-          const { qid, vid, v, md2 } = query
+        const { qid, vid, v, md3, pid } = query
 
-          if (md2 === 'bill') {
-            dispatch({
-              type: 'initState',
-              payload: { qid, visitID: vid, v },
-            })
-          }
+        if (md3 === 'bill') {
+          dispatch({
+            type: 'initState',
+            payload: { qid, visitID: vid, v, pid },
+          })
         }
       })
     },
     effects: {
-      *initState ({ payload }, { select, put }) {
-        const patientInfo = yield select((st) => st.patient)
+      *initState ({ payload }, { select, put, take }) {
+        const patientState = yield select((st) => st.patient)
+        if (!patientState.entity) {
+          yield put({
+            type: 'patient/query',
+            payload: {
+              id: payload.pid,
+            },
+          })
+          yield take('patient/query/@@end')
+        }
         yield put({
           type: 'query',
           payload: {

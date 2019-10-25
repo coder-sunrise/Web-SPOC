@@ -54,6 +54,7 @@ class Grid extends PureComponent {
         style={{ margin: 0 }}
         type='settingClinicService'
         onRowDoubleClick={this.editRow}
+        getRowId={(row) => row.serviceId}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },

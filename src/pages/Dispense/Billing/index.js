@@ -23,7 +23,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 // model
 import model from '../models/billing'
 // utils
-import { getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
 window.g_app.replaceModel(model)
@@ -50,6 +50,7 @@ const bannerStyle = {
   loading,
 }))
 @withFormikExtend({
+  notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
@@ -152,6 +153,13 @@ class Billing extends Component {
       md2: 'dsps',
       version: Date.now(),
     }
+    const destinationUrl = getRemovedUrl(
+      [
+        'md3',
+      ],
+      getAppendUrl(parameters),
+      '/reception/queue/patientdashboard',
+    )
 
     dispatch({
       type: 'dispense/unlock',
@@ -160,10 +168,7 @@ class Billing extends Component {
       },
     }).then((response) => {
       if (response) {
-        router.push(
-          getAppendUrl(parameters),
-          '/reception/queue/patientdashboard',
-        )
+        router.push(destinationUrl)
         dispatch({
           type: 'billing/closeModal',
           payload: {

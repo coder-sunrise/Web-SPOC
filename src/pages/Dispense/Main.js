@@ -139,11 +139,9 @@ class Main extends Component {
     }).then((response) => {
       if (response) {
         const parameters = {
-          md2: 'bill',
+          md3: 'bill',
         }
-        router.push(
-          getAppendUrl(parameters, '/reception/queue/patientdashboard'),
-        )
+        router.push(getAppendUrl(parameters, '/reception/queue'))
       }
     })
   }

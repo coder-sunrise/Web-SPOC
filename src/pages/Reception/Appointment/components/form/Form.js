@@ -190,7 +190,8 @@ class Form extends React.PureComponent {
           {
             [`${prefix}name`]: values.patientName,
             [`${prefix}patientAccountNo`]: values.patientName,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo}`,
+            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
+              ''}`,
             combineCondition: 'or',
           },
         ],
@@ -697,7 +698,10 @@ class Form extends React.PureComponent {
             ...datagrid,
           ]
 
-    const show = loading.effects['patientSearch/query'] || isSubmitting
+    const show =
+      loading.effects['patientSearch/query'] || loading.models.calendar
+
+    console.log({ show, loadingEffects: loading.effects, isSubmitting })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
