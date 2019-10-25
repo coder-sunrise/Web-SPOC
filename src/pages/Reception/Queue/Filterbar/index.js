@@ -67,34 +67,35 @@ const Filterbar = ({
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={5}>
-        <ProgressButton
-          variant='contained'
-          color='primary'
-          icon={
-            <Hidden mdDown>
-              <Search />
-            </Hidden>
-          }
-          onClick={handleSubmit}
-          size='sm'
-          submitKey='patientSearch/query'
-        >
-          Create Visit
-        </ProgressButton>
         <Authorized authority='queue.registervisit'>
-          <Button
-            icon={null}
+          <ProgressButton
+            variant='contained'
             color='primary'
+            icon={
+              <Hidden mdDown>
+                <Search />
+              </Hidden>
+            }
+            onClick={handleSubmit}
             size='sm'
-            onClick={toggleNewPatient}
-            disabled={loading.global}
+            submitKey='patientSearch/query'
           >
-            <Hidden mdDown>
-              <PersonAdd />
-            </Hidden>
-            <FormattedMessage id='reception.queue.createPatient' />
-          </Button>
+            Create Visit
+          </ProgressButton>
         </Authorized>
+        <Button
+          icon={null}
+          color='primary'
+          size='sm'
+          onClick={toggleNewPatient}
+          disabled={loading.global}
+        >
+          <Hidden mdDown>
+            <PersonAdd />
+          </Hidden>
+          <FormattedMessage id='reception.queue.createPatient' />
+        </Button>
+
         {shouldShowSelfOnlyCheckbox.includes(
           user.clinicianProfile.userProfile.role.id,
         ) && (

@@ -14,7 +14,6 @@ import {
   Divider,
   Fab,
   Slide,
-  Tooltip,
 } from '@material-ui/core'
 import MoreHoriz from '@material-ui/icons/MoreHoriz'
 import MoreVert from '@material-ui/icons/MoreVert'
@@ -25,7 +24,7 @@ import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
 import Loading from '@/components/PageLoading/index'
-import { AuthorizedContext, IconButton, Button } from '@/components'
+import { Tooltip, AuthorizedContext, IconButton, Button } from '@/components'
 
 const widgets = [
   {

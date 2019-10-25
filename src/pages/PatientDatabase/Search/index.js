@@ -3,13 +3,13 @@ import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import Assignment from '@material-ui/icons/Assignment'
 import { getAppendUrl } from '@/utils/utils'
 
 import { compare } from '@/layouts'
-import { CardContainer, Button } from '@/components'
+import { CardContainer, Button, Tooltip } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 

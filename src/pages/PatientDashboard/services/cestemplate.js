@@ -21,7 +21,7 @@ module.exports = {
     })
   },
   update: (id, params) => {
-    return request(`${url}/update/${id}`, {
+    return request(`${url}/replace/${id}`, {
       method: 'PUT',
       body: params,
     })
