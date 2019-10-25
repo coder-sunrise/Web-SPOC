@@ -1,6 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
-import * as service from '../services'
 import moment from 'moment'
+import * as service from '../services'
 import { notification } from '@/components'
 import { podoOrderType } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
@@ -144,7 +144,7 @@ export default createFormViewModel({
           notification.success({
             message,
           })
-        } 
+        }
         // else {
         //   notification.error({
         //     message,
