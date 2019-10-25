@@ -13,6 +13,7 @@ import {
   ProgressButton,
   DateRangePicker,
   Tooltip,
+  Field,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -63,7 +64,7 @@ class FilterBar extends PureComponent {
           />
         </GridItem>
         <GridItem md={6}>
-          <FastField
+          <Field
             name='transactionDates'
             render={(args) => {
               return (
