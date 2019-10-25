@@ -36,15 +36,17 @@ import { PAYMENT_MODE } from '@/utils/constants'
     )
 
     return {
-      outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
       cashReceived:
         payments.length > 0 ? payments[0].cashReceived : collectableAmount,
+      outstandingAfterPayment: 0,
+      totalAmtPaid: collectableAmount,
       paymentList:
         payments.length > 0
           ? payments[0].paymentModes
           : [
               {
+                id: 0,
                 paymentMode: 'Cash',
                 paymentModeFK: 1,
                 amt: collectableAmount,
@@ -100,7 +102,8 @@ import { PAYMENT_MODE } from '@/utils/constants'
                 then: Yup.number().required(),
               }),
               referrenceNo: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.GIRO,
+                is: (val) =>
+                  val === PAYMENT_MODE.GIRO || val === PAYMENT_MODE.NETS,
                 then: Yup.string().required(),
               }),
             }),
@@ -142,6 +145,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       totalAmtPaid,
       collectableAmount,
     } = values
+    console.log()
     const returnValue = {
       paymentModes: paymentList.map((payment, index) => ({
         ...payment,
@@ -220,7 +224,8 @@ class AddPayment extends Component {
       setFieldValue('cashReturned', 0)
     }
 
-    if (newPaymentList.length === 0) setFieldValue('outstandingAfterPayment', 0)
+    if (newPaymentList.length === 0)
+      setFieldValue('outstandingAfterPayment', values.collectableAmount)
   }
 
   handleAmountChange = () => {
@@ -260,7 +265,7 @@ class AddPayment extends Component {
       handleSubmit,
     } = this.props
     const { paymentList } = values
-
+    console.log({ values })
     return (
       <div>
         <PayerHeader

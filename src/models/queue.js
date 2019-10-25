@@ -70,9 +70,16 @@ export default createListViewModel({
         const { data } = response
         if (data && data.id) {
           // start session successfully
-          return yield put({
+          yield put({
             type: 'updateSessionInfo',
             payload: { ...data },
+          })
+          yield put({
+            type: 'query',
+            payload: {
+              pagesize: 999999,
+              'VisitFKNavigation.BizSessionFK': data.id,
+            },
           })
         }
         return yield put({
@@ -89,10 +96,10 @@ export default createListViewModel({
 
         if (status >= 204 && status < 400) {
           // end session successfully, reset session info
-          yield put({
-            type: 'updateSessionInfo',
-            payload: { ...InitialSessionInfo },
-          })
+          // yield put({
+          //   type: 'updateSessionInfo',
+          //   payload: { ...InitialSessionInfo },
+          // })
           // yield put({
           //   type: 'global/sendNotification',
           //   payload: {

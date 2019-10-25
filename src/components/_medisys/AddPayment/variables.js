@@ -17,6 +17,7 @@ export const InitialValue = {
   [PAYMENT_MODE.NETS]: {
     amt: null,
     remarks: '',
+    referrenceNo: null,
   },
   [PAYMENT_MODE.CREDIT_CARD]: {
     amt: null,
