@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Tooltip } from '@material-ui/core'
 import { Edit, Print } from '@material-ui/icons'
-import { Button, CommonTableGrid } from '@/components'
+import { Tooltip, Button, CommonTableGrid } from '@/components'
 
 const Grid = (props) => {
   console.log('Grid render')
-  const [ pageSizes, setPagesizes ] = useState([ 5, 10, 15 ])
-  const [ selection, setSelecion ] = useState([])
+  const [
+    pageSizes,
+    setPagesizes,
+  ] = useState([
+    5,
+    10,
+    15,
+  ])
+  const [
+    selection,
+    setSelecion,
+  ] = useState([])
   const { dispatch, list } = props
 
   const tableParas = {

@@ -23,7 +23,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
 @withFormik({
-  mapPropsToValues: ({ invoice, clinicSettings }) => {
+  mapPropsToValues: ({ invoice, payments, clinicSettings }) => {
     const collectableAmount = rounding(
       clinicSettings,
       invoice.outstandingBalance,
@@ -36,7 +36,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
       cashReceived: 0,
-      paymentList: [],
+      paymentList: payments.length > 0 ? payments[0].paymentModes : [],
       cashRounding,
       collectableAmount,
       ...invoice,
@@ -54,31 +54,6 @@ import { PAYMENT_MODE } from '@/utils/constants'
         'outstandingAfterPayment',
       ],
       (totalAmtPaid, collectableAmount, outstandingAfterPayment, schema) => {
-        if (outstandingAfterPayment === 0)
-          return schema.of(
-            Yup.object().shape({
-              id: Yup.number(),
-              paymentModeFK: Yup.number().required(),
-              amt: Yup.number().min(0).required(),
-              creditCardTypeFK: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-                then: Yup.string().required(),
-              }),
-              creditCardNo: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-                then: Yup.string().required(),
-              }),
-              chequeNo: Yup.number().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CHEQUE,
-                then: Yup.number().required(),
-              }),
-              referrenceNo: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.GIRO,
-                then: Yup.string().required(),
-              }),
-            }),
-          )
-
         if (outstandingAfterPayment < 0)
           return schema.of(
             Yup.object().shape({
@@ -115,6 +90,30 @@ import { PAYMENT_MODE } from '@/utils/constants'
               }),
             }),
           )
+        // if (outstandingAfterPayment === 0)
+        return schema.of(
+          Yup.object().shape({
+            id: Yup.number(),
+            paymentModeFK: Yup.number().required(),
+            amt: Yup.number().min(0).required(),
+            creditCardTypeFK: Yup.string().when('paymentModeFK', {
+              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+              then: Yup.string().required(),
+            }),
+            creditCardNo: Yup.string().when('paymentModeFK', {
+              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
+              then: Yup.string().required(),
+            }),
+            chequeNo: Yup.number().when('paymentModeFK', {
+              is: (val) => val === PAYMENT_MODE.CHEQUE,
+              then: Yup.number().required(),
+            }),
+            referrenceNo: Yup.string().when('paymentModeFK', {
+              is: (val) => val === PAYMENT_MODE.GIRO,
+              then: Yup.string().required(),
+            }),
+          }),
+        )
       },
     ),
   }),
@@ -132,7 +131,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       paymentModes: paymentList.map((payment, index) => ({
         ...payment,
         sequence: index,
-        id: undefined,
+        // id: undefined,
       })),
       outstandingBalance: collectableAmount - totalAmtPaid,
       cashRounding,

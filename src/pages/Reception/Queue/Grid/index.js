@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 import router from 'umi/router'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
@@ -10,10 +11,12 @@ import ActionButton from './ActionButton'
 import StatusBadge from './StatusBadge'
 // utils
 import { getAppendUrl } from '@/utils/utils'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
 import { filterData, formatAppointmentTimes } from '../utils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
+import { GENDER } from '@/utils/constants'
 
 const compareQueueNo = (a, b) => {
   const floatA = parseFloat(a)
@@ -103,8 +106,16 @@ const columnExtensions = [
   {
     columnName: 'gender/age',
     render: (row) => {
+      if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+        const { patientProfile } = row
+        const { genderFK, dob } = patientProfile
+        const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+        const age = calculateAgeFromDOB(dob)
+        return `${gender}/${age}`
+      }
       const { age = 0, gender = 'U' } = row
-      const ageLabel = age < 0 ? 0 : age + 1
+      console.log({ row })
+      const ageLabel = age < 0 ? 0 : age
       return `${gender}/${ageLabel}`
     },
     sortingEnabled: false,
@@ -391,7 +402,6 @@ const Grid = ({
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile } = codetable
-                  console.log({ codetable })
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {

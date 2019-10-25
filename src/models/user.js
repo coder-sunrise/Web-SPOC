@@ -5,14 +5,23 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
-
   // for testing only
-  // if (rights === 'hidden') {
+  // if (name === 'patientdatabase') {
   //   return [
-  //     { name, rights: 'enable' },
+  //     { name, rights: 'disable' },
   //   ]
   // }
 
+  if (rights === 'hidden') {
+    return [
+      { name, rights: 'enable' },
+    ]
+  }
+  // if (name === 'patientdatabase') {
+  //   return [
+  //     { name, rights: 'readOnly' },
+  //   ]
+  // }
   if (type === 'Module') {
     if (name === 'inventory/purchasingandre ceiving') {
       return [
@@ -86,6 +95,7 @@ export default {
       })
     },
     *fetchCurrent (_, { call, put }) {
+      let user
       const response = yield call(queryCurrent)
       if (response.data) {
         const { userProfileDetailDto } = response.data
@@ -99,35 +109,33 @@ export default {
         //   console.log(a.name)
         // })
         // console.log({ data: response.data, accessRights })
+        user = {
+          data: response.data.userProfileDetailDto,
+          accessRights,
+        }
+      }
+
+      yield put({
+        type: 'saveCurrentUser',
+        payload: user,
+      })
+
+      // yield put({
+      //   type: 'queueLog/refresh',
+      //   payload: {
+      //     shouldGetTodayAppointments: false,
+      //   },
+      // })
+
+      if (!user.data.clinicianProfile.userProfile.lastPasswordChangedDate)
         yield put({
-          type: 'saveCurrentUser',
+          type: 'global/updateState',
           payload: {
-            data: response.data.userProfileDetailDto,
-            accessRights,
+            showChangePasswordModal: true,
           },
         })
 
-        // yield put({
-        //   type: 'queueLog/refresh',
-        //   payload: {
-        //     shouldGetTodayAppointments: false,
-        //   },
-        // })
-
-        if (
-          !userProfileDetailDto.clinicianProfile.userProfile
-            .lastPasswordChangedDate
-        )
-          yield put({
-            type: 'global/updateState',
-            payload: {
-              showChangePasswordModal: true,
-            },
-          })
-
-        return response.data
-      }
-      return null
+      return response.data
     },
     *fetchProfileDetails ({ id }, { call, put }) {
       const result = yield call(fetchUserProfileByID, id)

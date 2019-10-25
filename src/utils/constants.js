@@ -79,6 +79,18 @@ export const INVOICE_ITEM_TYPE = {
   5: 'Package',
 }
 
+export const INVENTORY_TYPE = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+}
+
+export const INVENTORY_ADJUSTMENT_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  DISCARDED: 3,
+}
+
 export const REPORT_TYPE = {
   1: 'Queue Listing',
   2: 'Patient Listing',
@@ -107,4 +119,10 @@ export const REPORT_TYPE = {
   25: 'Statement',
   26: 'Purchase Order',
   27: 'Patient Label',
+}
+
+export const GENDER = {
+  1: 'MALE',
+  2: 'FEMALE',
+  3: 'UNKNOWN',
 }

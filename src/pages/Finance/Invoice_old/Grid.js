@@ -3,13 +3,13 @@ import router from 'umi/router'
 import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { PanTool, Edit, Search, Person } from '@material-ui/icons'
 // import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
 import { sleep, getAppendUrl } from '@/utils/utils'
 import { status, suppliers, dispUOMs } from '@/utils/codes'
 
-import { Button, CommonModal, CommonTableGrid } from '@/components'
+import { Tooltip, Button, CommonModal, CommonTableGrid } from '@/components'
 
 class Grid extends PureComponent {
   state = {

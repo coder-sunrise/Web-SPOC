@@ -66,10 +66,8 @@ const Templates = ({
   }
 
   const updateTemplate = () => {
-    notification.warning({
-      message: 'Function not ready yet',
-    })
-    return
+    if (onSaveTemplate) onSaveTemplate()
+
     dispatch({
       type: 'cestemplate/update',
       payload: currentId,

@@ -43,9 +43,9 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
+    // Routes: [
+    //   'src/pages/Authorized',
+    // ],
     // authority: [
     //   { name: 'admin', rights: 'enable' },
     //   { name: 'user', rights: 'enable' },

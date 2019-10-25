@@ -24,7 +24,6 @@ export default createFormViewModel({
       selectedWidgets: [
         '1',
       ],
-
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -100,7 +99,6 @@ export default createFormViewModel({
             message: `Consultation paused`,
           })
 
-      
           yield put({ type: 'closeModal' })
         }
         return response
@@ -175,7 +173,7 @@ export default createFormViewModel({
             message: `Consultation signed`,
           })
           yield put({ type: 'closeModal' })
-          console.log("payload ", payload)
+          console.log('payload ', payload)
         }
         return response
       },
@@ -217,7 +215,6 @@ export default createFormViewModel({
             type: 'queryDone',
             payload: {
               data: response,
-              page: 'edit order',
             },
           })
         }
@@ -290,7 +287,16 @@ export default createFormViewModel({
             )
           })
         }
-
+        // let orderList = []
+        // if (
+        //   oRows.length === 0 &&
+        //   visitStatus === 'IN CONS' &&
+        //   status !== 'PAUSED'
+        // ) {
+        //   orderList = yield put.resolve({
+        //     type: 'addAutoOrder',
+        //   })
+        // }
         yield put({
           type: 'orders/updateState',
           payload: {
