@@ -1,18 +1,19 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { withStyles } from '@material-ui/core/styles'
-import MenuItem from '@material-ui/core/MenuItem'
-import ClickAwayListener from '@material-ui/core/ClickAwayListener'
-import Grow from '@material-ui/core/Grow'
-import Paper from '@material-ui/core/Paper'
-import Popper from '@material-ui/core/Popper'
-import MenuList from '@material-ui/core/MenuList'
+import { FormattedMessage } from 'umi/locale'
+import {
+  MenuList,
+  Popper,
+  Paper,
+  Grow,
+  ClickAwayListener,
+  MenuItem,
+} from '@material-ui/core'
+import { INVENTORY_TYPE } from '@/utils/constants'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
-  Button,
   TextField,
   Checkbox,
   Select,
@@ -20,6 +21,7 @@ import {
   DateRangePicker,
   Field,
 } from '@/components'
+import { inventoryAdjustmentStatus } from '@/utils/codes'
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) =>
@@ -110,10 +112,7 @@ class Filter extends PureComponent {
                 return (
                   <Select
                     label='Status'
-                    options={[
-                      { value: 1, name: 'Draft' },
-                      { value: 2, name: 'Finalized' },
-                    ]}
+                    options={inventoryAdjustmentStatus}
                     {...args}
                   />
                 )
@@ -212,12 +211,12 @@ class Filter extends PureComponent {
                             Medication
                           </MenuItem>
                           <MenuItem
-                            onClick={() => this.handleMassAdjustment(3)}
+                            onClick={() => this.handleMassAdjustment(2)}
                           >
                             Consumable
                           </MenuItem>
                           <MenuItem
-                            onClick={() => this.handleMassAdjustment(2)}
+                            onClick={() => this.handleMassAdjustment(3)}
                           >
                             Vaccination
                           </MenuItem>

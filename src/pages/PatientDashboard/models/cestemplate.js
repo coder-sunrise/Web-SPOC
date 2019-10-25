@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import router from 'umi/router'
+import _ from 'lodash'
 import * as service from '../services/cestemplate'
 import { sleep, removeFields } from '@/utils/utils'
 
@@ -44,32 +45,34 @@ export default createListViewModel({
         const { name } = payload
         const consultation = yield select((st) => st.consultation)
         const { entity } = consultation
-        delete entity.corPatientNoteVitalSign
-        delete entity.visitConsultationTemplate
-        delete entity.concurrencyToken
+        const cloneEntity = _.cloneDeep(entity)
+        delete cloneEntity.corPatientNoteVitalSign
+        delete cloneEntity.visitConsultationTemplate
+        delete cloneEntity.concurrencyToken
 
-        removeFields(entity, [
+        removeFields(cloneEntity, [
           'id',
           'clinicalObjectRecordFK',
           'concurrencyToken',
         ])
 
-        return yield call(service.create, name, entity)
+        return yield call(service.create, name, cloneEntity)
       },
       *update ({ payload }, { call, put, select, take }) {
         const consultation = yield select((st) => st.consultation)
         const { entity } = consultation
-        delete entity.corPatientNoteVitalSign
-        delete entity.visitConsultationTemplate
-        delete entity.concurrencyToken
+        const cloneEntity = _.cloneDeep(entity)
+        delete cloneEntity.corPatientNoteVitalSign
+        delete cloneEntity.visitConsultationTemplate
+        delete cloneEntity.concurrencyToken
 
-        removeFields(entity, [
+        removeFields(cloneEntity, [
           'id',
           'clinicalObjectRecordFK',
           'concurrencyToken',
         ])
 
-        return yield call(service.update, Number(payload), entity)
+        return yield call(service.update, Number(payload), cloneEntity)
       },
       *delete ({ payload }, { call, put, select, take }) {
         return yield call(service.delete, payload)

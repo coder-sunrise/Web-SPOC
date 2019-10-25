@@ -351,22 +351,9 @@ const Grid = ({
               },
             }).then((o) => {
               if (o)
-                dispatch({
-                  type: 'codetable/fetchCodes',
-                  payload: {
-                    code: 'ctservice',
-                    filter: {
-                      'serviceFKNavigation.IsActive': true,
-                      combineCondition: 'or',
-                    },
-                  },
-                }).then((v) => {
-                  if (v) {
-                    router.push(
-                      `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-                    )
-                  }
-                })
+                router.push(
+                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                )
             })
           }
           break
@@ -391,22 +378,9 @@ const Grid = ({
                   )
               })
             } else {
-              dispatch({
-                type: 'codetable/fetchCodes',
-                payload: {
-                  code: 'ctservice',
-                  filter: {
-                    'serviceFKNavigation.IsActive': true,
-                    combineCondition: 'or',
-                  },
-                },
-              }).then((o) => {
-                if (o) {
-                  router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-                  )
-                }
-              })
+              router.push(
+                `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+              )
             }
           }
 
@@ -428,7 +402,6 @@ const Grid = ({
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile } = codetable
-                  console.log({ codetable })
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {

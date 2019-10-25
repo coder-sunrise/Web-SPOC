@@ -59,7 +59,7 @@ const recurrenceTypes = [
 class Filter extends PureComponent {
   render () {
     const { classes, values } = this.props
-    console.log({ values })
+    // console.log({ values })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
