@@ -187,7 +187,9 @@ class Index extends Component {
             onConfirmDiscard: async () => {
               processedPayload = this.processSubmitPayload(false, statusCode)
               await submit()
-              history.push('/inventory/pr')
+              if (statusCode === 4) {
+                history.push('/inventory/pr')
+              }
             },
             openConfirmText: confirmText,
           },
