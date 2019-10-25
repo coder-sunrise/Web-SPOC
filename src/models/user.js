@@ -52,7 +52,7 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     //     { name, rights: 'hidden' },
     //   ]
     // }
-    if (name === 'settings.mastersetting') {
+    if (name === 'appointment.newappoihntment') {
       return [
         { name, rights: 'hidden' },
       ]

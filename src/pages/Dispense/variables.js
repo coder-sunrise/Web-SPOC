@@ -69,9 +69,9 @@ export const PrescriptionColumnExtensions = (
         <Checkbox
           labelPlacement='start'
           color='primary'
-          checked={row.rowIndex === 1}
-          iconStyle={{fill: 'blue'}}
-          inputStyle={{color:'blue'}}
+          checked={row.isExternalPrescription ? row.isExternalPrescription  : false}
+          // iconStyle={{fill: 'blue'}}
+          // inputStyle={{color:'blue'}}
           disabled
         />
       )

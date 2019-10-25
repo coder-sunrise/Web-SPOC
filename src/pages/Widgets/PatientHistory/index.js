@@ -53,6 +53,7 @@ import ConsultationDocument from './ConsultationDocument'
 import ResultHistory from './ResultHistory'
 import Invoice from './Invoice'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 
 // import ChiefComplaints from './ChiefComplaints'
 // import ChiefComplaints from './ChiefComplaints'
@@ -513,33 +514,35 @@ class PatientHistory extends Component {
               maxTagCount={maxItemTagCount}
             />
           </GridItem>
-          <GridItem md={3}>
-            {(!widget || !findGetParameter('cid')) && (
-              <ProgressButton
-                color='primary'
-                style={{ marginLeft: theme.spacing(2) }}
-                size='sm'
-                onClick={() => {
-                  dispatch({
-                    type: `consultation/edit`,
-                    payload: {
-                      id: selected.id,
-                      version: patientHistory.version,
-                    },
-                  }).then((o) => {
-                    if (o)
-                      router.push(
-                        `/reception/queue/patientdashboard?qid=${findGetParameter(
-                          'qid',
-                        )}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
-                      )
-                  })
-                }}
-              >
-                Edit Consultation
-              </ProgressButton>
-            )}
-          </GridItem>
+          <Authorized authority='patientdashboard.editconsultation'>
+            <GridItem md={3}>
+              {(!widget || !findGetParameter('cid')) && (
+                <ProgressButton
+                  color='primary'
+                  style={{ marginLeft: theme.spacing(2) }}
+                  size='sm'
+                  onClick={() => {
+                    dispatch({
+                      type: `consultation/edit`,
+                      payload: {
+                        id: selected.id,
+                        version: patientHistory.version,
+                      },
+                    }).then((o) => {
+                      if (o)
+                        router.push(
+                          `/reception/queue/patientdashboard?qid=${findGetParameter(
+                            'qid',
+                          )}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                        )
+                    })
+                  }}
+                >
+                  Edit Consultation
+                </ProgressButton>
+              )}
+            </GridItem>
+          </Authorized>
           <GridItem md={7} style={{ textAlign: 'right' }}>
             Updated Date:
             {patientHistory.selectedSubRow.signOffDate && (
@@ -568,7 +571,11 @@ class PatientHistory extends Component {
                 return (
                   <div>
                     <h5>{o.name}</h5>
-                    <Widget current={entity || {}} {...this.props} setFieldValue={this.props.setFieldValue} />
+                    <Widget
+                      current={entity || {}}
+                      {...this.props}
+                      setFieldValue={this.props.setFieldValue}
+                    />
                   </div>
                 )
               })}
