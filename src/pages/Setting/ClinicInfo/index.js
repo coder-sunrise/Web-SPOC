@@ -192,7 +192,6 @@ class ClinicInfo extends PureComponent {
                 <TextField
                   label='Clinic Short Code'
                   {...args}
-                  disabled
                 />
               )}
             />

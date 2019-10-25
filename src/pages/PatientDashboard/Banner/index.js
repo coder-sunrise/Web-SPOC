@@ -495,7 +495,11 @@ class Banner extends PureComponent {
                               }}
                             >
                               <Tooltip
-                                title={schemeData.statusDescription}
+                                title={
+                                  <p style={{ color: 'red', fontSize: 14 }}>
+                                    {schemeData.statusDescription}
+                                  </p>
+                                }
                                 placement='bottom-end'
                               >
                                 <IconButton>

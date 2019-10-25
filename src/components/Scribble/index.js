@@ -120,6 +120,7 @@ let temp = null
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
   validationSchema: Yup.object().shape({
+    drawing: Yup.string().required(),
     subject: Yup.string()
       .required()
       .max(20, 'Subject should not exceed 20 characters'),
@@ -286,6 +287,7 @@ class Scribble extends React.Component {
       })
       this._sketch.hideDrawing(false)
     }
+    this.props.setFieldValue("drawing", this._sketch.getAllLayerData() )
   }
 
   _selectTool = (event) => {
@@ -389,6 +391,7 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
     } = this.props
+    console.log("props ", this.props)
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -915,33 +918,39 @@ class Scribble extends React.Component {
               </div>
             </div>
             <div className={classes.sketchArea}>
-              <SketchField
-                name='sketch'
-                ref={(c) => {
-                  this._sketch = c
-                }}
-                lineWidth={this.state.lineWidth}
-                lineColor={this.state.lineColor}
-                className={classes.container}
-                tool={this.state.tool}
-                fillColor={
-                  this.state.fillWithColor ? (
-                    this.state.fillColor
-                  ) : (
-                    'transparent'
-                  )
-                }
-                backgroundColor={
-                  this.state.fillWithBackgroundColor ? (
-                    this.state.backgroundColor
-                  ) : (
-                    'transparent'
-                  )
-                }
-                onChange={this._onSketchChange}
-                forceValue
-                height={this.state.sketchHeight}
-                width={this.state.sketchWidth}
+              <FastField
+                name='drawing'
+                render={(args) => (
+                  <SketchField
+                    {...args}
+                    name='sketch'
+                    ref={(c) => {
+                      this._sketch = c
+                    }}
+                    lineWidth={this.state.lineWidth}
+                    lineColor={this.state.lineColor}
+                    className={classes.container}
+                    tool={this.state.tool}
+                    fillColor={
+                      this.state.fillWithColor ? (
+                        this.state.fillColor
+                      ) : (
+                        'transparent'
+                      )
+                    }
+                    backgroundColor={
+                      this.state.fillWithBackgroundColor ? (
+                        this.state.backgroundColor
+                      ) : (
+                        'transparent'
+                      )
+                    }
+                    onChange={this._onSketchChange}
+                    forceValue
+                    height={this.state.sketchHeight}
+                    width={this.state.sketchWidth}
+                  />
+                )}
               />
             </div>
           </GridItem>

@@ -134,6 +134,7 @@ class Queue extends React.Component {
     patientID = undefined,
     appointmentID = undefined,
     pdid = undefined,
+    pdroomid = undefined,
   }) => {
     const parameter = {
       md: 'visreg',
@@ -142,6 +143,7 @@ class Queue extends React.Component {
     if (visitID) parameter.vis = visitID
     if (appointmentID) parameter.apptid = appointmentID
     if (pdid) parameter.pdid = pdid
+    if (pdroomid) parameter.pdroomid = pdroomid
 
     this.togglePatientSearch(false)
     this.props.history.push(getAppendUrl(parameter))
@@ -151,11 +153,13 @@ class Queue extends React.Component {
     patientID = undefined,
     appointmentID = undefined,
     primaryClinicianFK = undefined,
+    primaryClinicianRoomFK = undefined,
   }) => {
     this.showVisitRegistration({
       patientID,
       appointmentID,
       pdid: primaryClinicianFK,
+      pdroomid: primaryClinicianRoomFK,
     })
   }
 

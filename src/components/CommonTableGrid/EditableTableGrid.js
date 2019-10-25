@@ -53,7 +53,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onAddedRowsChange = (addedRows) => {
-    // console.log('_onAddedRowsChange', addedRows)
+    console.log('_onAddedRowsChange', addedRows)
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)
@@ -61,18 +61,19 @@ class EditableTableGrid extends PureComponent {
     this.setState({
       addedRows: row,
     })
+    if (row.length === 0) {
+      delete window.$tempGridRow[this.gridId][undefined]
+    }
   }
 
   _onEditingRowIdsChange = (ids) => {
     const { EditingProps, rows } = this.props
     const { onEditingRowIdsChange } = EditingProps
-
     let newIds = ids
     // console.log(ids, window.$tempGridRow)
     if (onEditingRowIdsChange) {
       newIds = onEditingRowIdsChange(ids)
     }
-    // console.log(newIds)
     this.setState({
       editingRowIds: newIds,
     })

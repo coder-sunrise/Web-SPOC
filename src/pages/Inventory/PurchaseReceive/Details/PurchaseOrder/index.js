@@ -148,7 +148,7 @@ class Index extends Component {
   }
 
   onSubmitButtonClicked = async (action) => {
-    const { dispatch, validateForm } = this.props
+    const { dispatch, validateForm, history } = this.props
     let dispatchType = 'purchaseOrderDetails/upsert'
     let processedPayload = {}
     const isFormValid = await validateForm()
@@ -177,13 +177,29 @@ class Index extends Component {
         return validation
       }
 
+      const openConfirmationModal = (statusCode) => {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: 'Are you sure want to cancel PO?',
+            onConfirmDiscard: async () => {
+              processedPayload = this.processSubmitPayload(false, statusCode)
+              await submit()
+              history.push('/inventory/pr')
+            },
+            openConfirmText: 'Cancel PO',
+          },
+        })
+      }
+
       switch (action) {
         case poSubmitAction.SAVE:
           processedPayload = this.processSubmitPayload(true)
           break
         case poSubmitAction.CANCEL:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 4)
+          openConfirmationModal(4)
           break
         case poSubmitAction.FINALIZE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
@@ -191,18 +207,7 @@ class Index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          dispatch({
-            type: 'global/updateAppState',
-            payload: {
-              openConfirm: true,
-              openConfirmContent: 'Are you sure want to complete PO?',
-              onConfirmDiscard: () => {
-                processedPayload = this.processSubmitPayload(false, 5)
-                submit()
-              },
-              openConfirmText: 'Complete PO',
-            },
-          })
+          openConfirmationModal(5)
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
@@ -491,6 +496,7 @@ class Index extends Component {
           <POForm
             isReadOnly={isInvoiceReadOnly(poStatus)}
             setFieldValue={setFieldValue}
+            {...this.props}
           />
         </AuthorizedContext.Provider>
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}

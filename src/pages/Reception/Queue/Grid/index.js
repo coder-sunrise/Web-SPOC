@@ -442,6 +442,9 @@ const Grid = ({
             primaryClinicianFK: row.appointment_Resources.find(
               (item) => item.isPrimaryClinician,
             ).clinicianFK,
+            primaryClinicianRoomFK: row.appointment_Resources.find(
+              (item) => item.isPrimaryClinician,
+            ).roomFk,
           })
           break
         }

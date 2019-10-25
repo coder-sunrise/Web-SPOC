@@ -13,6 +13,7 @@ import {
   CardContainer,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
@@ -114,7 +115,11 @@ class RejectedCHAS extends React.Component {
           modelsName='claimSubmissionRejected'
         />
         <GridContainer>
-          <LoadingWrapper linear loading={isLoading} text='Re-submitting Claim...'>
+          <LoadingWrapper
+            linear
+            loading={isLoading}
+            text='Re-submitting Claim...'
+          >
             <GridItem md={12}>
               <TableGrid
                 data={list}
@@ -127,6 +132,7 @@ class RejectedCHAS extends React.Component {
                   handleContextMenuItemClick(row, id, true)}
               />
             </GridItem>
+
             <GridItem md={4} className={classes.buttonGroup}>
               <ProgressButton
                 icon={null}
@@ -135,14 +141,16 @@ class RejectedCHAS extends React.Component {
               >
                 Refresh
               </ProgressButton>
-              <ProgressButton
-                icon={null}
-                color='primary'
-                disabled={selectedRows.length <= 0}
-                onClick={this.onReSubmitClaimClicked}
-              >
-                Re-Submit Claim
-              </ProgressButton>
+              <Authorized authority='claimsubmission.submitclaim'>
+                <ProgressButton
+                  icon={null}
+                  color='primary'
+                  disabled={selectedRows.length <= 0}
+                  onClick={this.onReSubmitClaimClicked}
+                >
+                  Re-Submit Claim
+                </ProgressButton>
+              </Authorized>
             </GridItem>
           </LoadingWrapper>
         </GridContainer>

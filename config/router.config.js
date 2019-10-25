@@ -464,6 +464,9 @@ const routes = [
             name: 'copayer',
             // mini: 'CP',
             component: './Setting/Company',
+            authority: [
+              'finance/scheme',
+            ],
           },
         ],
       },
