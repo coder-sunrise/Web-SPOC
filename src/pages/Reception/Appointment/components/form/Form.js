@@ -155,7 +155,7 @@ class Form extends React.PureComponent {
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
-          ...patientProfileDefaultValue.contact.countryFK,
+          ...patientProfileDefaultValue.contact.mobileContactNumber,
           number: values.patientContactNo,
         },
       },
