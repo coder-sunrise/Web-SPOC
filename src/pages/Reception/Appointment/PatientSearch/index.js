@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import Loadable from 'react-loadable'
 import { connect } from 'dva'
 // mateerial ui
-import { Tooltip } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'

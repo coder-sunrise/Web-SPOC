@@ -8,9 +8,15 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
 
   const { rows: orderRows = [], finalAdjustments = [] } = orders
   values.corOrderAdjustment = finalAdjustments
-  orderTypes.forEach((p) => {
-    values[p.prop] = (values[p.prop] || [])
-      .concat(orderRows.filter((o) => o.type === p.value))
+  orderTypes.forEach((p, i) => {
+    if (p.prop) {
+      if (p.value === '5') {
+        values[p.prop] = (values[p.prop] || [])
+          .concat(orderRows.filter((o) => o.type === p.value))
+      } else {
+        values[p.prop] = orderRows.filter((o) => o.type === p.value)
+      }
+    }
   })
   return values
 }

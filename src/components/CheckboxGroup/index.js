@@ -117,6 +117,7 @@ class CheckboxGroup extends React.Component {
       field,
       form,
       vertical,
+      disabled,
       valueField = 'value',
       textField = 'label',
       labelClass,
@@ -149,7 +150,7 @@ class CheckboxGroup extends React.Component {
                     onChange={this.handleChange(v)}
                     value={v}
                     color='primary'
-                    disabled={o.disabled}
+                    disabled={o.disabled || disabled}
                     // icon={
                     //   <FiberManualRecord className={classes.uncheckedIcon} />
                     // }

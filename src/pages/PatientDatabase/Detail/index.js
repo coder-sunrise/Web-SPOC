@@ -63,6 +63,7 @@ const styles = () => ({
   authority: 'patientdatabase.patientprofiledetails',
   // enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
+    // console.log(patient)
     const mappedValues = {
       ...(patient.entity || patient.default),
       pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
@@ -322,7 +323,6 @@ class PatientDetail extends PureComponent {
       ? Object.prototype.hasOwnProperty.call(entity, 'id')
       : false
 
-  
     // console.log(this.props)
     // // console.log('patient', patient)
     // // console.log('xx', resetProps)

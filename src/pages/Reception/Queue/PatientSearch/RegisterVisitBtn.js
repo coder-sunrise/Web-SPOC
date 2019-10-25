@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { FormattedMessage } from 'umi/locale'
 // material ui
-import { Tooltip } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 // custom component
 import { Button } from '@/components'

@@ -114,7 +114,9 @@ class BasicLayout extends React.PureComponent {
     this.resizeFunction = this.resizeFunction.bind(this)
 
     const { dispatch, route: { routes, authority } } = this.props
-
+    dispatch({
+      type: 'codetable/fetchAllCachedCodetable',
+    })
     dispatch({
       type: 'user/fetchCurrent',
     }).then((d) => {
@@ -135,10 +137,6 @@ class BasicLayout extends React.PureComponent {
           },
         })
       }
-
-      dispatch({
-        type: 'codetable/fetchAllCachedCodetable',
-      })
 
       dispatch({
         type: 'clinicInfo/query',

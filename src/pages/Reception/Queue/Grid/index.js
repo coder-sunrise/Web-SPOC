@@ -402,7 +402,6 @@ const Grid = ({
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile } = codetable
-                  console.log({ codetable })
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {
