@@ -37,7 +37,7 @@ class InvoiceDetails extends Component {
     const { classes, values } = this.props
     return (
       <div className={classes.cardContainer}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice
           </Button>
