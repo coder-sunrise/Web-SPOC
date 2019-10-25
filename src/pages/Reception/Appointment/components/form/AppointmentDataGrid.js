@@ -53,7 +53,7 @@ const styles = () => ({
 class AppointmentDataGrid extends React.Component {
   constructor (props) {
     super(props)
-    const { appointmentDate, data } = this.props
+    const { appointmentDate, data, selectedSlot } = this.props
     const columnExtensions = AppointmentDataColExtensions.map((column) => {
       if (column.columnName === 'isPrimaryClinician') {
         return {
@@ -165,8 +165,21 @@ class AppointmentDataGrid extends React.Component {
       disabled,
       handleEditingRowsChange,
       editingRows,
+      selectedSlot,
     } = this.props
+    let defaultNewRows = []
 
+    if (!data || data.length <= 0) {
+      let defaultNewRow = { isPrimaryClinician: true }
+      if (selectedSlot && selectedSlot.allDay === false) {
+        defaultNewRow = {
+          startTime: moment(selectedSlot.start).format('HH:mm A'),
+          endTime: moment(selectedSlot.end).format('HH:mm A'),
+          ...defaultNewRow,
+        }
+      }
+      defaultNewRows.push(defaultNewRow)
+    }
     return (
       <div className={classes.container}>
         <EditableTableGrid
@@ -194,6 +207,7 @@ class AppointmentDataGrid extends React.Component {
             showDeleteCommand: !disabled && data.length !== 1,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,
+            defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />

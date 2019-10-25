@@ -173,10 +173,12 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  onSelectSlot = ({ start }) => {
+  onSelectSlot = (props) => {
+    let { start, end } = props
     const selectedSlot = {
-      allDay: false,
+      allDay: start - end === 0,
       start,
+      end,
     }
 
     this.setState({
@@ -311,7 +313,7 @@ class Appointment extends React.PureComponent {
   }
 
   handleAddAppointmentClick = () => {
-    this.onSelectSlot({ start: new Date() })
+    this.onSelectSlot({ start: new Date(), end: new Date() })
   }
 
   handleDoctorEventClick = () => {
