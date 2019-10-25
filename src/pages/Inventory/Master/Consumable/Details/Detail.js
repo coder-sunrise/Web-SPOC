@@ -28,11 +28,14 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
     setHasActiveSession,
   ] = useState(true)
   const checkHasActiveSession = async () => {
-    const result = await getBizSession()
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    // let data = []
-    if (!data || data.length === 0) {
-      setHasActiveSession(!hasActiveSession)
+    if (data && data.length > 0) {
+      const { isClinicSessionClosed } = data[0]
+      setHasActiveSession(!isClinicSessionClosed)
     }
   }
 

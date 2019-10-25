@@ -75,7 +75,7 @@ const styles = (theme) => ({
       },
     ]
     const { dispatch, onConfirm, history } = props
-  
+
     dispatch({
       type: 'clinicSettings/upsert',
       payload,
@@ -103,13 +103,16 @@ class GeneralSetting extends PureComponent {
   }
 
   checkHasActiveSession = async () => {
-    const result = await getBizSession()
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    // let data = []
-    if (!data || data.length === 0) {
-      this.setState((prevState) => {
+    if (data && data.length > 0) {
+      const { isClinicSessionClosed } = data[0]
+      this.setState(() => {
         return {
-          hasActiveSession: !prevState.hasActiveSession,
+          hasActiveSession: !isClinicSessionClosed,
         }
       })
     }
