@@ -135,7 +135,6 @@ class Grid extends PureComponent {
         commitCount: (commitCount += 1),
       },
     })
-    console.log({option, row})
     return { ...row }
   }
 
