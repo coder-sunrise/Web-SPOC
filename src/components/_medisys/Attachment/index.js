@@ -71,6 +71,7 @@ const Attachment = ({
   classes,
   handleUpdateAttachments,
   attachmentType = '',
+  filterTypes = [],
   attachments = [],
   isReadOnly,
   label = 'Attachment:',
@@ -99,9 +100,11 @@ const Attachment = ({
 
   const fileAttachments = attachments.filter(
     (attachment) =>
-      attachment.attachmentType === attachmentType && !attachment.isDeleted,
+      (!attachmentType ||
+        attachment.attachmentType === attachmentType ||
+        filterTypes.indexOf(attachment.attachmentType) >= 0) &&
+      !attachment.isDeleted,
   )
-
   const inputEl = useRef(null)
 
   const mapFileToUploadObject = async (file) => {

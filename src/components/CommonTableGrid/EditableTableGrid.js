@@ -53,7 +53,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onAddedRowsChange = (addedRows) => {
-    console.log('_onAddedRowsChange', addedRows)
+    // console.log('_onAddedRowsChange', addedRows)
     let row = addedRows
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)

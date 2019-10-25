@@ -478,14 +478,8 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {children}
+                                  {routerConfig ? children : <div />}
                                 </div>
-                                {/* <Authorized
-                authority={routerConfig && routerConfig.authority}
-                noMatch={<Exception403 />}
-              >
-                {children}
-              </Authorized> */}
                               </div>
                             </ErrorBoundary>
                             {/* <Footer fluid /> */}
