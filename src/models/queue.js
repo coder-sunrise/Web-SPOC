@@ -105,7 +105,7 @@ export default createListViewModel({
           // })
         }
 
-        return status >= 204
+        return response
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },

@@ -1,4 +1,5 @@
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
   preInvoicePayer,

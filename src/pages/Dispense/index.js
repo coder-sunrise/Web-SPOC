@@ -25,6 +25,7 @@ import style from './style'
 import { getAppendUrl } from '@/utils/utils'
 import { postPDF } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
+import { LoadingWrapper } from '@/components/_medisys'
 import { queryDrugLabelDetails } from '@/services/dispense'
 // model
 @connect(
@@ -36,7 +37,9 @@ import { queryDrugLabelDetails } from '@/services/dispense'
     orders,
     patient,
     clinicSettings,
+    loading,
   }) => ({
+    loading,
     dispense,
     visitRegistration,
     consultation,
@@ -69,6 +72,9 @@ class Dispense extends PureComponent {
   getExtraComponent = () => {
     const { classes, dispense, values } = this.props
     const { entity, totalWithGST } = dispense
+    const totalInvoice = entity
+      ? entity.invoice.invoiceTotalAftGST
+      : totalWithGST
     return (
       <GridContainer
         // className={classes.actionPanel}
@@ -80,11 +86,7 @@ class Dispense extends PureComponent {
           Total Invoice
           <span>
             &nbsp;:&nbsp;
-            <NumberInput
-              text
-              currency
-              value={totalWithGST || entity.invoice.invoiceTotalAftGST}
-            />
+            <NumberInput text currency value={totalInvoice} />
           </span>
         </h4>
       </GridContainer>
@@ -148,25 +150,29 @@ class Dispense extends PureComponent {
   }
 
   render () {
-    const { classes, dispense } = this.props
+    const { classes, dispense, loading } = this.props
     const { editingOrder } = dispense
     return (
       <div className={classes.root}>
-        <Banner
-          style={{}}
-          patientInfo={dispense.patientInfo}
-          extraCmt={this.getExtraComponent()}
-        />
-        <SizeContainer size='sm'>
-          {!editingOrder ? (
-            <Main
-              {...this.props}
-              handleClickPrintDrugLabel={this.handleClickPrintDrugLabel}
-            />
-          ) : (
-            <EditOrder {...this.props} />
-          )}
-        </SizeContainer>
+        <LoadingWrapper loading={loading.models.dispense}>
+          <Banner
+            style={{}}
+            patientInfo={dispense.patientInfo}
+            extraCmt={this.getExtraComponent()}
+          />
+          <SizeContainer size='sm'>
+            <React.Fragment>
+              {!editingOrder ? (
+                <Main
+                  {...this.props}
+                  handleClickPrintDrugLabel={this.handleClickPrintDrugLabel}
+                />
+              ) : (
+                <EditOrder {...this.props} />
+              )}
+            </React.Fragment>
+          </SizeContainer>
+        </LoadingWrapper>
       </div>
     )
   }

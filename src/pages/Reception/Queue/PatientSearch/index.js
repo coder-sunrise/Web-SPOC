@@ -10,6 +10,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 // sub components
 import Loading from '@/components/PageLoading/index'
 import RegisterVisitBtn from './RegisterVisitBtn'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const styles = () => ({
   patientNameBtn: {
@@ -57,7 +58,8 @@ class PatientSearch extends PureComponent {
       {
         columnName: 'gender/age',
         width: 95,
-        render: (row) => `${row.gender.substring(0, 1)}/${row.age}`,
+        render: (row) =>
+          `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
       },
       {
         columnName: 'action',
