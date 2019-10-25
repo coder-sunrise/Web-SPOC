@@ -481,6 +481,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         })
 
         setTempInvoicePayer(newInvoicePayers)
+        setInitialState(newInvoicePayers)
         refTempInvociePayer.current = newInvoicePayers
       } else if (claimableSchemes.length > 0) {
         const _invoicePayer = {
@@ -626,7 +627,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
-  console.log({ tempInvoicePayer })
   return (
     <React.Fragment>
       <GridItem md={2}>

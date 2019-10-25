@@ -5,7 +5,6 @@ import { Search, PermIdentity } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import Authorized from '@/utils/Authorized'
-import { getAppendUrl } from '@/utils/utils'
 
 import {
   GridContainer,

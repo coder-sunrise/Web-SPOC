@@ -7,6 +7,7 @@ import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
+import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import PayerHeader from './PayerHeader'
 import PaymentType from './PaymentType'
@@ -22,7 +23,9 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @connect(({ clinicSettings }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
 }))
-@withFormik({
+@withFormikExtend({
+  notDirtyDuration: 0,
+  displayName: 'AddPaymentForm',
   mapPropsToValues: ({ invoice, payments, clinicSettings }) => {
     const collectableAmount = rounding(
       clinicSettings,

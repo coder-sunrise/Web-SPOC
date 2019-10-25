@@ -27,6 +27,7 @@ export default createListViewModel({
     effects: {},
     reducers: {
       queryDone (st, { payload }) {
+        console.log('query done')
         const { data } = payload
         return {
           ...st,
@@ -41,7 +42,7 @@ export default createListViewModel({
           }),
         }
       },
-      querySingleDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         // console.log('single', data)
         return {

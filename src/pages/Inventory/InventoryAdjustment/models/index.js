@@ -57,7 +57,7 @@ export default createListViewModel({
         }
       },
 
-      querySingleDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
         return {
           ...st,

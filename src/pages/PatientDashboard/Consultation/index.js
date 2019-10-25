@@ -617,7 +617,6 @@ class Consultation extends PureComponent {
     // console.log(currentLayout)
 
     // console.log(rights)
-    console.log(visit.visitStatus)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'
