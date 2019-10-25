@@ -126,3 +126,10 @@ export const GENDER = {
   2: 'FEMALE',
   3: 'UNKNOWN',
 }
+
+export const INVOICE_STATUS = {
+  PAID: 1,
+  OVERPAID: 2,
+  OUTSTANDING: 3,
+  WRITEOFF: 4,
+}

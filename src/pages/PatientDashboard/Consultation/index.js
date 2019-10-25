@@ -111,9 +111,8 @@ const saveConsultation = ({
         if (!newValues.visitConsultationTemplate) {
           newValues.visitConsultationTemplate = {}
         }
-        newValues.visitConsultationTemplate.consultationTemplate = localStorage.getItem(
-          'consultationLayout',
-        )
+        newValues.visitConsultationTemplate.consultationTemplate =
+          localStorage.getItem('consultationLayout') || ''
         dispatch({
           type: `consultation/${action}`,
           payload: newValues,

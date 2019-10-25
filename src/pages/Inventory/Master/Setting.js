@@ -93,7 +93,7 @@ const Setting = ({
                 label={formatMessage({
                   id: 'inventory.master.setting.dosage',
                 })}
-                labelField='displayValue'
+                labelField='name'
                 code='ctMedicationDosage'
                 {...args}
               />
