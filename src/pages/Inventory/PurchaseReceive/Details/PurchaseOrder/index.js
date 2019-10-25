@@ -215,7 +215,7 @@ class Index extends Component {
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
-            5,
+            6,
             'Are you sure want to complete PO?',
             'Complete PO',
           )
