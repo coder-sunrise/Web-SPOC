@@ -6,8 +6,8 @@ import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import Consultation from '@/pages/PatientDashboard/Consultation'
-import Dispense from '@/pages/Dispense'
-import Billing from '@/pages/Dispense/Billing'
+// import Dispense from '@/pages/Dispense'
+// import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 
@@ -114,7 +114,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
-        <CommonModal
+        {/* <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
           observe={[
@@ -132,7 +132,7 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showDispensePanel && <Dispense />}
-        </CommonModal>
+        </CommonModal> */}
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
@@ -154,7 +154,7 @@ class GlobalModalContainer extends PureComponent {
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
 
-        <CommonModal
+        {/* <CommonModal
           open={global.showBillingPanel}
           title='Billing'
           observe='BillingForm'
@@ -170,7 +170,7 @@ class GlobalModalContainer extends PureComponent {
           overrideLoading
         >
           {global.showBillingPanel && <Billing />}
-        </CommonModal>
+        </CommonModal> */}
         <CommonModal
           open={global.showPatientInfoPanel}
           title='Patient Profile'

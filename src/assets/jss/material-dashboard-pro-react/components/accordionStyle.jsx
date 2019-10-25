@@ -8,6 +8,8 @@ const accordionStyle = (theme) => ({
   },
   expansionPanel: {
     boxShadow: 'none',
+    paddingBottom: theme.spacing(1.5),
+
     '&:before': {
       display: 'none !important',
     },
@@ -44,6 +46,7 @@ const accordionStyle = (theme) => ({
   },
   expansionPanelSummaryContent: {
     margin: '0 !important',
+    paddingLeft: theme.spacing(1.5),
   },
   expansionPanelSummaryExpandIcon: {
     [theme.breakpoints.up('md')]: {

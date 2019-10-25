@@ -14,6 +14,7 @@ export default createFormViewModel({
     service,
     state: {
       totalWithGST: 0,
+      visitID: undefined,
       default: {
         corAttachment: [],
         corPatientNoteVitalSign: [],
@@ -29,26 +30,53 @@ export default createFormViewModel({
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
 
-        if (
-          pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
-          Number(query.vid) &&
-          query.md2 === 'dsps'
-        ) {
+        // if (
+        //   pathname.indexOf('/reception/queue/dispense') === 0 &&
+        //   Number(query.vid) &&
+        //   query.md2 === 'dsps'
+        // ) {
+        //   dispatch({
+        //     type: 'initState',
+        //     payload: {
+        //       version: Number(query.v) || undefined,
+        //       visitID: Number(query.vid),
+        //       md2: query.md2,
+        //     },
+        //   })
+        // }
+        if (pathname === '/reception/queue/dispense' && Number(query.vid)) {
           dispatch({
             type: 'initState',
             payload: {
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
-              md2: query.md2,
+              pid: Number(query.pid),
+              // md2: query.md2,
             },
           })
         }
       })
     },
     effects: {
-      *initState ({ payload }, { call, put, select, take }) {
+      *initState ({ payload }, { all, put, select, take }) {
         const { version, visitID, md2 } = payload
-        console.log('dispense initstate')
+        const patientState = yield select((st) => st.patient)
+        if (!patientState.entity) {
+          yield put({
+            type: 'patient/query',
+            payload: {
+              id: payload.pid,
+            },
+          })
+          yield take('patient/query/@@end')
+        }
+        yield put({
+          type: 'updateState',
+          payload: {
+            visitID,
+            patientID: payload.pid,
+          },
+        })
         yield put({
           type: 'query',
           payload: {
@@ -58,15 +86,15 @@ export default createFormViewModel({
         })
         yield take('query/@@end')
 
-        if (md2 === 'dsps') {
-          yield put({
-            type: 'global/updateState',
-            payload: {
-              fullscreen: true,
-              showDispensePanel: true,
-            },
-          })
-        }
+        // if (md2 === 'dsps') {
+        //   yield put({
+        //     type: 'global/updateState',
+        //     payload: {
+        //       fullscreen: true,
+        //       showDispensePanel: true,
+        //     },
+        //   })
+        // }
       },
 
       *start ({ payload }, { call, put }) {

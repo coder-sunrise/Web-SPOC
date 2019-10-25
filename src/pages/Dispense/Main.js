@@ -32,7 +32,8 @@ const reloadDispense = (props, effect = 'query') => {
 
   dispatch({
     type: `dispense/${effect}`,
-    payload: visitRegistration.entity.visit.id,
+    // payload: visitRegistration.entity.visit.id,
+    payload: dispense.visitID,
   }).then((o) => {
     resetForm(o)
     dispatch({
@@ -98,8 +99,8 @@ const reloadDispense = (props, effect = 'query') => {
     ),
   }),
   handleSubmit: (values, { props, ...restProps }) => {
-    const { dispatch, onConfirm, codetable, visitRegistration } = props
-    const vid = visitRegistration.entity.visit.id
+    const { dispatch, onConfirm, codetable, dispense } = props
+    const vid = dispense.visitID
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -122,7 +123,7 @@ const reloadDispense = (props, effect = 'query') => {
 })
 class Main extends Component {
   makePayment = () => {
-    const { dispatch, visitRegistration, values } = this.props
+    const { dispatch, dispense, values } = this.props
 
     // dispatch({
     //   type: 'dispense/closeModal',
@@ -133,26 +134,26 @@ class Main extends Component {
     dispatch({
       type: 'dispense/finalize',
       payload: {
-        id: visitRegistration.entity.visit.id,
+        // id: visitRegistration.entity.visit.id,
+        id: dispense.visitID,
         values,
       },
     }).then((response) => {
       if (response) {
-        const parameters = {
-          md3: 'bill',
-        }
-        router.push(getAppendUrl(parameters, '/reception/queue'))
+        const parameters = {}
+        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
+        // router.push('/receptiom')
       }
     })
   }
 
   _editOrder = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
+    const { dispatch, dispense } = this.props
 
     dispatch({
       type: `consultation/editOrder`,
       payload: {
-        id: visitRegistration.entity.visit.id,
+        id: dispense.visitID,
         version: dispense.version,
       },
     }).then((o) => {
@@ -178,7 +179,7 @@ class Main extends Component {
   }
 
   render () {
-    const { classes, dispense, handleSubmit } = this.props
+    const { classes, dispense, onClose, handleSubmit } = this.props
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -203,7 +204,11 @@ class Main extends Component {
             </Button>
           </GridItem>
           <DispenseDetails {...this.props} />
+
           <GridItem justify='flex-end' container className={classes.footerRow}>
+            <Button color='danger' size='sm' onClick={onClose}>
+              Close
+            </Button>
             <Authorized authority='queue.dispense.savedispense'>
               <Button color='success' size='sm' onClick={handleSubmit}>
                 Save Dispense

@@ -198,6 +198,7 @@ class BaseMenu extends PureComponent {
       collapsed,
       color,
     } = this.props
+
     const collapseItemMini = `${classes.collapseItemMini} ${cx({
       [classes.collapseItemMiniRTL]: rtlActive,
     })}`
