@@ -24,9 +24,18 @@ class Index extends Component {
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
-    const { purchaseOrder } = purchaseOrderDetails
+    let { purchaseOrderDetails } = this.props
+    let { purchaseOrder,type } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
+
+    if(type && type === 'dup' && purchaseOrder){
+      purchaseOrder.purchaseOrderNo = null
+      purchaseOrder.invoiceDate = null
+      purchaseOrder.remark = null
+      purchaseOrder.invoiceNo = null
+      purchaseOrder.exceptedDeliveryDate = null
+    }
+
 
     return (
       // <AuthorizedContext.Provider
