@@ -3,7 +3,6 @@ import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
 import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Tooltip } from '@material-ui/core'
 import {
   GridContainer,
   GridItem,
@@ -13,6 +12,7 @@ import {
   CodeSelect,
   ProgressButton,
   DateRangePicker,
+  Tooltip,
 } from '@/components'
 
 @connect(({ purchaseReceiveList }) => {

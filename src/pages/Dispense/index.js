@@ -120,7 +120,7 @@ class Dispense extends PureComponent {
         if (result) {
           const base64Result = arrayBufferToBase64(result)
           if (this.iswsConnect === true) {
-            this.wsConnection.send('["' + base64Result + '"]')
+            this.wsConnection.send(`["${base64Result}"]`)
           } else {
             notification.error({
               message: `The printing client application didn\'t running up, please start it.`,

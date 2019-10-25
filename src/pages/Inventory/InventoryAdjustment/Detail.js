@@ -2,6 +2,12 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { navigateDirtyCheck } from '@/utils/utils'
+import { INVENTORY_TYPE, INVENTORY_ADJUSTMENT_STATUS } from '@/utils/constants'
+import {
+  inventoryAdjustmentStatus,
+  podoOrderType,
+  getInventoryItemList,
+} from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -16,7 +22,6 @@ import {
   Field,
   ProgressButton,
 } from '@/components'
-import { podoOrderType, getInventoryItemList } from '@/utils/codes'
 
 const styles = (theme) => ({})
 let commitCount = 1000 // uniqueNumber
@@ -47,7 +52,7 @@ let commitCount = 1000 // uniqueNumber
     const newInventoryAdjustmentItem = list.map((o) => {
       const type = (v) => {
         switch (v) {
-          case 1:
+          case INVENTORY_TYPE.MEDICATION:
             return {
               typeName: 'medication',
               codeName: 'medicationCode',
@@ -55,7 +60,7 @@ let commitCount = 1000 // uniqueNumber
               stockFK: 'medicationStockFK',
               itemFK: 'inventoryMedicationFK',
             }
-          case 2:
+          case INVENTORY_TYPE.VACCINATION:
             return {
               typeName: 'vaccination',
               codeName: 'vaccinationCode',
@@ -63,7 +68,7 @@ let commitCount = 1000 // uniqueNumber
               stockFK: 'vaccinationStockFK',
               itemFK: 'inventoryVaccinationFK',
             }
-          case 3:
+          case INVENTORY_TYPE.CONSUMABLE:
             return {
               typeName: 'consumable',
               codeName: 'consumableCode',
@@ -169,9 +174,9 @@ class Detail extends PureComponent {
         columnName: 'inventoryTypeFK',
         type: 'select',
         options: [
-          { value: 1, name: 'Medication' },
-          { value: 3, name: 'Consumable' },
-          { value: 2, name: 'Vaccination' },
+          { value: INVENTORY_TYPE.MEDICATION, name: 'Medication' },
+          { value: INVENTORY_TYPE.CONSUMABLE, name: 'Consumable' },
+          { value: INVENTORY_TYPE.VACCINATION, name: 'Vaccination' },
         ],
         onChange: (e) => {
           this.setState({ type: `inventory${e.val}` })
@@ -404,20 +409,64 @@ class Detail extends PureComponent {
   }
 
   rowOptions = (row) => {
-    if (row.inventoryTypeFK === 1) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.MEDICATION) {
       return this.state.MedicationItemList
     }
-    if (row.inventoryTypeFK === 2) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
       return this.state.VaccinationItemList
     }
-    if (row.inventoryTypeFK === 3) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.CONSUMABLE) {
       return this.state.ConsumableItemList
     }
     return []
   }
 
+  additionalFilteringStock = (row, filteredStockOptions, x) => {
+    const getType = this.type(row.inventoryTypeFK)
+    const value = row[getType.typeName]
+      ? row[getType.typeName].batchNo
+      : undefined
+
+    const results = filteredStockOptions.filter(
+      ({ value: id1 }) => !x.some(({ value: id2 }) => id2 === id1),
+    )
+
+    const edittingBatchNo = filteredStockOptions.find(
+      (o) => o.batchNo === value,
+    )
+
+    const edittingBatchNo1 = this.state[getType.stateName].find(
+      (o) => o.id === row.batchNo,
+    )
+
+    filteredStockOptions = [
+      ...x,
+      edittingBatchNo,
+    ]
+
+    filteredStockOptions = [
+      ...new Set(filteredStockOptions),
+    ]
+
+    let temp = []
+    if (!filteredStockOptions.includes(undefined)) {
+      temp = filteredStockOptions.filter(
+        ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
+      )
+    }
+    filteredStockOptions = [
+      ...temp,
+      edittingBatchNo1,
+    ]
+
+    if (filteredStockOptions.includes(undefined)) {
+      return []
+    }
+    return filteredStockOptions
+  }
+
   stockOptions = (row) => {
-    if (row.inventoryTypeFK === 1) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.MEDICATION) {
       let array = [
         ...this.state.filterStockMedication,
       ]
@@ -432,7 +481,6 @@ class Detail extends PureComponent {
       )
 
       let filteredStockOptions = filteredTempStockMedication
-
       if (row.id) {
         const getType = this.type(row.inventoryTypeFK)
         const value = row[getType.typeName]
@@ -460,9 +508,12 @@ class Detail extends PureComponent {
           ...new Set(filteredStockOptions),
         ]
 
-        const temp = filteredStockOptions.filter(
-          ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
-        )
+        let temp = []
+        if (!filteredStockOptions.includes(undefined)) {
+          temp = filteredStockOptions.filter(
+            ({ value: id1 }) => !results.some(({ value: id2 }) => id2 === id1),
+          )
+        }
 
         filteredStockOptions = [
           ...temp,
@@ -472,7 +523,7 @@ class Detail extends PureComponent {
 
       return row.id ? filteredStockOptions : x
     }
-    if (row.inventoryTypeFK === 2) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
       let array = [
         ...this.state.filterStockVaccination,
       ]
@@ -487,18 +538,15 @@ class Detail extends PureComponent {
 
       let filteredStockOptions = filteredTempStockVaccination
       if (row.id) {
-        const edittingBatchNo = this.state.stockVaccination.find(
-          (o) => o.id === row.batchNo,
+        filteredStockOptions = this.additionalFilteringStock(
+          row,
+          filteredStockOptions,
+          x,
         )
-
-        filteredStockOptions = [
-          ...x,
-          edittingBatchNo,
-        ]
       }
       return row.id ? filteredStockOptions : x
     }
-    if (row.inventoryTypeFK === 3) {
+    if (row.inventoryTypeFK === INVENTORY_TYPE.CONSUMABLE) {
       let array = [
         ...this.state.filterStockConsumable,
       ]
@@ -513,15 +561,13 @@ class Detail extends PureComponent {
 
       let filteredStockOptions = filteredTempStockConsumable
       if (row.id) {
-        const edittingBatchNo = this.state.stockConsumable.find(
-          (o) => o.id === row.batchNo,
+        filteredStockOptions = this.additionalFilteringStock(
+          row,
+          filteredStockOptions,
+          x,
         )
-
-        filteredStockOptions = [
-          ...x,
-          edittingBatchNo,
-        ]
       }
+      console.log({ filteredStockOptions, x })
       return row.id ? filteredStockOptions : x
     }
     return []
@@ -565,7 +611,7 @@ class Detail extends PureComponent {
 
   type = (v) => {
     switch (v) {
-      case 1:
+      case INVENTORY_TYPE.MEDICATION:
         return {
           typeName: 'medication',
           codeName: 'medicationCode',
@@ -575,7 +621,7 @@ class Detail extends PureComponent {
           stateName: 'stockMedication',
           filterStateName: 'filterStockMedication',
         }
-      case 2:
+      case INVENTORY_TYPE.VACCINATION:
         return {
           typeName: 'vaccination',
           codeName: 'vaccinationCode',
@@ -585,7 +631,7 @@ class Detail extends PureComponent {
           stateName: 'stockVaccination',
           filterStateName: 'filterStockVaccination',
         }
-      case 3:
+      case INVENTORY_TYPE.CONSUMABLE:
         return {
           typeName: 'consumable',
           codeName: 'consumableCode',
@@ -645,13 +691,13 @@ class Detail extends PureComponent {
 
     if (deleted) {
       const deletedSet = new Set(deleted)
-
-      const deletedRow = rows.find((row) => deletedSet.has(row.id))
+      const test = [
+        ...deletedSet,
+      ]
+      const deletedRow = rows.find((row) => row.id === test[0])
 
       deletedRow.isDeleted = true
-
-      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
-
+      const changedRows = rows.filter((row) => row.id === test[0])
       if (deletedRow.batchNo) {
         const getState = this.type(deletedRow.inventoryTypeFK)
 
@@ -667,7 +713,6 @@ class Detail extends PureComponent {
           }
         })
       }
-
       if (stockList.length > 0) {
         this.setState({ stockList: rows })
       } else {
@@ -696,21 +741,21 @@ class Detail extends PureComponent {
 
     rows.forEach((o) => {
       const type = o.inventoryTypeFK
-      if (o.batchNo) {
+      if (o.batchNo && !o.isDeleted) {
         switch (type) {
-          case 1: {
+          case INVENTORY_TYPE.MEDICATION: {
             tempfilterStockMedication = tempfilterStockMedication.filter(
               (j) => j.id !== o.batchNo,
             )
             break
           }
-          case 2: {
+          case INVENTORY_TYPE.VACCINATION: {
             tempfilterStockVaccination = tempfilterStockVaccination.filter(
               (j) => j.id !== o.batchNo,
             )
             break
           }
-          case 3: {
+          case INVENTORY_TYPE.CONSUMABLE: {
             tempfilterStockConsumable = tempfilterStockConsumable.filter(
               (j) => j.id !== o.batchNo,
             )
@@ -742,8 +787,11 @@ class Detail extends PureComponent {
 
     //   return rows
     // })
-
-    this.setState({ inventoryAdjustmentItems: rows })
+    if (stockList.length > 0) {
+      this.setState({ stockList: rows })
+    } else {
+      this.setState({ inventoryAdjustmentItems: rows })
+    }
     setValues({
       ...values,
       inventoryAdjustmentItems: rows,
@@ -803,7 +851,10 @@ class Detail extends PureComponent {
   updateStatus = async () => {
     const { setFieldValue, handleSubmit, errors } = this.props
     if (_.isEmpty(errors)) {
-      await setFieldValue('inventoryAdjustmentStatusFK', 2)
+      await setFieldValue(
+        'inventoryAdjustmentStatusFK',
+        INVENTORY_ADJUSTMENT_STATUS.FINALIZED,
+      )
     }
     handleSubmit()
   }
@@ -816,7 +867,9 @@ class Detail extends PureComponent {
     const { props } = this
     const { theme, values, handleSubmit, getRunningNo, footer } = props
     const cfg = {}
-    if (values.inventoryAdjustmentStatusFK !== 1) {
+    if (
+      values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
+    ) {
       cfg.onRowDoubleClick = undefined
     }
     const inventoryAdjustmentSchema = Yup.object().shape({
@@ -828,6 +881,7 @@ class Detail extends PureComponent {
         .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
         .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
     })
+    console.log('check', this.state)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -848,7 +902,10 @@ class Detail extends PureComponent {
                     <DatePicker
                       label='Transaction Date'
                       {...args}
-                      disabled={values.inventoryAdjustmentStatusFK !== 1}
+                      disabled={
+                        values.inventoryAdjustmentStatusFK !==
+                        INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                      }
                     />
                   )}
                 />
@@ -861,11 +918,7 @@ class Detail extends PureComponent {
                     return (
                       <Select
                         label='Status'
-                        options={[
-                          { value: 1, name: 'Draft' },
-                          { value: 2, name: 'Finalized' },
-                          { value: 3, name: 'Discarded' },
-                        ]}
+                        options={inventoryAdjustmentStatus}
                         disabled
                         {...args}
                       />
@@ -884,7 +937,10 @@ class Detail extends PureComponent {
                       multiline
                       rowsMax={2}
                       rows={2}
-                      disabled={values.inventoryAdjustmentStatusFK !== 1}
+                      disabled={
+                        values.inventoryAdjustmentStatusFK !==
+                        INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                      }
                       {...args}
                     />
                   )
@@ -903,9 +959,15 @@ class Detail extends PureComponent {
             schema={inventoryAdjustmentSchema}
             // onRowDoubleClick={this.onEditingRowsChange}
             EditingProps={{
-              showAddCommand: values.inventoryAdjustmentStatusFK === 1,
-              showEditCommand: values.inventoryAdjustmentStatusFK === 1,
-              showDeleteCommand: values.inventoryAdjustmentStatusFK === 1,
+              showAddCommand:
+                values.inventoryAdjustmentStatusFK ===
+                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+              showEditCommand:
+                values.inventoryAdjustmentStatusFK ===
+                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+              showDeleteCommand:
+                values.inventoryAdjustmentStatusFK ===
+                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
               onEditingRowIdsChange: this.changeEditingRowIds,
@@ -952,7 +1014,10 @@ class Detail extends PureComponent {
                   color='info'
                   type='submit'
                   onClick={this.updateStatus}
-                  disabled={values.inventoryAdjustmentStatusFK !== 1}
+                  disabled={
+                    values.inventoryAdjustmentStatusFK !==
+                    INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                  }
                 >
                   Finalize
                 </Button>

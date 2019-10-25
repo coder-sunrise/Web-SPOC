@@ -179,7 +179,6 @@ class Main extends Component {
 
   render () {
     const { classes, dispense, handleSubmit } = this.props
-    console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>

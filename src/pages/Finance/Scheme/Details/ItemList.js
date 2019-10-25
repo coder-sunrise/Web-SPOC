@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import Delete from '@material-ui/icons/Delete'
-import { Tooltip } from '@material-ui/core'
 import {
   Field,
   FastField,
@@ -11,6 +10,7 @@ import {
   Tabs,
   CommonTableGrid,
   Popconfirm,
+  Tooltip,
 } from '@/components'
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'

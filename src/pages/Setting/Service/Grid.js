@@ -52,6 +52,7 @@ class Grid extends PureComponent {
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
+        getRowId={(r) => r.serviceCenter_ServiceId}
         type='settingClinicService'
         onRowDoubleClick={this.editRow}
         getRowId={(row) => row.serviceId}

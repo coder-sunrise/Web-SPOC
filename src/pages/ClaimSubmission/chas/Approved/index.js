@@ -128,7 +128,7 @@ class ApprovedCHAS extends React.Component {
       payload: {
         id: rows[0].id,
       },
-    }).then((r) => {      
+    }).then((r) => {
       dispatch({
         type: 'claimSubmissionApproved/updateState',
         payload: {
@@ -219,7 +219,7 @@ class ApprovedCHAS extends React.Component {
           onClose={this.onCloseCollectPayment}
           onConfirm={this.onCloseCollectPayment}
         >
-          <CollectPaymentModal />
+          <CollectPaymentModal closeModal={this.onCloseCollectPayment} />
         </CommonModal>
       </CardContainer>
     )

@@ -150,26 +150,35 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        const { finalAdjustments, rows } = state
-        const tempRows = [
+        let { finalAdjustments, rows } = state
+        let tempRows = [
           ...rows,
         ]
-        let filteredRow = []
-        if (payload)
-         filteredRow = tempRows.filter(
-          (orderRow) => (orderRow.uid !== payload.uid && orderRow.isDeleted === false),
-        )
+        if (payload) {
+          tempRows.map((a, index) => {
+            if (a.uid === payload.uid) {
+              a.isDeleted = true
+            }
+            return a
+          })
+        } else {
+          tempRows = tempRows.map((o) => ({
+            ...o,
+            isDeleted: true,
+          }))
+          finalAdjustments = finalAdjustments.map((o) => ({
+            ...o,
+            isDeleted: true,
+          }))
+        }
 
-
-        const amount = calculateAmount(filteredRow, finalAdjustments)
-
+        const amount = calculateAmount(tempRows, finalAdjustments)
+        // console.log(tempRows, finalAdjustments, amount)
         return {
           ...state,
           ...amount,
-          rows: rows.map((o) => {
-            if (!payload || o.uid === payload.uid) o.isDeleted = true
-            return o
-          }),
+          rows: tempRows,
+          finalAdjustments,
         }
       },
 

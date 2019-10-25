@@ -3,7 +3,7 @@ import router from 'umi/router'
 import moment from 'moment'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 
-import { Tooltip, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Print, Edit, Search } from '@material-ui/icons'
 // import tooltipsStyle from 'assets/jss/material-kit-pro-react/tooltipsStyle.jsx'
 import { sleep, getAppendUrl } from '@/utils/utils'
@@ -14,6 +14,7 @@ import {
   Button,
   CommonModal,
   CommonTableGrid,
+  Tooltip,
 } from '@/components'
 
 class Grid extends PureComponent {

@@ -151,7 +151,7 @@ class Billing extends Component {
     const { dispatch, values } = this.props
     const parameters = {
       md2: 'dsps',
-      version: Date.now(),
+      v: Date.now(),
     }
     const destinationUrl = getRemovedUrl(
       [

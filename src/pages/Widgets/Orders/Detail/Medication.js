@@ -38,6 +38,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
       ...(orders.entity || orders.defaultMedication),
       type,
     }
+    if (type === '5') {
+      v.drugCode = 'MISC'
+    }
+
     return v
   },
   enableReinitialize: true,
