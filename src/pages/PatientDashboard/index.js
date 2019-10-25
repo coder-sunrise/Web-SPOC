@@ -197,7 +197,6 @@ class PatientDashboard extends PureComponent {
               leftPanel: classes.leftPanel,
               rightPanel: classes.rightPanel,
             }}
-            {...this.props}
           />
         </div>
       </div>

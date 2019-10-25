@@ -49,7 +49,6 @@ export default ({ classes, current, setFieldValue }) => {
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
   }
-  console.log("************************ ", setFieldValue)
   return (
     <div>
       {current.invoice ? (
