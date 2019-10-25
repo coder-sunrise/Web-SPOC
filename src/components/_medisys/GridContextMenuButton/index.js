@@ -64,7 +64,6 @@ const GridContextMenuButton = ({
           index,
         ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
-
           const { rights } = Authorized.check(authority)
           const menu = (
             <Menu.Item

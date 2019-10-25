@@ -3,7 +3,6 @@ import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
 import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Tooltip } from '@material-ui/core'
 import {
   GridContainer,
   GridItem,
@@ -13,7 +12,9 @@ import {
   CodeSelect,
   ProgressButton,
   DateRangePicker,
+  Tooltip,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 @connect(({ purchaseReceiveList }) => {
   return purchaseReceiveList.filterSearch
@@ -196,10 +197,11 @@ class FilterBar extends PureComponent {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-
-            <Button onClick={() => handleNavigate('new')} color='primary'>
-              Add New
-            </Button>
+            <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
+              <Button onClick={() => handleNavigate('new')} color='primary'>
+                Add New
+              </Button>
+            </Authorized>
           </div>
         </GridItem>
       </GridContainer>

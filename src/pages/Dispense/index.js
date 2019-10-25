@@ -69,6 +69,9 @@ class Dispense extends PureComponent {
   getExtraComponent = () => {
     const { classes, dispense, values } = this.props
     const { entity, totalWithGST } = dispense
+    const totalInvoice = entity
+      ? entity.invoice.invoiceTotalAftGST
+      : totalWithGST
     return (
       <GridContainer
         // className={classes.actionPanel}
@@ -80,11 +83,7 @@ class Dispense extends PureComponent {
           Total Invoice
           <span>
             &nbsp;:&nbsp;
-            <NumberInput
-              text
-              currency
-              value={totalWithGST || entity.invoice.invoiceTotalAftGST}
-            />
+            <NumberInput text currency value={totalInvoice} />
           </span>
         </h4>
       </GridContainer>
@@ -120,7 +119,7 @@ class Dispense extends PureComponent {
         if (result) {
           const base64Result = arrayBufferToBase64(result)
           if (this.iswsConnect === true) {
-            this.wsConnection.send('["' + base64Result + '"]')
+            this.wsConnection.send(`["${base64Result}"]`)
           } else {
             notification.error({
               message: `The printing client application didn\'t running up, please start it.`,
@@ -150,6 +149,7 @@ class Dispense extends PureComponent {
   render () {
     const { classes, dispense } = this.props
     const { editingOrder } = dispense
+
     return (
       <div className={classes.root}>
         <Banner
@@ -158,14 +158,16 @@ class Dispense extends PureComponent {
           extraCmt={this.getExtraComponent()}
         />
         <SizeContainer size='sm'>
-          {!editingOrder ? (
-            <Main
-              {...this.props}
-              handleClickPrintDrugLabel={this.handleClickPrintDrugLabel}
-            />
-          ) : (
-            <EditOrder {...this.props} />
-          )}
+          <React.Fragment>
+            {!editingOrder ? (
+              <Main
+                {...this.props}
+                handleClickPrintDrugLabel={this.handleClickPrintDrugLabel}
+              />
+            ) : (
+              <EditOrder {...this.props} />
+            )}
+          </React.Fragment>
         </SizeContainer>
       </div>
     )

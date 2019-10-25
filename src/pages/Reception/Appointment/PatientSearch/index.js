@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import Loadable from 'react-loadable'
 import { connect } from 'dva'
 // mateerial ui
-import { Tooltip } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 // medisys components
 import { LoadingWrapper } from '@/components/_medisys'
@@ -10,6 +9,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 import { Button } from '@/components'
 // sub components
 import Loading from '@/components/PageLoading/index'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 @connect(({ loading }) => ({ loading }))
 class PatientSearch extends PureComponent {
@@ -28,7 +28,8 @@ class PatientSearch extends PureComponent {
       {
         columnName: 'gender/age',
         width: 95,
-        render: (row) => `${row.gender.substring(0, 1)}/${row.age}`,
+        render: (row) =>
+          `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
       },
       {
         columnName: 'action',

@@ -113,9 +113,9 @@ const columnExtensions = [
         const age = calculateAgeFromDOB(dob)
         return `${gender}/${age}`
       }
-      const { age = 0, gender = 'U' } = row
-      console.log({ row })
-      const ageLabel = age < 0 ? 0 : age
+      const { dob, gender = 'U' } = row
+
+      const ageLabel = calculateAgeFromDOB(dob)
       return `${gender}/${ageLabel}`
     },
     sortingEnabled: false,
@@ -304,8 +304,11 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
+              // router.push(
+              //   `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
+              // )
               router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
+                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 
@@ -315,15 +318,11 @@ const Grid = ({
           // billing
           const version = Date.now()
           const parameters = {
-            qid: row.id,
             vid: row.visitFK,
             pid: row.patientProfileFK,
             v: version,
-            md2: 'bill',
           }
-          router.push(
-            getAppendUrl(parameters, '/reception/queue/patientdashboard'),
-          )
+          router.push(getAppendUrl(parameters, '/reception/queue/billing'))
           break
         }
         case '2': // delete visit
@@ -402,7 +401,6 @@ const Grid = ({
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
                   const { clinicianprofile } = codetable
-                  console.log({ codetable })
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {
@@ -444,6 +442,9 @@ const Grid = ({
             primaryClinicianFK: row.appointment_Resources.find(
               (item) => item.isPrimaryClinician,
             ).clinicianFK,
+            primaryClinicianRoomFK: row.appointment_Resources.find(
+              (item) => item.isPrimaryClinician,
+            ).roomFk,
           })
           break
         }

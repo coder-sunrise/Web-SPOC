@@ -43,9 +43,9 @@ const routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
-    Routes: [
-      'src/pages/Authorized',
-    ],
+    // Routes: [
+    //   'src/pages/Authorized',
+    // ],
     // authority: [
     //   { name: 'admin', rights: 'enable' },
     //   { name: 'user', rights: 'enable' },
@@ -74,20 +74,20 @@ const routes = [
               'reception/queue',
             ],
           },
-          // {
-          //   path: '/reception/queue/dispense',
-          //   name: 'dispense',
-          //   hideInMenu: true,
-          //   exact: true,
-          //   component: './Dispense',
-          // },
-          // {
-          //   path: '/reception/queue/dispense/billing',
-          //   name: 'billing',
-          //   hideInMenu: true,
-          //   exact: true,
-          //   component: './Dispense/Billing',
-          // },
+          {
+            path: '/reception/queue/dispense',
+            name: 'dispense',
+            hideInMenu: true,
+            exact: true,
+            component: './Dispense',
+          },
+          {
+            path: '/reception/queue/billing',
+            name: 'billing',
+            hideInMenu: true,
+            exact: true,
+            component: './Billing',
+          },
           {
             path: '/reception/appointment',
             name: 'appointment',
@@ -464,6 +464,9 @@ const routes = [
             name: 'copayer',
             // mini: 'CP',
             component: './Setting/Company',
+            authority: [
+              'finance/scheme',
+            ],
           },
         ],
       },

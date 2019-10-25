@@ -1,7 +1,7 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
-import { getRemovedUrl } from '@/utils/utils'
+import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
 
@@ -33,21 +33,28 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
-        if (pathname === '/reception/queue/patientdashboard') {
-          const { qid, vid, v, md2 } = query
+        const { vid, v, pid } = query
 
-          if (md2 === 'bill') {
-            dispatch({
-              type: 'initState',
-              payload: { qid, visitID: vid, v },
-            })
-          }
+        if (pathname === '/reception/queue/billing' && Number(vid)) {
+          dispatch({
+            type: 'initState',
+            payload: { visitID: Number(vid), pid: Number(pid), v },
+          })
         }
       })
     },
     effects: {
-      *initState ({ payload }, { select, put }) {
-        const patientInfo = yield select((st) => st.patient)
+      *initState ({ payload }, { select, put, take }) {
+        const patientState = yield select((st) => st.patient)
+        if (!patientState.entity) {
+          yield put({
+            type: 'patient/query',
+            payload: {
+              id: payload.pid,
+            },
+          })
+          yield take('patient/query/@@end')
+        }
         yield put({
           type: 'query',
           payload: {
@@ -55,10 +62,10 @@ export default createFormViewModel({
           },
         })
         yield put({
-          type: 'global/updateAppState',
+          type: 'updateState',
           payload: {
-            fullscreen: true,
-            showBillingPanel: true,
+            visitID: payload.visitID,
+            patientID: payload.pid,
           },
         })
       },
@@ -82,35 +89,37 @@ export default createFormViewModel({
           payload: { id: payload.visitID },
         })
       },
-      *closeModal ({ payload = { toDispensePage: false } }, { put }) {
-        const { toDispensePage = false } = payload
-        // router.push(
-        //   getRemovedUrl([
-        //     'md2',
-        //     'cmt',
-        //     'vid',
-        //   ]),
-        // )
-        yield put({
-          type: 'updateState',
+      *backToDispense ({ payload }, { put, select }) {
+        const billingState = yield select((state) => state.billing)
+
+        const parameters = {
+          v: Date.now(),
+          vid: billingState.visitID,
+          pid: billingState.patientID,
+        }
+
+        const destinationUrl = getAppendUrl(
+          parameters,
+          '/reception/queue/dispense',
+        )
+
+        const response = yield put({
+          type: 'dispense/unlock',
           payload: {
-            entity: undefined,
+            id: billingState.visitID,
           },
         })
-        yield put({
-          type: 'global/updateAppState',
-          payload: {
-            disableSave: false,
-            showBillingPanel: false,
-            fullscreen: false,
-          },
-        })
-        if (!toDispensePage) {
+
+        if (response) {
           yield put({
-            type: 'patient/updateState',
-            payload: { entity: null },
+            type: 'updateState',
+            payload: {
+              entity: null,
+              visitID: undefined,
+              patientID: undefined,
+            },
           })
-          router.push('/reception/queue')
+          router.push(destinationUrl)
         }
       },
     },

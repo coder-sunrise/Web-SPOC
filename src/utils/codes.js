@@ -657,7 +657,9 @@ const consultationDocumentTypes = [
       draft: (row) => {
         return {
           ReferralLetterDetails: [
-            { ...row },
+            { ...row,
+              referralDate: moment(row.referralDate).format(dateFormatLong),
+            },
           ],
         }
       },
@@ -960,7 +962,7 @@ export const getCodes = async (payload) => {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
           if updateDate is null, always perform network call to get latest copy
-          else perform network call and update indexedDB 
+          else perform network call and update indexedDB
       */
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate =
@@ -1014,7 +1016,7 @@ export const checkIsCodetableAPI = (url) => {
     const isTenantCodes =
       paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
-    console.log({ isTenantCodes, isCodetable })
+    // console.log({ isTenantCodes, isCodetable })
     return isTenantCodes || isCodetable
   } catch (error) {
     console.log({ error })
@@ -1278,6 +1280,12 @@ export const recurrenceTypes = [
   },
 ]
 
+export const inventoryAdjustmentStatus = [
+  { value: 1, name: 'Draft' },
+  { value: 2, name: 'Finalized' },
+  { value: 3, name: 'Discarded' },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1320,5 +1328,6 @@ module.exports = {
   tagList,
   osBalanceStatus,
   buttonTypes,
+  inventoryAdjustmentStatus,
   ...module.exports,
 }

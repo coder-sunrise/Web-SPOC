@@ -498,6 +498,7 @@ const InventoryTypeListing = ({
   const onRowChangesChange = (rows) => {}
 
   const onAddedRowsChange = (type) => (addedRows) => {
+    console.log(type, addedRows)
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 

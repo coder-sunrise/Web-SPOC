@@ -1,19 +1,15 @@
 import React, { PureComponent } from 'react'
-import router from 'umi/router'
 import { connect } from 'dva'
-import qs from 'query-string'
 import { withStyles } from '@material-ui/core'
 import { ChangePassword } from 'medisys-components'
-import { CommonModal, SimpleModal, Button } from '@/components'
+import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
 import Consultation from '@/pages/PatientDashboard/Consultation'
-import Dispense from '@/pages/Dispense'
-import Billing from '@/pages/Dispense/Billing'
+// import Dispense from '@/pages/Dispense'
+// import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
-
-import { sleep, getRemovedUrl } from '@/utils/utils'
 
 const styles = (theme) => ({
   patientModal: {
@@ -21,7 +17,7 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ global, loading, user }) => ({
+@connect(({ global, user }) => ({
   global,
   loggedInUserID: user.data && user.data.id,
 }))
@@ -80,7 +76,7 @@ class GlobalModalContainer extends PureComponent {
   }
 
   render () {
-    const { global, dispatch, loggedInUserID, history, classes } = this.props
+    const { global, dispatch, loggedInUserID, classes } = this.props
     return (
       <div>
         {/* <SimpleModal
@@ -118,7 +114,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
-        <CommonModal
+        {/* <CommonModal
           open={global.showDispensePanel}
           title='Dispensing'
           observe={[
@@ -127,7 +123,7 @@ class GlobalModalContainer extends PureComponent {
           ]}
           authority='dispense'
           bodyNoPadding
-          onClose={(e) => {
+          onClose={() => {
             dispatch({
               type: 'dispense/closeModal',
             })
@@ -136,7 +132,7 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showDispensePanel && <Dispense />}
-        </CommonModal>
+        </CommonModal> */}
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
@@ -146,7 +142,7 @@ class GlobalModalContainer extends PureComponent {
           ]}
           authority='consultation'
           bodyNoPadding
-          onClose={(e) => {
+          onClose={() => {
             dispatch({
               type: 'consultation/closeModal',
             })
@@ -158,13 +154,13 @@ class GlobalModalContainer extends PureComponent {
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
 
-        <CommonModal
+        {/* <CommonModal
           open={global.showBillingPanel}
           title='Billing'
           observe='BillingForm'
           authority='billing'
           bodyNoPadding
-          onClose={(e) => {
+          onClose={() => {
             dispatch({
               type: 'billing/closeModal',
             })
@@ -174,13 +170,13 @@ class GlobalModalContainer extends PureComponent {
           overrideLoading
         >
           {global.showBillingPanel && <Billing />}
-        </CommonModal>
+        </CommonModal> */}
         <CommonModal
           open={global.showPatientInfoPanel}
           title='Patient Profile'
           observe='PatientDetail'
           authority='patient'
-          onClose={(e) => {
+          onClose={() => {
             dispatch({
               type: 'patient/closePatientModal',
             })
@@ -209,7 +205,7 @@ class GlobalModalContainer extends PureComponent {
           open={global.showSessionTimeout}
           title='Session Timeout'
           maxWidth='sm'
-          onClose={(e) => {
+          onClose={() => {
             clearTimeout(this._timer)
             dispatch({
               type: 'global/updateAppState',
@@ -287,7 +283,7 @@ class GlobalModalContainer extends PureComponent {
                 }
               : undefined,
           }}
-          onClose={(e) => {
+          onClose={() => {
             global.onConfirmClose ? global.onConfirmClose() : null
             clearTimeout(this._timer)
             dispatch({
@@ -311,7 +307,7 @@ class GlobalModalContainer extends PureComponent {
           title={global.openAdjustmentTitle}
           cancelText='Cancel'
           maxWidth='sm'
-          onClose={(e) => {
+          onClose={() => {
             dispatch({
               type: 'global/updateAppState',
               payload: {

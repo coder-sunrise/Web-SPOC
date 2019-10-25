@@ -34,6 +34,10 @@ const styles = (theme) => ({
     paddingLeft: theme.spacing(2),
   },
 
+  indentDisclaimer: {
+    paddingLeft: theme.spacing(3),
+  },
+
   errorMsg: {
     color: '#cf1322',
     margin: 0,
@@ -63,23 +67,39 @@ const styles = (theme) => ({
     }
   },
 
+  // markupMargin: Yup.number()
+  // .min(0, 'Markup Margin must between 0 and 999,999.9')
+  // .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
+
   validationSchema: Yup.object().shape({
-    customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
-      is: (v) => v === true,
-      then: Yup.number().required(),
-    }),
-    standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
-      is: (v) => v === true,
-      then: Yup.number().required(),
-    }),
-    footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
-      is: (v) => v === true,
-      then: Yup.number().required(),
-    }),
-    footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfo', {
-      is: (v) => v === true,
-      then: Yup.number().required(),
-    }),
+    customLetterHeadHeight: Yup.number()
+      .min(0, 'The value must between 0 and 5')
+      .max(5, 'The value must between 0 and 5')
+      .when('isDisplayCustomLetterHead', {
+        is: (v) => v === true,
+        then: Yup.number().required(),
+      }),
+    standardHeaderInfoHeight: Yup.number()
+      .min(0, 'The value must between 0 and 5')
+      .max(5, 'The value must between 0 and 5')
+      .when('isDisplayStandardHeader', {
+        is: (v) => v === true,
+        then: Yup.number().required(),
+      }),
+    footerInfoHeight: Yup.number()
+      .min(0, 'The value must between 0 and 5')
+      .max(5, 'The value must between 0 and 5')
+      .when('isDisplayFooterInfo', {
+        is: (v) => v === true,
+        then: Yup.number().required(),
+      }),
+    footerDisclaimerHeight: Yup.number()
+      .min(0, 'The value must between 0 and 5')
+      .max(5, 'The value must between 0 and 5')
+      .when('isDisplayFooterInfoDisclaimer', {
+        is: (v) => v === true,
+        then: Yup.number().required(),
+      }),
     customLetterHeadImage: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -364,6 +384,26 @@ class printoutSetting extends PureComponent {
                       )}
                     />
                   </GridItem>
+                </GridItem>
+              </GridContainer>
+
+              <GridContainer className={classes.verticalSpacing} />
+
+              <GridContainer className={classes.indentDisclaimer}>
+                <GridItem md={1}>
+                  <h4>Disclaimer</h4>
+                </GridItem>
+                <GridItem md={3}>
+                  <FastField
+                    name='isDisplayFooterInfoDisclaimer'
+                    render={(args) => (
+                      <Switch style={{ marginTop: 0, left: -22 }} {...args} />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+              <GridContainer className={classes.indent}>
+                <GridItem direction='column' md={6}>
                   <GridItem md={6}>
                     <FastField
                       name='footerDisclaimerHeight'
