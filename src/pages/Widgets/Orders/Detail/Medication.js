@@ -30,7 +30,6 @@ import {
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
-
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
@@ -47,7 +46,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
-    quantity: Yup.number() 
+    quantity: Yup.number()
       .min(0.1, 'Quantity must be between 0.1 and 999')
       .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
@@ -104,19 +103,19 @@ class Medication extends PureComponent {
     selectionOptions: [],
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (
-      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
-      nextProps.orders.shouldPushToState
-    ) {
-      nextProps.dispatch({
-        type: 'orders/updateState',
-        payload: {
-          entity: nextProps.values,
-          shouldPushToState: false,
-        },
-      })
-    }
+  componentDidMount () {
+    // this.props
+    //   .dispatch({
+    //     type: 'orders/getStockDetails',
+    //     payload: {
+    //       id: 1,
+    //     },
+    //   })
+    //   .then((v) => {
+    //     if (v) {
+    //       this.setState({ stockList: v.data })
+    //     }
+    //   })
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -162,6 +161,21 @@ class Medication extends PureComponent {
         )}
       </GridItem>
     )
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (
+      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
+      nextProps.orders.shouldPushToState
+    ) {
+      nextProps.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          entity: nextProps.values,
+          shouldPushToState: false,
+        },
+      })
+    }
   }
 
   calcualteQuantity = () => {
@@ -211,16 +225,19 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    // console.log(v, op)
+    console.log('asd', v, op)
+    this.setState(() => {
+      return { selectionOptions: op.medicationStock }
+    })
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
-    let tempArray = [
-      ...this.state.stockList,
-    ]
-    tempArray = tempArray.filter((o) => o.inventoryItemFK === v)
-    this.setState(() => {
-      return { selectionOptions: tempArray }
-    })
+    // let tempArray = [
+    //   ...this.state.stockList,
+    // ]
+    // tempArray = tempArray.filter((o) => o.inventoryItemFK === v)
+    // this.setState(() => {
+    //   return { selectionOptions: tempArray }
+    // })
     const { setFieldValue, values, codetable } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
@@ -253,7 +270,7 @@ class Medication extends PureComponent {
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
-    if (op.duration && op.medicationFrequency.id && op.prescribingDosage.id) {
+    if (op.duration && op.medicationFrequency && op.prescribingDosage) {
       for (let a = 0; a < dosageUsageList.length; a++) {
         if (dosageUsageList[a].id === op.prescribingDosage.id) {
           dosageMultiplier = dosageUsageList[a].multiplier
@@ -361,21 +378,6 @@ class Medication extends PureComponent {
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
     }
-  }
-
-  componentDidMount () {
-    this.props
-      .dispatch({
-        type: 'orders/getStockDetails',
-        payload: {
-          id: 1,
-        },
-      })
-      .then((v) => {
-        if (v) {
-          this.setState({ stockList: v.data })
-        }
-      })
   }
 
   render () {
@@ -587,8 +589,8 @@ class Medication extends PureComponent {
                           'corPrescriptionItemInstruction',
                           'Add step dose',
                           {
-                           // drugFrequencyFK: 1,
-                           // duration: 1,
+                            // drugFrequencyFK: 1,
+                            // duration: 1,
                             stepdose: 'AND',
                             sequence: i + 1,
                           },

@@ -27,6 +27,7 @@ import {
   isInvoiceReadOnly,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
+import { INVOICE_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
@@ -177,18 +178,20 @@ class Index extends Component {
         return validation
       }
 
-      const openConfirmationModal = (statusCode) => {
+      const openConfirmationModal = (statusCode, content, confirmText) => {
         dispatch({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent: 'Are you sure want to cancel PO?',
+            openConfirmContent: content,
             onConfirmDiscard: async () => {
               processedPayload = this.processSubmitPayload(false, statusCode)
               await submit()
-              history.push('/inventory/pr')
+              if (statusCode === 4) {
+                history.push('/inventory/pr')
+              }
             },
-            openConfirmText: 'Cancel PO',
+            openConfirmText: confirmText,
           },
         })
       }
@@ -199,7 +202,11 @@ class Index extends Component {
           break
         case poSubmitAction.CANCEL:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          openConfirmationModal(4)
+          openConfirmationModal(
+            4,
+            'Are you sure want to cancel PO?',
+            'Cancel PO',
+          )
           break
         case poSubmitAction.FINALIZE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
@@ -207,7 +214,11 @@ class Index extends Component {
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          openConfirmationModal(5)
+          openConfirmationModal(
+            6,
+            'Are you sure want to complete PO?',
+            'Complete PO',
+          )
           break
         // case poSubmitAction.PRINT:
         //   this.toggleReport()
@@ -479,6 +490,10 @@ class Index extends Component {
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
     const { IsGSTEnabled } = purchaseOrder || false
+    const isWriteOff = po
+      ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+      : false
+    console.log('asd', isPOStatusDraft(poStatus))
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -489,7 +504,7 @@ class Index extends Component {
       <div>
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 ? 'enable' : 'disable',
+            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
@@ -503,11 +518,12 @@ class Index extends Component {
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
           isEditable={isPOStatusDraft(poStatus)}
+          isWriteOff={isWriteOff}
           {...this.props}
         />
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 ? 'enable' : 'disable',
+            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
