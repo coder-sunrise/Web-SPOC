@@ -493,7 +493,6 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    console.log('asd', isPOStatusDraft(poStatus))
     return (
       // <AuthorizedContext.Provider
       //   value={{
