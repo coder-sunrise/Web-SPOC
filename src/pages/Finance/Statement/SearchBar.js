@@ -80,8 +80,7 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values } = this.props
-
+    const { classes, history, dispatch, values, selectedRows } = this.props
     // const {
     //   allStatementDate,
     //   isAllDateChecked,
@@ -235,6 +234,7 @@ class SearchBar extends PureComponent {
               buttonRef={(node) => {
                 this.anchorElAccount = node
               }}
+              disabled={selectedRows.length < 1}
             >
               Print Statement
             </Button>
@@ -286,7 +286,7 @@ class SearchBar extends PureComponent {
           <ReportViewer
             reportID={25}
             reportParameters={{
-              StatementId: values ? values.id : '',
+              StatementId: selectedRows.length > 0 ? selectedRows[0] : '',
               GroupBy: this.state.reportGroupBy,
             }}
           />
