@@ -657,7 +657,9 @@ const consultationDocumentTypes = [
       draft: (row) => {
         return {
           ReferralLetterDetails: [
-            { ...row },
+            { ...row,
+              referralDate: moment(row.referralDate).format(dateFormatLong),
+            },
           ],
         }
       },
@@ -960,7 +962,7 @@ export const getCodes = async (payload) => {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
           if updateDate is null, always perform network call to get latest copy
-          else perform network call and update indexedDB 
+          else perform network call and update indexedDB
       */
       const { updateDate, data: existedData } = ct
       const parsedUpdateDate =
