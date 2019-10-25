@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import { status } from '@/utils/codes'
 import { compose } from 'redux'
+import Authorized from '@/utils/Authorized'
 
 import {
   GridContainer,
@@ -122,16 +123,18 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               <Search />
               <FormattedMessage id='form.search' />
             </Button>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                history.push('/inventory/master/medication')
-              }}
-            >
-              <Add />
-              Add New
-            </Button>
+            <Authorized authority='inventorymaster.newinventoryitem'>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  history.push('/inventory/master/medication')
+                }}
+              >
+                <Add />
+                Add New
+              </Button>
+            </Authorized> 
             {/* <Button
               variant='contained'
               color='primary'
