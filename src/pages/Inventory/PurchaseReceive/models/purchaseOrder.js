@@ -31,6 +31,10 @@ export default createFormViewModel({
         purchaseOrderConsumableItem: [],
         purchaseOrderAdjustment: [],
       },
+      purchaseOrder: {
+        purchaseOrderDate: moment(),
+        purchaseOrderStatusFK: 1,
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
