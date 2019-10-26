@@ -72,7 +72,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       paymentModes: paymentList.map((payment, index) => ({
         ...payment,
         sequence: index,
-        // id: undefined,
+        id: undefined,
       })),
       outstandingBalance: collectableAmount - totalAmtPaid,
       cashRounding,
