@@ -139,15 +139,12 @@ const bannerStyle = {
     }
     console.log({ payload })
     dispatch({
-      type: 'billing/upsert',
+      type: 'billing/save',
       payload,
     }).then((response) => {
       if (response) {
         resetForm()
         router.push('/reception/queue')
-        // dispatch({
-        //   type: 'billing/closeModal',
-        // })
       }
     })
   },
@@ -162,34 +159,7 @@ class Billing extends Component {
     const { dispatch } = this.props
     dispatch({
       type: 'billing/backToDispense',
-      // payload: {
-      //   visitID: values.visitId,
-      // },
     })
-    // const parameters = {
-    //   md2: 'dsps',
-    //   v: Date.now(),
-    //   vid: values.visitId,
-    //   pid: billing.patientID,
-    // }
-    // const destinationUrl = getAppendUrl(parameters, '/reception/queue/dispense')
-
-    // dispatch({
-    //   type: 'dispense/unlock',
-    //   payload: {
-    //     id: values.visitId,
-    //   },
-    // }).then((response) => {
-    //   if (response) {
-    //     router.push(destinationUrl)
-    //     // dispatch({
-    //     //   type: 'billing/closeModal',
-    //     //   payload: {
-    //     //     toDispensePage: true,
-    //     //   },
-    //     // })
-    //   }
-    // })
   }
 
   toggleAddPaymentModal = () => {
@@ -208,7 +178,7 @@ class Billing extends Component {
     this.toggleAddPaymentModal()
   }
 
-  onExpandDispenseDetails = (event, panel, expanded) => {
+  onExpandDispenseDetails = () => {
     const { dispense } = this.props
     if (!dispense.entity) {
       this.props.dispatch({
