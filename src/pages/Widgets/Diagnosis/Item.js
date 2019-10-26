@@ -32,21 +32,52 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
-    ctComplication,
-    setCtComplication,
+    ctComplicationPairedWithDiag,
+    setCtComplicationPairedWithDiag,
   ] = useState([])
 
   const { form } = arrayHelpers
+
+  // useEffect(
+  //   () => {
+  //     if (form.values.corDiagnosis[index]) {
+  //       const { _complication = [] } = form.values.corDiagnosis[index]
+  //       setCtComplication(_complication)
+  //     }
+  //   },
+  //   [
+  //     form.values.corDiagnosis[index],
+  //   ],
+  // )
 
   useEffect(
     () => {
       if (form.values.corDiagnosis[index]) {
         const { _complication = [] } = form.values.corDiagnosis[index]
-        setCtComplication(_complication)
+        setCtComplicationPairedWithDiag(_complication)
       }
+      const { ctComplication = [] } = codetable
+      const selectedComplications = diagnosises[index].corComplication.map(
+        (complication) => complication.complicationFK,
+      )
+      const _ctComplication = ctComplication.reduce(
+        (mappedCtComplication, complication) => {
+          if (selectedComplications.includes(complication.id))
+            return [
+              ...mappedCtComplication,
+              { ...complication, displayvalue: complication.name },
+            ]
+          return [
+            ...mappedCtComplication,
+          ]
+        },
+        [],
+      )
+      setCtComplicationPairedWithDiag(_ctComplication)
     },
     [
       form.values.corDiagnosis[index],
+      codetable.ctComplication,
     ],
   )
 
@@ -65,21 +96,30 @@ const DiagnosisItem = ({
 
       setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
 
-      // if (op.complication && op.complication.length) {
-      //   setFieldValue(
-      //     `corDiagnosis[${index}]complication`,
-      //     op.complication.map((o) => o.id),
-      //   )
-      //   setFieldValue(
-      //     `corDiagnosis[${index}]corComplication`,
-      //     op.complication.map((o) => ({
-      //       complicationFK: o.id,
-      //     })),
-      //   )
-      // }
+
+      
+
+      if (op.complication && op.complication.length) {
+        // setFieldValue(
+        //   `corDiagnosis[${index}]complication`,
+        //   op.complication.map((o) => o.id),
+        // )
+        // setFieldValue(
+        //   `corDiagnosis[${index}]corComplication`,
+        //   op.complication.map((o) => ({
+        //     complicationFK: o.id,
+        //   })),
+        // )
+      }else{
+        setFieldValue(`corDiagnosis[${index}]complication`, [])
+        setFieldValue(`corDiagnosis[${index}]corComplication`, [])
+        setCtComplicationPairedWithDiag([])
+      }
     }
   }
+
   const { values } = form
+
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
@@ -144,8 +184,8 @@ const DiagnosisItem = ({
                   label='Complication'
                   mode='multiple'
                   // code='ctComplication'
-                  options={ctComplication}
-                  labelField='displayValue'
+                  options={ctComplicationPairedWithDiag}
+                  labelField='displayvalue'
                   valueField='id'
                   maxTagCount={2}
                   disableAll

@@ -21,6 +21,7 @@ import {
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
 import { getRemovedUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   popover: {
@@ -424,18 +425,20 @@ class Appointment extends React.PureComponent {
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
         />
-        <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
-          <FuncCalendarView
-            resources={resources}
-            filter={filter}
-            handleSelectSlot={this.onSelectSlot}
-            handleSelectEvent={this.onSelectEvent}
-            // handleDoubleClick={this.onSelectEvent}
-            handleMoveEvent={this.moveEvent}
-            handleEventMouseOver={this.onEventMouseOver}
-            handleOnDragStart={this.handleOnDragStart}
-          />
-        </div>
+        <Authorized authority='appointment.appointmentdetails'>
+          <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
+            <FuncCalendarView
+              resources={resources}
+              filter={filter}
+              handleSelectSlot={this.onSelectSlot}
+              handleSelectEvent={this.onSelectEvent}
+              // handleDoubleClick={this.onSelectEvent}
+              handleMoveEvent={this.moveEvent}
+              handleEventMouseOver={this.onEventMouseOver}
+              handleOnDragStart={this.handleOnDragStart}
+            />
+          </div>
+        </Authorized>
 
         <CommonModal
           open={showAppointmentForm}

@@ -287,7 +287,7 @@ class Scribble extends React.Component {
       })
       this._sketch.hideDrawing(false)
     }
-    this.props.setFieldValue("drawing", this._sketch.getAllLayerData() )
+    this.props.setFieldValue('drawing', this._sketch.getAllLayerData())
   }
 
   _selectTool = (event) => {
@@ -391,7 +391,7 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
     } = this.props
-    console.log("props ", this.props)
+    console.log('props ', this.props)
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -903,18 +903,18 @@ class Scribble extends React.Component {
                   ''
                 )}
 
-                <ProgressButton
-                  onClick={() => {
-                    temp = this._sketch.getAllLayerData()
-                    handleSubmit()
-                  }}
-                />
                 <Button
                   color='danger'
                   onClick={navigateDirtyCheck(toggleScribbleModal)}
                 >
                   Cancel
                 </Button>
+                <ProgressButton
+                  onClick={() => {
+                    temp = this._sketch.getAllLayerData()
+                    handleSubmit()
+                  }}
+                />
               </div>
             </div>
             <div className={classes.sketchArea}>

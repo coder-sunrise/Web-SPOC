@@ -1,6 +1,13 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
-import { TextField, FastField, DatePicker, Button, Tooltip } from '@/components'
+import {
+  TextField,
+  FastField,
+  DatePicker,
+  Button,
+  Tooltip,
+  Checkbox,
+} from '@/components'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -8,6 +15,10 @@ export const tableConfig = {
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
+  {
+    name: 'isExternalPrescription',
+    title: 'Ext.',
+  },
   {
     name: 'name',
     title: 'Name',
@@ -50,6 +61,24 @@ export const PrescriptionColumnExtensions = (
   viewOnly = false,
   handleClickPrintDrugLabel,
 ) => [
+  {
+    columnName: 'isExternalPrescription',
+    width: 70,
+    render: (row) => {
+      return (
+        <Checkbox
+          labelPlacement='start'
+          color='primary'
+          checked={
+            row.isExternalPrescription ? row.isExternalPrescription : false
+          }
+          // iconStyle={{fill: 'blue'}}
+          // inputStyle={{color:'blue'}}
+          disabled
+        />
+      )
+    },
+  },
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
@@ -82,6 +111,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'expiryDate',
+    width: 150,
     render: (row) => {
       return (
         <FastField
