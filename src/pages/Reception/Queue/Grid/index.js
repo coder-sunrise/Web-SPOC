@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
 import router from 'umi/router'
+// material ui
+import { Popover } from '@material-ui/core'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
 import { CommonTableGrid, DateFormatter, notification } from '@/components'
@@ -160,6 +161,16 @@ const Grid = ({
   onViewPatientProfileClick,
   handleActualizeAppointment,
 }) => {
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+  const handlePopoverOpen = (event) => setAnchorEl(event.currentTarget)
+
+  const handlePopoverClose = () => setAnchorEl(null)
+
+  const openContextMenu = Boolean(anchorEl)
+
   const deleteQueue = (id) => {
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
@@ -475,6 +486,10 @@ const Grid = ({
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
+          onContextMenu={(row, event) => {
+            // event.preventDefault()
+            // handlePopoverOpen(event)
+          }}
           columnExtensions={[
             ...columnExtensions,
             {
@@ -490,6 +505,22 @@ const Grid = ({
           {...TableConfig}
         />
       </LoadingWrapper>
+      {/* <Popover
+        open={openContextMenu}
+        anchorEl={anchorEl}
+        // anchorOrigin={{
+        //   vertical: 'center',
+        //   horizontal: 'center',
+        // }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'center',
+        }}
+        onClose={handlePopoverClose}
+        // style={{ width: 500, height: 500 }}
+      >
+        <div style={{ width: 200, height: 400 }}>123f</div>
+      </Popover> */}
     </div>
   )
 }

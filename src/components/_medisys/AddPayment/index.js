@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
-import * as Yup from 'yup'
 import { connect } from 'dva'
-// formik
-import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -26,7 +23,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @withFormikExtend({
   notDirtyDuration: 0,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice, payments, clinicSettings }) => {
+  mapPropsToValues: ({ invoice, clinicSettings }) => {
     const { outstandingBalance = 0 } = invoice
     const collectableAmount = rounding(clinicSettings, outstandingBalance)
 
@@ -106,7 +103,7 @@ class AddPayment extends Component {
   }
 
   onPaymentTypeClick = async (event) => {
-    const { values, setFieldValue, clinicSettings } = this.props
+    const { values, setFieldValue } = this.props
     const { currentTarget: { id: type } } = event
     const paymentMode = Object.keys(PAYMENT_MODE).find(
       (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
@@ -141,7 +138,7 @@ class AddPayment extends Component {
 
   handleAmountChange = () => {
     const { values, setFieldValue, clinicSettings } = this.props
-    const { paymentList, outstandingBalance, collectableAmount } = values
+    const { paymentList, outstandingBalance } = values
     const totalPaid = paymentList.reduce(
       (total, payment) => total + (payment.amt || 0),
       0,
@@ -155,27 +152,25 @@ class AddPayment extends Component {
       const cashAfterRounding = roundToTwoDecimals(
         rounding(clinicSettings, cashPayment.amt),
       )
-      console.log({ cashAfterRounding })
-      setFieldValue('cashReceived', cashAfterRounding)
-      setFieldValue(
-        'cashRounding',
-        roundToTwoDecimals(cashAfterRounding - cashPayment.amt),
+      const collectableAmountAfterRounding = roundToTwoDecimals(
+        rounding(clinicSettings, outstandingBalance),
       )
+      const roundingAmt = roundToTwoDecimals(
+        cashAfterRounding - cashPayment.amt,
+      )
+      setFieldValue('cashReceived', cashAfterRounding)
+      setFieldValue('cashRounding', roundingAmt)
+      setFieldValue('collectableAmount', collectableAmountAfterRounding)
+
+      this.setState({
+        cashPaymentAmount: cashPayment.amt,
+      })
 
       if (totalPaid > outstandingBalance && cashPayment) {
         cashReturned = roundToTwoDecimals(totalPaid - outstandingBalance)
         setFieldValue('cashReturned', cashReturned)
       }
-      const collectableAmountAfterRounding = roundToTwoDecimals(
-        rounding(clinicSettings, outstandingBalance),
-      )
-      setFieldValue('collectableAmount', collectableAmountAfterRounding)
-      this.setState({
-        cashPaymentAmount: cashPayment.amt,
-      })
     } else {
-      console.log('no cash payment')
-
       setFieldValue('collectableAmount', values.finalPayable)
       setFieldValue('cashReceived', 0)
       setFieldValue('cashReturned', 0)

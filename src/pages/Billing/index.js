@@ -200,12 +200,12 @@ class Billing extends Component {
   handleAddPayment = (payment) => {
     const { setFieldValue } = this.props
     const { outstandingBalance, ...rest } = payment
-    setFieldValue('payments', [
-      rest,
-    ])
+    // setFieldValue('payments', [
+    //   rest,
+    // ])
     console.log({ payment })
     setFieldValue('invoice.outstandingBalance', outstandingBalance)
-    this.toggleAddPaymentModal()
+    // this.toggleAddPaymentModal()
   }
 
   onExpandDispenseDetails = (event, panel, expanded) => {
