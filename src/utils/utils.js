@@ -758,7 +758,7 @@ const calculateItemLevelAdjustment = (
   gstPercentage = 0,
   gstEnabled = false,
   gstIncluded = false,
-  count=0
+  count = 0,
 ) => {
   let itemLevelAdjustmentAmount = 0
   let itemLevelGSTAmount = 0
@@ -915,7 +915,8 @@ const calculateAmount = (
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
       gst,
-      total: totalAfterAdj,
+      total,
+      totalAfterAdj,
       totalWithGST: isGSTInclusive ? totalAfterAdj : gst + totalAfterAdj,
       isEnableGST,
       gSTPercentage,
