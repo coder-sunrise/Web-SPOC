@@ -273,7 +273,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-    console.log(v, this.props.max)
+
     this.setState({
       value: newV === undefined ? '' : newV,
     })
@@ -382,7 +382,6 @@ class AntdNumberInput extends React.PureComponent {
           )
         : ''
       extraCfg.parser = (v) => {
-
         if (!Number(v) && this.state.value === '') return ''
         if (v === '') return v
         if (format) {

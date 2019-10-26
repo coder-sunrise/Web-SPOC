@@ -156,6 +156,7 @@ class CommonTableGrid extends PureComponent {
       theme,
       oddEven = true,
       onRowDoubleClick = undefined,
+      onContextMenu = undefined,
       onRowClick = (f) => f,
       rowMoveable = (f) => false,
     } = props
@@ -183,24 +184,29 @@ class CommonTableGrid extends PureComponent {
       )
     }
 
-    this.TableRow = ({ row, tableRow, ...restProps }) => (
-      <Table.Row
-        {...restProps}
-        onDoubleClick={(event) => {
-          onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
-        }}
-        onClick={(event) => {
-          onRowClick(row, event)
-        }}
-        className={
-          typeof rowMoveable === 'function' && rowMoveable(row) ? (
-            'moveable'
-          ) : (
-            ''
-          )
-        }
-      />
-    )
+    this.TableRow = ({ row, tableRow, ...restProps }) => {
+      return (
+        <Table.Row
+          {...restProps}
+          onDoubleClick={(event) => {
+            onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
+          }}
+          onClick={(event) => {
+            onRowClick(row, event)
+          }}
+          onContextMenu={(event) => {
+            onContextMenu && onContextMenu(row || tableRow.row, event)
+          }}
+          className={
+            typeof rowMoveable === 'function' && rowMoveable(row) ? (
+              'moveable'
+            ) : (
+              ''
+            )
+          }
+        />
+      )
+    }
 
     this.TableHeaderRow = ({ row, ...restProps }) => (
       <TableHeaderRow
