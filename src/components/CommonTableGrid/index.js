@@ -59,6 +59,7 @@ import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import PatchedTableSelection from './plugins/PatchedTableSelection'
+import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import { LoadingWrapper } from '@/components/_medisys'
 
 window.$tempGridRow = {}
@@ -655,7 +656,10 @@ class CommonTableGrid extends PureComponent {
     const {
       grouping,
       selectable,
-      selectConfig = { showSelectAll: false },
+      selectConfig = {
+        showSelectAll: false,
+        rowSelectionEnabled: (row) => true,
+      },
       pager,
       pagerConfig = {},
       pagerStateConfig,
@@ -816,6 +820,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
+    console.log({ selectConfig })
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -907,7 +912,12 @@ class CommonTableGrid extends PureComponent {
               this.state.entity && (
                 <CustomPaging totalCount={this.state.pagination.totalRecords} />
               )}
-              {selectable && <IntegratedSelection />}
+              {selectable && (
+                // <IntegratedSelection />
+                <PatchedIntegratedSelection
+                  rowSelectionEnabled={selectConfig.rowSelectionEnabled}
+                />
+              )}
               <TextTypeProvider {...cellComponentConfig} />
               <SelectTypeProvider {...cellComponentConfig} />
               <NumberTypeProvider {...cellComponentConfig} />
@@ -927,21 +937,21 @@ class CommonTableGrid extends PureComponent {
                 {...tableProps}
               />
               {selectable && (
-                <TableSelection
-                  highlightRow
-                  // selectByRowClick={allowSelectRowByClick}
-                  showSelectionColumn
-                  rowComponent={this.TableRow}
-                  {...selectConfig}
-                />
-                // <PatchedTableSelection
+                // <TableSelection
                 //   highlightRow
                 //   // selectByRowClick={allowSelectRowByClick}
                 //   showSelectionColumn
                 //   rowComponent={this.TableRow}
-
                 //   {...selectConfig}
                 // />
+                <PatchedTableSelection
+                  highlightRow
+                  // selectByRowClick={allowSelectRowByClick}
+                  showSelectionColumn
+                  rowComponent={this.TableRow}
+                  // rowSelectionEnabled={selectionConfig.rowSelectionEnabled}
+                  {...selectConfig}
+                />
               )}
 
               {header && <HeaderRow showSortingControls />}

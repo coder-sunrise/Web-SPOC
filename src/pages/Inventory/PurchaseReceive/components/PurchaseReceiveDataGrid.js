@@ -3,6 +3,16 @@ import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { formatMessage } from 'umi/locale'
 import { CommonTableGrid, Tooltip, notification } from '@/components'
 import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
+import {
+  PURCHASE_ORDER_STATUS_TEXT,
+  INVOICE_STATUS_TEXT,
+} from '@/utils/constants'
+
+const enabledSelectPOStatus = [
+  PURCHASE_ORDER_STATUS_TEXT.FINALIZED,
+  PURCHASE_ORDER_STATUS_TEXT.PARTIALREVD,
+  PURCHASE_ORDER_STATUS_TEXT.FULFILLED,
+]
 
 const PurchaseReceiveDataGrid = ({
   selectedRows,
@@ -71,7 +81,12 @@ const PurchaseReceiveDataGrid = ({
           type: 'date',
         },
         { columnName: 'totalAmount', type: 'number', currency: true },
-        { columnName: 'outstanding', type: 'number', currency: true, sortingEnabled: false, },
+        {
+          columnName: 'outstanding',
+          type: 'number',
+          currency: true,
+          sortingEnabled: false,
+        },
         {
           columnName: 'purchaseOrderStatus',
           sortBy: 'purchaseOrderStatusFKNavigation.displayValue',
@@ -98,6 +113,9 @@ const PurchaseReceiveDataGrid = ({
         selectable: true,
         selectConfig: {
           showSelectAll: true,
+          rowSelectionEnabled: (row) =>
+            enabledSelectPOStatus.includes(row.purchaseOrderStatus) &&
+            row.invoiceStatus === INVOICE_STATUS_TEXT.OUTSTANDING,
         },
       }}
     />
