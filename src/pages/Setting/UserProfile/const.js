@@ -19,7 +19,8 @@ export const UserProfileTableConfig = {
     },
     {
       columnName: 'role',
-      sortBy: 'userProfileFKNavigation.UserRole.RoleNavigation.Description',
+      sortingEnabled: false,
+      // sortBy: 'userProfileFKNavigation.UserRole.RoleNavigation.Description',
       render: (row) =>
         row.userProfile && row.userProfile.role
           ? row.userProfile.role.name
