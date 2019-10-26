@@ -610,8 +610,8 @@ const consultationDocumentTypes = [
               ...row,
               unfitType: UNFIT_TYPE[row.unfitTypeFK],
               mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
-              mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
-              mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcStartDate: moment(row.mcStartDate).format(dateFormatLong),
+              mcEndDate: moment(row.mcEndDate).format(dateFormatLong),
             },
           ],
         }
@@ -711,6 +711,20 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Others',
     prop: 'corOtherDocuments',
+    downloadKey: 'documentid',
+    downloadConfig: {
+      id: 12,
+      key: 'documentid',
+      draft: (row) => {
+        return {
+          DocumentDetails: [
+            {
+              ...row,
+            },
+          ],
+        }
+      },
+    },
   },
 ]
 
