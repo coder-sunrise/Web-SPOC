@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
-import * as Yup from 'yup'
 import { connect } from 'dva'
-// formik
-import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -15,7 +12,7 @@ import PaymentCard from './PaymentCard'
 import PaymentSummary from './PaymentSummary'
 // styling
 import styles from './styles'
-import { getLargestID, InitialValue } from './variables'
+import { ValidationSchema, getLargestID, InitialValue } from './variables'
 import { rounding } from './utils'
 import { roundToTwoDecimals } from '@/utils/utils'
 import { PAYMENT_MODE } from '@/utils/constants'
@@ -26,112 +23,40 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @withFormikExtend({
   notDirtyDuration: 0,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice, payments, clinicSettings }) => {
-    const collectableAmount = rounding(
-      clinicSettings,
-      invoice.outstandingBalance,
-    )
-    const cashRounding = roundToTwoDecimals(
-      collectableAmount - invoice.outstandingBalance,
-    )
+  mapPropsToValues: ({ invoice, clinicSettings }) => {
+    const { outstandingBalance = 0 } = invoice
+    const collectableAmount = rounding(clinicSettings, outstandingBalance)
+
+    // const cashReceived =
+    //   payments.length > 0 ? payments[0].cashReceived : outstandingBalance
+    // const cashRounding = rounding(clinicSettings, cashReceived)
+    // const cashPayment = payments.length > 0 ? payments
 
     return {
-      outstandingAfterPayment: collectableAmount,
       cashReturned: 0,
-      cashReceived:
-        payments.length > 0 ? payments[0].cashReceived : collectableAmount,
-      paymentList:
-        payments.length > 0
-          ? payments[0].paymentModes
-          : [
-              {
-                paymentMode: 'Cash',
-                paymentModeFK: 1,
-                amt: collectableAmount,
-                remarks: '',
-                sequence: 0,
-              },
-            ],
-      cashRounding,
+      cashReceived: 0,
+      cashRounding: 0,
+      outstandingAfterPayment: outstandingBalance,
+      totalAmtPaid: outstandingBalance,
+      paymentList: [],
+      // paymentList:
+      //   payments.length > 0
+      //     ? payments[0].paymentModes
+      //     : [
+      //         {
+      //           id: 0,
+      //           paymentMode: 'Cash',
+      //           paymentModeFK: 1,
+      //           amt: outstandingBalance,
+      //           remarks: '',
+      //           sequence: 0,
+      //         },
+      //       ],
       collectableAmount,
       ...invoice,
     }
   },
-  validationSchema: Yup.object().shape({
-    cashReceived: Yup.number(),
-    totalAmtPaid: Yup.number(),
-    collectableAmount: Yup.number(),
-    outstandingAfterPayment: Yup.number(),
-    paymentList: Yup.array().when(
-      [
-        'totalAmtPaid',
-        'collectableAmount',
-        'outstandingAfterPayment',
-      ],
-      (totalAmtPaid, collectableAmount, outstandingAfterPayment, schema) => {
-        if (outstandingAfterPayment < 0)
-          return schema.of(
-            Yup.object().shape({
-              id: Yup.number(),
-              paymentModeFK: Yup.number().required(),
-              amt: Yup.number().when(
-                'paymentModeFK',
-                (paymentModeFK) =>
-                  paymentModeFK !== PAYMENT_MODE.CASH
-                    ? Yup.number()
-                        .min(0)
-                        .max(
-                          0.01,
-                          'Total amount paid cannot exceed collectable amount',
-                        )
-                        .required()
-                    : Yup.number().min(0).required(),
-              ),
-              creditCardTypeFK: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-                then: Yup.string().required(),
-              }),
-              creditCardNo: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-                then: Yup.string().required(),
-              }),
-              chequeNo: Yup.number().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.CHEQUE,
-                then: Yup.number().required(),
-              }),
-              referrenceNo: Yup.string().when('paymentModeFK', {
-                is: (val) => val === PAYMENT_MODE.GIRO,
-                then: Yup.string().required(),
-              }),
-            }),
-          )
-        // if (outstandingAfterPayment === 0)
-        return schema.of(
-          Yup.object().shape({
-            id: Yup.number(),
-            paymentModeFK: Yup.number().required(),
-            amt: Yup.number().min(0).required(),
-            creditCardTypeFK: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
-            }),
-            creditCardNo: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
-            }),
-            chequeNo: Yup.number().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CHEQUE,
-              then: Yup.number().required(),
-            }),
-            referrenceNo: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.GIRO,
-              then: Yup.string().required(),
-            }),
-          }),
-        )
-      },
-    ),
-  }),
+  validationSchema: ValidationSchema,
   handleSubmit: (values, { props }) => {
     const { handleSubmit } = props
     const {
@@ -142,6 +67,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       totalAmtPaid,
       collectableAmount,
     } = values
+
     const returnValue = {
       paymentModes: paymentList.map((payment, index) => ({
         ...payment,
@@ -158,6 +84,10 @@ import { PAYMENT_MODE } from '@/utils/constants'
   },
 })
 class AddPayment extends Component {
+  state = {
+    cashPaymentAmount: 0,
+  }
+
   componentDidMount () {
     const { values, setFieldValue } = this.props
     const { paymentList, collectableAmount } = values
@@ -172,14 +102,14 @@ class AddPayment extends Component {
     )
   }
 
-  onPaymentTypeClick = (event) => {
+  onPaymentTypeClick = async (event) => {
     const { values, setFieldValue } = this.props
     const { currentTarget: { id: type } } = event
     const paymentMode = Object.keys(PAYMENT_MODE).find(
       (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
     )
     const amount =
-      values.paymentList.length === 0 ? values.collectableAmount : null
+      values.paymentList.length === 0 ? values.outstandingBalance : null
     const payment = {
       id: getLargestID(values.paymentList) + 1,
       paymentModeFK: parseInt(type, 10),
@@ -191,41 +121,24 @@ class AddPayment extends Component {
       ...values.paymentList,
       payment,
     ]
-    setFieldValue('paymentList', newPaymentList)
-    if (values.paymentList.length === 0) {
-      setFieldValue('outstandingAfterPayment', 0)
-      setFieldValue('totalAmtPaid', amount)
-
-      if (parseInt(type, 10) === PAYMENT_MODE.CASH) {
-        setFieldValue('cashReceived', amount)
-      }
-    }
+    await setFieldValue('paymentList', newPaymentList)
+    this.handleAmountChange()
   }
 
-  onDeleteClick = (event) => {
+  onDeleteClick = async (event) => {
     const { currentTarget: { id } } = event
     const { values, setFieldValue } = this.props
     const newPaymentList = values.paymentList.filter(
       (payment) => payment.id !== parseFloat(id, 10),
     )
-    const hasCash = newPaymentList.reduce(
-      (noCashPaymentMode, payment) =>
-        payment.paymentModeFK === PAYMENT_MODE.CASH || noCashPaymentMode,
-      false,
-    )
 
-    setFieldValue('paymentList', newPaymentList)
-    if (!hasCash) {
-      setFieldValue('cashReceived', 0)
-      setFieldValue('cashReturned', 0)
-    }
-
-    if (newPaymentList.length === 0) setFieldValue('outstandingAfterPayment', 0)
+    await setFieldValue('paymentList', newPaymentList)
+    this.handleAmountChange()
   }
 
   handleAmountChange = () => {
-    const { values, setFieldValue } = this.props
-    const { paymentList, collectableAmount } = values
+    const { values, setFieldValue, clinicSettings } = this.props
+    const { paymentList, outstandingBalance } = values
     const totalPaid = paymentList.reduce(
       (total, payment) => total + (payment.amt || 0),
       0,
@@ -236,18 +149,55 @@ class AddPayment extends Component {
 
     let cashReturned = 0
     if (cashPayment) {
-      setFieldValue('cashReceived', cashPayment.amt)
+      const cashAfterRounding = roundToTwoDecimals(
+        rounding(clinicSettings, cashPayment.amt),
+      )
+      const collectableAmountAfterRounding = roundToTwoDecimals(
+        rounding(clinicSettings, outstandingBalance),
+      )
+      const roundingAmt = roundToTwoDecimals(
+        cashAfterRounding - cashPayment.amt,
+      )
+      setFieldValue('cashReceived', cashAfterRounding)
+      setFieldValue('cashRounding', roundingAmt)
+      setFieldValue('collectableAmount', collectableAmountAfterRounding)
 
-      if (totalPaid > collectableAmount && cashPayment) {
-        cashReturned = roundToTwoDecimals(totalPaid - collectableAmount)
+      this.setState({
+        cashPaymentAmount: cashPayment.amt,
+      })
+
+      if (totalPaid > outstandingBalance && cashPayment) {
+        cashReturned = roundToTwoDecimals(totalPaid - outstandingBalance)
         setFieldValue('cashReturned', cashReturned)
       }
+    } else {
+      setFieldValue('collectableAmount', values.finalPayable)
+      setFieldValue('cashReceived', 0)
+      setFieldValue('cashReturned', 0)
+      setFieldValue('cashRounding', 0)
+      this.setState({
+        cashPaymentAmount: 0,
+      })
     }
     setFieldValue('totalAmtPaid', totalPaid)
     setFieldValue(
       'outstandingAfterPayment',
-      roundToTwoDecimals(collectableAmount - totalPaid + cashReturned),
+      roundToTwoDecimals(outstandingBalance - totalPaid + cashReturned),
     )
+  }
+
+  handleCashReceivedChange = () => {
+    const { values, setFieldValue } = this.props
+    const { paymentList } = values
+    const cashPayment = paymentList.find(
+      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+    )
+    if (cashPayment) {
+      const cashReturned = roundToTwoDecimals(
+        values.cashReceived - (cashPayment.amt + values.cashRounding),
+      )
+      setFieldValue('cashReturned', cashReturned)
+    }
   }
 
   render () {
@@ -260,7 +210,7 @@ class AddPayment extends Component {
       handleSubmit,
     } = this.props
     const { paymentList } = values
-
+    console.log({ values })
     return (
       <div>
         <PayerHeader
@@ -285,7 +235,12 @@ class AddPayment extends Component {
           />
 
           <GridContainer alignItems='flex-end'>
-            <PaymentSummary clinicSettings={clinicSettings} {...values} />
+            <PaymentSummary
+              clinicSettings={clinicSettings}
+              handleCashReceivedChange={this.handleCashReceivedChange}
+              minCashReceived={this.state.cashPaymentAmount}
+              {...values}
+            />
             <GridItem md={12} className={classes.addPaymentActionButtons}>
               <Button color='danger' onClick={onClose}>
                 Cancel

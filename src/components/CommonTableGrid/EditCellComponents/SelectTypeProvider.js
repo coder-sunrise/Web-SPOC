@@ -127,7 +127,7 @@ class SelectEditor extends Component {
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
-    console.log(columnName)
+
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
     // const _onChange = (val, option) => {
     //   // console.log({ val, option })
@@ -203,6 +203,12 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
 
   const { labelField = 'name', render } = cfg
+  console.log('selectdisplay', {
+    cfgoptions: cfg.options,
+    state: state[`${columnName}Option`].find(
+      (o) => o.value === value || o.id === value,
+    ),
+  })
   const label = Object.byString(v, labelField)
   const vEl = v ? (
     <Tooltip title={label} enterDelay={1500}>

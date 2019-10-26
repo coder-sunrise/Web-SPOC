@@ -248,10 +248,27 @@ class Queue extends React.Component {
       sessionID: queueLog.sessionInfo.id,
     }).then((response) => {
       const { status } = response
-      if (status === 204)
-        this.setState({
-          showEndSessionSummary: true,
-        })
+      if (status === 204) {
+        this.setState(
+          {
+            showEndSessionSummary: true,
+          },
+          () => {
+            dispatch({
+              type: `${modelKey}updateState`,
+              payload: {
+                isClinicSessionClosed: true,
+                id: '',
+                // sessionNo: `${moment().format('YYMMDD')}-01`,
+                sessionNo: 'N/A',
+                sessionNoPrefix: '',
+                sessionStartDate: '',
+                sessionCloseDate: '',
+              },
+            })
+          },
+        )
+      }
     })
   }
 
@@ -260,7 +277,6 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async (searchQuery) => {
-    console.log('on enter pressed')
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({

@@ -50,6 +50,12 @@ const Nets = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
+            name={`paymentList[${index}].referrenceNo`}
+            render={(args) => <TextField label='Referrence No.' {...args} />}
+          />
+        </GridItem>
+        <GridItem md={6}>
+          <FastField
             name={`paymentList[${index}].remarks`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />

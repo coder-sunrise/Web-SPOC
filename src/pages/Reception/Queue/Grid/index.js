@@ -1,7 +1,8 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
 import router from 'umi/router'
+// material ui
+import { Popover } from '@material-ui/core'
 // medisys component
 import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
 import { CommonTableGrid, DateFormatter, notification } from '@/components'
@@ -46,20 +47,20 @@ const TableConfig = {
     { name: 'visitStatus', title: 'Status' },
     { name: 'queueNo', title: 'Q. No.' },
     { name: 'patientName', title: 'Patient Name' },
+    { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
     { name: 'doctor', title: 'Doctor' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
-    { name: 'invoiceAmount', title: 'Invoice Amount' },
-    { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'patientAccountNo', title: 'Acc. No.' },
-    { name: 'gst', title: 'GST' },
-    { name: 'payment', title: 'Payment' },
-    { name: 'paymentMode', title: 'Payment Mode' },
-    { name: 'company', title: 'Company' },
-    { name: 'outstandingBalance', title: 'Outstanding' },
+    { name: 'invoiceStatus', title: 'Invoice Status' },
+    { name: 'invoiceAmount', title: 'Invoice Amt.' },
+    { name: 'invoicePaymentMode', title: 'Payment Mode' },
+    { name: 'invoiceGST', title: 'GST' },
+    { name: 'invoicePaymentAmount', title: 'Payment' },
+    { name: 'invoiceOutstanding', title: 'Outstanding' },
     { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
     { name: 'action', title: 'Action' },
@@ -89,9 +90,9 @@ const columnExtensions = [
   { columnName: 'referralPerson', width: 150 },
   { columnName: 'referralRemarks', width: 150 },
   { columnName: 'invoiceAmount', type: 'number', currency: true },
-  { columnName: 'payment', type: 'number', currency: true },
-  { columnName: 'gst', type: 'number', currency: true },
-  { columnName: 'outstandingBalance', type: 'number', currency: true },
+  { columnName: 'invoicePaymentAmount', type: 'number', currency: true },
+  { columnName: 'invoiceGST', type: 'number', currency: true },
+  { columnName: 'invoiceOutstanding', type: 'number', currency: true },
   { columnName: 'Action', width: 100, align: 'center' },
   {
     columnName: 'timeIn',
@@ -160,6 +161,16 @@ const Grid = ({
   onViewPatientProfileClick,
   handleActualizeAppointment,
 }) => {
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+  const handlePopoverOpen = (event) => setAnchorEl(event.currentTarget)
+
+  const handlePopoverClose = () => setAnchorEl(null)
+
+  const openContextMenu = Boolean(anchorEl)
+
   const deleteQueue = (id) => {
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
@@ -475,6 +486,10 @@ const Grid = ({
           size='sm'
           TableProps={{ height: gridHeight }}
           rows={queueListingData}
+          onContextMenu={(row, event) => {
+            // event.preventDefault()
+            // handlePopoverOpen(event)
+          }}
           columnExtensions={[
             ...columnExtensions,
             {
@@ -490,6 +505,22 @@ const Grid = ({
           {...TableConfig}
         />
       </LoadingWrapper>
+      {/* <Popover
+        open={openContextMenu}
+        anchorEl={anchorEl}
+        // anchorOrigin={{
+        //   vertical: 'center',
+        //   horizontal: 'center',
+        // }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'center',
+        }}
+        onClose={handlePopoverClose}
+        // style={{ width: 500, height: 500 }}
+      >
+        <div style={{ width: 200, height: 400 }}>123f</div>
+      </Popover> */}
     </div>
   )
 }
