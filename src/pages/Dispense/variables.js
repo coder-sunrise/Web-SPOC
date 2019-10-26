@@ -58,38 +58,38 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    render: row => {
+    render: (row) => {
       return <p>{row.dispensedQuanity} Strips</p>
     },
   },
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    render: row => {
+    render: (row) => {
       return <p>{row.orderedQuantity} Strips</p>
     },
   },
   {
     columnName: 'batchNo',
-    render: row => {
+    render: (row) => {
       return (
         <FastField
           name={`prescription[${row.rowIndex}]batchNo`}
-          render={args => <TextField simple text={viewOnly} {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
   },
   {
     columnName: 'expiryDate',
-    render: row => {
+    render: (row) => {
       return (
         <FastField
           name={`prescription[${row.rowIndex}]expiryDate`}
-          render={args => (
+          render={(args) => (
             <DatePicker
               text={viewOnly}
-              disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
+              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               simple
               {...args}
             />
@@ -102,7 +102,7 @@ export const PrescriptionColumnExtensions = (
     columnName: 'action',
     align: 'center',
     width: 80,
-    render: row => {
+    render: (row) => {
       return (
         <Tooltip title='Print'>
           <Button
@@ -160,24 +160,24 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   },
   {
     columnName: 'batchNo',
-    render: row => {
+    render: (row) => {
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={args => <TextField simple text={viewOnly} {...args} />}
+          render={(args) => <TextField simple text={viewOnly} {...args} />}
         />
       )
     },
   },
   {
     columnName: 'expiryDate',
-    render: row => {
+    render: (row) => {
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]expiryDate`}
-          render={args => (
+          render={(args) => (
             <DatePicker
-              disabledDate={d => !d || d.isBefore(moment().add('days', -1))}
+              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               text={viewOnly}
               simple
               {...args}
@@ -206,6 +206,10 @@ export const OtherOrdersColumns = [
     name: 'totalPrice',
     title: 'Total Price',
   },
+  {
+    name: 'action',
+    title: 'Action',
+  },
 ]
 
 export const OtherOrdersColumnExtensions = (viewOnly = false) => [
@@ -213,5 +217,21 @@ export const OtherOrdersColumnExtensions = (viewOnly = false) => [
   {
     columnName: 'totalPrice',
     type: 'currency',
+  },
+  {
+    columnName: 'action',
+    align: 'center',
+    width: 80,
+    render: (r) => {
+      const { type } = r
+      if (type === 'Service') return null
+      return (
+        <Tooltip title='Print'>
+          <Button color='primary' justIcon>
+            <Print />
+          </Button>
+        </Tooltip>
+      )
+    },
   },
 ]
