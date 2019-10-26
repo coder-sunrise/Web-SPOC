@@ -1,20 +1,25 @@
 import React from 'react'
 import { Getter, Plugin } from '@devexpress/dx-react-core'
-import { IntegratedSelection } from '@devexpress/dx-react-grid-material-ui'
+import { IntegratedSelection } from '@devexpress/dx-react-grid'
 
 class PatchedIntegratedSelection extends React.PureComponent {
   render () {
     const { rowSelectionEnabled, ...restProps } = this.props
+    console.log({ props: this.props })
     return (
       <Plugin>
         <Getter
           name='rows'
           computed={({ rows }) => {
             this.rows = rows
-            return rows.filter(rowSelectionEnabled)
+            if (rowSelectionEnabled) {
+              const filtered = rows.filter(rowSelectionEnabled)
+              return filtered
+            }
+            return rows
           }}
         />
-        <IntegratedSelection {...restProps} />
+        <IntegratedSelection />
         <Getter name='rows' computed={() => this.rows} />
       </Plugin>
     )
