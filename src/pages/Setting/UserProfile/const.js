@@ -14,11 +14,12 @@ export const UserProfileTableConfig = {
   columnExtensions: [
     {
       columnName: 'userName',
-      sortBy: 'userProfileNavigation.userName',
+      sortBy: 'userProfileFKNavigation.userName',
       render: (row) => (row.userProfile ? row.userProfile.userName : ''),
     },
     {
       columnName: 'role',
+      sortBy: 'userProfileFKNavigation.UserRole.RoleNavigation.Description',
       render: (row) =>
         row.userProfile && row.userProfile.role
           ? row.userProfile.role.name

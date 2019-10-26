@@ -113,13 +113,13 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       recurrenceDto: { ...initDailyRecurrence },
     }
   },
-  validationSchema: Yup.object().shape(
-    {
-      // code: Yup.string().required(),
-      // displayValue: Yup.string().required(),
-      // effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    roomFK: Yup.string().required(),
+    durationHour: Yup.string().required(),
+    durationMinute: Yup.string().required(),
+    eventDate: Yup.string().required(),
+    eventTime: Yup.string().required(),
+  }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onClose, onConfirm } = props
     const {
