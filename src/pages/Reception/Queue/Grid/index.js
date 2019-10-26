@@ -78,6 +78,16 @@ const columnExtensions = [
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
   { columnName: 'visitStatus', type: 'status', width: 150 },
+  { columnName: 'timeOut', render: (row) => row.timeOut || '-' },
+  { columnName: 'invoiceNo', render: (row) => row.invoiceNo || '-' },
+  {
+    columnName: 'roomNo',
+    render: (row) => row.roomNo || '-',
+  },
+  {
+    columnName: 'patientScheme',
+    render: (row) => row.patientScheme || '-',
+  },
   {
     columnName: 'invoicePaymentMode',
     width: 150,
