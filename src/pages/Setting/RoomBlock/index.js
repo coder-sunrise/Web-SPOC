@@ -17,14 +17,6 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-const DoctorFormValidation = Yup.object().shape({
-  doctorBlockUserFk: Yup.string().required(),
-  durationHour: Yup.string().required(),
-  durationMinute: Yup.string().required(),
-  eventDate: Yup.string().required(),
-  eventTime: Yup.string().required(),
-})
-
 @connect(({ roomBlock, loading }) => ({
   roomBlock,
   loading: loading.effects['roomBlock/query'],
