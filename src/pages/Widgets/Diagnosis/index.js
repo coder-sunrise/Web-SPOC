@@ -139,7 +139,6 @@ class Diagnosis extends PureComponent {
 
             return diagnosises.map((v, i) => {
               if (v.isDeleted === true) return null
-              console.log("========= ", arrayHelpers)
               return (
                 <div key={v.uid}>
                   <Item

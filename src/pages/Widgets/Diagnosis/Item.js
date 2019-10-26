@@ -57,9 +57,11 @@ const DiagnosisItem = ({
         setCtComplicationPairedWithDiag(_complication)
       }
       const { ctComplication = [] } = codetable
-      const selectedComplications = diagnosises[index].corComplication.map(
-        (complication) => complication.complicationFK,
-      )
+      const selectedComplications = diagnosises[index].corComplication
+        ? diagnosises[index].corComplication.map(
+            (complication) => complication.complicationFK,
+          )
+        : []
       const _ctComplication = ctComplication.reduce(
         (mappedCtComplication, complication) => {
           if (selectedComplications.includes(complication.id))
@@ -96,9 +98,6 @@ const DiagnosisItem = ({
 
       setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
 
-
-      
-
       if (op.complication && op.complication.length) {
         // setFieldValue(
         //   `corDiagnosis[${index}]complication`,
@@ -110,7 +109,7 @@ const DiagnosisItem = ({
         //     complicationFK: o.id,
         //   })),
         // )
-      }else{
+      } else {
         setFieldValue(`corDiagnosis[${index}]complication`, [])
         setFieldValue(`corDiagnosis[${index}]corComplication`, [])
         setCtComplicationPairedWithDiag([])
