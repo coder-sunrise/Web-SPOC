@@ -321,7 +321,6 @@ class ClinicalNotes extends Component {
         showScribbleModal: !scriblenotes.showScribbleModal,
       },
     })
-  
   }
 
   getScribbleValue = (test) => {
@@ -357,7 +356,7 @@ class ClinicalNotes extends Component {
 
         return [
           ...attachments,
-          { ...item },  
+          { ...item },
         ]
       }, [])
 
@@ -409,8 +408,8 @@ class ClinicalNotes extends Component {
       clinicalnotes,
       classes,
       scriblenotes,
+      theme,
     } = this.props
-
     return (
       <div>
         <div className={classes.editor}>
@@ -420,6 +419,7 @@ class ClinicalNotes extends Component {
             name='corScribbleNotes'
             render={(arrayHelpers) => {
               const { form } = arrayHelpers
+              this.form = form
               const { values } = form
               // console.log('diagnosis', values)
 
@@ -628,7 +628,7 @@ class ClinicalNotes extends Component {
                     </div>
                   </div>
                   <RichEditor
-                   // handlePastedText={() => false}
+                    // handlePastedText={() => false}
                     handlePastedText={() => false}
                     strongLabel
                     label='Clinical Notes'
@@ -994,7 +994,6 @@ class ClinicalNotes extends Component {
                     strongLabel
                     label='Plan'
                     {...args}
-
                   />
                 </div>
               )
@@ -1002,39 +1001,11 @@ class ClinicalNotes extends Component {
           />
         </div>
 
-        
+        <div style={{ marginTop: theme.spacing(1) }}>
+          <UploadAttachment updateAttachments={this.updateAttachments} />
+        </div>
 
-        <h6 style={{ marginTop: 10 }}></h6>
-        <FastField
-          name='corAttachment'
-          render={(args) => {
-            this.form = args.form
-
-          //   <Attachment
-          //   attachmentType='ClinicalNotes'
-          //   handleUpdateAttachments={this.updateAttachments(args)}
-          //   attachments={args.field.value}
-          //   label=''
-          //   isReadOnly
-          // />
-
-            return (
-              <UploadAttachment updateAttachments={this.updateAttachments} />
-            )
-          }}
-        />
-
-        {/*         
-        <p>
-          <a>Attachment002.pdf</a>
-        </p>
-        <p>
-          <a>Attachment003.docx</a>
-        </p>
-        <p>
-          <a>Scribble 01</a>
-        </p> */}
-        <CommonModal
+        {/* <CommonModal
           open={clinicalnotes.showAttachmentModal}
           title='Upload Attachment'
           maxWidth='sm'
@@ -1042,8 +1013,8 @@ class ClinicalNotes extends Component {
           onClose={() => this.toggleAttachmentModal()}
         >
           <UploadAttachment updateAttachments={this.updateAttachments} />
-        </CommonModal>
-        
+        </CommonModal> */}
+
         <CommonModal
           open={scriblenotes.showScribbleModal}
           title='Scribble'

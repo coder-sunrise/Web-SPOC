@@ -13,6 +13,7 @@ import {
 } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
+import { INVOICE_STATUS } from '@/utils/constants'
 import { isPOStatusFinalized } from '../../variables'
 import PaymentDetails from './PaymentDetails'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -151,22 +152,22 @@ class index extends PureComponent {
 
   render () {
     const { purchaseOrderDetails } = this.props
-    // const { showPODOPaymentModal } = this.state
-    const poStatus = purchaseOrderDetails
-      ? purchaseOrderDetails.purchaseOrder.purchaseOrderStatusFK
-      : 1
+    const { purchaseOrder: po } = purchaseOrderDetails
+    const poStatus = po ? po.purchaseOrderStatusFK : 1
+    const isWriteOff = po
+      ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+      : false
     const isEditable = isPOStatusFinalized(poStatus)
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: poStatus !== 6 ? 'enable' : 'disable',
+          rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
           // rights: 'disable',
         }}
       >
         <GridContainer>
           <Header {...this.props} />
           <Grid
-            isEditable={!isEditable}
             {...this.props}
             recalculateOutstandingAmount={this.recalculateOutstandingAmount}
           />
@@ -198,15 +199,11 @@ class index extends PureComponent {
           <ProgressButton
             color='danger'
             icon={null}
-            disabled={isEditable}
             onClick={navigateDirtyCheck(this.onClickCancelPayment)}
           >
             Cancel
           </ProgressButton>
-          <ProgressButton
-            onClick={this.props.handleSubmit}
-            disabled={isEditable}
-          />
+          <ProgressButton onClick={this.props.handleSubmit} />
         </div>
       </AuthorizedContext.Provider>
     )

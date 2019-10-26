@@ -239,7 +239,7 @@ class SelectTypeProvider extends React.Component {
       if (!labelField) {
         labelField = 'name'
       }
-      console.log(labelField)
+      // console.log(labelField)
       o.compare = (a, b) => {
         const codes = this.state[`${columnName}Option`]
         const aa = codes.find((m) => m[valueField] === a)

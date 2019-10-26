@@ -10,7 +10,6 @@ import { withFormik } from 'formik'
 import { Book, Pageview, Edit, Delete } from '@material-ui/icons'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom components
-import Authorized from '@/utils/Authorized'
 import {
   Dialog,
   DialogTitle,
@@ -18,6 +17,7 @@ import {
   DialogContent,
   DialogContentText,
 } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 import {
   Button,
   CommonTableGrid,
@@ -118,7 +118,9 @@ class Statement extends PureComponent {
   }
 
   handleSelectionChange = (selection) => {
-    this.setState({ selectedRows: selection })
+    if (selection.length < 2) {
+      this.setState({ selectedRows: selection })
+    }
   }
 
   // editRow = (row, e) => {
@@ -195,6 +197,7 @@ class Statement extends PureComponent {
             handleSearch={this.handleSearch}
             handleAddNew={this.toggleAddNewStatementModal}
             dispatch={dispatch}
+            selectedRows={this.state.selectedRows}
           />
           <CommonTableGrid
             style={{ margin: 0 }}

@@ -87,8 +87,12 @@ export default createFormViewModel({
               ...x,
               orderQuantity: x.orderQuantity,
               totalBonusReceived: x.bonusReceived,
-              currentReceivingQty: x.orderQuantity - x.totalQtyReceived,
-              currentReceivingBonusQty: x.bonusQty - x.bonusReceived,
+              // currentReceivingQty: x.orderQuantity - x.totalQtyReceived,
+              // currentReceivingBonusQty: x.bonusQty - x.bonusReceived,
+              currentReceivingQty: x.orderQuantity - x.quantityReceived,
+              currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
+              maxCurrentReceivingQty: x.orderQuantity - x.quantityReceived,
+              maxCurrentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
             }
           })
         }

@@ -158,7 +158,7 @@ const ItemList = ({
             <FastField
               name={`rows[${row.rowIndex}].${itemFKName}`}
               render={(args) => {
-                console.log(args)
+                // console.log(args)
                 return (
                   <CodeSelect
                     text

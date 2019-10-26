@@ -59,14 +59,17 @@ const styles = () => ({
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, ...restValues } = values
+    const { effectiveDates, statementInvoice, ...restValues } = values
     const { dispatch, history } = props
+    statementInvoice.forEach((o) => {
+      delete o.id
+    })
     console.log('submit', values)
-    // return
     dispatch({
       type: 'statement/upsert',
       payload: {
         ...restValues,
+        statementInvoice,
       },
     }).then((r) => {
       if (r) {
@@ -152,9 +155,11 @@ class AddNewStatement extends PureComponent {
     let statementInvoiceRows = []
     rows.forEach((o) => {
       const invoice = invoiceRows.find((r) => r.id === o)
-      invoice.invoicePayerFK = values.copayerFK
-      invoice.invoiceFK = o
-      statementInvoiceRows.push(invoice)
+      if (invoice) {
+        invoice.invoicePayerFK = values.copayerFK
+        invoice.invoiceFK = o
+        statementInvoiceRows.push(invoice)
+      }
     })
     setValues({
       ...values,
