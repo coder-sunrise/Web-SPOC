@@ -97,6 +97,12 @@ const DispenseDetails = ({
                 }}
                 onValueChanged={(v) => {
                   console.log(v)
+
+                  setFieldValue('invoice.invoiceTotal', v.summary.total)
+                  setFieldValue(
+                    'invoice.invoiceTotalAftAdj',
+                    v.summary.totalAfterAdj,
+                  )
                   setFieldValue(
                     'invoice.invoiceTotalAftGST',
                     v.summary.totalWithGST,
@@ -106,11 +112,7 @@ const DispenseDetails = ({
                     v.summary.totalWithGST,
                   )
                   // console.log({ v })
-                  setFieldValue(
-                    'invoice.invoiceTotal',
-                    Math.round((v.summary.totalWithGST - v.summary.gst) * 100) /
-                      100,
-                  )
+
                   setFieldValue(
                     'invoice.invoiceGSTAmt',
                     Math.round(v.summary.gst * 100) / 100,

@@ -478,7 +478,7 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {routerConfig ? children : <div />}
+                                  {children}
                                 </div>
                               </div>
                             </ErrorBoundary>
