@@ -203,12 +203,7 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
 
   const { labelField = 'name', render } = cfg
-  console.log('selectdisplay', {
-    cfgoptions: cfg.options,
-    state: state[`${columnName}Option`].find(
-      (o) => o.value === value || o.id === value,
-    ),
-  })
+
   const label = Object.byString(v, labelField)
   const vEl = v ? (
     <Tooltip title={label} enterDelay={1500}>
