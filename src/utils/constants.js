@@ -133,3 +133,19 @@ export const INVOICE_STATUS = {
   OUTSTANDING: 3,
   WRITEOFF: 4,
 }
+
+export const PURCHASE_ORDER_STATUS_TEXT = {
+  DRAFT: 'Draft',
+  FINALIZED: 'Finalized',
+  PARTIALREVD: 'Partially Received',
+  CANCELLED: 'Cancelled',
+  FULFILLED: 'Fulfilled',
+  COMPLETED: 'Completed',
+}
+
+export const INVOICE_STATUS_TEXT = {
+  PAID: 'Paid',
+  OVERPAID: 'Overpaid',
+  OUTSTANDING: 'Outstanding',
+  WRITEOFF: 'Write-Off',
+}

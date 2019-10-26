@@ -68,7 +68,6 @@ const bannerStyle = {
     try {
       if (billing.entity) {
         const finalClaim = 0
-
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
@@ -145,9 +144,10 @@ const bannerStyle = {
     }).then((response) => {
       if (response) {
         resetForm()
-        dispatch({
-          type: 'billing/closeModal',
-        })
+        router.push('/reception/queue')
+        // dispatch({
+        //   type: 'billing/closeModal',
+        // })
       }
     })
   },
@@ -203,6 +203,7 @@ class Billing extends Component {
     setFieldValue('payments', [
       rest,
     ])
+
     setFieldValue('invoice.outstandingBalance', outstandingBalance)
     this.toggleAddPaymentModal()
   }

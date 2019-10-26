@@ -181,6 +181,11 @@ class GlobalModalContainer extends PureComponent {
               type: 'patient/closePatientModal',
             })
           }}
+          onConfirm={() => {
+            dispatch({
+              type: 'patient/closePatientModal',
+            })
+          }}
           // onConfirm={this.toggleModal}
           fullScreen
           className={classes.patientModal}

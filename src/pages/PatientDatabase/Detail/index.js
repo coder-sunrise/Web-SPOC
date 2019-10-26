@@ -61,7 +61,7 @@ const styles = () => ({
 }))
 @withFormikExtend({
   authority: 'patientdatabase.patientprofiledetails',
-  // enableReinitialize: true,
+  enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
     // console.log(patient)
     const mappedValues = {
@@ -108,25 +108,20 @@ const styles = () => ({
                 }),
               ),
             )
-        } else {
-          dispatch({
-            type: 'patient/closePatientModal',
-          })
         }
         dispatch({
           type: 'patient/query',
           payload: {
             id: r.id || values.id,
           },
-        }).then((value) => {
-          resetForm(value)
+        }).then(() => {
           if (patient.callback) patient.callback()
         })
         if (onConfirm) onConfirm()
+        resetForm()
       }
     })
   },
-
   displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {

@@ -23,7 +23,7 @@ export default createListViewModel({
               if (codetable.code !== 'codetable/ctsnomeddiagnosis') {
                 return {
                   ...allCodetable,
-                  [codetable.code]: codetable.data,
+                  [codetable.code.toLowerCase()]: codetable.data,
                 }
               }
               return { ...allCodetable }
