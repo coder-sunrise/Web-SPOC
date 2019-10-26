@@ -1,5 +1,5 @@
 /* eslint-disable react/no-multi-comp */
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import { connect } from 'dva'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
@@ -13,7 +13,7 @@ import {
   difference,
 } from '@/utils/utils'
 
-class SelectEditor extends PureComponent {
+class SelectEditor extends Component {
   state = {
     error: false,
   }
@@ -47,6 +47,12 @@ class SelectEditor extends PureComponent {
     })
   }
 
+  shouldComponentUpdate (nextProps, nextState) {
+    // console.log(nextProps, nextState)
+    // console.log(this.props, this.state)
+    return true
+  }
+
   // componentWillUnmount () {
   //   console.log('unmount')
   // }
@@ -75,9 +81,10 @@ class SelectEditor extends PureComponent {
     } = cfg
 
     const error = updateCellValue(this.props, this.myRef.current, val)
-    this.setState({
-      error,
-    })
+    if (error !== this.state.error)
+      this.setState({
+        error,
+      })
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
@@ -120,6 +127,7 @@ class SelectEditor extends PureComponent {
     const latestRow = window.$tempGridRow[gridId]
       ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row
+
     // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
     // const _onChange = (val, option) => {
     //   // console.log({ val, option })
@@ -195,6 +203,12 @@ const SelectDisplay = (columnExtensions, state) => ({
     ) || {}
 
   const { labelField = 'name', render } = cfg
+  console.log('selectdisplay', {
+    cfgoptions: cfg.options,
+    state: state[`${columnName}Option`].find(
+      (o) => o.value === value || o.id === value,
+    ),
+  })
   const label = Object.byString(v, labelField)
   const vEl = v ? (
     <Tooltip title={label} enterDelay={1500}>
@@ -239,7 +253,7 @@ class SelectTypeProvider extends React.Component {
       if (!labelField) {
         labelField = 'name'
       }
-      console.log(labelField)
+      // console.log(labelField)
       o.compare = (a, b) => {
         const codes = this.state[`${columnName}Option`]
         const aa = codes.find((m) => m[valueField] === a)

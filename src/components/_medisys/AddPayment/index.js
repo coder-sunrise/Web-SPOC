@@ -39,7 +39,6 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReturned: 0,
       cashReceived: 0,
       cashRounding: 0,
-
       outstandingAfterPayment: outstandingBalance,
       totalAmtPaid: outstandingBalance,
       paymentList: [],
@@ -88,6 +87,10 @@ import { PAYMENT_MODE } from '@/utils/constants'
   },
 })
 class AddPayment extends Component {
+  state = {
+    cashPaymentAmount: 0,
+  }
+
   componentDidMount () {
     const { values, setFieldValue } = this.props
     const { paymentList, collectableAmount } = values
@@ -123,38 +126,7 @@ class AddPayment extends Component {
     ]
     await setFieldValue('paymentList', newPaymentList)
     this.handleAmountChange()
-    // if (values.paymentList.length === 0) {
-    //   setFieldValue('outstandingAfterPayment', 0)
-    //   setFieldValue('totalAmtPaid', amount)
-
-    // if (parseInt(type, 10) === PAYMENT_MODE.CASH) {
-    //   setFieldValue('cashReceived', amount)
-    //   const cashAfterRounding = rounding(clinicSettings, amount)
-    //   setFieldValue(
-    //     'cashRounding',
-    //     roundToTwoDecimals(cashAfterRounding - amount),
-    //   )
-    // }
-    // }
   }
-
-  // calculateOutstanding = () => {
-  //   const { values, setFieldValue, clinicSettings } = this.props
-  //   const { paymentList, outstandingBalance, collectableAmount } = values
-  //   const totalPaid = paymentList.reduce(
-  //     (total, payment) => total + (payment.amt || 0),
-  //     0,
-  //   )
-  //   const cashPayment = paymentList.find(
-  //     (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
-  //   )
-
-  //   setFieldValue('totalAmtPaid', totalPaid)
-  //   setFieldValue(
-  //     'outstandingAfterPayment',
-  //     roundToTwoDecimals(outstandingBalance - totalPaid),
-  //   )
-  // }
 
   onDeleteClick = async (event) => {
     const { currentTarget: { id } } = event
@@ -162,21 +134,9 @@ class AddPayment extends Component {
     const newPaymentList = values.paymentList.filter(
       (payment) => payment.id !== parseFloat(id, 10),
     )
-    const hasCash = newPaymentList.reduce(
-      (noCashPaymentMode, payment) =>
-        payment.paymentModeFK === PAYMENT_MODE.CASH || noCashPaymentMode,
-      false,
-    )
 
     await setFieldValue('paymentList', newPaymentList)
-    if (!hasCash) {
-      setFieldValue('cashReceived', 0)
-      setFieldValue('cashReturned', 0)
-      setFieldValue('cashRounding', 0)
-    }
     this.handleAmountChange()
-    // if (newPaymentList.length === 0)
-    //   setFieldValue('outstandingAfterPayment', values.collectableAmount)
   }
 
   handleAmountChange = () => {
@@ -195,6 +155,7 @@ class AddPayment extends Component {
       const cashAfterRounding = roundToTwoDecimals(
         rounding(clinicSettings, cashPayment.amt),
       )
+      console.log({ cashAfterRounding })
       setFieldValue('cashReceived', cashAfterRounding)
       setFieldValue(
         'cashRounding',
@@ -205,6 +166,23 @@ class AddPayment extends Component {
         cashReturned = roundToTwoDecimals(totalPaid - outstandingBalance)
         setFieldValue('cashReturned', cashReturned)
       }
+      const collectableAmountAfterRounding = roundToTwoDecimals(
+        rounding(clinicSettings, outstandingBalance),
+      )
+      setFieldValue('collectableAmount', collectableAmountAfterRounding)
+      this.setState({
+        cashPaymentAmount: cashPayment.amt,
+      })
+    } else {
+      console.log('no cash payment')
+
+      setFieldValue('collectableAmount', values.finalPayable)
+      setFieldValue('cashReceived', 0)
+      setFieldValue('cashReturned', 0)
+      setFieldValue('cashRounding', 0)
+      this.setState({
+        cashPaymentAmount: 0,
+      })
     }
     setFieldValue('totalAmtPaid', totalPaid)
     setFieldValue(
@@ -265,6 +243,7 @@ class AddPayment extends Component {
             <PaymentSummary
               clinicSettings={clinicSettings}
               handleCashReceivedChange={this.handleCashReceivedChange}
+              minCashReceived={this.state.cashPaymentAmount}
               {...values}
             />
             <GridItem md={12} className={classes.addPaymentActionButtons}>

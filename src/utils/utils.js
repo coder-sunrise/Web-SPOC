@@ -915,7 +915,8 @@ const calculateAmount = (
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
       gst,
-      total: totalAfterAdj,
+      total,
+      totalAfterAdj,
       totalWithGST: isGSTInclusive ? totalAfterAdj : gst + totalAfterAdj,
       isEnableGST,
       gSTPercentage,

@@ -15,9 +15,20 @@ import DOGrid from './DOGrid'
 import DODetails from './DODetails'
 import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
+import { INVOICE_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
+  errorMsgStyle: {
+    margin: theme.spacing(2),
+    color: '#cf1322',
+    fontSize: ' 0.75rem',
+    minHeight: '1em',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: ' 0.03333em',
+  },
 })
 
 // @withFormikExtend({
@@ -71,12 +82,15 @@ class index extends Component {
     const { purchaseOrderDetails, theme } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
+    const isWriteOff = purchaseOrder
+      ? purchaseOrder.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+      : false
     const { showDeliveryOrderDetails } = this.state
 
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: poStatus !== 6 ? 'enable' : 'disable',
+          rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
           // rights: 'disable',
         }}
       >

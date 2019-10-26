@@ -70,7 +70,8 @@ class SchemesGrid extends PureComponent {
               ctSchemeType.toLowerCase()
             ]
             const st = ctSchemeTypes.find((o) => o.id === val)
-            console.log('schemesgrid', { rows, st })
+            if (!st) return
+            // console.log('schemesgrid', { rows, st })
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&
@@ -98,7 +99,6 @@ class SchemesGrid extends PureComponent {
               notification.error({
                 message: 'Patient already has a CHAS Scheme Added',
               })
-              return
             }
             // console.log(row, rows)
             if (
@@ -123,13 +123,13 @@ class SchemesGrid extends PureComponent {
               row.validFrom = undefined
               row.validTo = undefined
             }
-            this.props.dispatch({
-              // force current edit row components to update
-              type: 'global/updateState',
-              payload: {
-                commitCount: commitCount++,
-              },
-            })
+            // this.props.dispatch({
+            //   // force current edit row components to update
+            //   type: 'global/updateState',
+            //   payload: {
+            //     commitCount: commitCount++,
+            //   },
+            // })
           },
         },
         {

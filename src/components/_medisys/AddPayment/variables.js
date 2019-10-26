@@ -5,35 +5,30 @@ export const ValidationSchema = Yup.object().shape({
   cashReceived: Yup.number(),
   cashReturned: Yup.number(),
   totalAmtPaid: Yup.number(),
+  finalPayable: Yup.number(),
   collectableAmount: Yup.number(),
   outstandingBalance: Yup.number(),
   outstandingAfterPayment: Yup.number(),
   paymentList: Yup.array().when(
     [
-      'cashReturned',
+      'collectableAmount',
       'outstandingBalance',
       'totalAmtPaid',
     ],
-    (cashReturned, totalAmtPaid, outstandingBalance, schema) => {
+    (collectableAmount, outstandingBalance, totalAmtPaid, schema) => {
       // console.log('total', outstandingBalance - totalAmtPaid + cashReturned)
-      if (totalAmtPaid - cashReturned > 0)
+      if (totalAmtPaid > outstandingBalance)
         return schema.of(
           Yup.object().shape({
             id: Yup.number(),
             paymentModeFK: Yup.number().required(),
-            amt: Yup.number().when(
-              'paymentModeFK',
-              (paymentModeFK) =>
-                paymentModeFK !== PAYMENT_MODE.CASH
-                  ? Yup.number()
-                      .min(0)
-                      .max(
-                        totalAmtPaid - cashReturned,
-                        `Total amount paid cannot exceed $${totalAmtPaid}`,
-                      )
-                      .required()
-                  : Yup.number().min(0).required(),
-            ),
+            amt: Yup.number()
+              .min(0, 'Amount must be greater than 0')
+              .max(
+                outstandingBalance - totalAmtPaid,
+                `Total amount paid cannot exceed $${outstandingBalance}`,
+              )
+              .required(),
             creditCardTypeFK: Yup.string().when('paymentModeFK', {
               is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
               then: Yup.string().required(),
@@ -54,11 +49,18 @@ export const ValidationSchema = Yup.object().shape({
           }),
         )
       // if (outstandingAfterPayment === 0)
+
       return schema.of(
         Yup.object().shape({
           id: Yup.number(),
           paymentModeFK: Yup.number().required(),
-          amt: Yup.number().min(0).required(),
+          amt: Yup.number()
+            .min(0)
+            .max(
+              collectableAmount,
+              `Total amount paid cannot exceed $${collectableAmount}`,
+            )
+            .required(),
           creditCardTypeFK: Yup.string().when('paymentModeFK', {
             is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
             then: Yup.string().required(),

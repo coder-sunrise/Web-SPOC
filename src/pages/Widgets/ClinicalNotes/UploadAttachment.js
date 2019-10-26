@@ -50,14 +50,21 @@ class UploadAttachment extends PureComponent {
         <div style={{ margin: theme.spacing(1) }}>
           <FastField
             name='corAttachment'
-            render={(args) => (
-              <Attachment
-                attachmentType='ClinicalNotes'
-                handleUpdateAttachments={updateAttachments(args)}
-                attachments={args.field.value}
-                // isReadOnly={isReadOnly}
-              />
-            )}
+            render={(args) => {
+              // console.log(args)
+              return (
+                <Attachment
+                  attachmentType='ClinicalNotes'
+                  filterTypes={[
+                    'ClinicalNotes',
+                    'Visit',
+                  ]}
+                  handleUpdateAttachments={updateAttachments(args)}
+                  attachments={args.field.value}
+                  // isReadOnly={isReadOnly}
+                />
+              )
+            }}
           />
         </div>
         {footer &&
