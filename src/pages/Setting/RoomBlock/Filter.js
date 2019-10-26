@@ -12,6 +12,7 @@ import {
   Button,
   ProgressButton,
   DatePicker,
+  Field,
 } from '@/components'
 // medisys components
 
@@ -37,8 +38,8 @@ const styles = (theme) => ({
   mapPropsToValues: () => {
     return {
       roomBlockGroupFK: [],
-      dateFrom: undefined,
-      dateTo: undefined,
+      dateFrom: moment().subtract(6, 'months'),
+      dateTo: moment(),
       recurrence: undefined,
     }
   },
@@ -47,7 +48,11 @@ const styles = (theme) => ({
     dateTo: Yup.date().when(
       'dateFrom',
       (dateFrom, schema) =>
-        dateFrom && schema.min(moment(dateFrom).add(6, 'months').calendar()),
+        dateFrom &&
+        schema.max(
+          moment(dateFrom).add(6, 'months'),
+          'Maximum 6 months date range.',
+        ),
     ),
   }),
 
@@ -85,7 +90,7 @@ const styles = (theme) => ({
 class Filter extends PureComponent {
   setDateTo = (v) => {
     if (v) {
-      this.props.setFieldValue('dateTo', moment(v).add(6, 'months').calendar())
+      this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
     } else {
       this.props.setFieldValue('dateTo', undefined)
     }
@@ -115,12 +120,12 @@ class Filter extends PureComponent {
             />
           </GridItem>
           <GridItem xs={2} md={2}>
-            <FastField
+            <Field
               name='dateFrom'
               render={(args) => {
                 return (
                   <DatePicker
-                    timeFomat={false}
+                    // timeFomat={false}
                     label='From date'
                     onChange={(v) => this.setDateTo(v)}
                     {...args}
@@ -130,12 +135,10 @@ class Filter extends PureComponent {
             />
           </GridItem>
           <GridItem xs={2} md={2}>
-            <FastField
+            <Field
               name='dateTo'
               render={(args) => {
-                return (
-                  <DatePicker timeFomat={false} label='To date' {...args} />
-                )
+                return <DatePicker label='To date' {...args} />
               }}
             />
           </GridItem>

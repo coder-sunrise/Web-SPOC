@@ -53,7 +53,8 @@ const recurrenceTypes = [
 @withFormik({
   mapPropsToValues: () => ({
     doctorName: [],
-    dates: [],
+    dateFrom: moment().subtract(6, 'months'),
+    dateTo: moment(),
     recurrence: undefined,
   }),
   validationSchema: Yup.object().shape({
@@ -61,7 +62,11 @@ const recurrenceTypes = [
     dateTo: Yup.date().when(
       'dateFrom',
       (dateFrom, schema) =>
-        dateFrom && schema.min(moment(dateFrom).add(6, 'months').calendar()),
+        dateFrom &&
+        schema.max(
+          moment(dateFrom).add(6, 'months'),
+          'Maximum 6 months date range.',
+        ),
     ),
   }),
   handleSubmit: (values, { props }) => {
@@ -84,7 +89,7 @@ const recurrenceTypes = [
 class Filter extends PureComponent {
   setDateTo = (v) => {
     if (v) {
-      this.props.setFieldValue('dateTo', moment(v).add(6, 'months').calendar())
+      this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
     } else {
       this.props.setFieldValue('dateTo', undefined)
     }
@@ -123,7 +128,7 @@ class Filter extends PureComponent {
               render={(args) => {
                 return (
                   <DatePicker
-                    timeFomat={false}
+                    timeFormat={false}
                     label='From date'
                     onChange={(v) => this.setDateTo(v)}
                     {...args}
@@ -137,7 +142,7 @@ class Filter extends PureComponent {
               name='dateTo'
               render={(args) => {
                 return (
-                  <DatePicker timeFomat={false} label='To date' {...args} />
+                  <DatePicker timeFormat={false} label='To date' {...args} />
                 )
               }}
             />
