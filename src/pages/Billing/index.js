@@ -68,7 +68,6 @@ const bannerStyle = {
     try {
       if (billing.entity) {
         const finalClaim = 0
-        console.log({ invoice: billing.entity.invoice, finalClaim })
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )

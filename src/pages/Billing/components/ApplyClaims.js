@@ -175,17 +175,18 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
 
   const updateOriginalInvoiceItemList = () => {
     const _resultInvoiceItems = invoice.invoiceItems.map((item) => {
-      const _subtotal = tempInvoicePayer.reduce((subtotal, invoicePayer) => {
+      const computeInvoicePayerSubtotal = (subtotal, invoicePayer) => {
+        if (invoicePayer.isCancelled) return roundToTwoDecimals(subtotal)
         const _invoicePayerItem = invoicePayer.invoicePayerItems.find(
           (payerItem) => payerItem.id === item.id,
         )
 
-        if (_invoicePayerItem)
+        if (_invoicePayerItem) {
           return roundToTwoDecimals(subtotal + _invoicePayerItem.claimAmount)
-
+        }
         return roundToTwoDecimals(subtotal)
-      }, 0)
-
+      }
+      const _subtotal = tempInvoicePayer.reduce(computeInvoicePayerSubtotal, 0)
       return { ...item, _claimedAmount: _subtotal }
     })
 
@@ -193,15 +194,20 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const _updateTempInvoicePayer = (updatedIndex, updatedRow) => {
-    const _invoicePayersWithUpdatedClaimRow = refTempInvociePayer.current
-      .map(
-        (item, oriIndex) =>
-          updatedIndex === oriIndex ? { ...updatedRow } : { ...item },
-      )
-      .filter((item) => !item._isDeleted)
+    const _invoicePayersWithUpdatedClaimRow = refTempInvociePayer.current.map(
+      (item, oriIndex) =>
+        updatedIndex === oriIndex ? { ...updatedRow } : { ...item },
+    )
 
     const _newTempInvoicePayer = _invoicePayersWithUpdatedClaimRow.reduce(
       (_newInvoicePayers, invoicePayer, curIndex) => {
+        if (invoicePayer.isCancelled) {
+          return [
+            ..._newInvoicePayers,
+            invoicePayer,
+          ]
+        }
+
         if (curIndex === 0) {
           return [
             ..._newInvoicePayers,
@@ -214,7 +220,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                       ? originalItem.id === item.invoiceItemFK
                       : originalItem.id === item.id,
                 )
-                console.log({ original, invoice })
                 return { ...item, payableBalance: original.totalAfterGst }
               }),
             },
@@ -486,11 +491,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       } else if (claimableSchemes.length > 0) {
         const _invoicePayer = {
           _indexInClaimableSchemes: 0,
-
           _isConfirmed: false,
           _isDeleted: false,
           _isEditing: true,
           _isValid: true,
+          isDeleted: false,
+          isCancelled: false,
           copaymentSchemeFK: undefined,
           name: '',
           payerDistributedAmt: 0,
@@ -517,10 +523,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const newInvoiceItems = validateInvoicePayerItems(
       tempInvoicePayer[index].invoicePayerItems,
     )
-    const isInvalid = newInvoiceItems.reduce(
+    const hasInvalidRow = newInvoiceItems.reduce(
       (hasError, item) => (item.error ? true : hasError),
       false,
     )
+
     const updatedRow = {
       ...tempInvoicePayer[index],
       payerDistributedAmt: roundToTwoDecimals(
@@ -530,10 +537,17 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         ),
       ),
       invoicePayerItems: newInvoiceItems,
-      _isConfirmed: !isInvalid,
-      _isEditing: isInvalid,
+      _isConfirmed: !hasInvalidRow,
+      _isEditing: hasInvalidRow,
       _isDeleted: false,
     }
+
+    if (hasInvalidRow) {
+      // abort early when there is row level error
+      _updateTempInvoicePayer(index, updatedRow)
+      return false
+    }
+
     const invalidMessages = validateClaimAmount(updatedRow, values.finalPayable)
 
     if (invalidMessages.length <= 0) {
@@ -544,19 +558,26 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       setErrorMessage(invalidMessages)
       toggleErrorPrompt()
     }
+    return true
   }
 
-  const handleAppliedSchemeCancelClick = (index) => () => {
-    const updatedRow = {
-      ...tempInvoicePayer[index],
-      ...curEditInvoicePayerBackup,
-      _isConfirmed: true,
-      _isEditing: false,
-      _isDeleted: false,
-    }
-    setCurEditInvoicePayerBackup(updatedRow)
-    _updateTempInvoicePayer(index, updatedRow)
-  }
+  const handleAppliedSchemeCancelClick = useCallback(
+    (index) => () => {
+      const updatedRow = {
+        ...tempInvoicePayer[index],
+        ...curEditInvoicePayerBackup,
+        _isConfirmed: false,
+        _isEditing: true,
+        _isDeleted: false,
+        isCancelled: false,
+      }
+      setCurEditInvoicePayerBackup(updatedRow)
+      _updateTempInvoicePayer(index, updatedRow)
+    },
+    [
+      curEditInvoicePayerBackup,
+    ],
+  )
 
   const handleAppliedSchemeEditClick = (index) => () => {
     const updatedRow = {
@@ -570,7 +591,13 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
   }
 
   const handleAppliedSchemeRemoveClick = (index) => {
-    const updatedRow = { ...tempInvoicePayer[index], _isDeleted: true }
+    const updatedRow = {
+      ...tempInvoicePayer[index],
+      _isConfirmed: true,
+      _isEditing: false,
+      _isDeleted: true,
+      isCancelled: true,
+    }
     _updateTempInvoicePayer(index, updatedRow)
   }
 
@@ -626,7 +653,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ).length < invoice.claimableSchemes
     return isEditing || hasUnappliedScheme
   }
-  console.log({ invoice })
+  // console.log({ tempInvoicePayer, curEditInvoicePayerBackup })
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -658,8 +685,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       </GridItem>
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
-          if (invoicePayer._isDeleted) return null
-          console.log({ invoicePayer })
+          if (invoicePayer.isCancelled) return null
+
           const { copaymentSchemeFK, _isConfirmed } = invoicePayer
           const claimAmountColExt = {
             columnName: 'claimAmount',
@@ -671,6 +698,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
               return (
                 <NumberInput
                   currency
+                  min={0}
                   disabled={shouldDisable}
                   onChange={handleClaimAmountChange(
                     row.invoiceItemFK ? row.invoiceItemFK : row.id,
@@ -854,7 +882,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         maxWidth='sm'
       >
         <ApplicableClaims
-          currentClaims={tempInvoicePayer}
+          currentClaims={tempInvoicePayer.filter(
+            (invoicePayer) => !invoicePayer.isCancelled,
+          )}
           claimableSchemes={claimableSchemes}
           handleSelectClick={handleSelectClaimClick}
         />

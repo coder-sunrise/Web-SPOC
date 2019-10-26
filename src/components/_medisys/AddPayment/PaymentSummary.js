@@ -15,7 +15,7 @@ const PaymentSummary = ({
   collectableAmount,
   cashReturned,
   cashRounding,
-  outstandingAfterPayment,
+  handleCashReceivedChange,
   paymentList,
 }) => (
   <React.Fragment>
@@ -42,6 +42,7 @@ const PaymentSummary = ({
             <NumberInput
               style={{ textAlign: 'right' }}
               simple
+              onChange={handleCashReceivedChange}
               disabled={paymentList.reduce(
                 (noCashPaymentMode, payment) =>
                   payment.paymentModeFK === PAYMENT_MODE.CASH

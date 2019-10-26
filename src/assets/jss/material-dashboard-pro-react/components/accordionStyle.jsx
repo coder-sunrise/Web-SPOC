@@ -8,8 +8,6 @@ const accordionStyle = (theme) => ({
   },
   expansionPanel: {
     boxShadow: 'none',
-    paddingBottom: theme.spacing(1.5),
-
     '&:before': {
       display: 'none !important',
     },
