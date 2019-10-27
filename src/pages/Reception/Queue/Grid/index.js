@@ -485,6 +485,16 @@ const Grid = ({
     ],
   )
 
+  const renderActionButton = useCallback(
+    (row) => {
+      return <ActionButton row={row} onClick={onClick} />
+    },
+    [
+      codetable,
+      onClick,
+    ],
+  )
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -509,9 +519,7 @@ const Grid = ({
             {
               columnName: 'action',
               align: 'center',
-              render: (row) => {
-                return <ActionButton row={row} onClick={onClick} />
-              },
+              render: renderActionButton,
             },
           ]}
           FuncProps={FuncConfig}

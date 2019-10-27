@@ -509,7 +509,7 @@ class Medication extends PureComponent {
                                   // simple
                                   allowClear={false}
                                   code='ctMedicationDosage'
-                                  labelField='displayValue'
+                                  labelField='name'
                                   {...commonSelectProps}
                                   {...args}
                                   onChange={(v, option = {}) => {

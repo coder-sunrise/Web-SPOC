@@ -5,6 +5,7 @@ import { FastField, withFormik } from 'formik'
 import { compose } from 'redux'
 import lodash from 'lodash'
 import { Badge } from '@material-ui/core'
+import Authorized from '@/utils/Authorized'
 
 import {
   GridContainer,
@@ -83,19 +84,21 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
           }}
         />
       </GridItem>
-      <GridItem md={3} style={{ margin: 'auto' }}>
-        <Button
-          disabled={
-            !values.message || !values.template || !lodash.isEmpty(errors)
-          }
-          variant='contained'
-          color='primary'
-          onClick={handleClick}
-        >
-          <Send />
-          Send
-        </Button>
-      </GridItem>
+      <Authorized authority='sms.sendsms'>
+        <GridItem md={3} style={{ margin: 'auto' }}>
+          <Button
+            disabled={
+              !values.message || !values.template || !lodash.isEmpty(errors)
+            }
+            variant='contained'
+            color='primary'
+            onClick={handleClick}
+          >
+            <Send />
+            Send
+          </Button>
+        </GridItem>
+      </Authorized>
       <GridItem md={12}>
         <FastField
           name='message'

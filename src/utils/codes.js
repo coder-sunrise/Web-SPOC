@@ -657,7 +657,8 @@ const consultationDocumentTypes = [
       draft: (row) => {
         return {
           ReferralLetterDetails: [
-            { ...row,
+            {
+              ...row,
               referralDate: moment(row.referralDate).format(dateFormatLong),
             },
           ],
@@ -925,6 +926,7 @@ const _fetchAndSaveCodeTable = async (
 
   if (parseInt(statusCode, 10) === 200) {
     const result = multiplyCodetable(newData, multiplier)
+
     await db.codetable.put({
       code,
       data: result,
@@ -939,9 +941,18 @@ const _fetchAndSaveCodeTable = async (
 }
 
 export const getAllCodes = async () => {
+  const lastLoginDate = localStorage.getItem('_lastLogin')
+  const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    return code.map((_i) => ({ code: _i.code, data: _i.data }))
+    return code
+      .filter((_i) => {
+        const { updateDate } = _i
+        const parsedUpdateDate =
+          updateDate === null ? moment('2001-01-01') : moment(updateDate)
+        return parsedUpdateDate.isAfter(parsedLastLoginDate)
+      })
+      .map((_i) => ({ code: _i.code, data: _i.data }))
   })
 
   return ct || []
@@ -971,7 +982,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, true)
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing

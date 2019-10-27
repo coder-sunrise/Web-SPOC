@@ -1,6 +1,7 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
+import { notification } from '@/components'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
@@ -82,6 +83,16 @@ export default createFormViewModel({
             },
           })
         }
+      },
+      *save ({ payload }, { call }) {
+        const response = yield call(service.save, payload)
+        if (response) {
+          notification.success({
+            message: 'Completed billing',
+          })
+          return response
+        }
+        return false
       },
       *refresh ({ payload }, { put }) {
         yield put({
