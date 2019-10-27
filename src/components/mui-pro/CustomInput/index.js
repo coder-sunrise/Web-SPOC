@@ -54,7 +54,7 @@ class TextField extends React.PureComponent {
     // } else {
     //   this.debouncedOnChange = this._onChange
     // }
-    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300, {
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 500, {
       leading: true,
     })
   }

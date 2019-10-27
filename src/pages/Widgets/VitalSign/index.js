@@ -31,7 +31,7 @@ class index extends PureComponent {
 
   addPatientVitalSign = () => {
     this.arrayHelpers.push({
-      temperatureC: 0.0,
+      temperatureC: undefined,
       bpSysMMHG: undefined,
       bpDiaMMHG: undefined,
       pulseRateBPM: undefined,

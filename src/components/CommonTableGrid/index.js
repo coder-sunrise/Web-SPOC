@@ -528,7 +528,7 @@ class CommonTableGrid extends PureComponent {
       //   //   payload.sorting[0].direction === 'asc' ? 'desc' : 'asc'
       // }
       // payload.current &&
-      console.log('none of the above')
+
       this.setState({
         pagination: {
           ...pagination,

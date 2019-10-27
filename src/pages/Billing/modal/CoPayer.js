@@ -66,6 +66,7 @@ class CoPayer extends Component {
   }
 
   handleSelectionChange = (selection) => {
+    console.log({ selection })
     this.setState({ selectedRows: selection })
   }
 
@@ -76,15 +77,20 @@ class CoPayer extends Component {
   onConfirmClick = () => {
     const { codetable } = this.props
     const { coPayer, selectedRows, invoiceItems } = this.state
-    const invoicePayerItems = invoiceItems.filter((item) =>
+    const invoicePayerItem = invoiceItems.filter((item) =>
       selectedRows.includes(item.id),
     )
     const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
     const returnValue = {
-      invoicePayerItems,
+      invoicePayerItem,
+      payerDistributedAmt: invoicePayerItem.reduce(
+        (total, item) => total + item.claimAmount,
+        0,
+      ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
       name: copayer.name,
       companyFK: copayer.id,
+      isModified: false,
       _isConfirmed: true,
       _isEditing: false,
       _isDeleted: false,
@@ -150,7 +156,10 @@ class CoPayer extends Component {
               FuncProps={{
                 pager: false,
                 selectable: true,
-                selectConfig: { showSelectAll: true },
+                selectConfig: {
+                  showSelectAll: true,
+                  rowSelectionEnabled: (row) => true,
+                },
               }}
               EditingProps={{
                 showAddCommand: false,

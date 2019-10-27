@@ -1,5 +1,6 @@
 import * as Yup from 'yup'
 import { PAYMENT_MODE } from '@/utils/constants'
+import { roundToTwoDecimals } from '@/utils/utils'
 
 export const ValidationSchema = Yup.object().shape({
   cashReceived: Yup.number(),
@@ -11,13 +12,19 @@ export const ValidationSchema = Yup.object().shape({
   outstandingAfterPayment: Yup.number(),
   paymentList: Yup.array().when(
     [
+      'finalPayable',
       'collectableAmount',
-      'outstandingBalance',
+      'outstandingAfterPayment',
       'totalAmtPaid',
     ],
-    (collectableAmount, outstandingBalance, totalAmtPaid, schema) => {
-      // console.log('total', outstandingBalance - totalAmtPaid + cashReturned)
-      if (totalAmtPaid > outstandingBalance)
+    (
+      finalPayable,
+      collectableAmount,
+      outstandingAfterPayment,
+      totalAmtPaid,
+      schema,
+    ) => {
+      if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({
             id: Yup.number(),
@@ -25,30 +32,27 @@ export const ValidationSchema = Yup.object().shape({
             amt: Yup.number()
               .min(0, 'Amount must be greater than 0')
               .max(
-                outstandingBalance - totalAmtPaid,
-                `Total amount paid cannot exceed $${outstandingBalance}`,
+                0.01,
+                `Total amount paid cannot exceed $${roundToTwoDecimals(
+                  collectableAmount,
+                )}`,
               )
               .required(),
-            creditCardTypeFK: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
+            creditCardPayment: Yup.object().shape({
+              creditCardTypeFK: Yup.string().required(),
+              creditCardNo: Yup.number().required(),
             }),
-            creditCardNo: Yup.string().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-              then: Yup.string().required(),
+            chequePayment: Yup.object().shape({
+              chequeNo: Yup.string().required(),
             }),
-            chequeNo: Yup.number().when('paymentModeFK', {
-              is: (val) => val === PAYMENT_MODE.CHEQUE,
-              then: Yup.number().required(),
+            netsPayment: Yup.object().shape({
+              refNo: Yup.string().required(),
             }),
-            referrenceNo: Yup.string().when('paymentModeFK', {
-              is: (val) =>
-                val === PAYMENT_MODE.GIRO || val === PAYMENT_MODE.NETS,
-              then: Yup.string().required(),
+            giroPayment: Yup.object().shape({
+              refNo: Yup.string().required(),
             }),
           }),
         )
-      // if (outstandingAfterPayment === 0)
 
       return schema.of(
         Yup.object().shape({
@@ -61,21 +65,30 @@ export const ValidationSchema = Yup.object().shape({
               `Total amount paid cannot exceed $${collectableAmount}`,
             )
             .required(),
-          creditCardTypeFK: Yup.string().when('paymentModeFK', {
+          creditCardPayment: Yup.object().when('paymentModeFK', {
             is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-            then: Yup.string().required(),
+            then: Yup.object().shape({
+              creditCardTypeFK: Yup.string().required(),
+              creditCardNo: Yup.number().required(),
+            }),
           }),
-          creditCardNo: Yup.string().when('paymentModeFK', {
-            is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
-            then: Yup.string().required(),
-          }),
-          chequeNo: Yup.number().when('paymentModeFK', {
+          chequePayment: Yup.object().when('paymentModeFK', {
             is: (val) => val === PAYMENT_MODE.CHEQUE,
-            then: Yup.number().required(),
+            then: Yup.object().shape({
+              chequeNo: Yup.string().required(),
+            }),
           }),
-          referrenceNo: Yup.string().when('paymentModeFK', {
+          netsPayment: Yup.object().when('paymentModeFK', {
+            is: (val) => val === PAYMENT_MODE.NETS,
+            then: Yup.object().shape({
+              refNo: Yup.string().required(),
+            }),
+          }),
+          giroPayment: Yup.object().when('paymentModeFK', {
             is: (val) => val === PAYMENT_MODE.GIRO,
-            then: Yup.string().required(),
+            then: Yup.object().shape({
+              refNo: Yup.string().required(),
+            }),
           }),
         }),
       )
@@ -99,23 +112,29 @@ export const InitialValue = {
   [PAYMENT_MODE.NETS]: {
     amt: null,
     remarks: '',
-    referrenceNo: null,
+    netsPayment: {
+      refNo: null,
+    },
   },
   [PAYMENT_MODE.CREDIT_CARD]: {
     amt: null,
     remarks: '',
-    creditCardTypeFK: undefined,
-    creditCardNo: null,
+    creditCardPayment: {
+      creditCardTypeFK: undefined,
+      creditCardNo: null,
+    },
   },
   [PAYMENT_MODE.CHEQUE]: {
     amt: null,
-    chequeNo: null,
     remarks: '',
+    chequePayment: { chequeNo: null },
   },
   [PAYMENT_MODE.GIRO]: {
     amt: null,
     remarks: '',
-    referrenceNo: null,
+    giroPayment: {
+      refNo: null,
+    },
   },
 }
 

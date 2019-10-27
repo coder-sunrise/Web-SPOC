@@ -79,6 +79,13 @@ export const INVOICE_ITEM_TYPE = {
   5: 'Package',
 }
 
+export const INVOICE_ITEM_TYPE_BY_TEXT = {
+  Medication: 1,
+  Consumable: 2,
+  Service: 3,
+  Package: 4,
+}
+
 export const INVENTORY_TYPE = {
   MEDICATION: 1,
   CONSUMABLE: 2,
