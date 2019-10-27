@@ -73,6 +73,7 @@ const receivingDetailsSchema = Yup.object().shape({
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
+        ...x,
         inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
         purchaseOrderItemFK: x.id,
         recevingQuantity: x.currentReceivingQty,
@@ -591,7 +592,7 @@ class DODetails extends PureComponent {
             // this.handleSelectedBatch(e)
           },
           render: (row) => {
-            return <TextField text value={row.batchNo[0]} />
+            return <TextField text value={row.batchNo} />
           },
         },
         {

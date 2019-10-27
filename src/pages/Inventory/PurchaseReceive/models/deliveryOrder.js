@@ -55,7 +55,6 @@ export default createFormViewModel({
 
         if (response.status === '200') {
           const { data } = response
-          console.log(data)
           if (data.deliveryOrderItem) {
             data.deliveryOrderItem = data.deliveryOrderItem.map((x) => ({
               ...x,
@@ -162,10 +161,9 @@ export default createFormViewModel({
             bonusQuantity: x.bonusQty,
             currentReceivingQty: x.recevingQuantity,
             currentReceivingBonusQty: x.bonusQuantity,
-            expiryDate: null,
+            // expiryDate: null,
           }
         })
-
         return {
           ...state,
           entity: {
