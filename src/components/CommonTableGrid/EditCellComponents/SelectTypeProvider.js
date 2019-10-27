@@ -1,6 +1,7 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent, Component } from 'react'
 import { connect } from 'dva'
+import _ from 'lodash'
 import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
@@ -13,155 +14,44 @@ import {
   difference,
 } from '@/utils/utils'
 
-class SelectEditor extends Component {
-  state = {
-    error: false,
-  }
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
+class SelectEditor extends PureComponent {
+  state = {}
 
   constructor (props) {
-    // console.log('constructor', props)
     super(props)
     this.myRef = React.createRef()
   }
 
-  // componentWillMount () {
-  //   console.log({ 't-1': window.$tempGridRow })
-  // }
-
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
-    })
+    onComponentDidMount.call(this)
   }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    // console.log(nextProps, nextState)
-    // console.log(this.props, this.state)
-    return true
-  }
-
-  // componentWillUnmount () {
-  //   console.log('unmount')
-  // }
 
   _onChange = (val, option) => {
-    const {
-      columnExtensions,
-      column: { name: columnName },
-      value,
-      onValueChange,
-      row,
-    } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const {
-      type,
-      code,
-      validationSchema,
-      isDisabled = () => false,
-      onChange,
-      gridId,
-      getRowId,
-      ...restProps
-    } = cfg
-
-    const error = updateCellValue(this.props, this.myRef.current, val)
-    if (error !== this.state.error)
-      this.setState({
-        error,
-      })
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-    if (!error) {
-      if (onChange)
-        onChange({
-          val,
-          option,
-          row: latestRow,
-          onValueChange,
-          error,
-        })
-    }
+    onComponentChange.call(this, { val, option })
   }
 
   render () {
-    const {
-      columnExtensions,
-      column: { name: columnName },
-      value,
-      onValueChange,
-      row,
-      codes,
-    } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
+    const { codes } = this.props
     const {
       type,
       code,
-      validationSchema,
-      isDisabled = () => false,
-      onChange,
-      gridId,
+      columnName,
       options,
-      getRowId,
-      ...restProps
-    } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
+      row,
+      ...commonCfg
+    } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+    commonCfg.options =
+      typeof options === 'function'
+        ? options(row)
+        : options || codes[`${columnName}Option`] || []
 
-    // console.log(row, row.id, latestRow, latestRow[columnName], columnName)
-    // const _onChange = (val, option) => {
-    //   // console.log({ val, option })
-    //   const error = updateCellValue(this.props, this.myRef.current, val)
-    //   this.setState({
-    //     error,
-    //   })
-    //   if (!error) {
-    //     if (onChange)
-    //       onChange({
-    //         val,
-    //         option,
-    //         row: latestRow,
-    //         onValueChange,
-    //         error,
-    //       })
-    //   }
-    // }
-    // console.log(window.$tempGridRow, row, latestRow[columnName])
-    // console.log(options, this.state, codes, columnName)
-    const commonCfg = {
-      simple: true,
-      showErrorIcon: true,
-      error: this.state.error,
-      value: latestRow[columnName],
-      disabled: isDisabled(latestRow),
-      options:
-        typeof options === 'function'
-          ? options(latestRow)
-          : options || codes[`${columnName}Option`] || [],
-      ...restProps,
-      onChange: this._onChange,
-    }
-    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -179,7 +69,7 @@ class SelectEditor extends Component {
       }
       return null
     }
-    return <TextField value={value} simple />
+    return <TextField value={commonCfg.value} simple />
   }
 }
 
@@ -315,10 +205,9 @@ class SelectTypeProvider extends React.Component {
   shouldComponentUpdate = (nextProps, nextState) => {
     // console.log(nextProps, this.props)
     // console.log(nextState, this.state)
-
     return (
       // optionsUpdate ||
-      this.props.editingRowIds !== nextProps.editingRowIds ||
+      // this.props.editingRowIds !== nextProps.editingRowIds ||
       Object.keys(this.state).length !== Object.keys(nextState).length ||
       this.state.codeLoaded !== nextState.codeLoaded ||
       this.props.commitCount !== nextProps.commitCount

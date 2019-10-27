@@ -8,12 +8,16 @@ import debounce from 'lodash/debounce'
 import { TextField, Tooltip } from '@/components'
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
 const styles = (theme) => ({})
 
 class TextEditorBase extends PureComponent {
-  state = {
-    error: false,
-  }
+  state = {}
 
   constructor (props) {
     super(props)
@@ -21,85 +25,59 @@ class TextEditorBase extends PureComponent {
   }
 
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
-    })
+    onComponentDidMount.call(this)
   }
 
-  render () {
-    const {
-      column: { name: columnName },
-      value,
-      onValueChange,
-      columnExtensions,
-      classes,
-      config = {},
-      row,
-    } = this.props
-    // const { name, value: v, ...otherInputProps } = inputProps
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    // console.log(cfg)
-    const {
-      validationSchema,
-      isDisabled = () => false,
-      onChange,
-      gridId,
-      editRender,
-      ...restConfig
-    } = cfg
+  _onChange = (e) => {
+    onComponentChange.call(this, { value: e.target.value })
+  }
 
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][row.id] || row
-      : row
-    if (editRender) {
-      return editRender(row)
-    }
-    const submitValue = (e) => {
-      const error = updateCellValue(
-        this.props,
-        this.myRef.current,
-        e.target.value,
-      )
-      this.setState({
-        error,
-      })
-      if (!error) {
-        if (onChange) onChange(e.target.value, latestRow)
-      }
-    }
-    const commonCfg = {
-      disabled: isDisabled(latestRow),
-    }
+  // _onChange = (e) => {
+  //   const {
+  //     columnExtensions,
+  //     column: { name: columnName },
+  //     value,
+  //     onValueChange,
+  //     row,
+  //   } = this.props
+
+  //   const {
+  //     type,
+  //     code,
+  //     validationSchema,
+  //     isDisabled = () => false,
+  //     onChange,
+  //     gridId,
+  //     getRowId,
+  //     ...restProps
+  //   } = this.state.cfg
+
+  //   const errors = updateCellValue(
+  //     this.props,
+  //     this.myRef.current,
+  //     e.target.value,
+  //   )
+
+  //   const latestRow = window.$tempGridRow[gridId]
+  //     ? window.$tempGridRow[gridId][getRowId(row)] || row
+  //     : row
+  //   latestRow._errors = errors
+  //   const error = errors.find((o) => o.path === this.state.cfg.columnName)
+  //   console.log(error, errors)
+  //   if (!error) {
+  //     if (onChange) {
+  //       onChange(e.target.value, latestRow)
+  //     }
+  //   }
+  // }
+
+  render () {
+    const { ...commonCfg } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+
     return (
       <div ref={this.myRef}>
-        <TextField
-          showErrorIcon
-          simple
-          defaultValue={latestRow[columnName]}
-          onChange={submitValue}
-          // onCommit={submitValue}
-          // onChange={submitValue}
-          error={this.state.error}
-          {...commonCfg}
-          {...restConfig}
-        />
+        <TextField {...commonCfg} />
       </div>
     )
   }

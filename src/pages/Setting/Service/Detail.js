@@ -131,7 +131,7 @@ class Detail extends PureComponent {
         type: 'radio',
         checkedValue: true,
         uncheckedValue: false,
-        onRadioChange: (row, e, checked) => {
+        onRadioChange: ({ row, checked }) => {
           // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props

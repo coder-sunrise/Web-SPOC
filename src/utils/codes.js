@@ -1170,7 +1170,7 @@ export const InventoryTypes = [
 const tagList = [
   {
     value: 'PatientName',
-    text: 'PatientName',
+    text: '<#PatientName#>',
     url: '',
     getter: () => {
       const { patient } = window.g_app._store.getState()
@@ -1187,7 +1187,7 @@ const tagList = [
   },
   {
     value: 'Doctor',
-    text: 'Doctor',
+    text: '<#Doctor#>',
     url: '',
     getter: () => {
       const { user } = window.g_app._store.getState()
@@ -1200,7 +1200,7 @@ const tagList = [
   },
   {
     value: 'NewLine',
-    text: 'NewLine',
+    text: '<#NewLine#>',
     url: '',
     getter: () => {
       return '<br/>'
@@ -1208,7 +1208,7 @@ const tagList = [
   },
   {
     value: 'PatientCallingName',
-    text: 'PatientCallingName',
+    text: '<#PatientCallingName#>',
     url: '',
     getter: () => {
       const { patient } = window.g_app._store.getState()
@@ -1220,7 +1220,7 @@ const tagList = [
   },
   {
     value: 'LastVisitDate',
-    text: 'LastVisitDate',
+    text: '<#LastVisitDate#>',
     url: '',
   },
 ]
