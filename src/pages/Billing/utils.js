@@ -5,7 +5,7 @@ export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayer,
 ) => [
   ...preInvoicePayerInvoiceItems,
-  ...preInvoicePayer.invoicePayerItems,
+  ...preInvoicePayer.invoicePayerItem,
 ]
 
 export const computeInvoiceItemSubtotal = (invoiceItems, item) => {
@@ -25,9 +25,9 @@ export const computeInvoiceItemSubtotal = (invoiceItems, item) => {
 }
 
 export const computeTotalForAllSavedClaim = (sum, payer) =>
-  payer._isConfirmed
+  payer._isConfirmed && !payer.isCancelled
     ? sum +
-      payer.invoicePayerItems.reduce(
+      payer.invoicePayerItem.reduce(
         (subtotal, item) =>
           subtotal + (item.claimAmount ? item.claimAmount : 0),
         0,
@@ -184,7 +184,7 @@ const getItemTypeSubtotal = (list, type) =>
 export const validateClaimAmount = (schemeRow, totalPayable) => {
   let invalidMessage = []
 
-  const { schemeConfig, invoicePayerItems, payerTypeFK } = schemeRow
+  const { schemeConfig, invoicePayerItem, payerTypeFK } = schemeRow
   if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY) return []
 
   const {
@@ -222,11 +222,11 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
   } else {
     // check for each item category
     // return isValid = false early
-    const medicationTotalClaim = getItemTypeSubtotal(invoicePayerItems, 1)
-    const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItems, 2)
-    const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItems, 3)
-    const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItems, 4)
-    const packageTotalClaim = getItemTypeSubtotal(invoicePayerItems, 5)
+    const medicationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 1)
+    const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItem, 2)
+    const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 3)
+    const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItem, 4)
+    const packageTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
 
     if (
       isMedicationCoverageMaxCapCheckRequired &&
@@ -259,7 +259,7 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
       invalidMessage.push('Package total claim amount has exceed the max cap')
   }
 
-  const totalClaimAmount = invoicePayerItems.reduce(
+  const totalClaimAmount = invoicePayerItem.reduce(
     (totalClaim, item) => totalClaim + (item.claimAmount || 0),
     0,
   )
@@ -272,8 +272,8 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
   return invalidMessage
 }
 
-export const validateInvoicePayerItems = (invoicePayerItems) => {
-  const returnData = invoicePayerItems.map((item) => {
+export const validateInvoicePayerItems = (invoicePayerItem) => {
+  const returnData = invoicePayerItem.map((item) => {
     let maxAmount
     if (item.schemeCoverageType.toLowerCase() === 'percentage') {
       maxAmount = item.payableBalance * item.schemeCoverage / 100
@@ -289,9 +289,9 @@ export const validateInvoicePayerItems = (invoicePayerItems) => {
 }
 
 // export const flattenInvoicePayerItems = (invoiceItems, payer) => {
-//   const { invoicePayerItems } = payer
+//   const { invoicePayerItem } = payer
 //   return [
 //     ...invoiceItems,
-//     ...invoicePayerItems,
+//     ...invoicePayerItem,
 //   ]
 // }
