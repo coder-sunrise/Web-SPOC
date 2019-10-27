@@ -47,7 +47,21 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    return purchaseOrderDetails
+    const { purchaseOrder } = purchaseOrderDetails
+    let IsGSTEnabled
+    let IsGSTInclusive
+    if (purchaseOrder) {
+      IsGSTEnabled = purchaseOrder.isGstInclusive
+      IsGSTInclusive = purchaseOrder.isGstInclusive
+    }
+    return {
+      ...purchaseOrderDetails,
+      purchaseOrder: {
+        ...purchaseOrder,
+        IsGSTEnabled,
+        IsGSTInclusive,
+      },
+    }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
