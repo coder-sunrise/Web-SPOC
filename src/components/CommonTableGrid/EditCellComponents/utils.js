@@ -92,7 +92,6 @@ function getCommonConfig () {
     isDisabled = () => false,
     onChange,
     gridId,
-    options,
     getRowId,
     getInitialValue,
     ...restProps
