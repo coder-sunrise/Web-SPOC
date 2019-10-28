@@ -93,18 +93,28 @@ export default createFormViewModel({
         })
       },
       *save ({ payload }, { call, put }) {
+        const { visitStatus } = payload
         const response = yield call(service.save, payload)
         if (response) {
-          notification.success({
-            message: 'Billing saved',
-          })
           yield put({
             type: 'query',
             payload: {
               id: payload.visitId,
             },
           })
-          return response
+          // TODO: once server done enhancement, back to
+          // individual call instead of mixing 2 to 1
+          if (visitStatus === 'COMPLETED') {
+            notification.success({
+              message: 'Billing completed',
+            })
+            router.push('/reception/queue')
+          } else {
+            notification.success({
+              message: 'Billing saved',
+            })
+            return response
+          }
         }
         return false
       },

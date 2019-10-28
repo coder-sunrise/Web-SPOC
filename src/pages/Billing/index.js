@@ -182,7 +182,9 @@ const bannerStyle = {
       type: 'billing/submit',
       payload,
     }).then((response) => {
-      if (response) resetForm()
+      if (response) {
+        resetForm()
+      }
     })
   },
 })
