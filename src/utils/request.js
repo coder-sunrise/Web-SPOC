@@ -15,7 +15,7 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
-export const baseUrl = process.env.url
+export const baseUrl = 'http://192.168.1.245:9999'
 
 let dynamicURL = baseUrl
 // if (process.env.NODE_ENV === 'development')

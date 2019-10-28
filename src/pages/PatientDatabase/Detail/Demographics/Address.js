@@ -42,8 +42,7 @@ class Address extends Component {
     })
   }
 
-  handleAddressType = (e) => {
-  }
+  handleAddressType = (e) => {}
 
   handleGetAddress = () => {
     const {
@@ -274,6 +273,7 @@ class Address extends Component {
                   label='Country'
                   code='ctCountry'
                   max={10}
+                  autocomplete='off'
                   {...args}
                 />
               )}
