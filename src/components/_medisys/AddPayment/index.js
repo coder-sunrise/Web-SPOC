@@ -31,26 +31,26 @@ import { PAYMENT_MODE } from '@/utils/constants'
 
     let _totalAmtPaid = 0
     let paymentList = []
+    let _cashReceived = 0
+    let _cashReturned = 0
+    let _cashRounding = 0
     if (currentPayments.length > 0) {
       paymentList = [
         ...currentPayments[0].invoicePaymentMode,
       ]
-      _totalAmtPaid = roundToTwoDecimals(
-        currentPayments.reduce(
-          (total, payment) => total + payment.totalAmtPaid,
-          0,
-        ),
-      )
+      _totalAmtPaid = currentPayments[0].totalAmtPaid
+      _cashReceived = currentPayments[0].cashReceived
+      _cashReturned = currentPayments[0].cashReturned
+      _cashRounding = currentPayments[0].cashRounding
     }
 
     const outstandingAfterPayment = roundToTwoDecimals(
       finalPayable - _totalAmtPaid,
     )
-
     return {
-      cashReturned: 0,
-      cashReceived: 0,
-      cashRounding: 0,
+      cashReturned: _cashReturned,
+      cashReceived: _cashReceived,
+      cashRounding: _cashRounding,
       outstandingAfterPayment,
       totalAmtPaid: _totalAmtPaid,
       paymentList,
@@ -174,22 +174,27 @@ class AddPayment extends Component {
       const roundingAmt = roundToTwoDecimals(
         cashAfterRounding - cashPayment.amt,
       )
-      setFieldValue('cashReceived', cashAfterRounding)
+      this.setState(
+        {
+          cashPaymentAmount: cashPayment.amt,
+        },
+        () => {
+          setFieldValue('cashReceived', cashAfterRounding)
+        },
+      )
+
       setFieldValue('cashRounding', roundingAmt)
       setFieldValue('collectableAmount', collectableAmountAfterRounding)
-      const cashMinimumAmount = roundToTwoDecimals(
-        finalPayable -
-          paymentList.reduce(
-            (total, payment) =>
-              payment.paymentModeFK !== PAYMENT_MODE.CASH
-                ? total + (payment.amt || 0)
-                : total,
-            0,
-          ),
-      )
-      this.setState({
-        cashPaymentAmount: cashMinimumAmount,
-      })
+      // const cashMinimumAmount = roundToTwoDecimals(
+      //   finalPayable -
+      //     paymentList.reduce(
+      //       (total, payment) =>
+      //         payment.paymentModeFK !== PAYMENT_MODE.CASH
+      //           ? total + (payment.amt || 0)
+      //           : total,
+      //       0,
+      //     ),
+      // )
 
       if (totalPaid > finalPayable && cashPayment) {
         cashReturned = roundToTwoDecimals(totalPaid - finalPayable)
@@ -205,6 +210,7 @@ class AddPayment extends Component {
     }
 
     setFieldValue('totalAmtPaid', totalPaid)
+
     setFieldValue(
       'outstandingAfterPayment',
       roundToTwoDecimals(finalPayable - totalPaid + cashReturned),
@@ -212,7 +218,7 @@ class AddPayment extends Component {
   }
 
   handleAmountChange = () => {
-    setTimeout(() => this.calculatePayment(), 200)
+    setTimeout(() => this.calculatePayment(), 300)
   }
 
   handleCashReceivedChange = (event) => {

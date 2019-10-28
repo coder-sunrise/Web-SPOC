@@ -140,15 +140,19 @@ const InvoiceSummary = ({
                     </GridItem>
                     <GridItem md={1}>
                       <DeleteWithPopover
-                        disabled={!item.id}
+                        // disabled={!item.id}
                         index={item.id}
                         title='Cancel Payment'
                         contentText='Confirm to cancel this payment?'
                         extraCmd={
-                          <TextField
-                            label='Cancel Reason'
-                            onChange={onCancelReasonChange}
-                          />
+                          item.id ? (
+                            <TextField
+                              label='Cancel Reason'
+                              onChange={onCancelReasonChange}
+                            />
+                          ) : (
+                            undefined
+                          )
                         }
                         onConfirmDelete={handleConfirmDelete}
                       />

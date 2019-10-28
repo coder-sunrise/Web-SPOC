@@ -263,20 +263,27 @@ class Billing extends Component {
   handleDeletePayment = (id, cancelReason) => {
     const { values, setFieldValue, user } = this.props
     const { invoicePayment } = values
-    const _newInvoicePayment = invoicePayment.map(
-      (payment) =>
-        payment.id === id
-          ? {
-              ...payment,
-              isCancelled: true,
-              cancelReason,
-              cancelDate: new Date(),
-              cancelByUserFK: user.id,
-            }
-          : { ...payment },
-    )
+    if (id === undefined) {
+      const _newInvoicePayment = invoicePayment.filter(
+        (payment) => payment.id !== undefined,
+      )
+      setFieldValue('invoicePayment', _newInvoicePayment)
+    } else {
+      const _newInvoicePayment = invoicePayment.map(
+        (payment) =>
+          payment.id === id
+            ? {
+                ...payment,
+                isCancelled: true,
+                cancelReason,
+                cancelDate: new Date(),
+                cancelByUserFK: user.id,
+              }
+            : { ...payment },
+      )
 
-    setFieldValue('invoicePayment', _newInvoicePayment)
+      setFieldValue('invoicePayment', _newInvoicePayment)
+    }
   }
 
   render () {
@@ -367,16 +374,17 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
-              finalPayable: roundToTwoDecimals(
-                values.finalPayable -
-                  values.invoicePayment.reduce(
-                    (totalPaid, payment) =>
-                      !payment.isCancelled
-                        ? totalPaid + payment.totalAmtPaid
-                        : totalPaid,
-                    0,
-                  ),
-              ),
+              // finalPayable: roundToTwoDecimals(
+              //   values.finalPayable -
+              //     values.invoicePayment.reduce(
+              //       (totalPaid, payment) =>
+              //         !payment.isCancelled
+              //           ? totalPaid + payment.totalAmtPaid
+              //           : totalPaid,
+              //       0,
+              //     ),
+              // ),
+              finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
             }}
           />
