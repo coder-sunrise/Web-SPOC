@@ -504,17 +504,26 @@ class ControlTest extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem>
-            <ButtonSelect
-              options={doctors}
-              mode='multiple'
-              textField='name'
-              justIcon
-              onClick={(v, option) => {
-                console.log(v, option)
+            <FastField
+              name='doctor'
+              render={(args) => {
+                return (
+                  <ButtonSelect
+                    options={doctors}
+                    mode='multiple'
+                    textField='name'
+                    valueField='value'
+                    justIcon
+                    onClick={(v, option) => {
+                      console.log(v, option)
+                    }}
+                    {...args}
+                  >
+                    <FilterList />
+                  </ButtonSelect>
+                )
               }}
-            >
-              <FilterList />
-            </ButtonSelect>
+            />
           </GridItem>
         </GridContainer>
         <Divider />
