@@ -23,8 +23,8 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @withFormikExtend({
   notDirtyDuration: 0,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice, invoicePayment, clinicSettings }) => {
-    const { outstandingBalance = 0, finalPayable, totalClaim } = invoice
+  mapPropsToValues: ({ invoice, invoicePayment }) => {
+    const { finalPayable } = invoice
     const currentPayments = invoicePayment.filter(
       (item) => item.id === undefined,
     )
@@ -127,37 +127,38 @@ class AddPayment extends Component {
       payment,
     ]
     await setFieldValue('paymentList', newPaymentList)
-    this.handleAmountChange()
+    this.calculatePayment()
   }
 
   onDeleteClick = async (event) => {
     const { currentTarget: { id } } = event
     const { values, setFieldValue } = this.props
     if (parseFloat(id, 10) === PAYMENT_MODE.CASH) {
-      this.setState({
-        cashPaymentAmount: 0,
-      })
+      this.setState(
+        {
+          cashPaymentAmount: 0,
+        },
+        () => {
+          setFieldValue('cashReceived', 0)
+        },
+      )
     }
     const newPaymentList = values.paymentList.filter(
       (payment) => payment.id !== parseFloat(id, 10),
     )
 
     await setFieldValue('paymentList', newPaymentList)
-    this.handleAmountChange()
+    this.calculatePayment()
   }
 
-  handleAmountChange = () => {
+  calculatePayment = () => {
     const { values, setFieldValue, clinicSettings } = this.props
-    const {
-      paymentList,
-      outstandingBalance,
-      finalPayable,
-      outstandingAfterPayment,
-    } = values
-    const totalPaid = paymentList.reduce(
-      (total, payment) => total + (payment.amt || 0),
-      0,
+    const { paymentList, finalPayable } = values
+
+    const totalPaid = roundToTwoDecimals(
+      paymentList.reduce((total, payment) => total + (payment.amt || 0), 0),
     )
+
     const cashPayment = paymentList.find(
       (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
     )
@@ -193,6 +194,8 @@ class AddPayment extends Component {
       if (totalPaid > finalPayable && cashPayment) {
         cashReturned = roundToTwoDecimals(totalPaid - finalPayable)
         setFieldValue('cashReturned', cashReturned)
+      } else {
+        setFieldValue('cashReturned', 0)
       }
     } else {
       setFieldValue('collectableAmount', finalPayable)
@@ -200,6 +203,7 @@ class AddPayment extends Component {
       setFieldValue('cashReturned', 0)
       setFieldValue('cashRounding', 0)
     }
+
     setFieldValue('totalAmtPaid', totalPaid)
     setFieldValue(
       'outstandingAfterPayment',
@@ -207,9 +211,14 @@ class AddPayment extends Component {
     )
   }
 
-  handleCashReceivedChange = () => {
+  handleAmountChange = () => {
+    setTimeout(() => this.calculatePayment(), 200)
+  }
+
+  handleCashReceivedChange = (event) => {
+    const _cashReceived = event.target.value
     const { values, setFieldValue } = this.props
-    const { paymentList } = values
+    const { cashRounding, paymentList, finalPayable } = values
     const cashPayment = paymentList.find(
       (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
     )
@@ -217,13 +226,13 @@ class AddPayment extends Component {
       (total, payment) => total + (payment.amt || 0),
       0,
     )
-    if (cashPayment && totalPaid > values.finalPayable) {
-      const cashReturned = roundToTwoDecimals(
-        values.cashReceived - (cashPayment.amt + values.cashRounding),
-      )
 
-      setFieldValue('cashReturned', cashReturned)
-    }
+    if (totalPaid - cashPayment.amt + _cashReceived > finalPayable)
+      setFieldValue(
+        'cashReturned',
+        roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
+      )
+    else setFieldValue('cashReturned', 0)
   }
 
   render () {
@@ -236,7 +245,6 @@ class AddPayment extends Component {
       handleSubmit,
     } = this.props
     const { paymentList } = values
-
     return (
       <div>
         <PayerHeader
