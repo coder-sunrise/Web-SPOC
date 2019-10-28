@@ -90,7 +90,6 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log('queue will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -243,15 +242,33 @@ class Queue extends React.Component {
 
   onConfirmEndSession = () => {
     const { queueLog, dispatch } = this.props
+    console.log('confirm end session')
     dispatch({
-      type: `${modelKey}endSession`,
+      type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then((response) => {
       const { status } = response
-      if (status === 204)
-        this.setState({
-          showEndSessionSummary: true,
-        })
+      if (status === 204) {
+        this.setState(
+          {
+            showEndSessionSummary: true,
+          },
+          () => {
+            dispatch({
+              type: `${modelKey}updateState`,
+              payload: {
+                isClinicSessionClosed: true,
+                id: '',
+                // sessionNo: `${moment().format('YYMMDD')}-01`,
+                sessionNo: 'N/A',
+                sessionNoPrefix: '',
+                sessionStartDate: '',
+                sessionCloseDate: '',
+              },
+            })
+          },
+        )
+      }
     })
   }
 
@@ -260,7 +277,6 @@ class Queue extends React.Component {
   }
 
   onEnterPressed = async (searchQuery) => {
-    console.log('on enter pressed')
     const { dispatch } = this.props
     const prefix = 'like_'
     await dispatch({
@@ -281,7 +297,6 @@ class Queue extends React.Component {
   }
 
   showSearchResult = () => {
-    console.log('show search result')
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 

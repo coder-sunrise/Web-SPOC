@@ -3,13 +3,16 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
+import * as Yup from 'yup'
+import moment from 'moment'
 import {
   CodeSelect,
   GridContainer,
   GridItem,
   Button,
   ProgressButton,
-  DateRangePicker,
+  DatePicker,
+  Field,
 } from '@/components'
 // medisys components
 
@@ -31,18 +34,70 @@ const styles = (theme) => ({
     right: 0,
   },
 })
-
 @withFormik({
   mapPropsToValues: () => {
     return {
       roomBlockGroupFK: [],
+      dateFrom: moment().subtract(6, 'months'),
+      dateTo: moment(),
+      recurrence: undefined,
     }
   },
-  handleSubmit: () => {},
+  validationSchema: Yup.object().shape({
+    dateFrom: Yup.date(),
+    dateTo: Yup.date().when(
+      'dateFrom',
+      (dateFrom, schema) =>
+        dateFrom &&
+        schema.max(
+          moment(dateFrom).add(6, 'months'),
+          'Maximum 6 months date range.',
+        ),
+    ),
+  }),
+
+  handleSubmit: (values, { props }) => {
+    const { roomBlockRecurrenceFK, roomBlockGroupFK, dateFrom, dateTo } = values
+    const { dispatch } = props
+
+    let stringRoomBlockGroupFK = Number(roomBlockGroupFK)
+    let type = 'RoomBlockGroupFkNavigation.RoomFK'
+    if (roomBlockGroupFK.length > 1) {
+      type = 'in_RoomBlockGroupFkNavigation.RoomFK'
+      stringRoomBlockGroupFK = roomBlockGroupFK.join('|')
+    }
+
+    dispatch({
+      type: 'roomBlock/query',
+      payload: {
+        [type]:
+          stringRoomBlockGroupFK === 0 ? undefined : stringRoomBlockGroupFK,
+
+        'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
+        lgteql_startDateTime: dateFrom,
+        lsteql_endDateTime: dateTo,
+      },
+    }).then(() => {
+      dispatch({
+        type: 'roomBlock/updateState',
+        payload: {
+          filter: undefined,
+        },
+      })
+    })
+  },
 })
 class Filter extends PureComponent {
+  setDateTo = (v) => {
+    if (v) {
+      this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
+    } else {
+      this.props.setFieldValue('dateTo', undefined)
+    }
+  }
+
   render () {
-    const { classes, values } = this.props
+    const { classes, values, handleSubmit } = this.props
 
     return (
       <div className={classes.filterBar}>
@@ -64,17 +119,26 @@ class Filter extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
-            <FastField
-              name='dates'
+          <GridItem xs={2} md={2}>
+            <Field
+              name='dateFrom'
               render={(args) => {
                 return (
-                  <DateRangePicker
-                    label='Start Date'
-                    label2='End Date'
+                  <DatePicker
+                    // timeFomat={false}
+                    label='From date'
+                    onChange={(v) => this.setDateTo(v)}
                     {...args}
                   />
                 )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} md={2}>
+            <Field
+              name='dateTo'
+              render={(args) => {
+                return <DatePicker label='To date' {...args} />
               }}
             />
           </GridItem>
@@ -131,43 +195,7 @@ class Filter extends PureComponent {
               <ProgressButton
                 color='primary'
                 icon={null}
-                onClick={() => {
-                  const {
-                    dates,
-                    roomBlockRecurrenceFK,
-                    roomBlockGroupFK,
-                  } = this.props.values
-
-                  let stringRoomBlockGroupFK = Number(roomBlockGroupFK)
-                  let type = 'RoomBlockGroupFkNavigation.RoomFK'
-                  if (roomBlockGroupFK.length > 1) {
-                    type = 'in_RoomBlockGroupFkNavigation.RoomFK'
-                    stringRoomBlockGroupFK = roomBlockGroupFK.join('|')
-                  }
-
-                  this.props
-                    .dispatch({
-                      type: 'roomBlock/query',
-                      payload: {
-                        [type]:
-                          stringRoomBlockGroupFK === 0
-                            ? undefined
-                            : stringRoomBlockGroupFK,
-
-                        'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
-                        lgteql_startDateTime: dates ? dates[0] : undefined,
-                        lsteql_endDateTime: dates ? dates[1] : undefined,
-                      },
-                    })
-                    .then(() => {
-                      this.props.dispatch({
-                        type: 'roomBlock/updateState',
-                        payload: {
-                          filter: undefined,
-                        },
-                      })
-                    })
-                }}
+                onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>

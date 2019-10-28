@@ -83,8 +83,6 @@ const styles = (theme) => ({})
   }),
 
   handleSubmit: (values, { props }) => {
-    console.log(values)
-
     if (values.isMinus && values.adjustment > 0) {
       let minusValue = -values.adjustment
       values.adjustment = minusValue

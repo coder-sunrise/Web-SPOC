@@ -24,7 +24,6 @@ const RowErrorStyles = () => ({
 })
 
 const ListTypeError = ({ errors }) => {
-  console.log({ errors })
   return (
     <ul>
       {errors.map((error, index) => <li key={`rowError-${index}`}>{error}</li>)}

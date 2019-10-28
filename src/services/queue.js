@@ -1,16 +1,17 @@
 import * as commonServices from '@/services/common'
-import { axiosRequest } from '@/utils/request'
+import request, { axiosRequest } from '@/utils/request'
 
 const queueAPIUrl = '/api/queue'
 const bizSessionAPIURL = '/api/bizsession'
 
 export const startSession = async () => {
-  const response = await axiosRequest('/api/bizsession/', { method: 'POST' })
+  const response = await request('/api/bizsession/', { method: 'POST' })
   return response
 }
 
 export const endSession = async (sessionID) => {
-  const response = await axiosRequest(`/api/bizsession/${sessionID}`, {
+  console.log('endsession')
+  const response = await request(`/api/bizsession/${sessionID}`, {
     method: 'PUT',
   })
   return response

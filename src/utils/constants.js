@@ -79,6 +79,13 @@ export const INVOICE_ITEM_TYPE = {
   5: 'Package',
 }
 
+export const INVOICE_ITEM_TYPE_BY_TEXT = {
+  Medication: 1,
+  Consumable: 2,
+  Service: 3,
+  Package: 4,
+}
+
 export const INVENTORY_TYPE = {
   MEDICATION: 1,
   CONSUMABLE: 2,
@@ -132,4 +139,20 @@ export const INVOICE_STATUS = {
   OVERPAID: 2,
   OUTSTANDING: 3,
   WRITEOFF: 4,
+}
+
+export const PURCHASE_ORDER_STATUS_TEXT = {
+  DRAFT: 'Draft',
+  FINALIZED: 'Finalized',
+  PARTIALREVD: 'Partially Received',
+  CANCELLED: 'Cancelled',
+  FULFILLED: 'Fulfilled',
+  COMPLETED: 'Completed',
+}
+
+export const INVOICE_STATUS_TEXT = {
+  PAID: 'Paid',
+  OVERPAID: 'Overpaid',
+  OUTSTANDING: 'Outstanding',
+  WRITEOFF: 'Write-Off',
 }

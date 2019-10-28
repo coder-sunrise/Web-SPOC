@@ -1,6 +1,7 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
+import { notification } from '@/components'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
@@ -24,10 +25,10 @@ export default createFormViewModel({
           totalAftGst: 0,
           invoiceItems: [],
         },
-        invoicePayers: [],
+        invoicePayer: [],
         applicableSchemes: [],
         claimableSchemes: [],
-        invoicePaymentModes: [],
+        invoicePayment: [],
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -81,6 +82,45 @@ export default createFormViewModel({
               version: routing.location.query.v,
             },
           })
+        }
+      },
+      *submit ({ payload }, { call, put }) {
+        const { mode, ...restPayload } = payload
+        yield put({
+          type: `${mode}`,
+          payload: restPayload,
+        })
+      },
+      *save ({ payload }, { call, put }) {
+        const response = yield call(service.save, payload)
+        if (response) {
+          notification.success({
+            message: 'Billing saved',
+          })
+          yield put({
+            type: 'query',
+            payload: {
+              id: payload.visitId,
+            },
+          })
+          return response
+        }
+        return false
+      },
+      *complete ({ payload }, { call, put }) {
+        const response = yield call(service.complete, payload)
+        if (response) {
+          yield put({ type: 'formik/clean', payload: 'BillingForm' })
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: null,
+            },
+          })
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
         }
       },
       *refresh ({ payload }, { put }) {

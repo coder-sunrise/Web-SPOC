@@ -16,8 +16,6 @@ export default createFormViewModel({
       history.listen((loct, method) => {
         const { pathname, search, query = {} } = loct
         if (pathname === '/inventory/master') {
-          console.log('check', pathname, search, query)
-
           dispatch({
             type: 'inventoryMaster/updateState',
             payload: {

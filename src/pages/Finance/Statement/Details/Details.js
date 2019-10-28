@@ -99,7 +99,11 @@ class Details extends PureComponent {
         <GridContainer classes={{ grid: classes.gridContainer }}>
           <GridContainer direction='row' justify='flex-end'>
             <GridItem style={{ marginRight: -16 }}>
-              <ProgressButton color='primary' onClick={this.handleRefresh}>
+              <ProgressButton
+                color='primary'
+                onClick={this.handleRefresh}
+                icon={null}
+              >
                 <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </ProgressButton>

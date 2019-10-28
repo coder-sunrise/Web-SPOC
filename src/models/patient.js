@@ -157,14 +157,14 @@ export default createFormViewModel({
       //     },
       //   })
       // },
-      *closePatientModal ({ payload }, { call, put }) {
+      *closePatientModal ({ payload }, { all, put }) {
         router.push(
           getRemovedUrl([
             'md',
             'cmt',
             'pid',
             'new',
-            // 'v',
+            'v',
           ]),
         )
         // yield put({
@@ -173,21 +173,23 @@ export default createFormViewModel({
         //     entity: undefined,
         //   },
         // })
-        yield put({
-          type: 'global/updateAppState',
-          payload: {
-            disableSave: false,
-            showPatientInfoPanel: false,
-            fullscreen: false,
-            currentPatientId: null,
-          },
-        })
-        yield put({
-          type: 'updateState',
-          paylad: {
-            callback: undefined,
-          },
-        })
+        yield all([
+          yield put({
+            type: 'global/updateAppState',
+            payload: {
+              disableSave: false,
+              showPatientInfoPanel: false,
+              fullscreen: false,
+              currentPatientId: null,
+            },
+          }),
+          yield put({
+            type: 'updateState',
+            paylad: {
+              callback: undefined,
+            },
+          }),
+        ])
       },
 
       *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {

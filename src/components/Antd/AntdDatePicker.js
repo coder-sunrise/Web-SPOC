@@ -113,10 +113,14 @@ class AntdDatePicker extends PureComponent {
       this.setState({
         value: field.value === undefined ? '' : field.value,
       })
-    }
-    if (value) {
+    } else if (value) {
       this.setState({
         value,
+      })
+    } else {
+      this.setState({
+        value: undefined,
+        shrink: false,
       })
     }
   }

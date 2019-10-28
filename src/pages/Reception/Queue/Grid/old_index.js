@@ -314,7 +314,6 @@ class DetailsGrid extends PureComponent {
     const isLoading = global.showVisitRegistration
       ? false
       : loading.effects['queueLog/query']
-    console.log('render grid')
     return (
       <LoadingWrapper
         linear

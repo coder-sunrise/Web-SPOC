@@ -137,12 +137,21 @@ class AntdDateRangePicker extends PureComponent {
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, local, showTime } = nextProps
+    const { field, local, showTime, value } = nextProps
     // console.log(field.value)
 
     if (field) {
       this.setState({
         value: field.value === undefined ? [] : field.value,
+      })
+    } else if (value) {
+      this.setState({
+        value,
+      })
+    } else {
+      this.setState({
+        value: [],
+        shrink: false,
       })
     }
   }
@@ -165,7 +174,6 @@ class AntdDateRangePicker extends PureComponent {
             : o
         })
       : []
-
     this.setState({
       value: v,
     })
@@ -178,7 +186,7 @@ class AntdDateRangePicker extends PureComponent {
     }
 
     if (onChange) {
-      onChange(dateString, dateArray, v)
+      onChange(v, dateArray, dateString)
     }
   }
 
@@ -253,14 +261,9 @@ class AntdDateRangePicker extends PureComponent {
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text) {
-      // console.log(this.state.value)
       return (
         <span>
-          <DatePicker
-            text
-            format={format}
-            value={this.state.value[0]}
-          />&nbsp;~&nbsp;
+          <DatePicker text format={format} value={this.state.value[0]} />&nbsp;{this.state.value[0] || this.state.value[1] ? '~' : ''}&nbsp;
           <DatePicker text format={format} value={this.state.value[1]} />
         </span>
       )

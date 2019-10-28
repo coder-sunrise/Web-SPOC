@@ -60,7 +60,7 @@ class AppointmentDataGrid extends React.Component {
           ...column,
           checkedValue: true,
           uncheckedValue: false,
-          onRadioChange: this.onRadioChange,
+          onChange: this.onRadioChange,
         }
       }
 
@@ -141,7 +141,7 @@ class AppointmentDataGrid extends React.Component {
     ]
   }
 
-  onRadioChange = (row, e, checked) => {
+  onRadioChange = ({ row, checked }) => {
     if (checked) {
       const { data, handleCommitChanges } = this.props
       const newRows = data.map(

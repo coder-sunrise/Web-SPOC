@@ -121,13 +121,11 @@ class ExcelGrid extends PureComponent {
   changeEditingRowIds = (editingRowIds) => this.setState({ editingRowIds })
 
   changeRowChanges = (rowChanges) => {
-    console.log(rowChanges)
     this.setState({ rowChanges })
   }
 
   commitChanges = ({ added, changed, deleted }) => {
     const { rows } = this.state
-    console.log('commitChanges', added, changed, deleted)
     // let updatedRows = []
     // if (changed) {
     //   updatedRows = rows.map(
@@ -190,9 +188,6 @@ class ExcelGrid extends PureComponent {
           const data = this.state.data.map((row) => [
             ...row,
           ])
-          console.log(data)
-          console.log(changes)
-
           changes.forEach(({ cell, row, col, value }) => {
             data[row][col] = { ...data[row][col], value }
           })

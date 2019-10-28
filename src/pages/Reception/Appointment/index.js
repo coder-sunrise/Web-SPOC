@@ -21,6 +21,7 @@ import {
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 // utils
 import { getRemovedUrl } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   popover: {
@@ -165,9 +166,6 @@ class Appointment extends React.PureComponent {
   }
 
   moveEvent = (props) => {
-    console.log({
-      props,
-    })
     this.setState({
       isDragging: false,
     })
@@ -286,23 +284,23 @@ class Appointment extends React.PureComponent {
   onFilterUpdate = (filter) => {
     const { filterByDoctor = [] } = filter
     const { clinicianProfiles } = this.props
-    const newResources = filterByDoctor.includes(-99)
-      ? []
-      : clinicianProfiles.reduce(
-          (resources, doctor) =>
-            filterByDoctor.includes(doctor.id)
-              ? [
-                  ...resources,
-                  {
-                    clinicianFK: doctor.id,
-                    doctorName: doctor.name,
-                  },
-                ]
-              : [
-                  ...resources,
-                ],
-          [],
-        )
+
+    const newResources = clinicianProfiles.reduce(
+      (resources, doctor) =>
+        filterByDoctor.includes(doctor.id)
+          ? [
+              ...resources,
+              {
+                clinicianFK: doctor.id,
+                doctorName: doctor.name,
+              },
+            ]
+          : [
+              ...resources,
+            ],
+      [],
+    )
+
     this.setState((preState) => ({
       filter: { ...preState.filter, ...filter },
       resources: newResources.length > 0 ? newResources : null,
@@ -424,18 +422,20 @@ class Appointment extends React.PureComponent {
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
         />
-        <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
-          <FuncCalendarView
-            resources={resources}
-            filter={filter}
-            handleSelectSlot={this.onSelectSlot}
-            handleSelectEvent={this.onSelectEvent}
-            // handleDoubleClick={this.onSelectEvent}
-            handleMoveEvent={this.moveEvent}
-            handleEventMouseOver={this.onEventMouseOver}
-            handleOnDragStart={this.handleOnDragStart}
-          />
-        </div>
+        <Authorized authority='appointment.appointmentdetails'>
+          <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
+            <FuncCalendarView
+              resources={resources}
+              filter={filter}
+              handleSelectSlot={this.onSelectSlot}
+              handleSelectEvent={this.onSelectEvent}
+              // handleDoubleClick={this.onSelectEvent}
+              handleMoveEvent={this.moveEvent}
+              handleEventMouseOver={this.onEventMouseOver}
+              handleOnDragStart={this.handleOnDragStart}
+            />
+          </div>
+        </Authorized>
 
         <CommonModal
           open={showAppointmentForm}

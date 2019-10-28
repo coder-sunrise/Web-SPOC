@@ -13,12 +13,7 @@ class EditPlugin extends React.PureComponent {
   render () {
     return (
       <Plugin>
-        <Action
-          name='commitAddedRows'
-          action={(p) => {
-            console.log(p)
-          }}
-        />
+        <Action name='commitAddedRows' action={(p) => {}} />
       </Plugin>
     )
   }

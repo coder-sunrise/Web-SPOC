@@ -244,7 +244,6 @@ export default compose(
             doctorBlock,
           )
         }
-        console.log({ doctorBlocks })
 
         // compute startTime and endTime on all recurrence
         doctorBlocks = doctorBlocks.map((item) => {
@@ -312,7 +311,6 @@ export default compose(
         const start = moment(doctorBlock.startDateTime)
         const end = moment(doctorBlock.endDateTime)
         const hour = end.diff(start, 'hour')
-        console.log({ start, end, endDiff: end.diff(start, 'minute') })
         // const minute = end.format(timeFormat24Hour).split(':')[1]
         const minute = (end.diff(start, 'minute') / 60 - hour) * 60
 

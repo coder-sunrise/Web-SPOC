@@ -109,11 +109,16 @@ export default ({ classes, current, setFieldValue }) => {
               adjustedField: 'totalAfterOverallAdjustment',
             }}
             onValueChanged={(v) => {
-              setFieldValue(
-                'current.invoice.invoiceTotalAftGST',
-                v.summary.totalWithGST,
-              )
-              setFieldValue('current.invoice.invoiceAdjustment', v.adjustments)
+              if (setFieldValue) {
+                setFieldValue(
+                  'current.invoice.invoiceTotalAftGST',
+                  v.summary.totalWithGST,
+                )
+                setFieldValue(
+                  'current.invoice.invoiceAdjustment',
+                  v.adjustments,
+                )
+              }
             }}
           />
         </GridItem>

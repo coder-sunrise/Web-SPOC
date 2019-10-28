@@ -22,6 +22,7 @@ import {
   DoctorLabel,
   DoctorProfileSelect,
 } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   selectorContainer: {
@@ -135,10 +136,13 @@ const FilterBar = ({
         </GridItem>
 
         <GridItem xs md={12}>
-          <Button color='primary' size='sm' onClick={onAddAppointmentClick}>
-            <AddIcon />
-            Add Appointment
-          </Button>
+          <Authorized authority='appointment.newappointment'>
+            <Button color='primary' size='sm' onClick={onAddAppointmentClick}>
+              <AddIcon />
+              Add Appointment
+            </Button>
+          </Authorized>
+
           <Button color='primary' size='sm' onClick={onDoctorEventClick}>
             <AddIcon />
             Add Doctor Block

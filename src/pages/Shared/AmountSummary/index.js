@@ -46,6 +46,9 @@ class AmountSummary extends PureComponent {
       rows: [],
       ...calculateAmount(rows, adjustments, config),
     }
+    if (onValueChanged) {
+      onValueChanged(this.state)
+    }
   }
 
   // static getDerivedStateFromProps (props, state) {

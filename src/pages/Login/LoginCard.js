@@ -109,7 +109,6 @@ class LoginCard extends PureComponent {
   }
 
   onEnterPressed = () => {
-    console.log('on login click')
     const { handleSubmit } = this.props
     handleSubmit()
   }

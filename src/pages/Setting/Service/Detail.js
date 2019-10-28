@@ -131,7 +131,7 @@ class Detail extends PureComponent {
         type: 'radio',
         checkedValue: true,
         uncheckedValue: false,
-        onRadioChange: (row, e, checked) => {
+        onRadioChange: ({ row, checked }) => {
           // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
@@ -169,12 +169,19 @@ class Detail extends PureComponent {
   }
 
   checkHasActiveSession = async () => {
-    const result = await getBizSession()
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-
-    this.setState({
-      hasActiveSession: !!data,
-    })
+    if (data && data.length > 0) {
+      const { isClinicSessionClosed } = data[0]
+      this.setState(() => {
+        return {
+          hasActiveSession: !isClinicSessionClosed,
+        }
+      })
+    }
   }
 
   initMedisaveSetting = () => {

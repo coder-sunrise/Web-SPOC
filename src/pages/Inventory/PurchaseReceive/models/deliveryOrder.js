@@ -55,7 +55,6 @@ export default createFormViewModel({
 
         if (response.status === '200') {
           const { data } = response
-          console.log(data)
           if (data.deliveryOrderItem) {
             data.deliveryOrderItem = data.deliveryOrderItem.map((x) => ({
               ...x,
@@ -73,14 +72,12 @@ export default createFormViewModel({
         return false
       },
       *getOutstandingPOItem ({ payload }, { call, put }) {
-        console.log(payload)
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
           (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
         )
 
-        console.log(tempList)
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
             return {
@@ -162,10 +159,9 @@ export default createFormViewModel({
             bonusQuantity: x.bonusQty,
             currentReceivingQty: x.recevingQuantity,
             currentReceivingBonusQty: x.bonusQuantity,
-            expiryDate: null,
+            // expiryDate: null,
           }
         })
-
         return {
           ...state,
           entity: {

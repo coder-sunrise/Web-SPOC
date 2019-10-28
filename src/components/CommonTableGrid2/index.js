@@ -8,7 +8,6 @@ import {
   createMuiTheme,
   withStyles,
 } from '@material-ui/core/styles'
-import { Button } from '@/components'
 // import Paper from '@material-ui/core/Paper'
 import { LinearProgress, Paper, Tooltip, IconButton } from '@material-ui/core'
 import {
@@ -54,6 +53,7 @@ import {
   TableFixedColumns,
   VirtualTable,
 } from '@devexpress/dx-react-grid-material-ui'
+import { Button } from '@/components'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -61,7 +61,7 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
-import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
+// import StatusTypeProvider from './EditCellComponents/StatusTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import { watchForElementChange } from '@/utils/utils'
@@ -808,7 +808,7 @@ class CommonTableGrid2 extends React.Component {
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />
-              <StatusTypeProvider {...cellComponentConfig} />
+              {/* <StatusTypeProvider {...cellComponentConfig} /> */}
               <TimeTypeProvider {...cellComponentConfig} />
               <RowErrorTypeProvider {...cellComponentConfig} />
 

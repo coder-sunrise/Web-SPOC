@@ -39,8 +39,6 @@ class Filter extends PureComponent {
   render () {
     const { classes, navigatePdoDetails } = this.props
 
-    console.log('filter', this.state.isAllDateChecked)
-
     return (
       <div className={classes.filterBar}>
         <GridContainer>

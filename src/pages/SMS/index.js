@@ -40,7 +40,6 @@ const SMS = ({ classes }) => {
   ] = useState(false)
   const newMessageProps = {
     onSend: (value) => {
-      console.log(value)
       //   setList([
       //     ...list,
       //     {

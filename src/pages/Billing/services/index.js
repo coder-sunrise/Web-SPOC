@@ -5,9 +5,17 @@ const url = '/api/billing'
 
 export const query = (payload) => commonService.query(url, payload)
 
-export const upsert = (payload) => {
-  const { invoice } = payload
-  return request(`${url}/save/${invoice.id}`, { method: 'PUT', body: payload })
+export const save = (payload) => {
+  const { visitId } = payload
+  return request(`${url}/save/${visitId}`, { method: 'PUT', body: payload })
+}
+
+export const complete = (payload) => {
+  const { visitId } = payload
+  return request(`${url}/complete/${visitId}`, {
+    method: 'PUT',
+    body: payload,
+  })
 }
 
 export const queryList = (params) =>

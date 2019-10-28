@@ -49,7 +49,6 @@ class index extends PureComponent {
   }
 
   render () {
-    console.log('DO Index', this.props)
     const { props } = this
     const { classes, deliveryOrder } = props
 

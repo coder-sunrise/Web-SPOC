@@ -343,18 +343,33 @@ class CollectPaymentModal extends PureComponent {
               />
             </GridItem>
             {this.state.isCardPayment && (
-              <GridItem xs={4}>
-                <FastField
-                  name='creditCardTypeFK'
-                  render={(args) => (
-                    <CodeSelect
-                      label='Card Type'
-                      code='ctCreditCardType'
-                      {...args}
-                    />
-                  )}
-                />
-              </GridItem>
+              <React.Fragment>
+                <GridItem xs={4}>
+                  <FastField
+                    name='creditCardTypeFK'
+                    render={(args) => (
+                      <CodeSelect
+                        label='Card Type'
+                        code='ctCreditCardType'
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem>
+                  <Field
+                    name='cardNumber'
+                    render={(args) => (
+                      <NumberInput
+                        label='Card Number'
+                        inputProps={{ maxLength: 4 }}
+                        maxLength={4}
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </React.Fragment>
             )}
             <GridItem xs={4}>
               <FastField
