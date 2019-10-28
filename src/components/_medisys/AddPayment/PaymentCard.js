@@ -11,6 +11,7 @@ import NetsPayment from './paymentTypes/Nets'
 import CreditCardPayment from './paymentTypes/CreditCard'
 import ChequePayment from './paymentTypes/Cheque'
 import GiroPayment from './paymentTypes/Giro'
+import DepositPayment from './paymentTypes/Deposit'
 import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
 
@@ -20,6 +21,7 @@ const MapPaymentType = {
   [PAYMENT_MODE.CREDIT_CARD]: (props) => <CreditCardPayment {...props} />,
   [PAYMENT_MODE.CHEQUE]: (props) => <ChequePayment {...props} />,
   [PAYMENT_MODE.GIRO]: (props) => <GiroPayment {...props} />,
+  [PAYMENT_MODE.DEPOSIT]: (props) => <DepositPayment {...props} />,
 }
 
 class PaymentCard extends Component {
@@ -31,6 +33,7 @@ class PaymentCard extends Component {
         handleDeletePayment: this.props.handleDeletePayment,
         handleAmountChange: this.props.handleAmountChange,
         setFieldValue: this.props.setFieldValue,
+        patientInfo: this.props.patientInfo,
       })}
     </GridItem>
   )

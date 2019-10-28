@@ -17,8 +17,9 @@ import { rounding } from './utils'
 import { roundToTwoDecimals } from '@/utils/utils'
 import { PAYMENT_MODE } from '@/utils/constants'
 
-@connect(({ clinicSettings }) => ({
+@connect(({ clinicSettings, patient }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
+  patient: patient.entity,
 }))
 @withFormikExtend({
   notDirtyDuration: 0,
@@ -120,7 +121,7 @@ class AddPayment extends Component {
       paymentModeFK: parseInt(type, 10),
       paymentMode,
       ...InitialValue[type],
-      amt: amount,
+      amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
     }
     const newPaymentList = [
       ...values.paymentList,
@@ -185,16 +186,6 @@ class AddPayment extends Component {
 
       setFieldValue('cashRounding', roundingAmt)
       setFieldValue('collectableAmount', collectableAmountAfterRounding)
-      // const cashMinimumAmount = roundToTwoDecimals(
-      //   finalPayable -
-      //     paymentList.reduce(
-      //       (total, payment) =>
-      //         payment.paymentModeFK !== PAYMENT_MODE.CASH
-      //           ? total + (payment.amt || 0)
-      //           : total,
-      //       0,
-      //     ),
-      // )
 
       if (totalPaid > finalPayable && cashPayment) {
         cashReturned = roundToTwoDecimals(totalPaid - finalPayable)
@@ -210,7 +201,6 @@ class AddPayment extends Component {
     }
 
     setFieldValue('totalAmtPaid', totalPaid)
-
     setFieldValue(
       'outstandingAfterPayment',
       roundToTwoDecimals(finalPayable - totalPaid + cashReturned),
@@ -249,8 +239,10 @@ class AddPayment extends Component {
       clinicSettings,
       values,
       handleSubmit,
+      patient,
     } = this.props
     const { paymentList } = values
+    console.log({ values })
     return (
       <div>
         <PayerHeader
@@ -265,6 +257,7 @@ class AddPayment extends Component {
                 noCashPaymentMode,
               false,
             )}
+            patientInfo={patient}
             handlePaymentTypeClick={this.onPaymentTypeClick}
           />
           <PaymentCard
@@ -272,6 +265,7 @@ class AddPayment extends Component {
             handleDeletePayment={this.onDeleteClick}
             handleAmountChange={this.handleAmountChange}
             setFieldValue={this.props.setFieldValue}
+            patientInfo={patient}
           />
 
           <GridContainer alignItems='flex-end'>

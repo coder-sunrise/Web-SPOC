@@ -73,10 +73,14 @@ const reloadDispense = (props, effect = 'query') => {
       : roundToTwoDecimals(invoiceGSTAmt + invoiceTotal)
     const outstandingBalance = invoiceTotalAftGST
 
+    const { invoice = {} } = dispense.entity
+      ? dispense.entity
+      : dispense.default
+
     return {
       ...(dispense.entity || dispense.default),
       invoice: {
-        ...(dispense.entity.invoice || dispense.default.invoice),
+        ...invoice,
         invoiceTotal,
         invoiceGSTAmt,
         invoiceTotalAftGST,

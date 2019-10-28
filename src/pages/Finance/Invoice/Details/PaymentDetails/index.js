@@ -313,9 +313,11 @@ class PaymentDetails extends Component {
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
             onClose={this.closeAddPaymentModal}
+            invoicePayment={[]}
             invoice={{
               ...invoiceDetail.entity,
               totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
+              finalPayable: invoiceDetail.entity.outstandingBalance,
             }}
           />
         </CommonModal>
