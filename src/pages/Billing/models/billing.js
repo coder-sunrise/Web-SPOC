@@ -87,13 +87,12 @@ export default createFormViewModel({
       },
       *submit ({ payload }, { call, put }) {
         const { mode, ...restPayload } = payload
-        yield put({
+        return yield put({
           type: `${mode}`,
           payload: restPayload,
         })
       },
-      *save ({ payload }, { call, put }) {
-        const { visitStatus } = payload
+      *save ({ payload }, { call, put, take }) {
         const response = yield call(service.save, payload)
         if (response) {
           yield put({
@@ -102,19 +101,14 @@ export default createFormViewModel({
               id: payload.visitId,
             },
           })
-          // TODO: once server done enhancement, back to
-          // individual call instead of mixing 2 to 1
-          if (visitStatus === 'COMPLETED') {
-            notification.success({
-              message: 'Billing completed',
-            })
-            router.push('/reception/queue')
-          } else {
-            notification.success({
-              message: 'Billing saved',
-            })
-            return response
-          }
+
+          yield take('billing/query/@@end')
+          yield put({
+            type: 'formik/clean',
+            payload: 'BillingForm',
+          })
+
+          return response
         }
         return false
       },

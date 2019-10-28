@@ -13,6 +13,7 @@ import {
   CommonModal,
   GridContainer,
   withFormikExtend,
+  notification,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
@@ -184,6 +185,19 @@ const bannerStyle = {
     }).then((response) => {
       if (response) {
         resetForm()
+
+        // TODO: once server done enhancement, back to
+        // individual call instead of mixing 2 to 1
+        if (visitStatus === 'COMPLETED') {
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
+        } else {
+          notification.success({
+            message: 'Billing saved',
+          })
+        }
       }
     })
   },
