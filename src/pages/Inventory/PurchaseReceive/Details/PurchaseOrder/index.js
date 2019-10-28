@@ -223,7 +223,7 @@ class Index extends Component {
           )
           break
         case poSubmitAction.FINALIZE:
-          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          // dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           processedPayload = this.processSubmitPayload(false, 2)
           break
         case poSubmitAction.COMPLETE:
