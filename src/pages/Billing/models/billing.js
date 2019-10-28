@@ -150,7 +150,6 @@ export default createFormViewModel({
             id: billingState.visitID,
           },
         })
-
         yield take('dispense/unlock/@@end')
 
         if (response) {

@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
+import { ListItemIcon, MenuItem, Typography } from '@material-ui/core'
+import Done from '@material-ui/icons/Done'
 import Button from '../mui-pro/CustomButtons'
+
 
 export default ({
   options = [],
@@ -9,6 +11,8 @@ export default ({
   valueField = 'id',
   textField = 'name',
   color = 'info',
+  mode = 'default',
+  includeAll = true,
   onClick = (f) => f,
   ...props
 }) => {
@@ -30,6 +34,7 @@ export default ({
         aria-controls='customized-menu'
         aria-haspopup='true'
         color={color}
+        {...props}
       >
         {children}
       </Button>
@@ -45,6 +50,18 @@ export default ({
           },
         }}
       >
+        {mode === 'multiple' &&
+        includeAll && (
+          <MenuItem
+            key='$all'
+            onClick={() => {
+              // onClick(tag)
+              // tagButtonHandleClose()
+            }}
+          >
+            All
+          </MenuItem>
+        )}
         {options.map((tag) => (
           <MenuItem
             key={tag[valueField]}
@@ -53,6 +70,13 @@ export default ({
               tagButtonHandleClose()
             }}
           >
+            <ListItemIcon>
+              <Done fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='inherit' noWrap>
+              A very long text that overflows
+            </Typography>
+
             {tag[textField]}
           </MenuItem>
         ))}
