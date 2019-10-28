@@ -242,8 +242,9 @@ class Queue extends React.Component {
 
   onConfirmEndSession = () => {
     const { queueLog, dispatch } = this.props
+    console.log('confirm end session')
     dispatch({
-      type: `${modelKey}endSession`,
+      type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then((response) => {
       const { status } = response

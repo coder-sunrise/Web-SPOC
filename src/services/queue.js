@@ -1,5 +1,5 @@
 import * as commonServices from '@/services/common'
-import { axiosRequest, request } from '@/utils/request'
+import request, { axiosRequest } from '@/utils/request'
 
 const queueAPIUrl = '/api/queue'
 const bizSessionAPIURL = '/api/bizsession'
@@ -10,6 +10,7 @@ export const startSession = async () => {
 }
 
 export const endSession = async (sessionID) => {
+  console.log('endsession')
   const response = await request(`/api/bizsession/${sessionID}`, {
     method: 'PUT',
   })
