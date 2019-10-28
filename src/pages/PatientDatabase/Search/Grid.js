@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { statusString } from '@/utils/codes'
 import { CommonTableGrid } from '@/components'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
+import Authorized from '@/utils/Authorized'
 
 class Grid extends PureComponent {
   state = {}
@@ -47,7 +48,11 @@ class Grid extends PureComponent {
           sortingEnabled: false,
           render: (row) => {
             const { renderActionFn = (f) => f } = props
-            return renderActionFn(row)
+            return (
+              <Authorized authority='patientdatabase.patientprofiledetails'>
+                {renderActionFn(row)}
+              </Authorized>
+            )
           },
         },
         {

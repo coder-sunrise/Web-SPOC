@@ -96,8 +96,6 @@ const DispenseDetails = ({
                   gstAmtField: 'gstAmount',
                 }}
                 onValueChanged={(v) => {
-                  console.log(v)
-
                   setFieldValue('invoice.invoiceTotal', v.summary.total)
                   setFieldValue(
                     'invoice.invoiceTotalAftAdj',

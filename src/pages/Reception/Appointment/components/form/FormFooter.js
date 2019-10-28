@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import style from './style'
+import Authorized from '@/utils/Authorized'
 
 const ButtonText = {
   DELETE: 'Delete',
@@ -51,14 +52,16 @@ const FormFooter = ({
           >
             {ButtonText.CHECK}
           </Button>
-          <Button
-            color='danger'
-            className={classnames(hideCancelAppointmentClass)}
-            onClick={handleCancelOrDeleteClick}
-            disabled={disabled || isTurnedUp}
-          >
-            {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
-          </Button>
+          <Authorized authority='appointment.deletecancelappointment'>
+            <Button
+              color='danger'
+              className={classnames(hideCancelAppointmentClass)}
+              onClick={handleCancelOrDeleteClick}
+              disabled={disabled || isTurnedUp}
+            >
+              {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
+            </Button>
+          </Authorized>
 
           {(isNew || isDraft) && (
             <Button

@@ -43,6 +43,7 @@ import { getAppendUrl } from '@/utils/utils'
 import Loading from '@/components/PageLoading/index'
 import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -173,20 +174,22 @@ class PatientDashboard extends PureComponent {
     if (!entity) return null
     const { visit = {} } = entity
     // console.log(visit)
-    // console.log(this.props)
+
     return (
       <div className={classes.root}>
         <Banner
           extraCmt={
             visit.visitStatus === 'WAITING' && (
-              <div style={{ padding: '30px 0' }}>
-                <ProgressButton
-                  color='primary'
-                  onClick={this.startConsultation}
-                >
-                  Start Consultation
-                </ProgressButton>
-              </div>
+              <Authorized authority='patientdashboard.startresumeconsultation'>
+                <div style={{ padding: '30px 0' }}>
+                  <ProgressButton
+                    color='primary'
+                    onClick={this.startConsultation}
+                  >
+                    Start Consultation
+                  </ProgressButton>
+                </div>
+              </Authorized>
             )
           }
           {...this.props}

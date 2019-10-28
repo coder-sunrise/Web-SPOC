@@ -50,7 +50,7 @@ const Cheque = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`paymentList[${index}].chequeNo`}
+            name={`paymentList[${index}].chequePayment.chequeNo`}
             render={(args) => <TextField label='Cheque No.' {...args} />}
           />
         </GridItem>

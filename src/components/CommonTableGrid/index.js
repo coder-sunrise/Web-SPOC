@@ -528,7 +528,7 @@ class CommonTableGrid extends PureComponent {
       //   //   payload.sorting[0].direction === 'asc' ? 'desc' : 'asc'
       // }
       // payload.current &&
-      console.log('none of the above')
+
       this.setState({
         pagination: {
           ...pagination,
@@ -820,7 +820,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-    console.log({ selectConfig })
+
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper

@@ -238,7 +238,7 @@ class BaseInput extends React.PureComponent {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
     }
     // console.log({ error, showErrorIcon })
-    if (error && showErrorIcon) {
+    if (error && error.length && showErrorIcon) {
       cfg.endAdornment = (
         <InputAdornment position='end'>
           <Tooltip

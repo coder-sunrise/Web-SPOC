@@ -71,7 +71,7 @@ const InventoryTypeListing = ({
           <Tooltip title='Remove' placement='bottom'>
             <Button
               size='sm'
-              onClick={() => console.log(row)}
+              onClick={() => (console.log(row))}
               justIcon
               round
               color='primary'
@@ -498,7 +498,6 @@ const InventoryTypeListing = ({
   const onRowChangesChange = (rows) => {}
 
   const onAddedRowsChange = (type) => (addedRows) => {
-    console.log(type, addedRows)
     if (addedRows.length > 0) {
       const newRow = addedRows[0]
 

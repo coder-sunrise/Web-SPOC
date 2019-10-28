@@ -67,6 +67,7 @@ export default createFormViewModel({
 
         // Access clinicInfo from store
         let clinicAddress = ''
+        let tempClinicAddress = []
         const clinicInfo = yield select((state) => state.clinicInfo)
         const { contact } = clinicInfo
         if (contact) {
@@ -77,7 +78,15 @@ export default createFormViewModel({
             unitNo,
             postcode,
           } = contact.contactAddress[0]
-          clinicAddress = `${buildingName}, ${blockNo}, ${street}, ${unitNo}, ${postcode}`
+
+          if (buildingName) tempClinicAddress.push(buildingName)
+          if (blockNo) tempClinicAddress.push(blockNo)
+          if (street) tempClinicAddress.push(street)
+          if (unitNo) tempClinicAddress.push(unitNo)
+          if (postcode) tempClinicAddress.push(postcode)
+          clinicAddress = tempClinicAddress.join(', ')
+
+          // clinicAddress = `${buildingName}, ${blockNo}, ${street}, ${unitNo}, ${postcode}`
         }
 
         const purchaseOrder = {
@@ -90,6 +99,7 @@ export default createFormViewModel({
           IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
+          exceptedDeliveryDate: '',
         }
 
         return yield put({

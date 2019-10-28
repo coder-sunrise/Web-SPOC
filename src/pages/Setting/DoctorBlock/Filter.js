@@ -3,13 +3,15 @@ import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
+import * as Yup from 'yup'
+import moment from 'moment'
 import {
   GridContainer,
   GridItem,
   Button,
   CodeSelect,
   ProgressButton,
-  DateRangePicker,
+  DatePicker,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
@@ -51,14 +53,50 @@ const recurrenceTypes = [
 @withFormik({
   mapPropsToValues: () => ({
     doctorName: [],
-    dates: [],
+    dateFrom: moment().subtract(6, 'months'),
+    dateTo: moment(),
     recurrence: undefined,
   }),
-  handleSubmit: () => {},
+  validationSchema: Yup.object().shape({
+    dateFrom: Yup.date(),
+    dateTo: Yup.date().when(
+      'dateFrom',
+      (dateFrom, schema) =>
+        dateFrom &&
+        schema.max(
+          moment(dateFrom).add(6, 'months'),
+          'Maximum 6 months date range.',
+        ),
+    ),
+  }),
+  handleSubmit: (values, { props }) => {
+    const prefix = values.doctorName.length === 1 ? 'eql_' : 'in_'
+    const doctorIDs = values.doctorName.join('|')
+    props.dispatch({
+      type: 'doctorBlock/query',
+      payload: {
+        // [`${prefix}name`]: values.doctorName,
+        [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
+        lgteql_startDateTime: values.dateFrom || '',
+        lsteql_endDateTime: values.dateTo || '',
+        'DoctorBlockGroupFKNavigation.DoctorBlockRecurrenceFKNavigation.RecurrencePatternFKNavigation.Id':
+          values.recurrence,
+        combineCondition: 'and',
+      },
+    })
+  },
 })
 class Filter extends PureComponent {
+  setDateTo = (v) => {
+    if (v) {
+      this.props.setFieldValue('dateTo', moment(v).add(6, 'months'))
+    } else {
+      this.props.setFieldValue('dateTo', undefined)
+    }
+  }
+
   render () {
-    const { classes, values } = this.props
+    const { classes, values, handleSubmit } = this.props
     // console.log({ values })
     return (
       <div className={classes.filterBar}>
@@ -83,16 +121,28 @@ class Filter extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem xs={6} md={4}>
+
+          <GridItem xs={2} md={2}>
             <FastField
-              name='dates'
+              name='dateFrom'
               render={(args) => {
                 return (
-                  <DateRangePicker
-                    label='Start Date'
-                    label2='End Date'
+                  <DatePicker
+                    timeFormat={false}
+                    label='From date'
+                    onChange={(v) => this.setDateTo(v)}
                     {...args}
                   />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} md={2}>
+            <FastField
+              name='dateTo'
+              render={(args) => {
+                return (
+                  <DatePicker timeFormat={false} label='To date' {...args} />
                 )
               }}
             />
@@ -119,23 +169,7 @@ class Filter extends PureComponent {
               <ProgressButton
                 color='primary'
                 icon={null}
-                onClick={() => {
-                  const prefix =
-                    this.props.values.doctorName.length === 1 ? 'eql_' : 'in_'
-                  const doctorIDs = values.doctorName.join('|')
-                  this.props.dispatch({
-                    type: 'doctorBlock/query',
-                    payload: {
-                      // [`${prefix}name`]: values.doctorName,
-                      [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
-                      lgteql_startDateTime: values.dates[0] || '',
-                      lsteql_endDateTime: values.dates[1] || '',
-                      'DoctorBlockGroupFKNavigation.DoctorBlockRecurrenceFKNavigation.RecurrencePatternFKNavigation.Id':
-                        values.recurrence,
-                      combineCondition: 'and',
-                    },
-                  })
-                }}
+                onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>

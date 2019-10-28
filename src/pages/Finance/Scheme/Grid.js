@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Edit } from '@material-ui/icons'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
-import { Button, CommonTableGrid } from '@/components'
+import { Button, CommonTableGrid, Tooltip } from '@/components'
 
 const Grid = ({ history }) => {
   const [
@@ -65,18 +65,19 @@ const Grid = ({ history }) => {
               <Search />
             </Button>
           </Tooltip> */
-
-        <Tooltip title='Edit' placement='bottom'>
-          <Button
-            size='sm'
-            onClick={() => editRow(row)}
-            justIcon
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <Edit />
-          </Button>
-        </Tooltip>
+        <Authorized authority='scheme.schemedetails'>
+          <Tooltip title='Edit' placement='bottom'>
+            <Button
+              size='sm'
+              onClick={() => editRow(row)}
+              justIcon
+              color='primary'
+              style={{ marginRight: 5 }}
+            >
+              <Edit />
+            </Button>
+          </Tooltip>
+        </Authorized>
       ),
     },
     // {

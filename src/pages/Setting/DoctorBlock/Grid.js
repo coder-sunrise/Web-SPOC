@@ -15,7 +15,7 @@ import { DoctorLabel, LoadingWrapper } from '@/components/_medisys'
 
 const TableParams = {
   FuncProps: {
-    // pager: false,
+    pager: false,
     grouping: true,
   },
   columns: [

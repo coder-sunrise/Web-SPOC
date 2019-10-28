@@ -159,11 +159,13 @@ class AddConsultationDocument extends PureComponent {
           )}
           textField='displayValue'
           onClick={(option) => {
-            let msg = option.templateContent
-            const match = option.templateContent.match(templateReg) || []
+            let msg = htmlDecodeByRegExp(option.templateContent)
+            const match = msg.match(templateReg) || []
+            // console.log(msg, templateReg, match, tagList)
             match.forEach((s) => {
               const text = s.match(/data-value="(.*?)"/)[1]
               const m = tagList.find((o) => o.text === text)
+              // console.log(text, m)
               if (m && m.getter) msg = msg.replace(s, m.getter())
             })
             setFieldValue('content', msg)

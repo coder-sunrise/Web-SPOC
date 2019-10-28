@@ -9,13 +9,18 @@ import {
   timeFormat24Hour,
 } from '@/components'
 
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
 const dateFormat = 'DD-MMM-YYYY'
 const timeFormat = 'hh:mm a'
 
 class TimeEditorBase extends PureComponent {
   state = {
-    error: false,
-    tempValue: '',
+    open: false,
   }
 
   constructor (props) {
@@ -24,105 +29,27 @@ class TimeEditorBase extends PureComponent {
   }
 
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
-    })
+    onComponentDidMount.call(this)
   }
 
-  onChange = (time) => {
+  _onChange = (date, value) => {
     this.setState({
-      tempValue: time,
+      value,
     })
   }
 
   onOpenChange = (open) => {
-    // update value when closing timepicker
-    if (!open) {
-      const { tempValue } = this.state
-      const { columnExtensions, column: { name: columnName } } = this.props
-      const cfg = columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      )
-      if (tempValue === null || tempValue === '') {
-        this.setState({
-          error: updateCellValue(this.props, this.myRef.current, null),
-        })
-        return
-      }
-
-      const timeString = tempValue.format(cfg.format ? cfg.format : timeFormat)
-      // const timeString24HourFormat = tempValue.format(timeFormat24Hour)
-      // const currentDateString = cfg.currentDate.format(dateFormat)
-
-      // const fullDateTime = moment(
-      //   `${currentDateString} ${timeString}`,
-      //   `${dateFormat} ${timeFormat}`,
-      // )
-
-      // const time = moment(
-      //   timeString,
-      //   cfg.format ? cfg.format : timeFormat,
-      // ).format(cfg.format ? cfg.format : timeFormat)
-
-      // console.log({ time, timeString })
-
-      this.setState({
-        error: updateCellValue(this.props, this.myRef.current, timeString),
-      })
-    }
+    if (!open) onComponentChange.call(this, { value: this.state.value })
   }
 
   render () {
-    const { props } = this
-    const {
-      column = {},
-      value,
-      onValueChange,
-      columnExtensions,
-      row,
-      gridId,
-    } = props
-    const { name: columnName } = column
-    const cfg = columnExtensions.find(
-      ({ columnName: currentColumnName }) => currentColumnName === columnName,
-    )
-    const { type, isDisabled = () => false, ...restConfig } = cfg
-
-    const commonCfg = {
-      onChange: this.onChange,
-      onOpenChange: this.onOpenChange,
-      disabled: isDisabled(
-        window.$tempGridRow[gridId]
-          ? window.$tempGridRow[gridId][row.id] || {}
-          : row,
-      ),
-      value,
-    }
+    const { allowClear = false, ...commonCfg } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+    commonCfg.onOpenChange = this.onOpenChange
 
     return (
       <div ref={this.myRef}>
-        <TimePicker
-          // format='hh:mm a'
-          showErrorIcon
-          allowClear={false}
-          error={this.state.error}
-          {...commonCfg}
-          {...restConfig}
-        />
+        <TimePicker allowClear={allowClear} {...commonCfg} />
       </div>
     )
   }

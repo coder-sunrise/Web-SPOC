@@ -119,7 +119,6 @@ class CollectPaymentConfirm extends PureComponent {
 
   handlePaymentAmount = (e, from) => {
     const { setFieldValue, statement, values, setValues } = this.props
-    console.log('statement', values)
 
     if (from === 'grid') {
       this.setState({ totalAmount: e.target.value })
@@ -155,7 +154,6 @@ class CollectPaymentConfirm extends PureComponent {
       }
     })
 
-    console.log('testt', test)
     setValues({
       ...values,
       statementInvoice: test,
@@ -192,11 +190,11 @@ class CollectPaymentConfirm extends PureComponent {
 
     if (selectedValue === 1) {
       this.setState({ isCardPayment: true })
-      setFieldValue('patientDepositTransaction.creditCardTypeFK', 1)
+      setFieldValue('creditCardTypeFK', 1)
     } else {
       this.setState({ isCardPayment: false })
-      setFieldValue('patientDepositTransaction.cardNumber', '')
-      setFieldValue('patientDepositTransaction.creditCardTypeFK', undefined)
+      setFieldValue('cardNumber', '')
+      setFieldValue('creditCardTypeFK', undefined)
     }
   }
 
@@ -255,7 +253,7 @@ class CollectPaymentConfirm extends PureComponent {
 
             <GridItem>
               <FastField
-                name='paymentMode'
+                name='paymentModeFK'
                 render={(args) => (
                   <CodeSelect
                     {...args}
@@ -272,7 +270,7 @@ class CollectPaymentConfirm extends PureComponent {
               <React.Fragment>
                 <GridItem>
                   <Field
-                    name='patientDepositTransaction.creditCardTypeFK'
+                    name='creditCardTypeFK'
                     render={(args) => (
                       <CodeSelect
                         label='Card Type'
@@ -284,7 +282,7 @@ class CollectPaymentConfirm extends PureComponent {
                 </GridItem>
                 <GridItem>
                   <Field
-                    name='patientDepositTransaction.cardNumber'
+                    name='cardNumber'
                     render={(args) => (
                       <NumberInput
                         label='Card Number'

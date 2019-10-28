@@ -62,12 +62,12 @@ export default createFormViewModel({
           payload,
         })
 
-        yield put({
-          type: 'global/updateState',
-          payload: {
-            commitCount: commitCount++,
-          },
-        })
+        // yield put({
+        //   type: 'global/updateState',
+        //   payload: {
+        //     commitCount: commitCount++,
+        //   },
+        // })
       },
     },
     reducers: {

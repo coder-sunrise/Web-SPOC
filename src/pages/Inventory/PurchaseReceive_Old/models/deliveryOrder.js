@@ -114,8 +114,6 @@ export default createListViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        console.log('deleteRow', rows.filter((x) => x.uid !== payload))
-
         return {
           ...state,
           entity: {

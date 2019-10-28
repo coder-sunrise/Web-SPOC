@@ -4,7 +4,6 @@ import { Edit, Print } from '@material-ui/icons'
 import { Tooltip, Button, CommonTableGrid } from '@/components'
 
 const Grid = (props) => {
-  console.log('Grid render')
   const [
     pageSizes,
     setPagesizes,
@@ -37,7 +36,6 @@ const Grid = (props) => {
   ]
 
   useEffect(() => {
-    console.log('grid effect trigger')
     // dispatch({
     //   type: 'purchasedelivery/query',
     // })

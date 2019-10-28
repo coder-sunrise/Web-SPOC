@@ -47,7 +47,21 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    return purchaseOrderDetails
+    const { purchaseOrder } = purchaseOrderDetails
+    let IsGSTEnabled
+    let IsGSTInclusive
+    if (purchaseOrder) {
+      IsGSTEnabled = purchaseOrder.isGstInclusive
+      IsGSTInclusive = purchaseOrder.isGstInclusive
+    }
+    return {
+      ...purchaseOrderDetails,
+      purchaseOrder: {
+        ...purchaseOrder,
+        IsGSTEnabled,
+        IsGSTInclusive,
+      },
+    }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -209,7 +223,7 @@ class Index extends Component {
           )
           break
         case poSubmitAction.FINALIZE:
-          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          // dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           processedPayload = this.processSubmitPayload(false, 2)
           break
         case poSubmitAction.COMPLETE:
@@ -493,7 +507,6 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    console.log('asd', isPOStatusDraft(poStatus))
     return (
       // <AuthorizedContext.Provider
       //   value={{

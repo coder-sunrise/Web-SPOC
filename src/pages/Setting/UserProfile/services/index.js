@@ -15,6 +15,5 @@ export const query = (params) => service.query(url, params)
 export const queryList = (params) => service.queryList(url, params)
 export const create = (params) => service.create(url, params)
 export const upsert = (params) => {
-  console.log({ params })
   return service.upsert(url, params)
 }

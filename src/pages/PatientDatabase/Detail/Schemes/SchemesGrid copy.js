@@ -113,9 +113,7 @@ class SchemesGrid extends PureComponent {
   }
 
   isMedisave = (row) => {
-    console.log(schemeTypes)
     const r = schemeTypes.find((o) => o.id === row.schemeTypeFK)
-    console.log(r)
     if (!r) return false
     return (
       [
@@ -134,8 +132,6 @@ class SchemesGrid extends PureComponent {
   }
 
   onRowChangesChange = (changes) => {
-    console.log(changes)
-
     this.setState((preSate) => {
       return {
         rows: preSate.rows.map(
@@ -227,7 +223,6 @@ class SchemesGrid extends PureComponent {
   render () {
     const { editingRowIds, rowChanges, rows } = this.state
     const { type, schema } = this.props
-    console.log(rows)
     const EditingProps = {
       showAddCommand: true,
       onRowChangesChange: this.onRowChangesChange,

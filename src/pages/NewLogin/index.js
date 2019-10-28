@@ -102,6 +102,12 @@ const submitKey = 'login/getToken'
         const validLogin = payload.access_token !== undefined
 
         if (validLogin) {
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              showSessionTimeout: false,
+            },
+          })
           localStorage.setItem('clinicCode', clinicCode)
 
           router.push(loginDestination)

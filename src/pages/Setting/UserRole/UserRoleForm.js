@@ -84,6 +84,5 @@ const UserRoleForm = ({ classes, footer, handleSubmit, ...props }) => {
 export default withFormik({
   mapPropsToValues: () => ({}),
   handleSubmit: () => {
-    console.log('submit')
   },
 })(withStyles(styles, { name: 'UserProfileForm' })(UserRoleForm))

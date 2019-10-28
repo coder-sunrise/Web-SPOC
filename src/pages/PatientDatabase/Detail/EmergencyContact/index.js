@@ -75,7 +75,7 @@ class EmergencyContact extends PureComponent {
         checkedValue: true,
         uncheckedValue: false,
         // sortingEnabled: false,
-        onRadioChange: (row, e, checked) => {
+        onChange: ({ row, checked }) => {
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
             const patientEmergencyContact = _.cloneDeep(

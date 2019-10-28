@@ -116,7 +116,6 @@ class EditableTableGrid extends PureComponent {
     ) {
       const { onRowDoubleClick, EditingProps, rows } = this.props
       const { onEditingRowIdsChange } = EditingProps
-
       if (onRowDoubleClick) {
         onRowDoubleClick()
       } else {

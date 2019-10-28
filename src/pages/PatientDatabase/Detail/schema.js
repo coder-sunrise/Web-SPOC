@@ -162,6 +162,7 @@ const schemaDemographic = {
 const pecValidationSchema = Yup.object().shape({
   accountNoTypeFK: Yup.string().required(),
   accountNo: Yup.string().NRIC().required(),
+  remark: Yup.date().required(),
   name: Yup.string().required(),
   relationshipFK: Yup.number().required(),
 })
@@ -203,6 +204,7 @@ const schemaSchemes = {
     .of(
       Yup.object().shape({
         schemeTypeFK: Yup.number().required(),
+        // accountNumber: Yup.string().required(),
         coPaymentSchemeFK: Yup.number().when('schemeTypeFK', {
           is: (val) => {
             // return false

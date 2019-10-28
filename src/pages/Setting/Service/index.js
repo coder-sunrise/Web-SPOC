@@ -56,7 +56,6 @@ class Service extends PureComponent {
       })
     }
 
-    console.log(this.state.open)
   }
 
   render () {

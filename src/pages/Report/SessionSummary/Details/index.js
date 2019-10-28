@@ -26,12 +26,17 @@ const PaymentDetailsColumns = [
   { name: 'pastCollected', title: 'Past Session' },
   { name: 'subTotal', title: 'Sub Total' },
 ]
-
+const PaymentDetailsColumnsExtensions = [
+  { columnName: 'currentCollected', type: 'currency', currency: true },
+  { columnName: 'pastCollected', type: 'currency', currency: true },
+  { columnName: 'subTotal', type: 'currency', currency: true },
+]
 const initialState = {
   loaded: false,
   isLoading: false,
-  paymentDetailsData: {},
+  paymentDetailsData: [],
   sessionDetails: {},
+  companyDetails: {},
 }
 const reducer = (state, action) => {
   switch (action.type) {
@@ -69,19 +74,8 @@ const SessionSummary = ({ match, sessionID }) => {
     const result = await getRawData(reportID, values)
 
     if (result) {
-      const [
-        totalCurrentCollected,
-        totalPastCollected,
-      ] = result.PaymentDetails.reduce(
-        (sum, payment) => [
-          sum + payment.currentCollected,
-          sum + payment.pastCollected,
-        ],
-        [
-          0,
-          0,
-        ],
-      )
+      const totalCurrentCollected = result.PaymentDetails.map((t) => t.currentCollected).reduce((pre, cur) => pre + cur)
+      const totalPastCollected = result.PaymentDetails.map((t) => t.pastCollected).reduce((pre, cur) => pre + cur)
       dispatch({
         type: 'updateState',
         payload: {
@@ -89,6 +83,7 @@ const SessionSummary = ({ match, sessionID }) => {
           loaded: true,
           isLoading: false,
           sessionDetails: result.SessionDetails[0],
+          companyDetails: result.CompanyDetails[0],
           paymentDetailsData: [
             ...result.PaymentDetails.map((item, index) => ({
               ...item,
@@ -108,9 +103,9 @@ const SessionSummary = ({ match, sessionID }) => {
   }
 
   useEffect(() => {
-    /* 
+    /*
     clean up function
-    set data to empty array when leaving the page 
+    set data to empty array when leaving the page
     */
     asyncGetData()
     return () =>
@@ -119,8 +114,7 @@ const SessionSummary = ({ match, sessionID }) => {
       })
   }, [])
 
-  const { sessionDetails } = state
-  console.log({ sessionDetails })
+  const { sessionDetails, paymentDetailsData, companyDetails } = state
   return (
     <CardContainer hideHeader>
       <GridContainer>
@@ -179,14 +173,23 @@ const SessionSummary = ({ match, sessionID }) => {
                   value={sessionDetails.totalSessionOutstandingBalance}
                 />
               </GridItem>
+              <GridItem md={3} style={{ marginBottom: 16 }}>
+                <NumberInput
+                  label='Company'
+                  disabled
+                  currency
+                  value={companyDetails.TotalCompanyAmount?companyDetails.TotalCompanyAmount:0}
+                />
+              </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
                 <h4>Payment Summary</h4>
               </GridItem>
               <GridItem md={12}>
                 <ReportDataGrid
                   height='auto'
-                  data={state.paymentDetails}
+                  data={paymentDetailsData}
                   columns={PaymentDetailsColumns}
+                  columnExtensions={PaymentDetailsColumnsExtensions}
                 />
               </GridItem>
             </GridContainer>

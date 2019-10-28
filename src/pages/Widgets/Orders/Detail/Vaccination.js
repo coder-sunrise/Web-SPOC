@@ -130,7 +130,6 @@ class Vaccination extends PureComponent {
       handleSubmit,
       setFieldValue,
     } = this.props
-    console.log('Vaccination', this.props)
     return (
       <div>
         <GridContainer>
