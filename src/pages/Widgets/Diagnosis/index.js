@@ -125,13 +125,16 @@ class Diagnosis extends PureComponent {
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
 
-            if (values.corDiagnosis.length <= 0) {
-              this.addDiagnosis()
-            }
+            // if (values.corDiagnosis.length <= 0) {
+            //   this.addDiagnosis()
+            // }
 
             if (diagnosises.length === 0) {
               // if(!values.disabled)
-              if (components.ConsultationPage.edit) {
+              if (
+                components &&
+                components.ConsultationPage.rights === 'enable'
+              ) {
                 this.addDiagnosis()
                 return null
               }
