@@ -374,16 +374,6 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
-              // finalPayable: roundToTwoDecimals(
-              //   values.finalPayable -
-              //     values.invoicePayment.reduce(
-              //       (totalPaid, payment) =>
-              //         !payment.isCancelled
-              //           ? totalPaid + payment.totalAmtPaid
-              //           : totalPaid,
-              //       0,
-              //     ),
-              // ),
               finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
             }}
