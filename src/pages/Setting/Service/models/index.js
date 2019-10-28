@@ -27,7 +27,6 @@ export default createListViewModel({
     effects: {},
     reducers: {
       queryDone (st, { payload }) {
-        console.log('query done')
         const { data } = payload
         return {
           ...st,

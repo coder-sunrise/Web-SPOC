@@ -166,9 +166,6 @@ class Appointment extends React.PureComponent {
   }
 
   moveEvent = (props) => {
-    console.log({
-      props,
-    })
     this.setState({
       isDragging: false,
     })

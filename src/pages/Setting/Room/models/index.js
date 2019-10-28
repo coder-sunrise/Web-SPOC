@@ -25,7 +25,6 @@ export default createListViewModel({
     effects: {},
     reducers: {
       queryOneDone (st, { payload }) {
-        console.log(payload)
         const { data } = payload
         data.effectiveDates = [
           data.effectiveStartDate,

@@ -4,16 +4,12 @@ import Skeleton from '@material-ui/lab/Skeleton'
 import lodash from 'lodash'
 
 const skeleton = (...props) => (Component) => {
-  console.log('skeleton', props)
   @connect(({ loading }) => ({
     loading,
   }))
   class BasicComponent extends React.Component {
     shouldComponentUpdate (nextProps) {
-      console.log(props, nextProps, this.props)
-      console.log(window.g_app)
       const { loading } = nextProps
-      console.log(loading.global)
       return !loading.global
     }
 

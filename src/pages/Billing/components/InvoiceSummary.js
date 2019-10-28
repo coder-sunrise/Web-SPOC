@@ -64,12 +64,13 @@ const InvoiceSummary = ({
 
   const shouldDisableAddPayment = () => {
     if (disabled) return disabled
+    console.log({ values })
     const totalPaid = values.invoicePayment.reduce(
       (total, payment) =>
         !payment.isCancelled ? total + payment.totalAmtPaid : total,
       0,
     )
-    return values.finalPayable < totalPaid
+    return values.finalPayable <= totalPaid
   }
 
   return (
@@ -140,15 +141,19 @@ const InvoiceSummary = ({
                     </GridItem>
                     <GridItem md={1}>
                       <DeleteWithPopover
-                        disabled={!item.id}
+                        // disabled={!item.id}
                         index={item.id}
                         title='Cancel Payment'
                         contentText='Confirm to cancel this payment?'
                         extraCmd={
-                          <TextField
-                            label='Cancel Reason'
-                            onChange={onCancelReasonChange}
-                          />
+                          item.id ? (
+                            <TextField
+                              label='Cancel Reason'
+                              onChange={onCancelReasonChange}
+                            />
+                          ) : (
+                            undefined
+                          )
                         }
                         onConfirmDelete={handleConfirmDelete}
                       />

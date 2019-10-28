@@ -49,7 +49,7 @@ const PaymentSummary = ({
               <NumberInput
                 simple
                 onChange={handleCashReceivedChange}
-                min={minCashReceived}
+                min={shouldDisableCashReceived ? 0 : minCashReceived}
                 disabled={shouldDisableCashReceived}
                 currency
                 size='sm'

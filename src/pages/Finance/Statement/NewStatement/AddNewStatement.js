@@ -64,7 +64,6 @@ const styles = () => ({
     statementInvoice.forEach((o) => {
       delete o.id
     })
-    console.log('submit', values)
     dispatch({
       type: 'statement/upsert',
       payload: {
@@ -178,15 +177,6 @@ class AddNewStatement extends PureComponent {
       lgteql_invoiceDate: effectiveDates ? effectiveDates[0] : undefined,
       lsteql_invoiceDate: effectiveDates ? effectiveDates[1] : undefined,
     }
-    console.log(
-      'getInvoice',
-      values,
-      InvoiceNo,
-      effectiveDates,
-      e,
-      copayerFK,
-      payload,
-    )
     dispatch({
       type: 'statement/queryInvoiceList',
       payload,

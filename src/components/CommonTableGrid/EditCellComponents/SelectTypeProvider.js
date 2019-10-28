@@ -51,7 +51,6 @@ class SelectEditor extends PureComponent {
       typeof options === 'function'
         ? options(row)
         : options || codes[`${columnName}Option`] || []
-
     if (columnName) {
       if (type === 'select') {
         return (

@@ -45,7 +45,6 @@ const receivingDetailsSchema = Yup.object().shape({
 
 @withFormikExtend({
   mapPropsToValues: ({ deliveryOrder }) => {
-    console.log('mapPropsToValues', deliveryOrder)
     return deliveryOrder.entity || deliveryOrder.default
   },
   enableReinitialize: true,
@@ -175,7 +174,6 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, changed }) => {
-    console.log('onCommitChanges')
     const { dispatch } = this.props
 
     if (deleted) {
@@ -201,7 +199,6 @@ export class DeliveryOrderDetails extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    console.log('onAddedRowsChange')
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
         const { onClickColumn, selectedItem } = this.state
@@ -298,7 +295,6 @@ export class DeliveryOrderDetails extends PureComponent {
     const { footer, deliveryOrderDetails, values } = props
     const { rows } = values
 
-    console.log('DO Details', this.props)
 
     const tableParas = {
       columns: [
@@ -411,7 +407,6 @@ export class DeliveryOrderDetails extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-    console.log(rows)
     return (
       <React.Fragment>
         <GridContainer>

@@ -5,7 +5,6 @@ import { IntegratedSelection } from '@devexpress/dx-react-grid'
 class PatchedIntegratedSelection extends React.PureComponent {
   render () {
     const { rowSelectionEnabled, ...restProps } = this.props
-    console.log({ props: this.props })
     return (
       <Plugin>
         <Getter

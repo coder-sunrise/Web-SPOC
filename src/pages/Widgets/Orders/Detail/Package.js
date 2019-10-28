@@ -62,7 +62,6 @@ class Package extends PureComponent {
   }
 
   changePackage = (v, op) => {
-    console.log(v, op)
     let rows = []
     rows = rows.concat(
       op.medicationPackageItem.map((o) => {
@@ -119,13 +118,7 @@ class Package extends PureComponent {
       setFieldValue,
       codetable,
     } = this.props
-    console.log(
-      'Package',
-      theme,
-      this.props,
-      codetable.inventorypackage,
-      this.state,
-    )
+
     return (
       <div>
         <GridContainer>

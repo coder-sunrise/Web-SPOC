@@ -438,7 +438,6 @@ class Demographic extends PureComponent {
                             },
                             [],
                           )
-                        console.log({ _patientPdpaConsent })
                         setFieldValue('patientPdpaConsent', _patientPdpaConsent)
                       }}
                       {...args}

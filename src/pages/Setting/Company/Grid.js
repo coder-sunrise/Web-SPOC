@@ -95,7 +95,6 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             width: 400,
             render: (row) => {
-              console.log('row', row)
               return (
                 <a
                   rel='noopener noreferrer'

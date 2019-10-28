@@ -24,7 +24,6 @@ export const ValidationSchema = Yup.object().shape({
       totalAmtPaid,
       schema,
     ) => {
-      console.log({ totalAmtPaid, finalPayable })
       if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({
@@ -35,7 +34,7 @@ export const ValidationSchema = Yup.object().shape({
               .max(
                 0.01,
                 `Total amount paid cannot exceed $${roundToTwoDecimals(
-                  collectableAmount,
+                  finalPayable,
                 )}`,
               )
               .required(),

@@ -75,7 +75,6 @@ class Grid extends PureComponent {
         },
       })
       .then(() => {
-        console.log('hihi')
         toggleModal()
         // dispatch({
         //   type: 'inventoryAdjustment/updateState',

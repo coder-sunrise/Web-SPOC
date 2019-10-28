@@ -72,14 +72,12 @@ export default createFormViewModel({
         return false
       },
       *getOutstandingPOItem ({ payload }, { call, put }) {
-        console.log(payload)
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
           (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
         )
 
-        console.log(tempList)
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
             return {
