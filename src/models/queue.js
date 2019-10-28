@@ -92,27 +92,28 @@ export default createListViewModel({
       },
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
-        const { status } = response
-
-        if (status >= 204 && status < 400) {
-          // end session successfully, reset session info
-          // yield put({
-          //   type: 'updateSessionInfo',
-          //   payload: { ...InitialSessionInfo },
-          // })
-          // yield put({
-          //   type: 'global/sendNotification',
-          //   payload: {
-          //     type: 'QueueListing',
-          //     data: {
-          //       sender: 'End Session',
-          //       message: 'Session has been ended',
-          //     },
-          //   },
-          // })
-        }
-
         return response
+        // const { status } = response
+
+        // if (status >= 204 && status < 400) {
+        //   // end session successfully, reset session info
+        //   // yield put({
+        //   //   type: 'updateSessionInfo',
+        //   //   payload: { ...InitialSessionInfo },
+        //   // })
+        //   // yield put({
+        //   //   type: 'global/sendNotification',
+        //   //   payload: {
+        //   //     type: 'QueueListing',
+        //   //     data: {
+        //   //       sender: 'End Session',
+        //   //       message: 'Session has been ended',
+        //   //     },
+        //   //   },
+        //   // })
+        // }
+
+        // return response
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
