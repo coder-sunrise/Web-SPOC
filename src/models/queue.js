@@ -67,18 +67,19 @@ export default createListViewModel({
       },
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
-        const { data } = response
-        if (data && data.id) {
+        console.log('start session', { response })
+
+        if (response) {
           // start session successfully
           yield put({
             type: 'updateSessionInfo',
-            payload: { ...data },
+            payload: { ...response },
           })
           yield put({
             type: 'query',
             payload: {
               pagesize: 999999,
-              'VisitFKNavigation.BizSessionFK': data.id,
+              'VisitFKNavigation.BizSessionFK': response.id,
             },
           })
         }
@@ -92,6 +93,23 @@ export default createListViewModel({
       },
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
+        console.log({ response })
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              sessionInfo: {
+                isClinicSessionClosed: true,
+                id: '',
+                // sessionNo: `${moment().format('YYMMDD')}-01`,
+                sessionNo: 'N/A',
+                sessionNoPrefix: '',
+                sessionStartDate: '',
+                sessionCloseDate: '',
+              },
+            },
+          })
+        }
         return response
         // const { status } = response
 

@@ -15,6 +15,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {
+        _isNewBill: true,
         payments: [],
         invoice: {
           invoiceNo: '',
