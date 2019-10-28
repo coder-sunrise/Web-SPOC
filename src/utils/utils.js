@@ -614,7 +614,7 @@ export const updateCellValue = (
 
       $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
-      return ''
+      return []
       // row._$error = false
     } catch (er) {
       // console.log(er)
@@ -632,13 +632,13 @@ export const updateCellValue = (
       // }
       // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
 
-      const actualError = (er.inner || []).find((o) => o.path === columnName)
-      return actualError ? actualError.message : ''
+      return er.inner || []
       // row._$error = true
     }
   } else if (value !== val) {
     onValueChange(val)
   }
+  return []
 }
 
 const observers = {}

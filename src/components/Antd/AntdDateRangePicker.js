@@ -137,12 +137,21 @@ class AntdDateRangePicker extends PureComponent {
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, local, showTime } = nextProps
+    const { field, local, showTime, value } = nextProps
     // console.log(field.value)
 
     if (field) {
       this.setState({
         value: field.value === undefined ? [] : field.value,
+      })
+    } else if (value) {
+      this.setState({
+        value,
+      })
+    } else {
+      this.setState({
+        value: [],
+        shrink: false,
       })
     }
   }
@@ -165,7 +174,6 @@ class AntdDateRangePicker extends PureComponent {
             : o
         })
       : []
-
     this.setState({
       value: v,
     })
@@ -178,7 +186,7 @@ class AntdDateRangePicker extends PureComponent {
     }
 
     if (onChange) {
-      onChange(dateString, dateArray, v)
+      onChange(v, dateArray, dateString)
     }
   }
 

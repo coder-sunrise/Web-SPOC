@@ -10,10 +10,14 @@ import {
   dateFormatLong,
 } from '@/components'
 
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
 class DateEditorBase extends PureComponent {
-  state = {
-    error: false,
-  }
+  state = {}
 
   constructor (props) {
     super(props)
@@ -21,76 +25,25 @@ class DateEditorBase extends PureComponent {
   }
 
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
+    onComponentDidMount.call(this)
+  }
 
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
+  _onChange = (date, val) => {
+    onComponentChange.call(this, {
+      value: date || '',
     })
   }
 
   render () {
-    const { props } = this
-    const {
-      column = {},
-      value,
-      onValueChange,
-      columnExtensions,
-      row,
-      text,
-    } = props
-    const { name: columnName } = column
-    const cfg = columnExtensions.find(
-      ({ columnName: currentColumnName }) => currentColumnName === columnName,
-    )
-    const onChange = (date, val) => {
-      // console.log(date, val)
-      this.setState({
-        error: updateCellValue(this.props, this.myRef.current, date || ''),
-      })
-    }
-    const {
-      type,
-      isDisabled = () => false,
-      gridId,
-      format,
-      getRowId,
-      ...restProps
-    } = cfg
-    const lastestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-    const commonCfg = {
-      text,
-      onChange,
-      disabled: isDisabled(lastestRow),
-      defaultValue: lastestRow[columnName],
-    }
+    const { currency, text, format, ...commonCfg } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+
     if (text && !format) {
       commonCfg.format = dateFormatLong
     }
-    // console.log(commonCfg, restProps)
     return (
       <div ref={this.myRef}>
-        <DatePicker
-          simple
-          timeFormat={false}
-          showErrorIcon
-          error={this.state.error}
-          {...commonCfg}
-          {...restProps}
-        />
+        <DatePicker timeFormat={false} text={text} {...commonCfg} />
       </div>
     )
   }

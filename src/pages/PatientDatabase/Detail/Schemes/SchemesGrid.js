@@ -72,6 +72,13 @@ class SchemesGrid extends PureComponent {
             const st = ctSchemeTypes.find((o) => o.id === val)
             if (!st) return
             // console.log('schemesgrid', { rows, st })
+            if (this.isMedisaveOrPHPC(row)) {
+              row.validRange = []
+              row.validFrom = undefined
+              row.validTo = undefined
+              // row.accountNumber = undefined
+            }
+            // console.log('row', row)
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&
@@ -101,6 +108,7 @@ class SchemesGrid extends PureComponent {
               })
             }
             // console.log(row, rows)
+
             if (
               this.medisaveCheck(row) &&
               rows.filter(
@@ -115,14 +123,10 @@ class SchemesGrid extends PureComponent {
               })
               return
             }
-            if (st.code !== 'Corporate' && row.coPaymentSchemeFK) {
+            if (st.code !== 'CORPORATE' && row.coPaymentSchemeFK) {
               row.coPaymentSchemeFK = undefined
             }
-            if (this.isMedisaveOrPHPC(row)) {
-              row.validRange = []
-              row.validFrom = undefined
-              row.validTo = undefined
-            }
+
             // this.props.dispatch({
             //   // force current edit row components to update
             //   type: 'global/updateState',

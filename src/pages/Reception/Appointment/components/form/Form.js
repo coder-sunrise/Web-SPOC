@@ -316,7 +316,7 @@ class Form extends React.PureComponent {
     }
   }
 
-  validateDataGrid = () => {    
+  validateDataGrid = () => {
     const { datagrid = [], editingRows } = this.state
 
     let isDataGridValid = true
@@ -700,7 +700,7 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
 
-    console.log({ show, loadingEffects: loading.effects, isSubmitting })
+    // console.log({ show, loadingEffects: loading.effects, isSubmitting })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
