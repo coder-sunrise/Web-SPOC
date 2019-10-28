@@ -51,8 +51,9 @@ const styles = (theme) => ({
     let IsGSTEnabled
     let IsGSTInclusive
     if (purchaseOrder) {
-      IsGSTEnabled = purchaseOrder.isGstInclusive
-      IsGSTInclusive = purchaseOrder.isGstInclusive
+      const { isGstEnabled, isGstInclusive } = purchaseOrder
+      IsGSTEnabled = isGstEnabled
+      IsGSTInclusive = isGstInclusive
     }
     return {
       ...purchaseOrderDetails,
