@@ -199,7 +199,6 @@ class Grid extends PureComponent {
         }))
       }
     }
-
     return newAddedRows
   }
 
