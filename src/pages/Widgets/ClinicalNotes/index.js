@@ -324,7 +324,6 @@ class ClinicalNotes extends Component {
   }
 
   getScribbleValue = (test) => {
-    console.log(test)
   }
 
   updateAttachments = (args) => ({ added, deleted }) => {

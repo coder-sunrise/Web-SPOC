@@ -24,7 +24,6 @@ export const ValidationSchema = Yup.object().shape({
       totalAmtPaid,
       schema,
     ) => {
-      console.log({ totalAmtPaid, finalPayable })
       if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({

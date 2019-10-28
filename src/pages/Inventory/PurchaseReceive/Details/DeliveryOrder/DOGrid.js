@@ -7,8 +7,6 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
   const editRow = (row, e) => {
     onEditDeliveryOrderClicked(row)
   }
-  console.log(list)
-
   return (
     <CommonTableGrid
       style={{ margin: 0 }}

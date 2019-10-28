@@ -45,7 +45,6 @@ const Package = ({ dispatch, history, pack }) => {
   }
 
   const getPackList = (list) => {
-    console.log('list', list)
     if (list) {
       list.map((r) => {
         const {

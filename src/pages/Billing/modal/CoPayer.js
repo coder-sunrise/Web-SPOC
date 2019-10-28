@@ -66,7 +66,6 @@ class CoPayer extends Component {
   }
 
   handleSelectionChange = (selection) => {
-    console.log({ selection })
     this.setState({ selectedRows: selection })
   }
 
@@ -131,7 +130,6 @@ class CoPayer extends Component {
   render () {
     const { classes, onClose } = this.props
     const { selectedRows, invoiceItems } = this.state
-    console.log({ invoiceItems: this.props.invoiceItems })
     return (
       <div className={classes.container}>
         <GridContainer>

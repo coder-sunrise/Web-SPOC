@@ -90,7 +90,6 @@ class Queue extends React.Component {
   }
 
   componentWillMount = () => {
-    console.log('queue will mount')
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
     if (Object.keys(query).length === 0) {
@@ -297,7 +296,6 @@ class Queue extends React.Component {
   }
 
   showSearchResult = () => {
-    console.log('show search result')
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 

@@ -119,7 +119,6 @@ class CollectPaymentConfirm extends PureComponent {
 
   handlePaymentAmount = (e, from) => {
     const { setFieldValue, statement, values, setValues } = this.props
-    console.log('statement', values)
 
     if (from === 'grid') {
       this.setState({ totalAmount: e.target.value })
@@ -155,7 +154,6 @@ class CollectPaymentConfirm extends PureComponent {
       }
     })
 
-    console.log('testt', test)
     setValues({
       ...values,
       statementInvoice: test,

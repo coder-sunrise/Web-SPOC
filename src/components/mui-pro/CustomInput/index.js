@@ -112,7 +112,6 @@ class TextField extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
-    console.log(v.target.value)
     this.setState({
       value: v.target.value,
       isDebouncing: false,

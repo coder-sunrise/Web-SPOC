@@ -313,7 +313,6 @@ class ConsultationDocument extends PureComponent {
                   return (
                     <Checkbox
                       onChange={(e) => {
-                        console.log(e)
                         this.setState({
                           acknowledged: e.target.value,
                         })

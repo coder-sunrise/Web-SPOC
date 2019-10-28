@@ -86,7 +86,6 @@ export default createFormViewModel({
       },
       *submit ({ payload }, { call, put }) {
         const { mode, ...restPayload } = payload
-        console.log({ mode, restPayload })
         yield put({
           type: `${mode}`,
           payload: restPayload,

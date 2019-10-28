@@ -36,7 +36,6 @@ class UserRole extends React.Component {
   }
 
   onTextFieldChange = (event, value) => {
-    console.log({ event, value })
   }
 
   handleActionButtonClick = (row) => {

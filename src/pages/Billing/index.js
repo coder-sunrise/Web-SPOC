@@ -171,7 +171,7 @@ const bannerStyle = {
           return _payer
         }),
     }
-    console.log({ payload })
+    // console.log({ payload })
     dispatch({
       type: 'billing/submit',
       payload,
@@ -286,7 +286,6 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
