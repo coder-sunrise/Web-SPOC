@@ -100,7 +100,11 @@ const styles = (theme) => ({
         is: (v) => v === true,
         then: Yup.number().required(),
       }),
-    customLetterHeadImage: Yup.string().required(),
+    // customLetterHeadImage: Yup.string().required(),
+    customLetterHeadImage: Yup.string().when('isDisplayCustomLetterHead', {
+      is: (v) => v === true,
+      then: Yup.string().required(),
+    }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, history } = props

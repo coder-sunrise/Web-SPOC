@@ -167,7 +167,6 @@ class InvoiceGrid extends PureComponent {
           columns={columns}
         >
           <FilteringState  onFiltersChange={(f)=>{
-          console.log(f)
         }} 
             columnExtensions={[
           { columnName: 'Action', filteringEnabled: false },

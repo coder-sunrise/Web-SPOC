@@ -115,7 +115,6 @@ const SessionSummary = ({ match, sessionID }) => {
   }, [])
 
   const { sessionDetails, paymentDetailsData, companyDetails } = state
-  console.log({ sessionDetails })
   return (
     <CardContainer hideHeader>
       <GridContainer>

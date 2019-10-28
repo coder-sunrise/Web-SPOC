@@ -43,7 +43,6 @@ import {
   }),
 
   handleSubmit: (values, { props }) => {
-    console.log(values)
     const { dispatch, onConfirm, consultationDocument } = props
     const { rows } = consultationDocument
     dispatch({

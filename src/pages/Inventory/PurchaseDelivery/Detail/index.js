@@ -8,7 +8,6 @@ import { getAppendUrl } from '@/utils/utils'
 
 const styles = () => ({})
 const Detail = (props) => {
-  console.log(props)
   const { history, purchaseOrder } = props
   return (
     <NavPills

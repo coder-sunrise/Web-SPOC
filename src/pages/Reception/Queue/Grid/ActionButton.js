@@ -52,6 +52,7 @@ const ActionButton = ({ row, onClick }) => {
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
 
   const isStatusCompleted = [
+    VISIT_STATUS.BILLING,
     VISIT_STATUS.COMPLETED,
     VISIT_STATUS.DISPENSE,
     VISIT_STATUS.ORDER_UPDATED,

@@ -90,7 +90,6 @@ class Grid123 extends PureComponent {
   }
 
   render () {
-    console.log('settingRoomBlock', this.props.settingRoomBlock)
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
