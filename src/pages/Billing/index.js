@@ -67,7 +67,9 @@ const bannerStyle = {
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const { invoicePayer } = billing.entity
+        const { invoicePayer, invoicePayment } = billing.entity
+        const _isNewBill =
+          invoicePayer.length === 0 && invoicePayment.lenght === 0
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -81,14 +83,12 @@ const bannerStyle = {
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return { ...billing.entity, finalClaim, finalPayable, _isNewBill }
       }
-
-      return billing.default
     } catch (error) {
       console.log({ error })
-      return billing.default
     }
+    return billing.default
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -120,6 +120,7 @@ const bannerStyle = {
       invoice: restInvoice,
       invoicePayer: invoicePayer
         .map((item, index) => ({ ...item, sequence: index }))
+        .filter((payer) => payer.id !== undefined && !payer._isCancelled)
         .filter((payer) => (payer.id ? payer.isModified : true))
         .map((payer) => {
           const {
@@ -238,12 +239,25 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  shouldDisableCompletePayment = () => {
+  shouldDisableSavePayment = () => {
     const { values } = this.props
     const { invoicePayer = [], payments = [], invoice } = values
     if (invoice === null) return true
     // if (payments.length === 0) return true
     if (invoicePayer.length === 0) return false
+
+    return false
+  }
+
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayer = [], invoicePayment = [] } = values
+    const noSavedPayments =
+      invoicePayment.filter(
+        (payment) => !payment.isCancelled && payment.receiptNo,
+      ).length === 0
+
+    if (invoicePayer.length === 0 && noSavedPayments) return true
 
     return false
   }
@@ -255,7 +269,8 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue, handleSubmit } = this.props
+    const { setFieldValue, handleSubmit, values } = this.props
+    if (values._isNewBill) await setFieldValue('mode', 'save')
     await setFieldValue('mode', 'complete')
     handleSubmit()
   }
@@ -348,7 +363,15 @@ class Billing extends Component {
           >
             <ArrowBack />Dispense
           </Button>
-          <Button color='primary' onClick={this.onSavePaymentClick}>
+          <Button
+            color='primary'
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableSavePayment()
+            }
+            onClick={this.onSavePaymentClick}
+          >
             Save
           </Button>
           <Button

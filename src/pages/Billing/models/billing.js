@@ -15,6 +15,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {
+        _isNewBill: true,
         payments: [],
         invoice: {
           invoiceNo: '',
@@ -47,7 +48,7 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { select, put, take }) {
         const patientState = yield select((st) => st.patient)
-        if (!patientState.entity) {
+        if (!patientState.entity || patientState.entity.id !== payload.pid) {
           yield put({
             type: 'patient/query',
             payload: {
@@ -129,7 +130,7 @@ export default createFormViewModel({
           payload: { id: payload.visitID },
         })
       },
-      *backToDispense ({ payload }, { put, select }) {
+      *backToDispense ({ payload }, { put, select, take }) {
         const billingState = yield select((state) => state.billing)
 
         const parameters = {
@@ -149,6 +150,7 @@ export default createFormViewModel({
             id: billingState.visitID,
           },
         })
+        yield take('dispense/unlock/@@end')
 
         if (response) {
           yield put({

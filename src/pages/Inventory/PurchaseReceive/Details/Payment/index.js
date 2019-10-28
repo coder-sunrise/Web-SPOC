@@ -169,6 +169,7 @@ class index extends PureComponent {
           <Header {...this.props} />
           <Grid
             {...this.props}
+            isEditable={isEditable}
             recalculateOutstandingAmount={this.recalculateOutstandingAmount}
           />
         </GridContainer>

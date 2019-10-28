@@ -97,20 +97,18 @@ export default {
     *fetchCurrent (_, { call, put }) {
       let user
       const response = yield call(queryCurrent)
-      if (response.data) {
-        const { userProfileDetailDto } = response.data
-        const accessRights = response.data.userClientAccessRightDto.reduce(
-          (a, b) => {
-            return a.concat(convertServerRights(b))
-          },
-          [],
-        )
+      const { data } = response
+      if (data) {
+        const { userProfileDetailDto } = data
+        const accessRights = data.userClientAccessRightDto.reduce((a, b) => {
+          return a.concat(convertServerRights(b))
+        }, [])
         // accessRights.forEach((a) => {
         //   console.log(a.name)
         // })
         // console.log({ data: response.data, accessRights })
         user = {
-          data: response.data.userProfileDetailDto,
+          data: data.userProfileDetailDto,
           accessRights,
         }
       }
