@@ -264,6 +264,7 @@ class Grid extends PureComponent {
           columnName: 'type',
           type: 'select',
           options: podoOrderType,
+          sortingEnabled: false,
           onChange: (e) => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
@@ -274,6 +275,7 @@ class Grid extends PureComponent {
           columnName: 'code',
           type: 'select',
           labelField: 'code',
+          sortingEnabled: false,
           options: (row) => {
             return this.rowOptions(row)
           },
@@ -287,6 +289,7 @@ class Grid extends PureComponent {
           columnName: 'name',
           type: 'select',
           labelField: 'name',
+          sortingEnabled: false,
           options: (row) => {
             return this.rowOptions(row)
           },
@@ -301,6 +304,7 @@ class Grid extends PureComponent {
           type: 'select',
           labelField: 'uom',
           disabled: true,
+          sortingEnabled: false,
           options: (row) => {
             if (row.type === 1) {
               return this.state.MedicationItemList

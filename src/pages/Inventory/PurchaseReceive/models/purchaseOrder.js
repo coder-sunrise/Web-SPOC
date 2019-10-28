@@ -99,6 +99,7 @@ export default createFormViewModel({
           IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
+          exceptedDeliveryDate: '',
         }
 
         return yield put({
