@@ -54,6 +54,7 @@ export const PAYMENT_MODE = {
   CREDIT_CARD: 3,
   CHEQUE: 4,
   GIRO: 5,
+  DEPOSIT: 6,
 }
 
 export const CREDIT_CARD_TYPE = {
