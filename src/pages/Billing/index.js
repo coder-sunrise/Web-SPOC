@@ -368,15 +368,16 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
-              finalPayable:
+              finalPayable: roundToTwoDecimals(
                 values.finalPayable -
-                values.invoicePayment.reduce(
-                  (totalPaid, payment) =>
-                    !payment.isCancelled
-                      ? totalPaid + payment.totalAmtPaid
-                      : totalPaid,
-                  0,
-                ),
+                  values.invoicePayment.reduce(
+                    (totalPaid, payment) =>
+                      !payment.isCancelled
+                        ? totalPaid + payment.totalAmtPaid
+                        : totalPaid,
+                    0,
+                  ),
+              ),
               totalClaim: values.finalClaim,
             }}
           />
@@ -388,6 +389,7 @@ class Billing extends Component {
           maxWidth='lg'
         >
           <ReportViewer
+            showTopDivider={false}
             reportID={15}
             reportParameters={{
               InvoiceID: values.invoice ? values.invoice.id : '',
