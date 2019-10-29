@@ -64,7 +64,7 @@ const InvoiceSummary = ({
 
   const shouldDisableAddPayment = () => {
     if (disabled) return disabled
-    console.log({ values })
+
     const totalPaid = values.invoicePayment.reduce(
       (total, payment) =>
         !payment.isCancelled ? total + payment.totalAmtPaid : total,

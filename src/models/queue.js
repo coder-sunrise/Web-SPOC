@@ -67,18 +67,19 @@ export default createListViewModel({
       },
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
-        const { data } = response
-        if (data && data.id) {
+        console.log('start session', { response })
+
+        if (response) {
           // start session successfully
           yield put({
             type: 'updateSessionInfo',
-            payload: { ...data },
+            payload: { ...response },
           })
           yield put({
             type: 'query',
             payload: {
               pagesize: 999999,
-              'VisitFKNavigation.BizSessionFK': data.id,
+              'VisitFKNavigation.BizSessionFK': response.id,
             },
           })
         }
@@ -92,27 +93,45 @@ export default createListViewModel({
       },
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
-        const { status } = response
-
-        if (status >= 204 && status < 400) {
-          // end session successfully, reset session info
-          // yield put({
-          //   type: 'updateSessionInfo',
-          //   payload: { ...InitialSessionInfo },
-          // })
-          // yield put({
-          //   type: 'global/sendNotification',
-          //   payload: {
-          //     type: 'QueueListing',
-          //     data: {
-          //       sender: 'End Session',
-          //       message: 'Session has been ended',
-          //     },
-          //   },
-          // })
+        console.log({ response })
+        if (response) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              sessionInfo: {
+                isClinicSessionClosed: true,
+                id: '',
+                // sessionNo: `${moment().format('YYMMDD')}-01`,
+                sessionNo: 'N/A',
+                sessionNoPrefix: '',
+                sessionStartDate: '',
+                sessionCloseDate: '',
+              },
+            },
+          })
         }
-
         return response
+        // const { status } = response
+
+        // if (status >= 204 && status < 400) {
+        //   // end session successfully, reset session info
+        //   // yield put({
+        //   //   type: 'updateSessionInfo',
+        //   //   payload: { ...InitialSessionInfo },
+        //   // })
+        //   // yield put({
+        //   //   type: 'global/sendNotification',
+        //   //   payload: {
+        //   //     type: 'QueueListing',
+        //   //     data: {
+        //   //       sender: 'End Session',
+        //   //       message: 'Session has been ended',
+        //   //     },
+        //   //   },
+        //   // })
+        // }
+
+        // return response
       },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },

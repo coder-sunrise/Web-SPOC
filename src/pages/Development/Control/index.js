@@ -29,7 +29,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import WarningIcon from '@material-ui/icons/Warning'
 import ErrorIcon from '@material-ui/icons/Error'
 import InfoIcon from '@material-ui/icons/Info'
-import CloseIcon from '@material-ui/icons/Close'
+import FilterList from '@material-ui/icons/FilterList'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import {
@@ -59,6 +59,7 @@ import {
   TimePicker,
   NumberInput,
   Switch,
+  ButtonSelect,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -496,6 +497,30 @@ class ControlTest extends PureComponent {
                     }}
                     {...args}
                   />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem>
+            <FastField
+              name='doctor'
+              render={(args) => {
+                return (
+                  <ButtonSelect
+                    options={doctors}
+                    mode='multiple'
+                    textField='name'
+                    valueField='value'
+                    justIcon
+                    onClick={(v, option) => {
+                      console.log(v, option)
+                    }}
+                    {...args}
+                  >
+                    <FilterList />
+                  </ButtonSelect>
                 )
               }}
             />

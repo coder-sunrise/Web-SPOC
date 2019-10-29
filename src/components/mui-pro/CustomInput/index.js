@@ -240,11 +240,14 @@ class TextField extends React.PureComponent {
     }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
-    if (uppercase) {
-      cfg.value = cfg.value.toUpperCase()
-    } else if (lowercase) {
-      cfg.value = cfg.value.toLowerCase()
+    if (cfg.value) {
+      if (uppercase) {
+        cfg.value = cfg.value.toUpperCase()
+      } else if (lowercase) {
+        cfg.value = cfg.value.toLowerCase()
+      }
     }
+
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log('custominput', props, cfg, state)
