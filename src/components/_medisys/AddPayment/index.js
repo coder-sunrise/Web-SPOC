@@ -242,7 +242,7 @@ class AddPayment extends Component {
       patient,
     } = this.props
     const { paymentList } = values
-    console.log({ values })
+
     return (
       <div>
         <PayerHeader

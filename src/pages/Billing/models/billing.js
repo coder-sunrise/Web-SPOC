@@ -87,23 +87,27 @@ export default createFormViewModel({
       },
       *submit ({ payload }, { call, put }) {
         const { mode, ...restPayload } = payload
-        yield put({
+        return yield put({
           type: `${mode}`,
           payload: restPayload,
         })
       },
-      *save ({ payload }, { call, put }) {
+      *save ({ payload }, { call, put, take }) {
         const response = yield call(service.save, payload)
         if (response) {
-          notification.success({
-            message: 'Billing saved',
-          })
           yield put({
             type: 'query',
             payload: {
               id: payload.visitId,
             },
           })
+
+          yield take('billing/query/@@end')
+          yield put({
+            type: 'formik/clean',
+            payload: 'BillingForm',
+          })
+
           return response
         }
         return false

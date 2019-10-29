@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import _ from 'lodash'
 import Menu from '@material-ui/core/Menu'
 import { ListItemIcon, MenuItem, Typography } from '@material-ui/core'
 import Done from '@material-ui/icons/Done'
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import Button from '../mui-pro/CustomButtons'
-
 
 export default ({
   options = [],
@@ -13,6 +14,9 @@ export default ({
   color = 'info',
   mode = 'default',
   includeAll = true,
+  value,
+  field,
+  form,
   onClick = (f) => f,
   ...props
 }) => {
@@ -20,13 +24,30 @@ export default ({
     anchorEl,
     setAnchorEl,
   ] = useState(undefined)
+  const [
+    selected = field ? field.value : value,
+    setSelected,
+  ] = useState(undefined)
   const tagButtonHandleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
-  const tagButtonHandleClose = () => {
+  const tagButtonHandleClose = (e) => {
     setAnchorEl(undefined)
   }
-
+  useEffect(
+    () => {
+      if (form) form.setFieldValue(field.name, selected)
+      onClick(
+        selected,
+        mode === 'multiple'
+          ? options.filter((o) => selected.indexOf(o[valueField]) >= 0)
+          : options.find((o) => o[valueField] === selected),
+      )
+    },
+    [
+      selected,
+    ],
+  )
   return (
     <React.Fragment>
       <Button
@@ -42,23 +63,35 @@ export default ({
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={tagButtonHandleClose}
         PaperProps={{
           style: {
             maxHeight: 500,
             width: 250,
           },
         }}
+        onClose={tagButtonHandleClose}
       >
         {mode === 'multiple' &&
         includeAll && (
           <MenuItem
             key='$all'
             onClick={() => {
+              if (selected.length === options.length) {
+                setSelected([])
+              } else {
+                setSelected(options.map((o) => o[valueField]))
+              }
               // onClick(tag)
-              // tagButtonHandleClose()
+              // if (mode !== 'multiple') tagButtonHandleClose()
             }}
           >
+            {mode === 'multiple' ? (
+              <ListItemIcon>
+                {(selected || []).length === options.length ? (
+                  <Done fontSize='small' />
+                ) : null}
+              </ListItemIcon>
+            ) : null}
             All
           </MenuItem>
         )}
@@ -66,17 +99,29 @@ export default ({
           <MenuItem
             key={tag[valueField]}
             onClick={() => {
-              onClick(tag)
-              tagButtonHandleClose()
+              if (mode !== 'multiple') {
+                setSelected(tag[valueField])
+                tagButtonHandleClose()
+              } else {
+                setSelected(
+                  selected.indexOf(tag[valueField]) >= 0
+                    ? _.reject(selected, (o) => o === tag[valueField])
+                    : selected.concat([
+                        tag[valueField],
+                      ]),
+                )
+              }
+
+              // tagButtonHandleClose()
             }}
           >
-            <ListItemIcon>
-              <Done fontSize='small' />
-            </ListItemIcon>
-            <Typography variant='inherit' noWrap>
-              A very long text that overflows
-            </Typography>
-
+            {mode === 'multiple' ? (
+              <ListItemIcon>
+                {(selected || []).indexOf(tag[valueField]) >= 0 ? (
+                  <Done fontSize='small' />
+                ) : null}
+              </ListItemIcon>
+            ) : null}
             {tag[textField]}
           </MenuItem>
         ))}

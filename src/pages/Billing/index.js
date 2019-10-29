@@ -13,6 +13,7 @@ import {
   CommonModal,
   GridContainer,
   withFormikExtend,
+  notification,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
@@ -95,6 +96,7 @@ const bannerStyle = {
     const {
       concurrencyToken,
       visitId,
+      visitStatus = 'BILLING',
       invoice,
       invoicePayer,
       invoicePayment,
@@ -107,6 +109,7 @@ const bannerStyle = {
       mode,
       concurrencyToken,
       visitId,
+      visitStatus,
       invoicePayment: invoicePayment
         .filter((item) => {
           if (item.id && item.isCancelled) return true
@@ -120,7 +123,10 @@ const bannerStyle = {
       invoice: restInvoice,
       invoicePayer: invoicePayer
         .map((item, index) => ({ ...item, sequence: index }))
-        .filter((payer) => payer.id !== undefined && !payer._isCancelled)
+        .filter((payer) => {
+          if (payer.id === undefined && payer.isCancelled) return false
+          return true
+        })
         .filter((payer) => (payer.id ? payer.isModified : true))
         .map((payer) => {
           const {
@@ -177,7 +183,22 @@ const bannerStyle = {
       type: 'billing/submit',
       payload,
     }).then((response) => {
-      if (response) resetForm()
+      if (response) {
+        resetForm()
+
+        // TODO: once server done enhancement, back to
+        // individual call instead of mixing 2 to 1
+        if (visitStatus === 'COMPLETED') {
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
+        } else {
+          notification.success({
+            message: 'Billing saved',
+          })
+        }
+      }
     })
   },
 })
@@ -265,13 +286,16 @@ class Billing extends Component {
   onSavePaymentClick = async () => {
     const { setFieldValue, handleSubmit } = this.props
     await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'BILLING')
     handleSubmit()
   }
 
   onCompletePaymentClick = async () => {
     const { setFieldValue, handleSubmit, values } = this.props
     if (values._isNewBill) await setFieldValue('mode', 'save')
-    await setFieldValue('mode', 'complete')
+    await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'COMPLETED')
+
     handleSubmit()
   }
 
@@ -379,7 +403,7 @@ class Billing extends Component {
             disabled={
               this.state.isEditing ||
               values.id === undefined ||
-              this.shouldDisableCompletePayment()
+              this.shouldDisableSavePayment()
             }
             onClick={this.onCompletePaymentClick}
           >
