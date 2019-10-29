@@ -17,7 +17,7 @@ export default ({
   value,
   field,
   form,
-  onClick = (f) => f,
+  onChange = (f) => f,
   ...props
 }) => {
   const [
@@ -25,29 +25,34 @@ export default ({
     setAnchorEl,
   ] = useState(undefined)
   const [
-    selected = field ? field.value : value,
+    selected,
     setSelected,
-  ] = useState(undefined)
+  ] = useState(
+    field ? field.value : value || (mode === 'multiple' ? [] : undefined),
+  )
   const tagButtonHandleClick = (event) => {
     setAnchorEl(event.currentTarget)
   }
   const tagButtonHandleClose = (e) => {
     setAnchorEl(undefined)
-  }
-  useEffect(
-    () => {
-      if (form) form.setFieldValue(field.name, selected)
-      onClick(
-        selected,
-        mode === 'multiple'
-          ? options.filter((o) => selected.indexOf(o[valueField]) >= 0)
-          : options.find((o) => o[valueField] === selected),
-      )
-    },
-    [
+    if (form) form.setFieldValue(field.name, selected)
+    onChange(
       selected,
-    ],
-  )
+      mode === 'multiple'
+        ? options.filter((o) => (selected || []).indexOf(o[valueField]) >= 0)
+        : options.find((o) => o[valueField] === selected),
+    )
+  }
+  // useEffect(
+  //   () => {
+  //     if (anchorEl) {
+
+  //     }
+  //   },
+  //   [
+  //     selected,
+  //   ],
+  // )
   return (
     <React.Fragment>
       <Button

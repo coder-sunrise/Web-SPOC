@@ -3,6 +3,7 @@ import { Field, FastField } from 'formik'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
+import FilterList from '@material-ui/icons/FilterList'
 import moment from 'moment'
 import {
   Button,
@@ -15,7 +16,23 @@ import {
   Popover,
   Tooltip,
   Select,
+  ButtonSelect,
 } from '@/components'
+
+const filterOptions = [
+  {
+    value: 'isChasAcuteClaimable',
+    name: 'CHAS Chronic',
+  },
+  {
+    value: 'isChasChronicClaimable',
+    name: 'CHAS Acute',
+  },
+  {
+    value: 'isHazeClaimable',
+    name: 'Haze',
+  },
+]
 
 const DiagnosisItem = ({
   dispatch,
@@ -82,7 +99,7 @@ const DiagnosisItem = ({
     },
     [
       form.values.corDiagnosis[index].diagnosisFK,
-      codetable.ctcomplication,
+      codetable.ctComplication,
     ],
   )
 
@@ -121,24 +138,35 @@ const DiagnosisItem = ({
     }
   }
 
-  const { values } = form
-
+  const [
+    diagnosisFilter,
+    setDiagnosisFilter,
+  ] = useState(filterOptions.map((o) => o.value))
+  // console.log(diagnosisFilter)
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={6}>
-          <FastField
+        <GridItem xs={6} style={{ position: 'relative' }}>
+          <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
               <CodeSelect
                 label='Diagnosis'
                 code='codetable/ctsnomeddiagnosis'
-                filter={{
+                remoteFilter={{
                   props:
                     'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
                   sorting: [
                     { columnName: 'displayvalue', direction: 'asc' },
                   ],
+                }}
+                localFilter={(row) => {
+                  if (diagnosisFilter.length === 0) return true
+                  for (let i = 0; i < diagnosisFilter.length; i++) {
+                    const df = diagnosisFilter[i]
+                    if (row[df]) return true
+                  }
+                  return false
                 }}
                 labelField='displayvalue'
                 autoComplete
@@ -165,6 +193,20 @@ const DiagnosisItem = ({
               />
             )}
           />
+          <ButtonSelect
+            options={filterOptions}
+            mode='multiple'
+            textField='name'
+            valueField='value'
+            value={diagnosisFilter}
+            justIcon
+            style={{ position: 'absolute', bottom: 2, right: -35 }}
+            onChange={(v, option) => {
+              if (v !== diagnosisFilter) setDiagnosisFilter(v)
+            }}
+          >
+            <FilterList />
+          </ButtonSelect>
         </GridItem>
         <GridItem xs={12}>
           <Field
@@ -183,10 +225,9 @@ const DiagnosisItem = ({
                 )
               }
               return (
-                <CodeSelect
+                <Select
                   label='Complication'
                   mode='multiple'
-                  // code='ctComplication'
                   options={ctComplicationPairedWithDiag}
                   labelField='displayValue'
                   valueField='id'
