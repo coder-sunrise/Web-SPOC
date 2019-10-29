@@ -20,12 +20,12 @@ export default createListViewModel({
             type: 'updateState',
             payload: response.reduce((allCodetable, codetable) => {
               // skip snomeddiagnosis codetable
-              if (codetable.code !== 'codetable/ctsnomeddiagnosis') {
-                return {
-                  ...allCodetable,
-                  [codetable.code.toLowerCase()]: codetable.data,
-                }
-              }
+              // if (codetable.code !== 'codetable/ctsnomeddiagnosis') {
+              //   return {
+              //     ...allCodetable,
+              //     [codetable.code.toLowerCase()]: codetable.data,
+              //   }
+              // }
               return { ...allCodetable }
             }, {}),
           })
