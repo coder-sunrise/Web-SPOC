@@ -469,18 +469,12 @@ const Grid = ({
   const onRowDoubleClick = useCallback(
     (row) => {
       const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
-      const enableDoubleClickStatus = [
-        VISIT_STATUS.WAITING,
-        VISIT_STATUS.IN_CONS,
-        VISIT_STATUS.PAUSED,
-      ]
       const { clinicianProfile: { doctorProfile } } = user.data
+
       if (!doctorProfile) return false
 
-      // start consultation context menu id = 5
-      // resume consultation context menu id = 6
-      const contextMenuButtonID = isWaiting ? '5' : '6'
-      onClick(row, contextMenuButtonID)
+      if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
+
       return true
     },
     [
