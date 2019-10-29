@@ -59,11 +59,6 @@ const InventoryTypeListing = ({
     servicePackageItem,
   } = values
 
-  const [
-    price,
-    setPrice,
-  ] = useState()
-
   const Cell = ({ column, row, ...p }) => {
     if (column.name === 'Action') {
       return (
@@ -71,7 +66,7 @@ const InventoryTypeListing = ({
           <Tooltip title='Remove' placement='bottom'>
             <Button
               size='sm'
-              onClick={() => (console.log(row))}
+              onClick={() => console.log(row)}
               justIcon
               round
               color='primary'
@@ -465,29 +460,20 @@ const InventoryTypeListing = ({
 
   const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {}
 
-  const getServiceCenterService = () => {
-    if (!serviceCenterFK || !serviceFK) {
+  const getServiceCenterService = (row) => {
+    const { serviceCenterServiceFK, serviceName } = row
+    if (!serviceCenterServiceFK || !serviceName) {
       setSelectedItem({})
       return
     }
     const serviceCenterService =
       serviceCenterServicess.find(
         (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+          o.serviceId === serviceCenterServiceFK &&
+          o.serviceCenterId === serviceName,
       ) || {}
     if (serviceCenterService) {
-      // setValues({
-      //   ...values,
-      //   serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
-      //   serviceName: servicess.find((o) => o.value === serviceFK).name,
-      //   unitPrice: serviceCenterService.unitPrice,
-      //   total: serviceCenterService.unitPrice,
-      //   quantity: 1,
-      // })
-      // this.updateTotalValue(serviceCenterService.unitPrice)
-      // setPrice(serviceCenterService.unitPrice)
-      setPrice(serviceCenterService.unitPrice)
-      // setSelectedItem(serviceCenterService)
+      row.unitPrice = serviceCenterService.unitPrice
     }
   }
   const calSubtotal = (e) => {
@@ -516,10 +502,8 @@ const InventoryTypeListing = ({
       }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
-          getServiceCenterService()
           const returnRow = addedRows.map((row) => ({
             ...row,
-            unitPrice: unitPrice || price,
             subTotal: total(),
           }))
           return returnRow
@@ -612,7 +596,13 @@ const InventoryTypeListing = ({
         options: vaccinationList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', width: 150, type: 'number', format: '0.0' },
+      {
+        columnName: 'quantity',
+        width: 150,
+        type: 'number',
+        format: '0.0',
+        onChange: (e) => calSubtotal(e),
+      },
       {
         columnName: 'unitPrice',
         width: 150,
@@ -645,7 +635,14 @@ const InventoryTypeListing = ({
         options: consumableList,
         onChange: handleItemOnChange,
       },
-      { columnName: 'quantity', width: 150, type: 'number', format: '0.0' },
+
+      {
+        columnName: 'quantity',
+        width: 150,
+        type: 'number',
+        format: '0.0',
+        onChange: (e) => calSubtotal(e),
+      },
       {
         columnName: 'unitPrice',
         width: 150,
@@ -672,7 +669,6 @@ const InventoryTypeListing = ({
     ],
 
     columnExtensions: [
-      { columnName: 'quantity', width: 150, type: 'number' },
       {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
@@ -685,6 +681,8 @@ const InventoryTypeListing = ({
 
         onChange: (e) => {
           setServiceFK(e.val)
+          handleItemOnChange
+          getServiceCenterService(e.row)
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -692,7 +690,6 @@ const InventoryTypeListing = ({
               commitCount: (commitCount += 1),
             },
           })
-          handleItemOnChange
         },
       },
       {
@@ -710,6 +707,8 @@ const InventoryTypeListing = ({
 
         onChange: (e) => {
           setServiceCenterFK(e.val)
+          handleItemOnChange
+          getServiceCenterService(e.row)
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -717,8 +716,14 @@ const InventoryTypeListing = ({
               commitCount: (commitCount += 1),
             },
           })
-          handleItemOnChange
         },
+      },
+      {
+        columnName: 'quantity',
+        width: 150,
+        type: 'number',
+        format: '0.0',
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'unitPrice',

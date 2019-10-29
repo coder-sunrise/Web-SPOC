@@ -158,7 +158,7 @@ class AddConsultationDocument extends PureComponent {
             (template) => template.documentTemplateTypeFK === documentType,
           )}
           textField='displayValue'
-          onClick={(val, option) => {
+          onChange={(val, option) => {
             if (!val) return
             let msg = htmlDecodeByRegExp(option.templateContent)
             const match = msg.match(templateReg) || []
@@ -180,7 +180,7 @@ class AddConsultationDocument extends PureComponent {
         <ButtonSelect
           options={loadFromCodes}
           valueField='value'
-          onClick={(val, option) => {
+          onChange={(val, option) => {
             if (!val) return
             const { values } = parentProps
             const v = option.getter
