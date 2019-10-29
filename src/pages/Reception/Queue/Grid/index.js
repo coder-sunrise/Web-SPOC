@@ -194,10 +194,7 @@ const Grid = ({
 
   const isAssignedDoctor = useCallback(
     (row) => {
-      const {
-        doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
-        visitStatus,
-      } = row
+      const { doctor: { id }, visitStatus } = row
       const { clinicianProfile: { doctorProfile } } = user.data
 
       if (!doctorProfile) {
@@ -208,7 +205,7 @@ const Grid = ({
       }
 
       if (visitStatus === 'IN CONS') {
-        if (assignedDoctorProfile.id !== doctorProfile.id) {
+        if (id !== doctorProfile.id) {
           notification.error({
             message: `You cannot resume other doctor's consultation.`,
           })
