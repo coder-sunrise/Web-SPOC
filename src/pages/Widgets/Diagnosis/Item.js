@@ -50,31 +50,31 @@ const DiagnosisItem = ({
 
   useEffect(
     () => {
-      if (form.values.corDiagnosis[index]) {
-        const { _complication = [] } = form.values.corDiagnosis[index]
-        setCtComplicationPairedWithDiag(_complication)
-      }
-      const { ctcomplication = [] } = codetable
-      const selectedComplications = diagnosises[index].corComplication
-        ? diagnosises[index].corComplication.map(
-            (complication) => complication.complicationFK,
-          )
-        : []
-
-      const _ctComplication = ctcomplication.reduce(
-        (mappedCtComplication, complication) => {
-          if (selectedComplications.includes(complication.id))
-            return [
-              ...mappedCtComplication,
-              { ...complication, displayValue: complication.name },
-            ]
-          return [
-            ...mappedCtComplication,
-          ]
-        },
-        [],
-      )
-      setCtComplicationPairedWithDiag(_ctComplication)
+      // if (form.values.corDiagnosis[index]) {
+      //   const { _complication = [] } = form.values.corDiagnosis[index]
+      //   console.log({ diagnosis: form.values.corDiagnosis[index] })
+      //   setCtComplicationPairedWithDiag(_complication)
+      // }
+      // const { ctcomplication = [] } = codetable
+      // const selectedComplications = diagnosises[index].corComplication
+      //   ? diagnosises[index].corComplication.map(
+      //       (complication) => complication.complicationFK,
+      //     )
+      //   : []
+      // const _ctComplication = ctcomplication.reduce(
+      //   (mappedCtComplication, complication) => {
+      //     if (selectedComplications.includes(complication.id))
+      //       return [
+      //         ...mappedCtComplication,
+      //         { ...complication, displayValue: complication.name },
+      //       ]
+      //     return [
+      //       ...mappedCtComplication,
+      //     ]
+      //   },
+      //   [],
+      // )
+      // setCtComplicationPairedWithDiag(_ctComplication)
     },
     [
       form.values.corDiagnosis[index].diagnosisFK,
@@ -85,10 +85,7 @@ const DiagnosisItem = ({
   const onDiagnosisChange = async (v, op) => {
     const { setFieldValue } = form
     if (op) {
-      await setFieldValue(
-        `corDiagnosis[${index}]_complication`,
-        op.complication,
-      )
+      setFieldValue(`corDiagnosis[${index}]_complication`, op.complication)
 
       setFieldValue(
         `corDiagnosis[${index}]diagnosisDescription`,
@@ -118,7 +115,7 @@ const DiagnosisItem = ({
   }
 
   const { values } = form
-
+  console.log({ ctComplicationPairedWithDiag })
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>

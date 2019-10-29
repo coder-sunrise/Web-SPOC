@@ -236,19 +236,6 @@ const Grid = ({
     })
   }
 
-  const onRowDoubleClick = (row) => {
-    const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
-    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
-    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
-    const version = Date.now()
-
-    const valid = isAssignedDoctor(row)
-
-    const contextMenuButtonID = isWaiting ? '5' : '6'
-    console.log({ row, contextMenuButtonID })
-    return true
-  }
-
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
     [
@@ -426,7 +413,7 @@ const Grid = ({
             }).then((o) => {
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
-                  const { clinicianprofile } = codetable
+                  const { clinicianprofile = [] } = codetable
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {
@@ -482,7 +469,29 @@ const Grid = ({
       }
     },
     [
-      codetable,
+      codetable.clinicianprofile,
+    ],
+  )
+
+  const onRowDoubleClick = useCallback(
+    (row) => {
+      const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
+      const enableDoubleClickStatus = [
+        VISIT_STATUS.WAITING,
+        VISIT_STATUS.IN_CONS,
+        VISIT_STATUS.PAUSED,
+      ]
+      const { clinicianProfile: { doctorProfile } } = user.data
+      if (!doctorProfile) return false
+
+      // start consultation context menu id = 5
+      // resume consultation context menu id = 6
+      const contextMenuButtonID = isWaiting ? '5' : '6'
+      onClick(row, contextMenuButtonID)
+      return true
+    },
+    [
+      user,
     ],
   )
 
