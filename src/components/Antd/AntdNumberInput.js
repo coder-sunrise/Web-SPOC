@@ -134,11 +134,9 @@ class AntdNumberInput extends React.PureComponent {
     }
     // console.log(this.state.value)
 
-    this.debouncedOnChange = _.debounce(
-      this.debouncedOnChange.bind(this),
-      100,
-      { leading: true },
-    )
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 1000, {
+      leading: true,
+    })
   }
 
   handleFocus = (e) => {
@@ -162,27 +160,11 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
-    window.$_inputFocused = false
-
-    this.setState({
-      focused: false,
-    })
-    const { form, field } = this.props
-    if (form && field) {
-      // form.setFieldTouched(field.name, true)
-
-      field.onChange(this.state.value)
-    }
-    // console.log('handleBlur')
-    // const { formatter } = this.props
-    // if (formatter) {
-    //   this.setState({
-    //     value: formatter(this.state.value, true),
-    //   })
-    // }
+    this._onChange(numeral(this.state.value)._value)
+    this.debouncedOnChange.cancel()
   }
 
-  debouncedOnChange = (value) => {
+  _onChange = (value) => {
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -211,6 +193,17 @@ class AntdNumberInput extends React.PureComponent {
     }
   }
 
+  handleKeyUp = (e) => {
+    if (
+      [
+        13,
+      ].includes(e.which)
+    ) {
+      this._onChange(numeral(e.target.value)._value)
+      this.debouncedOnChange.cancel()
+    }
+  }
+
   handleKeyDown = (e) => {
     if (
       !e.ctrlKey &&
@@ -219,9 +212,9 @@ class AntdNumberInput extends React.PureComponent {
       !(e.keyCode >= 37 && e.keyCode <= 40) &&
       ![
         8,
+        9,
         46,
         189,
-        9,
       ].includes(e.keyCode)
     ) {
       e.preventDefault()
@@ -281,8 +274,12 @@ class AntdNumberInput extends React.PureComponent {
     this.setState({
       value: newV === undefined ? '' : newV,
     })
-
-    this.debouncedOnChange(newV)
+    if (newV === '') {
+      this._onChange(newV)
+      this.debouncedOnChange.cancel()
+    } else {
+      this.debouncedOnChange(newV)
+    }
     return true
   }
 
@@ -440,7 +437,6 @@ class AntdNumberInput extends React.PureComponent {
         />
       )
     }
-
     return (
       <div style={{ width: '100%' }} {...props}>
         <InputNumber
@@ -450,6 +446,7 @@ class AntdNumberInput extends React.PureComponent {
           onBlur={extendFunc(onBlur, this.handleBlur)}
           value={this.state.value}
           onKeyDown={this.handleKeyDown}
+          onKeyUp={this.handleKeyUp}
           {...this.getConfig()}
           {...restProps}
           // formatter={this.handleFormatter}
@@ -467,11 +464,11 @@ class AntdNumberInput extends React.PureComponent {
         value:
           field.value === undefined || Number.isNaN(field.value)
             ? ''
-            : field.value,
+            : Number(field.value),
       })
     } else if (value) {
       this.setState({
-        value: value === undefined || Number.isNaN(value) ? '' : value,
+        value: value === undefined || Number.isNaN(value) ? '' : Number(value),
       })
     } else {
       this.setState({
@@ -483,7 +480,6 @@ class AntdNumberInput extends React.PureComponent {
 
   render () {
     const { classes, onChange, ...restProps } = this.props
-
     const labelProps = {
       shrink:
         !(

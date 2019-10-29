@@ -6,6 +6,7 @@ import classNames from 'classnames'
 import $ from 'jquery'
 import _ from 'lodash'
 // @material-ui/core components
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import withStyles from '@material-ui/core/styles/withStyles'
 import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
@@ -42,7 +43,7 @@ class TextField extends React.PureComponent {
     } = props
     // console.log(this.state, props)
     this.state = {
-      isDebouncing: false,
+      // isDebouncing: false,
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
@@ -54,7 +55,7 @@ class TextField extends React.PureComponent {
     // } else {
     //   this.debouncedOnChange = this._onChange
     // }
-    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 500, {
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 1000, {
       leading: true,
     })
   }
@@ -114,7 +115,7 @@ class TextField extends React.PureComponent {
     }
     this.setState({
       value: v.target.value,
-      isDebouncing: false,
+      // isDebouncing: false,
     })
   }
 
@@ -122,9 +123,16 @@ class TextField extends React.PureComponent {
     // console.log(event)
     this.setState({
       value: event.target.value,
-      isDebouncing: true,
     })
-    this.debouncedOnChange(event.target.value)
+    if (event.target.value) {
+      // this.setState({
+      //   isDebouncing: true,
+      // })
+      this.debouncedOnChange(event.target.value)
+    } else {
+      this._onChange(event.target.value)
+      this.debouncedOnChange.cancel()
+    }
   }
 
   shouldFocus = (error) => {
@@ -132,19 +140,34 @@ class TextField extends React.PureComponent {
   }
 
   onKeyUp = (e) => {
-    // console.log('onKeyUp', e.target.value)
-    // console.log('onKeyUp', e.which)
-    if (e.which === 13) {
+    if (
+      [
+        13,
+      ].includes(e.which)
+    ) {
       this._onChange(e.target.value)
+      this.debouncedOnChange.cancel()
     }
   }
+
+  // onKeyDown = (e) => {
+  //   if (
+  //     [
+  //       9,
+  //     ].includes(e.which)
+  //   ) {
+  //     this._onChange(e.target.value)
+  //     this.debouncedOnChange.cancel()
+  //   }
+  // }
 
   handleFocus = () => {
     window.$_inputFocused = true
   }
 
-  handleBlur = () => {
-    window.$_inputFocused = false
+  handleBlur = (e) => {
+    this._onChange(e.target.value)
+    this.debouncedOnChange.cancel()
   }
 
   render () {
@@ -181,6 +204,7 @@ class TextField extends React.PureComponent {
       focus = false,
       shrink = false,
       onKeyUp,
+      onKeyDown,
       onFocus,
       onBlur,
       preventDefaultChangeEvent,
@@ -231,15 +255,17 @@ class TextField extends React.PureComponent {
     }
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
+      cfg.onBlur = extendFunc(onBlur, this.handleBlur)
     }
     // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
-    // cfg.onBlur = extendFunc(onBlur, this.handleBlur)
     // console.log(maxLength, 'maxLength')
     if (!maxLength) {
       cfg.maxLength = 200
     }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
+    // cfg.onKeyDown = extendFunc(onKeyDown, this.onKeyDown)
+
     if (cfg.value) {
       if (uppercase) {
         cfg.value = cfg.value.toUpperCase()
@@ -247,7 +273,7 @@ class TextField extends React.PureComponent {
         cfg.value = cfg.value.toLowerCase()
       }
     }
-
+    // console.log(cfg)
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log('custominput', props, cfg, state)
@@ -255,7 +281,7 @@ class TextField extends React.PureComponent {
       <BaseInput
         {...resetProps}
         {...cfg}
-        isDebouncing={this.state.isDebouncing}
+        // isDebouncing={this.state.isDebouncing}
       />
     )
   }
