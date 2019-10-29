@@ -15,7 +15,15 @@ const styles = (theme) => ({
   },
 })
 
-const DeleteWithPopover = ({ classes, index, onConfirmDelete }) => {
+const DeleteWithPopover = ({
+  classes,
+  disabled,
+  index,
+  title = 'Remove this scheme',
+  contentText = 'Confirm to remove this scheme?',
+  extraCmd,
+  onConfirmDelete,
+}) => {
   const [
     show,
     setShow,
@@ -32,7 +40,7 @@ const DeleteWithPopover = ({ classes, index, onConfirmDelete }) => {
 
   return (
     <Popover
-      title='Remove this scheme'
+      title={title}
       trigger='click'
       anchorOrigin={{
         vertical: 'top',
@@ -46,9 +54,8 @@ const DeleteWithPopover = ({ classes, index, onConfirmDelete }) => {
       onVisibleChange={toggleVisibleChange}
       content={
         <div className={classes.popoverContainer}>
-          <p className={classes.popoverMessage}>
-            Confirm to remove this scheme?
-          </p>
+          <p className={classes.popoverMessage}>{contentText}</p>
+          <div>{extraCmd}</div>
           <Button size='sm' color='danger' onClick={onCancelClick}>
             Cancel
           </Button>
@@ -58,8 +65,8 @@ const DeleteWithPopover = ({ classes, index, onConfirmDelete }) => {
         </div>
       }
     >
-      <Tooltip title='Remove Scheme'>
-        <Button justIcon color='danger'>
+      <Tooltip title={title}>
+        <Button justIcon color='danger' disabled={disabled}>
           <Delete />
         </Button>
       </Tooltip>

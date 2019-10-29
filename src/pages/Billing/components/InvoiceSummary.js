@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, IconButton } from '@material-ui/core'
+import Delete from '@material-ui/icons/Delete'
 // ant design
 import { Divider } from 'antd'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  TextField,
+} from '@/components'
+import DeleteWithPopover from './DeleteWithPopover'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
 
@@ -30,11 +38,41 @@ const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
 const InvoiceSummary = ({
   classes,
   handleAddPaymentClick,
+  handleDeletePaymentClick,
+  handlePrintInvoiceClick,
   disabled,
   values,
 }) => {
-  const { payments, invoice } = values
+  const [
+    cancelReason,
+    setCancelReason,
+  ] = useState('')
+  const { invoicePayment, invoice } = values
   const { gstValue, gstAmount, totalAftGst, invoiceNo } = invoice
+  const handleConfirmDelete = useCallback(
+    (id) => {
+      handleDeletePaymentClick(id, cancelReason)
+    },
+    [
+      cancelReason,
+    ],
+  )
+
+  const onCancelReasonChange = (event) => {
+    setCancelReason(event.target.value)
+  }
+
+  const shouldDisableAddPayment = () => {
+    if (disabled) return disabled
+
+    const totalPaid = values.invoicePayment.reduce(
+      (total, payment) =>
+        !payment.isCancelled ? total + payment.totalAmtPaid : total,
+      0,
+    )
+    return values.finalPayable <= totalPaid
+  }
+
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -94,20 +132,48 @@ const InvoiceSummary = ({
           <h4 style={{ fontWeight: 500 }}>Payment</h4>
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
-              {payments.map((item) =>
-                item.paymentModes.map((payment) => (
+              {invoicePayment
+                .filter((item) => !item.isCancelled)
+                .map((item) => (
                   <React.Fragment>
-                    <GridItem md={6}>
-                      <h5>{payment.paymentMode}</h5>
+                    <GridItem md={11}>
+                      <h5>Receipt No: {item.receiptNo || 'N/A'}</h5>
                     </GridItem>
-                    <GridItem md={6} className={classes.rightAlign}>
-                      <h5 className={classes.currencyValue}>
-                        $ {parseToTwoDecimalString(payment.amt)}
-                      </h5>
+                    <GridItem md={1}>
+                      <DeleteWithPopover
+                        // disabled={!item.id}
+                        index={item.id}
+                        title='Cancel Payment'
+                        contentText='Confirm to cancel this payment?'
+                        extraCmd={
+                          item.id ? (
+                            <TextField
+                              label='Cancel Reason'
+                              onChange={onCancelReasonChange}
+                            />
+                          ) : (
+                            undefined
+                          )
+                        }
+                        onConfirmDelete={handleConfirmDelete}
+                      />
                     </GridItem>
+
+                    {item.invoicePaymentMode.map((payment) => (
+                      <React.Fragment>
+                        <GridItem md={1} />
+                        <GridItem md={5}>
+                          <p>{payment.paymentMode}</p>
+                        </GridItem>
+                        <GridItem md={6} className={classes.rightAlign}>
+                          <p className={classes.currencyValue}>
+                            $ {parseToTwoDecimalString(payment.amt)}
+                          </p>
+                        </GridItem>
+                      </React.Fragment>
+                    ))}
                   </React.Fragment>
-                )),
-              )}
+                ))}
             </GridItem>
             <GridItem md={12}>
               <Divider
@@ -125,6 +191,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.invoiceButton}
                 disabled={disabled}
+                onClick={handlePrintInvoiceClick}
               >
                 Print Invoice
               </Button>
@@ -136,7 +203,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.addPaymentButton}
                 onClick={handleAddPaymentClick}
-                disabled={disabled}
+                disabled={shouldDisableAddPayment()}
               >
                 Add Payment
               </Button>

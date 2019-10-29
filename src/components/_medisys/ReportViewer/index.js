@@ -224,7 +224,7 @@ const ReportViewer = ({
               pageNumber={pageNumber}
               width={screenSize - 200}
               height={screenSize - 200}
-              scale={1.25}
+              scale={scale}
             />
           </Document>
         )}

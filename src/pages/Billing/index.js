@@ -13,16 +13,16 @@ import {
   CommonModal,
   GridContainer,
   withFormikExtend,
+  notification,
 } from '@/components'
-import { AddPayment, LoadingWrapper } from '@/components/_medisys'
+import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
-// model
-// import model from '../models/billing'
 // utils
+import { computeTotalForAllSavedClaim } from './utils'
 import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
 import { INVOICE_ITEM_TYPE } from '@/utils/constants'
 
@@ -55,10 +55,11 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, dispense, loading }) => ({
+@connect(({ billing, user, dispense, loading }) => ({
   billing,
   dispense,
   loading,
+  user: user.data,
 }))
 @withFormikExtend({
   notDirtyDuration: 3,
@@ -67,129 +68,165 @@ const bannerStyle = {
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const finalClaim = 0
-
+        const { invoicePayer, invoicePayment } = billing.entity
+        const _isNewBill =
+          invoicePayer.length === 0 && invoicePayment.lenght === 0
+        const finalClaim = invoicePayer.reduce(
+          (totalClaim, payer) =>
+            totalClaim +
+            payer.invoicePayerItem.reduce(
+              (subtotal, item) => subtotal + item.claimAmount,
+              0,
+            ),
+          0,
+        )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return { ...billing.entity, finalClaim, finalPayable, _isNewBill }
       }
-
-      return billing.default
     } catch (error) {
       console.log({ error })
-      return billing.default
     }
+    return billing.default
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
     const {
       concurrencyToken,
       visitId,
+      visitStatus = 'BILLING',
       invoice,
-      invoicePayers,
-      payments,
+      invoicePayer,
+      invoicePayment,
+      mode,
     } = values
 
     const { invoiceItems, ...restInvoice } = invoice
 
     const payload = {
+      mode,
       concurrencyToken,
       visitId,
-      payments,
+      visitStatus,
+      invoicePayment: invoicePayment
+        .filter((item) => {
+          if (item.id && item.isCancelled) return true
+          if (!item.id) return true
+          return false
+        })
+        .map((item) => ({
+          ...item,
+          invoicePayerFK: undefined,
+        })),
       invoice: restInvoice,
-      invoicePayers: invoicePayers.map((payer, index) => {
-        const { claimableSchemes, ...restPayer } = payer
-        const _payer = {
-          ...restPayer,
-          sequence: index,
-          invoicePayerItems: payer.invoicePayerItems
-            .filter((item) => item.claimAmount > 0)
-            .map((item) => {
-              if (item.invoiceItemFK) {
-                return { ...item }
-              }
-              const {
-                invoiceItemFK,
-                _claimedAmount,
-                disabled,
-                itemCode,
-                rowIndex,
-                notClaimableBySchemeIds,
-                invoiceItemTypeFk,
-                itemDescription,
-                coverage,
-                payableBalance,
-                id,
-                ...restItem
-              } = item
+      invoicePayer: invoicePayer
+        .map((item, index) => ({ ...item, sequence: index }))
+        .filter((payer) => {
+          if (payer.id === undefined && payer.isCancelled) return false
+          return true
+        })
+        .filter((payer) => (payer.id ? payer.isModified : true))
+        .map((payer) => {
+          const {
+            schemeConfig,
+            _indexInClaimableSchemes,
+            _isConfirmed,
+            claimableSchemes,
+            _isDeleted,
+            _isEditing,
+            _isValid,
+            isModified,
+            ...restPayer
+          } = payer
+          const _payer = {
+            ...restPayer,
+            isModified: restPayer.id ? isModified : false,
+            invoicePayerItem: payer.invoicePayerItem
+              .filter((item) => item.claimAmount > 0)
+              .map((item) => {
+                if (item.invoiceItemFK) {
+                  return { ...item }
+                }
+                const {
+                  invoiceItemFK,
+                  _claimedAmount,
+                  disabled,
+                  itemCode,
+                  rowIndex,
+                  notClaimableBySchemeIds,
+                  invoiceItemTypeFK,
+                  itemDescription,
+                  coverage,
+                  payableBalance,
+                  id,
+                  ...restItem
+                } = item
 
-              const _invoicePayerItem = {
-                ...restItem,
-                invoiceItemFK: id,
-                payableBalance,
-                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFk],
-                itemName: itemDescription,
-              }
-              return _invoicePayerItem
-            }),
-        }
-        return _payer
-      }),
+                const _invoicePayerItem = {
+                  ...restItem,
+                  invoiceItemFK: id,
+                  payableBalance,
+                  invoiceItemTypeFK,
+                  itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
+                  itemName: itemDescription,
+                }
+                return _invoicePayerItem
+              }),
+          }
+          return _payer
+        }),
     }
-    console.log({ payload })
+    // console.log({ payload })
     dispatch({
-      type: 'billing/upsert',
+      type: 'billing/submit',
       payload,
     }).then((response) => {
       if (response) {
         resetForm()
-        dispatch({
-          type: 'billing/closeModal',
-        })
+
+        // TODO: once server done enhancement, back to
+        // individual call instead of mixing 2 to 1
+        if (visitStatus === 'COMPLETED') {
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
+        } else {
+          notification.success({
+            message: 'Billing saved',
+          })
+        }
       }
     })
   },
 })
 class Billing extends Component {
   state = {
+    showReport: false,
     showAddPaymentModal: false,
     isEditing: false,
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
+  }
+
+  toggleReport = () => {
+    this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
   backToDispense = () => {
     const { dispatch } = this.props
     dispatch({
       type: 'billing/backToDispense',
-      // payload: {
-      //   visitID: values.visitId,
-      // },
     })
-    // const parameters = {
-    //   md2: 'dsps',
-    //   v: Date.now(),
-    //   vid: values.visitId,
-    //   pid: billing.patientID,
-    // }
-    // const destinationUrl = getAppendUrl(parameters, '/reception/queue/dispense')
-
-    // dispatch({
-    //   type: 'dispense/unlock',
-    //   payload: {
-    //     id: values.visitId,
-    //   },
-    // }).then((response) => {
-    //   if (response) {
-    //     router.push(destinationUrl)
-    //     // dispatch({
-    //     //   type: 'billing/closeModal',
-    //     //   payload: {
-    //     //     toDispensePage: true,
-    //     //   },
-    //     // })
-    //   }
-    // })
   }
 
   toggleAddPaymentModal = () => {
@@ -198,16 +235,19 @@ class Billing extends Component {
   }
 
   handleAddPayment = (payment) => {
-    const { setFieldValue } = this.props
+    const { values, setFieldValue } = this.props
     const { outstandingBalance, ...rest } = payment
-    setFieldValue('payments', [
+    const invoicePayment = [
+      ...values.invoicePayment.filter((item) => item.id),
       rest,
-    ])
+    ]
+
+    setFieldValue('invoicePayment', invoicePayment)
     setFieldValue('invoice.outstandingBalance', outstandingBalance)
     this.toggleAddPaymentModal()
   }
 
-  onExpandDispenseDetails = (event, panel, expanded) => {
+  onExpandDispenseDetails = () => {
     const { dispense } = this.props
     if (!dispense.entity) {
       this.props.dispatch({
@@ -220,26 +260,74 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  shouldDisableCompletePayment = () => {
+  shouldDisableSavePayment = () => {
     const { values } = this.props
-    const { invoicePayers = [], payments = [], invoice } = values
+    const { invoicePayer = [], payments = [], invoice } = values
     if (invoice === null) return true
     // if (payments.length === 0) return true
-    if (invoicePayers.length === 0) return false
+    if (invoicePayer.length === 0) return false
 
     return false
   }
 
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayer = [], invoicePayment = [] } = values
+    const noSavedPayments =
+      invoicePayment.filter(
+        (payment) => !payment.isCancelled && payment.receiptNo,
+      ).length === 0
+
+    if (invoicePayer.length === 0 && noSavedPayments) return true
+
+    return false
+  }
+
+  onSavePaymentClick = async () => {
+    const { setFieldValue, handleSubmit } = this.props
+    await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'BILLING')
+    handleSubmit()
+  }
+
+  onCompletePaymentClick = async () => {
+    const { setFieldValue, handleSubmit, values } = this.props
+    if (values._isNewBill) await setFieldValue('mode', 'save')
+    await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'COMPLETED')
+
+    handleSubmit()
+  }
+
+  handleDeletePayment = (id, cancelReason) => {
+    const { values, setFieldValue, user } = this.props
+    const { invoicePayment } = values
+    if (id === undefined) {
+      const _newInvoicePayment = invoicePayment.filter(
+        (payment) => payment.id !== undefined,
+      )
+      setFieldValue('invoicePayment', _newInvoicePayment)
+    } else {
+      const _newInvoicePayment = invoicePayment.map(
+        (payment) =>
+          payment.id === id
+            ? {
+                ...payment,
+                isCancelled: true,
+                cancelReason,
+                cancelDate: new Date(),
+                cancelByUserFK: user.id,
+              }
+            : { ...payment },
+      )
+
+      setFieldValue('invoicePayment', _newInvoicePayment)
+    }
+  }
+
   render () {
-    const { showAddPaymentModal } = this.state
-    const {
-      classes,
-      values,
-      dispense,
-      loading,
-      setFieldValue,
-      handleSubmit,
-    } = this.props
+    const { showReport, showAddPaymentModal } = this.state
+    const { classes, values, dispense, loading, setFieldValue } = this.props
     const formikBag = {
       values,
       setFieldValue,
@@ -284,6 +372,8 @@ class Billing extends Component {
               <InvoiceSummary
                 disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
+                handleDeletePaymentClick={this.handleDeletePayment}
+                handlePrintInvoiceClick={this.toggleReport}
                 values={values}
               />
             </GridContainer>
@@ -302,9 +392,20 @@ class Billing extends Component {
             disabled={
               this.state.isEditing ||
               values.id === undefined ||
-              this.shouldDisableCompletePayment()
+              this.shouldDisableSavePayment()
             }
-            onClick={handleSubmit}
+            onClick={this.onSavePaymentClick}
+          >
+            Save
+          </Button>
+          <Button
+            color='success'
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableSavePayment()
+            }
+            onClick={this.onCompletePaymentClick}
           >
             Complete Payment
           </Button>
@@ -317,12 +418,25 @@ class Billing extends Component {
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
-            payments={values.payments}
+            invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
-              finalPayable: values.invoice.totalAftGst,
+              finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
-              outstandingBalance: values.finalPayable,
+            }}
+          />
+        </CommonModal>
+        <CommonModal
+          open={showReport}
+          onClose={this.toggleReport}
+          title='Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            showTopDivider={false}
+            reportID={15}
+            reportParameters={{
+              InvoiceID: values.invoice ? values.invoice.id : '',
             }}
           />
         </CommonModal>

@@ -15,7 +15,6 @@ import { formatMessage } from 'umi/locale'
 @withFormikExtend({
   displayName: 'purchasingReceiving',
   mapPropsToValues: ({ purchasingReceiving }) => {
-    console.log('mapPropsToValues', purchasingReceiving)
     return purchasingReceiving.entity || purchasingReceiving.default
   },
 })

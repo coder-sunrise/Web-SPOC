@@ -21,7 +21,6 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
         keepFilter: false,
       },
     }).then((response) => {
-      console.log({ response })
     })
   }, [])
 
@@ -99,8 +98,6 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
             color='primary'
             icon={null}
             onClick={() => {
-              console.log('search', props.values)
-
               const { sddIdName } = props.values
 
               dispatch({

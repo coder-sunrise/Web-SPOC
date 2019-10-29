@@ -2,7 +2,18 @@ import React, { useState } from 'react'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { formatMessage } from 'umi/locale'
 import { CommonTableGrid, Tooltip, notification } from '@/components'
+import Authorized from '@/utils/Authorized'
 import { ContextMenuOptions, PurchaseReceiveGridCol } from '../variables'
+import {
+  PURCHASE_ORDER_STATUS_TEXT,
+  INVOICE_STATUS_TEXT,
+} from '@/utils/constants'
+
+const enabledSelectPOStatus = [
+  PURCHASE_ORDER_STATUS_TEXT.FINALIZED,
+  PURCHASE_ORDER_STATUS_TEXT.PARTIALREVD,
+  PURCHASE_ORDER_STATUS_TEXT.FULFILLED,
+]
 
 const PurchaseReceiveDataGrid = ({
   selectedRows,
@@ -48,15 +59,6 @@ const PurchaseReceiveDataGrid = ({
         {
           columnName: 'invoiceStatus',
           sortBy: 'invoiceStatusFKNavigation.DisplayValue',
-          render: (row) => {
-            const { purchaseOrderStatus, invoiceStatus } = row
-            if (
-              purchaseOrderStatus === 'Draft' ||
-              purchaseOrderStatus === 'Cancelled'
-            )
-              return <p />
-            return <p>{invoiceStatus}</p>
-          },
         },
         {
           columnName: 'supplier',
@@ -71,7 +73,12 @@ const PurchaseReceiveDataGrid = ({
           type: 'date',
         },
         { columnName: 'totalAmount', type: 'number', currency: true },
-        { columnName: 'outstanding', type: 'number', currency: true, sortingEnabled: false, },
+        {
+          columnName: 'outstanding',
+          type: 'number',
+          currency: true,
+          sortingEnabled: false,
+        },
         {
           columnName: 'purchaseOrderStatus',
           sortBy: 'purchaseOrderStatusFKNavigation.displayValue',
@@ -81,15 +88,17 @@ const PurchaseReceiveDataGrid = ({
           align: 'center',
           render: (row) => {
             return (
-              <Tooltip title='More Actions'>
-                <div style={{ display: 'inline-block' }}>
-                  <GridButton
-                    row={row}
-                    onClick={onContextButtonClick}
-                    contextMenuOptions={ContextMenuOptions(row)}
-                  />
-                </div>
-              </Tooltip>
+              <Authorized authority='purchasingandreceiving.purchasingandreceivingdetails'>
+                <Tooltip title='More Actions'>
+                  <div style={{ display: 'inline-block' }}>
+                    <GridButton
+                      row={row}
+                      onClick={onContextButtonClick}
+                      contextMenuOptions={ContextMenuOptions(row)}
+                    />
+                  </div>
+                </Tooltip>
+              </Authorized>
             )
           },
         },
@@ -98,6 +107,9 @@ const PurchaseReceiveDataGrid = ({
         selectable: true,
         selectConfig: {
           showSelectAll: true,
+          rowSelectionEnabled: (row) =>
+            enabledSelectPOStatus.includes(row.purchaseOrderStatus) &&
+            row.invoiceStatus === INVOICE_STATUS_TEXT.OUTSTANDING,
         },
       }}
     />

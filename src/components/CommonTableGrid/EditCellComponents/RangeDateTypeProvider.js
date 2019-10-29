@@ -7,10 +7,14 @@ import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 import { DateRangePicker, DateFormatter } from '@/components'
 
-class DateEditorBase extends PureComponent {
-  state = {
-    error: false,
-  }
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
+class DateEditorBase extends React.Component {
+  state = {}
 
   constructor (props) {
     super(props)
@@ -18,82 +22,81 @@ class DateEditorBase extends PureComponent {
   }
 
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
-    })
+    onComponentDidMount.call(this)
   }
 
-  render () {
-    const { props } = this
-    const {
-      column = {},
-      value,
-      onValueChange,
-      columnExtensions,
-      row,
-      text,
-    } = props
-    const { name: columnName } = column
-    const cfg = columnExtensions.find(
-      ({ columnName: currentColumnName }) => currentColumnName === columnName,
-    )
+  _onChange = (date, moments, org) => {
+    onComponentChange.call(this, { date, moments, org })
+  }
 
+  // componentDidMount () {
+  //   const { columnExtensions, row, column: { name: columnName } } = this.props
+  //   const cfg =
+  //     columnExtensions.find(
+  //       ({ columnName: currentColumnName }) => currentColumnName === columnName,
+  //     ) || {}
+  //   const { gridId, getRowId } = cfg
+  //   const latestRow = window.$tempGridRow[gridId]
+  //     ? window.$tempGridRow[gridId][getRowId(row)] || row
+  //     : row
+  //   updateCellValue(this.props, this.myRef.current, latestRow[columnName])
+  //   this.setState({
+  //     cfg,
+  //     row: latestRow,
+  //   })
+  // }
+
+  // _onChange = (date, moments, org) => {
+  //   const {
+  //     columnExtensions,
+  //     column: { name: columnName },
+  //     value,
+  //     onValueChange,
+  //     row,
+  //   } = this.props
+
+  //   const {
+  //     type,
+  //     code,
+  //     validationSchema,
+  //     isDisabled = () => false,
+  //     onChange,
+  //     gridId,
+  //     getRowId,
+  //     ...restProps
+  //   } = this.state.cfg
+
+  //   const errors = updateCellValue(this.props, this.myRef.current, date)
+
+  //   const latestRow = window.$tempGridRow[gridId]
+  //     ? window.$tempGridRow[gridId][getRowId(row)] || row
+  //     : row
+  //   latestRow._errors = errors
+  //   const error = errors.find((o) => o.path === this.state.cfg.columnName)
+  //   console.log(error, errors)
+  //   if (!error) {
+  //     if (onChange) {
+  //       onChange(date, moments, org, latestRow)
+  //     }
+  //   }
+  // }
+
+  render () {
     const {
       type,
-      isDisabled = () => false,
-      getInitialValue,
-      onChange,
-      gridId,
-      getRowId,
-      ...restProps
-    } = cfg
-
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-
-    const _onChange = (date, moments, org) => {
-      const error = updateCellValue(this.props, this.myRef.current, date)
-
-      this.setState({
-        error,
-      })
-      if (!error) {
-        if (onChange) onChange(date, moments, org, latestRow)
-      }
+      code,
+      columnName,
+      options,
+      row,
+      ...commonCfg
+    } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+    if (!commonCfg.timeFormat) {
+      commonCfg.timeFormat = false
     }
-    const commonCfg = {
-      onChange: _onChange,
-      disabled: isDisabled(latestRow),
-      defaultValue: getInitialValue ? getInitialValue(row) : value,
-      value: latestRow[columnName],
-      text,
-    }
-    // console.log('RangeDateTypeProvider', cfg, value, commonCfg)
     return (
       <div ref={this.myRef}>
-        <DateRangePicker
-          simple
-          timeFormat={false}
-          showErrorIcon
-          error={this.state.error}
-          {...commonCfg}
-          {...restProps}
-        />
+        <DateRangePicker {...commonCfg} />
       </div>
     )
   }
@@ -134,7 +137,7 @@ class RangeDateTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds ||
+    // this.props.editingRowIds !== nextProps.editingRowIds ||
     this.props.commitCount !== nextProps.commitCount
 
   render () {

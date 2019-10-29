@@ -42,9 +42,7 @@ class Address extends Component {
     })
   }
 
-  handleAddressType = (e) => {
-    console.log(e, 'address-handleAddressType')
-  }
+  handleAddressType = (e) => {}
 
   handleGetAddress = () => {
     const {
@@ -71,7 +69,6 @@ class Address extends Component {
             const { data } = o
             const { postalCode, blkHseNo, building, street } = data[0]
             const { contactAddress } = values.contact
-            console.log('contactAddress', contactAddress)
             const contactAddressArray = [
               {
                 ...contactAddress[addressIndex],
@@ -81,7 +78,6 @@ class Address extends Component {
                 street,
               },
             ]
-            console.log('contactAddressArray', contactAddressArray)
             // contactAddressArray[addressIndex] = [
             //   {
             //     ...contactAddressArray[addressIndex],
@@ -91,7 +87,6 @@ class Address extends Component {
             //     street,
             //   },
             // ]
-            console.log('apple', values)
             setValues({
               ...values,
               contact: {
@@ -278,6 +273,7 @@ class Address extends Component {
                   label='Country'
                   code='ctCountry'
                   max={10}
+                  autocomplete='off'
                   {...args}
                 />
               )}

@@ -6,7 +6,6 @@ class FormField extends PureComponent {
     const { label,name, render } = this.props
 
     const control = render()
-    console.log(control)
     return control 
 
   }

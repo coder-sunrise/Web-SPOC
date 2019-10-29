@@ -33,21 +33,30 @@ class TextField extends React.PureComponent {
   constructor (props) {
     super(props)
     // this.myRef = React.createRef()
-    const { field = {}, form, inputProps = {}, defaultValue = '' } = props
+    const {
+      field = {},
+      form,
+      inputProps = {},
+      defaultValue = '',
+      value,
+    } = props
     // console.log(this.state, props)
     this.state = {
       isDebouncing: false,
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
-          : defaultValue,
+          : defaultValue || value,
     }
     // console.log(this.state.value)
-    if (field && form) {
-      this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
-    } else {
-      this.debouncedOnChange = this._onChange
-    }
+    // if (field && form) {
+    //   this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
+    // } else {
+    //   this.debouncedOnChange = this._onChange
+    // }
+    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 500, {
+      leading: true,
+    })
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -62,7 +71,7 @@ class TextField extends React.PureComponent {
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field } = nextProps
+    const { field, value } = nextProps
     if (field) {
       this.setState({
         value:
@@ -71,6 +80,14 @@ class TextField extends React.PureComponent {
           field.value !== null
             ? field.value
             : '',
+      })
+    } else if (value) {
+      this.setState({
+        value,
+      })
+    } else {
+      this.setState({
+        value: '',
       })
     }
   }
@@ -206,10 +223,11 @@ class TextField extends React.PureComponent {
         cfg.help = !showErrorIcon && shouldShow ? rawError : help
       }
       cfg.rawError = error || rawError
-    } else if (value) {
-      cfg.value = value
     } else {
-      cfg.value = state.value
+      /* else if (value) {
+      cfg.value = value
+    } */ cfg.value =
+        state.value
     }
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
@@ -222,11 +240,14 @@ class TextField extends React.PureComponent {
     }
     cfg.negative = state.value < 0
     cfg.onKeyUp = extendFunc(onKeyUp, this.onKeyUp)
-    if (uppercase) {
-      cfg.value = cfg.value.toUpperCase()
-    } else if (lowercase) {
-      cfg.value = cfg.value.toLowerCase()
+    if (cfg.value) {
+      if (uppercase) {
+        cfg.value = cfg.value.toUpperCase()
+      } else if (lowercase) {
+        cfg.value = cfg.value.toLowerCase()
+      }
     }
+
     // console.log(inputProps)
     // console.log('custominput', inputProps)
     // console.log('custominput', props, cfg, state)

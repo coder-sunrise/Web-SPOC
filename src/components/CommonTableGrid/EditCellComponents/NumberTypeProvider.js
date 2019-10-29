@@ -17,6 +17,12 @@ import {
   difference,
 } from '@/utils/utils'
 
+import {
+  onComponentDidMount,
+  onComponentChange,
+  getCommonConfig,
+} from './utils'
+
 const { currencyFormat, qtyFormat, currencySymbol } = config
 
 const styles = (theme) => ({
@@ -35,9 +41,7 @@ const styles = (theme) => ({
 })
 
 class NumberEditor extends PureComponent {
-  state = {
-    error: false,
-  }
+  state = {}
 
   constructor (props) {
     super(props)
@@ -45,86 +49,32 @@ class NumberEditor extends PureComponent {
   }
 
   componentDidMount () {
-    const { columnExtensions, row, column: { name: columnName } } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const { gridId, getRowId } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
+    onComponentDidMount.call(this)
+  }
 
-    this.setState({
-      error: updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[columnName],
-      ),
+  _onChange = (e) => {
+    onComponentChange.call(this, {
+      value:
+        e.target.value === undefined
+          ? undefined
+          : numeral(e.target.value)._value,
     })
   }
 
   render () {
-    const {
-      columnExtensions,
-      column: { name: columnName },
-      value,
-      onValueChange,
-      row,
-    } = this.props
-    const cfg =
-      columnExtensions.find(
-        ({ columnName: currentColumnName }) => currentColumnName === columnName,
-      ) || {}
-    const {
-      type,
-      code,
-      validationSchema,
-      isDisabled = () => false,
-      onChange,
-      gridId,
-      getRowId,
-      ...restProps
-    } = cfg
-    const latestRow = window.$tempGridRow[gridId]
-      ? window.$tempGridRow[gridId][getRowId(row)] || row
-      : row
-    const _onChange = (event) => {
-      const v = numeral(event.target.value)._value
-      const error = updateCellValue(this.props, this.myRef.current, v)
-      this.setState({
-        error,
-      })
-      if (!error) {
-        if (onChange)
-          onChange({
-            value: v,
-            row: latestRow,
-            error,
-          })
-      }
-    }
-    // console.log(columnName, value)
-    const commonCfg = {
-      simple: true,
-      showErrorIcon: true,
-      error: this.state.error,
-      value,
-      disabled: isDisabled(latestRow),
-      currency: cfg && (cfg.currency || type === 'currency'),
-      ...restProps,
-      onChange: _onChange,
-    }
-
+    const { currency, type, ...commonCfg } = getCommonConfig.call(this)
+    commonCfg.onChange = this._onChange
+    commonCfg.currency = currency || type === 'currency'
+    console.log(commonCfg)
     return (
-      <NumberInput
-        inputProps={{
-          fullWidth: true,
-        }}
-        // classes={{ input: classes.alignRight }}
-        {...commonCfg}
-        {...restProps}
-      />
+      <div ref={this.myRef}>
+        <NumberInput
+          inputProps={{
+            fullWidth: true,
+          }}
+          {...commonCfg}
+        />
+      </div>
     )
   }
 }

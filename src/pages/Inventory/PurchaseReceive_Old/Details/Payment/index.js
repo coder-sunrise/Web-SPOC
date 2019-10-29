@@ -27,7 +27,6 @@ class index extends PureComponent {
   }
 
   render() {
-    console.log('Payment Index', this.props)
     const { purchaseOrderDetails } = this.props
     const { status } = purchaseOrderDetails.entity.purchaseOrder
     const isEditable = isPOStatusFinalized(status)

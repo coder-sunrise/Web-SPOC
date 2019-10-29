@@ -35,7 +35,7 @@ const styles = () => ({})
   validationSchema: Yup.object().shape({
     amount: Yup.number().max(Yup.ref('maxAmount')),
     paymentCreatedBizSessionFK: Yup.number().required(),
-    creditCardTypeFK: Yup.number().when('paymentMode', {
+    creditCardTypeFK: Yup.number().when('paymentModeFK', {
       is: (val) => val === 1,
       then: Yup.number().required(),
     }),

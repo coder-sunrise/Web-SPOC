@@ -194,10 +194,6 @@ class UserProfileForm extends React.PureComponent {
     const { classes, errors, footer, handleSubmit, values } = this.props
     const { showChangePassword, canEditDoctorMCR } = this.state
     const isEdit = values.id !== undefined
-    const test = /(^[a-zA-Z][a-zA-Z0-9.,$;]+$)/.test(
-      values.userProfile.userName,
-    )
-    console.log({ test })
     return (
       <React.Fragment>
         <GridContainer

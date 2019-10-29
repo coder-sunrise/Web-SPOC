@@ -63,6 +63,8 @@ class EditableTableGrid extends PureComponent {
     })
     if (row.length === 0) {
       delete window.$tempGridRow[this.gridId][undefined]
+    } else if (window.$tempGridRow[this.gridId]) {
+      window.$tempGridRow[this.gridId][undefined] = row[0]
     }
   }
 
@@ -116,7 +118,6 @@ class EditableTableGrid extends PureComponent {
     ) {
       const { onRowDoubleClick, EditingProps, rows } = this.props
       const { onEditingRowIdsChange } = EditingProps
-
       if (onRowDoubleClick) {
         onRowDoubleClick()
       } else {

@@ -21,7 +21,7 @@ export default createFormViewModel({
           purchaseOrderStatusFK: 1,
           shippingAddress: '',
           IsGSTEnabled: false,
-          isGstInclusive: false,
+          IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
           adjustmentAmount: 0,
@@ -68,6 +68,7 @@ export default createFormViewModel({
 
         // Access clinicInfo from store
         let clinicAddress = ''
+        let tempClinicAddress = []
         const clinicInfo = yield select((state) => state.clinicInfo)
         const { contact } = clinicInfo
         if (contact) {
@@ -78,7 +79,15 @@ export default createFormViewModel({
             unitNo,
             postcode,
           } = contact.contactAddress[0]
-          clinicAddress = `${buildingName}, ${blockNo}, ${street}, ${unitNo}, ${postcode}`
+
+          if (buildingName) tempClinicAddress.push(buildingName)
+          if (blockNo) tempClinicAddress.push(blockNo)
+          if (street) tempClinicAddress.push(street)
+          if (unitNo) tempClinicAddress.push(unitNo)
+          if (postcode) tempClinicAddress.push(postcode)
+          clinicAddress = tempClinicAddress.join(', ')
+
+          // clinicAddress = `${buildingName}, ${blockNo}, ${street}, ${unitNo}, ${postcode}`
         }
 
         const purchaseOrder = {
@@ -88,10 +97,11 @@ export default createFormViewModel({
           purchaseOrderStatusFK: 1,
           shippingAddress: clinicAddress,
           IsEnabledGST: false,
-          isGstInclusive: false,
+          IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
           adjustmentAmount: 0,
+          exceptedDeliveryDate: '',
         }
 
         return yield put({
@@ -119,7 +129,7 @@ export default createFormViewModel({
             purchaseOrderStatusFK: 1,
             purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,
             IsEnabledGST: false,
-            isGstInclusive: data.isGstInclusive,
+            IsGSTInclusive: data.isGstInclusive,
             gstAmount: data.gstAmount,
             totalAmount: data.totalAmount,
             adjustmentAmount: 0,

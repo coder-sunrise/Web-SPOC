@@ -1,6 +1,7 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
+import { notification } from '@/components'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '../services'
 import { query as queryPatient } from '@/services/patient'
@@ -14,6 +15,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {
+        _isNewBill: true,
         payments: [],
         invoice: {
           invoiceNo: '',
@@ -24,10 +26,10 @@ export default createFormViewModel({
           totalAftGst: 0,
           invoiceItems: [],
         },
-        invoicePayers: [],
+        invoicePayer: [],
         applicableSchemes: [],
         claimableSchemes: [],
-        invoicePaymentModes: [],
+        invoicePayment: [],
       },
     },
     subscriptions: ({ dispatch, history }) => {
@@ -46,7 +48,7 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { select, put, take }) {
         const patientState = yield select((st) => st.patient)
-        if (!patientState.entity) {
+        if (!patientState.entity || patientState.entity.id !== payload.pid) {
           yield put({
             type: 'patient/query',
             payload: {
@@ -83,13 +85,56 @@ export default createFormViewModel({
           })
         }
       },
+      *submit ({ payload }, { call, put }) {
+        const { mode, ...restPayload } = payload
+        return yield put({
+          type: `${mode}`,
+          payload: restPayload,
+        })
+      },
+      *save ({ payload }, { call, put, take }) {
+        const response = yield call(service.save, payload)
+        if (response) {
+          yield put({
+            type: 'query',
+            payload: {
+              id: payload.visitId,
+            },
+          })
+
+          yield take('billing/query/@@end')
+          yield put({
+            type: 'formik/clean',
+            payload: 'BillingForm',
+          })
+
+          return response
+        }
+        return false
+      },
+      *complete ({ payload }, { call, put }) {
+        const response = yield call(service.complete, payload)
+        if (response) {
+          yield put({ type: 'formik/clean', payload: 'BillingForm' })
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: null,
+            },
+          })
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
+        }
+      },
       *refresh ({ payload }, { put }) {
         yield put({
           type: 'query',
           payload: { id: payload.visitID },
         })
       },
-      *backToDispense ({ payload }, { put, select }) {
+      *backToDispense ({ payload }, { put, select, take }) {
         const billingState = yield select((state) => state.billing)
 
         const parameters = {
@@ -109,6 +154,7 @@ export default createFormViewModel({
             id: billingState.visitID,
           },
         })
+        yield take('dispense/unlock/@@end')
 
         if (response) {
           yield put({

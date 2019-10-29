@@ -6,6 +6,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common components
 import { CommonTableGrid, Tooltip } from '@/components'
 // medisys components
+import Authorized from '@/utils/Authorized'
 import { GridContextMenuButton } from '@/components/_medisys'
 
 const generateRowData = () => {
@@ -94,30 +95,32 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
       // )
       return (
         <Table.Cell {...props}>
-          <Tooltip title='View SMS History' placement='bottom'>
-            <div style={{ display: 'inline-block' }}>
-              <GridContextMenuButton
-                row={row}
-                onClick={handleContextMenuClick}
-                contextMenuOptions={[
-                  {
-                    id: '0',
-                    label: 'View SMS History',
-                  },
-                  {
-                    id: '1',
-                    label: 'Mark as Read',
-                    disabled: true,
-                  },
-                  {
-                    id: '2',
-                    label: 'Mark as Unread',
-                    disabled: true,
-                  },
-                ]}
-              />
-            </div>
-          </Tooltip>
+          <Authorized authority='sms.viewsms'>
+            <Tooltip title='View SMS History' placement='bottom'>
+              <div style={{ display: 'inline-block' }}>
+                <GridContextMenuButton
+                  row={row}
+                  onClick={handleContextMenuClick}
+                  contextMenuOptions={[
+                    {
+                      id: '0',
+                      label: 'View SMS History',
+                    },
+                    {
+                      id: '1',
+                      label: 'Mark as Read',
+                      disabled: true,
+                    },
+                    {
+                      id: '2',
+                      label: 'Mark as Unread',
+                      disabled: true,
+                    },
+                  ]}
+                />
+              </div>
+            </Tooltip>
+          </Authorized>
         </Table.Cell>
       )
     }

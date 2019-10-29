@@ -49,7 +49,7 @@ const styles = (theme) => ({
   mapPropsToValues: ({ purchaseOrderDetails }) => {
 
     const newPurchaseOrderDetails = purchaseOrderDetails
-
+    // const { purchaseOrder } = purchaseOrderDetails
     if(newPurchaseOrderDetails){
 
       if(newPurchaseOrderDetails.type && newPurchaseOrderDetails.type === 'dup' && newPurchaseOrderDetails.purchaseOrder){
@@ -60,13 +60,28 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
       }
 
-      if(newPurchaseOrderDetails.purchaseOrder)
-      {
-        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = newPurchaseOrderDetails.purchaseOrder.gstAmount > 0
-      }
+      // if(newPurchaseOrderDetails.purchaseOrder)
+      // {
+      //   newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = newPurchaseOrderDetails.purchaseOrder.gstAmount > 0
+      // }
     }
 
     return newPurchaseOrderDetails
+
+    // let IsGSTEnabled
+    //   let IsGSTInclusive
+    //   if (purchaseOrder) {
+    //     IsGSTEnabled = purchaseOrder.isGstInclusive
+    //     IsGSTInclusive = purchaseOrder.isGstInclusive
+    //   }
+    //   return {
+    //     ...purchaseOrderDetails,
+    //     purchaseOrder: {
+    //       ...purchaseOrder,
+    //       IsGSTEnabled,
+    //       IsGSTInclusive,
+    //     },
+    // }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -228,7 +243,7 @@ class Index extends Component {
           )
           break
         case poSubmitAction.FINALIZE:
-          dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
+          // dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           processedPayload = this.processSubmitPayload(false, 2)
           break
         case poSubmitAction.COMPLETE:
@@ -375,7 +390,7 @@ class Index extends Component {
     const { settingGSTEnable, settingGSTPercentage } = this.state
     const { values, setFieldValue } = this.props
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
-    const { IsGSTEnabled, isGstInclusive } = purchaseOrder || false
+    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     let tempInvoiceTotal = 0
     let totalAmount = 0
     let gstAmount = 0
@@ -415,7 +430,7 @@ class Index extends Component {
               settingGSTEnable,
               settingGSTPercentage,
               IsGSTEnabled,
-              isGstInclusive,
+              IsGSTInclusive,
               filteredPurchaseOrderItem.length,
             )
 
@@ -434,7 +449,7 @@ class Index extends Component {
             // Sum up all itemLevelGST & invoiceTotal at last iteration
             if (Object.is(adjArr.length - 1, adjKey)) {
               // Calculate item level totalAfterAdjustments & totalAfterGst
-              if (isGstInclusive) {
+              if (IsGSTInclusive) {
                 item.totalAfterGst = item.tempSubTotal
                 totalAmount += item.tempSubTotal
               } else {
@@ -455,7 +470,7 @@ class Index extends Component {
         if (settingGSTEnable) {
           if (!IsGSTEnabled) {
             item.itemLevelGST = 0
-          } else if (isGstInclusive) {
+          } else if (IsGSTInclusive) {
             item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 107)
           } else {
             item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 100)
@@ -514,12 +529,10 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled,isGstInclusive } = purchaseOrder || false
-
+    const { IsGSTEnabled } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    console.log('asd', isPOStatusDraft(poStatus))
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -562,7 +575,6 @@ class Index extends Component {
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
             setFieldValue={setFieldValue}
-            isGstInclusive={isGstInclusive}
             // {...this.props}
           />
 

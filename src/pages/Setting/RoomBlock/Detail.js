@@ -113,13 +113,13 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
       recurrenceDto: { ...initDailyRecurrence },
     }
   },
-  validationSchema: Yup.object().shape(
-    {
-      // code: Yup.string().required(),
-      // displayValue: Yup.string().required(),
-      // effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-    },
-  ),
+  validationSchema: Yup.object().shape({
+    roomFK: Yup.string().required(),
+    durationHour: Yup.string().required(),
+    durationMinute: Yup.string().required(),
+    eventDate: Yup.string().required(),
+    eventTime: Yup.string().required(),
+  }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onClose, onConfirm } = props
     const {
@@ -238,9 +238,27 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
 class Detail extends PureComponent {
   state = {}
 
+  recurrence = () => {
+    const { values } = this.props
+    const isNew = !values.isEnableRecurrence && !values.id
+
+    if (isNew || values.isEnableRecurrence) {
+      return (
+        <Recurrence
+          block
+          disabled={values.id !== undefined}
+          formValues={values}
+          recurrenceDto={values.recurrenceDto}
+        />
+      )
+    }
+    return null
+  }
+
   render () {
     const { props } = this
-    const { theme, footer, values } = props
+    const { theme, footer } = props
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -334,16 +352,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>
-              {values.isEnableRecurrence && (
-                <Recurrence
-                  block
-                  disabled={values.id !== undefined}
-                  formValues={values}
-                  recurrenceDto={values.recurrenceDto}
-                />
-              )}
-            </GridItem>
+            <GridItem md={12}>{this.recurrence()}</GridItem>
           </GridContainer>
         </div>
         {footer &&

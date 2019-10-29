@@ -610,8 +610,8 @@ const consultationDocumentTypes = [
               ...row,
               unfitType: UNFIT_TYPE[row.unfitTypeFK],
               mcIssueDate: moment(row.mcIssueDate).format(dateFormatLong),
-              mcStartDate: moment(row.mcIssueDate).format(dateFormatLong),
-              mcEndDate: moment(row.mcIssueDate).format(dateFormatLong),
+              mcStartDate: moment(row.mcStartDate).format(dateFormatLong),
+              mcEndDate: moment(row.mcEndDate).format(dateFormatLong),
             },
           ],
         }
@@ -657,7 +657,8 @@ const consultationDocumentTypes = [
       draft: (row) => {
         return {
           ReferralLetterDetails: [
-            { ...row,
+            {
+              ...row,
               referralDate: moment(row.referralDate).format(dateFormatLong),
             },
           ],
@@ -711,6 +712,20 @@ const consultationDocumentTypes = [
     value: '5',
     name: 'Others',
     prop: 'corOtherDocuments',
+    downloadKey: 'documentid',
+    downloadConfig: {
+      id: 12,
+      key: 'documentid',
+      draft: (row) => {
+        return {
+          DocumentDetails: [
+            {
+              ...row,
+            },
+          ],
+        }
+      },
+    },
   },
 ]
 
@@ -911,6 +926,7 @@ const _fetchAndSaveCodeTable = async (
 
   if (parseInt(statusCode, 10) === 200) {
     const result = multiplyCodetable(newData, multiplier)
+
     await db.codetable.put({
       code,
       data: result,
@@ -925,9 +941,18 @@ const _fetchAndSaveCodeTable = async (
 }
 
 export const getAllCodes = async () => {
+  const lastLoginDate = localStorage.getItem('_lastLogin')
+  const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    return code.map((_i) => ({ code: _i.code, data: _i.data }))
+    return code
+      .filter((_i) => {
+        const { updateDate } = _i
+        const parsedUpdateDate =
+          updateDate === null ? moment('2001-01-01') : moment(updateDate)
+        return parsedUpdateDate.isAfter(parsedLastLoginDate)
+      })
+      .map((_i) => ({ code: _i.code, data: _i.data }))
   })
 
   return ct || []
@@ -957,7 +982,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, true)
+      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
@@ -1145,7 +1170,7 @@ export const InventoryTypes = [
 const tagList = [
   {
     value: 'PatientName',
-    text: 'PatientName',
+    text: '<#PatientName#>',
     url: '',
     getter: () => {
       const { patient } = window.g_app._store.getState()
@@ -1162,7 +1187,7 @@ const tagList = [
   },
   {
     value: 'Doctor',
-    text: 'Doctor',
+    text: '<#Doctor#>',
     url: '',
     getter: () => {
       const { user } = window.g_app._store.getState()
@@ -1175,7 +1200,7 @@ const tagList = [
   },
   {
     value: 'NewLine',
-    text: 'NewLine',
+    text: '<#NewLine#>',
     url: '',
     getter: () => {
       return '<br/>'
@@ -1183,7 +1208,7 @@ const tagList = [
   },
   {
     value: 'PatientCallingName',
-    text: 'PatientCallingName',
+    text: '<#PatientCallingName#>',
     url: '',
     getter: () => {
       const { patient } = window.g_app._store.getState()
@@ -1195,7 +1220,7 @@ const tagList = [
   },
   {
     value: 'LastVisitDate',
-    text: 'LastVisitDate',
+    text: '<#LastVisitDate#>',
     url: '',
   },
 ]

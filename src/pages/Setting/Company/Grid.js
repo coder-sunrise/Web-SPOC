@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 class Grid extends PureComponent {
   FuncConfig = {
@@ -94,7 +95,6 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             width: 400,
             render: (row) => {
-              console.log('row', row)
               return (
                 <a
                   rel='noopener noreferrer'
@@ -190,24 +190,26 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Tooltip
-                  title={
-                    companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
-                  }
-                  placement='bottom'
-                >
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      this.editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 0 }}
+                <Authorized authority='scheme.schemedetails'>
+                  <Tooltip
+                    title={
+                      companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
+                    }
+                    placement='bottom'
                   >
-                    <Edit />
-                  </Button>
-                </Tooltip>
+                    <Button
+                      size='sm'
+                      onClick={() => {
+                        this.editRow(row)
+                      }}
+                      justIcon
+                      color='primary'
+                      style={{ marginRight: 0 }}
+                    >
+                      <Edit />
+                    </Button>
+                  </Tooltip>
+                </Authorized>
               )
             },
           },

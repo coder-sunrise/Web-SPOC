@@ -40,7 +40,7 @@ const CreditCard = ({
       <GridContainer>
         <GridItem md={6}>
           <FastField
-            name={`paymentList[${index}].creditCardTypeFK`}
+            name={`paymentList[${index}].creditCardPayment.creditCardTypeFK`}
             render={(args) => (
               <CodeSelect
                 {...args}
@@ -48,7 +48,7 @@ const CreditCard = ({
                 code='ctcreditcardtype'
                 onChange={(value) => {
                   setFieldValue(
-                    `paymentList[${index}].creditCardType`,
+                    `paymentList[${index}].creditCardPayment.creditCardType`,
                     CREDIT_CARD_TYPE[value],
                   )
                 }}
@@ -58,9 +58,10 @@ const CreditCard = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`paymentList[${index}].creditCardNo`}
+            name={`paymentList[${index}].creditCardPayment.creditCardNo`}
             render={(args) => (
               <NumberInput
+                max={9999}
                 inputProps={{ maxLength: 4 }}
                 maxLength={4}
                 label='Card No.'
