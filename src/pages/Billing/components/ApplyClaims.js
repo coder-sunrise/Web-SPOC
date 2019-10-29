@@ -455,6 +455,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     () => {
       if (values.invoicePayer.length > 0) {
         const newInvoicePayers = values.invoicePayer.map((ip) => {
+          // console.log({ ip })
           if (ip.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
             const _claimableSchemesIndex = claimableSchemes.findIndex(
               (cs) =>
