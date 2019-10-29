@@ -514,7 +514,7 @@ class ControlTest extends PureComponent {
                     textField='name'
                     valueField='value'
                     justIcon
-                    onClick={(v, option) => {
+                    onChange={(v, option) => {
                       console.log(v, option)
                     }}
                     {...args}

@@ -236,44 +236,6 @@ const Grid = ({
     })
   }
 
-  const onRowDoubleClick = (row) => {
-    const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
-    const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
-    const valid = isAssignedDoctor(row)
-    if (!valid) return false
-
-    const version = Date.now()
-    // if (isInCons) {
-    //   dispatch({
-    //     type: `consultation/start`,
-    //     payload: {
-    //       id: row.visitFK,
-    //       version,
-    //     },
-    //   }).then((o) => {
-    //     if (o)
-    //       router.push(
-    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-    //       )
-    //   })
-    // } else if (isPaused) {
-    //   dispatch({
-    //     type: `consultation/resume`,
-    //     payload: {
-    //       id: row.visitFK,
-    //       version,
-    //     },
-    //   }).then((o) => {
-    //     if (o)
-    //       router.push(
-    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-    //       )
-    //   })
-    // }
-
-    return true
-  }
-
   const calendarData = useMemo(
     () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
     [
@@ -291,15 +253,8 @@ const Grid = ({
 
     if (selfOnly)
       data = data.filter((item) => {
-        const {
-          doctor: {
-            clinicianProfile: { doctorProfile: assignedDoctorProfile },
-          },
-        } = item
-
-        return doctorProfile
-          ? assignedDoctorProfile.id === doctorProfile.id
-          : false
+        const { doctor: { id } } = item
+        return doctorProfile ? id === doctorProfile.id : false
       })
 
     return filterData(filter, data)
@@ -451,7 +406,7 @@ const Grid = ({
             }).then((o) => {
               if (o)
                 if (o.updateByUserFK !== user.data.id) {
-                  const { clinicianprofile } = codetable
+                  const { clinicianprofile = [] } = codetable
                   const editingUser = clinicianprofile.find(
                     (m) => m.userProfileFK === o.updateByUserFK,
                   ) || {
@@ -507,7 +462,29 @@ const Grid = ({
       }
     },
     [
-      codetable,
+      codetable.clinicianprofile,
+    ],
+  )
+
+  const onRowDoubleClick = useCallback(
+    (row) => {
+      const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
+      const enableDoubleClickStatus = [
+        VISIT_STATUS.WAITING,
+        VISIT_STATUS.IN_CONS,
+        VISIT_STATUS.PAUSED,
+      ]
+      const { clinicianProfile: { doctorProfile } } = user.data
+      if (!doctorProfile) return false
+
+      // start consultation context menu id = 5
+      // resume consultation context menu id = 6
+      const contextMenuButtonID = isWaiting ? '5' : '6'
+      onClick(row, contextMenuButtonID)
+      return true
+    },
+    [
+      user,
     ],
   )
 
