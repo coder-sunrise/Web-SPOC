@@ -255,9 +255,9 @@ class TextField extends React.PureComponent {
     }
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
+      cfg.onBlur = extendFunc(onBlur, this.handleBlur)
     }
     // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
-    cfg.onBlur = extendFunc(onBlur, this.handleBlur)
     // console.log(maxLength, 'maxLength')
     if (!maxLength) {
       cfg.maxLength = 200
