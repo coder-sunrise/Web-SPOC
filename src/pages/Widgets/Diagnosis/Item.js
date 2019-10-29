@@ -56,6 +56,7 @@ const DiagnosisItem = ({
         const { _complication = [] } = form.values.corDiagnosis[index]
         setCtComplicationPairedWithDiag(_complication)
       }
+      console.log("diagnosis ", codetable.ctComplication)
       const { ctComplication = [] } = codetable
       const selectedComplications = diagnosises[index].corComplication
         ? diagnosises[index].corComplication.map(
@@ -109,6 +110,7 @@ const DiagnosisItem = ({
         //     complicationFK: o.id,
         //   })),
         // )
+        setCtComplicationPairedWithDiag(op.complication)
       } else {
         setFieldValue(`corDiagnosis[${index}]complication`, [])
         setFieldValue(`corDiagnosis[${index}]corComplication`, [])

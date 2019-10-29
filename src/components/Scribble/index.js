@@ -116,6 +116,8 @@ const styles = () => ({
 
 let temp = null
 @withFormikExtend({
+  displayName: 'scribbleNotePage',
+  notDirtyDuration: 0.5,
   mapPropsToValues: ({ scriblenotes }) => {
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
@@ -125,12 +127,11 @@ let temp = null
       .required()
       .max(20, 'Subject should not exceed 20 characters'),
   }),
-  notDirtyDuration: 0.5,
+
   handleSubmit: (values, { props }) => {
     props.addScribble(values.subject, temp)
     props.toggleScribbleModal()
   },
-  displayName: 'scribbleNotePage',
 })
 @connect(({ scriblenotes }) => ({
   scriblenotes,
