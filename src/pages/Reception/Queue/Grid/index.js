@@ -253,15 +253,8 @@ const Grid = ({
 
     if (selfOnly)
       data = data.filter((item) => {
-        const {
-          doctor: {
-            clinicianProfile: { doctorProfile: assignedDoctorProfile },
-          },
-        } = item
-
-        return doctorProfile
-          ? assignedDoctorProfile.id === doctorProfile.id
-          : false
+        const { doctor: { id } } = item
+        return doctorProfile ? id === doctorProfile.id : false
       })
 
     return filterData(filter, data)
