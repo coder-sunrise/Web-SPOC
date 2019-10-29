@@ -200,7 +200,9 @@ class index extends PureComponent {
           <ProgressButton
             color='danger'
             icon={null}
-            onClick={navigateDirtyCheck(this.onClickCancelPayment)}
+            onClick={navigateDirtyCheck({
+              onProceed: this.onClickCancelPayment,
+            })}
           >
             Cancel
           </ProgressButton>

@@ -189,10 +189,7 @@ class ClinicInfo extends PureComponent {
             <Field
               name='clinicShortCode'
               render={(args) => (
-                <TextField
-                  label='Clinic Short Code'
-                  {...args}
-                />
+                <TextField label='Clinic Short Code' {...args} />
               )}
             />
           </GridItem>
@@ -261,7 +258,12 @@ class ClinicInfo extends PureComponent {
           className={classes.actionBtn}
           style={{ display: 'flex', justifyContent: 'center' }}
         >
-          <Button color='danger' onClick={navigateDirtyCheck('/setting')}>
+          <Button
+            color='danger'
+            onClick={navigateDirtyCheck({
+              redirectUrl: '/setting',
+            })}
+          >
             Cancel
           </Button>
 

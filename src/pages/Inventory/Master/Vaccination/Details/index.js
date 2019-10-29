@@ -101,7 +101,9 @@ const Detail = ({
       <div className={classes.actionDiv}>
         <Button
           color='danger'
-          onClick={navigateDirtyCheck('/inventory/master?t=2')}
+          onClick={navigateDirtyCheck({
+            redirectUrl: '/inventory/master?t=2',
+          })}
         >
           Close
         </Button>

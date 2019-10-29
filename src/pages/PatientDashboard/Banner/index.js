@@ -265,7 +265,10 @@ class Banner extends PureComponent {
   displayMedicalProblemData (entity) {
     let medicalProblemData = ''
 
-    if (entity.patientHistoryDiagnosis.length) {
+    if (
+      entity.patientHistoryDiagnosis &&
+      entity.patientHistoryDiagnosis.length
+    ) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]
           .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
@@ -287,7 +290,8 @@ class Banner extends PureComponent {
           )}
         </div>
 
-        {entity.patientHistoryDiagnosis.length ? (
+        {entity.patientHistoryDiagnosis &&
+        entity.patientHistoryDiagnosis.length ? (
           <Popover
             icon={null}
             content={
@@ -338,7 +342,6 @@ class Banner extends PureComponent {
     } = props
 
     const { entity } = patient
-
     if (!entity)
       return (
         <Paper>
@@ -437,7 +440,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
