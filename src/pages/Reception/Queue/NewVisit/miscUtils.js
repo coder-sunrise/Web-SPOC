@@ -42,9 +42,9 @@ export const formikMapPropsToValues = ({
     let doctorProfile
     // let doctorProfileFK
 
-    if (clinicInfo) {
+    if (clinicInfo && clinicInfo.settings) {
       doctorProfile = doctorProfiles.find(
-        (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
+        (item) => item.doctorMCRNo === clinicInfo.settings.primaryMCRNO,
       )
     }
 
