@@ -35,11 +35,11 @@ const filterOptions = [
 ]
 
 const DiagnosisItem = ({
+  codetable,
   dispatch,
   theme,
   index,
   arrayHelpers,
-  codetable,
   diagnosises,
   classes,
   ...props
@@ -61,52 +61,19 @@ const DiagnosisItem = ({
   const { form } = arrayHelpers
 
   useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctcomplication',
-      },
-    }).then((response) => {
-      if (response)
-        setCtComplicationPairedWithDiag(
-          response.map((item) => ({ ...item, displayValue: item.name })),
-        )
-    })
+    console.log('use effect')
+    if (form.values.corDiagnosis[index].diagnosisFK) {
+      const { diagnosisFK } = form.values.corDiagnosis[index]
+      const ctsnomeddiagnosis = codetable['codetable/ctsnomeddiagnosis'] || []
+      // const { ctcomplication } = codetable
+      const diagnosis = ctsnomeddiagnosis.find(
+        (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+      )
+      if (diagnosis) {
+        setCtComplicationPairedWithDiag(diagnosis.complication || [])
+      }
+    }
   }, [])
-
-  // useEffect(
-  //   () => {
-  //     // if (form.values.corDiagnosis[index]) {
-  //     //   const { _complication = [] } = form.values.corDiagnosis[index]
-  //     //   console.log({ diagnosis: form.values.corDiagnosis[index] })
-  //     //   setCtComplicationPairedWithDiag(_complication)
-  //     // }
-  //     // const { ctcomplication = [] } = codetable
-  //     // const selectedComplications = diagnosises[index].corComplication
-  //     //   ? diagnosises[index].corComplication.map(
-  //     //       (complication) => complication.complicationFK,
-  //     //     )
-  //     //   : []
-  //     // const _ctComplication = ctcomplication.reduce(
-  //     //   (mappedCtComplication, complication) => {
-  //     //     if (selectedComplications.includes(complication.id))
-  //     //       return [
-  //     //         ...mappedCtComplication,
-  //     //         { ...complication, displayValue: complication.name },
-  //     //       ]
-  //     //     return [
-  //     //       ...mappedCtComplication,
-  //     //     ]
-  //     //   },
-  //     //   [],
-  //     // )
-  //     // setCtComplicationPairedWithDiag(_ctComplication)
-  //   },
-  //   [
-  //     form.values.corDiagnosis[index].diagnosisFK,
-  //     codetable.ctComplication,
-  //   ],
-  // )
 
   const onDiagnosisChange = async (v, op) => {
     const { setFieldValue } = form
@@ -122,16 +89,6 @@ const DiagnosisItem = ({
 
       if (op.complication && op.complication.length) {
         setCtComplicationPairedWithDiag(op.complication)
-        // setFieldValue(
-        //   `corDiagnosis[${index}]complication`,
-        //   op.complication.map((o) => o.id),
-        // )
-        // setFieldValue(
-        //   `corDiagnosis[${index}]corComplication`,
-        //   op.complication.map((o) => ({
-        //     complicationFK: o.id,
-        //   })),
-        // )
       } else {
         setFieldValue(`corDiagnosis[${index}]complication`, [])
         setFieldValue(`corDiagnosis[${index}]corComplication`, [])
