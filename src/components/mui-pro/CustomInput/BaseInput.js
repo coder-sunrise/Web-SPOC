@@ -213,7 +213,7 @@ class BaseInput extends React.PureComponent {
     //   inputProps.value = this.state.value
     // }
 
-    // console.log(this.props)
+    // console.log(this.props,)
 
     const cfg = {
       onBlur,
