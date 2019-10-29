@@ -13,6 +13,7 @@ import {
   CommonModal,
   GridContainer,
   withFormikExtend,
+  notification,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
@@ -67,7 +68,9 @@ const bannerStyle = {
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const { invoicePayer } = billing.entity
+        const { invoicePayer, invoicePayment } = billing.entity
+        const _isNewBill =
+          invoicePayer.length === 0 && invoicePayment.lenght === 0
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -81,20 +84,19 @@ const bannerStyle = {
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return { ...billing.entity, finalClaim, finalPayable, _isNewBill }
       }
-
-      return billing.default
     } catch (error) {
       console.log({ error })
-      return billing.default
     }
+    return billing.default
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
     const {
       concurrencyToken,
       visitId,
+      visitStatus = 'BILLING',
       invoice,
       invoicePayer,
       invoicePayment,
@@ -107,6 +109,7 @@ const bannerStyle = {
       mode,
       concurrencyToken,
       visitId,
+      visitStatus,
       invoicePayment: invoicePayment
         .filter((item) => {
           if (item.id && item.isCancelled) return true
@@ -120,6 +123,10 @@ const bannerStyle = {
       invoice: restInvoice,
       invoicePayer: invoicePayer
         .map((item, index) => ({ ...item, sequence: index }))
+        .filter((payer) => {
+          if (payer.id === undefined && payer.isCancelled) return false
+          return true
+        })
         .filter((payer) => (payer.id ? payer.isModified : true))
         .map((payer) => {
           const {
@@ -176,7 +183,22 @@ const bannerStyle = {
       type: 'billing/submit',
       payload,
     }).then((response) => {
-      if (response) resetForm()
+      if (response) {
+        resetForm()
+
+        // TODO: once server done enhancement, back to
+        // individual call instead of mixing 2 to 1
+        if (visitStatus === 'COMPLETED') {
+          notification.success({
+            message: 'Billing completed',
+          })
+          router.push('/reception/queue')
+        } else {
+          notification.success({
+            message: 'Billing saved',
+          })
+        }
+      }
     })
   },
 })
@@ -238,7 +260,7 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  shouldDisableCompletePayment = () => {
+  shouldDisableSavePayment = () => {
     const { values } = this.props
     const { invoicePayer = [], payments = [], invoice } = values
     if (invoice === null) return true
@@ -248,15 +270,32 @@ class Billing extends Component {
     return false
   }
 
+  shouldDisableCompletePayment = () => {
+    const { values } = this.props
+    const { invoicePayer = [], invoicePayment = [] } = values
+    const noSavedPayments =
+      invoicePayment.filter(
+        (payment) => !payment.isCancelled && payment.receiptNo,
+      ).length === 0
+
+    if (invoicePayer.length === 0 && noSavedPayments) return true
+
+    return false
+  }
+
   onSavePaymentClick = async () => {
     const { setFieldValue, handleSubmit } = this.props
     await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'BILLING')
     handleSubmit()
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue, handleSubmit } = this.props
-    await setFieldValue('mode', 'complete')
+    const { setFieldValue, handleSubmit, values } = this.props
+    if (values._isNewBill) await setFieldValue('mode', 'save')
+    await setFieldValue('mode', 'save')
+    await setFieldValue('visitStatus', 'COMPLETED')
+
     handleSubmit()
   }
 
@@ -348,7 +387,15 @@ class Billing extends Component {
           >
             <ArrowBack />Dispense
           </Button>
-          <Button color='primary' onClick={this.onSavePaymentClick}>
+          <Button
+            color='primary'
+            disabled={
+              this.state.isEditing ||
+              values.id === undefined ||
+              this.shouldDisableSavePayment()
+            }
+            onClick={this.onSavePaymentClick}
+          >
             Save
           </Button>
           <Button
@@ -356,7 +403,7 @@ class Billing extends Component {
             disabled={
               this.state.isEditing ||
               values.id === undefined ||
-              this.shouldDisableCompletePayment()
+              this.shouldDisableSavePayment()
             }
             onClick={this.onCompletePaymentClick}
           >

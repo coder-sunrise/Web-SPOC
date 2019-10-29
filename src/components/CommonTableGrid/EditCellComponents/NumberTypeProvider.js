@@ -65,6 +65,7 @@ class NumberEditor extends PureComponent {
     const { currency, type, ...commonCfg } = getCommonConfig.call(this)
     commonCfg.onChange = this._onChange
     commonCfg.currency = currency || type === 'currency'
+    console.log(commonCfg)
     return (
       <div ref={this.myRef}>
         <NumberInput

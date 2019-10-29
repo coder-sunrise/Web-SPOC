@@ -25,16 +25,19 @@ import {
 
 const menuData = [
   {
+    authority: 'settings.mastersetting',
     title: 'Master Setting',
     text: 'Clinic Information',
     url: '/setting/clinicinfo',
   },
   {
+    authority: 'settings.mastersetting',
     title: 'Master Setting',
     text: 'GST Setup',
     url: '/setting/gstsetup',
   },
   {
+    authority: 'settings.mastersetting',
     title: 'Master Setting',
     text: 'General Setting',
     url: '/setting/generalsetting',
@@ -216,15 +219,25 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ systemSetting, global }) => ({
+const Authority = {
+  'Master Setting': 'settings.mastersetting',
+  'Clinic Setting': 'settings.clinicsetting',
+  'Print Setup': 'settings.printsetup',
+  'User Preference': 'settings.userpreference',
+  Templates: 'settings.template',
+  Contact: 'settings.contact',
+}
+
+@connect(({ systemSetting, global, user }) => ({
   systemSetting,
   global,
+  user,
 }))
 class SystemSetting extends PureComponent {
   constructor (props) {
     super(props)
     this.group = _.groupBy(menuData, 'title')
-
+    console.log({ group: this.group })
     // console.log(menuData, group, Object.keys(group))
     const { classes, theme } = props
   }
@@ -234,7 +247,7 @@ class SystemSetting extends PureComponent {
     selectedOptions: [],
     active: 0,
   }
- 
+
   componentDidMount () {}
 
   componentWillUnmount () {}
@@ -243,8 +256,8 @@ class SystemSetting extends PureComponent {
     const { classes, theme } = this.props
 
     return Object.keys(this.group).map((o) => {
-    
       return {
+        authority: Authority[o],
         title: o,
         items: this.group[o],
         key: o,
@@ -296,12 +309,13 @@ class SystemSetting extends PureComponent {
       theme,
       classes,
       height,
+      user,
       linkProps = {},
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
     // console.log(this.props)
-
+    const { accessRights = [] } = user
     return (
       <CardContainer hideHeader>
         {/* <Select
@@ -331,15 +345,23 @@ class SystemSetting extends PureComponent {
           defaultActive={0}
           mode={this.state.searchText.length > 0 ? 'multiple' : 'default'}
           collapses={this.menus().filter((item) => {
+            const accessRight = accessRights.find(
+              (menuItem) => menuItem.name === item.authority,
+            )
+            const canAccess =
+              accessRight === undefined
+                ? true
+                : accessRight.rights === 'readwrite'
             return (
-              !this.state.searchText ||
-              // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=
-              //   0 ||
-              item.items.find(
-                (m) =>
-                  m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                  0,
-              )
+              canAccess &&
+              (!this.state.searchText ||
+                // item.title.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                //   0 ||
+                item.items.find(
+                  (m) =>
+                    m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
+                    0,
+                ))
             )
           })}
         />
