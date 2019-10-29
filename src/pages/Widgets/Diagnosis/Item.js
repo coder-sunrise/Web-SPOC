@@ -61,17 +61,23 @@ const DiagnosisItem = ({
   const { form } = arrayHelpers
 
   useEffect(() => {
-    console.log('use effect')
-    if (form.values.corDiagnosis[index].diagnosisFK) {
-      const { diagnosisFK } = form.values.corDiagnosis[index]
-      const ctsnomeddiagnosis = codetable['codetable/ctsnomeddiagnosis'] || []
-      // const { ctcomplication } = codetable
-      const diagnosis = ctsnomeddiagnosis.find(
-        (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
-      )
-      if (diagnosis) {
-        setCtComplicationPairedWithDiag(diagnosis.complication || [])
+    try {
+      if (
+        form.values.corDiagnosis[index] &&
+        form.values.corDiagnosis[index].diagnosisFK
+      ) {
+        const { diagnosisFK } = form.values.corDiagnosis[index]
+        const ctsnomeddiagnosis = codetable['codetable/ctsnomeddiagnosis'] || []
+        // const { ctcomplication } = codetable
+        const diagnosis = ctsnomeddiagnosis.find(
+          (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+        )
+        if (diagnosis) {
+          setCtComplicationPairedWithDiag(diagnosis.complication || [])
+        }
       }
+    } catch (error) {
+      console.log({ error })
     }
   }, [])
 
