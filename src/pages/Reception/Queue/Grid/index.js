@@ -80,7 +80,6 @@ const columnExtensions = [
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
   { columnName: 'visitStatus', type: 'status', width: 150 },
-  { columnName: 'timeOut', render: (row) => row.timeOut || '-' },
   { columnName: 'invoiceNo', render: (row) => row.invoiceNo || '-' },
   {
     columnName: 'roomNo',
@@ -117,7 +116,15 @@ const columnExtensions = [
         full: true,
       }),
   },
-  { columnName: 'timeOut', width: 160 },
+  {
+    columnName: 'timeOut',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeOut,
+        full: true,
+      }),
+  },
   {
     columnName: 'gender/age',
     render: (row) => {
@@ -185,6 +192,36 @@ const Grid = ({
 
   const openContextMenu = Boolean(anchorEl)
 
+  const isAssignedDoctor = useCallback(
+    (row) => {
+      const {
+        doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
+        visitStatus,
+      } = row
+      const { clinicianProfile: { doctorProfile } } = user.data
+
+      if (!doctorProfile) {
+        notification.error({
+          message: 'Unauthorized Access',
+        })
+        return false
+      }
+
+      if (visitStatus === 'IN CONS') {
+        if (assignedDoctorProfile.id !== doctorProfile.id) {
+          notification.error({
+            message: `You cannot resume other doctor's consultation.`,
+          })
+          return false
+        }
+      }
+      return true
+    },
+    [
+      user,
+    ],
+  )
+
   const deleteQueue = (id) => {
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
@@ -202,12 +239,39 @@ const Grid = ({
   const onRowDoubleClick = (row) => {
     const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
     const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
+    const valid = isAssignedDoctor(row)
+    if (!valid) return false
+
+    const version = Date.now()
     // if (isInCons) {
+    //   dispatch({
+    //     type: `consultation/start`,
+    //     payload: {
+    //       id: row.visitFK,
+    //       version,
+    //     },
+    //   }).then((o) => {
+    //     if (o)
+    //       router.push(
+    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+    //       )
+    //   })
     // } else if (isPaused) {
+    //   dispatch({
+    //     type: `consultation/resume`,
+    //     payload: {
+    //       id: row.visitFK,
+    //       version,
+    //     },
+    //   }).then((o) => {
+    //     if (o)
+    //       router.push(
+    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+    //       )
+    //   })
     // }
-    // handleEditVisitClick({
-    //   visitID: row.id,
-    // })
+
+    return true
   }
 
   const calendarData = useMemo(
@@ -263,44 +327,6 @@ const Grid = ({
       },
     })
   }
-
-  const isAssignedDoctor = useCallback(
-    (row) => {
-      const {
-        doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
-        visitStatus,
-      } = row
-      const { clinicianProfile: { doctorProfile } } = user.data
-
-      if (!doctorProfile) {
-        notification.error({
-          message: 'Unauthorized Access',
-        })
-        return false
-      }
-
-      if (visitStatus === 'IN CONS') {
-        if (assignedDoctorProfile.id !== doctorProfile.id) {
-          notification.error({
-            message: `You cannot resume other doctor's consultation.`,
-          })
-          return false
-        }
-      }
-
-      // if (assignedDoctorProfile.id !== doctorProfile.id) {
-      //   notification.error({
-      //     message: `You cannot resume other doctor's consultation.`,
-      //   })
-      //   return false
-      // }
-
-      return true
-    },
-    [
-      user,
-    ],
-  )
 
   const onClick = useCallback(
     (row, id) => {
