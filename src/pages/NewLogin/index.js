@@ -131,7 +131,7 @@ class NewLogin extends React.Component {
     }, cardAnimationDuration)
 
     // bind keyDown listener to document
-    document.addEventListener('keydown', this.handleKeyDown)
+    // document.addEventListener('keydown', this.handleKeyDown)
   }
 
   componentWillUnmount () {
@@ -139,7 +139,7 @@ class NewLogin extends React.Component {
     this.timeOutFunction = null
 
     // unbind keyDown listener
-    document.removeEventListener('keydown', this.handleKeyDown)
+    // document.removeEventListener('keydown', this.handleKeyDown)
   }
 
   handleKeyDown = (event) => {
@@ -155,6 +155,7 @@ class NewLogin extends React.Component {
 
   onEnterPressed = () => {
     const { handleSubmit } = this.props
+    // console.log({ values: this.props.values })
     handleSubmit()
   }
 

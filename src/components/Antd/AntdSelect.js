@@ -435,14 +435,20 @@ class AntdSelect extends React.PureComponent {
       const search = value.toLowerCase()
 
       const { props } = this
-      const { options, valueField, labelField, max } = props
-
+      const {
+        options,
+        valueField,
+        labelField,
+        max,
+        localFilter = () => true,
+      } = props
       this.setState({
         data: _.filter(
           options,
           // (o) => o[labelField].toLowerCase().indexOf(search) >= 0,
           (o) =>
-            Object.byString(o, labelField).toLowerCase().indexOf(search) >= 0,
+            Object.byString(o, labelField).toLowerCase().indexOf(search) >= 0 &&
+            localFilter(o),
         ).splice(0, max),
         fetching: false,
       })

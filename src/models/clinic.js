@@ -57,9 +57,15 @@ export default createFormViewModel({
             website: '',
           },
         }
-        return {
+        const clinicInfo = {
           ...data,
           contact: data.contact ? data.contact : contact,
+        }
+
+        sessionStorage.setItem('clinicInfo', JSON.stringify(clinicInfo))
+
+        return {
+          ...clinicInfo,
         }
       },
     },
