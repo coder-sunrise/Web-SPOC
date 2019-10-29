@@ -47,9 +47,8 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-
     const newPurchaseOrderDetails = purchaseOrderDetails
-    // const { purchaseOrder } = purchaseOrderDetails
+
     if(newPurchaseOrderDetails){
 
       if(newPurchaseOrderDetails.type && newPurchaseOrderDetails.type === 'dup' && newPurchaseOrderDetails.purchaseOrder){
@@ -60,28 +59,17 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
       }
 
-      // if(newPurchaseOrderDetails.purchaseOrder)
-      // {
-      //   newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = newPurchaseOrderDetails.purchaseOrder.gstAmount > 0
-      // }
+      if(newPurchaseOrderDetails.purchaseOrder)
+      {
+        const { isGSTEnabled, isGstInclusive } = newPurchaseOrderDetails.purchaseOrder
+        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = isGSTEnabled
+        newPurchaseOrderDetails.purchaseOrder.IsGSTInclusive = isGstInclusive
+      }
+
     }
-
-    return newPurchaseOrderDetails
-
-    // let IsGSTEnabled
-    //   let IsGSTInclusive
-    //   if (purchaseOrder) {
-    //     IsGSTEnabled = purchaseOrder.isGstInclusive
-    //     IsGSTInclusive = purchaseOrder.isGstInclusive
-    //   }
-    //   return {
-    //     ...purchaseOrderDetails,
-    //     purchaseOrder: {
-    //       ...purchaseOrder,
-    //       IsGSTEnabled,
-    //       IsGSTInclusive,
-    //     },
-    // }
+    return {
+      ...purchaseOrderDetails,
+      }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -500,7 +488,7 @@ class Index extends Component {
 
     setTimeout(() => {
       setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
-    })
+    }, 1)
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -574,6 +562,8 @@ class Index extends Component {
             adjustmentListName='purchaseOrderAdjustment'
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
+            setInclusiveGSTChecked={this.setInclusiveGSTChecked}
+            inclusiveGSTChecked={this.state.inclusiveGSTChecked}
             setFieldValue={setFieldValue}
             // {...this.props}
           />

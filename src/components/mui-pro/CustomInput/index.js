@@ -81,7 +81,7 @@ class TextField extends React.PureComponent {
             ? field.value
             : '',
       })
-    } else if (value) {
+    } else if (value || value === 0) {
       this.setState({
         value,
       })

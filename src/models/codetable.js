@@ -19,14 +19,21 @@ export default createListViewModel({
           yield put({
             type: 'updateState',
             payload: response.reduce((allCodetable, codetable) => {
-              // skip snomeddiagnosis codetable
-              if (codetable.code !== 'codetable/ctsnomeddiagnosis') {
-                return {
-                  ...allCodetable,
-                  [codetable.code.toLowerCase()]: codetable.data,
-                }
+              // skip snomeddiagnosis codetable in development mode
+              // if (
+              //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
+              //   process.env.NODE_ENV === 'development'
+              // ) {
+              //   return {
+              //     ...allCodetable,
+              //     // [codetable.code.toLowerCase()]: codetable.data,
+              //   }
+              // }
+
+              return {
+                ...allCodetable,
+                [codetable.code.toLowerCase()]: codetable.data,
               }
-              return { ...allCodetable }
             }, {}),
           })
         }
