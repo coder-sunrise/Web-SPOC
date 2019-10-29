@@ -56,7 +56,6 @@ const DiagnosisItem = ({
         const { _complication = [] } = form.values.corDiagnosis[index]
         setCtComplicationPairedWithDiag(_complication)
       }
-      console.log("diagnosis ", codetable.ctComplication)
       const { ctComplication = [] } = codetable
       const selectedComplications = diagnosises[index].corComplication
         ? diagnosises[index].corComplication.map(
@@ -68,7 +67,7 @@ const DiagnosisItem = ({
           if (selectedComplications.includes(complication.id))
             return [
               ...mappedCtComplication,
-              { ...complication, displayvalue: complication.name },
+              { ...complication, displayValue: complication.name },
             ]
           return [
             ...mappedCtComplication,
@@ -110,7 +109,6 @@ const DiagnosisItem = ({
         //     complicationFK: o.id,
         //   })),
         // )
-        setCtComplicationPairedWithDiag(op.complication)
       } else {
         setFieldValue(`corDiagnosis[${index}]complication`, [])
         setFieldValue(`corDiagnosis[${index}]corComplication`, [])
@@ -186,7 +184,7 @@ const DiagnosisItem = ({
                   mode='multiple'
                   // code='ctComplication'
                   options={ctComplicationPairedWithDiag}
-                  labelField='displayvalue'
+                  labelField='displayValue'
                   valueField='id'
                   maxTagCount={2}
                   disableAll
