@@ -116,7 +116,6 @@ const styles = () => ({
 
 let temp = null
 @withFormikExtend({
-  
   notDirtyDuration: 0.5,
   mapPropsToValues: ({ scriblenotes }) => {
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
@@ -281,7 +280,7 @@ class Scribble extends React.Component {
   _onSketchChange = () => {
     let prev = this.state.canUndo
     let now = this._sketch.canUndo()
-    if (prev !== now) {
+    if ( now) {
       this.setState({
         canUndo: now,
         canClear: true,
@@ -393,7 +392,7 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
     } = this.props
-    console.log('props ', this.props)
+
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -920,39 +919,34 @@ class Scribble extends React.Component {
               </div>
             </div>
             <div className={classes.sketchArea}>
-              <FastField
-                name='drawing'
-                render={(args) => (
-                  <SketchField
-                    {...args}
-                    name='sketch'
-                    ref={(c) => {
-                      this._sketch = c
-                    }}
-                    lineWidth={this.state.lineWidth}
-                    lineColor={this.state.lineColor}
-                    className={classes.container}
-                    tool={this.state.tool}
-                    fillColor={
-                      this.state.fillWithColor ? (
-                        this.state.fillColor
-                      ) : (
-                        'transparent'
-                      )
-                    }
-                    backgroundColor={
-                      this.state.fillWithBackgroundColor ? (
-                        this.state.backgroundColor
-                      ) : (
-                        'transparent'
-                      )
-                    }
-                    onChange={this._onSketchChange}
-                    forceValue
-                    height={this.state.sketchHeight}
-                    width={this.state.sketchWidth}
-                  />
-                )}
+              <FastField name='drawing' render={(args) => ''} />
+              <SketchField
+                name='sketch'
+                ref={(c) => {
+                  this._sketch = c
+                }}
+                lineWidth={this.state.lineWidth}
+                lineColor={this.state.lineColor}
+                className={classes.container}
+                tool={this.state.tool}
+                fillColor={
+                  this.state.fillWithColor ? (
+                    this.state.fillColor
+                  ) : (
+                    'transparent'
+                  )
+                }
+                backgroundColor={
+                  this.state.fillWithBackgroundColor ? (
+                    this.state.backgroundColor
+                  ) : (
+                    'transparent'
+                  )
+                }
+                onChange={this._onSketchChange}
+                forceValue
+                height={this.state.sketchHeight}
+                width={this.state.sketchWidth}
               />
             </div>
           </GridItem>

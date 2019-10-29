@@ -86,6 +86,18 @@ export default ({ classes, current, setFieldValue }) => {
         ]}
         FuncProps={{ pager: false }}
         columnExtensions={[
+          {
+            columnName: 'itemType',
+    
+            render: (row) => {
+              return (
+                <div>
+                  {row.itemType}
+                  {row.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+                </div>
+              )
+            },
+          },
           { columnName: 'adjAmt', type: 'number', currency: true },
           {
             columnName: 'totalAfterItemAdjustment',

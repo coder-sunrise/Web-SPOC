@@ -42,7 +42,7 @@ const SchemePopover = ({
       isShowReplacementModal,
     ],
   )
-
+  console.log('scheme data ', schemeData)
   return (
     <React.Fragment>
       <Popover
@@ -102,44 +102,52 @@ const SchemePopover = ({
               </GridItem>
             </GridContainer>
             <GridContainer>
-              <GridItem>
-                Patient Acute Visit Balance:{' '}
-                <div
-                  style={{
-                    fontWeight: 500,
-                    display: 'inline-block',
-                    paddingLeft: 2,
-                  }}
-                >
-                  {schemeData.acuteVisitPatientBalance ? (
-                    ''
-                  ) : (
-                    schemeData.acuteVisitPatientBalance
-                  )}{' '}
-                  Remaining{' '}
-                </div>{' '}
-                for Year {moment().year()}
-              </GridItem>
+              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
+                <GridItem>
+                  Patient Acute Visit Balance:{' '}
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      display: 'inline-block',
+                      paddingLeft: 2,
+                    }}
+                  >
+                    {schemeData.acuteVisitPatientBalance ? (
+                      ''
+                    ) : (
+                      schemeData.acuteVisitPatientBalance
+                    )}{' '}
+                    Remaining{' '}
+                  </div>{' '}
+                  for Year {moment().year()}
+                </GridItem>
+              ) : (
+                <GridItem>Patient Acute Visit Balance:{' '} NA</GridItem>
+              )}
             </GridContainer>
             <GridContainer>
-              <GridItem>
-                Patient Acute Clinic Balance:
-                <div
-                  style={{
-                    fontWeight: 500,
-                    display: 'inline-block',
-                    paddingLeft: 2,
-                  }}
-                >
-                  {schemeData.acuteVisitClinicBalance <= 0 ? (
-                    ''
-                  ) : (
-                    schemeData.acuteVisitClinicBalance
-                  )}{' '}
-                  Remaining
-                </div>{' '}
-                for {moment().format('MMMM')} {moment().year()}
-              </GridItem>
+              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
+                <GridItem>
+                  Patient Acute Clinic Balance:
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      display: 'inline-block',
+                      paddingLeft: 2,
+                    }}
+                  >
+                    {schemeData.acuteVisitClinicBalance <= 0 ? (
+                      ''
+                    ) : (
+                      schemeData.acuteVisitClinicBalance
+                    )}{' '}
+                    Remaining
+                  </div>{' '}
+                  for {moment().format('MMMM')} {moment().year()}
+                </GridItem>
+              ) : (
+                <GridItem> Patient Acute Clinic Balance:{' '} NA</GridItem>
+              )}
             </GridContainer>
             <GridContainer>
               <GridItem>
