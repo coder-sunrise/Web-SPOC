@@ -157,11 +157,16 @@ class index extends PureComponent {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = isPOStatusFinalized(poStatus)
+    let isEditable = isPOStatusFinalized(poStatus)
+    const allowEdit = () => {
+      if (poStatus === 6) return false
+      if (isWriteOff) return false
+      return true
+    }
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+          rights: allowEdit() ? 'enable' : 'disable',
           // rights: 'disable',
         }}
       >
