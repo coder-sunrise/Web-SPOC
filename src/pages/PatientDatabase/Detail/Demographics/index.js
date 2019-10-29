@@ -17,6 +17,7 @@ import {
   DatePicker,
   RadioGroup,
   CheckboxGroup,
+  NumberInput,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
@@ -328,7 +329,7 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.number'
-                  render={(args) => <TextField label='Mobile' {...args} />}
+                  render={(args) => <NumberInput label='Mobile' {...args} />}
                 />
               </GridItem>
               <GridItem xs={3}>
