@@ -31,7 +31,10 @@ import { updateAPIType } from '@/utils/request'
 
 @connect(({ user, clinicInfo }) => ({
   user,
-  clinicShortCode: clinicInfo.clinicShortCode,
+  clinicShortCode:
+    clinicInfo && clinicInfo.settings
+      ? clinicInfo.settings.clinicShortCode
+      : '',
 }))
 class HeaderLinks extends React.Component {
   state = {

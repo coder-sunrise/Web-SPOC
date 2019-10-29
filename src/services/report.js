@@ -28,17 +28,17 @@ export const getPDF = async (reportID, payload) => {
 }
 
 export const getUnsavedPDF = async (reportID, payload) => {
+  console.log('get unsaved pdf')
   const baseURL = '/api/reports'
-  return request(`${baseURL}/${reportID}`, {
+  return request(`${baseURL}/${reportID}?ReportFormat=pdf`, {
     method: 'POST',
+    contentType: 'application/x-www-form-urlencoded',
     xhrFields: {
       responseType: 'arraybuffer',
-      contentType: 'application/x-www-form-urlencoded',
     },
-    body: stringify({
-      reportFormat: 'Pdf',
-      reportContent: JSON.stringify({ ...payload }),
-    }),
+    data: {
+      reportContent: payload,
+    },
   })
 }
 
@@ -67,7 +67,9 @@ export const exportPdfReport = async (reportID, payload) => {
 export const exportExcelReport = async (reportID, payload) => {
   const baseURL = '/api/report'
   return download(
-    `${baseURL}/${reportID}?ReportFormat=excel&ReportParameters={${payload}}`,
+    `${baseURL}/${reportID}?ReportFormat=excel&ReportParameters={${JSON.stringify(
+      payload,
+    )}}`,
     { subject: REPORT_TYPE[reportID] || 'Report', type: 'xls' },
   )
 }
