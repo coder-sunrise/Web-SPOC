@@ -265,7 +265,7 @@ class Banner extends PureComponent {
   displayMedicalProblemData (entity) {
     let medicalProblemData = ''
 
-    if (entity.patientHistoryDiagnosis.length) {
+    if (entity && entity.patientHistoryDiagnosis.length) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]
           .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
