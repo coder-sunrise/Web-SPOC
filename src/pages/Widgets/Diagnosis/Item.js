@@ -32,6 +32,10 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
+    removeConfirmMessage,
+    setRemoveConfirmMessage,
+  ] = useState('Confirm to remove a diagnosis?')
+  const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
@@ -250,13 +254,7 @@ const DiagnosisItem = ({
             content={
               <div>
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
-                  Confirm to remove a
-                  {form.values.corDiagnosis[index].isPersist === true ? (
-                    ' persist '
-                  ) : (
-                    ' '
-                  )}
-                  diagnosis?
+                  {removeConfirmMessage}
                 </p>
                 <Button
                   onClick={() => {
@@ -305,10 +303,15 @@ const DiagnosisItem = ({
                 onClick={() => {
                   let diagnosis = form.values.corDiagnosis[index]
                   if (diagnosis && diagnosis.diagnosisFK >= 0) {
-                    setShow(true)
+                    setRemoveConfirmMessage(
+                      `Confirm to remove a ${diagnosis.isPersist === true
+                        ? 'persist'
+                        : ''} diagnosis?`,
+                    )
                   } else {
-                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                    setRemoveConfirmMessage('Remove diagnosis?')
                   }
+                  setShow(true)
                 }}
               >
                 <DeleteIcon />
