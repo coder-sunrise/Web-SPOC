@@ -18,6 +18,7 @@ import {
 } from '@/components'
 
 const DiagnosisItem = ({
+  dispatch,
   theme,
   index,
   arrayHelpers,
@@ -38,17 +39,14 @@ const DiagnosisItem = ({
 
   const { form } = arrayHelpers
 
-  // useEffect(
-  //   () => {
-  //     if (form.values.corDiagnosis[index]) {
-  //       const { _complication = [] } = form.values.corDiagnosis[index]
-  //       setCtComplication(_complication)
-  //     }
-  //   },
-  //   [
-  //     form.values.corDiagnosis[index],
-  //   ],
-  // )
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctcomplication',
+      },
+    })
+  }, [])
 
   useEffect(
     () => {
@@ -56,18 +54,19 @@ const DiagnosisItem = ({
         const { _complication = [] } = form.values.corDiagnosis[index]
         setCtComplicationPairedWithDiag(_complication)
       }
-      const { ctComplication = [] } = codetable
+      const { ctcomplication = [] } = codetable
       const selectedComplications = diagnosises[index].corComplication
         ? diagnosises[index].corComplication.map(
             (complication) => complication.complicationFK,
           )
         : []
-      const _ctComplication = ctComplication.reduce(
+
+      const _ctComplication = ctcomplication.reduce(
         (mappedCtComplication, complication) => {
           if (selectedComplications.includes(complication.id))
             return [
               ...mappedCtComplication,
-              { ...complication, displayvalue: complication.name },
+              { ...complication, displayValue: complication.name },
             ]
           return [
             ...mappedCtComplication,
@@ -78,8 +77,8 @@ const DiagnosisItem = ({
       setCtComplicationPairedWithDiag(_ctComplication)
     },
     [
-      form.values.corDiagnosis[index],
-      codetable.ctComplication,
+      form.values.corDiagnosis[index].diagnosisFK,
+      codetable.ctcomplication,
     ],
   )
 
@@ -99,6 +98,7 @@ const DiagnosisItem = ({
       setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
 
       if (op.complication && op.complication.length) {
+        setCtComplicationPairedWithDiag(op.complication)
         // setFieldValue(
         //   `corDiagnosis[${index}]complication`,
         //   op.complication.map((o) => o.id),
@@ -184,7 +184,7 @@ const DiagnosisItem = ({
                   mode='multiple'
                   // code='ctComplication'
                   options={ctComplicationPairedWithDiag}
-                  labelField='displayvalue'
+                  labelField='displayValue'
                   valueField='id'
                   maxTagCount={2}
                   disableAll
