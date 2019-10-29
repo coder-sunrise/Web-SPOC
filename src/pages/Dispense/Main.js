@@ -158,15 +158,18 @@ class Main extends Component {
   editOrder = (e) => {
     const { handleSubmit } = this.props
 
-    navigateDirtyCheck(this._editOrder, () => {
-      handleSubmit()
-      this._editOrder()
+    navigateDirtyCheck({
+      onProceed: this._editOrder,
+      onConfirm: () => {
+        handleSubmit()
+        this._editOrder()
+      },
     })(e)
   }
 
   render () {
     const { classes, handleSubmit } = this.props
-    console.log({ values: this.props.values })
+    // console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
