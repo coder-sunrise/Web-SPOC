@@ -93,10 +93,18 @@ const styles = (theme) => ({
       if (r) {
         if (onConfirm) onConfirm()
         if (r) {
-          history.push('/inventory/pr')
           dispatch({
-            type: `formik/clean`,
-            payload: 'purchaseOrderDetails',
+            type: 'purchaseOrderDetails/queryPurchaseOrder',
+            payload: {
+              id: props.purchaseOrderDetails.id,
+            },
+          }).then((v) => {
+            dispatch({
+              type: 'podoPayment/queryPodoPayment',
+              payload: {
+                ...v,
+              },
+            })
           })
         }
       }
@@ -157,7 +165,7 @@ class index extends PureComponent {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    let isEditable = isPOStatusFinalized(poStatus)
+    const isEditable = isPOStatusFinalized(poStatus)
     const allowEdit = () => {
       if (poStatus === 6) return false
       if (isWriteOff) return false
