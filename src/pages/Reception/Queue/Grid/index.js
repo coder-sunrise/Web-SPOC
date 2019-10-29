@@ -194,10 +194,7 @@ const Grid = ({
 
   const isAssignedDoctor = useCallback(
     (row) => {
-      const {
-        doctor: { clinicianProfile: { doctorProfile: assignedDoctorProfile } },
-        visitStatus,
-      } = row
+      const { doctor: { id }, visitStatus } = row
       const { clinicianProfile: { doctorProfile } } = user.data
 
       if (!doctorProfile) {
@@ -208,7 +205,7 @@ const Grid = ({
       }
 
       if (visitStatus === 'IN CONS') {
-        if (assignedDoctorProfile.id !== doctorProfile.id) {
+        if (id !== doctorProfile.id) {
           notification.error({
             message: `You cannot resume other doctor's consultation.`,
           })
@@ -469,18 +466,12 @@ const Grid = ({
   const onRowDoubleClick = useCallback(
     (row) => {
       const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
-      const enableDoubleClickStatus = [
-        VISIT_STATUS.WAITING,
-        VISIT_STATUS.IN_CONS,
-        VISIT_STATUS.PAUSED,
-      ]
       const { clinicianProfile: { doctorProfile } } = user.data
+
       if (!doctorProfile) return false
 
-      // start consultation context menu id = 5
-      // resume consultation context menu id = 6
-      const contextMenuButtonID = isWaiting ? '5' : '6'
-      onClick(row, contextMenuButtonID)
+      if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
+
       return true
     },
     [
