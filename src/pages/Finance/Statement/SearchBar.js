@@ -81,12 +81,13 @@ class SearchBar extends PureComponent {
 
   render () {
     const { classes, history, dispatch, values, selectedRows } = this.props
-    // const {
-    //   allStatementDate,
-    //   isAllDateChecked,
-    //   isAllDueDateChecked,
-    // } = this.state
-    // console.log(isAllDateChecked)
+    let statementId = ''
+    if (selectedRows && selectedRows.length > 0) {
+      const [
+        firstIndex,
+      ] = selectedRows
+      statementId = firstIndex
+    }
     return (
       <GridContainer className={classes.container}>
         <GridItem container xs md={12}>
@@ -234,7 +235,7 @@ class SearchBar extends PureComponent {
               buttonRef={(node) => {
                 this.anchorElAccount = node
               }}
-              disabled={selectedRows.length < 1}
+              disabled={selectedRows ? selectedRows.length < 1 : true}
             >
               Print Statement
             </Button>
@@ -286,7 +287,7 @@ class SearchBar extends PureComponent {
           <ReportViewer
             reportID={25}
             reportParameters={{
-              StatementId: selectedRows.length > 0 ? selectedRows[0] : '',
+              StatementId: statementId,
               GroupBy: this.state.reportGroupBy,
             }}
           />

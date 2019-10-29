@@ -237,40 +237,15 @@ const Grid = ({
   }
 
   const onRowDoubleClick = (row) => {
+    const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
     const isInCons = row.visitStatus === VISIT_STATUS.IN_CONS
     const isPaused = row.visitStatus === VISIT_STATUS.PAUSED
-    const valid = isAssignedDoctor(row)
-    if (!valid) return false
-
     const version = Date.now()
-    // if (isInCons) {
-    //   dispatch({
-    //     type: `consultation/start`,
-    //     payload: {
-    //       id: row.visitFK,
-    //       version,
-    //     },
-    //   }).then((o) => {
-    //     if (o)
-    //       router.push(
-    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
-    //       )
-    //   })
-    // } else if (isPaused) {
-    //   dispatch({
-    //     type: `consultation/resume`,
-    //     payload: {
-    //       id: row.visitFK,
-    //       version,
-    //     },
-    //   }).then((o) => {
-    //     if (o)
-    //       router.push(
-    //         `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
-    //       )
-    //   })
-    // }
 
+    const valid = isAssignedDoctor(row)
+
+    const contextMenuButtonID = isWaiting ? '5' : '6'
+    console.log({ row, contextMenuButtonID })
     return true
   }
 

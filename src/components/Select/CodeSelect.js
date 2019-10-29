@@ -23,7 +23,7 @@ class CodeSelect extends React.PureComponent {
               type: 'codetable/fetchCodes',
               payload: {
                 code: props.code.toLowerCase(),
-                filter: props.filter,
+                filter: props.remoteFilter,
                 multiplier: props.multiplier, // for stress testing purpose only
                 force: true,
               },
@@ -35,7 +35,7 @@ class CodeSelect extends React.PureComponent {
           type: 'codetable/fetchCodes',
           payload: {
             code: props.code.toLowerCase(),
-            filter: props.filter,
+            filter: props.remoteFilter,
             multiplier: props.multiplier, // for stress testing purpose only
           },
         })
