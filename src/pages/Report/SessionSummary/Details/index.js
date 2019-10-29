@@ -74,8 +74,12 @@ const SessionSummary = ({ match, sessionID }) => {
     const result = await getRawData(reportID, values)
 
     if (result) {
-      const totalCurrentCollected = result.PaymentDetails.map((t) => t.currentCollected).reduce((pre, cur) => pre + cur)
-      const totalPastCollected = result.PaymentDetails.map((t) => t.pastCollected).reduce((pre, cur) => pre + cur)
+      const totalCurrentCollected = result.PaymentDetails
+        .map((t) => t.currentCollected)
+        .reduce((pre, cur) => pre + cur, 0)
+      const totalPastCollected = result.PaymentDetails
+        .map((t) => t.pastCollected)
+        .reduce((pre, cur) => pre + cur, 0)
       dispatch({
         type: 'updateState',
         payload: {
@@ -115,6 +119,7 @@ const SessionSummary = ({ match, sessionID }) => {
   }, [])
 
   const { sessionDetails, paymentDetailsData, companyDetails } = state
+  console.log({ sessionDetails })
   return (
     <CardContainer hideHeader>
       <GridContainer>
@@ -178,7 +183,13 @@ const SessionSummary = ({ match, sessionID }) => {
                   label='Company'
                   disabled
                   currency
-                  value={companyDetails.TotalCompanyAmount?companyDetails.TotalCompanyAmount:0}
+                  value={
+                    companyDetails.TotalCompanyAmount ? (
+                      companyDetails.TotalCompanyAmount
+                    ) : (
+                      0
+                    )
+                  }
                 />
               </GridItem>
               <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>

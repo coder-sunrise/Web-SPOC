@@ -257,25 +257,12 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  shouldDisableSavePayment = () => {
+  shouldDisableSaveAndCompleteButton = () => {
     const { values } = this.props
     const { invoicePayer = [], payments = [], invoice } = values
     if (invoice === null) return true
     // if (payments.length === 0) return true
     if (invoicePayer.length === 0) return false
-
-    return false
-  }
-
-  shouldDisableCompletePayment = () => {
-    const { values } = this.props
-    const { invoicePayer = [], invoicePayment = [] } = values
-    const noSavedPayments =
-      invoicePayment.filter(
-        (payment) => !payment.isCancelled && payment.receiptNo,
-      ).length === 0
-
-    if (invoicePayer.length === 0 && noSavedPayments) return true
 
     return false
   }
@@ -329,6 +316,7 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
@@ -386,22 +374,14 @@ class Billing extends Component {
           </Button>
           <Button
             color='primary'
-            disabled={
-              this.state.isEditing ||
-              values.id === undefined ||
-              this.shouldDisableSavePayment()
-            }
+            disabled={this.state.isEditing || values.id === undefined}
             onClick={this.onSavePaymentClick}
           >
             Save
           </Button>
           <Button
             color='success'
-            disabled={
-              this.state.isEditing ||
-              values.id === undefined ||
-              this.shouldDisableSavePayment()
-            }
+            disabled={this.state.isEditing || values.id === undefined}
             onClick={this.onCompletePaymentClick}
           >
             Complete Payment
