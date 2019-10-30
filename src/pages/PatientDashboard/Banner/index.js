@@ -194,7 +194,7 @@ class Banner extends PureComponent {
         } = result
         let isShowReplacementModal = false
 
-        if (isSuccessful) {
+        if (!isSuccessful) {
           this.setState({
             refreshedSchemeData: {
               statusDescription,
@@ -230,10 +230,12 @@ class Banner extends PureComponent {
     const { refreshedSchemeData } = this.state
     if (
       !_.isEmpty(refreshedSchemeData) 
-       // &&  refreshedSchemeData.isSuccessful === true
+        &&  refreshedSchemeData.isSuccessful === true
     ) {
       return { ...refreshedSchemeData }
     }
+
+
     // Scheme Balance
     const balance =
       schemeData.patientSchemeBalance.length <= 0
@@ -267,6 +269,7 @@ class Banner extends PureComponent {
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
       acuteBalanceStatusCode: schemeData.patientSchemeBalance.length > 0 ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode : '',
+      isSuccessful: refreshedSchemeData.isSuccessful !== '' ? refreshedSchemeData.isSuccessful : '',
     }
   }
 

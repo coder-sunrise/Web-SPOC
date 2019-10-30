@@ -28,6 +28,8 @@ const SchemePopover = ({
     setShowReplacementModal,
   ] = useState(isShowReplacementModal)
 
+  const { isSuccessful } = schemeData
+
   const handleReplacementModalVisibility = (show = false) => {
     setShowReplacementModal(show)
   }
@@ -112,17 +114,12 @@ const SchemePopover = ({
                       paddingLeft: 2,
                     }}
                   >
-                    {schemeData.acuteVisitPatientBalance ? (
-                       schemeData.acuteVisitPatientBalance
-                    ) : (
-                     ''
-                    )}{' '}
-                    Remaining{' '}
+                    {schemeData.acuteVisitPatientBalance} Remaining{' '}
                   </div>{' '}
                   for Year {moment().year()}
                 </GridItem>
               ) : (
-                <GridItem>Patient Acute Visit Balance:{' '} NA</GridItem>
+                <GridItem>Patient Acute Visit Balance: NA</GridItem>
               )}
             </GridContainer>
             <GridContainer>
@@ -136,17 +133,12 @@ const SchemePopover = ({
                       paddingLeft: 2,
                     }}
                   >
-                    {schemeData.acuteVisitClinicBalance <= 0 ? (
-                      ''
-                    ) : (
-                      schemeData.acuteVisitClinicBalance
-                    )}{' '}
-                    Remaining
+                    {schemeData.acuteVisitClinicBalance} Remaining
                   </div>{' '}
                   for {moment().format('MMMM')} {moment().year()}
                 </GridItem>
               ) : (
-                <GridItem> Patient Acute Clinic Balance:{' '} NA</GridItem>
+                <GridItem> Patient Acute Clinic Balance: NA</GridItem>
               )}
             </GridContainer>
             <GridContainer>

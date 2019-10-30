@@ -28,6 +28,7 @@ const CHASCardReplacement = ({
     acuteVisitPatientBalance,
     acuteVisitClinicBalance,
     acuteBalanceStatusCode,
+    isSuccessful,
   } = refreshedSchemeData
   const { callingName, patientAccountNo } = entity
 
@@ -78,6 +79,7 @@ const CHASCardReplacement = ({
         <GridItem md={2} />
 
         <GridItem md={5}>Patient Acute Visit Balance:</GridItem>
+
         {acuteBalanceStatusCode === 'SC100' ? (
           <GridItem md={5}>
             <div
@@ -87,8 +89,7 @@ const CHASCardReplacement = ({
                 paddingLeft: 2,
               }}
             >
-              {acuteVisitPatientBalance ? '' : acuteVisitPatientBalance}{' '}
-              Remaining{' '}
+              {acuteVisitPatientBalance} Remaining{' '}
             </div>{' '}
             for Year {moment().year()}
           </GridItem>
@@ -107,8 +108,7 @@ const CHASCardReplacement = ({
                 paddingLeft: 2,
               }}
             >
-              {acuteVisitClinicBalance <= 0 ? '' : acuteVisitClinicBalance}{' '}
-              Remaining
+              {acuteVisitClinicBalance} Remaining
             </div>{' '}
             for {moment().format('MMMM')} {moment().year()}
           </GridItem>

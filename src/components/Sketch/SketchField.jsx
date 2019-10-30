@@ -196,7 +196,7 @@ class SketchField extends PureComponent {
     let { indexCount } = this.state
     let latestIndex = 0
     let count = allList[allList.length - 1].layerNumber
-    let testData = { objects: [] }
+    let initializeData = { objects: [] }
     this.initialData = data
 
     //history.getInitializeList(data, count)
@@ -207,9 +207,7 @@ class SketchField extends PureComponent {
 
 
 
-      // let testData = {objects: []}
-
-      testData.objects.push(obj)
+      initializeData.objects.push(obj)
 
       // this.setState({ action: false }, () => {
       //   this._fc.add(obj)
@@ -236,7 +234,7 @@ class SketchField extends PureComponent {
       // })
     }
 
-    this.fromJSON(testData)
+    this.fromJSON(initializeData)
   }
 
   /**
@@ -484,13 +482,7 @@ class SketchField extends PureComponent {
     ] = history.getCurrent()
 
 
-
     let objects = canvas.getObjects();
-
-    console.log("undo " , obj.__removed)
-    // console.log("all ", objects[1].__originalState)
-
-   
 
     history.undo()
     if (obj.__removed) {
@@ -504,7 +496,7 @@ class SketchField extends PureComponent {
           }
         }
         obj.__version -= 1
-        obj.__removed = false
+        //obj.__removed = false
       })
     } else if (obj.__version <= 1) {
       this._fc.remove(obj)

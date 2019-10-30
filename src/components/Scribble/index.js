@@ -149,6 +149,7 @@ class Scribble extends React.Component {
       toolsShapeVisible: false,
       colorVisible: false,
       imageVisible: false,
+      textVisible: false,
       text: '',
       fillColor: '#68CCCA',
       fillWithColor: false,
@@ -202,22 +203,38 @@ class Scribble extends React.Component {
   }
 
   handleToolsDrawVisibleChange = (toolsDrawVisible) => {
-    this.setState({ 
-      toolsDrawVisible, 
-      toolsDrawingColor: toolsDrawVisible ? true : false,
-    })
+    this.setState({ toolsDrawVisible })
+    if (!toolsDrawVisible) {
+      this.setState({ toolsDrawingColor: false })
+    }
   }
 
   handleToolsShapeVisibleChange = (toolsShapeVisible) => {
     this.setState({ toolsShapeVisible })
+    if (!toolsShapeVisible) {
+      this.setState({ toolsShapeColor: false })
+    }
   }
 
   handleColorVisibleChange = (colorVisible) => {
     this.setState({ colorVisible })
+    if (!colorVisible) {
+      this.setState({ selectColorColor: false })
+    }
   }
 
   handleInsertImageVisibleChange = (imageVisible) => {
     this.setState({ imageVisible })
+    if (!imageVisible) {
+      this.setState({ imageColor: false })
+    }
+  }
+
+  handleTextVisibleChange = (textVisible) => {
+    this.setState({ textVisible })
+    if (!textVisible) {
+      this.setState({ textColor: false })
+    }
   }
 
   _removeSelected = () => {
@@ -290,14 +307,18 @@ class Scribble extends React.Component {
   _onSketchChange = () => {
     let prev = this.state.canUndo
     let now = this._sketch.canUndo()
-    if (now) {
+
+    if (prev !== now) {
       this.setState({
         canUndo: now,
-        canClear: true,
         hideEnable: false,
       })
       this._sketch.hideDrawing(false)
     }
+
+    this.setState({
+      canClear: now,
+    })
     this.props.setFieldValue('drawing', this._sketch.getAllLayerData())
   }
 
@@ -356,55 +377,33 @@ class Scribble extends React.Component {
   }
 
   toolDrawingHandleClickAway = () => {
-    const { toolsDrawVisible } =this.state
-    console.log("test ", toolsDrawVisible)
     this.setState({
-      toolsDrawingColor: toolsDrawVisible ? toolsDrawVisible : false,
-      toolsShapeColor: false,
-      selectColorColor: false,
-      imageColor: false,
-      textColor: false,
+      toolsDrawingColor: false,
     })
   }
 
   toolShapeHandleClickAway = () => {
+
     this.setState({
-      toolsDrawingColor: false,
       toolsShapeColor: false,
-      selectColorColor: false,
-      imageColor: false,
-      textColor: false,
     })
   }
 
   colorHandleClickAway = () => {
+
     this.setState({
-      toolsDrawingColor: false,
-      toolsShapeColor: false,
       selectColorColor: false,
-      imageColor: false,
-      textColor: false,
     })
   }
 
   imageHandleClickAway = () => {
-    const { imageColor } = this.state
     this.setState({
-      toolsDrawingColor: false,
-      toolsShapeColor: false,
-      selectColorColor: false,
       imageColor: false,
-      textColor: false,
     })
   }
 
   textHandleClickAway = () => {
-    const { textColor } = this.state
     this.setState({
-      toolsDrawingColor: false,
-      toolsShapeColor: false,
-      selectColorColor: false,
-      imageColor: false,
       textColor: false,
     })
   }
@@ -484,7 +483,9 @@ class Scribble extends React.Component {
               <Popover
                 icon={null}
                 content={
-                  <ClickAwayListener onClickAway={this.toolDrawingHandleClickAway}>
+                  <ClickAwayListener
+                    onClickAway={this.toolDrawingHandleClickAway}
+                  >
                     <div style={{ paddingTop: 10, width: 200 }}>
                       <GridContainer>
                         <GridItem xs={12} md={12}>
@@ -499,7 +500,6 @@ class Scribble extends React.Component {
                                 selectColor: false,
                                 toolsDrawingColor: true,
                               })
-
                             }}
                           >
                             <Tooltip title='Pencil'>
@@ -527,7 +527,7 @@ class Scribble extends React.Component {
                         </GridItem>
                       </GridContainer>
 
-                      <GridContainer style={{paddingTop:10}}>
+                      <GridContainer style={{ paddingTop: 10 }}>
                         <GridItem xs={12} md={12}>
                           <Typography>Line Weight</Typography>
                           <Slider
@@ -550,7 +550,7 @@ class Scribble extends React.Component {
                 visible={this.state.toolsDrawVisible}
                 onVisibleChange={this.handleToolsDrawVisibleChange}
                 onClick={() => {
-                  const { toolsDrawingColor } =this.state
+                  const { toolsDrawingColor } = this.state
                   this.setState(() => ({
                     toolsDrawingColor: true,
                     toolsShapeColor: false,
@@ -573,7 +573,9 @@ class Scribble extends React.Component {
               <Popover
                 icon={null}
                 content={
-                  <ClickAwayListener onClickAway={this.toolShapeHandleClickAway}>
+                  <ClickAwayListener
+                    onClickAway={this.toolShapeHandleClickAway}
+                  >
                     <div style={{ paddingTop: 10, width: 200 }}>
                       <GridContainer>
                         <GridItem xs={10} md={10}>
@@ -586,9 +588,7 @@ class Scribble extends React.Component {
                                 tool: e.target.value,
                                 eraserColor: false,
                                 selectColor: false,
-                                
                               })
-
                             }}
                           >
                             <Radio.Button
@@ -852,8 +852,8 @@ class Scribble extends React.Component {
                 // title='Text'
                 trigger='click'
                 placement='bottomLeft'
-                // visible={this.state.colorVisible}
-                // onVisibleChange={this.handleColorVisibleChange}
+                visible={this.state.textVisible}
+                onVisibleChange={this.handleTextVisibleChange}
                 onClick={() => {
                   this.setState(() => ({
                     toolsDrawingColor: false,
