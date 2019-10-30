@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import router from 'umi/router'
 import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
-import { formatMessage } from 'umi/locale'
 // common component
 import {
   Button,
@@ -183,15 +182,15 @@ class Main extends Component {
               }}
             >
               <Refresh />
-              {formatMessage({ id: 'reception.queue.dispense.refresh' })}
+              Refresh
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              {formatMessage({ id: 'reception.queue.dispense.printDrugLabel' })}
+              Drug Label
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              {formatMessage({ id: 'reception.queue.dispense.printPatientLabel' })}
+              Patient Label
             </Button>
           </GridItem>
           <DispenseDetails {...this.props} />
@@ -199,17 +198,17 @@ class Main extends Component {
           <GridItem justify='flex-end' container className={classes.footerRow}>
             <Authorized authority='queue.dispense.savedispense'>
               <Button color='success' size='sm' onClick={handleSubmit}>
-                {formatMessage({ id: 'reception.queue.dispense.savedispense' })}
+                Save Dispense
               </Button>
             </Authorized>
             <Authorized authority='queue.dispense.editorder'>
               <Button color='primary' size='sm' onClick={this.editOrder}>
-                {formatMessage({ id: 'reception.queue.dispense.editorder' })}
+                Edit Order
               </Button>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
               <Button color='primary' size='sm' onClick={this.makePayment}>
-                {formatMessage({ id: 'reception.queue.dispense.makepayment' })}
+                Make Payment
               </Button>
             </Authorized>
           </GridItem>
