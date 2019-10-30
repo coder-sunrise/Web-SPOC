@@ -80,7 +80,7 @@ export const printRow = async (row, props) => {
         method: 'POST',
         contentType: 'application/x-www-form-urlencoded',
         data: {
-          reportContent: JSON.stringify(
+          reportParameters: JSON.stringify(
             commonDataReaderTransform(downloadConfig.draft(row)),
           ),
         },
@@ -130,7 +130,7 @@ class ConsultationDocument extends PureComponent {
   state = {
     acknowledged: false,
     reportTypeID: undefined,
-    reportContent: {},
+    reportParameters: {},
   }
 
   constructor (props) {
@@ -177,7 +177,13 @@ class ConsultationDocument extends PureComponent {
       return false
     }
     if (row.id) {
-      console.log('wait')
+      this.setState({
+        reportTypeID: downloadConfig.id,
+        reportParameters: {
+          [downloadConfig.key]: row.id,
+          isSaved: true,
+        },
+      })
     } else {
       const { codetable, patient } = this.props
       const { clinicianprofile = [] } = codetable
@@ -199,9 +205,12 @@ class ConsultationDocument extends PureComponent {
       reportParameters.patientAccountNo = entity.patientAccountNo
       this.setState({
         reportTypeID: downloadConfig.id,
-        reportContent: JSON.stringify(
-          commonDataReaderTransform(downloadConfig.draft(reportParameters)),
-        ),
+        reportParameters: {
+          isSaved: false,
+          reportContent: JSON.stringify(
+            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+          ),
+        },
       })
     }
 
@@ -227,7 +236,7 @@ class ConsultationDocument extends PureComponent {
     } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    const { reportTypeID, reportContent } = this.state
+    const { reportTypeID, reportParameters } = this.state
     // console.log('consultationDocumentTypes', values)
     return (
       <div>
@@ -414,11 +423,13 @@ class ConsultationDocument extends PureComponent {
             types={consultationDocumentTypes}
           />
         </CommonModal>
-        {/* <ReportModal
-          onReportViewerClose={this.handleReportViewerClose}
-          reportTypeID={reportTypeID}
-          reportContent={reportContent}
-        /> */}
+        {reportTypeID && (
+          <ReportModal
+            onReportViewerClose={this.handleReportViewerClose}
+            reportTypeID={reportTypeID}
+            reportParameters={reportParameters}
+          />
+        )}
       </div>
     )
   }

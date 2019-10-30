@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 
-const ReportModal = ({ reportTypeID, reportContent }) => {
-  console.log({ reportTypeID, reportContent })
+const ReportModal = ({ reportTypeID, reportParameters }) => {
+  console.log({ reportTypeID, reportParameters })
   const [
     showReport,
     setShowReport,
   ] = useState(false)
+
+  const [
+    reportConfig,
+    setReportConfig,
+  ] = useState({})
 
   const toggleReport = () => {
     setShowReport(!showReport)
@@ -18,13 +23,26 @@ const ReportModal = ({ reportTypeID, reportContent }) => {
       if (reportTypeID) {
         setShowReport(true)
       }
+
+      const { isSaved, ...restParams } = reportParameters
+      if (isSaved) {
+        setReportConfig({
+          reportParameters: { ...restParams },
+          unsavedReport: false,
+        })
+      } else {
+        setReportConfig({
+          reportContent: restParams.reportContent,
+          unsavedReport: true,
+        })
+      }
     },
     [
       reportTypeID,
-      reportContent,
+      reportParameters,
     ],
   )
-
+  console.log({ reportConfig })
   return (
     <React.Fragment>
       {/* <ReportViewer /> */}
@@ -36,9 +54,9 @@ const ReportModal = ({ reportTypeID, reportContent }) => {
       >
         <ReportViewer
           showTopDivider={false}
-          unsavedReport
+          // unsavedReport
           reportID={reportTypeID}
-          reportContent={reportContent}
+          {...reportConfig}
         />
       </CommonModal>
     </React.Fragment>
