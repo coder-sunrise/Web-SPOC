@@ -76,7 +76,7 @@ const styles = (theme) => ({
 })
 
 const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
-  const { invoice, claimableSchemes } = values
+  const { invoice, invoicePayment, claimableSchemes } = values
 
   const [
     showErrorPrompt,
@@ -507,7 +507,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         setTempInvoicePayer(newInvoicePayers)
         setInitialState(newInvoicePayers)
         refTempInvociePayer.current = newInvoicePayers
-      } else if (claimableSchemes.length > 0) {
+      } else if (claimableSchemes.length > 0 && invoicePayment.length === 0) {
         const _invoicePayer = {
           _indexInClaimableSchemes: 0,
           _isConfirmed: false,
