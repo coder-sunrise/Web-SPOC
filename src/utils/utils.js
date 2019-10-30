@@ -895,7 +895,7 @@ const calculateAmount = (
     activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
       const adj = r.weightage * fa.adjAmount
-      console.log(r.subAdjustment + adj, r.subAdjustment, adj)
+      // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
 
       r[adjustedField] += adj
       r.subAdjustment += adj
