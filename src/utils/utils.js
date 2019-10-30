@@ -675,16 +675,26 @@ const confirmBeforeReload = (e) => {
   e.returnValue = ''
 }
 
-const _checkCb = (cb, e) => {
-  if (typeof cb === 'string') {
-    router.push(cb)
-  } else if (typeof cb === 'function') {
-    cb(e)
+const _checkCb = ({ redirectUrl, onProceed }, e) => {
+  if (redirectUrl) {
+    router.push(redirectUrl)
+  } else if (onProceed) {
+    onProceed(e)
   }
 }
 
-const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
+const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
+  e,
+) => {
+  console.log(restProps)
   if (window.beforeReloadHandlerAdded) {
+    if (displayName) {
+      const ob = window.g_app._store.getState().formik[displayName]
+      if (ob && !ob.dirty) {
+        return
+      }
+    }
+
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {
@@ -692,8 +702,8 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
         openConfirmContent: formatMessage({
           id: 'app.general.leave-without-save',
         }),
-        onConfirmSave: saveCb,
-        openConfirmText: saveCb ? 'Save Changes' : 'Confirm',
+        onConfirmSave: onConfirm,
+        openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
           if (displayName) {
             window.g_app._store.dispatch({
@@ -716,13 +726,13 @@ const navigateDirtyCheck = (cb, saveCb, displayName) => (e) => {
           }
           window.beforeReloadHandlerAdded = false
           window.removeEventListener('beforeunload', confirmBeforeReload)
-          _checkCb(cb, e)
+          _checkCb(restProps, e)
         },
       },
     })
     e.preventDefault()
   } else {
-    _checkCb(cb, e)
+    _checkCb(restProps, e)
     // window._localFormik = {}
     // console.log(window._localFormik)
   }

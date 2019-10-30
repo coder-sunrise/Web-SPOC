@@ -267,7 +267,9 @@ class clinicSettings extends PureComponent {
           >
             <Button
               color='danger'
-              onClick={navigateDirtyCheck('/setting')}
+              onClick={navigateDirtyCheck({
+                redirectUrl: '/setting',
+              })}
               disabled={hasActiveSession}
             >
               Cancel

@@ -35,13 +35,13 @@ export default ({
   }
   const tagButtonHandleClose = (e) => {
     setAnchorEl(undefined)
-    if (form) form.setFieldValue(field.name, selected)
-    onChange(
-      selected,
-      mode === 'multiple'
-        ? options.filter((o) => (selected || []).indexOf(o[valueField]) >= 0)
-        : options.find((o) => o[valueField] === selected),
-    )
+    if (mode === 'multiple') {
+      if (form) form.setFieldValue(field.name, selected)
+      onChange(
+        selected,
+        options.filter((o) => (selected || []).indexOf(o[valueField]) >= 0),
+      )
+    }
   }
   // useEffect(
   //   () => {
@@ -106,6 +106,11 @@ export default ({
             onClick={() => {
               if (mode !== 'multiple') {
                 setSelected(tag[valueField])
+                if (form) form.setFieldValue(field.name, tag[valueField])
+                onChange(
+                  tag[valueField],
+                  options.find((o) => o[valueField] === tag[valueField]),
+                )
                 tagButtonHandleClose()
               } else {
                 setSelected(
