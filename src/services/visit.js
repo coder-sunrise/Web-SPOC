@@ -12,7 +12,10 @@ const queueApiUrl = '/api/queue'
 //   return response
 // }
 
-export const query = async (payload) => service.query(queueApiUrl, payload)
+export const query = (payload) => {
+  if (payload.id === 0) return false
+  return service.query(queueApiUrl, payload)
+}
 
 export async function registerVisit (visitInfo) {
   const options = {

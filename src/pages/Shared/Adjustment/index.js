@@ -4,9 +4,9 @@ import { connect } from 'dva'
 import { isNumber } from 'util'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
+import { formatMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
-import { formatMessage } from 'umi/locale'
 
 import {
   Button,
@@ -62,25 +62,32 @@ const styles = (theme) => ({})
       ...defaultValues,
     }
   },
-  validationSchema: Yup.object().shape({
-    adjustment: Yup.number().required().min(
-      0.01,
-      formatMessage({
-        id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
-      }),
-    ),
-    finalAmount: Yup.number()
-      .min(
+  validationSchema: ({ global }) => {
+    const { openAdjustmentConfig } = global
+    const extraCfg = {}
+    if (openAdjustmentConfig.showRemark) {
+      extraCfg.adjRemark = Yup.string().required()
+    }
+    return Yup.object().shape({
+      adjustment: Yup.number().required().min(
         0.01,
         formatMessage({
-          id:
-            'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
+          id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
         }),
-      )
-      .required(),
-    adjRemark: Yup.string().required(),
-    // remarks: Yup.string().required(),
-  }),
+      ),
+      finalAmount: Yup.number()
+        .min(
+          0.01,
+          formatMessage({
+            id:
+              'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
+          }),
+        )
+        .required(),
+      ...extraCfg,
+      // remarks: Yup.string().required(),
+    })
+  },
 
   handleSubmit: (values, { props }) => {
     if (values.isMinus && values.adjustment > 0) {
@@ -154,7 +161,7 @@ class Adjustment extends PureComponent {
       isMinus,
       showAmountPreview = true,
     } = openAdjustmentConfig
-    // console.log(global, openAdjustmentConfig)
+    console.log(errors)
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
@@ -194,7 +201,11 @@ class Adjustment extends PureComponent {
                         autoFocus
                         currency
                         label='Adjustment'
-                        onChange={this.onConditionChange}
+                        onChange={() => {
+                          setTimeout(() => {
+                            this.onConditionChange()
+                          }, 1)
+                        }}
                         {...args}
                       />
                     )
@@ -205,7 +216,11 @@ class Adjustment extends PureComponent {
                       autoFocus
                       max={999}
                       label='Adjustment'
-                      onChange={this.onConditionChange}
+                      onChange={() => {
+                        setTimeout(() => {
+                          this.onConditionChange()
+                        }, 1)
+                      }}
                       {...args}
                     />
                   )

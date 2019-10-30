@@ -238,21 +238,22 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
             invoicePayer,
           ]
 
-        const previousIndexesInvoiceItems = _newInvoicePayers.reduce(
-          flattenInvoicePayersInvoiceItemList,
-          [],
-        )
+        const previousIndexesInvoiceItems = _newInvoicePayers
+          .filter((payer) => !payer.isCancelled)
+          .reduce(flattenInvoicePayersInvoiceItemList, [])
+
         const previousIndexesInvoiceItemsWithSubtotal = previousIndexesInvoiceItems.reduce(
           computeInvoiceItemSubtotal,
           [],
         )
+
         const _newInvoicePayerItems = invoicePayer.invoicePayerItem.map(
           (ip) => {
             const _existed = previousIndexesInvoiceItemsWithSubtotal.find(
               (_i) => _i.id === ip.id,
             )
 
-            if (!_existed) return { ...ip }
+            if (!_existed) return { ...ip, payableBalance: ip.totalAfterGst }
 
             return {
               ...ip,
@@ -300,6 +301,10 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     )
     const totalPayableBalance = refTempInvociePayer.current
       .reduce(flattenInvoicePayersInvoiceItemList, [])
+      .filter(
+        (item) =>
+          item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
+      )
       .reduce(
         (largestPayable, item) =>
           item.payableBalance > largestPayable
@@ -311,9 +316,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const currentItemClaimedAmount = refTempInvociePayer.current
       .reduce(flattenInvoicePayersInvoiceItemList, [])
       .reduce((remainingClaimable, item) => {
-        if (item.invoiceItemFK && item.invoiceItemFK === id)
+        if (
+          item.invoiceItemFK &&
+          parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
+        )
           return remainingClaimable + item.claimAmount
-        if (item.id === id) {
+        if (parseInt(item.id, 10) === parseInt(id, 10)) {
           return remainingClaimable + item.claimAmount
         }
         return remainingClaimable
@@ -324,7 +332,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       invoicePayerItem: _editingInvoicePayer.invoicePayerItem.map((item) => {
         const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
 
-        if (_id === id) {
+        if (parseInt(_id, 10) === parseInt(id, 10)) {
           const currentClaimAmount = item.claimAmount
           const toBeChangeAmount = event.target.value
           if (currentItemClaimedAmount === 0)
@@ -666,7 +674,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       ).length < invoice.claimableSchemes
     return isEditing || hasUnappliedScheme
   }
-  // console.log({ tempInvoicePayer })
+
   return (
     <React.Fragment>
       <GridItem md={2}>

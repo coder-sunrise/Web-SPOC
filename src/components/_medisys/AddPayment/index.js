@@ -37,7 +37,10 @@ import { PAYMENT_MODE } from '@/utils/constants'
     let _cashRounding = 0
     if (currentPayments.length > 0) {
       paymentList = [
-        ...currentPayments[0].invoicePaymentMode,
+        ...currentPayments[0].invoicePaymentMode.map((item, index) => ({
+          ...item,
+          id: index,
+        })),
       ]
       _totalAmtPaid = currentPayments[0].totalAmtPaid
       _cashReceived = currentPayments[0].cashReceived
@@ -69,6 +72,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReceived,
       cashReturned,
       totalAmtPaid,
+      finalPayable,
       collectableAmount,
     } = values
 
@@ -80,7 +84,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
         cashRounding:
           payment.paymentModeFK === PAYMENT_MODE.CASH ? cashRounding : 0,
       })),
-      outstandingBalance: collectableAmount - totalAmtPaid,
+      outstandingBalance: finalPayable - totalAmtPaid,
       cashRounding,
       cashReceived,
       cashReturned,
@@ -134,16 +138,17 @@ class AddPayment extends Component {
   onDeleteClick = async (event) => {
     const { currentTarget: { id } } = event
     const { values, setFieldValue } = this.props
-    if (parseFloat(id, 10) === PAYMENT_MODE.CASH) {
-      this.setState(
-        {
-          cashPaymentAmount: 0,
-        },
-        () => {
-          setFieldValue('cashReceived', 0)
-        },
-      )
-    }
+    console.log({ id, paymentList: values.paymentList })
+    // if (parseFloat(id, 10) === PAYMENT_MODE.CASH) {
+    //   this.setState(
+    //     {
+    //       cashPaymentAmount: 0,
+    //     },
+    //     () => {
+    //       setFieldValue('cashReceived', 0)
+    //     },
+    //   )
+    // }
     const newPaymentList = values.paymentList.filter(
       (payment) => payment.id !== parseFloat(id, 10),
     )

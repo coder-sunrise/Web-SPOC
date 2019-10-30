@@ -29,6 +29,7 @@ import {
   ProgressButton,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
+import ReportModal from './ReportModal'
 
 import model from './models'
 
@@ -63,7 +64,7 @@ export const printRow = async (row, props) => {
           (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
       ) || {}
 
-    row.doctorName = (obj.title ? (`${obj.title  } `) : '') + obj.name
+    row.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
     row.doctorMCRNo = obj.doctorProfile.doctorMCRNo
 
     row.patientName = entity.name
@@ -79,7 +80,7 @@ export const printRow = async (row, props) => {
         method: 'POST',
         contentType: 'application/x-www-form-urlencoded',
         data: {
-          reportContent: JSON.stringify(
+          reportParameters: JSON.stringify(
             commonDataReaderTransform(downloadConfig.draft(row)),
           ),
         },
@@ -128,6 +129,8 @@ export const printRow = async (row, props) => {
 class ConsultationDocument extends PureComponent {
   state = {
     acknowledged: false,
+    reportTypeID: undefined,
+    reportParameters: {},
   }
 
   constructor (props) {
@@ -164,6 +167,63 @@ class ConsultationDocument extends PureComponent {
     this.toggleModal()
   }
 
+  viewReport = (row) => {
+    const type = consultationDocumentTypes.find(
+      (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+    )
+    const { downloadConfig } = type
+    if (!downloadConfig) {
+      notification.error({ message: 'No configuration found' })
+      return false
+    }
+    if (row.id) {
+      this.setState({
+        reportTypeID: downloadConfig.id,
+        reportParameters: {
+          [downloadConfig.key]: row.id,
+          isSaved: true,
+        },
+      })
+    } else {
+      const { codetable, patient } = this.props
+      const { clinicianprofile = [] } = codetable
+      const { entity } = patient
+      const obj =
+        clinicianprofile.find(
+          (o) =>
+            o.id ===
+            (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+        ) || {}
+
+      const reportParameters = { ...row }
+      const { subject } = row
+      reportParameters.doctorName =
+        (obj.title ? `${obj.title} ` : '') + obj.name
+      reportParameters.doctorMCRNo = obj.doctorProfile.doctorMCRNo
+
+      reportParameters.patientName = entity.name
+      reportParameters.patientAccountNo = entity.patientAccountNo
+      this.setState({
+        reportTypeID: downloadConfig.id,
+        reportParameters: {
+          isSaved: false,
+          reportContent: JSON.stringify(
+            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+          ),
+        },
+      })
+    }
+
+    return true
+  }
+
+  handleReportViewerClose = () => {
+    this.setState({
+      reportTypeID: undefined,
+      reportParameters: {},
+    })
+  }
+
   render () {
     const {
       consultationDocument,
@@ -176,6 +236,7 @@ class ConsultationDocument extends PureComponent {
     } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
+    const { reportTypeID, reportParameters } = this.state
     // console.log('consultationDocumentTypes', values)
     return (
       <div>
@@ -218,6 +279,7 @@ class ConsultationDocument extends PureComponent {
               columnName: 'subject',
               onClick: (row) => {
                 printRow(row, this.props)
+                // this.viewReport(row)
               },
               type: 'link',
               linkField: 'href',
@@ -351,16 +413,23 @@ class ConsultationDocument extends PureComponent {
           observe='AddConsultationDocument'
           maxWidth='md'
           bodyNoPadding
-        // showFooter=
-        // footProps={{
-        //   confirmBtnText: 'Save',
-        // }}
+          // showFooter=
+          // footProps={{
+          //   confirmBtnText: 'Save',
+          // }}
         >
           <AddConsultationDocument
             {...this.props}
             types={consultationDocumentTypes}
           />
         </CommonModal>
+        {reportTypeID && (
+          <ReportModal
+            onReportViewerClose={this.handleReportViewerClose}
+            reportTypeID={reportTypeID}
+            reportParameters={reportParameters}
+          />
+        )}
       </div>
     )
   }

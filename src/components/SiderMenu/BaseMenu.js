@@ -3,7 +3,6 @@ import { Menu } from 'antd'
 import Link from 'umi/link'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
-import { isUrl, confirmBeforeReload, navigateDirtyCheck } from '@/utils/utils'
 import router from 'umi/router'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
 
@@ -25,6 +24,7 @@ import StarBorder from '@material-ui/icons/StarBorder'
 import Icon from '@material-ui/core/Icon'
 import sidebarStyle from 'mui-pro-jss/material-dashboard-pro-react/components/sidebarStyle.jsx'
 import cx from 'classnames'
+import { isUrl, confirmBeforeReload, navigateDirtyCheck } from '@/utils/utils'
 import styles from './index.less'
 import { getMenuMatches } from './SiderMenuUtils'
 import { urlToList } from '../_utils/pathTools'
@@ -233,7 +233,9 @@ class BaseMenu extends PureComponent {
                 onCollapse(true)
               }
             ) : (
-              navigateDirtyCheck(itemPath)
+              navigateDirtyCheck({
+                redirectUrl: itemPath,
+              })
             )
           }
           className={navLinkClasses}
