@@ -103,44 +103,56 @@ const SchemePopover = ({
                 <NumberInput text currency value={schemeData.balance} />
               </GridItem>
             </GridContainer>
-            <GridContainer>
-              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
-                <GridItem>
-                  Patient Acute Visit Balance:{' '}
-                  <div
-                    style={{
-                      fontWeight: 500,
-                      display: 'inline-block',
-                      paddingLeft: 2,
-                    }}
-                  >
-                    {schemeData.acuteVisitPatientBalance} Remaining{' '}
-                  </div>{' '}
-                  for Year {moment().year()}
-                </GridItem>
-              ) : (
+            {isSuccessful !== false ? (
+              <GridContainer>
+                {schemeData.acuteBalanceStatusCode === 'SC100' ? (
+                  <GridItem>
+                    Patient Acute Visit Balance:{' '}
+                    <div
+                      style={{
+                        fontWeight: 500,
+                        display: 'inline-block',
+                        paddingLeft: 2,
+                      }}
+                    >
+                      {schemeData.acuteVisitPatientBalance} Remaining{' '}
+                    </div>{' '}
+                    for Year {moment().year()}
+                  </GridItem>
+                ) : (
+                  <GridItem>Patient Acute Visit Balance: NA</GridItem>
+                )}
+              </GridContainer>
+            ) : (
+              <GridContainer>
                 <GridItem>Patient Acute Visit Balance: NA</GridItem>
-              )}
-            </GridContainer>
-            <GridContainer>
-              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
-                <GridItem>
-                  Patient Acute Clinic Balance:
-                  <div
-                    style={{
-                      fontWeight: 500,
-                      display: 'inline-block',
-                      paddingLeft: 2,
-                    }}
-                  >
-                    {schemeData.acuteVisitClinicBalance} Remaining
-                  </div>{' '}
-                  for {moment().format('MMMM')} {moment().year()}
-                </GridItem>
-              ) : (
+              </GridContainer>
+            )}
+            {isSuccessful !== false ? (
+              <GridContainer>
+                {schemeData.acuteBalanceStatusCode === 'SC100' ? (
+                  <GridItem>
+                    Patient Acute Clinic Balance:
+                    <div
+                      style={{
+                        fontWeight: 500,
+                        display: 'inline-block',
+                        paddingLeft: 2,
+                      }}
+                    >
+                      {schemeData.acuteVisitClinicBalance} Remaining
+                    </div>{' '}
+                    for {moment().format('MMMM')} {moment().year()}
+                  </GridItem>
+                ) : (
+                  <GridItem> Patient Acute Clinic Balance: NA</GridItem>
+                )}
+              </GridContainer>
+            ) : (
+              <GridContainer>
                 <GridItem> Patient Acute Clinic Balance: NA</GridItem>
-              )}
-            </GridContainer>
+              </GridContainer>
+            )}
             <GridContainer>
               <GridItem>
                 <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>

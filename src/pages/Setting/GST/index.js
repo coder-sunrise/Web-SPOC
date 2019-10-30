@@ -152,6 +152,7 @@ class clinicSettings extends PureComponent {
       gSTPercentage,
     } = this.props.values
     // console.log(this.props.values)
+
     const payload = [
       {
         ...isEnableGST,
