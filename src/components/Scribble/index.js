@@ -35,10 +35,6 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import { Radio } from 'antd'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-<<<<<<< HEAD
-
-=======
->>>>>>> dev
 import {
   GridContainer,
   GridItem,
@@ -1015,7 +1011,7 @@ class Scribble extends React.Component {
                 <Button
                   color='danger'
                   onClick={navigateDirtyCheck({
-                    displayName: 'scribbleNotePage',
+                    displayName: 'ScribbleNotePage',
                     onProceed: toggleScribbleModal,
                   })}
                 >
