@@ -218,6 +218,57 @@ const Setting = ({
           />
         </GridItem>
       </GridContainer>
+      <GridContainer>
+        <GridItem xs={1}>
+          <FastField
+            name='prescriptionToDispenseConversion'
+            render={(args) => (
+              <NumberInput label='' {...args} defaultValue={1} />
+            )}
+          />
+        </GridItem>
+        <GridItem xs={1} style={{ flex: 0 }}>
+          <FastField
+            name='prescribingUOMFK'
+            render={(args) => (
+              <CodeSelect
+                style={{ marginTop: 15 }}
+                label=''
+                text
+                labelField='name'
+                code={
+                  showTransfer ? (
+                    'ctmedicationunitofmeasurement'
+                  ) : (
+                    'ctvaccinationunitofmeasurement'
+                  )
+                }
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem style={{ padding: 0 }}>
+          <React.Fragment>
+            <div style={{ marginTop: 30, fontSize: 16 }}>= 1.0</div>
+          </React.Fragment>
+        </GridItem>
+        <GridItem xs={1}>
+          <FastField
+            name='dispensingUOMFK'
+            render={(args) => (
+              <CodeSelect
+                style={{ marginTop: 15 }}
+                text
+                label=''
+                labelField='name'
+                code='ctmedicationunitofmeasurement'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
       {showTransfer && (
         <React.Fragment>
           <h4 style={{ fontWeight: 400, marginTop: 25 }}>
