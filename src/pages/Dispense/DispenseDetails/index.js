@@ -39,8 +39,8 @@ const DispenseDetails = ({
   setFieldValue,
   values,
   dispatch,
-  viewOnly = false,
-  handleClickPrintDrugLabel,
+  viewOnly = false, 
+  onPrint,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
@@ -57,7 +57,7 @@ const DispenseDetails = ({
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
                 viewOnly,
-                handleClickPrintDrugLabel,
+                onPrint,
               )}
               data={prescription}
             />
@@ -76,7 +76,7 @@ const DispenseDetails = ({
               title='Other Orders'
               height={150}
               columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly)}
+              colExtensions={OtherOrdersColumnExtensions(viewOnly,onPrint)}
               data={otherOrder}
             />
           </GridItem>
