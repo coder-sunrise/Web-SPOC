@@ -196,6 +196,7 @@ class Statement extends PureComponent {
           handleSearch={this.handleSearch}
           handleAddNew={this.toggleAddNewStatementModal}
           dispatch={dispatch}
+          selectedRows={this.state.selectedRows}
         />
         <CommonTableGrid
           style={{ margin: 0 }}

@@ -254,8 +254,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false) => [
     width: 80,
     render: (r) => {
       const { type } = r
-      if (type === 'Service' || type === 'Consumable' || type === 'Vaccination')
-        return null
+      if (type === 'Service' || type === 'Consumable') return null
       return (
         <Tooltip title='Print'>
           <Button color='primary' justIcon>

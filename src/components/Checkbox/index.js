@@ -133,6 +133,7 @@ class Checkbox extends React.Component {
         labelProps={{
           shrink: true,
         }}
+        preventDefaultChangeEvent
         {...restProps}
       />
     )

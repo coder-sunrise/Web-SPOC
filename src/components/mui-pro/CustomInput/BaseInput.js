@@ -29,7 +29,7 @@ const _config = {
       'name',
       'defaultValue',
       'onChange',
-      'onBlur',
+      // 'onBlur',
       'onFocus',
       'autoFocus',
       'multiline',
@@ -203,7 +203,9 @@ class BaseInput extends React.PureComponent {
       size,
       style,
       onKeyUp,
+      onKeyDown,
       text,
+      onBlur,
     } = props
 
     // console.log(this.state, this.state.value)
@@ -211,9 +213,11 @@ class BaseInput extends React.PureComponent {
     //   inputProps.value = this.state.value
     // }
 
-    // console.log(this.props)
+    // console.log(this.props,)
 
-    const cfg = {}
+    const cfg = {
+      onBlur,
+    }
     if (prefix) {
       cfg.startAdornment = (
         <InputAdornment position='start' {...prefixProps}>
@@ -236,6 +240,7 @@ class BaseInput extends React.PureComponent {
     }
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
+      cfg.onKeyDown = onKeyDown
     }
     // console.log({ error, showErrorIcon })
     if (error && error.length && showErrorIcon) {
@@ -302,6 +307,9 @@ class BaseInput extends React.PureComponent {
             {...cfg}
             inputProps={inputProps}
             {...inputProps}
+            // onBlur={() => {
+            //   console.log(123)
+            // }}
           />
         )}
       </CustomInputWrapper>

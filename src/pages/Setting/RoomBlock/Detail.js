@@ -242,17 +242,14 @@ class Detail extends PureComponent {
     const { values } = this.props
     const isNew = !values.isEnableRecurrence && !values.id
 
-    if (isNew || values.isEnableRecurrence) {
-      return (
-        <Recurrence
-          block
-          disabled={values.id !== undefined}
-          formValues={values}
-          recurrenceDto={values.recurrenceDto}
-        />
-      )
-    }
-    return null
+    return (
+      <Recurrence
+        block
+        disabled={values.id !== undefined}
+        formValues={values}
+        recurrenceDto={values.recurrenceDto}
+      />
+    )
   }
 
   render () {

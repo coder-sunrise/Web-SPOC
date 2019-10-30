@@ -10,8 +10,8 @@ import {
 let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
-  type: Yup.string().required(),
-  code: Yup.string().required(),
+  type: Yup.number().required(),
+  code: Yup.number().required(),
   // name: Yup.string().required(),
   orderQuantity: Yup.number().min(1).required(),
   bonusQuantity: Yup.number().min(0).required(),
@@ -128,14 +128,14 @@ class Grid extends PureComponent {
       onClickColumn: 'item',
     })
 
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
-    return { ...row }
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+    // return { ...row }
   }
 
   onAddedRowsChange = (addedRows) => {

@@ -49,13 +49,15 @@ class EditOrder extends Component {
   }
 
   cancelOrder = (e) => {
-    navigateDirtyCheck(() => {
-      this.props.dispatch({
-        type: `dispense/updateState`,
-        payload: {
-          editingOrder: false,
-        },
-      })
+    navigateDirtyCheck({
+      onProceed: () => {
+        this.props.dispatch({
+          type: `dispense/updateState`,
+          payload: {
+            editingOrder: false,
+          },
+        })
+      },
     })(e)
   }
 

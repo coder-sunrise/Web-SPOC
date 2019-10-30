@@ -24,7 +24,12 @@ import {
   defaultScreenSize,
 } from './utils'
 // services
-import { getPDF, exportPdfReport, exportExcelReport } from '@/services/report'
+import {
+  getPDF,
+  getUnsavedPDF,
+  exportPdfReport,
+  exportExcelReport,
+} from '@/services/report'
 // styles
 import styles from './styles'
 
@@ -33,6 +38,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 const ReportViewer = ({
   reportID,
   reportParameters = {},
+  reportContent = '',
+  unsavedReport = false,
   classes,
   showTopDivider = true,
 }) => {
@@ -68,14 +75,25 @@ const ReportViewer = ({
   useEffect(() => {
     setScreenSize({ height: window.innerHeight, width: window.innerWidth })
     // fetchReport().then((result) => setPdfData(result))
-    getPDF(reportID, reportParameters).then((result) => {
-      if (result) {
-        const base64Result = arrayBufferToBase64(result)
-        setPdfData(base64Result)
-      } else {
-        setShowError(true)
-      }
-    })
+    if (!unsavedReport) {
+      getPDF(reportID, reportParameters).then((result) => {
+        if (result) {
+          const base64Result = arrayBufferToBase64(result)
+          setPdfData(base64Result)
+        } else {
+          setShowError(true)
+        }
+      })
+    } else {
+      getUnsavedPDF(reportID, reportContent).then((result) => {
+        if (result) {
+          const base64Result = arrayBufferToBase64(result)
+          setPdfData(base64Result)
+        } else {
+          setShowError(true)
+        }
+      })
+    }
     return () => {
       // clean up, invoke on unmounting
       setPdfData(undefined)

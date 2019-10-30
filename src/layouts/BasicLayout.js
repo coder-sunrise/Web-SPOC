@@ -123,6 +123,7 @@ class BasicLayout extends React.PureComponent {
       if (!d) return
       reloadAuthorized()
       const getClinicSettings = sessionStorage.getItem('clinicSettings')
+      const getClinicInfo = sessionStorage.getItem('clinicInfo')
 
       if (getClinicSettings === null) {
         dispatch({
@@ -138,10 +139,20 @@ class BasicLayout extends React.PureComponent {
         })
       }
 
-      dispatch({
-        type: 'clinicInfo/query',
-        payload: localStorage.getItem('clinicCode'),
-      })
+      if (getClinicInfo == null) {
+        dispatch({
+          type: 'clinicInfo/query',
+          payload: localStorage.getItem('clinicCode'),
+        })
+      } else {
+        const parsedClinicInfo = JSON.parse(getClinicInfo)
+        dispatch({
+          type: 'clinicInfo/updateState',
+          payload: {
+            settings: parsedClinicInfo,
+          },
+        })
+      }
 
       // console.log(routes, authority)
       dispatch({

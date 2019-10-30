@@ -94,7 +94,9 @@ const Detail = (props) => {
         <Button
           authority='none'
           color='danger'
-          onClick={navigateDirtyCheck('/finance/scheme')}
+          onClick={navigateDirtyCheck({
+            redirectUrl: '/finance/scheme',
+          })}
         >
           Close
         </Button>

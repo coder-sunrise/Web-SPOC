@@ -446,7 +446,9 @@ class printoutSetting extends PureComponent {
               <Button
                 color='danger'
                 authority='none'
-                onClick={navigateDirtyCheck('/setting')}
+                onClick={navigateDirtyCheck({
+                  redirectUrl: '/setting',
+                })}
               >
                 Cancel
               </Button>
