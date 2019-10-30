@@ -110,13 +110,14 @@ class Grid extends PureComponent {
 
   handleItemOnChange = (e, type) => {
     const { option, row } = e
-
     if (type === 'code') {
       row.name = option.value
     } else {
       row.code = option.value
     }
-
+    row.codeString = option.code
+    row.nameString = option.name
+    row.uomString = option.uom
     row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
