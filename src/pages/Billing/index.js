@@ -207,12 +207,12 @@ class Billing extends Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatch({
-      type: 'billing/updateState',
-      payload: {
-        entity: null,
-      },
-    })
+    // this.props.dispatch({
+    //   type: 'billing/updateState',
+    //   payload: {
+    //     entity: null,
+    //   },
+    // })
   }
 
   toggleReport = () => {

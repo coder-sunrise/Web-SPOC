@@ -71,6 +71,19 @@ const loadFromCodes = [
         .join('')
     },
   },
+  {
+    value: 'externalPrescription',
+    name: 'External Prescription',
+    getter: (v) => {
+      const { orders } = window.g_app._store.getState()
+      if (!orders) return '-'
+      const { rows = [] } = orders
+      return rows
+        .filter((o) => !o.isDeleted && o.isExternalPrescription)
+        .map((o) => `<p>- ${o.subject}</p>`)
+        .join('')
+    },
+  },
 ]
 const styles = (theme) => ({
   editor: {
@@ -181,6 +194,7 @@ class AddConsultationDocument extends PureComponent {
           options={loadFromCodes}
           valueField='value'
           onChange={(val, option) => {
+            console.log(val, option)
             if (!val) return
             const { values } = parentProps
             const v = option.getter
