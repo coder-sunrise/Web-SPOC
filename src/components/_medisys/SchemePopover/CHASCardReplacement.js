@@ -27,6 +27,8 @@ const CHASCardReplacement = ({
     validTo,
     acuteVisitPatientBalance,
     acuteVisitClinicBalance,
+    acuteBalanceStatusCode,
+    isSuccessful,
   } = refreshedSchemeData
   const { callingName, patientAccountNo } = entity
 
@@ -77,34 +79,42 @@ const CHASCardReplacement = ({
         <GridItem md={2} />
 
         <GridItem md={5}>Patient Acute Visit Balance:</GridItem>
-        <GridItem md={5}>
-          <div
-            style={{
-              fontWeight: 500,
-              display: 'inline-block',
-              paddingLeft: 2,
-            }}
-          >
-            {acuteVisitPatientBalance ? '' : acuteVisitPatientBalance} Remaining{' '}
-          </div>{' '}
-          for Year {moment().year()}
-        </GridItem>
+
+        {acuteBalanceStatusCode === 'SC100' ? (
+          <GridItem md={5}>
+            <div
+              style={{
+                fontWeight: 500,
+                display: 'inline-block',
+                paddingLeft: 2,
+              }}
+            >
+              {acuteVisitPatientBalance} Remaining{' '}
+            </div>{' '}
+            for Year {moment().year()}
+          </GridItem>
+        ) : (
+          <GridItem> NA</GridItem>
+        )}
         <GridItem md={2} />
 
         <GridItem md={5}>Patient Acute Clinic Balance:</GridItem>
-        <GridItem md={5}>
-          <div
-            style={{
-              fontWeight: 500,
-              display: 'inline-block',
-              paddingLeft: 2,
-            }}
-          >
-            {acuteVisitClinicBalance <= 0 ? '' : acuteVisitClinicBalance}{' '}
-            Remaining
-          </div>{' '}
-          for {moment().format('MMMM')} {moment().year()}
-        </GridItem>
+        {acuteBalanceStatusCode === 'SC100' ? (
+          <GridItem md={5}>
+            <div
+              style={{
+                fontWeight: 500,
+                display: 'inline-block',
+                paddingLeft: 2,
+              }}
+            >
+              {acuteVisitClinicBalance} Remaining
+            </div>{' '}
+            for {moment().format('MMMM')} {moment().year()}
+          </GridItem>
+        ) : (
+          <GridItem> NA</GridItem>
+        )}
         <GridItem md={2} />
       </GridContainer>
       <GridContainer className={classes.confirmButton}>
