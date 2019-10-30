@@ -9,13 +9,18 @@ export const rounding = (config, amount) => {
   if (cents === 0) return returnAmount + cents
 
   const { currencyRounding, currencyRoundingToTheClosest = 0.0 } = config
+
   const roundingPoint = parseFloat(currencyRoundingToTheClosest)
 
   if (currencyRounding.toLowerCase() === 'up') {
     switch (roundingPoint) {
       case 0.05: {
-        const _cents = cents % 5
-        cents = _cents < 5 ? 5 : 0.1
+        const _cents = roundToTwoDecimals(cents % 0.1)
+        const flooredCents = Math.floor(cents * 10) / 10
+        cents =
+          _cents > roundingPoint
+            ? Math.round(cents)
+            : flooredCents + roundingPoint
         break
       }
       case 0.1:
@@ -35,9 +40,13 @@ export const rounding = (config, amount) => {
     }
   } else {
     switch (roundingPoint) {
-      case 0.05:
-        cents = cents < roundingPoint ? 0.0 : roundingPoint
+      case 0.05: {
+        const _cents = roundToTwoDecimals(cents % 0.1)
+        const flooredCents = Math.floor(cents * 10) / 10
+        cents =
+          _cents < roundingPoint ? flooredCents : flooredCents + roundingPoint
         break
+      }
       case 0.1:
         cents = Math.floor(cents * 10) / 10
         break
