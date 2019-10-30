@@ -15,7 +15,7 @@ import MoreVert from '@material-ui/icons/MoreVert'
 import ColorLens from '@material-ui/icons/ColorLens'
 import Pen from '@material-ui/icons/Create'
 import InsertPhoto from '@material-ui/icons/InsertPhoto'
-import Title from '@material-ui/icons/Title'
+import Title from '@material-ui/icons/TextFields'
 import Dropzone from 'react-dropzone'
 import UndoIcon from '@material-ui/icons/Undo'
 import RedoIcon from '@material-ui/icons/Redo'
@@ -23,8 +23,8 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import Save from '@material-ui/icons/SaveAlt'
 import Erase from '@material-ui/icons/HowToVote'
 import Remove from '@material-ui/icons/Remove'
-import Backspace from '@material-ui/icons/ArrowBack'
-import Rectangle from '@material-ui/icons/CropLandscape'
+import Backspace from '@material-ui/icons/CompareArrowsTwoTone'
+import Rectangle from '@material-ui/icons/CropSquare'
 import Circle from '@material-ui/icons/PanoramaFishEye'
 import Move from '@material-ui/icons/OpenWith'
 import Select from '@material-ui/icons/PanTool'
@@ -33,8 +33,9 @@ import InVisibility from '@material-ui/icons/VisibilityOff'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import { Radio } from 'antd'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
+import Yup from '@/utils/yup'
+
 import {
   GridContainer,
   GridItem,
@@ -131,7 +132,7 @@ let temp = null
     props.addScribble(values.subject, temp)
     props.toggleScribbleModal()
   },
-  displayName: 'scribbleNotePage',
+  displayName: 'ScribbleNotePage',
 })
 @connect(({ scriblenotes }) => ({
   scriblenotes,
@@ -144,7 +145,8 @@ class Scribble extends React.Component {
       lineWidth: 10,
       lineColor: 'black',
       backgroundColor: 'transparent',
-      toolsVisible: false,
+      toolsDrawVisible: false,
+      toolsShapeVisible: false,
       colorVisible: false,
       imageVisible: false,
       text: '',
@@ -160,7 +162,8 @@ class Scribble extends React.Component {
       disableAddImage: false,
       indexCount: 1,
       deleteEnable: false,
-      toolsColor: false,
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -198,8 +201,15 @@ class Scribble extends React.Component {
     }
   }
 
-  handleToolsVisibleChange = (toolsVisible) => {
-    this.setState({ toolsVisible })
+  handleToolsDrawVisibleChange = (toolsDrawVisible) => {
+    this.setState({ 
+      toolsDrawVisible, 
+      toolsDrawingColor: toolsDrawVisible ? true : false,
+    })
+  }
+
+  handleToolsShapeVisibleChange = (toolsShapeVisible) => {
+    this.setState({ toolsShapeVisible })
   }
 
   handleColorVisibleChange = (colorVisible) => {
@@ -280,7 +290,7 @@ class Scribble extends React.Component {
   _onSketchChange = () => {
     let prev = this.state.canUndo
     let now = this._sketch.canUndo()
-    if ( now) {
+    if (now) {
       this.setState({
         canUndo: now,
         canClear: true,
@@ -311,7 +321,8 @@ class Scribble extends React.Component {
       tool: 'select',
       eraserColor: false,
       selectColor: true,
-      toolsColor: false,
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -344,10 +355,22 @@ class Scribble extends React.Component {
     this._sketch.setTemplate(layerContent, id)
   }
 
-  toolHandleClickAway = () => {
-    const { toolsColor } = this.state
+  toolDrawingHandleClickAway = () => {
+    const { toolsDrawVisible } =this.state
+    console.log("test ", toolsDrawVisible)
     this.setState({
-      toolsColor: false,
+      toolsDrawingColor: toolsDrawVisible ? toolsDrawVisible : false,
+      toolsShapeColor: false,
+      selectColorColor: false,
+      imageColor: false,
+      textColor: false,
+    })
+  }
+
+  toolShapeHandleClickAway = () => {
+    this.setState({
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -355,9 +378,9 @@ class Scribble extends React.Component {
   }
 
   colorHandleClickAway = () => {
-    const { selectColorColor } = this.state
     this.setState({
-      toolsColor: false,
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -367,7 +390,8 @@ class Scribble extends React.Component {
   imageHandleClickAway = () => {
     const { imageColor } = this.state
     this.setState({
-      toolsColor: false,
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -377,7 +401,8 @@ class Scribble extends React.Component {
   textHandleClickAway = () => {
     const { textColor } = this.state
     this.setState({
-      toolsColor: false,
+      toolsDrawingColor: false,
+      toolsShapeColor: false,
       selectColorColor: false,
       imageColor: false,
       textColor: false,
@@ -444,7 +469,8 @@ class Scribble extends React.Component {
                       tool: 'select',
                       eraserColor: false,
                       selectColor: true,
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -458,112 +484,76 @@ class Scribble extends React.Component {
               <Popover
                 icon={null}
                 content={
-                  <ClickAwayListener onClickAway={this.toolHandleClickAway}>
-                    <div>
-                      <div style={{ paddingBottom: 10 }}>
-                        <Typography>Select Tools</Typography>
-                        <Divider />
-                      </div>
-
-                      <div>
-                        <Typography>Please select Canvas Tool</Typography>
-                        <br />
-                        <Radio.Group
-                          // defaultValue={Tools.Pencil}
-                          value={this.state.tool}
-                          buttonStyle='solid'
-                          onChange={(e) => {
-                            this.setState({
-                              tool: e.target.value,
-                              eraserColor: false,
-                              selectColor: false,
-                            })
-
-                            if (e.target.value === 'select') {
+                  <ClickAwayListener onClickAway={this.toolDrawingHandleClickAway}>
+                    <div style={{ paddingTop: 10, width: 200 }}>
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <Radio.Group
+                            // defaultValue={Tools.Pencil}
+                            value={this.state.tool}
+                            buttonStyle='solid'
+                            onChange={(e) => {
                               this.setState({
+                                tool: e.target.value,
                                 eraserColor: false,
-                                selectColor: true,
+                                selectColor: false,
+                                toolsDrawingColor: true,
                               })
-                            }
-                          }}
-                        >
-                          <Tooltip title='Select'>
-                            <React.Fragment>
+
+                            }}
+                          >
+                            <Tooltip title='Pencil'>
                               <Radio.Button
-                                value={Tools.Select}
+                                value={Tools.Pencil}
                                 className={classes.radioButtonPadding}
                               >
-                                <Select />
+                                <Pen />
                               </Radio.Button>
-                            </React.Fragment>
-                          </Tooltip>
+                            </Tooltip>
 
-                          <Tooltip title='Pencil'>
                             <Radio.Button
-                              value={Tools.Pencil}
+                              value={Tools.Line}
                               className={classes.radioButtonPadding}
                             >
-                              <Pen />
+                              <Remove />
                             </Radio.Button>
-                          </Tooltip>
+                            <Radio.Button
+                              value={Tools.Arrow}
+                              className={classes.radioButtonPadding}
+                            >
+                              <Backspace />
+                            </Radio.Button>
+                          </Radio.Group>
+                        </GridItem>
+                      </GridContainer>
 
-                          <Radio.Button
-                            value={Tools.Line}
-                            className={classes.radioButtonPadding}
-                          >
-                            <Remove />
-                          </Radio.Button>
-                          <Radio.Button
-                            value={Tools.Arrow}
-                            className={classes.radioButtonPadding}
-                          >
-                            <Backspace />
-                          </Radio.Button>
-                          <Radio.Button
-                            value={Tools.Rectangle}
-                            className={classes.radioButtonPadding}
-                          >
-                            <Rectangle />
-                          </Radio.Button>
-                          <Radio.Button
-                            value={Tools.Circle}
-                            className={classes.radioButtonPadding}
-                          >
-                            <Circle />
-                          </Radio.Button>
-                          <Radio.Button
-                            value={Tools.Pan}
-                            className={classes.radioButtonPadding}
-                          >
-                            <Move />
-                          </Radio.Button>
-                        </Radio.Group>
-                      </div>
-
-                      <br />
-                      <div>
-                        <Typography>Line Weight</Typography>
-                        <Slider
-                          // ValueLabelComponent={ValueLabelComponent}
-                          step={1}
-                          min={0}
-                          max={50}
-                          aria-labelledby='slider'
-                          value={this.state.lineWidth}
-                          onChange={(e, v) => this.setState({ lineWidth: v })}
-                        />
-                      </div>
+                      <GridContainer style={{paddingTop:10}}>
+                        <GridItem xs={12} md={12}>
+                          <Typography>Line Weight</Typography>
+                          <Slider
+                            // ValueLabelComponent={ValueLabelComponent}
+                            step={1}
+                            min={0}
+                            max={50}
+                            aria-labelledby='slider'
+                            value={this.state.lineWidth}
+                            onChange={(e, v) => this.setState({ lineWidth: v })}
+                          />
+                        </GridItem>
+                      </GridContainer>
                     </div>
                   </ClickAwayListener>
                 }
                 // title='Select Tools'
                 trigger='click'
                 placement='bottomLeft'
-                visible={this.state.toolsVisible}
-                onVisibleChange={this.handleToolsVisibleChange}
+                visible={this.state.toolsDrawVisible}
+                onVisibleChange={this.handleToolsDrawVisibleChange}
                 onClick={() => {
+                  const { toolsDrawingColor } =this.state
                   this.setState(() => ({
-                    toolsColor: true,
+                    toolsDrawingColor: true,
+                    toolsShapeColor: false,
                     selectColorColor: false,
                     imageColor: false,
                     textColor: false,
@@ -573,7 +563,101 @@ class Scribble extends React.Component {
               >
                 <Tooltip title='Colors'>
                   <ToggleButton key={2} type='primary'>
-                    <MoreVert color={this.state.toolsColor ? 'primary' : ''} />
+                    <Pen
+                      color={this.state.toolsDrawingColor ? 'primary' : ''}
+                    />
+                  </ToggleButton>
+                </Tooltip>
+              </Popover>
+
+              <Popover
+                icon={null}
+                content={
+                  <ClickAwayListener onClickAway={this.toolShapeHandleClickAway}>
+                    <div style={{ paddingTop: 10, width: 200 }}>
+                      <GridContainer>
+                        <GridItem xs={10} md={10}>
+                          <Radio.Group
+                            // defaultValue={Tools.Pencil}
+                            value={this.state.tool}
+                            buttonStyle='solid'
+                            onChange={(e) => {
+                              this.setState({
+                                tool: e.target.value,
+                                eraserColor: false,
+                                selectColor: false,
+                                
+                              })
+
+                            }}
+                          >
+                            <Radio.Button
+                              value={Tools.Rectangle}
+                              className={classes.radioButtonPadding}
+                            >
+                              <Rectangle />
+                            </Radio.Button>
+                            <Radio.Button
+                              value={Tools.Circle}
+                              className={classes.radioButtonPadding}
+                            >
+                              <Circle />
+                            </Radio.Button>
+                          </Radio.Group>
+                        </GridItem>
+                      </GridContainer>
+
+                      <GridContainer style={{ paddingTop: 20 }}>
+                        <GridItem xs={10} md={10}>
+                          <Typography>Fill Enable</Typography>
+                          <Switch
+                            value={this.state.fillWithColor}
+                            onChange={() =>
+                              this.setState((preState) => ({
+                                fillWithColor: !preState.fillWithColor,
+                              }))}
+                          />
+                        </GridItem>
+                      </GridContainer>
+
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <Typography>Line Weight</Typography>
+                          <Slider
+                            // ValueLabelComponent={ValueLabelComponent}
+                            step={1}
+                            min={0}
+                            max={50}
+                            aria-labelledby='slider'
+                            value={this.state.lineWidth}
+                            onChange={(e, v) => this.setState({ lineWidth: v })}
+                          />
+                        </GridItem>
+                      </GridContainer>
+                    </div>
+                  </ClickAwayListener>
+                }
+                // title='Select Tools'
+                trigger='click'
+                placement='bottomLeft'
+                visible={this.state.toolsShapeVisible}
+                onVisibleChange={this.handleToolsShapeVisibleChange}
+                onClick={() => {
+                  this.setState(() => ({
+                    toolsDrawingColor: false,
+                    toolsShapeColor: true,
+                    selectColorColor: false,
+                    imageColor: false,
+                    textColor: false,
+                    eraserColor: false,
+                  }))
+                }}
+              >
+                <Tooltip title='Colors'>
+                  <ToggleButton key={3} type='primary'>
+                    <Rectangle
+                      color={this.state.toolsShapeColor ? 'primary' : ''}
+                    />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -583,38 +667,41 @@ class Scribble extends React.Component {
                 content={
                   <ClickAwayListener onClickAway={this.colorHandleClickAway}>
                     <div>
-                      <div style={{ paddingBottom: 10 }}>
-                        <Typography>Colors</Typography>
-                        <Divider />
-                      </div>
-                      <Typography>Line Color</Typography>
-                      <CompactPicker
-                        id='lineColor'
-                        color={this.state.lineColor}
-                        onChange={(color) =>
-                          this.setState({ lineColor: color.hex })}
-                      />
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <div style={{ paddingBottom: 10 }}>
+                            <Typography>Colors</Typography>
+                            <Divider />
+                          </div>
+                          <Typography>Line Color</Typography>
+                          <CompactPicker
+                            id='lineColor'
+                            color={this.state.lineColor}
+                            onChange={(color) =>
+                              this.setState({ lineColor: color.hex })}
+                          />
+                        </GridItem>
+                      </GridContainer>
 
-                      <br />
-                      <br />
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <Typography>Fill Color</Typography>
+                          <CompactPicker
+                            color={this.state.fillColor}
+                            onChange={(color) =>
+                              this.setState({ fillColor: color.hex })}
+                          />
 
-                      <Typography>Fill Color</Typography>
-                      <CompactPicker
-                        color={this.state.fillColor}
-                        onChange={(color) =>
-                          this.setState({ fillColor: color.hex })}
-                      />
-
-                      <br />
-                      <br />
-                      <Typography>Fill Enable</Typography>
+                          {/* <Typography>Fill Enable</Typography>
                       <Switch
                         value={this.state.fillWithColor}
                         onChange={() =>
                           this.setState((preState) => ({
                             fillWithColor: !preState.fillWithColor,
                           }))}
-                      />
+                      /> */}
+                        </GridItem>
+                      </GridContainer>
                     </div>
                   </ClickAwayListener>
                 }
@@ -625,7 +712,8 @@ class Scribble extends React.Component {
                 onVisibleChange={this.handleColorVisibleChange}
                 onClick={() => {
                   this.setState(() => ({
-                    toolsColor: false,
+                    toolsDrawingColor: false,
+                    toolsShapeColor: false,
                     selectColorColor: true,
                     imageColor: false,
                     textColor: false,
@@ -634,7 +722,7 @@ class Scribble extends React.Component {
                 }}
               >
                 <Tooltip title='Colors'>
-                  <ToggleButton key={3}>
+                  <ToggleButton key={4}>
                     <ColorLens
                       color={this.state.selectColorColor ? 'primary' : ''}
                     />
@@ -647,56 +735,62 @@ class Scribble extends React.Component {
                 content={
                   <ClickAwayListener onClickAway={this.imageHandleClickAway}>
                     <div>
-                      <div style={{ paddingBottom: 10 }}>
-                        <Typography>Select Image</Typography>
-                        <Divider />
-                      </div>
-                      <Paper className={classes.templateImage}>
-                        <List>
-                          <div className={classes.imageOption}>
-                            {this.state.templateList.map((item) => {
-                              return (
-                                <Button
-                                  color='primary'
-                                  onClick={() => {
-                                    this._setTemplate(
-                                      item.layerContent,
-                                      item.id,
-                                    )
-                                  }}
-                                  style={{
-                                    margin: 10,
-                                  }}
-                                >
-                                  {item.description}
-                                </Button>
-                              )
-                            })}
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <div style={{ paddingBottom: 10 }}>
+                            <Typography>Select Image</Typography>
+                            <Divider />
                           </div>
-                        </List>
-                      </Paper>
-
-                      <br />
-
-                      <div>
-                        <Dropzone
-                          onDrop={this._onBackgroundImageDrop}
-                          accept='image/*'
-                          multiple={false}
-                        >
-                          {({ getRootProps, getInputProps }) => (
-                            <section>
-                              <div {...getRootProps()} style={styles.dropArea}>
-                                <input {...getInputProps()} />
-                                <p className={classes.dropArea}>
-                                  Drag and drop some files here, or click to
-                                  select files
-                                </p>
+                          <Paper className={classes.templateImage}>
+                            <List>
+                              <div className={classes.imageOption}>
+                                {this.state.templateList.map((item) => {
+                                  return (
+                                    <Button
+                                      color='primary'
+                                      onClick={() => {
+                                        this._setTemplate(
+                                          item.layerContent,
+                                          item.id,
+                                        )
+                                      }}
+                                      style={{
+                                        margin: 10,
+                                      }}
+                                    >
+                                      {item.description}
+                                    </Button>
+                                  )
+                                })}
                               </div>
-                            </section>
-                          )}
-                        </Dropzone>
-                      </div>
+                            </List>
+                          </Paper>
+                        </GridItem>
+                      </GridContainer>
+                      <GridContainer style={{ paddingTop: 10 }}>
+                        <GridItem xs={12} md={12}>
+                          <Dropzone
+                            onDrop={this._onBackgroundImageDrop}
+                            accept='image/*'
+                            multiple={false}
+                          >
+                            {({ getRootProps, getInputProps }) => (
+                              <section>
+                                <div
+                                  {...getRootProps()}
+                                  style={styles.dropArea}
+                                >
+                                  <input {...getInputProps()} />
+                                  <p className={classes.dropArea}>
+                                    Drag and drop some files here, or click to
+                                    select files
+                                  </p>
+                                </div>
+                              </section>
+                            )}
+                          </Dropzone>
+                        </GridItem>
+                      </GridContainer>
                     </div>
                   </ClickAwayListener>
                 }
@@ -708,7 +802,8 @@ class Scribble extends React.Component {
                 onClick={() => {
                   const { imageColor } = this.state
                   this.setState(() => ({
-                    toolsColor: false,
+                    toolsDrawingColor: false,
+                    toolsShapeColor: false,
                     selectColorColor: false,
                     imageColor: true,
                     textColor: false,
@@ -717,60 +812,66 @@ class Scribble extends React.Component {
                 }}
               >
                 <Tooltip title='Insert Image'>
-                  <ToggleButton key={4}>
+                  <ToggleButton key={5}>
                     <InsertPhoto
                       color={this.state.imageColor ? 'primary' : ''}
                     />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
-              <Tooltip title='Add Text'>
-                <Popover
-                  icon={null}
-                  content={
-                    <ClickAwayListener onClickAway={this.textHandleClickAway}>
-                      <div>
-                        <div style={{ paddingBottom: 10 }}>
-                          <Typography>Text</Typography>
-                          <Divider />
-                        </div>
-                        <MaterialTextField
-                          label='Text'
-                          helperText='Add text to Sketch'
-                          onChange={(e) =>
-                            this.setState({ text: e.target.value })}
-                          value={this.state.text}
-                        />
-                        <br />
-                        <Button color='primary' onClick={this._addText}>
-                          Add Text
-                        </Button>
-                      </div>
-                    </ClickAwayListener>
-                  }
-                  // title='Text'
-                  trigger='click'
-                  placement='bottomLeft'
-                  // visible={this.state.colorVisible}
-                  // onVisibleChange={this.handleColorVisibleChange}
-                  onClick={() => {
-                    const { textColor } = this.state
-                    this.setState(() => ({
-                      toolsColor: false,
-                      selectColorColor: false,
-                      imageColor: false,
-                      eraserColor: false,
-                      textColor: true,
-                    }))
-                  }}
-                >
-                  <Tooltip title='Colors'>
-                    <ToggleButton key={3}>
-                      <Title color={this.state.textColor ? 'primary' : ''} />
-                    </ToggleButton>
-                  </Tooltip>
-                </Popover>
-              </Tooltip>
+
+              <Popover
+                icon={null}
+                content={
+                  <ClickAwayListener onClickAway={this.textHandleClickAway}>
+                    <div style={{ width: 300 }}>
+                      <GridContainer>
+                        <GridItem xs={12} md={12}>
+                          <TextField
+                            label='Text'
+                            onChange={(e) =>
+                              this.setState({ text: e.target.value })}
+                            // value={this.state.text}
+                          />
+                        </GridItem>
+                      </GridContainer>
+                      <GridContainer style={{ paddingTop: 10 }}>
+                        <GridItem xs={12} md={12}>
+                          <Button
+                            color='primary'
+                            onClick={this._addText}
+                            style={{ paddingTop: 20 }}
+                          >
+                            Add Text
+                          </Button>
+                        </GridItem>
+                      </GridContainer>
+                    </div>
+                  </ClickAwayListener>
+                }
+                // title='Text'
+                trigger='click'
+                placement='bottomLeft'
+                // visible={this.state.colorVisible}
+                // onVisibleChange={this.handleColorVisibleChange}
+                onClick={() => {
+                  this.setState(() => ({
+                    toolsDrawingColor: false,
+                    toolsShapeColor: false,
+                    selectColorColor: false,
+                    imageColor: false,
+                    eraserColor: false,
+                    textColor: true,
+                  }))
+                }}
+              >
+                <Tooltip title='Add Text'>
+                  <ToggleButton key={6}>
+                    <Title color={this.state.textColor ? 'primary' : ''} />
+                  </ToggleButton>
+                </Tooltip>
+              </Popover>
+
               <Tooltip title='Erase'>
                 <ToggleButton
                   key={7}
@@ -780,7 +881,8 @@ class Scribble extends React.Component {
                       tool: 'eraser',
                       eraserColor: true,
                       selectColor: false,
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -797,7 +899,7 @@ class Scribble extends React.Component {
                     this._download()
 
                     this.setState({
-                      toolsColor: false,
+                      toolsDrawingColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -816,7 +918,8 @@ class Scribble extends React.Component {
                     this._undo()
 
                     this.setState({
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -837,7 +940,8 @@ class Scribble extends React.Component {
                     this._redo()
 
                     this.setState({
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -858,7 +962,8 @@ class Scribble extends React.Component {
                     this._clear()
 
                     this.setState({
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,
@@ -878,7 +983,8 @@ class Scribble extends React.Component {
                     this._hideDrawing()
 
                     this.setState({
-                      toolsColor: false,
+                      toolsDrawingColor: false,
+                      toolsShapeColor: false,
                       selectColorColor: false,
                       imageColor: false,
                       textColor: false,

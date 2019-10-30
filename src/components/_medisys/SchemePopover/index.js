@@ -113,9 +113,9 @@ const SchemePopover = ({
                     }}
                   >
                     {schemeData.acuteVisitPatientBalance ? (
-                      ''
+                       schemeData.acuteVisitPatientBalance
                     ) : (
-                      schemeData.acuteVisitPatientBalance
+                     ''
                     )}{' '}
                     Remaining{' '}
                   </div>{' '}

@@ -230,7 +230,7 @@ class Banner extends PureComponent {
     const { refreshedSchemeData } = this.state
     if (
       !_.isEmpty(refreshedSchemeData) 
-     //  &&  refreshedSchemeData.isSuccessful === true
+       // &&  refreshedSchemeData.isSuccessful === true
     ) {
       return { ...refreshedSchemeData }
     }
@@ -266,6 +266,7 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
+      acuteBalanceStatusCode: schemeData.patientSchemeBalance.length > 0 ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode : '',
     }
   }
 
