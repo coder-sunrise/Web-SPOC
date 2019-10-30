@@ -1021,10 +1021,10 @@ class ClinicalNotes extends Component {
           title='Scribble'
           fullScreen
           bodyNoPadding
-          observe='scribbleNotePage'
+          observe='ScribbleNotePage'
           onClose={() =>
             navigateDirtyCheck({
-              onProceed: this.toggleScribbleModal,
+              onProceed: this.toggleScribbleModal(),
             })}
         >
           <ScribbleNote

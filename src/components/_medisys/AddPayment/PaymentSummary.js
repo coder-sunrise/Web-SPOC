@@ -12,6 +12,7 @@ const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
 const PaymentSummary = ({
   classes,
   totalAftGst,
+  outstandingBalance,
   collectableAmount,
   cashReturned,
   cashRounding,
@@ -30,7 +31,7 @@ const PaymentSummary = ({
       <GridItem md={6} container className={classes.paymentSummary}>
         <GridItem md={6}>Total Payment: </GridItem>
         <GridItem md={6}>
-          <NumberInput text currency value={totalAftGst} />
+          <NumberInput text currency value={outstandingBalance} />
         </GridItem>
         <GridItem md={6}>Cash Rounding: </GridItem>
         <GridItem md={6}>

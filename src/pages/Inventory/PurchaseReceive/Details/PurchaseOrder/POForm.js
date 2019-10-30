@@ -153,7 +153,14 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                         id: 'inventory.pr.detail.pod.poDate',
                       })}
                       allowClear={false}
-                      // disabled={!isReadOnly}
+                      onChange={(e) => {
+                        if (e === '') {
+                          setFieldValue(
+                            'purchaseOrder.purchaseOrderDate',
+                            moment(),
+                          )
+                        }
+                      }}
                       {...args}
                     />
                   )

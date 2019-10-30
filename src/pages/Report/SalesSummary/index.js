@@ -266,12 +266,13 @@ const SalesSummary = ({ values, validateForm }) => {
   }, [])
 
   const handleExpandedGroupsChange = (expandedGroups) => {
-    dispatch({
-      type: 'updateState',
-      payload: {
-        groups: expandedGroups,
-      },
-    })
+    console.log({ expandedGroups })
+    // dispatch({
+    //   type: 'updateState',
+    //   payload: {
+    //     groups: expandedGroups,
+    //   },
+    // })
   }
   console.log({ state })
   return (
