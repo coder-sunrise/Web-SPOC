@@ -104,29 +104,30 @@ const ItemList = ({
   }
 
   const options = () => [
+   
     {
       id: 1,
-      name: 'Consumables',
-      content: addContent('inventoryconsumable'),
-    },
-    {
-      id: 2,
-      name: 'Medications',
+      name: 'Medication',
       content: addContent('inventorymedication'),
     },
     {
+      id: 2,
+      name: 'Consumable',
+      content: addContent('inventoryconsumable'),
+    },
+    {
       id: 3,
-      name: 'Vaccines',
+      name: 'Vaccination',
       content: addContent('inventoryvaccination'),
     },
     {
       id: 4,
-      name: 'Services',
+      name: 'Service',
       content: addContent('ctservice'),
     },
     {
       id: 5,
-      name: 'Packages',
+      name: 'Package',
       content: addContent('inventorypackage'),
     },
   ]

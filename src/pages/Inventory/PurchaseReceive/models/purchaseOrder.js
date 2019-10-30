@@ -204,7 +204,9 @@ export default createFormViewModel({
           ...state,
           purchaseOrder: {
             ...payload,
-            invoiceStatusFK: getInvoiceStatusFK(payload.invoiceStatus).id,
+            invoiceStatusFK: payload.invoiceStatus
+              ? getInvoiceStatusFK(payload.invoiceStatus).id
+              : null,
             purchaseOrderStatusFK: getPurchaseOrderStatusFK(
               payload.purchaseOrderStatus,
             ).id,

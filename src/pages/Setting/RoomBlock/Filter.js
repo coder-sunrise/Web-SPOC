@@ -74,8 +74,12 @@ const styles = (theme) => ({
           stringRoomBlockGroupFK === 0 ? undefined : stringRoomBlockGroupFK,
 
         'RoomBlockGroupFkNavigation.RoomBlockRecurrenceFkNavigation.RecurrencePatternFK': roomBlockRecurrenceFK,
-        lgteql_startDateTime: dateFrom,
-        lsteql_endDateTime: dateTo,
+        lgteql_startDateTime: dateFrom
+          ? moment(dateFrom).formatUTC()
+          : undefined,
+        lsteql_endDateTime: dateTo
+          ? moment(dateTo).endOf('day').formatUTC(false)
+          : undefined,
       },
     }).then(() => {
       dispatch({
@@ -125,9 +129,9 @@ class Filter extends PureComponent {
               render={(args) => {
                 return (
                   <DatePicker
-                    // timeFomat={false}
                     label='From date'
                     onChange={(v) => this.setDateTo(v)}
+                    timeFormat={false}
                     {...args}
                   />
                 )
@@ -138,7 +142,9 @@ class Filter extends PureComponent {
             <Field
               name='dateTo'
               render={(args) => {
-                return <DatePicker label='To date' {...args} />
+                return (
+                  <DatePicker label='To date' timeFormat={false} {...args} />
+                )
               }}
             />
           </GridItem>

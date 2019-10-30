@@ -12,6 +12,18 @@ export default ({ current }) => (
     ]}
     FuncProps={{ pager: false }}
     columnExtensions={[
+      {
+        columnName: 'type',
+
+        render: (row) => {
+          return (
+            <div>
+              {row.type}
+              {row.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+            </div>
+          )
+        },
+      },
       { columnName: 'totalAmount', type: 'number', currency: true },
     ]}
   />

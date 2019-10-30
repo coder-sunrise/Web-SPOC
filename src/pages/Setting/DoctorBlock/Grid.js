@@ -46,33 +46,66 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
   }
 
   const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
+  const [
     tableConfig,
     setTableConfig,
   ] = useState(TableParams)
+
   useEffect(
     () => {
-      const tempTableConfig = {
-        ...TableParams,
-        FuncProps: {
-          ...TableParams.FuncProps,
-          groupingConfig: {
-            state: {
-              grouping: [
-                { columnName: 'doctorBlockGroupFK' },
-              ],
-            },
-            row: {
-              contentComponent: GroupCellContent,
-            },
-          },
-        },
+      if (dataSource) {
+        let tempArray = []
+        dataSource.forEach((o) => {
+          tempArray.push(o.doctorBlockGroupFK.toString())
+        })
+
+        setExpandedGroups(tempArray)
       }
-      setTableConfig(tempTableConfig)
     },
     [
       dataSource,
     ],
   )
+
+  useEffect(
+    () => {
+      if (dataSource) {
+        const tempTableConfig = {
+          ...TableParams,
+          FuncProps: {
+            ...TableParams.FuncProps,
+            groupingConfig: {
+              state: {
+                grouping: [
+                  { columnName: 'doctorBlockGroupFK' },
+                ],
+                expandedGroups: [
+                  ...expandedGroups,
+                ],
+                onExpandedGroupsChange: handleExpandedGroupsChange,
+              },
+              row: {
+                contentComponent: GroupCellContent,
+              },
+            },
+          },
+        }
+        setTableConfig(tempTableConfig)
+      }
+    },
+    [
+      expandedGroups,
+    ],
+  )
+
   const editDoctorBlock = (event) => onEditClick(event.currentTarget.id)
 
   const deleteDoctorBlock = (event) => onDeleteClick(event.currentTarget.id)

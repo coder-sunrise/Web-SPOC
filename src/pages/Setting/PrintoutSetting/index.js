@@ -1,4 +1,4 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 // import NumberFormat from 'react-number-format'
@@ -10,9 +10,7 @@ import {
   GridContainer,
   GridItem,
   CardContainer,
-  TextField,
   Button,
-  Select,
   Switch,
   NumberInput,
   CodeSelect,
@@ -100,14 +98,18 @@ const styles = (theme) => ({
         is: (v) => v === true,
         then: Yup.number().required(),
       }),
-    // customLetterHeadImage: Yup.string().required(),
     customLetterHeadImage: Yup.string().when('isDisplayCustomLetterHead', {
       is: (v) => v === true,
-      then: Yup.string().required(),
+      then: Yup.string().required('Letter Head Image is required.'),
+    }),
+
+    footerDisclaimerImage: Yup.string().when('isDisplayFooterInfoDisclaimer', {
+      is: (v) => v === true,
+      then: Yup.string().required('Footer Disclaimer Image is required.'),
     }),
   }),
-  handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, history } = props
+  handleSubmit: (values, { props }) => {
+    const { dispatch } = props
     const { customLetterHeadImage, footerDisclaimerImage, reportFK } = values
     const noHeaderBase64 = (v) => {
       if (v) return v.split(',')[1] || v
@@ -185,7 +187,7 @@ class printoutSetting extends PureComponent {
   }
 
   getSelectedReportSetting = (e) => {
-    const { dispatch, resetForm, formik } = this.props
+    const { dispatch } = this.props
 
     if (e) {
       dispatch({
@@ -240,6 +242,7 @@ class printoutSetting extends PureComponent {
       ...restProps
     } = this.props
     const letterHeadImgRequired = this.props.errors.customLetterHeadImage
+    const footerDisclaimerImgRequired = this.props.errors.footerDisclaimerImage
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -303,7 +306,7 @@ class printoutSetting extends PureComponent {
                   <GridItem md={6}>
                     {letterHeadImgRequired && (
                       <span className={classes.errorMsg}>
-                        Letter Head Image is required.
+                        {letterHeadImgRequired}
                       </span>
                     )}
                     <Field
@@ -421,7 +424,13 @@ class printoutSetting extends PureComponent {
                       )}
                     />
                   </GridItem>
+
                   <GridItem md={6}>
+                    {footerDisclaimerImgRequired && (
+                      <span className={classes.errorMsg}>
+                        {footerDisclaimerImgRequired}
+                      </span>
+                    )}
                     <Field
                       name='footerDisclaimerImage'
                       render={(args) => (
