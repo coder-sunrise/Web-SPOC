@@ -323,8 +323,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  getScribbleValue = (test) => {
-  }
+  getScribbleValue = (test) => {}
 
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
@@ -1020,7 +1019,10 @@ class ClinicalNotes extends Component {
           fullScreen
           bodyNoPadding
           observe='scribbleNotePage'
-          onClose={() => navigateDirtyCheck(this.toggleScribbleModal())}
+          onClose={() =>
+            navigateDirtyCheck({
+              onProceed: this.toggleScribbleModal,
+            })}
         >
           <ScribbleNote
             {...this.props}

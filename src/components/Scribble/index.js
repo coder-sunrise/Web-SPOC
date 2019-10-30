@@ -33,8 +33,8 @@ import InVisibility from '@material-ui/icons/VisibilityOff'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import { Radio } from 'antd'
-import Yup from '@/utils/yup'
 import { connect } from 'dva'
+import Yup from '@/utils/yup'
 import {
   GridContainer,
   GridItem,
@@ -392,7 +392,7 @@ class Scribble extends React.Component {
       deleteScribbleNote,
       setFieldValue,
     } = this.props
-    console.log('props ', this.props)
+    // console.log('props ', this.props)
     return (
       <div className={classes.layout}>
         <GridContainer>
@@ -906,7 +906,10 @@ class Scribble extends React.Component {
 
                 <Button
                   color='danger'
-                  onClick={navigateDirtyCheck(toggleScribbleModal)}
+                  onClick={navigateDirtyCheck({
+                    displayName: 'scribbleNotePage',
+                    onProceed: toggleScribbleModal,
+                  })}
                 >
                   Cancel
                 </Button>
