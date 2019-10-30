@@ -39,7 +39,12 @@ export default {
   'reception.queue.dispense.printInvoice': 'Print Invoice',
   'reception.queue.dispense.printInvoiceWithSummary':
     'Print Invoice with Summary',
-  'reception.queue.dispense.printDrugLabel': 'Print Drug Label',
+  'reception.queue.dispense.refresh': 'Refresh',
+  'reception.queue.dispense.printDrugLabel': 'Drug Label',
+  'reception.queue.dispense.printPatientLabel': 'Patient Label',
+  'reception.queue.dispense.savedispense': 'Save Dispense',
+  'reception.queue.dispense.editorder': 'Edit Order',
+  'reception.queue.dispense.makepayment': 'Make Payment',
 
   'reception.queue.dispense.patientInfo.visitRemarks': 'Visit Remarks',
   'reception.queue.dispense.patientInfo.invoiceRemarks': 'Invoice Remarks',
