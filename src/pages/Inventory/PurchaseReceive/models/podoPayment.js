@@ -51,9 +51,14 @@ export default createFormViewModel({
         return false
       },
       *queryPodoPayment ({ payload }, { call, put }) {
+        const newPOValue = payload.payload
+        let returnValue = payload
+        if (newPOValue) returnValue = newPOValue
         return yield put({
           type: 'setPodoPayment',
-          payload: { ...payload },
+          payload: {
+            ...returnValue,
+          },
         })
       },
       *upsertPodoPayment ({ payload }, { call }) {
@@ -68,6 +73,7 @@ export default createFormViewModel({
     reducers: {
       setPodoPayment (state, { payload }) {
         const { purchaseOrder } = payload
+        const type = purchaseOrder || payload
         const {
           purchaseOrderPayment,
           purchaseOrderNo,
@@ -77,10 +83,11 @@ export default createFormViewModel({
           supplierFK,
           purchaseOrderStatusFK,
           concurrencyToken,
-        } = purchaseOrder
+        } = type
 
         let totalPaidAmount = 0
         let newPurchaseOrderPayment
+
         if (purchaseOrderPayment.length >= 1) {
           let tempId = -99
           newPurchaseOrderPayment = purchaseOrderPayment
@@ -89,8 +96,10 @@ export default createFormViewModel({
               x.cpId = x.clinicPaymentDto.id
               x.cpConcurrencyToken = x.clinicPaymentDto.concurrencyToken
               totalPaidAmount += x.clinicPaymentDto.paymentAmount
-              x.clinicPaymentDto.paymentModeFK =
-                tempId - x.clinicPaymentDto.creditCardTypeFK
+              if (x.clinicPaymentDto.creditCardTypeFK) {
+                x.clinicPaymentDto.paymentModeFK =
+                  tempId - x.clinicPaymentDto.creditCardTypeFK
+              }
 
               return {
                 ...x.clinicPaymentDto,
@@ -98,7 +107,6 @@ export default createFormViewModel({
               }
             })
         }
-
         return {
           ...state,
           purchaseOrderDetails: {
