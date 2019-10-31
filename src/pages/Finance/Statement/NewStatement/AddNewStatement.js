@@ -176,12 +176,11 @@ class AddNewStatement extends PureComponent {
       lgteql_invoiceDate: effectiveDates ? effectiveDates[0] : undefined,
       lsteql_invoiceDate: effectiveDates ? effectiveDates[1] : undefined,
     }
- 
+
     dispatch({
       type: 'statement/queryInvoiceList',
       payload,
     }).then((invoiceList) => {
-
       if (invoiceList) {
         const { data } = invoiceList.data
         this.setState((prevState) => {
