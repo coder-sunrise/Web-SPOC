@@ -24,32 +24,8 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @withFormikExtend({
   notDirtyDuration: 0,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice, invoicePayment }) => {
-    const { finalPayable, outstandingBalance } = invoice
-    const currentPayments = invoicePayment.filter(
-      (item) => item.id === undefined,
-    )
-
-    // let _totalAmtPaid = 0
-    // let paymentList = []
-    // let _cashReceived = 0
-    // let _cashReturned = 0
-    // let _cashRounding = 0
-    // let outstandingAfterPayment = roundToTwoDecimals(outstandingBalance)
-    // if (currentPayments.length > 0) {
-    //   paymentList = [
-    //     ...currentPayments[0].invoicePaymentMode.map((item, index) => ({
-    //       ...item,
-    //       id: index,
-    //     })),
-    //   ]
-    //   _totalAmtPaid = currentPayments[0].totalAmtPaid
-    //   _cashReceived = currentPayments[0].cashReceived
-    //   _cashReturned = currentPayments[0].cashReturned
-    //   _cashRounding = currentPayments[0].cashRounding
-    //   outstandingAfterPayment = roundToTwoDecimals(finalPayable - _totalAmtPaid)
-    // }
-
+  mapPropsToValues: ({ invoice }) => {
+    const { outstandingBalance } = invoice
     return {
       ...invoice,
       cashReturned: 0,
@@ -71,8 +47,6 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReceived,
       cashReturned,
       totalAmtPaid,
-      finalPayable,
-      collectableAmount,
     } = values
 
     const returnValue = {
@@ -124,7 +98,7 @@ class AddPayment extends Component {
       paymentModeFK: parseInt(type, 10),
       paymentMode,
       ...InitialValue[type],
-      // amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
+      amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
     }
     const newPaymentList = [
       ...values.paymentList,
