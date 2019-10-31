@@ -31,6 +31,7 @@ export default createFormViewModel({
         medicationStock: [],
         isChasAcuteClaimable: true,
         isChasChronicClaimable: true,
+        prescriptionToDispenseConversion: 1.0,
       },
     },
     subscriptions: ({ dispatch, history, searchField }) => {
