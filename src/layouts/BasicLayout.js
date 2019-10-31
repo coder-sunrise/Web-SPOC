@@ -151,7 +151,7 @@ class BasicLayout extends React.PureComponent {
         dispatch({
           type: 'clinicInfo/updateState',
           payload: {
-            settings: parsedClinicInfo,
+            ...parsedClinicInfo,
           },
         })
       }
