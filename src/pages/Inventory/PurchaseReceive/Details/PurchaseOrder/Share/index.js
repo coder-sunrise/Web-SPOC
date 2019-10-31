@@ -157,7 +157,7 @@ class InvoiceSummary extends PureComponent {
             {IsGSTEnabled ? (
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
-                  name={`${prefix}isGstInclusive`}
+                  name={`${prefix}IsGSTInclusive`}
                   render={(args) => {
                     return (
                       <Tooltip
