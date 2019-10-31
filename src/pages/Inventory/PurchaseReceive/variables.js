@@ -189,10 +189,9 @@ export const fakeQueryDoneData = {
     shippingAddress:
       '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
     IsGSTEnabled: true,
-    isGstInclusive: true,
+    IsGSTInclusive: true,
     invoiceGST: 10.7,
     invoiceTotal: 163.6,
-    adjustmentAmount: 0,
   },
   rows: [],
   purchaseOrderMedicationItem: [
