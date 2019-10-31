@@ -24,7 +24,7 @@ module.exports = {
 
   upsert: async (params) => {
     const r = await request(url, {
-      method: 'PUT',
+      method: 'POST',
       body: [
         ...params,
       ],

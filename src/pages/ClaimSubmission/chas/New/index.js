@@ -126,6 +126,7 @@ class NewCHAS extends React.Component {
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
+                type='new'
               />
             </GridItem>
 

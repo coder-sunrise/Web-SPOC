@@ -6,6 +6,7 @@ import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common components
 import NearMe from '@material-ui/icons/NearMe'
+import { Progress } from 'antd'
 import {
   ProgressButton,
   GridContainer,
@@ -21,7 +22,6 @@ import {
   NewCHASColumns,
   TableConfig,
 } from './variables'
-import { Progress } from 'antd'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -93,6 +93,7 @@ class DraftCHAS extends React.Component {
               onContextMenuItemClick={handleContextMenuItemClick}
               contextMenuOptions={overrideContextMenuOptions}
               isDraft
+              type='draft'
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
