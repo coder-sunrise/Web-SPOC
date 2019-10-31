@@ -24,7 +24,7 @@ import EditOrder from './EditOrder'
 import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
-import { postPDF, getPDF } from '@/services/report'
+import { postPDF, exportPdfReport } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 import { queryDrugLabelDetails } from '@/services/dispense'
@@ -105,15 +105,25 @@ class Dispense extends PureComponent {
   setHandleClickPrint () {
     this.handleOnPrint = async (type, row) => {
       this.connectWebSocket()
-      let printResult
 
       if (type === 'Medication') {
         let drugLableSource = await this.generateDrugLablePrintSource(row)
         if (drugLableSource) {
-          printResult = await postPDF(
+          let printResult = await postPDF(
             drugLableSource.reportId,
             drugLableSource.payload,
           )
+
+          if (printResult) {
+            const base64Result = arrayBufferToBase64(printResult)
+            if (this.iswsConnect === true) {
+              this.wsConnection.send(`["${base64Result}"]`)
+            } else {
+              notification.error({
+                message: `The printing client application didn\'t running up, please start it.`,
+              })
+            }
+          }
         }
       } else {
         const documentType = consultationDocumentTypes.find(
@@ -126,20 +136,11 @@ class Dispense extends PureComponent {
           return
         }
         const { downloadConfig } = documentType
-        const payload = JSON.parse(`{"${downloadConfig.key}":${row.sourceFK}}`)
 
-        printResult = await getPDF(downloadConfig.id, payload)
-      }
-
-      if (printResult) {
-        const base64Result = arrayBufferToBase64(printResult)
-        if (this.iswsConnect === true) {
-          this.wsConnection.send(`["${base64Result}"]`)
-        } else {
-          notification.error({
-            message: `The printing client application didn\'t running up, please start it.`,
-          })
-        }
+        exportPdfReport(
+          downloadConfig.id,
+          `${downloadConfig.key}:${row.sourceFK}`,
+        )
       }
     }
   }
