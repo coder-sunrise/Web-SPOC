@@ -24,19 +24,30 @@ const FilterByPatient = ({ classes }) => {
       <GridItem md={4}>
         <FastField
           name='patientName'
-          render={(args) => <TextField {...args} label='Patient Details' />}
+          render={(args) => (
+            <TextField
+              {...args}
+              label='Patient Details (Patient Name, Acc No., Phone No., Office No.)'
+            />
+          )}
         />
       </GridItem>
       <GridItem md={4}>
         <FastField
-          name='visitDate'
-          render={(args) => <DateRangePicker {...args} label='Visit Date' />}
+          name='lastVisitDate'
+          render={(args) => (
+            <DateRangePicker
+              {...args}
+              label='Last Visit Date From'
+              label2='To'
+            />
+          )}
         />
       </GridItem>
       <GridItem md={4} />
       <GridItem md={2}>
         <FastField
-          name='status'
+          name='lastSMSSendStatus'
           render={(args) => (
             <Select
               {...args}
