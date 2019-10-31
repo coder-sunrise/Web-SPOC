@@ -19,7 +19,14 @@ import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
+export default ({
+  orders,
+  dispatch,
+  classes,
+  theme,
+  handleAddAdjustment,
+  codetable,
+}) => {
   const { rows, summary, finalAdjustments } = orders
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
@@ -110,7 +117,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
-        { name: 'remark', title: 'Description' },
+        { name: 'description', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
         { name: 'action', title: 'Action' },
@@ -194,16 +201,62 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
           columnName: 'type',
           // type: 'select',
           // options: orderTypes,
-          render: (r) => {
+          render: (row) => {
             return (
               <div>
                 <Select
                   text
                   options={orderTypes}
                   labelField='name'
-                  value={r.type}
+                  value={row.type}
                 />
-                {r.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+                {row.isExternalPrescription === true ? (
+                  <span> (Ext.) </span>
+                ) : (
+                  ''
+                )}
+              </div>
+            )
+          },
+        },
+        {
+          columnName: 'description',
+          width: 300,
+          render: (row) => {
+            let text = ''
+            const codetableList = codetable
+            return (
+              <div>
+                {row.corPrescriptionItemInstruction ? (
+                  row.corPrescriptionItemInstruction.map((item) => {
+                    text = ''
+                    const usageMethod = codetableList.ctmedicationusage.filter(
+                      (codeTableItem) =>
+                        codeTableItem.id === item.usageMethodFK,
+                    )
+                    text += `${usageMethod[0].name} `
+                    text += ' '
+                    const dosage = codetableList.ctmedicationdosage.filter(
+                      (codeTableItem) => codeTableItem.id === item.dosageFK,
+                    )
+                    text += `${dosage[0].displayValue} `
+                    const prescribe = codetableList.ctmedicationunitofmeasurement.filter(
+                      (codeTableItem) =>
+                        codeTableItem.id === item.prescribeUOMFK,
+                    )
+                    text += `${prescribe[0].name} `
+                    const drugFrequency = codetableList.ctmedicationfrequency.filter(
+                      (codeTableItem) =>
+                        codeTableItem.id === item.drugFrequencyFK,
+                    )
+                    text += `${drugFrequency[0].displayValue} For `
+                    text += `${item.duration} day(s)`
+
+                    return <p>{text}</p>
+                  })
+                ) : (
+                  ''
+                )}
               </div>
             )
           },

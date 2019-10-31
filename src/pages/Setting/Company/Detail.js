@@ -173,6 +173,7 @@ class Detail extends PureComponent {
                         <CodeSelect
                           label='Co-Payer Type'
                           code='ctCopayerType'
+                          disabled
                           {...args}
                         />
                       )}
