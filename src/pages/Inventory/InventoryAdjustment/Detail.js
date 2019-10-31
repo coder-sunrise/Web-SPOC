@@ -1027,7 +1027,9 @@ class Detail extends PureComponent {
                 </Button>
               ),
               confirmProps: {
-                disabled: false,
+                disabled:
+                  values.inventoryAdjustmentStatusFK !==
+                  INVENTORY_ADJUSTMENT_STATUS.DRAFT,
               },
             })}
         </div>
