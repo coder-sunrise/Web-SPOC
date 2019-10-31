@@ -273,10 +273,11 @@ class Index extends Component {
           unitPrice: x.unitPrice,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -303,10 +304,11 @@ class Index extends Component {
           totalAfterGst: x.totalAfterGst,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -333,10 +335,11 @@ class Index extends Component {
             totalAfterGst: x.totalAfterGst,
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
+            unitOfMeasurement: x.uomString,
             [itemType.prop]: {
               [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: '',
-              [itemType.itemName]: '',
+              [itemType.itemCode]: x.codeString,
+              [itemType.itemName]: x.nameString,
             },
           }
         } else {

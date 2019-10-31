@@ -159,7 +159,9 @@ class ControlTest extends PureComponent {
     this.container = React.createRef()
   }
 
-  state = {}
+  state = {
+    val: undefined,
+  }
 
   // componentDidUpdate (prevProps, prevState, snapshot) {
   //   console.log(this.props, prevProps)
@@ -233,6 +235,17 @@ class ControlTest extends PureComponent {
       <div style={{ marginBottom: theme.spacing(5) }}>
         <GridContainer>
           <GridItem sm={3}>
+            {/* <TextField
+              value={`${this.state.val}`}
+              prefix={<Search />}
+              label='Name'
+              onChange={(e) => {
+                this.setState({
+                  val: e.target.value,
+                })
+              }}
+            /> */}
+
             <FastField
               name='name'
               render={(args) => (

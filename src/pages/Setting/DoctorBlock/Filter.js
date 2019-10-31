@@ -77,8 +77,12 @@ const recurrenceTypes = [
       payload: {
         // [`${prefix}name`]: values.doctorName,
         [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
-        lgteql_startDateTime: values.dateFrom || '',
-        lsteql_endDateTime: values.dateTo || '',
+        lgteql_startDateTime: values.dateFrom
+          ? moment(values.dateFrom).formatUTC()
+          : undefined,
+        lsteql_endDateTime: values.dateTo
+          ? moment(values.dateTo).endOf('day').formatUTC(false)
+          : undefined,
         'DoctorBlockGroupFKNavigation.DoctorBlockRecurrenceFKNavigation.RecurrencePatternFKNavigation.Id':
           values.recurrence,
         combineCondition: 'and',

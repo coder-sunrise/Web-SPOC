@@ -335,10 +335,13 @@ class ClinicalNotes extends Component {
     if (added)
       updated = [
         ...updated,
-        ...added.map((o) => ({
-          ...o,
-          fileIndexFK: o.id,
-        })),
+        ...added.map((o) => {
+          const { id, ...resetProps } = o
+          return {
+            ...resetProps,
+            fileIndexFK: o.id,
+          }
+        }),
       ]
 
     if (deleted)
