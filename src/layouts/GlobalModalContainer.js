@@ -179,11 +179,17 @@ class GlobalModalContainer extends PureComponent {
           onClose={() => {
             dispatch({
               type: 'patient/closePatientModal',
+              payload: {
+                history: this.props.history,
+              },
             })
           }}
           onConfirm={() => {
             dispatch({
               type: 'patient/closePatientModal',
+              payload: {
+                history: this.props.history,
+              },
             })
           }}
           // onConfirm={this.toggleModal}

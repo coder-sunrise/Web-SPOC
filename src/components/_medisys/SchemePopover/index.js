@@ -44,7 +44,6 @@ const SchemePopover = ({
       isShowReplacementModal,
     ],
   )
-  console.log('scheme data ', schemeData)
   return (
     <React.Fragment>
       <Popover

@@ -106,7 +106,6 @@ export default createFormViewModel({
       *initState ({ payload }, { call, put, select, take }) {
         let { currentId, version, currentComponent, md } = payload
         const patient = yield select((state) => state.patient)
-
         if (
           patient.version !== version ||
           (patient.entity && patient.entity.id !== currentId)
@@ -158,15 +157,24 @@ export default createFormViewModel({
       //   })
       // },
       *closePatientModal ({ payload }, { all, put }) {
-        router.push(
-          getRemovedUrl([
+        const { history } = payload || { history: undefined }
+
+        const patientDatabasePath = '/patientdb/search'
+        let shouldRemoveUrl = [
+          'md',
+          'cmt',
+          'pid',
+          'new',
+          'v',
+        ]
+        if (history && history.location.pathname !== patientDatabasePath) {
+          shouldRemoveUrl = [
             'md',
             'cmt',
-            'pid',
             'new',
-            'v',
-          ]),
-        )
+          ]
+        }
+        router.push(getRemovedUrl(shouldRemoveUrl))
         // yield put({
         //   type: 'updateState',
         //   payload: {
