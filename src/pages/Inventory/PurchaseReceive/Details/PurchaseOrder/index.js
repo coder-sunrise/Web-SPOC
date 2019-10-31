@@ -386,6 +386,7 @@ class Index extends Component {
     let totalAmount = 0
     let gstAmount = 0
     let totalAdjustmentAmount = 0
+    let gstValue = IsGSTEnabled ? settingGSTPercentage : 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
       (x) => !x.isDeleted,
@@ -481,17 +482,14 @@ class Index extends Component {
       })
     }
 
+
     setTimeout(() => {
       setFieldValue('purchaseOrder.gstAmount', gstAmount)
-    }, 1)
-
-    setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
+      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
+      setFieldValue('purchaseOrder.GSTValue',gstValue)
     }, 1)
 
-    setTimeout(() => {
-      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
-    }, 1)
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -520,7 +518,7 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled } = purchaseOrder || false
+    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -570,8 +568,7 @@ class Index extends Component {
             adjustmentListName='purchaseOrderAdjustment'
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
-            setInclusiveGSTChecked={this.setInclusiveGSTChecked}
-            inclusiveGSTChecked={this.state.inclusiveGSTChecked}
+            IsGSTInclusive={IsGSTInclusive}
             setFieldValue={setFieldValue}
             // {...this.props}
           />
