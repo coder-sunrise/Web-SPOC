@@ -173,13 +173,11 @@ class Banner extends PureComponent {
     let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
     let oldSchemeTypeFK = currentSchemeType
 
-    console.log("tets ", entity)
 
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
-      console.log(")))) ", result)
       if (result) {
         const {
           balance,
@@ -256,8 +254,6 @@ class Banner extends PureComponent {
       currPatientCoPaymentSchemeFK: schemeData.id,
       currentSchemeType: schemeData.schemeTypeFK,
     })
-
-    console.log("tets ", schemeData)
 
     return {
       balance,
@@ -463,7 +459,6 @@ class Banner extends PureComponent {
                     .filter((o) => o.schemeTypeFK <= 5)
                     .map((o) => {
                       const schemeData = this.getSchemeDetails(o)
-                      console.log("latest ", schemeData)
                       return (
                         <div>
                           <CodeSelect
