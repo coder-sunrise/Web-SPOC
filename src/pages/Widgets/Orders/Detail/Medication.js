@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
+import { formatMessage } from 'umi/locale'
 import {
   Button,
   GridContainer,
@@ -488,9 +489,11 @@ class Medication extends PureComponent {
                                     {i + 1}.
                                   </span>
                                   <CodeSelect
-                                    // simple
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.usage',
+                                    })}
                                     allowClear={false}
-                                    style={{ paddingLeft: 15 }}
+                                    style={{ marginLeft: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -506,7 +509,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.dosage',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationDosage'
                                   labelField='displayValue'
@@ -528,7 +533,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.uom',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
                                   {...commonSelectProps}
@@ -544,7 +551,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.frequency',
+                                  })}
                                   labelField='displayValue'
                                   allowClear={false}
                                   code='ctMedicationFrequency'
@@ -566,7 +575,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.duration',
+                                  })}
                                   allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
