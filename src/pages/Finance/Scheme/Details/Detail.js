@@ -137,8 +137,9 @@ const Detail = ({ height, ...props }) => {
                   })}
                   // code='ctCopayer'
                   options={props.codetable.ctcopayer.filter(
-                    (copayerList) => copayerList.id !== 1,
+                    (copayerList) => copayerList.coPayerTypeFK === 1,
                   )}
+                  labelField='displayValue'
                   max={50}
                   {...args}
                 />

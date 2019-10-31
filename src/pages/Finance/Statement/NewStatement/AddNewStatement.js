@@ -251,6 +251,7 @@ class AddNewStatement extends PureComponent {
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
+                        labelField='displayValue'
                         // onChange={(e) => this.getInvoiceList(e)}
                         disabled={statement.entity}
                         {...args}

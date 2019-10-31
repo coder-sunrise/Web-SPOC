@@ -828,6 +828,7 @@ const tenantCodes = [
   'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
+  'ctcopayer',
 ]
 
 // const codes = [
