@@ -21,6 +21,7 @@ export default createListViewModel({
           moment('2099-12-31T23:59:59').formatUTC(false),
         ],
         adminCharge: 0,
+        coPayerTypeFK: 1,
         contact: {
           contactAddress: [
             {

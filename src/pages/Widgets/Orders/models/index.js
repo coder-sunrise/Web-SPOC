@@ -11,9 +11,12 @@ import {
 
 const sharedMedicationValue = {
   quantity: 0,
+  totalPrice: 0,
+  totalAfterItemAdjustment: 0,
   corPrescriptionItemPrecaution: [
     {},
   ],
+
   corPrescriptionItemInstruction: [
     {
       // usageMethodFK: 1,

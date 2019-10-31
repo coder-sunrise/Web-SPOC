@@ -46,6 +46,7 @@ const FilterBar = ({ handleSubmit }) => {
                   {...args}
                   // code='ctcopayer,ctsupplier'
                   code='ctcopayer'
+                  labelField='displayValue'
                   label='Company'
                 />
               )}
