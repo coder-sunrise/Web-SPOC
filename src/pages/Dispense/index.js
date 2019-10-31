@@ -104,9 +104,8 @@ class Dispense extends PureComponent {
 
   setHandleClickPrint () {
     this.handleOnPrint = async (type, row) => {
-      this.connectWebSocket()
-
       if (type === 'Medication') {
+        this.connectWebSocket()
         let drugLableSource = await this.generateDrugLablePrintSource(row)
         if (drugLableSource) {
           let printResult = await postPDF(
