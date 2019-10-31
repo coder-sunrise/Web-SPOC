@@ -31,6 +31,7 @@ export default createFormViewModel({
         vaccinationStock: [],
         isChasAcuteClaimable: true,
         isChasChronicClaimable: true,
+        prescriptionToDispenseConversion: 1.0,
       },
       // entity: {},
     },
