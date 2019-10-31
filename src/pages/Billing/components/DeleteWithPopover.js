@@ -23,6 +23,7 @@ const DeleteWithPopover = ({
   contentText = 'Confirm to remove this scheme?',
   extraCmd,
   onConfirmDelete,
+  onCancelClick,
 }) => {
   const [
     show,
@@ -31,11 +32,14 @@ const DeleteWithPopover = ({
 
   const toggleVisibleChange = () => setShow(!show)
 
-  const onCancelClick = () => toggleVisibleChange()
+  const handleCancelClick = () => {
+    toggleVisibleChange()
+    if (onCancelClick) onCancelClick(index)
+  }
 
   const onConfirmClick = () => {
-    onConfirmDelete(index)
-    toggleVisibleChange()
+    onConfirmDelete(index, toggleVisibleChange)
+    // toggleVisibleChange()
   }
 
   return (
@@ -56,7 +60,7 @@ const DeleteWithPopover = ({
         <div className={classes.popoverContainer}>
           <p className={classes.popoverMessage}>{contentText}</p>
           <div>{extraCmd}</div>
-          <Button size='sm' color='danger' onClick={onCancelClick}>
+          <Button size='sm' color='danger' onClick={handleCancelClick}>
             Cancel
           </Button>
           <Button size='sm' color='primary' onClick={onConfirmClick}>

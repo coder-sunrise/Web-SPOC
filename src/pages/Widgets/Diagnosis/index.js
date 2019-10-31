@@ -133,6 +133,7 @@ class Diagnosis extends PureComponent {
               // if(!values.disabled)
               if (
                 components &&
+                components.ConsultationPage &&
                 components.ConsultationPage.rights === 'enable'
               ) {
                 this.addDiagnosis()

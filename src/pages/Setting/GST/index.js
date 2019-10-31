@@ -78,7 +78,7 @@ class clinicSettings extends PureComponent {
   state = {
     enableGst: true,
     inclusiveGst: false,
-    hasActiveSession: true,
+    hasActiveSession: false,
   }
 
   componentDidMount = () => {
@@ -100,10 +100,15 @@ class clinicSettings extends PureComponent {
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
 
+<<<<<<< HEAD
     this.setState(() => {
       return {
         hasActiveSession: data.length > 0,
       }
+=======
+    this.setState({
+      hasActiveSession: data.length > 0,
+>>>>>>> dev
     })
   }
 

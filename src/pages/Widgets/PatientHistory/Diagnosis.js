@@ -1,7 +1,6 @@
 import { CommonTableGrid, DatePicker } from '@/components'
 
 export default ({ current, classes, theme, codetable }) => {
-
   const complicationData = (complicationList) => {
     let complicationValue = ''
 
@@ -32,7 +31,7 @@ export default ({ current, classes, theme, codetable }) => {
             <li key={i}>
               {o.diagnosisDescription} (<DatePicker
                 text
-                defaultValue={o.onsetDate}
+                value={o.onsetDate}
               />)
               {o.corComplication.length > 0 ? <br /> : ''}
               {o.corComplication.length > 0 ? (
