@@ -82,6 +82,7 @@ class Queue extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      _sessionInfoID: undefined,
       showPatientSearch: false,
       showEndSessionSummary: false,
       search: '',
@@ -220,6 +221,9 @@ class Queue extends React.Component {
 
   onStartSession = () => {
     const { dispatch } = this.props
+    this.setState({
+      _sessionInfoID: undefined,
+    })
     dispatch({
       type: `${modelKey}startSession`,
     })
@@ -242,30 +246,23 @@ class Queue extends React.Component {
 
   onConfirmEndSession = () => {
     const { queueLog, dispatch } = this.props
-    console.log('confirm end session')
+    const _sessionInfoID = queueLog.sessionInfo.id
+    this.setState({ _sessionInfoID })
     dispatch({
       type: `queueLog/endSession`,
       sessionID: queueLog.sessionInfo.id,
     }).then((response) => {
       const { status } = response
-      if (status === 204) {
+      if (response) {
         this.setState(
           {
             showEndSessionSummary: true,
           },
           () => {
-            dispatch({
-              type: `${modelKey}updateState`,
-              payload: {
-                isClinicSessionClosed: true,
-                id: '',
-                // sessionNo: `${moment().format('YYMMDD')}-01`,
-                sessionNo: 'N/A',
-                sessionNoPrefix: '',
-                sessionStartDate: '',
-                sessionCloseDate: '',
-              },
-            })
+            // dispatch({
+            //   type: 'queueLog/updateState',
+            //   payload: ,
+            // })
           },
         )
       }
@@ -346,7 +343,11 @@ class Queue extends React.Component {
 
   render () {
     const { classes, queueLog, loading, history } = this.props
-    const { showEndSessionSummary, showPatientSearch } = this.state
+    const {
+      showEndSessionSummary,
+      showPatientSearch,
+      _sessionInfoID,
+    } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
     return (
@@ -435,7 +436,7 @@ class Queue extends React.Component {
               onConfirm={this.onEndSessionSummaryClose}
               disableBackdropClick
             >
-              <EndSessionSummary sessionID={sessionInfo.id} />
+              <EndSessionSummary sessionID={_sessionInfoID} />
             </CommonModal>
           </CardBody>
         </Card>

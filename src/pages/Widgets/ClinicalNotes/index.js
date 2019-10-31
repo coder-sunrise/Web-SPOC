@@ -323,8 +323,7 @@ class ClinicalNotes extends Component {
     })
   }
 
-  getScribbleValue = (test) => {
-  }
+  getScribbleValue = (test) => {}
 
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
@@ -336,10 +335,13 @@ class ClinicalNotes extends Component {
     if (added)
       updated = [
         ...updated,
-        ...added.map((o) => ({
-          ...o,
-          fileIndexFK: o.id,
-        })),
+        ...added.map((o) => {
+          const { id, ...resetProps } = o
+          return {
+            ...resetProps,
+            fileIndexFK: o.id,
+          }
+        }),
       ]
 
     if (deleted)
@@ -1019,8 +1021,11 @@ class ClinicalNotes extends Component {
           title='Scribble'
           fullScreen
           bodyNoPadding
-          observe='scribbleNotePage'
-          onClose={() => navigateDirtyCheck(this.toggleScribbleModal())}
+          observe='ScribbleNotePage'
+          onClose={() =>
+            navigateDirtyCheck({
+              onProceed: this.toggleScribbleModal(),
+            })}
         >
           <ScribbleNote
             {...this.props}

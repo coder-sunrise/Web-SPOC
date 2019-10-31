@@ -71,6 +71,19 @@ const loadFromCodes = [
         .join('')
     },
   },
+  {
+    value: 'externalPrescription',
+    name: 'External Prescription',
+    getter: (v) => {
+      const { orders } = window.g_app._store.getState()
+      if (!orders) return '-'
+      const { rows = [] } = orders
+      return rows
+        .filter((o) => !o.isDeleted && o.isExternalPrescription)
+        .map((o) => `<p>- ${o.subject}</p>`)
+        .join('')
+    },
+  },
 ]
 const styles = (theme) => ({
   editor: {
@@ -158,7 +171,8 @@ class AddConsultationDocument extends PureComponent {
             (template) => template.documentTemplateTypeFK === documentType,
           )}
           textField='displayValue'
-          onClick={(option) => {
+          onChange={(val, option) => {
+            if (!val) return
             let msg = htmlDecodeByRegExp(option.templateContent)
             const match = msg.match(templateReg) || []
             // console.log(msg, templateReg, match, tagList)
@@ -178,7 +192,10 @@ class AddConsultationDocument extends PureComponent {
         </ButtonSelect>
         <ButtonSelect
           options={loadFromCodes}
-          onClick={(option) => {
+          valueField='value'
+          onChange={(val, option) => {
+            console.log(val, option)
+            if (!val) return
             const { values } = parentProps
             const v = option.getter
               ? option.getter(values)

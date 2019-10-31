@@ -135,7 +135,6 @@ export const getApplicableClaimAmount = (
     )
     const itemRemainingAmount =
       invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
-
     if (itemCategory.groupValueType.toLowerCase() === 'percentage') {
       returnClaimAmount =
         itemRemainingAmount * (itemCategory.itemGroupValue / 100)
@@ -148,11 +147,15 @@ export const getApplicableClaimAmount = (
   } else {
     const itemRemainingAmount =
       invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
-
-    returnClaimAmount =
+    const copaymentValue =
       overAllCoPaymentValueType.toLowerCase() === 'percentage'
         ? itemRemainingAmount * (overAllCoPaymentValue / 100)
         : overAllCoPaymentValue
+
+    returnClaimAmount =
+      copaymentValue > itemRemainingAmount
+        ? itemRemainingAmount
+        : copaymentValue
   }
 
   if (isCoverageMaxCapCheckRequired) {

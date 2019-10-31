@@ -121,7 +121,7 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
     eventTime: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onClose, onConfirm } = props
+    const { dispatch, onConfirm } = props
     const {
       restRoomBlock,
       roomBlockGroupFK,
@@ -238,26 +238,9 @@ const generateRecurringRoomBlock = (recurrenceDto, roomBlock) => {
 class Detail extends PureComponent {
   state = {}
 
-  recurrence = () => {
-    const { values } = this.props
-    const isNew = !values.isEnableRecurrence && !values.id
-
-    if (isNew || values.isEnableRecurrence) {
-      return (
-        <Recurrence
-          block
-          disabled={values.id !== undefined}
-          formValues={values}
-          recurrenceDto={values.recurrenceDto}
-        />
-      )
-    }
-    return null
-  }
-
   render () {
     const { props } = this
-    const { theme, footer } = props
+    const { theme, footer, values } = props
 
     return (
       <React.Fragment>
@@ -352,7 +335,14 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem md={12}>{this.recurrence()}</GridItem>
+            <GridItem md={12}>
+              <Recurrence
+                block
+                disabled={values.id !== undefined}
+                formValues={values}
+                recurrenceDto={values.recurrenceDto}
+              />
+            </GridItem>
           </GridContainer>
         </div>
         {footer &&

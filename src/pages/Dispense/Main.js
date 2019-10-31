@@ -72,11 +72,11 @@ const reloadDispense = (props, effect = 'query') => {
       ? invoiceTotal
       : roundToTwoDecimals(invoiceGSTAmt + invoiceTotal)
     const outstandingBalance = invoiceTotalAftGST
-
+    const obj = dispense.entity || dispense.default
     return {
-      ...(dispense.entity || dispense.default),
+      ...obj,
       invoice: {
-        ...(dispense.entity.invoice || dispense.default.invoice),
+        ...obj.invoice,
         invoiceTotal,
         invoiceGSTAmt,
         invoiceTotalAftGST,
@@ -158,14 +158,18 @@ class Main extends Component {
   editOrder = (e) => {
     const { handleSubmit } = this.props
 
-    navigateDirtyCheck(this._editOrder, () => {
-      handleSubmit()
-      this._editOrder()
+    navigateDirtyCheck({
+      onProceed: this._editOrder,
+      onConfirm: () => {
+        handleSubmit()
+        this._editOrder()
+      },
     })(e)
   }
 
   render () {
     const { classes, handleSubmit } = this.props
+    // console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -182,7 +186,7 @@ class Main extends Component {
             </Button>
             <Button color='primary' size='sm'>
               <Print />
-              Print Drug Label
+              Drug Label
             </Button>
             <Button color='primary' size='sm'>
               <Print />

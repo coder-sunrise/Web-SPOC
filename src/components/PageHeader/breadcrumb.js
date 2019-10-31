@@ -139,7 +139,9 @@ class BreadcrumbView extends PureComponent {
         <Link
           key={index}
           to={targetUrl}
-          onClick={navigateDirtyCheck(targetUrl)}
+          onClick={navigateDirtyCheck({
+            redirectUrl: targetUrl,
+          })}
         >
           {name}
         </Link>

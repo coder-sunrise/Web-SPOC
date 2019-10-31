@@ -49,11 +49,12 @@ export const UNFIT_TYPE = {
 }
 
 export const PAYMENT_MODE = {
-  CASH: 1,
-  NETS: 2,
-  CREDIT_CARD: 3,
-  CHEQUE: 4,
+  CREDIT_CARD: 1,
+  CHEQUE: 2,
+  CASH: 3,
+  NETS: 4,
   GIRO: 5,
+  DEPOSIT: 6,
 }
 
 export const CREDIT_CARD_TYPE = {

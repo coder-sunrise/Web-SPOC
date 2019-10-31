@@ -401,7 +401,9 @@ class AddNewStatement extends PureComponent {
           >
             <Button
               color='danger'
-              onClick={navigateDirtyCheck(this.goBackToPreviousPage)}
+              onClick={navigateDirtyCheck({
+                onProceed: this.goBackToPreviousPage,
+              })}
             >
               Close
             </Button>

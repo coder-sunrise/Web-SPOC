@@ -18,7 +18,10 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
     dispatch({
       type: 'sddDetail/query',
       payload: {
-        keepFilter: false,
+       // keepFilter: true,
+       sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
       },
     }).then((response) => {
     })
@@ -110,6 +113,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
                       combineCondition: 'or',
                     },
                   ],
+                  
                 },
               })
             }}
