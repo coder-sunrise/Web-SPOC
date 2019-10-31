@@ -686,7 +686,7 @@ const _checkCb = ({ redirectUrl, onProceed }, e) => {
 const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
   e,
 ) => {
-  console.log(restProps)
+  // console.log(restProps)
   if (window.beforeReloadHandlerAdded) {
     if (displayName) {
       const ob = window.g_app._store.getState().formik[displayName]
@@ -889,9 +889,16 @@ const calculateAmount = (
     // console.log(r)
   })
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+    activeRows.forEach((o) => {
+      o.subAdjustment = 0
+    })
     activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      r[adjustedField] += r.weightage * fa.adjAmount
+      const adj = r.weightage * fa.adjAmount
+      // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
+
+      r[adjustedField] += adj
+      r.subAdjustment += adj
     })
   })
 
@@ -912,10 +919,12 @@ const calculateAmount = (
         gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
       })
     } else {
-      gst = totalAfterAdj * gSTPercentage
+      gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
         r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
-        r[gstField] = roundToTwoDecimals(r[totalField] * (1 + gSTPercentage))
+        r[gstField] = roundToTwoDecimals(
+          r[totalField] * (1 + gSTPercentage) + r.subAdjustment,
+        )
       })
     }
   }
@@ -925,7 +934,7 @@ const calculateAmount = (
     rows,
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
-      gst: roundToTwoDecimals(gst),
+      gst,
       total,
       totalAfterAdj,
       totalWithGST: isGSTInclusive

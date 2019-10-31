@@ -71,11 +71,19 @@ class Dispense extends PureComponent {
   }
 
   getExtraComponent = () => {
-    const { classes, dispense, values } = this.props
-    const { entity, totalWithGST } = dispense
-    const totalInvoice = entity
-      ? entity.invoice.invoiceTotalAftGST
-      : totalWithGST
+    const { classes, dispense, values, orders } = this.props
+    const { totalWithGST, editingOrder } = dispense
+
+    if (!editingOrder) return null
+    let amount = 0
+    if (editingOrder) {
+      const { summary } = orders
+      if (summary) {
+        amount = summary.totalWithGST
+      }
+    } else {
+      amount = totalWithGST
+    }
     return (
       <GridContainer
         // className={classes.actionPanel}
@@ -87,7 +95,7 @@ class Dispense extends PureComponent {
           Total Invoice
           <span>
             &nbsp;:&nbsp;
-            <NumberInput text currency value={totalInvoice} />
+            <NumberInput text currency value={amount} />
           </span>
         </h4>
       </GridContainer>

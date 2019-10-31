@@ -69,8 +69,7 @@ const bannerStyle = {
     try {
       if (billing.entity) {
         const { invoicePayer, invoicePayment } = billing.entity
-        const _isNewBill =
-          invoicePayer.length === 0 && invoicePayment.lenght === 0
+
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -80,11 +79,15 @@ const bannerStyle = {
             ),
           0,
         )
+        const totalPaid = invoicePayment.reduce(
+          (total, payment) => total + payment.totalAmtPaid,
+          0,
+        )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable, _isNewBill }
+        return { ...billing.entity, finalClaim, finalPayable }
       }
     } catch (error) {
       console.log({ error })
@@ -178,7 +181,7 @@ const bannerStyle = {
           return _payer
         }),
     }
-    // console.log({ payload })
+
     dispatch({
       type: 'billing/submit',
       payload,
@@ -231,17 +234,14 @@ class Billing extends Component {
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  handleAddPayment = (payment) => {
+  calculateOutstandingBalance = (invoicePayment) => {
     const { values, setFieldValue } = this.props
-    const { outstandingBalance, ...rest } = payment
-    const invoicePayment = [
-      ...values.invoicePayment.filter((item) => item.id),
-      rest,
-    ]
 
-    setFieldValue('invoicePayment', invoicePayment)
-    setFieldValue('invoice.outstandingBalance', outstandingBalance)
-    this.toggleAddPaymentModal()
+    const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
+      if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+      return totalAmtPaid
+    }, 0)
+    setFieldValue('invoice.outstandingBalance', values.finalPayable - totalPaid)
   }
 
   onExpandDispenseDetails = () => {
@@ -276,37 +276,64 @@ class Billing extends Component {
 
   onCompletePaymentClick = async () => {
     const { setFieldValue, handleSubmit, values } = this.props
-    if (values._isNewBill) await setFieldValue('mode', 'save')
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-
     handleSubmit()
   }
 
-  handleDeletePayment = (id, cancelReason) => {
-    const { values, setFieldValue, user } = this.props
+  handleAddPayment = async (payment) => {
+    const { values, setFieldValue, setValues, handleSubmit } = this.props
+    const { outstandingBalance, ...rest } = payment
+    const invoicePayment = [
+      ...values.invoicePayment.filter((item) => item.id),
+      rest,
+    ]
+
+    const _newValues = {
+      ...values,
+      invoicePayment,
+      mode: 'save',
+      visitStatus: 'BILLING',
+    }
+    await setValues(_newValues)
+    this.calculateOutstandingBalance(invoicePayment)
+    this.toggleAddPaymentModal()
+    handleSubmit()
+  }
+
+  handleDeletePayment = async (id) => {
+    const { values, setValues, user, handleSubmit } = this.props
     const { invoicePayment } = values
+    let _newInvoicePayment = [
+      ...invoicePayment,
+    ]
     if (id === undefined) {
-      const _newInvoicePayment = invoicePayment.filter(
+      _newInvoicePayment = invoicePayment.filter(
         (payment) => payment.id !== undefined,
       )
-      setFieldValue('invoicePayment', _newInvoicePayment)
     } else {
-      const _newInvoicePayment = invoicePayment.map(
+      _newInvoicePayment = invoicePayment.map(
         (payment) =>
           payment.id === id
             ? {
                 ...payment,
                 isCancelled: true,
-                cancelReason,
                 cancelDate: new Date(),
                 cancelByUserFK: user.id,
               }
             : { ...payment },
       )
-
-      setFieldValue('invoicePayment', _newInvoicePayment)
     }
+    // await setFieldValue('invoicePayment', _newInvoicePayment)
+    const _newValues = {
+      ...values,
+      invoicePayment: _newInvoicePayment,
+      mode: 'save',
+      visitStatus: 'BILLING',
+    }
+    await setValues(_newValues)
+    this.calculateOutstandingBalance(_newInvoicePayment)
+    handleSubmit()
   }
 
   render () {
@@ -359,7 +386,7 @@ class Billing extends Component {
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
                 handlePrintInvoiceClick={this.toggleReport}
-                values={values}
+                {...formikBag}
               />
             </GridContainer>
           </GridContainer>
@@ -372,13 +399,13 @@ class Billing extends Component {
           >
             <ArrowBack />Dispense
           </Button>
-          <Button
+          {/* <Button
             color='primary'
             disabled={this.state.isEditing || values.id === undefined}
             onClick={this.onSavePaymentClick}
           >
             Save
-          </Button>
+          </Button> */}
           <Button
             color='success'
             disabled={this.state.isEditing || values.id === undefined}

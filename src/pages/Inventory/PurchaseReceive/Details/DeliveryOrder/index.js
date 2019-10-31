@@ -86,11 +86,15 @@ class index extends Component {
       ? purchaseOrder.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
     const { showDeliveryOrderDetails } = this.state
-
+    const isEditable = () => {
+      if (poStatus === 6) return false
+      if (isWriteOff) return false
+      return true
+    }
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+          rights: isEditable() ? 'enable' : 'disable',
           // rights: 'disable',
         }}
       >

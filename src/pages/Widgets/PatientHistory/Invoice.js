@@ -81,12 +81,24 @@ export default ({ classes, current, setFieldValue }) => {
           { name: 'itemType', title: 'Type' },
           { name: 'itemName', title: 'Name' },
           { name: 'quantity', title: 'Quantity' },
-          { name: 'totalAfterItemAdjustment', title: 'Adj' },
-          { name: 'unitPrice', title: 'Total' },
+          { name: 'adjAmt', title: 'Adj' },
+          { name: 'totalAfterItemAdjustment', title: 'Total' },
         ]}
         FuncProps={{ pager: false }}
         columnExtensions={[
-          { columnName: 'unitPrice', type: 'number', currency: true },
+          {
+            columnName: 'itemType',
+    
+            render: (row) => {
+              return (
+                <div>
+                  {row.itemType}
+                  {row.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+                </div>
+              )
+            },
+          },
+          { columnName: 'adjAmt', type: 'number', currency: true },
           {
             columnName: 'totalAfterItemAdjustment',
             type: 'number',
