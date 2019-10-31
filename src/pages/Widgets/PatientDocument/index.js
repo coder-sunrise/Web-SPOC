@@ -25,10 +25,12 @@ class PatientDocument extends Component {
   state = {}
 
   componentDidMount () {
-    const { dispatch } = this.props
-
+    const { dispatch, values } = this.props
     dispatch({
       type: 'patientAttachment/query',
+      payload: {
+        'PatientProfileFKNavigation.Id': values.id,
+      },
     })
   }
 
@@ -88,7 +90,7 @@ class PatientDocument extends Component {
       <div>
         <Filter {...this.props} />
         <Grid {...this.props} />
-        <div style={{float: 'left'}}>
+        <div style={{ float: 'left' }}>
           <FastField
             name='patientAttachment'
             render={(args) => {
