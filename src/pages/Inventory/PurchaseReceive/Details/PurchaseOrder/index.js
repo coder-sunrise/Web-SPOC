@@ -273,10 +273,11 @@ class Index extends Component {
           unitPrice: x.unitPrice,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -303,10 +304,11 @@ class Index extends Component {
           totalAfterGst: x.totalAfterGst,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -333,10 +335,11 @@ class Index extends Component {
             totalAfterGst: x.totalAfterGst,
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
+            unitOfMeasurement: x.uomString,
             [itemType.prop]: {
               [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: '',
-              [itemType.itemName]: '',
+              [itemType.itemCode]: x.codeString,
+              [itemType.itemName]: x.nameString,
             },
           }
         } else {
@@ -508,6 +511,11 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
+    const isEditable = () => {
+      if (poStatus === 6) return false
+      if (isWriteOff) return false
+      return true
+    }
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -518,7 +526,7 @@ class Index extends Component {
       <div>
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+            rights: isEditable() ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
@@ -537,7 +545,7 @@ class Index extends Component {
         />
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+            rights: isEditable() ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >

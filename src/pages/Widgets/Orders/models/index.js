@@ -184,7 +184,7 @@ export default createListViewModel({
 
       // used by each order component
       adjustAmount (state, { payload }) {
-        // console.log(payload)
+        console.log(state.entity, payload)
         return {
           ...state,
           entity: {

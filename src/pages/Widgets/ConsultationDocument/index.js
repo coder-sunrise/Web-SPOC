@@ -80,7 +80,7 @@ export const printRow = async (row, props) => {
         method: 'POST',
         contentType: 'application/x-www-form-urlencoded',
         data: {
-          reportParameters: JSON.stringify(
+          reportContent: JSON.stringify(
             commonDataReaderTransform(downloadConfig.draft(row)),
           ),
         },

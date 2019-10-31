@@ -95,7 +95,7 @@ class Orders extends PureComponent {
         <Grid
           {...props}
           // summary={this.state}
-          handleAddAdjustment={this.addAdjustment}
+          // handleAddAdjustment={this.addAdjustment}
         />
         {/* {this.generateFinalAmount()} */}
       </div>
