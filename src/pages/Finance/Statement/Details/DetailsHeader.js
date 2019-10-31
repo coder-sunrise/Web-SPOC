@@ -80,7 +80,13 @@ class DetailsHeader extends PureComponent {
               <Field
                 name='copayerFK'
                 render={(args) => (
-                  <CodeSelect code='ctcopayer' disabled noUnderline {...args} />
+                  <CodeSelect
+                    code='ctcopayer'
+                    disabled
+                    noUnderline
+                    labelField='displayValue'
+                    {...args}
+                  />
                 )}
               />
             </GridItem>

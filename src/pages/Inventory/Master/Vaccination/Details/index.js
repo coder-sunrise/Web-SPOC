@@ -149,6 +149,7 @@ export default compose(
       revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       prescribingUOMFK: Yup.number().required(),
+      prescriptionToDispenseConversion: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
       averageCostPrice: Yup.number()
         .min(0, 'Average Cost Price must between 0 and 999,999.9999')

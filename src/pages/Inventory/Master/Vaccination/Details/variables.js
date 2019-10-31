@@ -39,9 +39,15 @@ const tabHeader = (tabName, detailsProps) => {
         maxDiscount,
         reOrderThreshold,
         criticalThreshold,
+        prescriptionToDispenseConversion,
       } = detailsProps.errors
-
-      if ((dispensingUOMFK || prescribingUOMFK) && tabName === 'Setting') {
+      
+      if (
+        (dispensingUOMFK ||
+          prescribingUOMFK ||
+          prescriptionToDispenseConversion) &&
+        tabName === 'Setting'
+      ) {
         return errorHeader
       }
       if (

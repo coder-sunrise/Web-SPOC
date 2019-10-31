@@ -137,6 +137,7 @@ class CoPayer extends Component {
             <CodeSelect
               label='Corporate Copayer'
               code='ctcopayer'
+              labelField='displayValue'
               onChange={this.handleCopayerChange}
             />
           </GridItem>

@@ -73,6 +73,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                     id: 'finance.scheme.search.cpname',
                   })}
                   code='ctCopayer'
+                  labelField='displayValue'
                   {...args}
                 />
               )

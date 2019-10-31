@@ -49,7 +49,7 @@ class Allergies extends PureComponent {
     return (
       <div>
         <GridContainer alignItems='flex-start'>
-          <GridItem xs={12} md={6}>
+          <GridItem xs={2.5} md={2.5}>
             <Field
               name='patientAllergyMetaData[0].noAllergies'
               render={(args) => {
@@ -64,7 +64,7 @@ class Allergies extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={12} md={6}>
+          <GridItem xs={2} md={2}>
             <Field
               name='patientAllergyMetaData[0].isG6PDConfirmed'
               render={(args) => {
