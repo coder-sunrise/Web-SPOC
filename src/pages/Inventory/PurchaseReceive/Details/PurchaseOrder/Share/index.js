@@ -52,10 +52,8 @@ class InvoiceSummary extends PureComponent {
       if (!settingGSTEnable) {
         setFieldValue(`${prefix}IsGSTInclusive`, false)
       }
-    } else if (e.target.value) {
-      setFieldValue(`${prefix}IsGSTInclusive`, true)
-    } else {
-      setFieldValue(`${prefix}IsGSTInclusive`, false)
+    }else{
+      setFieldValue(`${prefix}IsGSTInclusive`, e.target.value)
     }
 
     setTimeout(() => handleCalcInvoiceSummary(), 1)
