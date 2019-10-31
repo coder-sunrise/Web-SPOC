@@ -43,7 +43,7 @@ export default createFormViewModel({
             emailAddress: '',
           },
           mobileContactNumber: {
-            number: '',
+            number: undefined,
             countryCodeFK: 1,
           },
           homeContactNumber: {

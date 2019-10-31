@@ -53,11 +53,7 @@ export const PrescriptionColumns = [
   },
 ]
 
-export const PrescriptionColumnExtensions = (
-  viewOnly = false,
-  handleClickPrintDrugLabel,
-) => [
-
+export const PrescriptionColumnExtensions = (viewOnly = false, onPrint) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',

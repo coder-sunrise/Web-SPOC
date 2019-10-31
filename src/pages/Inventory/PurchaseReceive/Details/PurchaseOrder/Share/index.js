@@ -25,7 +25,6 @@ class InvoiceSummary extends PureComponent {
   state = {
     settingGSTEnable: false,
     settingGSTPercentage: 0,
-    isGSTInclusiveChecked: false,
   }
 
   static getDerivedStateFromProps (props, state) {
@@ -53,10 +52,8 @@ class InvoiceSummary extends PureComponent {
       if (!settingGSTEnable) {
         setFieldValue(`${prefix}IsGSTInclusive`, false)
       }
-    } else if (e.target.value) {
-      this.setState({ isGSTInclusiveChecked: true })
-    } else {
-      this.setState({ isGSTInclusiveChecked: false })
+    }else{
+      setFieldValue(`${prefix}IsGSTInclusive`, e.target.value)
     }
 
     setTimeout(() => handleCalcInvoiceSummary(), 1)
@@ -66,7 +63,6 @@ class InvoiceSummary extends PureComponent {
     const {
       settingGSTEnable,
       settingGSTPercentage,
-      isGSTInclusiveChecked,
     } = this.state
     const {
       toggleInvoiceAdjustment,
@@ -77,6 +73,7 @@ class InvoiceSummary extends PureComponent {
       IsGSTEnabled = false,
       handleCalcInvoiceSummary,
       setFieldValue,
+      IsGSTInclusive,
     } = this.props
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
@@ -140,7 +137,7 @@ class InvoiceSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
-                    disabled={isGSTInclusiveChecked}
+                    disabled={IsGSTInclusive}
                     {...args}
                   />
                 )}

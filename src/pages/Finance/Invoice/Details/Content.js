@@ -28,7 +28,10 @@ const Content = ({ classes, ...restProps }) => {
 
   const isInvoiceCurrentBizSession = () => {
     if (currentBizSessionFK && invoiceBizSessionFK) {
-      if (currentBizSessionFK === invoiceBizSessionFK) {
+      if (
+        currentBizSessionFK === invoiceBizSessionFK &&
+        !currentBizSessionInfo.isClinicSessionClosed
+      ) {
         return true
       }
       return false

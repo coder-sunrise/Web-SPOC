@@ -173,13 +173,10 @@ class Banner extends PureComponent {
     let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
     let oldSchemeTypeFK = currentSchemeType
 
-    console.log('tets ', entity)
-
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
-      console.log(')))) ', result)
       if (result) {
         const {
           balance,

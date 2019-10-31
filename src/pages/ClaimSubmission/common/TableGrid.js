@@ -4,9 +4,9 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import NearMe from '@material-ui/icons/NearMe'
 import Money from '@material-ui/icons/AttachMoney'
 // common components
+import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { CommonTableGrid, Tooltip } from '@/components'
 // sub component
-import { GridContextMenuButton as GridButton } from 'medisys-components'
 
 const TableGrid = ({
   data,

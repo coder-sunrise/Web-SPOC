@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
 import Send from '@material-ui/icons/Send'
 import MailIcon from '@material-ui/icons/Mail'
-import { FastField, withFormik } from 'formik'
 import { compose } from 'redux'
 import lodash from 'lodash'
 import { Badge } from '@material-ui/core'
+import { formatMessage } from 'umi/locale'
 import Authorized from '@/utils/Authorized'
-
 import {
   GridContainer,
   GridItem,
   Select,
   OutlinedTextField,
   Button,
+  withFormikExtend,
+  FastField,
 } from '@/components'
-import { formatMessage } from 'umi/locale'
 
-const New = ({ values, onSend, setFieldValue, errors }) => {
+const New = ({
+  values,
+  onSend,
+  setFieldValue,
+  errors,
+  selectedRows,
+  handleSubmit,
+}) => {
   const [
     messageNumber,
     setMessageNumber,
@@ -60,7 +67,7 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
     const { value } = target
     let arr = []
     if (value) {
-      splitMessage(value, arr, 160)
+      // splitMessage(value, arr, 160)
       setMessageArr(arr)
       setMessageNumber(arr.length)
     }
@@ -88,11 +95,13 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
         <GridItem md={3} style={{ margin: 'auto' }}>
           <Button
             disabled={
-              !values.message || !values.template || !lodash.isEmpty(errors)
+              !values.content ||
+              !lodash.isEmpty(errors) ||
+              selectedRows.length <= 0
             }
             variant='contained'
             color='primary'
-            onClick={handleClick}
+            onClick={handleSubmit}
           >
             <Send />
             Send
@@ -101,16 +110,20 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
       </Authorized>
       <GridItem md={12}>
         <FastField
-          name='message'
+          name='content'
           render={(args) => {
             return (
               <OutlinedTextField
                 onChange={handleChange}
-                multiline
                 rows='4'
+                multiline
                 label={formatMessage({
                   id: 'sms.message',
                 })}
+                inputProps={{
+                  maxLength: 5,
+                }}
+                maxLength={5}
                 {...args}
               />
             )
@@ -133,8 +146,41 @@ const New = ({ values, onSend, setFieldValue, errors }) => {
 
 export default compose(
   // withStyles(styles, { withTheme: true }),
-  withFormik({
-    mapPropsToValues: () => {},
+  withFormikExtend({
+    handleSubmit: (values, { props, resetForm }) => {
+      const { dispatch, onConfirm, selectedRows, sms } = props
+
+      let payload = []
+
+      selectedRows.forEach((o) => {
+        const { patientProfileFK } = sms.list.find((r) => r.id === o)
+        const smsObject = {
+          ...values,
+          patientOutgoingSMS: {
+            patientProfileFK,
+            appointmentReminderDto: {
+              appointmentFK: o,
+            },
+          },
+          sms: undefined,
+          selectedRows: undefined,
+        }
+        payload.push(smsObject)
+      })
+      console.log({ payload })
+      dispatch({
+        type: 'sms/upsert',
+        payload,
+      }).then((r) => {
+        if (r) {
+          if (onConfirm) onConfirm()
+          dispatch({
+            type: 'sms/querySMSData',
+            smsType: 'Appointment',
+          })
+        }
+      })
+    },
+    displayName: 'Sms',
   }),
-  // React.memo,
 )(New)

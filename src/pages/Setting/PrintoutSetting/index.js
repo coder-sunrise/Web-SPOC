@@ -394,21 +394,23 @@ class printoutSetting extends PureComponent {
                 </GridItem>
               </GridContainer>
 
-              <GridContainer className={classes.verticalSpacing} />
-
-              <GridContainer className={classes.indentDisclaimer}>
+              <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={1}>
-                  <h4>Disclaimer</h4>
+                  <h4>
+                    <b>Disclaimer</b>
+                  </h4>
                 </GridItem>
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayFooterInfoDisclaimer'
                     render={(args) => (
-                      <Switch style={{ marginTop: 0, left: -22 }} {...args} />
+                      <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
                 </GridItem>
               </GridContainer>
+
+              <GridContainer className={classes.indentDisclaimer} />
               <GridContainer className={classes.indent}>
                 <GridItem direction='column' md={6}>
                   <GridItem md={6}>

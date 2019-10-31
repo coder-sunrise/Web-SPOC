@@ -1,9 +1,14 @@
 import React, { PureComponent } from 'react'
 import Delete from '@material-ui/icons/Delete'
 import Download from '@material-ui/icons/GetApp'
-import { CommonTableGrid, Button, Tooltip, Popconfirm , DatePicker} from '@/components'
+import {
+  CommonTableGrid,
+  Button,
+  Tooltip,
+  Popconfirm,
+  DatePicker,
+} from '@/components'
 // import * as service from './services'
-
 
 import { downloadAttachment } from '@/services/file'
 
@@ -35,18 +40,8 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'createDate',
-            // type: 'date',
-            // format: 'DD MMM YYYY h:mm a',
-            render: (date) => {
-              return (
-                <DatePicker
-                  text
-                  showTime
-                  format='DD MMM YYYY h:mm a'
-                  value={date}
-                />
-              )
-            },
+            type: 'date',
+            format: 'DD MMM YYYY ',
           },
           {
             columnName: 'action',

@@ -60,7 +60,7 @@ export const printRow = async (row, props) => {
     const obj =
       clinicianprofile.find(
         (o) =>
-          o.id ===
+          o.userProfileFK ===
           (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
       ) || {}
 
@@ -191,7 +191,7 @@ class ConsultationDocument extends PureComponent {
       const obj =
         clinicianprofile.find(
           (o) =>
-            o.id ===
+            o.userProfileFK ===
             (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
         ) || {}
 
@@ -267,7 +267,7 @@ class ConsultationDocument extends PureComponent {
                 const obj =
                   clinicianprofile.find(
                     (o) =>
-                      o.id ===
+                      o.userProfileFK ===
                       (r.issuedByUserFK
                         ? r.issuedByUserFK
                         : r.referredByUserFK),

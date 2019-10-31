@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
-import MessageListing from './Reminder/MessageListing'
-import { CommonModal, CardContainer, Danger } from '@/components'
-import Grid from './Grid'
+import { connect } from 'dva'
+import { CardContainer, Danger, Tabs } from '@/components'
 import New from './New'
-import FilterBar from './FilterBar'
+import { SmsOption } from './variables'
 
 const styles = {
   sendBar: {
@@ -33,33 +32,22 @@ const styles = {
   },
 }
 
-const SMS = ({ classes }) => {
+const SMS = ({ classes, sms, dispatch }) => {
   const [
-    showMessageModal,
-    setShowMessageModal,
-  ] = useState(false)
+    selectedRows,
+    setSelectedRows,
+  ] = useState([])
+
   const newMessageProps = {
-    onSend: (value) => {
-      //   setList([
-      //     ...list,
-      //     {
-      //       date: moment().format('YYYY-MM-DD HH-mm'),
-      //       text: value,
-      //       avatar:
-      //         'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      //       // authorName: 'Jonn Smith',
-      //       isOwn: true,
-      //       deliveryStatus: 'Pending',
-      //       id: list.length + 1,
-      //     },
-      //   ])
-      // },
-    },
+    selectedRows,
+    sms,
+    dispatch,
   }
   const gridProps = {
-    showSMSHistory: () => {
-      setShowMessageModal(true)
-    },
+    sms,
+    dispatch,
+    setSelectedRows,
+    selectedRows,
   }
 
   const showWarning = false
@@ -67,15 +55,25 @@ const SMS = ({ classes }) => {
     [classes.blur]: showWarning,
   })
 
+  const getSMSData = (e) => {
+    let type = ''
+    if (e === '0') type = 'Appointment'
+    else type = 'Patient'
+    dispatch({
+      type: 'sms/querySMSData',
+      smsType: type,
+    })
+  }
+
+  useEffect(() => {
+    dispatch({
+      type: 'sms/querySMSData',
+      smsType: 'Appointment',
+    })
+  }, [])
+
   return (
     <CardContainer hideHeader>
-      {/* <Button
-        variant='contained'
-        color='primary'
-        onClick={() => }
-      >
-        <Assignment />
-      </Button> */}
       {showWarning && (
         <div className={classes.warningContainer}>
           <div className={classes.warningContent}>
@@ -88,22 +86,22 @@ const SMS = ({ classes }) => {
         </div>
       )}
       <div className={contentClass}>
-        <FilterBar />
-        <Grid {...gridProps} />
+        <Tabs
+          defaultActiveKey='0'
+          options={SmsOption(gridProps)}
+          onChange={getSMSData}
+        />
         <div className={classes.sendBar}>
           <New {...newMessageProps} />
         </div>
       </div>
-      <CommonModal
-        open={showMessageModal}
-        title='Send SMS'
-        onClose={() => setShowMessageModal(false)}
-        onConfirm={() => setShowMessageModal(true)}
-        showFooter={false}
-      >
-        {showMessageModal ? <MessageListing /> : null}
-      </CommonModal>
     </CardContainer>
   )
 }
-export default compose(withStyles(styles, { withTheme: true }), React.memo)(SMS)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  React.memo,
+  connect(({ sms }) => ({
+    sms,
+  })),
+)(SMS)
