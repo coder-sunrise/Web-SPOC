@@ -5,7 +5,7 @@ import { Divider, withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
 
-import { FastField, Button, GridContainer, GridItem, notification, Select, Tabs } from '@/components'
+import { Button, GridContainer, GridItem, notification, Tabs } from '@/components'
 import { currencySymbol } from '@/utils/config'
 
 import Medication from './Medication'
@@ -139,7 +139,6 @@ class Details extends PureComponent {
 		const { props, state } = this
 		const { theme, classes, orders, values, rowHeight, footer, dispatch } = props
 		const { type, entity } = orders
-		// console.log(values)
 
 		const cfg = {
 			footer: this.footerBtns,
@@ -154,18 +153,18 @@ class Details extends PureComponent {
 					<GridContainer>
 						<GridItem xs={12}>
 							<Tabs
-								defaultActiveKey="0"
+								activeKey={type}
 								options={orderTypes.map((o) => {
 									return {
 										id: o.value,
 										name: o.name
 									}
 								})}
-								onChange={(value) => {
+								onChange={(key) => {
 									dispatch({
 										type: 'orders/updateState',
 										payload: {
-											type: value
+											type: key
 										}
 									})
 								}}
