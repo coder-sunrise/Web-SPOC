@@ -28,11 +28,8 @@ export default ({ current, classes, theme, codetable }) => {
         >
           {' '}
           {current.diagnosis.map((o, i) => (
-            <li key={i}>
-              {o.diagnosisDescription} (<DatePicker
-                text
-                value={o.onsetDate}
-              />)
+            <li key={i} style={{ paddingBottom: 10 }}>
+              {o.diagnosisDescription} (<DatePicker text value={o.onsetDate} />)
               {o.corComplication.length > 0 ? <br /> : ''}
               {o.corComplication.length > 0 ? (
                 `Complication: ${complicationData(o.corComplication)}`

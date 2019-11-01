@@ -14,7 +14,7 @@ export const BASE64_MARKER = 'data:application/pdf;base64,'
 
 export const maxScale = 2.0
 
-export const minScale = 1.25
+export const minScale = 1.0
 
 export const defaultScreenSize = { height: 720, width: 1280 }
 

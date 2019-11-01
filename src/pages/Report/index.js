@@ -45,7 +45,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'GST Report',
-    url: '',
+    url: '/report/gstreport',
   },
   {
     title: 'Finance',

@@ -373,6 +373,7 @@ class Demographic extends PureComponent {
                   name='pdpaConsent'
                   render={(args) => (
                     <CheckboxGroup
+                      prefix='PDPA Consent: '
                       label='PDPA Consent - Agree to receive marketing material via:'
                       horizontal
                       simple

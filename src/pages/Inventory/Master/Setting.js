@@ -223,7 +223,14 @@ const Setting = ({
           <FastField
             name='prescriptionToDispenseConversion'
             render={(args) => (
-              <NumberInput label='' {...args} defaultValue={1} />
+              <NumberInput
+                label={formatMessage({
+                  id:
+                    'inventory.master.setting.prescriptionToDispenseConversion',
+                })}
+                format='0.0'
+                {...args}
+              />
             )}
           />
         </GridItem>

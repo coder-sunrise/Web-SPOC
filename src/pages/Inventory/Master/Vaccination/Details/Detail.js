@@ -42,10 +42,7 @@ const Detail = ({
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    if (data && data.length > 0) {
-      const { isClinicSessionClosed } = data[0]
-      setHasActiveSession(!isClinicSessionClosed)
-    }
+    setHasActiveSession(data.length > 0)
   }
 
   useEffect(() => {

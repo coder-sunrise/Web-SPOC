@@ -7,7 +7,7 @@ trigger:
 - dev
 
 pool:
-  agent: 'SEMRGen2'
+  name: 'SEMRGen2'
 
 steps:
 - script: npm install

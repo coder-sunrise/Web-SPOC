@@ -65,6 +65,7 @@ export const TableConfig = {
     selectable: true,
     selectConfig: {
       showSelectAll: true,
+      rowSelectionEnabled: (row) => true,
     },
   },
 }

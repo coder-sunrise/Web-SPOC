@@ -55,12 +55,20 @@ export default createListViewModel({
       },
       *fetchCodes ({ payload }, { select, call, put }) {
         let ctcode = payload
-        if (typeof payload === 'object') ctcode = payload.code
+        let hasFilter = false
+        if (typeof payload === 'object') {
+          ctcode = payload.code
+          hasFilter = payload.filter !== undefined
+        }
 
         const codetableState = yield select((state) => state.codetable)
 
         if (ctcode !== undefined) {
-          if (codetableState[ctcode] === undefined || payload.force) {
+          if (
+            codetableState[ctcode] === undefined ||
+            payload.force ||
+            hasFilter
+          ) {
             const response = yield call(getCodes, payload)
             // console.log({ ctcode, response })
             if (response.length > 0) {

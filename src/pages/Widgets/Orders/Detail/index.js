@@ -81,6 +81,7 @@ class Details extends PureComponent {
             <Button
               link
               style={{ float: 'left' }}
+              disabled
               onClick={this.showAdjustment}
             >
               {currencySymbol} Adjustment
@@ -183,7 +184,7 @@ class Details extends PureComponent {
     } = props
     const { type, entity } = orders
     // console.log(values)
-    
+
     const cfg = {
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),

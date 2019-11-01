@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
+import { formatMessage } from 'umi/locale'
 import {
   Button,
   GridContainer,
@@ -50,7 +51,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       .min(0.1, 'Quantity must be between 0.1 and 999')
       .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
-    totalPrice: Yup.number().required(),
+    // totalPrice: Yup.number().required(),
     type: Yup.string(),
     stockDrugFK: Yup.number().when('type', {
       is: (val) => val !== '5',
@@ -219,13 +220,13 @@ class Medication extends PureComponent {
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
 
-    const total = newTotalQuantity * values.unitPrice
-    setFieldValue('totalPrice', total)
-    this.updateTotalPrice(total)
+    // const total = newTotalQuantity * values.unitPrice
+    // setFieldValue('totalPrice', total)
+    // this.updateTotalPrice(total)
+    this.props.setFieldValue('adjAmount', 0)
   }
 
   changeMedication = (v, op = {}) => {
-    console.log('asd', v, op)
     this.setState(() => {
       return { selectionOptions: op.medicationStock }
     })
@@ -348,20 +349,21 @@ class Medication extends PureComponent {
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
-    if (op.sellingPrice) {
-      setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue(
-        'totalPrice',
-        op.sellingPrice * (newTotalQuantity + totalFirstItem),
-      )
-      this.updateTotalPrice(
-        op.sellingPrice * (newTotalQuantity + totalFirstItem),
-      )
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
-    }
+    // if (op.sellingPrice) {
+    //   setFieldValue('unitPrice', op.sellingPrice)
+    //   setFieldValue(
+    //     'totalPrice',
+    //     op.sellingPrice * (newTotalQuantity + totalFirstItem),
+    //   )
+    //   this.updateTotalPrice(
+    //     op.sellingPrice * (newTotalQuantity + totalFirstItem),
+    //   )
+    // } else {
+    //   setFieldValue('unitPrice', undefined)
+    //   setFieldValue('totalPrice', undefined)
+    //   this.updateTotalPrice(undefined)
+    // }
+    this.props.setFieldValue('adjAmount', 0)
   }
 
   updateTotalPrice = (v) => {
@@ -488,9 +490,11 @@ class Medication extends PureComponent {
                                     {i + 1}.
                                   </span>
                                   <CodeSelect
-                                    // simple
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.usage',
+                                    })}
                                     allowClear={false}
-                                    style={{ paddingLeft: 15 }}
+                                    style={{ marginLeft: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -506,7 +510,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.dosage',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationDosage'
                                   labelField='displayValue'
@@ -528,7 +534,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.uom',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
                                   {...commonSelectProps}
@@ -544,7 +552,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.frequency',
+                                  })}
                                   labelField='displayValue'
                                   allowClear={false}
                                   code='ctMedicationFrequency'
@@ -566,7 +576,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.duration',
+                                  })}
                                   allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
@@ -709,11 +721,11 @@ class Medication extends PureComponent {
                     min={0}
                     format='0.0'
                     onChange={(e) => {
-                      if (values.unitPrice) {
-                        const total = e.target.value * values.unitPrice
-                        setFieldValue('totalPrice', total)
-                        this.updateTotalPrice(total)
-                      }
+                      // if (values.unitPrice) {
+                      //   const total = e.target.value * values.unitPrice
+                      //   setFieldValue('totalPrice', total)
+                      //   this.updateTotalPrice(total)
+                      // }
                     }}
                     {...args}
                   />
@@ -757,6 +769,8 @@ class Medication extends PureComponent {
                       //   },
                       // })
                     }}
+                    format='0.00'
+                    disabled
                     currency
                     {...args}
                   />
@@ -777,8 +791,9 @@ class Medication extends PureComponent {
                 return (
                   <NumberInput
                     label='Total After Adj'
-                    currency
+                    format='0.00'
                     disabled
+                    currency
                     {...args}
                   />
                 )
@@ -800,6 +815,7 @@ class Medication extends PureComponent {
                     onChange={(e, op = {}) => {
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
+                    disabled
                     {...args}
                   />
                 )
@@ -810,7 +826,7 @@ class Medication extends PureComponent {
             <FastField
               name='expiryDate'
               render={(args) => {
-                return <DatePicker label='Expiry Date' {...args} />
+                return <DatePicker label='Expiry Date' disabled {...args} />
               }}
             />
           </GridItem>

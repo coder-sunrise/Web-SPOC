@@ -447,6 +447,9 @@ class PatientDetail extends PureComponent {
               onCancel: () => {
                 dispatch({
                   type: 'patient/closePatientModal',
+                  payload: {
+                    history: this.props.history,
+                  },
                 })
               },
               onConfirm: handleSubmit,

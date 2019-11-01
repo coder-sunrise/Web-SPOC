@@ -13,8 +13,7 @@ schedules:
     - dev
 
 pool:
-  name: 'uat-emr-com-sg-01'
-  agent: 'uat-machine2'
+  name: 'SEMRGen2'
 
 steps:
 - script: npm install

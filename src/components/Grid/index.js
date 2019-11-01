@@ -109,6 +109,7 @@ const fullDateTime = 'DD-MM-YYYY hh:mm a'
 const serverDateFormat = 'YYYY-MM-DD'
 const serverDateTimeFormatFull = 'YYYY-MM-DDTHH:mm:ss'
 const timeFormat = 'hh:mm A'
+const timeFormatSmallCase = 'hh:mm a'
 const timeFormat24Hour = 'HH:mm'
 const timeFormat24HourWithSecond = 'HH:mm:ss'
 
@@ -181,6 +182,7 @@ module.exports = {
   dateFormatLongWithTimeNoSec,
   dateFormatLong,
   fullDateTime,
+  timeFormatSmallCase,
   serverDateFormat,
   serverDateTimeFormatFull,
   timeFormat,

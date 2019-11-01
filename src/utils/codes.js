@@ -18,8 +18,8 @@ const statusString = [
 ]
 
 const isAutoOrder = [
-  { value: false, name: 'False' },
-  { value: true, name: 'True' },
+  { value: false, name: 'No' },
+  { value: true, name: 'Yes' },
 ]
 
 const osBalanceStatus = [
@@ -828,6 +828,7 @@ const tenantCodes = [
   'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
+  'ctcopayer',
 ]
 
 // const codes = [
