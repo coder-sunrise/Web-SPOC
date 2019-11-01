@@ -109,7 +109,6 @@ class Orders extends PureComponent {
       visitRegistration,
       codetable,
     } = props
-    // console.log(orders)
     return (
       <div className={className}>
         <Detail {...props} />
