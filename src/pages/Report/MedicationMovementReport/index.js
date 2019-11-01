@@ -1,24 +1,20 @@
 import React, { useEffect, useReducer } from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
-import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // formik
 import { withFormik } from 'formik'
 // common components
-import { CardContainer, GridContainer, GridItem, Accordion } from '@/components'
-import { AccordionTitle } from '@/components/_medisys'
+import { CardContainer, GridContainer, GridItem } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
 
 import ReportLayoutWrapper from '../ReportLayout'
 // services
 import { getRawData } from '@/services/report'
-import IncomeList from './IncomeList'
-import ExpenditureList from './ExpenditureList'
-import Summary from './Summary'
+import MovementList from './MovementList'
 
-const reportId = 28
-const fileName = 'GST Report'
+const reportId = 22
+const fileName = 'Medication Movement Report'
 
 const initialState = {
   loaded: false,
@@ -45,7 +41,7 @@ const reducer = (state, action) => {
   }
 }
 
-const GSTReport = ({ values, validateForm }) => {
+const MedicationMovementReport = ({ values, validateForm }) => {
   const [
     state,
     dispatch,
@@ -88,11 +84,6 @@ const GSTReport = ({ values, validateForm }) => {
       })
     }
   }
-  const handleActivePanelChange = (event, panel) =>
-    dispatch({
-      type: 'setActivePanel',
-      payload: state.activePanel === panel.key ? -1 : panel.key,
-    })
 
   const onSubmitClick = async () => {
     dispatch({
@@ -118,48 +109,7 @@ const GSTReport = ({ values, validateForm }) => {
             loaded={state.loaded}
             fileName={fileName}
           >
-            <Accordion
-              active={state.activePanel}
-              onChange={handleActivePanelChange}
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
-              collapses={[
-                {
-                  title: <AccordionTitle title='Income' />,
-                  content: (
-                    <IncomeList {...state} />
-                  ),
-                },
-              ]}
-            />
-            <Accordion
-              active={state.activePanel}
-              onChange={handleActivePanelChange}
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
-              collapses={[
-                {
-                  title: <AccordionTitle title='Expenditure' />,
-                  content: (
-                    <ExpenditureList {...state} />
-                  ),
-                },
-              ]}
-            />
-            <Accordion
-              active={state.activePanel}
-              onChange={handleActivePanelChange}
-              leftIcon
-              expandIcon={<SolidExpandMore fontSize='large' />}
-              collapses={[
-                {
-                  title: <AccordionTitle title='Summary' />,
-                  content: (
-                    <Summary {...state} />
-                  ),
-                },
-              ]}
-            />
+            <MovementList {...state} />
           </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
@@ -167,7 +117,7 @@ const GSTReport = ({ values, validateForm }) => {
   )
 }
 
-const GSTReportWithFormik = withFormik({
+const MedicationMovementReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
@@ -175,6 +125,6 @@ const GSTReportWithFormik = withFormik({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
   }),
-})(GSTReport)
+})(MedicationMovementReport)
 
-export default GSTReportWithFormik
+export default MedicationMovementReportWithFormik

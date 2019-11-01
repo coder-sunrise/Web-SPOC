@@ -67,11 +67,10 @@ const menuData = [
     text: 'CHAS Claim Report',
     url: '',
   },
-
   {
     title: 'Inventory',
-    text: 'Drug Movement Report',
-    url: '',
+    text: 'Medication Movement Report',
+    url: '/report/medicationmovementreport',
   },
   {
     title: 'Other',
