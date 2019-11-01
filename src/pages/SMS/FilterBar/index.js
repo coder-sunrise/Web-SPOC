@@ -16,7 +16,7 @@ import FilterByPatient from './FilterByPatient'
 
 const styles = (theme) => ({
   filterBar: {
-    marginBottom: '10px',
+    marginBottom: '20px',
   },
   filterBtn: {
     // paddingTop: '13px',
@@ -28,50 +28,14 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes, values }) => {
+const FilterBar = ({ classes, type, handleSubmit }) => {
   return (
     <div className={classes.filterBar}>
-      <GridContainer alignItems='center'>
-        <GridItem xs={6}>
-          <FastField
-            name='searchBy'
-            render={(args) => (
-              <RadioGroup
-                label='Search By'
-                simple
-                defaultValue='patient'
-                options={[
-                  {
-                    value: 'appointment',
-                    label: formatMessage({ id: 'sms.appointment' }),
-                  },
-                  {
-                    value: 'patient',
-                    label: formatMessage({ id: 'sms.patient' }),
-                  },
-                ]}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={6} />
-        {values.SearchBy === 'appointment' ? (
-          <FilterByAppointment />
-        ) : (
-          <FilterByPatient />
-        )}
+      <GridContainer>
+        {type === 'Appointment' ? <FilterByAppointment /> : <FilterByPatient />}
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                // props.dispatch({
-                //   type: 'consumable/query',
-                // })
-              }}
-            >
+            <Button variant='contained' color='primary' onClick={handleSubmit}>
               <Search />
               <FormattedMessage id='sms.search' />
             </Button>
@@ -88,6 +52,30 @@ export default compose(
     mapPropsToValues: () => ({
       SearchBy: 'appointment',
     }),
+
+    handleSubmit: (values, { props, resetForm }) => {
+      const { patientName, lastVisitDate, ...restValues } = values
+      const { dispatch, type } = props
+
+      const payload = {
+        group: [
+          {
+            name: patientName,
+            patientAccountNo: patientName,
+            'ContactFkNavigation.contactNumber.number': patientName,
+            combineCondition: 'or',
+          },
+        ],
+        lastSMSSendStatus: 'Accepted',
+        lgteql_lastVisitDate: lastVisitDate && lastVisitDate[0],
+        lsteql_lastVisitDate: lastVisitDate && lastVisitDate[1],
+      }
+      dispatch({
+        type: 'sms/querySMSData',
+        payload,
+        smsType: type,
+      })
+    },
   }),
   React.memo,
 )(FilterBar)

@@ -3,6 +3,7 @@ import { convertToQuery } from '@/utils/utils'
 import request from '@/utils/request'
 
 const url = '/api/SMSReminder'
+const smsHistoryUrl = '/api/SMSReminder/smshistory'
 
 module.exports = {
   querySMSData: async (params, smsType) => {
@@ -18,9 +19,7 @@ module.exports = {
 
     return data
   },
-  query: (params) => {
-    return service.query(url, params)
-  },
+  querySMSHistory: (params) => service.queryList(smsHistoryUrl, params),
 
   upsert: async (params) => {
     const r = await request(url, {
