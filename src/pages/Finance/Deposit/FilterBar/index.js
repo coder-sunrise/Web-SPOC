@@ -157,6 +157,7 @@ class FilterBar extends PureComponent {
                         this.props.dispatch({
                           type: 'patient/closePatientModal',
                         })
+                        queryDepositListing()
                       },
                     },
                   })
