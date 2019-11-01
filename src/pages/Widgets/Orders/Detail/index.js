@@ -39,9 +39,9 @@ const styles = (theme) => ({
 })
 
 class Details extends PureComponent {
-  state = {
-    disableEdit: false,
-  }
+	state = {
+		disableEdit: false
+	}
 
 	footerBtns = ({ onSave, showAdjustment = true }) => {
 		const { classes, orders } = this.props
@@ -137,34 +137,26 @@ class Details extends PureComponent {
 		}, 1)
 	}
 
-  setDisable = (value) => {
-    this.setState({
-      disableEdit: value,
-    })
-  }
+	setDisable = (value) => {
+		this.setState({
+			disableEdit: value
+		})
+	}
 
-  render () {
-    const { props, state } = this
-    const {
-      theme,
-      classes,
-      orders,
-      values,
-      rowHeight,
-      footer,
-      dispatch,
-    } = props
-    const { type, entity } = orders
-    // console.log(values)
+	render() {
+		const { props, state } = this
+		const { theme, classes, orders, values, rowHeight, footer, dispatch } = props
+		const { type, entity } = orders
+		// console.log(values)
 
-    const cfg = {
-      disableEdit: this.state.disableEdit,
-      setDisable: this.setDisable,
-      footer: this.footerBtns,
-      currentType: orderTypes.find((o) => o.value === type),
-      type,
-      ...props,
-    }
+		const cfg = {
+			disableEdit: this.state.disableEdit,
+			setDisable: this.setDisable,
+			footer: this.footerBtns,
+			currentType: orderTypes.find((o) => o.value === type),
+			type,
+			...props
+		}
 
 		return (
 			<div>
