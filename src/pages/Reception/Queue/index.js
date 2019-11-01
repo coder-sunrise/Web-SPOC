@@ -302,11 +302,6 @@ class Queue extends React.Component {
         patientID: patientSearchResult[0].id,
       })
     if (totalRecords > 1) {
-      this.props.history.push(
-        getAppendUrl({
-          v: Date.now(),
-        }),
-      )
       return this.setState({ showPatientSearch: true })
     }
     return this.toggleRegisterNewPatient()
