@@ -31,10 +31,7 @@ import { updateAPIType } from '@/utils/request'
 
 @connect(({ user, clinicInfo }) => ({
   user,
-  clinicShortCode:
-    clinicInfo && clinicInfo.settings
-      ? clinicInfo.settings.clinicShortCode
-      : '',
+  clinicInfo,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -91,7 +88,7 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user, clinicShortCode } = this.props
+    const { classes, rtlActive, user, clinicInfo } = this.props
     const { openNotification, openAccount, openDomain, title } = this.state
 
     // console.log(openNotification, openAccount)
@@ -117,6 +114,8 @@ class HeaderLinks extends React.Component {
       user.data && user.data.clinicianProfile
         ? user.data.clinicianProfile.title
         : ''
+
+    const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
 
     return (
       <div className={wrapper}>

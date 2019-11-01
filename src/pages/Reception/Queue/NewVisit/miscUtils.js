@@ -40,11 +40,12 @@ export const formikMapPropsToValues = ({
   try {
     let qNo = 0.0
     let doctorProfile
-    // let doctorProfileFK
+    let doctorProfileFK
     if (clinicInfo) {
-      doctorProfile = doctorProfiles.find(
-        (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
-      )
+      // doctorProfile = doctorProfiles.find(
+      //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
+      // )
+      doctorProfileFK = clinicInfo.primaryRegisteredDoctorFK
     }
 
     if (queueLog) {
@@ -84,7 +85,8 @@ export const formikMapPropsToValues = ({
       queueNo: qNo,
       visitPurposeFK: 1,
       visitStatus: VISIT_STATUS.WAITING,
-      doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
+      // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
+      doctorProfileFK,
       ...visitEntries,
     }
   } catch (error) {
