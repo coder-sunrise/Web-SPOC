@@ -68,6 +68,7 @@ export default {
   'inventory.master.setting.uom': 'UOM',
   'inventory.master.setting.usage': 'Usage',
   'inventory.master.setting.quantity': 'Quantity',
+  'inventory.master.setting.prescriptionToDispenseConversion': 'Conversion',
 
   'inventory.master.setting.precaution':
     'Maximum up to 3 precautions to be configured',
@@ -76,7 +77,7 @@ export default {
   'inventory.master.stock.reorderThreshold': 'Re-Order Threshold',
   'inventory.master.stock.criticalThreshold': 'Critical Threshold',
 
-  //Purchasing & Receiving
+  // Purchasing & Receiving
   'inventory.pr.reason': 'Reason',
   'inventory.pr.diplicatePO': 'Duplicate Purchase Order',
   'inventory.pr.duplicatePOConfirmation':
@@ -117,8 +118,10 @@ export default {
   'inventory.pr.detail.pod.summary.gst': 'GST (7.00%): ',
   'inventory.pr.detail.pod.summary.inclusiveGST': 'Inclusive GST',
   'inventory.pr.detail.pod.summary.total': 'Total: ',
-  'inventory.pr.detail.pod.summary.adjustment.minAdjustment': 'Adjustment cannot be zero',
-  'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount': 'Adjustment is larger than total amount. Please amend',
+  'inventory.pr.detail.pod.summary.adjustment.minAdjustment':
+    'Adjustment cannot be zero',
+  'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount':
+    'Adjustment is larger than total amount. Please amend',
 
   'inventory.pr.detail.dod.do': 'Delivery Order',
   'inventory.pr.detail.dod.addDeliveryOrder': 'Add Delivery Order',

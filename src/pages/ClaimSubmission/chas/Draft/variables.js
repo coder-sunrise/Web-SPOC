@@ -57,5 +57,11 @@ export const NewCHASColumnExtensions = [
 ]
 
 export const TableConfig = {
-  FuncProps: {},
+  FuncProps: {
+    selectable: true,
+    selectConfig: {
+      showSelectAll: true,
+      rowSelectionEnabled: (row) => true,
+    },
+  },
 }

@@ -79,6 +79,7 @@ export default {
   'menu.consultation': 'Consultation',
   'menu.reception.consultation': 'Consultation',
   'menu.reception.billing': 'Billing',
+  'menu.report.gstReport': 'GST Report',
 
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',

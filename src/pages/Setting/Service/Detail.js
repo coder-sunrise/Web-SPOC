@@ -174,14 +174,11 @@ class Detail extends PureComponent {
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    if (data && data.length > 0) {
-      const { isClinicSessionClosed } = data[0]
-      this.setState(() => {
-        return {
-          hasActiveSession: !isClinicSessionClosed,
-        }
-      })
-    }
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
   }
 
   initMedisaveSetting = () => {

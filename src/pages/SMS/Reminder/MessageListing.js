@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
-import { GridContainer } from '@/components'
 import {
   ThemeProvider,
   MessageList,
@@ -12,6 +11,7 @@ import {
   Avatar,
   Row,
 } from '@livechat/ui-kit'
+import { GridContainer } from '@/components'
 
 import New from '../New'
 
@@ -50,7 +50,10 @@ const styles = () => ({
 })
 
 const MessageListing = ({ classes }) => {
-  const [ list, setList ] = useState([
+  const [
+    list,
+    setList,
+  ] = useState([
     {
       date: '2019-05-01 21:37',
       text: 'Hi Tan Ah Kow',
@@ -132,11 +135,11 @@ const MessageListing = ({ classes }) => {
     while (i < messageCount) {
       let previous = messages[i - 1]
       let current = messages[i]
-      let currentMoment = moment(current.date)
+      let currentMoment = moment(current.sendDate)
       let showTimestamp = true
 
       if (previous) {
-        let previousMoment = moment(previous.date)
+        let previousMoment = moment(previous.sendDate)
         let previousDuration = moment.duration(
           currentMoment.diff(previousMoment),
         )
@@ -144,21 +147,16 @@ const MessageListing = ({ classes }) => {
           showTimestamp = false
         }
       }
-      const { date, text, avatar, isOwn, deliveryStatus } = current
-      let p = { text, avatar, isOwn, deliveryStatus }
+      const { sendDate, content, status } = current
+      let p = { content, status }
       m = m.concat(
         <React.Fragment key={current.id}>
-          {showTimestamp && <div style={{ textAlign: 'center' }}>{date}</div>}
-          <Row reverse={!!isOwn}>
-            <Avatar imgUrl={avatar} />
+          {showTimestamp && (
+            <div style={{ textAlign: 'center' }}>{sendDate}</div>
+          )}
+          <Row reverse>
             <Message {...p}>
-              <MessageText
-                className={
-                  current.isOwn ? classes.sentMessage : classes.repliedMessage
-                }
-              >
-                {text}
-              </MessageText>
+              <MessageText>{content}</MessageText>
             </Message>
           </Row>
         </React.Fragment>,

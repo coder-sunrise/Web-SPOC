@@ -130,6 +130,7 @@ class RejectedCHAS extends React.Component {
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
+                type='rejected'
               />
             </GridItem>
 

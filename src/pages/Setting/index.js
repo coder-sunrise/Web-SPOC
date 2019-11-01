@@ -333,13 +333,12 @@ class SystemSetting extends PureComponent {
           }}
         /> */}
         <TextField
-          prefix={<Search />}
           onChange={(e) => {
-            console.log(e.target)
             this.setState({
               searchText: e.target.value.toLowerCase(),
             })
           }}
+          value={this.state.searchText}
         />
         <Accordion
           defaultActive={0}

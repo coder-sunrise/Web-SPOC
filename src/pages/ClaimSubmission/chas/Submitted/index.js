@@ -123,6 +123,7 @@ class SubmittedCHAS extends React.Component {
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}
+                type='submitted'
               />
             </GridItem>
             <GridItem md={4} className={classes.buttonGroup}>

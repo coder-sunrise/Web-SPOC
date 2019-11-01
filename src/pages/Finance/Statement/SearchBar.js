@@ -127,7 +127,14 @@ class SearchBar extends PureComponent {
             <FastField
               name='copayerFK'
               render={(args) => {
-                return <CodeSelect {...args} label='Company' code='ctCopayer' />
+                return (
+                  <CodeSelect
+                    {...args}
+                    label='Company'
+                    code='ctCopayer'
+                    labelField='displayValue'
+                  />
+                )
               }}
             />
           </GridItem>

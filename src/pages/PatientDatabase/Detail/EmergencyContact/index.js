@@ -225,7 +225,7 @@ class EmergencyContact extends PureComponent {
         <EditableTableGrid
           rows={values.patientEmergencyContact}
           schema={schema}
-          showRowNumber
+          // showRowNumber
           // onRowDoubleClick={this.onRowDoubleClick}
           FuncProps={{
             pagerConfig: {

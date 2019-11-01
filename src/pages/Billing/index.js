@@ -44,6 +44,8 @@ const styles = (theme) => ({
     textAlign: 'right',
   },
   dispenseContainer: {
+    maxHeight: '40vh',
+    overflow: 'auto',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
