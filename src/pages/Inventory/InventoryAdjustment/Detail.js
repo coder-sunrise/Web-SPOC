@@ -38,7 +38,7 @@ let commitCount = 1000 // uniqueNumber
     adjustmentTransactionDate: Yup.date().required(),
     remarks: Yup.string().max(2000, 'Max 2000 characters for remarks.'),
   }),
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props, resetForm }) => {
     const {
       inventoryAdjustmentItems,
       stockList,
@@ -85,8 +85,12 @@ let commitCount = 1000 // uniqueNumber
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
         const { batchNo, code, displayValue, ...value } = val
+        let newQty = 0
+        if (val.stock) newQty += val.stock
+        if (val.adjustmentQty) newQty += val.adjustmentQty
         return {
           ...value,
+          newQty,
           [getType.typeName]: {
             ...restValues,
             batchNo: o.batchNoString || o[getType.typeName].batchNo,
@@ -120,6 +124,7 @@ let commitCount = 1000 // uniqueNumber
       },
     }).then((r) => {
       if (r) {
+        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
           type: 'inventoryAdjustment/query',
@@ -596,7 +601,7 @@ class Detail extends PureComponent {
     const { option, row } = e
     if (option) {
       const { expiryDate, stock, value, batchNo } = option
-      this.setState({ selectedItem: e })
+      this.setState({ selectedItem: undefined })
       row.batchNo = value
       row.expiryDate = expiryDate
       row.stock = stock
@@ -1014,7 +1019,7 @@ class Detail extends PureComponent {
               onConfirm: props.handleSubmit,
               confirmBtnText: 'Save',
               extraButtons: (
-                <Button
+                <ProgressButton
                   color='info'
                   type='submit'
                   onClick={this.updateStatus}
@@ -1024,7 +1029,7 @@ class Detail extends PureComponent {
                   }
                 >
                   Finalize
-                </Button>
+                </ProgressButton>
               ),
               confirmProps: {
                 disabled:

@@ -65,7 +65,23 @@ class CoPayer extends Component {
     // .map((item) => ({ ...item, claimAmount: 0 })) || [],
   }
 
+  populateClaimAmount = (selected) => {
+    const { invoiceItems } = this.state
+
+    const selectedItems = invoiceItems.map((item) => {
+      if (
+        selected.includes(item.id) &&
+        (item.claimAmount === 0 || item.claimAmount === undefined)
+      )
+        return { ...item, claimAmount: item.payableBalance }
+      return { ...item }
+    })
+
+    this.setState({ invoiceItems: selectedItems })
+  }
+
   handleSelectionChange = (selection) => {
+    this.populateClaimAmount(selection)
     this.setState({ selectedRows: selection })
   }
 
