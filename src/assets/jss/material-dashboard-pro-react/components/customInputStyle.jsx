@@ -90,6 +90,13 @@ const customInputStyle = {
       fontWeight: 500,
     },
   },
+  inActive: {
+    '& input': {
+      color: 'gray',
+      fontWeight: 200,
+    },
+  },
+  
   negativeCurrency: {
     '& input': {
       color: 'red',
