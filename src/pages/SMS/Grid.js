@@ -4,68 +4,103 @@ import moment from 'moment'
 // devexpress react grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common components
-import { CommonTableGrid, Tooltip } from '@/components'
+import { FastField, withFormik } from 'formik'
+import { withStyles } from '@material-ui/core'
+import ForumIcon from '@material-ui/icons/Forum'
+import DraftsIcon from '@material-ui/icons/Drafts'
+import MarkunreadIcon from '@material-ui/icons/Markunread'
+// common components
+import { GridContextMenuButton as GridButton } from 'medisys-components'
+import MessageListing from './Reminder/MessageListing'
+
+import {
+  CommonTableGrid,
+  Tooltip,
+  GridContainer,
+  CommonModal,
+} from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
-import { GridContextMenuButton } from '@/components/_medisys'
+import FilterByAppointment from './FilterBar/FilterByAppointment'
+import FilterByPatient from './FilterBar/FilterByPatient'
 
+const styles = (theme) => ({
+  filterBar: {
+    marginBottom: '10px',
+  },
+  filterBtn: {
+    // paddingTop: '13px',
+
+    textAlign: 'left',
+    '& > button': {
+      marginRight: theme.spacing.unit,
+    },
+  },
+})
 const generateRowData = () => {
-  let data = []
-  for (let i = 0; i < 10; i++) {
-    data.push({
-      id: `row-${i}-data`,
-      patientName: `Tan ${i}`,
-      contactNo: `1234567${i}`,
-      upComingAppt: moment().format('DD-MMM-YYYY HH:MM'),
-      remarks: '',
-      doctor: 'Dr Levine',
-      status: 'Confirmed',
-      apptType: 'Screening',
-      reminderSent: 'Yes',
-    })
-  }
-  return data
+  // let data = []
+  // for (let i = 0; i < 10; i++) {
+  //   data.push({
+  //     id: `row-${i}-data`,
+  //     patientName: `Tan ${i}`,
+  //     contactNo: `1234567${i}`,
+  //     upComingAppt: moment().format('DD-MMM-YYYY HH:MM'),
+  //     remarks: '',
+  //     doctor: 'Dr Levine',
+  //     status: 'Confirmed',
+  //     apptType: 'Screening',
+  //     reminderSent: 'Yes',
+  //   })
+  // }
+  // return data
 }
-const Grid = ({ showSMSHistory, list, dispatch }) => {
+const Grid = ({
+  sms,
+  showSMSHistory,
+  list,
+  dispatch,
+  type,
+  columns,
+  columnsExtensions,
+  setSelectedRows,
+  selectedRows,
+}) => {
   const [
-    selectedRows,
-    setSelectedRows,
-  ] = useState([])
+    showMessageModal,
+    setShowMessageModal,
+  ] = useState(false)
+
   const [
     tableParas,
     setTableParas,
   ] = useState({
-    columns: [
-      { name: 'patientName', title: 'Patient Name' },
-      { name: 'contactNo', title: 'Contact No' },
-      { name: 'upcomingAppt', title: 'Upcoming Appt.' },
-      { name: 'remarks', title: 'Appt. Remarks' },
-      { name: 'doctor', title: 'Doctor' },
-      { name: 'status', title: 'Appt. Status' },
-      { name: 'apptType', title: 'Appt. Type' },
-      { name: 'lastVisitDate', title: 'Last Visit Date' },
-      { name: 'lastSMSStatus', title: 'Last SMS Status' },
-      { name: 'lastSMSSent', title: 'Last SMS Sent' },
-      { name: 'lastSMSReceived', title: 'Last SMS Received' },
-      { name: 'reminderSent', title: 'Reminder Sent' },
-      { name: 'Action', title: 'Action' },
-    ],
-    leftColumns: [],
+    columns,
   })
   const [
     colExtensions,
     setColExtensions,
-  ] = useState([
-    { columnName: 'Action', width: 120, align: 'center' },
-  ])
+  ] = useState(columnsExtensions)
+
+  const [
+    selectedRow,
+    setSelectedRow,
+  ] = useState([])
 
   const handleSelectionChange = (selection) => {
     setSelectedRows(selection)
   }
 
   const handleContextMenuClick = (recordRow, id) => {
+    console.log(recordRow, id)
     switch (id) {
       case '0':
+        dispatch({
+          type: 'sms/querySMSData',
+          payload: {
+            Recipient: '98112345',
+          },
+          smsType: 'smshistory',
+        }).then((v) => console.log({ v }))
         showSMSHistory()
         break
       default:
@@ -74,49 +109,41 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
   }
 
   const gridGetRowID = (row) => row.id
-  const Cell = ({ column, row, classes, ...props }) => {
-    if (column.name === 'Action') {
-      // return (
-      //   <Table.Cell {...props}>
-      //     <Tooltip title='View SMS History' placement='bottom'>
-      //       <div>
-      //         <Button
-      //           size='sm'
-      //           onClick={showSMSHistory}
-      //           justIcon
-      //           round
-      //           color='primary'
-      //         >
-      //           <Textsms />
-      //         </Button>
-      //       </div>
-      //     </Tooltip>
-      //   </Table.Cell>
-      // )
+
+  const Cell = React.memo(({ ...tableProps }) => {
+    const handleMenuItemClick = (row, id) => {
+      handleContextMenuClick(row, id)
+    }
+
+    const defaultContextMenuOptions = [
+      {
+        id: 0,
+        label: 'View SMS History',
+        Icon: ForumIcon,
+      },
+      {
+        id: 1,
+        label: 'Mark as Read',
+        Icon: DraftsIcon,
+      },
+      {
+        id: 1,
+        label: 'Mark as Unread',
+        Icon: MarkunreadIcon,
+      },
+    ]
+    const options = defaultContextMenuOptions
+
+    if (tableProps.column.name === 'Action') {
       return (
-        <Table.Cell {...props}>
+        <Table.Cell {...tableProps}>
           <Authorized authority='sms.viewsms'>
-            <Tooltip title='View SMS History' placement='bottom'>
+            <Tooltip title='More Actions' placement='bottom'>
               <div style={{ display: 'inline-block' }}>
-                <GridContextMenuButton
-                  row={row}
-                  onClick={handleContextMenuClick}
-                  contextMenuOptions={[
-                    {
-                      id: '0',
-                      label: 'View SMS History',
-                    },
-                    {
-                      id: '1',
-                      label: 'Mark as Read',
-                      disabled: true,
-                    },
-                    {
-                      id: '2',
-                      label: 'Mark as Unread',
-                      disabled: true,
-                    },
-                  ]}
+                <GridButton
+                  row={tableProps.row}
+                  contextMenuOptions={options}
+                  onClick={handleMenuItemClick}
                 />
               </div>
             </Tooltip>
@@ -124,26 +151,43 @@ const Grid = ({ showSMSHistory, list, dispatch }) => {
         </Table.Cell>
       )
     }
-    return <Table.Cell {...props} />
-  }
 
-  const TableCell = (p) => Cell({ ...p, dispatch })
-
-  const ActionProps = { TableCellComponent: TableCell }
+    return <Table.Cell {...tableProps} />
+  })
 
   return (
     <React.Fragment>
+      <GridContainer style={{ marginBottom: 20 }}>
+        {type === 'Appointment' ? <FilterByAppointment /> : <FilterByPatient />}
+      </GridContainer>
       <CommonTableGrid
-        getRowId={gridGetRowID}
-        rows={generateRowData()}
+        type='sms'
         onSelectionChange={handleSelectionChange}
         selection={selectedRows}
         columnExtensions={colExtensions}
-        ActionProps={ActionProps}
+        ActionProps={{ TableCellComponent: Cell }}
         FuncProps={{ selectable: true }}
         {...tableParas}
       />
+      <CommonModal
+        open={showMessageModal}
+        title='Send SMS'
+        onClose={() => setShowMessageModal(false)}
+        onConfirm={() => setShowMessageModal(true)}
+        showFooter={false}
+      >
+        {showMessageModal ? <MessageListing /> : null}
+      </CommonModal>
     </React.Fragment>
   )
 }
-export default compose(React.memo)(Grid)
+// export default compose(React.memo)(Grid)
+export default compose(
+  withStyles(styles, { withTheme: true }),
+  withFormik({
+    mapPropsToValues: () => ({
+      SearchBy: 'appointment',
+    }),
+  }),
+  React.memo,
+)(Grid)

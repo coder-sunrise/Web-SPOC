@@ -14,6 +14,7 @@ const sharedMedicationValue = {
   corPrescriptionItemPrecaution: [
     {},
   ],
+
   corPrescriptionItemInstruction: [
     {
       // usageMethodFK: 1,

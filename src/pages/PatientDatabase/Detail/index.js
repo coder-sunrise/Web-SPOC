@@ -63,7 +63,6 @@ const styles = () => ({
   authority: 'patientdatabase.patientprofiledetails',
   enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
-    // console.log(patient)
     const mappedValues = {
       ...(patient.entity || patient.default),
       pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
@@ -447,6 +446,9 @@ class PatientDetail extends PureComponent {
               onCancel: () => {
                 dispatch({
                   type: 'patient/closePatientModal',
+                  payload: {
+                    history: this.props.history,
+                  },
                 })
               },
               onConfirm: handleSubmit,

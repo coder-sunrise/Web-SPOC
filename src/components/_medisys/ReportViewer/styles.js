@@ -36,7 +36,7 @@ export default (theme) => ({
     width: '100%',
     height: '100%',
     minHeight: '85vh',
-    maxHeight: '88vh',
+    // maxHeight: '88vh',
     overflow: 'scroll',
     marginTop: theme.spacing(1),
     boxShadow: '0 1px 4px 0 rgba(0, 0, 0, 0.28)',

@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
+import { formatMessage } from 'umi/locale'
 import {
   Button,
   GridContainer,
@@ -179,7 +180,7 @@ class Medication extends PureComponent {
   }
 
   calcualteQuantity = () => {
-    const { codetable, setFieldValue, values } = this.props
+    const { codetable, setFieldValue, values, disableEdit } = this.props
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
 
@@ -218,14 +219,14 @@ class Medication extends PureComponent {
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
-
-    const total = newTotalQuantity * values.unitPrice
-    setFieldValue('totalPrice', total)
-    this.updateTotalPrice(total)
+    if (disableEdit === false) {
+      const total = newTotalQuantity * values.unitPrice
+      setFieldValue('totalPrice', total)
+      this.updateTotalPrice(total)
+    }
   }
 
   changeMedication = (v, op = {}) => {
-    console.log('asd', v, op)
     this.setState(() => {
       return { selectionOptions: op.medicationStock }
     })
@@ -238,7 +239,7 @@ class Medication extends PureComponent {
     // this.setState(() => {
     //   return { selectionOptions: tempArray }
     // })
-    const { setFieldValue, values, codetable } = this.props
+    const { setFieldValue, values, codetable, disableEdit } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
 
@@ -348,19 +349,21 @@ class Medication extends PureComponent {
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
-    if (op.sellingPrice) {
-      setFieldValue('unitPrice', op.sellingPrice)
-      setFieldValue(
-        'totalPrice',
-        op.sellingPrice * (newTotalQuantity + totalFirstItem),
-      )
-      this.updateTotalPrice(
-        op.sellingPrice * (newTotalQuantity + totalFirstItem),
-      )
-    } else {
-      setFieldValue('unitPrice', undefined)
-      setFieldValue('totalPrice', undefined)
-      this.updateTotalPrice(undefined)
+    if (disableEdit === false) {
+      if (op.sellingPrice) {
+        setFieldValue('unitPrice', op.sellingPrice)
+        setFieldValue(
+          'totalPrice',
+          op.sellingPrice * (newTotalQuantity + totalFirstItem),
+        )
+        this.updateTotalPrice(
+          op.sellingPrice * (newTotalQuantity + totalFirstItem),
+        )
+      } else {
+        setFieldValue('unitPrice', undefined)
+        setFieldValue('totalPrice', undefined)
+        this.updateTotalPrice(undefined)
+      }
     }
   }
 
@@ -390,6 +393,8 @@ class Medication extends PureComponent {
       handleSubmit,
       setFieldValue,
       orders,
+      disableEdit,
+      setDisable,
     } = this.props
     const commonSelectProps = {
       dropdownMatchSelectWidth: false,
@@ -397,7 +402,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-
     return (
       <div>
         <GridContainer>
@@ -488,9 +492,11 @@ class Medication extends PureComponent {
                                     {i + 1}.
                                   </span>
                                   <CodeSelect
-                                    // simple
+                                    label={formatMessage({
+                                      id: 'inventory.master.setting.usage',
+                                    })}
                                     allowClear={false}
-                                    style={{ paddingLeft: 15 }}
+                                    style={{ marginLeft: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -506,7 +512,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.dosage',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationDosage'
                                   labelField='displayValue'
@@ -528,7 +536,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.uom',
+                                  })}
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
                                   {...commonSelectProps}
@@ -544,7 +554,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <CodeSelect
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.frequency',
+                                  })}
                                   labelField='displayValue'
                                   allowClear={false}
                                   code='ctMedicationFrequency'
@@ -566,7 +578,9 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
-                                  // simple
+                                  label={formatMessage({
+                                    id: 'inventory.master.setting.duration',
+                                  })}
                                   allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
@@ -709,10 +723,12 @@ class Medication extends PureComponent {
                     min={0}
                     format='0.0'
                     onChange={(e) => {
-                      if (values.unitPrice) {
-                        const total = e.target.value * values.unitPrice
-                        setFieldValue('totalPrice', total)
-                        this.updateTotalPrice(total)
+                      if (disableEdit === false) {
+                        if (values.unitPrice) {
+                          const total = e.target.value * values.unitPrice
+                          setFieldValue('totalPrice', total)
+                          this.updateTotalPrice(total)
+                        }
                       }
                     }}
                     {...args}
@@ -757,6 +773,8 @@ class Medication extends PureComponent {
                       //   },
                       // })
                     }}
+                    format='0.00'
+                    disabled={disableEdit}
                     currency
                     {...args}
                   />
@@ -777,8 +795,9 @@ class Medication extends PureComponent {
                 return (
                   <NumberInput
                     label='Total After Adj'
-                    currency
+                    format='0.00'
                     disabled
+                    currency
                     {...args}
                   />
                 )
@@ -800,6 +819,7 @@ class Medication extends PureComponent {
                     onChange={(e, op = {}) => {
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
+                    disabled={disableEdit}
                     {...args}
                   />
                 )
@@ -807,10 +827,16 @@ class Medication extends PureComponent {
             />
           </GridItem>
           <GridItem xs={2} className={classes.editor}>
-            <FastField
+            <Field
               name='expiryDate'
               render={(args) => {
-                return <DatePicker label='Expiry Date' {...args} />
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
@@ -833,11 +859,28 @@ class Medication extends PureComponent {
             <FastField
               name='isExternalPrescription'
               render={(args) => {
+                if (args.field.value) {
+                  setDisable(true)
+                } else {
+                  setDisable(false)
+                }
                 return (
                   <Checkbox
                     label='External Prescription'
                     labelPlacement='start'
                     {...args}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        this.props.setFieldValue('adjAmount', 0)
+                        this.props.setFieldValue('totalAfterItemAdjustment', 0)
+                        this.props.setFieldValue('totalPrice', 0)
+                      } else {
+                        setTimeout(() => {
+                          this.calcualteQuantity()
+                        }, 1)
+                      }
+                      setDisable(e.target.value)
+                    }}
                   />
                 )
               }}

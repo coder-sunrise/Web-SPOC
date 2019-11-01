@@ -110,8 +110,9 @@ const Detail = (props) => {
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ schemeDetail }) => ({
+  connect(({ schemeDetail, codetable }) => ({
     schemeDetail,
+    codetable,
   })),
   withFormikExtend({
     authority: 'finance/scheme',

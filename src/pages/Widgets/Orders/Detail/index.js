@@ -67,7 +67,9 @@ const styles = (theme) => ({
 })
 
 class Details extends PureComponent {
-  state = {}
+  state = {
+    disableEdit: false,
+  }
 
   footerBtns = ({ onSave, showAdjustment = true }) => {
     const { classes, orders } = this.props
@@ -81,6 +83,7 @@ class Details extends PureComponent {
             <Button
               link
               style={{ float: 'left' }}
+              disabled={this.state.disableEdit}
               onClick={this.showAdjustment}
             >
               {currencySymbol} Adjustment
@@ -170,6 +173,12 @@ class Details extends PureComponent {
     }, 1)
   }
 
+  setDisable = (value) => {
+    this.setState({
+      disableEdit: value,
+    })
+  }
+
   render () {
     const { props, state } = this
     const {
@@ -183,8 +192,10 @@ class Details extends PureComponent {
     } = props
     const { type, entity } = orders
     // console.log(values)
-    
+
     const cfg = {
+      disableEdit: this.state.disableEdit,
+      setDisable: this.setDisable,
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
       type,
