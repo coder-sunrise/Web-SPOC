@@ -1192,9 +1192,12 @@ const tagList = [
     text: '<#AppointmentDateTime#>',
     url: '',
     getter: () => {
-      const { patient } = window.g_app._store.getState()
-      if (patient && patient.entity) {
-        return patient.entity.name
+      const { visitRegistration = {} } = window.g_app._store.getState()
+      const { entity } = visitRegistration
+      if (entity && entity.visit && entity.visit.appointmentDatetTime) {
+        return moment(entity.visit.appointmentDatetTime).format(
+          dateFormatLongWithTime,
+        )
       }
       return 'N.A.'
     },

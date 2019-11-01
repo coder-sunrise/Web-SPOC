@@ -502,7 +502,9 @@ class BasicLayout extends React.PureComponent {
                         </div>
                       )}
 
-                      <GlobalModalContainer {...props} />
+                      {this.state.authorized && (
+                        <GlobalModalContainer {...props} />
+                      )}
                     </div>
                   </ErrorBoundary>
                 </Context.Provider>
