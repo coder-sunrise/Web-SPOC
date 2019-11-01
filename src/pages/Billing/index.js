@@ -347,7 +347,6 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-    console.log(this.props)
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
