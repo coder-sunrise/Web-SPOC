@@ -66,7 +66,13 @@ class CoPayer extends Component {
   }
 
   handleSelectionChange = (selection) => {
-    this.setState({ selectedRows: selection })
+    const { invoiceItems } = this.state
+    const selectedItems = invoiceItems.map((item) => {
+      if (selection.includes(item.id))
+        return { ...item, claimAmount: item.payableBalance }
+      return { ...item }
+    })
+    this.setState({ selectedRows: selection, invoiceItems: selectedItems })
   }
 
   handleCopayerChange = (value) => {
