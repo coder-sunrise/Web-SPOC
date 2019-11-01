@@ -49,9 +49,12 @@ const styles = (theme) => ({
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     const newPurchaseOrderDetails = purchaseOrderDetails
 
-    if(newPurchaseOrderDetails){
-
-      if(newPurchaseOrderDetails.type && newPurchaseOrderDetails.type === 'dup' && newPurchaseOrderDetails.purchaseOrder){
+    if (newPurchaseOrderDetails) {
+      if (
+        newPurchaseOrderDetails.type &&
+        newPurchaseOrderDetails.type === 'dup' &&
+        newPurchaseOrderDetails.purchaseOrder
+      ) {
         newPurchaseOrderDetails.purchaseOrder.purchaseOrderNo = null
         newPurchaseOrderDetails.purchaseOrder.invoiceDate = null
         newPurchaseOrderDetails.purchaseOrder.remark = null
@@ -59,17 +62,18 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
       }
 
-      if(newPurchaseOrderDetails.purchaseOrder)
-      {
-        const { isGSTEnabled, isGstInclusive } = newPurchaseOrderDetails.purchaseOrder
+      if (newPurchaseOrderDetails.purchaseOrder) {
+        const {
+          isGSTEnabled,
+          isGstInclusive,
+        } = newPurchaseOrderDetails.purchaseOrder
         newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = isGSTEnabled
         newPurchaseOrderDetails.purchaseOrder.IsGSTInclusive = isGstInclusive
       }
-
     }
     return {
       ...purchaseOrderDetails,
-      }
+    }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -482,14 +486,12 @@ class Index extends Component {
       })
     }
 
-
     setTimeout(() => {
       setFieldValue('purchaseOrder.gstAmount', gstAmount)
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
-      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
-      setFieldValue('purchaseOrder.GSTValue',gstValue)
+      setFieldValue('purchaseOrder.AdjustmentAmount', totalAdjustmentAmount)
+      setFieldValue('purchaseOrder.GSTValue', gstValue)
     }, 1)
-
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -550,8 +552,7 @@ class Index extends Component {
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={isPOStatusDraft(poStatus)}
-          isWriteOff={isWriteOff}
+          isEditable={isEditable()}
           {...this.props}
         />
         <AuthorizedContext.Provider

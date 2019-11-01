@@ -1,6 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import _ from 'lodash'
+import styled from 'styled-jss'
 import {
   EditorState,
   ContentState,
@@ -15,21 +16,48 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import classnames from 'classnames'
 import htmlToDraft from 'html-to-draftjs'
 import htmlEscape from 'react-escape-html'
-import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { control } from '@/components/Decorator'
-import { CustomInput } from '@/components'
+import { CustomInput, Button } from '@/components'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
-const STYLES = (theme) => {
+const STYLES = ({ height = 'auto', tagList, theme, ...restProps }) => {
+  const { props: themeProps } = theme
+  const { size } = themeProps
+
+  const editorCfg = {}
+  if (Number.isInteger(height)) {
+    switch (size) {
+      case 'md':
+        editorCfg.height = height - 120
+        if (!tagList) editorCfg.height += 39
+
+        break
+      case 'sm':
+        editorCfg.height = height - 64
+        if (!tagList) editorCfg.height += 29
+
+        break
+      default:
+        break
+    }
+  }
+
   return {
-    wrapper: {},
+    wrapper: {
+      // height: '90%',
+    },
     editor: {
       minHeight: 120,
+      ...editorCfg,
+      '& > div': {
+        height: '99%',
+      },
     },
   }
 }
+let tagButtonClicked = false
 
 @control()
 class RichEditor extends React.PureComponent {
@@ -92,6 +120,7 @@ class RichEditor extends React.PureComponent {
     this.setDomEditorRef = (ref) => (this.domEditor = ref)
 
     // this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
+    this.debouncedOnBlur = _.debounce(this._onBlur.bind(this), 200)
   }
 
   componentDidMount () {}
@@ -181,13 +210,19 @@ class RichEditor extends React.PureComponent {
   // }
 
   _onFocus = () => {
+    this.debouncedOnBlur.cancel()
+    tagButtonClicked = false
     this.setState((prevState) => ({
-      isEditorFocused: false,
+      isEditorFocused: true,
       // value: EditorState.moveFocusToEnd(prevState.value),
     }))
   }
 
-  _onBlur = () => {
+  _onBlur = (e) => {
+    // console.log(this.state.tagButtonClicked, tagButtonClicked)
+    if (tagButtonClicked) return
+    // console.log('_onBlur', e, e.explicitOriginalTarget, document.activeElement)
+
     this.setState({ isEditorFocused: false })
     const { props } = this
     const { onBlur, delimiter } = props
@@ -271,7 +306,8 @@ class RichEditor extends React.PureComponent {
       newContentState = Modifier.replaceText(
         currentContentState,
         currentEditorSelection,
-        `@${selectedValue}$nbsp;`,
+        `@${selectedValue}`,
+        // `@${selectedValue}$nbsp;`,
         null,
         entityKey,
       )
@@ -293,10 +329,12 @@ class RichEditor extends React.PureComponent {
       onBlur,
       tagList,
       disabled,
+      height,
+      theme,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    // console.log('getComponent', restProps)
+
     let metionCfg = {}
     if (tagList) {
       metionCfg = {
@@ -376,19 +414,22 @@ class RichEditor extends React.PureComponent {
     return (
       <div>
         {tagList.map((tag) => (
+          // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
           <Button
             key={tag.id}
+            color='info'
             style={{
-              marginRight: 5,
-              marginTop: 5,
-              backgroundColor: '#48C9B0',
-              color: 'white',
-              fontWeight: 'normal',
-              padding: 8,
-              fontSize: 12,
+              marginRight: 2,
+              marginBottom: 2,
+            }}
+            onMouseOver={() => {
+              tagButtonClicked = true
+            }}
+            onMouseOut={() => {
+              tagButtonClicked = false
             }}
             onClick={() => {
-              this.tagButtonOnClick(tag.text)
+              this.tagButtonOnClick(tag.value)
               this.tagButtonHandleClose()
             }}
           >
@@ -476,4 +517,13 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
   return EditorState.push(editorState, newContentState, 'insert-fragment')
 }
 
-export default withStyles(STYLES, { name: 'RichEditor' })(RichEditor)
+const withStylesProps = (styles, cfg) => (Cmpt) => (props) => {
+  const Comp = withStyles((theme) => styles({ ...props, theme }), {
+    ...cfg,
+  })(Cmpt)
+  return <Comp {...props} />
+}
+
+export default withStylesProps(STYLES, { name: 'RichEditor', withTheme: true })(
+  RichEditor,
+)

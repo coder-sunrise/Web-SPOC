@@ -42,6 +42,7 @@ const SMS = ({ classes, sms, dispatch }) => {
     selectedRows,
     sms,
     dispatch,
+    setSelectedRows,
   }
   const gridProps = {
     sms,
