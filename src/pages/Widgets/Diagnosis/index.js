@@ -74,7 +74,7 @@ const styles = (theme) => ({
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
-  //   // console.log(this.state, props)
+  //   console.log(this.state, props)
   // }
 
   componentDidMount () {
@@ -93,7 +93,7 @@ class Diagnosis extends PureComponent {
       nextProps.diagnosis.shouldAddNew
     ) {
       // console.log('shouldAddNew')
-      this.addDiagnosis()
+      this.addDiagnosis(this.diagnosises.length + 1)
       this.props.dispatch({
         type: 'diagnosis/updateState',
         payload: {
@@ -103,11 +103,11 @@ class Diagnosis extends PureComponent {
     }
   }
 
-  addDiagnosis = () => {
-    // console.log('addDiagnosis')
+  addDiagnosis = (index) => {
     this.arrayHelpers.push({
       onsetDate: moment(),
       uid: getUniqueGUID(),
+      sequence: index,
     })
   }
 
@@ -120,7 +120,7 @@ class Diagnosis extends PureComponent {
           render={(arrayHelpers) => {
             const { form } = arrayHelpers
             const { values } = form
-            let diagnosises = values.corDiagnosis || []
+            this.diagnosises = values.corDiagnosis || []
 
             this.arrayHelpers = arrayHelpers
             // if (!values || !values.corDiagnosis) return null
@@ -129,19 +129,19 @@ class Diagnosis extends PureComponent {
             //   this.addDiagnosis()
             // }
 
-            if (diagnosises.length === 0) {
+            if (this.diagnosises.length === 0) {
               // if(!values.disabled)
               if (
                 components &&
                 components.ConsultationPage &&
                 components.ConsultationPage.rights === 'enable'
               ) {
-                this.addDiagnosis()
+                this.addDiagnosis(1)
                 return null
               }
             }
 
-            return diagnosises.map((v, i) => {
+            return this.diagnosises.map((v, i) => {
               if (v.isDeleted === true) return null
               return (
                 <div key={v.uid}>
@@ -150,7 +150,7 @@ class Diagnosis extends PureComponent {
                     ctCompilation={this.props.codetable}
                     index={i}
                     arrayHelpers={arrayHelpers}
-                    diagnosises={diagnosises}
+                    diagnosises={this.diagnosises}
                   />
                 </div>
               )
