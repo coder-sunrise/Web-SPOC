@@ -56,11 +56,12 @@ export const getExcel = async (reportID, payload) => {
   })
 }
 
-export const exportPdfReport = async (reportID, payload) => {
+export const exportPdfReport = async (reportID, payload, subject) => {
   const baseURL = '/api/reports'
+  const _subject = subject || REPORT_TYPE[reportID]
   return download(
     `${baseURL}/${reportID}?ReportFormat=pdf&ReportParameters={${payload}}`,
-    { subject: REPORT_TYPE[reportID] || 'Report', type: 'pdf' },
+    { subject: _subject || 'Report', type: 'pdf' },
   )
 }
 

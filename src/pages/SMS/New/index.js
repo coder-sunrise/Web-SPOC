@@ -121,9 +121,11 @@ const New = ({
                   id: 'sms.message',
                 })}
                 inputProps={{
-                  maxLength: 5,
+                  inputProps: {
+                    maxLength: 5,
+                  },
                 }}
-                maxLength={5}
+                // maxLength={5}
                 {...args}
               />
             )

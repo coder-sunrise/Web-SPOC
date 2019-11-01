@@ -77,7 +77,6 @@ export default createFormViewModel({
             'pdroomid',
           ]),
         )
-        console.log('visit close modal')
         yield put({
           type: 'updateState',
           payload: {

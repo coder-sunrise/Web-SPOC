@@ -94,6 +94,7 @@ export default createFormViewModel({
               type: 'initState',
               payload: {
                 md: query.md,
+                newPatient: query.new,
                 version: Number(query.v) || undefined,
                 currentId: Number(query.pid) || undefined,
               },
@@ -104,11 +105,16 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        let { currentId, version, currentComponent, md } = payload
+        let { currentId, version, currentComponent, md, newPatient } = payload
+        if (newPatient) {
+          yield put({ type: 'updateState', payload: { entity: null } })
+        }
+
         const patient = yield select((state) => state.patient)
         if (
-          patient.version !== version ||
-          (patient.entity && patient.entity.id !== currentId)
+          !newPatient &&
+          (patient.version !== version ||
+            (patient.entity && patient.entity.id !== currentId))
         ) {
           yield put({
             type: 'query',
