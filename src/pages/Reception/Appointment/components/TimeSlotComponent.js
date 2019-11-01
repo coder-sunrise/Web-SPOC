@@ -16,8 +16,78 @@ const WEEKDAYS = {
   6: 'sat',
 }
 
+const checkIsBeforeOrAfterOperationHour = (operationHour, currentTime) => {
+  const _currentTime = moment(currentTime).format(timeFormat)
+  const _operationHourFromSuffix = 'FromOpHour'
+  const _operationHourToSuffix = 'ToOpHour'
+  const day = WEEKDAYS[moment(currentTime).weekday()]
+
+  const isBeforeOrAfter = operationHour.filter((item) => {
+    const startOperation = moment(
+      item[`${day}${_operationHourFromSuffix}`],
+      timeFormat,
+    )
+    const endOperation = moment(
+      item[`${day}${_operationHourToSuffix}`],
+      timeFormat,
+    )
+    return (
+      moment(_currentTime, timeFormat).isBefore(startOperation) ||
+      moment(_currentTime, timeFormat).isAfter(endOperation)
+    )
+  })
+  return isBeforeOrAfter.length > 0
+}
+
+const checkIsWithinBreakHour = (breakHour, currentTime) => {
+  const _currentTime = moment(currentTime).format(timeFormat)
+  const _breakHourFromSuffix = 'FromBreak'
+  const _breakHourToSuffix = 'ToBreak'
+  const day = WEEKDAYS[moment(currentTime).weekday()]
+
+  const isWithin = breakHour.filter((item) => {
+    const startBreakHour = moment(
+      item[`${day}${_breakHourFromSuffix}`],
+      timeFormat,
+    )
+    const endBreakHour = moment(item[`${day}${_breakHourToSuffix}`], timeFormat)
+    return (
+      moment(_currentTime, timeFormat).isSameOrAfter(startBreakHour) &&
+      moment(_currentTime, timeFormat).isSameOrBefore(endBreakHour)
+    )
+  })
+  const isSameAsStartBreakHour = isWithin.find((item) => {
+    const startBreakHour = moment(
+      item[`${day}${_breakHourFromSuffix}`],
+      timeFormat,
+    )
+    return moment(_currentTime, timeFormat).isSame(startBreakHour)
+  })
+  return {
+    isWithin: isWithin.length > 0,
+    isSameAsStartBreakHour: isSameAsStartBreakHour !== undefined,
+  }
+}
+
+const checkIsTodayPublicHoliday = (publicHolidays, currentTime) => {
+  const currentDate = moment(currentTime)
+
+  const isPublicHoliday = publicHolidays.find((item) => {
+    const startDate = moment(item.startDate)
+    const endDate = moment(item.endDate)
+    if (currentDate.isBetween(startDate, endDate, 'days', '[]')) {
+      return true
+    }
+    return false
+  })
+  const holidayLabel = isPublicHoliday ? isPublicHoliday.displayValue : ''
+
+  return { isPublicHoliday, holidayLabel }
+}
+
 const TimeSlotComponent = ({
   calendarView,
+  publicHolidays,
   clinicBreakHours,
   clinicOperationHours,
   children,
@@ -25,9 +95,41 @@ const TimeSlotComponent = ({
 }) => {
   if (calendarView === BigCalendar.Views.MONTH) return children
   if (children.props.children) return children
-
+  const timeSlot = moment(value).format(timeFormat)
   const currentDayOfWeek = WEEKDAYS[moment(value).weekday()]
-  const _currentTime = moment(value).format(timeFormat)
+
+  const { isPublicHoliday, holidayLabel } = checkIsTodayPublicHoliday(
+    publicHolidays,
+    value,
+  )
+
+  if (isPublicHoliday) {
+    if (timeSlot === '07:00:00')
+      return (
+        <div
+          style={{
+            backgroundColor: '#7d7d7d',
+            color: '#fff',
+            minHeight: '39px',
+            maxHeight: '39px',
+            paddingLeft: 8,
+          }}
+        >
+          <span>{holidayLabel}</span>
+        </div>
+      )
+
+    return (
+      <div
+        style={{
+          backgroundColor: '#7d7d7d',
+          color: '#fff',
+          minHeight: '39px',
+          maxHeight: '39px',
+        }}
+      />
+    )
+  }
 
   const breakHour = clinicBreakHours.filter(
     (item) =>
@@ -41,55 +143,16 @@ const TimeSlotComponent = ({
       item[`${currentDayOfWeek}FromOpHour`] &&
       item[`${currentDayOfWeek}ToOpHour`],
   )
-
-  const sourceList = [
-    ...breakHour,
-    ...operationHour,
-  ]
-  const _breakHourFromSuffix = 'FromBreak'
-  const _breakHourToSuffix = 'ToBreak'
-
-  const _operationHourFromSuffix = 'FromOpHour'
-  const _operationHourToSuffix = 'ToOpHour'
-
-  const day = WEEKDAYS[moment(value).weekday()]
-  const sameDateTimeSource = sourceList.filter((item) => {
-    const _fromSuffix =
-      item[`${day}${_breakHourFromSuffix}`] === undefined
-        ? _operationHourFromSuffix
-        : _breakHourFromSuffix
-
-    return moment(item[`${day}${_fromSuffix}`], timeFormat).isBetween(
-      moment(_currentTime, timeFormat),
-      moment(_currentTime, timeFormat).add(15, 'minute'),
-      'minute',
-      '[)',
-    )
-  })
-  const label = sameDateTimeSource.reduce(
-    (labels, source) => [
-      ...labels,
-      source.displayValue,
-    ],
-    [],
+  const isBeforeOrAfterOperationHour = checkIsBeforeOrAfterOperationHour(
+    operationHour,
+    value,
   )
-  const withinEndTime = sourceList.filter((item) => {
-    const _fromSuffix =
-      item[`${day}${_breakHourFromSuffix}`] === undefined
-        ? _operationHourFromSuffix
-        : _breakHourFromSuffix
-    const _toSuffix =
-      item[`${day}${_breakHourToSuffix}`] === undefined
-        ? _operationHourToSuffix
-        : _breakHourToSuffix
+  const { isWithin, isSameAsStartBreakHour } = checkIsWithinBreakHour(
+    breakHour,
+    value,
+  )
 
-    return moment(_currentTime, timeFormat).isBetween(
-      moment(item[`${day}${_fromSuffix}`], timeFormat, 'minute', '[]'),
-      moment(item[`${day}${_toSuffix}`], timeFormat, 'minute', '[]'),
-    )
-  })
-
-  if (label.length > 0)
+  if (isBeforeOrAfterOperationHour)
     return (
       <div
         style={{
@@ -99,11 +162,24 @@ const TimeSlotComponent = ({
           maxHeight: '39px',
         }}
       >
-        <span>{label.join(',')}</span>
+        <span>Non-Operation Hour</span>
       </div>
     )
 
-  if (withinEndTime.length > 0)
+  if (isWithin) {
+    if (isSameAsStartBreakHour)
+      return (
+        <div
+          style={{
+            backgroundColor: '#7d7d7d',
+            color: '#fff',
+            minHeight: '39px',
+            maxHeight: '39px',
+          }}
+        >
+          <span>Break Hour</span>
+        </div>
+      )
     return (
       <div
         style={{
@@ -114,6 +190,80 @@ const TimeSlotComponent = ({
         }}
       />
     )
+  }
+  // const sourceList = [
+  //   ...breakHour,
+  //   ...operationHour,
+  // ]
+
+  // const _breakHourFromSuffix = 'FromBreak'
+  // const _breakHourToSuffix = 'ToBreak'
+
+  // const _operationHourFromSuffix = 'FromOpHour'
+  // const _operationHourToSuffix = 'ToOpHour'
+
+  // const day = WEEKDAYS[moment(value).weekday()]
+  // const sameDateTimeSource = sourceList.filter((item) => {
+  //   const _fromSuffix =
+  //     item[`${day}${_breakHourFromSuffix}`] === undefined
+  //       ? _operationHourFromSuffix
+  //       : _breakHourFromSuffix
+
+  //   return moment(item[`${day}${_fromSuffix}`], timeFormat).isBetween(
+  //     moment(_currentTime, timeFormat),
+  //     moment(_currentTime, timeFormat).add(15, 'minute'),
+  //     'minute',
+  //     '[)',
+  //   )
+  // })
+  // const label = sameDateTimeSource.reduce(
+  //   (labels, source) => [
+  //     ...labels,
+  //     source.displayValue,
+  //   ],
+  //   [],
+  // )
+  // const withinEndTime = sourceList.filter((item) => {
+  //   const _fromSuffix =
+  //     item[`${day}${_breakHourFromSuffix}`] === undefined
+  //       ? _operationHourFromSuffix
+  //       : _breakHourFromSuffix
+  //   const _toSuffix =
+  //     item[`${day}${_breakHourToSuffix}`] === undefined
+  //       ? _operationHourToSuffix
+  //       : _breakHourToSuffix
+
+  //   return moment(_currentTime, timeFormat).isBetween(
+  //     moment(item[`${day}${_fromSuffix}`], timeFormat, 'minute', '[]'),
+  //     moment(item[`${day}${_toSuffix}`], timeFormat, 'minute', '[]'),
+  //   )
+  // })
+
+  // if (label.length > 0)
+  //   return (
+  //     <div
+  //       style={{
+  //         backgroundColor: '#7d7d7d',
+  //         color: '#fff',
+  //         minHeight: '39px',
+  //         maxHeight: '39px',
+  //       }}
+  //     >
+  //       <span>{label.join(',')}</span>
+  //     </div>
+  //   )
+
+  // if (withinEndTime.length > 0)
+  //   return (
+  //     <div
+  //       style={{
+  //         backgroundColor: '#7d7d7d',
+  //         color: '#fff',
+  //         minHeight: '39px',
+  //         maxHeight: '39px',
+  //       }}
+  //     />
+  //   )
 
   return children
 }
@@ -122,4 +272,5 @@ export default connect(({ calendar }) => ({
   calendarView: calendar.calendarView,
   clinicBreakHours: calendar.clinicBreakHourList || [],
   clinicOperationHours: calendar.clinicOperationHourList || [],
+  publicHolidays: calendar.publicHolidayList || [],
 }))(TimeSlotComponent)

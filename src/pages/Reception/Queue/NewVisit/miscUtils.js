@@ -79,6 +79,7 @@ export const formikMapPropsToValues = ({
         (item) =>
           item.clinicianProfile.id === parseInt(location.query.pdid, 10),
       )
+      doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
     return {

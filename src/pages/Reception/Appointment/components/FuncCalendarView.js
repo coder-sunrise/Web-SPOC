@@ -113,11 +113,6 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
       if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
       return false
-
-      // if (momentStartDate.diff(momentDate, 'day') === 0) {
-      //   return true
-      // }
-      // return false
     })
 
     if (publicHoliday.length > 0) {

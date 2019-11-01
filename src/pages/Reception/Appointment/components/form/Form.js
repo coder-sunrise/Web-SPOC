@@ -599,7 +599,11 @@ class Form extends React.PureComponent {
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
-      pdroomid: primaryDoctorResource.roomFk, // primary clinician id
+    }
+
+    if (primaryDoctorResource.roomFk) {
+      // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
+      parameters.pdroomid = primaryDoctorResource.roomFk
     }
 
     this.onCloseFormClick()

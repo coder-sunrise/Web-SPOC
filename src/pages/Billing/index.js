@@ -67,11 +67,11 @@ const bannerStyle = {
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
-  mapPropsToValues: (props) => {
-    let { billing } = props
+  mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const { invoicePayer = [], invoicePayment = [] } = billing.entity
+        const { invoicePayer = [] } = billing.entity
+
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -81,11 +81,6 @@ const bannerStyle = {
             ),
           0,
         )
-
-        // const totalPaid = invoicePayment.reduce(
-        //   (total, payment) => total + payment.totalAmtPaid,
-        //   0,
-        // )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )

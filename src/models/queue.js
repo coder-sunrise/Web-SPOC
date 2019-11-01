@@ -178,9 +178,20 @@ export default createListViewModel({
         }
         return false
       },
-      *getTodayAppointments ({ payload }, { put }) {
+      *getTodayAppointments ({ payload }, { call, put }) {
         const { shouldGetTodayAppointments = true } = payload
-
+        // TODO: integrate with new appointment listing api
+        // const today = moment().formatUTC()
+        // const queryPayload = {
+        //   combineCondition: 'and',
+        //   eql_appointmentDate: today,
+        //   in_appointmentStatusFk: '1|2|5',
+        // }
+        // const response = yield call(
+        //   service.queryAppointmentListing,
+        //   queryPayload,
+        // )
+        // console.log({ response })
         if (shouldGetTodayAppointments) {
           const today = moment().formatUTC()
 

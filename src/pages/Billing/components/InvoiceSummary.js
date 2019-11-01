@@ -143,7 +143,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                ${parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
+                $ {parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
               </h5>
             </GridItem>
             <GridItem md={6}>
