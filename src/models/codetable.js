@@ -10,6 +10,7 @@ export default createListViewModel({
     service: {},
     state: {
       tenantCodes: {}, // prepare for future use
+      hasFilterProps: [],
     },
     subscriptions: {},
     effects: {
@@ -63,6 +64,26 @@ export default createListViewModel({
 
         const codetableState = yield select((state) => state.codetable)
 
+        if (hasFilter) {
+          yield put({
+            type: 'addToHasFilterList',
+            payload: {
+              code: ctcode,
+            },
+          })
+        } else {
+          const filteredBefore = codetableState.hasFilterProps.includes(ctcode)
+          if (filteredBefore) {
+            payload.force = true
+            yield put({
+              type: 'removeFromFilterList',
+              payload: {
+                code: ctcode,
+              },
+            })
+          }
+        }
+
         if (ctcode !== undefined) {
           if (
             codetableState[ctcode] === undefined ||
@@ -86,10 +107,28 @@ export default createListViewModel({
             return codetableState[ctcode]
           }
         }
+
         return []
       },
     },
     reducers: {
+      removeFromFilterList (state, { payload }) {
+        return {
+          ...state,
+          hasFilterProps: state.hasFilterProps.filter(
+            (code) => payload.code !== code,
+          ),
+        }
+      },
+      addToHasFilterList (state, { payload }) {
+        return {
+          ...state,
+          hasFilterProps: [
+            ...state.hasFilterProps,
+            payload.code,
+          ],
+        }
+      },
       saveCodetable (state, { payload }) {
         // console.log({ payload })
         return { ...state, [payload.code.toLowerCase()]: payload.data }

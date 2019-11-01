@@ -247,6 +247,29 @@ class ControlTest extends PureComponent {
             /> */}
 
             <FastField
+              name='coPaymentSchemeName'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            {/* <TextField
+              value={`${this.state.val}`}
+              prefix={<Search />}
+              label='Name'
+              onChange={(e) => {
+                this.setState({
+                  val: e.target.value,
+                })
+              }}
+            /> */}
+
+            <FastField
               name='name'
               render={(args) => (
                 <TextField prefix={<Search />} label='Name' {...args} />
