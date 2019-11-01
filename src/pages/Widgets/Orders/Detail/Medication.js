@@ -8,16 +8,11 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  notification,
   Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
   confirm,
   Checkbox,
-  SizeContainer,
   RichEditor,
   NumberInput,
   CustomInputWrapper,
@@ -51,9 +46,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
       .min(0.1, 'Quantity must be between 0.1 and 999')
       .max(999, 'Quantity must be between 0.1 and 999'),
     dispenseUOMFK: Yup.number().required(),
-    // totalPrice: Yup.number().required(),
+    totalPrice: Yup.number().required(),
     type: Yup.string(),
-    stockDrugFK: Yup.number().when('type', {
+    inventoryMedicationFK: Yup.number().when('type', {
       is: (val) => val !== '5',
       then: Yup.number().required(),
     }),
@@ -79,8 +74,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     ),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
 
     const data = {
@@ -93,8 +88,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    })
-    if (onConfirm) onConfirm()
+    }).then((response) => {
+			resetForm()
+		})
   },
   displayName: 'OrderPage',
 })
@@ -136,7 +132,7 @@ class Medication extends PureComponent {
             onConfirm={() => {
               arrayHelpers.remove(i)
               setTimeout(() => {
-                this.calcualteQuantity()
+                this.calculateQuantity()
               }, 1)
             }}
             // okText='Yes'
@@ -179,8 +175,8 @@ class Medication extends PureComponent {
     }
   }
 
-  calcualteQuantity = () => {
-    const { codetable, setFieldValue, values } = this.props
+  calculateQuantity = () => {
+    const { codetable, setFieldValue, values, disableEdit } = this.props
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
 
@@ -219,11 +215,11 @@ class Medication extends PureComponent {
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
-
-    // const total = newTotalQuantity * values.unitPrice
-    // setFieldValue('totalPrice', total)
-    // this.updateTotalPrice(total)
-    this.props.setFieldValue('adjAmount', 0)
+    if (disableEdit === false) {
+      const total = newTotalQuantity * values.unitPrice
+      setFieldValue('totalPrice', total)
+      this.updateTotalPrice(total)
+    }
   }
 
   changeMedication = (v, op = {}) => {
@@ -239,7 +235,7 @@ class Medication extends PureComponent {
     // this.setState(() => {
     //   return { selectionOptions: tempArray }
     // })
-    const { setFieldValue, values, codetable } = this.props
+    const { setFieldValue, values, codetable, disableEdit } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
 
@@ -349,21 +345,22 @@ class Medication extends PureComponent {
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
-    // if (op.sellingPrice) {
-    //   setFieldValue('unitPrice', op.sellingPrice)
-    //   setFieldValue(
-    //     'totalPrice',
-    //     op.sellingPrice * (newTotalQuantity + totalFirstItem),
-    //   )
-    //   this.updateTotalPrice(
-    //     op.sellingPrice * (newTotalQuantity + totalFirstItem),
-    //   )
-    // } else {
-    //   setFieldValue('unitPrice', undefined)
-    //   setFieldValue('totalPrice', undefined)
-    //   this.updateTotalPrice(undefined)
-    // }
-    this.props.setFieldValue('adjAmount', 0)
+    if (disableEdit === false) {
+      if (op.sellingPrice) {
+        setFieldValue('unitPrice', op.sellingPrice)
+        setFieldValue(
+          'totalPrice',
+          op.sellingPrice * (newTotalQuantity + totalFirstItem),
+        )
+        this.updateTotalPrice(
+          op.sellingPrice * (newTotalQuantity + totalFirstItem),
+        )
+      } else {
+        setFieldValue('unitPrice', undefined)
+        setFieldValue('totalPrice', undefined)
+        this.updateTotalPrice(undefined)
+      }
+    }
   }
 
   updateTotalPrice = (v) => {
@@ -392,6 +389,8 @@ class Medication extends PureComponent {
       handleSubmit,
       setFieldValue,
       orders,
+      disableEdit,
+      setDisable,
     } = this.props
     const commonSelectProps = {
       dropdownMatchSelectWidth: false,
@@ -399,7 +398,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-
     return (
       <div>
         <GridContainer>
@@ -413,7 +411,7 @@ class Medication extends PureComponent {
               />
             ) : (
               <FastField
-                name='stockDrugFK'
+                name='inventoryMedicationFK'
                 render={(args) => {
                   return (
                     <CodeSelect
@@ -520,7 +518,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v, option = {}) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -562,7 +560,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v, option = {}) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -587,7 +585,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -662,7 +660,6 @@ class Medication extends PureComponent {
                                       // simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option = {}) => {
-                                        // console.log(v, option)
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
                                           option.name,
@@ -721,11 +718,13 @@ class Medication extends PureComponent {
                     min={0}
                     format='0.0'
                     onChange={(e) => {
-                      // if (values.unitPrice) {
-                      //   const total = e.target.value * values.unitPrice
-                      //   setFieldValue('totalPrice', total)
-                      //   this.updateTotalPrice(total)
-                      // }
+                      if (disableEdit === false) {
+                        if (values.unitPrice) {
+                          const total = e.target.value * values.unitPrice
+                          setFieldValue('totalPrice', total)
+                          this.updateTotalPrice(total)
+                        }
+                      }
                     }}
                     {...args}
                   />
@@ -770,7 +769,7 @@ class Medication extends PureComponent {
                       // })
                     }}
                     format='0.00'
-                    disabled
+                    disabled={disableEdit}
                     currency
                     {...args}
                   />
@@ -815,7 +814,7 @@ class Medication extends PureComponent {
                     onChange={(e, op = {}) => {
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
-                    disabled
+                    disabled={disableEdit}
                     {...args}
                   />
                 )
@@ -823,10 +822,16 @@ class Medication extends PureComponent {
             />
           </GridItem>
           <GridItem xs={2} className={classes.editor}>
-            <FastField
+            <Field
               name='expiryDate'
               render={(args) => {
-                return <DatePicker label='Expiry Date' disabled {...args} />
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>
@@ -849,11 +854,28 @@ class Medication extends PureComponent {
             <FastField
               name='isExternalPrescription'
               render={(args) => {
+                if (args.field.value) {
+                  setDisable(true)
+                } else {
+                  setDisable(false)
+                }
                 return (
                   <Checkbox
                     label='External Prescription'
                     labelPlacement='start'
                     {...args}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        this.props.setFieldValue('adjAmount', 0)
+                        this.props.setFieldValue('totalAfterItemAdjustment', 0)
+                        this.props.setFieldValue('totalPrice', 0)
+                      } else {
+                        setTimeout(() => {
+                          this.calculateQuantity()
+                        }, 1)
+                      }
+                      setDisable(e.target.value)
+                    }}
                   />
                 )
               }}

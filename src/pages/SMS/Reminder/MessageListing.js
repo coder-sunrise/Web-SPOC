@@ -11,7 +11,11 @@ import {
   Avatar,
   Row,
 } from '@livechat/ui-kit'
-import { GridContainer } from '@/components'
+import {
+  GridContainer,
+  dateFormatLongWithTimeNoSec,
+  timeFormat24Hour,
+} from '@/components'
 
 import New from '../New'
 
@@ -49,7 +53,7 @@ const styles = () => ({
   },
 })
 
-const MessageListing = ({ classes }) => {
+const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
   const [
     list,
     setList,
@@ -128,61 +132,59 @@ const MessageListing = ({ classes }) => {
     },
   ])
   const renderMessages = (messages) => {
-    let i = 0
-    let messageCount = messages.length
-    let m = []
+    if (messages) {
+      let i = 0
+      let messageCount = messages.length
+      let m = []
 
-    while (i < messageCount) {
-      let previous = messages[i - 1]
-      let current = messages[i]
-      let currentMoment = moment(current.sendDate)
-      let showTimestamp = true
+      while (i < messageCount) {
+        let previous = messages[i - 1]
+        let current = messages[i]
+        let currentMoment = moment(current.sendDate)
+        let showTimestamp = true
 
-      if (previous) {
-        let previousMoment = moment(previous.sendDate)
-        let previousDuration = moment.duration(
-          currentMoment.diff(previousMoment),
-        )
-        if (previousDuration.as('hours') < 1) {
-          showTimestamp = false
+        if (previous) {
+          let previousMoment = moment(previous.sendDate)
+          let previousDuration = moment.duration(
+            previousMoment.diff(currentMoment),
+          )
+          if (previousDuration.asMinutes() < 2) {
+            showTimestamp = false
+          }
         }
+        const { sendDate, content, status } = current
+        let p = { content, status }
+        m = m.concat(
+          <React.Fragment key={current.id}>
+            {showTimestamp && (
+              <div style={{ textAlign: 'center' }}>
+                {moment(sendDate).format(dateFormatLongWithTimeNoSec)}
+              </div>
+            )}
+            <Row reverse>
+              <Message
+                {...p}
+                date={moment(sendDate).format(timeFormat24Hour)}
+                isOwn
+                showMetaOnClick
+              >
+                <MessageText className={classes.sentMessage}>
+                  {content}
+                </MessageText>
+              </Message>
+            </Row>
+          </React.Fragment>,
+        )
+        i += 1
       }
-      const { sendDate, content, status } = current
-      let p = { content, status }
-      m = m.concat(
-        <React.Fragment key={current.id}>
-          {showTimestamp && (
-            <div style={{ textAlign: 'center' }}>{sendDate}</div>
-          )}
-          <Row reverse>
-            <Message {...p}>
-              <MessageText>{content}</MessageText>
-            </Message>
-          </Row>
-        </React.Fragment>,
-      )
-      i += 1
+      return m
     }
-    return m
+    return null
   }
   const newMessageProps = {
-    onSend: (arr) => {
-      setList([
-        ...list,
-        ...arr.map((m, index) => {
-          return {
-            date: moment().format('YYYY-MM-DD HH-mm'),
-            text: m,
-            avatar:
-              'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-            // authorName: 'Jonn Smith',
-            isOwn: true,
-            deliveryStatus: 'Pending',
-            id: list.length + 1 + index,
-          }
-        }),
-      ])
-    },
+    recipient,
+    dispatch,
+    onConfirm,
   }
   return (
     <ThemeProvider>
@@ -195,7 +197,7 @@ const MessageListing = ({ classes }) => {
       >
         <Grid item>
           <Paper className={classes.messageBar}>
-            <MessageList active>{renderMessages(list)}</MessageList>
+            <MessageList active>{renderMessages(sms.smsHistory)}</MessageList>
           </Paper>
         </Grid>
         <Grid item>

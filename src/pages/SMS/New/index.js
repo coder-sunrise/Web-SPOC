@@ -23,6 +23,7 @@ const New = ({
   errors,
   selectedRows,
   handleSubmit,
+  recipient,
 }) => {
   const [
     messageNumber,
@@ -73,6 +74,18 @@ const New = ({
     }
   }
 
+  const allowSent = () => {
+    if (recipient && values.content) {
+      return true
+    }
+
+    if (values.content && lodash.isEmpty(errors) && selectedRows.length > 0) {
+      return true
+    }
+
+    return false
+  }
+
   return (
     <GridContainer>
       <GridItem md={9}>
@@ -94,11 +107,7 @@ const New = ({
       <Authorized authority='sms.sendsms'>
         <GridItem md={3} style={{ margin: 'auto' }}>
           <Button
-            disabled={
-              !values.content ||
-              !lodash.isEmpty(errors) ||
-              selectedRows.length <= 0
-            }
+            disabled={!allowSent()}
             variant='contained'
             color='primary'
             onClick={handleSubmit}
@@ -122,10 +131,9 @@ const New = ({
                 })}
                 inputProps={{
                   inputProps: {
-                    maxLength: 5,
+                    maxLength: 160,
                   },
                 }}
-                // maxLength={5}
                 {...args}
               />
             )
@@ -133,7 +141,7 @@ const New = ({
         />
       </GridItem>
       <GridItem md={1}>
-        {values.message ? values.message.length : 0}/160
+        {values.content ? values.content.length : 0}/160
       </GridItem>
       <GridItem md={11}>
         <Badge badgeContent={messageNumber} color='error'>
@@ -150,31 +158,54 @@ export default compose(
   // withStyles(styles, { withTheme: true }),
   withFormikExtend({
     handleSubmit: (values, { props, resetForm }) => {
-      const { dispatch, onConfirm, selectedRows, sms } = props
+      const {
+        dispatch,
+        onConfirm,
+        selectedRows,
+        sms,
+        recipient,
+        setSelectedRows,
+      } = props
 
       let payload = []
-
-      selectedRows.forEach((o) => {
-        const { patientProfileFK } = sms.list.find((r) => r.id === o)
-        const smsObject = {
+      const createPayload = (patientProfFK, o) => {
+        let patientProfileFK = patientProfFK
+        let appointmentFK = o
+        if (!patientProfileFK) {
+          patientProfileFK = o
+          appointmentFK = undefined
+        }
+        const tempObject = {
           ...values,
           patientOutgoingSMS: {
             patientProfileFK,
             appointmentReminderDto: {
-              appointmentFK: o,
+              appointmentFK,
             },
           },
           sms: undefined,
           selectedRows: undefined,
         }
-        payload.push(smsObject)
-      })
-      console.log({ payload })
+        payload.push(tempObject)
+      }
+
+      if (recipient) {
+        const { id, patientProfileFK } = recipient
+        createPayload(patientProfileFK, id)
+      } else {
+        selectedRows.forEach((o) => {
+          const { patientProfileFK } = sms.list.find((r) => r.id === o)
+          createPayload(patientProfileFK, o)
+        })
+      }
+
       dispatch({
         type: 'sms/upsert',
         payload,
       }).then((r) => {
         if (r) {
+          if (setSelectedRows) setSelectedRows([])
+          resetForm()
           if (onConfirm) onConfirm()
           dispatch({
             type: 'sms/querySMSData',

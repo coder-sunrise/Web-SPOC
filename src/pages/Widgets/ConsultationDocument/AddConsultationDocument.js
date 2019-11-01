@@ -178,8 +178,8 @@ class AddConsultationDocument extends PureComponent {
             const match = msg.match(templateReg) || []
             // console.log(msg, templateReg, match, tagList)
             match.forEach((s) => {
-              const text = s.match(/data-value="(.*?)"/)[1]
-              const m = tagList.find((o) => o.text === text)
+              const value = s.match(/data-value="(.*?)"/)[1]
+              const m = tagList.find((o) => o.value === value)
               // console.log(text, m)
               if (m && m.getter) msg = msg.replace(s, m.getter())
             })

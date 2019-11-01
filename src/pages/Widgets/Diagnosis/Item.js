@@ -126,7 +126,11 @@ const DiagnosisItem = ({
                   ],
                 }}
                 localFilter={(row) => {
-                  if (diagnosisFilter.length === 0) return true
+                  if (
+                    diagnosisFilter.length === 0 ||
+                    diagnosisFilter.length === filterOptions.length
+                  )
+                    return true
                   for (let i = 0; i < diagnosisFilter.length; i++) {
                     const df = diagnosisFilter[i]
                     if (row[df]) return true

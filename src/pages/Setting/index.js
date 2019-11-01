@@ -310,11 +310,11 @@ class SystemSetting extends PureComponent {
       classes,
       height,
       user,
+      history,
       linkProps = {},
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
-    // console.log(this.props)
     const { accessRights = [] } = user
     return (
       <CardContainer hideHeader>
@@ -333,10 +333,20 @@ class SystemSetting extends PureComponent {
           }}
         /> */}
         <TextField
+          prefix={<Search />}
           onChange={(e) => {
-            this.setState({
-              searchText: e.target.value.toLowerCase(),
+            this.setState(() => {
+              return {
+                searchText: e.target.value.toLowerCase(),
+              }
             })
+          }}
+          onKeyDown={(e) => {
+            if (e.keyCode === 13) {
+              const currentUrl = history.location.pathname
+              const searchValue = this.state.searchText
+              history.push(`${currentUrl}/${searchValue}`)
+            }
           }}
           value={this.state.searchText}
         />
