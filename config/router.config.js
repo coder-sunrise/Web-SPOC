@@ -515,6 +515,11 @@ const routes = [
             component: './Report/GSTReport',
           },
           {
+            path: '/report/medicationmovementreport',
+            name: 'medicationMovementReport',
+            component: './Report/MedicationMovementReport',
+          },
+          {
             path: '/report/patientlisting',
             name: 'patientListingReport',
             component: './Report/PatientListing',
