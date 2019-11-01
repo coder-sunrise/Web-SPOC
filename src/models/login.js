@@ -70,6 +70,9 @@ export default createFormViewModel({
         //   type: 'user/reset',
         // })
         yield put({ type: 'RESET_APP_STATE' })
+
+        // do not remove this line
+        console.log('logout log')
         return true
       },
     },

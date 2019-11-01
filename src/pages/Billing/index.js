@@ -85,7 +85,12 @@ const bannerStyle = {
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return {
+          ...billing.default,
+          ...billing.entity,
+          finalClaim,
+          finalPayable,
+        }
       }
     } catch (error) {
       console.log({ error })
