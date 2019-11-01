@@ -8,16 +8,11 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  notification,
   Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
   confirm,
   Checkbox,
-  SizeContainer,
   RichEditor,
   NumberInput,
   CustomInputWrapper,
@@ -79,8 +74,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     ),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, resetForm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
 
     const data = {
@@ -93,8 +88,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    })
-    if (onConfirm) onConfirm()
+    }).then((response) => {
+			resetForm()
+		})
   },
   displayName: 'OrderPage',
 })
@@ -664,7 +660,6 @@ class Medication extends PureComponent {
                                       // simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option = {}) => {
-                                        // console.log(v, option)
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
                                           option.name,
