@@ -278,8 +278,8 @@ class ConsultationDocument extends PureComponent {
             {
               columnName: 'subject',
               onClick: (row) => {
-                printRow(row, this.props)
-                // this.viewReport(row)
+                // printRow(row, this.props)
+                this.viewReport(row)
               },
               type: 'link',
               linkField: 'href',

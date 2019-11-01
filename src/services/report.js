@@ -28,7 +28,6 @@ export const getPDF = async (reportID, payload) => {
 }
 
 export const getUnsavedPDF = async (reportID, payload) => {
-  console.log('get unsaved pdf')
   const baseURL = '/api/reports'
   return request(`${baseURL}/${reportID}?ReportFormat=pdf`, {
     method: 'POST',
@@ -59,8 +58,11 @@ export const getExcel = async (reportID, payload) => {
 export const exportPdfReport = async (reportID, payload, subject) => {
   const baseURL = '/api/reports'
   const _subject = subject || REPORT_TYPE[reportID]
+
   return download(
-    `${baseURL}/${reportID}?ReportFormat=pdf&ReportParameters={${payload}}`,
+    `${baseURL}/${reportID}?ReportFormat=pdf&ReportParameters=${JSON.stringify(
+      payload,
+    )}`,
     { subject: _subject || 'Report', type: 'pdf' },
   )
 }
@@ -84,6 +86,29 @@ export const getPatientListingReport = async (payload) => {
       'reportParameters',
     ]),
   })
+}
+
+export const exportUnsavedReport = (
+  reportID,
+  reportFormat = 'pdf',
+  reportContent,
+  subject,
+) => {
+  const _subject = subject || REPORT_TYPE[reportID]
+  download(
+    `/api/Reports/${reportID}?ReportFormat=${reportFormat}`,
+    {
+      subject: _subject,
+      type: 'pdf',
+    },
+    {
+      method: 'POST',
+      contentType: 'application/x-www-form-urlencoded',
+      data: {
+        reportContent,
+      },
+    },
+  )
 }
 
 export const postPDF = async (reportID, payload) => {
