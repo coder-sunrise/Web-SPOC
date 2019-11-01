@@ -57,7 +57,7 @@ class MedicalCertificate extends PureComponent {
     const { setFieldValue, values } = this.props
 
     if (values.mcReferenceNo === '-')
-      service.runningNumber('coa').then((o) => {
+      service.runningNumber('mc').then((o) => {
         if (o && o.data) {
           setFieldValue('mcReferenceNo', o.data)
         } else {
