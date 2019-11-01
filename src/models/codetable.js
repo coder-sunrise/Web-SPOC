@@ -10,6 +10,7 @@ export default createListViewModel({
     service: {},
     state: {
       tenantCodes: {}, // prepare for future use
+      hasFilterProps: [],
     },
     subscriptions: {},
     effects: {
@@ -55,12 +56,40 @@ export default createListViewModel({
       },
       *fetchCodes ({ payload }, { select, call, put }) {
         let ctcode = payload
-        if (typeof payload === 'object') ctcode = payload.code
+        let hasFilter = false
+        if (typeof payload === 'object') {
+          ctcode = payload.code
+          hasFilter = payload.filter !== undefined
+        }
 
         const codetableState = yield select((state) => state.codetable)
 
+        if (hasFilter) {
+          yield put({
+            type: 'addToHasFilterList',
+            payload: {
+              code: ctcode,
+            },
+          })
+        } else {
+          const filteredBefore = codetableState.hasFilterProps.includes(ctcode)
+          if (filteredBefore) {
+            payload.force = true
+            yield put({
+              type: 'removeFromFilterList',
+              payload: {
+                code: ctcode,
+              },
+            })
+          }
+        }
+
         if (ctcode !== undefined) {
-          if (codetableState[ctcode] === undefined || payload.force) {
+          if (
+            codetableState[ctcode] === undefined ||
+            payload.force ||
+            hasFilter
+          ) {
             const response = yield call(getCodes, payload)
             // console.log({ ctcode, response })
             if (response.length > 0) {
@@ -78,10 +107,28 @@ export default createListViewModel({
             return codetableState[ctcode]
           }
         }
+
         return []
       },
     },
     reducers: {
+      removeFromFilterList (state, { payload }) {
+        return {
+          ...state,
+          hasFilterProps: state.hasFilterProps.filter(
+            (code) => payload.code !== code,
+          ),
+        }
+      },
+      addToHasFilterList (state, { payload }) {
+        return {
+          ...state,
+          hasFilterProps: [
+            ...state.hasFilterProps,
+            payload.code,
+          ],
+        }
+      },
       saveCodetable (state, { payload }) {
         // console.log({ payload })
         return { ...state, [payload.code.toLowerCase()]: payload.data }
