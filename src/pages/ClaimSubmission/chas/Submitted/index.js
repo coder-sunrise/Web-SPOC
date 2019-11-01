@@ -18,9 +18,8 @@ import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 // variables
 import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  TableConfig,
+  SubmittedCHASColumnExtensions,
+  SubmittedCHASColumns,
 } from './variables'
 
 const styles = (theme) => ({
@@ -117,9 +116,16 @@ class SubmittedCHAS extends React.Component {
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={NewCHASColumnExtensions}
-                columns={NewCHASColumns}
-                tableConfig={TableConfig}
+                columnExtensions={SubmittedCHASColumnExtensions}
+                columns={SubmittedCHASColumns}
+                // tableConfig={TableConfig}
+                FuncProps={{
+                  selectable: true,
+                  selectConfig: {
+                    showSelectAll: true,
+                    rowSelectionEnabled: () => true,
+                  },
+                }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}

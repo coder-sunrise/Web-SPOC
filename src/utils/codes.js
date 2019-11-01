@@ -607,6 +607,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 7,
       key: 'MedicalCertificateId',
+      subject: 'Medical Certificate',
       draft: (row) => {
         return {
           MedicalCertificateDetails: [
@@ -639,6 +640,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 8,
       key: 'CertificateOfAttendanceId',
+      subject: 'Certificate Of Attendance',
       draft: (row) => {
         return {
           CertificateOfAttendanceDetails: [
@@ -658,6 +660,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 9,
       key: 'ReferralLetterId',
+      subject: 'Referral Letter',
       draft: (row) => {
         return {
           ReferralLetterDetails: [
@@ -677,6 +680,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 11,
       key: 'memoid',
+      subject: 'Memo',
       draft: (row) => {
         return {
           MemoDetails: [
@@ -698,6 +702,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 10,
       key: 'vaccinationcertificateid',
+      subject: 'Vaccination Certificate',
       draft: (row) => {
         return {
           VaccinationCertificateDetails: [
@@ -720,6 +725,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 12,
       key: 'documentid',
+      subject: 'Other Documents',
       draft: (row) => {
         return {
           DocumentDetails: [

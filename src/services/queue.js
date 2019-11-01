@@ -3,6 +3,7 @@ import request, { axiosRequest } from '@/utils/request'
 
 const queueAPIUrl = '/api/queue'
 const bizSessionAPIURL = '/api/bizsession'
+const appointmentAPIURL = '/api/Appointment/PatientAppointmentListing'
 
 export const startSession = async () => {
   const response = await request('/api/bizsession/', { method: 'POST' })
@@ -26,3 +27,9 @@ export const queryList = (params) =>
 
 export const deleteQueue = (params) =>
   commonServices.remove(queueAPIUrl, params)
+
+export const queryAppointmentListing = (params) =>
+  request(`${appointmentAPIURL}`, {
+    method: 'GET',
+    body: params,
+  })
