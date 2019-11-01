@@ -136,7 +136,7 @@ class Medication extends PureComponent {
             onConfirm={() => {
               arrayHelpers.remove(i)
               setTimeout(() => {
-                this.calcualteQuantity()
+                this.calculateQuantity()
               }, 1)
             }}
             // okText='Yes'
@@ -179,7 +179,7 @@ class Medication extends PureComponent {
     }
   }
 
-  calcualteQuantity = () => {
+  calculateQuantity = () => {
     const { codetable, setFieldValue, values, disableEdit } = this.props
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
@@ -522,7 +522,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v, option = {}) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -564,7 +564,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v, option = {}) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -589,7 +589,7 @@ class Medication extends PureComponent {
                                   {...args}
                                   onChange={(v) => {
                                     setTimeout(() => {
-                                      this.calcualteQuantity()
+                                      this.calculateQuantity()
                                     }, 1)
                                   }}
                                 />
@@ -876,7 +876,7 @@ class Medication extends PureComponent {
                         this.props.setFieldValue('totalPrice', 0)
                       } else {
                         setTimeout(() => {
-                          this.calcualteQuantity()
+                          this.calculateQuantity()
                         }, 1)
                       }
                       setDisable(e.target.value)
