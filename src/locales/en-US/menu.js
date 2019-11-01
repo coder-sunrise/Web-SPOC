@@ -80,7 +80,7 @@ export default {
   'menu.reception.consultation': 'Consultation',
   'menu.reception.billing': 'Billing',
   'menu.report.gstReport': 'GST Report',
-
+  'menu.report.medicationMovementReport': 'Medication Movement Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
