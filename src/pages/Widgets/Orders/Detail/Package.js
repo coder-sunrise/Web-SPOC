@@ -3,20 +3,23 @@ import { connect } from 'dva'
 import {
 	GridContainer,
 	GridItem,
-	Select,
 	CodeSelect,
 	RadioGroup,
 	confirm,
-	FastField,
 	withFormikExtend,
 	CommonTableGrid,
 	serverDateTimeFormatFull,
-	Field
+	Field,
+	NumberInput
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
 import { orderTypes } from '@/utils/codes'
 import moment from 'moment'
+import { CustomInput } from 'mui-pro-components'
+import config from '@/utils/config'
+import numeral from 'numeral'
+const { qtyFormat } = config
 
 @connect(({ global, codetable }) => ({ global }))
 @withFormikExtend({
@@ -224,12 +227,46 @@ class Package extends PureComponent {
 			],
 			columnExtensions: [
 				{
+					columnName: 'typeName',
+					render: (row) => {
+						if (row.isActive === true) {
+							return <CustomInput text value={row.typeName} />
+						} else {
+							return <CustomInput text inActive value={row.typeName} />
+						}
+					}
+				},
+				{
+					columnName: 'name',
+					render: (row) => {
+						if (row.isActive === true) {
+							return <CustomInput text value={row.name} />
+						} else {
+							return <CustomInput text inActive value={row.name} />
+						}
+					}
+				},
+				{
 					columnName: 'quantity',
-					type: 'number'
+					align: 'right',
+					render: (row) => {
+						if (row.isActive === true) {
+							return <CustomInput text currency value={numeral(row.quantity).format(qtyFormat)} />
+						} else {
+							return <CustomInput text inActive value={numeral(row.quantity).format(qtyFormat)} />
+						}
+					}
 				},
 				{
 					columnName: 'subTotal',
-					type: 'currency'
+					align: 'right',
+					render: (row) => {
+						if (row.isActive === true) {
+							return <NumberInput text currency value={row.subTotal} />
+						} else {
+							return <NumberInput text inActive currency value={row.subTotal} />
+						}
+					}
 				}
 			]
 		}
@@ -245,7 +282,8 @@ class Package extends PureComponent {
 							name: o.medicationName,
 							uid: getUniqueId(),
 							type: '1',
-							typeName: orderTypes.find((type) => type.value === '1').name
+							typeName: orderTypes.find((type) => type.value === '1').name,
+							isActive: o.inventoryMedication.isActive
 						}
 					})
 				)
@@ -258,7 +296,8 @@ class Package extends PureComponent {
 							name: o.vaccinationName,
 							uid: getUniqueId(),
 							type: '2',
-							typeName: orderTypes.find((type) => type.value === '2').name
+							typeName: orderTypes.find((type) => type.value === '2').name,
+							isActive: o.inventoryVaccination.isActive
 						}
 					})
 				)
@@ -271,7 +310,11 @@ class Package extends PureComponent {
 							name: o.serviceName,
 							uid: getUniqueId(),
 							type: '3',
-							typeName: orderTypes.find((type) => type.value === '3').name
+							typeName: orderTypes.find((type) => type.value === '3').name,
+							isActive:
+								o.service.isActive &&
+								o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
+								o.service.ctServiceCenter_ServiceNavigation[0].serviceCenterFKNavigation.isActive
 						}
 					})
 				)
@@ -284,7 +327,8 @@ class Package extends PureComponent {
 							name: o.consumableName,
 							uid: getUniqueId(),
 							type: '4',
-							typeName: orderTypes.find((type) => type.value === '4').name
+							typeName: orderTypes.find((type) => type.value === '4').name,
+							isActive: o.inventoryConsumable.isActive
 						}
 					})
 				)
