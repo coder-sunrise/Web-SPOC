@@ -53,7 +53,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispenseUOMFK: Yup.number().required(),
     // totalPrice: Yup.number().required(),
     type: Yup.string(),
-    stockDrugFK: Yup.number().when('type', {
+    inventoryMedicationFK: Yup.number().when('type', {
       is: (val) => val !== '5',
       then: Yup.number().required(),
     }),
@@ -413,7 +413,7 @@ class Medication extends PureComponent {
               />
             ) : (
               <FastField
-                name='stockDrugFK'
+                name='inventoryMedicationFK'
                 render={(args) => {
                   return (
                     <CodeSelect
