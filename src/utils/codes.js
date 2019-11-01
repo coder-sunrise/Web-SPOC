@@ -963,12 +963,14 @@ export const getCodes = async (payload) => {
   let ctcode
   let params
   let multiply = 1
+  let _force = false
   const { refresh = false } = payload
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
     ctcode = payload.code
     params = payload.filter
     multiply = payload.multiplier
+    _force = payload.force
   }
 
   let result = []
@@ -982,7 +984,7 @@ export const getCodes = async (payload) => {
     const parsedLastLoginDate = moment(lastLoginDate)
 
     /* not exist in current table, make network call to retrieve data */
-    if (ct === undefined || refresh) {
+    if (ct === undefined || refresh || _force) {
       result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
@@ -1008,8 +1010,11 @@ export const getCodes = async (payload) => {
   return result
 }
 
-export const checkShouldRefresh = async (code) => {
+export const checkShouldRefresh = async (payload) => {
   try {
+    const { code, filter } = payload
+    if (filter !== undefined) return true
+
     await db.open()
     const ct = await db.codetable.get(code.toLowerCase())
 
