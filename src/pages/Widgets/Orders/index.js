@@ -59,7 +59,7 @@ class Orders extends PureComponent {
     const { entity: vistEntity } = visitRegistration
     const { visit = {} } = vistEntity
 
-    let codeTableNameArray = []
+    const codeTableNameArray = []
     codeTableNameArray.push('ctMedicationUsage')
     codeTableNameArray.push('ctMedicationDosage')
     codeTableNameArray.push('ctMedicationUnitOfMeasurement')
