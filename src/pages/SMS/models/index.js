@@ -20,25 +20,38 @@ export default createListViewModel({
         const response = yield call(service.querySMSData, payload, smsType)
         if (response) {
           yield put({
-            type: 'queryDone',
+            type: 'getSMSData',
+            payload: response.data,
+          })
+        }
+      },
+      *querySMSHistory ({ payload, smsType }, { call, put }) {
+        const response = yield call(service.querySMSHistory, payload, smsType)
+        if (response) {
+          yield put({
+            type: 'getSMSHistory',
             payload: response.data,
           })
         }
       },
     },
     reducers: {
-      queryOneDone (st, { payload }) {
-        const { data } = payload
-        return {
-          ...st,
-          entity: data,
-        }
-      },
-      queryDone (st, { payload }) {
+      getSMSData (st, { payload }) {
         const { data } = payload
         return {
           ...st,
           list: data.map((o) => {
+            return {
+              ...o,
+            }
+          }),
+        }
+      },
+      getSMSHistory (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          smsHistory: data.map((o) => {
             return {
               ...o,
             }

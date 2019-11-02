@@ -4,7 +4,11 @@ import _ from 'lodash'
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
-import { dateFormatLong, CodeSelect } from '@/components'
+import {
+  dateFormatLong,
+  CodeSelect,
+  dateFormatLongWithTime,
+} from '@/components'
 import { UNFIT_TYPE } from '@/utils/constants'
 
 const status = [
@@ -603,6 +607,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 7,
       key: 'MedicalCertificateId',
+      subject: 'Medical Certificate',
       draft: (row) => {
         return {
           MedicalCertificateDetails: [
@@ -635,6 +640,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 8,
       key: 'CertificateOfAttendanceId',
+      subject: 'Certificate Of Attendance',
       draft: (row) => {
         return {
           CertificateOfAttendanceDetails: [
@@ -654,6 +660,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 9,
       key: 'ReferralLetterId',
+      subject: 'Referral Letter',
       draft: (row) => {
         return {
           ReferralLetterDetails: [
@@ -673,6 +680,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 11,
       key: 'memoid',
+      subject: 'Memo',
       draft: (row) => {
         return {
           MemoDetails: [
@@ -694,6 +702,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 10,
       key: 'vaccinationcertificateid',
+      subject: 'Vaccination Certificate',
       draft: (row) => {
         return {
           VaccinationCertificateDetails: [
@@ -716,6 +725,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 12,
       key: 'documentid',
+      subject: 'Other Documents',
       draft: (row) => {
         return {
           DocumentDetails: [
@@ -734,7 +744,7 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
-    filter: (r) => !!r.stockDrugFK,
+    filter: (r) => !!r.inventoryMedicationFK,
     getSubject: (r) => {
       return r.drugName
     },
@@ -761,15 +771,12 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    filter: (r) => !r.stockDrugFK,
+    filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
   },
   {
     name: 'Package',
     value: '6',
-    // prop: 'corPrescriptionItem',
-    // filter: (r) => !r.stockDrugFK,
-    // getSubject: (r) => r.drugName,
   },
 ]
 const buttonTypes = [
@@ -1183,13 +1190,23 @@ const tagList = [
       if (patient && patient.entity) {
         return patient.entity.name
       }
-      return ''
+      return 'N.A.'
     },
   },
   {
     value: 'AppointmentDateTime',
-    text: 'AppointmentDateTime',
+    text: '<#AppointmentDateTime#>',
     url: '',
+    getter: () => {
+      const { visitRegistration = {} } = window.g_app._store.getState()
+      const { entity } = visitRegistration
+      if (entity && entity.visit && entity.visit.appointmentDatetTime) {
+        return moment(entity.visit.appointmentDatetTime).format(
+          dateFormatLongWithTime,
+        )
+      }
+      return 'N.A.'
+    },
   },
   {
     value: 'Doctor',
@@ -1201,7 +1218,7 @@ const tagList = [
         return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
           .name}`
       }
-      return ''
+      return 'N.A.'
     },
   },
   {
@@ -1221,13 +1238,22 @@ const tagList = [
       if (patient && patient.entity) {
         return patient.entity.callingName
       }
-      return ''
+      return 'N.A.'
     },
   },
   {
     value: 'LastVisitDate',
     text: '<#LastVisitDate#>',
     url: '',
+    getter: () => {
+      const { patient } = window.g_app._store.getState()
+      if (patient && patient.entity && patient.entity.lastVisitDate) {
+        return moment(patient.entity.lastVisitDate).format(
+          dateFormatLongWithTime,
+        )
+      }
+      return 'N.A.'
+    },
   },
 ]
 

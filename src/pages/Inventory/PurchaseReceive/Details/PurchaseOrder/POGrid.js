@@ -243,7 +243,7 @@ class Grid extends PureComponent {
 
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable, isWriteOff } = this.props
+    const { values, isEditable  } = this.props
     const { rows } = values
 
     const tableParas = {
@@ -364,9 +364,9 @@ class Grid extends PureComponent {
               pager: false,
             }}
             EditingProps={{
-              showAddCommand: isEditable || !isWriteOff,
+              showAddCommand: isEditable,
               showEditCommand: false,
-              showDeleteCommand: isEditable || !isWriteOff,
+              showDeleteCommand: isEditable ,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
             }}

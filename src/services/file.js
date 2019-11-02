@@ -34,7 +34,6 @@ export const downloadFile = async (data, fileName) => {
         data,
       ]),
     )
-    console.log({ dataUrl })
     const link = document.createElement('a')
     link.href = dataUrl
     link.setAttribute('download', fileName)

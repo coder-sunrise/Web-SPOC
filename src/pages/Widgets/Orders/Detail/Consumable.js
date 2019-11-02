@@ -1,24 +1,13 @@
 import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
   confirm,
-  Checkbox,
-  SizeContainer,
   RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
   withFormikExtend,
 } from '@/components'
@@ -30,7 +19,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
-      ...(orders.entity || orders.defaultVaccination),
+      ...(orders.entity || orders.defaultConsumable),
       type,
     }
     return v
@@ -43,8 +32,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, resetForm, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -55,6 +44,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
+    }).then((response) => {
+      resetForm()
     })
     if (onConfirm) onConfirm()
   },
@@ -116,7 +107,6 @@ class Consumable extends PureComponent {
       handleSubmit,
       setFieldValue,
     } = this.props
-    // console.log(values)
     return (
       <div>
         <GridContainer>

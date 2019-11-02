@@ -22,7 +22,7 @@ import {
 // medisys components
 import Authorized from '@/utils/Authorized'
 import FilterByAppointment from './FilterBar/FilterByAppointment'
-import FilterByPatient from './FilterBar/FilterByPatient'
+import FilterBar from './FilterBar'
 
 const styles = (theme) => ({
   filterBar: {
@@ -56,8 +56,6 @@ const generateRowData = () => {
 }
 const Grid = ({
   sms,
-  showSMSHistory,
-  list,
   dispatch,
   type,
   columns,
@@ -86,22 +84,26 @@ const Grid = ({
     setSelectedRow,
   ] = useState([])
 
+  const [
+    recipient,
+    setRecipient,
+  ] = useState()
+
   const handleSelectionChange = (selection) => {
     setSelectedRows(selection)
   }
 
   const handleContextMenuClick = (recordRow, id) => {
-    console.log(recordRow, id)
+    setRecipient(recordRow)
     switch (id) {
       case '0':
         dispatch({
-          type: 'sms/querySMSData',
+          type: 'sms/querySMSHistory',
           payload: {
-            Recipient: '98112345',
+            Recipient: recordRow.patientContactNo,
           },
-          smsType: 'smshistory',
-        }).then((v) => console.log({ v }))
-        showSMSHistory()
+        })
+        setShowMessageModal(true)
         break
       default:
         break
@@ -155,13 +157,24 @@ const Grid = ({
     return <Table.Cell {...tableProps} />
   })
 
+  const messageListingProps = {
+    sms,
+    recipient,
+    dispatch,
+    setSelectedRows,
+  }
+
+  const filterBarProps = {
+    type,
+    dispatch,
+  }
+
   return (
     <React.Fragment>
-      <GridContainer style={{ marginBottom: 20 }}>
-        {type === 'Appointment' ? <FilterByAppointment /> : <FilterByPatient />}
-      </GridContainer>
+      <FilterBar {...filterBarProps} />
       <CommonTableGrid
         type='sms'
+        entity={sms}
         onSelectionChange={handleSelectionChange}
         selection={selectedRows}
         columnExtensions={colExtensions}
@@ -173,10 +186,10 @@ const Grid = ({
         open={showMessageModal}
         title='Send SMS'
         onClose={() => setShowMessageModal(false)}
-        onConfirm={() => setShowMessageModal(true)}
+        onConfirm={() => setShowMessageModal(false)}
         showFooter={false}
       >
-        {showMessageModal ? <MessageListing /> : null}
+        {showMessageModal ? <MessageListing {...messageListingProps} /> : null}
       </CommonModal>
     </React.Fragment>
   )

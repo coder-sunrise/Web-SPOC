@@ -59,13 +59,3 @@ export const NewCHASColumnExtensions = [
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
-
-export const TableConfig = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: {
-      showSelectAll: true,
-      rowSelectionEnabled: (row) => true,
-    },
-  },
-}

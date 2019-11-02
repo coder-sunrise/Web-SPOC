@@ -14,7 +14,6 @@ const sharedMedicationValue = {
   corPrescriptionItemPrecaution: [
     {},
   ],
-
   corPrescriptionItemInstruction: [
     {
       // usageMethodFK: 1,
@@ -47,6 +46,10 @@ export default createListViewModel({
       defaultVaccination: {
         vaccinationGivenDate: moment(),
         quantity: 1,
+      },
+      defaultConsumable: {},
+      defaultPackage: {
+        packageItems: [],
       },
       // default: {
       //   corPrescriptionItemPrecaution: [
@@ -85,6 +88,15 @@ export default createListViewModel({
       *upsertRow ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'upsertRowState',
+          payload,
+        })
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
+      *upsertRows ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'upsertRowsState',
           payload,
         })
         yield put({
@@ -140,11 +152,29 @@ export default createListViewModel({
             uid: getUniqueId(),
           })
         }
-
+        const defaultValue = resetDefaulVlue(state.type)
         return {
           ...state,
           rows,
-          type: undefined,
+          // type: undefined,
+          entity: undefined,
+          // totalAfterAdj: undefined,
+        }
+      },
+
+      upsertRowsState (state, { payload }) {
+        let { rows } = state
+        for (let index = 0; index < payload.length; index++) {
+          rows.push({
+            ...payload[index],
+            uid: getUniqueId(),
+          })
+        }
+        // const defaultValue = resetDefaulVlue(state.type)
+        return {
+          ...state,
+          rows,
+          // type: undefined,
           entity: undefined,
           // totalAfterAdj: undefined,
         }
@@ -185,7 +215,7 @@ export default createListViewModel({
 
       // used by each order component
       adjustAmount (state, { payload }) {
-        console.log(state.entity, payload)
+        // console.log(payload)
         return {
           ...state,
           entity: {

@@ -108,6 +108,7 @@ class BaseInput extends React.PureComponent {
       inputRootCustomClasses,
       negative,
       text,
+      inActive,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -137,6 +138,7 @@ class BaseInput extends React.PureComponent {
       [classes.whiteUnderline]: white,
       [classes.currency]: text && currency,
       [classes.negativeCurrency]: text && negative,
+      [classes.inActive]: text && inActive,
     })
     // console.log(underlineClasses)
     const marginTop = classNames({
