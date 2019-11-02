@@ -42,7 +42,7 @@ class GlobalModalContainer extends PureComponent {
         this.props.dispatch({
           type: 'login/logout',
         })
-      }, 10000)
+      }, 60000)
     }
   }
 

@@ -8,21 +8,19 @@ import {
   DatePicker,
   NumberInput,
   FastField,
+  Field,
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
+let i = 0
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultVaccination),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {} }) =>
+    orders.entity || orders.defaultVaccination,
   enableReinitialize: true,
+
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
     unitPrice: Yup.number().required(),
@@ -34,7 +32,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     uomfk: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
+  handleSubmit: (values, { props, onConfirm, resetForm }) => {
     const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
@@ -46,7 +44,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
+    }).then(() => {
+      resetForm(orders.defaultVaccination)
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
@@ -109,13 +110,26 @@ class Vaccination extends PureComponent {
     }
   }
 
+  // componentDidMount () {
+  //   console.log(this, 11)
+  // }
+
   render () {
-    const { values, footer, handleSubmit, setFieldValue } = this.props
+    const {
+      values,
+      footer,
+      handleSubmit,
+      setFieldValue,
+      errors,
+      resetForm,
+      orders,
+    } = this.props
+    // console.log(values, errors)
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
-            <FastField
+            <Field
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
@@ -143,7 +157,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={4}>
-            <FastField
+            <Field
               name='usageMethodFK'
               render={(args) => {
                 return (

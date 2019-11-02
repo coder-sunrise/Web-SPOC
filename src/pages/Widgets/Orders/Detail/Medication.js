@@ -34,7 +34,14 @@ import { calculateAdjustAmount } from '@/utils/utils'
     if (type === '5') {
       v.drugCode = 'MISC'
     }
-
+    if (
+      !v.corPrescriptionItemPrecaution ||
+      !v.corPrescriptionItemPrecaution[0]
+    ) {
+      v.corPrescriptionItemPrecaution = [
+        {},
+      ]
+    }
     return v
   },
   enableReinitialize: true,
@@ -192,6 +199,7 @@ class Medication extends PureComponent {
         for (let a = 0; a < dosageUsageList.length; a++) {
           if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
             dosageMultiplier = dosageUsageList[a].multiplier
+            break
           }
         }
 
@@ -201,6 +209,7 @@ class Medication extends PureComponent {
             prescriptionItem[i].drugFrequencyFK
           ) {
             multipler = medicationFrequencyList[b].multiplier
+            break
           }
         }
 
@@ -393,6 +402,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log(this.props)
     return (
       <div>
         <GridContainer>
@@ -487,7 +497,7 @@ class Medication extends PureComponent {
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{ marginLeft: 15 }}
+                                    style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -711,7 +721,7 @@ class Medication extends PureComponent {
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
                     min={0}
-                    format='0.0'
+                    currency
                     onChange={(e) => {
                       if (disableEdit === false) {
                         if (values.unitPrice) {

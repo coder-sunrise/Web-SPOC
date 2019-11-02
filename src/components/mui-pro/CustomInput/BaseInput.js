@@ -30,7 +30,7 @@ const _config = {
       'defaultValue',
       'onChange',
       // 'onBlur',
-      'onFocus',
+      // 'onFocus',
       'autoFocus',
       'multiline',
       'rows',
@@ -208,6 +208,7 @@ class BaseInput extends React.PureComponent {
       onKeyDown,
       text,
       onBlur,
+      onFocus,
     } = props
 
     // console.log(this.state, this.state.value)
@@ -219,6 +220,7 @@ class BaseInput extends React.PureComponent {
 
     const cfg = {
       onBlur,
+      onFocus,
     }
     if (prefix) {
       cfg.startAdornment = (

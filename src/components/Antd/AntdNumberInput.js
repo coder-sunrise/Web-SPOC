@@ -159,12 +159,27 @@ class AntdNumberInput extends React.PureComponent {
     // }
   }
 
-  handleBlur = () => {
-    this._onChange(numeral(this.state.value)._value)
+  handleBlur = (e) => {
+    if (!e.target.value && this.props.allowEmpty) {
+      this._onChange('')
+      this.setState({
+        value: '',
+        focused: false,
+      })
+    } else {
+      const v = numeral(e.target.value)._value
+      this._onChange(v)
+      this.setState({
+        value: v,
+        focused: false,
+      })
+    }
+
     this.debouncedOnChange.cancel()
   }
 
   _onChange = (value) => {
+    console.log(value)
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -265,14 +280,14 @@ class AntdNumberInput extends React.PureComponent {
     if (!isNumber(newV)) {
       newV = undefined
     }
-    if (v === undefined && !this.props.allowEmpty) {
+    if ((newV === undefined || newV === null) && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-
+    if (newV === undefined || newV === null) newV = ''
     this.setState({
-      value: newV === undefined ? '' : newV,
+      value: newV,
     })
     if (newV === '') {
       this._onChange(newV)

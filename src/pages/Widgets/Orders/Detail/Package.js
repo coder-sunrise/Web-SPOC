@@ -22,13 +22,7 @@ const { qtyFormat } = config
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...orders.defaultPackage,
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {} }) => orders.defaultPackage,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventorypackageFK: Yup.number().required(),

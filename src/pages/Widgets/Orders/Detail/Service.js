@@ -17,13 +17,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultService),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultService,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
@@ -210,7 +205,7 @@ class Service extends PureComponent {
                 return (
                   <NumberInput
                     label='Total'
-                    min={0.01}
+                    min={0}
                     currency
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)

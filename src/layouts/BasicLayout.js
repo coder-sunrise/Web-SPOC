@@ -127,13 +127,14 @@ class BasicLayout extends React.PureComponent {
       })
       const getClinicSettings = sessionStorage.getItem('clinicSettings')
       const getClinicInfo = sessionStorage.getItem('clinicInfo')
-      if (getClinicSettings === null) {
+      // console.log(getClinicInfo)
+      if (!getClinicSettings) {
         await dispatch({
           type: 'clinicSettings/query',
         })
       } else {
         const parsedClinicSettings = JSON.parse(getClinicSettings)
-        dispatch({
+        await dispatch({
           type: 'clinicSettings/updateState',
           payload: {
             settings: parsedClinicSettings,
@@ -141,14 +142,14 @@ class BasicLayout extends React.PureComponent {
         })
       }
 
-      if (getClinicInfo == null) {
+      if (!getClinicInfo) {
         await dispatch({
           type: 'clinicInfo/query',
           payload: localStorage.getItem('clinicCode'),
         })
       } else {
         const parsedClinicInfo = JSON.parse(getClinicInfo)
-        dispatch({
+        await dispatch({
           type: 'clinicInfo/updateState',
           payload: {
             ...parsedClinicInfo,
