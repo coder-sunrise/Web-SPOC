@@ -79,7 +79,7 @@ class Vaccination extends PureComponent {
 		setFieldValue('vaccinationName', op.displayValue)
 		setFieldValue('vaccinationCode', op.code)
 
-		if (op.sellingPrice) {
+		if (op.sellingPrice !== undefined && op.sellingPrice !== null) {
 			setFieldValue('unitPrice', op.sellingPrice)
 			setFieldValue('totalPrice', op.sellingPrice * values.quantity)
 			this.updateTotalPrice(op.sellingPrice * values.quantity)
