@@ -21,11 +21,7 @@ import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
-import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  TableConfig,
-} from './variables'
+import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -185,9 +181,16 @@ class ApprovedCHAS extends React.Component {
             <GridItem md={12}>
               <TableGrid
                 data={list}
-                columnExtensions={NewCHASColumnExtensions}
-                columns={NewCHASColumns}
-                tableConfig={TableConfig}
+                columnExtensions={ApprovedCHASColumnExtensions}
+                columns={ApprovedCHASColumns}
+                // tableConfig={TableConfig}
+                FuncProps={{
+                  selectable: true,
+                  selectConfig: {
+                    showSelectAll: true,
+                    rowSelectionEnabled: (row) => row.approvedAmount,
+                  },
+                }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={handleContextMenuItemClick}

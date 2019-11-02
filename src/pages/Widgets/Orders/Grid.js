@@ -224,28 +224,40 @@ export default ({
           width: 300,
           render: (row) => {
             let text = ''
-            const codetableList = codetable
+            const {
+              ctmedicationusage,
+              ctmedicationunitofmeasurement,
+              ctmedicationfrequency,
+              ctmedicationdosage,
+            } = codetable
+            if (
+              !ctmedicationusage ||
+              !ctmedicationunitofmeasurement ||
+              !ctmedicationfrequency ||
+              !ctmedicationdosage
+            )
+              return null
             return (
               <div>
                 {row.corPrescriptionItemInstruction ? (
                   row.corPrescriptionItemInstruction.map((item) => {
                     text = ''
-                    const usageMethod = codetableList.ctmedicationusage.filter(
+                    const usageMethod = ctmedicationusage.filter(
                       (codeTableItem) =>
                         codeTableItem.id === item.usageMethodFK,
                     )
                     text += `${usageMethod[0].name} `
                     text += ' '
-                    const dosage = codetableList.ctmedicationdosage.filter(
+                    const dosage = ctmedicationdosage.filter(
                       (codeTableItem) => codeTableItem.id === item.dosageFK,
                     )
                     text += `${dosage[0].displayValue} `
-                    const prescribe = codetableList.ctmedicationunitofmeasurement.filter(
+                    const prescribe = ctmedicationunitofmeasurement.filter(
                       (codeTableItem) =>
                         codeTableItem.id === item.prescribeUOMFK,
                     )
                     text += `${prescribe[0].name} `
-                    const drugFrequency = codetableList.ctmedicationfrequency.filter(
+                    const drugFrequency = ctmedicationfrequency.filter(
                       (codeTableItem) =>
                         codeTableItem.id === item.drugFrequencyFK,
                     )

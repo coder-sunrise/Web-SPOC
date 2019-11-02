@@ -1,4 +1,4 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
@@ -8,17 +8,10 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  notification,
   Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
   Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
   CustomInputWrapper,
   Popconfirm,
@@ -33,7 +26,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type, ...resetProps }) => {
+  mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
       ...(orders.entity || orders.defaultMedication),
       type,
@@ -79,8 +72,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     ),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
 
     const data = {
@@ -100,7 +93,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
 })
 class Medication extends PureComponent {
   state = {
-    stockList: [],
     selectionOptions: [],
   }
 
@@ -239,7 +231,7 @@ class Medication extends PureComponent {
     // this.setState(() => {
     //   return { selectionOptions: tempArray }
     // })
-    const { setFieldValue, values, codetable, disableEdit } = this.props
+    const { setFieldValue, codetable, disableEdit } = this.props
     const dosageUsageList = codetable.ctmedicationdosage
     const medicationFrequencyList = codetable.ctmedicationfrequency
 
@@ -342,7 +334,9 @@ class Medication extends PureComponent {
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
       })
     } else {
-      setFieldValue(`corPrescriptionItemPrecaution`, [])
+      setFieldValue(`corPrescriptionItemPrecaution`, [
+        {},
+      ])
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
@@ -392,7 +386,6 @@ class Medication extends PureComponent {
       footer,
       handleSubmit,
       setFieldValue,
-      orders,
       disableEdit,
       setDisable,
     } = this.props
@@ -520,7 +513,7 @@ class Medication extends PureComponent {
                                   labelField='displayValue'
                                   {...commonSelectProps}
                                   {...args}
-                                  onChange={(v, option = {}) => {
+                                  onChange={() => {
                                     setTimeout(() => {
                                       this.calculateQuantity()
                                     }, 1)
@@ -562,7 +555,7 @@ class Medication extends PureComponent {
                                   code='ctMedicationFrequency'
                                   {...commonSelectProps}
                                   {...args}
-                                  onChange={(v, option = {}) => {
+                                  onChange={() => {
                                     setTimeout(() => {
                                       this.calculateQuantity()
                                     }, 1)
@@ -587,7 +580,7 @@ class Medication extends PureComponent {
                                   step={1}
                                   min={1}
                                   {...args}
-                                  onChange={(v) => {
+                                  onChange={() => {
                                     setTimeout(() => {
                                       this.calculateQuantity()
                                     }, 1)
@@ -664,7 +657,6 @@ class Medication extends PureComponent {
                                       // simple
                                       code='ctMedicationPrecaution'
                                       onChange={(v, option = {}) => {
-                                        // console.log(v, option)
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
                                           option.name,

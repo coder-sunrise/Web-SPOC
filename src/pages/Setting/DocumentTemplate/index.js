@@ -46,21 +46,23 @@ class ServiceCenter extends PureComponent {
 
   //   return `${isEntityEmpty ? 'Edit ' : 'Add '  }Document Template`
   // }
-  
+
   render () {
     const { settingDocumentTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
-    } 
+    }
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
         <Grid {...cfg} {...this.props} />
         <CommonModal
           open={settingDocumentTemplate.showModal}
-          observe='TemplateMessageDetail'
+          observe='DocumentTemplateDetail'
           // title={this.getModalTitle(settingDocumentTemplate.entity)}
-          title={`${settingDocumentTemplate.entity ? 'Edit ' : 'Add '  }Document Template`}
+          title={`${settingDocumentTemplate.entity
+            ? 'Edit '
+            : 'Add '}Document Template`}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

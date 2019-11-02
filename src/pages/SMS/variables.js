@@ -35,7 +35,7 @@ const patientColumns = [
 const appointmentColumnsExtensions = [
   {
     columnName: 'upcomingAppointmentDate',
-    width: 180,
+    width: 190,
     render: (row) => {
       const { upcomingAppointmentDate, upcomingAppointmentStartTime } = row
       return `${moment(upcomingAppointmentDate).format(
@@ -48,7 +48,7 @@ const appointmentColumnsExtensions = [
   },
   {
     columnName: 'lastVisitDate',
-    width: 180,
+    width: 190,
     render: (row) =>
       DateFormatter({
         value: row.lastVisitDate,
@@ -57,7 +57,7 @@ const appointmentColumnsExtensions = [
   },
   {
     columnName: 'lastSMSSendDate',
-    width: 180,
+    width: 190,
     render: (row) =>
       DateFormatter({
         value: row.lastSMSSendDate,
@@ -74,7 +74,7 @@ const appointmentColumnsExtensions = [
 const patientColumnsExtensions = [
   {
     columnName: 'lastVisitDate',
-    width: 180,
+    width: 190,
     render: (row) =>
       DateFormatter({
         value: row.lastVisitDate,
@@ -83,7 +83,7 @@ const patientColumnsExtensions = [
   },
   {
     columnName: 'lastSMSSendDate',
-    width: 180,
+    width: 190,
     render: (row) =>
       DateFormatter({
         value: row.lastSMSSendDate,

@@ -1,38 +1,14 @@
-import React, { Component, PureComponent } from 'react'
-import { connect } from 'dva'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
-import {
-  Divider,
-  CircularProgress,
-  Paper,
-  withStyles,
-  IconButton,
-} from '@material-ui/core'
-import Yup from '@/utils/yup'
+import { Divider, withStyles } from '@material-ui/core'
 import { orderTypes } from '@/utils/codes'
 
 import {
-  withFormikExtend,
-  FastField,
   Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  TextField,
   notification,
-  Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
+  Tabs,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 
@@ -180,18 +156,9 @@ class Details extends PureComponent {
   }
 
   render () {
-    const { props, state } = this
-    const {
-      theme,
-      classes,
-      orders,
-      values,
-      rowHeight,
-      footer,
-      dispatch,
-    } = props
-    const { type, entity } = orders
-    // console.log(values)
+    const { props } = this
+    const { classes, orders, dispatch } = props
+    const { type } = orders
 
     const cfg = {
       disableEdit: this.state.disableEdit,
@@ -206,18 +173,21 @@ class Details extends PureComponent {
       <div>
         <div className={classes.detail}>
           <GridContainer>
-            <GridItem xs={6}>
-              <Select
-                label='Type'
-                options={orderTypes}
-                allowClear={false}
-                value={type}
-                disabled={!!entity}
-                onChange={(v) => {
+            <GridItem xs={12}>
+              <Tabs
+                activeKey={type}
+                options={orderTypes.map((o) => {
+                  return {
+                    id: o.value,
+                    name: o.name,
+                  }
+                })}
+                onChange={(key) => {
                   dispatch({
                     type: 'orders/updateState',
                     payload: {
-                      type: v,
+                      entity: undefined,
+                      type: key,
                     },
                   })
                 }}

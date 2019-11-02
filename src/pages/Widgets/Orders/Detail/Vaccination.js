@@ -1,24 +1,12 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
   withFormikExtend,
 } from '@/components'
@@ -37,7 +25,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    unitPrice: Yup.number().required(),
+    // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
@@ -46,8 +34,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     uomfk: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -122,14 +110,7 @@ class Vaccination extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      classes,
-      values,
-      footer,
-      handleSubmit,
-      setFieldValue,
-    } = this.props
+    const { values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>
@@ -186,7 +167,6 @@ class Vaccination extends PureComponent {
                     labelField='displayValue'
                     allowClear={false}
                     code='ctMedicationDosage'
-                    labelField='displayValue'
                     valueFiled='id'
                     {...args}
                   />

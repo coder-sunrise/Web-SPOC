@@ -2,19 +2,13 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 
-import {
-  getUniqueId,
-  maxReducer,
-  sumReducer,
-  calculateAmount,
-} from '@/utils/utils'
+import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
   quantity: 0,
   corPrescriptionItemPrecaution: [
     {},
   ],
-
   corPrescriptionItemInstruction: [
     {
       // usageMethodFK: 1,
@@ -47,6 +41,10 @@ export default createListViewModel({
       defaultVaccination: {
         vaccinationGivenDate: moment(),
         quantity: 1,
+      },
+      defaultConsumable: { quantity: 1 },
+      defaultPackage: {
+        packageItems: [],
       },
       // default: {
       //   corPrescriptionItemPrecaution: [
@@ -91,6 +89,15 @@ export default createListViewModel({
           type: 'calculateAmount',
         })
       },
+      *upsertRows ({ payload }, { select, call, put, delay }) {
+        yield put({
+          type: 'upsertRowsState',
+          payload,
+        })
+        yield put({
+          type: 'calculateAmount',
+        })
+      },
       *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
         yield put({
           type: 'addFinalAdjustmentState',
@@ -122,6 +129,7 @@ export default createListViewModel({
 
     reducers: {
       upsertRowState (state, { payload }) {
+        let newRow
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {
@@ -135,16 +143,32 @@ export default createListViewModel({
             return n
           })
         } else {
-          rows.push({
+          newRow = {
             ...payload,
             uid: getUniqueId(),
-          })
+          }
+          rows.push(newRow)
         }
-
         return {
           ...state,
           rows,
-          type: undefined,
+          entity: newRow,
+          // totalAfterAdj: undefined,
+        }
+      },
+
+      upsertRowsState (state, { payload }) {
+        let { rows } = state
+        for (let index = 0; index < payload.length; index++) {
+          rows.push({
+            ...payload[index],
+            uid: getUniqueId(),
+          })
+        }
+        return {
+          ...state,
+          rows,
+          type: state.type === '6' ? undefined : state.type,
           entity: undefined,
           // totalAfterAdj: undefined,
         }
@@ -185,7 +209,7 @@ export default createListViewModel({
 
       // used by each order component
       adjustAmount (state, { payload }) {
-        console.log(state.entity, payload)
+        // console.log(payload)
         return {
           ...state,
           entity: {

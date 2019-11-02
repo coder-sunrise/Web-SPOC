@@ -1,26 +1,12 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import _ from 'lodash'
 
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
   Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
   Field,
   withFormikExtend,
@@ -45,8 +31,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     total: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -78,7 +64,6 @@ class Service extends PureComponent {
         },
       },
     }).then((list) => {
-      // console.log(list)
       // eslint-disable-next-line compat/compat
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
@@ -88,11 +73,6 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
-      // console.log("service ", services)
-      // console.log("serviceCenterServices ", serviceCenterServices)
-      // console.log("serviceCenters ", serviceCenters)
-
-      // console.log(services, serviceCenters, serviceCenterServices)
       // this.setState((ps) => {
       //   return {
       //     pagination: {
@@ -128,11 +108,11 @@ class Service extends PureComponent {
   }
 
   getServiceCenterService = () => {
-    const { values, setFieldValue, setValues } = this.props
+    const { values, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
 
     if (!serviceCenterFK || !serviceFK) return
-    const serviceCenterService =  
+    const serviceCenterService =
       this.state.serviceCenterServices.find(
         (o) =>
           o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
@@ -168,14 +148,7 @@ class Service extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      orders,
-      classes,
-      values = {},
-      footer,
-      handleSubmit,
-    } = this.props
+    const { classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
@@ -193,14 +166,13 @@ class Service extends PureComponent {
                       (o) =>
                         !serviceCenterFK ||
                         o.serviceCenters.find(
-                           (m) => m.value === serviceCenterFK,
+                          (m) => m.value === serviceCenterFK,
                         ),
                     )}
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)
-                    }
+                      }, 1)}
                     {...args}
                   />
                 )
@@ -222,8 +194,7 @@ class Service extends PureComponent {
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)
-                    }
+                      }, 1)}
                     {...args}
                   />
                 )

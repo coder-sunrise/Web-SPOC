@@ -675,6 +675,7 @@ class CommonTableGrid extends PureComponent {
       ...this.defaultFunctionConfig,
       ...FuncProps,
     }
+
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }

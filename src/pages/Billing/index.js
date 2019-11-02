@@ -70,7 +70,7 @@ const bannerStyle = {
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const { invoicePayer, invoicePayment } = billing.entity
+        const { invoicePayer = [] } = billing.entity
 
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
@@ -81,20 +81,22 @@ const bannerStyle = {
             ),
           0,
         )
-        const totalPaid = invoicePayment.reduce(
-          (total, payment) => total + payment.totalAmtPaid,
-          0,
-        )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return {
+          ...billing.default,
+          ...billing.entity,
+          finalClaim,
+          finalPayable,
+          visitId: billing.visitID,
+        }
       }
     } catch (error) {
       console.log({ error })
     }
-    return billing.default
+    return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -345,7 +347,6 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
