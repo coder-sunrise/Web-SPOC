@@ -152,6 +152,7 @@ const { qtyFormat } = config
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
           // priority:,
+          serviceCode: service.code,
           serviceName: service.displayValue,
           serviceFK: service.id,
           serviceCenterFK: serviceCenterService.serviceCenterFK,
@@ -176,6 +177,7 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
+          consumableCode: inventoryConsumable.code,
           consumableName: inventoryConsumable.displayValue,
         }
       }
