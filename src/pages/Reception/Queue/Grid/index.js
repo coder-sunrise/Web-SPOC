@@ -57,11 +57,11 @@ const TableConfig = {
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceStatus', title: 'Invoice Status' },
     { name: 'invoiceAmount', title: 'Invoice Amt.' },
-    { name: 'invoicePaymentMode', title: 'Payment Mode' },
+    // { name: 'invoicePaymentMode', title: 'Payment Mode' },
     { name: 'invoiceGST', title: 'GST' },
     { name: 'invoicePaymentAmount', title: 'Payment' },
     { name: 'invoiceOutstanding', title: 'Outstanding' },
-    { name: 'patientScheme', title: 'Scheme' },
+    // { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
@@ -85,15 +85,15 @@ const columnExtensions = [
     columnName: 'roomNo',
     render: (row) => row.roomNo || '-',
   },
-  {
-    columnName: 'patientScheme',
-    render: (row) => row.patientScheme || '-',
-  },
-  {
-    columnName: 'invoicePaymentMode',
-    width: 150,
-    render: (row) => row.invoicePaymentMode || '-',
-  },
+  // {
+  //   columnName: 'patientScheme',
+  //   render: (row) => row.patientScheme || '-',
+  // },
+  // {
+  //   columnName: 'invoicePaymentMode',
+  //   width: 150,
+  //   render: (row) => row.invoicePaymentMode || '-',
+  // },
   {
     columnName: 'patientName',
     width: 250,
