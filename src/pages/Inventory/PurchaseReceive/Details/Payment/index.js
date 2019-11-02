@@ -31,9 +31,19 @@ const styles = (theme) => ({
   displayName: 'podoPayment',
   enableReinitialize: true,
   mapPropsToValues: ({ podoPayment }) => {
+    let outstandingAmount = {}
+    if (
+      podoPayment &&
+      podoPayment.purchaseOrderDetails &&
+      podoPayment.purchaseOrderDetails.outstandingAmount
+    ) {
+      outstandingAmount = {
+        outstandingAmt: podoPayment.purchaseOrderDetails.outstandingAmount,
+      }
+    }
     return {
       ...podoPayment,
-      outstandingAmt: podoPayment.purchaseOrderDetails.outstandingAmount,
+      ...outstandingAmount,
     }
   },
   handleSubmit: (values, { props }) => {
