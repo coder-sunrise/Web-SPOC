@@ -192,7 +192,6 @@ class Dispense extends PureComponent {
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
-            style={{}}
             patientInfo={dispense.patientInfo}
             extraCmt={this.getExtraComponent()}
           />

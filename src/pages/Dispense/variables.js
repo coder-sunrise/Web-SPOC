@@ -216,8 +216,19 @@ export const OtherOrdersColumns = [
   },
 ]
 
+const compareString = (a, b) => a.localeCompare(b)
+
 export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
+  {
+    columnName: 'type',
+    compare: compareString,
+  },
+  {
+    columnName: 'description',
+    compare: compareString,
+  },
   { columnName: 'unitPrice', type: 'currency' },
+
   {
     columnName: 'totalPrice',
     type: 'currency',

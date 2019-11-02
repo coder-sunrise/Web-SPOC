@@ -6,6 +6,7 @@ import { connect } from 'dva'
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
   Accordion,
@@ -44,14 +45,16 @@ const styles = (theme) => ({
     textAlign: 'right',
   },
   dispenseContainer: {
-    maxHeight: '40vh',
-    overflow: 'auto',
+    // maxHeight: '40vh',
+    // overflow: 'auto',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
 })
 
 const bannerStyle = {
+  position: 'sticky',
+  top: headerHeight,
   zIndex: 1000,
   paddingLeft: 16,
   paddingRight: 16,
@@ -349,7 +352,7 @@ class Billing extends Component {
 
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
-        <PatientBanner style={bannerStyle} />
+        <PatientBanner />
         <div className={classes.accordionContainer}>
           <LoadingWrapper
             linear
@@ -363,9 +366,9 @@ class Billing extends Component {
                 {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
-                    <Paper elevation={3} className={classes.dispenseContainer}>
+                    <div className={classes.dispenseContainer}>
                       <DispenseDetails viewOnly values={dispense.entity} />
-                    </Paper>
+                    </div>
                   ),
                 },
               ]}
