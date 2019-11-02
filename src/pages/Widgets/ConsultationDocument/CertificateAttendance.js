@@ -17,7 +17,6 @@ import * as service from '@/services/common'
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
-    console.log('========= ', visitEntity)
     const values = {
       ...(consultationDocument.entity ||
         consultationDocument.defaultCertOfAttendance),
@@ -122,7 +121,6 @@ class CertificateAttendance extends PureComponent {
             <FastField
               name='attendanceEndTime'
               render={(args) => {
-                console.log('--------- ', args)
                 return <TimePicker label='To' {...args} />
               }}
             />
