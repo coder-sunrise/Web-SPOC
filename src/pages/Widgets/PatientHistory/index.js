@@ -313,7 +313,7 @@ class PatientHistory extends Component {
 
   getContent = (row) => {
     const { patientHistory, mode, clinicSettings } = this.props
-    const { settings } = clinicSettings
+    const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
 
     let newArray = []
@@ -613,7 +613,7 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-    const { settings } = clinicSettings
+    const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
 
     const cfg = {}

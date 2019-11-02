@@ -2,7 +2,7 @@ import { CommonTableGrid, DatePicker } from '@/components'
 
 export default ({ current, classes, theme, codetable }) => {
   const complicationData = (complicationList) => {
-    const { ctcomplication } = codetable
+    const { ctcomplication = [] } = codetable
     let complicationValue = ''
 
     for (let i = 0; i < complicationList.length; i++) {
