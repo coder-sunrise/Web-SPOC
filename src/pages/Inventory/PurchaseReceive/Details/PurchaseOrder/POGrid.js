@@ -10,8 +10,8 @@ import {
 let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
-  type: Yup.string().required(),
-  code: Yup.string().required(),
+  type: Yup.number().required(),
+  code: Yup.number().required(),
   // name: Yup.string().required(),
   orderQuantity: Yup.number().min(1).required(),
   bonusQuantity: Yup.number().min(0).required(),
@@ -110,13 +110,14 @@ class Grid extends PureComponent {
 
   handleItemOnChange = (e, type) => {
     const { option, row } = e
-
     if (type === 'code') {
       row.name = option.value
     } else {
       row.code = option.value
     }
-
+    row.codeString = option.code
+    row.nameString = option.name
+    row.uomString = option.uom
     row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
@@ -128,14 +129,14 @@ class Grid extends PureComponent {
       onClickColumn: 'item',
     })
 
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
-    return { ...row }
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
+    // return { ...row }
   }
 
   onAddedRowsChange = (addedRows) => {
@@ -199,7 +200,6 @@ class Grid extends PureComponent {
         }))
       }
     }
-
     return newAddedRows
   }
 

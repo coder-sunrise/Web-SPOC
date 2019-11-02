@@ -47,7 +47,7 @@ class POSummary extends PureComponent {
     const { setFieldValue, calcPurchaseOrderSummary } = this.props
     if (!isCheckboxClicked) {
       if (!settingGSTEnable) {
-        setFieldValue(`${poPrefix}.isGstInclusive`, false)
+        setFieldValue(`${poPrefix}.IsGSTInclusive`, false)
       }
     }
     setTimeout(() => calcPurchaseOrderSummary(), 1)
@@ -121,7 +121,7 @@ class POSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
-                    disabled={`${poPrefix}.isGstInclusive`}
+                    disabled={`${poPrefix}.IsGSTInclusive`}
                     {...args}
                   />
                 )}
@@ -139,7 +139,7 @@ class POSummary extends PureComponent {
             {IsGSTEnabled ? (
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
-                  name={`${poPrefix}.isGstInclusive`}
+                  name={`${poPrefix}.IsGSTInclusive`}
                   render={(args) => {
                     return (
                       <Tooltip

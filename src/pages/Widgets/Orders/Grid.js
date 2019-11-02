@@ -262,14 +262,14 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
                         uid: row.uid,
                       },
                     })
-                    let commitCount = 1000 // uniqueNumber
-                    dispatch({
-                      // force current edit row components to update
-                      type: 'global/updateState',
-                      payload: {
-                        commitCount: (commitCount += 1),
-                      },
-                    })
+                    // let commitCount = 1000 // uniqueNumber
+                    // dispatch({
+                    //   // force current edit row components to update
+                    //   type: 'global/updateState',
+                    //   payload: {
+                    //     commitCount: (commitCount += 1),
+                    //   },
+                    // })
                   }}
                 >
                   <Tooltip title='Delete'>

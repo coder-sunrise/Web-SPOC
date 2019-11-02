@@ -105,7 +105,7 @@ const Grid = ({
       selection,
     ],
   )
-
+  const compareString = (a, b) => a.localeCompare(b)
   const tableParas = {
     columns: [
       { name: 'paymentNo', title: 'Payment No.' },
@@ -119,6 +119,7 @@ const Grid = ({
       {
         columnName: 'paymentNo',
         disabled: true,
+        compare: compareString,
       },
       {
         columnName: 'paymentDate',
@@ -126,23 +127,33 @@ const Grid = ({
         format: { dateFormatLong },
         value: moment(),
         disabled: true,
+        compare: compareString,
       },
       {
         columnName: 'paymentModeFK',
         type: 'select',
         options: selection,
+        sortingEnabled: false,
         onChange: (p) => {
           const { option, row } = p
           if (option) {
             row.typeId = option.typeId
-            row.creditCardId = option.creditCardId
+            row.creditCardId = option.creditCardId || option.value
           }
         },
+      },
+      {
+        columnName: 'referenceNo',
+        compare: compareString,
       },
       {
         columnName: 'paymentAmount',
         type: 'number',
         currency: true,
+      },
+      {
+        columnName: 'remark',
+        compare: compareString,
       },
     ],
   }
@@ -177,7 +188,7 @@ const Grid = ({
           pager: false,
         }}
         EditingProps={{
-          showAddCommand: isEditable,
+          showAddCommand: values.outstandingAmt > 0,
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,

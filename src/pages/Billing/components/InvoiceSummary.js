@@ -1,4 +1,7 @@
 import React, { useState, useCallback } from 'react'
+import classnames from 'classnames'
+// formik
+import { FastField, withFormik } from 'formik'
 // material ui
 import { withStyles, IconButton } from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
@@ -11,12 +14,24 @@ import {
   GridContainer,
   GridItem,
   TextField,
+  Danger,
 } from '@/components'
 import DeleteWithPopover from './DeleteWithPopover'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
 
 const styles = () => ({
+  crossed: {
+    textDecorationLine: 'line-through',
+  },
+  errorContainer: {
+    textAlign: 'left',
+    lineHeight: '1em',
+    paddingBottom: 8,
+    '& span': {
+      fontSize: '.8rem',
+    },
+  },
   rightAlign: {
     textAlign: 'right',
   },
@@ -42,29 +57,49 @@ const InvoiceSummary = ({
   handlePrintInvoiceClick,
   disabled,
   values,
+  setFieldValue,
 }) => {
+  const errorMessage = 'Cancel reason is required'
   const [
     cancelReason,
     setCancelReason,
   ] = useState('')
+
+  const [
+    showError,
+    setShowError,
+  ] = useState(false)
+
   const { invoicePayment, invoice } = values
   const { gstValue, gstAmount, totalAftGst, invoiceNo } = invoice
+
   const handleConfirmDelete = useCallback(
-    (id) => {
-      handleDeletePaymentClick(id, cancelReason)
+    (id, toggleVisibleCallback) => {
+      const payment = invoicePayment.find(
+        (item) => parseInt(item.id, 10) === parseInt(id, 10),
+      )
+
+      if (payment.cancelReason === '' || payment.cancelReason === undefined) {
+        setShowError(true)
+      } else {
+        toggleVisibleCallback()
+        handleDeletePaymentClick(id)
+      }
     },
     [
+      invoicePayment,
       cancelReason,
     ],
   )
 
   const onCancelReasonChange = (event) => {
-    setCancelReason(event.target.value)
+    if (event.target.value !== '' || event.target.value !== undefined)
+      setShowError(false)
   }
 
   const shouldDisableAddPayment = () => {
     if (disabled) return disabled
-    console.log({ values })
+
     const totalPaid = values.invoicePayment.reduce(
       (total, payment) =>
         !payment.isCancelled ? total + payment.totalAmtPaid : total,
@@ -72,6 +107,18 @@ const InvoiceSummary = ({
     )
     return values.finalPayable <= totalPaid
   }
+
+  const handleCancelClick = useCallback(
+    (id) => {
+      const index = invoicePayment.findIndex(
+        (item) => parseInt(item.id, 10) === parseInt(id, 10),
+      )
+      setFieldValue(`invoicePayment[${index}].cancelReason`, undefined)
+    },
+    [
+      invoicePayment,
+    ],
+  )
 
   return (
     <React.Fragment>
@@ -132,29 +179,46 @@ const InvoiceSummary = ({
           <h4 style={{ fontWeight: 500 }}>Payment</h4>
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
-              {invoicePayment
-                .filter((item) => !item.isCancelled)
-                .map((item) => (
+              {invoicePayment.map((item, index) => {
+                const titleClass = classnames({
+                  [classes.crossed]: item.isCancelled,
+                })
+                return (
                   <React.Fragment>
                     <GridItem md={11}>
-                      <h5>Receipt No: {item.receiptNo || 'N/A'}</h5>
+                      <h5 className={titleClass}>
+                        Receipt No: {item.receiptNo || 'N/A'}
+                      </h5>
                     </GridItem>
                     <GridItem md={1}>
                       <DeleteWithPopover
-                        // disabled={!item.id}
                         index={item.id}
                         title='Cancel Payment'
                         contentText='Confirm to cancel this payment?'
                         extraCmd={
                           item.id ? (
-                            <TextField
-                              label='Cancel Reason'
-                              onChange={onCancelReasonChange}
-                            />
+                            <div className={classes.errorContainer}>
+                              <FastField
+                                name={`invoicePayment[${index}].cancelReason`}
+                                render={(args) => (
+                                  <TextField
+                                    label='Cancel Reason'
+                                    {...args}
+                                    onChange={onCancelReasonChange}
+                                  />
+                                )}
+                              />
+                              {showError && (
+                                <Danger>
+                                  <span>{errorMessage}</span>
+                                </Danger>
+                              )}
+                            </div>
                           ) : (
                             undefined
                           )
                         }
+                        onCancelClick={handleCancelClick}
                         onConfirmDelete={handleConfirmDelete}
                       />
                     </GridItem>
@@ -173,7 +237,8 @@ const InvoiceSummary = ({
                       </React.Fragment>
                     ))}
                   </React.Fragment>
-                ))}
+                )
+              })}
             </GridItem>
             <GridItem md={12}>
               <Divider

@@ -173,10 +173,13 @@ class Banner extends PureComponent {
     let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
     let oldSchemeTypeFK = currentSchemeType
 
+    console.log("tets ", entity)
+
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
+      console.log(")))) ", result)
       if (result) {
         const {
           balance,
@@ -187,6 +190,7 @@ class Banner extends PureComponent {
           acuteVisitClinicBalance,
           isSuccessful,
           statusDescription,
+          acuteBalanceStatusCode,
         } = result
         let isShowReplacementModal = false
 
@@ -214,6 +218,7 @@ class Banner extends PureComponent {
               acuteVisitPatientBalance,
               acuteVisitClinicBalance,
               isSuccessful,
+              acuteBalanceStatusCode,
             },
           })
         }
@@ -224,11 +229,13 @@ class Banner extends PureComponent {
   getSchemeDetails = (schemeData) => {
     const { refreshedSchemeData } = this.state
     if (
-      !_.isEmpty(refreshedSchemeData) &&
-      refreshedSchemeData.isSuccessful === true
+      !_.isEmpty(refreshedSchemeData) 
+        &&  refreshedSchemeData.isSuccessful === true
     ) {
       return { ...refreshedSchemeData }
     }
+
+
     // Scheme Balance
     const balance =
       schemeData.patientSchemeBalance.length <= 0
@@ -250,6 +257,8 @@ class Banner extends PureComponent {
       currentSchemeType: schemeData.schemeTypeFK,
     })
 
+    console.log("tets ", schemeData)
+
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -259,13 +268,15 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
+      acuteBalanceStatusCode: schemeData.patientSchemeBalance.length > 0 ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode : '',
+      isSuccessful: refreshedSchemeData.isSuccessful !== '' ? refreshedSchemeData.isSuccessful : '',
     }
   }
 
   displayMedicalProblemData (entity) {
     let medicalProblemData = ''
 
-    if (entity.patientHistoryDiagnosis.length) {
+    if (entity && entity.patientHistoryDiagnosis.length) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]
           .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
@@ -287,7 +298,8 @@ class Banner extends PureComponent {
           )}
         </div>
 
-        {entity.patientHistoryDiagnosis.length ? (
+        {entity.patientHistoryDiagnosis &&
+        entity.patientHistoryDiagnosis.length ? (
           <Popover
             icon={null}
             content={
@@ -338,7 +350,6 @@ class Banner extends PureComponent {
     } = props
 
     const { entity } = patient
-
     if (!entity)
       return (
         <Paper>
@@ -437,7 +448,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
@@ -452,6 +463,7 @@ class Banner extends PureComponent {
                     .filter((o) => o.schemeTypeFK <= 5)
                     .map((o) => {
                       const schemeData = this.getSchemeDetails(o)
+                      console.log("latest ", schemeData)
                       return (
                         <div>
                           <CodeSelect

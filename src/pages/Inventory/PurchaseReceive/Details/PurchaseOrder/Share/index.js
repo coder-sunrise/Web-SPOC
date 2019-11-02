@@ -46,20 +46,14 @@ class InvoiceSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false, e) => {
-    const { settingGSTEnable,settingGSTPercentage } = this.state
-    const { setFieldValue, prefix, handleCalcInvoiceSummary, IsGSTEnabled } = this.props
-
-    let GSTValue = IsGSTEnabled ? settingGSTPercentage:0
-    setFieldValue(`${prefix}GSTValue`,GSTValue)
-
+    const { settingGSTEnable } = this.state
+    const { setFieldValue, prefix, handleCalcInvoiceSummary } = this.props
     if (!isCheckboxClicked) {
       if (!settingGSTEnable) {
-        setFieldValue(`${prefix}isGstInclusive`, false)
+        setFieldValue(`${prefix}IsGSTInclusive`, false)
       }
-    } else if (e.target.value) {
-      setFieldValue(`${prefix}isGstInclusive`, true)
-    } else {
-      setFieldValue(`${prefix}isGstInclusive`, false)
+    }else{
+      setFieldValue(`${prefix}IsGSTInclusive`, e.target.value)
     }
 
     setTimeout(() => handleCalcInvoiceSummary(), 1)
@@ -72,14 +66,14 @@ class InvoiceSummary extends PureComponent {
     } = this.state
     const {
       toggleInvoiceAdjustment,
-      handleCalcInvoiceSummary,
       handleDeleteInvoiceAdjustment,
       prefix = '',
       adjustmentListName = '',
       adjustmentList = [],
-      IsGSTEnabled,
+      IsGSTEnabled = false,
+      handleCalcInvoiceSummary,
       setFieldValue,
-      isGstInclusive,
+      IsGSTInclusive,
     } = this.props
     return (
       <div style={{ paddingRight: 98, paddingTop: 20 }}>
@@ -143,7 +137,7 @@ class InvoiceSummary extends PureComponent {
                     label={undefined}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
-                    disabled={isGstInclusive}
+                    disabled={IsGSTInclusive}
                     {...args}
                   />
                 )}
@@ -161,7 +155,7 @@ class InvoiceSummary extends PureComponent {
             {IsGSTEnabled ? (
               <GridItem xs={10} md={3} style={{ paddingLeft: 28 }}>
                 <FastField
-                  name={`${prefix}isGstInclusive`}
+                  name={`${prefix}IsGSTInclusive`}
                   render={(args) => {
                     return (
                       <Tooltip

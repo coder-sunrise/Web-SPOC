@@ -87,8 +87,8 @@ const _defaultLayout = [
   {
     id: '2',
     config: {
-      lg: { x: 6, y: 0, w: 6, h: 4, minH: 3, minW: 4 },
-      md: { x: 5, y: 0, w: 5, h: 4, minH: 3, minW: 3 },
+      lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
+      md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
       sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
       xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
       xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
@@ -97,43 +97,45 @@ const _defaultLayout = [
   {
     id: '3',
     config: {
-      lg: { x: 6, y: 4, w: 6, h: 2, minH: 2, minW: 4 },
-      md: { x: 5, y: 4, w: 5, h: 2, minH: 2, minW: 3 },
+      lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
+      md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
       sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
       xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
       xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
     },
   },
   {
-    id: '4',
+    id: '7',
     config: {
-      lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 4 },
-      md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 14, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 14, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 14, w: 2, h: 6, minH: 3, minW: 2 },
+      lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
+      md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
+      sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
+      xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
+      xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
     },
   },
+  {
+    id: '4',
+    config: {
+      lg: { x: 0, y: 18, w: 12, h: 6, minH: 3, minW: 6 },
+      md: { x: 0, y: 18, w: 10, h: 6, minH: 3, minW: 5 },
+      sm: { x: 0, y: 18, w: 6, h: 6, minH: 3, minW: 6 },
+      xs: { x: 0, y: 18, w: 4, h: 6, minH: 3, minW: 4 },
+      xxs: { x: 0, y: 18, w: 2, h: 6, minH: 3, minW: 2 },
+    },
+  },
+
   {
     id: '5',
     config: {
-      lg: { x: 6, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 20, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 20, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 20, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '7',
-    config: {
-      lg: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 0, y: 6, w: 5, h: 6, minH: 3, minW: 3 },
+      lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
+      md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
       sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
       xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
       xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
     },
   },
+
   // {
   //   id: '1002',
   //   config: {

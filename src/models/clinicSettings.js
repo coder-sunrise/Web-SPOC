@@ -53,6 +53,7 @@ export default createFormViewModel({
 
         const clinicSettingsSessionData = JSON.stringify(settings)
         sessionStorage.setItem('clinicSettings', clinicSettingsSessionData)
+
         return {
           settings,
           entity,

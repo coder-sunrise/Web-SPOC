@@ -59,15 +59,6 @@ const PurchaseReceiveDataGrid = ({
         {
           columnName: 'invoiceStatus',
           sortBy: 'invoiceStatusFKNavigation.DisplayValue',
-          render: (row) => {
-            const { purchaseOrderStatus, invoiceStatus } = row
-            if (
-              purchaseOrderStatus === 'Draft' ||
-              purchaseOrderStatus === 'Cancelled'
-            )
-              return <p />
-            return <p>{invoiceStatus}</p>
-          },
         },
         {
           columnName: 'supplier',

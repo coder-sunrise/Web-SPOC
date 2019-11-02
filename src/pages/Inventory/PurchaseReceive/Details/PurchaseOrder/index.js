@@ -47,22 +47,6 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    const { purchaseOrder } = purchaseOrderDetails
-    let IsGSTEnabled
-    let IsGSTInclusive
-    if (purchaseOrder) {
-      IsGSTEnabled = purchaseOrder.isGstInclusive
-      IsGSTInclusive = purchaseOrder.isGstInclusive
-    }
-    return {
-      ...purchaseOrderDetails,
-      purchaseOrder: {
-        ...purchaseOrder,
-        IsGSTEnabled,
-        IsGSTInclusive,
-      },
-    }
-
     const newPurchaseOrderDetails = purchaseOrderDetails
 
     if(newPurchaseOrderDetails){
@@ -77,11 +61,15 @@ const styles = (theme) => ({
 
       if(newPurchaseOrderDetails.purchaseOrder)
       {
-        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = newPurchaseOrderDetails.purchaseOrder.gstAmount > 0
+        const { isGSTEnabled, isGstInclusive } = newPurchaseOrderDetails.purchaseOrder
+        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = isGSTEnabled
+        newPurchaseOrderDetails.purchaseOrder.IsGSTInclusive = isGstInclusive
       }
-    }
 
-    return newPurchaseOrderDetails
+    }
+    return {
+      ...purchaseOrderDetails,
+      }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -292,10 +280,11 @@ class Index extends Component {
           unitPrice: x.unitPrice,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -322,10 +311,11 @@ class Index extends Component {
           totalAfterGst: x.totalAfterGst,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
+          unitOfMeasurement: x.uomString,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
-            [itemType.itemCode]: '',
-            [itemType.itemName]: '',
+            [itemType.itemCode]: x.codeString,
+            [itemType.itemName]: x.nameString,
           },
         }
       })
@@ -352,10 +342,11 @@ class Index extends Component {
             totalAfterGst: x.totalAfterGst,
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
+            unitOfMeasurement: x.uomString,
             [itemType.prop]: {
               [itemType.itemFKName]: x[itemType.itemFKName],
-              [itemType.itemCode]: '',
-              [itemType.itemName]: '',
+              [itemType.itemCode]: x.codeString,
+              [itemType.itemName]: x.nameString,
             },
           }
         } else {
@@ -395,6 +386,7 @@ class Index extends Component {
     let totalAmount = 0
     let gstAmount = 0
     let totalAdjustmentAmount = 0
+    let gstValue = IsGSTEnabled ? settingGSTPercentage : 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
       (x) => !x.isDeleted,
@@ -490,17 +482,14 @@ class Index extends Component {
       })
     }
 
+
     setTimeout(() => {
       setFieldValue('purchaseOrder.gstAmount', gstAmount)
-    }, 1)
-
-    setTimeout(() => {
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
+      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
+      setFieldValue('purchaseOrder.GSTValue',gstValue)
     }, 1)
 
-    setTimeout(() => {
-      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
-    })
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -529,10 +518,15 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
-    const { IsGSTEnabled } = purchaseOrder || false
+    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
+    const isEditable = () => {
+      if (poStatus === 6) return false
+      if (isWriteOff) return false
+      return true
+    }
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -543,7 +537,7 @@ class Index extends Component {
       <div>
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+            rights: isEditable() ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
@@ -562,7 +556,7 @@ class Index extends Component {
         />
         <AuthorizedContext.Provider
           value={{
-            rights: poStatus !== 6 || !isWriteOff ? 'enable' : 'disable',
+            rights: isEditable() ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
@@ -574,8 +568,7 @@ class Index extends Component {
             adjustmentListName='purchaseOrderAdjustment'
             adjustmentList={purchaseOrderAdjustment}
             IsGSTEnabled={IsGSTEnabled}
-            setInclusiveGSTChecked={this.setInclusiveGSTChecked}
-            inclusiveGSTChecked={this.state.inclusiveGSTChecked}
+            IsGSTInclusive={IsGSTInclusive}
             setFieldValue={setFieldValue}
             // {...this.props}
           />

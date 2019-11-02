@@ -108,14 +108,9 @@ class GeneralSetting extends PureComponent {
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    if (data && data.length > 0) {
-      const { isClinicSessionClosed } = data[0]
-      this.setState(() => {
-        return {
-          hasActiveSession: !isClinicSessionClosed,
-        }
-      })
-    }
+    this.setState({
+      hasActiveSession: data.length > 0,
+    })
   }
 
   render () {
@@ -219,7 +214,9 @@ class GeneralSetting extends PureComponent {
           >
             <Button
               color='danger'
-              onClick={navigateDirtyCheck('/setting')}
+              onClick={navigateDirtyCheck({
+                redirectUrl: '/setting',
+              })}
               disabled={hasActiveSession}
             >
               Cancel

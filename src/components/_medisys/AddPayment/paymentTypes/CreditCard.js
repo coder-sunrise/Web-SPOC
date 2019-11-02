@@ -61,6 +61,7 @@ const CreditCard = ({
             name={`paymentList[${index}].creditCardPayment.creditCardNo`}
             render={(args) => (
               <NumberInput
+                max={9999}
                 inputProps={{ maxLength: 4 }}
                 maxLength={4}
                 label='Card No.'

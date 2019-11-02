@@ -24,7 +24,6 @@ export default createFormViewModel({
           IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
-          adjustmentAmount: 0,
         },
         rows: [],
         purchaseOrderMedicationItem: [],
@@ -101,7 +100,6 @@ export default createFormViewModel({
           gstAmount: 0,
           totalAmount: 0,
           exceptedDeliveryDate: '',
-          adjustmentAmount: 0,
         }
 
         return yield put({
@@ -132,7 +130,6 @@ export default createFormViewModel({
             IsGSTInclusive: data.isGstInclusive,
             gstAmount: data.gstAmount,
             totalAmount: data.totalAmount,
-            adjustmentAmount: 0,
           },
         })
       },
@@ -207,7 +204,9 @@ export default createFormViewModel({
           ...state,
           purchaseOrder: {
             ...payload,
-            invoiceStatusFK: getInvoiceStatusFK(payload.invoiceStatus).id,
+            invoiceStatusFK: payload.invoiceStatus
+              ? getInvoiceStatusFK(payload.invoiceStatus).id
+              : null,
             purchaseOrderStatusFK: getPurchaseOrderStatusFK(
               payload.purchaseOrderStatus,
             ).id,

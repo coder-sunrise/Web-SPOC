@@ -199,8 +199,7 @@ class History {
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
   redo () {
-    console.log("88888")
-    console.log(this.redoList[0])
+
     try {
       if (this.redoList.length > 0) {
         if (this.current) this.undoList.push(this.current)

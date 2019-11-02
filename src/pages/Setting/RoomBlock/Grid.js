@@ -44,33 +44,66 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
   }
 
   const [
+    expandedGroups,
+    setExpandedGroups,
+  ] = useState([])
+
+  const handleExpandedGroupsChange = (e) => {
+    setExpandedGroups(e)
+  }
+
+  const [
     tableConfig,
     setTableConfig,
   ] = useState(TableParams)
+
   useEffect(
     () => {
-      const tempTableConfig = {
-        ...TableParams,
-        FuncProps: {
-          ...TableParams.FuncProps,
-          groupingConfig: {
-            state: {
-              grouping: [
-                { columnName: 'roomBlockGroupFK' },
-              ],
-            },
-            row: {
-              contentComponent: GroupCellContent,
-            },
-          },
-        },
+      if (dataSource) {
+        let tempArray = []
+        dataSource.forEach((o) => {
+          tempArray.push(o.roomBlockGroupFK.toString())
+        })
+
+        setExpandedGroups(tempArray)
       }
-      setTableConfig(tempTableConfig)
     },
     [
       dataSource,
     ],
   )
+
+  useEffect(
+    () => {
+      if (dataSource) {
+        const tempTableConfig = {
+          ...TableParams,
+          FuncProps: {
+            ...TableParams.FuncProps,
+            groupingConfig: {
+              state: {
+                grouping: [
+                  { columnName: 'roomBlockGroupFK' },
+                ],
+                expandedGroups: [
+                  ...expandedGroups,
+                ],
+                onExpandedGroupsChange: handleExpandedGroupsChange,
+              },
+              row: {
+                contentComponent: GroupCellContent,
+              },
+            },
+          },
+        }
+        setTableConfig(tempTableConfig)
+      }
+    },
+    [
+      expandedGroups,
+    ],
+  )
+
   const editRoomBlock = (event) => onEditClick(event.currentTarget.id)
 
   const deleteRoomBlock = (event) => onDeleteClick(event.currentTarget.id)

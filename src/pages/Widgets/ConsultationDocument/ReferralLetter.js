@@ -90,7 +90,7 @@ class ReferralLetter extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6}>
-            <Field
+            <FastField
               name='referredByUserFK'
               render={(args) => {
                 return <ClinicianSelect label='From' disabled {...args} />

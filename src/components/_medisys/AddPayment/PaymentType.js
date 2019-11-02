@@ -9,7 +9,12 @@ import styles from './styles'
 import { paymentTypes } from './variables'
 import { PAYMENT_MODE } from '@/utils/constants'
 
-const PayerHeader = ({ classes, disableCash, handlePaymentTypeClick }) => (
+const PayerHeader = ({
+  classes,
+  disableCash,
+  handlePaymentTypeClick,
+  patientInfo,
+}) => (
   <GridContainer alignItems='center' className={classes.paymentTypeRow}>
     <GridItem className={classes.leftAlignText}>
       <h4>Payment Type: </h4>
@@ -60,6 +65,16 @@ const PayerHeader = ({ classes, disableCash, handlePaymentTypeClick }) => (
       >
         <Add />
         GIRO
+      </Button>
+      <Button
+        color='primary'
+        size='sm'
+        id={PAYMENT_MODE.DEPOSIT}
+        onClick={handlePaymentTypeClick}
+        disabled={patientInfo.patientDeposit === undefined}
+      >
+        <Add />
+        Deposit
       </Button>
     </GridItem>
   </GridContainer>

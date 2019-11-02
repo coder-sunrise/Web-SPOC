@@ -44,6 +44,7 @@ const DOGrid = ({ onEditDeliveryOrderClicked, deliveryOrderDetails }) => {
             return (
               <Button
                 size='sm'
+                authority='none'
                 onClick={() => {
                   editRow(row)
                 }}

@@ -37,6 +37,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
 import Header from 'mui-pro-components/Header'
 import Footer from 'mui-pro-components/Footer'
+import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
@@ -110,22 +111,24 @@ class BasicLayout extends React.PureComponent {
     super(props)
     this.state = {
       mobileOpen: false,
+      authorized: false,
     }
     this.resizeFunction = this.resizeFunction.bind(this)
 
     const { dispatch, route: { routes, authority } } = this.props
-    dispatch({
-      type: 'codetable/fetchAllCachedCodetable',
-    })
+
     dispatch({
       type: 'user/fetchCurrent',
-    }).then((d) => {
+    }).then(async (d) => {
       if (!d) return
       reloadAuthorized()
+      await dispatch({
+        type: 'codetable/fetchAllCachedCodetable',
+      })
       const getClinicSettings = sessionStorage.getItem('clinicSettings')
-
+      const getClinicInfo = sessionStorage.getItem('clinicInfo')
       if (getClinicSettings === null) {
-        dispatch({
+        await dispatch({
           type: 'clinicSettings/query',
         })
       } else {
@@ -138,33 +141,41 @@ class BasicLayout extends React.PureComponent {
         })
       }
 
-      dispatch({
-        type: 'clinicInfo/query',
-        payload: localStorage.getItem('clinicCode'),
-      })
+      if (getClinicInfo == null) {
+        await dispatch({
+          type: 'clinicInfo/query',
+          payload: localStorage.getItem('clinicCode'),
+        })
+      } else {
+        const parsedClinicInfo = JSON.parse(getClinicInfo)
+        dispatch({
+          type: 'clinicInfo/updateState',
+          payload: {
+            settings: parsedClinicInfo,
+          },
+        })
+      }
 
       // console.log(routes, authority)
-      dispatch({
+      const menus = await dispatch({
         type: 'menu/getMenuData',
         payload: { routes, authority },
-      }).then((menus) => {
-        // console.log(d, menus)
-        this.getBreadcrumbNameMap = memoizeOne(
-          this.getBreadcrumbNameMap,
-          isEqual,
-        )
-        this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
-        // console.log(this.breadcrumbNameMap)
+      })
+      this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
+      this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
+      // console.log(this.breadcrumbNameMap)
 
-        this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
-        this.getPageTitle = memoizeOne(this.getPageTitle)
-        this.menus = menus
-        this.forceUpdate()
+      this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
+      this.getPageTitle = memoizeOne(this.getPageTitle)
+      this.menus = menus
+      // this.forceUpdate()
+      await dispatch({
+        type: 'global/getUserSettings',
       })
 
-      dispatch({
-        type: 'global/getUserSettings',
-      }).then((response) => {})
+      this.setState({
+        authorized: true,
+      })
     })
 
     initStream()
@@ -478,7 +489,11 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {children}
+                                  {this.state.authorized ? (
+                                    children
+                                  ) : (
+                                    <Loading />
+                                  )}
                                 </div>
                               </div>
                             </ErrorBoundary>

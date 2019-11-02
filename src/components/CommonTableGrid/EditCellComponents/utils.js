@@ -1,4 +1,6 @@
 import { object } from 'prop-types'
+import _ from 'lodash'
+
 import {
   updateGlobalVariable,
   updateCellValue,
@@ -45,7 +47,7 @@ function onComponentChange (args) {
     getRowId,
     ...restProps
   } = cfg
-  const errors = updateCellValue(
+  let errors = updateCellValue(
     this.props,
     this.myRef.current,
     Object.values(args)[0],
@@ -71,6 +73,14 @@ function onComponentChange (args) {
         error,
         ...args,
       })
+
+      // incase other row value has been change, re-valid
+      errors = updateCellValue(
+        this.props,
+        this.myRef.current,
+        latestRow[cfg.columnName],
+      )
+      latestRow._errors = errors
     }
   }
 }

@@ -653,7 +653,7 @@ const consultationDocumentTypes = [
     prop: 'corReferralLetter',
     downloadConfig: {
       id: 9,
-      key: 'referralletterid',
+      key: 'ReferralLetterId',
       draft: (row) => {
         return {
           ReferralLetterDetails: [
