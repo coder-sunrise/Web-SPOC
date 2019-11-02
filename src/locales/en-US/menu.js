@@ -137,4 +137,8 @@ export default {
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.viewreport': 'View Report',
+  
+  'menu.support':'Support',
+  'menu.support.teamviewer':'Teamviewer',
+  'menu.support.druglabel':'Drug Label',
 }
