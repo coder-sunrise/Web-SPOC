@@ -10,6 +10,7 @@ import Consultation from '@/pages/PatientDashboard/Consultation'
 // import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
+import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
 
 const styles = (theme) => ({
   patientModal: {
@@ -343,6 +344,13 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
+        {global.reportTypeID && (
+          <ReportModal
+          // onReportViewerClose={this.handleReportViewerClose}
+          // reportTypeID={global.reportTypeID}
+          // reportParameters={global.reportParameters}
+          />
+        )}
       </div>
     )
   }

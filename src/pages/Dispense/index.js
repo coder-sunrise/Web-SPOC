@@ -28,7 +28,7 @@ import { postPDF, exportPdfReport } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 import { queryDrugLabelDetails } from '@/services/dispense'
-// model
+
 @connect(
   ({
     dispense,
@@ -138,7 +138,17 @@ class Dispense extends PureComponent {
         const reportParameters = {
           [downloadConfig.key]: row.sourceFK,
         }
-        exportPdfReport(downloadConfig.id, reportParameters)
+        this.props.dispatch({
+          type: 'global/updateState',
+          payload: {
+            reportTypeID: downloadConfig.id,
+            reportParameters: {
+              [downloadConfig.key]: row.id,
+              isSaved: true,
+            },
+          },
+        })
+        // exportPdfReport(downloadConfig.id, reportParameters)
       }
     }
   }

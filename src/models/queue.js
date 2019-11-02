@@ -3,7 +3,10 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
-import { StatusIndicator } from '@/pages/Reception/Queue/variables'
+import {
+  StatusIndicator,
+  VISIT_STATUS,
+} from '@/pages/Reception/Queue/variables'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -26,6 +29,7 @@ export default createListViewModel({
       list: [],
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
+      appointmentList: [],
       currentFilter: StatusIndicator.ALL,
       selfOnly: false,
       error: {
@@ -181,29 +185,40 @@ export default createListViewModel({
       *getTodayAppointments ({ payload }, { call, put }) {
         const { shouldGetTodayAppointments = true } = payload
         // TODO: integrate with new appointment listing api
-        // const today = moment().formatUTC()
-        // const queryPayload = {
-        //   combineCondition: 'and',
-        //   eql_appointmentDate: today,
-        //   in_appointmentStatusFk: '1|2|5',
-        // }
-        // const response = yield call(
-        //   service.queryAppointmentListing,
-        //   queryPayload,
-        // )
-        // console.log({ response })
-        if (shouldGetTodayAppointments) {
-          const today = moment().formatUTC()
-
+        const today = moment().formatUTC()
+        const queryPayload = {
+          combineCondition: 'and',
+          eql_appointmentDate: today,
+          in_appointmentStatusFk: '1|2|5',
+        }
+        const response = yield call(
+          service.queryAppointmentListing,
+          queryPayload,
+        )
+        if (response) {
+          const { data: { data = [] } } = response
           yield put({
-            type: 'calendar/getCalendarList',
+            type: 'updateState',
             payload: {
-              combineCondition: 'and',
-              eql_appointmentDate: today,
-              in_appointmentStatusFk: '1|2|5',
+              appointmentList: data.map((item) => ({
+                ...item,
+                visitStatus: VISIT_STATUS.UPCOMING_APPT,
+              })),
             },
           })
         }
+        // if (shouldGetTodayAppointments) {
+        //   const today = moment().formatUTC()
+
+        //   yield put({
+        //     type: 'calendar/getCalendarList',
+        //     payload: {
+        //       combineCondition: 'and',
+        //       eql_appointmentDate: today,
+        //       in_appointmentStatusFk: '1|2|5',
+        //     },
+        //   })
+        // }
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
         const result = yield call(service.deleteQueue, payload)
