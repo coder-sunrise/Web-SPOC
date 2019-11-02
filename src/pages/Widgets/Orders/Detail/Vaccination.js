@@ -25,7 +25,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    unitPrice: Yup.number().required(),
+    // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
