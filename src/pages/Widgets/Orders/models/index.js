@@ -42,7 +42,7 @@ export default createListViewModel({
         vaccinationGivenDate: moment(),
         quantity: 1,
       },
-      defaultConsumable: {},
+      defaultConsumable: { quantity: 1 },
       defaultPackage: {
         packageItems: [],
       },
