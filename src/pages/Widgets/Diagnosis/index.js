@@ -93,7 +93,14 @@ class Diagnosis extends PureComponent {
       nextProps.diagnosis.shouldAddNew
     ) {
       // console.log('shouldAddNew')
-      this.addDiagnosis(this.diagnosises.length + 1)
+
+      let index = 0
+      if (this.diagnosises.length === 0) {
+        index = 1
+      } else {
+        index = this.diagnosises[this.diagnosises.length - 1].sequence
+      }
+      this.addDiagnosis(index + 1)
       this.props.dispatch({
         type: 'diagnosis/updateState',
         payload: {
