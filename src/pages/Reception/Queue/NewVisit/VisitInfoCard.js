@@ -129,6 +129,7 @@ const VisitInfoCard = ({
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
             isReadOnly={isReadOnly}
+            page='visit registration'
           />
         </GridItem>
       </GridContainer>
