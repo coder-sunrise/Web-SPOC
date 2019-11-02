@@ -59,6 +59,7 @@ class Details extends PureComponent {
             <Button
               link
               style={{ float: 'left' }}
+              disabled={this.state.disableEdit}
               onClick={this.showAdjustment}
             >
               {currencySymbol} Adjustment
