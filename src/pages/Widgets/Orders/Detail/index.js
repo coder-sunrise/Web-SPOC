@@ -1,8 +1,6 @@
-import React, { Component, PureComponent } from 'react'
-import { connect } from 'dva'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
-import Yup from '@/utils/yup'
 import { orderTypes } from '@/utils/codes'
 
 import {
@@ -158,18 +156,9 @@ class Details extends PureComponent {
   }
 
   render () {
-    const { props, state } = this
-    const {
-      theme,
-      classes,
-      orders,
-      values,
-      rowHeight,
-      footer,
-      dispatch,
-    } = props
-    const { type, entity } = orders
-    // console.log(values)
+    const { props } = this
+    const { classes, orders, dispatch } = props
+    const { type } = orders
 
     const cfg = {
       disableEdit: this.state.disableEdit,
@@ -197,6 +186,7 @@ class Details extends PureComponent {
                   dispatch({
                     type: 'orders/updateState',
                     payload: {
+                      entity: undefined,
                       type: key,
                     },
                   })

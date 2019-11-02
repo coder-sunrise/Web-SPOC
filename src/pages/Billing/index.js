@@ -90,12 +90,13 @@ const bannerStyle = {
           ...billing.entity,
           finalClaim,
           finalPayable,
+          visitId: billing.visitID,
         }
       }
     } catch (error) {
       console.log({ error })
     }
-    return billing.default
+    return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -346,7 +347,6 @@ class Billing extends Component {
       values,
       setFieldValue,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner style={bannerStyle} />
