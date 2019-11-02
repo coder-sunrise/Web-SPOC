@@ -135,11 +135,10 @@ class Dispense extends PureComponent {
           return
         }
         const { downloadConfig } = documentType
-
-        exportPdfReport(
-          downloadConfig.id,
-          `${downloadConfig.key}:${row.sourceFK}`,
-        )
+        const reportParameters = {
+          [downloadConfig.key]: row.sourceFK,
+        }
+        exportPdfReport(downloadConfig.id, reportParameters)
       }
     }
   }

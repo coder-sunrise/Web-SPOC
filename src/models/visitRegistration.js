@@ -83,6 +83,8 @@ export default createFormViewModel({
             visitInfo: {},
             patientInfo: {},
             errorState: {},
+            roomFK: undefined,
+            appointmentFK: undefined,
           },
         })
         yield put({
@@ -158,6 +160,9 @@ export default createFormViewModel({
       },
     },
     reducers: {
+      // resetState (state, { payload }) {
+      //   return { ...state, ...payload }
+      // },
       updateErrorState (state, { payload }) {
         return {
           ...state,

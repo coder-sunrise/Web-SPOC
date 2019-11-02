@@ -30,7 +30,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
+  handleSubmit: (values, { props,onConfirm }) => {
     const { dispatch, onConfirm, orders, currentType } = props
     const { rows } = orders
     const data = {

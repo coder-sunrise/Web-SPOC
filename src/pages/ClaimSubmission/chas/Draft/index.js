@@ -17,11 +17,7 @@ import {
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 // variables
-import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  TableConfig,
-} from './variables'
+import { DraftCHASColumnExtensions, DraftCHASColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -87,9 +83,16 @@ class DraftCHAS extends React.Component {
           <GridItem md={12}>
             <TableGrid
               data={list}
-              columnExtensions={NewCHASColumnExtensions}
-              columns={NewCHASColumns}
-              tableConfig={TableConfig}
+              columnExtensions={DraftCHASColumnExtensions}
+              columns={DraftCHASColumns}
+              // tableConfig={TableConfig}
+              // FuncProps={{
+              //   selectable: false,
+              //   selectConfig: {
+              //     showSelectAll: true,
+              //     rowSelectionEnabled: () => true,
+              //   },
+              // }}
               onContextMenuItemClick={handleContextMenuItemClick}
               contextMenuOptions={overrideContextMenuOptions}
               isDraft

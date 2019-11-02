@@ -61,8 +61,8 @@ export const ValidationSchema = Yup.object().shape({
           amt: Yup.number()
             .min(0)
             .max(
-              collectableAmount,
-              `Total amount paid cannot exceed $${collectableAmount}`,
+              finalPayable,
+              `Total amount paid cannot exceed $${finalPayable}`,
             )
             .required(),
           creditCardPayment: Yup.object().when('paymentModeFK', {

@@ -27,6 +27,7 @@ import {
 import {
   getPDF,
   getUnsavedPDF,
+  exportUnsavedReport,
   exportPdfReport,
   exportExcelReport,
 } from '@/services/report'
@@ -129,12 +130,19 @@ const ReportViewer = ({
     //   downloadFile(base64Result, `${fileName}${fileExtension}`)
     // }
 
+    if (unsavedReport) {
+      const reportFormat = key === 'export-excel' ? 'excel' : 'pdf'
+      exportUnsavedReport(reportID, reportFormat, reportContent)
+      return true
+    }
+    console.log({ reportParameters })
     if (key === 'export-excel') {
-      exportExcelReport(reportID, reportParameters)
+      exportExcelReport(reportID, JSON.stringify(reportParameters))
       // fileExtension = '.xls'
     } else {
       exportPdfReport(reportID, reportParameters)
     }
+    return true
   }
 
   const onPageNumberChange = (value) => {
