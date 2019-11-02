@@ -17,13 +17,16 @@ import * as service from '@/services/common'
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
+    console.log('========= ', visitEntity)
     const values = {
       ...(consultationDocument.entity ||
         consultationDocument.defaultCertOfAttendance),
       attendanceStartTime: visitEntity.visit
         ? moment(visitEntity.visit.visitDate).format('HH:mm')
         : moment().format('HH:mm'),
-      attendanceEndTime: moment().format('HH:mm'),
+      attendanceEndTime: visitEntity.visit
+        ? moment(visitEntity.visit.timeOut).format('HH:mm')
+        : moment().format('HH:mm'),
     }
     return values
   },
@@ -119,6 +122,7 @@ class CertificateAttendance extends PureComponent {
             <FastField
               name='attendanceEndTime'
               render={(args) => {
+                console.log('--------- ', args)
                 return <TimePicker label='To' {...args} />
               }}
             />
