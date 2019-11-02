@@ -89,6 +89,8 @@ class Orders extends PureComponent {
       setValues({
         ...values,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceCode: this.state.services.find((o) => o.value === serviceFK)
+          .code,
         serviceName: this.state.services.find((o) => o.value === serviceFK)
           .name,
         unitPrice: serviceCenterService.unitPrice,

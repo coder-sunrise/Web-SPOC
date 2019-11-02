@@ -63,6 +63,7 @@ class ReferralCard extends PureComponent {
               handleUpdateAttachments={handleUpdateAttachments}
               attachments={attachments}
               isReadOnly={isReadOnly}
+              page='visit registration'
             />
           </GridItem>
         </GridContainer>
