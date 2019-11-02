@@ -31,8 +31,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     total: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,

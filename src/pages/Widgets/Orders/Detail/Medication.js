@@ -72,8 +72,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     ),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
 
     const data = {

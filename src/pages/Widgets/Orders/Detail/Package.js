@@ -33,8 +33,8 @@ const { qtyFormat } = config
   validationSchema: Yup.object().shape({
     inventorypackageFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders } = props
     const { rows } = orders
     const getOrderMedicationFromPackage = (packageCode, packageItem) => {
       const { inventoryMedication } = packageItem

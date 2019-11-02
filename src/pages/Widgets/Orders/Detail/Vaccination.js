@@ -34,8 +34,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     uomfk: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
