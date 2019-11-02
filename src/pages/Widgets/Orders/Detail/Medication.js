@@ -334,7 +334,9 @@ class Medication extends PureComponent {
         setFieldValue(`corPrescriptionItemPrecaution[${i}].sequence`, i)
       })
     } else {
-      setFieldValue(`corPrescriptionItemPrecaution`, [])
+      setFieldValue(`corPrescriptionItemPrecaution`, [
+        {},
+      ])
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
