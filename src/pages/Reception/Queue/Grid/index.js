@@ -112,8 +112,6 @@ const Grid = ({
     user,
   ])
 
-  console.log({ queueListingData })
-
   const deleteQueueConfirmation = (row) => {
     const { queueNo, id } = row
 
@@ -288,16 +286,17 @@ const Grid = ({
           break
         }
         case '8': {
-          // TODO: wait for API changes
+          const { clinicianprofile = [] } = codetable
+          const doctorProfile = clinicianprofile.find(
+            (item) => item.id === row.clinicianProfileFk,
+          )
+          console.log({ doctorProfile })
+
           handleActualizeAppointment({
             patientID: row.patientProfileFk,
             appointmentID: row.id,
-            primaryClinicianFK: row.appointment_Resources.find(
-              (item) => item.isPrimaryClinician,
-            ).clinicianFK,
-            primaryClinicianRoomFK: row.appointment_Resources.find(
-              (item) => item.isPrimaryClinician,
-            ).roomFk,
+            primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
+            primaryClinicianRoomFK: row.roomFk,
           })
           break
         }

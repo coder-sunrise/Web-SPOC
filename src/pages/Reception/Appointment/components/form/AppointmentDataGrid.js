@@ -93,7 +93,7 @@ class AppointmentDataGrid extends React.Component {
 
             const { clinicianProfiles = [] } = this.props
             const clinicianProfile = clinicianProfiles.find(
-              (item) => item.id === clinicianFK,
+              (item) => item.userProfileFK === clinicianFK,
             )
 
             if (!clinicianProfile) return null
