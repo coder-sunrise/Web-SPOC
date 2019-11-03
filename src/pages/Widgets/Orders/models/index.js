@@ -2,12 +2,7 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 
-import {
-  getUniqueId,
-  maxReducer,
-  sumReducer,
-  calculateAmount,
-} from '@/utils/utils'
+import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
   quantity: 0,
@@ -35,7 +30,7 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      // type: '1',
+      type: '1',
       rows: [],
       finalAdjustments: [],
       summary: {},
@@ -47,7 +42,7 @@ export default createListViewModel({
         vaccinationGivenDate: moment(),
         quantity: 1,
       },
-      defaultConsumable: {},
+      defaultConsumable: { quantity: 1 },
       defaultPackage: {
         packageItems: [],
       },
@@ -134,6 +129,7 @@ export default createListViewModel({
 
     reducers: {
       upsertRowState (state, { payload }) {
+        let newRow
         let { rows } = state
         if (payload.uid) {
           rows = rows.map((row) => {
@@ -147,17 +143,16 @@ export default createListViewModel({
             return n
           })
         } else {
-          rows.push({
+          newRow = {
             ...payload,
             uid: getUniqueId(),
-          })
+          }
+          rows.push(newRow)
         }
-        const defaultValue = resetDefaulVlue(state.type)
         return {
           ...state,
           rows,
-          // type: undefined,
-          entity: undefined,
+          entity: newRow,
           // totalAfterAdj: undefined,
         }
       },
@@ -170,11 +165,10 @@ export default createListViewModel({
             uid: getUniqueId(),
           })
         }
-        // const defaultValue = resetDefaulVlue(state.type)
         return {
           ...state,
           rows,
-          // type: undefined,
+          type: state.type === '6' ? undefined : state.type,
           entity: undefined,
           // totalAfterAdj: undefined,
         }

@@ -1,6 +1,6 @@
 import { CommonTableGrid, Select } from '@/components'
 
-export default ({ current }) => (
+export default ({ current, codetable }) => (
   <CommonTableGrid
     size='sm'
     rows={current.orders || []}
@@ -20,6 +20,59 @@ export default ({ current }) => (
             <div>
               {row.type}
               {row.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+            </div>
+          )
+        },
+      },
+      {
+        columnName: 'description',
+
+        render: (row) => {
+          let text = ''
+          const {
+            ctmedicationusage,
+            ctmedicationdosage,
+            ctmedicationunitofmeasurement,
+            ctmedicationfrequency,
+          } = codetable
+
+          if (
+            !ctmedicationusage ||
+            !ctmedicationdosage ||
+            !ctmedicationunitofmeasurement ||
+            !ctmedicationfrequency
+          )
+            return null
+          return (
+            <div>
+              {row.corPrescriptionItemInstruction ? (
+                row.corPrescriptionItemInstruction.map((item) => {
+                  text = ''
+                  const usageMethod = ctmedicationusage.filter(
+                    (codeTableItem) => codeTableItem.id === item.usageMethodFK,
+                  )
+                  text += `${usageMethod[0].name} `
+                  text += ' '
+                  const dosage = ctmedicationdosage.filter(
+                    (codeTableItem) => codeTableItem.id === item.dosageFK,
+                  )
+                  text += `${dosage[0].displayValue} `
+                  const prescribe = ctmedicationunitofmeasurement.filter(
+                    (codeTableItem) => codeTableItem.id === item.prescribeUOMFK,
+                  )
+                  text += `${prescribe[0].name} `
+                  const drugFrequency = ctmedicationfrequency.filter(
+                    (codeTableItem) =>
+                      codeTableItem.id === item.drugFrequencyFK,
+                  )
+                  text += `${drugFrequency[0].displayValue} For `
+                  text += `${item.duration} day(s)`
+
+                  return <p>{text}</p>
+                })
+              ) : (
+                ''
+              )}
             </div>
           )
         },

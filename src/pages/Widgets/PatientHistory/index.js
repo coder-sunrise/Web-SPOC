@@ -263,11 +263,27 @@ class PatientHistory extends Component {
 
   componentDidMount () {
     const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctComplication',
-      },
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'ctComplication',
+    //   },
+    // })
+
+    const codeTableNameArray = []
+    codeTableNameArray.push('ctComplication')
+    codeTableNameArray.push('ctMedicationUsage')
+    codeTableNameArray.push('ctMedicationDosage')
+    codeTableNameArray.push('ctMedicationUnitOfMeasurement')
+    codeTableNameArray.push('ctMedicationFrequency')
+
+    codeTableNameArray.forEach((o) => {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: o,
+        },
+      })
     })
 
     dispatch({
@@ -297,12 +313,13 @@ class PatientHistory extends Component {
 
   getContent = (row) => {
     const { patientHistory, mode, clinicSettings } = this.props
+    const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
 
     let newArray = []
     if (
-      clinicSettings.settings.showConsultationVersioning === false ||
-      clinicSettings.settings.showConsultationVersioning === undefined
+      settings.showConsultationVersioning === false ||
+      settings.showConsultationVersioning === undefined
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
@@ -596,9 +613,13 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-
+    const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
+
     const cfg = {}
+
+    if (!clinicSettings) return null
+
     if (mode === 'split') {
       cfg.style = style
     } else if (mode === 'integrated') {
@@ -617,14 +638,14 @@ class PatientHistory extends Component {
           hideHeader
           size='sm'
           className={classnames({
-            [classes.leftPanel]: !widget ? true : false,
+            [classes.leftPanel]: !widget,
             [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget ? true : false,
+            [override.leftPanel]: !widget,
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.showConsultationVersioning === false ||
-          clinicSettings.settings.showConsultationVersioning === undefined ? (
+          0 ? settings.showConsultationVersioning === false ||
+          settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion

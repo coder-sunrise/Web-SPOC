@@ -1,12 +1,10 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import {
   GridContainer,
   GridItem,
   TextField,
   CodeSelect,
-  confirm,
-  RichEditor,
   NumberInput,
   FastField,
   withFormikExtend,
@@ -32,7 +30,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, resetForm, onConfirm }) => {
+  handleSubmit: (values, { props, onConfirm }) => {
     const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
@@ -44,8 +42,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
-    }).then((response) => {
-      resetForm()
     })
     if (onConfirm) onConfirm()
   },
@@ -70,6 +66,7 @@ class Consumable extends PureComponent {
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values } = this.props
     console.log(v, op)
+    setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
@@ -99,14 +96,7 @@ class Consumable extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      classes,
-      values,
-      footer,
-      handleSubmit,
-      setFieldValue,
-    } = this.props
+    const { values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>

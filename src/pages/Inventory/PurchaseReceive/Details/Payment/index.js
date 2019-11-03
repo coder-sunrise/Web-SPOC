@@ -30,22 +30,20 @@ const styles = (theme) => ({
 @withFormikExtend({
   displayName: 'podoPayment',
   enableReinitialize: true,
-  mapPropsToValues: ({ podoPayment, purchaseOrderDetails }) => {
-    let outstandingAmt = 0
+  mapPropsToValues: ({ podoPayment }) => {
+    let outstandingAmount = {}
     if (
-      purchaseOrderDetails &&
-      purchaseOrderDetails.purchaseOrder &&
-      purchaseOrderDetails.purchaseOrder.invoiceStatusFK ===
-        INVOICE_STATUS.WRITEOFF
+      podoPayment &&
+      podoPayment.purchaseOrderDetails &&
+      podoPayment.purchaseOrderDetails.outstandingAmount
     ) {
-      purchaseOrderDetails.purchaseOrder.outstandingAmount = 0
-      outstandingAmt = 0
+      outstandingAmount = {
+        outstandingAmt: podoPayment.purchaseOrderDetails.outstandingAmount,
+      }
     }
-    if (podoPayment.purchaseOrderDetails)
-      podoPayment.purchaseOrderDetails.outstandingAmount = outstandingAmt
     return {
       ...podoPayment,
-      outstandingAmt,
+      ...outstandingAmount,
     }
   },
   handleSubmit: (values, { props }) => {
