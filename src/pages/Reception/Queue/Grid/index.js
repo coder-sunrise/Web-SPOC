@@ -290,8 +290,6 @@ const Grid = ({
           const doctorProfile = clinicianprofile.find(
             (item) => item.id === row.clinicianProfileFk,
           )
-          console.log({ doctorProfile })
-
           handleActualizeAppointment({
             patientID: row.patientProfileFk,
             appointmentID: row.id,
