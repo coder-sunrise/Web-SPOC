@@ -1077,6 +1077,7 @@ export const getServices = (data) => {
   const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
     return {
       value: o[0].serviceId,
+      code: o[0].code,
       name: o[0].displayValue,
       serviceCenters: o.map((m) => {
         return {
