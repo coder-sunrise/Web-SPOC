@@ -177,6 +177,7 @@ class Banner extends PureComponent {
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
+      console.log('result ==========', result)
       if (result) {
         const {
           balance,
@@ -448,7 +449,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
