@@ -20,11 +20,11 @@ export const ApprovedCHASColumns = [
     title: 'Diagnosis',
   },
   {
-    name: 'schemeType',
+    name: 'schemeTypeDisplayValue',
     title: 'Scheme Type',
   },
   {
-    name: 'schemeCategory',
+    name: 'schemeCategoryDisplayValue',
     title: 'Scheme Category',
   },
   {
