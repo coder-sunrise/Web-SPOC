@@ -124,14 +124,12 @@ class Report extends React.Component {
         <GridContainer>
           <GridItem md={3}>
             <FastField
-              name='start'
+              name='copaymentschemename'
               render={(args) => (
-                <TextField
+                <CodeSelect
                   {...args}
-                  label='Start'
-                  // format='hh:mm A'
-                  // inputProps={{ maxLength: 5 }}
-                  maxLength={5}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
                 />
               )}
             />
