@@ -85,10 +85,10 @@ const columnExtensions = [
     columnName: 'roomNo',
     render: (row) => row.roomNo || '-',
   },
-  {
-    columnName: 'patientScheme',
-    render: (row) => row.patientScheme || '-',
-  },
+  // {
+  //   columnName: 'patientScheme',
+  //   render: (row) => row.patientScheme || '-',
+  // },
   {
     columnName: 'invoicePaymentMode',
     width: 150,
