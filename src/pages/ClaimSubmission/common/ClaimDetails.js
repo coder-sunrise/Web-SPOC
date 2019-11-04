@@ -3,6 +3,7 @@ import { connect } from 'dva'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common components
+import moment from 'moment'
 import {
   Button,
   DatePicker,
@@ -88,7 +89,7 @@ class ClaimDetails extends Component {
     const { ctgender = [] } = codetable
     const {
       clinicianProfile: { title, name, doctorProfile },
-      patientDetail: { age, genderFK },
+      patientDetail: { dob, genderFK },
       patientName,
       // tier: maxDiagnosisSelectionCount,
       visitDate,
@@ -96,6 +97,7 @@ class ClaimDetails extends Component {
       invoiceDate,
       diagnosis,
     } = values
+    const age = moment().diff(dob, 'years')
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
@@ -210,7 +212,7 @@ class ClaimDetails extends Component {
               <GridItem md={12} container>
                 <GridItem md={5}>
                   <FastField
-                    name='schemeType'
+                    name='schemeTypeDisplayValue'
                     render={(args) => (
                       <TextField {...args} disabled label='Scheme Type' />
                     )}
@@ -219,7 +221,7 @@ class ClaimDetails extends Component {
                 <GridItem md={7} />
                 <GridItem md={5}>
                   <FastField
-                    name='schemeCategory'
+                    name='schemeCategoryDisplayValue'
                     render={(args) => (
                       <TextField {...args} disabled label='Scheme Category' />
                     )}
@@ -264,15 +266,6 @@ class ClaimDetails extends Component {
                     maxSelected={maxDiagnosisSelectionCount}
                     mode='multiple'
                     options={diagnosis}
-                    // options={[
-                    //   { name: 'Chief Complaints', value: 1 },
-                    //   { name: 'Plan', value: 2 },
-                    //   { name: 'Diagnosis', value: 3 },
-                    //   { name: 'Consultation Document', value: 4 },
-                    //   { name: 'Orders', value: 5 },
-                    //   { name: 'Invoice', value: 7 },
-                    // ]}
-                    value={[]}
                     onChange={this.onSelectChange}
                     maxTagCount={2}
                   />

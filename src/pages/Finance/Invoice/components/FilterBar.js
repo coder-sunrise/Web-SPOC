@@ -13,7 +13,7 @@ import {
   Select,
 } from '@/components'
 
-import { osBalanceStatus } from '@/utils/codes'
+import { osBalanceStatus,sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
   return (
@@ -71,7 +71,16 @@ const FilterBar = ({ classes, dispatch, values }) => {
               render={(args) => <TextField label='Patient Name' {...args} />}
             />
           </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='session'
+              render={(args) => (
+                <Select label='Session' options={sessionOptions} {...args} />
+              )}
+            />
+          </GridItem>
         </GridContainer>
+
         <div className={classes.searchButton}>
           <Button
             color='primary'

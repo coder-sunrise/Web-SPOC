@@ -273,17 +273,25 @@ class DODetails extends PureComponent {
   }
 
   handleItemOnChange = (e, type) => {
-    const { dispatch } = this.props
+    const { dispatch, deliveryOrderDetails } = this.props
     const { option, row } = e
     const { sellingPrice, uom, name, value } = option
-
     if (type === 'code') {
-      row.name = option.name
+      row.name = value
     } else {
-      row.code = option.code
+      row.code = value
     }
 
     row.uom = option.uom
+
+    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+    let osItem = purchaseOrderOutstandingItem.filter(
+      (x) => x.code === option.value,
+    )[0]
+
+    row.maxCurrentReceivingQty = osItem.orderQuantity
+    row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
 
     this.setState({
       selectedItem: option,
@@ -297,7 +305,6 @@ class DODetails extends PureComponent {
 
   handleSelectedBatch = (e) => {
     // console.log('handleSelectedBatch', e)
-    console.log(e)
     const { option, row, val } = e
     if (val) {
       row.batchNo = val[0]
@@ -364,7 +371,6 @@ class DODetails extends PureComponent {
           )[0]
 
           this.setState({ onClickColumn: undefined })
-
           return addedRows.map((row) => ({
             ...row,
             itemFK: selectedItem.value,
@@ -385,7 +391,7 @@ class DODetails extends PureComponent {
             tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
               ? ''
               : tempCurrentReceivingBonusQty
-          this.forceUpdate()
+          // this.forceUpdate()
         }
 
         this.setState({ onClickColumn: undefined })

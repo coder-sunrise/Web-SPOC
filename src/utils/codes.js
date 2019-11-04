@@ -32,6 +32,11 @@ const osBalanceStatus = [
   { value: 'no', name: 'No', color: 'no' },
 ]
 
+const sessionOptions = [
+  { value: 'all', name: 'All Sessions'},
+  { value: 'current', name: 'Current Session'}
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1385,6 +1390,7 @@ module.exports = {
   currencyRoundingToTheClosestList,
   coPayerType,
   // country,
+  sessionOptions,
   consultationDocumentTypes,
   getServices,
   tagList,
