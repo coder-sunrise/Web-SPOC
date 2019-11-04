@@ -13,7 +13,7 @@ import {
   Select,
 } from '@/components'
 
-import { osBalanceStatus,sessionOptions } from '@/utils/codes'
+import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
   return (
@@ -95,6 +95,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
+                  // combineCondition: 'and',
                   lgteql_invoiceDate: invoiceDates
                     ? invoiceDates[0]
                     : undefined,
@@ -116,7 +117,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                       invoiceNo,
                       'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
                       'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-                      combineCondition: 'or',
+                      combineCondition: 'and',
                     },
                   ],
                 },
