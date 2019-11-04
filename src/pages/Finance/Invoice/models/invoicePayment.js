@@ -79,48 +79,52 @@ export default createFormViewModel({
         const bizSessionState = yield select(
           (state) => state.invoicePayment.currentBizSessionInfo,
         )
+        console.log({ payload, bizSessionState })
         const { invoicePaymentList, invoicePayerFK } = payload
         let addPaymentPayload = {}
-        let invoicePaymentMode = []
+        // let invoicePaymentMode = []
         const {
           cashReceived,
           cashReturned,
+          cashRounding,
           totalAmtPaid,
-          paymentModes,
+          invoicePaymentMode,
         } = invoicePaymentList
 
-        invoicePaymentMode = invoicePaymentMode.concat(
-          paymentModes.map((x) => {
-            const pMode = paymentMode.filter(
-              (y) => x.paymentModeFK === y.paymentModeFK,
-            )[0]
-            return {
-              ...x,
-              [pMode.objName]: [
-                { ...x },
-              ],
-            }
-          }),
-        )
+        // invoicePaymentMode = invoicePaymentMode.concat(
+        //   paymentModes.map((x) => {
+        //     const pMode = paymentMode.filter(
+        //       (y) => x.paymentModeFK === y.paymentModeFK,
+        //     )[0]
+        //     return {
+        //       ...x,
+        //       [pMode.objName]: [
+        //         { ...x },
+        //       ],
+        //     }
+        //   }),
+        // )
 
-        addPaymentPayload = {
-          totalAmtPaid,
-          cashReceived,
-          cashReturned,
-          paymentReceivedDate: moment().formatUTC(false),
-          paymentReceivedByUserFK: userState.id,
-          paymentReceivedBizSessionFK: bizSessionState.id,
-          paymentCreatedBizSessionFK: bizSessionState.id,
-          invoicePayerFK,
-          invoicePaymentMode,
-        }
+        addPaymentPayload = [
+          {
+            totalAmtPaid,
+            cashReceived,
+            cashReturned,
+            paymentReceivedDate: moment().formatUTC(false),
+            paymentReceivedByUserFK: userState.id,
+            paymentReceivedBizSessionFK: bizSessionState.id,
+            paymentCreatedBizSessionFK: bizSessionState.id,
+            invoicePayerFK,
+            invoicePaymentMode,
+          },
+        ]
 
         const response = yield call(service.addPayment, addPaymentPayload)
         const { status } = response
 
-        if (status === '200') {
+        if (parseInt(status, 10) === 200) {
           notification.success({
-            message: 'Saved',
+            message: 'Payment added',
           })
           return true
         }

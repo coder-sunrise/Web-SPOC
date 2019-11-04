@@ -35,7 +35,7 @@ export const AppointmentDataColExtensions = [
     type: 'codeSelect',
     code: 'doctorprofile',
     labelField: 'clinicianProfile.name',
-    valueField: 'clinicianProfile.userProfileFK',
+    valueField: 'clinicianProfile.id',
     renderDropdown: (option) => <DoctorLabel doctor={option} />,
   },
   {
