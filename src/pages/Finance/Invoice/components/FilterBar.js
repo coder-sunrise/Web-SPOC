@@ -12,10 +12,22 @@ import {
   TextField,
   Select,
 } from '@/components'
-
-import { osBalanceStatus,sessionOptions } from '@/utils/codes'
+import { getBizSession } from '@/services/queue'
+import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
+  const getBizSessionId = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    if (data.length > 0) {
+      return data[0].id
+    }
+    return null
+  }
+
   return (
     <SizeContainer>
       <React.Fragment>
@@ -84,14 +96,19 @@ const FilterBar = ({ classes, dispatch, values }) => {
         <div className={classes.searchButton}>
           <Button
             color='primary'
-            onClick={() => {
+            onClick={async () => {
               const {
                 invoiceNo,
                 patientName,
                 patientAccountNo,
                 invoiceDates,
                 outstandingBalanceStatus,
+                session,
               } = values
+              let SessionID
+              if (session === 'current') {
+                SessionID = await getBizSessionId()
+              }
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
@@ -111,6 +128,9 @@ const FilterBar = ({ classes, dispatch, values }) => {
                     outstandingBalanceStatus !== 'all'
                       ? '0'
                       : undefined,
+                  apiCriteria: {
+                    SessionID,
+                  },
                   group: [
                     {
                       invoiceNo,
