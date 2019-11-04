@@ -1,8 +1,7 @@
 import { CommonTableGrid } from '@/components'
-import { printRow } from '../ConsultationDocument'
+import { printRow, viewReport } from '../ConsultationDocument'
 
 export default ({ current }) => {
-
   return (
     <CommonTableGrid
       size='sm'
@@ -18,7 +17,8 @@ export default ({ current }) => {
           columnName: 'subject',
           type: 'link',
           linkField: 'href',
-          onClick: printRow,
+          // onClick: printRow,
+          onClick: viewReport,
         },
         {
           columnName: 'from',

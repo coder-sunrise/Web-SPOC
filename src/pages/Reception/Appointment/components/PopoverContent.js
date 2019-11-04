@@ -170,10 +170,10 @@ class PopoverContent extends React.Component {
             <GridItem md={12}>
               <CodeSelect
                 disabled
-                code='clinicianprofile'
+                code='doctorprofile'
                 label='Doctor'
-                labelField='name'
-                valueField='id'
+                labelField='clinicianProfile.name'
+                valueField='clinicianProfile.userProfileFK'
                 value={clinicianFK}
               />
             </GridItem>

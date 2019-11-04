@@ -23,7 +23,7 @@ class CodeSelect extends React.PureComponent {
           code: props.code,
           filter: props.remoteFilter,
         }).then((response) => {
-          if (response || isPreviouslyFiltered) {
+          if (response || isPreviouslyFiltered || props.remoteFilter) {
             dispatch({
               type: 'codetable/fetchCodes',
               payload: {
@@ -50,14 +50,12 @@ class CodeSelect extends React.PureComponent {
 
   componentWillUnmount () {
     // const { code } = props
-    // console.log({ props: this.props })
   }
 
   render () {
-    const { codetable, code } = this.props
+    const { codetable, code, remoteFilter } = this.props
     const options =
       code !== undefined ? codetable[code.toLowerCase()] : this.state.options
-
     return <Select options={options || []} valueField='id' {...this.props} />
   }
 }

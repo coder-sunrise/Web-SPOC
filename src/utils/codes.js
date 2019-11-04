@@ -945,6 +945,7 @@ const _fetchAndSaveCodeTable = async (
       data: result,
       createDate: new Date(),
       updateDate: refresh ? null : new Date(),
+      params,
       // shouldRefresh: refresh,
     })
     return result
@@ -1031,7 +1032,10 @@ export const checkShouldRefresh = async (payload) => {
     const ct = await db.codetable.get(code.toLowerCase())
 
     if (ct === undefined) return true
-    const { updateDate } = ct
+    const { updateDate, params } = ct
+
+    if (!_.isEqual(params, filter)) return true
+
     return updateDate === null
   } catch (error) {
     console.log({ error })
