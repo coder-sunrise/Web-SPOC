@@ -11,6 +11,9 @@ const styles = (theme) => ({
     marginRight: -3,
     // height: 'auto',
   },
+  fullscreenWidget: {
+    height: 'auto !important',
+  },
   layoutOnDrag: {
     paddingBottom: 50,
   },
@@ -30,6 +33,8 @@ const styles = (theme) => ({
   fullscreen: {
     position: 'initial !important',
     width: '100% !important',
+    height: 'auto !important',
+
     // height: `calc(100vh - ${topHeight}px) !important`,
   },
   block: {

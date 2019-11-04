@@ -166,6 +166,9 @@ class AntdNumberInput extends React.PureComponent {
         : undefined,
     )
     this.debouncedOnChange.cancel()
+    this.setState({
+      focused: false,
+    })
   }
 
   _onChange = (value) => {
@@ -225,9 +228,15 @@ class AntdNumberInput extends React.PureComponent {
     ) {
       e.preventDefault()
     }
+    // console.log(this.state.value)
+    if (e.keyCode === 189 || e.keyCode === 109) {
+      if (this.props.min >= 0) {
+        e.preventDefault()
+      } else {
+        this.handleValueChange(-Math.abs(this.state.value), true)
 
-    if ((this.props.min === 0 || this.props.min === 1) && e.keyCode === 189) {
-      e.preventDefault()
+        e.preventDefault()
+      }
     }
 
     if (
@@ -256,7 +265,7 @@ class AntdNumberInput extends React.PureComponent {
     // })
   }
 
-  handleValueChange = (v) => {
+  handleValueChange = (v, force) => {
     // if ((v === undefined || !/\S/.test(v)) && !this.props.allowEmpty) {
     //   return false
     // }
@@ -279,8 +288,7 @@ class AntdNumberInput extends React.PureComponent {
     this.setState({
       value: newV === undefined ? '' : newV,
     })
-
-    if (newV === '') {
+    if (newV === '' || force) {
       this._onChange(newV)
       this.debouncedOnChange.cancel()
     } else {

@@ -82,6 +82,7 @@ const { qtyFormat } = config
               dosageFK: inventoryMedication.prescribingDosageFK,
               prescribeUOMFK: inventoryMedication.prescribingUOMFK,
               drugFrequencyFK: inventoryMedication.medicationFrequencyFK,
+              duration: inventoryMedication.duration,
               stepdose: 'AND',
               sequence: 0,
               // duration:,

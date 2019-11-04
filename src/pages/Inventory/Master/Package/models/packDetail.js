@@ -2,6 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
 import { queryServiceCenter } from '../services'
+
 const { upsert } = service
 
 export default createFormViewModel({
@@ -35,14 +36,6 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentId: query.uid,
-            },
-          })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: undefined,
             },
           })
         }
