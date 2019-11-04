@@ -15,15 +15,16 @@ class CodeSelect extends React.PureComponent {
     const { dispatch, codetable } = props
     if (props.code) {
       const isExisted = codetable[props.code.toLowerCase()]
-      const isPreviouslyFiltered = codetable.hasFilterProps.includes(
-        props.code.toLowerCase(),
-      )
+      // const isPreviouslyFiltered = codetable.hasFilterProps.includes(
+      //   props.code.toLowerCase(),
+      // )
+
       if (isExisted) {
         checkShouldRefresh({
           code: props.code,
           filter: props.remoteFilter,
         }).then((response) => {
-          if (response || isPreviouslyFiltered || props.remoteFilter) {
+          if (response) {
             dispatch({
               type: 'codetable/fetchCodes',
               payload: {

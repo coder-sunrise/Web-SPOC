@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import Remove from '@material-ui/icons/Remove'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Yup from '@/utils/yup'
-import { CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  CardContainer,
+  Tooltip,
+  Button,
+  GridContainer,
+  GridItem,
+  EditableTableGrid,
+} from '@/components'
 import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
-import InventoryType from './InventoryType'
 
 const styles = () => ({
   displayDiv: {
@@ -50,6 +58,29 @@ const InventoryTypeListing = ({
     vaccinationPackageItem,
     servicePackageItem,
   } = values
+
+  const Cell = ({ column, row, ...p }) => {
+    if (column.name === 'Action') {
+      return (
+        <Table.Cell {...p}>
+          <Tooltip title='Remove' placement='bottom'>
+            <Button
+              size='sm'
+              onClick={() => console.log(row)}
+              justIcon
+              round
+              color='primary'
+              style={{ marginRight: 5 }}
+            >
+              <Remove />
+            </Button>
+          </Tooltip>
+        </Table.Cell>
+      )
+    }
+    return <Table.Cell {...p} />
+  }
+  const TableCell = (p) => Cell({ ...p, dispatch })
 
   const medicationSchema = Yup.object().shape({
     inventoryMedicationFK: Yup.number().required(),
@@ -126,6 +157,14 @@ const InventoryTypeListing = ({
     serviceCenterFK,
     setServiceCenterFK,
   ] = useState(() => {})
+  const [
+    editingRowIds,
+    setEditingRowIds,
+  ] = useState([])
+  const [
+    rowChanges,
+    setRowChanges,
+  ] = useState({})
 
   const fetchCodes = async () => {
     await dispatch({
@@ -332,6 +371,8 @@ const InventoryTypeListing = ({
 
   const onCommitChanges = (type) => ({ rows, deleted }) => {
     if (deleted) {
+      const deletedSet = new Set(deleted)
+      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
       const tempArray = [
         ...values[type],
       ]
@@ -417,6 +458,8 @@ const InventoryTypeListing = ({
     }
   }
 
+  const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {}
+
   const getServiceCenterService = (row) => {
     const { serviceCenterServiceFK, serviceName } = row
     if (!serviceCenterServiceFK || !serviceName) {
@@ -437,6 +480,8 @@ const InventoryTypeListing = ({
     const { value, row } = e
     row.subTotal = value * row.unitPrice
   }
+
+  const onRowChangesChange = (rows) => {}
 
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
@@ -696,46 +741,6 @@ const InventoryTypeListing = ({
     ],
   }
 
-  const medicationEditingProps = {
-    messages: {
-      deleteCommand: 'Delete medication',
-    },
-    showAddCommand: true,
-    showEditCommand: false,
-    onCommitChanges: onCommitChanges('medicationPackageItem'),
-    onAddedRowsChange: onAddedRowsChange('medication'),
-  }
-
-  const consumableEditingProps = {
-    messages: {
-      deleteCommand: 'Delete consumable',
-    },
-    showAddCommand: true,
-    showEditCommand: false,
-    onAddedRowsChange: onAddedRowsChange('consumable'),
-    onCommitChanges: onCommitChanges('consumablePackageItem'),
-  }
-
-  const vaccinationEditingProps = {
-    messages: {
-      deleteCommand: 'Delete vaccination',
-    },
-    showAddCommand: true,
-    showEditCommand: false,
-    onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-    onAddedRowsChange: onAddedRowsChange('vaccination'),
-  }
-
-  const serviceEditingProps = {
-    messages: {
-      deleteCommand: 'Delete service',
-    },
-    showAddCommand: true,
-    showEditCommand: false,
-    onAddedRowsChange: onAddedRowsChange('service'),
-    onCommitChanges: onCommitChanges('servicePackageItem'),
-  }
-
   return (
     <div>
       <CardContainer
@@ -763,40 +768,94 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <InventoryType
-            title='Medication'
-            inventoryTypeProps={medicationProps}
-            schema={medicationSchema}
-            rows={medicationRows}
-            editingProps={medicationEditingProps}
-          />
-
-          <InventoryType
-            title='Consumable'
-            inventoryTypeProps={consumableProps}
-            schema={consumableSchema}
-            rows={consumableRows}
-            editingProps={consumableEditingProps}
-            style={{ marginTop: 15 }}
-          />
-
-          <InventoryType
-            title='Vaccination'
-            inventoryTypeProps={vaccinationProps}
-            schema={vaccinationSchema}
-            rows={vaccinationRows}
-            editingProps={vaccinationEditingProps}
-            style={{ marginTop: 15 }}
-          />
-
-          <InventoryType
-            title='Service'
-            inventoryTypeProps={serviceProps}
-            schema={serviceSchema}
-            rows={serviceRows}
-            editingProps={serviceEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <GridItem xs={12}>
+            <h4>
+              <b>Medication</b>
+            </h4>
+            <EditableTableGrid
+              {...medicationProps}
+              editingRowIds={editingRowIds}
+              onEditingRowIdsChange={onEditingRowIdsChange()}
+              rowChanges={rowChanges}
+              onRowChangesChange={onRowChangesChange()}
+              schema={medicationSchema}
+              rows={medicationRows}
+              onRowDoubleClick={undefined}
+              FuncProps={{ pager: false }}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete medication',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onCommitChanges: onCommitChanges('medicationPackageItem'),
+                onAddedRowsChange: onAddedRowsChange('medication'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4>
+              <b>Consumable</b>
+            </h4>
+            <EditableTableGrid
+              {...consumableProps}
+              schema={consumableSchema}
+              rows={consumableRows}
+              FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete consumable',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onAddedRowsChange: onAddedRowsChange('consumable'),
+                onCommitChanges: onCommitChanges('consumablePackageItem'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4>
+              <b>Vaccination</b>
+            </h4>
+            <EditableTableGrid
+              {...vaccinationProps}
+              schema={vaccinationSchema}
+              rows={vaccinationRows}
+              FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete vaccination',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onCommitChanges: onCommitChanges('vaccinationPackageItem'),
+                onAddedRowsChange: onAddedRowsChange('vaccination'),
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} className={classes.tableHeader}>
+            <h4>
+              <b>Service</b>
+            </h4>
+            <EditableTableGrid
+              {...serviceProps}
+              schema={serviceSchema}
+              rows={serviceRows}
+              FuncProps={{ pager: false }}
+              onRowDoubleClick={undefined}
+              EditingProps={{
+                messages: {
+                  deleteCommand: 'Delete service',
+                },
+                showAddCommand: true,
+                showEditCommand: false,
+                onAddedRowsChange: onAddedRowsChange('service'),
+                onCommitChanges: onCommitChanges('servicePackageItem'),
+              }}
+            />
+          </GridItem>
         </GridContainer>
       </CardContainer>
     </div>

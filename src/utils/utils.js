@@ -743,6 +743,7 @@ const calculateAdjustAmount = (
   initialAmout = 0,
   adj = 0,
 ) => {
+  console.log({ initialAmout, adj })
   let amount = initialAmout
   let adjAmount
   if (isExactAmount) {

@@ -110,10 +110,11 @@ class AmountSummary extends PureComponent {
       const lastAdjustment = {
         ...filterDeletedAdjustments[filterDeletedAdjustments.length - 1],
       }
-      lastAdjustmentAmount =
-        lastAdjustment.finalAmount - lastAdjustment.initialAmout
+      lastAdjustmentAmount = lastAdjustment.adjAmount
     }
+
     const nextInitialAmount = total + lastAdjustmentAmount
+
     this.props.dispatch({
       type: 'global/updateState',
       payload: {

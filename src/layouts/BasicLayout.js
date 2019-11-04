@@ -117,67 +117,7 @@ class BasicLayout extends React.PureComponent {
 
     const { dispatch, route: { routes, authority } } = this.props
 
-    dispatch({
-      type: 'user/fetchCurrent',
-    }).then(async (d) => {
-      if (!d) return
-      reloadAuthorized()
-      await dispatch({
-        type: 'codetable/fetchAllCachedCodetable',
-      })
-      const getClinicSettings = sessionStorage.getItem('clinicSettings')
-      const getClinicInfo = sessionStorage.getItem('clinicInfo')
-      if (getClinicSettings === null) {
-        await dispatch({
-          type: 'clinicSettings/query',
-        })
-      } else {
-        const parsedClinicSettings = JSON.parse(getClinicSettings)
-        dispatch({
-          type: 'clinicSettings/updateState',
-          payload: {
-            settings: parsedClinicSettings,
-          },
-        })
-      }
-
-      if (getClinicInfo == null) {
-        await dispatch({
-          type: 'clinicInfo/query',
-          payload: localStorage.getItem('clinicCode'),
-        })
-      } else {
-        const parsedClinicInfo = JSON.parse(getClinicInfo)
-        dispatch({
-          type: 'clinicInfo/updateState',
-          payload: {
-            ...parsedClinicInfo,
-          },
-        })
-      }
-
-      // console.log(routes, authority)
-      const menus = await dispatch({
-        type: 'menu/getMenuData',
-        payload: { routes, authority },
-      })
-      this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
-      this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
-      // console.log(this.breadcrumbNameMap)
-
-      this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
-      this.getPageTitle = memoizeOne(this.getPageTitle)
-      this.menus = menus
-      // this.forceUpdate()
-      await dispatch({
-        type: 'global/getUserSettings',
-      })
-
-      this.setState({
-        authorized: true,
-      })
-    })
-
+    this.initUserData()
     initStream()
 
     let sessionTimeOutTimer = null
@@ -306,6 +246,71 @@ class BasicLayout extends React.PureComponent {
     }
     flattenMenuData(menus)
     return routerMap
+  }
+
+  initUserData = async () => {
+    const { dispatch, route: { routes, authority } } = this.props
+
+    const user = await dispatch({
+      type: 'user/fetchCurrent',
+    })
+
+    if (!user) return
+    reloadAuthorized()
+    await dispatch({
+      type: 'codetable/fetchAllCachedCodetable',
+    })
+    const getClinicSettings = sessionStorage.getItem('clinicSettings')
+    const getClinicInfo = sessionStorage.getItem('clinicInfo')
+    if (getClinicSettings === null) {
+      await dispatch({
+        type: 'clinicSettings/query',
+      })
+    } else {
+      const parsedClinicSettings = JSON.parse(getClinicSettings)
+      dispatch({
+        type: 'clinicSettings/updateState',
+        payload: {
+          settings: parsedClinicSettings,
+        },
+      })
+    }
+
+    if (getClinicInfo == null) {
+      await dispatch({
+        type: 'clinicInfo/query',
+        payload: localStorage.getItem('clinicCode'),
+      })
+    } else {
+      const parsedClinicInfo = JSON.parse(getClinicInfo)
+      dispatch({
+        type: 'clinicInfo/updateState',
+        payload: {
+          ...parsedClinicInfo,
+        },
+      })
+    }
+
+    // console.log(routes, authority)
+    const menus = await dispatch({
+      type: 'menu/getMenuData',
+      payload: { routes, authority },
+    })
+    this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
+    this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
+    // console.log(this.breadcrumbNameMap)
+
+    this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
+    this.getPageTitle = memoizeOne(this.getPageTitle)
+    this.menus = menus
+    // this.forceUpdate()
+    await dispatch({
+      type: 'global/getUserSettings',
+    })
+
+    this.setState({
+      authorized: true,
+    })
   }
 
   matchParamsPath = (pathname) => {

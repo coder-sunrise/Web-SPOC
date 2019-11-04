@@ -44,16 +44,6 @@ export default createFormViewModel({
               currentId: query.uid,
             },
           })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: undefined,
-              sddCode: undefined,
-              sddDescription: undefined,
-            },
-          })
         }
       })
       dispatch({

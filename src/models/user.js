@@ -95,36 +95,26 @@ export default {
       })
     },
     *fetchCurrent (_, { call, put }) {
-      let user
-      const response = yield call(queryCurrent)
-      const { data } = response
-      if (data) {
-        const { userProfileDetailDto } = data
-        const accessRights = data.userClientAccessRightDto.reduce((a, b) => {
-          return a.concat(convertServerRights(b))
-        }, [])
-        // accessRights.forEach((a) => {
-        //   console.log(a.name)
-        // })
-        // console.log({ data: response.data, accessRights })
-        user = {
-          data: data.userProfileDetailDto,
-          accessRights,
-        }
-      }
+      let user = JSON.parse(sessionStorage.getItem('user'))
+      if (!user) {
+        const response = yield call(queryCurrent)
+        const { data } = response
+        if (data) {
+          const accessRights = data.userClientAccessRightDto.reduce((a, b) => {
+            return a.concat(convertServerRights(b))
+          }, [])
 
+          user = {
+            data: data.userProfileDetailDto,
+            accessRights,
+          }
+        }
+        sessionStorage.setItem('user', JSON.stringify(user))
+      }
       yield put({
         type: 'saveCurrentUser',
         payload: user,
       })
-
-      // yield put({
-      //   type: 'queueLog/refresh',
-      //   payload: {
-      //     shouldGetTodayAppointments: false,
-      //   },
-      // })
-
       if (!user.data.clinicianProfile.userProfile.lastPasswordChangedDate)
         yield put({
           type: 'global/updateState',
@@ -132,8 +122,7 @@ export default {
             showChangePasswordModal: true,
           },
         })
-
-      return response.data
+      return user
     },
     *fetchProfileDetails ({ id }, { call, put }) {
       const result = yield call(fetchUserProfileByID, id)
@@ -158,10 +147,7 @@ export default {
     },
     saveCurrentUser (state, { payload }) {
       // console.log({ payload })
-      sessionStorage.setItem(
-        'accessRights',
-        JSON.stringify(payload.accessRights),
-      )
+
       return {
         ...state,
         ...payload,
