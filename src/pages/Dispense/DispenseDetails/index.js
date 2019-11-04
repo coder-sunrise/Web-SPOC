@@ -1,6 +1,6 @@
 import React from 'react'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Paper, withStyles } from '@material-ui/core'
 // sub components
 import TableData from './TableData'
 // common component
@@ -26,6 +26,14 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 // })
 
 const styles = (theme) => ({
+  paper: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(2),
+  },
+  gridContainer: {
+    maxHeight: '60vh',
+    overflow: 'auto',
+  },
   gridRow: {
     '&:not(:first-child)': {
       marginTop: theme.spacing(2),
@@ -49,35 +57,41 @@ const DispenseDetails = ({
   return (
     <React.Fragment>
       <GridItem>
-        <GridContainer>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Prescription'
-              height={200}
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(viewOnly, onPrint)}
-              data={prescription}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Vaccination'
-              height={150}
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Other Orders'
-              height={150}
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
-              data={otherOrder}
-            />
-          </GridItem>
-        </GridContainer>
+        <Paper className={classes.paper}>
+          <GridContainer className={classes.gridContainer}>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Prescription'
+                // height={200}
+                columns={PrescriptionColumns}
+                colExtensions={PrescriptionColumnExtensions(viewOnly, onPrint)}
+                data={prescription}
+              />
+            </GridItem>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Vaccination'
+                // TableProps={{
+                //   height: 200,
+                // }}
+                columns={VaccinationColumn}
+                colExtensions={VaccinationColumnExtensions(viewOnly)}
+                data={vaccination}
+              />
+            </GridItem>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Other Orders'
+                // TableProps={{
+                //   height: 200,
+                // }}
+                columns={OtherOrdersColumns}
+                colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
+                data={otherOrder}
+              />
+            </GridItem>
+          </GridContainer>
+        </Paper>
         {!viewOnly && (
           <GridContainer className={classes.summaryPanel}>
             <GridItem xs={2} md={9} />

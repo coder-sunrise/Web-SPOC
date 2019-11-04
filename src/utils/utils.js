@@ -913,6 +913,7 @@ const calculateAmount = (
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
+
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
@@ -921,10 +922,8 @@ const calculateAmount = (
     } else {
       gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
-        r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
-        r[gstField] = roundToTwoDecimals(
-          r[totalField] * (1 + gSTPercentage) + r.subAdjustment,
-        )
+        r[gstAmtField] = roundToTwoDecimals(r[adjustedField] * gSTPercentage)
+        r[gstField] = roundToTwoDecimals(r[adjustedField] * (1 + gSTPercentage))
       })
     }
   }
