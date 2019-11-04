@@ -520,6 +520,11 @@ const routes = [
             component: './Report/MedicationMovementReport',
           },
           {
+            path: '/report/consumablemovementreport',
+            name: 'consumableMovementReport',
+            component: './Report/ConsumableMovementReport',
+          },
+          {
             path: '/report/patientlisting',
             name: 'patientListingReport',
             component: './Report/PatientListing',
@@ -792,13 +797,13 @@ const routes = [
           },
         ],
       },
-      // Settings 
+      // Settings
       // Support
       {
         path: '/support',
         icon: 'library_books',
         name: 'support',
-        hideChildrenInMenu: true, 
+        hideChildrenInMenu: true,
         routes: [
           {
             path: '/support',
@@ -816,7 +821,7 @@ const routes = [
             component: './support/druglabel',
           },
         ],
-      }, 
+      },
       {
         hideInMenu: process.env.NODE_ENV === 'production',
         path: '/development',

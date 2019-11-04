@@ -14,19 +14,19 @@ class MovementList extends PureComponent {
     const { reportDatas } = this.props
     if (!reportDatas)
       return null
-    if (reportDatas && reportDatas.MedicationStockDetails) {
-      incomeData = reportDatas.MedicationStockDetails.map(
+    if (reportDatas && reportDatas.ConsumableStockDetails) {
+      incomeData = reportDatas.ConsumableStockDetails.map(
         (item, index) => ({
           ...item,
-          id: `medicationMovement-${index}-${item.medicationCode}`,
+          id: `ConsumableMovement-${index}-${item.ConsumableCode}`,
         }),
       )
     }
 
-    const MedicationStockDetailsCols = [
+    const ConsumableStockDetailsCols = [
       { name: 'transactionDate', title: 'Date' },
-      { name: 'medicationCode', title: 'Code' },
-      { name: 'medicationName', title: 'Name' },
+      { name: 'consumableCode', title: 'Code' },
+      { name: 'consumableName', title: 'Name' },
       { name: 'transactionCategory', title: 'Transaction' },
       { name: 'transactionQuantity', title: 'QTY' },
       { name: 'uom', title: 'UOM' },
@@ -34,7 +34,7 @@ class MovementList extends PureComponent {
       { name: 'patientAccountNo', title: 'Acc. No.' },
       { name: 'patientName', title: 'Patient Name' },
     ]
-    const MedicationStockDetailsExtensions = [
+    const ConsumableStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date' },
       { columnName: 'transactionQuantity', type: 'qty'},
     ]
@@ -43,8 +43,8 @@ class MovementList extends PureComponent {
       <ReportDataGrid
         height={500}
         data={incomeData}
-        columns={MedicationStockDetailsCols}
-        columnExtensions={MedicationStockDetailsExtensions}
+        columns={ConsumableStockDetailsCols}
+        columnExtensions={ConsumableStockDetailsExtensions}
       />
     )
   }
