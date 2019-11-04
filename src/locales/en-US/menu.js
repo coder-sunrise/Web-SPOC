@@ -81,7 +81,7 @@ export default {
   'menu.reception.billing': 'Billing',
   'menu.report.gstReport': 'GST Report',
   'menu.report.medicationMovementReport': 'Medication Movement Report',
-  'menu.report.consumableMovementReport': 'Medication Movement Report',
+  'menu.report.consumableMovementReport': 'Consumable Movement Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
