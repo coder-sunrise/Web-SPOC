@@ -695,13 +695,12 @@ class Detail extends PureComponent {
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
         const getState = this.type(row.inventoryTypeFK)
         const defaultStock = this.state[getState.filterStateName].find(
-          (j) =>
-            j.inventoryItemFK === row.code && j.batchNo === 'Not Applicable',
+          (j) => j.inventoryItemFK === row.code && j.isDefault,
         )
         if (defaultStock) {
           row.batchNo = defaultStock.id
           row.stock = defaultStock.stock
-
+          row.expiryDate = defaultStock.expiryDate
           this.setState({ selectedBatch: defaultStock })
         }
       }
@@ -834,39 +833,51 @@ class Detail extends PureComponent {
 
   onAddedRowsChange = (addedRows) => {
     let returnRows = addedRows
-    if (this.state.selectedItem) {
-      const { option } = this.state.selectedItem
-      const { uom, expiryDate, stock } = option
-      if (uom) {
-        returnRows = returnRows.map((r) => ({
-          ...r,
-          uomDisplayValue: uom,
-          stock: undefined,
-          expiryDate: undefined,
-        }))
-      } else {
-        returnRows = returnRows.map((r) => {
-          const { uomDisplayValue } = r
-          return {
+    if (returnRows.length > 0 && !_.isEmpty(returnRows[0])) {
+      if (this.state.selectedItem) {
+        const { option } = this.state.selectedItem
+        const { uom, expiryDate, stock } = option
+        if (uom) {
+          returnRows = returnRows.map((r) => ({
             ...r,
-            uomDisplayValue,
-            expiryDate,
-            stock,
-          }
-        })
-      }
-      if (this.state.selectedBatch && returnRows) {
-        // const { stock } = this.state.selectedItem
-        returnRows = returnRows.map((r) => ({
-          ...r,
-          stock: this.state.selectedBatch.stock,
-          batchNoString: this.state.selectedBatch.batchNo,
-          expiryDate,
-        }))
+            uomDisplayValue: uom,
+            // stock: undefined,
+            // expiryDate: undefined,
+          }))
+        } else {
+          returnRows = returnRows.map((r) => {
+            const { uomDisplayValue } = r
+            return {
+              ...r,
+              uomDisplayValue,
+              expiryDate,
+              stock,
+            }
+          })
+        }
+        if (this.state.selectedBatch && returnRows) {
+          // const { stock } = this.state.selectedItem
+          returnRows = returnRows.map((r) => ({
+            ...r,
+            stock: this.state.selectedBatch.stock,
+            batchNoString: this.state.selectedBatch.batchNo,
+          }))
+        }
       }
 
       return returnRows
     }
+    returnRows = returnRows.map((o) => ({
+      inventoryTypeFK: undefined,
+      code: undefined,
+      displayValue: undefined,
+      uomDisplayValue: undefined,
+      batchNo: undefined,
+      expiryDate: undefined,
+      stock: undefined,
+      adjustmentQty: undefined,
+    }))
+
     return returnRows
   }
 
