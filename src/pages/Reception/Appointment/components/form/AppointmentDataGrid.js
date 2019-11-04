@@ -180,6 +180,7 @@ class AppointmentDataGrid extends React.Component {
       }
       defaultNewRows.push(defaultNewRow)
     }
+
     return (
       <div className={classes.container}>
         <EditableTableGrid

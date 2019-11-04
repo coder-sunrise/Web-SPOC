@@ -303,6 +303,8 @@ class Demographic extends PureComponent {
                       label='Remarks'
                       multiline
                       rowsMax={4}
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
                       {...args}
                     />
                   )}
@@ -373,10 +375,9 @@ class Demographic extends PureComponent {
                   name='pdpaConsent'
                   render={(args) => (
                     <CheckboxGroup
-                      prefix='PDPA Consent: '
+                      // prefix='PDPA Consent: '
                       label='PDPA Consent - Agree to receive marketing material via:'
                       horizontal
-                      simple
                       valueField='id'
                       textField='name'
                       options={[

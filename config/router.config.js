@@ -520,6 +520,11 @@ const routes = [
             component: './Report/MedicationMovementReport',
           },
           {
+            path: '/report/consumablemovementreport',
+            name: 'consumableMovementReport',
+            component: './Report/ConsumableMovementReport',
+          },
+          {
             path: '/report/patientlisting',
             name: 'patientListingReport',
             component: './Report/PatientListing',
@@ -793,6 +798,30 @@ const routes = [
         ],
       },
       // Settings
+      // Support
+      {
+        path: '/support',
+        icon: 'library_books',
+        name: 'support',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/support',
+            name: 'support',
+            component: './Support',
+          },
+          {
+            path: '/support/teamviewer',
+            name: 'teamviewer',
+            component: './support/teamviewer',
+          },
+          {
+            path: '/support/druglabel',
+            name: 'druglabel',
+            component: './support/druglabel',
+          },
+        ],
+      },
       {
         hideInMenu: process.env.NODE_ENV === 'production',
         path: '/development',

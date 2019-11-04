@@ -76,6 +76,7 @@ const { qtyFormat } = config
               dosageFK: inventoryMedication.prescribingDosageFK,
               prescribeUOMFK: inventoryMedication.prescribingUOMFK,
               drugFrequencyFK: inventoryMedication.medicationFrequencyFK,
+              duration: inventoryMedication.duration,
               stepdose: 'AND',
               sequence: 0,
               // duration:,
@@ -146,6 +147,7 @@ const { qtyFormat } = config
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
           // priority:,
+          serviceCode: service.code,
           serviceName: service.displayValue,
           serviceFK: service.id,
           serviceCenterFK: serviceCenterService.serviceCenterFK,
@@ -170,6 +172,7 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
+          consumableCode: inventoryConsumable.code,
           consumableName: inventoryConsumable.displayValue,
         }
       }

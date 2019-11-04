@@ -93,30 +93,28 @@ class Queue extends React.Component {
   componentWillMount = () => {
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
-    if (Object.keys(query).length === 0) {
-      const { sessionInfo } = queueLog
+    const { sessionInfo } = queueLog
+    dispatch({
+      type: `${modelKey}initState`,
+    })
+    // dispatch({
+    //   type: 'calendar/updateState',
+    //   payload: {
+    //     list: [],
+    //   },
+    // })
+    if (sessionInfo.id === '') {
       dispatch({
-        type: `${modelKey}initState`,
+        type: `${modelKey}getSessionInfo`,
       })
-      // dispatch({
-      //   type: 'calendar/updateState',
-      //   payload: {
-      //     list: [],
-      //   },
-      // })
-      if (sessionInfo.id === '') {
-        dispatch({
-          type: `${modelKey}getSessionInfo`,
-        })
-      } else {
-        dispatch({
-          type: `${modelKey}refresh`,
-        })
-      }
-      this._timer = setInterval(() => {
-        dispatch({ type: `${modelKey}refresh` })
-      }, 900000)
+    } else {
+      dispatch({
+        type: `${modelKey}refresh`,
+      })
     }
+    this._timer = setInterval(() => {
+      dispatch({ type: `${modelKey}refresh` })
+    }, 900000)
   }
 
   componentWillUnmount () {

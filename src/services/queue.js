@@ -29,7 +29,8 @@ export const deleteQueue = (params) =>
   commonServices.remove(queueAPIUrl, params)
 
 export const queryAppointmentListing = (params) =>
-  request(`${appointmentAPIURL}`, {
-    method: 'GET',
-    body: params,
+  commonServices.queryList(`${appointmentAPIURL}`, {
+    ...params,
+    isCancelled: false,
+    pagesize: 999,
   })

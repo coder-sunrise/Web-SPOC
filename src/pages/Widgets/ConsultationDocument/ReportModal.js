@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
+import { connect } from 'dva'
 import { CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
+import { REPORT_TYPE } from '@/utils/constants'
 
-const ReportModal = ({ reportTypeID, reportParameters }) => {
-  console.log({ reportTypeID, reportParameters })
+const ReportModal = ({ dispatch, reportTypeID, reportParameters }) => {
   const [
     showReport,
     setShowReport,
@@ -14,7 +15,20 @@ const ReportModal = ({ reportTypeID, reportParameters }) => {
     setReportConfig,
   ] = useState({})
 
+  const resetReportParameters = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        reportTypeID: undefined,
+        reportParameters: {},
+      },
+    })
+  }
+
   const toggleReport = () => {
+    if (showReport) {
+      resetReportParameters()
+    }
     setShowReport(!showReport)
   }
 
@@ -42,19 +56,18 @@ const ReportModal = ({ reportTypeID, reportParameters }) => {
       reportParameters,
     ],
   )
-  console.log({ reportConfig })
+
   return (
     <React.Fragment>
       {/* <ReportViewer /> */}
       <CommonModal
         open={showReport}
         onClose={toggleReport}
-        title='Invoice'
+        title={REPORT_TYPE[reportTypeID]}
         maxWidth='lg'
       >
         <ReportViewer
           showTopDivider={false}
-          // unsavedReport
           reportID={reportTypeID}
           {...reportConfig}
         />
@@ -63,4 +76,7 @@ const ReportModal = ({ reportTypeID, reportParameters }) => {
   )
 }
 
-export default ReportModal
+export default connect(({ global }) => ({
+  reportTypeID: global.reportTypeID,
+  reportParameters: global.reportParameters,
+}))(ReportModal)

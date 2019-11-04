@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/podoPayment'
+import { INVOICE_STATUS } from '@/utils/constants'
 import { notification } from '@/components'
 
 export default createFormViewModel({
@@ -83,6 +84,7 @@ export default createFormViewModel({
           supplierFK,
           purchaseOrderStatusFK,
           concurrencyToken,
+          invoiceStatusFK,
         } = type
 
         let totalPaidAmount = 0
@@ -114,7 +116,10 @@ export default createFormViewModel({
             purchaseOrderDate,
             totalAmount,
             purchaseOrderStatus,
-            outstandingAmount: totalAmount - totalPaidAmount,
+            outstandingAmount:
+              invoiceStatusFK === INVOICE_STATUS.WRITEOFF
+                ? 0
+                : totalAmount - totalPaidAmount,
             supplierFK,
             purchaseOrderStatusFK,
             concurrencyToken,

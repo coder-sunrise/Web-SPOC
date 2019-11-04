@@ -239,9 +239,9 @@ const StatusFilterButton = ({
   )
 }
 
-const ConnectedStatusFilterButton = connect(({ queueLog, calendar }) => ({
+const ConnectedStatusFilterButton = connect(({ queueLog }) => ({
   queueLog,
-  appointments: calendar.list || [],
+  appointments: queueLog.appointmentList || [],
 }))(StatusFilterButton)
 
 export default memo(withStyles(styles)(ConnectedStatusFilterButton))

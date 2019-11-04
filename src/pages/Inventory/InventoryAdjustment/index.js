@@ -14,9 +14,8 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ inventoryAdjustment, global }) => ({
+@connect(({ inventoryAdjustment }) => ({
   inventoryAdjustment,
-  global,
 }))
 class InventoryAdjustment extends PureComponent {
   state = {
@@ -25,6 +24,12 @@ class InventoryAdjustment extends PureComponent {
   }
 
   componentDidMount () {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
     this.props.dispatch({
       type: 'inventoryAdjustment/query',
       payload: {
@@ -45,7 +50,6 @@ class InventoryAdjustment extends PureComponent {
 
   toggleModal = async () => {
     const { dispatch, inventoryAdjustment } = this.props
-
     // await dispatch({
     //   type: 'inventoryAdjustment/updateState',
     //   payload: {

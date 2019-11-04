@@ -540,7 +540,10 @@ class Layout extends PureComponent {
     // console.log(state.currentLayout)
 
     const layoutCfg = {
-      className: classes.layout,
+      className: classnames({
+        [classes.layout]: true,
+        [classes.fullscreenWidget]: this.state.fullScreenWidget,
+      }),
       rowHeight: state.rowHeight,
       layouts: state.currentLayout,
       breakpoints,

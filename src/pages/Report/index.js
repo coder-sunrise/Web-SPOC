@@ -73,6 +73,11 @@ const menuData = [
     url: '/report/medicationmovementreport',
   },
   {
+    title: 'Inventory',
+    text: 'Consumable Movement Report',
+    url: '/report/consumablemovementreport',
+  },
+  {
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',

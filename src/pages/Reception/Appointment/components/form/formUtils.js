@@ -98,7 +98,7 @@ export const mapPropsToValues = ({
     _patientAccountNo = accNo
     _patientProfileFK = id
   }
-
+  console.log({ selectedSlot })
   let values = {
     patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,

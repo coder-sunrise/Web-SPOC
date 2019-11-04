@@ -61,6 +61,7 @@ class Consumable extends PureComponent {
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values } = this.props
     console.log(v, op)
+    setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)

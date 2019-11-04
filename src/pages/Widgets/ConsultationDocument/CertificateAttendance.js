@@ -23,7 +23,9 @@ import * as service from '@/services/common'
       attendanceStartTime: visitEntity.visit
         ? moment(visitEntity.visit.visitDate).format('HH:mm')
         : moment().format('HH:mm'),
-      attendanceEndTime: moment().format('HH:mm'),
+      attendanceEndTime: visitEntity.visit
+        ? moment(visitEntity.visit.timeOut).format('HH:mm')
+        : moment().format('HH:mm'),
     }
     return values
   },

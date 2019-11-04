@@ -101,6 +101,20 @@ class AmountSummary extends PureComponent {
     const { adjustments, rows, summary } = this.state
     const { total } = summary
     const { config, onValueChanged } = this.props
+
+    let lastAdjustmentAmount = 0
+    const filterDeletedAdjustments = [
+      ...adjustments.filter((item) => !item.isDeleted),
+    ]
+    if (filterDeletedAdjustments.length > 0) {
+      const lastAdjustment = {
+        ...filterDeletedAdjustments[filterDeletedAdjustments.length - 1],
+      }
+      lastAdjustmentAmount = lastAdjustment.adjAmount
+    }
+
+    const nextInitialAmount = total + lastAdjustmentAmount
+
     this.props.dispatch({
       type: 'global/updateState',
       payload: {
@@ -122,7 +136,7 @@ class AmountSummary extends PureComponent {
           showAmountPreview: false,
           defaultValues: {
             // ...this.props.orders.entity,
-            initialAmout: total,
+            initialAmout: nextInitialAmount,
           },
         },
       },
