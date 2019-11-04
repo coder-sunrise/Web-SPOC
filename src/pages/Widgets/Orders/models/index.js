@@ -7,7 +7,10 @@ import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 const sharedMedicationValue = {
   quantity: 0,
   corPrescriptionItemPrecaution: [
-    {},
+    {
+      precaution: '',
+      sequence: 0,
+    },
   ],
   corPrescriptionItemInstruction: [
     {

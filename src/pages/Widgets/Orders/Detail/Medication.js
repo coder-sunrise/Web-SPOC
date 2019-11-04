@@ -335,7 +335,10 @@ class Medication extends PureComponent {
       })
     } else {
       setFieldValue(`corPrescriptionItemPrecaution`, [
-        {},
+        {
+          precaution: '',
+          sequence: 0,
+        },
       ])
     }
 
