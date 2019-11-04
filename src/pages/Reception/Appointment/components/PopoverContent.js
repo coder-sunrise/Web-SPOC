@@ -173,7 +173,7 @@ class PopoverContent extends React.Component {
                 code='doctorprofile'
                 label='Doctor'
                 labelField='clinicianProfile.name'
-                valueField='clinicianProfile.userProfileFK'
+                valueField='clinicianProfile.id'
                 value={clinicianFK}
               />
             </GridItem>

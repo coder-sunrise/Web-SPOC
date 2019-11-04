@@ -93,7 +93,7 @@ class AppointmentDataGrid extends React.Component {
 
             const { clinicianProfiles = [] } = this.props
             const clinicianProfile = clinicianProfiles.find(
-              (item) => item.userProfileFK === clinicianFK,
+              (item) => item.id === clinicianFK,
             )
 
             if (!clinicianProfile) return null
@@ -180,7 +180,7 @@ class AppointmentDataGrid extends React.Component {
       }
       defaultNewRows.push(defaultNewRow)
     }
-    console.log({ defaultNewRows })
+
     return (
       <div className={classes.container}>
         <EditableTableGrid
