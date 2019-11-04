@@ -64,8 +64,8 @@ class PaymentDetails extends Component {
 
     dispatch({
       type: 'patient/query',
-      // payload: { id: values.patientProfileFK },
-      payload: { id: 4 },
+      payload: { id: values.patientProfileFK },
+      // payload: { id: 4 },
     }).then((r) => {
       if (r)
         this.setState({
@@ -267,8 +267,10 @@ class PaymentDetails extends Component {
             .map((payment) => {
               return (
                 <PaymentCard
+                  companyName={payment.companyName}
                   patientName={payment.patientName}
-                  payerType={payment.payerTypeFK}
+                  payerType={payment.payerType}
+                  payerTypeFK={payment.payerTypeFK}
                   payments={payment.paymentTxnList}
                   totalPaid={payment.totalPaid}
                   outstanding={payment.outStanding}
