@@ -81,6 +81,7 @@ export default {
   'menu.reception.billing': 'Billing',
   'menu.report.gstReport': 'GST Report',
   'menu.report.medicationMovementReport': 'Medication Movement Report',
+  'menu.report.consumableMovementReport': 'Consumable Movement Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
@@ -138,7 +139,7 @@ export default {
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.viewreport': 'View Report',
-  
+
   'menu.support':'Support',
   'menu.support.teamviewer':'Teamviewer',
   'menu.support.druglabel':'Drug Label',
