@@ -1,12 +1,15 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+// material ui
+import { Popover } from '@material-ui/core'
 // medisys component
 import { LoadingWrapper } from '@/components/_medisys'
 import { CommonTableGrid, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
+import ContextMenu from './ContextMenu'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { filterData } from '../utils'
@@ -39,6 +42,22 @@ const Grid = ({
   onViewPatientProfileClick,
   handleActualizeAppointment,
 }) => {
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+
+  const [
+    rightCickedRow,
+    setRightClickedRow,
+  ] = useState(undefined)
+
+  const handlePopoverOpen = (event) => setAnchorEl(event.target)
+
+  const handlePopoverClose = () => setAnchorEl(null)
+
+  const openContextMenu = Boolean(anchorEl)
+
   const isAssignedDoctor = useCallback(
     (row) => {
       const { doctor: { id }, visitStatus } = row
@@ -362,6 +381,11 @@ const Grid = ({
             ]}
             FuncProps={FuncConfig}
             onRowDoubleClick={onRowDoubleClick}
+            onContextMenu={(row, event) => {
+              event.preventDefault()
+              handlePopoverOpen(event)
+              setRightClickedRow(row)
+            }}
             {...QueueTableConfig}
           />
         )}
@@ -384,22 +408,23 @@ const Grid = ({
           />
         )}
       </LoadingWrapper>
-      {/* <Popover
+      <Popover
         open={openContextMenu}
         anchorEl={anchorEl}
-        // anchorOrigin={{
-        //   vertical: 'center',
-        //   horizontal: 'center',
-        // }}
-        transformOrigin={{
+        anchorOrigin={{
           vertical: 'center',
           horizontal: 'center',
         }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'left',
+        }}
         onClose={handlePopoverClose}
-        // style={{ width: 500, height: 500 }}
       >
-        <div style={{ width: 200, height: 400 }}>123f</div>
-      </Popover> */}
+        <div>
+          <ContextMenu show={openContextMenu} row={rightCickedRow} />
+        </div>
+      </Popover>
     </div>
   )
 }
