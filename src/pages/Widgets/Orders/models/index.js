@@ -84,13 +84,22 @@ export default createListViewModel({
     },
     effects: {
       *upsertRow ({ payload }, { select, call, put, delay }) {
-        yield put({
+        const upsert = yield put({
           type: 'upsertRowState',
           payload,
         })
         yield put({
           type: 'calculateAmount',
         })
+
+        if (upsert) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: undefined,
+            },
+          })
+        }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
         yield put({
