@@ -28,6 +28,7 @@ const CHASCardReplacement = ({
     acuteVisitPatientBalance,
     acuteVisitClinicBalance,
     acuteBalanceStatusCode,
+    chronicBalanceStatusCode,
     isSuccessful,
   } = refreshedSchemeData
   const { callingName, patientAccountNo } = entity
@@ -68,9 +69,13 @@ const CHASCardReplacement = ({
       </GridContainer>
       <GridContainer>
         <GridItem md={5}>CHAS Balance:</GridItem>
-        <GridItem md={5}>
-          <NumberInput text currency value={balance} />
-        </GridItem>
+        {chronicBalanceStatusCode === 'SC105' ? (
+          <GridItem md={5}>Full Balance</GridItem>
+        ) : (
+          <GridItem md={5}>
+            <NumberInput text currency value={balance} />
+          </GridItem>
+        )}
         <GridItem md={2} />
         <GridItem md={5}>CHAS Validity: </GridItem>
         <GridItem md={5}>
@@ -80,8 +85,10 @@ const CHASCardReplacement = ({
 
         <GridItem md={5}>Patient Acute Visit Balance:</GridItem>
 
-        {acuteBalanceStatusCode === 'SC100' ? (
-          <GridItem md={5}>
+        {acuteBalanceStatusCode === 'SC100' ||
+        (acuteVisitPatientBalance !== undefined &&
+          acuteBalanceStatusCode === undefined) ? (
+            <GridItem md={5}>
             <div
               style={{
                 fontWeight: 500,
@@ -99,8 +106,10 @@ const CHASCardReplacement = ({
         <GridItem md={2} />
 
         <GridItem md={5}>Patient Acute Clinic Balance:</GridItem>
-        {acuteBalanceStatusCode === 'SC100' ? (
-          <GridItem md={5}>
+        {acuteBalanceStatusCode === 'SC100' ||
+        (acuteVisitClinicBalance !== undefined &&
+          acuteBalanceStatusCode === undefined) ? (
+            <GridItem md={5}>
             <div
               style={{
                 fontWeight: 500,

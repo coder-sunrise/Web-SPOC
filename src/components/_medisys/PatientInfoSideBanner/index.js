@@ -55,6 +55,8 @@ const PatientInfoSideBanner = ({
           acuteVisitClinicBalance,
           isSuccessful,
           statusDescription,
+          acuteBalanceStatusCode,
+          chronicBalanceStatusCode,
         } = result
         let isShowReplacementModal = false
         if (!isSuccessful) {
@@ -77,6 +79,8 @@ const PatientInfoSideBanner = ({
             acuteVisitPatientBalance,
             acuteVisitClinicBalance,
             isSuccessful,
+            acuteBalanceStatusCode,
+            chronicBalanceStatusCode,
           })
         }
       }
@@ -115,6 +119,18 @@ const PatientInfoSideBanner = ({
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
+      // acuteBalanceStatusCode:
+      //   schemeData.patientSchemeBalance.length > 0
+      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
+      //     : '',
+      // chronicBalanceStatusCode:
+      //   schemeData.patientSchemeBalance.length > 0
+      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+      //     : '',
+      isSuccessful:
+        refreshedSchemeData.isSuccessful !== ''
+          ? refreshedSchemeData.isSuccessful
+          : '',
     }
   }
 
@@ -140,14 +156,12 @@ const PatientInfoSideBanner = ({
         ({Math.floor(
           moment.duration(moment().diff(entity.dob)).asYears(),
         )},&nbsp;
-        {
-          <CodeSelect
-            code='ctGender'
-            // optionLabelLength={1}
-            text
-            value={entity.genderFK}
-          />
-        })
+        <CodeSelect
+          code='ctGender'
+          // optionLabelLength={1}
+          text
+          value={entity.genderFK}
+        />)
       </p>
 
       <Divider light />
@@ -157,7 +171,6 @@ const PatientInfoSideBanner = ({
       >
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
           const schemeData = getSchemeDetails(o)
-
           return (
             <div style={{ marginBottom: theme.spacing(1) }}>
               <p style={{ fontWeight: 500 }}>
@@ -192,7 +205,11 @@ const PatientInfoSideBanner = ({
                 <div>
                   <p>
                     Balance:{' '}
-                    <NumberInput text currency value={schemeData.balance} />
+                    {schemeData.chronicBalanceStatusCode === 'SC105' ? (
+                      'Full Balance'
+                    ) : (
+                      <NumberInput text currency value={schemeData.balance} />
+                    )}
                   </p>
                   <p>
                     Validity:{' '}
@@ -210,9 +227,7 @@ const PatientInfoSideBanner = ({
                       value={schemeData.validTo}
                     />
                   </p>
-                  <p style={{ color: 'red' }}>
-                    {schemeData.statusDescription}
-                  </p>
+                  <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
                 </div>
               )}
             </div>

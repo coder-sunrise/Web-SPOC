@@ -676,7 +676,7 @@ class ClinicalNotes extends Component {
                     >
                       {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
                         .length > 0 ? (
-                        <GridContainer>
+                          <GridContainer>
                           <div
                             className={classes.root}
                             style={{ width: this.state.width, paddingLeft: 20 }}
