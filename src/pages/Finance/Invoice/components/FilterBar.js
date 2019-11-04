@@ -46,6 +46,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <DateRangePicker
                     label='Invoice Date From'
                     label2='Invoice Date To'
+                    allowClear={false}
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     {...args}
                   />
