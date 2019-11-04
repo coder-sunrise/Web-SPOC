@@ -87,6 +87,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       type: 'orders/upsertRow',
       payload: data,
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
