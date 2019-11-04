@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
+import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
-import { navigateDirtyCheck } from '@/utils/utils'
 import { INVENTORY_TYPE, INVENTORY_ADJUSTMENT_STATUS } from '@/utils/constants'
 import {
   inventoryAdjustmentStatus,
@@ -17,14 +17,34 @@ import {
   DatePicker,
   Select,
   EditableTableGrid,
-  Button,
   OutlinedTextField,
   Field,
   ProgressButton,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  errorMessage: {
+    margin: theme.spacing(2),
+    color: '#cf1322',
+    fontSize: ' 0.75rem',
+    minHeight: '1em',
+    fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
+    fontWeight: 400,
+    lineHeight: '1em',
+    letterSpacing: ' 0.03333em',
+  },
+})
 let commitCount = 1000 // uniqueNumber
+
+const inventoryAdjustmentSchema = Yup.object().shape({
+  inventoryTypeFK: Yup.number().required(),
+  code: Yup.number().required(),
+  displayValue: Yup.number().required(),
+  batchNo: Yup.number().required(),
+  adjustmentQty: Yup.number()
+    .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
+    .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
+})
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) => {
@@ -37,6 +57,10 @@ let commitCount = 1000 // uniqueNumber
   validationSchema: Yup.object().shape({
     adjustmentTransactionDate: Yup.date().required(),
     remarks: Yup.string().max(2000, 'Max 2000 characters for remarks.'),
+    inventoryAdjustmentItems: Yup.array()
+      .compact((v) => v.isDeleted)
+      .of(inventoryAdjustmentSchema)
+      .required('At least one item is required.'),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {
@@ -92,11 +116,12 @@ let commitCount = 1000 // uniqueNumber
           ...value,
           newQty,
           [getType.typeName]: {
-            ...restValues,
+            ...o[getType.typeName],
             batchNo: o.batchNoString || o[getType.typeName].batchNo,
             expiryDate: o.expiryDate,
-            [getType.itemFK]: o.code,
-            [getType.stockFK]: o.batchNo,
+            [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
+            [getType.stockFK]:
+              o.batchNo || o[getType.typeName][getType.stockFK],
             [getType.codeName]:
               o.codeString || o[getType.typeName][getType.codeName],
             [getType.nameName]:
@@ -198,7 +223,6 @@ class Detail extends PureComponent {
         columnName: 'code',
         type: 'select',
         labelField: 'code',
-        autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
         },
@@ -211,7 +235,6 @@ class Detail extends PureComponent {
         type: 'select',
         labelField: 'name',
         width: 250,
-        autoComplete: true,
         options: (row) => {
           return this.rowOptions(row)
         },
@@ -227,7 +250,6 @@ class Detail extends PureComponent {
       {
         columnName: 'batchNo',
         type: 'select',
-        autoComplete: true,
         options: (row) => {
           return this.stockOptions(row)
         },
@@ -258,7 +280,7 @@ class Detail extends PureComponent {
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, inventoryAdjustment, setValues } = this.props
+    const { dispatch, values, inventoryAdjustment } = this.props
     await this.initializeStateItemList()
 
     dispatch({
@@ -531,7 +553,6 @@ class Detail extends PureComponent {
           x,
         )
       }
-
       return row.id ? filteredStockOptions : x
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
@@ -584,7 +605,7 @@ class Detail extends PureComponent {
   }
 
   filterStockOption = (e) => {
-    const { option, row } = e
+    const { row } = e
     if (row.batchNo) {
       const getState = this.type(row.inventoryTypeFK)
       this.setState((prevState) => {
@@ -695,9 +716,9 @@ class Detail extends PureComponent {
     })
   }
 
-  onCommitChanges = ({ rows, deleted, added }) => {
-    const { setValues, setFieldValue, values } = this.props
-    const { stockList, stockMedication } = this.state
+  onCommitChanges = ({ rows, deleted }) => {
+    const { setValues, values } = this.props
+    const { stockList } = this.state
 
     if (deleted) {
       const deletedSet = new Set(deleted)
@@ -707,7 +728,7 @@ class Detail extends PureComponent {
       const deletedRow = rows.find((row) => row.id === test[0])
 
       deletedRow.isDeleted = true
-      const changedRows = rows.filter((row) => row.id === test[0])
+      // const changedRows = rows.filter((row) => row.id === test[0])
       if (deletedRow.batchNo) {
         const getState = this.type(deletedRow.inventoryTypeFK)
 
@@ -875,22 +896,14 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, values, handleSubmit, getRunningNo, footer } = props
+    const { classes, theme, values, footer, errors } = props
     const cfg = {}
     if (
       values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
     ) {
       cfg.onRowDoubleClick = undefined
     }
-    const inventoryAdjustmentSchema = Yup.object().shape({
-      inventoryTypeFK: Yup.number().required(),
-      code: Yup.number().required(),
-      displayValue: Yup.number().required(),
-      batchNo: Yup.number().required(),
-      adjustmentQty: Yup.number()
-        .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
-        .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
-    })
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -957,7 +970,11 @@ class Detail extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-
+          {errors.inventoryAdjustmentItems && (
+            <p className={classes.errorMessage}>
+              {errors.inventoryAdjustmentItems}
+            </p>
+          )}
           <EditableTableGrid
             style={{ marginTop: 10 }}
             FuncProps={{
@@ -1043,4 +1060,4 @@ class Detail extends PureComponent {
   }
 }
 
-export default Detail
+export default withStyles(styles, { withTheme: true })(Detail)
