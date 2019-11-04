@@ -75,6 +75,7 @@ class PatientSearch extends PureComponent {
 
   render () {
     const { props } = this
+    console.log(props)
     const {
       classes,
       renderActionFn = this.defaultAction,

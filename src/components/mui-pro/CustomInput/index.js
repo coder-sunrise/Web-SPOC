@@ -47,7 +47,7 @@ class TextField extends React.PureComponent {
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
-          : defaultValue || value,
+          : defaultValue || value || '',
     }
     // console.log(this.state.value)
     // if (field && form) {

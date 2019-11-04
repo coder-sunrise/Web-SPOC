@@ -398,8 +398,9 @@ class AntdNumberInput extends React.PureComponent {
           if (format.lastIndexOf('.') > 0) {
             v = `${v}`.replace('.', '')
             const lastCharIsZero = v[v.length - 1] === '0'
-
-            v = `${Number(v) / Math.pow(10, dotPos.length)}`
+            const tv = Number(v) / Math.pow(10, dotPos.length)
+            if (Number.isNaN(tv)) return ''
+            v = `${tv}`
             const idx = v.indexOf('.')
             if (lastCharIsZero && idx >= 0) {
               v += dotPos
