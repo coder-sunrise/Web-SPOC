@@ -2,14 +2,7 @@ import React, { PureComponent } from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class MovementList extends PureComponent {
-
-  handleExpandedGroupsChange = (expandedGroups) => {
-    this.setState((prevState) => {
-      return { ...prevState, tableGroupRows: expandedGroups }
-    })
-  }
-
-  render () {
+   render () {
     let incomeData = []
     const { reportDatas } = this.props
     if (!reportDatas)
@@ -18,7 +11,7 @@ class MovementList extends PureComponent {
       incomeData = reportDatas.ConsumableStockDetails.map(
         (item, index) => ({
           ...item,
-          id: `ConsumableMovement-${index}-${item.ConsumableCode}`,
+          id: `ConsumableMovement-${index}-${item.consumableCode}`,
         }),
       )
     }

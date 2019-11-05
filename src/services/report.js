@@ -1,15 +1,20 @@
 import { stringify } from 'qs'
-import request, { download, baseUrl, axiosRequest } from '@/utils/request'
-import { convertToQuery } from '@/utils/utils'
+import request, { download} from '@/utils/request'
+import { convertToQuery, commonDataWriterTransform } from '@/utils/utils'
 import { REPORT_TYPE } from '@/utils/constants'
 // static data
 // import { QueueListingDummyData } from '@/pages/Report/dummyData'
 
 export const getRawData = async (reportID, payload) => {
   const baseRawDataURL = '/api/reports/datas'
+
   return request(`${baseRawDataURL}/${reportID}`, {
     method: 'GET',
-    body: { reportParameters: JSON.stringify({ ...payload }) },
+    body: {
+      reportParameters: JSON.stringify({
+        ...commonDataWriterTransform(payload),
+      }),
+    },
   })
 }
 
@@ -113,7 +118,7 @@ export const exportUnsavedReport = (
 
 export const postPDF = async (reportID, payload) => {
   const baseURL = '/api/reports'
-  var response = request(`${baseURL}/${reportID}`, {
+  let response = request(`${baseURL}/${reportID}`, {
     method: 'POST',
     contentType: 'application/x-www-form-urlencoded',
     xhrFields: {

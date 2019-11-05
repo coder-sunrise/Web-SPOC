@@ -1,22 +1,5 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core/styles'
 import { GridItem, EditableTableGrid } from '@/components'
-
-const styles = () => ({
-  displayDiv: {
-    float: 'right',
-    padding: '20px',
-  },
-
-  tableHeader: {
-    marginTop: 50,
-  },
-
-  tableSectionHeader: {
-    fontWeight: 400,
-    marginLeft: -15,
-  },
-})
 
 const InventoryType = ({
   inventoryTypeProps,
@@ -42,4 +25,4 @@ const InventoryType = ({
     </GridItem>
   )
 }
-export default withStyles(styles, { withTheme: true })(InventoryType)
+export default InventoryType
