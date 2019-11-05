@@ -381,7 +381,12 @@ class Package extends PureComponent {
   render () {
     const { theme, values, footer, handleSubmit } = this.props
     return (
-      <div>
+      <div
+        style={{
+          paddingLeft: theme.spacing(2),
+          paddingRight: theme.spacing(2),
+        }}
+      >
         <GridContainer>
           <GridItem xs={12}>
             <Field
