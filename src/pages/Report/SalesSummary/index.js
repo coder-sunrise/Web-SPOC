@@ -266,15 +266,14 @@ const SalesSummary = ({ values, validateForm }) => {
   }, [])
 
   const handleExpandedGroupsChange = (expandedGroups) => {
-    console.log({ expandedGroups })
-    // dispatch({
-    //   type: 'updateState',
-    //   payload: {
-    //     groups: expandedGroups,
-    //   },
-    // })
+    dispatch({
+      type: 'updateState',
+      payload: {
+        groups: expandedGroups,
+      },
+    })
   }
-  console.log({ state })
+
   return (
     <CardContainer hideHeader>
       <GridContainer>

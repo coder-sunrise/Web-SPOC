@@ -94,6 +94,7 @@ export const ContextMenuOptions = [
     label: 'Billing',
     Icon: Money,
     disabled: false,
+    authority: 'queue.dispense.makepayment',
   },
   {
     id: 2,

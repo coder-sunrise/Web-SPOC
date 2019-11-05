@@ -278,6 +278,7 @@ class Consultation extends PureComponent {
       consultation,
       resetForm,
     } = this.props
+
     if (values.id) {
       dispatch({
         type: 'global/updateAppState',
@@ -288,7 +289,7 @@ class Consultation extends PureComponent {
           onConfirmSave: () => {
             dispatch({
               type: 'consultation/discard',
-              payload: values.id,
+              payload: { id: values.id, history: { ...this.props.history } },
             })
           },
         },
