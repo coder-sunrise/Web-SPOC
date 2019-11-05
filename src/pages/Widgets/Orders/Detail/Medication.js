@@ -403,6 +403,15 @@ class Medication extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultMedication,
+      type: orders.type,
+      drugCode: orders.type === '5' ? 'MISC' : undefined,
+    })
+  }
+
   render () {
     const {
       theme,
@@ -916,6 +925,7 @@ class Medication extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

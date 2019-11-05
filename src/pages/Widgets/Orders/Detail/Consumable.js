@@ -95,6 +95,14 @@ class Consumable extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultConsumable,
+      type: orders.type,
+    })
+  }
+
   render () {
     const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
@@ -189,6 +197,7 @@ class Consumable extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )
