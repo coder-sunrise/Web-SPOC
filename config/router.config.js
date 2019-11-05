@@ -552,6 +552,11 @@ const routes = [
             component: './Report/PaymentCollection',
           },
           {
+            path: '/report/outstandingpaymentreport',
+            name: 'outstandingPaymentReport',
+            component: './Report/OutstandingPaymentReport',
+          },
+          {
             path: '/report/salesummary',
             name: 'salessummary',
             component: './Report/SalesSummary',
