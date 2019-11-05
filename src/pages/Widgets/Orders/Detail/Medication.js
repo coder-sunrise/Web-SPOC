@@ -195,6 +195,7 @@ class Medication extends PureComponent {
         for (let a = 0; a < dosageUsageList.length; a++) {
           if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
             dosageMultiplier = dosageUsageList[a].multiplier
+            break
           }
         }
 
@@ -204,6 +205,7 @@ class Medication extends PureComponent {
             prescriptionItem[i].drugFrequencyFK
           ) {
             multipler = medicationFrequencyList[b].multiplier
+            break
           }
         }
 
@@ -257,6 +259,8 @@ class Medication extends PureComponent {
 
     // setFieldValue('batchNo', undefined)
     // setFieldValue('expiryDate', undefined)
+    setFieldValue('corPrescriptionItemInstruction', [])
+
     setFieldValue(
       'batchNo',
       isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
@@ -287,55 +291,20 @@ class Medication extends PureComponent {
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
     if (op.duration && op.medicationFrequency && op.prescribingDosage) {
-      for (let a = 0; a < dosageUsageList.length; a++) {
-        if (dosageUsageList[a].id === op.prescribingDosage.id) {
-          dosageMultiplier = dosageUsageList[a].multiplier
-        }
-      }
+      dosageMultiplier = dosageUsageList.find(
+        (o) => o.id === op.prescribingDosage.id,
+      )
 
-      for (let b = 0; b < medicationFrequencyList.length; b++) {
-        if (medicationFrequencyList[b].id === op.medicationFrequency.id) {
-          multipler = medicationFrequencyList[b].multiplier
-        }
-      }
+      multipler = medicationFrequencyList.find(
+        (o) => o.id === op.medicationFrequency.id,
+      )
 
-      totalFirstItem += dosageMultiplier * multipler * op.duration
+      totalFirstItem +=
+        dosageMultiplier.multiplier * multipler.multiplier * op.duration
     }
 
-    for (let i = 1; i < prescriptionItem.length; i++) {
-      if (
-        prescriptionItem[i].dosageFK &&
-        prescriptionItem[i].drugFrequencyFK &&
-        prescriptionItem[i].duration
-      ) {
-        for (let a = 0; a < dosageUsageList.length; a++) {
-          if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
-            dosageMultiplier = dosageUsageList[a].multiplier
-          }
-        }
-
-        for (let b = 0; b < medicationFrequencyList.length; b++) {
-          if (
-            medicationFrequencyList[b].id ===
-            prescriptionItem[i].drugFrequencyFK
-          ) {
-            multipler = medicationFrequencyList[b].multiplier
-          }
-        }
-
-        newTotalQuantity +=
-          dosageMultiplier * multipler * prescriptionItem[i].duration
-      }
-    }
-
-    let rounded = Math.round((newTotalQuantity + totalFirstItem) * 10) / 10
+    let rounded = Math.round(totalFirstItem * 10) / 10
     setFieldValue(`quantity`, rounded)
-
-    // if (values.unitPrice) {
-    //   const total = (newTotalQuantity + totalFirstItem) * values.unitPrice
-    //   setFieldValue('totalPrice', total)
-    //   this.updateTotalPrice(total)
-    // }
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
