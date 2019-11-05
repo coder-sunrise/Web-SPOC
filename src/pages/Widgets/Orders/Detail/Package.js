@@ -24,7 +24,7 @@ const { qtyFormat } = config
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
-      ...orders.defaultPackage,
+      ...(orders.entity || orders.defaultPackage),
       type,
     }
     return v
