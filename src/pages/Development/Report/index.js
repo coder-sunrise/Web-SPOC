@@ -14,6 +14,7 @@ import {
   GridContainer,
   GridItem,
   TimePicker,
+  NumberInput,
   CommonModal,
   Select,
   TextField,
@@ -131,6 +132,14 @@ class Report extends React.Component {
                   label='Copayment Scheme name'
                   code='coPaymentScheme'
                 />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='Amount'
+              render={(args) => (
+                <NumberInput {...args} currency label='Amount' />
               )}
             />
           </GridItem>

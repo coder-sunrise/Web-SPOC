@@ -96,6 +96,7 @@ class CoPayer extends Component {
       selectedRows.includes(item.id),
     )
     const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
+    console.log({ copayer })
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmt: invoicePayerItem.reduce(
@@ -103,7 +104,7 @@ class CoPayer extends Component {
         0,
       ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
-      name: copayer.name,
+      name: copayer.displayValue,
       companyFK: copayer.id,
       isModified: false,
       _isConfirmed: true,
@@ -145,7 +146,7 @@ class CoPayer extends Component {
 
   render () {
     const { classes, onClose } = this.props
-    const { selectedRows, invoiceItems } = this.state
+    const { selectedRows, invoiceItems, coPayer } = this.state
     return (
       <div className={classes.container}>
         <GridContainer>
@@ -154,6 +155,10 @@ class CoPayer extends Component {
               label='Corporate Copayer'
               code='ctcopayer'
               labelField='displayValue'
+              remoteFilter={{
+                coPayerTypeFK: 1,
+              }}
+              value={coPayer}
               onChange={this.handleCopayerChange}
             />
           </GridItem>

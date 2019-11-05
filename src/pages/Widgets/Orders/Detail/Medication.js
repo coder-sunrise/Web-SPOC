@@ -195,6 +195,7 @@ class Medication extends PureComponent {
         for (let a = 0; a < dosageUsageList.length; a++) {
           if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
             dosageMultiplier = dosageUsageList[a].multiplier
+            break
           }
         }
 
@@ -204,6 +205,7 @@ class Medication extends PureComponent {
             prescriptionItem[i].drugFrequencyFK
           ) {
             multipler = medicationFrequencyList[b].multiplier
+            break
           }
         }
 
@@ -257,6 +259,13 @@ class Medication extends PureComponent {
 
     // setFieldValue('batchNo', undefined)
     // setFieldValue('expiryDate', undefined)
+    setFieldValue('corPrescriptionItemInstruction', [
+      {
+        sequence: 0,
+        stepdose: 'AND',
+      },
+    ])
+
     setFieldValue(
       'batchNo',
       isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
@@ -286,22 +295,6 @@ class Medication extends PureComponent {
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
-    // if (op.duration && op.medicationFrequency && op.prescribingDosage) {
-    //   for (let a = 0; a < dosageUsageList.length; a++) {
-    //     if (dosageUsageList[a].id === op.prescribingDosage.id) {
-    //       dosageMultiplier = dosageUsageList[a].multiplier
-    //     }
-    //   }
-
-    //   for (let b = 0; b < medicationFrequencyList.length; b++) {
-    //     if (medicationFrequencyList[b].id === op.medicationFrequency.id) {
-    //       multipler = medicationFrequencyList[b].multiplier
-    //     }
-    //   }
-
-    //   totalFirstItem += dosageMultiplier * multipler * op.duration
-    // }
-
     for (let i = 0; i < prescriptionItem.length; i++) {
       if (
         prescriptionItem[i].dosageFK &&
@@ -326,16 +319,9 @@ class Medication extends PureComponent {
     if (dispensingUOM && dispensingUOM.quantity) {
       // setFieldValue(`quantity`, rounded)
     }
-    console.log(op)
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
-
-    // if (values.unitPrice) {
-    //   const total = (newTotalQuantity + totalFirstItem) * values.unitPrice
-    //   setFieldValue('totalPrice', total)
-    //   this.updateTotalPrice(total)
-    // }
 
     if (
       op.inventoryMedication_MedicationPrecaution &&

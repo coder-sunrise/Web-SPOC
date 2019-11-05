@@ -23,7 +23,6 @@ import {
   NumberInput,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
-// import model from '../models/demographic'
 import Block from './Block'
 import { control } from '@/components/Decorator'
 
@@ -64,9 +63,6 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    // const da = ctdrugallergy.filter((o) =>
-    //   patientAllergy.find((m) => m.allergyFK === o.id),
-    // )
 
     const filter = patientAllergy.filter((o) => o.type === 'Allergy')
     const da = ctdrugallergy.filter((o) =>
@@ -84,21 +80,6 @@ class Banner extends PureComponent {
     } else {
       allergyData = '-'
     }
-
-    // {da.length ? (
-    //   `${da[0].name.length > 8
-    //     ? `${da[0].name.substring(0, 8)}... `
-    //     : da[0].name} `
-    // ) : (
-    //   '-'
-    // )}
-    // {da.length >= 2 ? (
-    //   `${da[1].name.length > 8
-    //     ? `, ${da[1].name.substring(0, 8)}...`
-    //     : `, ${da[1].name}`}`
-    // ) : (
-    //   ''
-    // )}
 
     if (da.length) {
       this.setState({
