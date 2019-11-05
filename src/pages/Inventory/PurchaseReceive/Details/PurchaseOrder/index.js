@@ -520,7 +520,6 @@ class Index extends Component {
       errors,
       classes,
     } = this.props
-    console.log({ values })
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
