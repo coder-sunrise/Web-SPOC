@@ -33,8 +33,8 @@ const osBalanceStatus = [
 ]
 
 const sessionOptions = [
-  { value: 'all', name: 'All Sessions'},
-  { value: 'current', name: 'Current Session'}
+  { value: 'all', name: 'All Sessions' },
+  { value: 'current', name: 'Current Session' },
 ]
 
 // const paymentMethods = [

@@ -160,7 +160,11 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
-    this._onChange(numeral(this.state.value)._value)
+    this._onChange(
+      this.state.value || this.state.value === 0
+        ? numeral(this.state.value)._value
+        : undefined,
+    )
     this.debouncedOnChange.cancel()
     this.setState({
       focused: false,
@@ -168,6 +172,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   _onChange = (value) => {
+    console.log({ value })
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -208,6 +213,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleKeyDown = (e) => {
+    console.log({ keycode: e.keyCode })
     if (
       !e.ctrlKey &&
       !(e.keyCode >= 48 && e.keyCode <= 57) &&
@@ -269,7 +275,6 @@ class AntdNumberInput extends React.PureComponent {
     //   return
     // }
     // console.log('handleValueChange', v)
-
     let newV = v
     if (!isNumber(newV)) {
       newV = undefined
@@ -330,6 +335,7 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
       parser,
+      field,
     } = this.props
     let { format } = this.props
     const { selectionStart } = this.state
@@ -338,6 +344,7 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
     }
+
     if (currency) {
       if (!format) format = `${currencySymbol}${currencyFormat}`
 
@@ -466,7 +473,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, min } = nextProps
 
     if (field) {
       this.setState({
@@ -474,14 +481,25 @@ class AntdNumberInput extends React.PureComponent {
           field.value === undefined || Number.isNaN(field.value)
             ? ''
             : Number(field.value),
+        focused:
+          field.value !== undefined &&
+          field.value !== null &&
+          field.value !== '' &&
+          !Number.isNaN(field.value),
       })
     } else if (value) {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
+        focused:
+          value !== undefined &&
+          value !== null &&
+          value !== '' &&
+          !Number.isNaN(value),
       })
     } else {
       this.setState({
         value: undefined,
+        // focused: false,
       })
     }
     // console.log(field)

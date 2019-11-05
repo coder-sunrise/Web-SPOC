@@ -187,7 +187,6 @@ class CommonModal extends React.PureComponent {
       const ob = window.g_app._store.getState().formik[o]
       // console.log(ob,this.props.observe)
       if (ob) {
-        console.log({ ob, force })
         if (ob.dirty && force !== true) {
           this.setState({
             openConfirm: true,
