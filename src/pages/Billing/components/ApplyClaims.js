@@ -341,12 +341,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const eligibleAmount =
             totalPayableBalance -
             (currentItemClaimedAmount - currentClaimAmount)
-          console.log({
-            eligibleAmount,
-            totalPayableBalance,
-            currentItemClaimedAmount,
-            currentClaimAmount,
-          })
           if (eligibleAmount === 0 || toBeChangeAmount <= eligibleAmount)
             return { ...item, claimAmount: toBeChangeAmount, error: undefined }
 
