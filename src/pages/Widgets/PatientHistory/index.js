@@ -548,7 +548,7 @@ class PatientHistory extends Component {
                     }).then((o) => {
                       if (o)
                         router.push(
-                          `/reception/queue/patientdashboard?qid=${findGetParameter(
+                          `/reception/queue/consultation?qid=${findGetParameter(
                             'qid',
                           )}&cid=${o.id}&v=${patientHistory.version}`,
                         )

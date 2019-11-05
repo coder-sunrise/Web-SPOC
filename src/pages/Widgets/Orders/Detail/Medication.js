@@ -412,6 +412,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log(values)
     return (
       <div>
         <GridContainer>
@@ -506,7 +507,7 @@ class Medication extends PureComponent {
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{ marginLeft: 15 }}
+                                    style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
