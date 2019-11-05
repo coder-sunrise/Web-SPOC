@@ -220,7 +220,7 @@ class Service extends PureComponent {
                 return (
                   <NumberInput
                     label='Total'
-                    min={0.01}
+                    min={0}
                     currency
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)

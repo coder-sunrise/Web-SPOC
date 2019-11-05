@@ -195,7 +195,6 @@ class AddConsultationDocument extends PureComponent {
           options={loadFromCodes}
           valueField='value'
           onChange={(val, option) => {
-            console.log(val, option)
             if (!val) return
             const { values } = parentProps
             const v = option.getter

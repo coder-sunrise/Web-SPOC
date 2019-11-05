@@ -130,10 +130,6 @@ export const VaccinationColumn = [
     title: 'Name',
   },
   {
-    name: 'sequence',
-    title: 'Sequence',
-  },
-  {
     name: 'batchNo',
     title: 'Batch #',
   },

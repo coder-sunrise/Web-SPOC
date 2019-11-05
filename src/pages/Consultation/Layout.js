@@ -487,7 +487,7 @@ class Layout extends PureComponent {
         fullScreenWidget: id,
       },
       () => {
-        $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
+        // $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
       },
     )
   }

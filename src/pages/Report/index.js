@@ -74,6 +74,11 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Outstanding Payment Report',
+    url: '/report/outstandingpaymentreport',
+  },
+  {
+    title: 'Finance',
     text: 'CHAS Claim Report',
     url: '',
   },
