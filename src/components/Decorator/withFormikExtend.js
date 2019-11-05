@@ -25,7 +25,7 @@ const withFormikExtend = (props) => (Component) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
 
     const { errors, dirty, initialValues, values } = ps
-    // console.log({ initialValues, values })
+    console.log({ initialValues, values })
     const _lastFormikUpdate = {
       displayName,
       errors,

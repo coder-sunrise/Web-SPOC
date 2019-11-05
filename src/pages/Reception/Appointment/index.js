@@ -110,10 +110,17 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    // dispatch({
-    //   type: 'calendar/getPublicHolidayList',
-    //   payload: { start: startOfMonth },
-    // })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'doctorprofile' },
+    }).then((response) => {
+      this.setState({
+        resources: response.map((item) => ({
+          clinicianFK: item.clinicianProfile.id,
+          doctorName: item.clinicianProfile.name,
+        })),
+      })
+    })
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },
@@ -172,11 +179,13 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (props) => {
-    let { start, end } = props
+    const { start, end, resourceId } = props
+
     const selectedSlot = {
       allDay: start - end === 0,
       start,
       end,
+      resourceId,
     }
 
     this.setState({

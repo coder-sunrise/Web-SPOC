@@ -139,6 +139,24 @@ class AppointmentDataGrid extends React.Component {
     this.columnExtensions = [
       ...columnExtensions,
     ]
+
+    let defaultNewRows = []
+
+    if (!data || data.length <= 0) {
+      let defaultNewRow = { isPrimaryClinician: true }
+      if (selectedSlot && selectedSlot.allDay === false) {
+        defaultNewRow = {
+          startTime: moment(selectedSlot.start).format('HH:mm A'),
+          endTime: moment(selectedSlot.end).format('HH:mm A'),
+          clinicianFK: selectedSlot.resourceId,
+          ...defaultNewRow,
+        }
+      }
+      defaultNewRows.push(defaultNewRow)
+    }
+    this.state = {
+      defaultNewRows,
+    }
   }
 
   onRadioChange = ({ row, checked }) => {
@@ -167,19 +185,8 @@ class AppointmentDataGrid extends React.Component {
       editingRows,
       selectedSlot,
     } = this.props
-    let defaultNewRows = []
 
-    if (!data || data.length <= 0) {
-      let defaultNewRow = { isPrimaryClinician: true }
-      if (selectedSlot && selectedSlot.allDay === false) {
-        defaultNewRow = {
-          startTime: moment(selectedSlot.start).format('HH:mm A'),
-          endTime: moment(selectedSlot.end).format('HH:mm A'),
-          ...defaultNewRow,
-        }
-      }
-      defaultNewRows.push(defaultNewRow)
-    }
+    const { defaultNewRows } = this.state
 
     return (
       <div className={classes.container}>
@@ -208,7 +215,7 @@ class AppointmentDataGrid extends React.Component {
             showDeleteCommand: !disabled && data.length !== 1,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,
-            defaultNewRow: defaultNewRows,
+            // defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />
