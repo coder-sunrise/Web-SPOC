@@ -20,7 +20,6 @@ const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  paymentCollectionData: [],
   params: {},
 }
 const reducer = (state, action) => {

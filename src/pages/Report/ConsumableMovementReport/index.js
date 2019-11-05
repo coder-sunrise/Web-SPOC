@@ -20,7 +20,6 @@ const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  incomeData: [],
 }
 
 const reducer = (state, action) => {
