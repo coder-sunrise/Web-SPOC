@@ -856,10 +856,16 @@ const getRefreshChasBalanceStatus = (status = []) => {
   const { statusCode, statusDescription } = status[0]
 
   if (
-    statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase() ||
-    statusCode.trim().toLowerCase() !==
-      fullBalanceSuccessCode.trim().toLowerCase()
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
   ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
+
+  if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
       ...defaultResponse,
       statusDescription,
