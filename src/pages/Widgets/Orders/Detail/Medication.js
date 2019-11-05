@@ -259,7 +259,12 @@ class Medication extends PureComponent {
 
     // setFieldValue('batchNo', undefined)
     // setFieldValue('expiryDate', undefined)
-    setFieldValue('corPrescriptionItemInstruction', [])
+    setFieldValue('corPrescriptionItemInstruction', [
+      {
+        sequence: 0,
+        stepdose: 'AND',
+      },
+    ])
 
     setFieldValue(
       'batchNo',
