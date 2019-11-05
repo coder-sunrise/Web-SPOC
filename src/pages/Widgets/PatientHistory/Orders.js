@@ -14,7 +14,7 @@ export default ({ current, codetable }) => (
     columnExtensions={[
       {
         columnName: 'type',
-
+        width: 180,
         render: (row) => {
           return (
             <div>
@@ -102,7 +102,7 @@ export default ({ current, codetable }) => (
           )
         },
       },
-      { columnName: 'totalAmount', type: 'number', currency: true },
+      { columnName: 'totalAmount', type: 'number', currency: true, width: 120 },
     ]}
   />
 )
