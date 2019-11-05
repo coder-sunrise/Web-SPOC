@@ -155,12 +155,7 @@ class Service extends PureComponent {
     const { serviceFK, serviceCenterFK } = values
 
     return (
-      <div
-        style={{
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(2),
-        }}
-      >
+      <div>
         <GridContainer>
           <GridItem xs={12}>
             <Field

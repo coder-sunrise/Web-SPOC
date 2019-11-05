@@ -421,14 +421,8 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log(values)
     return (
-      <div
-        style={{
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(2),
-        }}
-      >
+      <div>
         <GridContainer>
           <GridItem xs={10}>
             {openPrescription ? (
@@ -503,7 +497,7 @@ class Medication extends PureComponent {
                             />
                           </GridItem>
                         )}
-                        {i > 0 && <GridItem xs={2} />}
+                        {i > 0 && <GridItem xs={10} />}
                         <GridItem xs={2}>
                           <FastField
                             name={`corPrescriptionItemInstruction[${i}].usageMethodFK`}
@@ -514,7 +508,6 @@ class Medication extends PureComponent {
                                     style={{
                                       position: 'absolute',
                                       bottom: 4,
-                                      left: -16,
                                     }}
                                   >
                                     {i + 1}.
@@ -680,15 +673,14 @@ class Medication extends PureComponent {
                                       style={{
                                         position: 'absolute',
                                         top: 3,
-                                        left: -16,
                                       }}
                                     >
                                       {i + 1}.
                                     </span>
                                     <CodeSelect
-                                      // style={{
-                                      //   paddingLeft: 15,
-                                      // }}
+                                      style={{
+                                        paddingLeft: 15,
+                                      }}
                                       // label='Precaution'
                                       // simple
                                       code='ctMedicationPrecaution'
