@@ -149,6 +149,14 @@ class Service extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
+  }
+
   render () {
     const { classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
@@ -254,6 +262,7 @@ class Service extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )
