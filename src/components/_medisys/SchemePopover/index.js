@@ -55,8 +55,7 @@ const SchemePopover = ({
       isShowReplacementModal,
     ],
   )
-  console.log('popOver ', schemeData)
-  console.log('test ', `${chronicBalanceStatusCode} ${acuteBalanceStatusCode}`)
+
   return (
     <React.Fragment>
       <Popover

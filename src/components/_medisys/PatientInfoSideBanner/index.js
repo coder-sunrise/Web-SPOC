@@ -46,6 +46,13 @@ const PatientInfoSideBanner = ({
       },
     }).then((result) => {
       if (result) {
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
+
         const {
           balance,
           schemeTypeFk,

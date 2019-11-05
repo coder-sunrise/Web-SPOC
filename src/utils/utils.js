@@ -854,7 +854,7 @@ const getRefreshChasBalanceStatus = (status = []) => {
   const successCode = 'SC100'
   const fullBalanceSuccessCode = 'SC105'
   const { statusCode, statusDescription } = status[0]
-  console.log('response ', status)
+
   if (
     statusCode.trim().toLowerCase() ===
     fullBalanceSuccessCode.trim().toLowerCase()

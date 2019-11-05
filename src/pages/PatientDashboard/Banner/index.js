@@ -178,7 +178,7 @@ class Banner extends PureComponent {
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
       if (result) {
-        this.props.dispatch({
+        dispatch({
           type: 'patient/query',
           payload: {
             id: entity.id,
@@ -463,8 +463,8 @@ class Banner extends PureComponent {
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
                     .length > 0 ? (
                       <IconButton onClick={this.refreshChasBalance}>
-                        <Refresh />
-                      </IconButton>
+                      <Refresh />
+                    </IconButton>
                   ) : (
                     ''
                   )}
