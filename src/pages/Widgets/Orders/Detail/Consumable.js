@@ -104,7 +104,7 @@ class Consumable extends PureComponent {
   }
 
   render () {
-    const { values, footer, handleSubmit, setFieldValue } = this.props
+    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>

@@ -40,7 +40,11 @@ const inventoryAdjustmentSchema = Yup.object().shape({
   inventoryTypeFK: Yup.number().required(),
   code: Yup.number().required(),
   displayValue: Yup.number().required(),
-  batchNo: Yup.number().required(),
+  batchNo: Yup.array().when('expiryDate', {
+    is: (v) => v === undefined || v === '',
+    then: Yup.array().nullable(),
+    otherwise: Yup.array().required(),
+  }),
   adjustmentQty: Yup.number()
     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
@@ -250,12 +254,18 @@ class Detail extends PureComponent {
       {
         columnName: 'batchNo',
         type: 'select',
+        mode: 'tags',
+        maxSelected: 1,
+        disableAll: true,
         options: (row) => {
           return this.stockOptions(row)
         },
         onChange: (e) => {
           this.handleSelectedBatch(e)
         },
+        // render: (row) => {
+        //   return <TextField text value={row.batchNo} />
+        // },
       },
       {
         columnName: 'expiryDate',
@@ -619,11 +629,20 @@ class Detail extends PureComponent {
   }
 
   handleSelectedBatch = (e) => {
+    console.log({ e })
     const { option, row } = e
     if (option) {
       const { expiryDate, stock, value, batchNo } = option
       this.setState({ selectedItem: undefined })
-      row.batchNo = value
+      let tempBatchNo = value
+      if (Array.isArray(tempBatchNo) && tempBatchNo.length > 0) {
+        const [
+          firstIndex,
+        ] = tempBatchNo
+        tempBatchNo = firstIndex
+      }
+      // row.batchNo = value
+      row.batchNo = tempBatchNo
       row.expiryDate = expiryDate
       row.stock = stock
       row.batchNoString = batchNo
@@ -698,7 +717,7 @@ class Detail extends PureComponent {
           (j) => j.inventoryItemFK === row.code && j.isDefault,
         )
         if (defaultStock) {
-          row.batchNo = defaultStock.id
+          row.batchNo = defaultStock.batchNo
           row.stock = defaultStock.stock
           row.expiryDate = defaultStock.expiryDate
           this.setState({ selectedBatch: defaultStock })
@@ -841,8 +860,6 @@ class Detail extends PureComponent {
           returnRows = returnRows.map((r) => ({
             ...r,
             uomDisplayValue: uom,
-            // stock: undefined,
-            // expiryDate: undefined,
           }))
         } else {
           returnRows = returnRows.map((r) => {
@@ -856,7 +873,7 @@ class Detail extends PureComponent {
           })
         }
         if (this.state.selectedBatch && returnRows) {
-          // const { stock } = this.state.selectedItem
+          this.setState({ selectedItem: undefined })
           returnRows = returnRows.map((r) => ({
             ...r,
             stock: this.state.selectedBatch.stock,
@@ -877,7 +894,6 @@ class Detail extends PureComponent {
       stock: undefined,
       adjustmentQty: undefined,
     }))
-
     return returnRows
   }
 
