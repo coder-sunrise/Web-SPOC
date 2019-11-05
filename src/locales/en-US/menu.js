@@ -137,6 +137,7 @@ export default {
   'menu.report.queueListingReport': 'Queue Listing Report',
   'menu.report.patientListingReport': 'Patient Listing Report',
   'menu.report.paymentCollection': 'Payment Collection Report',
+  'menu.report.outstandingPaymentReport': 'Outstanding Payment Report',
   'menu.report.salessummary': 'Sales Summary Report',
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
