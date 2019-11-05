@@ -21,7 +21,7 @@ import { unstable_Box as Box } from '@material-ui/core/Box'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 import Loadable from 'react-loadable'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
-import { findGetParameter } from '@/utils/utils'
+import { findGetParameter , getAppendUrl } from '@/utils/utils'
 import {
   PictureUpload,
   GridContainer,
@@ -38,7 +38,7 @@ import {
 } from '@/components'
 
 import avatar from '@/assets/img/faces/marc.jpg'
-import { getAppendUrl } from '@/utils/utils'
+
 
 import Loading from '@/components/PageLoading/index'
 import Banner from './Banner'
@@ -173,7 +173,6 @@ class PatientDashboard extends PureComponent {
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {} } = entity
-    // console.log(visit)
 
     return (
       <div className={classes.root}>
