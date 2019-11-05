@@ -286,49 +286,49 @@ class Medication extends PureComponent {
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
-    if (op.duration && op.medicationFrequency && op.prescribingDosage) {
-      for (let a = 0; a < dosageUsageList.length; a++) {
-        if (dosageUsageList[a].id === op.prescribingDosage.id) {
-          dosageMultiplier = dosageUsageList[a].multiplier
-        }
-      }
+    // if (op.duration && op.medicationFrequency && op.prescribingDosage) {
+    //   for (let a = 0; a < dosageUsageList.length; a++) {
+    //     if (dosageUsageList[a].id === op.prescribingDosage.id) {
+    //       dosageMultiplier = dosageUsageList[a].multiplier
+    //     }
+    //   }
 
-      for (let b = 0; b < medicationFrequencyList.length; b++) {
-        if (medicationFrequencyList[b].id === op.medicationFrequency.id) {
-          multipler = medicationFrequencyList[b].multiplier
-        }
-      }
+    //   for (let b = 0; b < medicationFrequencyList.length; b++) {
+    //     if (medicationFrequencyList[b].id === op.medicationFrequency.id) {
+    //       multipler = medicationFrequencyList[b].multiplier
+    //     }
+    //   }
 
-      totalFirstItem += dosageMultiplier * multipler * op.duration
-    }
+    //   totalFirstItem += dosageMultiplier * multipler * op.duration
+    // }
 
-    for (let i = 1; i < prescriptionItem.length; i++) {
+    for (let i = 0; i < prescriptionItem.length; i++) {
       if (
         prescriptionItem[i].dosageFK &&
         prescriptionItem[i].drugFrequencyFK &&
         prescriptionItem[i].duration
       ) {
-        for (let a = 0; a < dosageUsageList.length; a++) {
-          if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
-            dosageMultiplier = dosageUsageList[a].multiplier
-          }
-        }
+        const dosage = dosageUsageList.find(
+          (o) => o.id === prescriptionItem[i].dosageFK,
+        )
 
-        for (let b = 0; b < medicationFrequencyList.length; b++) {
-          if (
-            medicationFrequencyList[b].id ===
-            prescriptionItem[i].drugFrequencyFK
-          ) {
-            multipler = medicationFrequencyList[b].multiplier
-          }
-        }
+        const drugFrequency = medicationFrequencyList.find(
+          (o) => o.id === prescriptionItem[i].drugFrequencyFK,
+        )
 
         newTotalQuantity +=
-          dosageMultiplier * multipler * prescriptionItem[i].duration
+          dosage.multiplier *
+          drugFrequency.multiplier *
+          prescriptionItem[i].duration
       }
     }
+    const { dispensingUOM } = op
+    if (dispensingUOM && dispensingUOM.quantity) {
+      // setFieldValue(`quantity`, rounded)
+    }
+    console.log(op)
 
-    let rounded = Math.round((newTotalQuantity + totalFirstItem) * 10) / 10
+    let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
 
     // if (values.unitPrice) {

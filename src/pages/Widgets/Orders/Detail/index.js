@@ -65,7 +65,7 @@ class Details extends PureComponent {
               {currencySymbol} Adjustment
             </Button>
           )}
-          {!!entity && (
+          {/* {!!entity && (
             <Button
               color='danger'
               onClick={() => {
@@ -81,12 +81,10 @@ class Details extends PureComponent {
             >
               New
             </Button>
-          )}
-          {!entity && (
-            <Button color='danger' onClick={onReset}>
-              Discard
-            </Button>
-          )}
+          )} */}
+          <Button color='danger' onClick={onReset}>
+            Discard
+          </Button>
           <Button color='primary' onClick={onSave}>
             Save
           </Button>
