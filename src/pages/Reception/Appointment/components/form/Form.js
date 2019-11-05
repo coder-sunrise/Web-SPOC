@@ -133,13 +133,14 @@ class Form extends React.PureComponent {
     const { showSearchPatientModal } = this.state
     this.setState({ showSearchPatientModal: !showSearchPatientModal })
     if (showSearchPatientModal) {
-      this.props.dispatch({
-        type: 'patientSearch/updateState',
-        payload: {
-          filter: {},
-          list: [],
-        },
-      })
+      // this.props.dispatch({
+      //   type: 'patientSearch/updateState',
+      //   payload: {
+      //     filter: {},
+      //     list: [],
+      //   },
+      // })
+      this.resetPatientSearchResult()
     }
   }
 
@@ -197,6 +198,16 @@ class Form extends React.PureComponent {
     this.showSearchResult()
   }
 
+  resetPatientSearchResult = () => {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
+
   showSearchResult = () => {
     const { patientSearchResult } = this.props
 
@@ -205,6 +216,7 @@ class Form extends React.PureComponent {
 
       if (shouldPopulate) {
         this.onSelectPatientClick(patientSearchResult[0], true)
+        this.resetPatientSearchResult()
       } else this.toggleSearchPatientModal()
     }
   }
