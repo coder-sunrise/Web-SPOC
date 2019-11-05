@@ -150,12 +150,17 @@ class Service extends PureComponent {
   }
 
   render () {
-    const { classes, values = {}, footer, handleSubmit } = this.props
+    const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
     return (
-      <div>
+      <div
+        style={{
+          paddingLeft: theme.spacing(2),
+          paddingRight: theme.spacing(2),
+        }}
+      >
         <GridContainer>
           <GridItem xs={12}>
             <Field
