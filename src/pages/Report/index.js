@@ -64,6 +64,11 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Credit Note Listing Report',
+    url: '/report/creditnotelistingreport',
+  },
+  {
+    title: 'Finance',
     text: 'CHAS Claim Report',
     url: '',
   },

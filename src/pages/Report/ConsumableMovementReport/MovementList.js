@@ -18,7 +18,7 @@ class MovementList extends PureComponent {
       incomeData = reportDatas.ConsumableStockDetails.map(
         (item, index) => ({
           ...item,
-          id: `ConsumableMovement-${index}-${item.ConsumableCode}`,
+          id: `ConsumableMovement-${index}-${item.consumableCode}`,
         }),
       )
     }
