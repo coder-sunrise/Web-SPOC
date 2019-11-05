@@ -176,7 +176,7 @@ const PatientInfoSideBanner = ({
         className={classes.schemeContainer}
         style={{ maxHeight: height - 455 - 20 }}
       >
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
+        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
           const schemeData = getSchemeDetails(o)
           return (
             <div style={{ marginBottom: theme.spacing(1) }}>
