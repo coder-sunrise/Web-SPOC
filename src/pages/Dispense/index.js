@@ -143,7 +143,7 @@ class Dispense extends PureComponent {
           payload: {
             reportTypeID: downloadConfig.id,
             reportParameters: {
-              [downloadConfig.key]: row.id,
+              ...reportParameters,
               isSaved: true,
             },
           },
