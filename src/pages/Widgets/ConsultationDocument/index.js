@@ -88,7 +88,7 @@ export const printRow = async (row, props) => {
   }
 }
 
-export const viewReport = (row, props) => {
+export const viewReport = (row, props, useID = false) => {
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -97,7 +97,7 @@ export const viewReport = (row, props) => {
     notification.error({ message: 'No configuration found' })
     return false
   }
-  if (row.id) {
+  if (row.id && useID) {
     window.g_app._store.dispatch({
       type: 'global/updateState',
       payload: {
@@ -219,6 +219,12 @@ class ConsultationDocument extends PureComponent {
     this.toggleModal()
   }
 
+  viewReport = (uid) => {
+    const { consultationDocument } = this.props
+    const { rows } = consultationDocument
+    const row = viewReport(rows.find((item) => item.uid === uid), this.props)
+  }
+
   render () {
     const {
       consultationDocument,
@@ -273,7 +279,8 @@ class ConsultationDocument extends PureComponent {
               columnName: 'subject',
               onClick: (row) => {
                 // printRow(row, this.props)
-                viewReport(row, this.props)
+                this.viewReport(row.uid)
+                // viewReport(row, this.props)
               },
               type: 'link',
               linkField: 'href',
