@@ -132,13 +132,13 @@ class ClinicalNotes extends Component {
   }
 
   resize = () => {
-    if (window.innerWidth >= 1812) {
+    if (window.innerWidth <= 1785) {
       this.setState({
-        width: window.innerWidth / 4,
+        width: window.innerWidth / 11,
       })
     } else {
       this.setState({
-        width: window.innerWidth / 7.8,
+        width: window.innerWidth / 5.8,
       })
     }
   }

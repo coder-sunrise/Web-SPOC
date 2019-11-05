@@ -42,7 +42,8 @@ const PatientInfoInput = ({
             return (
               <TextField
                 {...args}
-                autoFocus
+                // autoFocus
+                defaultValue={undefined}
                 label='Patient Name / Acc. No.'
                 disabled={isEdit}
               />
