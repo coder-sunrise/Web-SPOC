@@ -87,6 +87,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       type: 'orders/upsertRow',
       payload: data,
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
@@ -222,6 +223,11 @@ class Medication extends PureComponent {
     this.setState(() => {
       return { selectionOptions: op.medicationStock }
     })
+
+    const isDefaultBatchNo = op.medicationStock.find(
+      (o) => o.isDefault === true,
+    )
+
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
     // let tempArray = [
@@ -240,8 +246,16 @@ class Medication extends PureComponent {
     let newTotalQuantity = 0
     let totalFirstItem = 0
 
-    setFieldValue('batchNo', undefined)
-    setFieldValue('expiryDate', undefined)
+    // setFieldValue('batchNo', undefined)
+    // setFieldValue('expiryDate', undefined)
+    setFieldValue(
+      'batchNo',
+      isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+    )
+    setFieldValue(
+      'expiryDate',
+      isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
+    )
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',

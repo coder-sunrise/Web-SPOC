@@ -278,7 +278,6 @@ class BaseInput extends React.PureComponent {
     ) {
       labelProps.shrink = true
     }
-    // console.log(labelProps, props, inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}

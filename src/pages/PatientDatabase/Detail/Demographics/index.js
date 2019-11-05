@@ -303,6 +303,8 @@ class Demographic extends PureComponent {
                       label='Remarks'
                       multiline
                       rowsMax={4}
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
                       {...args}
                     />
                   )}

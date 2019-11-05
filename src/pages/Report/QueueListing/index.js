@@ -6,7 +6,13 @@ import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Accordion,
+  CardContainer,
+  DateFormatter,
+  GridContainer,
+  GridItem,
+} from '@/components'
 // sub components
 import FilterBar from './FilterBar'
 import ReportLayoutWrapper from '../ReportLayout'
@@ -35,6 +41,39 @@ const VisitListingColumns = [
   { name: 'paymentMode', title: 'Payment Mode' },
   { name: 'countNumber', title: 'Count Number' },
   { name: 'coPayerName', title: 'Copayer Name' },
+]
+
+const VisitListingColumnExtension = [
+  {
+    columnName: 'visitDate',
+    width: 160,
+    render: (row) => (
+      <span style={{ width: '200px' }}>
+        {DateFormatter({
+          value: row.visitDate,
+          full: true,
+        })}
+      </span>
+    ),
+  },
+  {
+    columnName: 'timeIn',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeIn,
+        full: true,
+      }),
+  },
+  {
+    columnName: 'timeout',
+    width: 160,
+    render: (row) =>
+      DateFormatter({
+        value: row.timeout,
+        full: true,
+      }),
+  },
 ]
 
 const PastPaymentCollectionTableColumn = [
@@ -181,6 +220,7 @@ const QueueListing = ({ values, validateForm }) => {
                       height={500}
                       data={state.visitListingData}
                       columns={VisitListingColumns}
+                      columnExtensions={VisitListingColumnExtension}
                     />
                   ),
                 },

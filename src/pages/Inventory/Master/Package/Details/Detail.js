@@ -28,14 +28,14 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
         payload: {
           id: packDetail.currentId,
         },
-      }) //.then((v) => console.log('v', v))
+      }) // .then((v) => console.log('v', v))
     }
   }, [])
   return (
     <CardContainer
       hideHeader
       style={{
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         minHeight: 700,
         maxHeight: 700,
       }}

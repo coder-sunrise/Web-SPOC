@@ -63,25 +63,25 @@ export default createListViewModel({
         }
         const codetableState = yield select((state) => state.codetable)
 
-        if (hasFilter) {
-          yield put({
-            type: 'addToHasFilterList',
-            payload: {
-              code: ctcode,
-            },
-          })
-        } else {
-          const filteredBefore = codetableState.hasFilterProps.includes(ctcode)
-          if (filteredBefore) {
-            payload.force = true
-            yield put({
-              type: 'removeFromFilterList',
-              payload: {
-                code: ctcode,
-              },
-            })
-          }
-        }
+        // if (hasFilter) {
+        //   yield put({
+        //     type: 'addToHasFilterList',
+        //     payload: {
+        //       code: ctcode,
+        //     },
+        //   })
+        // } else {
+        //   const filteredBefore = codetableState.hasFilterProps.includes(ctcode)
+        //   if (filteredBefore) {
+        //     payload.force = true
+        //     yield put({
+        //       type: 'removeFromFilterList',
+        //       payload: {
+        //         code: ctcode,
+        //       },
+        //     })
+        //   }
+        // }
 
         if (ctcode !== undefined) {
           if (
