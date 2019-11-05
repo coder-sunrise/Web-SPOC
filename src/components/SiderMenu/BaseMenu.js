@@ -145,6 +145,7 @@ class BaseMenu extends PureComponent {
             replace={item.path === location.pathname}
             onClick={(e) => {
               this.openCollapse(key)
+              e.preventDefault()
               return false
             }}
             className={navLinkClasses}

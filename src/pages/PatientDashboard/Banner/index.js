@@ -177,6 +177,7 @@ class Banner extends PureComponent {
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
+      console.log('result ==========', result)
       if (result) {
         const {
           balance,
@@ -446,9 +447,9 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
@@ -460,7 +461,7 @@ class Banner extends PureComponent {
                 <div>
                   {entity.patientScheme.length ? '' : '-'}
                   {entity.patientScheme
-                    .filter((o) => o.schemeTypeFK <= 5)
+                    .filter((o) => o.schemeTypeFK <= 6)
                     .map((o) => {
                       const schemeData = this.getSchemeDetails(o)
                       return (

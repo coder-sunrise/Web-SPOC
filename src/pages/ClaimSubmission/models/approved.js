@@ -17,9 +17,9 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        dispatch({
-          type: 'getCurrentBizSession',
-        })
+        // dispatch({
+        //   type: 'getCurrentBizSession',
+        // })
       })
     },
     effects: {

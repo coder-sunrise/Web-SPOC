@@ -22,6 +22,11 @@ class PayersGrid extends PureComponent {
         type: 'codeSelect',
         code: 'ctMedisaveRelationShip',
       },
+      {
+        columnName: 'scheme',
+        type: 'codeSelect',
+        code: 'ctSchemeType',
+      },
     ],
   }
 

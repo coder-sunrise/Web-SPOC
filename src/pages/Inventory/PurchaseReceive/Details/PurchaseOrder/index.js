@@ -60,6 +60,9 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.remark = null
         newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
+      } else if (newPurchaseOrderDetails.type === 'new') {
+        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
+        newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
       }
 
       if (newPurchaseOrderDetails.purchaseOrder) {

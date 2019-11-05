@@ -7,7 +7,10 @@ import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 const sharedMedicationValue = {
   quantity: 0,
   corPrescriptionItemPrecaution: [
-    {},
+    {
+      precaution: '',
+      sequence: 0,
+    },
   ],
   corPrescriptionItemInstruction: [
     {
@@ -30,7 +33,7 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      // type: '1',
+      type: '1',
       rows: [],
       finalAdjustments: [],
       summary: {},
@@ -81,13 +84,22 @@ export default createListViewModel({
     },
     effects: {
       *upsertRow ({ payload }, { select, call, put, delay }) {
-        yield put({
+        const upsert = yield put({
           type: 'upsertRowState',
           payload,
         })
         yield put({
           type: 'calculateAmount',
         })
+
+        if (upsert) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: undefined,
+            },
+          })
+        }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
         yield put({

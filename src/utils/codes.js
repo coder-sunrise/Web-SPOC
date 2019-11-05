@@ -32,6 +32,11 @@ const osBalanceStatus = [
   { value: 'no', name: 'No', color: 'no' },
 ]
 
+const sessionOptions = [
+  { value: 'all', name: 'All Sessions' },
+  { value: 'current', name: 'Current Session' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -940,6 +945,7 @@ const _fetchAndSaveCodeTable = async (
       data: result,
       createDate: new Date(),
       updateDate: refresh ? null : new Date(),
+      params,
       // shouldRefresh: refresh,
     })
     return result
@@ -1020,13 +1026,15 @@ export const getCodes = async (payload) => {
 export const checkShouldRefresh = async (payload) => {
   try {
     const { code, filter } = payload
-    if (filter !== undefined) return true
 
     await db.open()
     const ct = await db.codetable.get(code.toLowerCase())
 
     if (ct === undefined) return true
-    const { updateDate } = ct
+
+    const { updateDate, params } = ct
+    if (!_.isEqual(params, filter)) return true
+
     return updateDate === null
   } catch (error) {
     console.log({ error })
@@ -1381,6 +1389,7 @@ module.exports = {
   currencyRoundingToTheClosestList,
   coPayerType,
   // country,
+  sessionOptions,
   consultationDocumentTypes,
   getServices,
   tagList,

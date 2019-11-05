@@ -28,6 +28,22 @@ export default createListViewModel({
           userProfile: { ...data },
         })
       },
+      *refreshAllRelatedCodetables (_, { put }) {
+        yield put({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'doctorprofile',
+            force: true,
+          },
+        })
+        yield put({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'clinicianprofile',
+            force: true,
+          },
+        })
+      },
     },
     reducers: {
       openModal (state) {

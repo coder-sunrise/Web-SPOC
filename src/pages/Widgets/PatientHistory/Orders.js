@@ -51,22 +51,26 @@ export default ({ current, codetable }) => (
                   const usageMethod = ctmedicationusage.filter(
                     (codeTableItem) => codeTableItem.id === item.usageMethodFK,
                   )
-                  text += `${usageMethod[0].name} `
+                  text += `${usageMethod.length > 0
+                    ? usageMethod[0].name
+                    : ''} `
                   text += ' '
                   const dosage = ctmedicationdosage.filter(
                     (codeTableItem) => codeTableItem.id === item.dosageFK,
                   )
-                  text += `${dosage[0].displayValue} `
+                  text += `${dosage.length > 0 ? dosage[0].displayValue : ''} `
                   const prescribe = ctmedicationunitofmeasurement.filter(
                     (codeTableItem) => codeTableItem.id === item.prescribeUOMFK,
                   )
-                  text += `${prescribe[0].name} `
+                  text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
                   const drugFrequency = ctmedicationfrequency.filter(
                     (codeTableItem) =>
                       codeTableItem.id === item.drugFrequencyFK,
                   )
-                  text += `${drugFrequency[0].displayValue} For `
-                  text += `${item.duration} day(s)`
+                  text += `${drugFrequency.length > 0
+                    ? drugFrequency[0].displayValue
+                    : ''} For `
+                  text += `${item.duration ? item.duration : ''} day(s)`
 
                   return <p>{text}</p>
                 })

@@ -281,9 +281,15 @@ class PatientDetail extends PureComponent {
   // }
 
   registerVisit = () => {
-    router.push(
-      `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
-    )
+    this.props
+      .dispatch({
+        type: 'patient/closePatientModal',
+      })
+      .then(() => {
+        router.push(
+          `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+        )
+      })
   }
 
   handleOpenReplacementModal = () =>

@@ -29,7 +29,6 @@ import {
   ProgressButton,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
-import ReportModal from './ReportModal'
 
 import model from './models'
 
@@ -89,6 +88,61 @@ export const printRow = async (row, props) => {
   }
 }
 
+export const viewReport = (row, props, useID = false) => {
+  const type = consultationDocumentTypes.find(
+    (o) => o.value === row.type || o.name === row.type || o.code === row.type,
+  )
+  const { downloadConfig } = type
+  if (!downloadConfig) {
+    notification.error({ message: 'No configuration found' })
+    return false
+  }
+  if (row.id && useID) {
+    window.g_app._store.dispatch({
+      type: 'global/updateState',
+      payload: {
+        reportTypeID: downloadConfig.id,
+        reportParameters: {
+          [downloadConfig.key]: row.id,
+          isSaved: true,
+        },
+      },
+    })
+  } else {
+    const { codetable, patient } = props
+    const { clinicianprofile = [] } = codetable
+    const { entity } = patient
+    const obj =
+      clinicianprofile.find(
+        (o) =>
+          o.userProfileFK ===
+          (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
+      ) || {}
+
+    const reportParameters = { ...row }
+    const { subject } = row
+    reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
+    reportParameters.doctorMCRNo = obj.doctorProfile.doctorMCRNo
+
+    reportParameters.patientName = entity.name
+    reportParameters.patientAccountNo = entity.patientAccountNo
+    window.g_app._store.dispatch({
+      type: 'global/updateState',
+      payload: {
+        reportTypeID: downloadConfig.id,
+        reportParameters: {
+          isSaved: false,
+          reportContent: JSON.stringify(
+            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
+          ),
+        },
+      },
+    })
+  }
+
+  return true
+}
+
 // @skeleton(['consultationDocument'])
 
 @connect(({ consultationDocument, codetable, patient, consultation }) => ({
@@ -129,8 +183,6 @@ export const printRow = async (row, props) => {
 class ConsultationDocument extends PureComponent {
   state = {
     acknowledged: false,
-    reportTypeID: undefined,
-    reportParameters: {},
   }
 
   constructor (props) {
@@ -167,61 +219,10 @@ class ConsultationDocument extends PureComponent {
     this.toggleModal()
   }
 
-  viewReport = (row) => {
-    const type = consultationDocumentTypes.find(
-      (o) => o.value === row.type || o.name === row.type || o.code === row.type,
-    )
-    const { downloadConfig } = type
-    if (!downloadConfig) {
-      notification.error({ message: 'No configuration found' })
-      return false
-    }
-    if (row.id) {
-      this.setState({
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          [downloadConfig.key]: row.id,
-          isSaved: true,
-        },
-      })
-    } else {
-      const { codetable, patient } = this.props
-      const { clinicianprofile = [] } = codetable
-      const { entity } = patient
-      const obj =
-        clinicianprofile.find(
-          (o) =>
-            o.userProfileFK ===
-            (row.issuedByUserFK ? row.issuedByUserFK : row.referredByUserFK),
-        ) || {}
-
-      const reportParameters = { ...row }
-      const { subject } = row
-      reportParameters.doctorName =
-        (obj.title ? `${obj.title} ` : '') + obj.name
-      reportParameters.doctorMCRNo = obj.doctorProfile.doctorMCRNo
-
-      reportParameters.patientName = entity.name
-      reportParameters.patientAccountNo = entity.patientAccountNo
-      this.setState({
-        reportTypeID: downloadConfig.id,
-        reportParameters: {
-          isSaved: false,
-          reportContent: JSON.stringify(
-            commonDataReaderTransform(downloadConfig.draft(reportParameters)),
-          ),
-        },
-      })
-    }
-
-    return true
-  }
-
-  handleReportViewerClose = () => {
-    this.setState({
-      reportTypeID: undefined,
-      reportParameters: {},
-    })
+  viewReport = (uid) => {
+    const { consultationDocument } = this.props
+    const { rows } = consultationDocument
+    const row = viewReport(rows.find((item) => item.uid === uid), this.props)
   }
 
   render () {
@@ -236,7 +237,6 @@ class ConsultationDocument extends PureComponent {
     } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    const { reportTypeID, reportParameters } = this.state
     // console.log('consultationDocumentTypes', values)
     return (
       <div>
@@ -279,7 +279,8 @@ class ConsultationDocument extends PureComponent {
               columnName: 'subject',
               onClick: (row) => {
                 // printRow(row, this.props)
-                this.viewReport(row)
+                this.viewReport(row.uid)
+                // viewReport(row, this.props)
               },
               type: 'link',
               linkField: 'href',
@@ -423,13 +424,6 @@ class ConsultationDocument extends PureComponent {
             types={consultationDocumentTypes}
           />
         </CommonModal>
-        {reportTypeID && (
-          <ReportModal
-            onReportViewerClose={this.handleReportViewerClose}
-            reportTypeID={reportTypeID}
-            reportParameters={reportParameters}
-          />
-        )}
       </div>
     )
   }

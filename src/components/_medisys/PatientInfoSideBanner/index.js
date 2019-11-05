@@ -140,14 +140,12 @@ const PatientInfoSideBanner = ({
         ({Math.floor(
           moment.duration(moment().diff(entity.dob)).asYears(),
         )},&nbsp;
-        {
-          <CodeSelect
-            code='ctGender'
-            // optionLabelLength={1}
-            text
-            value={entity.genderFK}
-          />
-        })
+        <CodeSelect
+          code='ctGender'
+          // optionLabelLength={1}
+          text
+          value={entity.genderFK}
+        />)
       </p>
 
       <Divider light />
@@ -155,7 +153,7 @@ const PatientInfoSideBanner = ({
         className={classes.schemeContainer}
         style={{ maxHeight: height - 455 - 20 }}
       >
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
+        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
           const schemeData = getSchemeDetails(o)
 
           return (
@@ -210,9 +208,7 @@ const PatientInfoSideBanner = ({
                       value={schemeData.validTo}
                     />
                   </p>
-                  <p style={{ color: 'red' }}>
-                    {schemeData.statusDescription}
-                  </p>
+                  <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
                 </div>
               )}
             </div>

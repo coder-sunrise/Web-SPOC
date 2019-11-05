@@ -47,6 +47,7 @@ export default createFormViewModel({
           },
         })
         localStorage.removeItem('token')
+        sessionStorage.clear()
         reloadAuthorized()
 
         const redirect =

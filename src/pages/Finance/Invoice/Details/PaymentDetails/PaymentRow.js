@@ -24,6 +24,7 @@ const PaymentRow = ({
   ...payment
 }) => {
   const { id, type, itemID, date, amount, reason, isCancelled } = payment
+
   return (
     <GridContainer
       justify='center'

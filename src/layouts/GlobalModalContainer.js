@@ -10,6 +10,7 @@ import Consultation from '@/pages/PatientDashboard/Consultation'
 // import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
+import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
 
 const styles = (theme) => ({
   patientModal: {
@@ -42,7 +43,7 @@ class GlobalModalContainer extends PureComponent {
         this.props.dispatch({
           type: 'login/logout',
         })
-      }, 10000)
+      }, 60000)
     }
   }
 
@@ -226,8 +227,15 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           onConfirm={() => {
-            this.props.dispatch({
-              type: 'login/logout',
+            // this.props.dispatch({
+            //   type: 'login/logout',
+            // })
+            clearTimeout(this._timer)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: false,
+              },
             })
           }}
           showFooter
@@ -241,7 +249,7 @@ class GlobalModalContainer extends PureComponent {
               justifyContent: 'center',
             }}
           >
-            Your session will be disconnected in 1 minutes
+            <h4>Your session will be disconnected in 1 minutes</h4>
           </div>
         </CommonModal>
 
@@ -343,6 +351,13 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
+        {global.reportTypeID && (
+          <ReportModal
+          // onReportViewerClose={this.handleReportViewerClose}
+          // reportTypeID={global.reportTypeID}
+          // reportParameters={global.reportParameters}
+          />
+        )}
       </div>
     )
   }

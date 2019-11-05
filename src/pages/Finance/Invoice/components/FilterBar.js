@@ -12,10 +12,22 @@ import {
   TextField,
   Select,
 } from '@/components'
-
-import { osBalanceStatus } from '@/utils/codes'
+import { getBizSession } from '@/services/queue'
+import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
+  const getBizSessionId = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    if (data.length > 0) {
+      return data[0].id
+    }
+    return null
+  }
+
   return (
     <SizeContainer>
       <React.Fragment>
@@ -34,6 +46,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <DateRangePicker
                     label='Invoice Date From'
                     label2='Invoice Date To'
+                    allowClear={false}
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     {...args}
                   />
@@ -71,21 +84,36 @@ const FilterBar = ({ classes, dispatch, values }) => {
               render={(args) => <TextField label='Patient Name' {...args} />}
             />
           </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='session'
+              render={(args) => (
+                <Select label='Session' options={sessionOptions} {...args} />
+              )}
+            />
+          </GridItem>
         </GridContainer>
+
         <div className={classes.searchButton}>
           <Button
             color='primary'
-            onClick={() => {
+            onClick={async () => {
               const {
                 invoiceNo,
                 patientName,
                 patientAccountNo,
                 invoiceDates,
                 outstandingBalanceStatus,
+                session,
               } = values
+              let SessionID
+              if (session === 'current') {
+                SessionID = await getBizSessionId()
+              }
               dispatch({
                 type: 'invoiceList/query',
                 payload: {
+                  // combineCondition: 'and',
                   lgteql_invoiceDate: invoiceDates
                     ? invoiceDates[0]
                     : undefined,
@@ -102,12 +130,15 @@ const FilterBar = ({ classes, dispatch, values }) => {
                     outstandingBalanceStatus !== 'all'
                       ? '0'
                       : undefined,
+                  apiCriteria: {
+                    SessionID,
+                  },
                   group: [
                     {
                       invoiceNo,
                       'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
                       'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-                      combineCondition: 'or',
+                      combineCondition: 'and',
                     },
                   ],
                 },
