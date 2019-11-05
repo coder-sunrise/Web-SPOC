@@ -14,7 +14,7 @@ export default ({ current, codetable }) => (
     columnExtensions={[
       {
         columnName: 'type',
-
+        width: 180,
         render: (row) => {
           return (
             <div>
@@ -28,7 +28,6 @@ export default ({ current, codetable }) => (
         columnName: 'description',
 
         render: (row) => {
-          console.log('patient history ', row)
           let text = ''
           const {
             ctmedicationusage,
@@ -48,19 +47,22 @@ export default ({ current, codetable }) => (
           )
             return null
 
-          if (row.usageMethodFK && row.dosageFK && row.uomfk) {
+          if (row.corVaccinationItem) {
             text = ''
             const usageMethod = ctvaccinationusage.filter(
-              (codeTableItem) => codeTableItem.id === row.usageMethodFK,
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.usageMethodFK,
             )
             text += `${usageMethod.length > 0 ? usageMethod[0].name : ''} `
             text += ' '
             const dosage = ctmedicationdosage.filter(
-              (codeTableItem) => codeTableItem.id === row.dosageFK,
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.dosageFK,
             )
             text += `${dosage.length > 0 ? dosage[0].displayValue : ''} `
             const prescribe = ctvaccinationunitofmeasurement.filter(
-              (codeTableItem) => codeTableItem.id === row.uomfk,
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.uomfk,
             )
             text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
           }
@@ -102,7 +104,7 @@ export default ({ current, codetable }) => (
           )
         },
       },
-      { columnName: 'totalAmount', type: 'number', currency: true },
+      { columnName: 'totalAmount', type: 'number', currency: true, width: 120 },
     ]}
   />
 )

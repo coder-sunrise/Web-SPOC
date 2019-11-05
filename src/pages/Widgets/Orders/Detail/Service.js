@@ -149,18 +149,21 @@ class Service extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
+  }
+
   render () {
     const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
     return (
-      <div
-        style={{
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(2),
-        }}
-      >
+      <div>
         <GridContainer>
           <GridItem xs={12}>
             <Field
@@ -259,6 +262,7 @@ class Service extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

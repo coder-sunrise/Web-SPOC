@@ -47,7 +47,7 @@ class Details extends PureComponent {
     disableEdit: false,
   }
 
-  footerBtns = ({ onSave, showAdjustment = true }) => {
+  footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     const { entity } = orders
     return (
@@ -83,17 +83,7 @@ class Details extends PureComponent {
             </Button>
           )}
           {!entity && (
-            <Button
-              color='danger'
-              onClick={() => {
-                this.props.dispatch({
-                  type: 'orders/updateState',
-                  payload: {
-                    type: undefined,
-                  },
-                })
-              }}
-            >
+            <Button color='danger' onClick={onReset}>
               Discard
             </Button>
           )}

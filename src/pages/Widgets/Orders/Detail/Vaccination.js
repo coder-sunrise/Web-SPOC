@@ -76,6 +76,14 @@ class Vaccination extends PureComponent {
     )
     setFieldValue('uomfk', op.prescribingUOM ? op.prescribingUOM.id : undefined)
     setFieldValue(
+      'uomCode',
+      op.prescribingUOM ? op.prescribingUOM.code : undefined,
+    )
+    setFieldValue(
+      'uomDisplayValue',
+      op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
+    setFieldValue(
       'usageMethodFK',
       op.vaccinationUsage ? op.vaccinationUsage.id : undefined,
     )
@@ -109,15 +117,18 @@ class Vaccination extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
+  }
+
   render () {
     const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
-      <div
-        style={{
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(2),
-        }}
-      >
+      <div>
         <GridContainer>
           <GridItem xs={12}>
             <FastField
@@ -265,6 +276,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

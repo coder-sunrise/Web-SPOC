@@ -68,6 +68,8 @@ class Consumable extends PureComponent {
     console.log(v, op)
     setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
+    setFieldValue('unitOfMeasurement', op.uom ? op.uom.name : undefined)
+
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -95,15 +97,18 @@ class Consumable extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultConsumable,
+      type: orders.type,
+    })
+  }
+
   render () {
     const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
-      <div
-        style={{
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(2),
-        }}
-      >
+      <div>
         <GridContainer>
           <GridItem xs={12}>
             <FastField
@@ -194,6 +199,7 @@ class Consumable extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )
