@@ -60,6 +60,14 @@ export const ApptColumnExtensions = [
     compare: compareString,
   },
   {
+    columnName: 'doctorName',
+    width: 250,
+    render: (row) => {
+      const _title = row.title ? `${row.title} ` : ''
+      return `${_title}${row.doctorName}`
+    },
+  },
+  {
     columnName: 'gender/age',
     render: (row) => {
       const { genderFK, dob } = row
