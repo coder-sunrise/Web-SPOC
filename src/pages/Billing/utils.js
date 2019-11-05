@@ -3,10 +3,15 @@ import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
   preInvoicePayer,
-) => [
-  ...preInvoicePayerInvoiceItems,
-  ...preInvoicePayer.invoicePayerItem,
-]
+) =>
+  preInvoicePayer.isCancelled
+    ? [
+        ...preInvoicePayerInvoiceItems,
+      ]
+    : [
+        ...preInvoicePayerInvoiceItems,
+        ...preInvoicePayer.invoicePayerItem,
+      ]
 
 export const computeInvoiceItemSubtotal = (invoiceItems, item) => {
   const _existed = invoiceItems.find((_i) => _i.id === item.id)

@@ -341,13 +341,19 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const eligibleAmount =
             totalPayableBalance -
             (currentItemClaimedAmount - currentClaimAmount)
-
-          if (eligibleAmount < 0 || toBeChangeAmount <= eligibleAmount)
+          console.log({
+            eligibleAmount,
+            totalPayableBalance,
+            currentItemClaimedAmount,
+            currentClaimAmount,
+          })
+          if (eligibleAmount === 0 || toBeChangeAmount <= eligibleAmount)
             return { ...item, claimAmount: toBeChangeAmount, error: undefined }
 
           return {
             ...item,
-            error: `Cannot claim more than $${currentClaimAmount.toFixed(2)}`,
+            claimAmount: toBeChangeAmount,
+            error: `Cannot claim more than $${eligibleAmount.toFixed(2)}`,
           }
         }
         return { ...item, error: undefined }
@@ -586,8 +592,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       const updatedRow = {
         ...tempInvoicePayer[index],
         ...curEditInvoicePayerBackup,
-        _isConfirmed: false,
-        _isEditing: true,
+        _isConfirmed: true,
+        _isEditing: false,
         _isDeleted: false,
         isCancelled: false,
       }
@@ -675,6 +681,28 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
+  const renderClaimAmount = useCallback(
+    (index) => (row) => {
+      const { _isConfirmed: shouldDisable } = refTempInvociePayer.current[index]
+
+      return shouldDisable ? (
+        <NumberInput currency text value={row.claimAmount} />
+      ) : (
+        <NumberInput
+          currency
+          min={0}
+          onChange={handleClaimAmountChange(
+            row.invoiceItemFK ? row.invoiceItemFK : row.id,
+          )}
+          value={row.claimAmount}
+        />
+      )
+    },
+    [
+      refTempInvociePayer.current,
+    ],
+  )
+
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -712,23 +740,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const claimAmountColExt = {
             columnName: 'claimAmount',
             align: 'right',
-            render: (row) => {
-              const {
-                _isConfirmed: shouldDisable,
-              } = refTempInvociePayer.current[index]
-              return (
-                <NumberInput
-                  currency
-                  min={0}
-                  disabled={shouldDisable}
-                  onChange={handleClaimAmountChange(
-                    row.invoiceItemFK ? row.invoiceItemFK : row.id,
-                  )}
-                  value={row.claimAmount}
-                />
-              )
-            },
+            render: renderClaimAmount(index),
           }
+
           return (
             <Paper
               key={`invoicePayer-${index}`}
@@ -808,41 +822,39 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 >
                   <DeleteWithPopover
                     index={index}
+                    disabled={invoicePayer._isEditing ? false : hasEditing()}
                     onConfirmDelete={handleAppliedSchemeRemoveClick}
                   />
                 </GridItem>
                 <GridItem md={12}>
-                  {
-                    <CommonTableGrid
-                      key={`invoicePayer-${index}`}
-                      size='sm'
-                      FuncProps={{ pager: false }}
-                      // EditingProps={{
-                      //   showAddCommand: false,
-                      //   showDeleteCommand: false,
-                      //   showEditCommand: false,
-                      //   onEditingRowIdsChange: handleEditingRowIdsChange(index),
-                      //   onCommitChanges: handleCommitChanges(index),
-                      //   // editingRowIds: _isEditing
-                      //   //   ? invoicePayerItem.map((item) => item.id)
-                      //   //   : [],
-                      // }}
-                      // schema={validationSchema}
-                      columns={
-                        invoicePayer.payerTypeFK ===
-                        INVOICE_PAYER_TYPE.SCHEME ? (
-                          SchemeInvoicePayerColumn
-                        ) : (
-                          CompanyInvoicePayerColumn
-                        )
-                      }
-                      columnExtensions={[
-                        ...ApplyClaimsColumnExtension,
-                        claimAmountColExt,
-                      ]}
-                      rows={invoicePayer.invoicePayerItem}
-                    />
-                  }
+                  <CommonTableGrid
+                    key={`invoicePayer-${index}`}
+                    size='sm'
+                    FuncProps={{ pager: false }}
+                    // EditingProps={{
+                    //   showAddCommand: false,
+                    //   showDeleteCommand: false,
+                    //   showEditCommand: false,
+                    //   onEditingRowIdsChange: handleEditingRowIdsChange(index),
+                    //   onCommitChanges: handleCommitChanges(index),
+                    //   // editingRowIds: _isEditing
+                    //   //   ? invoicePayerItem.map((item) => item.id)
+                    //   //   : [],
+                    // }}
+                    // schema={validationSchema}
+                    columns={
+                      invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
+                        SchemeInvoicePayerColumn
+                      ) : (
+                        CompanyInvoicePayerColumn
+                      )
+                    }
+                    columnExtensions={[
+                      ...ApplyClaimsColumnExtension,
+                      claimAmountColExt,
+                    ]}
+                    rows={invoicePayer.invoicePayerItem}
+                  />
                 </GridItem>
                 <GridItem md={8} />
                 <GridItem md={4} className={classes.gridActionBtn}>
