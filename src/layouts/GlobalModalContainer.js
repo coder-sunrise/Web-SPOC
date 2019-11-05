@@ -43,7 +43,7 @@ class GlobalModalContainer extends PureComponent {
         this.props.dispatch({
           type: 'login/logout',
         })
-      }, 10000)
+      }, 60000)
     }
   }
 
@@ -227,8 +227,15 @@ class GlobalModalContainer extends PureComponent {
             })
           }}
           onConfirm={() => {
-            this.props.dispatch({
-              type: 'login/logout',
+            // this.props.dispatch({
+            //   type: 'login/logout',
+            // })
+            clearTimeout(this._timer)
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: false,
+              },
             })
           }}
           showFooter
@@ -242,7 +249,7 @@ class GlobalModalContainer extends PureComponent {
               justifyContent: 'center',
             }}
           >
-            Your session will be disconnected in 1 minutes
+            <h4>Your session will be disconnected in 1 minutes</h4>
           </div>
         </CommonModal>
 

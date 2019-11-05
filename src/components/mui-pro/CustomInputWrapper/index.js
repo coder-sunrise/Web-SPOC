@@ -130,7 +130,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
             </React.Fragment>
           </InputLabel>
         ) : null}
-        {label2 !== undefined ? (
+        {label2 ? (
           <InputLabel
             title={label2}
             className={labelClasses}

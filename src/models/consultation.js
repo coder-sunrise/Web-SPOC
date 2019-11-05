@@ -207,7 +207,7 @@ export default createFormViewModel({
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
           })
-          yield put({ type: 'closeModal' })
+          yield put({ type: 'closeModal', payload })
         }
         return response
       },
@@ -241,10 +241,10 @@ export default createFormViewModel({
       },
       *signOrder ({ payload }, { call, put }) {
         const response = yield call(service.signOrder, payload)
-        console.log(response)
         return response
       },
-      *closeModal ({ payload }, { call, put, take }) {
+      *closeModal ({ payload = { history: {} } }, { call, put, take }) {
+        const { history = {} } = payload
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -261,6 +261,7 @@ export default createFormViewModel({
             ConsultationDocumentList: undefined,
           },
         })
+
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {

@@ -82,6 +82,8 @@ export default {
   'menu.report.gstReport': 'GST Report',
   'menu.report.medicationMovementReport': 'Medication Movement Report',
   'menu.report.consumableMovementReport': 'Consumable Movement Report',
+  'menu.report.depositTransactionReport': 'Deposit Transaction Report',
+  'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',

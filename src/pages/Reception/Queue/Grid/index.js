@@ -48,13 +48,16 @@ const Grid = ({
   ] = useState(null)
 
   const [
-    rightCickedRow,
+    rightClickedRow,
     setRightClickedRow,
   ] = useState(undefined)
 
   const handlePopoverOpen = (event) => setAnchorEl(event.target)
 
-  const handlePopoverClose = () => setAnchorEl(null)
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+    setRightClickedRow(undefined)
+  }
 
   const openContextMenu = Boolean(anchorEl)
 
@@ -355,6 +358,21 @@ const Grid = ({
     ],
   )
 
+  const handleContextMenuClick = useCallback(
+    (menuItem) => {
+      handlePopoverClose()
+      onClick(rightClickedRow, menuItem.key)
+    },
+    [
+      rightClickedRow,
+    ],
+  )
+
+  const onOutsidePopoverRightClick = (event) => {
+    event.preventDefault()
+    handlePopoverClose()
+  }
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -408,23 +426,28 @@ const Grid = ({
           />
         )}
       </LoadingWrapper>
-      <Popover
-        open={openContextMenu}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'center',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        onClose={handlePopoverClose}
-      >
-        <div>
-          <ContextMenu show={openContextMenu} row={rightCickedRow} />
-        </div>
-      </Popover>
+      {rightClickedRow && (
+        <Popover
+          open={openContextMenu}
+          onContextMenu={onOutsidePopoverRightClick}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          onClose={handlePopoverClose}
+        >
+          <ContextMenu
+            show={openContextMenu}
+            handleClick={handleContextMenuClick}
+            row={rightClickedRow}
+          />
+        </Popover>
+      )}
     </div>
   )
 }

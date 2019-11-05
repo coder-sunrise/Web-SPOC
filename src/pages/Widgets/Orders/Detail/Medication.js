@@ -95,6 +95,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 class Medication extends PureComponent {
   state = {
     selectionOptions: [],
+    batchNo: '',
+    expiryDate: '',
   }
 
   componentDidMount () {
@@ -227,6 +229,13 @@ class Medication extends PureComponent {
     const isDefaultBatchNo = op.medicationStock.find(
       (o) => o.isDefault === true,
     )
+
+    isDefaultBatchNo
+      ? this.setState({
+          batchNo: isDefaultBatchNo.batchNo,
+          expiryDate: isDefaultBatchNo.expiryDate,
+        })
+      : ''
 
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
@@ -421,7 +430,9 @@ class Medication extends PureComponent {
               <FastField
                 name='drugName'
                 render={(args) => {
-                  return <TextField label='Name' {...args} />
+                  return (
+                    <TextField label='Name' {...args} autocomplete='nope' />
+                  )
                 }}
               />
             ) : (
@@ -884,7 +895,14 @@ class Medication extends PureComponent {
                         this.props.setFieldValue('adjAmount', 0)
                         this.props.setFieldValue('totalAfterItemAdjustment', 0)
                         this.props.setFieldValue('totalPrice', 0)
+                        this.props.setFieldValue('expiryDate', undefined)
+                        this.props.setFieldValue('batchNo', undefined)
                       } else {
+                        this.props.setFieldValue(
+                          'expiryDate',
+                          this.state.expiryDate,
+                        )
+                        this.props.setFieldValue('batchNo', this.state.batchNo)
                         setTimeout(() => {
                           this.calculateQuantity()
                         }, 1)

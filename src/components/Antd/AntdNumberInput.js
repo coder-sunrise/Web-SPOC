@@ -350,6 +350,7 @@ class AntdNumberInput extends React.PureComponent {
 
       extraCfg.formatter = (v) => {
         if (v === '') return ''
+
         if (!this.state.focused) {
           const nv = numeral(v)
           if (nv._value < 0) return nv.format(`(${format})`)
@@ -474,7 +475,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value, min } = nextProps
+    const { field, value, min, text } = nextProps
 
     if (field) {
       this.setState({
@@ -483,6 +484,7 @@ class AntdNumberInput extends React.PureComponent {
             ? ''
             : Number(field.value),
         focused:
+          !text &&
           field.value !== undefined &&
           field.value !== null &&
           field.value !== '' &&
@@ -492,6 +494,7 @@ class AntdNumberInput extends React.PureComponent {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
         focused:
+          !text &&
           value !== undefined &&
           value !== null &&
           value !== '' &&

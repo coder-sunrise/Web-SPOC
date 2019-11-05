@@ -276,6 +276,8 @@ class PatientHistory extends Component {
     codeTableNameArray.push('ctMedicationDosage')
     codeTableNameArray.push('ctMedicationUnitOfMeasurement')
     codeTableNameArray.push('ctMedicationFrequency')
+    codeTableNameArray.push('ctVaccinationUsage')
+    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
 
     codeTableNameArray.forEach((o) => {
       dispatch({
