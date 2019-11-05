@@ -11,6 +11,7 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 import Input from '@material-ui/core/Input'
 import customInputStyle from 'mui-pro-jss/material-dashboard-pro-react/components/customInputStyle.jsx'
 import { extendFunc } from '@/utils/utils'
+import { Tooltip } from '@/components'
 
 const _config = {
   formControlPropsArray: {
@@ -116,16 +117,22 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
       style={style}
     >
       <React.Fragment>
-        {label !== undefined ? (
-          <InputLabel className={labelClasses} htmlFor={id} {...labelProps}>
+        {label ? (
+          <InputLabel
+            className={labelClasses}
+            htmlFor={id}
+            title={label}
+            {...labelProps}
+          >
             <React.Fragment>
               {label}
               {label && rawError && <span className={classes.required}>*</span>}
             </React.Fragment>
           </InputLabel>
         ) : null}
-        {label2 !== undefined ? (
+        {label2 ? (
           <InputLabel
+            title={label2}
             className={labelClasses}
             {...labelProps}
             style={{ left: '44%', marginLeft: 20 }}

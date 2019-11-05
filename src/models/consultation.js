@@ -30,7 +30,7 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
 
         if (
-          pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
+          pathname.indexOf('/reception/queue/consultation') === 0 &&
           Number(query.cid)
         ) {
           dispatch({
@@ -39,6 +39,7 @@ export default createFormViewModel({
               version: Number(query.v) || undefined,
               consultationID: Number(query.cid),
               md: query.md2,
+              queueID: Number(query.qid),
             },
           })
         }
@@ -46,7 +47,25 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { version, consultationID, md } = payload
+        const { queueID, version } = payload
+        yield put({
+          type: 'visitRegistration/query',
+          payload: { id: queueID, version },
+        })
+        yield take('visitRegistration/query/@@end')
+        const visitRegistration = yield select((st) => st.visitRegistration)
+        const { visit } = visitRegistration.entity
+
+        // console.log(visitRegistration, visit)
+        if (!visit) return
+        yield put({
+          type: 'patient/query',
+          payload: { id: visit.patientProfileFK, version },
+        })
+
+        yield take('patient/query/@@end')
+
+        const { consultationID, md } = payload
         yield put({
           type: 'query',
           payload: {
@@ -55,16 +74,16 @@ export default createFormViewModel({
           },
         })
 
-        yield take('query/@@end')
-        if (md === 'cons') {
-          yield put({
-            type: 'global/updateState',
-            payload: {
-              fullscreen: true,
-              showConsultationPanel: true,
-            },
-          })
-        }
+        // yield take('query/@@end')
+        // if (md === 'cons') {
+        //   yield put({
+        //     type: 'global/updateState',
+        //     payload: {
+        //       fullscreen: true,
+        //       showConsultationPanel: true,
+        //     },
+        //   })
+        // }
       },
 
       *start ({ payload }, { call, put, select, take }) {

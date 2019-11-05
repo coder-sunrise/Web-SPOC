@@ -220,7 +220,7 @@ const Grid = ({
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                 )
             })
           }
@@ -242,12 +242,12 @@ const Grid = ({
               }).then((o) => {
                 if (o)
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.clinicalObjectRecordFK}&v=${version}`,
                   )
               })
             } else {
               router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
               )
             }
           }
@@ -289,7 +289,7 @@ const Grid = ({
                           },
                         }).then((c) => {
                           router.push(
-                            `/reception/queue/patientdashboard?qid=${row.id}&cid=${c.id}&v=${version}&md2=cons`,
+                            `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
                           )
                         })
                       },
@@ -297,7 +297,7 @@ const Grid = ({
                   })
                 } else {
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
                 }
             })
