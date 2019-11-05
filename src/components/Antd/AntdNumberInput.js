@@ -340,7 +340,7 @@ class AntdNumberInput extends React.PureComponent {
 
       extraCfg.formatter = (v) => {
         if (v === '') return ''
-        console.log({ focused: this.state.focused, format })
+
         if (!this.state.focused) {
           const nv = numeral(v)
           if (nv._value < 0) return nv.format(`(${format})`)
@@ -508,7 +508,7 @@ class AntdNumberInput extends React.PureComponent {
           this.state.value === null
         ) || this.state.focused,
     }
-    console.log({ value: this.state.value })
+
     return (
       <CustomInput
         labelProps={labelProps}
