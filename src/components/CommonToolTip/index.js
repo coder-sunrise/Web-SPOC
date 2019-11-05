@@ -36,8 +36,12 @@ const STYLES = () => ({
 
 class CommonTooltip extends PureComponent {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     children: PropTypes.object.isRequired,
+  }
+
+  static defaultProps = {
+    title: '',
   }
 
   render () {

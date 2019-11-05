@@ -112,7 +112,6 @@ class BaseMenu extends PureComponent {
       collapsed,
       color,
     } = this.props
-
     const collapseItemMini = `${classes.collapseItemMini} ${cx({
       [classes.collapseItemMiniRTL]: rtlActive,
     })}`
@@ -155,7 +154,9 @@ class BaseMenu extends PureComponent {
                 <Icon>{item.icon}</Icon>
               ) : (
                 // <item.icon />
-                <span className={collapseItemMini}>{item.mini || ''}</span>
+                <span className={collapseItemMini}>
+                  {collapsed ? item.mini || '' : ''}
+                </span>
               )}
             </ListItemIcon>
             <ListItemText
@@ -246,7 +247,9 @@ class BaseMenu extends PureComponent {
               <Icon>{item.icon}</Icon>
             </ListItemIcon>
           ) : (
-            <span className={collapseItemMini}>{item.mini || ''}</span>
+            <span className={collapseItemMini}>
+              {collapsed ? item.mini || '' : ''}
+            </span>
           )}
 
           <ListItemText
