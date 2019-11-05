@@ -32,7 +32,7 @@ class MovementList extends PureComponent {
       { name: 'uom', title: 'UOM' },
       { name: 'remark', title: 'Remarks' },
       { name: 'patientAccountNo', title: 'Acc. No.' },
-      { name: 'PatientName', title: 'Patient Name' },
+      { name: 'patientName', title: 'Patient Name' },
     ]
     const MedicationStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date' },

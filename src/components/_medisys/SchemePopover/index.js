@@ -37,6 +37,7 @@ const SchemePopover = ({
     acuteBalanceStatusCode,
     acuteVisitPatientBalance,
     acuteVisitClinicBalance,
+    chronicBalanceStatusCode,
     statusDescription,
   } = schemeData
 
@@ -54,6 +55,7 @@ const SchemePopover = ({
       isShowReplacementModal,
     ],
   )
+
   return (
     <React.Fragment>
       <Popover
@@ -71,84 +73,88 @@ const SchemePopover = ({
                 >
                   <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
 
-                  <div
-                    style={{ display: 'inline-block', position: 'absolute' }}
+                  {/* <div
+                    style={{
+                      display: 'inline-block',
+                      position: 'absolute',
+                      float: 'right',
+                    }}
                   >
                     <IconButton onClick={handleRefreshChasBalance}>
-                      {' '}
                       <Refresh fontSize='large' />
                     </IconButton>
-                  </div>
+                  </div> */}
                 </div>
               </GridItem>
+              <GridItem>
+                <IconButton onClick={handleRefreshChasBalance}>
+                  <Refresh fontSize='large' />
+                </IconButton>
+              </GridItem>
             </GridContainer>
-
             <GridContainer>
               <GridItem>
                 <p>
                   Validity:{' '}
                   <DatePicker text format={dateFormatLong} value={validFrom} />
-                  {' - '}
+                  -
                   <DatePicker text format={dateFormatLong} value={validTo} />
                 </p>
               </GridItem>
             </GridContainer>
             <GridContainer>
-              <GridItem>
-                {' '}
-                Balance: <NumberInput text currency value={balance} />
-              </GridItem>
+              {chronicBalanceStatusCode === 'SC105' ? (
+                <GridItem> Balance: Full Balance</GridItem>
+              ) : (
+                <GridItem>
+                  {' '}
+                  Balance: <NumberInput text currency value={balance} />
+                </GridItem>
+              )}
             </GridContainer>
-            {isSuccessful !== false ? (
-              <GridContainer>
-                {acuteBalanceStatusCode === 'SC100' ? (
+            <GridContainer>
+              {acuteBalanceStatusCode === 'SC100' ||
+              (acuteVisitPatientBalance !== undefined &&
+                acuteBalanceStatusCode === undefined) ? (
                   <GridItem>
-                    Patient Acute Visit Balance:{' '}
-                    <div
-                      style={{
-                        fontWeight: 500,
-                        display: 'inline-block',
-                        paddingLeft: 2,
-                      }}
-                    >
-                      {acuteVisitPatientBalance} Remaining{' '}
-                    </div>{' '}
-                    for Year {moment().year()}
-                  </GridItem>
-                ) : (
-                  <GridItem>Patient Acute Visit Balance: NA</GridItem>
-                )}
-              </GridContainer>
-            ) : (
-              <GridContainer>
+                  Patient Acute Visit Balance:{' '}
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      display: 'inline-block',
+                      paddingLeft: 2,
+                    }}
+                  >
+                    {acuteVisitPatientBalance} Remaining{' '}
+                  </div>{' '}
+                  for Year {moment().year()}
+                </GridItem>
+              ) : (
                 <GridItem>Patient Acute Visit Balance: NA</GridItem>
-              </GridContainer>
-            )}
-            {isSuccessful !== false ? (
-              <GridContainer>
-                {acuteBalanceStatusCode === 'SC100' ? (
+              )}
+            </GridContainer>
+            <GridContainer>
+              {acuteBalanceStatusCode === 'SC100' ||
+              (acuteVisitClinicBalance !== undefined &&
+                acuteBalanceStatusCode === undefined) ? (
                   <GridItem>
-                    Patient Acute Clinic Balance:
-                    <div
-                      style={{
-                        fontWeight: 500,
-                        display: 'inline-block',
-                        paddingLeft: 2,
-                      }}
-                    >
-                      {acuteVisitClinicBalance} Remaining
-                    </div>{' '}
-                    for {moment().format('MMMM')} {moment().year()}
-                  </GridItem>
-                ) : (
-                  <GridItem> Patient Acute Clinic Balance: NA</GridItem>
-                )}
-              </GridContainer>
-            ) : (
-              <GridContainer>
+                  Patient Acute Clinic Balance:
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      display: 'inline-block',
+                      paddingLeft: 2,
+                    }}
+                  >
+                    {acuteVisitClinicBalance} Remaining
+                  </div>{' '}
+                  for {moment().format('MMMM')} {moment().year()}
+                </GridItem>
+              ) : (
                 <GridItem> Patient Acute Clinic Balance: NA</GridItem>
-              </GridContainer>
-            )}
+              )}
+            </GridContainer>
+
             <GridContainer>
               <GridItem>
                 <p style={{ color: 'red' }}>{statusDescription}</p>

@@ -215,7 +215,7 @@ export const RadioEditor = withStyles(styles)(RadioEditorBase)
 
 class RadioTypeProvider extends PureComponent {
   static propTypes = {
-    for: PropTypes.array.isRequired,
+    for: PropTypes.array,
     columnExtensions: PropTypes.array,
   }
 

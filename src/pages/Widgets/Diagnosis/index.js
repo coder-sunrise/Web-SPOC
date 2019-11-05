@@ -74,7 +74,7 @@ const styles = (theme) => ({
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
-  //   console.log(this.state, props)
+  //   console.log(this.state, props, 'constructor')
   // }
 
   componentDidMount () {

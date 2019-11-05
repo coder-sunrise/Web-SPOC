@@ -142,7 +142,7 @@ const styles = (theme) => ({
     }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, ctRole, onConfirm } = props
+    const { dispatch, ctRole, currentUser, onConfirm } = props
     const { effectiveDates, role: roleFK, ...restValues } = values
     const role = ctRole.find((item) => item.id === roleFK)
     const isDoctor = roleFK === 2 || roleFK === 3
@@ -162,7 +162,15 @@ const styles = (theme) => ({
       payload,
     }).then((response) => {
       if (response) {
+        if (currentUser) {
+          dispatch({
+            type: 'user/fetchCurrent',
+          })
+        }
         dispatch({ type: 'settingUserProfile/query' })
+        dispatch({
+          type: 'settingUserProfile/refreshAllRelatedCodetables',
+        })
         resetForm()
         onConfirm()
       }

@@ -119,7 +119,7 @@ class Dispense extends PureComponent {
               this.wsConnection.send(`["${base64Result}"]`)
             } else {
               notification.error({
-                message: `The printing client application didn\'t running up, please start it.`,
+                message: `SEMR printing tool is not running, please start it.`,
               })
             }
           }
@@ -143,7 +143,7 @@ class Dispense extends PureComponent {
           payload: {
             reportTypeID: downloadConfig.id,
             reportParameters: {
-              [downloadConfig.key]: row.id,
+              ...reportParameters,
               isSaved: true,
             },
           },

@@ -1,12 +1,15 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+// material ui
+import { Popover } from '@material-ui/core'
 // medisys component
 import { LoadingWrapper } from '@/components/_medisys'
 import { CommonTableGrid, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
+import ContextMenu from './ContextMenu'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { filterData } from '../utils'
@@ -39,6 +42,25 @@ const Grid = ({
   onViewPatientProfileClick,
   handleActualizeAppointment,
 }) => {
+  const [
+    anchorEl,
+    setAnchorEl,
+  ] = useState(null)
+
+  const [
+    rightClickedRow,
+    setRightClickedRow,
+  ] = useState(undefined)
+
+  const handlePopoverOpen = (event) => setAnchorEl(event.target)
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+    setRightClickedRow(undefined)
+  }
+
+  const openContextMenu = Boolean(anchorEl)
+
   const isAssignedDoctor = useCallback(
     (row) => {
       const { doctor: { id }, visitStatus } = row
@@ -201,7 +223,7 @@ const Grid = ({
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                 )
             })
           }
@@ -223,12 +245,12 @@ const Grid = ({
               }).then((o) => {
                 if (o)
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.clinicalObjectRecordFK}&v=${version}`,
                   )
               })
             } else {
               router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
               )
             }
           }
@@ -270,7 +292,7 @@ const Grid = ({
                           },
                         }).then((c) => {
                           router.push(
-                            `/reception/queue/patientdashboard?qid=${row.id}&cid=${c.id}&v=${version}&md2=cons`,
+                            `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
                           )
                         })
                       },
@@ -278,7 +300,7 @@ const Grid = ({
                   })
                 } else {
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
                 }
             })
@@ -336,6 +358,21 @@ const Grid = ({
     ],
   )
 
+  const handleContextMenuClick = useCallback(
+    (menuItem) => {
+      handlePopoverClose()
+      onClick(rightClickedRow, menuItem.key)
+    },
+    [
+      rightClickedRow,
+    ],
+  )
+
+  const onOutsidePopoverRightClick = (event) => {
+    event.preventDefault()
+    handlePopoverClose()
+  }
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -362,6 +399,11 @@ const Grid = ({
             ]}
             FuncProps={FuncConfig}
             onRowDoubleClick={onRowDoubleClick}
+            onContextMenu={(row, event) => {
+              event.preventDefault()
+              handlePopoverOpen(event)
+              setRightClickedRow(row)
+            }}
             {...QueueTableConfig}
           />
         )}
@@ -384,22 +426,28 @@ const Grid = ({
           />
         )}
       </LoadingWrapper>
-      {/* <Popover
-        open={openContextMenu}
-        anchorEl={anchorEl}
-        // anchorOrigin={{
-        //   vertical: 'center',
-        //   horizontal: 'center',
-        // }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'center',
-        }}
-        onClose={handlePopoverClose}
-        // style={{ width: 500, height: 500 }}
-      >
-        <div style={{ width: 200, height: 400 }}>123f</div>
-      </Popover> */}
+      {rightClickedRow && (
+        <Popover
+          open={openContextMenu}
+          onContextMenu={onOutsidePopoverRightClick}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          onClose={handlePopoverClose}
+        >
+          <ContextMenu
+            show={openContextMenu}
+            handleClick={handleContextMenuClick}
+            row={rightClickedRow}
+          />
+        </Popover>
+      )}
     </div>
   )
 }

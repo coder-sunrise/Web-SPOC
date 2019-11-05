@@ -121,7 +121,6 @@ let temp = null
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
   validationSchema: Yup.object().shape({
-    drawing: Yup.string().required(),
     subject: Yup.string()
       .required()
       .max(20, 'Subject should not exceed 20 characters'),

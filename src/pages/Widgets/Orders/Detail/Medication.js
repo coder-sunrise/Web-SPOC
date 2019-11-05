@@ -87,6 +87,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       type: 'orders/upsertRow',
       payload: data,
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
@@ -94,6 +95,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 class Medication extends PureComponent {
   state = {
     selectionOptions: [],
+    batchNo: '',
+    expiryDate: '',
   }
 
   componentDidMount () {
@@ -222,6 +225,18 @@ class Medication extends PureComponent {
     this.setState(() => {
       return { selectionOptions: op.medicationStock }
     })
+
+    const isDefaultBatchNo = op.medicationStock.find(
+      (o) => o.isDefault === true,
+    )
+
+    isDefaultBatchNo
+      ? this.setState({
+          batchNo: isDefaultBatchNo.batchNo,
+          expiryDate: isDefaultBatchNo.expiryDate,
+        })
+      : ''
+
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
     // let tempArray = [
@@ -240,8 +255,16 @@ class Medication extends PureComponent {
     let newTotalQuantity = 0
     let totalFirstItem = 0
 
-    setFieldValue('batchNo', undefined)
-    setFieldValue('expiryDate', undefined)
+    // setFieldValue('batchNo', undefined)
+    // setFieldValue('expiryDate', undefined)
+    setFieldValue(
+      'batchNo',
+      isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+    )
+    setFieldValue(
+      'expiryDate',
+      isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
+    )
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
@@ -407,6 +430,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log(values)
     return (
       <div>
         <GridContainer>
@@ -415,7 +439,9 @@ class Medication extends PureComponent {
               <FastField
                 name='drugName'
                 render={(args) => {
-                  return <TextField label='Name' {...args} />
+                  return (
+                    <TextField label='Name' {...args} autocomplete='nope' />
+                  )
                 }}
               />
             ) : (
@@ -501,7 +527,7 @@ class Medication extends PureComponent {
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{ marginLeft: 15 }}
+                                    style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -878,7 +904,14 @@ class Medication extends PureComponent {
                         this.props.setFieldValue('adjAmount', 0)
                         this.props.setFieldValue('totalAfterItemAdjustment', 0)
                         this.props.setFieldValue('totalPrice', 0)
+                        this.props.setFieldValue('expiryDate', undefined)
+                        this.props.setFieldValue('batchNo', undefined)
                       } else {
+                        this.props.setFieldValue(
+                          'expiryDate',
+                          this.state.expiryDate,
+                        )
+                        this.props.setFieldValue('batchNo', this.state.batchNo)
                         setTimeout(() => {
                           this.calculateQuantity()
                         }, 1)

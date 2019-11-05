@@ -992,7 +992,7 @@ class CommonTableGrid extends PureComponent {
 }
 CommonTableGrid.propTypes = {
   // required
-  rows: PropTypes.array.isRequired,
+  rows: PropTypes.array,
   columns: PropTypes.array.isRequired,
   // optional
   pageSizes: PropTypes.array,

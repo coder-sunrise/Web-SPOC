@@ -143,9 +143,6 @@ export default createListViewModel({
       ) {
         let user = yield select((state) => state.user.data)
         let { clinicianProfile: { userProfile: { role: userRole } } } = user
-        if (userRole === undefined) {
-          yield take('user/fetchCurrent/@@end')
-        }
 
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {

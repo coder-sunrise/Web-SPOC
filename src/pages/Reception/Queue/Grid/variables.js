@@ -1,6 +1,7 @@
+import moment from 'moment'
 // components
 import { DoctorLabel } from '@/components/_medisys'
-import { DateFormatter } from '@/components'
+import { dateFormat, timeFormat, DateFormatter } from '@/components'
 import StatusBadge from './StatusBadge'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
@@ -39,7 +40,7 @@ export const AppointmentTableConfig = {
     { name: 'patientAccountNo', title: 'Acc. No.' },
     { name: 'gender/age', title: 'Gender / Age' },
     { name: 'doctorName', title: 'Doctor' },
-    { name: 'startTime', title: 'Appt. Time' },
+    { name: 'appointmentTime', title: 'Appt. Time' },
     { name: 'roomNo', title: 'Room No.' },
     { name: 'patientContactNo', title: 'Phone' },
     { name: 'action', title: 'Action' },
@@ -57,6 +58,14 @@ export const ApptColumnExtensions = [
     columnName: 'patientName',
     width: 250,
     compare: compareString,
+  },
+  {
+    columnName: 'doctorName',
+    width: 250,
+    render: (row) => {
+      const _title = row.title ? `${row.title} ` : ''
+      return `${_title}${row.doctorName}`
+    },
   },
   {
     columnName: 'gender/age',
@@ -77,15 +86,20 @@ export const ApptColumnExtensions = [
     columnName: 'appointmentTime',
     width: 160,
     render: (row) => {
-      if (row.appointmentTime) {
-        return DateFormatter({
-          value: row.appointmentTime,
-          full: true,
-        })
-      }
+      const appointmentDate = moment(row.appointmentDate).format(dateFormat)
+      return DateFormatter({
+        value: `${appointmentDate} ${row.startTime}`,
+        full: true,
+      })
+      // if (row.appointmentTime) {
+      //   return DateFormatter({
+      //     value: row.appointmentTime,
+      //     full: true,
+      //   })
+      // }
 
-      if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
-      return '-'
+      // if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
+      // return '-'
     },
   },
 ]
@@ -109,7 +123,7 @@ export const QueueTableConfig = {
     { name: 'invoiceGST', title: 'GST' },
     { name: 'invoicePaymentAmount', title: 'Payment' },
     { name: 'invoiceOutstanding', title: 'Outstanding' },
-    // { name: 'patientScheme', title: 'Scheme' },
+    { name: 'patientScheme', title: 'Scheme' },
     { name: 'patientMobile', title: 'Phone' },
     { name: 'action', title: 'Action' },
   ],
@@ -194,15 +208,13 @@ export const QueueColumnExtensions = [
     columnName: 'appointmentTime',
     width: 160,
     render: (row) => {
-      // console.log({ row })
       if (row.appointmentTime) {
+        const appointmentDate = moment(row.appointmentTime).format(dateFormat)
         return DateFormatter({
-          value: row.appointmentTime,
+          value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
           full: true,
         })
       }
-
-      if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
       return '-'
     },
   },

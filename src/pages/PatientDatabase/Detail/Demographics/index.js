@@ -303,6 +303,8 @@ class Demographic extends PureComponent {
                       label='Remarks'
                       multiline
                       rowsMax={4}
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
                       {...args}
                     />
                   )}
@@ -545,15 +547,15 @@ class Demographic extends PureComponent {
                       {values.contact.contactAddress.map((val, i) => {
                         return (
                           <Address
-                            key={val.id}
+                            key={val.id || i}
                             addressIndex={i}
                             theme={theme}
                             arrayHelpers={arrayHelpers}
                             propName='contact.contactAddress'
                             style={{
-                              padding: theme.spacing.unit,
-                              marginTop: theme.spacing.unit,
-                              marginBottom: theme.spacing.unit,
+                              padding: theme.spacing(),
+                              marginTop: theme.spacing(),
+                              marginBottom: theme.spacing(),
                             }}
                             values={values}
                             {...props}

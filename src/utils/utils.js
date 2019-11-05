@@ -743,6 +743,7 @@ const calculateAdjustAmount = (
   initialAmout = 0,
   adj = 0,
 ) => {
+  console.log({ initialAmout, adj })
   let amount = initialAmout
   let adjAmount
   if (isExactAmount) {
@@ -851,7 +852,18 @@ const getRefreshChasBalanceStatus = (status = []) => {
   }
 
   const successCode = 'SC100'
+  const fullBalanceSuccessCode = 'SC105'
   const { statusCode, statusDescription } = status[0]
+
+  if (
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
+  ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
 
   if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {

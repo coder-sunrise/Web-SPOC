@@ -1,4 +1,5 @@
 import * as service from '@/services/common'
+import request from '@/utils/request'
 
 const url = '/api/invoicePayer'
 const invoicePaymentUrl = '/api/invoicePayment'
@@ -9,7 +10,7 @@ const bizSessionAPIURL = '/api/bizsession'
 module.exports = {
   query: (params) => service.query(url, params),
   addPayment: (params) => {
-    return service.upsert(invoicePaymentUrl, params)
+    return request(invoicePaymentUrl, { method: 'POST', body: params })
   },
   writeOff: (params) => {
     return service.upsert(writeOffUrl, params)
@@ -17,6 +18,7 @@ module.exports = {
   upsert: (params) => {
     return service.upsert(creditNoteUrl, params)
   },
+
   getBizSession: (params) => service.queryList(bizSessionAPIURL, params),
   voidWriteOff: (params) => service.upsert(writeOffUrl, params),
   voidPayment: (params) => service.upsert(invoicePaymentUrl, params),

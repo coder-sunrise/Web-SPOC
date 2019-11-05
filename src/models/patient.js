@@ -165,22 +165,36 @@ export default createFormViewModel({
       *closePatientModal ({ payload }, { all, put }) {
         const { history } = payload || { history: undefined }
 
-        const patientDatabasePath = '/patientdb/search'
-        let shouldRemoveUrl = [
+        // do not remove PID query in these URLs
+        const exceptionalPaths = [
+          'billing',
+          'dispense',
+          'consultation',
+          'patientdashboard',
+        ]
+
+        const matchesExceptionalPath = exceptionalPaths.reduce(
+          (matched, url) =>
+            history.location.pathname.indexOf(url) > 0 ? true : matched,
+          false,
+        )
+
+        let shouldRemoveQueries = [
           'md',
           'cmt',
           'pid',
           'new',
+          'qid',
           'v',
         ]
-        if (history && history.location.pathname !== patientDatabasePath) {
-          shouldRemoveUrl = [
+        if (matchesExceptionalPath) {
+          shouldRemoveQueries = [
             'md',
             'cmt',
             'new',
           ]
         }
-        router.push(getRemovedUrl(shouldRemoveUrl))
+        router.push(getRemovedUrl(shouldRemoveQueries))
         // yield put({
         //   type: 'updateState',
         //   payload: {

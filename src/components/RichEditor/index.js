@@ -1,7 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
+import jss from 'jss'
 import _ from 'lodash'
-import styled from 'styled-jss'
 import {
   EditorState,
   ContentState,
@@ -22,42 +22,19 @@ import { control } from '@/components/Decorator'
 import { CustomInput, Button } from '@/components'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
-const STYLES = ({ height = 'auto', tagList, theme, ...restProps }) => {
-  const { props: themeProps } = theme
-  const { size } = themeProps
-
-  const editorCfg = {}
-  if (Number.isInteger(height)) {
-    switch (size) {
-      case 'md':
-        editorCfg.height = height - 120
-        if (!tagList) editorCfg.height += 39
-
-        break
-      case 'sm':
-        editorCfg.height = height - 64
-        if (!tagList) editorCfg.height += 29
-
-        break
-      default:
-        break
-    }
-  }
-
+const STYLES = (theme) => {
   return {
     wrapper: {
       // height: '90%',
     },
     editor: {
       minHeight: 120,
-      ...editorCfg,
       '& > div': {
         height: '99%',
       },
     },
   }
 }
-let tagButtonClicked = false
 
 @control()
 class RichEditor extends React.PureComponent {
@@ -92,6 +69,7 @@ class RichEditor extends React.PureComponent {
       value: EditorState.moveSelectionToEnd(editorState),
       anchorEl: null,
       isEditorFocused: false,
+      sheet: this.calculateEditorHeight(),
     }
 
     this.editorCfg = {
@@ -116,21 +94,22 @@ class RichEditor extends React.PureComponent {
         link: { inDropdown: true },
       },
     }
-
     this.setDomEditorRef = (ref) => (this.domEditor = ref)
 
     // this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
-    this.debouncedOnBlur = _.debounce(this._onBlur.bind(this), 200)
   }
 
-  componentDidMount () {}
+  componentDidMount () {
+    window.addEventListener('resize', this.resize.bind(this))
+  }
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, height } = nextProps
     const { isEditorFocused } = this.state
     let v = value || ''
+
     if (field) {
       v = field.value || ''
       // v = field.value || ''
@@ -175,6 +154,45 @@ class RichEditor extends React.PureComponent {
     }
   }
 
+  resize () {
+    this.setState({
+      sheet: this.calculateEditorHeight(),
+    })
+  }
+
+  calculateEditorHeight = () => {
+    const { height = 'auto', tagList, theme = {}, ...restProps } = this.props
+    const { props: themeProps = {} } = theme
+    const { size } = themeProps
+    const editorCfg = {}
+    if (Number.isInteger(height)) {
+      switch (size) {
+        case 'md':
+          editorCfg.height = height - 120
+          if (!tagList) editorCfg.height += 39
+
+          break
+        case 'sm':
+          editorCfg.height = height - 64
+          if (!tagList) editorCfg.height += 29
+
+          break
+        default:
+          break
+      }
+      if (editorCfg.height) {
+        editorCfg.height = `${editorCfg.height}px`
+      }
+    }
+    return jss
+      .createStyleSheet({
+        editor: {
+          ...editorCfg,
+        },
+      })
+      .attach()
+  }
+
   onChange = (editorState) => {
     // console.log(editorState)
     // const {onChange}=this.props
@@ -210,19 +228,13 @@ class RichEditor extends React.PureComponent {
   // }
 
   _onFocus = () => {
-    this.debouncedOnBlur.cancel()
-    tagButtonClicked = false
     this.setState((prevState) => ({
       isEditorFocused: true,
       // value: EditorState.moveFocusToEnd(prevState.value),
     }))
   }
 
-  _onBlur = (e) => {
-    // console.log(this.state.tagButtonClicked, tagButtonClicked)
-    if (tagButtonClicked) return
-    // console.log('_onBlur', e, e.explicitOriginalTarget, document.activeElement)
-
+  _onBlur = () => {
     this.setState({ isEditorFocused: false })
     const { props } = this
     const { onBlur, delimiter } = props
@@ -307,7 +319,6 @@ class RichEditor extends React.PureComponent {
         currentContentState,
         currentEditorSelection,
         `@${selectedValue}`,
-        // `@${selectedValue}$nbsp;`,
         null,
         entityKey,
       )
@@ -329,12 +340,10 @@ class RichEditor extends React.PureComponent {
       onBlur,
       tagList,
       disabled,
-      height,
-      theme,
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-
+    // console.log('getComponent', restProps)
     let metionCfg = {}
     if (tagList) {
       metionCfg = {
@@ -356,7 +365,7 @@ class RichEditor extends React.PureComponent {
           })}
           editorClassName={classnames({
             [classes.editor]: true,
-            [this.editorClassName]: true,
+            [this.state.sheet.classes.editor]: true,
           })}
           onEditorStateChange={this.onChange}
           onFocus={this._onFocus}
@@ -414,19 +423,12 @@ class RichEditor extends React.PureComponent {
     return (
       <div>
         {tagList.map((tag) => (
-          // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
           <Button
             key={tag.id}
             color='info'
             style={{
               marginRight: 2,
               marginBottom: 2,
-            }}
-            onMouseOver={() => {
-              tagButtonClicked = true
-            }}
-            onMouseOut={() => {
-              tagButtonClicked = false
             }}
             onClick={() => {
               this.tagButtonOnClick(tag.value)
@@ -517,13 +519,6 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
   return EditorState.push(editorState, newContentState, 'insert-fragment')
 }
 
-const withStylesProps = (styles, cfg) => (Cmpt) => (props) => {
-  const Comp = withStyles((theme) => styles({ ...props, theme }), {
-    ...cfg,
-  })(Cmpt)
-  return <Comp {...props} />
-}
-
-export default withStylesProps(STYLES, { name: 'RichEditor', withTheme: true })(
+export default withStyles(STYLES, { name: 'RichEditor', withTheme: true })(
   RichEditor,
 )

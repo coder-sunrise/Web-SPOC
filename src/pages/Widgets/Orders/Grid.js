@@ -224,19 +224,42 @@ export default ({
           width: 300,
           render: (row) => {
             let text = ''
+
             const {
               ctmedicationusage,
               ctmedicationunitofmeasurement,
               ctmedicationfrequency,
               ctmedicationdosage,
+              ctvaccinationunitofmeasurement,
+              ctvaccinationusage,
             } = codetable
             if (
               !ctmedicationusage ||
               !ctmedicationunitofmeasurement ||
               !ctmedicationfrequency ||
-              !ctmedicationdosage
+              !ctmedicationdosage ||
+              !ctvaccinationunitofmeasurement ||
+              !ctvaccinationusage
             )
               return null
+
+            if (row.usageMethodFK && row.dosageFK && row.uomfk) {
+              text = ''
+              const usageMethod = ctvaccinationusage.filter(
+                (codeTableItem) => codeTableItem.id === row.usageMethodFK,
+              )
+              text += `${usageMethod.length > 0 ? usageMethod[0].name : ''} `
+              text += ' '
+              const dosage = ctmedicationdosage.filter(
+                (codeTableItem) => codeTableItem.id === row.dosageFK,
+              )
+              text += `${dosage.length > 0 ? dosage[0].displayValue : ''} `
+              const prescribe = ctvaccinationunitofmeasurement.filter(
+                (codeTableItem) => codeTableItem.id === row.uomfk,
+              )
+              text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
+            }
+
             return (
               <div>
                 {row.corPrescriptionItemInstruction ? (
@@ -246,28 +269,34 @@ export default ({
                       (codeTableItem) =>
                         codeTableItem.id === item.usageMethodFK,
                     )
-                    text += `${usageMethod[0].name} `
+                    text += `${usageMethod.length > 0
+                      ? usageMethod[0].name
+                      : ''} `
                     text += ' '
                     const dosage = ctmedicationdosage.filter(
                       (codeTableItem) => codeTableItem.id === item.dosageFK,
                     )
-                    text += `${dosage[0].displayValue} `
+                    text += `${dosage.length > 0
+                      ? dosage[0].displayValue
+                      : ''} `
                     const prescribe = ctmedicationunitofmeasurement.filter(
                       (codeTableItem) =>
                         codeTableItem.id === item.prescribeUOMFK,
                     )
-                    text += `${prescribe[0].name} `
+                    text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
                     const drugFrequency = ctmedicationfrequency.filter(
                       (codeTableItem) =>
                         codeTableItem.id === item.drugFrequencyFK,
                     )
-                    text += `${drugFrequency[0].displayValue} For `
-                    text += `${item.duration} day(s)`
+                    text += `${drugFrequency.length > 0
+                      ? drugFrequency[0].displayValue
+                      : ''} For `
+                    text += `${item.duration ? item.duration : ''} day(s)`
 
                     return <p>{text}</p>
                   })
                 ) : (
-                  ''
+                  text
                 )}
               </div>
             )

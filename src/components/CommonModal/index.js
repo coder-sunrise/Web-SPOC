@@ -187,7 +187,6 @@ class CommonModal extends React.PureComponent {
       const ob = window.g_app._store.getState().formik[o]
       // console.log(ob,this.props.observe)
       if (ob) {
-        console.log({ ob, force })
         if (ob.dirty && force !== true) {
           this.setState({
             openConfirm: true,
@@ -356,10 +355,10 @@ class CommonModal extends React.PureComponent {
                   width: '100%',
                   zIndex: 99999,
                   height: `${this.myRef.current
-                    ? this.myRef.current.offsetHeight
+                    ? this.myRef.current.offsetHeight + (bodyNoPadding ? 0 : 16)
                     : this.state.height}px`,
                   backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  margin: bodyNoPadding ? 0 : -12,
+                  margin: bodyNoPadding ? 0 : -8,
                 }}
               />
             ) : null}
