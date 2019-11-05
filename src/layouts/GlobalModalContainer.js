@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { ChangePassword } from 'medisys-components'
+import { ChangePassword, SessionTimeout } from 'medisys-components'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
@@ -218,18 +218,18 @@ class GlobalModalContainer extends PureComponent {
           title='Session Timeout'
           maxWidth='sm'
           onClose={() => {
-            clearTimeout(this._timer)
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                showSessionTimeout: false,
-              },
+            this.props.dispatch({
+              type: 'login/logout',
             })
+            // clearTimeout(this._timer)
+            // dispatch({
+            //   type: 'global/updateAppState',
+            //   payload: {
+            //     showSessionTimeout: false,
+            //   },
+            // })
           }}
           onConfirm={() => {
-            // this.props.dispatch({
-            //   type: 'login/logout',
-            // })
             clearTimeout(this._timer)
             dispatch({
               type: 'global/updateAppState',
@@ -238,19 +238,11 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
-          showFooter
+          cancelText='No'
+          // showFooter
+          // footer={{ cancelText: 'No', confirmBtnText: 'Yes' }}
         >
-          <div
-            style={{
-              textAlign: 'center',
-              minHeight: 100,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            <h4>Your session will be disconnected in 1 minutes</h4>
-          </div>
+          <SessionTimeout />
         </CommonModal>
 
         <CommonModal
