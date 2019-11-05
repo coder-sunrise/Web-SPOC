@@ -883,6 +883,8 @@ class Medication extends PureComponent {
                         this.props.setFieldValue('adjAmount', 0)
                         this.props.setFieldValue('totalAfterItemAdjustment', 0)
                         this.props.setFieldValue('totalPrice', 0)
+                        this.props.setFieldValue('expiryDate', '')
+                        this.props.setFieldValue('batchNo', '')
                       } else {
                         setTimeout(() => {
                           this.calculateQuantity()
