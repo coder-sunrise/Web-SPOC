@@ -190,7 +190,6 @@ const Attachment = ({
 
       if (page === 'visit registration') {
         if (filesArray[0].size > maxUploadSize) {
-          console.log('test')
           setErrorText('Cannot upload more than 30MB')
           setUploading(false)
           dispatch({
