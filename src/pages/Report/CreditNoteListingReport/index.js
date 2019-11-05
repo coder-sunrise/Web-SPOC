@@ -11,10 +11,10 @@ import FilterBar from './FilterBar'
 import ReportLayoutWrapper from '../ReportLayout'
 // services
 import { getRawData } from '@/services/report'
-import MovementList from './MovementList'
+import CNList from './CNList'
 
-const reportId = 22
-const fileName = 'Medication Movement Report'
+const reportId = 13
+const fileName = 'Credit Note Listing Report'
 
 const initialState = {
   loaded: false,
@@ -40,7 +40,7 @@ const reducer = (state, action) => {
   }
 }
 
-const MedicationMovementReport = ({ values, validateForm }) => {
+const CreditNoteListingReport = ({ values, validateForm }) => {
   const [
     state,
     dispatch,
@@ -108,7 +108,7 @@ const MedicationMovementReport = ({ values, validateForm }) => {
             loaded={state.loaded}
             fileName={fileName}
           >
-            <MovementList {...state} />
+            <CNList {...state} />
           </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
@@ -116,7 +116,7 @@ const MedicationMovementReport = ({ values, validateForm }) => {
   )
 }
 
-const MedicationMovementReportWithFormik = withFormik({
+const CreditNoteListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
@@ -124,6 +124,6 @@ const MedicationMovementReportWithFormik = withFormik({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
   }),
-})(MedicationMovementReport)
+})(CreditNoteListingReport)
 
-export default MedicationMovementReportWithFormik
+export default CreditNoteListingReportWithFormik

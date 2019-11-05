@@ -3,7 +3,7 @@ import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import { GridItem } from '@/components'
+import { GridItem, DateFormatter } from '@/components'
 
 class PaymentCollectionList extends PureComponent {
   render () {
@@ -20,7 +20,15 @@ class PaymentCollectionList extends PureComponent {
       )
     }
     const PaymentCollectionDetailsExtensions = [
-      { columnName: 'paymentReceivedDate', type: 'date' },
+      {
+        columnName: 'paymentReceivedDate',
+        width: 180,
+        render: (row) =>
+          DateFormatter({
+            value: row.paymentReceivedDate,
+            full: true,
+          }),
+      },
       { columnName: 'amount', type: 'currency', currency: true },
     ]
     let FuncProps = {

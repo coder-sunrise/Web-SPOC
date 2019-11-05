@@ -6,13 +6,6 @@ import {
 import { ReportDataGrid } from '@/components/_medisys'
 
 class IncomeList extends PureComponent {
-
-  handleExpandedGroupsChange = (expandedGroups) => {
-    this.setState((prevState) => {
-      return { ...prevState, tableGroupRows: expandedGroups }
-    })
-  }
-
   render () {
     let incomeData = []
     const { reportDatas } = this.props

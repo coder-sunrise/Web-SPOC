@@ -520,9 +520,19 @@ const routes = [
             component: './Report/MedicationMovementReport',
           },
           {
+            path: '/report/deposittransactionreport',
+            name: 'depositTransactionReport',
+            component: './Report/DepositTransactionReport',
+          },
+          {
             path: '/report/consumablemovementreport',
             name: 'consumableMovementReport',
             component: './Report/ConsumableMovementReport',
+          },
+          {
+            path: '/report/creditnotelistingreport',
+            name: 'creditNoteListingReport',
+            component: './Report/CreditNoteListingReport',
           },
           {
             path: '/report/patientlisting',

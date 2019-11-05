@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react'
+import React, { useEffect, setState, useReducer } from 'react'
 import * as Yup from 'yup'
 import moment from 'moment'
 // formik
@@ -21,41 +21,36 @@ import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
 import { getRawData } from '@/services/report'
 
 const VisitListingColumns = [
-  { name: 'invoiceID', title: 'Invoice ID' },
-  { name: 'sessionNo', title: 'Session No.' },
+  // { name: 'invoiceID', title: 'Invoice ID' },
+  // { name: 'sessionNo', title: 'Session No.' },
   { name: 'queueNo', title: 'Queue No.' },
-  { name: 'visitReferenceNo', title: 'Visit Reference No.' },
-  { name: 'invoiceNo', title: 'Invoice No' },
   { name: 'patientName', title: 'Patient Name' },
-  { name: 'visitDate', title: 'Visit Date' },
+  { name: 'doctorCode', title: 'Doctor MCR No.' },
   { name: 'timeIn', title: 'Time In' },
   { name: 'timeout', title: 'Time Out' },
-  { name: 'doctorCode', title: 'Doctor MCR No.' },
+  { name: 'invoiceNo', title: 'Invoice No' },
   { name: 'invoiceAmt', title: 'Invoice Amt.' },
-  { name: 'gstAmt', title: 'GST Amt.' },
-  { name: 'patientPayable', title: 'Patient Payable' },
-  { name: 'totalPatientPaid', title: 'Total Patient Paid' },
-  { name: 'patientPaid', title: 'Patient Paid' },
-  { name: 'coPayerPayable', title: 'Copayer Payable' },
-  { name: 'totalBalanceTrasfer', title: 'Total Balance Transfer' },
-  { name: 'paymentMode', title: 'Payment Mode' },
-  { name: 'countNumber', title: 'Count Number' },
-  { name: 'coPayerName', title: 'Copayer Name' },
+  { name: 'gstAmt', title: 'GST' },
+  { name: 'totalPatientPaid', title: 'Patient Paid Amt.' },
+  { name: 'paymentMode', title: 'Mode' },
+  { name: 'patientPayable', title: 'Patient O/S Amt.' },
+  { name: 'coPayerPayable', title: 'Company Payable' },
+  { name: 'coPayerName', title: 'Co-Payer' },
+  { name: 'visitDate', title: 'Visit Date' },
+
+  // { name: 'visitReferenceNo', title: 'Visit Reference No.' },
+  // { name: 'patientPaid', title: 'Patient Paid' },
+  // { name: 'totalBalanceTrasfer', title: 'Total Balance Transfer' },
+  // { name: 'countNumber', title: 'Count Number' },
 ]
 
 const VisitListingColumnExtension = [
-  {
-    columnName: 'visitDate',
-    width: 160,
-    render: (row) => (
-      <span style={{ width: '200px' }}>
-        {DateFormatter({
-          value: row.visitDate,
-          full: true,
-        })}
-      </span>
-    ),
-  },
+  { columnName: 'patientName', width: 180 },
+  { columnName: 'invoiceAmt', type: 'currency', currency: true },
+  { columnName: 'gstAmt', type: 'currency', currency: true },
+  { columnName: 'totalPatientPaid', type: 'currency', currency: true },
+  { columnName: 'patientPayable', type: 'currency', currency: true },
+  { columnName: 'coPayerPayable', type: 'currency', currency: true },
   {
     columnName: 'timeIn',
     width: 160,
@@ -76,6 +71,15 @@ const VisitListingColumnExtension = [
   },
 ]
 
+const GroupCellContent = ({ row }) => (
+  <span style={{ paddingRight: 8 }}>
+    {DateFormatter({
+      value: row.value,
+      full: false,
+    })}
+  </span>
+)
+
 const PastPaymentCollectionTableColumn = [
   // { name: 'invoicePayerDetail', title: 'Invoice Payer Detail' },
   { name: 'payerName', title: 'Payer Name' },
@@ -84,11 +88,21 @@ const PastPaymentCollectionTableColumn = [
   { name: 'invoiceDate', title: 'Invoice Date' },
   { name: 'mode', title: 'Payment Mode' },
   { name: 'invoiceAmt', title: 'Invoice Amt' },
-  { name: 'coPayerPayable', title: 'Copayer Payable' },
+  { name: 'paymentReceivedDate', title: 'Payment Received Date' },
 ]
 
 const PastPaymentCollectionTableColumnExtension = [
   { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'invoiceAmt', type: 'currency', currency: true },
+]
+
+const InvoicePayerTableColumn = [
+  { name: 'coPayer', title: 'Co-Payer' },
+  { name: 'coPayerPayable', title: 'Co-Payer Payable' },
+]
+
+const InvoicePayerTableColumnExtension = [
+  { columnName: 'coPayerPayable', type: 'currency', currency: true },
 ]
 
 const fileName = 'Queue Listing Report'
@@ -97,8 +111,11 @@ const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
+  invoicePayerListingData: [],
   visitListingData: [],
+  visitListingExpandedGroups: [],
   pastPaymentsCollection: [],
+  paymentCollectionExpandedGroups: [],
 }
 
 const reducer = (state, action) => {
@@ -117,6 +134,21 @@ const reducer = (state, action) => {
     default:
       throw new Error()
   }
+}
+
+const getGroupingID = ({ groupingField, data }) => {
+  const _result = data.reduce((grouped, row) => {
+    if (!grouped.includes(row[groupingField]))
+      return [
+        ...grouped,
+        row[groupingField],
+      ]
+
+    return [
+      ...grouped,
+    ]
+  }, [])
+  return _result
 }
 
 const QueueListing = ({ values, validateForm }) => {
@@ -162,13 +194,26 @@ const QueueListing = ({ values, validateForm }) => {
         }),
       )
 
+      const invoicePayerListingData = queueListingResult.InvoicePayerDetail.map(
+        (item, index) => ({ ...item, id: `${item.coPayer}-${index}` }),
+      )
+
       dispatch({
         type: 'updateState',
         payload: {
           activePanel: 0,
           loaded: true,
           isLoading: false,
+          invoicePayerListingData,
           visitListingData,
+          visitListingExpandedGroups: getGroupingID({
+            groupingField: 'visitDate',
+            data: visitListingData,
+          }),
+          paymentCollectionExpandedGroups: getGroupingID({
+            groupingField: 'paymentReceivedDate',
+            data: pastPaymentsCollection,
+          }),
           pastPaymentsCollection,
         },
       })
@@ -191,6 +236,24 @@ const QueueListing = ({ values, validateForm }) => {
     const errors = await validateForm()
     if (Object.keys(errors).length > 0) return
     asyncGetData()
+  }
+
+  const handleVisitListingExpandedGroupsChange = (expandedGroups) => {
+    dispatch({
+      type: 'updateState',
+      payload: {
+        visitListingExpandedGroups: expandedGroups,
+      },
+    })
+  }
+
+  const handlePaymentCollectionsExpandedGroupsChange = (expandedGroups) => {
+    dispatch({
+      type: 'updateState',
+      payload: {
+        paymentCollectionExpandedGroups: expandedGroups,
+      },
+    })
   }
 
   return (
@@ -221,6 +284,24 @@ const QueueListing = ({ values, validateForm }) => {
                       data={state.visitListingData}
                       columns={VisitListingColumns}
                       columnExtensions={VisitListingColumnExtension}
+                      FuncProps={{
+                        pager: false,
+                        grouping: true,
+                        groupingConfig: {
+                          row: {
+                            contentComponent: GroupCellContent,
+                          },
+                          state: {
+                            grouping: [
+                              { columnName: 'visitDate' },
+                            ],
+                            expandedGroups: [
+                              ...state.visitListingExpandedGroups,
+                            ],
+                            onExpandedGroupsChange: handleVisitListingExpandedGroupsChange,
+                          },
+                        },
+                      }}
                     />
                   ),
                 },
@@ -233,6 +314,34 @@ const QueueListing = ({ values, validateForm }) => {
                       columnExtensions={
                         PastPaymentCollectionTableColumnExtension
                       }
+                      FuncProps={{
+                        pager: false,
+                        grouping: true,
+                        groupingConfig: {
+                          row: {
+                            contentComponent: GroupCellContent,
+                          },
+                          state: {
+                            grouping: [
+                              { columnName: 'paymentReceivedDate' },
+                            ],
+                            expandedGroups: [
+                              ...state.paymentCollectionExpandedGroups,
+                            ],
+                            onExpandedGroupsChange: handlePaymentCollectionsExpandedGroupsChange,
+                          },
+                        },
+                      }}
+                    />
+                  ),
+                },
+                {
+                  title: <AccordionTitle title='Invoice Payer' />,
+                  content: (
+                    <ReportDataGrid
+                      data={state.invoicePayerListingData}
+                      columns={InvoicePayerTableColumn}
+                      columnExtensions={InvoicePayerTableColumnExtension}
                     />
                   ),
                 },
