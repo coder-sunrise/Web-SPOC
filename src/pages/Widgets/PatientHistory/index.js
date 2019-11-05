@@ -552,11 +552,7 @@ class PatientHistory extends Component {
                         router.push(
                           `/reception/queue/patientdashboard?qid=${findGetParameter(
                             'qid',
-<<<<<<< HEAD
-                          )}&cid=${o.id}&v=${patientHistory.version}&md2=cons&fr=phist`,
-=======
                           )}&cid=${o.id}&v=${patientHistory.version}`,
->>>>>>> chris_test
                         )
                     })
                   }}

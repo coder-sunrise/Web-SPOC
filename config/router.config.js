@@ -75,6 +75,13 @@ const routes = [
             ],
           },
           {
+            path: '/reception/queue/consultation',
+            name: 'consultation',
+            hideInMenu: true,
+            exact: true,
+            component: './Consultation',
+          },
+          {
             path: '/reception/queue/dispense',
             name: 'dispense',
             hideInMenu: true,

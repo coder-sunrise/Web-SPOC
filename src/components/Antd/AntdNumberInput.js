@@ -172,6 +172,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   _onChange = (value) => {
+    // console.log({ value })
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -212,6 +213,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleKeyDown = (e) => {
+    // console.log({ keycode: e.keyCode })
     if (
       !e.ctrlKey &&
       !(e.keyCode >= 48 && e.keyCode <= 57) &&
@@ -284,7 +286,7 @@ class AntdNumberInput extends React.PureComponent {
     }
 
     this.setState({
-      value: newV === undefined ? '' : newV,
+      value: !newV && newV !== 0 ? '' : newV,
     })
     if (newV === '' || force) {
       this._onChange(newV)
@@ -511,13 +513,14 @@ class AntdNumberInput extends React.PureComponent {
     const { classes, onChange, ...restProps } = this.props
     const labelProps = {
       shrink:
-        !(
-          this.state.value === undefined ||
-          this.state.value === '' ||
-          this.state.value === null
-        ) || this.state.focused,
+        !(!this.state.value && this.state.value !== 0) || this.state.focused,
     }
-
+    // console.log(
+    //   this.props.field,
+    //   labelProps,
+    //   this.state.value,
+    //   this.state.focused,
+    // )
     return (
       <CustomInput
         labelProps={labelProps}
