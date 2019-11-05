@@ -64,6 +64,8 @@ class Orders extends PureComponent {
     codeTableNameArray.push('ctMedicationDosage')
     codeTableNameArray.push('ctMedicationUnitOfMeasurement')
     codeTableNameArray.push('ctMedicationFrequency')
+    codeTableNameArray.push('ctVaccinationUsage')
+    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
 
     codeTableNameArray.forEach((o) => {
       dispatch({
@@ -111,6 +113,7 @@ class Orders extends PureComponent {
       visitRegistration,
       codetable,
     } = props
+
     return (
       <div className={className}>
         <Detail {...props} />

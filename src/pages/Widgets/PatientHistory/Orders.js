@@ -28,21 +28,42 @@ export default ({ current, codetable }) => (
         columnName: 'description',
 
         render: (row) => {
+          console.log('patient history ', row)
           let text = ''
           const {
             ctmedicationusage,
-            ctmedicationdosage,
             ctmedicationunitofmeasurement,
             ctmedicationfrequency,
+            ctmedicationdosage,
+            ctvaccinationunitofmeasurement,
+            ctvaccinationusage,
           } = codetable
-
           if (
             !ctmedicationusage ||
-            !ctmedicationdosage ||
             !ctmedicationunitofmeasurement ||
-            !ctmedicationfrequency
+            !ctmedicationfrequency ||
+            !ctmedicationdosage ||
+            !ctvaccinationunitofmeasurement ||
+            !ctvaccinationusage
           )
             return null
+
+          if (row.usageMethodFK && row.dosageFK && row.uomfk) {
+            text = ''
+            const usageMethod = ctvaccinationusage.filter(
+              (codeTableItem) => codeTableItem.id === row.usageMethodFK,
+            )
+            text += `${usageMethod.length > 0 ? usageMethod[0].name : ''} `
+            text += ' '
+            const dosage = ctmedicationdosage.filter(
+              (codeTableItem) => codeTableItem.id === row.dosageFK,
+            )
+            text += `${dosage.length > 0 ? dosage[0].displayValue : ''} `
+            const prescribe = ctvaccinationunitofmeasurement.filter(
+              (codeTableItem) => codeTableItem.id === row.uomfk,
+            )
+            text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
+          }
           return (
             <div>
               {row.corPrescriptionItemInstruction ? (
@@ -75,7 +96,7 @@ export default ({ current, codetable }) => (
                   return <p>{text}</p>
                 })
               ) : (
-                ''
+                text
               )}
             </div>
           )
