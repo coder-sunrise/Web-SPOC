@@ -429,7 +429,7 @@ class Medication extends PureComponent {
               <FastField
                 name='drugName'
                 render={(args) => {
-                  return <TextField label='Name' {...args} />
+                  return <TextField autocomplete='off' label='Name' {...args} />
                 }}
               />
             ) : (

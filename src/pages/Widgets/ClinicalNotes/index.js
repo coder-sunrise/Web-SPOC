@@ -198,7 +198,6 @@ class ClinicalNotes extends Component {
         previousData.push(planArray[i])
       }
     } else {
-      previousData === undefined ? (previousData = []) : ''
       this.props.dispatch({
         type: 'scriblenotes/updateState',
         payload: {
