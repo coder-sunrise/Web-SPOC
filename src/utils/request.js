@@ -257,6 +257,7 @@ const request = (url, option, showNotification = true) => {
             'Content-Type',
             options.contentType || defaultContentType,
           )
+          console.time(newUrl)
         },
       }),
     )
@@ -274,6 +275,8 @@ const request = (url, option, showNotification = true) => {
       // })
       .then((response, s, xhr) => {
         // console.log(response, s, xhr)
+        console.timeEnd(newUrl)
+
         if (typeof response === 'object') {
           commonDataReaderTransform(response)
         }
@@ -308,6 +311,7 @@ const request = (url, option, showNotification = true) => {
           }
           notification.destroy()
         }
+
         return data
       })
       .catch((response, s, xhr) => {

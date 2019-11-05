@@ -54,6 +54,7 @@ import {
   Skeleton,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
+import PatientBanner from '@/pages/PatientDashboard/Banner'
 
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl } from '@/utils/utils'
@@ -61,7 +62,6 @@ import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
-import Banner from '../Banner'
 // import Test from './Test'
 import Layout from './Layout'
 
@@ -278,7 +278,6 @@ class Consultation extends PureComponent {
       consultation,
       resetForm,
     } = this.props
-
     if (values.id) {
       dispatch({
         type: 'global/updateAppState',
@@ -289,7 +288,7 @@ class Consultation extends PureComponent {
           onConfirmSave: () => {
             dispatch({
               type: 'consultation/discard',
-              payload: { id: values.id, history: { ...this.props.history } },
+              payload: values.id,
             })
           },
         },
@@ -627,11 +626,7 @@ class Consultation extends PureComponent {
 
     return (
       <div className={classes.root} ref={this.container}>
-        <Banner
-          style={{}}
-          extraCmt={this.getExtraComponent()}
-          {...this.props}
-        />
+        <PatientBanner extraCmt={this.getExtraComponent()} {...this.props} />
         <Authorized.Context.Provider value={matches}>
           <Layout
             {...this.props}

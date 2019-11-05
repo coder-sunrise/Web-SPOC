@@ -334,10 +334,15 @@ export const defaultTheme = createMuiTheme({
       },
       formControl: {
         transform: 'translate(0, 22px) scale(1)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        width: '100%',
       },
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
+        width: '126%',
       },
     },
     MuiInputAdornment: {
@@ -494,6 +499,9 @@ export const smallTheme = createMuiTheme({
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        width: '126%',
       },
     },
     MuiInputAdornment: {
@@ -651,6 +659,9 @@ export const largeTheme = createMuiTheme({
       shrink: {
         transform: 'translate(0, 6px) scale(0.8)',
         fontWeight: 'inherit',
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        width: '126%',
       },
     },
     MuiInputAdornment: {
