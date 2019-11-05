@@ -60,6 +60,9 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.remark = null
         newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
+      } else if (newPurchaseOrderDetails.type === 'new') {
+        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
+        newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
       }
 
       if (newPurchaseOrderDetails.purchaseOrder) {
@@ -517,6 +520,7 @@ class Index extends Component {
       errors,
       classes,
     } = this.props
+    console.log({ values })
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment } = values
