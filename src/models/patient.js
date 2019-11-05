@@ -169,6 +169,7 @@ export default createFormViewModel({
         const exceptionalPaths = [
           'billing',
           'dispense',
+          'consultation',
           'patientdashboard',
         ]
 

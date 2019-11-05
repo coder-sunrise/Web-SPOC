@@ -5,7 +5,7 @@ import { ChangePassword } from 'medisys-components'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
-import Consultation from '@/pages/PatientDashboard/Consultation'
+// import Consultation from '@/pages/Consultation'
 // import Dispense from '@/pages/Dispense'
 // import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
@@ -133,7 +133,7 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showDispensePanel && <Dispense />}
-        </CommonModal> */}
+        </CommonModal> 
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
@@ -155,7 +155,7 @@ class GlobalModalContainer extends PureComponent {
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
 
-        {/* <CommonModal
+        <CommonModal
           open={global.showBillingPanel}
           title='Billing'
           observe='BillingForm'
@@ -352,11 +352,7 @@ class GlobalModalContainer extends PureComponent {
           <Adjustment />
         </CommonModal>
         {global.reportTypeID && (
-          <ReportModal
-          // onReportViewerClose={this.handleReportViewerClose}
-          // reportTypeID={global.reportTypeID}
-          // reportParameters={global.reportParameters}
-          />
+          <ReportModal />
         )}
       </div>
     )

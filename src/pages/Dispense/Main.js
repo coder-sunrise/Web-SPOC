@@ -5,6 +5,7 @@ import Print from '@material-ui/icons/Print'
 // common component
 import {
   Button,
+  ProgressButton,
   GridContainer,
   GridItem,
   withFormikExtend,
@@ -196,19 +197,27 @@ class Main extends Component {
 
           <GridItem justify='flex-end' container className={classes.footerRow}>
             <Authorized authority='queue.dispense.savedispense'>
-              <Button color='success' size='sm' onClick={handleSubmit}>
+              <ProgressButton color='success' size='sm' onClick={handleSubmit}>
                 Save Dispense
-              </Button>
+              </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.editorder'>
-              <Button color='primary' size='sm' onClick={this.editOrder}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                onClick={this.editOrder}
+              >
                 Edit Order
-              </Button>
+              </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
-              <Button color='primary' size='sm' onClick={this.makePayment}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                onClick={this.makePayment}
+              >
                 Make Payment
-              </Button>
+              </ProgressButton>
             </Authorized>
           </GridItem>
         </GridContainer>
