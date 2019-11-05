@@ -68,6 +68,8 @@ class Consumable extends PureComponent {
     console.log(v, op)
     setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
+    setFieldValue('unitOfMeasurement', op.uom ? op.uom.name : undefined)
+
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -104,7 +106,7 @@ class Consumable extends PureComponent {
   }
 
   render () {
-    const { values, footer, handleSubmit, setFieldValue } = this.props
+    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>

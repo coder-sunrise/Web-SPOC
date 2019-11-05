@@ -76,6 +76,14 @@ class Vaccination extends PureComponent {
     )
     setFieldValue('uomfk', op.prescribingUOM ? op.prescribingUOM.id : undefined)
     setFieldValue(
+      'uomCode',
+      op.prescribingUOM ? op.prescribingUOM.code : undefined,
+    )
+    setFieldValue(
+      'uomDisplayValue',
+      op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
+    setFieldValue(
       'usageMethodFK',
       op.vaccinationUsage ? op.vaccinationUsage.id : undefined,
     )
@@ -118,7 +126,7 @@ class Vaccination extends PureComponent {
   }
 
   render () {
-    const { values, footer, handleSubmit, setFieldValue } = this.props
+    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>

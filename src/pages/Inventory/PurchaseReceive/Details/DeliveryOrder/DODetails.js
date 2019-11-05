@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
 import _ from 'lodash'
+import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -74,13 +75,14 @@ const receivingDetailsSchema = Yup.object().shape({
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
         ...x,
-        inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
+        // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
         purchaseOrderItemFK: x.id,
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
         batchNo: x.batchNo ? x.batchNo[0] : undefined,
         expiryDate: x.expiryDate,
+        expiryDate1: moment(x.expiryDate).formatUTC(),
         sortOrder: index + 1,
       }
     })

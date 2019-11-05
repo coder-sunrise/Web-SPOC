@@ -335,6 +335,15 @@ class Medication extends PureComponent {
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue(
+      'dispenseUOMCode',
+      op.dispensingUOM ? op.dispensingUOM.code : [],
+    )
+    setFieldValue(
+      'dispenseUOMDisplayValue',
+      op.dispensingUOM ? op.dispensingUOM.name : [],
+    )
+
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
@@ -399,7 +408,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log(values)
     return (
       <div>
         <GridContainer>

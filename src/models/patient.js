@@ -173,11 +173,13 @@ export default createFormViewModel({
           'patientdashboard',
         ]
 
-        const matchesExceptionalPath = exceptionalPaths.reduce(
-          (matched, url) =>
-            history.location.pathname.indexOf(url) > 0 ? true : matched,
-          false,
-        )
+        const matchesExceptionalPath =
+          history &&
+          exceptionalPaths.reduce(
+            (matched, url) =>
+              history.location.pathname.indexOf(url) > 0 ? true : matched,
+            false,
+          )
 
         let shouldRemoveQueries = [
           'md',
@@ -201,7 +203,7 @@ export default createFormViewModel({
         //     entity: undefined,
         //   },
         // })
-        yield all([
+        return yield all([
           yield put({
             type: 'global/updateAppState',
             payload: {
