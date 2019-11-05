@@ -95,6 +95,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 class Medication extends PureComponent {
   state = {
     selectionOptions: [],
+    batchNo: '',
+    expiryDate: '',
   }
 
   componentDidMount () {
@@ -228,6 +230,13 @@ class Medication extends PureComponent {
       (o) => o.isDefault === true,
     )
 
+    isDefaultBatchNo
+      ? this.setState({
+          batchNo: isDefaultBatchNo.batchNo,
+          expiryDate: isDefaultBatchNo.expiryDate,
+        })
+      : ''
+
     const { form } = this.descriptionArrayHelpers
     const prescriptionItem = form.values.corPrescriptionItemInstruction
     // let tempArray = [
@@ -357,6 +366,15 @@ class Medication extends PureComponent {
     }
 
     setFieldValue('dispenseUOMFK', op.dispensingUOM ? op.dispensingUOM.id : [])
+    setFieldValue(
+      'dispenseUOMCode',
+      op.dispensingUOM ? op.dispensingUOM.code : [],
+    )
+    setFieldValue(
+      'dispenseUOMDisplayValue',
+      op.dispensingUOM ? op.dispensingUOM.name : [],
+    )
+
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
 
@@ -394,6 +412,15 @@ class Medication extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultMedication,
+      type: orders.type,
+      drugCode: orders.type === '5' ? 'MISC' : undefined,
+    })
+  }
+
   render () {
     const {
       theme,
@@ -420,7 +447,9 @@ class Medication extends PureComponent {
               <FastField
                 name='drugName'
                 render={(args) => {
-                  return <TextField label='Name' {...args} />
+                  return (
+                    <TextField label='Name' {...args} autocomplete='nope' />
+                  )
                 }}
               />
             ) : (
@@ -506,7 +535,7 @@ class Medication extends PureComponent {
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{ marginLeft: 15 }}
+                                    style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
                                     {...commonSelectProps}
                                     {...args}
@@ -883,7 +912,14 @@ class Medication extends PureComponent {
                         this.props.setFieldValue('adjAmount', 0)
                         this.props.setFieldValue('totalAfterItemAdjustment', 0)
                         this.props.setFieldValue('totalPrice', 0)
+                        this.props.setFieldValue('expiryDate', undefined)
+                        this.props.setFieldValue('batchNo', undefined)
                       } else {
+                        this.props.setFieldValue(
+                          'expiryDate',
+                          this.state.expiryDate,
+                        )
+                        this.props.setFieldValue('batchNo', this.state.batchNo)
                         setTimeout(() => {
                           this.calculateQuantity()
                         }, 1)
@@ -898,6 +934,7 @@ class Medication extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

@@ -343,7 +343,7 @@ class RichEditor extends React.PureComponent {
       ...restProps
     } = this.props
     const { form, field, value } = restProps
-    console.log('getComponent', restProps)
+    // console.log('getComponent', restProps)
     let metionCfg = {}
     if (tagList) {
       metionCfg = {

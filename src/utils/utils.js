@@ -852,9 +852,14 @@ const getRefreshChasBalanceStatus = (status = []) => {
   }
 
   const successCode = 'SC100'
+  const fullBalanceSuccessCode = 'SC105'
   const { statusCode, statusDescription } = status[0]
 
-  if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
+  if (
+    statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase() ||
+    statusCode.trim().toLowerCase() !==
+      fullBalanceSuccessCode.trim().toLowerCase()
+  ) {
     return {
       ...defaultResponse,
       statusDescription,

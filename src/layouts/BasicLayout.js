@@ -104,7 +104,7 @@ const query = {
 }
 
 const sessionTimeoutTimer = 15 * 60 * 1000
-// const sessionTimeoutTimer = 2500
+// const sessionTimeoutTimer = 5000
 
 class BasicLayout extends React.PureComponent {
   constructor (props) {
@@ -113,8 +113,10 @@ class BasicLayout extends React.PureComponent {
       mobileOpen: false,
       authorized: false,
     }
-    this.resizeFunction = this.resizeFunction.bind(this)
-
+    // this.resize = this.resize.bind(this)
+    this.resize = _.debounce(this.resize, 500, {
+      leading: true,
+    })
     const { dispatch, route: { routes, authority } } = this.props
 
     this.initUserData()
@@ -181,9 +183,9 @@ class BasicLayout extends React.PureComponent {
     // const accessToken = localStorage.getItem('token')
     // !accessToken && router.push('/login')
 
-    window.addEventListener('resize', this.resizeFunction)
-
-    const { dispatch, route: { routes, authority } } = this.props
+    window.addEventListener('resize', this.resize)
+    this.resize()
+    // const { dispatch, route: { routes, authority } } = this.props
   }
 
   componentDidUpdate (e) {
@@ -207,17 +209,11 @@ class BasicLayout extends React.PureComponent {
     // if (navigator.platform.indexOf("Win") > -1) {
     //   ps.destroy()
     // }
-    window.removeEventListener('resize', this.resizeFunction)
+    window.removeEventListener('resize', this.resize)
   }
 
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen })
-  }
-
-  resizeFunction () {
-    if (window.innerWidth >= 960) {
-      this.setState({ mobileOpen: false })
-    }
   }
 
   getContext () {
@@ -398,6 +394,18 @@ class BasicLayout extends React.PureComponent {
     })
   }
 
+  resize = () => {
+    if (window.innerWidth >= 960) {
+      this.setState({ mobileOpen: false })
+    }
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        mainDivHeight: window.mainPanel.offsetHeight - 62,
+      },
+    })
+  }
+
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
@@ -424,6 +432,7 @@ class BasicLayout extends React.PureComponent {
     })}`
     // console.log(this.props)
     // console.log(this)
+    // console.log(this.state.mainDivHeight, window.mainPanel)
     return (
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>

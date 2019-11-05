@@ -527,7 +527,8 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = () => {
+    const isEditable = (poItem) => {
+      if (poItem && (poStatus === 5 || poStatus === 6)) return false
       if (poStatus === 6) return false
       if (isWriteOff) return false
       return true
@@ -555,7 +556,7 @@ class Index extends Component {
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={isEditable()}
+          isEditable={isEditable('poItem')}
           {...this.props}
         />
         <AuthorizedContext.Provider

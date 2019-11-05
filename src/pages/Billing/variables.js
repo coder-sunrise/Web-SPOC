@@ -51,7 +51,7 @@ export const ApplyClaimsColumnExtension = [
     render: (row) => {
       if (row.error)
         return (
-          <Tooltip title={row.error}>
+          <Tooltip title={row.error} placement='top'>
             <div>
               <SizeContainer size='lg'>
                 <Info color='error' />

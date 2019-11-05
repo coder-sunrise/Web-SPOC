@@ -24,7 +24,7 @@ const { qtyFormat } = config
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
-      ...orders.defaultPackage,
+      ...(orders.entity || orders.defaultPackage),
       type,
     }
     return v
@@ -376,6 +376,14 @@ class Package extends PureComponent {
         packageCode: op ? op.code : '',
       })
     }
+
+    this.handleReset = () => {
+      const { setValues, orders } = this.props
+      setValues({
+        ...orders.defaultPackage,
+        type: orders.type,
+      })
+    }
   }
 
   render () {
@@ -411,6 +419,7 @@ class Package extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
           showAdjustment: false,
         })}
       </div>

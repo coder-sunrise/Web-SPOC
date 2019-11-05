@@ -14,7 +14,7 @@ export default ({ current, codetable }) => (
     columnExtensions={[
       {
         columnName: 'type',
-
+        width: 180,
         render: (row) => {
           return (
             <div>
@@ -31,18 +31,41 @@ export default ({ current, codetable }) => (
           let text = ''
           const {
             ctmedicationusage,
-            ctmedicationdosage,
             ctmedicationunitofmeasurement,
             ctmedicationfrequency,
+            ctmedicationdosage,
+            ctvaccinationunitofmeasurement,
+            ctvaccinationusage,
           } = codetable
-
           if (
             !ctmedicationusage ||
-            !ctmedicationdosage ||
             !ctmedicationunitofmeasurement ||
-            !ctmedicationfrequency
+            !ctmedicationfrequency ||
+            !ctmedicationdosage ||
+            !ctvaccinationunitofmeasurement ||
+            !ctvaccinationusage
           )
             return null
+
+          if (row.corVaccinationItem) {
+            text = ''
+            const usageMethod = ctvaccinationusage.filter(
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.usageMethodFK,
+            )
+            text += `${usageMethod.length > 0 ? usageMethod[0].name : ''} `
+            text += ' '
+            const dosage = ctmedicationdosage.filter(
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.dosageFK,
+            )
+            text += `${dosage.length > 0 ? dosage[0].displayValue : ''} `
+            const prescribe = ctvaccinationunitofmeasurement.filter(
+              (codeTableItem) =>
+                codeTableItem.id === row.corVaccinationItem.uomfk,
+            )
+            text += `${prescribe.length > 0 ? prescribe[0].name : ''} `
+          }
           return (
             <div>
               {row.corPrescriptionItemInstruction ? (
@@ -75,13 +98,13 @@ export default ({ current, codetable }) => (
                   return <p>{text}</p>
                 })
               ) : (
-                ''
+                text
               )}
             </div>
           )
         },
       },
-      { columnName: 'totalAmount', type: 'number', currency: true },
+      { columnName: 'totalAmount', type: 'number', currency: true, width: 120 },
     ]}
   />
 )

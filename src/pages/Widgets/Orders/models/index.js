@@ -102,13 +102,21 @@ export default createListViewModel({
         }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
-        yield put({
+        const upsert = yield put({
           type: 'upsertRowsState',
           payload,
         })
         yield put({
           type: 'calculateAmount',
         })
+        if (upsert) {
+          yield put({
+            type: 'updateState',
+            payload: {
+              entity: undefined,
+            },
+          })
+        }
       },
       *addFinalAdjustment ({ payload }, { select, call, put, delay }) {
         yield put({
@@ -180,8 +188,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          type: state.type === '6' ? undefined : state.type,
-          entity: undefined,
+          entity: { uid: getUniqueId(), packageItems: [] },
           // totalAfterAdj: undefined,
         }
       },
