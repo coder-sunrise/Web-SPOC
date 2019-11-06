@@ -267,15 +267,6 @@ class Medication extends PureComponent {
     ])
 
     setFieldValue(
-      'batchNo',
-      isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
-    )
-    setFieldValue(
-      'expiryDate',
-      isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
-    )
-
-    setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
       op.medicationUsage ? op.medicationUsage.id : undefined,
     )
@@ -365,6 +356,15 @@ class Medication extends PureComponent {
     setFieldValue('drugName', op.displayValue)
 
     if (disableEdit === false) {
+      setFieldValue(
+        'batchNo',
+        isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
+      )
+      setFieldValue(
+        'expiryDate',
+        isDefaultBatchNo ? isDefaultBatchNo.expiryDate : undefined,
+      )
+
       if (op.sellingPrice) {
         setFieldValue('unitPrice', op.sellingPrice)
         setFieldValue(
