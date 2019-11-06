@@ -20,9 +20,6 @@ export default createListViewModel({
         if (pathname === '/setting/doctorblock') {
           dispatch({
             type: 'query',
-            payload: {
-              pagesize: 99999,
-            },
           })
         }
       })
@@ -40,9 +37,6 @@ export default createListViewModel({
       *refresh (_, { call, put }) {
         yield put({
           type: 'query',
-          payload: {
-            pagesize: 99999,
-          },
         })
       },
       *update ({ payload }, { call }) {

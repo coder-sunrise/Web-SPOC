@@ -82,7 +82,6 @@ export default createListViewModel({
           yield put({
             type: 'query',
             payload: {
-              pagesize: 999999,
               'VisitFKNavigation.BizSessionFK': response.id,
             },
           })
@@ -159,7 +158,6 @@ export default createListViewModel({
             put({
               type: 'query',
               payload: {
-                pagesize: 999999,
                 'VisitFKNavigation.BizSessionFK': sessionData[0].id,
               },
             }),
@@ -182,40 +180,30 @@ export default createListViewModel({
       *getTodayAppointments ({ payload }, { call, put }) {
         const { shouldGetTodayAppointments = true } = payload
         // TODO: integrate with new appointment listing api
-        const today = moment().formatUTC()
-        const queryPayload = {
-          combineCondition: 'and',
-          eql_appointmentDate: today,
-          in_appointmentStatusFk: '1|2|5',
+        if (shouldGetTodayAppointments) {
+          const today = moment().formatUTC()
+          const queryPayload = {
+            combineCondition: 'and',
+            eql_appointmentDate: today,
+            in_appointmentStatusFk: '1|2|5',
+          }
+          const response = yield call(
+            service.queryAppointmentListing,
+            queryPayload,
+          )
+          if (response) {
+            const { data: { data = [] } } = response
+            yield put({
+              type: 'updateState',
+              payload: {
+                appointmentList: data.map((item) => ({
+                  ...item,
+                  visitStatus: VISIT_STATUS.UPCOMING_APPT,
+                })),
+              },
+            })
+          }
         }
-        const response = yield call(
-          service.queryAppointmentListing,
-          queryPayload,
-        )
-        if (response) {
-          const { data: { data = [] } } = response
-          yield put({
-            type: 'updateState',
-            payload: {
-              appointmentList: data.map((item) => ({
-                ...item,
-                visitStatus: VISIT_STATUS.UPCOMING_APPT,
-              })),
-            },
-          })
-        }
-        // if (shouldGetTodayAppointments) {
-        //   const today = moment().formatUTC()
-
-        //   yield put({
-        //     type: 'calendar/getCalendarList',
-        //     payload: {
-        //       combineCondition: 'and',
-        //       eql_appointmentDate: today,
-        //       in_appointmentStatusFk: '1|2|5',
-        //     },
-        //   })
-        // }
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
         const result = yield call(service.deleteQueue, payload)
