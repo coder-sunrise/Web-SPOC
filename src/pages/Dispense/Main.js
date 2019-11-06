@@ -119,7 +119,8 @@ const reloadDispense = (props, effect = 'query') => {
 class Main extends Component {
   makePayment = () => {
     const { dispatch, dispense, values } = this.props
-
+    console.log({ values })
+    return
     dispatch({
       type: 'dispense/finalize',
       payload: {

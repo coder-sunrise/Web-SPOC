@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
+import { List, message, Avatar, Spin } from 'antd'
+import InfiniteScroll from 'react-infinite-scroller'
 import {
   ThemeProvider,
   MessageList,
   Message,
   MessageText,
-  Avatar,
   Row,
 } from '@livechat/ui-kit'
 import {
@@ -51,86 +52,58 @@ const styles = () => ({
     borderColor: 'rgba(0, 0, 0, 0.05)',
     borderImage: 'initial',
   },
+
+  demoInfiniteContainer: {
+    border: '1px solid #e8e8e8',
+    borderRadius: 4,
+    overflow: 'auto',
+    padding: '8px 24px',
+    height: 200,
+  },
+  demoLoadingContainer: {
+    position: 'absolute',
+    bottom: 40,
+    width: '100%',
+    textAlign: 'center',
+  },
 })
 
 const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
   const [
-    list,
-    setList,
-  ] = useState([
-    {
-      date: '2019-05-01 21:37',
-      text: 'Hi Tan Ah Kow',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn Smith',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 1,
-    },
-    {
-      date: '2019-05-01 22:38',
-      text: 'Hi ',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn',
-      isOwn: false,
-      id: 2,
-    },
-    {
-      date: '2019-05-01 22:39',
-      text: 'How Are you ',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 3,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Are you okay',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 4,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 5,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 6,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 7,
-    },
-    {
-      date: '2019-05-01 23:37',
-      text: 'Can we make appointment on 2019-02-31',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Pending',
-      id: 8,
-    },
-  ])
+    historyList,
+    setHistoryList,
+  ] = useState([])
+  const [
+    loading,
+    setLoading,
+  ] = useState(false)
+  const [
+    hasMore,
+    setHasMore,
+  ] = useState(true)
+  const [
+    totalHistory,
+    setTotalHistory,
+  ] = useState(true)
+
+  useEffect(() => {
+    dispatch({
+      type: 'sms/querySMSHistory',
+      payload: {
+        Recipient: recipient.patientContactNo,
+      },
+    }).then((v) => {
+      if (v) {
+        const { data, totalRecords } = v.data
+        setHistoryList([
+          ...historyList,
+          ...data,
+        ])
+        setTotalHistory(totalRecords)
+      }
+    })
+  }, [])
+
   const renderMessages = (messages) => {
     if (messages) {
       let i = 0
@@ -186,27 +159,76 @@ const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
     dispatch,
     onConfirm,
   }
+
+  const checkIsItLoadedAllHistory = () => {
+    if (historyList.length >= totalHistory) {
+      message.warning('Infinite List loaded all')
+      setHasMore(false)
+      setLoading(false)
+      return true
+    }
+    return false
+  }
+
+  const fetchData = () => {
+    dispatch({
+      type: 'sms/querySMSHistory',
+      payload: {
+        Recipient: recipient.patientContactNo,
+        current: 2,
+        pagesize: 10,
+      },
+    }).then(async (v) => {
+      if (v) {
+        const { data, totalRecords } = v.data
+        await setHistoryList([
+          ...historyList,
+          ...data,
+        ])
+        setTotalHistory(totalRecords)
+      }
+    })
+  }
+
+  const fetchDataCallback = useCallback(
+    () => {
+      fetchData()
+      checkIsItLoadedAllHistory()
+    },
+    [
+      historyList,
+    ],
+  )
+
+  const handleInfiniteOnLoad = () => {
+    setLoading(true)
+    if (checkIsItLoadedAllHistory()) return
+    fetchDataCallback()
+  }
   return (
-    <ThemeProvider>
-      <GridContainer
-        style={{
-          overflowY: 'auto',
-        }}
-        direction='column'
-        spacing={8}
-      >
-        <Grid item>
-          <Paper className={classes.messageBar}>
-            <MessageList active>{renderMessages(sms.smsHistory)}</MessageList>
-          </Paper>
-        </Grid>
-        <Grid item>
-          <Paper className={classes.sendBar}>
-            <New {...newMessageProps} />
-          </Paper>
-        </Grid>
-      </GridContainer>
-    </ThemeProvider>
+    <React.Fragment>
+      <div className={classes.demoInfiniteContainer}>
+        <InfiniteScroll
+          initialLoad={false}
+          pageStart={0}
+          loadMore={handleInfiniteOnLoad}
+          hasMore={!loading && hasMore}
+          useWindow={false}
+        >
+          <List
+            dataSource={historyList}
+            renderItem={(item) => <p>{item.content}</p>}
+          >
+            {loading &&
+            hasMore && (
+              <div className={classes.demoLoadingContainer}>
+                <Spin />
+              </div>
+            )}
+          </List>
+        </InfiniteScroll>
+      </div>
+    </React.Fragment>
   )
 }
 export default compose(withStyles(styles, { withTheme: true }), React.memo)(
