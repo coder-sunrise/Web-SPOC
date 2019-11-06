@@ -137,6 +137,19 @@ class Report extends React.Component {
           </GridItem>
           <GridItem md={3}>
             <FastField
+              name='copaymentschemename'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
+                  localFilter={(opt) => opt.schemeCategoryName === 'Corporate'}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
               name='ctMedicationDosage'
               render={(args) => (
                 <CodeSelect
@@ -148,12 +161,12 @@ class Report extends React.Component {
               )}
             />
           </GridItem>
-          <GridItem md={3}>
+          {/* <GridItem md={3}>
             <FastField
               name='ctMedicationDosage'
               render={(args) => <DoctorProfileSelect />}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem md={3}>
             <FastField
               name='Amount'

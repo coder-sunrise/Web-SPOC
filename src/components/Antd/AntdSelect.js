@@ -417,10 +417,11 @@ class AntdSelect extends React.PureComponent {
     })
     if (this.props.query) {
       const q = await this.props.query(value)
-      // console.log(q)
+      console.log({ q })
       let data = []
       try {
-        data = q.data.data
+        if (q instanceof Array) data = q
+        else data = q.data.data
       } catch (error) {}
       this.setState({
         fetching: false,

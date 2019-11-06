@@ -158,6 +158,7 @@ export default createListViewModel({
             put({
               type: 'query',
               payload: {
+                pagesize: 9999,
                 'VisitFKNavigation.BizSessionFK': sessionData[0].id,
               },
             }),
