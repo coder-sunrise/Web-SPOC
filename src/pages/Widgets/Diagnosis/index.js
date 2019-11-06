@@ -115,6 +115,7 @@ class Diagnosis extends PureComponent {
       onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
+      isNew: true,
     })
   }
 
