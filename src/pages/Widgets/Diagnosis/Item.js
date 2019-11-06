@@ -50,13 +50,14 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
-    removeConfirmMessage,
-    setRemoveConfirmMessage,
-  ] = useState('Confirm to remove a diagnosis?')
-  const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
+
+  const [
+    showPersistMsg,
+    setShowPersistMsg,
+  ] = useState(false)
 
   const { form } = arrayHelpers
 
@@ -241,11 +242,36 @@ const DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={6}>
+        <GridItem xs={1}>
           <FastField
             name={`corDiagnosis[${index}].isPersist`}
             render={(args) => {
-              return <Checkbox inputLabel='Persist' {...args} />
+              return (
+                <Checkbox
+                  inputLabel='Persist'
+                  {...args}
+                  onChange={({ target }) => {
+                    if (
+                      target.value === false &&
+                      !form.values.corDiagnosis[index].isNew
+                    ) {
+                      setShowPersistMsg(true)
+                    } else {
+                      setShowPersistMsg(false)
+                    }
+                  }}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs={5}>
+          <FastField
+            render={() => {
+              if (showPersistMsg === true) {
+                return "Diagnosis will be removed from patient's medical problem"
+              }
+              return ''
             }}
           />
         </GridItem>
@@ -262,9 +288,17 @@ const DiagnosisItem = ({
         <GridItem xs={1} style={{ position: 'relative' }}>
           <Popover
             content={
-              <div>
+              <div
+                style={{
+                  width:
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].isPersist
+                      ? '180px'
+                      : '340px',
+                }}
+              >
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
-                  {removeConfirmMessage}
+                  Remove diagnosis?
                 </p>
                 <Button
                   onClick={() => {
@@ -281,10 +315,19 @@ const DiagnosisItem = ({
                     // arrayHelpers.remove(index)
                   }}
                 >
-                  Remove Current Visit
+                  {form.values.corDiagnosis[index].isNew === true ||
+                  !form.values.corDiagnosis[index].isPersist ? (
+                    'Confirm'
+                  ) : (
+                    'Current Visit'
+                  )}
                 </Button>
                 <Button
                   color='primary'
+                  hidden={
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].isPersist
+                  }
                   onClick={() => {
                     // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
@@ -294,7 +337,7 @@ const DiagnosisItem = ({
                     )
                   }}
                 >
-                  Remove Permanently
+                  Permanently
                 </Button>
               </div>
             }
@@ -310,19 +353,6 @@ const DiagnosisItem = ({
                 justIcon
                 color='danger'
                 size='sm'
-                onClick={() => {
-                  let diagnosis = form.values.corDiagnosis[index]
-                  if (diagnosis && diagnosis.diagnosisFK >= 0) {
-                    setRemoveConfirmMessage(
-                      `Confirm to remove a ${diagnosis.isPersist === true
-                        ? 'persist'
-                        : ''} diagnosis?`,
-                    )
-                  } else {
-                    setRemoveConfirmMessage('Remove diagnosis?')
-                  }
-                  setShow(true)
-                }}
               >
                 <DeleteIcon />
               </Button>
