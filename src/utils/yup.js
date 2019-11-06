@@ -238,7 +238,7 @@ function equalAndLaterThan (ref, msg) {
       const startTimeObject = getTimeObject(start)
       const endTimeObject = getTimeObject(value)
       if (startTimeObject && endTimeObject)
-        return compare(startTimeObject, endTimeObject)
+        return compareEqual(startTimeObject, endTimeObject)
 
       return false
     },

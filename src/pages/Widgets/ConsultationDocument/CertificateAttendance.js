@@ -21,7 +21,6 @@ const isSameOrAfterTime = (startTime, endTime) =>
 
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
-    console.log('data ', visitEntity)
     const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
     const currentTime = moment().format('HH:mm')
 
@@ -45,20 +44,8 @@ const isSameOrAfterTime = (startTime, endTime) =>
     issuedByUserFK: Yup.number().required(),
     accompaniedBy: Yup.string().required(),
     attendanceStartTime: Yup.string().required(),
-    // attendanceEndTime: Yup.string().when(
-    //   [
-    //     'attendanceEndTime',
-    //     'attendanceStartTime',
-    //   ],
-    //   {
-    //     is: (attendanceEndTime, attendanceStartTime) =>
-    //       isSameOrAfterTime(attendanceEndTime, attendanceStartTime),
-    //     then: Yup.string(), // ???
-    //     // otherwise: // ????
-    //   },
-    // ),
     attendanceEndTime: Yup.string()
-      .laterThan(
+      .equalAndLaterThan(
         Yup.ref('attendanceStartTime'),
         'Time From must be later than Time To',
       )
