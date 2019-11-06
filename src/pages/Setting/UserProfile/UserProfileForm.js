@@ -1,4 +1,5 @@
 import React from 'react'
+import _ from 'lodash'
 import * as Yup from 'yup'
 import moment from 'moment'
 import { connect } from 'dva'
@@ -146,14 +147,21 @@ const styles = (theme) => ({
     const { effectiveDates, role: roleFK, ...restValues } = values
     const role = ctRole.find((item) => item.id === roleFK)
     const isDoctor = roleFK === 2 || roleFK === 3
+    const doctorProfile = _.isEmpty(restValues.doctorProfile)
+      ? undefined
+      : {
+          ...restValues.doctorProfile,
+          isDeleted: !isDoctor,
+        }
 
     const userProfile = constructUserProfile(values, role)
-
+    console.log({ userProfile })
     const payload = {
       ...restValues,
-      doctorProfile: isDoctor
-        ? restValues.doctorProfile
-        : { ...restValues.doctorProfile, isDeleted: true },
+      doctorProfile,
+      // doctorProfile: isDoctor
+      //   ? restValues.doctorProfile
+      //   : { ...restValues.doctorProfile, isDeleted: true },
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,

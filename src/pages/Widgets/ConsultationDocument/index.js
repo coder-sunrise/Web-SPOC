@@ -240,7 +240,7 @@ class ConsultationDocument extends PureComponent {
     } = this.props
     const { showModal } = consultationDocument
     const { rows } = consultationDocument
-    // console.log('consultationDocumentTypes', values)
+
     return (
       <div>
         <CommonTableGrid
