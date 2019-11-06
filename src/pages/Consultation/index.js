@@ -444,6 +444,7 @@ class Consultation extends PureComponent {
                 <ProgressButton
                   color='danger'
                   onClick={this.discardConsultation}
+                  icon={null}
                 >
                   Discard
                 </ProgressButton>

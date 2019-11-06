@@ -89,6 +89,7 @@ export const printRow = async (row, props) => {
 }
 
 export const viewReport = (row, props, useID = false) => {
+  console.log({ row, props, useID })
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -122,7 +123,9 @@ export const viewReport = (row, props, useID = false) => {
     const reportParameters = { ...row }
     const { subject } = row
     reportParameters.doctorName = (obj.title ? `${obj.title} ` : '') + obj.name
-    reportParameters.doctorMCRNo = obj.doctorProfile.doctorMCRNo
+    reportParameters.doctorMCRNo = obj.doctorProfile
+      ? obj.doctorProfile.doctorMCRNo
+      : ''
 
     reportParameters.patientName = entity.name
     reportParameters.patientAccountNo = entity.patientAccountNo
@@ -219,10 +222,10 @@ class ConsultationDocument extends PureComponent {
     this.toggleModal()
   }
 
-  viewReport = (uid) => {
+  handleViewReport = (uid) => {
     const { consultationDocument } = this.props
     const { rows } = consultationDocument
-    const row = viewReport(rows.find((item) => item.uid === uid), this.props)
+    viewReport(rows.find((item) => item.uid === uid), this.props)
   }
 
   render () {
@@ -279,8 +282,8 @@ class ConsultationDocument extends PureComponent {
               columnName: 'subject',
               onClick: (row) => {
                 // printRow(row, this.props)
-                this.viewReport(row.uid)
-                // viewReport(row, this.props)
+
+                this.handleViewReport(row.uid)
               },
               type: 'link',
               linkField: 'href',

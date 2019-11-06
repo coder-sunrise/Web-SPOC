@@ -16,6 +16,26 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
+import { getBizSession } from '@/services/queue'
+
+const defaultPatientPayment = {
+  id: undefined,
+  invoiceFK: undefined,
+  invoicePayerWriteOff: [],
+  invoicePayment: [],
+  isCancelled: false,
+  isDeleted: false,
+  outStanding: 0,
+  patientName: '',
+  patientProfileFK: undefined,
+  payerDistributedAmt: 0,
+  payerType: 'Patient',
+  payerTypeFK: 1,
+  paymentTxnList: [],
+  sequence: 0,
+  statementInvoice: [],
+  totalPaid: 0,
+}
 
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
@@ -24,7 +44,25 @@ import styles from './styles'
 @withFormik({
   name: 'invoicePayment',
   enableReinitialize: true,
-  mapPropsToValues: ({ invoicePayment }) => {
+  mapPropsToValues: ({ invoicePayment, invoiceDetail }) => {
+    // console.log({ invoicePayment, invoiceDetail })
+    // const { entity: invoiceDetailEntity } = invoiceDetail
+    // const { entity = [] } = invoicePayment
+
+    // const isEmpty = entity.length === 0
+    // let _values = {}
+    // if (isEmpty) {
+    //   _values = [
+    //     {
+    //       ...defaultPatientPayment,
+    //       invoiceFK: invoiceDetailEntity.id,
+    //       patientName: invoiceDetailEntity.patientName,
+    //       outStanding: invoiceDetailEntity.outstandingBalance,
+    //     },
+    //   ]
+    //   console.log({ _values })
+    //   return _values
+    // }
     return invoicePayment.entity || {}
   },
 })
@@ -41,6 +79,25 @@ class PaymentDetails extends Component {
       reportID: undefined,
       reportParameters: undefined,
     },
+    hasActiveSession: false,
+  }
+
+  componentDidMount = () => {
+    this.checkHasActiveSession()
+  }
+
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
   }
 
   refresh = () => {
@@ -231,6 +288,7 @@ class PaymentDetails extends Component {
   render () {
     // console.log('PaymentIndex', this.props)
     const { classes, values, readOnly, invoiceDetail } = this.props
+    const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -247,7 +305,7 @@ class PaymentDetails extends Component {
       showReport,
       reportPayload,
     } = this.state
-    // console.log({ values })
+    console.log({ values })
     return (
       <div className={classes.container}>
         {readOnly ? (
@@ -277,6 +335,7 @@ class PaymentDetails extends Component {
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
                   readOnly={readOnly}
+                  hasActiveSession={hasActiveSession}
                 />
               )
             })

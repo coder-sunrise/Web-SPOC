@@ -856,10 +856,16 @@ const getRefreshChasBalanceStatus = (status = []) => {
   const { statusCode, statusDescription } = status[0]
 
   if (
-    statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase() ||
-    statusCode.trim().toLowerCase() !==
-      fullBalanceSuccessCode.trim().toLowerCase()
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
   ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
+
+  if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
       ...defaultResponse,
       statusDescription,
@@ -889,7 +895,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total
+    r.weightage = r[totalField] / total || 0
     r[adjustedField] = r[totalField]
 
     // console.log(r)
