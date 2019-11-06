@@ -307,7 +307,7 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, disableEdit } = this.props
 
     const defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
     if (defaultBatch)
@@ -327,12 +327,13 @@ class Medication extends PureComponent {
         stepdose: 'AND',
       },
     ])
-
-    setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
-    setFieldValue(
-      'expiryDate',
-      defaultBatch ? defaultBatch.expiryDate : undefined,
-    )
+    if (disableEdit === false) {
+      setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
+      setFieldValue(
+        'expiryDate',
+        defaultBatch ? defaultBatch.expiryDate : undefined,
+      )
+    }
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',

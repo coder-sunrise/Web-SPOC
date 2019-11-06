@@ -15,7 +15,15 @@ const amountProps = {
   normalText: true,
 }
 
-const Summary = ({ classes }) => {
+const Summary = ({ classes, clinicSettings }) => {
+  const getGST = () => {
+    const { settings } = clinicSettings
+    if (settings) {
+      const { gSTPercentageInt } = settings
+      return `GST (${gSTPercentageInt}%)`
+    }
+    return null
+  }
   return (
     <GridContainer
       direction='column'
@@ -49,7 +57,7 @@ const Summary = ({ classes }) => {
         <FastField
           name='invoiceGSTAmt'
           render={(args) => {
-            return <NumberInput prefix='GST (7%):' {...amountProps} {...args} />
+            return <NumberInput prefix={getGST()} {...amountProps} {...args} />
           }}
         />
       </GridItem>
