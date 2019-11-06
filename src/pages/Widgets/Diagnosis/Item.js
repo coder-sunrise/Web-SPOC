@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Field, FastField } from 'formik'
+import _ from 'lodash'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
@@ -18,6 +19,8 @@ import {
   Select,
   ButtonSelect,
 } from '@/components'
+import { fetchAndSaveCodeTable } from '@/utils/codes'
+import { queryList } from '@/services/common'
 
 const filterOptions = [
   {
@@ -50,6 +53,11 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
+    ctDiagnosis,
+    setCtDiagnosis,
+  ] = useState([])
+
+  const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
@@ -59,34 +67,42 @@ const DiagnosisItem = ({
     setShowPersistMsg,
   ] = useState(false)
 
+  const [
+    diagnosisFilter,
+    setDiagnosisFilter,
+  ] = useState(filterOptions.map((o) => o.value))
+
   const { form } = arrayHelpers
 
-  useEffect(() => {
-    try {
-      if (
-        form.values.corDiagnosis[index] &&
-        form.values.corDiagnosis[index].diagnosisFK
-      ) {
-        const { diagnosisFK } = form.values.corDiagnosis[index]
-        const ctsnomeddiagnosis = codetable['codetable/ctsnomeddiagnosis'] || []
-        // const { ctcomplication } = codetable
-        const diagnosis = ctsnomeddiagnosis.find(
-          (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
-        )
-        if (diagnosis) {
-          setCtComplicationPairedWithDiag(diagnosis.complication || [])
+  useEffect(
+    () => {
+      try {
+        if (
+          form.values.corDiagnosis[index] &&
+          form.values.corDiagnosis[index].diagnosisFK
+        ) {
+          const { diagnosisFK } = form.values.corDiagnosis[index]
+          const ctsnomeddiagnosis = ctDiagnosis || []
+          // const { ctcomplication } = codetable
+          const diagnosis = ctsnomeddiagnosis.find(
+            (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+          )
+          if (diagnosis) {
+            setCtComplicationPairedWithDiag(diagnosis.complication || [])
+          }
         }
+      } catch (error) {
+        console.log({ error })
       }
-    } catch (error) {
-      console.log({ error })
-    }
-  }, [])
+    },
+    [
+      ctDiagnosis,
+    ],
+  )
 
   const onDiagnosisChange = (v, op) => {
     const { setFieldValue } = form
     if (op) {
-      // setFieldValue(`corDiagnosis[${index}]_complication`, op.complication)
-
       setFieldValue(
         `corDiagnosis[${index}]diagnosisDescription`,
         op.displayvalue,
@@ -104,10 +120,49 @@ const DiagnosisItem = ({
     }
   }
 
-  const [
-    diagnosisFilter,
-    setDiagnosisFilter,
-  ] = useState(filterOptions.map((o) => o.value))
+  const onDiagnosisSearch = async (v) => {
+    // console.log('onDiagnosisSearch', v)
+    // if (!v) {
+
+    //   return []
+    // }
+    const search = {
+      props:
+        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
+      sorting: [
+        { columnName: 'displayvalue', direction: 'asc' },
+      ],
+    }
+    if (typeof v === 'string') {
+      search.displayvalue = v
+    } else {
+      search.id = Number(v)
+    }
+    if (
+      !(
+        diagnosisFilter.length === 0 ||
+        diagnosisFilter.length === filterOptions.length
+      )
+    ) {
+      search.group = [
+        {
+          combineCondition: 'or',
+        },
+      ]
+      diagnosisFilter.forEach((df) => {
+        search.group[0][df] = true
+      })
+    }
+
+    // console.log(diagnosisFilter)
+    const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
+    setCtDiagnosis(response.data.data)
+
+    return response
+  }
+
+  // const deboucedOnDiagnosisSearch = _.debounce(onDiagnosisSearch, 500)
+
   // console.log(diagnosisFilter)
   return (
     <React.Fragment>
@@ -116,30 +171,25 @@ const DiagnosisItem = ({
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
-              <CodeSelect
+              <Select
                 label='Diagnosis'
-                code='codetable/ctsnomeddiagnosis'
-                remoteFilter={{
-                  props:
-                    'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
-                  sorting: [
-                    { columnName: 'displayvalue', direction: 'asc' },
-                  ],
-                }}
-                localFilter={(row) => {
-                  if (
-                    diagnosisFilter.length === 0 ||
-                    diagnosisFilter.length === filterOptions.length
-                  )
-                    return true
-                  for (let i = 0; i < diagnosisFilter.length; i++) {
-                    const df = diagnosisFilter[i]
-                    if (row[df]) return true
-                  }
-                  return false
-                }}
+                // code='codetable/ctsnomeddiagnosis'
+                // localFilter={(row) => {
+                //   if (
+                //     diagnosisFilter.length === 0 ||
+                //     diagnosisFilter.length === filterOptions.length
+                //   )
+                //     return true
+                //   for (let i = 0; i < diagnosisFilter.length; i++) {
+                //     const df = diagnosisFilter[i]
+                //     if (row[df]) return true
+                //   }
+                //   return false
+                // }}
+                options={ctDiagnosis}
+                valueField='id'
                 labelField='displayvalue'
-                autoComplete
+                // autoComplete
                 renderDropdown={(option) => {
                   const {
                     isChasAcuteClaimable,
@@ -158,7 +208,11 @@ const DiagnosisItem = ({
                     </span>
                   )
                 }}
+                query={onDiagnosisSearch}
                 onChange={onDiagnosisChange}
+                onDataSouceChange={(data) => {
+                  setCtDiagnosis(data)
+                }}
                 {...args}
               />
             )}

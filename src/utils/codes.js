@@ -866,7 +866,7 @@ const convertExcludeFields = [
   // 'excludeInactiveCodes',
 ]
 
-const _fetchAndSaveCodeTable = async (
+const fetchAndSaveCodeTable = async (
   code,
   params,
   multiplier = 1,
@@ -1011,7 +1011,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh || _force) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
+      result = fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
@@ -1027,7 +1027,7 @@ export const getCodes = async (payload) => {
       //   lastLogin: parsedLastLoginDate.format(),
       // })
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
+        ? fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
@@ -1409,5 +1409,6 @@ module.exports = {
   osBalanceStatus,
   buttonTypes,
   inventoryAdjustmentStatus,
+  fetchAndSaveCodeTable,
   ...module.exports,
 }

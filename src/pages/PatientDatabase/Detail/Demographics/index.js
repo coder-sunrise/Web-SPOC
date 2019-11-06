@@ -57,7 +57,6 @@ class Demographic extends PureComponent {
     const { values, classes } = this.props
     return (
       <Select
-        remote
         query={(v) => {
           const search = {}
           if (typeof v === 'number') {
@@ -72,6 +71,7 @@ class Demographic extends PureComponent {
             combineCondition: 'or',
           })
         }}
+        valueField='id'
         label='Patient Name/Account No./Mobile No.'
         renderDropdown={(p) => {
           // console.log(p)
@@ -203,7 +203,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <DatePicker
                       label='Date of Birth'
-                      showTime
+                      // showTime
                       dobRestrict
                       {...args}
                     />

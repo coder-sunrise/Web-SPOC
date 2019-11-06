@@ -286,10 +286,14 @@ class Medication extends PureComponent {
       }
 
       newTotalQuantity = Math.round(newTotalQuantity * 10) / 10 || 0
+      const { prescriptionToDispenseConversion } = currentMedicaiton
+      if (prescriptionToDispenseConversion)
+        newTotalQuantity = Math.round(
+          newTotalQuantity / prescriptionToDispenseConversion,
+        )
     }
     setFieldValue(`quantity`, newTotalQuantity)
 
-    // console.log(currentMedicaiton)
     if (disableEdit === false) {
       if (currentMedicaiton.sellingPrice) {
         setFieldValue('unitPrice', currentMedicaiton.sellingPrice)
