@@ -78,6 +78,7 @@ export default createListViewModel({
           type: 'updateState',
           payload: {
             queueID,
+            patientID,
           },
         })
       },

@@ -77,7 +77,7 @@ class Allergies extends PureComponent {
                       { name: 'No', value: false },
                     ]}
                     label='G6PD Deficiency:'
-                    disabled={allergyDisabled}
+                    // disabled={allergyDisabled}
                   />
                 )
               }}
