@@ -159,12 +159,12 @@ class Banner extends PureComponent {
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
       if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
+        // dispatch({
+        //   type: 'patient/query',
+        //   payload: {
+        //     id: entity.id,
+        //   },
+        // })
 
         const {
           balance,
