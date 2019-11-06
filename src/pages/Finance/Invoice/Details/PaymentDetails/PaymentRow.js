@@ -64,7 +64,7 @@ const PaymentRow = ({
         </GridItem>
         <GridItem>
           <Tooltip
-            title='Void'
+            title='Delete Selected item'
             style={{
               visibility: isCancelled === undefined ? 'hidden' : 'visible',
             }}
