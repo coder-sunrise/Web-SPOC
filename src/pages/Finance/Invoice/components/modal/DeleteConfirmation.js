@@ -25,11 +25,13 @@ const DeleteConfirmation = ({
     setCancelReason,
   ] = useState('')
 
+  const _writeOffLabel = `Are you sure to undo the ${type}  ${itemID}?`;
+  const _otherLabel = `Are you sure to void the ${type}  ${itemID}?`;
   return (
     <GridContainer justify='center' alignItems='center'>
       <GridItem md={12} className={classes.centerText}>
         <h4>
-          Are you sure to {type === 'Write Off'?"undo":"void" } the {type} {itemID}?
+          {type === 'Write Off'? _writeOffLabel:_otherLabel }
         </h4>
       </GridItem>
       { (type !== 'Write Off') && 
