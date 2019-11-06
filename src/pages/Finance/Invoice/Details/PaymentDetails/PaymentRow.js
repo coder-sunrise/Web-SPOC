@@ -34,14 +34,16 @@ const PaymentRow = ({
     >
       <GridItem md={2}>
         {type === 'Payment' || type === 'Credit Note' ? (
-          <IconButton
-            // payerID='N/A'
-            id={itemID}
-            className={classes.printButton}
-            onClick={() => handlePrinterClick(type, id)}
-          >
-            <Printer />
-          </IconButton>
+          <Tooltip title='Print Receipt'>
+            <IconButton
+              // payerID='N/A'
+              id={itemID}
+              className={classes.printButton}
+              onClick={() => handlePrinterClick(type, id)}
+            >
+              <Printer />
+            </IconButton>
+          </Tooltip>
         ) : (
           <Tooltip title={reason}>
             <IconButton className={classes.infoButton}>
@@ -64,7 +66,7 @@ const PaymentRow = ({
         </GridItem>
         <GridItem>
           <Tooltip
-            title='Void'
+            title='Delete Selected item'
             style={{
               visibility: isCancelled === undefined ? 'hidden' : 'visible',
             }}

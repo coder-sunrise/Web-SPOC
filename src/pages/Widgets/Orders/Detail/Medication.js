@@ -73,45 +73,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType, codetable } = props
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
-    const {
-      ctmedicationusage,
-      ctmedicationunitofmeasurement,
-      ctmedicationfrequency,
-      ctmedicationdosage,
-    } = codetable
-
-    let itemsInstruction = values.corPrescriptionItemInstruction
-    if (itemsInstruction) {
-      for (let index = 0; index < itemsInstruction.length; index++) {
-        let item = itemsInstruction[index]
-        const usageMethod = ctmedicationusage.find(
-          (codeTableItem) => codeTableItem.id === item.usageMethodFK,
-        )
-        const dosage = ctmedicationdosage.find(
-          (codeTableItem) => codeTableItem.id === item.dosageFK,
-        )
-        const prescribe = ctmedicationunitofmeasurement.find(
-          (codeTableItem) => codeTableItem.id === item.prescribeUOMFK,
-        )
-        const drugFrequency = ctmedicationfrequency.find(
-          (codeTableItem) => codeTableItem.id === item.drugFrequencyFK,
-        )
-        item.usageMethodCode = usageMethod ? usageMethod.code : undefined
-        item.usageMethodDisplayValue = usageMethod
-          ? usageMethod.name
-          : undefined
-        item.dosageCode = dosage ? dosage.code : undefined
-        item.dosageDisplayValue = dosage ? dosage.displayValue : undefined
-        item.prescribeUOMCode = prescribe ? prescribe.code : undefined
-        item.prescribeUOMDisplayValue = prescribe ? prescribe.name : undefined
-        item.drugFrequencyCode = drugFrequency ? drugFrequency.code : undefined
-        item.drugFrequencyDisplayValue = drugFrequency
-          ? drugFrequency.displayValue
-          : undefined
-      }
-    }
 
     const getInstruction = (instructions) => {
       let instruction = ''
@@ -135,13 +98,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
       return instruction
     }
 
-    const instruction = getInstruction(itemsInstruction)
+    const instruction = getInstruction(values.corPrescriptionItemInstruction)
 
     const data = {
       sequence: rows.length,
       ...values,
       instruction,
-      corPrescriptionItemInstruction: itemsInstruction,
       subject: currentType.getSubject(values),
       isDeleted: false,
     }
@@ -311,7 +273,7 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue } = this.props
+    const { setFieldValue, disableEdit } = this.props
 
     const defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
     if (defaultBatch)
@@ -331,30 +293,63 @@ class Medication extends PureComponent {
         stepdose: 'AND',
       },
     ])
-
-    setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
-    setFieldValue(
-      'expiryDate',
-      defaultBatch ? defaultBatch.expiryDate : undefined,
-    )
+    if (disableEdit === false) {
+      setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
+      setFieldValue(
+        'expiryDate',
+        defaultBatch ? defaultBatch.expiryDate : undefined,
+      )
+    }
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
       op.medicationUsage ? op.medicationUsage.id : undefined,
     )
     setFieldValue(
+      'corPrescriptionItemInstruction[0].usageMethodCode',
+      op.medicationUsage ? op.medicationUsage.code : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].usageMethodDisplayValue',
+      op.medicationUsage ? op.medicationUsage.name : undefined,
+    )
+    setFieldValue(
       'corPrescriptionItemInstruction[0].dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].dosageCode',
+      op.prescribingDosage ? op.prescribingDosage.code : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].dosageDisplayValue',
+      op.prescribingDosage ? op.prescribingDosage.name : undefined,
     )
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].prescribeUOMFK',
       op.prescribingUOM ? op.prescribingUOM.id : undefined,
     )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].prescribeUOMCode',
+      op.prescribingUOM ? op.prescribingUOM.code : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].prescribeUOMDisplayValue',
+      op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
 
     setFieldValue(
       'corPrescriptionItemInstruction[0].drugFrequencyFK',
       op.medicationFrequency ? op.medicationFrequency.id : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].drugFrequencyCode',
+      op.medicationFrequency ? op.medicationFrequency.code : undefined,
+    )
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].drugFrequencyDisplayValue',
+      op.medicationFrequency ? op.medicationFrequency.name : undefined,
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
@@ -541,6 +536,16 @@ class Medication extends PureComponent {
                                     allowClear={false}
                                     style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
+                                    onChange={(v, op = {}) => {
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].usageMethodCode`,
+                                        op ? op.code : undefined,
+                                      )
+                                      setFieldValue(
+                                        `corPrescriptionItemInstruction[${i}].usageMethodDisplayValue`,
+                                        op ? op.name : undefined,
+                                      )
+                                    }}
                                     {...commonSelectProps}
                                     {...args}
                                   />
@@ -563,7 +568,15 @@ class Medication extends PureComponent {
                                   labelField='displayValue'
                                   {...commonSelectProps}
                                   {...args}
-                                  onChange={() => {
+                                  onChange={(v, op = {}) => {
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].dosageCode`,
+                                      op ? op.code : undefined,
+                                    )
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].dosageDisplayValue`,
+                                      op ? op.displayValue : undefined,
+                                    )
                                     setTimeout(() => {
                                       this.calculateQuantity()
                                     }, 1)
@@ -584,6 +597,16 @@ class Medication extends PureComponent {
                                   })}
                                   allowClear={false}
                                   code='ctMedicationUnitOfMeasurement'
+                                  onChange={(v, op = {}) => {
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].prescribeUOMCode`,
+                                      op ? op.code : undefined,
+                                    )
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].prescribeUOMDisplayValue`,
+                                      op ? op.name : undefined,
+                                    )
+                                  }}
                                   {...commonSelectProps}
                                   {...args}
                                 />
@@ -605,7 +628,15 @@ class Medication extends PureComponent {
                                   code='ctMedicationFrequency'
                                   {...commonSelectProps}
                                   {...args}
-                                  onChange={() => {
+                                  onChange={(v, op = {}) => {
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].drugFrequencyCode`,
+                                      op ? op.code : undefined,
+                                    )
+                                    setFieldValue(
+                                      `corPrescriptionItemInstruction[${i}].drugFrequencyDisplayValue`,
+                                      op ? op.displayValue : undefined,
+                                    )
                                     setTimeout(() => {
                                       this.calculateQuantity()
                                     }, 1)

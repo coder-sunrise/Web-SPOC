@@ -12,30 +12,40 @@ import {
   FastField,
   Field,
   ClinicianSelect,
+  timeFormat24HourWithSecond as timeFormat,
 } from '@/components'
 import * as service from '@/services/common'
 
+const isSameOrAfterTime = (startTime, endTime) =>
+  moment(startTime, timeFormat).isSameOrAfter(endTime)
+
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
+    const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
+    const currentTime = moment().format('HH:mm')
+
     const values = {
       ...(consultationDocument.entity ||
         consultationDocument.defaultCertOfAttendance),
       attendanceStartTime: visitEntity.visit
         ? moment(visitEntity.visit.visitDate).format('HH:mm')
         : moment().format('HH:mm'),
-      attendanceEndTime: visitEntity.visit
-        ? moment(visitEntity.visit.timeOut).format('HH:mm')
+      attendanceEndTime: moment(visitDataValue, timeFormat).isAfter(
+        moment(currentTime, timeFormat),
+      )
+        ? moment(visitEntity.visit.visitDate).format('HH:mm')
         : moment().format('HH:mm'),
     }
     return values
   },
+
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
     accompaniedBy: Yup.string().required(),
     attendanceStartTime: Yup.string().required(),
     attendanceEndTime: Yup.string()
-      .laterThan(
+      .equalAndLaterThan(
         Yup.ref('attendanceStartTime'),
         'Time From must be later than Time To',
       )
