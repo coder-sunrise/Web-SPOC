@@ -151,7 +151,9 @@ const styles = (theme) => ({
 
     const payload = {
       ...restValues,
-      doctorProfile: isDoctor ? restValues.doctorProfile : undefined,
+      doctorProfile: isDoctor
+        ? restValues.doctorProfile
+        : { ...restValues.doctorProfile, isDeleted: true },
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
@@ -190,7 +192,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   onRoleChange = (value) => {
-    const { ctRole } = this.props
+    const { ctRole, setFieldValue } = this.props
     const role = ctRole.find((item) => item.id === value)
 
     this.setState({

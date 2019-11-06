@@ -108,8 +108,8 @@ const bannerStyle = {
       visitId,
       visitStatus = 'BILLING',
       invoice,
-      invoicePayer,
-      invoicePayment,
+      invoicePayer = [],
+      invoicePayment = [],
       mode,
     } = values
 

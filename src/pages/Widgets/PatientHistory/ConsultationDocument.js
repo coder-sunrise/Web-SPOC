@@ -18,7 +18,7 @@ export default ({ current }) => {
           type: 'link',
           linkField: 'href',
           // onClick: printRow,
-          onClick: viewReport,
+          onClick: (row) => viewReport(row, undefined, true),
         },
         {
           columnName: 'from',
