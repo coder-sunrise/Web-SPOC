@@ -11,6 +11,7 @@ import InvoiceDataGrid from './components/InvoiceDataGrid'
 // styles
 import styles from './styles'
 import Authorized from '@/utils/Authorized'
+
 @connect(({ invoiceList, global }) => ({
   invoiceList,
   global,
@@ -19,7 +20,7 @@ import Authorized from '@/utils/Authorized'
   mapPropsToValues: () => {
     return {
       invoiceDates: [
-        moment(),
+        moment().add(-1, 'month'),
         moment(),
       ],
     }
@@ -27,10 +28,9 @@ import Authorized from '@/utils/Authorized'
 })
 class Invoice extends React.Component {
   componentDidMount () {
-   
-      this.props.dispatch({
-        type: 'invoiceList/query',
-      })
+    this.props.dispatch({
+      type: 'invoiceList/query',
+    })
   }
 
   onRowDoubleClick = (row) => {
@@ -41,7 +41,6 @@ class Invoice extends React.Component {
   render () {
     const { classes } = this.props
     return (
-
       <CardContainer hideHeader>
         <FilterBar {...this.props} />
         <InvoiceDataGrid
@@ -52,7 +51,6 @@ class Invoice extends React.Component {
           Note: Total Payment is the sum total of the payment amount of payers
         </p>
       </CardContainer>
-
     )
   }
 }

@@ -866,7 +866,7 @@ const convertExcludeFields = [
   // 'excludeInactiveCodes',
 ]
 
-const _fetchAndSaveCodeTable = async (
+const fetchAndSaveCodeTable = async (
   code,
   params,
   multiplier = 1,
@@ -878,7 +878,7 @@ const _fetchAndSaveCodeTable = async (
   const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
-  let url = useGeneral ? generalCodetableURL : searchURL
+  let url = searchURL
   let criteriaForTenantCodes = noIsActiveProp.reduce(
     (codes, tenantCode) =>
       tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
@@ -915,26 +915,26 @@ const _fetchAndSaveCodeTable = async (
   let { status: statusCode, data } = response
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
-    if (code.split(',').length > 1) {
-      const codes = code.split(',')
-      newData = [
-        ...codes.reduce(
-          (merged, c) => [
-            ...merged,
-            ...data[c],
-          ],
-          [],
-        ),
-      ]
-    } else {
-      newData = useGeneral
-        ? [
-            ...data[code],
-          ]
-        : [
-            ...data.data,
-          ]
-    }
+    newData = [
+      ...data.data,
+    ]
+    // if (code.split(',').length > 1) {
+    //   const codes = code.split(',')
+    //   newData = [
+    //     ...codes.reduce(
+    //       (merged, c) => [
+    //         ...merged,
+    //         ...data[c],
+    //       ],
+    //       [],
+    //     ),
+    //   ]
+    // } else {
+    //   console.log({ data, code, useGeneral })
+    //   newData = [
+    //     ...data.data,
+    //   ]
+    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
@@ -959,16 +959,29 @@ export const getAllCodes = async () => {
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    return code
+    const results = code
       .filter((_i) => {
         const { updateDate } = _i
         const parsedUpdateDate =
           updateDate === null ? moment('2001-01-01') : moment(updateDate)
         return parsedUpdateDate.isAfter(parsedLastLoginDate)
       })
-      .map((_i) => ({ code: _i.code, data: _i.data }))
-  })
+      .map((_i) => ({
+        code: _i.code,
+        data: _i.data,
+        updateDate: _i.updateDate,
+      }))
 
+    const cts = {
+      config: {},
+    }
+    results.forEach((r) => {
+      const { code: c, data, ...others } = r
+      cts[c.toLowerCase()] = data
+      cts.config[c.toLowerCase()] = others
+    })
+    return cts
+  })
   return ct || []
 }
 
@@ -998,7 +1011,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh || _force) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
+      result = fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
@@ -1014,7 +1027,7 @@ export const getCodes = async (payload) => {
       //   lastLogin: parsedLastLoginDate.format(),
       // })
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
+        ? fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
@@ -1396,5 +1409,6 @@ module.exports = {
   osBalanceStatus,
   buttonTypes,
   inventoryAdjustmentStatus,
+  fetchAndSaveCodeTable,
   ...module.exports,
 }

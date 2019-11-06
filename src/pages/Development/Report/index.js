@@ -3,9 +3,9 @@ import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // custom type
+import { FastField, Field, withFormik } from 'formik'
 import TimeSchemaType from './YupTime'
 // formik
-import { FastField, Field, withFormik } from 'formik'
 // common component
 import {
   Button,
@@ -133,6 +133,25 @@ class Report extends React.Component {
                   code='coPaymentScheme'
                 />
               )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='ctMedicationDosage'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Medication dosage'
+                  labelField='displayValue'
+                  code='ctMedicationDosage'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='ctMedicationDosage'
+              render={(args) => <DoctorProfileSelect />}
             />
           </GridItem>
           <GridItem md={3}>

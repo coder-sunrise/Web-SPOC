@@ -82,6 +82,10 @@ export default {
   'menu.report.gstReport': 'GST Report',
   'menu.report.medicationMovementReport': 'Medication Movement Report',
   'menu.report.consumableMovementReport': 'Consumable Movement Report',
+  'menu.report.voidCreditNoteReport': 'Void Credit Note & Payment Report',
+  'menu.report.salesListingReport': 'Sales Listing Report',
+  'menu.report.lowStockConsumablesReport': 'Low Stock Consumables Report',
+  'menu.report.lowStockMedicationReport': 'Low Stock Medication Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.communication': 'Communication',
@@ -143,7 +147,13 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.viewreport': 'View Report',
 
+<<<<<<< HEAD
   'menu.support': 'Support',
   'menu.support.teamviewer': 'Teamviewer',
   'menu.support.druglabel': 'Drug Label',
+=======
+  'menu.support':'Support',
+  'menu.support.teamviewer':'Teamviewer',
+  'menu.support.druglabel':'Drug Label',
+>>>>>>> 15132aaa2f4003f413856d180c37e1b8dc83cabd
 }

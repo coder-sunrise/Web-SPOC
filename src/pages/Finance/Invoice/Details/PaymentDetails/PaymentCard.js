@@ -45,6 +45,7 @@ const PaymentCard = ({
   outstanding,
   invoicePayerFK,
   readOnly,
+  hasActiveSession,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
   let _payerName = (
@@ -118,6 +119,7 @@ const PaymentCard = ({
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
             readOnly={readOnly}
+            hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             {...buttonActions}
           />

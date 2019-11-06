@@ -1,26 +1,21 @@
 import React, { useEffect, useReducer } from 'react'
-import * as Yup from 'yup'
-import moment from 'moment'
-// formik
-import { withFormik } from 'formik'
 // common components
 import { CardContainer, GridContainer, GridItem } from '@/components'
-// sub components
-import FilterBar from './FilterBar'
 
 import ReportLayoutWrapper from '../ReportLayout'
 // services
 import { getRawData } from '@/services/report'
-import OutstandingList from './OutstandingList'
+import LowStockList from './LowStockList'
+// sub components
+import FilterBar from './FilterBar'
 
-const reportId = 16
-const fileName = 'Outstanding Payment Report'
+const reportId = 19
+const fileName = 'Low Stock Consumables Report'
 
 const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  params: {},
 }
 
 const reducer = (state, action) => {
@@ -41,7 +36,7 @@ const reducer = (state, action) => {
   }
 }
 
-const OutstandingPaymentReport = ({ values, validateForm }) => {
+const LowStockConsumablesReport = ({ values }) => {
   const [
     state,
     dispatch,
@@ -62,14 +57,7 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
     dispatch({
       type: 'toggleLoading',
     })
-    const params = {
-      ...values,
-      isPatientPayer:
-        values.payerType === 'All' || values.payerType === 'Patient',
-      isCompanyPayer:
-        values.payerType === 'All' || values.payerType === 'Company',
-    }
-    const reportDatas = await getRawData(reportId, params)
+    const reportDatas = await getRawData(reportId, values)
 
     if (reportDatas) {
       dispatch({
@@ -79,7 +67,6 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
           loaded: true,
           isLoading: false,
           reportDatas,
-          params,
         },
       })
     } else {
@@ -92,17 +79,13 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
       })
     }
   }
-
   const onSubmitClick = async () => {
     dispatch({
       type: 'setLoaded',
       payload: false,
     })
-    const errors = await validateForm()
-    if (Object.keys(errors).length > 0) return
     asyncGetData()
   }
-
   return (
     <CardContainer hideHeader>
       <GridContainer>
@@ -113,11 +96,10 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
           <ReportLayoutWrapper
             loading={state.isLoading}
             reportID={reportId}
-            reportParameters={state.params}
             loaded={state.loaded}
             fileName={fileName}
           >
-            <OutstandingList {...state} />
+            <LowStockList {...state} />
           </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
@@ -125,15 +107,4 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
   )
 }
 
-const OutstandingPaymentReportWithFormik = withFormik({
-  validationSchema: Yup.object().shape({
-    dateFrom: Yup.date().required(),
-  }),
-  mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
-    payerType: 'All',
-  }),
-})(OutstandingPaymentReport)
-
-export default OutstandingPaymentReportWithFormik
+export default LowStockConsumablesReport

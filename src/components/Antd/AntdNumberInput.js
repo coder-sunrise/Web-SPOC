@@ -150,22 +150,12 @@ class AntdNumberInput extends React.PureComponent {
     // }
   }
 
-  handleBlur = (e) => {
-    if (!e.target.value && this.props.allowEmpty) {
-      this._onChange('')
-      this.setState({
-        value: '',
-        focused: false,
-      })
-    } else {
-      const v = numeral(e.target.value)._value
-      this._onChange(v)
-      this.setState({
-        value: v,
-        focused: false,
-      })
-    }
-
+  handleBlur = () => {
+    this._onChange(
+      this.state.value || this.state.value === 0
+        ? numeral(this.state.value)._value
+        : undefined,
+    )
     this.debouncedOnChange.cancel()
     this.setState({
       focused: false,

@@ -7,7 +7,7 @@ export const TableConfig = {
 export const InvoiceGridColumns = [
   { name: 'invoiceNo', title: 'Invoice No.' },
   { name: 'invoiceDate', title: 'Invoice Date' },
-  { name: 'patientAccountNo', title: 'Patient ID' },
+  { name: 'patientAccountNo', title: 'Patient Acc. No.' },
   { name: 'patientName', title: 'Patient Name' },
   { name: 'invoiceTotalAftGST', title: 'Total After GST' },
   { name: 'totalPayment', title: 'Total Payments' },

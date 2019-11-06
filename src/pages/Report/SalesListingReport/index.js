@@ -11,16 +11,15 @@ import FilterBar from './FilterBar'
 import ReportLayoutWrapper from '../ReportLayout'
 // services
 import { getRawData } from '@/services/report'
-import OutstandingList from './OutstandingList'
+import SalesList from './SalesList'
 
-const reportId = 16
-const fileName = 'Outstanding Payment Report'
+const reportId = 17
+const fileName = 'Sales Listing Report'
 
 const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  params: {},
 }
 
 const reducer = (state, action) => {
@@ -41,7 +40,7 @@ const reducer = (state, action) => {
   }
 }
 
-const OutstandingPaymentReport = ({ values, validateForm }) => {
+const SalesListingReport = ({ values, validateForm }) => {
   const [
     state,
     dispatch,
@@ -62,14 +61,8 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
     dispatch({
       type: 'toggleLoading',
     })
-    const params = {
-      ...values,
-      isPatientPayer:
-        values.payerType === 'All' || values.payerType === 'Patient',
-      isCompanyPayer:
-        values.payerType === 'All' || values.payerType === 'Company',
-    }
-    const reportDatas = await getRawData(reportId, params)
+
+    const reportDatas = await getRawData(reportId, values)
 
     if (reportDatas) {
       dispatch({
@@ -79,7 +72,6 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
           loaded: true,
           isLoading: false,
           reportDatas,
-          params,
         },
       })
     } else {
@@ -113,11 +105,11 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
           <ReportLayoutWrapper
             loading={state.isLoading}
             reportID={reportId}
-            reportParameters={state.params}
+            reportParameters={values}
             loaded={state.loaded}
             fileName={fileName}
           >
-            <OutstandingList {...state} />
+            <SalesList {...state} />
           </ReportLayoutWrapper>
         </GridItem>
       </GridContainer>
@@ -125,15 +117,14 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
   )
 }
 
-const OutstandingPaymentReportWithFormik = withFormik({
+const SalesListingReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
     dateFrom: moment(new Date()).startOf('month').toDate(),
     dateTo: moment(new Date()).endOf('month').toDate(),
-    payerType: 'All',
   }),
-})(OutstandingPaymentReport)
+})(SalesListingReport)
 
-export default OutstandingPaymentReportWithFormik
+export default SalesListingReportWithFormik

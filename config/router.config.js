@@ -537,6 +537,26 @@ const routes = [
             component: './Report/ConsumableMovementReport',
           },
           {
+            path: '/report/voidcreditnotereport',
+            name: 'voidCreditNoteReport',
+            component: './Report/VoidCreditNoteReport',
+          },
+          {
+            path: '/report/saleslistingreport',
+            name: 'salesListingReport',
+            component: './Report/SalesListingReport',
+          },
+          {
+            path: '/report/lowstockconsumablesreport',
+            name: 'lowStockConsumablesReport',
+            component: './Report/LowStockConsumablesReport',
+          },
+          {
+            path: '/report/lowstockmedicationreport',
+            name: 'lowStockMedicationReport',
+            component: './Report/LowStockMedicationReport',
+          },
+          {
             path: '/report/creditnotelistingreport',
             name: 'creditNoteListingReport',
             component: './Report/CreditNoteListingReport',
