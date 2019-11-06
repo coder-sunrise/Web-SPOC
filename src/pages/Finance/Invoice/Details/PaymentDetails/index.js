@@ -17,6 +17,25 @@ import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
 
+const defaultPatientPayment = {
+  id: undefined,
+  invoiceFK: undefined,
+  invoicePayerWriteOff: [],
+  invoicePayment: [],
+  isCancelled: false,
+  isDeleted: false,
+  outStanding: 0,
+  patientName: '',
+  patientProfileFK: undefined,
+  payerDistributedAmt: 0,
+  payerType: 'Patient',
+  payerTypeFK: 1,
+  paymentTxnList: [],
+  sequence: 0,
+  statementInvoice: [],
+  totalPaid: 0,
+}
+
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
   invoicePayment,
@@ -24,7 +43,25 @@ import styles from './styles'
 @withFormik({
   name: 'invoicePayment',
   enableReinitialize: true,
-  mapPropsToValues: ({ invoicePayment }) => {
+  mapPropsToValues: ({ invoicePayment, invoiceDetail }) => {
+    // console.log({ invoicePayment, invoiceDetail })
+    // const { entity: invoiceDetailEntity } = invoiceDetail
+    // const { entity = [] } = invoicePayment
+
+    // const isEmpty = entity.length === 0
+    // let _values = {}
+    // if (isEmpty) {
+    //   _values = [
+    //     {
+    //       ...defaultPatientPayment,
+    //       invoiceFK: invoiceDetailEntity.id,
+    //       patientName: invoiceDetailEntity.patientName,
+    //       outStanding: invoiceDetailEntity.outstandingBalance,
+    //     },
+    //   ]
+    //   console.log({ _values })
+    //   return _values
+    // }
     return invoicePayment.entity || {}
   },
 })
@@ -247,7 +284,7 @@ class PaymentDetails extends Component {
       showReport,
       reportPayload,
     } = this.state
-    // console.log({ values })
+    console.log({ values })
     return (
       <div className={classes.container}>
         {readOnly ? (
