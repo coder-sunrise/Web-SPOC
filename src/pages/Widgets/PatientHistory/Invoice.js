@@ -109,6 +109,7 @@ export default ({ classes, current, setFieldValue }) => {
               adjustedField: 'totalAfterOverallAdjustment',
             }}
             onValueChanged={(v) => {
+              // console.log('onValueChanged', v)
               if (setFieldValue) {
                 setFieldValue(
                   'current.invoice.invoiceTotalAftGST',

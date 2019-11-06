@@ -40,6 +40,7 @@ export default createFormViewModel({
               consultationID: Number(query.cid),
               md: query.md2,
               queueID: Number(query.qid),
+              patientID: Number(query.pid),
             },
           })
         }
@@ -47,20 +48,24 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { queueID, version } = payload
-        yield put({
-          type: 'visitRegistration/query',
-          payload: { id: queueID, version },
-        })
-        yield take('visitRegistration/query/@@end')
-        const visitRegistration = yield select((st) => st.visitRegistration)
-        const { visit } = visitRegistration.entity
+        const { queueID, patientID, version } = payload
+
+        let visit
+        if (queueID) {
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: queueID, version },
+          })
+          yield take('visitRegistration/query/@@end')
+          const visitRegistration = yield select((st) => st.visitRegistration)
+          visit = visitRegistration.entity
+          if (!visit) return
+        }
 
         // console.log(visitRegistration, visit)
-        if (!visit) return
         yield put({
           type: 'patient/query',
-          payload: { id: visit.patientProfileFK, version },
+          payload: { id: patientID || visit.patientProfileFK, version },
         })
 
         yield take('patient/query/@@end')

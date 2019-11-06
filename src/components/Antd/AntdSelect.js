@@ -256,16 +256,17 @@ class AntdSelect extends React.PureComponent {
           ]
         }
       }
-
-      this.setState({
-        value: v,
-        shrink: [
-          'multiple',
-          'tags',
-        ].includes(mode)
-          ? v && v.length > 0
-          : v !== undefined,
-      })
+      if (!_.isEqual(v, this.state.value)) {
+        this.setState({
+          value: v,
+          shrink: [
+            'multiple',
+            'tags',
+          ].includes(mode)
+            ? v && v.length > 0
+            : v !== undefined,
+        })
+      }
     } else {
       this.setState({
         value: [
@@ -640,7 +641,7 @@ class AntdSelect extends React.PureComponent {
       // )
       labelProps.shrink = (value && value.length > 0) || this.state.shrink
     }
-    // console.log(labelProps)
+    // console.log(this.state.value)
     return (
       <CustomInput
         labelProps={labelProps}
