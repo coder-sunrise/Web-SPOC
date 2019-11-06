@@ -339,6 +339,7 @@ class PatientHistory extends Component {
         disablePadding
       >
         {newArray.map((o) => {
+          const _title = o.doctorTitle ? `${o.doctorTitle} ` : ''
           return (
             <React.Fragment>
               <ListItem
@@ -404,7 +405,7 @@ class PatientHistory extends Component {
                         <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                            value={`V${o.versionNumber}, ${_title}${o.doctorName}`}
                           />
                         </GridItem>
                       </GridContainer>
@@ -496,7 +497,7 @@ class PatientHistory extends Component {
       widget,
       showEditPatient,
     } = this.props
-    const { entity, selected } = patientHistory
+    const { entity, selected, patientID } = patientHistory
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
@@ -548,12 +549,14 @@ class PatientHistory extends Component {
                         version: patientHistory.version,
                       },
                     }).then((o) => {
-                      if (o)
+                      if (o) {
+                        dispatch({
+                          type: 'patient/closePatientModal',
+                        })
                         router.push(
-                          `/reception/queue/patientdashboard?qid=${findGetParameter(
-                            'qid',
-                          )}&cid=${o.id}&v=${patientHistory.version}`,
+                          `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                         )
+                      }
                     })
                   }}
                 >
@@ -563,7 +566,7 @@ class PatientHistory extends Component {
             </GridItem>
           </Authorized>
           <GridItem md={7} style={{ textAlign: 'right' }}>
-            Updated Date:
+            Updated Date:&nbsp;
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
                 text

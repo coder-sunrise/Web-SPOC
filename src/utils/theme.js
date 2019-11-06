@@ -299,7 +299,7 @@ export const defaultTheme = createMuiTheme({
         //   marginBottom: '-9px',
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          top: -1,
+          top: -2,
         },
         '& .Mui-disabled': {
           cursor: 'not-allowed',

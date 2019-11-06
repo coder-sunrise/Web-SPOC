@@ -33,7 +33,9 @@ class History extends PureComponent {
   }
 
   render () {
-    return <PatientHistory {...this.props} showEditPatient />   
+    // console.log({ props: this.props })
+    // return <PatientHistory {...this.props} showEditPatient />
+    return <PatientHistory />
   }
 }
 

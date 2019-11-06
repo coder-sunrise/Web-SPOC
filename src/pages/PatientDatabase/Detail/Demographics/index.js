@@ -203,7 +203,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <DatePicker
                       label='Date of Birth'
-                      // showTime
+                      showTime
                       dobRestrict
                       {...args}
                     />

@@ -176,7 +176,7 @@ const saveConsultation = ({
     return consultation.entity || consultation.default
   },
   validationSchema: schema,
-  // enableReinitialize: true,
+  enableReinitialize: true,
 
   handleSubmit: (values, { props }) => {
     saveConsultation({
@@ -444,6 +444,7 @@ class Consultation extends PureComponent {
                 <ProgressButton
                   color='danger'
                   onClick={this.discardConsultation}
+                  icon={null}
                 >
                   Discard
                 </ProgressButton>
@@ -504,7 +505,7 @@ class Consultation extends PureComponent {
 
   loadTemplate = (v) => {
     const exist = this.props.values
-    console.log(exist, v)
+    // console.log(exist, v)
     // v.id = exist.id
     // v.concurrencyToken = exist.concurrencyToken
     const mergeArrayProps = [

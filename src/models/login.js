@@ -50,23 +50,25 @@ export default createFormViewModel({
         sessionStorage.clear()
         reloadAuthorized()
 
-        const redirect =
-          routing.location.pathname !== '/login'
-            ? routing.location.pathname + routing.location.search
-            : ''
+        yield put(routerRedux.push({ pathname: '/login' }))
 
-        if (routing.location.pathname === '/login') {
-          yield put(routerRedux.push({ pathname: '/login' }))
-        } else {
-          yield put(
-            routerRedux.push({
-              pathname: '/login',
-              search: stringify({
-                redirect,
-              }),
-            }),
-          )
-        }
+        // const redirect =
+        //   routing.location.pathname !== '/login'
+        //     ? routing.location.pathname + routing.location.search
+        //     : ''
+
+        // if (routing.location.pathname === '/login') {
+        //   yield put(routerRedux.push({ pathname: '/login' }))
+        // } else {
+        //   yield put(
+        //     routerRedux.push({
+        //       pathname: '/login',
+        //       search: stringify({
+        //         redirect,
+        //       }),
+        //     }),
+        //   )
+        // }
         // yield put({
         //   type: 'user/reset',
         // })

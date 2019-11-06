@@ -15,30 +15,35 @@ export default createListViewModel({
     subscriptions: {},
     effects: {
       *fetchAllCachedCodetable (_, { call, put }) {
+        console.time('fetchAllCachedCodetable')
         const response = yield call(getAllCodes)
-        if (response) {
-          yield put({
-            type: 'updateState',
-            payload: response.reduce((allCodetable, codetable) => {
-              // skip snomeddiagnosis codetable in development mode
-              // if (
-              //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
-              //   process.env.NODE_ENV === 'development'
-              // ) {
-              //   return {
-              //     ...allCodetable,
-              //     // [codetable.code.toLowerCase()]: codetable.data,
-              //   }
-              // }
+        console.log(response)
+        // if (response) {
+        //   const ct = response.reduce((allCodetable, codetable) => {
+        //     // skip snomeddiagnosis codetable in development mode
+        //     // if (
+        //     //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
+        //     //   process.env.NODE_ENV === 'development'
+        //     // ) {
+        //     //   return {
+        //     //     ...allCodetable,
+        //     //     // [codetable.code.toLowerCase()]: codetable.data,
+        //     //   }
+        //     // }
 
-              return {
-                ...allCodetable,
-                [codetable.code.toLowerCase()]: codetable.data,
-              }
-            }, {}),
-          })
-        }
+        //     return {
+        //       ...allCodetable,
+        //       [codetable.code.toLowerCase()]: codetable.data,
+        //     }
+        //   }, {})
+        yield put({
+          type: 'updateState',
+          payload: response,
+        })
+        // console.log(ct)
+        console.timeEnd('fetchAllCachedCodetable')
       },
+
       *refreshCodes ({ payload }, { call, put }) {
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
@@ -55,14 +60,18 @@ export default createListViewModel({
         return []
       },
       *fetchCodes ({ payload }, { select, call, put }) {
-        let ctcode = payload
+        // console.log(payload)
+
+        let ctcode
         let hasFilter = false
         if (typeof payload === 'object') {
-          ctcode = payload.code
+          ctcode = payload.code.toLowerCase()
           hasFilter = payload.filter !== undefined
+        } else {
+          ctcode = payload.toLowerCase()
         }
         const codetableState = yield select((state) => state.codetable)
-
+        // console.log(codetableState)
         // if (hasFilter) {
         //   yield put({
         //     type: 'addToHasFilterList',
@@ -82,7 +91,12 @@ export default createListViewModel({
         //     })
         //   }
         // }
-
+        // console.log(
+        //   ctcode,
+        //   codetableState[ctcode] === undefined,
+        //   payload.force,
+        //   hasFilter,
+        // )
         if (ctcode !== undefined) {
           if (
             codetableState[ctcode] === undefined ||
