@@ -16,6 +16,7 @@ import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
 import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
+import { getBizSession } from '@/services/queue'
 
 const defaultPatientPayment = {
   id: undefined,
@@ -78,6 +79,25 @@ class PaymentDetails extends Component {
       reportID: undefined,
       reportParameters: undefined,
     },
+    hasActiveSession: false,
+  }
+
+  componentDidMount = () => {
+    this.checkHasActiveSession()
+  }
+
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
   }
 
   refresh = () => {
@@ -268,6 +288,7 @@ class PaymentDetails extends Component {
   render () {
     // console.log('PaymentIndex', this.props)
     const { classes, values, readOnly, invoiceDetail } = this.props
+    const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
       handleAddCrNote: this.onAddCrNoteClick,
@@ -314,6 +335,7 @@ class PaymentDetails extends Component {
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
                   readOnly={readOnly}
+                  hasActiveSession={hasActiveSession}
                 />
               )
             })

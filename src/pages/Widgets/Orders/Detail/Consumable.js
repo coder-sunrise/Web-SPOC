@@ -82,7 +82,7 @@ class Consumable extends PureComponent {
   }
 
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',

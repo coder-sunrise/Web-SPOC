@@ -94,7 +94,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
 })
 class Medication extends PureComponent {
   state = {
-    selectionOptions: [],
+    selectedMedication: {
+      medicationStock: [],
+    },
     batchNo: '',
     expiryDate: '',
   }
@@ -216,6 +218,7 @@ class Medication extends PureComponent {
 
     let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
+    console.log(this.state.selectedMedication)
     if (disableEdit === false) {
       const total = newTotalQuantity * values.unitPrice
       setFieldValue('totalPrice', total)
@@ -225,7 +228,7 @@ class Medication extends PureComponent {
 
   changeMedication = (v, op = {}) => {
     this.setState(() => {
-      return { selectionOptions: op.medicationStock }
+      return { selectedMedication: op }
     })
 
     const isDefaultBatchNo = op.medicationStock.find(
@@ -367,13 +370,8 @@ class Medication extends PureComponent {
     if (disableEdit === false) {
       if (op.sellingPrice) {
         setFieldValue('unitPrice', op.sellingPrice)
-        setFieldValue(
-          'totalPrice',
-          op.sellingPrice * (newTotalQuantity + totalFirstItem),
-        )
-        this.updateTotalPrice(
-          op.sellingPrice * (newTotalQuantity + totalFirstItem),
-        )
+        setFieldValue('totalPrice', op.sellingPrice * rounded)
+        this.updateTotalPrice(op.sellingPrice * rounded)
       } else {
         setFieldValue('unitPrice', undefined)
         setFieldValue('totalPrice', undefined)
@@ -383,7 +381,7 @@ class Medication extends PureComponent {
   }
 
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',
@@ -839,7 +837,7 @@ class Medication extends PureComponent {
                     label='Batch No'
                     labelField='batchNo'
                     valueField='batchNo'
-                    options={this.state.selectionOptions}
+                    options={this.state.selectedMedication.medicationStock}
                     onChange={(e, op = {}) => {
                       setFieldValue('expiryDate', op.expiryDate)
                     }}
