@@ -295,20 +295,32 @@ class Medication extends PureComponent {
     )
     setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
 
-    if (op.duration && op.medicationFrequency && op.prescribingDosage) {
-      dosageMultiplier = dosageUsageList.find(
-        (o) => o.id === op.prescribingDosage.id,
-      )
+    for (let i = 0; i < prescriptionItem.length; i++) {
+      if (
+        prescriptionItem[i].dosageFK &&
+        prescriptionItem[i].drugFrequencyFK &&
+        prescriptionItem[i].duration
+      ) {
+        const dosage = dosageUsageList.find(
+          (o) => o.id === prescriptionItem[i].dosageFK,
+        )
 
-      multipler = medicationFrequencyList.find(
-        (o) => o.id === op.medicationFrequency.id,
-      )
+        const drugFrequency = medicationFrequencyList.find(
+          (o) => o.id === prescriptionItem[i].drugFrequencyFK,
+        )
 
-      totalFirstItem +=
-        dosageMultiplier.multiplier * multipler.multiplier * op.duration
+        newTotalQuantity +=
+          dosage.multiplier *
+          drugFrequency.multiplier *
+          prescriptionItem[i].duration
+      }
+    }
+    const { dispensingUOM } = op
+    if (dispensingUOM && dispensingUOM.quantity) {
+      // setFieldValue(`quantity`, rounded)
     }
 
-    let rounded = Math.round(totalFirstItem * 10) / 10
+    let rounded = Math.round(newTotalQuantity * 10) / 10
     setFieldValue(`quantity`, rounded)
 
     if (

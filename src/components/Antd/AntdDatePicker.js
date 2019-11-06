@@ -287,7 +287,7 @@ class AntdDatePicker extends PureComponent {
             format,
             'DD/MM/YYYY',
             'DD-MM-YYYY',
-            'DDMMYYYY',
+            // 'DDMMYYYY',
             'YYYY/MM/DD',
             'YYYY-MM-DD',
             'YYYYMMDD',

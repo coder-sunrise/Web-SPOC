@@ -339,6 +339,7 @@ class PatientHistory extends Component {
         disablePadding
       >
         {newArray.map((o) => {
+          const _title = o.doctorTitle ? `${o.doctorTitle} ` : ''
           return (
             <React.Fragment>
               <ListItem
@@ -404,7 +405,7 @@ class PatientHistory extends Component {
                         <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                            value={`V${o.versionNumber}, ${_title}${o.doctorName}`}
                           />
                         </GridItem>
                       </GridContainer>
@@ -542,6 +543,9 @@ class PatientHistory extends Component {
                   size='sm'
                   onClick={() => {
                     dispatch({
+                      type: 'patient/closePatientModal',
+                    })
+                    dispatch({
                       type: `consultation/edit`,
                       payload: {
                         id: selected.id,
@@ -563,7 +567,7 @@ class PatientHistory extends Component {
             </GridItem>
           </Authorized>
           <GridItem md={7} style={{ textAlign: 'right' }}>
-            Updated Date:
+            Updated Date:&nbsp;
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
                 text
