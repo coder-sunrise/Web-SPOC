@@ -146,14 +146,7 @@ export default {
   'menu.report.diagnosistrending': 'Diagnosis Trending Report',
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.viewreport': 'View Report',
-
-<<<<<<< HEAD
   'menu.support': 'Support',
   'menu.support.teamviewer': 'Teamviewer',
   'menu.support.druglabel': 'Drug Label',
-=======
-  'menu.support':'Support',
-  'menu.support.teamviewer':'Teamviewer',
-  'menu.support.druglabel':'Drug Label',
->>>>>>> 15132aaa2f4003f413856d180c37e1b8dc83cabd
 }
