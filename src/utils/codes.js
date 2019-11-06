@@ -837,7 +837,7 @@ const tenantCodes = [
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
   'ctMedicationFrequency',
-  'ltinvoiceitemtype',
+  // 'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
