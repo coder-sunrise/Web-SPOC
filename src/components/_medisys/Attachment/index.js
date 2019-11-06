@@ -184,7 +184,9 @@ const Attachment = ({
           totalFilesSize += o.size
         })
       attachments.forEach((o) => {
-        totalFilesSize += o.fileSize
+        if (!o.isDeleted) {
+          totalFilesSize += o.fileSize
+        }
       })
 
       if (totalFilesSize > maxUploadSize) {
