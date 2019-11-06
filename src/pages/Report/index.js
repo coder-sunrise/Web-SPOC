@@ -69,6 +69,11 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Void Credit Note & Payment Report',
+    url: '/report/voidcreditnotereport',
+  },
+  {
+    title: 'Finance',
     text: 'Deposit Transaction Report',
     url: '/report/deposittransactionreport',
   },
@@ -91,6 +96,16 @@ const menuData = [
     title: 'Inventory',
     text: 'Consumable Movement Report',
     url: '/report/consumablemovementreport',
+  },
+  {
+    title: 'Inventory',
+    text: 'Low Stock Medication Report',
+    url: '/report/lowstockmedicationreport',
+  },
+  {
+    title: 'Inventory',
+    text: 'Low Stock Consumables Report',
+    url: '/report/lowstockconsumablesreport',
   },
   {
     title: 'Other',
