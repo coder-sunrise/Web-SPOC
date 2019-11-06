@@ -497,7 +497,7 @@ class PatientHistory extends Component {
       widget,
       showEditPatient,
     } = this.props
-    const { entity, selected } = patientHistory
+    const { entity, selected, patientID } = patientHistory
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
@@ -543,21 +543,20 @@ class PatientHistory extends Component {
                   size='sm'
                   onClick={() => {
                     dispatch({
-                      type: 'patient/closePatientModal',
-                    })
-                    dispatch({
                       type: `consultation/edit`,
                       payload: {
                         id: selected.id,
                         version: patientHistory.version,
                       },
                     }).then((o) => {
-                      if (o)
+                      if (o) {
+                        dispatch({
+                          type: 'patient/closePatientModal',
+                        })
                         router.push(
-                          `/reception/queue/consultation?qid=${findGetParameter(
-                            'qid',
-                          )}&cid=${o.id}&v=${patientHistory.version}`,
+                          `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                         )
+                      }
                     })
                   }}
                 >

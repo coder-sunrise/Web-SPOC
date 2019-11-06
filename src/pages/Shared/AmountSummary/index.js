@@ -27,7 +27,13 @@ const amountProps = {
   text: true,
 }
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  cls01: {
+    '& .MuiGrid-item': {
+      lineHeight: `${theme.spacing(3)}px`,
+    },
+  },
+})
 
 @connect(({ clinicSettings, global }) => ({
   clinicSettings,
@@ -36,7 +42,6 @@ const styles = (theme) => ({})
 class AmountSummary extends PureComponent {
   constructor (props) {
     super(props)
-
     const { rows = [], adjustments = [], config, onValueChanged } = this.props
     // console.log(rows, adjustments)
     this.state = {
@@ -161,7 +166,12 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const { theme, gstInclusiveConfigrable, showAdjustment } = this.props
+    const {
+      theme,
+      gstInclusiveConfigrable,
+      showAdjustment,
+      classes,
+    } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
     const {
@@ -184,7 +194,7 @@ class AmountSummary extends PureComponent {
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
     return (
-      <div>
+      <div className={classes.cls01}>
         <GridContainer style={{ marginBottom: 4 }}>
           {showAdjustment === false ? (
             ''
