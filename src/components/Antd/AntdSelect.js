@@ -556,7 +556,7 @@ class AntdSelect extends React.PureComponent {
     } else {
       opts = this.getSelectOptions(source, renderDropdown)
     }
-
+    // console.log(opts)
     if (this.props.text) {
       const match = source.find(
         (o) => o[this.props.valueField] === this.state.value,

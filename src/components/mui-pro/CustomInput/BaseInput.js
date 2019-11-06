@@ -216,8 +216,7 @@ class BaseInput extends React.PureComponent {
     //   inputProps.value = this.state.value
     // }
 
-    // console.log(this.props,)
-
+    const { rowsMax, ...resetProps } = inputProps
     const cfg = {
       onBlur,
       onFocus,
@@ -309,7 +308,8 @@ class BaseInput extends React.PureComponent {
             inputRef={this.getRef}
             {...cfg}
             inputProps={inputProps}
-            {...inputProps}
+            {...resetProps}
+            // {...inputProps}
             // onBlur={() => {
             //   console.log(123)
             // }}

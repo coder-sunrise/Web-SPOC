@@ -49,7 +49,7 @@ const styles = (theme) => ({
   },
 })
 
-const ContextMenu = ({ show, row, onClick, classes }) => {
+const ContextMenu = ({ show, row, handleClick, classes }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -119,7 +119,7 @@ const ContextMenu = ({ show, row, onClick, classes }) => {
   )
 
   const MenuItemsOverlay = (
-    <Menu className={classes.menu}>
+    <Menu onClick={handleClick} className={classes.menu}>
       {contextMenuOptions.map(
         (
           { disabled, label, Icon, id, isDivider, hidden, authority },

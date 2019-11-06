@@ -7,7 +7,6 @@ import numeral from 'numeral'
 
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
-import { primaryColor } from 'mui-pro-jss'
 // ant
 import { InputNumber } from 'antd'
 import { isNumber } from 'util'
@@ -16,7 +15,7 @@ import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 import config from '@/utils/config'
 
-const { currencyFormat, percentageFormat, qtyFormat, currencySymbol } = config
+const { currencyFormat, percentageFormat, currencySymbol } = config
 
 const STYLES = () => {
   return {
@@ -116,15 +115,7 @@ class AntdNumberInput extends React.PureComponent {
 
   constructor (props) {
     super(props)
-    const {
-      field = {},
-      form,
-      inputProps = {},
-      formatter,
-      parser,
-      defaultValue,
-      value,
-    } = props
+    const { field = {}, defaultValue, value } = props
     this.state = {
       value:
         field.value !== undefined && field.value !== ''
@@ -182,6 +173,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   _onChange = (value) => {
+    // console.log({ value })
     const { props } = this
     const { field, loadOnChange, readOnly, onChange } = props
     if (readOnly || loadOnChange) return
@@ -222,7 +214,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleKeyDown = (e) => {
-    console.log({ keycode: e.keyCode })
+    // console.log({ keycode: e.keyCode })
     if (
       !e.ctrlKey &&
       !(e.keyCode >= 48 && e.keyCode <= 57) &&
@@ -295,7 +287,7 @@ class AntdNumberInput extends React.PureComponent {
     }
     if (newV === undefined || newV === null) newV = ''
     this.setState({
-      value: newV,
+      value: !newV && newV !== 0 ? '' : newV,
     })
     if (newV === '' || force) {
       this._onChange(newV)
@@ -347,7 +339,6 @@ class AntdNumberInput extends React.PureComponent {
       field,
     } = this.props
     let { format } = this.props
-    const { selectionStart } = this.state
     const extraCfg = {
       formatter,
       max,
@@ -414,8 +405,9 @@ class AntdNumberInput extends React.PureComponent {
           if (format.lastIndexOf('.') > 0) {
             v = `${v}`.replace('.', '')
             const lastCharIsZero = v[v.length - 1] === '0'
-
-            v = `${Number(v) / Math.pow(10, dotPos.length)}`
+            const tv = Number(v) / Math.pow(10, dotPos.length)
+            if (Number.isNaN(tv)) return ''
+            v = `${tv}`
             const idx = v.indexOf('.')
             if (lastCharIsZero && idx >= 0) {
               v += dotPos
@@ -518,13 +510,14 @@ class AntdNumberInput extends React.PureComponent {
     const { classes, onChange, ...restProps } = this.props
     const labelProps = {
       shrink:
-        !(
-          this.state.value === undefined ||
-          this.state.value === '' ||
-          this.state.value === null
-        ) || this.state.focused,
+        !(!this.state.value && this.state.value !== 0) || this.state.focused,
     }
-
+    // console.log(
+    //   this.props.field,
+    //   labelProps,
+    //   this.state.value,
+    //   this.state.focused,
+    // )
     return (
       <CustomInput
         labelProps={labelProps}

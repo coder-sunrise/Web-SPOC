@@ -88,7 +88,6 @@ export default createFormViewModel({
 
           // clinicAddress = `${buildingName}, ${blockNo}, ${street}, ${unitNo}, ${postcode}`
         }
-
         const purchaseOrder = {
           // purchaseOrderNo: poRunningNumber, // Mock PurchaseOrder#
           purchaseOrderDate: moment(),
@@ -99,7 +98,6 @@ export default createFormViewModel({
           IsGSTInclusive: false,
           gstAmount: 0,
           totalAmount: 0,
-          exceptedDeliveryDate: '',
         }
 
         return yield put({

@@ -23,7 +23,6 @@ import {
   NumberInput,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
-// import model from '../models/demographic'
 import Block from './Block'
 import { control } from '@/components/Decorator'
 
@@ -64,9 +63,6 @@ class Banner extends PureComponent {
     const info = entity
     const { patientAllergy = [] } = info
     const { ctdrugallergy = [] } = codetable
-    // const da = ctdrugallergy.filter((o) =>
-    //   patientAllergy.find((m) => m.allergyFK === o.id),
-    // )
 
     const filter = patientAllergy.filter((o) => o.type === 'Allergy')
     const da = ctdrugallergy.filter((o) =>
@@ -84,21 +80,6 @@ class Banner extends PureComponent {
     } else {
       allergyData = '-'
     }
-
-    // {da.length ? (
-    //   `${da[0].name.length > 8
-    //     ? `${da[0].name.substring(0, 8)}... `
-    //     : da[0].name} `
-    // ) : (
-    //   '-'
-    // )}
-    // {da.length >= 2 ? (
-    //   `${da[1].name.length > 8
-    //     ? `, ${da[1].name.substring(0, 8)}...`
-    //     : `, ${da[1].name}`}`
-    // ) : (
-    //   ''
-    // )}
 
     if (da.length) {
       this.setState({
@@ -179,6 +160,13 @@ class Banner extends PureComponent {
     }).then((result) => {
       console.log('result ==========', result)
       if (result) {
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
+
         const {
           balance,
           schemeTypeFk,
@@ -189,6 +177,7 @@ class Banner extends PureComponent {
           isSuccessful,
           statusDescription,
           acuteBalanceStatusCode,
+          chronicBalanceStatusCode,
         } = result
         let isShowReplacementModal = false
 
@@ -217,6 +206,7 @@ class Banner extends PureComponent {
               acuteVisitClinicBalance,
               isSuccessful,
               acuteBalanceStatusCode,
+              chronicBalanceStatusCode,
             },
           })
         }
@@ -226,6 +216,7 @@ class Banner extends PureComponent {
 
   getSchemeDetails = (schemeData) => {
     const { refreshedSchemeData } = this.state
+
     if (
       !_.isEmpty(refreshedSchemeData) &&
       refreshedSchemeData.isSuccessful === true
@@ -263,10 +254,14 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
-      acuteBalanceStatusCode:
-        schemeData.patientSchemeBalance.length > 0
-          ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
-          : '',
+      // acuteBalanceStatusCode:
+      //   schemeData.patientSchemeBalance.length > 0
+      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
+      //     : '',
+      // chronicBalanceStatusCode:
+      //   schemeData.patientSchemeBalance.length > 0
+      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+      //     : '',
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful
@@ -447,7 +442,7 @@ class Banner extends PureComponent {
               header={
                 <div>
                   {'Scheme'}{' '}
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5)
+                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
                       <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
@@ -461,7 +456,7 @@ class Banner extends PureComponent {
                 <div>
                   {entity.patientScheme.length ? '' : '-'}
                   {entity.patientScheme
-                    .filter((o) => o.schemeTypeFK <= 5)
+                    .filter((o) => o.schemeTypeFK <= 6)
                     .map((o) => {
                       const schemeData = this.getSchemeDetails(o)
                       return (
@@ -479,11 +474,15 @@ class Banner extends PureComponent {
                             }}
                           >
                             :{' '}
-                            <NumberInput
-                              text
-                              currency
-                              value={schemeData.balance}
-                            />
+                            {schemeData.chronicBalanceStatusCode === 'SC105' ? (
+                              'Full Balance'
+                            ) : (
+                              <NumberInput
+                                text
+                                currency
+                                value={schemeData.balance}
+                              />
+                            )}
                           </div>
                           <br />
                           <SchemePopover
@@ -530,82 +529,6 @@ class Banner extends PureComponent {
                     })}
                 </div>
               }
-              // body={
-              //   <div>
-              //     {entity.patientScheme.filter(
-              //       (o) =>
-              //         (this.state.schemeType === ''
-              //           ? o.schemeTypeFK
-              //           : this.state.schemeType) <= 5,
-              //     ).length >= 1 ? (
-              //       entity.patientScheme
-              //         .filter(
-              //           (o) =>
-              //             (this.state.schemeType === ''
-              //               ? o.schemeTypeFK
-              //               : this.state.schemeType) <= 5,
-              //         )
-              //         .map((o) => {
-              //           this.setState({
-              //             balanceValue:
-              //               o.patientSchemeBalance.length <= 0
-              //                 ? 0
-              //                 : o.patientSchemeBalance[0].balance,
-              //             dateFrom: o.validFrom,
-              //             dateTo: o.validTo,
-              //           })
-              //           console.log(this.state.schemeType)
-              //           return (
-              //             <div>
-              //               <CodeSelect
-              //                 text
-              //                 code='ctSchemeType'
-              //                 value={
-              //                   this.state.schemeType === '' ? (
-              //                     o.schemeTypeFK
-              //                   ) : (
-              //                     this.state.schemeType
-              //                   )
-              //                 }
-              //               />
-
-              //               <div
-              //                 style={{
-              //                   fontWeight: 500,
-              //                   display: 'inline-block',
-              //                 }}
-              //               >
-              //                 :{' '}
-              //                 <NumberInput
-              //                   text
-              //                   currency
-              //                   value={this.state.balanceValue}
-              //                 />
-              //               </div>
-              //               <br />
-              //               {/* <SchemePopover
-              //                 data={o}
-              //                 isBanner
-              //                 balanceValue={this.state.balanceValue}
-              //                 schemeTypeFK={
-              //                   this.state.schemeType === '' ? (
-              //                     o.schemeTypeFK
-              //                   ) : (
-              //                     this.state.schemeType
-              //                   )
-              //                 }
-              //                 dataFrom={this.state.dateFrom}
-              //                 dateTo={this.state.dateTo}
-              //                 handleRefreshChasBalance={this.refreshChasBalance}
-              //               /> */}
-              //             </div>
-              //           )
-              //         })
-              //     ) : (
-              //       '-'
-              //     )}
-              //   </div>
-              // }
             />
           </GridItem>
           <GridItem xs={12} md={4}>

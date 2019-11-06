@@ -467,11 +467,13 @@ class Layout extends PureComponent {
     // this.setState({ elevation })
     // if (lasActivedWidgetId === id) return
     if (lasActivedWidget) {
-      lasActivedWidget.css('overflow', 'hidden')
+      lasActivedWidget.css('overflowY', 'hidden')
+      lasActivedWidget.css('overflowX', 'hidden')
     }
     lasActivedWidget = $($(e.target).parents('.widget-container')[0])
     if (lasActivedWidget.length > 0) {
-      lasActivedWidget.css('overflow', 'auto')
+      lasActivedWidget.css('overflowY', 'auto')
+      lasActivedWidget.css('overflowX', 'hidden')
     }
   }
 
@@ -485,7 +487,7 @@ class Layout extends PureComponent {
         fullScreenWidget: id,
       },
       () => {
-        $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
+        // $(window.mainPanel).css('overflow', 'hidden').scrollTop(0)
       },
     )
   }
@@ -512,7 +514,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 130
+    const topHeight = (this.props.height ? 0 : headerHeight) + 114
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,

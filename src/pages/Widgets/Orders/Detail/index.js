@@ -47,7 +47,7 @@ class Details extends PureComponent {
     disableEdit: false,
   }
 
-  footerBtns = ({ onSave, onDiscard, showAdjustment = true }) => {
+  footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
     const { entity } = orders
@@ -66,19 +66,24 @@ class Details extends PureComponent {
               {currencySymbol} Adjustment
             </Button>
           )}
-          <Button
-            color='danger'
-            onClick={() => {
-              this.props.dispatch({
-                type: 'orders/updateState',
-                payload: {
-                  // type: undefined,
-                  entity: undefined,
-                },
-              })
-            }}
-            // onClick={onDiscard}
-          >
+          {/* {!!entity && (
+            <Button
+              color='danger'
+              onClick={() => {
+                this.props.dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    entity: undefined,
+                    // adjustment: undefined,
+                    // totalAfterAdj: undefined,
+                  },
+                })
+              }}
+            >
+              New
+            </Button>
+          )} */}
+          <Button color='danger' onClick={onReset}>
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>

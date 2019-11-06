@@ -22,7 +22,13 @@ const { qtyFormat } = config
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {} }) => orders.defaultPackage,
+  mapPropsToValues: ({ orders = {}, type }) => {
+    const v = {
+      ...(orders.entity || orders.defaultPackage),
+      type,
+    }
+    return v
+  },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventorypackageFK: Yup.number().required(),
@@ -297,8 +303,10 @@ class Package extends PureComponent {
               name: o.medicationName,
               uid: getUniqueId(),
               type: '1',
-              typeName: orderTypes.find((type) => type.value === '1').name,
-              isActive: o.inventoryMedication.isActive,
+              typeName:
+                orderTypes.find((type) => type.value === '1').name +
+                (o.inventoryMedication.isActive === true ? '' : ' (Inactive)'),
+              isActive: o.inventoryMedication.isActive === true,
             }
           }),
         )
@@ -311,8 +319,10 @@ class Package extends PureComponent {
               name: o.vaccinationName,
               uid: getUniqueId(),
               type: '2',
-              typeName: orderTypes.find((type) => type.value === '2').name,
-              isActive: o.inventoryVaccination.isActive,
+              typeName:
+                orderTypes.find((type) => type.value === '2').name +
+                (o.inventoryVaccination.isActive === true ? '' : ' (Inactive)'),
+              isActive: o.inventoryVaccination.isActive === true,
             }
           }),
         )
@@ -325,12 +335,21 @@ class Package extends PureComponent {
               name: o.serviceName,
               uid: getUniqueId(),
               type: '3',
-              typeName: orderTypes.find((type) => type.value === '3').name,
-              isActive:
-                o.service.isActive &&
-                o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
+              typeName:
+                orderTypes.find((type) => type.value === '3').name +
+                (o.service.isActive === true &&
+                o.service.ctServiceCenter_ServiceNavigation[0].isActive ===
+                  true &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
-                  .serviceCenterFKNavigation.isActive,
+                  .serviceCenterFKNavigation.isActive === true
+                  ? ''
+                  : ' (Inactive)'),
+              isActive:
+                o.service.isActive === true &&
+                o.service.ctServiceCenter_ServiceNavigation[0].isActive ===
+                  true &&
+                o.service.ctServiceCenter_ServiceNavigation[0]
+                  .serviceCenterFKNavigation.isActive === true,
             }
           }),
         )
@@ -343,8 +362,10 @@ class Package extends PureComponent {
               name: o.consumableName,
               uid: getUniqueId(),
               type: '4',
-              typeName: orderTypes.find((type) => type.value === '4').name,
-              isActive: o.inventoryConsumable.isActive,
+              typeName:
+                orderTypes.find((type) => type.value === '4').name +
+                (o.inventoryConsumable.isActive === true ? '' : ' (Inactive)'),
+              isActive: o.inventoryConsumable.isActive === true,
             }
           }),
         )
@@ -353,6 +374,14 @@ class Package extends PureComponent {
         ...values,
         packageItems: rows,
         packageCode: op ? op.code : '',
+      })
+    }
+
+    this.handleReset = () => {
+      const { setValues, orders } = this.props
+      setValues({
+        ...orders.defaultPackage,
+        type: orders.type,
       })
     }
   }
@@ -390,6 +419,7 @@ class Package extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
           showAdjustment: false,
         })}
       </div>

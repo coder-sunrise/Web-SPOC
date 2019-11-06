@@ -81,7 +81,7 @@ const DiagnosisItem = ({
     }
   }, [])
 
-  const onDiagnosisChange = async (v, op) => {
+  const onDiagnosisChange = (v, op) => {
     const { setFieldValue } = form
     if (op) {
       // setFieldValue(`corDiagnosis[${index}]_complication`, op.complication)

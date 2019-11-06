@@ -9,6 +9,9 @@ const styles = (theme) => ({
   layout: {
     marginLeft: -3,
     marginRight: -3,
+    overflowY: 'hidden',
+    overflowX: 'hidden',
+
     // height: 'auto',
   },
   fullscreenWidget: {

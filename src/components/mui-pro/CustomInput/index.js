@@ -28,7 +28,7 @@ class TextField extends React.PureComponent {
   validationCount = 0
 
   static defaultProps = {
-    autocomplete: 'off',
+    autocomplete: 'nope',
   }
 
   constructor (props) {
@@ -47,8 +47,7 @@ class TextField extends React.PureComponent {
       value:
         field.value !== undefined && field.value !== ''
           ? field.value
-          : defaultValue || value,
-      focused: false,
+          : defaultValue || value || '',
     }
     // console.log(this.state.value)
     // if (field && form) {
@@ -310,6 +309,7 @@ TextField.propTypes = {
   autocomplete: PropTypes.oneOf([
     'off',
     'on',
+    'nope',
   ]),
   success: PropTypes.bool,
   white: PropTypes.bool,

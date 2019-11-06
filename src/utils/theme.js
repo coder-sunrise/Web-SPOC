@@ -299,7 +299,7 @@ export const defaultTheme = createMuiTheme({
         //   marginBottom: '-9px',
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          top: -1,
+          top: -2,
         },
         '& .Mui-disabled': {
           cursor: 'not-allowed',
@@ -334,10 +334,15 @@ export const defaultTheme = createMuiTheme({
       },
       formControl: {
         transform: 'translate(0, 22px) scale(1)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        width: '100%',
       },
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
+        width: '126%',
       },
     },
     MuiInputAdornment: {
@@ -490,10 +495,15 @@ export const smallTheme = createMuiTheme({
       },
       formControl: {
         transform: 'translate(0, 20px) scale(1)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        width: '100%',
       },
       shrink: {
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
+        width: '126%',
       },
     },
     MuiInputAdornment: {
@@ -647,10 +657,15 @@ export const largeTheme = createMuiTheme({
       },
       formControl: {
         transform: 'translate(0, 30px) scale(1)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        width: '100%',
       },
       shrink: {
         transform: 'translate(0, 6px) scale(0.8)',
         fontWeight: 'inherit',
+        width: '126%',
       },
     },
     MuiInputAdornment: {

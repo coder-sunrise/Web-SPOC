@@ -283,7 +283,15 @@ class AntdDatePicker extends PureComponent {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
-          format={format}
+          format={[
+            format,
+            'DD/MM/YYYY',
+            'DD-MM-YYYY',
+            // 'DDMMYYYY',
+            'YYYY/MM/DD',
+            'YYYY-MM-DD',
+            'YYYYMMDD',
+          ]}
           value={_toMoment(this.state.value, local, restProps.showTime)}
           {...restProps}
         />
