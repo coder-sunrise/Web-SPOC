@@ -878,7 +878,7 @@ const _fetchAndSaveCodeTable = async (
   const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
-  let url = useGeneral ? generalCodetableURL : searchURL
+  let url = searchURL
   let criteriaForTenantCodes = noIsActiveProp.reduce(
     (codes, tenantCode) =>
       tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
@@ -915,26 +915,26 @@ const _fetchAndSaveCodeTable = async (
   let { status: statusCode, data } = response
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
-    if (code.split(',').length > 1) {
-      const codes = code.split(',')
-      newData = [
-        ...codes.reduce(
-          (merged, c) => [
-            ...merged,
-            ...data[c],
-          ],
-          [],
-        ),
-      ]
-    } else {
-      newData = useGeneral
-        ? [
-            ...data[code],
-          ]
-        : [
-            ...data.data,
-          ]
-    }
+    newData = [
+      ...data.data,
+    ]
+    // if (code.split(',').length > 1) {
+    //   const codes = code.split(',')
+    //   newData = [
+    //     ...codes.reduce(
+    //       (merged, c) => [
+    //         ...merged,
+    //         ...data[c],
+    //       ],
+    //       [],
+    //     ),
+    //   ]
+    // } else {
+    //   console.log({ data, code, useGeneral })
+    //   newData = [
+    //     ...data.data,
+    //   ]
+    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
