@@ -29,7 +29,7 @@ const DeleteConfirmation = ({
     <GridContainer justify='center' alignItems='center'>
       <GridItem md={12} className={classes.centerText}>
         <h4>
-          Are you sure to void {type} {itemID}?
+          Are you sure to {type == 'Write Off'?"undo":"void" } the {type} {itemID}?
         </h4>
       </GridItem>
       <GridItem md={10} className={classes.spacing}>
