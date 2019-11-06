@@ -73,12 +73,75 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType } = props
+    const { dispatch, orders, currentType, codetable } = props
     const { rows } = orders
+    const {
+      ctmedicationusage,
+      ctmedicationunitofmeasurement,
+      ctmedicationfrequency,
+      ctmedicationdosage,
+    } = codetable
+
+    let itemsInstruction = values.corPrescriptionItemInstruction
+    if (itemsInstruction) {
+      for (let index = 0; index < itemsInstruction.length; index++) {
+        let item = itemsInstruction[index]
+        const usageMethod = ctmedicationusage.find(
+          (codeTableItem) => codeTableItem.id === item.usageMethodFK,
+        )
+        const dosage = ctmedicationdosage.find(
+          (codeTableItem) => codeTableItem.id === item.dosageFK,
+        )
+        const prescribe = ctmedicationunitofmeasurement.find(
+          (codeTableItem) => codeTableItem.id === item.prescribeUOMFK,
+        )
+        const drugFrequency = ctmedicationfrequency.find(
+          (codeTableItem) => codeTableItem.id === item.drugFrequencyFK,
+        )
+        item.usageMethodCode = usageMethod ? usageMethod.code : undefined
+        item.usageMethodDisplayValue = usageMethod
+          ? usageMethod.name
+          : undefined
+        item.dosageCode = dosage ? dosage.code : undefined
+        item.dosageDisplayValue = dosage ? dosage.displayValue : undefined
+        item.prescribeUOMCode = prescribe ? prescribe.code : undefined
+        item.prescribeUOMDisplayValue = prescribe ? prescribe.name : undefined
+        item.drugFrequencyCode = drugFrequency ? drugFrequency.code : undefined
+        item.drugFrequencyDisplayValue = drugFrequency
+          ? drugFrequency.displayValue
+          : undefined
+      }
+    }
+
+    const getInstruction = (instructions) => {
+      let instruction = ''
+      if (instructions) {
+        for (let index = 0; index < instructions.length; index++) {
+          let item = instructions[index]
+          if (instruction !== '') {
+            instruction += ' - '
+          }
+          instruction += `${item.usageMethodDisplayValue
+            ? item.usageMethodDisplayValue
+            : ''} ${item.dosageDisplayValue
+            ? item.dosageDisplayValue
+            : ''} ${item.prescribeUOMDisplayValue
+            ? item.prescribeUOMDisplayValue
+            : ''} ${item.drugFrequencyDisplayValue
+            ? item.drugFrequencyDisplayValue
+            : ''} For ${item.duration ? item.duration : ''} day(s)`
+        }
+      }
+      return instruction
+    }
+
+    const instruction = getInstruction(itemsInstruction)
 
     const data = {
       sequence: rows.length,
       ...values,
+      instruction,
+      corPrescriptionItemInstruction: itemsInstruction,
       subject: currentType.getSubject(values),
       isDeleted: false,
     }
@@ -721,6 +784,13 @@ class Medication extends PureComponent {
                     label=''
                     allowClear={false}
                     code='ctMedicationUnitOfMeasurement'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('dispenseUOMCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'dispenseUOMDisplayValue',
+                        op ? op.name : undefined,
+                      )
+                    }}
                     {...args}
                   />
                 )
