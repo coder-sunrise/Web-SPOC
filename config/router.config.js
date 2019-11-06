@@ -542,6 +542,11 @@ const routes = [
             component: './Report/VoidCreditNoteReport',
           },
           {
+            path: '/report/saleslistingreport',
+            name: 'salesListingReport',
+            component: './Report/SalesListingReport',
+          },
+          {
             path: '/report/lowstockconsumablesreport',
             name: 'lowStockConsumablesReport',
             component: './Report/LowStockConsumablesReport',
