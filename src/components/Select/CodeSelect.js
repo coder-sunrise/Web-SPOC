@@ -18,8 +18,9 @@ class CodeSelect extends React.PureComponent {
       // const isPreviouslyFiltered = codetable.hasFilterProps.includes(
       //   props.code.toLowerCase(),
       // )
-
+      // console.log(isExisted)
       if (isExisted) {
+        return
         checkShouldRefresh({
           code: props.code,
           filter: props.remoteFilter,
@@ -36,16 +37,15 @@ class CodeSelect extends React.PureComponent {
             })
           }
         })
-      } else {
-        dispatch({
-          type: 'codetable/fetchCodes',
-          payload: {
-            code: props.code.toLowerCase(),
-            filter: props.remoteFilter,
-            multiplier: props.multiplier, // for stress testing purpose only
-          },
-        })
       }
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: props.code.toLowerCase(),
+          filter: props.remoteFilter,
+          multiplier: props.multiplier, // for stress testing purpose only
+        },
+      })
     }
   }
 

@@ -959,16 +959,29 @@ export const getAllCodes = async () => {
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    return code
+    const results = code
       .filter((_i) => {
         const { updateDate } = _i
         const parsedUpdateDate =
           updateDate === null ? moment('2001-01-01') : moment(updateDate)
         return parsedUpdateDate.isAfter(parsedLastLoginDate)
       })
-      .map((_i) => ({ code: _i.code, data: _i.data }))
-  })
+      .map((_i) => ({
+        code: _i.code,
+        data: _i.data,
+        updateDate: _i.updateDate,
+      }))
 
+    const cts = {
+      config: {},
+    }
+    results.forEach((r) => {
+      const { code: c, data, ...others } = r
+      cts[c.toLowerCase()] = data
+      cts.config[c.toLowerCase()] = others
+    })
+    return cts
+  })
   return ct || []
 }
 
