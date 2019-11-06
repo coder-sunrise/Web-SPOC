@@ -369,6 +369,7 @@ class PaymentDetails extends Component {
           title='Add Payment'
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
+          observe='AddPaymentForm'
         >
           {/* <AddPayment handleSubmit={this.onSubmit} /> */}
           <AddPayment
