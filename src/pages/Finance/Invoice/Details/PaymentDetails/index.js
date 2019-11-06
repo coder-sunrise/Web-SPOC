@@ -176,6 +176,7 @@ class PaymentDetails extends Component {
     const { invoicePayment } = this.props
     switch (type) {
       case 'Payment':
+        this.onShowReport('InvoicePaymentId', 29, itemID)
         break
       case 'Credit Note':
         this.onShowReport('CreditNoteId', 18, itemID)
