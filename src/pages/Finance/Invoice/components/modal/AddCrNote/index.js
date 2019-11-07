@@ -242,6 +242,7 @@ class AddCrNote extends Component {
                             min={1}
                             // max={row.originRemainingQty}
                             {...args}
+                            format='0.0'
                           />
                           {quantity > originRemainingQty ? (
                             <Tooltip
@@ -290,9 +291,11 @@ class AddCrNote extends Component {
                           this.handleDeleteRow(row)
                         }}
                       >
-                        <Button size='sm' justIcon color='danger'>
-                          <Delete />
-                        </Button>
+                        <Tooltip title='Delete Misc. Item' placement='top-end'>
+                          <Button size='sm' justIcon color='danger'>
+                            <Delete />
+                          </Button>
+                        </Tooltip>
                       </Popconfirm>
                     ) : (
                       ''
@@ -314,7 +317,7 @@ class AddCrNote extends Component {
           <GridItem md={9}>
             <p>Note: Total Price($) are after GST.</p>
           </GridItem>
-          <GridItem md={3} style={{textAlign: 'right'}}>
+          <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button
               color='primary'
               onClick={handleSubmit}
