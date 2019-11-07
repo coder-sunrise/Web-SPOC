@@ -241,9 +241,17 @@ class Grid extends PureComponent {
     return []
   }
 
+  calculateTotalPrice = (e) => {
+    const { row } = e
+    if (row) {
+      const { orderQuantity, unitPrice } = row
+      row.totalPrice = orderQuantity * unitPrice
+    }
+  }
+
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable  } = this.props
+    const { values, isEditable } = this.props
     const { rows } = values
 
     const tableParas = {
@@ -321,6 +329,7 @@ class Grid extends PureComponent {
         {
           columnName: 'orderQuantity',
           type: 'number',
+          onChange: this.calculateTotalPrice,
         },
         {
           columnName: 'bonusQuantity',
@@ -340,7 +349,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          // disabled: true,
+          onChange: this.calculateTotalPrice,
         },
         {
           columnName: 'totalPrice',
@@ -365,8 +374,8 @@ class Grid extends PureComponent {
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: false,
-              showDeleteCommand: isEditable ,
+              showEditCommand: isEditable,
+              showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
             }}
