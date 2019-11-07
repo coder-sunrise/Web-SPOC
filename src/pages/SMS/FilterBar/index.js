@@ -9,6 +9,7 @@ import { Search } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
+import moment from 'moment'
 import { GridContainer, GridItem, Button, RadioGroup } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
@@ -54,7 +55,13 @@ export default compose(
     }),
 
     handleSubmit: (values, { props, resetForm }) => {
-      const { patientName, lastVisitDate, ...restValues } = values
+      const {
+        patientName,
+        consent,
+        lastSMSSendStatus,
+        lastVisitDate,
+        ...restValues
+      } = values
       const { dispatch, type } = props
 
       const payload = {
@@ -66,9 +73,12 @@ export default compose(
             combineCondition: 'or',
           },
         ],
-        lastSMSSendStatus: 'Accepted',
-        lgteql_lastVisitDate: lastVisitDate && lastVisitDate[0],
-        lsteql_lastVisitDate: lastVisitDate && lastVisitDate[1],
+        StatusFK: lastSMSSendStatus,
+        'PatientPdpaConsent.IsConsent': consent,
+        'lgteql_Visit.VisitDate':
+          lastVisitDate && moment(lastVisitDate[0]).formatUTC(),
+        'lsteql_Visit.VisitDate':
+          lastVisitDate && moment(lastVisitDate[0]).formatUTC(false),
       }
       dispatch({
         type: 'sms/querySMSData',
