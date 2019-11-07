@@ -10,7 +10,9 @@ import {
   GridItem,
   TextField,
   Select,
+  CodeSelect,
 } from '@/components'
+import { outgoingSMSStatus } from '@/utils/codes'
 
 const styles = (theme) => ({
   checkbox: {
@@ -49,14 +51,12 @@ const FilterByPatient = ({ classes }) => {
         <FastField
           name='lastSMSSendStatus'
           render={(args) => (
-            <Select
-              {...args}
-              label='SMS Status'
-              options={[
-                { name: 'Sent', value: 'sent' },
-                { name: 'Received', value: 'received' },
-              ]}
-            />
+            // <CodeSelect
+            //   {...args}
+            //   label='SMS Status'
+            //   code='ltOutgoingSMSStatus'
+            // />
+            <Select {...args} label='SMS Status' options={outgoingSMSStatus} />
           )}
         />
       </GridItem>

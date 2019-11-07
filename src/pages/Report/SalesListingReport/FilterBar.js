@@ -80,7 +80,6 @@ const FilterBar = ({ handleSubmit }) => {
                 <CodeSelect
                   {...args}
                   code='ltinvoiceitemtype'
-                  labelField='displayValue'
                   mode='multiple'
                   label='Category'
                 />

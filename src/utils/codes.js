@@ -37,6 +37,20 @@ const sessionOptions = [
   { value: 'current', name: 'Current Session' },
 ]
 
+const outgoingSMSStatus = [
+  { value: 1, name: 'Sent' },
+  { value: 2, name: 'Failed' },
+  { value: 3, name: 'Delivered' },
+  { value: 4, name: 'Undelivered' },
+  { value: 5, name: 'Receiving' },
+  { value: 6, name: 'Received' },
+  { value: 7, name: 'Accepted' },
+  { value: 8, name: 'Scheduled' },
+  { value: 9, name: 'Read' },
+  { value: 10, name: 'Queued' },
+  { value: 11, name: 'Sending' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -837,7 +851,7 @@ const tenantCodes = [
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
   'ctMedicationFrequency',
-  'ltinvoiceitemtype',
+  // 'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
@@ -1404,6 +1418,7 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
+  outgoingSMSStatus,
   // country,
   sessionOptions,
   consultationDocumentTypes,
