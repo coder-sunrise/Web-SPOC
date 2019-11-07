@@ -80,6 +80,8 @@ class PaymentDetails extends Component {
       reportParameters: undefined,
     },
     hasActiveSession: false,
+    invoicePayerName: undefined,
+    invoicePayerPayment: {},
   }
 
   componentDidMount = () => {
@@ -117,17 +119,36 @@ class PaymentDetails extends Component {
   }
 
   onAddPaymentClick = (invoicePayerFK) => {
-    const { dispatch, values } = this.props
+    const { dispatch, values, invoiceDetail } = this.props
 
     dispatch({
       type: 'patient/query',
       payload: { id: values.patientProfileFK },
       // payload: { id: 4 },
     }).then((r) => {
+      const invoicePayer = values.find(
+        (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
+      )
+      const invoicePayerPayment = {
+        ...invoiceDetail.entity,
+        totalAftGst: invoicePayer.payerDistributedAmt,
+        outstandingBalance: invoicePayer.outStanding,
+        finalPayable: invoicePayer.outStanding,
+        totalClaims: undefined,
+      }
+      let invoicePayerName = ''
+      if (invoicePayer.payerTypeFK === 1)
+        invoicePayerName = invoicePayer.patientName
+      if (invoicePayer.payerTypeFK === 2)
+        invoicePayerName = invoicePayer.payerType
+      if (invoicePayer.payerTypeFK === 4)
+        invoicePayerName = invoicePayer.companyName
       if (r)
         this.setState({
           showAddPayment: true,
           selectedInvoicePayerFK: invoicePayerFK,
+          invoicePayerName,
+          invoicePayerPayment,
         })
     })
   }
@@ -149,7 +170,12 @@ class PaymentDetails extends Component {
     this.setState({ showDeleteConfirmation: false, onVoid: {} })
 
   closeAddPaymentModal = () =>
-    this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
+    this.setState({
+      showAddPayment: false,
+      selectedInvoicePayerFK: undefined,
+      invoicePayerName: '',
+      invoicePayerPayment: undefined,
+    })
 
   onVoidClick = (entity) => {
     this.setState({
@@ -305,8 +331,10 @@ class PaymentDetails extends Component {
       onVoid,
       showReport,
       reportPayload,
+      invoicePayerName,
+      invoicePayerPayment,
     } = this.state
-    console.log({ values })
+
     return (
       <div className={classes.container}>
         {readOnly ? (
@@ -376,12 +404,14 @@ class PaymentDetails extends Component {
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
             onClose={this.closeAddPaymentModal}
+            invoicePayerName={invoicePayerName}
             invoicePayment={[]}
-            invoice={{
-              ...invoiceDetail.entity,
-              totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
-              finalPayable: invoiceDetail.entity.outstandingBalance,
-            }}
+            // invoice={{
+            //   ...invoiceDetail.entity,
+            //   totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
+            //   finalPayable: invoiceDetail.entity.outstandingBalance,
+            // }}
+            invoice={invoicePayerPayment}
           />
         </CommonModal>
         <CommonModal

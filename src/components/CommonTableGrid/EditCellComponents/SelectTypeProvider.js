@@ -61,6 +61,7 @@ class SelectEditor extends PureComponent {
         )
       }
       if (type === 'codeSelect') {
+        console.log({ commonCfg })
         return (
           <div ref={this.myRef}>
             <CodeSelect {...commonCfg} code={code} />
@@ -160,24 +161,30 @@ class SelectTypeProvider extends React.Component {
         const isPreviouslyFiltered = codetable.hasFilterProps.includes(
           f.code.toLowerCase(),
         )
-        const force = f.remoteFilter !== undefined || isPreviouslyFiltered
+        // const force = f.remoteFilter !== undefined || isPreviouslyFiltered
+        const { force, localFilter } = f
 
         if (isExisted && !force) {
-          payload[`${f.columnName}Option`] = codetable[f.code.toLowerCase()]
+          payload[`${f.columnName}Option`] = localFilter
+            ? codetable[f.code.toLowerCase()].filter(localFilter)
+            : codetable[f.code.toLowerCase()]
           payload.codeLoaded += 1
         } else {
           dispatch({
             type: 'codetable/fetchCodes',
             payload: {
               code: f.code.toLowerCase(),
-              filter: f.remoteFilter,
+              // filter: f.remoteFilter,
               force: true,
             },
           }).then((response) => {
             if (response) {
               this.setState((prevState) => {
+                const filtered = localFilter
+                  ? response.filter(localFilter)
+                  : response
                 return {
-                  [`${f.columnName}Option`]: response,
+                  [`${f.columnName}Option`]: filtered,
                   codeLoaded: ++prevState.codeLoaded,
                 }
               })
@@ -190,6 +197,7 @@ class SelectTypeProvider extends React.Component {
       for: colFor,
       ...payload,
     }
+
     this.SelectEditor = (ces) => (editorProps) => {
       // console.log(ces, editorProps)
       return (
