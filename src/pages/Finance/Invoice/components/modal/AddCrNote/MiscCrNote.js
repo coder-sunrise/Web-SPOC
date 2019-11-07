@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
+import * as Yup from 'yup'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 import {
@@ -20,9 +20,14 @@ import styles from './styles'
     // description: Yup.string().required(),
     total: Yup.number().min(1),
   }),
-  handleSubmit: (values, { props }) => {
-    let newCreditNoteItem = props.values.creditNoteItem || []
+  handleSubmit: (values, { props, resetForm }) => {
+    const newCreditNoteItem = props.values.creditNoteItem || []
+    const tempID = newCreditNoteItem.reduce((smallestNegativeID, item) => {
+      if (item.id < 0 && item.id < smallestNegativeID) return item.id
+      return smallestNegativeID
+    }, 0)
     const miscItem = {
+      id: tempID - 1,
       itemType: 'Misc',
       itemCode: 'MISC',
       itemTypeFK: 6,
@@ -32,9 +37,13 @@ import styles from './styles'
       totalAfterItemAdjustment: values.total,
       isDeleted: false,
     }
-    newCreditNoteItem.push(miscItem)
-    props.setFieldValue('creditNoteItem', newCreditNoteItem)
+
+    props.setFieldValue('creditNoteItem', [
+      ...newCreditNoteItem,
+      miscItem,
+    ])
     setTimeout(() => props.handleCalcFinalTotal(), 100)
+    resetForm({})
   },
   displayName: 'MiscCrNote',
 })
