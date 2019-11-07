@@ -75,15 +75,18 @@ const crNoteItemSchema = Yup.object().shape({
         creditNoteItem: creditNoteItem
           .filter((x) => x.isSelected)
           .map((selectedItem) => {
-            if (selectedItem.itemType.toLowerCase() === 'misc') {
+            if (
+              selectedItem.itemType.toLowerCase() === 'misc' ||
+              selectedItem.itemType.toLowerCase() === 'service'
+            ) {
               selectedItem.isInventoryItem = false
-              selectedItem.itemDescription = selectedItem.itemName
             } else {
               selectedItem.isInventoryItem = true
             }
             delete selectedItem.id
             delete selectedItem.concurrencyToken
             selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
+            selectedItem.itemDescription = selectedItem.itemName
             return { ...selectedItem }
           }),
       },
@@ -242,6 +245,7 @@ class AddCrNote extends Component {
                             min={1}
                             // max={row.originRemainingQty}
                             {...args}
+                            format='0.0'
                           />
                           {quantity > originRemainingQty ? (
                             <Tooltip
@@ -290,9 +294,11 @@ class AddCrNote extends Component {
                           this.handleDeleteRow(row)
                         }}
                       >
-                        <Button size='sm' justIcon color='danger'>
-                          <Delete />
-                        </Button>
+                        <Tooltip title='Delete Misc. Item' placement='top-end'>
+                          <Button size='sm' justIcon color='danger'>
+                            <Delete />
+                          </Button>
+                        </Tooltip>
                       </Popconfirm>
                     ) : (
                       ''
@@ -314,7 +320,7 @@ class AddCrNote extends Component {
           <GridItem md={9}>
             <p>Note: Total Price($) are after GST.</p>
           </GridItem>
-          <GridItem md={3} style={{textAlign: 'right'}}>
+          <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button
               color='primary'
               onClick={handleSubmit}
