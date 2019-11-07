@@ -271,7 +271,11 @@ class Banner extends PureComponent {
   displayMedicalProblemData (entity) {
     let medicalProblemData = ''
 
-    if (entity && entity.patientHistoryDiagnosis.length) {
+    if (
+      entity &&
+      entity.patientHistoryDiagnosis &&
+      entity.patientHistoryDiagnosis.length > 0
+    ) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]
           .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
@@ -443,7 +447,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
+                    <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
