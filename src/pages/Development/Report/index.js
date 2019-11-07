@@ -170,6 +170,7 @@ class Report extends React.Component {
                     label='Name'
                     code='inventorymedication'
                     labelField='displayValue'
+                    temp
                     // onChange={this.changeMedication}
                     {...args}
                   />
