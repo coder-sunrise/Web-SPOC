@@ -119,7 +119,13 @@ let commitCount = 1000 // uniqueNumber
       const getType = type(o.inventoryTypeFK)
 
       const stockFK = o.isManuallyCreated ? undefined : o.stockFK
-
+      const getBatchNo = () => {
+        if (o.batchNo) {
+          if (Array.isArray(o.batchNo)) return o.batchNo[0]
+          return o.batchNo
+        }
+        return o[getType.typeName].batchNo
+      }
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
         const { code, displayValue, ...value } = val
@@ -135,13 +141,7 @@ let commitCount = 1000 // uniqueNumber
             return o[getType.typeName].expiryDate
           return undefined
         }
-        const getBatchNo = () => {
-          if (o.batchNo) {
-            if (Array.isArray(o.batchNo)) return o.batchNo[0]
-            return o.batchNo
-          }
-          return o[getType.typeName].batchNo
-        }
+
         const getStockFK = () => {
           if (o.isManuallyCreated) return undefined
           if (o.stockFK) return o.stockFK
@@ -151,6 +151,7 @@ let commitCount = 1000 // uniqueNumber
         return {
           ...value,
           newQty,
+          id: o.getFromApi ? undefined : o.id,
           [getType.typeName]: {
             ...o[getType.typeName],
             [getType.stock]: undefined,
@@ -167,8 +168,10 @@ let commitCount = 1000 // uniqueNumber
       }
       return {
         ...o,
+        batchNo: getBatchNo(),
+        id: o.getFromApi ? undefined : o.id,
         [getType.typeName]: {
-          batchNo: o.batchNoString || o.batchNo,
+          batchNo: getBatchNo(),
           expiryDate: o.expiryDate,
           [getType.stockFK]: stockFK,
           [getType.codeName]: o.code,
@@ -297,9 +300,9 @@ class Detail extends PureComponent {
         onChange: (e) => {
           this.handleSelectedBatch(e)
         },
-        render: (row) => {
-          return <TextField text value={row.batchNo} />
-        },
+        // render: (row) => {
+        //   return <TextField text value={row.batchNo} />
+        // },
       },
       {
         columnName: 'expiryDate',
@@ -324,15 +327,24 @@ class Detail extends PureComponent {
   }
 
   isDisabled = (row) => {
+    console.log({ row })
     if (row.isManuallyCreated === true) return false
-    if (row.restValues && !row.restValues.medicationStock) return false
-    if (!row.stockFK) return false
+    if (
+      row.restValues &&
+      (row.restValues.medicationStockFK ||
+        row.restValues.consumableStockFK ||
+        row.restValues.vaccinationStockFK)
+    ) {
+      console.log('check', row)
+      return true
+    }
+    // if (!row.stockFK) return false
 
-    return true
+    return false
   }
 
   componentDidMount = async () => {
-    const { dispatch, values, inventoryAdjustment } = this.props
+    const { dispatch, values, inventoryAdjustment, setValues } = this.props
     await this.initializeStateItemList()
 
     dispatch({
@@ -343,6 +355,7 @@ class Detail extends PureComponent {
       },
     })
     if (values.stockList) {
+      let tempId = -9999
       const newStockList = values.stockList.map((o) => {
         // const getType = this.type(o.inventoryTypeFK)
         // const stockId = o[getType.typeName][getType.stockFK]
@@ -356,7 +369,7 @@ class Detail extends PureComponent {
         // const { batchNo } = this.state[getType.filterStateName].find((j) =>
         //   console.log(j, j.id, o.id),
         // )
-
+        tempId -= 1
         return {
           ...o,
           batchNo: [
@@ -368,15 +381,17 @@ class Detail extends PureComponent {
           codeString: o.code,
           displayValue: o.inventoryItemFK,
           displayValueString: o.displayValue,
-          id: undefined,
+          getFromApi: true,
+          // id: tempId,
         }
       })
-
+      console.log('sstockList', newStockList)
       this.setState({ stockList: newStockList })
+      setValues({ ...values, stockList: newStockList })
     } else if (inventoryAdjustment.entity) {
       const { inventoryAdjustmentItems } = inventoryAdjustment.entity
       if (inventoryAdjustmentItems) {
-        console.log({ inventoryAdjustmentItems })
+        // console.log({ inventoryAdjustmentItems })
         const newList = inventoryAdjustmentItems.map((o) => {
           const getType = this.type(o.inventoryTypeFK)
           return {
@@ -397,7 +412,7 @@ class Detail extends PureComponent {
             },
           }
         })
-        console.log({ newList })
+        // console.log({ newList })
         this.setState({ inventoryAdjustmentItems: newList })
         // values.inventoryAdjustmentItems.forEach((o) => {
         //   const getType = this.type(o.inventoryTypeFK)
@@ -587,7 +602,7 @@ class Detail extends PureComponent {
       // console.log(filteredStockOptions, x)
       // console.log(row.id)
       // return row.id ? filteredStockOptions : x
-
+      console.log({ x })
       return x
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
@@ -657,6 +672,7 @@ class Detail extends PureComponent {
 
   handleSelectedBatch = (e) => {
     const { option, row, val } = e
+    console.log({ e })
     if (option) {
       // const { expiryDate, stock, value, batchNo } = option
       this.setState({ selectedItem: undefined })
@@ -882,7 +898,6 @@ class Detail extends PureComponent {
 
     //   return rows
     // })
-    console.log('edited', rows)
     if (stockList.length > 0) {
       this.setState({ stockList: rows })
     } else {
@@ -927,7 +942,7 @@ class Detail extends PureComponent {
           }))
         }
       }
-
+      console.log({ returnRows })
       return returnRows
     }
     returnRows = returnRows.map((o) => ({
@@ -976,6 +991,8 @@ class Detail extends PureComponent {
     ) {
       cfg.onRowDoubleClick = undefined
     }
+
+    console.log('state', this.state.stockList)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
