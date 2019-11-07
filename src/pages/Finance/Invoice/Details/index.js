@@ -7,9 +7,10 @@ import { CardContainer } from '@/components'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail, invoicePayment }) => ({
+@connect(({ invoiceDetail, invoicePayment, clinicSettings }) => ({
   invoiceDetail,
   invoicePayment,
+  clinicSettings,
 }))
 @withFormik({
   name: 'invoiceDetail',

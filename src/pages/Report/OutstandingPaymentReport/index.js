@@ -14,7 +14,7 @@ import { getRawData } from '@/services/report'
 import OutstandingList from './OutstandingList'
 
 const reportId = 16
-const fileName = 'Credit Note Listing Report'
+const fileName = 'Outstanding Payment Report'
 
 const initialState = {
   loaded: false,
@@ -64,8 +64,10 @@ const OutstandingPaymentReport = ({ values, validateForm }) => {
     })
     const params = {
       ...values,
-      isPatientPayer: (values.payerType === 'All' || values.payerType === 'Patient'),
-      isCompanyPayer: (values.payerType === 'All' || values.payerType === 'Company'),
+      isPatientPayer:
+        values.payerType === 'All' || values.payerType === 'Patient',
+      isCompanyPayer:
+        values.payerType === 'All' || values.payerType === 'Company',
     }
     const reportDatas = await getRawData(reportId, params)
 

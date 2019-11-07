@@ -895,7 +895,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total
+    r.weightage = r[totalField] / total || 0
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -919,9 +919,9 @@ const calculateAmount = (
   )
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
-    notification.error({
-      message: 'Could not load GST Setting',
-    })
+    // notification.error({
+    //   message: 'Could not load GST Setting',
+    // })
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings

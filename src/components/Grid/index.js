@@ -112,6 +112,19 @@ const timeFormat = 'hh:mm A'
 const timeFormatSmallCase = 'hh:mm a'
 const timeFormat24Hour = 'HH:mm'
 const timeFormat24HourWithSecond = 'HH:mm:ss'
+const additionalShortcutFormats = [
+  'DD/MM/YY',
+  'D/MM/YY',
+  'DD/M/YY',
+  'D/M/YY',
+  'DD/MM/YYYY',
+  'D/MM/YYYY',
+  'DD/M/YYYY',
+  'D/M/YYYY',
+  'YYYY/MM/DD',
+  'YYYY-MM-DD',
+  'YYYYMMDD',
+]
 
 const TimeFormatter = ({ value, ...rest }) => {
   if (!value) return value
@@ -189,5 +202,6 @@ module.exports = {
   timeFormatWithoutSecond,
   timeFormat24HourWithSecond,
   timeFormat24Hour,
+  additionalShortcutFormats,
   ...module.exports,
 }

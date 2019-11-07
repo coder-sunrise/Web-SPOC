@@ -140,16 +140,16 @@ const InventoryTypeListing = ({
       setServicess(services)
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
-      if (
-        packDetail.entity &&
-        packDetail.entity.servicePackageItem.length > 0
-      ) {
-        servicePackageItem.forEach((o) => {
-          o.serviceName = serviceCenterServices.find(
-            (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-          ).serviceCenterId
-        })
-      }
+      // if (
+      //   packDetail.entity &&
+      //   packDetail.entity.servicePackageItem.length > 0
+      // ) {
+      //   servicePackageItem.forEach((o) => {
+      //     o.serviceName = serviceCenterServices.find(
+      //       (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+      //     ).serviceCenterId
+      //   })
+      // }
     })
 
     podoOrderType.forEach((x) => {
@@ -285,50 +285,50 @@ const InventoryTypeListing = ({
     ],
   )
 
-  useEffect(
-    () => {
-      if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
-        const newServiceRows = serviceRows.map((o) => {
-          if (o.tempServiceCenterServiceFK) {
-            return {
-              ...o,
-            }
-          }
-          return {
-            ...o,
-            serviceCenterServiceFK: serviceCenterServicess.find(
-              (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-            ).serviceId,
-            serviceName: serviceCenterServicess.find(
-              (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-            ).serviceCenterId,
-          }
-        })
+  // useEffect(
+  //   () => {
+  //     if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
+  //       const newServiceRows = serviceRows.map((o) => {
+  //         if (o.tempServiceCenterServiceFK) {
+  //           return {
+  //             ...o,
+  //           }
+  //         }
+  //         return {
+  //           ...o,
+  //           serviceCenterServiceFK: serviceCenterServicess.find(
+  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+  //           ).serviceId,
+  //           serviceName: serviceCenterServicess.find(
+  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+  //           ).serviceCenterId,
+  //         }
+  //       })
 
-        setServiceRows(newServiceRows)
+  //       setServiceRows(newServiceRows)
 
-        dispatch({
-          // force current edit row components to update
-          type: 'global/updateState',
-          payload: {
-            commitCount: (commitCount += 1),
-          },
-        })
-        dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            entity: {
-              ...values,
-              servicePackageItem: newServiceRows,
-            },
-          },
-        })
-      }
-    },
-    [
-      serviceCenterServicess,
-    ],
-  )
+  //       dispatch({
+  //         // force current edit row components to update
+  //         type: 'global/updateState',
+  //         payload: {
+  //           commitCount: (commitCount += 1),
+  //         },
+  //       })
+  //       dispatch({
+  //         type: 'packDetail/updateState',
+  //         payload: {
+  //           entity: {
+  //             ...values,
+  //             servicePackageItem: newServiceRows,
+  //           },
+  //         },
+  //       })
+  //     }
+  //   },
+  //   [
+  //     serviceCenterServicess,
+  //   ],
+  // )
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
     if (deleted) {
@@ -411,6 +411,8 @@ const InventoryTypeListing = ({
             ...serviceRows,
             rows[0],
           ])
+          setServiceCenterFK()
+          setServiceFK()
           return setFieldValue(`${type}`, serviceRows)
         }
         default:
@@ -446,7 +448,7 @@ const InventoryTypeListing = ({
               }
             }
             default: {
-              break
+              return null
             }
           }
         }
@@ -461,18 +463,35 @@ const InventoryTypeListing = ({
               inventoryConsumable,
               vaccinationName,
               inventoryVaccination,
-              serviceName,
               service,
               ...restFields
             } = item
+
+            let tempServiceCenterServiceFK
+            const tempServiceId = serviceFK || item.serviceCenterServiceFK
+            const tempServiceCenterId = serviceCenterFK || item.serviceName
+            const serviceCenterService =
+              serviceCenterServicess.find(
+                (o) =>
+                  o.serviceId === tempServiceId &&
+                  o.serviceCenterId === tempServiceCenterId,
+              ) || {}
+            if (serviceCenterService) {
+              tempServiceCenterServiceFK =
+                serviceCenterService.serviceCenter_ServiceId
+            }
             const obj = {
               ...restFields,
               ...value,
+              tempServiceCenterServiceFK,
             }
             return obj
           }
           return item
         })
+
+        setServiceCenterFK()
+        setServiceFK()
         edittedType.setStateRow(newArray)
         return setFieldValue(`${type}`, newArray)
       })
@@ -594,6 +613,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -632,6 +652,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -672,6 +693,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -696,17 +718,30 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
-        options: () =>
-          servicess.filter(
+        options: (row) => {
+          const tempArray = [
+            ...servicess,
+          ]
+          if (row.id) {
+            if (!row.serviceName) {
+              return tempArray
+            }
+            const cat = tempArray.filter((o) =>
+              o.serviceCenters.find((m) => m.value === row.serviceName),
+            )
+            return cat
+          }
+          return tempArray.filter(
             (o) =>
               !serviceCenterFK ||
               o.serviceCenters.find((m) => m.value === serviceCenterFK),
-          ),
-
+          )
+        },
         onChange: (e) => {
           setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
+          e.row.serviceCenterServiceFK = e.val
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -720,7 +755,19 @@ const InventoryTypeListing = ({
         columnName: 'serviceName',
         type: 'select',
         options: (row) => {
-          return serviceCenterss.filter(
+          const tempArray = [
+            ...serviceCenterss,
+          ]
+          if (row.id) {
+            if (!row.serviceCenterServiceFK) {
+              return tempArray
+            }
+            const test = tempArray.filter((o) =>
+              o.services.find((m) => m.value === row.serviceCenterServiceFK),
+            )
+            return test
+          }
+          return tempArray.filter(
             (o) =>
               !serviceFK ||
               o.services.find(
@@ -733,6 +780,7 @@ const InventoryTypeListing = ({
           setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
+          e.row.serviceName = e.val
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -754,6 +802,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',

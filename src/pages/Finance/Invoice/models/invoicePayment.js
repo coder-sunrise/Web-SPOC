@@ -121,7 +121,7 @@ export default createFormViewModel({
 
         const response = yield call(service.addPayment, addPaymentPayload)
         const { status } = response
-
+        console.log({ status })
         if (parseInt(status, 10) === 200) {
           notification.success({
             message: 'Payment added',
@@ -147,7 +147,7 @@ export default createFormViewModel({
       *submitVoidWriteOff ({ payload }, { call }) {
         const response = yield call(service.voidWriteOff, payload)
         const { status } = response
-
+        console.log({ response })
         if (status === '200') {
           notification.success({
             message: 'Saved',

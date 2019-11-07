@@ -17,13 +17,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultService),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultService,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
@@ -134,7 +129,7 @@ class Service extends PureComponent {
   }
 
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',

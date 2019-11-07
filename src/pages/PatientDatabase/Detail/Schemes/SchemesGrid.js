@@ -142,9 +142,10 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           // code: 'ctschemecategory',
           code: 'coPaymentScheme',
-          remoteFilter: {
-            schemeCategoryFK: 5,
-          },
+          // remoteFilter: {
+          //   schemeCategoryFK: 5,
+          // },
+          localFilter: (opt) => opt.schemeCategoryName === 'Corporate',
           isDisabled: (row) => !this.isCorporate(row),
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props

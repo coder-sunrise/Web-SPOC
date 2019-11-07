@@ -242,7 +242,26 @@ export default compose(
   withFormikExtend({
     enableReinitialize: true,
     mapPropsToValues: ({ packDetail }) => {
-      return packDetail.entity ? packDetail.entity : packDetail.default
+      const returnValue = packDetail.entity || packDetail.default
+      const { servicePackageItem } = returnValue
+      let newServicePackageItem = []
+      if (servicePackageItem.length > 0) {
+        newServicePackageItem = servicePackageItem.map((o) => {
+          const { service } = o
+          return {
+            ...o,
+            tempServiceCenterServiceFK: o.serviceCenterServiceFK,
+            serviceCenterServiceFK:
+              service.ctServiceCenter_ServiceNavigation[0].serviceFK,
+            serviceName:
+              service.ctServiceCenter_ServiceNavigation[0].serviceCenterFK,
+          }
+        })
+      }
+      return {
+        ...returnValue,
+        servicePackageItem: newServicePackageItem,
+      }
     },
 
     validationSchema: Yup.object().shape({

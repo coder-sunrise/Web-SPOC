@@ -4,7 +4,7 @@ import { FastField } from 'formik'
 import moment from 'moment'
 // common components
 import {
-  Button,
+  ProgressButton,
   DateRangePicker,
   GridContainer,
   GridItem,
@@ -26,6 +26,50 @@ const FilterBar = ({ classes, dispatch, values }) => {
       return data[0].id
     }
     return null
+  }
+
+  const onSearchClick = async () => {
+    const {
+      invoiceNo,
+      patientName,
+      patientAccountNo,
+      invoiceDates,
+      outstandingBalanceStatus,
+      session,
+    } = values
+    let SessionID
+    if (session === 'current') {
+      SessionID = await getBizSessionId()
+    }
+    dispatch({
+      type: 'invoiceList/query',
+      payload: {
+        // combineCondition: 'and',
+        lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
+        lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
+        lgt_OutstandingBalance:
+          outstandingBalanceStatus === 'yes' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
+        lsteql_OutstandingBalance:
+          outstandingBalanceStatus === 'no' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
+        apiCriteria: {
+          SessionID,
+        },
+        group: [
+          {
+            invoiceNo,
+            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+            combineCondition: 'and',
+          },
+        ],
+      },
+    })
   }
 
   return (
@@ -95,58 +139,9 @@ const FilterBar = ({ classes, dispatch, values }) => {
         </GridContainer>
 
         <div className={classes.searchButton}>
-          <Button
-            color='primary'
-            onClick={async () => {
-              const {
-                invoiceNo,
-                patientName,
-                patientAccountNo,
-                invoiceDates,
-                outstandingBalanceStatus,
-                session,
-              } = values
-              let SessionID
-              if (session === 'current') {
-                SessionID = await getBizSessionId()
-              }
-              dispatch({
-                type: 'invoiceList/query',
-                payload: {
-                  // combineCondition: 'and',
-                  lgteql_invoiceDate: invoiceDates
-                    ? invoiceDates[0]
-                    : undefined,
-                  lsteql_invoiceDate: invoiceDates
-                    ? invoiceDates[1]
-                    : undefined,
-                  lgt_OutstandingBalance:
-                    outstandingBalanceStatus === 'yes' &&
-                    outstandingBalanceStatus !== 'all'
-                      ? '0'
-                      : undefined,
-                  lsteql_OutstandingBalance:
-                    outstandingBalanceStatus === 'no' &&
-                    outstandingBalanceStatus !== 'all'
-                      ? '0'
-                      : undefined,
-                  apiCriteria: {
-                    SessionID,
-                  },
-                  group: [
-                    {
-                      invoiceNo,
-                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
-                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-                      combineCondition: 'and',
-                    },
-                  ],
-                },
-              })
-            }}
-          >
+          <ProgressButton color='primary' onClick={onSearchClick}>
             Search
-          </Button>
+          </ProgressButton>
           {/* <i>Double click on record to view invoice</i> */}
         </div>
       </React.Fragment>

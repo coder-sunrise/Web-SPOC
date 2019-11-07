@@ -77,6 +77,7 @@ const Attachment = ({
   attachments = [],
   isReadOnly,
   label = 'Attachment:',
+  page,
 }) => {
   const [
     uploading,
@@ -184,10 +185,25 @@ const Attachment = ({
           totalFilesSize += o.size
         })
       attachments.forEach((o) => {
-        totalFilesSize += o.fileSize
+        if (!o.isDeleted) {
+          totalFilesSize += o.fileSize
+        }
       })
 
-      if (totalFilesSize > maxUploadSize) {
+      if (page === 'visit registration') {
+        if (filesArray[0].size > maxUploadSize) {
+          console.log('test')
+          setErrorText('Cannot upload more than 30MB')
+          setUploading(false)
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              disableSave: false,
+            },
+          })
+          return
+        }
+      } else if (totalFilesSize > maxUploadSize) {
         setErrorText('Cannot upload more than 30MB')
         setUploading(false)
         dispatch({

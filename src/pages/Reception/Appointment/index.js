@@ -75,7 +75,7 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
 @connect(({ calendar, codetable }) => ({
   calendar,
   // doctorProfiles: codetable.doctorprofile || [],
-  clinicianProfiles: codetable.clinicianprofile || [],
+  doctorprofile: codetable.doctorprofile || [],
 }))
 class Appointment extends React.PureComponent {
   state = {
@@ -292,16 +292,16 @@ class Appointment extends React.PureComponent {
 
   onFilterUpdate = (filter) => {
     const { filterByDoctor = [] } = filter
-    const { clinicianProfiles } = this.props
+    const { doctorprofile } = this.props
 
-    const newResources = clinicianProfiles.reduce(
+    const newResources = doctorprofile.reduce(
       (resources, doctor) =>
-        filterByDoctor.includes(doctor.id)
+        filterByDoctor.includes(doctor.clinicianProfile.id)
           ? [
               ...resources,
               {
-                clinicianFK: doctor.id,
-                doctorName: doctor.name,
+                clinicianFK: doctor.clinicianProfile.id,
+                doctorName: doctor.clinicianProfile.name,
               },
             ]
           : [

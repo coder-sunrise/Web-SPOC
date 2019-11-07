@@ -18,6 +18,25 @@ import { ReportViewer } from '@/components/_medisys'
 import styles from './styles'
 import { getBizSession } from '@/services/queue'
 
+const defaultPatientPayment = {
+  id: undefined,
+  invoiceFK: undefined,
+  invoicePayerWriteOff: [],
+  invoicePayment: [],
+  isCancelled: false,
+  isDeleted: false,
+  outStanding: 0,
+  patientName: '',
+  patientProfileFK: undefined,
+  payerDistributedAmt: 0,
+  payerType: 'Patient',
+  payerTypeFK: 1,
+  paymentTxnList: [],
+  sequence: 0,
+  statementInvoice: [],
+  totalPaid: 0,
+}
+
 @connect(({ invoiceDetail, invoicePayment }) => ({
   invoiceDetail,
   invoicePayment,
@@ -25,7 +44,25 @@ import { getBizSession } from '@/services/queue'
 @withFormik({
   name: 'invoicePayment',
   enableReinitialize: true,
-  mapPropsToValues: ({ invoicePayment }) => {
+  mapPropsToValues: ({ invoicePayment, invoiceDetail }) => {
+    // console.log({ invoicePayment, invoiceDetail })
+    // const { entity: invoiceDetailEntity } = invoiceDetail
+    // const { entity = [] } = invoicePayment
+
+    // const isEmpty = entity.length === 0
+    // let _values = {}
+    // if (isEmpty) {
+    //   _values = [
+    //     {
+    //       ...defaultPatientPayment,
+    //       invoiceFK: invoiceDetailEntity.id,
+    //       patientName: invoiceDetailEntity.patientName,
+    //       outStanding: invoiceDetailEntity.outstandingBalance,
+    //     },
+    //   ]
+    //   console.log({ _values })
+    //   return _values
+    // }
     return invoicePayment.entity || {}
   },
 })
@@ -43,6 +80,8 @@ class PaymentDetails extends Component {
       reportParameters: undefined,
     },
     hasActiveSession: false,
+    invoicePayerName: undefined,
+    invoicePayerPayment: {},
   }
 
   componentDidMount = () => {
@@ -80,17 +119,36 @@ class PaymentDetails extends Component {
   }
 
   onAddPaymentClick = (invoicePayerFK) => {
-    const { dispatch, values } = this.props
+    const { dispatch, values, invoiceDetail } = this.props
 
     dispatch({
       type: 'patient/query',
       payload: { id: values.patientProfileFK },
       // payload: { id: 4 },
     }).then((r) => {
+      const invoicePayer = values.find(
+        (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
+      )
+      const invoicePayerPayment = {
+        ...invoiceDetail.entity,
+        totalAftGst: invoicePayer.payerDistributedAmt,
+        outstandingBalance: invoicePayer.outStanding,
+        finalPayable: invoicePayer.outStanding,
+        totalClaims: undefined,
+      }
+      let invoicePayerName = ''
+      if (invoicePayer.payerTypeFK === 1)
+        invoicePayerName = invoicePayer.patientName
+      if (invoicePayer.payerTypeFK === 2)
+        invoicePayerName = invoicePayer.payerType
+      if (invoicePayer.payerTypeFK === 4)
+        invoicePayerName = invoicePayer.companyName
       if (r)
         this.setState({
           showAddPayment: true,
           selectedInvoicePayerFK: invoicePayerFK,
+          invoicePayerName,
+          invoicePayerPayment,
         })
     })
   }
@@ -112,7 +170,12 @@ class PaymentDetails extends Component {
     this.setState({ showDeleteConfirmation: false, onVoid: {} })
 
   closeAddPaymentModal = () =>
-    this.setState({ showAddPayment: false, selectedInvoicePayerFK: undefined })
+    this.setState({
+      showAddPayment: false,
+      selectedInvoicePayerFK: undefined,
+      invoicePayerName: '',
+      invoicePayerPayment: undefined,
+    })
 
   onVoidClick = (entity) => {
     this.setState({
@@ -139,6 +202,7 @@ class PaymentDetails extends Component {
     const { invoicePayment } = this.props
     switch (type) {
       case 'Payment':
+        this.onShowReport('InvoicePaymentId', 29, itemID)
         break
       case 'Credit Note':
         this.onShowReport('CreditNoteId', 18, itemID)
@@ -267,8 +331,10 @@ class PaymentDetails extends Component {
       onVoid,
       showReport,
       reportPayload,
+      invoicePayerName,
+      invoicePayerPayment,
     } = this.state
-    // console.log({ values })
+
     return (
       <div className={classes.container}>
         {readOnly ? (
@@ -332,17 +398,20 @@ class PaymentDetails extends Component {
           title='Add Payment'
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
+          observe='AddPaymentForm'
         >
           {/* <AddPayment handleSubmit={this.onSubmit} /> */}
           <AddPayment
             handleSubmit={this.onSubmitAddPayment}
             onClose={this.closeAddPaymentModal}
+            invoicePayerName={invoicePayerName}
             invoicePayment={[]}
-            invoice={{
-              ...invoiceDetail.entity,
-              totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
-              finalPayable: invoiceDetail.entity.outstandingBalance,
-            }}
+            // invoice={{
+            //   ...invoiceDetail.entity,
+            //   totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
+            //   finalPayable: invoiceDetail.entity.outstandingBalance,
+            // }}
+            invoice={invoicePayerPayment}
           />
         </CommonModal>
         <CommonModal

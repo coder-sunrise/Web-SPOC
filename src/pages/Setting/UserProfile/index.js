@@ -93,7 +93,7 @@ class UserProfile extends React.Component {
             combineCondition: 'or',
           },
         ],
-        current: 1,
+        // current: 1,
         isActive: values.status,
       },
     })
