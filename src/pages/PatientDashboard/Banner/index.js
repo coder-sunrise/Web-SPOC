@@ -159,12 +159,12 @@ class Banner extends PureComponent {
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
       if (result) {
-        // dispatch({
-        //   type: 'patient/query',
-        //   payload: {
-        //     id: entity.id,
-        //   },
-        // })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
 
         const {
           balance,
@@ -253,14 +253,16 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
-      // acuteBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
-      //     : '',
-      // chronicBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-      //     : '',
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful
@@ -443,7 +445,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
+                    <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
