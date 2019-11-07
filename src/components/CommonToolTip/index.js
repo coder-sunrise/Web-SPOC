@@ -49,7 +49,8 @@ class CommonTooltip extends PureComponent {
       classes,
       title,
       children,
-      enterDelay = 250,
+      enterDelay = 150,
+      placement = 'top',
       ...restProps
     } = this.props
 
@@ -58,6 +59,7 @@ class CommonTooltip extends PureComponent {
         classes={{ tooltip: classes.tooltip }}
         title={title}
         enterDelay={enterDelay}
+        placement={placement}
         {...restProps}
       >
         {children}

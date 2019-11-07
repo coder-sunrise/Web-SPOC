@@ -99,7 +99,7 @@ const TextFormatter = (columnExtensions) =>
       // console.log(props, cfg)
       if (type === 'link') {
         return (
-          <Tooltip title={value} enterDelay={1500}>
+          <Tooltip title={value} enterDelay={750}>
             <a
               onClick={(e) => {
                 e.preventDefault()
@@ -114,7 +114,7 @@ const TextFormatter = (columnExtensions) =>
       }
       return (
         (
-          <Tooltip title={value} enterDelay={1500}>
+          <Tooltip title={value} enterDelay={750}>
             <span>{value}</span>
           </Tooltip>
         ) || ''

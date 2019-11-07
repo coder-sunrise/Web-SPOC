@@ -122,7 +122,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
         <Tooltip
           title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
           placement='top'
-          enterDelay={500}
+          enterDelay={250}
           classes={{ tooltip: classes.customMaxWidth }}
         >
           <div className={classes.calendarHoliday}>

@@ -449,6 +449,7 @@ class PaymentDetails extends Component {
         <CommonModal
           open={showAddCrNote}
           title='Add Credit Note'
+          closeIconTooltip='Close Credit Note'
           onConfirm={this.closeAddCrNoteModal}
           onClose={this.closeAddCrNoteModal}
           maxWidth='lg'
