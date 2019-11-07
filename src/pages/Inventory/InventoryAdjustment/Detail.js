@@ -300,9 +300,9 @@ class Detail extends PureComponent {
         onChange: (e) => {
           this.handleSelectedBatch(e)
         },
-        // render: (row) => {
-        //   return <TextField text value={row.batchNo} />
-        // },
+        render: (row) => {
+          return <TextField text value={row.batchNo} />
+        },
       },
       {
         columnName: 'expiryDate',
@@ -327,7 +327,6 @@ class Detail extends PureComponent {
   }
 
   isDisabled = (row) => {
-    console.log({ row })
     if (row.isManuallyCreated === true) return false
     if (
       row.restValues &&
@@ -335,11 +334,8 @@ class Detail extends PureComponent {
         row.restValues.consumableStockFK ||
         row.restValues.vaccinationStockFK)
     ) {
-      console.log('check', row)
       return true
     }
-    // if (!row.stockFK) return false
-
     return false
   }
 
@@ -355,7 +351,6 @@ class Detail extends PureComponent {
       },
     })
     if (values.stockList) {
-      let tempId = -9999
       const newStockList = values.stockList.map((o) => {
         // const getType = this.type(o.inventoryTypeFK)
         // const stockId = o[getType.typeName][getType.stockFK]
@@ -369,7 +364,6 @@ class Detail extends PureComponent {
         // const { batchNo } = this.state[getType.filterStateName].find((j) =>
         //   console.log(j, j.id, o.id),
         // )
-        tempId -= 1
         return {
           ...o,
           batchNo: [
@@ -382,7 +376,6 @@ class Detail extends PureComponent {
           displayValue: o.inventoryItemFK,
           displayValueString: o.displayValue,
           getFromApi: true,
-          // id: tempId,
         }
       })
       console.log('sstockList', newStockList)
@@ -984,7 +977,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, values, footer, errors } = props
+    const { theme, values, footer, errors } = props
     const cfg = {}
     if (
       values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
