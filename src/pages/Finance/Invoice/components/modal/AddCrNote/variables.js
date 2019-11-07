@@ -10,10 +10,10 @@ export const CrNoteColumns = [
 export const TableConfig = {
   FuncProps: {
     selectable: true,
-    selectConfig: {
-      showSelectAll: false,
-      rowSelectionEnabled: (row) => row.itemType !== 'Misc',
-    },
+    // selectConfig: {
+    //   showSelectAll: false,
+    //   rowSelectionEnabled: (row) => row.itemType !== 'Misc',
+    // },
     pager: false,
   },
 }

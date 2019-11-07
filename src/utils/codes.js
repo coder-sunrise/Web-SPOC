@@ -873,6 +873,9 @@ const noIsActiveProp = [
 ]
 
 const defaultParams = {
+  sorting: [
+    { columnName: 'sortOrder', direction: 'asc' },
+  ],
   excludeInactiveCodes: true,
 }
 

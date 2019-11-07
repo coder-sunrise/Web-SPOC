@@ -13,13 +13,9 @@ import PaymentDetails from './PaymentDetails'
 import styles from './styles'
 
 const Content = ({ classes, ...restProps }) => {
-  console.log({ restProps })
   const { invoiceDetail, invoicePayment } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
-  // const currentBizSessionFK = currentBizSessionInfo
-  //   ? currentBizSessionInfo.id
-  //   : undefined
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
 
   const [

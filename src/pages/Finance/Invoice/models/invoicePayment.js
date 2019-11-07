@@ -188,6 +188,7 @@ export default createFormViewModel({
     reducers: {
       queryDone (state, { payload }) {
         const { data } = payload
+        console.log({ data })
         let paymentResult
         if (data) {
           paymentResult = data.map((payment) => {

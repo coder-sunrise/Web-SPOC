@@ -210,15 +210,39 @@ class AddCrNote extends Component {
     setTimeout(() => this.handleCalcCrNoteItem(), 100)
   }
 
+  handleAddMiscItem = (newItem) => {
+    const { values, setFieldValue } = this.props
+    const { creditNoteItem } = values
+
+    const tempID = creditNoteItem.reduce((smallestNegativeID, item) => {
+      if (item.id < 0 && item.id < smallestNegativeID) return item.id
+      return smallestNegativeID
+    }, 0)
+    setFieldValue('creditNoteItem', [
+      ...creditNoteItem,
+      { ...newItem, id: tempID },
+    ])
+    setTimeout(() => this.handleCalcCrNoteItem(), 100)
+  }
+
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
+    console.log({ creditNoteItem })
     return (
       <div>
         <CrNoteForm />
         <CommonTableGrid
           size='sm'
-          {...TableConfig}
+          // {...TableConfig}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: false,
+              rowSelectionEnabled: (row) => row.itemType !== 'Misc',
+            },
+            pager: false,
+          }}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
           rows={creditNoteItem}
@@ -306,8 +330,9 @@ class AddCrNote extends Component {
 
         <Summary />
         <MiscCrNote
+          handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
-          {...this.props}
+          // {...this.props}
         />
 
         <GridContainer>

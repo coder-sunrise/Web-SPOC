@@ -21,13 +21,14 @@ import styles from './styles'
     total: Yup.number().min(1),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const newCreditNoteItem = props.values.creditNoteItem || []
-    const tempID = newCreditNoteItem.reduce((smallestNegativeID, item) => {
-      if (item.id < 0 && item.id < smallestNegativeID) return item.id
-      return smallestNegativeID
-    }, 0)
+    const { handleAddMiscItem } = props
+    // const newCreditNoteItem = props.values.creditNoteItem || []
+    // const tempID = newCreditNoteItem.reduce((smallestNegativeID, item) => {
+    //   if (item.id < 0 && item.id < smallestNegativeID) return item.id
+    //   return smallestNegativeID
+    // }, 0)
     const miscItem = {
-      id: tempID - 1,
+      // id: tempID - 1,
       itemType: 'Misc',
       itemCode: 'MISC',
       itemTypeFK: 6,
@@ -37,13 +38,15 @@ import styles from './styles'
       totalAfterItemAdjustment: values.total,
       isDeleted: false,
     }
-
-    props.setFieldValue('creditNoteItem', [
-      ...newCreditNoteItem,
-      miscItem,
-    ])
-    setTimeout(() => props.handleCalcFinalTotal(), 100)
+    handleAddMiscItem(miscItem)
     resetForm({})
+    // newCreditNoteItem.push(miscItem)
+    // props.setFieldValue('creditNoteItem', newCreditNoteItem)
+    // props.setFieldValue('creditNoteItem', [
+    //   ...newCreditNoteItem,
+    //   miscItem,
+    // ])
+    // setTimeout(() => props.handleCalcFinalTotal(), 100)
   },
   displayName: 'MiscCrNote',
 })

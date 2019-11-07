@@ -45,7 +45,8 @@ class CodeSelect extends React.PureComponent {
 
   render () {
     const { codetable, code, localFilter } = this.props
-    const options = code !== undefined ? codetable[code.toLowerCase()] : []
+    const options =
+      code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
 
     return (
