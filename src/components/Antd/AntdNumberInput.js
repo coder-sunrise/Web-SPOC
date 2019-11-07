@@ -472,20 +472,20 @@ class AntdNumberInput extends React.PureComponent {
           field.value === undefined || Number.isNaN(field.value)
             ? ''
             : Number(field.value),
-        focused:
-          field.value !== undefined &&
-          field.value !== null &&
-          field.value !== '' &&
-          !Number.isNaN(field.value),
+        // focused:
+        //   field.value !== undefined &&
+        //   field.value !== null &&
+        //   field.value !== '' &&
+        //   !Number.isNaN(field.value),
       })
     } else if (value) {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
-        focused:
-          value !== undefined &&
-          value !== null &&
-          value !== '' &&
-          !Number.isNaN(value),
+        // focused:
+        //   value !== undefined &&
+        //   value !== null &&
+        //   value !== '' &&
+        //   !Number.isNaN(value),
       })
     } else {
       this.setState({

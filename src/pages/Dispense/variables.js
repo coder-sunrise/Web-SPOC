@@ -1,6 +1,7 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
 import {
+  NumberInput,
   TextField,
   FastField,
   DatePicker,
@@ -223,7 +224,15 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'description',
     compare: compareString,
   },
-  { columnName: 'unitPrice', type: 'currency' },
+  {
+    columnName: 'unitPrice',
+    // type: 'currency',
+    render: (row) => {
+      const { type } = row
+      if (type !== 'Service' && type !== 'Consumable') return null
+      return <NumberInput text currency value={row.unitPrice} />
+    },
+  },
 
   {
     columnName: 'totalPrice',
