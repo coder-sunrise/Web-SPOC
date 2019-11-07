@@ -270,12 +270,12 @@ class AntdNumberInput extends React.PureComponent {
     if (!isNumber(newV)) {
       newV = undefined
     }
-    if (v === undefined && !this.props.allowEmpty) {
+    if ((newV === undefined || newV === null) && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-
+    if (newV === undefined || newV === null) newV = ''
     this.setState({
       value: !newV && newV !== 0 ? '' : newV,
     })
@@ -326,6 +326,7 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
       parser,
+      field,
     } = this.props
     let { format } = this.props
     const extraCfg = {
@@ -463,7 +464,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, min } = nextProps
 
     if (field) {
       this.setState({
@@ -471,10 +472,20 @@ class AntdNumberInput extends React.PureComponent {
           field.value === undefined || Number.isNaN(field.value)
             ? ''
             : Number(field.value),
+        focused:
+          field.value !== undefined &&
+          field.value !== null &&
+          field.value !== '' &&
+          !Number.isNaN(field.value),
       })
     } else if (value) {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
+        focused:
+          value !== undefined &&
+          value !== null &&
+          value !== '' &&
+          !Number.isNaN(value),
       })
     } else {
       this.setState({

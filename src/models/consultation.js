@@ -329,6 +329,7 @@ export default createFormViewModel({
               ...o,
               uid: o.id,
             })),
+            entity: undefined,
           },
         })
 

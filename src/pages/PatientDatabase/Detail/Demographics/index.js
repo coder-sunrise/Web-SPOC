@@ -23,7 +23,7 @@ import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
 import { widgets } from '@/utils/widgets'
-import { _fetchAndSaveCodeTable } from '@/utils/codes'
+import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
 
 const styles = () => ({
@@ -58,7 +58,6 @@ class Demographic extends PureComponent {
     const { values, classes } = this.props
     return (
       <Select
-        remote
         query={(v) => {
           const search = {}
           if (typeof v === 'number') {
@@ -73,6 +72,7 @@ class Demographic extends PureComponent {
             combineCondition: 'or',
           })
         }}
+        valueField='id'
         label='Patient Name/Account No./Mobile No.'
         renderDropdown={(p) => {
           // console.log(p)
@@ -126,7 +126,7 @@ class Demographic extends PureComponent {
 
     //   }
     // })
-    return _fetchAndSaveCodeTable('ctoccupation', {
+    return fetchAndSaveCodeTable('ctoccupation', {
       displayValue: value,
       pagesize: 25,
       sorting: [
@@ -223,7 +223,7 @@ class Demographic extends PureComponent {
                   render={(args) => (
                     <DatePicker
                       label='Date of Birth'
-                      showTime
+                      // showTime
                       dobRestrict
                       {...args}
                     />

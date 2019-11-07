@@ -158,13 +158,14 @@ class Banner extends PureComponent {
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
+      console.log('result ==========', result)
       if (result) {
-        dispatch({
-          type: 'patient/query',
-          payload: {
-            id: entity.id,
-          },
-        })
+        // dispatch({
+        //   type: 'patient/query',
+        //   payload: {
+        //     id: entity.id,
+        //   },
+        // })
 
         const {
           balance,
@@ -274,7 +275,7 @@ class Banner extends PureComponent {
     if (
       entity &&
       entity.patientHistoryDiagnosis &&
-      entity.patientHistoryDiagnosis.length > 0
+      entity.patientHistoryDiagnosis.length > 1
     ) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]

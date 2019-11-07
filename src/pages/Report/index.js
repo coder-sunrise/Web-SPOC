@@ -54,6 +54,11 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Sales Listing Report',
+    url: '/report/saleslistingreport',
+  },
+  {
+    title: 'Finance',
     text: 'Patient Listing Report',
     url: '/report/patientlisting',
   },

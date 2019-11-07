@@ -20,7 +20,7 @@ import config from '@/utils/config'
 
 const { qtyFormat } = config
 
-@connect(({ global }) => ({ global }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
@@ -34,14 +34,71 @@ const { qtyFormat } = config
     inventorypackageFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders } = props
+    const { dispatch, orders, codetable } = props
     const { rows } = orders
+    const {
+      ctmedicationusage,
+      ctmedicationunitofmeasurement,
+      ctmedicationfrequency,
+      ctmedicationdosage,
+      ctvaccinationunitofmeasurement,
+      ctvaccinationusage,
+    } = codetable
+
+    const getInstruction = (inventoryMedication) => {
+      let instruction = ''
+      const usageMethod = ctmedicationusage.find(
+        (codeTableItem) =>
+          codeTableItem.id === inventoryMedication.medicationUsageFK,
+      )
+      instruction += `${usageMethod ? usageMethod.name : ''} `
+      const dosage = ctmedicationdosage.find(
+        (codeTableItem) =>
+          codeTableItem.id === inventoryMedication.prescribingDosageFK,
+      )
+      instruction += `${dosage ? dosage.displayValue : ''} `
+      const prescribe = ctmedicationunitofmeasurement.find(
+        (codeTableItem) =>
+          codeTableItem.id === inventoryMedication.prescribingUOMFK,
+      )
+      instruction += `${prescribe ? prescribe.name : ''} `
+      const drugFrequency = ctmedicationfrequency.find(
+        (codeTableItem) =>
+          codeTableItem.id === inventoryMedication.medicationFrequencyFK,
+      )
+      instruction += `${drugFrequency ? drugFrequency.displayValue : ''} For `
+      instruction += `${inventoryMedication.duration
+        ? inventoryMedication.duration
+        : ''} day(s)`
+      return instruction
+    }
+
     const getOrderMedicationFromPackage = (packageCode, packageItem) => {
       const { inventoryMedication } = packageItem
-      const medicationPrecautions =
-        inventoryMedication.inventoryMedication_MedicationPrecaution
+
       let item
       if (inventoryMedication.isActive === true) {
+        const medicationdispensingUOM = ctmedicationunitofmeasurement.find(
+          (uom) => uom.id === inventoryMedication.dispensingUOMFK,
+        )
+        const medicationusage = ctmedicationusage.find(
+          (usage) => usage.id === inventoryMedication.medicationUsageFK,
+        )
+        const medicationfrequency = ctmedicationfrequency.find(
+          (frequency) =>
+            frequency.id === inventoryMedication.medicationFrequencyFK,
+        )
+        const medicationdosage = ctmedicationdosage.find(
+          (dosage) => dosage.id === inventoryMedication.prescribingDosageFK,
+        )
+        const medicationprescribingUOM = ctmedicationunitofmeasurement.find(
+          (uom) => uom.id === inventoryMedication.prescribingUOMFK,
+        )
+        const medicationPrecautions =
+          inventoryMedication.inventoryMedication_MedicationPrecaution
+        const isDefaultBatchNo = inventoryMedication.medicationStock.find(
+          (o) => o.isDefault === true,
+        )
         let currentMedicationPrecautions = []
         currentMedicationPrecautions = currentMedicationPrecautions.concat(
           medicationPrecautions.map((o) => {
@@ -68,24 +125,51 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
-          expiryDate: undefined,
-          batchNo: undefined,
+          expiryDate: isDefaultBatchNo
+            ? isDefaultBatchNo.expiryDate
+            : undefined,
+          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
           isExternalPrescription: false,
-          // instruction:,
+          instruction: getInstruction(inventoryMedication),
           dispenseUOMFK: inventoryMedication.dispensingUOMFK,
-          dispenseUOMCode: undefined,
-          dispenseUOMDisplayValue: undefined,
+          dispenseUOMCode: medicationdispensingUOM
+            ? medicationdispensingUOM.code
+            : undefined,
+          dispenseUOMDisplayValue: medicationdispensingUOM
+            ? medicationdispensingUOM.name
+            : undefined,
           corPrescriptionItemPrecaution: currentMedicationPrecautions,
           corPrescriptionItemInstruction: [
             {
               usageMethodFK: inventoryMedication.medicationUsageFK,
+              usageMethodCode: medicationusage
+                ? medicationusage.code
+                : undefined,
+              usageMethodDisplayValue: medicationusage
+                ? medicationusage.name
+                : undefined,
               dosageFK: inventoryMedication.prescribingDosageFK,
+              dosageCode: medicationdosage ? medicationdosage.code : undefined,
+              dosageDisplayValue: medicationdosage
+                ? medicationdosage.displayValue
+                : undefined,
               prescribeUOMFK: inventoryMedication.prescribingUOMFK,
+              prescribeUOMCode: medicationprescribingUOM
+                ? medicationprescribingUOM.code
+                : undefined,
+              prescribeUOMDisplayValue: medicationprescribingUOM
+                ? medicationprescribingUOM.name
+                : undefined,
               drugFrequencyFK: inventoryMedication.medicationFrequencyFK,
+              drugFrequencyCode: medicationfrequency
+                ? medicationfrequency.code
+                : undefined,
+              drugFrequencyDisplayValue: medicationfrequency
+                ? medicationfrequency.displayValue
+                : undefined,
               duration: inventoryMedication.duration,
               stepdose: 'AND',
               sequence: 0,
-              // duration:,
             },
           ],
         }
@@ -97,6 +181,19 @@ const { qtyFormat } = config
       const { inventoryVaccination } = packageItem
       let item
       if (inventoryVaccination.isActive === true) {
+        const vaccinationUOM = ctvaccinationunitofmeasurement.find(
+          (uom) => uom.id === inventoryVaccination.prescribingUOMFK,
+        )
+        const vaccinationusage = ctvaccinationusage.find(
+          (usage) => usage.id === inventoryVaccination.vaccinationUsageFK,
+        )
+        const vaccinationdosage = ctmedicationdosage.find(
+          (dosage) => dosage.id === inventoryVaccination.prescribingDosageFK,
+        )
+        const isDefaultBatchNo = inventoryVaccination.vaccinationStock.find(
+          (o) => o.isDefault === true,
+        )
+
         item = {
           inventoryVaccinationFK: inventoryVaccination.id,
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
@@ -104,14 +201,18 @@ const { qtyFormat } = config
           vaccinationName: inventoryVaccination.displayValue,
           // vaccinationSequenceDisplayValue:
           usageMethodFK: inventoryVaccination.vaccinationUsageFK,
-          usageMethodCode: undefined,
-          usageMethodDisplayValue: undefined,
+          usageMethodCode: vaccinationusage ? vaccinationusage.code : undefined,
+          usageMethodDisplayValue: vaccinationusage
+            ? vaccinationusage.name
+            : undefined,
           dosageFK: inventoryVaccination.prescribingDosageFK,
-          dosageCode: undefined,
-          dosageDisplayValue: undefined,
+          dosageCode: vaccinationdosage ? vaccinationdosage.code : undefined,
+          dosageDisplayValue: vaccinationdosage
+            ? vaccinationdosage.displayValue
+            : undefined,
           uomfk: inventoryVaccination.prescribingUOMFK,
-          uomCode: undefined,
-          uomDisplayValue: undefined,
+          uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
+          uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
           quantity: inventoryVaccination.dispensingQuantity,
           unitPrice: packageItem.unitPrice,
           totalPrice: packageItem.unitPrice * packageItem.quantity,
@@ -121,8 +222,10 @@ const { qtyFormat } = config
           totalAfterOverallAdjustment:
             packageItem.unitPrice * packageItem.quantity,
           packageCode,
-          expiryDate: undefined,
-          batchNo: undefined,
+          expiryDate: isDefaultBatchNo
+            ? isDefaultBatchNo.expiryDate
+            : undefined,
+          batchNo: isDefaultBatchNo ? isDefaultBatchNo.batchNo : undefined,
         }
       }
       return item
@@ -230,6 +333,15 @@ const { qtyFormat } = config
 class Package extends PureComponent {
   constructor (props) {
     super(props)
+    const { dispatch } = props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code:
+          'ctmedicationusage,ctmedicationunitofmeasurement,ctmedicationfrequency,ctmedicationdosage,ctvaccinationunitofmeasurement,ctvaccinationusage',
+      },
+    })
+
     this.tableProps = {
       getRowId: (r) => r.uid,
       columns: [

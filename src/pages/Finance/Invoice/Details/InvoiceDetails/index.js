@@ -34,10 +34,16 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { classes, values } = this.props
+    const { classes, values, clinicSettings } = this.props
     return (
       <div className={classes.cardContainer}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            marginBottom: 10,
+          }}
+        >
           <Button size='sm' color='primary' icon onClick={this.toggleReport}>
             <Printer />Print Invoice
           </Button>
@@ -61,7 +67,7 @@ class InvoiceDetails extends Component {
           columnExtensions={DataGridColExtensions}
           {...TableConfig}
         />
-        <Summary />
+        <Summary clinicSettings={clinicSettings} />
         <GridContainer className={classes.summaryContainer}>
           <GridItem md={6}>
             <FastField

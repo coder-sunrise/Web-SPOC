@@ -591,6 +591,17 @@ class Consultation extends PureComponent {
   //   }
   // }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'formik/updateState',
+      payload: {
+        ConsultationPage: undefined,
+        ConsultationDocumentList: undefined,
+        OrdersPage: undefined,
+      },
+    })
+  }
+
   render () {
     const { props, state } = this
     const {

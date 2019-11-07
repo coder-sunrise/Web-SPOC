@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 import { GridItem, DateFormatter } from '@/components'
 
@@ -9,8 +7,7 @@ class PaymentCollectionList extends PureComponent {
   render () {
     let paymentCollectionData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas.PaymentCollectionDetails) {
       paymentCollectionData = reportDatas.PaymentCollectionDetails.map(
         (item, index) => ({
@@ -41,9 +38,16 @@ class PaymentCollectionList extends PureComponent {
       let giroData = []
       let otherData = []
       if (paymentCollectionData.length > 0) {
-        cashData = paymentCollectionData.filter(item => item.paymentMode === 'CASH')
-        giroData = paymentCollectionData.filter(item => item.paymentMode === 'GIRO')
-        otherData = paymentCollectionData.filter(item => !(item.paymentMode === 'GIRO' || item.paymentMode === 'CASH'))
+        cashData = paymentCollectionData.filter(
+          (item) => item.paymentMode === 'CASH',
+        )
+        giroData = paymentCollectionData.filter(
+          (item) => item.paymentMode === 'GIRO',
+        )
+        otherData = paymentCollectionData.filter(
+          (item) =>
+            !(item.paymentMode === 'GIRO' || item.paymentMode === 'CASH'),
+        )
       }
       const OtherPaymentModeDetailsCols = [
         { name: 'paymentReceivedDate', title: 'Date' },

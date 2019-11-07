@@ -3,9 +3,9 @@ import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // custom type
+import { FastField, Field, withFormik } from 'formik'
 import TimeSchemaType from './YupTime'
 // formik
-import { FastField, Field, withFormik } from 'formik'
 // common component
 import {
   Button,

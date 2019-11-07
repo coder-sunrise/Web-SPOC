@@ -343,9 +343,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
-        {global.reportTypeID && (
-          <ReportModal />
-        )}
+        {global.reportTypeID && <ReportModal />}
       </div>
     )
   }

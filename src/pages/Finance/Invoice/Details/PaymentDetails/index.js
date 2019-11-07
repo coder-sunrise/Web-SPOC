@@ -202,6 +202,7 @@ class PaymentDetails extends Component {
     const { invoicePayment } = this.props
     switch (type) {
       case 'Payment':
+        this.onShowReport('InvoicePaymentId', 29, itemID)
         break
       case 'Credit Note':
         this.onShowReport('CreditNoteId', 18, itemID)
@@ -397,6 +398,7 @@ class PaymentDetails extends Component {
           title='Add Payment'
           onConfirm={this.closeAddPaymentModal}
           onClose={this.closeAddPaymentModal}
+          observe='AddPaymentForm'
         >
           {/* <AddPayment handleSubmit={this.onSubmit} /> */}
           <AddPayment
