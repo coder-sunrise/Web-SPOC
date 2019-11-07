@@ -77,6 +77,7 @@ const routes = [
           {
             path: '/reception/queue/consultation',
             name: 'consultation',
+            observe: 'ConsultationPage',
             hideInMenu: true,
             exact: true,
             component: './Consultation',

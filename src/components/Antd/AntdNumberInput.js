@@ -322,7 +322,7 @@ class AntdNumberInput extends React.PureComponent {
     const {
       currency,
       percentage,
-      formatter = (v) => v,
+      formatter,
       max,
       min,
       parser,
@@ -334,7 +334,7 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
     }
-
+    console.log(currency)
     if (currency) {
       if (!format) format = `${currencySymbol}${currencyFormat}`
 
@@ -382,12 +382,13 @@ class AntdNumberInput extends React.PureComponent {
       }
     }
     if (!parser) {
-      const dotPos = format
-        ? format.substring(
-            format.lastIndexOf('.') + 1,
-            format.lastIndexOf('0') + 1,
-          )
-        : ''
+      const dotPos =
+        format && format.indexOf('.') >= 0
+          ? format.substring(
+              format.lastIndexOf('.') + 1,
+              format.lastIndexOf('0') + 1,
+            )
+          : ''
       extraCfg.parser = (v) => {
         if (!Number(v) && this.state.value === '') return ''
         if (v === '') return v

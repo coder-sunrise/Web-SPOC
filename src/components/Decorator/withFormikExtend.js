@@ -16,7 +16,13 @@ window.dirtyForms = []
 const _localAuthority = {}
 let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
-  const { displayName, authority, notDirtyDuration = 1.5 } = props
+  const {
+    displayName,
+    authority,
+    notDirtyDuration = 1.5,
+    onDirtyDiscard,
+    dirtyCheckMessage,
+  } = props
   let startDirtyChecking = false
   if (displayName) {
     _localAuthority[displayName] = {}
@@ -48,12 +54,25 @@ const withFormikExtend = (props) => (Component) => {
 
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
-      window.dirtyForms.push(displayName)
+      window.dirtyForms.push({
+        displayName,
+        dirtyCheckMessage,
+        onDirtyDiscard: () => {
+          if (onDirtyDiscard) {
+            onDirtyDiscard(ps)
+          }
+        },
+      })
       window.addEventListener('beforeunload', confirmBeforeReload)
     } else if (!dirty && window.beforeReloadHandlerAdded) {
-      window.beforeReloadHandlerAdded = false
-      window.removeEventListener('beforeunload', confirmBeforeReload)
-      window.dirtyForms = _.reject(window.dirtyForms, (v) => v === displayName)
+      window.dirtyForms = _.reject(
+        window.dirtyForms,
+        (v) => v.displayName === displayName,
+      )
+      if (window.dirtyForms.length === 0) {
+        window.beforeReloadHandlerAdded = false
+        window.removeEventListener('beforeunload', confirmBeforeReload)
+      }
     }
   }
 
@@ -98,8 +117,9 @@ const withFormikExtend = (props) => (Component) => {
       authority,
     }
 
-    // constructor (props) {
-    //   super(props)
+    // constructor (ps) {
+    //   super(ps)
+    //   _updateDirtyState.bind(this)
     // }
 
     componentDidMount () {

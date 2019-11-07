@@ -201,17 +201,17 @@ export default createFormViewModel({
         return response
       },
       *discard ({ payload }, { call, put }) {
-        if (!payload) {
-          yield put({ type: 'closeModal' })
-          return null
-        }
+        // if (!payload) {
+        //   yield put({ type: 'closeModal' })
+        //   return null
+        // }
         const response = yield call(service.remove, payload)
 
         if (response) {
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
           })
-          yield put({ type: 'closeModal', payload })
+          // yield put({ type: 'closeModal', payload })
         }
         return response
       },

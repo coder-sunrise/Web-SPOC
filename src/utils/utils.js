@@ -676,19 +676,31 @@ const confirmBeforeReload = (e) => {
 }
 
 const _checkCb = ({ redirectUrl, onProceed }, e) => {
+  if (onProceed) {
+    onProceed(e)
+  }
   if (redirectUrl) {
     router.push(redirectUrl)
-  } else if (onProceed) {
-    onProceed(e)
   }
 }
 
-const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
-  e,
-) => {
-  // console.log(restProps)
+const navigateDirtyCheck = ({
+  onConfirm,
+  displayName,
+  openConfirmContent,
+  ...restProps
+}) => (e) => {
+  console.log(
+    onConfirm,
+    displayName,
+    restProps,
+    window.beforeReloadHandlerAdded,
+    window.dirtyForms,
+  )
   if (window.beforeReloadHandlerAdded) {
+    let f = {}
     if (displayName) {
+      f = window.dirtyForms.find((o) => o.displayName === displayName)
       const ob = window.g_app._store.getState().formik[displayName]
       if (ob && !ob.dirty) {
         return
@@ -699,9 +711,12 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: formatMessage({
-          id: 'app.general.leave-without-save',
-        }),
+        openConfirmContent:
+          openConfirmContent ||
+          f.dirtyCheckMessage ||
+          formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
         onConfirmSave: onConfirm,
         openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
@@ -712,20 +727,31 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
                 [displayName]: undefined,
               },
             })
+
+            if (f.onDirtyDiscard) f.onDirtyDiscard()
             // delete window._localFormik[displayName]
+            window.dirtyForms = _.reject(
+              window.dirtyForms,
+              (o) => o.displayName === displayName,
+            )
           } else {
             window.dirtyForms.forEach((f) => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
-                  [f]: undefined,
+                  [f.displayName]: undefined,
                 },
               })
+              if (f.onDirtyDiscard) f.onDirtyDiscard()
             })
+            window.dirtyForms = []
             // delete window._localFormik[displayName]
           }
-          window.beforeReloadHandlerAdded = false
-          window.removeEventListener('beforeunload', confirmBeforeReload)
+          if (window.dirtyForms.length === 0) {
+            window.beforeReloadHandlerAdded = false
+            window.removeEventListener('beforeunload', confirmBeforeReload)
+          }
+
           _checkCb(restProps, e)
         },
       },
@@ -743,7 +769,7 @@ const calculateAdjustAmount = (
   initialAmout = 0,
   adj = 0,
 ) => {
-  console.log({ initialAmout, adj })
+  // console.log({ initialAmout, adj })
   let amount = initialAmout
   let adjAmount
   if (isExactAmount) {

@@ -37,6 +37,51 @@ const filterOptions = [
   },
 ]
 
+const filterOptions = [
+  {
+    value: 'isChasAcuteClaimable',
+    name: 'CHAS Chronic',
+  },
+  {
+    value: 'isChasChronicClaimable',
+    name: 'CHAS Acute',
+  },
+  {
+    value: 'isHazeClaimable',
+    name: 'Haze',
+  },
+]
+
+const filterOptions = [
+  {
+    value: 'isChasAcuteClaimable',
+    name: 'CHAS Chronic',
+  },
+  {
+    value: 'isChasChronicClaimable',
+    name: 'CHAS Acute',
+  },
+  {
+    value: 'isHazeClaimable',
+    name: 'Haze',
+  },
+]
+
+const filterOptions = [
+  {
+    value: 'isChasAcuteClaimable',
+    name: 'CHAS Chronic',
+  },
+  {
+    value: 'isChasChronicClaimable',
+    name: 'CHAS Acute',
+  },
+  {
+    value: 'isHazeClaimable',
+    name: 'Haze',
+  },
+]
+
 const DiagnosisItem = ({
   codetable,
   dispatch,
