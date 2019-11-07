@@ -83,7 +83,21 @@ class Details extends PureComponent {
               New
             </Button>
           )} */}
-          <Button color='danger' onClick={onReset}>
+          <Button
+            color='danger'
+            onClick={() => {
+              if (entity) {
+                this.props.dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
+              } else {
+                onReset()
+              }
+            }}
+          >
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>

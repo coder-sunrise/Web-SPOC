@@ -34,7 +34,6 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      type: '1',
       rows: [],
       finalAdjustments: [],
       summary: {},
@@ -177,7 +176,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: undefined,
+          entity: newRow,
           // totalAfterAdj: undefined,
         }
       },
