@@ -18,7 +18,7 @@ import styles from './styles'
 @withFormik({
   validationSchema: Yup.object().shape({
     // description: Yup.string().required(),
-    total: Yup.number().min(1),
+    total: Yup.number().min(0.01),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { handleAddMiscItem } = props

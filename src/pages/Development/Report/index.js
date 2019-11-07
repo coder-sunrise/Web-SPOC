@@ -161,6 +161,23 @@ class Report extends React.Component {
               )}
             />
           </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='inventoryMedicationFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Name'
+                    code='inventorymedication'
+                    labelField='displayValue'
+                    // onChange={this.changeMedication}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+
           {/* <GridItem md={3}>
             <FastField
               name='ctMedicationDosage'

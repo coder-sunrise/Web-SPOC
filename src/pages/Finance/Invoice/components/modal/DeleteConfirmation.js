@@ -46,7 +46,7 @@ const DeleteConfirmation = ({
         <Button
           color='primary'
           onClick={() => handleSubmit(cancelReason, onVoid)}
-          disabled={cancelReason === ''}
+          disabled={cancelReason.trim() === ''}
         >
           Confirm
         </Button>

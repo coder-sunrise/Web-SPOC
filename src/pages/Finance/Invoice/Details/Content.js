@@ -30,13 +30,18 @@ const Content = ({ classes, ...restProps }) => {
     if (bizSessionFK === '') return true
 
     if (bizSessionFK && invoiceBizSessionFK) {
-      if (
+      const isSameBizSessionAndIsSessionClosed =
         parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
         !currentBizSessionInfo.isClinicSessionClosed
-      ) {
-        return true
-      }
-      return false
+
+      return isSameBizSessionAndIsSessionClosed
+      // if (
+      //   parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
+      //   !currentBizSessionInfo.isClinicSessionClosed
+      // ) {
+      //   return true
+      // }
+      // return false
     }
 
     return false

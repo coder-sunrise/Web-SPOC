@@ -46,7 +46,7 @@ const crNoteItemSchema = Yup.object().shape({
     const { creditNoteBalance, finalCredit } = values
     const errors = {}
     if (creditNoteBalance - finalCredit < 0) {
-      errors.finalCredit = `Total Credit Notes amount cannot be more than Net Amount. (Balance: $${creditNoteBalance.toFixed(
+      errors.finalCredit = `Total Credit Notes amount cannot be more than Outstanding Amount. (Balance: $${creditNoteBalance.toFixed(
         2,
       )})`
     }
