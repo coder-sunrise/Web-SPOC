@@ -68,7 +68,7 @@ const styles = (theme) => ({
     }
 
     dispatch({
-      type: 'roomBlock/query',
+      type: 'roomBlock/queryAll',
       payload: {
         [type]:
           stringRoomBlockGroupFK === 0 ? undefined : stringRoomBlockGroupFK,

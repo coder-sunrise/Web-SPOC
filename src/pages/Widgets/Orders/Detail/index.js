@@ -49,6 +49,7 @@ class Details extends PureComponent {
 
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
+    // console.log(this.props)
     const { entity } = orders
     return (
       <React.Fragment>

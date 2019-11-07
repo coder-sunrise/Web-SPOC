@@ -206,12 +206,14 @@ class AddPayment extends Component {
       values,
       handleSubmit,
       patient,
+      invoicePayerName = '',
     } = this.props
     const { paymentList } = values
 
     return (
       <div>
         <PayerHeader
+          invoicePayerName={invoicePayerName}
           invoice={invoice}
           outstandingAfterPayment={values.outstandingAfterPayment}
         />

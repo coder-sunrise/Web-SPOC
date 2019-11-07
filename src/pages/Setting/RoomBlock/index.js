@@ -19,7 +19,7 @@ const styles = (theme) => ({
 
 @connect(({ roomBlock, loading }) => ({
   roomBlock,
-  loading: loading.effects['roomBlock/query'],
+  loading: loading.models.roomBlock,
 }))
 class RoomBlock extends PureComponent {
   state = {

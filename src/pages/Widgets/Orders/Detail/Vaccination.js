@@ -8,21 +8,19 @@ import {
   DatePicker,
   NumberInput,
   FastField,
+  Field,
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
+let i = 0
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultVaccination),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {} }) =>
+    orders.entity || orders.defaultVaccination,
   enableReinitialize: true,
+
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
     // unitPrice: Yup.number().required(),
@@ -34,7 +32,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     uomfk: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props, onConfirm }) => {
+  handleSubmit: (values, { props, onConfirm, resetForm }) => {
     const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
@@ -46,7 +44,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
+    }).then(() => {
+      resetForm(orders.defaultVaccination)
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
@@ -74,6 +75,14 @@ class Vaccination extends PureComponent {
       'dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
     )
+    setFieldValue(
+      'dosageCode',
+      op.prescribingDosage ? op.prescribingDosage.code : undefined,
+    )
+    setFieldValue(
+      'dosageDisplayValue',
+      op.prescribingDosage ? op.prescribingDosage.name : undefined,
+    )
     setFieldValue('uomfk', op.prescribingUOM ? op.prescribingUOM.id : undefined)
     setFieldValue(
       'uomCode',
@@ -86,6 +95,14 @@ class Vaccination extends PureComponent {
     setFieldValue(
       'usageMethodFK',
       op.vaccinationUsage ? op.vaccinationUsage.id : undefined,
+    )
+    setFieldValue(
+      'usageMethodCode',
+      op.vaccinationUsage ? op.vaccinationUsage.code : undefined,
+    )
+    setFieldValue(
+      'usageMethodDisplayValue',
+      op.vaccinationUsage ? op.vaccinationUsage.name : undefined,
     )
     setFieldValue('vaccinationName', op.displayValue)
     setFieldValue('vaccinationCode', op.code)
@@ -131,7 +148,7 @@ class Vaccination extends PureComponent {
       <div>
         <GridContainer>
           <GridItem xs={12}>
-            <FastField
+            <Field
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
@@ -159,7 +176,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={4}>
-            <FastField
+            <Field
               name='usageMethodFK'
               render={(args) => {
                 return (
@@ -167,6 +184,13 @@ class Vaccination extends PureComponent {
                     label='Usage'
                     allowClear={false}
                     code='ctVaccinationUsage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('usageMethodCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'usageMethodDisplayValue',
+                        op ? op.name : undefined,
+                      )
+                    }}
                     {...args}
                   />
                 )
@@ -183,6 +207,13 @@ class Vaccination extends PureComponent {
                     labelField='displayValue'
                     allowClear={false}
                     code='ctMedicationDosage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('dosageCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'dosageDisplayValue',
+                        op ? op.displayValue : undefined,
+                      )
+                    }}
                     valueFiled='id'
                     {...args}
                   />
@@ -199,6 +230,10 @@ class Vaccination extends PureComponent {
                     label='UOM'
                     allowClear={false}
                     code='ctVaccinationUnitOfMeasurement'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('uomCode', op ? op.code : undefined)
+                      setFieldValue('uomDisplayValue', op ? op.name : undefined)
+                    }}
                     {...args}
                   />
                 )

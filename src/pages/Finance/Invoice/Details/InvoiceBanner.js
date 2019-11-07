@@ -34,7 +34,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           </GridItem>
           <GridItem md={8}>
             <h5 className={classes.normalText}>
-              {values.patientName || 'N/A'}({values.patientAccountNo || 'N/A'})
+              {values.patientName || 'N/A'}&nbsp;({values.patientAccountNo || 'N/A'})
             </h5>
           </GridItem>
           <GridItem md={4}>

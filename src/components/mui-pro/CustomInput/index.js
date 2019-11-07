@@ -72,6 +72,7 @@ class TextField extends React.PureComponent {
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
+    if (this.state.focused) return
     const { field, value } = nextProps
     if (field) {
       this.setState({
@@ -113,10 +114,10 @@ class TextField extends React.PureComponent {
     if (onChange) {
       onChange(v)
     }
-    this.setState({
-      value: v.target.value,
-      // isDebouncing: false,
-    })
+    // this.setState({
+    //   value: v.target.value,
+    //   // isDebouncing: false,
+    // })
   }
 
   onChange = (event) => {
@@ -162,10 +163,16 @@ class TextField extends React.PureComponent {
   // }
 
   handleFocus = () => {
-    window.$_inputFocused = true
+    this.setState({
+      focused: true,
+    })
+    // window.$_inputFocused = true
   }
 
   handleBlur = (e) => {
+    this.setState({
+      focused: false,
+    })
     this._onChange(e.target.value)
     this.debouncedOnChange.cancel()
   }
@@ -256,6 +263,7 @@ class TextField extends React.PureComponent {
     if (!preventDefaultChangeEvent) {
       cfg.onChange = this.onChange
       cfg.onBlur = extendFunc(onBlur, this.handleBlur)
+      cfg.onFocus = extendFunc(onFocus, this.handleFocus)
     }
     // cfg.onFocus = extendFunc(onFocus, this.handleFocus)
     // console.log(maxLength, 'maxLength')

@@ -39,8 +39,8 @@ export default createFormViewModel({
               version: Number(query.v) || undefined,
               consultationID: Number(query.cid),
               md: query.md2,
-              queueID: Number(query.qid),
-              patientID: Number(query.pid),
+              queueID: Number(query.qid) || 0,
+              patientID: Number(query.pid) || 0,
             },
           })
         }
@@ -58,11 +58,10 @@ export default createFormViewModel({
           })
           yield take('visitRegistration/query/@@end')
           const visitRegistration = yield select((st) => st.visitRegistration)
-          visit = visitRegistration.entity
+          visit = visitRegistration.entity.visit
           if (!visit) return
         }
 
-        // console.log(visitRegistration, visit)
         yield put({
           type: 'patient/query',
           payload: { id: patientID || visit.patientProfileFK, version },
@@ -330,6 +329,7 @@ export default createFormViewModel({
               ...o,
               uid: o.id,
             })),
+            entity: undefined,
           },
         })
 
