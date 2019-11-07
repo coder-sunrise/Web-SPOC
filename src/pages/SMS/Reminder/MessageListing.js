@@ -12,11 +12,7 @@ import {
   MessageText,
   Row,
 } from '@livechat/ui-kit'
-import {
-  GridContainer,
-  dateFormatLongWithTimeNoSec,
-  timeFormat24Hour,
-} from '@/components'
+import { dateFormatLongWithTimeNoSec, timeFormat24Hour } from '@/components'
 
 import New from '../New'
 
@@ -58,17 +54,17 @@ const styles = () => ({
     borderRadius: 4,
     overflow: 'auto',
     padding: '8px 24px',
-    height: 200,
+    height: 400,
   },
   demoLoadingContainer: {
-    position: 'absolute',
-    bottom: 40,
+    // position: 'absolute',
+    // bottom: 40,
     width: '100%',
     textAlign: 'center',
   },
 })
 
-const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
+const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
   const [
     historyList,
     setHistoryList,
@@ -86,23 +82,32 @@ const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
     setTotalHistory,
   ] = useState(true)
 
-  useEffect(() => {
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(1)
+
+  const getSMSHistory = () => {
     dispatch({
       type: 'sms/querySMSHistory',
       payload: {
         Recipient: recipient.patientContactNo,
+        current: currentPage,
+        pagesize: 10,
       },
     }).then((v) => {
       if (v) {
         const { data, totalRecords } = v.data
-        setHistoryList([
-          ...historyList,
+        setHistoryList((prevList) => [
+          ...prevList,
           ...data,
         ])
         setTotalHistory(totalRecords)
+        setCurrentPage(currentPage + 1)
+        setLoading(false)
       }
     })
-  }, [])
+  }
 
   const renderMessages = (messages) => {
     if (messages) {
@@ -170,33 +175,13 @@ const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
     return false
   }
 
-  const fetchData = () => {
-    dispatch({
-      type: 'sms/querySMSHistory',
-      payload: {
-        Recipient: recipient.patientContactNo,
-        current: 2,
-        pagesize: 10,
-      },
-    }).then(async (v) => {
-      if (v) {
-        const { data, totalRecords } = v.data
-        await setHistoryList([
-          ...historyList,
-          ...data,
-        ])
-        setTotalHistory(totalRecords)
-      }
-    })
-  }
-
   const fetchDataCallback = useCallback(
     () => {
-      fetchData()
-      checkIsItLoadedAllHistory()
+      getSMSHistory()
     },
     [
       historyList,
+      currentPage,
     ],
   )
 
@@ -205,6 +190,11 @@ const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
     if (checkIsItLoadedAllHistory()) return
     fetchDataCallback()
   }
+
+  useEffect(() => {
+    getSMSHistory()
+  }, [])
+
   return (
     <React.Fragment>
       <div className={classes.demoInfiniteContainer}>
@@ -215,19 +205,24 @@ const MessageListing = ({ classes, sms, recipient, dispatch, onConfirm }) => {
           hasMore={!loading && hasMore}
           useWindow={false}
         >
-          <List
-            dataSource={historyList}
-            renderItem={(item) => <p>{item.content}</p>}
-          >
-            {loading &&
-            hasMore && (
-              <div className={classes.demoLoadingContainer}>
-                <Spin />
-              </div>
-            )}
-          </List>
+          <ThemeProvider>
+            <Paper>
+              <MessageList active>{renderMessages(historyList)}</MessageList>
+              {loading &&
+              hasMore && (
+                <div className={classes.demoLoadingContainer}>
+                  <Spin />
+                </div>
+              )}
+            </Paper>
+          </ThemeProvider>
         </InfiniteScroll>
       </div>
+      <Grid item>
+        <Paper className={classes.sendBar}>
+          <New {...newMessageProps} />
+        </Paper>
+      </Grid>
     </React.Fragment>
   )
 }
