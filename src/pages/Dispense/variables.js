@@ -227,6 +227,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'unitPrice',
     // type: 'currency',
+    align: 'right',
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return null
@@ -236,7 +237,13 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
 
   {
     columnName: 'totalPrice',
-    type: 'currency',
+    // type: 'currency',
+    align: 'right',
+    render: (row) => {
+      const { type } = row
+      if (type !== 'Service' && type !== 'Consumable') return null
+      return <NumberInput text currency value={row.totalPrice} />
+    },
   },
   {
     columnName: 'action',
