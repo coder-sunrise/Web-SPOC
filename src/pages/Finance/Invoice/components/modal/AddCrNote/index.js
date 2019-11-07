@@ -19,10 +19,10 @@ import {
   IconButton,
   Tooltip,
   Popconfirm,
+  notification,
   SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
-import { notification } from '@/components'
 import { CrNoteColumns, TableConfig } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
@@ -314,7 +314,7 @@ class AddCrNote extends Component {
           <GridItem md={9}>
             <p>Note: Total Price($) are after GST.</p>
           </GridItem>
-          <GridItem md={3} style={{textAlign: 'right'}}>
+          <GridItem md={3} style={{ textAlign: 'right' }}>
             <Button
               color='primary'
               onClick={handleSubmit}

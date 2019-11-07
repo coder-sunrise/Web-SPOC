@@ -979,6 +979,7 @@ export const getAllCodes = async () => {
       cts[c.toLowerCase()] = data
       cts.config[c.toLowerCase()] = others
     })
+    console.log({ cts })
     return cts
   })
   return ct || []

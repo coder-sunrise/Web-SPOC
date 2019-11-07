@@ -2,7 +2,7 @@ export const CrNoteColumns = [
   { name: 'itemType', title: 'Type' },
   { name: 'itemName', title: 'Name' },
   { name: 'quantity', title: 'Quantity' },
-  { name: 'unitPrice', title: 'Unit Price' },
+  // { name: 'unitPrice', title: 'Unit Price' },
   { name: 'totalAfterItemAdjustment', title: 'Total ($)' },
   { name: 'action', title: 'Action' },
 ]
@@ -10,6 +10,10 @@ export const CrNoteColumns = [
 export const TableConfig = {
   FuncProps: {
     selectable: true,
+    selectConfig: {
+      showSelectAll: false,
+      rowSelectionEnabled: (row) => row.itemType !== 'Misc',
+    },
     pager: false,
   },
 }

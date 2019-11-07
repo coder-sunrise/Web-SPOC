@@ -13,12 +13,13 @@ import PaymentDetails from './PaymentDetails'
 import styles from './styles'
 
 const Content = ({ classes, ...restProps }) => {
+  console.log({ restProps })
   const { invoiceDetail, invoicePayment } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
-  const currentBizSessionFK = currentBizSessionInfo
-    ? currentBizSessionInfo.id
-    : undefined
+  // const currentBizSessionFK = currentBizSessionInfo
+  //   ? currentBizSessionInfo.id
+  //   : undefined
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
 
   const [
@@ -27,9 +28,14 @@ const Content = ({ classes, ...restProps }) => {
   ] = useState('1')
 
   const isInvoiceCurrentBizSession = () => {
-    if (currentBizSessionFK && invoiceBizSessionFK) {
+    const { id: bizSessionFK } = currentBizSessionInfo
+
+    // no active session, return true always
+    if (bizSessionFK === '') return true
+
+    if (bizSessionFK && invoiceBizSessionFK) {
       if (
-        currentBizSessionFK === invoiceBizSessionFK &&
+        parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
         !currentBizSessionInfo.isClinicSessionClosed
       ) {
         return true
@@ -48,7 +54,7 @@ const Content = ({ classes, ...restProps }) => {
         return (
           <PaymentDetails
             invoiceDetail={restProps.values}
-            readOnly={!currentBizSessionFK}
+            readOnly={!currentBizSessionInfo.id}
           />
         )
       default:

@@ -94,6 +94,14 @@ class PaymentDetails extends Component {
     this.checkHasActiveSession()
   }
 
+  _validateOutstandingAmount = (invoicePayer, callback) => {
+    if (invoicePayer.outStanding === 0) {
+      notification.error({
+        message: 'This payer does not have any outstanding',
+      })
+    } else callback()
+  }
+
   checkHasActiveSession = async () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
@@ -126,52 +134,61 @@ class PaymentDetails extends Component {
 
   onAddPaymentClick = (invoicePayerFK) => {
     const { dispatch, values, invoiceDetail } = this.props
-
-    dispatch({
-      type: 'patient/query',
-      payload: { id: values.patientProfileFK },
-      // payload: { id: 4 },
-    }).then((r) => {
-      const invoicePayer = values.find(
-        (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
-      )
-      const invoicePayerPayment = {
-        ...invoiceDetail.entity,
-        totalAftGst: invoicePayer.payerDistributedAmt,
-        outstandingBalance: invoicePayer.outStanding,
-        finalPayable: invoicePayer.outStanding,
-        totalClaims: undefined,
-      }
-      let invoicePayerName = ''
-      if (invoicePayer.payerTypeFK === 1)
-        invoicePayerName = invoicePayer.patientName
-      if (invoicePayer.payerTypeFK === 2)
-        invoicePayerName = invoicePayer.payerType
-      if (invoicePayer.payerTypeFK === 4)
-        invoicePayerName = invoicePayer.companyName
-      if (r)
-        this.setState({
-          showAddPayment: true,
-          selectedInvoicePayerFK: invoicePayerFK,
-          invoicePayerName,
-          invoicePayerPayment,
-        })
-    })
+    const invoicePayer = values.find(
+      (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
+    )
+    const queryPatientProfileThenShowAddPayment = () => {
+      dispatch({
+        type: 'patient/query',
+        payload: { id: values.patientProfileFK },
+        // payload: { id: 4 },
+      }).then((r) => {
+        const invoicePayerPayment = {
+          ...invoiceDetail.entity,
+          totalAftGst: invoicePayer.payerDistributedAmt,
+          outstandingBalance: invoicePayer.outStanding,
+          finalPayable: invoicePayer.outStanding,
+          totalClaims: undefined,
+        }
+        let invoicePayerName = ''
+        if (invoicePayer.payerTypeFK === 1)
+          invoicePayerName = invoicePayer.patientName
+        if (invoicePayer.payerTypeFK === 2)
+          invoicePayerName = invoicePayer.payerType
+        if (invoicePayer.payerTypeFK === 4)
+          invoicePayerName = invoicePayer.companyName
+        if (r)
+          this.setState({
+            showAddPayment: true,
+            selectedInvoicePayerFK: invoicePayerFK,
+            invoicePayerName,
+            invoicePayerPayment,
+          })
+      })
+    }
+    this._validateOutstandingAmount(
+      invoicePayer,
+      queryPatientProfileThenShowAddPayment,
+    )
   }
 
   onWriteOffClick = (invoicePayerFK) => {
     const { values } = this.props
     const invoicePayer = values.find((item) => item.id === invoicePayerFK)
-    if (invoicePayer.outStanding <= 0) {
-      notification.error({
-        message: 'This payer does not have any outstanding',
-      })
-    } else {
+    const showWriteOffModal = () => {
       this.setState({
         showWriteOff: true,
         selectedInvoicePayerFK: invoicePayerFK,
       })
     }
+    this._validateOutstandingAmount(invoicePayer, showWriteOffModal)
+    // if (invoicePayer.outStanding === 0) {
+    //   notification.error({
+    //     message: 'This payer does not have any outstanding',
+    //   })
+    // } else {
+
+    // }
   }
 
   closeAddCrNoteModal = () =>
