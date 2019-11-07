@@ -75,15 +75,18 @@ const crNoteItemSchema = Yup.object().shape({
         creditNoteItem: creditNoteItem
           .filter((x) => x.isSelected)
           .map((selectedItem) => {
-            if (selectedItem.itemType.toLowerCase() === 'misc') {
+            if (
+              selectedItem.itemType.toLowerCase() === 'misc' ||
+              selectedItem.itemType.toLowerCase() === 'service'
+            ) {
               selectedItem.isInventoryItem = false
-              selectedItem.itemDescription = selectedItem.itemName
             } else {
               selectedItem.isInventoryItem = true
             }
             delete selectedItem.id
             delete selectedItem.concurrencyToken
             selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
+            selectedItem.itemDescription = selectedItem.itemName
             return { ...selectedItem }
           }),
       },
