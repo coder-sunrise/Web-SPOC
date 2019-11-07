@@ -147,7 +147,7 @@ export default {
   'menu.report.sessionsummary': 'Session Summary Report',
   'menu.report.viewreport': 'View Report',
 
-  'menu.support':'Support',
-  'menu.support.teamviewer':'Teamviewer',
-  'menu.support.druglabel':'Drug Label',
+  'menu.support': 'Support',
+  'menu.support.teamviewer': 'Teamviewer',
+  'menu.support.druglabel': 'Drug Label',
 }

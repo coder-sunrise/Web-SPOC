@@ -16,6 +16,7 @@ import {
   TextField,
   Button,
   WarningSnackbar,
+  NumberInput,
 } from '@/components'
 
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -235,11 +236,12 @@ class clinicSettings extends PureComponent {
               <Field
                 name='gSTPercentage.settingValue'
                 render={(args) => (
-                  <TextField
+                  <NumberInput
                     label='GST Rate'
                     {...args}
                     disabled={!enableGst || !!hasActiveSession}
                     suffix='%'
+                    format='0.00'
                   />
                 )}
               />

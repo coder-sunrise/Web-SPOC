@@ -59,8 +59,10 @@ const PaymentCollection = ({ values, validateForm }) => {
     })
     const params = {
       ...values,
-      isPatientPayer: (values.payerType === 'All' || values.payerType === 'Patient'),
-      isCompanyPayer: (values.payerType === 'All' || values.payerType === 'Company'),
+      isPatientPayer:
+        values.payerType === 'All' || values.payerType === 'Patient',
+      isCompanyPayer:
+        values.payerType === 'All' || values.payerType === 'Company',
       groupByPaymentMode: values.groupBy === 'PaymentMode',
       groupByDoctor: values.groupBy === 'Doctor',
     }
@@ -130,21 +132,15 @@ const PaymentCollection = ({ values, validateForm }) => {
               collapses={[
                 {
                   title: <AccordionTitle title='Payment Collection Details' />,
-                  content: (
-                    <PaymentCollectionList {...state} />
-                  ),
+                  content: <PaymentCollectionList {...state} />,
                 },
                 {
                   title: <AccordionTitle title='Summary' />,
-                  content: (
-                    <Summary {...state} />
-                  ),
+                  content: <Summary {...state} />,
                 },
                 {
                   title: <AccordionTitle title='Summary By Payment Model' />,
-                  content: (
-                    <SumList {...state} />
-                  ),
+                  content: <SumList {...state} />,
                 },
               ]}
             />

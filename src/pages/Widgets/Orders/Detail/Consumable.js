@@ -15,13 +15,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultConsumable),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultConsumable,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),

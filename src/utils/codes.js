@@ -37,6 +37,20 @@ const sessionOptions = [
   { value: 'current', name: 'Current Session' },
 ]
 
+const outgoingSMSStatus = [
+  { value: 1, name: 'Sent' },
+  { value: 2, name: 'Failed' },
+  { value: 3, name: 'Delivered' },
+  { value: 4, name: 'Undelivered' },
+  { value: 5, name: 'Receiving' },
+  { value: 6, name: 'Received' },
+  { value: 7, name: 'Accepted' },
+  { value: 8, name: 'Scheduled' },
+  { value: 9, name: 'Read' },
+  { value: 10, name: 'Queued' },
+  { value: 11, name: 'Sending' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -837,7 +851,7 @@ const tenantCodes = [
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
   'ctMedicationFrequency',
-  'ltinvoiceitemtype',
+  // 'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
@@ -864,16 +878,17 @@ const defaultParams = {
 
 const convertExcludeFields = [
   // 'excludeInactiveCodes',
+  'temp',
+  'refresh',
 ]
 
-const _fetchAndSaveCodeTable = async (
+export const fetchAndSaveCodeTable = async (
   code,
   params,
-  multiplier = 1,
   refresh = false,
+  temp = false,
 ) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
-  const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
@@ -900,12 +915,14 @@ const _fetchAndSaveCodeTable = async (
     ...defaultParams,
     ...params,
   }
+
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...params, ...criteriaForTenantCodes },
+        { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
+
   // console.log(`fetch code: ${code}`)
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -938,17 +955,14 @@ const _fetchAndSaveCodeTable = async (
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    const result = multiplyCodetable(newData, multiplier)
-
-    await db.codetable.put({
-      code,
-      data: result,
-      createDate: new Date(),
-      updateDate: refresh ? null : new Date(),
-      params,
-      // shouldRefresh: refresh,
-    })
-    return result
+    if (!temp)
+      await db.codetable.put({
+        code,
+        data: newData,
+        updateDate: refresh ? null : new Date(),
+        params,
+      })
+    return newData
   }
 
   return []
@@ -959,18 +973,17 @@ export const getAllCodes = async () => {
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    const results = code
-      .filter((_i) => {
-        const { updateDate } = _i
-        const parsedUpdateDate =
-          updateDate === null ? moment('2001-01-01') : moment(updateDate)
-        return parsedUpdateDate.isAfter(parsedLastLoginDate)
-      })
-      .map((_i) => ({
-        code: _i.code,
-        data: _i.data,
-        updateDate: _i.updateDate,
-      }))
+    const results = code.filter((_i) => {
+      const { updateDate } = _i
+      const parsedUpdateDate =
+        updateDate === null ? moment('2001-01-01') : moment(updateDate)
+      return parsedUpdateDate.isAfter(parsedLastLoginDate)
+    })
+    // .map((_i) => ({
+    //   code: _i.code,
+    //   data: _i.data,
+    //   updateDate: _i.updateDate,
+    // }))
 
     const cts = {
       config: {},
@@ -990,6 +1003,8 @@ export const getCodes = async (payload) => {
   let params
   let multiply = 1
   let _force = false
+  let _temp = false
+
   const { refresh = false } = payload
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
@@ -997,6 +1012,7 @@ export const getCodes = async (payload) => {
     params = payload.filter
     multiply = payload.multiplier
     _force = payload.force
+    _temp = payload.temp || false
   }
 
   let result = []
@@ -1011,7 +1027,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh || _force) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
+      result = fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
@@ -1027,7 +1043,7 @@ export const getCodes = async (payload) => {
       //   lastLogin: parsedLastLoginDate.format(),
       // })
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
+        ? fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
@@ -1401,6 +1417,7 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
+  outgoingSMSStatus,
   // country,
   sessionOptions,
   consultationDocumentTypes,
@@ -1409,5 +1426,6 @@ module.exports = {
   osBalanceStatus,
   buttonTypes,
   inventoryAdjustmentStatus,
+  fetchAndSaveCodeTable,
   ...module.exports,
 }

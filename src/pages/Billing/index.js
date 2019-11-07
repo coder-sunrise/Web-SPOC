@@ -60,10 +60,11 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, user, dispense, loading }) => ({
+@connect(({ billing, user, dispense, loading, patient }) => ({
   billing,
   dispense,
   loading,
+  patient: patient.entity || patient.default,
   user: user.data,
 }))
 @withFormikExtend({
@@ -345,7 +346,14 @@ class Billing extends Component {
 
   render () {
     const { showReport, showAddPaymentModal } = this.state
-    const { classes, values, dispense, loading, setFieldValue } = this.props
+    const {
+      classes,
+      values,
+      dispense,
+      loading,
+      setFieldValue,
+      patient,
+    } = this.props
     const formikBag = {
       values,
       setFieldValue,
@@ -428,6 +436,7 @@ class Billing extends Component {
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
+            invoicePayerName={patient.name}
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,

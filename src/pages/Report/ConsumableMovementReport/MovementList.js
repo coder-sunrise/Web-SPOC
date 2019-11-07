@@ -2,18 +2,15 @@ import React, { PureComponent } from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class MovementList extends PureComponent {
-   render () {
+  render () {
     let incomeData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.ConsumableStockDetails) {
-      incomeData = reportDatas.ConsumableStockDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `ConsumableMovement-${index}-${item.consumableCode}`,
-        }),
-      )
+      incomeData = reportDatas.ConsumableStockDetails.map((item, index) => ({
+        ...item,
+        id: `ConsumableMovement-${index}-${item.consumableCode}`,
+      }))
     }
 
     const ConsumableStockDetailsCols = [
@@ -29,7 +26,7 @@ class MovementList extends PureComponent {
     ]
     const ConsumableStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date' },
-      { columnName: 'transactionQuantity', type: 'qty'},
+      { columnName: 'transactionQuantity', type: 'qty' },
     ]
 
     return (

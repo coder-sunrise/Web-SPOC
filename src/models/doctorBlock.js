@@ -19,10 +19,7 @@ export default createListViewModel({
         const { pathname } = location
         if (pathname === '/setting/doctorblock') {
           dispatch({
-            type: 'query',
-            payload: {
-              pagesize: 99999,
-            },
+            type: 'queryAll',
           })
         }
       })
@@ -37,12 +34,52 @@ export default createListViewModel({
       //   }
       //   return false
       // },
+      *queryAll ({ payload }, { all, call, put }) {
+        let mergeResult = []
+        const response = yield call(service.getList, payload)
+
+        const { status, data } = response
+        if (parseInt(status, 10) === 200) {
+          const { data: list, totalRecords, pageSize, currentPage } = data
+          mergeResult = [
+            ...list,
+          ]
+          const totalPage = Math.ceil(totalRecords / 10)
+          const serviceCalls = []
+          for (let i = 2; i <= totalPage; i++) {
+            const servicePayload = {
+              ...payload,
+              current: i,
+            }
+            serviceCalls.push(call(service.getList, servicePayload))
+          }
+          const allResult = yield all(serviceCalls)
+
+          if (allResult) {
+            const _flatten = allResult.reduce(
+              (_all, result) => [
+                ..._all,
+                ...result.data.data,
+              ],
+              [],
+            )
+            mergeResult = [
+              ...list,
+              ..._flatten,
+            ]
+          }
+
+          yield put({
+            type: 'updateState',
+            payload: {
+              list: mergeResult,
+            },
+          })
+        }
+      },
       *refresh (_, { call, put }) {
         yield put({
-          type: 'query',
-          payload: {
-            pagesize: 99999,
-          },
+          type: 'queryAll',
         })
       },
       *update ({ payload }, { call }) {

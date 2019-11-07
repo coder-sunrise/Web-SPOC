@@ -543,6 +543,9 @@ class PatientHistory extends Component {
                   size='sm'
                   onClick={() => {
                     dispatch({
+                      type: 'patient/closePatientModal',
+                    })
+                    dispatch({
                       type: `consultation/edit`,
                       payload: {
                         id: selected.id,

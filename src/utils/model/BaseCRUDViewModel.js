@@ -115,10 +115,12 @@ export default class BaseCRUDViewModel {
           )
             return list || entity
           if (typeof payload === 'object') {
+            const current = !payload.current ? 1 : payload.current
             filter = {
               ...fixedFilter,
               ...filter,
               ...payload,
+              current,
             }
           } else {
             filter = payload

@@ -5,7 +5,7 @@ import * as service from '@/pages/Inventory/InventoryAdjustment/services'
 import { getUniqueId, maxReducer, calculateAmount } from '@/utils/utils'
 
 const sharedMedicationValue = {
-  quantity: 0,
+  // quantity: 0,
   corPrescriptionItemPrecaution: [
     {
       precaution: '',
@@ -22,6 +22,7 @@ const sharedMedicationValue = {
       // duration: 1,
       sequence: 0,
       stepdose: 'AND',
+      unitPrice: 0,
     },
   ],
 }
@@ -33,17 +34,19 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      type: '1',
       rows: [],
       finalAdjustments: [],
       summary: {},
       defaultMedication: {
         ...sharedMedicationValue,
       },
-      defaultService: {},
+      defaultService: {
+        unitPrice: 0,
+      },
       defaultVaccination: {
         vaccinationGivenDate: moment(),
         quantity: 1,
+        unitPrice: 0,
       },
       defaultConsumable: { quantity: 1 },
       defaultPackage: {
@@ -150,7 +153,7 @@ export default createListViewModel({
     reducers: {
       upsertRowState (state, { payload }) {
         let newRow
-        let { rows } = state
+        let { rows, type } = state
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =
@@ -165,6 +168,7 @@ export default createListViewModel({
         } else {
           newRow = {
             ...payload,
+            type,
             uid: getUniqueId(),
           }
           rows.push(newRow)
