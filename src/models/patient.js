@@ -261,7 +261,7 @@ export default createFormViewModel({
         }
 
         const response = yield call(service.requestChasBalance, newPayload)
-        console.log('response ', response)
+
         const { data } = response
         let result = { isSuccessful: false }
 

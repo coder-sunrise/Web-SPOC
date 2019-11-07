@@ -23,6 +23,7 @@ import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
 import { widgets } from '@/utils/widgets'
+import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
 
 const styles = () => ({
@@ -114,6 +115,25 @@ class Demographic extends PureComponent {
         {...args}
       />
     )
+  }
+
+  queryOccupation = (value) => {
+    // this.props.dispatch({
+    //   type:'codetable/fetchCodes',
+    //   payload: {
+    //     force: true,
+    //     code: 'ctoccupation',
+
+    //   }
+    // })
+    return fetchAndSaveCodeTable('ctoccupation', {
+      displayValue: value,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
   }
 
   render () {
@@ -289,7 +309,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Occupation'
                       code='ctOccupation'
-                      autoComplete
+                      query={this.queryOccupation}
                       {...args}
                     />
                   )}

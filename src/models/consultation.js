@@ -324,6 +324,7 @@ export default createFormViewModel({
         yield put({
           type: 'orders/updateState',
           payload: {
+            type: '1',
             rows: _.sortBy(oRows, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,

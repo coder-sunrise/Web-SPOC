@@ -160,12 +160,12 @@ class Banner extends PureComponent {
     }).then((result) => {
       console.log('result ==========', result)
       if (result) {
-        // dispatch({
-        //   type: 'patient/query',
-        //   payload: {
-        //     id: entity.id,
-        //   },
-        // })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
 
         const {
           balance,
@@ -254,14 +254,16 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
-      // acuteBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
-      //     : '',
-      // chronicBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-      //     : '',
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful
@@ -272,7 +274,11 @@ class Banner extends PureComponent {
   displayMedicalProblemData (entity) {
     let medicalProblemData = ''
 
-    if (entity && entity.patientHistoryDiagnosis.length > 1) {
+    if (
+      entity &&
+      entity.patientHistoryDiagnosis &&
+      entity.patientHistoryDiagnosis.length > 1
+    ) {
       if (entity.patientHistoryDiagnosis.length >= 2) {
         medicalProblemData = `${entity.patientHistoryDiagnosis[0]
           .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
@@ -444,7 +450,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
+                    <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (

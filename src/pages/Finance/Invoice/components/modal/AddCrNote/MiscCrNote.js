@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
+import Yup from '@/utils/yup'
 import {
   Button,
   CardContainer,
