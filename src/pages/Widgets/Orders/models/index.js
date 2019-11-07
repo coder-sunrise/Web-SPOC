@@ -176,7 +176,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: undefined,
+          entity: newRow,
           // totalAfterAdj: undefined,
         }
       },
