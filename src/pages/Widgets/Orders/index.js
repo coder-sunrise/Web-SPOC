@@ -55,10 +55,9 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, status, visitRegistration, orders } = this.props
+    const { dispatch, status, visitRegistration } = this.props
     const { entity: vistEntity } = visitRegistration
     const { visit = {} } = vistEntity
-    orders.type = orders.defaultType
 
     const codeTableNameArray = []
     codeTableNameArray.push('ctMedicationUsage')

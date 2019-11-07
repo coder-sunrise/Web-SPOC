@@ -33,7 +33,6 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      defaultType: '1',
       rows: [],
       finalAdjustments: [],
       summary: {},
