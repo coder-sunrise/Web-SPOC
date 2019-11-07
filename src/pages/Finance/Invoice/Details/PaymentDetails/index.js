@@ -7,7 +7,13 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { CommonModal, withFormik, WarningSnackbar, Button } from '@/components'
+import {
+  CommonModal,
+  withFormik,
+  WarningSnackbar,
+  notification,
+  Button,
+} from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
@@ -153,11 +159,20 @@ class PaymentDetails extends Component {
     })
   }
 
-  onWriteOffClick = (invoicePayerFK) =>
-    this.setState({
-      showWriteOff: true,
-      selectedInvoicePayerFK: invoicePayerFK,
-    })
+  onWriteOffClick = (invoicePayerFK) => {
+    const { values } = this.props
+    const invoicePayer = values.find((item) => item.id === invoicePayerFK)
+    if (invoicePayer.outStanding <= 0) {
+      notification.error({
+        message: 'This payer does not have any outstanding',
+      })
+    } else {
+      this.setState({
+        showWriteOff: true,
+        selectedInvoicePayerFK: invoicePayerFK,
+      })
+    }
+  }
 
   closeAddCrNoteModal = () =>
     this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
