@@ -792,7 +792,7 @@ class Medication extends PureComponent {
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
                     min={0}
-                    currency
+                    // currency
                     onChange={(e) => {
                       if (disableEdit === false) {
                         if (values.unitPrice) {
@@ -851,7 +851,6 @@ class Medication extends PureComponent {
                       //   },
                       // })
                     }}
-                    format='0.00'
                     disabled={disableEdit}
                     currency
                     {...args}
@@ -873,7 +872,6 @@ class Medication extends PureComponent {
                 return (
                   <NumberInput
                     label='Total After Adj'
-                    format='0.00'
                     disabled
                     currency
                     {...args}

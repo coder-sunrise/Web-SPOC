@@ -334,15 +334,14 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
     }
-    console.log(currency)
     if (currency) {
       if (!format) format = `${currencySymbol}${currencyFormat}`
-
       extraCfg.formatter = (v) => {
         if (v === '') return ''
         if (!this.state.focused) {
           const nv = numeral(v)
           if (nv._value < 0) return nv.format(`(${format})`)
+
           return nv.format(format)
         }
         return `${v}`
@@ -473,20 +472,20 @@ class AntdNumberInput extends React.PureComponent {
           field.value === undefined || Number.isNaN(field.value)
             ? ''
             : Number(field.value),
-        focused:
-          field.value !== undefined &&
-          field.value !== null &&
-          field.value !== '' &&
-          !Number.isNaN(field.value),
+        // focused:
+        //   field.value !== undefined &&
+        //   field.value !== null &&
+        //   field.value !== '' &&
+        //   !Number.isNaN(field.value),
       })
     } else if (value) {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
-        focused:
-          value !== undefined &&
-          value !== null &&
-          value !== '' &&
-          !Number.isNaN(value),
+        // focused:
+        //   value !== undefined &&
+        //   value !== null &&
+        //   value !== '' &&
+        //   !Number.isNaN(value),
       })
     } else {
       this.setState({
