@@ -24,19 +24,29 @@ const isSameOrAfterTime = (startTime, endTime) =>
     const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
     const currentTime = moment().format('HH:mm')
 
-    const values = {
-      ...(consultationDocument.entity ||
-        consultationDocument.defaultCertOfAttendance),
-      attendanceStartTime: visitEntity.visit
-        ? moment(visitEntity.visit.visitDate).format('HH:mm')
-        : moment().format('HH:mm'),
-      attendanceEndTime: moment(visitDataValue, timeFormat).isAfter(
-        moment(currentTime, timeFormat),
-      )
-        ? moment(visitEntity.visit.visitDate).format('HH:mm')
-        : moment().format('HH:mm'),
+    if (consultationDocument.entity === undefined) {
+      return {
+        ...(consultationDocument.entity ||
+          consultationDocument.defaultCertOfAttendance),
+        attendanceStartTime: visitEntity.visit
+          ? moment(visitEntity.visit.visitDate).format('HH:mm')
+          : moment().format('HH:mm'),
+        attendanceEndTime: moment(visitDataValue, timeFormat).isAfter(
+          moment(currentTime, timeFormat),
+        )
+          ? moment(visitEntity.visit.visitDate).format('HH:mm')
+          : moment().format('HH:mm'),
+      }
     }
-    return values
+    return {
+      ...consultationDocument.entity,
+      attendanceStartTime: moment(
+        consultationDocument.entity.attendanceStartTime,
+      ).format('HH:mm'),
+      attendanceEndTime: moment(
+        consultationDocument.entity.attendanceEndTime,
+      ).format('HH:mm'),
+    }
   },
 
   validationSchema: Yup.object().shape({
@@ -56,11 +66,28 @@ const isSameOrAfterTime = (startTime, endTime) =>
     const { dispatch, onConfirm, consultationDocument, currentType } = props
     const { rows } = consultationDocument
 
+    const fullFormatAttendanceEndTime = `${moment().format(
+      'YYYY-MM-DD',
+    )}T${values.attendanceEndTime}`
+    const fullFormatAttendanceStartTime = `${moment().format(
+      'YYYY-MM-DD',
+    )}T${values.attendanceStartTime}`
+
+    const newValues = {
+      ...values,
+      attendanceEndTime: moment(fullFormatAttendanceEndTime).format(
+        'YYYY-MM-DDTHH:mm:ss',
+      ),
+      attendanceStartTime: moment(fullFormatAttendanceStartTime).format(
+        'YYYY-MM-DDTHH:mm:ss',
+      ),
+    }
+
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
         sequence: rows.length,
-        ...values,
+        ...newValues,
         subject: currentType.getSubject(values),
       },
     })

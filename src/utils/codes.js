@@ -652,8 +652,8 @@ const consultationDocumentTypes = [
     convert: (r) => {
       return {
         ...r,
-        attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
-        attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
+        // attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
+        // attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
     },
     downloadConfig: {

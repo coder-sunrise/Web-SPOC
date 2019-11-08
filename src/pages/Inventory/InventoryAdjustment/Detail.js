@@ -36,53 +36,48 @@ const styles = (theme) => ({
 })
 let commitCount = 1000 // uniqueNumber
 
-// const inventoryAdjustmentSchema = Yup.object().shape({
-//   inventoryTypeFK: Yup.number().required(),
-//   code: Yup.number().required(),
-//   displayValue: Yup.number().required(),
-//   batchNo: Yup.array().when('expiryDate', {
-//     is: (v) => v === undefined || v === '',
-//     then: Yup.array().nullable(),
-//     otherwise: Yup.array().required(),
-//   }),
-//   adjustmentQty: Yup.number()
-//     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
-//     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
-// })
+const inventoryAdjustmentSchema = Yup.object().shape({
+  inventoryTypeFK: Yup.number().required(),
+  code: Yup.number().required(),
+  displayValue: Yup.number().required(),
+  batchNo: Yup.array().when('expiryDate', {
+    is: (v) => v === undefined || v === '',
+    then: Yup.array().nullable(),
+    otherwise: Yup.array().required(),
+  }),
+  adjustmentQty: Yup.number()
+    .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
+    .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
+  expiryDate: Yup.string().nullable(),
+})
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) => {
     const value = inventoryAdjustment.entity || inventoryAdjustment.default
     return {
       ...value,
-      // adjustmentTransactionNo: value.adjustmentTransactionNo || runningNo,
     }
   },
   validationSchema: Yup.object().shape({
     adjustmentTransactionDate: Yup.date().required(),
     remarks: Yup.string().max(2000, 'Max 2000 characters for remarks.'),
-    // inventoryAdjustmentItems: Yup.array().when('stockList', {
-    //   is: (v) => !v || v.length === 0,
-    //   then: Yup.array()
-    //     .compact((v) => v.isDeleted)
-    //     .of(inventoryAdjustmentSchema)
-    //     .required('At least one item is required.'),
-    // }),
+    inventoryAdjustmentItems: Yup.array()
+      .compact((v) => v.isDeleted)
+      .of(inventoryAdjustmentSchema)
+      .required('At least one item is required.'),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {
       inventoryAdjustmentItems,
       stockList,
       inventoryAdjustmentStatusString,
-      batchNo,
       ...restValue
     } = values
-    const { dispatch, onConfirm } = props
-
+    const { dispatch, onConfirm, setFieldValue } = props
     const list =
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
-    console.log('list', inventoryAdjustmentItems, stockList)
-    const newInventoryAdjustmentItem = list.map((o) => {
+    // console.log('list', inventoryAdjustmentItems, stockList)
+    const newInventoryAdjustmentItem = list.map((o, index) => {
       const type = (v) => {
         switch (v) {
           case INVENTORY_TYPE.MEDICATION:
@@ -119,6 +114,7 @@ let commitCount = 1000 // uniqueNumber
       const getType = type(o.inventoryTypeFK)
 
       const stockFK = o.isManuallyCreated ? undefined : o.stockFK
+
       const getBatchNo = () => {
         if (o.batchNo) {
           if (Array.isArray(o.batchNo)) return o.batchNo[0]
@@ -126,60 +122,95 @@ let commitCount = 1000 // uniqueNumber
         }
         return o[getType.typeName].batchNo
       }
+
+      const getExpiryDate = () => {
+        if (o.expiryDate) {
+          return o.expiryDate
+        }
+        if (o[getType.typeName] && o[getType.typeName][getType.stockFK])
+          return o[getType.typeName].expiryDate
+        return undefined
+      }
+
+      const getStockFK = () => {
+        if (o.isManuallyCreated) return undefined
+        if (o.stockFK) return o.stockFK
+        if (o[getType.typeName]) return o[getType.typeName][getType.stockFK]
+        return undefined
+      }
+
+      const shareProperty = {
+        [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
+        [getType.stockFK]: getStockFK(),
+        batchNo: getBatchNo(),
+        expiryDate: getExpiryDate(),
+        stock: o.stock || 0,
+      }
+
+      const getStockObject = () => {
+        // console.log({ o })
+        if (values.inventoryAdjustmentStatusFK === 1) return undefined
+        if (o.stockFK) return undefined
+        if (o[getType.typeName] && o[getType.typeName][getType.stockFK]) {
+          return undefined
+        }
+        // if (!o.isManuallyCreated) return undefined
+        return shareProperty
+      }
+
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
-        const { code, displayValue, ...value } = val
+        const {
+          code,
+          codeString,
+          displayValue,
+          displayValueString,
+          batchNo,
+          batchNoString,
+          expiryDate,
+          ...value
+        } = val
         let newQty = 0
         if (val.stock) newQty += val.stock
         if (val.adjustmentQty) newQty += val.adjustmentQty
-        console.log('check123', { o })
-        const getExpiryDate = () => {
-          if (o.expiryDate) {
-            return o.expiryDate
-          }
-          if (o[getType.typeName] && o[getType.typeName][getType.stockFK])
-            return o[getType.typeName].expiryDate
-          return undefined
-        }
 
-        const getStockFK = () => {
-          if (o.isManuallyCreated) return undefined
-          if (o.stockFK) return o.stockFK
-          if (o[getType.typeName]) return o[getType.typeName][getType.stockFK]
-          return undefined
-        }
         return {
           ...value,
           newQty,
+          sortOrder: index + 1,
           id: o.getFromApi ? undefined : o.id,
           [getType.typeName]: {
             ...o[getType.typeName],
-            [getType.stock]: undefined,
-            batchNo: getBatchNo(), // || o[getType.typeName].batchNo,
-            expiryDate: getExpiryDate(),
+            ...shareProperty,
             [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
-            [getType.stockFK]: getStockFK(),
             [getType.codeName]:
-              o.codeString || o[getType.typeName][getType.codeName], // || o[getType.typeName][getType.codeName],
+              o.codeString || o[getType.typeName][getType.codeName],
             [getType.nameName]:
-              o.displayValueString || o[getType.typeName][getType.codeName], // || o[getType.typeName][getType.nameName],
+              o.displayValueString || o[getType.typeName][getType.nameName],
+            [getType.stock]: getStockObject(),
           },
         }
       }
-      return {
-        ...o,
-        batchNo: getBatchNo(),
-        id: o.getFromApi ? undefined : o.id,
-        [getType.typeName]: {
-          batchNo: getBatchNo(),
-          expiryDate: o.expiryDate,
-          [getType.stockFK]: stockFK,
-          [getType.codeName]: o.code,
-          [getType.nameName]: o.displayValue,
-        },
-      }
+
+      // console.log({ values })
+      // return {
+      //   ...o,
+      //   batchNo: getBatchNo(),
+      //   id: o.getFromApi ? undefined : o.id,
+      //   [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
+      //   [getType.typeName]: {
+      //     batchNo: getBatchNo(),
+      //     expiryDate: o.expiryDate,
+      //     [getType.stockFK]: stockFK,
+      //     [getType.codeName]:
+      //       o.codeString || o[getType.typeName][getType.codeName],
+      //     [getType.nameName]:
+      //       o.displayValueString || o[getType.typeName][getType.nameName],
+      //     [getType.stock]: getStockObject(),
+      //   },
+      // }
     })
-    console.log('submit123', newInventoryAdjustmentItem)
+    // console.log('submit123', newInventoryAdjustmentItem)
     dispatch({
       type: 'inventoryAdjustment/upsert',
       payload: {
@@ -194,6 +225,8 @@ let commitCount = 1000 // uniqueNumber
         dispatch({
           type: 'inventoryAdjustment/query',
         })
+      } else if (values.inventoryAdjustmentStatusFK === 2) {
+        setFieldValue('inventoryAdjustmentStatusFK', 1)
       }
     })
   },
@@ -337,7 +370,15 @@ class Detail extends PureComponent {
     ) {
       return true
     }
-    return false
+    if (
+      row.restValues &&
+      (!row.restValues.medicationStockFK ||
+        !row.restValues.consumableStockFK ||
+        !row.restValues.vaccinationStockFK)
+    )
+      return false
+
+    return true
   }
 
   componentDidMount = async () => {
@@ -353,24 +394,12 @@ class Detail extends PureComponent {
     })
     if (values.stockList) {
       const newStockList = values.stockList.map((o) => {
-        // const getType = this.type(o.inventoryTypeFK)
-        // const stockId = o[getType.typeName][getType.stockFK]
-        // this.setState((prevState) => {
-        //   return {
-        //     [getType.filterStateName]: prevState[
-        //       getType.filterStateName
-        //     ].filter((j) => j.id !== o.id),
-        //   }
-        // })
-        // const { batchNo } = this.state[getType.filterStateName].find((j) =>
-        //   console.log(j, j.id, o.id),
-        // )
         return {
           ...o,
           batchNo: [
             o.batchNo,
           ],
-          batchNoString: o.batchNo || '', // TODO: not sure want to pass empty string or not
+          batchNoString: o.batchNo,
           stockFK: o.id,
           code: o.inventoryItemFK,
           codeString: o.code,
@@ -379,13 +408,12 @@ class Detail extends PureComponent {
           getFromApi: true,
         }
       })
-      console.log('sstockList', newStockList)
       this.setState({ stockList: newStockList })
-      setValues({ ...values, stockList: newStockList })
+      // setValues({ ...values, stockList: newStockList })
+      setValues({ ...values, inventoryAdjustmentItems: newStockList })
     } else if (inventoryAdjustment.entity) {
       const { inventoryAdjustmentItems } = inventoryAdjustment.entity
       if (inventoryAdjustmentItems) {
-        // console.log({ inventoryAdjustmentItems })
         const newList = inventoryAdjustmentItems.map((o) => {
           const getType = this.type(o.inventoryTypeFK)
           return {
@@ -400,30 +428,11 @@ class Detail extends PureComponent {
               ? o[getType.typeName][getType.stock].stock
               : undefined,
             restValues: o[getType.typeName],
-            [getType.typeName]: {
-              ...o[getType.typeName],
-              [getType.stock]: undefined,
-            },
           }
         })
-        // console.log({ newList })
         this.setState({ inventoryAdjustmentItems: newList })
-        // values.inventoryAdjustmentItems.forEach((o) => {
-        //   const getType = this.type(o.inventoryTypeFK)
-        //   const stockId = o[getType.typeName][getType.stockFK]
-        //   this.setState((prevState) => {
-        //     return {
-        //       [getType.filterStateName]: prevState[
-        //         getType.filterStateName
-        //       ].filter((j) => j.id !== stockId),
-        //     }
-        //   })
-        // })
+        setValues({ ...values, inventoryAdjustmentItems: newList })
       }
-      // await setValues({
-      //   ...values,
-      //   inventoryAdjustmentItems: newList,
-      // })
     }
   }
 
@@ -575,28 +584,6 @@ class Detail extends PureComponent {
         ...this.state.filterStockMedication,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-
-      // const tempStockMedication = [
-      //   ...this.state.stockMedication,
-      // ]
-
-      // const filteredTempStockMedication = tempStockMedication.filter(
-      //   (o) => o.inventoryItemFK === row.code,
-      // )
-
-      // let filteredStockOptions = filteredTempStockMedication
-      // console.log('asds', filteredStockOptions)
-      // if (row.id) {
-      //   filteredStockOptions = this.additionalFilteringStock(
-      //     row,
-      //     filteredStockOptions,
-      //     x,
-      //   )
-      // }
-      // console.log(filteredStockOptions, x)
-      // console.log(row.id)
-      // return row.id ? filteredStockOptions : x
-      console.log({ x })
       return x
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
@@ -604,23 +591,6 @@ class Detail extends PureComponent {
         ...this.state.filterStockVaccination,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-
-      // const tempStockVaccination = [
-      //   ...this.state.stockVaccination,
-      // ]
-      // const filteredTempStockVaccination = tempStockVaccination.filter(
-      //   (o) => o.inventoryItemFK === row.code,
-      // )
-
-      // let filteredStockOptions = filteredTempStockVaccination
-      // if (row.id) {
-      //   filteredStockOptions = this.additionalFilteringStock(
-      //     row,
-      //     filteredStockOptions,
-      //     x,
-      //   )
-      // }
-      // return row.id ? filteredStockOptions : x
       return x
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.CONSUMABLE) {
@@ -628,23 +598,6 @@ class Detail extends PureComponent {
         ...this.state.filterStockConsumable,
       ]
       let x = array.filter((o) => o.inventoryItemFK === row.code)
-
-      // const tempStockConsumable = [
-      //   ...this.state.stockConsumable,
-      // ]
-      // const filteredTempStockConsumable = tempStockConsumable.filter(
-      //   (o) => o.inventoryItemFK === row.code,
-      // )
-
-      // let filteredStockOptions = filteredTempStockConsumable
-      // if (row.id) {
-      //   filteredStockOptions = this.additionalFilteringStock(
-      //     row,
-      //     filteredStockOptions,
-      //     x,
-      //   )
-      // }
-      // return row.id ? filteredStockOptions : x
       return x
     }
     return []
@@ -666,9 +619,7 @@ class Detail extends PureComponent {
 
   handleSelectedBatch = (e) => {
     const { option, row, val } = e
-    console.log({ e })
     if (option) {
-      // const { expiryDate, stock, value, batchNo } = option
       this.setState({ selectedItem: undefined })
       if (val && val.length > 0) {
         const [
@@ -677,29 +628,28 @@ class Detail extends PureComponent {
         row.batchNo = val
         row.batchNoString = firstIndex
         if (option.length > 0) {
-          const { expiryDate, stock, id } = option[0]
+          const { expiryDate, stock, id, concurrencyToken } = option[0]
           row.expiryDate = expiryDate
           row.stock = stock
           row.stockFK = id
+          row.stockId = id
+          row.concurrencyToken = concurrencyToken
         } else {
           row.stockFK = undefined
           row.isManuallyCreated = true
           row.expiryDate = undefined
           row.stock = undefined
+          row.stockId = undefined
+          row.concurrencyToken = undefined
         }
       } else {
         row.expiryDate = undefined
         row.stock = undefined
+        row.stockId = undefined
         row.batchNoString = undefined
+        row.concurrencyToken = undefined
       }
-      // row.batchNo = value
-      // row.expiryDate = expiryDate
-      // row.stock = stock
-      // row.batchNoString = batchNo
     }
-
-    // this.filterStockOption(e)
-
     this.props.dispatch({
       // force current edit row components to update
       type: 'global/updateState',
@@ -802,22 +752,7 @@ class Detail extends PureComponent {
       const deletedRow = rows.find((row) => row.id === test[0])
 
       deletedRow.isDeleted = true
-      // const changedRows = rows.filter((row) => row.id === test[0])
-      // if (deletedRow.batchNo) {
-      //   const getState = this.type(deletedRow.inventoryTypeFK)
 
-      //   const stockItem = this.state[getState.stateName].find(
-      //     (o) => o.id === deletedRow.batchNo,
-      //   )
-      //   this.setState((prevState) => {
-      //     return {
-      //       [getState.filterStateName]: [
-      //         ...prevState[getState.filterStateName],
-      //         stockItem,
-      //       ],
-      //     }
-      //   })
-      // }
       if (stockList.length > 0) {
         this.setState({ stockList: rows })
       } else {
@@ -830,68 +765,7 @@ class Detail extends PureComponent {
 
       return rows
     }
-    // if (this.state.selectedItem) {
-    //   this.filterStockOption(this.state.selectedItem)
-    // }
 
-    // let tempfilterStockConsumable = [
-    //   ...this.state.stockConsumable,
-    // ]
-    // let tempfilterStockMedication = [
-    //   ...this.state.stockMedication,
-    // ]
-    // let tempfilterStockVaccination = [
-    //   ...this.state.stockVaccination,
-    // ]
-
-    // rows.forEach((o) => {
-    //   const type = o.inventoryTypeFK
-    //   if (o.batchNo && !o.isDeleted) {
-    //     switch (type) {
-    //       case INVENTORY_TYPE.MEDICATION: {
-    //         tempfilterStockMedication = tempfilterStockMedication.filter(
-    //           (j) => j.id !== o.batchNo,
-    //         )
-    //         break
-    //       }
-    //       case INVENTORY_TYPE.VACCINATION: {
-    //         tempfilterStockVaccination = tempfilterStockVaccination.filter(
-    //           (j) => j.id !== o.batchNo,
-    //         )
-    //         break
-    //       }
-    //       case INVENTORY_TYPE.CONSUMABLE: {
-    //         tempfilterStockConsumable = tempfilterStockConsumable.filter(
-    //           (j) => j.id !== o.batchNo,
-    //         )
-    //         break
-    //       }
-    //       default:
-    //     }
-    //   }
-    // })
-    // this.setState(() => {
-    //   return {
-    //     filterStockMedication: tempfilterStockMedication,
-    //     filterStockConsumable: tempfilterStockConsumable,
-    //     filterStockVaccination: tempfilterStockVaccination,
-    //   }
-    // })
-
-    //   if (o.batchNo) {
-    //     const tempStockOptions = [
-    //       ...this.state[getState.stateName],
-    //     ]
-    //     filteredStockOptions = tempStockOptions.filter(
-    //       (j) => j.id !== o.batchNo,
-    //     )
-    //     console.log('filteredStockOptions', filteredStockOptions)
-
-    //
-    //   }
-
-    //   return rows
-    // })
     if (stockList.length > 0) {
       this.setState({ stockList: rows })
     } else {
@@ -936,7 +810,6 @@ class Detail extends PureComponent {
           }))
         }
       }
-      console.log({ returnRows })
       return returnRows
     }
     returnRows = returnRows.map((o) => ({
@@ -978,15 +851,14 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, values, footer, errors } = props
+    const { classes, theme, values, footer, errors } = props
+    const { inventoryAdjustmentItems } = errors
     const cfg = {}
     if (
       values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
     ) {
       cfg.onRowDoubleClick = undefined
     }
-
-    console.log('state', this.state.stockList)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -1053,16 +925,18 @@ class Detail extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {console.log(errors.inventoryAdjustmentItems)}
-
+          {inventoryAdjustmentItems &&
+          !Array.isArray(inventoryAdjustmentItems) && (
+            <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
+          )}
           <EditableTableGrid
             style={{ marginTop: 10 }}
             FuncProps={{
               edit: values.inventoryAdjustmentStatusFK === 1,
-              pager: false,
+              pager: true,
               addNewLabelName: 'New Inventory Adjustment',
             }}
-            // schema={inventoryAdjustmentSchema}
+            schema={inventoryAdjustmentSchema}
             // onRowDoubleClick={this.onEditingRowsChange}
             EditingProps={{
               showAddCommand:
@@ -1087,6 +961,7 @@ class Detail extends PureComponent {
                 this.state.inventoryAdjustmentItems
               )
             }
+            // row={values.inventoryAdjustmentItems}
             {...this.tableParas}
           />
           {/* <GridContainer
