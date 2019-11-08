@@ -58,7 +58,7 @@ export const PrescriptionColumns = [
 export const PrescriptionColumnExtensions = (
   viewOnly = false,
   onPrint,
-  inventorymedication,
+  inventorymedication = [],
   handleSelectedBatch,
 ) => [
   { columnName: 'unitPrice', type: 'currency' },

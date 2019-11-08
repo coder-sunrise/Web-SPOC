@@ -3,7 +3,7 @@
  * To export all material-ui-pro components all at once for easy import
  */
 export { default as Accordion } from './Accordion/Accordion'
-export { default as Badge } from './Badge/Badge'
+export { default as Badge } from './Badge'
 export { default as Button } from './CustomButtons'
 export { default as ProgressButton } from './CustomButtons/ProgressButton'
 export { default as Card } from './Card/Card'

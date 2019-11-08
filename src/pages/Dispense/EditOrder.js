@@ -10,6 +10,9 @@ import { convertToConsultation } from '@/pages/Consultation/utils'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
+import model from '@/pages/Widgets/Orders/models'
+
+window.g_app.replaceModel(model)
 
 // model
 @Authorized.Secured('queue.dispense.editorder')

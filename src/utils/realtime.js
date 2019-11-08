@@ -11,7 +11,7 @@ const initStream = () => {
       accessTokenFactory: () => localStorage.getItem('token'),
     })
     .build()
-  // console.log(connection)
+  console.log(connection)
   connection.on('NewNotification', (type, response) => {
     const { sender, message } = response
     console.log({ type, response, connectionObserver })
@@ -57,12 +57,24 @@ const initStream = () => {
   connection
     .start()
     .then(() => {
+      window.g_app._store.dispatch({
+        type: 'global/updateState',
+        payload: {
+          signalRConnected: true,
+        },
+      })
       console.log('Connected started')
     })
     .catch((err) => {
-      return console.error(err.toString())
+      window.g_app._store.dispatch({
+        type: 'global/updateState',
+        payload: {
+          signalRConnected: false,
+        },
+      })
+      return console.log(err)
     }) // JSON-string from `response.json()` call
-    .catch((error) => console.error(error))
+  // .catch((error) => console.log(error))
 
   // setInterval(() => {
   //   connection

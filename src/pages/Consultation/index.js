@@ -135,7 +135,7 @@ const saveConsultation = ({
   })
 }
 
-let discardConsultation = ({
+const discardConsultation = ({
   dispatch,
   values,
   history,
@@ -143,6 +143,7 @@ let discardConsultation = ({
   consultation,
   resetForm,
 }) => {
+  console.log(values)
   if (values.id) {
     // dispatch({
     //   type: 'global/updateAppState',
@@ -232,10 +233,10 @@ class Consultation extends PureComponent {
     recording: true,
   }
 
-  constructor (props) {
-    super(props)
-    discardConsultation = discardConsultation.bind(this)
-  }
+  // constructor (props) {
+  //   super(props)
+  //   discardConsultation = discardConsultation.bind(this)
+  // }
 
   // static getDerivedStateFromProps (nextProps, preState) {
   //   const { global } = nextProps
@@ -608,7 +609,7 @@ class Consultation extends PureComponent {
       payload: {
         ConsultationPage: undefined,
         ConsultationDocumentList: undefined,
-        OrdersPage: undefined,
+        OrderPage: undefined,
       },
     })
   }
