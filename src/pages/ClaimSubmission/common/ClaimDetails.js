@@ -43,7 +43,18 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ claimSubmission }) => {
-    return claimSubmission.entity || {}
+    const returnValue = claimSubmission.entity || {}
+    const { diagnosis } = returnValue
+    let diagnosisOptions = []
+    if (diagnosis) {
+      diagnosisOptions = diagnosis.map((o) => {
+        return o.id
+      })
+    }
+    return {
+      ...returnValue,
+      diagnosisSelections: diagnosisOptions,
+    }
   },
 })
 class ClaimDetails extends Component {
@@ -104,8 +115,6 @@ class ClaimDetails extends Component {
     let patientNameLabel = `${patientName} (${patientGender
       ? patientGender.code
       : ''}/${age})`
-
-    const maxDiagnosisSelectionCount = 2
 
     return (
       <SizeContainer size='md'>
@@ -238,36 +247,19 @@ class ClaimDetails extends Component {
                 </GridItem>
                 <GridItem md={4} />
                 <GridItem md={5}>
-                  {/* <FastField
-                    name='diagnosis'
+                  <FastField
+                    name='diagnosisSelections'
                     render={(args) => (
                       <Select
+                        label='Diagnosis'
                         disabled={!allowEdit}
-                        maxSelected={maxDiagnosisSelectionCount}
                         mode='multiple'
-                        // options={[
-                        //   { name: 'Chief Complaints', value: '1' },
-                        //   { name: 'Plan', value: '2' },
-                        //   { name: 'Diagnosis', value: '3' },
-                        //   { name: 'Consultation Document', value: '4' },
-                        //   { name: 'Orders', value: '5' },
-                        //   { name: 'Invoice', value: '7' },
-                        // ]}
                         options={diagnosis}
-                        onChange={this.onSelectChange}
-                        maxTagCount={2}
+                        labelField='diagnosisDescription'
+                        maxTagCount={diagnosis.length > 1 ? 1 : 0}
                         {...args}
                       />
                     )}
-                  /> */}
-
-                  <Select
-                    disabled={!allowEdit}
-                    maxSelected={maxDiagnosisSelectionCount}
-                    mode='multiple'
-                    options={diagnosis}
-                    onChange={this.onSelectChange}
-                    maxTagCount={2}
                   />
                 </GridItem>
                 <GridItem md={7} />
