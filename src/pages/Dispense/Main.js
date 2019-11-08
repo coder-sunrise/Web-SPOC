@@ -135,7 +135,9 @@ class Main extends Component {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'inventoryMedication',
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
       },
     })
   }

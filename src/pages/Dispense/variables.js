@@ -58,7 +58,7 @@ export const PrescriptionColumns = [
 export const PrescriptionColumnExtensions = (
   viewOnly = false,
   onPrint,
-  inventorymedication,
+  inventorymedication = [],
   handleSelectedBatch,
 ) => [
   { columnName: 'unitPrice', type: 'currency' },
@@ -97,6 +97,7 @@ export const PrescriptionColumnExtensions = (
             <Select
               options={batchNoOptions}
               mode='tags'
+              // valueField='id'
               valueField='batchNo'
               labelField='batchNo'
               maxSelected={1}

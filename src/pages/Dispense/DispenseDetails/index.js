@@ -61,13 +61,28 @@ const DispenseDetails = ({
   const { inventorymedication } = codetable
 
   const handleSelectedBatch = (e, op = {}, row) => {
+    // console.log({ e, op, row })
     if (op && op.length > 0) {
+      // const currentItem = inventorymedication.find(
+      //   (o) => o.id === row.inventoryMedicationFK,
+      // )
+      // let batchNoOptions = []
+      // if (currentItem) {
+      //   batchNoOptions = currentItem.medicationStock
+      // }
+      // const batchNo = batchNoOptions.find(
+      //   (item) => parseInt(item.id, 10) === parseInt(e[0], 10),
+      // )
+
       const { expiryDate } = op[0]
+
+      // setFieldValue(`prescription[${row.rowIndex}]batchNo`, batchNo.batchNo)
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
     } else {
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
     }
   }
+
   return (
     <React.Fragment>
       <GridItem>

@@ -19,7 +19,10 @@ export default createListViewModel({
         const { pathname } = location
         if (pathname === '/setting/doctorblock') {
           dispatch({
-            type: 'queryAll',
+            type: 'query',
+            payload: {
+              pagesize: 999,
+            },
           })
         }
       })
@@ -34,18 +37,18 @@ export default createListViewModel({
       //   }
       //   return false
       // },
-      *queryAll ({ payload }, { call, put }) {
-        const response = yield call(service.getAllList, payload)
-        const { status, data } = response
-        if (parseInt(status, 10) === 200) {
-          yield put({
-            type: 'updateState',
-            payload: {
-              list: data.data,
-            },
-          })
-        }
-      },
+      // *queryAll ({ payload }, { call, put }) {
+      //   const response = yield call(service.getAllList, payload)
+      //   const { status, data } = response
+      //   if (parseInt(status, 10) === 200) {
+      //     yield put({
+      //       type: 'updateState',
+      //       payload: {
+      //         list: data.data,
+      //       },
+      //     })
+      //   }
+      // },
       *refresh (_, { call, put }) {
         yield put({
           type: 'queryAll',

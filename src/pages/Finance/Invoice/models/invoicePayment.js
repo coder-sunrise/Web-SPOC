@@ -103,6 +103,8 @@ export default createFormViewModel({
           cashRounding,
           totalAmtPaid,
           invoicePaymentMode,
+          paymentReceivedDate,
+          paymentReceivedBizSessionFK,
         } = invoicePaymentList
 
         // invoicePaymentMode = invoicePaymentMode.concat(
@@ -124,19 +126,17 @@ export default createFormViewModel({
             totalAmtPaid,
             cashReceived,
             cashReturned,
-            paymentReceivedDate: moment().formatUTC(false),
+            paymentReceivedDate,
             paymentReceivedByUserFK: userState.id,
-            paymentReceivedBizSessionFK: bizSessionState.id,
-            paymentCreatedBizSessionFK: bizSessionState.id,
+            paymentReceivedBizSessionFK,
+            paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
             invoicePayerFK,
             invoicePaymentMode,
           },
         ]
 
         const response = yield call(service.addPayment, addPaymentPayload)
-        const { status } = response
-        console.log({ status })
-        if (parseInt(status, 10) === 200) {
+        if (response) {
           notification.success({
             message: 'Payment added',
           })

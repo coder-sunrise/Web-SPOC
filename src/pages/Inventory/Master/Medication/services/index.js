@@ -1,7 +1,8 @@
 import * as service from '@/services/common'
 
 const url = '/api/InventoryMedication'
-const medicPrecautionUrl = '/api/CodeTable/Search?ctname=ctmedicationprecaution'
+// const medicPrecautionUrl = '/api/CodeTable/Search?ctname=ctmedicationprecaution'
+const medicPrecautionUrl = '/api/ctmedicationprecaution'
 
 module.exports = {
   queryList: (params) => service.queryList(url, params),

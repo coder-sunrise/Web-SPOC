@@ -26,8 +26,8 @@ const Content = ({ classes, ...restProps }) => {
   const isInvoiceCurrentBizSession = () => {
     const { id: bizSessionFK } = currentBizSessionInfo
 
-    // no active session, return true always
-    if (bizSessionFK === '') return true
+    // no active session, return false, all the other buttons will be read only
+    if (bizSessionFK === '') return false
 
     if (bizSessionFK && invoiceBizSessionFK) {
       const isSameBizSessionAndIsSessionClosed =
