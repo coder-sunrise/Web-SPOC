@@ -11,7 +11,7 @@ import Authorized from '@/utils/Authorized'
 import Exception403 from '@/pages/Exception/403'
 
 window.beforeReloadHandlerAdded = false
-window.dirtyForms = []
+window.dirtyForms = {}
 // window._localFormik = {}
 const _localAuthority = {}
 let lastVersion = null
@@ -41,7 +41,17 @@ const withFormikExtend = (props) => (Component) => {
       // str: JSON.stringify(values),
     }
     const ob = window.g_app._store.getState().formik[displayName]
-
+    if (dirty) {
+      window.dirtyForms[displayName] = {
+        displayName,
+        dirtyCheckMessage,
+        onDirtyDiscard: () => {
+          if (onDirtyDiscard) {
+            onDirtyDiscard(ps)
+          }
+        },
+      }
+    }
     if (_.isEqual(_lastFormikUpdate, ob)) {
       return
     }
@@ -54,22 +64,12 @@ const withFormikExtend = (props) => (Component) => {
 
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
-      window.dirtyForms.push({
-        displayName,
-        dirtyCheckMessage,
-        onDirtyDiscard: () => {
-          if (onDirtyDiscard) {
-            onDirtyDiscard(ps)
-          }
-        },
-      })
+
       window.addEventListener('beforeunload', confirmBeforeReload)
     } else if (!dirty && window.beforeReloadHandlerAdded) {
-      window.dirtyForms = _.reject(
-        window.dirtyForms,
-        (v) => v.displayName === displayName,
-      )
-      if (window.dirtyForms.length === 0) {
+      delete window.dirtyForms[displayName]
+
+      if (Object.values(window.dirtyForms).length === 0) {
         window.beforeReloadHandlerAdded = false
         window.removeEventListener('beforeunload', confirmBeforeReload)
       }
@@ -133,7 +133,7 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     componentWillReceiveProps (nextProps) {
-      // console.log(nextProps)
+      // console.log(this.props, nextProps)
 
       if (startDirtyChecking) _updateDirtyState(nextProps)
     }

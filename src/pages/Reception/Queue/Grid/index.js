@@ -245,7 +245,7 @@ const Grid = ({
               }).then((o) => {
                 if (o)
                   router.push(
-                    `/reception/queue/consultation?qid=${row.id}&cid=${o.clinicalObjectRecordFK}&v=${version}`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
               })
             } else {

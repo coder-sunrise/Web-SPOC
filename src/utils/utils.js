@@ -617,7 +617,7 @@ export const updateCellValue = (
       return []
       // row._$error = false
     } catch (er) {
-      // console.log(er)
+      console.log(er)
       // window.g_app._store.dispatch({
       //   type: 'global/updateState',
       //   payload: {
@@ -700,7 +700,7 @@ const navigateDirtyCheck = ({
   if (window.beforeReloadHandlerAdded) {
     let f = {}
     if (displayName) {
-      f = window.dirtyForms.find((o) => o.displayName === displayName)
+      f = window.dirtyForms[displayName]
       const ob = window.g_app._store.getState().formik[displayName]
       if (ob && !ob.dirty) {
         return
@@ -729,13 +729,9 @@ const navigateDirtyCheck = ({
             })
 
             if (f.onDirtyDiscard) f.onDirtyDiscard()
-            // delete window._localFormik[displayName]
-            window.dirtyForms = _.reject(
-              window.dirtyForms,
-              (o) => o.displayName === displayName,
-            )
+            delete window.dirtyForms[displayName]
           } else {
-            window.dirtyForms.forEach((f) => {
+            Object.values(window.dirtyForms).forEach((f) => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
@@ -744,10 +740,10 @@ const navigateDirtyCheck = ({
               })
               if (f.onDirtyDiscard) f.onDirtyDiscard()
             })
-            window.dirtyForms = []
+            window.dirtyForms = {}
             // delete window._localFormik[displayName]
           }
-          if (window.dirtyForms.length === 0) {
+          if (Object.values(window.dirtyForms).length === 0) {
             window.beforeReloadHandlerAdded = false
             window.removeEventListener('beforeunload', confirmBeforeReload)
           }

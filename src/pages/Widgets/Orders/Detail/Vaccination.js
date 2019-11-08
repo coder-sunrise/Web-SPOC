@@ -139,7 +139,11 @@ class Vaccination extends PureComponent {
       const { ctmedicationdosage } = codetable
 
       const dosage = ctmedicationdosage.find(
-        (o) => o.id === (values.dosageFK || vaccination.prescribingDosage.id),
+        (o) =>
+          o.id ===
+          (values.dosageFK || vaccination.prescribingDosage
+            ? vaccination.prescribingDosage.id
+            : undefined),
       )
       newTotalQuantity = Math.round(dosage.multiplier)
 
