@@ -1,16 +1,10 @@
-import React, { PureComponent } from 'react' 
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import _ from 'lodash'
-import DesktopWindows from '@material-ui/icons/DesktopWindows'
-import Print from '@material-ui/icons/Print' 
+import { DesktopWindows, Print } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 
-import {
-  GridContainer,
-  GridItem,
-  CardContainer, 
-  Button,
-} from '@/components'
+import { GridContainer, GridItem, CardContainer, Button } from '@/components'
 
 const menuData = [
   {
@@ -51,7 +45,7 @@ class Support extends PureComponent {
             .filter((m) => {
               return (
                 m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                0 || !this.state.searchText
+                  0 || !this.state.searchText
               )
             })
             .map((item, i) => {
@@ -64,6 +58,7 @@ class Support extends PureComponent {
                 >
                   <Button
                     fullWidth
+                    bigview
                     color='primary'
                     className={classnames({
                       [classes.bigviewBtn]: true,
@@ -84,12 +79,8 @@ class Support extends PureComponent {
     })
   }
 
-  render () { 
-    return (
-      <CardContainer hideHeader>
-        {this.supportItems()}
-      </CardContainer>
-    )
+  render () {
+    return <CardContainer hideHeader>{this.supportItems()}</CardContainer>
   }
 }
 
