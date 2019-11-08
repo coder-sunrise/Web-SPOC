@@ -117,6 +117,11 @@ const PatientInfoSideBanner = ({
         ? undefined
         : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -135,7 +140,7 @@ const PatientInfoSideBanner = ({
         !_.isEmpty(refreshedSchemeData) &&
         refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
-          : undefined,
+          : chronicStatus,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful

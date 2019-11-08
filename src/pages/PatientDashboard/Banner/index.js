@@ -240,6 +240,11 @@ class Banner extends PureComponent {
         ? undefined
         : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
     this.setState({
       currPatientCoPaymentSchemeFK: schemeData.id,
       currentSchemeType: schemeData.schemeTypeFK,
@@ -263,7 +268,7 @@ class Banner extends PureComponent {
         !_.isEmpty(refreshedSchemeData) &&
         refreshedSchemeData.isSuccessful === false
           ? 'ERROR'
-          : undefined,
+          : chronicStatus,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful
@@ -450,7 +455,7 @@ class Banner extends PureComponent {
                   {'Scheme'}{' '}
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
-                    <IconButton onClick={this.refreshChasBalance}>
+                      <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>
                   ) : (
