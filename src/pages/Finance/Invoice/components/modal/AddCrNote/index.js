@@ -346,6 +346,9 @@ class AddCrNote extends Component {
             <p>Note: Total Price($) are after GST.</p>
           </GridItem>
           <GridItem md={3} style={{ textAlign: 'right' }}>
+            <Button color='danger' onClick={onConfirm}>
+              Cancel
+            </Button>
             <Button
               color='primary'
               onClick={handleSubmit}
@@ -357,9 +360,6 @@ class AddCrNote extends Component {
               }
             >
               Save
-            </Button>
-            <Button color='danger' onClick={onConfirm}>
-              Cancel
             </Button>
           </GridItem>
         </GridContainer>

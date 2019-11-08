@@ -41,6 +41,7 @@ const FilterBar = ({ handleSubmit }) => {
                   {...args}
                   label='Consumable'
                   mode='multiple'
+                  temp
                   code='inventoryConsumable'
                   labelField='displayValue'
                 />

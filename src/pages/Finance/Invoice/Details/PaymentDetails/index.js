@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { AddPayment } from 'medisys-components'
-import moment from 'moment'
+
 // material ui
 import { withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
@@ -292,12 +292,17 @@ class PaymentDetails extends Component {
 
   onSubmitWriteOff = (writeOffData) => {
     const { selectedInvoicePayerFK } = this.state
+    const { invoicePayment: { entity = [] } } = this.props
+    const payer = entity.find(
+      (item) => parseInt(item.id, 10) === parseInt(selectedInvoicePayerFK, 10),
+    )
     this.props
       .dispatch({
         type: 'invoicePayment/submitWriteOff',
         payload: {
           invoicePayerFK: selectedInvoicePayerFK,
           writeOffReason: writeOffData,
+          writeOffAmount: payer.outStanding,
         },
       })
       .then((r) => {
@@ -346,7 +351,7 @@ class PaymentDetails extends Component {
 
   render () {
     // console.log('PaymentIndex', this.props)
-    const { classes, values, readOnly, invoiceDetail } = this.props
+    const { classes, values, readOnly, invoicePayment } = this.props
     const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -443,7 +448,11 @@ class PaymentDetails extends Component {
             //   totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
             //   finalPayable: invoiceDetail.entity.outstandingBalance,
             // }}
-            invoice={invoicePayerPayment}
+            showPaymentDate
+            invoice={{
+              ...invoicePayerPayment,
+              // bizSessionNo: invoicePayment.currentBizSessionInfo,
+            }}
           />
         </CommonModal>
         <CommonModal

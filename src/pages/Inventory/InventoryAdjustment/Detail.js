@@ -331,6 +331,7 @@ class Detail extends PureComponent {
           return this.stockOptions(row)
         },
         onChange: (e) => {
+          console.log({ e })
           this.handleSelectedBatch(e)
         },
         render: (row) => {

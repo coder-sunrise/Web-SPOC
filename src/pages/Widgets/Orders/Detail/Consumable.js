@@ -111,6 +111,7 @@ class Consumable extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
+                    temp
                     label='Name'
                     code='inventoryconsumable'
                     labelField='displayValue'
