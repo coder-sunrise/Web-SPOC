@@ -63,7 +63,7 @@ class Teamviewer extends PureComponent {
                 <React.Fragment>
                   <div>
                     <h3>
-                      Sometimes you need a little help form our support rep.
+                      Sometimes you need a little help from our support rep.
                       Don't worry... we're here for you.
                     </h3>
                   </div>
