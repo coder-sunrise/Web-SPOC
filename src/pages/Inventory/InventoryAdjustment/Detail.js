@@ -65,32 +65,18 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       .compact((v) => v.isDeleted)
       .of(inventoryAdjustmentSchema)
       .required('At least one item is required.'),
-
-    // inventoryAdjustmentItems: Yup.array().when('stockList', {
-    //   is: (v) => !v || v.length === 0,
-    //   then: Yup.array()
-    //     .compact((v) => v.isDeleted)
-    //     .of(inventoryAdjustmentSchema)
-    //     .required('At least one item is required.'),
-    //   otherwise: Yup.array()
-    //     .compact((v) => v.isDeleted)
-    //     .of(inventoryAdjustmentSchema)
-    //     .required('At least one item is required.'),
-    // }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {
       inventoryAdjustmentItems,
       stockList,
       inventoryAdjustmentStatusString,
-      batchNo,
       ...restValue
     } = values
-    const { dispatch, onConfirm } = props
-    console.log('asdasd', inventoryAdjustmentItems, stockList)
+    const { dispatch, onConfirm, setFieldValue } = props
     const list =
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
-    console.log('list', inventoryAdjustmentItems, stockList)
+    // console.log('list', inventoryAdjustmentItems, stockList)
     const newInventoryAdjustmentItem = list.map((o, index) => {
       const type = (v) => {
         switch (v) {
@@ -162,25 +148,34 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       }
 
       const getStockObject = () => {
+        // console.log({ o })
         if (values.inventoryAdjustmentStatusFK === 1) return undefined
+        if (o.stockFK) return undefined
         if (o[getType.typeName] && o[getType.typeName][getType.stockFK]) {
           return undefined
         }
-        if (!o.isManuallyCreated) return undefined
+        // if (!o.isManuallyCreated) return undefined
         return shareProperty
       }
 
       if (list === inventoryAdjustmentItems) {
         const { restValues, ...val } = o
-        const { code, displayValue, ...value } = val
+        const {
+          code,
+          codeString,
+          displayValue,
+          displayValueString,
+          batchNo,
+          batchNoString,
+          expiryDate,
+          ...value
+        } = val
         let newQty = 0
         if (val.stock) newQty += val.stock
         if (val.adjustmentQty) newQty += val.adjustmentQty
-        console.log('check123', { o })
 
         return {
           ...value,
-          batchNo: getBatchNo(),
           newQty,
           sortOrder: index + 1,
           id: o.getFromApi ? undefined : o.id,
@@ -197,26 +192,25 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         }
       }
 
-      console.log({ values })
-      return {
-        ...o,
-        batchNo: getBatchNo(),
-        id: o.getFromApi ? undefined : o.id,
-        [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
-        [getType.typeName]: {
-          batchNo: getBatchNo(),
-          expiryDate: o.expiryDate,
-          [getType.stockFK]: stockFK,
-          [getType.codeName]:
-            o.codeString || o[getType.typeName][getType.codeName],
-          [getType.nameName]:
-            o.displayValueString || o[getType.typeName][getType.nameName],
-          [getType.stock]: getStockObject(),
-        },
-      }
+      // console.log({ values })
+      // return {
+      //   ...o,
+      //   batchNo: getBatchNo(),
+      //   id: o.getFromApi ? undefined : o.id,
+      //   [getType.itemFK]: o.code || o[getType.typeName][getType.itemFK],
+      //   [getType.typeName]: {
+      //     batchNo: getBatchNo(),
+      //     expiryDate: o.expiryDate,
+      //     [getType.stockFK]: stockFK,
+      //     [getType.codeName]:
+      //       o.codeString || o[getType.typeName][getType.codeName],
+      //     [getType.nameName]:
+      //       o.displayValueString || o[getType.typeName][getType.nameName],
+      //     [getType.stock]: getStockObject(),
+      //   },
+      // }
     })
-    console.log('submit123', newInventoryAdjustmentItem)
-
+    // console.log('submit123', newInventoryAdjustmentItem)
     dispatch({
       type: 'inventoryAdjustment/upsert',
       payload: {
@@ -231,6 +225,8 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         dispatch({
           type: 'inventoryAdjustment/query',
         })
+      } else if (values.inventoryAdjustmentStatusFK === 2) {
+        setFieldValue('inventoryAdjustmentStatusFK', 1)
       }
     })
   },
@@ -402,7 +398,7 @@ class Detail extends PureComponent {
           batchNo: [
             o.batchNo,
           ],
-          batchNoString: o.batchNo || '', // TODO: not sure want to pass empty string or not
+          batchNoString: o.batchNo,
           stockFK: o.id,
           code: o.inventoryItemFK,
           codeString: o.code,
@@ -411,7 +407,6 @@ class Detail extends PureComponent {
           getFromApi: true,
         }
       })
-      console.log('sstockList', newStockList)
       this.setState({ stockList: newStockList })
       // setValues({ ...values, stockList: newStockList })
       setValues({ ...values, inventoryAdjustmentItems: newStockList })
@@ -434,8 +429,8 @@ class Detail extends PureComponent {
             restValues: o[getType.typeName],
           }
         })
-        console.log({ newList })
         this.setState({ inventoryAdjustmentItems: newList })
+        setValues({ ...values, inventoryAdjustmentItems: newList })
       }
     }
   }
@@ -623,7 +618,6 @@ class Detail extends PureComponent {
 
   handleSelectedBatch = (e) => {
     const { option, row, val } = e
-    console.log({ e })
     if (option) {
       this.setState({ selectedItem: undefined })
       if (val && val.length > 0) {
@@ -857,6 +851,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { classes, theme, values, footer, errors } = props
+    const { inventoryAdjustmentItems } = errors
     const cfg = {}
     if (
       values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
@@ -929,8 +924,10 @@ class Detail extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {console.log(errors)}
-
+          {inventoryAdjustmentItems &&
+          !Array.isArray(inventoryAdjustmentItems) && (
+            <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
+          )}
           <EditableTableGrid
             style={{ marginTop: 10 }}
             FuncProps={{
@@ -963,6 +960,7 @@ class Detail extends PureComponent {
                 this.state.inventoryAdjustmentItems
               )
             }
+            // row={values.inventoryAdjustmentItems}
             {...this.tableParas}
           />
           {/* <GridContainer
