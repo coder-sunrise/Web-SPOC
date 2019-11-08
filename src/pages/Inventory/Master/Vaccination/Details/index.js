@@ -3,23 +3,12 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import {
-  getAppendUrl,
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
 } from '@/utils/utils'
-import {
-  NavPills,
-  ProgressButton,
-  Button,
-  withFormikExtend,
-  Tabs,
-} from '@/components'
+import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
-import DetailPanel from './Detail'
-import Pricing from '../../Pricing'
-import Stock from '../../Stock'
-import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -39,8 +28,6 @@ const Detail = ({
   setFieldValue,
   ...props
 }) => {
-  const { currentTab } = vaccination
-
   const detailProps = {
     vaccinationDetail,
     dispatch,
