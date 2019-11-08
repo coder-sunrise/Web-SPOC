@@ -113,8 +113,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       }
       const getType = type(o.inventoryTypeFK)
 
-      const stockFK = o.isManuallyCreated ? undefined : o.stockFK
-
       const getBatchNo = () => {
         if (o.batchNo) {
           if (Array.isArray(o.batchNo)) return o.batchNo[0]
@@ -144,18 +142,24 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         [getType.stockFK]: getStockFK(),
         batchNo: getBatchNo(),
         expiryDate: getExpiryDate(),
-        stock: o.stock || 0,
       }
 
       const getStockObject = () => {
-        // console.log({ o })
+        if (o.isManuallyCreated) {
+          return {
+            ...shareProperty,
+            stock: o.adjustmentQty,
+          }
+        }
         if (values.inventoryAdjustmentStatusFK === 1) return undefined
         if (o.stockFK) return undefined
         if (o[getType.typeName] && o[getType.typeName][getType.stockFK]) {
           return undefined
         }
-        // if (!o.isManuallyCreated) return undefined
-        return shareProperty
+        return {
+          ...shareProperty,
+          stock: o.adjustmentQty,
+        }
       }
 
       if (list === inventoryAdjustmentItems) {
@@ -225,8 +229,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         dispatch({
           type: 'inventoryAdjustment/query',
         })
-      } else if (values.inventoryAdjustmentStatusFK === 2) {
-        setFieldValue('inventoryAdjustmentStatusFK', 1)
       }
     })
   },
@@ -331,7 +333,6 @@ class Detail extends PureComponent {
           return this.stockOptions(row)
         },
         onChange: (e) => {
-          console.log({ e })
           this.handleSelectedBatch(e)
         },
         render: (row) => {
