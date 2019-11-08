@@ -11,7 +11,6 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart'
 const CustomizedBadge = ({ ripple, classes, ...resetProps }) => {
   // console.log(classes)
   const { color = 'primary' } = resetProps
-  console.log(color)
   return (
     <Badge
       classes={{

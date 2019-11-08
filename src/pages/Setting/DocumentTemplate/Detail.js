@@ -69,7 +69,7 @@ class Detail extends PureComponent {
       setFieldValue,
       height,
     } = props
-    console.log(htmlDecodeByRegExp(props.values.templateContent))
+    // console.log(htmlDecodeByRegExp(props.values.templateContent))
     return (
       <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
@@ -139,7 +139,7 @@ class Detail extends PureComponent {
                       {...cfg}
                       {...args}
                       onBlur={(html, text) => {
-                        // console.log(htmlDecodeByRegExp(html), text)
+                        console.log(htmlDecodeByRegExp(html), text)
                         // this.props.setFieldValue('templateContent', text)
                       }}
                     />

@@ -124,7 +124,8 @@ class HeaderLinks extends React.Component {
       <div className={wrapper}>
         <div className={managerClasses}>
           <SizeContainer size='lg'>
-            <Badge
+            <div>
+              {/* <Badge
               badgeContent={15}
               color='primary'
               anchorOrigin={{
@@ -164,29 +165,30 @@ class HeaderLinks extends React.Component {
                   <LinkOff />
                 </Badge>
               )}
-            </Button>
+            </Button> */}
 
-            <Button
-              justIcon
-              color='transparent'
-              aria-label='Person'
-              aria-haspopup='true'
-              aria-owns={openAccount ? 'menu-list' : null}
-              onClick={this.handleClick('Account')}
-              className={classes.buttonLink}
-              buttonRef={(node) => {
-                this.anchorElAccount = node
-              }}
-            >
-              <Person />
-              <span className={classes.username}>
-                {userTitle} {name} ({clinicShortCode})
-              </span>
-            </Button>
-            {/* <Divider type='vertical' style={{ background: '#999' }} />
+              <Button
+                justIcon
+                color='transparent'
+                aria-label='Person'
+                aria-haspopup='true'
+                aria-owns={openAccount ? 'menu-list' : null}
+                onClick={this.handleClick('Account')}
+                className={classes.buttonLink}
+                buttonRef={(node) => {
+                  this.anchorElAccount = node
+                }}
+              >
+                <Person />
+                <span className={classes.username}>
+                  {userTitle} {name} ({clinicShortCode})
+                </span>
+              </Button>
+              {/* <Divider type='vertical' style={{ background: '#999' }} />
             <div className={classes.clinicShortCode}>
               <span>{clinicShortCode}</span>
             </div> */}
+            </div>
           </SizeContainer>
           {/* 
           <Button color='transparent' justIcon className={classes.buttonLink}>

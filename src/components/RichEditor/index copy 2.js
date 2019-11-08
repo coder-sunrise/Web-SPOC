@@ -137,9 +137,25 @@ const InlineStyleControls = (props) => {
 class RichEditor extends React.PureComponent {
   constructor (props) {
     super(props)
-    this.state = { editorState: EditorState.createEmpty() }
+
+    const { form, field } = props
+    const v = htmlDecodeByRegExp(
+      form && field ? field.value : props.value || props.defaultValue,
+    )
+    let editorState
+
+    if (v) {
+      const contentBlock = htmlToDraft(v)
+      editorState = EditorState.createWithContent(
+        ContentState.createFromBlockArray(contentBlock.contentBlocks),
+      )
+    } else {
+      editorState = EditorState.createEmpty()
+    }
+
+    this.state = { editorState }
     this.focus = () => this.editorReferece.focus()
-    this.onChange = (editorState) => this.setState({ editorState })
+    this.onChange = (es) => this.setState({ editorState: es })
     this.handleKeyCommand = this._handleKeyCommand.bind(this)
     this.mapKeyToEditorCommand = this._mapKeyToEditorCommand.bind(this)
     this.toggleBlockType = this._toggleBlockType.bind(this)
@@ -214,10 +230,51 @@ class RichEditor extends React.PureComponent {
     const newEditorState = this.insertSelectedTagToEditor(selectedValue)
 
     this.setState({
-      value: newEditorState,
+      editorState: newEditorState,
     })
 
     // this.debouncedOnChange(newEditorState)
+  }
+
+  _onBlur = () => {
+    // this.setState({ isEditorFocused: false })
+    const { props } = this
+    const { onBlur, delimiter } = props
+
+    const textEditorValue = this.state.editorState
+      .getCurrentContent()
+      .getPlainText()
+    // console.log('_onBlur')
+    // console.log(
+    //   this.state.editorState.getCurrentContent(),
+    //   convertToRaw(this.state.editorState.getCurrentContent()),
+    //   this.state.editorState.getCurrentContent().getPlainText('\r\n'),
+    //   draftToHtml(convertToRaw(this.state.editorState.getCurrentContent())),
+    // )
+    const v = {
+      target: {
+        value:
+          textEditorValue === ''
+            ? ''
+            : htmlEncodeByRegExp(
+                draftToHtml(
+                  convertToRaw(this.state.editorState.getCurrentContent()),
+                ),
+              ),
+        // name: props.field.name,
+      },
+    }
+    // console.log(props.field, props.field.onChange)
+    if (props.field && props.field.onChange) {
+      v.target.name = props.field.name
+      props.field.onChange(v)
+    }
+    if (onBlur) {
+      onBlur(
+        v.target.value,
+        this.state.editorState.getCurrentContent().getPlainText(delimiter),
+      )
+    }
   }
 
   getComponent = ({ inputRef, ...props }) => {
@@ -250,10 +307,13 @@ class RichEditor extends React.PureComponent {
               handleKeyCommand={this.handleKeyCommand}
               keyBindingFn={this.mapKeyToEditorCommand}
               onChange={this.onChange}
-              placeholder='Tell a story...'
+              stripPastedStyles
+              // handlePastedText={() => false}
+              // placeholder='Tell a story...'
               // ref='editor'
               ref={this.setEditorReference}
               spellCheck
+              onBlur={this._onBlur}
             />
           </div>
         </div>
