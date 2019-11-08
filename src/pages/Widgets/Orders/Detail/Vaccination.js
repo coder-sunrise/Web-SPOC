@@ -200,7 +200,8 @@ class Vaccination extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Name'
+                    temp
+                    label='Inventory Medication'
                     labelField='displayValue'
                     code='inventoryvaccination'
                     onChange={this.changeVaccination}
