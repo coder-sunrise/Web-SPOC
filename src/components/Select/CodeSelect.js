@@ -11,7 +11,8 @@ class CodeSelect extends React.PureComponent {
     const { dispatch, codetable } = props
     if (props.code) {
       const isExisted = codetable[props.code.toLowerCase()]
-      if (isExisted) {
+      const { temp } = props
+      if (isExisted && !temp) {
         return
         // checkShouldRefresh({
         //   code: props.code,
@@ -33,6 +34,8 @@ class CodeSelect extends React.PureComponent {
         type: 'codetable/fetchCodes',
         payload: {
           code: props.code.toLowerCase(),
+          temp: props.temp,
+          force: props.temp,
           // filter: props.remoteFilter,
         },
       })
@@ -45,7 +48,8 @@ class CodeSelect extends React.PureComponent {
 
   render () {
     const { codetable, code, localFilter } = this.props
-    const options = code !== undefined ? codetable[code.toLowerCase()] : []
+    const options =
+      code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
 
     return (

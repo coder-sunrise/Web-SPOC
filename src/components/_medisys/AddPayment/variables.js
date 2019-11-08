@@ -122,7 +122,7 @@ export const InitialValue = {
     remarks: '',
     creditCardPayment: {
       creditCardTypeFK: undefined,
-      creditCardNo: null,
+      creditCardNo: undefined,
     },
   },
   [PAYMENT_MODE.CHEQUE]: {

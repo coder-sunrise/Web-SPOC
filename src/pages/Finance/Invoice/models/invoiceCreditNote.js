@@ -44,7 +44,7 @@ export default createFormViewModel({
           (x) => x.id === invoicePayerFK,
         )
 
-        const creditNoteBalance = filterInvPayment[0].totalPaid
+        const creditNoteBalance = filterInvPayment[0].outStanding
         const { creditNote } = filterInvPayment[0]
 
         const filteredCreditNote = creditNote.filter(

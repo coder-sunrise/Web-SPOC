@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
+import * as Yup from 'yup'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
-import Yup from '@/utils/yup'
 import {
   Button,
   CardContainer,
@@ -18,11 +18,17 @@ import styles from './styles'
 @withFormik({
   validationSchema: Yup.object().shape({
     // description: Yup.string().required(),
-    total: Yup.number().min(1),
+    total: Yup.number().min(0.01),
   }),
-  handleSubmit: (values, { props }) => {
-    let newCreditNoteItem = props.values.creditNoteItem || []
+  handleSubmit: (values, { props, resetForm }) => {
+    const { handleAddMiscItem } = props
+    // const newCreditNoteItem = props.values.creditNoteItem || []
+    // const tempID = newCreditNoteItem.reduce((smallestNegativeID, item) => {
+    //   if (item.id < 0 && item.id < smallestNegativeID) return item.id
+    //   return smallestNegativeID
+    // }, 0)
     const miscItem = {
+      // id: tempID - 1,
       itemType: 'Misc',
       itemCode: 'MISC',
       itemTypeFK: 6,
@@ -32,9 +38,15 @@ import styles from './styles'
       totalAfterItemAdjustment: values.total,
       isDeleted: false,
     }
-    newCreditNoteItem.push(miscItem)
-    props.setFieldValue('creditNoteItem', newCreditNoteItem)
-    setTimeout(() => props.handleCalcFinalTotal(), 100)
+    handleAddMiscItem(miscItem)
+    resetForm({})
+    // newCreditNoteItem.push(miscItem)
+    // props.setFieldValue('creditNoteItem', newCreditNoteItem)
+    // props.setFieldValue('creditNoteItem', [
+    //   ...newCreditNoteItem,
+    //   miscItem,
+    // ])
+    // setTimeout(() => props.handleCalcFinalTotal(), 100)
   },
   displayName: 'MiscCrNote',
 })

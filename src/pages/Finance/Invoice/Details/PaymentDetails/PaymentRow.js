@@ -39,6 +39,7 @@ const PaymentRow = ({
               // payerID='N/A'
               id={itemID}
               className={classes.printButton}
+              disabled={isCancelled}
               onClick={() => handlePrinterClick(type, id)}
             >
               <Printer />
@@ -62,7 +63,7 @@ const PaymentRow = ({
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>
-          <span className={classes.currency}>${amount}</span>
+          <span className={classes.currency}>${amount.toFixed(2)}</span>
         </GridItem>
         <GridItem>
           <Tooltip

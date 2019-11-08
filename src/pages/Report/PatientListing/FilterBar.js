@@ -39,7 +39,7 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='ageFrom'
               render={(args) => (
-                <NumberInput {...args} label='Age' prefix='From' />
+                <NumberInput {...args} label='Age From'/>
               )}
             />
           </GridItem>
@@ -47,7 +47,7 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='ageTo'
               render={(args) => (
-                <NumberInput {...args} label='Age' prefix='To' />
+                <NumberInput {...args} label='Age To'/>
               )}
             />
           </GridItem>
@@ -62,7 +62,7 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='dateFrom'
               render={(args) => (
-                <DatePicker {...args} label='Visit Date' prefix='From' />
+                <DatePicker {...args} label='Visit Date From'/>
               )}
             />
           </GridItem>
@@ -70,7 +70,7 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='dateTo'
               render={(args) => (
-                <DatePicker {...args} label='Visit Date' prefix='To' />
+                <DatePicker {...args} label='Visit Date To'/>
               )}
             />
           </GridItem>
@@ -88,18 +88,9 @@ const FilterBar = ({ handleSubmit }) => {
             />
           </GridItem>
           <GridItem md={4} />
-          {/* 3rd row  */}
           <GridItem md={2}>
             <FastField
-              name='patientTag'
-              render={(args) => (
-                <Select {...args} label='Patient Tag' options={[]} />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='DoctorIDs'
+              name='doctorIDs'
               render={(args) => (
                 <DoctorProfileSelect {...args} mode='multiple' label='Doctor' />
               )}

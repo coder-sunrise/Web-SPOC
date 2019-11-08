@@ -14,6 +14,9 @@ export default createFormViewModel({
     service,
     state: {
       currentId: '',
+      config: {
+        dispenseQuantityFormat: '0',
+      },
       default: {
         effectiveDates: [
           moment().formatUTC(),

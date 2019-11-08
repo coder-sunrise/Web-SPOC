@@ -32,14 +32,12 @@ const DeleteConfirmation = ({
       <GridItem md={12} className={classes.centerText}>
         <h4>{type === 'Write Off' ? _writeOffLabel : _otherLabel}</h4>
       </GridItem>
-      {type !== 'Write Off' && (
-        <GridItem md={10} className={classes.spacing}>
-          <TextField
-            label='Reason'
-            onChange={(e) => setCancelReason(e.target.value)}
-          />
-        </GridItem>
-      )}
+      <GridItem md={10} className={classes.spacing}>
+        <TextField
+          label='Reason'
+          onChange={(e) => setCancelReason(e.target.value)}
+        />
+      </GridItem>
       <GridItem>
         <Button color='danger' onClick={onClose}>
           Cancel
@@ -47,7 +45,7 @@ const DeleteConfirmation = ({
         <Button
           color='primary'
           onClick={() => handleSubmit(cancelReason, onVoid)}
-          disabled={cancelReason === ''}
+          disabled={cancelReason.trim() === ''}
         >
           Confirm
         </Button>

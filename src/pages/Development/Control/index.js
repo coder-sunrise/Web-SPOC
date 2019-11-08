@@ -121,6 +121,7 @@ const styles = (theme) => ({
 const initValues = {
   doctorRemarks: 'Testing multiple lines of input',
   timing2: '08:30',
+  numberField: 123,
   doctor: [
     'bao',
   ],
@@ -498,7 +499,7 @@ class ControlTest extends PureComponent {
             <FastField
               name='numberField'
               render={(args) => {
-                return <NumberInput currency label='Number' {...args} />
+                return <NumberInput text currency label='Number' {...args} />
               }}
             />
           </GridItem>

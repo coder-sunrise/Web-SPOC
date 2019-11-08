@@ -66,7 +66,6 @@ export default createFormViewModel({
           payload.pid &&
           (!patientState.entity || patientState.entity.id !== payload.pid)
         ) {
-          console.log('querying patient')
           yield put({
             type: 'patient/query',
             payload: {
