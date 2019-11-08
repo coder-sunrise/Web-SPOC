@@ -319,15 +319,16 @@ const DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={5}>
-          <FastField
-            render={() => {
-              if (showPersistMsg === true) {
-                return "Diagnosis will be removed from patient's medical problem"
-              }
-              return ''
-            }}
-          />
+        <GridItem style={{ alignItems: 'center', display: 'flex' }} xs={5}>
+          <React.Fragment>
+            {showPersistMsg === true ? (
+              <div>
+                Diagnosis will be removed from patient's medical problem
+              </div>
+            ) : (
+              ''
+            )}
+          </React.Fragment>
         </GridItem>
         <GridItem xs={11}>
           <FastField

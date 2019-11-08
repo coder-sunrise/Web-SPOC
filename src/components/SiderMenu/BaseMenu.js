@@ -223,6 +223,7 @@ class BaseMenu extends PureComponent {
         (o) => o === item.path,
       ),
     })}`
+    // console.log(item)
     return (
       <ListItem key={item.path} className={classes.item}>
         <Link
@@ -234,11 +235,17 @@ class BaseMenu extends PureComponent {
               () => {
                 onCollapse(true)
               }
-            ) : (
+            ) : (e)=>{
+              const {  route: { routes } } = this.props
+              const rt = routes.map(o=>o.routes || []).reduce((a,b)=>{
+                  return a.concat(b)
+              },[]).find(o=>location.pathname===o.path) ||{}
+
               navigateDirtyCheck({
                 redirectUrl: itemPath,
-              })
-            )
+                displayName:rt.observe,
+              })(e)
+            }
           }
           className={navLinkClasses}
         >

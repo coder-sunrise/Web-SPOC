@@ -26,17 +26,16 @@ const Setting = ({
     setSearch,
   ] = useState('')
 
-  const { medicationDetail, vaccinationDetail, theme } = props
+  const { medicationDetail, vaccinationDetail, theme, values } = props
 
   const [
     list,
     setList,
   ] = useState([])
 
-  const { ctmedicationprecaution, entity } =
+  const { ctmedicationprecaution, entity, config = {} } =
     medicationDetail || vaccinationDetail
   const entityData = entity || []
-
   const settingProps = {
     items: ctmedicationprecaution ? list : [],
     addedItems: entityData
@@ -187,7 +186,7 @@ const Setting = ({
                   label={formatMessage({
                     id: 'inventory.master.setting.quantity',
                   })}
-                  format='0.0'
+                  format={config.dispenseQuantityFormat || '0.0'}
                   {...args}
                 />
               )

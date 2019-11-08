@@ -59,6 +59,11 @@ const CrNoteForm = ({ classes }) => {
                 multiline
                 rowsMax={3}
                 rows={3}
+                inputProps={{
+                  inputProps: {
+                    maxLength: 2000,
+                  },
+                }}
               />
             )}
           />

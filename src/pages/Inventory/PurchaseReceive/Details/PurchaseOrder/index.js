@@ -528,7 +528,7 @@ class Index extends Component {
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
     const isEditable = (poItem) => {
-      if (poItem && (poStatus === 5 || poStatus === 6)) return false
+      if (poItem && poStatus !== 1) return false
       if (poStatus === 6) return false
       if (isWriteOff) return false
       return true
