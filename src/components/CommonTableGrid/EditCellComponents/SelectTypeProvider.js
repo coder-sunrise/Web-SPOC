@@ -61,7 +61,6 @@ class SelectEditor extends PureComponent {
         )
       }
       if (type === 'codeSelect') {
-        console.log({ commonCfg })
         return (
           <div ref={this.myRef}>
             <CodeSelect {...commonCfg} code={code} />

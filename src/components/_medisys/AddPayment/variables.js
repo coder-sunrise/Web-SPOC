@@ -10,6 +10,15 @@ export const ValidationSchema = Yup.object().shape({
   collectableAmount: Yup.number(),
   outstandingBalance: Yup.number(),
   outstandingAfterPayment: Yup.number(),
+  showPaymentDate: Yup.boolean(),
+  paymentReceivedDate: Yup.string().when('showPaymentDate', {
+    is: (val) => val,
+    then: Yup.string().required(),
+  }),
+  paymentReceivedBizSessionFK: Yup.string().when('showPaymentDate', {
+    is: (val) => val,
+    then: Yup.string().required(),
+  }),
   paymentList: Yup.array().when(
     [
       'finalPayable',
@@ -24,7 +33,6 @@ export const ValidationSchema = Yup.object().shape({
       totalAmtPaid,
       schema,
     ) => {
-      console.log({ totalAmtPaid, finalPayable })
       if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({
@@ -41,7 +49,7 @@ export const ValidationSchema = Yup.object().shape({
               .required(),
             creditCardPayment: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              creditCardNo: Yup.number().required(),
+              // creditCardNo: Yup.number().required(),
             }),
             chequePayment: Yup.object().shape({
               chequeNo: Yup.string().required(),
@@ -70,7 +78,7 @@ export const ValidationSchema = Yup.object().shape({
             is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
             then: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              creditCardNo: Yup.number().required(),
+              // creditCardNo: Yup.number().required(),
             }),
           }),
           chequePayment: Yup.object().when('paymentModeFK', {

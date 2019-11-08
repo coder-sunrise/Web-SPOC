@@ -339,12 +339,6 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    // has 1 primary doctor
-    // const hasPrimaryDoctor = datagrid.reduce(
-    //   (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
-    //   false,
-    // )
-    // if (!hasPrimaryDoctor) isDataGridValid = false
     // this.setState({ isDataGridValid })
     const newDataGrid =
       datagrid.length === 1
@@ -360,6 +354,14 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
+
+    // has 1 primary doctor
+    const hasPrimaryDoctor = newDataGrid.reduce(
+      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
+      false,
+    )
+    if (!hasPrimaryDoctor) isDataGridValid = false
+
     this.setState({ isDataGridValid, datagrid: newDataGrid })
   }
 

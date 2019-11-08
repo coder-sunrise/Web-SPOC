@@ -455,6 +455,7 @@ class Medication extends PureComponent {
                 render={(args) => {
                   return (
                     <CodeSelect
+                      temp
                       label='Name'
                       code='inventorymedication'
                       labelField='displayValue'

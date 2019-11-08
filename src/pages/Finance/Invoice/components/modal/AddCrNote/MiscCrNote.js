@@ -82,18 +82,18 @@ class MiscCrNote extends PureComponent {
                     <GridItem className={classes.miscActions}>
                       <Button
                         size='sm'
+                        color='danger'
+                        onClick={this.onClickResetMisc}
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        size='sm'
                         color='primary'
                         disabled={!values.description || !values.total}
                         onClick={handleSubmit}
                       >
                         Add
-                      </Button>
-                      <Button
-                        size='sm'
-                        color='danger'
-                        onClick={this.onClickResetMisc}
-                      >
-                        Reset
                       </Button>
                     </GridItem>
                   </GridContainer>

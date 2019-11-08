@@ -39,6 +39,7 @@ const PaymentRow = ({
               // payerID='N/A'
               id={itemID}
               className={classes.printButton}
+              disabled={isCancelled}
               onClick={() => handlePrinterClick(type, id)}
             >
               <Printer />

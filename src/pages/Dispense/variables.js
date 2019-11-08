@@ -97,6 +97,7 @@ export const PrescriptionColumnExtensions = (
             <Select
               options={batchNoOptions}
               mode='tags'
+              // valueField='id'
               valueField='batchNo'
               labelField='batchNo'
               maxSelected={1}

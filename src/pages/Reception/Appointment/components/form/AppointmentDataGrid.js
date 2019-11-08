@@ -215,7 +215,7 @@ class AppointmentDataGrid extends React.Component {
             showDeleteCommand: !disabled && data.length !== 1,
             onCommitChanges: handleCommitChanges,
             onEditingRowIdsChange: handleEditingRowsChange,
-            // defaultNewRow: defaultNewRows,
+            defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />

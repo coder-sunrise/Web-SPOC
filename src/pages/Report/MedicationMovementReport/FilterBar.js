@@ -11,9 +11,7 @@ import {
   CodeSelect,
 } from '@/components'
 
-import {
-  DoctorLabel,
-} from '@/components/_medisys'
+import { DoctorLabel } from '@/components/_medisys'
 
 const FilterBar = ({ handleSubmit }) => {
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
@@ -48,6 +46,7 @@ const FilterBar = ({ handleSubmit }) => {
                   mode='multiple'
                   code='inventorymedication'
                   labelField='displayValue'
+                  temp
                 />
               )}
             />

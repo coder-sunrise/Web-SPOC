@@ -103,13 +103,16 @@ const reloadDispense = (props, effect = 'query') => {
     //   }
     // })
     values.prescription.forEach((o) => {
-      if (o.batchNo && o.batchNo.length > 0) {
-        const [
-          firstIndex,
-        ] = o.batchNo
-        o.batchNo = firstIndex
+      if (o.batchNo instanceof Array) {
+        if (o.batchNo && o.batchNo.length > 0) {
+          const [
+            firstIndex,
+          ] = o.batchNo
+          o.batchNo = firstIndex
+        }
       }
     })
+
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -135,7 +138,9 @@ class Main extends Component {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: {
-        code: 'inventoryMedication',
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
       },
     })
   }
