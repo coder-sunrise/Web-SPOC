@@ -414,14 +414,13 @@ class AntdSelect extends React.PureComponent {
   }
 
   fetchData = async (value) => {
-    console.log('fetching data', value)
+    // console.log('fetching data', value)
     this.setState((prevState) => {
       return { data: [], fetching: true, fetchId: ++prevState.fetchId }
     })
     if (this.props.query) {
       const { valueField, labelField } = this.props
       const q = await this.props.query(value)
-      console.log({ q })
       let data = []
       try {
         if (q instanceof Array) data = q

@@ -136,6 +136,17 @@ class Demographic extends PureComponent {
     })
   }
 
+  queryCountry = (value) => {
+    return fetchAndSaveCodeTable('ctcountry', {
+      displayValue: value,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
@@ -266,6 +277,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
+                      query={this.queryCountry}
                       max={5}
                       {...args}
                     />

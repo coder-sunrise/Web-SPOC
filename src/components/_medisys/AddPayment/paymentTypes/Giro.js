@@ -56,7 +56,7 @@ const Giro = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`paymentList[${index}].remarks`}
+            name={`paymentList[${index}].remark`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

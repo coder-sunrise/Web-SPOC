@@ -1,15 +1,23 @@
 import React, { useEffect, useReducer } from 'react'
 import * as Yup from 'yup'
+import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion, CardContainer, GridContainer, GridItem } from '@/components'
+import { Accordion, CardContainer, GridContainer, GridItem, DateFormatter } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
 import ReportLayoutWrapper from '../ReportLayout'
+import {
+  IntegratedSummary,
+} from '@devexpress/dx-react-grid'
+import {
+  Table,
+} from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
+
 // services
 import { getRawData } from '@/services/report'
 
@@ -17,6 +25,7 @@ const PatientListingColumns = [
   { name: 'patientReferenceNo', title: 'Reference No.' },
   { name: 'patientAccountNo', title: 'Acc. No.' },
   { name: 'patientName', title: 'Patient Name' },
+  { name: 'doctorName', title: 'Last Visit Doctor' },
   { name: 'lastVisitDate', title: 'Last Visit Date' },
   { name: 'vC_Gender', title: 'Gender' },
   { name: 'vC_AgeInYear', title: 'Age' },
@@ -26,12 +35,27 @@ const PatientListingColumns = [
   { name: 'startDateTime', title: 'Next Appt.' },
 ]
 
+const PatientListingColumnsExtensions = [
+  { columnName: 'lastVisitDate', type: 'date' },
+  {
+    columnName: 'startDateTime',
+    width: 180,
+    render: (row) =>
+      DateFormatter({
+        value: row.startDateTime,
+        full: true,
+      }),
+  },
+]
+
 const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
   patientListingData: [],
+  patientListDetails: [],
 }
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'toggleLoading':
@@ -81,6 +105,7 @@ const PatientListing = ({ values, validateForm }) => {
             ...item,
             id: `patientListSummary-${index}-${item.patientReferenceNo}`,
           })),
+          patientListDetails: result.PatientListDetails,
         },
       })
     } else {
@@ -114,6 +139,112 @@ const PatientListing = ({ values, validateForm }) => {
         type: 'reset',
       })
   }, [])
+  const SummaryRow = (p) => {
+    const {children}=p 
+    let countCol = children.find((c)=>{
+      return c.props.tableColumn.column.name === 'patientReferenceNo';
+    })
+    console.log({countCol})
+    if (countCol) {
+      const newChildren = [
+        {
+          ...countCol,
+          props: {
+            ...countCol.props,
+            colSpan: 3,
+          },
+          key:1111,
+        },
+      ]
+      return <Table.Row {...p}>{newChildren}</Table.Row>
+    }
+    return <Table.Row {...p}>{children}</Table.Row>
+  }
+
+  let FuncProps = {
+    pager: false,
+    summary: true,
+    summaryConfig: {
+      state: {
+        totalItems: [
+          { columnName: 'patientReferenceNo', type: 'patientCount' },
+        ],
+      },
+      integrated: {
+        calculator: (type, rows, getValue) => {
+          console.log({ type, rows, getValue })
+          let patientIds = []
+          if (type === 'patientCount') {
+            if (rows && rows.length > 0) {
+              for (let p of rows) {
+                if (!patientIds.includes(p.patientProfileID)) {
+                  patientIds.push(p.patientProfileID)
+                }
+              }
+            }
+            return patientIds.length;
+          }
+          return IntegratedSummary.defaultCalculator(type, rows, getValue)
+        },
+      },
+      row: {
+        totalRowComponent: SummaryRow,
+        messages: {
+          patientCount: 'Total Number of Patient',
+        },
+      },
+    },
+  }
+
+  if (state.patientListDetails && state.patientListDetails.length > 0 && state.patientListDetails[0].isGroupByDoctor) {
+    FuncProps = {
+      ...FuncProps,
+      summary: true,
+      summaryConfig: {
+        state: {
+          totalItems: [
+            { columnName: 'patientReferenceNo', type: 'patientCount' },
+          ],
+          groupItems: [
+            { columnName: 'patientReferenceNo', type: 'groupCount' },
+          ],
+        },
+        integrated: {
+          calculator: (type, rows, getValue) => {
+            console.log({ type, rows, getValue })
+            let patientIds = []
+            if (type === 'patientCount' || type === 'groupCount') {
+              if (rows && rows.length > 0) {
+                for (let p of rows) {
+                  if (!patientIds.includes(p.patientProfileID)) {
+                    patientIds.push(p.patientProfileID)
+                  }
+                }
+              }
+              return patientIds.length;
+            }
+            return IntegratedSummary.defaultCalculator(type, rows, getValue)
+          },
+        },
+        row: {
+          totalRowComponent: SummaryRow,
+          groupRowComponent: SummaryRow,
+          messages: {
+            groupCount: 'Total Number of Patient',
+            patientCount: 'Grand Total Number of Patient',
+          },
+        },
+      },
+      grouping: true,
+      groupingConfig: {
+        state: {
+          grouping: [
+            { columnName: 'doctorName' },
+          ],
+        },
+      },
+    }
+  }
 
   return (
     <CardContainer hideHeader>
@@ -142,6 +273,8 @@ const PatientListing = ({ values, validateForm }) => {
                       height={500}
                       data={state.patientListingData}
                       columns={PatientListingColumns}
+                      columnExtensions={PatientListingColumnsExtensions}
+                      FuncProps={FuncProps}
                     />
                   ),
                 },
@@ -162,6 +295,10 @@ const PatientListingWithFormik = withFormik({
   ),
   mapPropsToValues: () => ({
     patientCriteria: '',
+    dateFrom: moment(new Date()).add(-1, 'year').toDate(),
+    dateTo: moment(new Date()).toDate(),
+    ageFrom: 0,
+    ageTo: 0,
   }),
 })(PatientListing)
 

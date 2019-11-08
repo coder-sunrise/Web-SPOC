@@ -97,7 +97,7 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   const label = Object.byString(v, labelField)
   const vEl = v ? (
-    <Tooltip title={label} enterDelay={1500}>
+    <Tooltip title={label} enterDelay={750}>
       <span style={{ color: v.color || 'inherit' }}>{label}</span>
     </Tooltip>
   ) : (
