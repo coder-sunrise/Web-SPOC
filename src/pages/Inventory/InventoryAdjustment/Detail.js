@@ -640,15 +640,13 @@ class Detail extends PureComponent {
           row.isManuallyCreated = true
           row.expiryDate = undefined
           row.stock = undefined
-          row.stockId = undefined
-          row.concurrencyToken = undefined
         }
       } else {
         row.expiryDate = undefined
         row.stock = undefined
-        row.stockId = undefined
+        // row.stockId = undefined
         row.batchNoString = undefined
-        row.concurrencyToken = undefined
+        // row.concurrencyToken = undefined
       }
     }
     this.props.dispatch({
