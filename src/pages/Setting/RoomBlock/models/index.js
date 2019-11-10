@@ -5,7 +5,10 @@ import * as service from '../services'
 export default createListViewModel({
   namespace: 'roomBlock',
   config: {
-    queryOnLoad: false,
+    codetable: {
+      message: 'Room Block updated',
+      code: 'roomblock',
+    },
   },
   param: {
     service,

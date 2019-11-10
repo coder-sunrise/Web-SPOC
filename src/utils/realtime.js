@@ -11,7 +11,7 @@ const initStream = () => {
       accessTokenFactory: () => localStorage.getItem('token'),
     })
     .build()
-  console.log(connection)
+  // console.log(connection)
   connection.on('NewNotification', (type, response) => {
     const { sender, message } = response
     console.log({ type, response, connectionObserver })
@@ -24,8 +24,10 @@ const initStream = () => {
           },
         },
       },
+      header,
     } = getState()
     if (sender !== user.data.clinicianProfile.name) {
+      const { notifications = [] } = header
       notification.info({
         // icon: WarningIcon,
         icon: null,
@@ -34,10 +36,17 @@ const initStream = () => {
         // description:
         //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
       })
+
+      notifications.push(response)
+      dispatch({
+        type: 'header/updateState',
+        payload: notifications,
+      })
+      sessionStorage.setItem('notifications', JSON.stringify(notifications))
     }
 
     if (connectionObserver[type]) {
-      connectionObserver[type]()
+      connectionObserver[type](response)
     }
     // var message = data.sender + ' says ' + data.message
     // var li = document.createElement('li')
@@ -58,7 +67,7 @@ const initStream = () => {
     .start()
     .then(() => {
       window.g_app._store.dispatch({
-        type: 'global/updateState',
+        type: 'header/updateState',
         payload: {
           signalRConnected: true,
         },
@@ -67,7 +76,7 @@ const initStream = () => {
     })
     .catch((err) => {
       window.g_app._store.dispatch({
-        type: 'global/updateState',
+        type: 'header/updateState',
         payload: {
           signalRConnected: false,
         },

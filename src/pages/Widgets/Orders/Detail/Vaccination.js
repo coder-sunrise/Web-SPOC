@@ -54,7 +54,7 @@ let i = 0
 })
 class Vaccination extends PureComponent {
   state = {
-    selectedVaccination: {},
+    selectedVaccination: undefined,
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -129,10 +129,12 @@ class Vaccination extends PureComponent {
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit } = this.props
     // console.log(this.props)
-    let currentVaccination = vaccination
+    let currentVaccination = Object.values(vaccination).length
+      ? vaccination
+      : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    // console.log(vaccination, values)
+    console.log(currentVaccination, values)
     if (currentVaccination && currentVaccination.dispensingQuantity) {
       newTotalQuantity = currentVaccination.dispensingQuantity
     } else {
@@ -141,11 +143,13 @@ class Vaccination extends PureComponent {
       const dosage = ctmedicationdosage.find(
         (o) =>
           o.id ===
-          (values.dosageFK || vaccination.prescribingDosage
-            ? vaccination.prescribingDosage.id
+          (values.dosageFK || currentVaccination.prescribingDosage
+            ? currentVaccination.prescribingDosage.id
             : undefined),
       )
-      newTotalQuantity = Math.round(dosage.multiplier)
+      if (dosage) {
+        newTotalQuantity = Math.round(dosage.multiplier)
+      }
 
       const { prescriptionToDispenseConversion } = currentVaccination
       if (prescriptionToDispenseConversion)

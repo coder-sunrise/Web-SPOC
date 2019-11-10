@@ -385,6 +385,7 @@ class RichEditor extends React.PureComponent {
           onEditorStateChange={this.onChange}
           onFocus={this._onFocus}
           editorRef={this.setEditorReference}
+          stripPastedStyles
           // handlePastedText={this.handlePastedText}
           {...metionCfg}
           {...this.editorCfg}

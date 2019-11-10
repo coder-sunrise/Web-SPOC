@@ -5,7 +5,10 @@ import * as service from '../services'
 export default createListViewModel({
   namespace: 'settingClinicBreakHour',
   config: {
-    // queryOnLoad: false,
+    codetable: {
+      message: 'Clinic Break Hour updated',
+      code: 'clinicbreakhour',
+    },
   },
   param: {
     service,

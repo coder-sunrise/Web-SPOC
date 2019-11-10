@@ -5,7 +5,10 @@ import * as service from '../services'
 export default createListViewModel({
   namespace: 'settingPublicHoliday',
   config: {
-    // queryOnLoad: false,
+    codetable: {
+      message: 'Public Holiday updated',
+      code: 'ctpublicholiday',
+    },
   },
   param: {
     service,

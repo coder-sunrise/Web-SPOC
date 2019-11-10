@@ -140,6 +140,23 @@ const withFormikExtend = (props) => (Component) => {
 
     componentWillUnmount () {
       startDirtyChecking = false
+
+      if (displayName) {
+        if (window.dirtyForms[displayName]) {
+          window.g_app._store.dispatch({
+            type: 'formik/updateState',
+            payload: {
+              [displayName]: undefined,
+            },
+          })
+        }
+        delete window.dirtyForms[displayName]
+
+        if (Object.values(window.dirtyForms).length === 0) {
+          window.beforeReloadHandlerAdded = false
+          window.removeEventListener('beforeunload', confirmBeforeReload)
+        }
+      }
     }
 
     render () {

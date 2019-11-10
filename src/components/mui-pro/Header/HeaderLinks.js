@@ -31,10 +31,10 @@ import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/component
 import { Badge, SizeContainer } from '@/components'
 import { updateAPIType } from '@/utils/request'
 
-@connect(({ user, clinicInfo, global }) => ({
+@connect(({ user, clinicInfo, header }) => ({
   user,
   clinicInfo,
-  global,
+  header,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -91,9 +91,9 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user, clinicInfo, global } = this.props
+    const { classes, rtlActive, user, clinicInfo, header } = this.props
     const { openNotification, openAccount, openDomain, title } = this.state
-    const { signalRConnected } = global
+    const { signalRConnected, notifications } = header
     // console.log(openNotification, openAccount)
     const searchButton = `${classes.top} ${classes.searchButton} ${classNames({
       [classes.searchRTL]: rtlActive,
@@ -125,47 +125,47 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              {/* <Badge
-              badgeContent={15}
-              color='primary'
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-            >
+              <Badge
+                badgeContent={notifications.length}
+                color='primary'
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+              >
+                <Button justIcon color='transparent'>
+                  <Notifications fontSize='large' />
+                </Button>
+              </Badge>
               <Button justIcon color='transparent'>
-                <Notifications fontSize='large' />
+                {signalRConnected ? (
+                  <Badge
+                    ripple
+                    color='info'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <Link />
+                  </Badge>
+                ) : (
+                  <Badge
+                    ripple
+                    color='danger'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <LinkOff />
+                  </Badge>
+                )}
               </Button>
-            </Badge>
-            <Button justIcon color='transparent'>
-              {signalRConnected ? (
-                <Badge
-                  ripple
-                  color='info'
-                  overlap='circle'
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  variant='dot'
-                >
-                  <Link />
-                </Badge>
-              ) : (
-                <Badge
-                  ripple
-                  color='danger'
-                  overlap='circle'
-                  anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  variant='dot'
-                >
-                  <LinkOff />
-                </Badge>
-              )}
-            </Button> */}
 
               <Button
                 justIcon

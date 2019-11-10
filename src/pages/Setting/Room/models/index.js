@@ -4,7 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingRoom',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Room updated',
+      code: 'ctroom',
+    },
+  },
   param: {
     service,
     state: {

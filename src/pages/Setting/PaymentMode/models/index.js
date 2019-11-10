@@ -4,7 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingPaymentMode',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Payment Mode updated',
+      code: 'ctpaymentmode',
+    },
+  },
   param: {
     service,
     state: {

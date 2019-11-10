@@ -215,7 +215,6 @@ class Medication extends PureComponent {
     if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
-    console.log(medication)
     if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
@@ -272,12 +271,15 @@ class Medication extends PureComponent {
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit } = this.props
 
-    const defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
-    if (defaultBatch)
-      this.setState({
-        batchNo: defaultBatch.batchNo,
-        expiryDate: defaultBatch.expiryDate,
-      })
+    let defaultBatch
+    if (op.medicationStock) {
+      defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
+      if (defaultBatch)
+        this.setState({
+          batchNo: defaultBatch.batchNo,
+          expiryDate: defaultBatch.expiryDate,
+        })
+    }
 
     this.setState({
       selectedMedication: op,

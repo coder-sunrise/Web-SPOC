@@ -958,13 +958,14 @@ export const fetchAndSaveCodeTable = async (
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    if (!temp)
-      await db.codetable.put({
-        code,
-        data: newData,
-        updateDate: refresh ? null : new Date(),
-        params,
-      })
+    // console.log(newData, temp)
+    // if (!temp)
+    await db.codetable.put({
+      code,
+      data: newData,
+      updateDate: new Date(), // refresh ? null : new Date(),
+      params,
+    })
     return newData
   }
 
