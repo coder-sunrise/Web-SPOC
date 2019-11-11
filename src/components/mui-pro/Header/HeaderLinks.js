@@ -28,7 +28,7 @@ import Button from 'mui-pro-components/CustomButtons'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
-import { Badge, SizeContainer } from '@/components'
+import { Badge, SizeContainer, TextField } from '@/components'
 import { updateAPIType } from '@/utils/request'
 
 @connect(({ user, clinicInfo, header }) => ({
@@ -181,9 +181,16 @@ class HeaderLinks extends React.Component {
               >
                 <Person />
                 <span className={classes.username}>
-                  {userTitle} {name} ({clinicShortCode})
+                  {userTitle} {name}
                 </span>
               </Button>
+              <Divider
+                type='vertical'
+                style={{ background: '#999', height: '1.2rem' }}
+              />
+              <div className={classes.clinicShortCode}>
+                <span>{clinicShortCode}</span>
+              </div>
               {/* <Divider type='vertical' style={{ background: '#999' }} />
             <div className={classes.clinicShortCode}>
               <span>{clinicShortCode}</span>
