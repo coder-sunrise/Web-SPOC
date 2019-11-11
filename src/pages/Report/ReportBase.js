@@ -111,7 +111,7 @@ export default class ReportBase extends React.Component {
           <GridItem md={12}>
             <ReportLayoutWrapper
               loading={this.state.isLoading}
-              reportID={this.props.reportId}
+              reportID={this.state.reportId}
               reportParameters={this.props.values}
               loaded={this.state.loaded}
               fileName={this.state.fileName}
