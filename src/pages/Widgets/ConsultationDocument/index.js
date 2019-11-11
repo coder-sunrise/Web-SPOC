@@ -89,7 +89,7 @@ export const printRow = async (row, props) => {
 }
 
 export const viewReport = (row, props, useID = false) => {
-  console.log({ row, props, useID })
+  console.log('viewReport', { row, props, useID })
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -416,10 +416,10 @@ class ConsultationDocument extends PureComponent {
           observe='AddConsultationDocument'
           maxWidth='md'
           bodyNoPadding
-          // showFooter=
-          // footProps={{
-          //   confirmBtnText: 'Save',
-          // }}
+        // showFooter=
+        // footProps={{
+        //   confirmBtnText: 'Save',
+        // }}
         >
           <AddConsultationDocument
             {...this.props}

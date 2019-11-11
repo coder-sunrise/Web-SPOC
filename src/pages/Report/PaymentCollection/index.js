@@ -24,6 +24,18 @@ class PaymentCollection extends ReportBase {
     }
   }
 
+  formatReportParams = (params) => {
+    return {
+      ...params,
+      isPatientPayer:
+        params.payerType === 'All' || params.payerType === 'Patient',
+      isCompanyPayer:
+        params.payerType === 'All' || params.payerType === 'Company',
+      groupByPaymentMode: params.groupBy === 'PaymentMode',
+      groupByDoctor: params.groupBy === 'Doctor',
+    }
+  }
+
   renderFilterBar = (handleSubmit) => {
     return <FilterBar handleSubmit={handleSubmit} />
   }
