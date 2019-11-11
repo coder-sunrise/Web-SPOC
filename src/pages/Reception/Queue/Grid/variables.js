@@ -1,12 +1,10 @@
+import React from 'react'
 import moment from 'moment'
 // components
 import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
-import { dateFormat, timeFormat, DateFormatter } from '@/components'
-import StatusBadge from './StatusBadge'
+import { dateFormat, CodeSelect, DateFormatter } from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
-import { GENDER } from '@/utils/constants'
-import { formatAppointmentTimes } from '../utils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
@@ -72,9 +70,22 @@ export const ApptColumnExtensions = [
     render: (row) => {
       const { genderFK, dob } = row
 
-      const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+      const gender = (
+        <CodeSelect
+          text
+          code='ctgender'
+          value={genderFK}
+          valueField='id'
+          labelField='code'
+        />
+      )
       const age = calculateAgeFromDOB(dob)
-      return `${gender}/${age}`
+      return (
+        <React.Fragment>
+          {gender}
+          <span>/{age}</span>
+        </React.Fragment>
+      )
     },
     sortingEnabled: false,
   },
@@ -193,9 +204,23 @@ export const QueueColumnExtensions = [
       if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
         const { patientProfile } = row
         const { genderFK, dob } = patientProfile
-        const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+        const gender = (
+          <CodeSelect
+            text
+            code='ctgender'
+            value={genderFK}
+            valueField='id'
+            labelField='code'
+          />
+        )
+
         const age = calculateAgeFromDOB(dob)
-        return `${gender}/${age}`
+        return (
+          <React.Fragment>
+            {gender}
+            <span>/{age}</span>
+          </React.Fragment>
+        )
       }
       const { dob, gender = 'U' } = row
 
