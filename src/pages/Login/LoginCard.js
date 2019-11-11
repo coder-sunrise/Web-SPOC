@@ -53,7 +53,7 @@ const submitKey = 'login/getToken'
 const LoginSchema = Yup.object().shape({
   username: Yup.string().trim().required('Please enter Username'),
   password: Yup.string().trim().required('Please enter Password'),
-  clinic_code: Yup.string().trim().required('Please enter Clinic Code'),
+  clinicCode: Yup.string().trim().required('Please enter Clinic Code'),
 })
 @connect(({ login }) => ({ login }))
 @withFormik({
@@ -62,15 +62,15 @@ const LoginSchema = Yup.object().shape({
       return {
         username: 'medisys',
         password: 'Medi$y$Innovati0n',
-        clinic_code: '123456789',
+        clinicCode: '123456789',
       }
-    return { username: '', password: '', clinic_code: '' }
+    return { username: '', password: '', clinicCode: '' }
   },
   handleSubmit: (values, { props }) => {
-    const { username, password, clinic_code } = values
+    const { username, password, clinicCode } = values
     const { handleLogin } = props
 
-    handleLogin(username, password, clinic_code)
+    handleLogin(username, password, clinicCode)
   },
   validationSchema: LoginSchema,
 })
@@ -172,7 +172,7 @@ class LoginCard extends PureComponent {
                   )}
                 />
                 <FastField
-                  name='clinic_code'
+                  name='clinicCode'
                   render={(args) => (
                     <TextField
                       {...args}
