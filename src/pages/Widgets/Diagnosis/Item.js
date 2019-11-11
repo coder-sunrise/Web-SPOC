@@ -21,6 +21,7 @@ import {
 } from '@/components'
 import { fetchAndSaveCodeTable } from '@/utils/codes'
 import { queryList } from '@/services/common'
+import DiagnosisSelect from './DiagnosisSelect'
 
 const filterOptions = [
   {
@@ -53,11 +54,6 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
-    ctDiagnosis,
-    setCtDiagnosis,
-  ] = useState([])
-
-  const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
@@ -67,38 +63,7 @@ const DiagnosisItem = ({
     setShowPersistMsg,
   ] = useState(false)
 
-  const [
-    diagnosisFilter,
-    setDiagnosisFilter,
-  ] = useState(filterOptions.map((o) => o.value))
-
   const { form } = arrayHelpers
-
-  useEffect(
-    () => {
-      try {
-        if (
-          form.values.corDiagnosis[index] &&
-          form.values.corDiagnosis[index].diagnosisFK
-        ) {
-          const { diagnosisFK } = form.values.corDiagnosis[index]
-          const ctsnomeddiagnosis = ctDiagnosis || []
-          // const { ctcomplication } = codetable
-          const diagnosis = ctsnomeddiagnosis.find(
-            (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
-          )
-          if (diagnosis) {
-            setCtComplicationPairedWithDiag(diagnosis.complication || [])
-          }
-        }
-      } catch (error) {
-        console.log({ error })
-      }
-    },
-    [
-      ctDiagnosis,
-    ],
-  )
 
   const onDiagnosisChange = (v, op) => {
     const { setFieldValue } = form
@@ -119,119 +84,49 @@ const DiagnosisItem = ({
       }
     }
   }
-
-  const onDiagnosisSearch = async (v) => {
-    // console.log('onDiagnosisSearch', v)
-    // if (!v) {
-
-    //   return []
-    // }
-    const search = {
-      props:
-        'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
-      sorting: [
-        { columnName: 'displayvalue', direction: 'asc' },
-      ],
-    }
-    if (typeof v === 'string') {
-      search.displayvalue = v
-    } else {
-      search.id = Number(v)
-    }
+  const onDataSouceChange = (data) => {
     if (
-      !(
-        diagnosisFilter.length === 0 ||
-        diagnosisFilter.length === filterOptions.length
-      )
+      form.values.corDiagnosis[index] &&
+      form.values.corDiagnosis[index].diagnosisFK
     ) {
-      search.group = [
-        {
-          combineCondition: 'or',
-        },
-      ]
-      diagnosisFilter.forEach((df) => {
-        search.group[0][df] = true
-      })
+      const { diagnosisFK } = form.values.corDiagnosis[index]
+      const ctsnomeddiagnosis = data || []
+      // const { ctcomplication } = codetable
+      const diagnosis = ctsnomeddiagnosis.find(
+        (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+      )
+      if (diagnosis) {
+        setCtComplicationPairedWithDiag(diagnosis.complication || [])
+      }
     }
-
-    // console.log(diagnosisFilter)
-    const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
-    setCtDiagnosis(response.data.data)
-
-    return response
   }
-
-  // const deboucedOnDiagnosisSearch = _.debounce(onDiagnosisSearch, 500)
-
-  // console.log(diagnosisFilter)
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={6} style={{ position: 'relative' }}>
+        <GridItem xs={6}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
-              <Select
-                label='Diagnosis'
-                // code='codetable/ctsnomeddiagnosis'
-                // localFilter={(row) => {
-                //   if (
-                //     diagnosisFilter.length === 0 ||
-                //     diagnosisFilter.length === filterOptions.length
-                //   )
-                //     return true
-                //   for (let i = 0; i < diagnosisFilter.length; i++) {
-                //     const df = diagnosisFilter[i]
-                //     if (row[df]) return true
-                //   }
-                //   return false
-                // }}
-                options={ctDiagnosis}
-                valueField='id'
-                labelField='displayvalue'
-                // autoComplete
-                renderDropdown={(option) => {
-                  const {
-                    isChasAcuteClaimable,
-                    isChasChronicClaimable,
-                    isHazeClaimable,
-                  } = option
-                  return (
-                    <span>
-                      {(isChasAcuteClaimable ||
-                        isChasChronicClaimable ||
-                        isHazeClaimable) && (
-                        <AttachMoney className={classes.money} />
-                      )}
-
-                      {option.displayvalue}
-                    </span>
-                  )
-                }}
-                query={onDiagnosisSearch}
+              <DiagnosisSelect
                 onChange={onDiagnosisChange}
-                onDataSouceChange={(data) => {
-                  setCtDiagnosis(data)
-                }}
+                onDataSouceChange={onDataSouceChange}
                 {...args}
               />
             )}
           />
-          <ButtonSelect
-            options={filterOptions}
-            mode='multiple'
-            textField='name'
-            valueField='value'
-            value={diagnosisFilter}
-            justIcon
-            style={{ position: 'absolute', bottom: 2, right: -35 }}
-            onChange={(v, option) => {
-              if (v !== diagnosisFilter) setDiagnosisFilter(v)
-            }}
-          >
-            <FilterList />
-          </ButtonSelect>
         </GridItem>
+        {/* <GridItem xs={6}>
+          {form.values && (
+            <DiagnosisSelect
+              mode='multiple'
+              value={[
+                form.values.corDiagnosis[index].diagnosisFK,
+              ]}
+              onChange={onDiagnosisChange}
+              onDataSouceChange={onDataSouceChange}
+            />
+          )}
+        </GridItem> */}
         <GridItem xs={12}>
           <Field
             name={`corDiagnosis[${index}].complication`}

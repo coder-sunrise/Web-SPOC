@@ -258,13 +258,13 @@ export default createFormViewModel({
           },
         })
         yield take('global/updateAppState/@@end')
-        yield put({
-          type: 'formik/updateState',
-          payload: {
-            ConsultationPage: undefined,
-            ConsultationDocumentList: undefined,
-          },
-        })
+        // yield put({
+        //   type: 'formik/updateState',
+        //   payload: {
+        //     ConsultationPage: undefined,
+        //     ConsultationDocumentList: undefined,
+        //   },
+        // })
 
         router.push('/reception/queue')
       },

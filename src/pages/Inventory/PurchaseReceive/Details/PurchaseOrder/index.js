@@ -196,10 +196,10 @@ class Index extends Component {
         }).then((r) => {
           if (r) {
             const { id } = r
-            dispatch({
-              type: `formik/clean`,
-              payload: 'purchaseOrderDetails',
-            })
+            // dispatch({
+            //   type: `formik/clean`,
+            //   payload: 'purchaseOrderDetails',
+            // })
             this.getPOdata(id)
           }
         })

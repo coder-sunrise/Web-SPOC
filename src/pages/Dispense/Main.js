@@ -31,10 +31,10 @@ const reloadDispense = (props, effect = 'query') => {
     payload: dispense.visitID,
   }).then((o) => {
     resetForm(o)
-    dispatch({
-      type: `formik/clean`,
-      payload: 'DispensePage',
-    })
+    // dispatch({
+    //   type: `formik/clean`,
+    //   payload: 'DispensePage',
+    // })
   })
 }
 @withFormikExtend({
