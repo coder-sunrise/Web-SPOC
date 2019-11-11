@@ -117,16 +117,16 @@ const Grid = ({
         label: 'View SMS History',
         Icon: ForumIcon,
       },
-      {
-        id: 1,
-        label: 'Mark as Read',
-        Icon: DraftsIcon,
-      },
-      {
-        id: 1,
-        label: 'Mark as Unread',
-        Icon: MarkunreadIcon,
-      },
+      // {
+      //   id: 1,
+      //   label: 'Mark as Read',
+      //   Icon: DraftsIcon,
+      // },
+      // {
+      //   id: 1,
+      //   label: 'Mark as Unread',
+      //   Icon: MarkunreadIcon,
+      // },
     ]
     const options = defaultContextMenuOptions
 
