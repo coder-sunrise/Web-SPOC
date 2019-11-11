@@ -3,7 +3,12 @@ import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  CodeSelect,
+  CardContainer,
+  GridContainer,
+  GridItem,
+} from '@/components'
 // sub component
 import PaymentRow from './PaymentRow'
 import PaymentActions from './PaymentActions'
@@ -36,6 +41,7 @@ const PaymentCard = ({
   classes,
   // payerID = 'N/A',
   // payerName = 'N/A',
+  coPaymentSchemeFK = undefined,
   companyName = '',
   patientName = 'N/A',
   payerType = '',
@@ -54,9 +60,20 @@ const PaymentCard = ({
     </p>
   )
   if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
+    // _payerName = (
+    //   <p className={classes.title}>
+    //     {payerTypeToString[payerTypeFK]} ({payerType})
+    //   </p>
+    // )
     _payerName = (
       <p className={classes.title}>
-        {payerTypeToString[payerTypeFK]} ({payerType})
+        <span>{payerTypeToString[payerTypeFK]}&nbsp;</span>
+        (<CodeSelect
+          text
+          code='copaymentscheme'
+          valueField='id'
+          value={coPaymentSchemeFK}
+        />)
       </p>
     )
   }

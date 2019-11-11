@@ -17,7 +17,7 @@ import styles from './styles'
 import { ValidationSchema, getLargestID, InitialValue } from './variables'
 import { rounding } from './utils'
 import { roundToTwoDecimals } from '@/utils/utils'
-import { PAYMENT_MODE } from '@/utils/constants'
+import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
 import { getBizSession } from '@/services/queue'
 
@@ -226,7 +226,12 @@ class AddPayment extends Component {
         'cashReturned',
         roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
       )
-    else setFieldValue('cashReturned', 0)
+    else if (totalPaid < finalPayable) {
+      setFieldValue(
+        'cashReturned',
+        _cashReceived - (cashPayment.amt + cashRounding),
+      )
+    } else setFieldValue('cashReturned', 0)
   }
 
   handlePaymentDateChange = (value) => {
@@ -247,6 +252,7 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList } = this.state
+
     return (
       <div>
         <PayerHeader
@@ -268,6 +274,7 @@ class AddPayment extends Component {
                 noCashPaymentMode,
               false,
             )}
+            hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
             patientInfo={patient}
             handlePaymentTypeClick={this.onPaymentTypeClick}
           />

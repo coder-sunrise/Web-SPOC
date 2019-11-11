@@ -23,6 +23,7 @@ import { ReportViewer } from '@/components/_medisys'
 // styles
 import styles from './styles'
 import { getBizSession } from '@/services/queue'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const defaultPatientPayment = {
   id: undefined,
@@ -137,14 +138,18 @@ class PaymentDetails extends Component {
     const invoicePayer = values.find(
       (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
     )
+
     const queryPatientProfileThenShowAddPayment = () => {
-      dispatch({
-        type: 'patient/query',
-        payload: { id: values.patientProfileFK },
-        // payload: { id: 4 },
-      }).then((r) => {
+      if (invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.PATIENT)
+        dispatch({
+          type: 'patient/query',
+          payload: { id: invoicePayer.patientProfileFK },
+          // payload: { id: 4 },
+        })
+      const showAddPayment = () => {
         const invoicePayerPayment = {
           ...invoiceDetail.entity,
+          payerTypeFK: invoicePayer.payerTypeFK,
           totalAftGst: invoicePayer.payerDistributedAmt,
           outstandingBalance: invoicePayer.outStanding,
           finalPayable: invoicePayer.outStanding,
@@ -157,14 +162,14 @@ class PaymentDetails extends Component {
           invoicePayerName = invoicePayer.payerType
         if (invoicePayer.payerTypeFK === 4)
           invoicePayerName = invoicePayer.companyName
-        if (r)
-          this.setState({
-            showAddPayment: true,
-            selectedInvoicePayerFK: invoicePayerFK,
-            invoicePayerName,
-            invoicePayerPayment,
-          })
-      })
+        this.setState({
+          showAddPayment: true,
+          selectedInvoicePayerFK: invoicePayerFK,
+          invoicePayerName,
+          invoicePayerPayment,
+        })
+      }
+      showAddPayment()
     }
     this._validateOutstandingAmount(
       invoicePayer,
@@ -230,33 +235,34 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = (type, itemID) => {
+  onPrinterClick = (type, itemID, invoicePayerFK) => {
     const { invoicePayment } = this.props
+
     switch (type) {
       case 'Payment':
-        this.onShowReport('InvoicePaymentId', 29, itemID)
+        this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'Credit Note':
-        this.onShowReport('CreditNoteId', 18, itemID)
+        this.onShowReport(18, { CreditNoteId: itemID })
         break
       case 'TaxInvoice':
-        this.onShowReport(
-          'InvoiceId',
-          15,
-          invoicePayment ? invoicePayment.currentId : '',
-        )
+        this.onShowReport(15, {
+          InvoiceId: invoicePayment ? invoicePayment.currentId : '',
+          CopayerId: invoicePayerFK,
+        })
         break
       default:
         break
     }
   }
 
-  onShowReport = (paramKey, reportID, itemID) => {
+  onShowReport = (reportID, reportParameters) => {
     this.setState({
       showReport: true,
       reportPayload: {
         reportID,
-        reportParameters: { [paramKey]: itemID },
+        reportParameters,
+        // reportParameters: { [paramKey]: itemID },
       },
     })
   }
@@ -391,6 +397,7 @@ class PaymentDetails extends Component {
             .map((payment) => {
               return (
                 <PaymentCard
+                  coPaymentSchemeFK={payment.coPaymentSchemeFK}
                   companyName={payment.companyName}
                   patientName={payment.patientName}
                   payerType={payment.payerType}

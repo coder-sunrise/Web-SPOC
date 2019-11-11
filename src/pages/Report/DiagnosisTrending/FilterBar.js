@@ -5,11 +5,12 @@ import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
-  Checkbox,
   DatePicker,
   GridContainer,
   GridItem,
   SizeContainer,
+  RadioGroup,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -35,11 +36,46 @@ const FilterBar = ({ classes, handleSubmit }) => {
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
-
+          <GridItem md={2}>
+            <FastField
+              name='viewBy'
+              render={(args) => (
+                <RadioGroup
+                  {...args}
+                  label='View By'
+                  options={[
+                    {
+                      value: 'Monthly',
+                      label: 'Monthly',
+                    },
+                    {
+                      value: 'Weekly',
+                      label: 'Weekly',
+                    },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
           <GridItem md={2} className={classes.generateBtn}>
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
+          </GridItem>
+          <GridItem md={8}>
+            <FastField
+              name='diagnosisIds'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Diagnosis'
+                  mode='multiple'
+                  temp
+                  code='codetable/ctsnomeddiagnosis'
+                  labelField='displayValue'
+                />
+              )}
+            />
           </GridItem>
         </GridContainer>
       </React.Fragment>
