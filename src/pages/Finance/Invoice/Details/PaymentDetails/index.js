@@ -235,7 +235,7 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = (type, itemID, invoicePayerFK) => {
+  onPrinterClick = (type, itemID, copayerID) => {
     const { invoicePayment } = this.props
 
     switch (type) {
@@ -248,7 +248,7 @@ class PaymentDetails extends Component {
       case 'TaxInvoice':
         this.onShowReport(15, {
           InvoiceId: invoicePayment ? invoicePayment.currentId : '',
-          CopayerId: invoicePayerFK,
+          CopayerId: copayerID,
         })
         break
       default:
@@ -398,6 +398,7 @@ class PaymentDetails extends Component {
               return (
                 <PaymentCard
                   coPaymentSchemeFK={payment.coPaymentSchemeFK}
+                  companyFK={payment.companyFK}
                   companyName={payment.companyName}
                   patientName={payment.patientName}
                   payerType={payment.payerType}
