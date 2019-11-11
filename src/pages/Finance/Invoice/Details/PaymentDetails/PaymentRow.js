@@ -62,7 +62,7 @@ const PaymentRow = ({
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>
-          <span className={classes.currency}>${amount}</span>
+          <span className={classes.currency}>${amount.toFixed(2)}</span>
         </GridItem>
         <GridItem>
           <Tooltip

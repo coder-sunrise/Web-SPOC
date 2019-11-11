@@ -2,35 +2,21 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
-import PerfectScrollbar from 'perfect-scrollbar'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 import Close from '@material-ui/icons/Close'
-import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import Slide from '@material-ui/core/Slide'
-import CircularProgress from '@material-ui/core/CircularProgress'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
-import ModalWrapper from '@/components/ModalWrapper'
 import Loading from '@/components/PageLoading/index'
+import { SizeContainer, ProgressButton, Tooltip } from '@/components'
 import { confirmBeforeReload } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 
-import { SizeContainer, ProgressButton } from '@/components'
-
-// const styles = theme => ({
-//     ...notificationsStyle(theme),
-// })
-let ps
-
-// function Transition (props) {
-//   return <Slide direction='up' {...props} />
-// }
 function Transition (props) {
   return <Slide direction='up' {...props} />
 }
@@ -75,7 +61,7 @@ class CommonModal extends React.PureComponent {
     this.myRef = React.createRef()
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
+  static getDerivedStateFromProps (nextProps) {
     const { open } = nextProps
     return {
       height: getContainerHeight(nextProps),
@@ -257,6 +243,7 @@ class CommonModal extends React.PureComponent {
       footProps = {},
       className,
       displayCloseIcon = true,
+      closeIconTooltip = 'Close',
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
@@ -315,17 +302,19 @@ class CommonModal extends React.PureComponent {
               className={classes.modalHeader}
             >
               {displayCloseIcon && (
-                <Button
-                  justIcon
-                  className={classes.modalCloseButton}
-                  key='close'
-                  authority='none'
-                  aria-label='Close'
-                  color='transparent'
-                  onClick={this.onClose}
-                >
-                  <Close className={classes.modalClose} />
-                </Button>
+                <Tooltip title={closeIconTooltip}>
+                  <Button
+                    justIcon
+                    className={classes.modalCloseButton}
+                    key='close'
+                    authority='none'
+                    aria-label='Close'
+                    color='transparent'
+                    onClick={this.onClose}
+                  >
+                    <Close className={classes.modalClose} />
+                  </Button>
+                </Tooltip>
               )}
               {/* <Button
                 justIcon

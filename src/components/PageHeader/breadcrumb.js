@@ -139,9 +139,21 @@ class BreadcrumbView extends PureComponent {
         <Link
           key={index}
           to={targetUrl}
-          onClick={navigateDirtyCheck({
-            redirectUrl: targetUrl,
-          })}
+          onClick={(e) => {
+            const { route: { routes } } = this.props
+            const rt =
+              routes
+                .map((o) => o.routes || [])
+                .reduce((a, b) => {
+                  return a.concat(b)
+                }, [])
+                .find((o) => location.pathname === o.path) || {}
+
+            navigateDirtyCheck({
+              redirectUrl: targetUrl,
+              displayName: rt.observe,
+            })(e)
+          }}
         >
           {name}
         </Link>
