@@ -29,11 +29,16 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes, type, handleSubmit }) => {
+const FilterBar = (args) => {
+  const { classes, type, handleSubmit } = args
   return (
     <div className={classes.filterBar}>
       <GridContainer>
-        {type === 'Appointment' ? <FilterByAppointment /> : <FilterByPatient />}
+        {type === 'Appointment' ? (
+          <FilterByAppointment {...args} />
+        ) : (
+          <FilterByPatient />
+        )}
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
             <Button variant='contained' color='primary' onClick={handleSubmit}>

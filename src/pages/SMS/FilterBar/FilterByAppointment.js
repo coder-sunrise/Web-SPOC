@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatMessage } from 'umi/locale'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -20,7 +20,9 @@ const styles = (theme) => ({
     paddingTop: `${theme.spacing(2)}px !important`,
   },
 })
-const FilterByAppointment = ({ classes }) => {
+const FilterByAppointment = ({ classes, values }) => {
+  const { appointmentType = [] } = values
+  const maxAppointmentTagCount = appointmentType.length <= 1 ? 1 : 0
   return (
     <React.Fragment>
       <GridItem xs={2}>
@@ -48,33 +50,34 @@ const FilterByAppointment = ({ classes }) => {
         />
       </GridItem>
       <GridItem xs={4}>
-        <FastField
+        <Field
           name='appointmentType'
-          render={(args) => {
-            return (
-              <CodeSelect
-                {...args}
-                mode='multiple'
-                all={-99}
-                label='Filter by Appointment Type'
-                code='ctappointmenttype'
-                labelField='displayValue'
-                renderDropdown={(option) => (
-                  <AppointmentTypeLabel
-                    color={option.tagColorHex}
-                    label={option.displayValue}
-                  />
-                )}
-                defaultOptions={[
-                  {
-                    isExtra: true,
-                    id: -99,
-                    displayValue: 'All appointment types',
-                  },
-                ]}
-              />
-            )
-          }}
+          render={(args) => (
+            <CodeSelect
+              {...args}
+              mode='multiple'
+              allowClear={false}
+              all={-99}
+              label='Filter by Appointment Type'
+              code='ctappointmenttype'
+              labelField='displayValue'
+              renderDropdown={(option) => (
+                <AppointmentTypeLabel
+                  color={option.tagColorHex}
+                  label={option.displayValue}
+                />
+              )}
+              defaultOptions={[
+                {
+                  isExtra: true,
+                  id: -99,
+                  displayValue: 'All appointment types',
+                },
+              ]}
+              maxTagCount={maxAppointmentTagCount}
+              maxTagPlaceholder='appointment types'
+            />
+          )}
         />
       </GridItem>
 
@@ -84,6 +87,7 @@ const FilterByAppointment = ({ classes }) => {
           render={(args) => {
             return (
               <Select
+                mode='multiple'
                 label={formatMessage({
                   id: 'sms.doctor',
                 })}

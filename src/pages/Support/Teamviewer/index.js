@@ -35,7 +35,12 @@ class Teamviewer extends PureComponent {
         <GridItem
           xs={4}
           md={4}
-          style={{ alignItems: 'center', textAlign: 'center', margin: 20 }}
+          style={{
+            alignItems: 'center',
+            textAlign: 'center',
+            margin: 20,
+            marginBottom: 50,
+          }}
         >
           <CardContainer
             hideHeader
