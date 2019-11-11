@@ -37,20 +37,46 @@ const sessionOptions = [
   { value: 'current', name: 'Current Session' },
 ]
 
-const outgoingSMSStatus = [
-  { value: 1, name: 'Sent' },
-  { value: 2, name: 'Failed' },
-  { value: 3, name: 'Delivered' },
-  { value: 4, name: 'Undelivered' },
-  { value: 5, name: 'Receiving' },
-  { value: 6, name: 'Received' },
-  { value: 7, name: 'Accepted' },
-  { value: 8, name: 'Scheduled' },
-  { value: 9, name: 'Read' },
-  { value: 10, name: 'Queued' },
-  { value: 11, name: 'Sending' },
+const smsStatus = [
+  {
+    name: 'Sent',
+    value: 'Sent',
+  },
+  {
+    name: 'Failed',
+    value: 'Failed',
+  },
 ]
 
+const messageStatus = [
+  {
+    name: 'Read',
+    value: 'Read',
+  },
+  {
+    name: 'Unread',
+    value: 'Unread',
+  },
+]
+
+const appointmentStatus = [
+  {
+    name: 'All',
+    value: undefined,
+  },
+  {
+    name: 'Draft',
+    value: 'Draft',
+  },
+  {
+    name: 'Scheduled',
+    value: 'Scheduled',
+  },
+  {
+    name: 'Rescheduled',
+    value: 'Rescheduled',
+  },
+]
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1411,6 +1437,7 @@ module.exports = {
   // preferredContactMode,
   // countries,
   // schemes,
+  appointmentStatus,
   recurrenceTypes,
   status,
   statusString,
@@ -1421,7 +1448,8 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
-  outgoingSMSStatus,
+  messageStatus,
+  smsStatus,
   // country,
   sessionOptions,
   consultationDocumentTypes,

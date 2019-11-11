@@ -173,7 +173,13 @@ const Grid = ({
         selection={selectedRows}
         columnExtensions={colExtensions}
         ActionProps={{ TableCellComponent: Cell }}
-        FuncProps={{ selectable: true }}
+        FuncProps={{
+          selectable: true,
+          selectConfig: {
+            showSelectAll: true,
+            rowSelectionEnabled: () => true,
+          },
+        }}
         {...tableParas}
       />
       <CommonModal

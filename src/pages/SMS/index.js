@@ -56,10 +56,20 @@ const SMS = ({ classes, sms, dispatch }) => {
     [classes.blur]: showWarning,
   })
 
+  const clearFilter = () => {
+    dispatch({
+      type: 'sms/updateState',
+      payload: {
+        filter: undefined,
+      },
+    })
+  }
+
   const getSMSData = (e) => {
     let type = ''
     if (e === '0') type = 'Appointment'
     else type = 'Patient'
+    clearFilter()
     dispatch({
       type: 'sms/query',
       payload: {
@@ -69,6 +79,7 @@ const SMS = ({ classes, sms, dispatch }) => {
   }
 
   useEffect(() => {
+    clearFilter()
     dispatch({
       type: 'sms/query',
       payload: {

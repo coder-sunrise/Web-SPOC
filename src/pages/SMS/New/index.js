@@ -16,23 +16,12 @@ import {
   FastField,
 } from '@/components'
 
-const New = ({
-  values,
-  onSend,
-  setFieldValue,
-  errors,
-  selectedRows,
-  handleSubmit,
-  recipient,
-}) => {
+const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
   const [
     messageNumber,
     setMessageNumber,
-  ] = useState(1)
-  const [
-    messageArr,
-    setMessageArr,
-  ] = useState([])
+  ] = useState()
+
   const SMSTemplate = [
     {
       name: 'Appointment Reminder',
@@ -44,33 +33,12 @@ const New = ({
     },
   ]
 
-  const splitMessage = (message, arr, limit) => {
-    let i = 0
-    while (message) {
-      if (i + limit >= message.length) {
-        arr.push(message.slice(i, message.length))
-        break
-      }
-      let end = message.slice(0, i + limit).lastIndexOf(' ')
-      arr.push(message.slice(i, end + 1))
-      i = end + 1
-    }
-  }
-
-  const handleClick = () => {
-    onSend(messageArr)
-    setFieldValue('message', '')
-    setMessageNumber(1)
-    setMessageArr([])
-  }
-
   const handleChange = ({ target }) => {
     const { value } = target
-    let arr = []
     if (value) {
-      // splitMessage(value, arr, 160)
-      setMessageArr(arr)
-      setMessageNumber(arr.length)
+      setMessageNumber(Math.ceil(value.length / 160))
+    } else {
+      setMessageNumber(0)
     }
   }
 
@@ -129,11 +97,6 @@ const New = ({
                 label={formatMessage({
                   id: 'sms.message',
                 })}
-                inputProps={{
-                  inputProps: {
-                    maxLength: 160,
-                  },
-                }}
                 {...args}
               />
             )

@@ -8,41 +8,36 @@ import { withStyles } from '@material-ui/core'
 import {
   Checkbox,
   GridItem,
-  DatePicker,
   Select,
   CodeSelect,
+  DateRangePicker,
+  Field,
 } from '@/components'
 // medisys component
-import { AppointmentTypeLabel } from '@/components/_medisys'
+import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
+import { smsStatus, messageStatus, appointmentStatus } from '@/utils/codes'
 
 const styles = (theme) => ({
   checkbox: {
     paddingTop: `${theme.spacing(2)}px !important`,
   },
 })
-const FilterByAppointment = ({ classes }) => {
+const FilterByAppointment = ({ classes, values, setFieldValue }) => {
+  const { appointmentType } = values
   return (
     <React.Fragment>
-      <GridItem xs={2}>
-        <FastField
-          name='Start'
+      <GridItem md={4}>
+        <Field
+          name='upcomingAppointmentDate'
           render={(args) => (
-            <DatePicker
-              label={formatMessage({ id: 'sms.from' })}
-              timeFormat={false}
+            <DateRangePicker
               {...args}
-            />
-          )}
-        />
-      </GridItem>
-      <GridItem xs={2}>
-        <FastField
-          name='End'
-          render={(args) => (
-            <DatePicker
-              label={formatMessage({ id: 'sms.to' })}
-              timeFormat={false}
-              {...args}
+              label='Upcoming Appointment From'
+              label2='To'
+              onChange={(e) => {
+                if (e.length === 0)
+                  setFieldValue('upcomingAppointmentDate', undefined)
+              }}
             />
           )}
         />
@@ -72,6 +67,8 @@ const FilterByAppointment = ({ classes }) => {
                     displayValue: 'All appointment types',
                   },
                 ]}
+                maxTagCount={appointmentType.length <= 1 ? 1 : 0}
+                maxTagPlaceholder='appointment types'
               />
             )
           }}
@@ -80,23 +77,17 @@ const FilterByAppointment = ({ classes }) => {
 
       <GridItem xs={4}>
         <FastField
-          name='Doctor'
+          name='doctor'
           render={(args) => {
             return (
-              <Select
+              <CodeSelect
                 label={formatMessage({
                   id: 'sms.doctor',
                 })}
-                options={[
-                  {
-                    name: 'Dr Levine',
-                    value: 'Dr Levine',
-                  },
-                  {
-                    name: 'Dr Heloo',
-                    value: 'Dr Heloo',
-                  },
-                ]}
+                code='doctorProfile'
+                labelField='clinicianProfile.name'
+                valueField='clinicianProfile.id'
+                renderDropdown={(option) => <DoctorLabel doctor={option} />}
                 {...args}
               />
             )
@@ -105,23 +96,14 @@ const FilterByAppointment = ({ classes }) => {
       </GridItem>
       <GridItem xs={2}>
         <FastField
-          name='AppointmentStatus'
+          name='appointmentStatus'
           render={(args) => {
             return (
               <Select
                 label={formatMessage({
                   id: 'sms.appointment.status',
                 })}
-                options={[
-                  {
-                    name: 'Confirmed',
-                    value: 'Confirmed',
-                  },
-                  {
-                    name: 'Unknown',
-                    value: 'Unknown',
-                  },
-                ]}
+                options={appointmentStatus}
                 {...args}
               />
             )
@@ -131,7 +113,7 @@ const FilterByAppointment = ({ classes }) => {
 
       <GridItem xs={4} className={classes.checkbox}>
         <FastField
-          name='ExcludeSent'
+          name='isReminderSent'
           render={(args) => (
             <Checkbox
               simple
@@ -146,23 +128,14 @@ const FilterByAppointment = ({ classes }) => {
       <GridItem md={6} />
       <GridItem xs={2}>
         <FastField
-          name='SMSStatus'
+          name='lastSMSSendStatus'
           render={(args) => {
             return (
               <Select
                 label={formatMessage({
                   id: 'sms.status',
                 })}
-                options={[
-                  {
-                    name: 'Sent',
-                    value: 'Sent',
-                  },
-                  {
-                    name: 'Pending',
-                    value: 'Pending',
-                  },
-                ]}
+                options={smsStatus}
                 {...args}
               />
             )
@@ -170,7 +143,7 @@ const FilterByAppointment = ({ classes }) => {
         />
       </GridItem>
 
-      <GridItem xs={2}>
+      {/* <GridItem xs={2}>
         <FastField
           name='MessageStatus'
           render={(args) => {
@@ -179,22 +152,13 @@ const FilterByAppointment = ({ classes }) => {
                 label={formatMessage({
                   id: 'sms.message.status',
                 })}
-                options={[
-                  {
-                    name: 'Read',
-                    value: 'Read',
-                  },
-                  {
-                    name: 'Unread',
-                    value: 'Unread',
-                  },
-                ]}
+                options={messageStatus}
                 {...args}
               />
             )
           }}
         />
-      </GridItem>
+      </GridItem> */}
     </React.Fragment>
   )
 }
