@@ -1,16 +1,16 @@
 import React from 'react'
 import { compose } from 'redux'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 // formik
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
 import { Search } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
 import moment from 'moment'
-import { GridContainer, GridItem, Button, RadioGroup } from '@/components'
+import { GridContainer, GridItem, Button } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
@@ -29,25 +29,38 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = (args) => {
-  const { classes, type, handleSubmit } = args
+const FilterBar = ({
+  classes,
+  type,
+  values,
+  dispatch,
+  handleSubmit,
+  setFieldValue,
+}) => {
+  const props = {
+    values,
+    type,
+    dispatch,
+    setFieldValue,
+  }
+
   return (
     <div className={classes.filterBar}>
       <GridContainer>
         {type === 'Appointment' ? (
-          <FilterByAppointment {...args} />
+          <FilterByAppointment {...props} />
         ) : (
-          <FilterByPatient />
+          <FilterByPatient {...props} />
         )}
-        <GridItem xs={12}>
-          <div className={classes.filterBtn}>
-            <Button variant='contained' color='primary' onClick={handleSubmit}>
-              <Search />
-              <FormattedMessage id='sms.search' />
-            </Button>
-          </div>
-        </GridItem>
       </GridContainer>
+      <GridItem xs={12}>
+        <div className={classes.filterBtn}>
+          <Button variant='contained' color='primary' onClick={handleSubmit}>
+            <Search />
+            <FormattedMessage id='sms.search' />
+          </Button>
+        </div>
+      </GridItem>
     </div>
   )
 }
@@ -56,20 +69,46 @@ export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => ({
-      SearchBy: 'appointment',
+      upcomingAppointmentDate: [
+        moment(),
+        moment().add(1, 'months'),
+      ],
+      appointmentType: [],
+
+      lastVisitDate: [
+        moment(),
+        moment().add(1, 'months'),
+      ],
+      consent: true,
     }),
 
-    handleSubmit: (values, { props, resetForm }) => {
+    handleSubmit: (values, { props }) => {
       const {
         patientName,
         consent,
         lastSMSSendStatus,
         lastVisitDate,
-        ...restValues
+        upcomingAppointmentDate,
+        appointmentStatus,
+        isReminderSent,
+        doctor,
+        appointmentType,
       } = values
       const { dispatch, type } = props
-
-      const payload = {
+      const appointmentPayload = {
+        lgteql_AppointmentDate: upcomingAppointmentDate
+          ? moment(upcomingAppointmentDate[0]).formatUTC()
+          : undefined,
+        lsteql_AppointmentDate: upcomingAppointmentDate
+          ? moment(upcomingAppointmentDate[1]).formatUTC(false)
+          : undefined,
+        'AppointmentStatusFkNavigation.Code': appointmentStatus,
+        'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.code': lastSMSSendStatus,
+        isReminderSent,
+        'AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor,
+        'AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType,
+      }
+      const patientPayload = {
         group: [
           {
             name: patientName,
@@ -78,17 +117,29 @@ export default compose(
             combineCondition: 'or',
           },
         ],
-        StatusFK: lastSMSSendStatus,
+        'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue': lastSMSSendStatus,
         'PatientPdpaConsent.IsConsent': consent,
-        'lgteql_Visit.VisitDate':
-          lastVisitDate && moment(lastVisitDate[0]).formatUTC(),
-        'lsteql_Visit.VisitDate':
-          lastVisitDate && moment(lastVisitDate[0]).formatUTC(false),
+        'lgteql_Visit.VisitDate': lastVisitDate
+          ? moment(lastVisitDate[0]).formatUTC()
+          : undefined,
+        'lsteql_Visit.VisitDate': lastVisitDate
+          ? moment(lastVisitDate[1]).formatUTC(false)
+          : undefined,
       }
+
+      let payload = {}
+      if (type === 'Appointment') {
+        payload = appointmentPayload
+      } else {
+        payload = patientPayload
+      }
+
       dispatch({
-        type: 'sms/querySMSData',
-        payload,
-        smsType: type,
+        type: 'sms/query',
+        payload: {
+          ...payload,
+          smsType: type,
+        },
       })
     },
   }),

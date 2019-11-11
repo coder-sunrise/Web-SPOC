@@ -10,9 +10,8 @@ import {
   GridItem,
   TextField,
   Select,
-  CodeSelect,
 } from '@/components'
-import { outgoingSMSStatus } from '@/utils/codes'
+import { smsStatus, messageStatus } from '@/utils/codes'
 
 const styles = (theme) => ({
   checkbox: {
@@ -20,7 +19,7 @@ const styles = (theme) => ({
   },
 })
 
-const FilterByPatient = ({ classes }) => {
+const FilterByPatient = ({ classes, setFieldValue }) => {
   return (
     <React.Fragment>
       <GridItem md={4}>
@@ -42,6 +41,9 @@ const FilterByPatient = ({ classes }) => {
               {...args}
               label='Last Visit Date From'
               label2='To'
+              onChange={(e) => {
+                if (e.length === 0) setFieldValue('lastVisitDate', undefined)
+              }}
             />
           )}
         />
@@ -51,12 +53,7 @@ const FilterByPatient = ({ classes }) => {
         <FastField
           name='lastSMSSendStatus'
           render={(args) => (
-            // <CodeSelect
-            //   {...args}
-            //   label='SMS Status'
-            //   code='ltOutgoingSMSStatus'
-            // />
-            <Select {...args} label='SMS Status' options={outgoingSMSStatus} />
+            <Select {...args} label='SMS Status' options={smsStatus} />
           )}
         />
       </GridItem>
@@ -68,21 +65,14 @@ const FilterByPatient = ({ classes }) => {
       </GridItem>
       <GridItem md={6} />
 
-      <GridItem md={2}>
+      {/* <GridItem md={2}>
         <FastField
           name='messageStatus'
           render={(args) => (
-            <Select
-              {...args}
-              label='Message Status'
-              options={[
-                { name: 'Sent', value: 'sent' },
-                { name: 'Received', value: 'received' },
-              ]}
-            />
+            <Select {...args} label='Message Status' options={messageStatus} />
           )}
         />
-      </GridItem>
+      </GridItem> */}
     </React.Fragment>
   )
 }

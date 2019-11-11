@@ -73,7 +73,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       inventoryAdjustmentStatusString,
       ...restValue
     } = values
-    const { dispatch, onConfirm, setFieldValue } = props
+    const { dispatch, onConfirm } = props
     const list =
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
     // console.log('list', inventoryAdjustmentItems, stockList)
@@ -148,7 +148,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         if (o.isManuallyCreated) {
           return {
             ...shareProperty,
-            stock: o.adjustmentQty,
+            stock: o.stock,
           }
         }
         if (values.inventoryAdjustmentStatusFK === 1) return undefined
@@ -158,7 +158,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         }
         return {
           ...shareProperty,
-          stock: o.adjustmentQty,
+          stock: o.stock,
         }
       }
 
@@ -347,14 +347,16 @@ class Detail extends PureComponent {
       },
       {
         columnName: 'stock',
-        disabled: true,
         type: 'number',
+        format: '0.0',
+        isDisabled: (row) => this.isDisabled(row),
         qty: true,
       },
       {
         columnName: 'adjustmentQty',
         type: 'number',
         format: '0.0',
+        isDisabled: (row) => !this.isDisabled(row),
         qty: true,
       },
     ],

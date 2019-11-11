@@ -47,6 +47,13 @@ const appointmentColumnsExtensions = [
     },
   },
   {
+    columnName: 'appointmentType',
+    sortingEnabled: false,
+    render: (row) => {
+      return row.appointmentTypes ? row.appointmentTypes.join(', ') : null
+    },
+  },
+  {
     columnName: 'lastVisitDate',
     width: 190,
     render: (row) =>
@@ -54,6 +61,11 @@ const appointmentColumnsExtensions = [
         value: row.lastVisitDate,
         full: true,
       }),
+  },
+  {
+    columnName: 'lastSMSSendStatus',
+    sortBy:
+      'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
   },
   {
     columnName: 'lastSMSSendDate',
@@ -73,8 +85,21 @@ const appointmentColumnsExtensions = [
 
 const patientColumnsExtensions = [
   {
+    columnName: 'patientName',
+    sortBy: 'name',
+  },
+  {
+    columnName: 'patientContactNo',
+    sortingEnabled: false,
+  },
+  {
+    columnName: 'doctor',
+    sortBy: 'Visit.DoctorProfileFkNavigation.ClinicianProfile.Name',
+  },
+  {
     columnName: 'lastVisitDate',
     width: 190,
+    sortBy: 'Visit.VisitDate',
     render: (row) =>
       DateFormatter({
         value: row.lastVisitDate,
@@ -82,8 +107,14 @@ const patientColumnsExtensions = [
       }),
   },
   {
+    columnName: 'lastSMSSendStatus',
+    sortBy:
+      'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
+  },
+  {
     columnName: 'lastSMSSendDate',
     width: 190,
+    sortBy: 'PatientOutgoingSMS.OutgoingSMSFKNavigation.SendDate',
     render: (row) =>
       DateFormatter({
         value: row.lastSMSSendDate,
