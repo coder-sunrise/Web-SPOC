@@ -602,7 +602,7 @@ export const updateCellValue = (
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
-      if (value !== val) {
+      if (value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
       const r = validationSchema.validateSync(
