@@ -12,6 +12,7 @@ import {
   RadioGroup,
   CodeSelect,
 } from '@/components'
+import { DiagnosisSelect } from '@/components/_medisys'
 
 const styles = (theme) => ({
   generateBtn: {
@@ -66,13 +67,12 @@ const FilterBar = ({ classes, handleSubmit }) => {
             <FastField
               name='diagnosisIds'
               render={(args) => (
-                <CodeSelect
+                <DiagnosisSelect
                   {...args}
-                  label='Diagnosis'
                   mode='multiple'
-                  temp
-                  code='codetable/ctsnomeddiagnosis'
-                  labelField='displayValue'
+                  onChange={(v, op) => {
+                    console.log(v, op)
+                  }}
                 />
               )}
             />

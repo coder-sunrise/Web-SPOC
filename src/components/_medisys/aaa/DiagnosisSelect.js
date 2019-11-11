@@ -18,8 +18,8 @@ import {
   Tooltip,
   Select,
   ButtonSelect,
-} from '@/components'
-import { queryList } from '@/services/common'
+} from './node_modules/@/components'
+import { queryList } from './node_modules/@/services/common'
 
 const styles = (theme) => ({
   money: {
