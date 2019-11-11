@@ -117,7 +117,7 @@ class BasicLayout extends React.PureComponent {
     this.resize = _.debounce(this.resize, 500, {
       leading: true,
     })
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch } = this.props
 
     this.initUserData()
     initStream()
@@ -407,7 +407,7 @@ class BasicLayout extends React.PureComponent {
   }
 
   render () {
-    const { classes, loading, theme, route, ...props } = this.props
+    const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
     NProgress.start()
     if (!loading.global) {
