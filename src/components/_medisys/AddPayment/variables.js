@@ -3,7 +3,6 @@ import { PAYMENT_MODE } from '@/utils/constants'
 import { roundToTwoDecimals } from '@/utils/utils'
 
 export const ValidationSchema = Yup.object().shape({
-  cashReceived: Yup.number(),
   cashReturned: Yup.number(),
   totalAmtPaid: Yup.number(),
   finalPayable: Yup.number(),
@@ -103,6 +102,23 @@ export const ValidationSchema = Yup.object().shape({
       )
     },
   ),
+  cashReceived: Yup.number().when('paymentList', (paymentList) => {
+    const cashPayment = paymentList.filter(
+      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+    )
+
+    if (cashPayment.length > 0) {
+      const minAmount = cashPayment[0].amt
+      return Yup.number()
+        .min(
+          minAmount,
+          `Cash Received must be at least $${minAmount.toFixed(2)}`,
+        )
+        .required()
+    }
+
+    return Yup.number()
+  }),
 })
 
 export const paymentTypes = {
