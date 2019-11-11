@@ -1,4 +1,6 @@
 import React from 'react'
+import { connect } from 'dva'
+import { compose } from 'redux'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 // sub components
@@ -49,11 +51,39 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  codetable,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
   const { invoiceItem = [], invoiceAdjustment = [] } = invoice
+
+  const { inventorymedication } = codetable
+
+  const handleSelectedBatch = (e, op = {}, row) => {
+    // console.log({ e, op, row })
+    if (op && op.length > 0) {
+      // const currentItem = inventorymedication.find(
+      //   (o) => o.id === row.inventoryMedicationFK,
+      // )
+      // let batchNoOptions = []
+      // if (currentItem) {
+      //   batchNoOptions = currentItem.medicationStock
+      // }
+      // const batchNo = batchNoOptions.find(
+      //   (item) => parseInt(item.id, 10) === parseInt(e[0], 10),
+      // )
+
+      const { expiryDate } = op[0]
+
+      // setFieldValue(`prescription[${row.rowIndex}]batchNo`, batchNo.batchNo)
+      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
+    } else {
+      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
+    }
+  }
+
+  console.log({ values })
   return (
     <React.Fragment>
       <GridItem>
@@ -64,7 +94,12 @@ const DispenseDetails = ({
                 title='Prescription'
                 // height={200}
                 columns={PrescriptionColumns}
-                colExtensions={PrescriptionColumnExtensions(viewOnly, onPrint)}
+                colExtensions={PrescriptionColumnExtensions(
+                  viewOnly,
+                  onPrint,
+                  inventorymedication,
+                  handleSelectedBatch,
+                )}
                 data={prescription}
               />
             </GridItem>
@@ -143,6 +178,9 @@ const DispenseDetails = ({
   )
 }
 
-export default withStyles(styles, { name: 'DispenseDetailsGrid' })(
-  DispenseDetails,
-)
+export default compose(
+  withStyles(styles, { name: 'DispenseDetailsGrid' }),
+  connect(({ codetable }) => ({
+    codetable,
+  })),
+)(DispenseDetails)

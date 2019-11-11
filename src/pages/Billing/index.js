@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-
+import moment from 'moment'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -60,12 +60,13 @@ const bannerStyle = {
   paddingRight: 16,
 }
 
-@connect(({ billing, user, dispense, loading, patient }) => ({
+@connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
   dispense,
   loading,
   patient: patient.entity || patient.default,
   user: user.data,
+  sessionInfo: queueLog.sessionInfo,
 }))
 @withFormikExtend({
   notDirtyDuration: 3,
@@ -353,6 +354,8 @@ class Billing extends Component {
       loading,
       setFieldValue,
       patient,
+      sessionInfo,
+      user,
     } = this.props
     const formikBag = {
       values,
@@ -440,6 +443,9 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
+              paymentReceivedDate: moment().formatUTC(),
+              paymentReceivedByUserFK: user.id,
+              paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
             }}

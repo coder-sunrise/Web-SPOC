@@ -96,6 +96,23 @@ const reloadDispense = (props, effect = 'query') => {
   handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, dispense } = props
     const vid = dispense.visitID
+    // const prescription = values.prescription.map((o) => {
+    //   return {
+    //     ...o,
+    //     batchNo: o.batchNo ? o.batchNo[0] : undefined,
+    //   }
+    // })
+    values.prescription.forEach((o) => {
+      if (o.batchNo instanceof Array) {
+        if (o.batchNo && o.batchNo.length > 0) {
+          const [
+            firstIndex,
+          ] = o.batchNo
+          o.batchNo = firstIndex
+        }
+      }
+    })
+
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -117,6 +134,17 @@ const reloadDispense = (props, effect = 'query') => {
   displayName: 'DispensePage',
 })
 class Main extends Component {
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
+  }
+
   makePayment = () => {
     const { dispatch, dispense, values } = this.props
     dispatch({

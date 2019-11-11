@@ -215,7 +215,6 @@ class Medication extends PureComponent {
     if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
-
     if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
@@ -223,34 +222,24 @@ class Medication extends PureComponent {
       const dosageUsageList = codetable.ctmedicationdosage
       const medicationFrequencyList = codetable.ctmedicationfrequency
 
-      let dosageMultiplier = 0
-      let multipler = 0
-
       for (let i = 0; i < prescriptionItem.length; i++) {
         if (
           prescriptionItem[i].dosageFK &&
           prescriptionItem[i].drugFrequencyFK &&
           prescriptionItem[i].duration
         ) {
-          for (let a = 0; a < dosageUsageList.length; a++) {
-            if (dosageUsageList[a].id === prescriptionItem[i].dosageFK) {
-              dosageMultiplier = dosageUsageList[a].multiplier
-              break
-            }
-          }
+          const dosage = dosageUsageList.find(
+            (o) => o.id === prescriptionItem[i].dosageFK,
+          )
 
-          for (let b = 0; b < medicationFrequencyList.length; b++) {
-            if (
-              medicationFrequencyList[b].id ===
-              prescriptionItem[i].drugFrequencyFK
-            ) {
-              multipler = medicationFrequencyList[b].multiplier
-              break
-            }
-          }
+          const frequency = medicationFrequencyList.find(
+            (o) => o.id === prescriptionItem[i].drugFrequencyFK,
+          )
 
           newTotalQuantity +=
-            dosageMultiplier * multipler * prescriptionItem[i].duration
+            dosage.multiplier *
+            frequency.multiplier *
+            prescriptionItem[i].duration
         }
       }
 
@@ -282,12 +271,15 @@ class Medication extends PureComponent {
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit } = this.props
 
-    const defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
-    if (defaultBatch)
-      this.setState({
-        batchNo: defaultBatch.batchNo,
-        expiryDate: defaultBatch.expiryDate,
-      })
+    let defaultBatch
+    if (op.medicationStock) {
+      defaultBatch = op.medicationStock.find((o) => o.isDefault === true)
+      if (defaultBatch)
+        this.setState({
+          batchNo: defaultBatch.batchNo,
+          expiryDate: defaultBatch.expiryDate,
+        })
+    }
 
     this.setState({
       selectedMedication: op,
@@ -445,7 +437,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div>
         <GridContainer>
@@ -465,6 +457,7 @@ class Medication extends PureComponent {
                 render={(args) => {
                   return (
                     <CodeSelect
+                      temp
                       label='Name'
                       code='inventorymedication'
                       labelField='displayValue'
@@ -802,7 +795,7 @@ class Medication extends PureComponent {
                     // formatter={(v) => `${v} Bottle${v > 1 ? 's' : ''}`}
                     step={1}
                     min={0}
-                    currency
+                    // currency
                     onChange={(e) => {
                       if (disableEdit === false) {
                         if (values.unitPrice) {
@@ -861,7 +854,6 @@ class Medication extends PureComponent {
                       //   },
                       // })
                     }}
-                    format='0.00'
                     disabled={disableEdit}
                     currency
                     {...args}
@@ -883,7 +875,6 @@ class Medication extends PureComponent {
                 return (
                   <NumberInput
                     label='Total After Adj'
-                    format='0.00'
                     disabled
                     currency
                     {...args}

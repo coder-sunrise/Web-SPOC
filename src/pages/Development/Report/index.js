@@ -22,6 +22,11 @@ import {
 // component
 import { ReportViewer } from '@/components/_medisys'
 
+const doctors = [
+  { value: 'bao', name: 'Bao' },
+  { value: 'cheah', name: 'Cheah' },
+]
+
 @connect(({ codetable }) => ({ codetable }))
 @withFormik({
   enableReinitialize: true,
@@ -161,6 +166,42 @@ class Report extends React.Component {
               )}
             />
           </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='inventoryMedicationFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Name'
+                    code='inventorymedication'
+                    labelField='displayValue'
+                    temp
+                    // onChange={this.changeMedication}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <Select
+                  mode='tags'
+                  maxSelected={1}
+                  label='Filter by Doctor (Tags)'
+                  onChange={(v) => {
+                    console.log(v)
+                  }}
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+
           {/* <GridItem md={3}>
             <FastField
               name='ctMedicationDosage'

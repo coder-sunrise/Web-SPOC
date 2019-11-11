@@ -4,7 +4,10 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingServiceCenterCategory',
-  config: {},
+  codetable: {
+    message: 'Service Center Category updated',
+    code: 'ctservicecentercategory',
+  },
   param: {
     service,
     state: {

@@ -57,9 +57,10 @@ import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import { getAppendUrl } from '@/utils/utils'
+import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
+
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
 // import Test from './Test'
@@ -70,6 +71,8 @@ import styles from './style'
 
 window.g_app.replaceModel(model)
 
+const discardMessage = 'Discard consultation?'
+const formName = 'ConsultationPage'
 const saveConsultation = ({
   props,
   action,
@@ -132,6 +135,38 @@ const saveConsultation = ({
   })
 }
 
+const discardConsultation = ({
+  dispatch,
+  values,
+  history,
+  onClose,
+  consultation,
+  resetForm,
+}) => {
+  console.log(values)
+  if (values.id) {
+    // dispatch({
+    //   type: 'global/updateAppState',
+    //   payload: {
+    //     openConfirm: true,
+    //     openConfirmContent: 'Discard consultation?',
+    //     openConfirmText: 'Confirm',
+    //     onConfirmSave: () => {
+
+    //     },
+    //   },
+    // })
+    dispatch({
+      type: 'consultation/discard',
+      payload: values.id,
+    })
+  } else {
+    dispatch({
+      type: 'consultation/discard',
+    })
+  }
+}
+
 // const getRights = (values) => {
 //   return {
 //     view: {
@@ -177,7 +212,9 @@ const saveConsultation = ({
   },
   validationSchema: schema,
   enableReinitialize: true,
-
+  dirtyCheckMessage: discardMessage,
+  notDirtyDuration: 0, // this page should alwasy show warning message when leave
+  onDirtyDiscard: discardConsultation,
   handleSubmit: (values, { props }) => {
     saveConsultation({
       props: {
@@ -189,11 +226,16 @@ const saveConsultation = ({
       action: 'sign',
     })
   },
-  displayName: 'ConsultationPage',
+  displayName: formName,
 })
 class Consultation extends PureComponent {
+  state = {
+    recording: true,
+  }
+
   // constructor (props) {
   //   super(props)
+  //   discardConsultation = discardConsultation.bind(this)
   // }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -208,10 +250,6 @@ class Consultation extends PureComponent {
 
   //   return null
   // }
-
-  state = {
-    recording: true,
-  }
 
   showInvoiceAdjustment = () => {
     const { theme, ...resetProps } = this.props
@@ -269,36 +307,7 @@ class Consultation extends PureComponent {
     })
   }
 
-  discardConsultation = () => {
-    const {
-      dispatch,
-      values,
-      history,
-      onClose,
-      consultation,
-      resetForm,
-    } = this.props
-    if (values.id) {
-      dispatch({
-        type: 'global/updateAppState',
-        payload: {
-          openConfirm: true,
-          openConfirmContent: 'Discard consultation?',
-          openConfirmText: 'Confirm',
-          onConfirmSave: () => {
-            dispatch({
-              type: 'consultation/discard',
-              payload: values.id,
-            })
-          },
-        },
-      })
-    } else {
-      dispatch({
-        type: 'consultation/discard',
-      })
-    }
-  }
+  // discardConsultation =
 
   getExtraComponent = () => {
     const {
@@ -443,7 +452,10 @@ class Consultation extends PureComponent {
               {values.status !== 'PAUSED' && (
                 <ProgressButton
                   color='danger'
-                  onClick={this.discardConsultation}
+                  onClick={navigateDirtyCheck({
+                    displayName: formName,
+                    redirectUrl: '/reception/queue',
+                  })}
                   icon={null}
                 >
                   Discard
@@ -591,15 +603,21 @@ class Consultation extends PureComponent {
   //   }
   // }
 
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'formik/updateState',
-      payload: {
-        ConsultationPage: undefined,
-        ConsultationDocumentList: undefined,
-        OrdersPage: undefined,
-      },
-    })
+  // componentWillUnmount () {
+  //   this.props.dispatch({
+  //     type: 'formik/updateState',
+  //     payload: {
+  //       ConsultationPage: undefined,
+  //       ConsultationDocumentList: undefined,
+  //       OrderPage: undefined,
+  //     },
+  //   })
+  // }
+
+  componentDidMount () {
+    setTimeout(() => {
+      this.props.setFieldValue('fakeField', 'setdirty')
+    }, 500)
   }
 
   render () {

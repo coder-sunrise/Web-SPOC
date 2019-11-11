@@ -5,7 +5,10 @@ import * as service from '../services'
 const pathname = window.location.pathname.trim().toLowerCase()
 export default createListViewModel({
   namespace: 'settingSmsTemplate',
-  config: {},
+  codetable: {
+    message: 'SMS Template updated',
+    code: 'smstemplate',
+  },
   param: {
     service,
     state: {

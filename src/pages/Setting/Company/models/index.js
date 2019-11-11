@@ -10,7 +10,18 @@ let companyTypes = [
 
 export default createListViewModel({
   namespace: 'settingCompany',
-  config: {},
+  config: {
+    codetable: ({ companyTypeFK }) =>
+      companyTypeFK === 1
+        ? {
+            message: 'Copayer updated',
+            code: 'ctcopayer',
+          }
+        : {
+            message: 'Supplier updated',
+            code: 'ctsupplier',
+          },
+  },
   param: {
     service,
     state: {

@@ -118,16 +118,44 @@ class Demographic extends PureComponent {
   }
 
   queryOccupation = (value) => {
-    // this.props.dispatch({
-    //   type:'codetable/fetchCodes',
-    //   payload: {
-    //     force: true,
-    //     code: 'ctoccupation',
+    const search = {}
+    if (typeof value === 'number') {
+      search.id = value
+    } else {
+      search.displayValue = value
+    }
 
-    //   }
-    // })
     return fetchAndSaveCodeTable('ctoccupation', {
+      ...search,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
+  queryCountry = (value) => {
+    return fetchAndSaveCodeTable('ctcountry', {
       displayValue: value,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
+  queryNationality = (value) => {
+    const search = {}
+    if (typeof value === 'number') {
+      search.id = value
+    } else {
+      search.displayValue = value
+    }
+
+    return fetchAndSaveCodeTable('ctnationality', {
+      ...search,
       pagesize: 25,
       sorting: [
         { columnName: 'displayValue', direction: 'asc' },
@@ -266,6 +294,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
+                      query={this.queryNationality}
                       max={5}
                       {...args}
                     />

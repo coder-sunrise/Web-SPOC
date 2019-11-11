@@ -24,8 +24,10 @@ const initStream = () => {
           },
         },
       },
+      header,
     } = getState()
     if (sender !== user.data.clinicianProfile.name) {
+      const { notifications = [] } = header
       notification.info({
         // icon: WarningIcon,
         icon: null,
@@ -34,10 +36,17 @@ const initStream = () => {
         // description:
         //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
       })
+
+      notifications.push(response)
+      dispatch({
+        type: 'header/updateState',
+        payload: notifications,
+      })
+      sessionStorage.setItem('notifications', JSON.stringify(notifications))
     }
 
     if (connectionObserver[type]) {
-      connectionObserver[type]()
+      connectionObserver[type](response)
     }
     // var message = data.sender + ' says ' + data.message
     // var li = document.createElement('li')
@@ -57,12 +66,24 @@ const initStream = () => {
   connection
     .start()
     .then(() => {
+      window.g_app._store.dispatch({
+        type: 'header/updateState',
+        payload: {
+          signalRConnected: true,
+        },
+      })
       console.log('Connected started')
     })
     .catch((err) => {
-      return console.error(err.toString())
+      window.g_app._store.dispatch({
+        type: 'header/updateState',
+        payload: {
+          signalRConnected: false,
+        },
+      })
+      return console.log(err)
     }) // JSON-string from `response.json()` call
-    .catch((error) => console.error(error))
+  // .catch((error) => console.log(error))
 
   // setInterval(() => {
   //   connection

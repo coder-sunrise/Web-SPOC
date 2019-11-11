@@ -160,12 +160,12 @@ class Banner extends PureComponent {
     }).then((result) => {
       console.log('result ==========', result)
       if (result) {
-        // dispatch({
-        //   type: 'patient/query',
-        //   payload: {
-        //     id: entity.id,
-        //   },
-        // })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
 
         const {
           balance,
@@ -240,6 +240,11 @@ class Banner extends PureComponent {
         ? undefined
         : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
     this.setState({
       currPatientCoPaymentSchemeFK: schemeData.id,
       currentSchemeType: schemeData.schemeTypeFK,
@@ -254,14 +259,16 @@ class Banner extends PureComponent {
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
-      // acuteBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
-      //     : '',
-      // chronicBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-      //     : '',
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : chronicStatus,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful

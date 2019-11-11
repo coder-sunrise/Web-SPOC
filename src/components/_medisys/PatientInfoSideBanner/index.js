@@ -46,12 +46,12 @@ const PatientInfoSideBanner = ({
       },
     }).then((result) => {
       if (result) {
-        // dispatch({
-        //   type: 'patient/query',
-        //   payload: {
-        //     id: entity.id,
-        //   },
-        // })
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
 
         const {
           balance,
@@ -117,6 +117,11 @@ const PatientInfoSideBanner = ({
         ? undefined
         : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -126,14 +131,16 @@ const PatientInfoSideBanner = ({
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
-      // acuteBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].acuteBalanceStatusCode
-      //     : '',
-      // chronicBalanceStatusCode:
-      //   schemeData.patientSchemeBalance.length > 0
-      //     ? schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
-      //     : '',
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : chronicStatus,
       isSuccessful:
         refreshedSchemeData.isSuccessful !== ''
           ? refreshedSchemeData.isSuccessful

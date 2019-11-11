@@ -4,8 +4,8 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import { compose } from 'redux'
+import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
 import {
@@ -125,6 +125,13 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 variant='contained'
                 color='primary'
                 onClick={() => {
+                  dispatch({
+                    type: 'consumableDetail/updateState',
+                    payload: {
+                      entity: undefined,
+                      currentId: undefined,
+                    },
+                  })
                   history.push('/inventory/master/consumable')
                 }}
               >

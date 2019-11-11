@@ -129,6 +129,7 @@ export default createFormViewModel({
         })
       },
       *changeLayoutCollapsed ({ payload }, { put, select }) {
+        console.log(payload, 'menuCollapsed')
         localStorage.setItem('menuCollapsed', payload ? 1 : 0)
 
         yield put({
@@ -139,7 +140,7 @@ export default createFormViewModel({
         })
       },
       *getUserSettings ({ payload }, { put, select }) {
-        localStorage.setItem('menuCollapsed', payload ? 1 : 0)
+        // localStorage.setItem('menuCollapsed', payload ? 1 : 0)
         const mockUserConfig = {
           currencySymbol: '$',
         }

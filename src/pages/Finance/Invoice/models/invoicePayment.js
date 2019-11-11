@@ -15,6 +15,16 @@ const paymentMode = [
   { type: 'Giro', objName: 'giroPayment', paymentModeFK: 5 },
 ]
 
+const InitialSessionInfo = {
+  isClinicSessionClosed: true,
+  id: '',
+  // sessionNo: `${moment().format('YYMMDD')}-01`,
+  sessionNo: 'N/A',
+  sessionNoPrefix: '',
+  sessionStartDate: '',
+  sessionCloseDate: '',
+}
+
 export default createFormViewModel({
   namespace: 'invoicePayment',
   config: {},
@@ -22,6 +32,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {},
+      currentBizSessionInfo: { ...InitialSessionInfo },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -59,9 +70,12 @@ export default createFormViewModel({
             type: 'setCurrentBizSession',
             payload: { ...sessionData[0] },
           })
-          return true
+        } else {
+          yield put({
+            type: 'setCurrentBizSession',
+            payload: InitialSessionInfo,
+          })
         }
-        return false
       },
       *submitWriteOff ({ payload }, { call, put }) {
         const response = yield call(service.writeOff, payload)
@@ -89,6 +103,8 @@ export default createFormViewModel({
           cashRounding,
           totalAmtPaid,
           invoicePaymentMode,
+          paymentReceivedDate,
+          paymentReceivedBizSessionFK,
         } = invoicePaymentList
 
         // invoicePaymentMode = invoicePaymentMode.concat(
@@ -110,19 +126,17 @@ export default createFormViewModel({
             totalAmtPaid,
             cashReceived,
             cashReturned,
-            paymentReceivedDate: moment().formatUTC(false),
+            paymentReceivedDate,
             paymentReceivedByUserFK: userState.id,
-            paymentReceivedBizSessionFK: bizSessionState.id,
-            paymentCreatedBizSessionFK: bizSessionState.id,
+            paymentReceivedBizSessionFK,
+            paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
             invoicePayerFK,
             invoicePaymentMode,
           },
         ]
 
         const response = yield call(service.addPayment, addPaymentPayload)
-        const { status } = response
-        console.log({ status })
-        if (parseInt(status, 10) === 200) {
+        if (response) {
           notification.success({
             message: 'Payment added',
           })
@@ -174,6 +188,7 @@ export default createFormViewModel({
     reducers: {
       queryDone (state, { payload }) {
         const { data } = payload
+        console.log({ data })
         let paymentResult
         if (data) {
           paymentResult = data.map((payment) => {

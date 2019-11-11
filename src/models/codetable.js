@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import { getCodes, getAllCodes } from '@/utils/codes'
+import { subscribeNotification } from '@/utils/realtime'
 
 export default createListViewModel({
   namespace: 'codetable',
@@ -12,7 +13,17 @@ export default createListViewModel({
       tenantCodes: {}, // prepare for future use
       hasFilterProps: [],
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch }) => {
+      subscribeNotification('CodetableUpdated', {
+        callback: ({ code }) => {
+          console.log(code, 'rete')
+          window.g_app._store.dispatch({
+            type: 'codetable/refreshCodes',
+            payload: { code },
+          })
+        },
+      })
+    },
     effects: {
       *fetchAllCachedCodetable (_, { call, put }) {
         console.time('fetchAllCachedCodetable')
@@ -46,17 +57,15 @@ export default createListViewModel({
       *refreshCodes ({ payload }, { call, put }) {
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
-        if (response.length > 0) {
-          yield put({
-            type: 'saveCodetable',
-            payload: {
-              code,
-              data: response,
-            },
-          })
-          return response
-        }
-        return []
+        yield put({
+          type: 'saveCodetable',
+          payload: {
+            force: true,
+            code,
+            data: response,
+          },
+        })
+        return response
       },
       *fetchCodes ({ payload }, { select, call, put }) {
         let ctcode

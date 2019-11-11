@@ -53,6 +53,10 @@ let i = 0
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
+  state = {
+    selectedVaccination: undefined,
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
@@ -71,6 +75,9 @@ class Vaccination extends PureComponent {
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values } = this.props
 
+    this.setState({
+      selectedVaccination: op,
+    })
     setFieldValue(
       'dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
@@ -107,10 +114,58 @@ class Vaccination extends PureComponent {
     setFieldValue('vaccinationName', op.displayValue)
     setFieldValue('vaccinationCode', op.code)
 
+    this.calculateQuantity(op)
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
       this.updateTotalPrice(op.sellingPrice * values.quantity)
+    } else {
+      setFieldValue('unitPrice', undefined)
+      setFieldValue('totalPrice', undefined)
+      this.updateTotalPrice(undefined)
+    }
+  }
+
+  calculateQuantity = (vaccination) => {
+    const { codetable, setFieldValue, values, disableEdit } = this.props
+    // console.log(this.props)
+    let currentVaccination = Object.values(vaccination).length
+      ? vaccination
+      : undefined
+    if (!currentVaccination) currentVaccination = this.state.selectedVaccination
+    let newTotalQuantity = 0
+    console.log(currentVaccination, values)
+    if (currentVaccination && currentVaccination.dispensingQuantity) {
+      newTotalQuantity = currentVaccination.dispensingQuantity
+    } else {
+      const { ctmedicationdosage } = codetable
+
+      const dosage = ctmedicationdosage.find(
+        (o) =>
+          o.id ===
+          (values.dosageFK || currentVaccination.prescribingDosage
+            ? currentVaccination.prescribingDosage.id
+            : undefined),
+      )
+      if (dosage) {
+        newTotalQuantity = Math.round(dosage.multiplier)
+      }
+
+      const { prescriptionToDispenseConversion } = currentVaccination
+      if (prescriptionToDispenseConversion)
+        newTotalQuantity = Math.round(
+          newTotalQuantity / prescriptionToDispenseConversion,
+        )
+    }
+    setFieldValue(`quantity`, newTotalQuantity)
+    // console.log(newTotalQuantity)
+    if (currentVaccination.sellingPrice) {
+      setFieldValue('unitPrice', currentVaccination.sellingPrice)
+      setFieldValue(
+        'totalPrice',
+        currentVaccination.sellingPrice * newTotalQuantity,
+      )
+      this.updateTotalPrice(currentVaccination.sellingPrice * newTotalQuantity)
     } else {
       setFieldValue('unitPrice', undefined)
       setFieldValue('totalPrice', undefined)
@@ -153,7 +208,8 @@ class Vaccination extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Name'
+                    temp
+                    label='Inventory Medication'
                     labelField='displayValue'
                     code='inventoryvaccination'
                     onChange={this.changeVaccination}
@@ -206,13 +262,14 @@ class Vaccination extends PureComponent {
                     label='Dosage'
                     labelField='displayValue'
                     allowClear={false}
-                    code='ctMedicationDosage'
+                    code='ctmedicationdosage'
                     onChange={(v, op = {}) => {
                       setFieldValue('dosageCode', op ? op.code : undefined)
                       setFieldValue(
                         'dosageDisplayValue',
                         op ? op.displayValue : undefined,
                       )
+                      setTimeout(this.calculateQuantity, 1)
                     }}
                     valueFiled='id'
                     {...args}
@@ -229,7 +286,7 @@ class Vaccination extends PureComponent {
                   <CodeSelect
                     label='UOM'
                     allowClear={false}
-                    code='ctVaccinationUnitOfMeasurement'
+                    code='ctvaccinationunitofmeasurement'
                     onChange={(v, op = {}) => {
                       setFieldValue('uomCode', op ? op.code : undefined)
                       setFieldValue('uomDisplayValue', op ? op.name : undefined)

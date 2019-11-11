@@ -381,6 +381,7 @@ class AntdSelect extends React.PureComponent {
       }
     }
     let proceed = true
+
     if (onChange) {
       if (!mode || mode === 'default') {
         const option = (autoComplete || query ? this.state.data : options).find(
@@ -390,7 +391,15 @@ class AntdSelect extends React.PureComponent {
       } else {
         const opts = (autoComplete || query
           ? this.state.data
-          : options).filter((o) => newVal.find((m) => m === o[valueField]))
+          : options).filter((o) =>
+          newVal.find(
+            (m) =>
+              valueField === 'id'
+                ? parseInt(m, 10) === o[valueField]
+                : m === o[valueField],
+          ),
+        )
+        newVal = mode === 'tags' && newVal.length === 0 ? '' : newVal
         proceed = onChange(newVal, opts) !== false
       }
     }
@@ -414,14 +423,13 @@ class AntdSelect extends React.PureComponent {
   }
 
   fetchData = async (value) => {
-    console.log('fetching data', value)
+    // console.log('fetching data', value)
     this.setState((prevState) => {
       return { data: [], fetching: true, fetchId: ++prevState.fetchId }
     })
     if (this.props.query) {
       const { valueField, labelField } = this.props
       const q = await this.props.query(value)
-      console.log({ q })
       let data = []
       try {
         if (q instanceof Array) data = q
@@ -468,22 +476,21 @@ class AntdSelect extends React.PureComponent {
 
   getSelectOptions = (source, renderDropdown) => {
     const { valueField, labelField, optionLabelLength = 0, mode } = this.props
-
     return source
       .map((s) => {
         // console.log({ label: Object.byString(s, labelField) })
         return {
           ...s,
           value: Object.byString(s, mode === 'tags' ? labelField : valueField),
+          // value: Object.byString(s, valueField),
           label: Object.byString(s, labelField),
           // value: s[valueField],
           // label: s[labelField],
         }
       })
-      .map((option) => (
+      .map((option, index) => (
         <Select.Option
           data={option}
-          key={option.value}
           title={option.label}
           label={
             optionLabelLength ? (
@@ -492,7 +499,9 @@ class AntdSelect extends React.PureComponent {
               option.label
             )
           }
-          value={option.value}
+          key={`select-${option.value}`}
+          value={mode === 'tags' ? `${option.value}` : option.value}
+          // key={option.id ? `${option.id}` : option.value}
           disabled={!!option.disabled}
         >
           {typeof renderDropdown === 'function' ? (

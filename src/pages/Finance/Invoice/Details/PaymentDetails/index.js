@@ -2,12 +2,18 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import { AddPayment } from 'medisys-components'
-import moment from 'moment'
+
 // material ui
 import { withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
 // common components
-import { CommonModal, withFormik, WarningSnackbar, Button } from '@/components'
+import {
+  CommonModal,
+  withFormik,
+  WarningSnackbar,
+  notification,
+  Button,
+} from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
 import WriteOff from '../../components/modal/WriteOff'
@@ -88,6 +94,14 @@ class PaymentDetails extends Component {
     this.checkHasActiveSession()
   }
 
+  _validateOutstandingAmount = (invoicePayer, callback) => {
+    if (invoicePayer.outStanding === 0) {
+      notification.error({
+        message: 'This payer does not have any outstanding',
+      })
+    } else callback()
+  }
+
   checkHasActiveSession = async () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
@@ -120,44 +134,62 @@ class PaymentDetails extends Component {
 
   onAddPaymentClick = (invoicePayerFK) => {
     const { dispatch, values, invoiceDetail } = this.props
-
-    dispatch({
-      type: 'patient/query',
-      payload: { id: values.patientProfileFK },
-      // payload: { id: 4 },
-    }).then((r) => {
-      const invoicePayer = values.find(
-        (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
-      )
-      const invoicePayerPayment = {
-        ...invoiceDetail.entity,
-        totalAftGst: invoicePayer.payerDistributedAmt,
-        outstandingBalance: invoicePayer.outStanding,
-        finalPayable: invoicePayer.outStanding,
-        totalClaims: undefined,
-      }
-      let invoicePayerName = ''
-      if (invoicePayer.payerTypeFK === 1)
-        invoicePayerName = invoicePayer.patientName
-      if (invoicePayer.payerTypeFK === 2)
-        invoicePayerName = invoicePayer.payerType
-      if (invoicePayer.payerTypeFK === 4)
-        invoicePayerName = invoicePayer.companyName
-      if (r)
-        this.setState({
-          showAddPayment: true,
-          selectedInvoicePayerFK: invoicePayerFK,
-          invoicePayerName,
-          invoicePayerPayment,
-        })
-    })
+    const invoicePayer = values.find(
+      (item) => parseInt(item.id, 10) === parseInt(invoicePayerFK, 10),
+    )
+    const queryPatientProfileThenShowAddPayment = () => {
+      dispatch({
+        type: 'patient/query',
+        payload: { id: values.patientProfileFK },
+        // payload: { id: 4 },
+      }).then((r) => {
+        const invoicePayerPayment = {
+          ...invoiceDetail.entity,
+          totalAftGst: invoicePayer.payerDistributedAmt,
+          outstandingBalance: invoicePayer.outStanding,
+          finalPayable: invoicePayer.outStanding,
+          totalClaims: undefined,
+        }
+        let invoicePayerName = ''
+        if (invoicePayer.payerTypeFK === 1)
+          invoicePayerName = invoicePayer.patientName
+        if (invoicePayer.payerTypeFK === 2)
+          invoicePayerName = invoicePayer.payerType
+        if (invoicePayer.payerTypeFK === 4)
+          invoicePayerName = invoicePayer.companyName
+        if (r)
+          this.setState({
+            showAddPayment: true,
+            selectedInvoicePayerFK: invoicePayerFK,
+            invoicePayerName,
+            invoicePayerPayment,
+          })
+      })
+    }
+    this._validateOutstandingAmount(
+      invoicePayer,
+      queryPatientProfileThenShowAddPayment,
+    )
   }
 
-  onWriteOffClick = (invoicePayerFK) =>
-    this.setState({
-      showWriteOff: true,
-      selectedInvoicePayerFK: invoicePayerFK,
-    })
+  onWriteOffClick = (invoicePayerFK) => {
+    const { values } = this.props
+    const invoicePayer = values.find((item) => item.id === invoicePayerFK)
+    const showWriteOffModal = () => {
+      this.setState({
+        showWriteOff: true,
+        selectedInvoicePayerFK: invoicePayerFK,
+      })
+    }
+    this._validateOutstandingAmount(invoicePayer, showWriteOffModal)
+    // if (invoicePayer.outStanding === 0) {
+    //   notification.error({
+    //     message: 'This payer does not have any outstanding',
+    //   })
+    // } else {
+
+    // }
+  }
 
   closeAddCrNoteModal = () =>
     this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
@@ -260,12 +292,17 @@ class PaymentDetails extends Component {
 
   onSubmitWriteOff = (writeOffData) => {
     const { selectedInvoicePayerFK } = this.state
+    const { invoicePayment: { entity = [] } } = this.props
+    const payer = entity.find(
+      (item) => parseInt(item.id, 10) === parseInt(selectedInvoicePayerFK, 10),
+    )
     this.props
       .dispatch({
         type: 'invoicePayment/submitWriteOff',
         payload: {
           invoicePayerFK: selectedInvoicePayerFK,
           writeOffReason: writeOffData,
+          writeOffAmount: payer.outStanding,
         },
       })
       .then((r) => {
@@ -314,7 +351,7 @@ class PaymentDetails extends Component {
 
   render () {
     // console.log('PaymentIndex', this.props)
-    const { classes, values, readOnly, invoiceDetail } = this.props
+    const { classes, values, readOnly, invoicePayment } = this.props
     const { hasActiveSession } = this.state
     const paymentActionsProps = {
       handleAddPayment: this.onAddPaymentClick,
@@ -411,12 +448,17 @@ class PaymentDetails extends Component {
             //   totalAftGst: invoiceDetail.entity.invoiceTotalAftGST,
             //   finalPayable: invoiceDetail.entity.outstandingBalance,
             // }}
-            invoice={invoicePayerPayment}
+            showPaymentDate
+            invoice={{
+              ...invoicePayerPayment,
+              // bizSessionNo: invoicePayment.currentBizSessionInfo,
+            }}
           />
         </CommonModal>
         <CommonModal
           open={showAddCrNote}
           title='Add Credit Note'
+          closeIconTooltip='Close Credit Note'
           onConfirm={this.closeAddCrNoteModal}
           onClose={this.closeAddCrNoteModal}
           maxWidth='lg'

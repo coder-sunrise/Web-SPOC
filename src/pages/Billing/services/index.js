@@ -20,7 +20,6 @@ export const complete = (payload) => {
 
 export const queryList = (params) =>
   commonService.queryList(url, {
-    pagesize: 9999,
     ...params,
     // isCancelled: false,
   })

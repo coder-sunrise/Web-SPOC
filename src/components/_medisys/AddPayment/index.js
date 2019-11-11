@@ -1,21 +1,25 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem } from '@/components'
+import { dateFormatLong, Button, GridContainer, GridItem } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import PayerHeader from './PayerHeader'
 import PaymentType from './PaymentType'
 import PaymentCard from './PaymentCard'
 import PaymentSummary from './PaymentSummary'
+import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 // styling
 import styles from './styles'
 import { ValidationSchema, getLargestID, InitialValue } from './variables'
 import { rounding } from './utils'
 import { roundToTwoDecimals } from '@/utils/utils'
 import { PAYMENT_MODE } from '@/utils/constants'
+// services
+import { getBizSession } from '@/services/queue'
 
 @connect(({ clinicSettings, patient }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -24,10 +28,11 @@ import { PAYMENT_MODE } from '@/utils/constants'
 @withFormikExtend({
   notDirtyDuration: 0,
   displayName: 'AddPaymentForm',
-  mapPropsToValues: ({ invoice }) => {
+  mapPropsToValues: ({ invoice, showPaymentDate }) => {
     const { outstandingBalance } = invoice
     return {
       ...invoice,
+      showPaymentDate,
       cashReturned: 0,
       cashReceived: 0,
       cashRounding: 0,
@@ -35,6 +40,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
       outstandingAfterPayment: outstandingBalance,
       collectableAmount: outstandingBalance,
       paymentList: [],
+      paymentReceivedDate: moment().format(dateFormatLong),
       // finalPayable: _finalPayable,
     }
   },
@@ -47,6 +53,9 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReceived,
       cashReturned,
       totalAmtPaid,
+      paymentReceivedByUserFK,
+      paymentReceivedDate,
+      paymentReceivedBizSessionFK,
     } = values
 
     const returnValue = {
@@ -62,6 +71,9 @@ import { PAYMENT_MODE } from '@/utils/constants'
       cashReceived,
       cashReturned,
       totalAmtPaid,
+      paymentReceivedByUserFK,
+      paymentReceivedDate,
+      paymentReceivedBizSessionFK,
     }
     handleSubmit(returnValue)
   },
@@ -69,21 +81,41 @@ import { PAYMENT_MODE } from '@/utils/constants'
 class AddPayment extends Component {
   state = {
     cashPaymentAmount: 0,
+    bizSessionList: [],
   }
 
-  // componentDidMount () {
-  //   const { values, setFieldValue } = this.props
-  //   const { paymentList, collectableAmount } = values
-  //   const totalPaid = paymentList.reduce(
-  //     (total, payment) => total + (payment.amt || 0),
-  //     0,
-  //   )
+  componentWillMount = () => {
+    this.fetchBizSessionList()
+  }
 
-  //   setFieldValue(
-  //     'outstandingAfterPayment',
-  //     roundToTwoDecimals(collectableAmount - totalPaid),
-  //   )
-  // }
+  fetchBizSessionList = (date = undefined) => {
+    const { showPaymentDate, values, setFieldValue } = this.props
+    if (showPaymentDate) {
+      getBizSession({
+        pagesize: 999,
+        sessionNoPrefix: moment(!date ? values.paymentDate : date).format(
+          'YYMMDD',
+        ),
+      }).then((response) => {
+        const { status, data } = response
+        if (parseInt(status, 10) === 200) {
+          const bizSessionList = data.data.map((item) => ({
+            value: item.id,
+            name: item.sessionNo,
+          }))
+          this.setState({
+            bizSessionList,
+          })
+
+          if (bizSessionList.length > 0)
+            setFieldValue(
+              'paymentReceivedBizSessionFK',
+              bizSessionList[0].value,
+            )
+        }
+      })
+    }
+  }
 
   onPaymentTypeClick = async (event) => {
     const { values, setFieldValue } = this.props
@@ -197,6 +229,10 @@ class AddPayment extends Component {
     else setFieldValue('cashReturned', 0)
   }
 
+  handlePaymentDateChange = (value) => {
+    this.fetchBizSessionList(value)
+  }
+
   render () {
     const {
       classes,
@@ -206,10 +242,11 @@ class AddPayment extends Component {
       values,
       handleSubmit,
       patient,
+      showPaymentDate,
       invoicePayerName = '',
     } = this.props
     const { paymentList } = values
-
+    const { bizSessionList } = this.state
     return (
       <div>
         <PayerHeader
@@ -218,6 +255,12 @@ class AddPayment extends Component {
           outstandingAfterPayment={values.outstandingAfterPayment}
         />
         <React.Fragment>
+          {showPaymentDate && (
+            <PaymentDateAndBizSession
+              bizSessionList={bizSessionList}
+              handleDateChange={this.handlePaymentDateChange}
+            />
+          )}
           <PaymentType
             disableCash={values.paymentList.reduce(
               (noCashPaymentMode, payment) =>
@@ -247,7 +290,11 @@ class AddPayment extends Component {
               <Button color='danger' onClick={onClose}>
                 Cancel
               </Button>
-              <Button color='primary' onClick={handleSubmit}>
+              <Button
+                color='primary'
+                onClick={handleSubmit}
+                disabled={paymentList.length === 0}
+              >
                 Confirm
               </Button>
             </GridItem>

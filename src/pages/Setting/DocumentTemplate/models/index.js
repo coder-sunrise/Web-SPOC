@@ -5,7 +5,12 @@ import * as service from '../services'
 const pathname = window.location.pathname.trim().toLowerCase()
 export default createListViewModel({
   namespace: 'settingDocumentTemplate',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Document Template updated',
+      code: 'documenttemplate',
+    },
+  },
   param: {
     service,
     state: {

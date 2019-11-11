@@ -1,6 +1,6 @@
 import moment from 'moment'
 // components
-import { DoctorLabel } from '@/components/_medisys'
+import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
 import { dateFormat, timeFormat, DateFormatter } from '@/components'
 import StatusBadge from './StatusBadge'
 // utils
@@ -51,7 +51,7 @@ export const ApptColumnExtensions = [
   {
     columnName: 'visitStatus',
     width: 180,
-    render: (row) => <StatusBadge row={row} />,
+    render: (row) => <VisitStatusTag row={row} />,
   },
   { columnName: 'patientAccountNo', compare: compareString },
   {
@@ -137,7 +137,7 @@ export const QueueColumnExtensions = [
   {
     columnName: 'visitStatus',
     width: 180,
-    render: (row) => <StatusBadge row={row} />,
+    render: (row) => <VisitStatusTag row={row} />,
   },
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
