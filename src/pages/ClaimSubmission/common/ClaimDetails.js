@@ -17,6 +17,7 @@ import {
   withFormikExtend,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  Field,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -247,7 +248,7 @@ class ClaimDetails extends Component {
                 </GridItem>
                 <GridItem md={4} />
                 <GridItem md={5}>
-                  <FastField
+                  <Field
                     name='diagnosisSelections'
                     render={(args) => (
                       <Select
@@ -256,7 +257,9 @@ class ClaimDetails extends Component {
                         mode='multiple'
                         options={diagnosis}
                         labelField='diagnosisDescription'
-                        maxTagCount={diagnosis.length > 1 ? 1 : 0}
+                        valueField='id'
+                        maxTagCount={diagnosis.length > 0 ? 0 : 0}
+                        maxTagPlaceholder='diagnosis'
                         {...args}
                       />
                     )}

@@ -1,18 +1,35 @@
+import React from 'react'
 import moment from 'moment'
 // components
 import { DoctorLabel, VisitStatusTag } from '@/components/_medisys'
-import { dateFormat, timeFormat, DateFormatter } from '@/components'
-import StatusBadge from './StatusBadge'
+import { dateFormat, CodeSelect, DateFormatter } from '@/components'
 // utils
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
-import { GENDER } from '@/utils/constants'
-import { formatAppointmentTimes } from '../utils'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const compareString = (a, b) => a.localeCompare(b)
-const compareDoctor = (a, b) =>
-  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
+const compareDoctor = (a, b) => {
+  const titleA = a.clinicianProfile.title ? `${a.clinicianProfile.title} ` : ''
+  const nameA = `${titleA}${a.clinicianProfile.name}`
+
+  const titleB = b.clinicianProfile.title ? `${b.clinicianProfile.title} ` : ''
+  const nameB = `${titleB}${b.clinicianProfile.name}`
+  return nameA.localeCompare(nameB)
+}
+
+const compareTime = (a, b) => {
+  if (a === '-' && b !== '-') return -1
+  if (a !== '-' && b === '-') return 1
+
+  const momentA = moment(a)
+  const momentB = moment(b)
+  if (momentA.isSameOrBefore(momentB)) return -1
+  if (momentA.isSameOrAfter(momentB)) return 1
+
+  return 0
+}
+
 const compareQueueNo = (a, b) => {
   const floatA = parseFloat(a)
   const floatB = parseFloat(b)
@@ -72,9 +89,22 @@ export const ApptColumnExtensions = [
     render: (row) => {
       const { genderFK, dob } = row
 
-      const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+      const gender = (
+        <CodeSelect
+          text
+          code='ctgender'
+          value={genderFK}
+          valueField='id'
+          labelField='code'
+        />
+      )
       const age = calculateAgeFromDOB(dob)
-      return `${gender}/${age}`
+      return (
+        <React.Fragment>
+          {gender}
+          <span>/{age}</span>
+        </React.Fragment>
+      )
     },
     sortingEnabled: false,
   },
@@ -181,11 +211,14 @@ export const QueueColumnExtensions = [
   {
     columnName: 'timeOut',
     width: 160,
-    render: (row) =>
-      DateFormatter({
+    compare: compareTime,
+    render: (row) => {
+      if (!row.timeOut) return '-'
+      return DateFormatter({
         value: row.timeOut,
         full: true,
-      }),
+      })
+    },
   },
   {
     columnName: 'gender/age',
@@ -193,9 +226,23 @@ export const QueueColumnExtensions = [
       if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
         const { patientProfile } = row
         const { genderFK, dob } = patientProfile
-        const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
+        const gender = (
+          <CodeSelect
+            text
+            code='ctgender'
+            value={genderFK}
+            valueField='id'
+            labelField='code'
+          />
+        )
+
         const age = calculateAgeFromDOB(dob)
-        return `${gender}/${age}`
+        return (
+          <React.Fragment>
+            {gender}
+            <span>/{age}</span>
+          </React.Fragment>
+        )
       }
       const { dob, gender = 'U' } = row
 
@@ -207,6 +254,7 @@ export const QueueColumnExtensions = [
   {
     columnName: 'appointmentTime',
     width: 160,
+    compare: compareTime,
     render: (row) => {
       if (row.appointmentTime) {
         const appointmentDate = moment(row.appointmentTime).format(dateFormat)

@@ -9,68 +9,25 @@ import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
   GridItem,
-  Select,
   OutlinedTextField,
   Button,
   withFormikExtend,
   FastField,
+  CodeSelect,
 } from '@/components'
 
-const New = ({
-  values,
-  onSend,
-  setFieldValue,
-  errors,
-  selectedRows,
-  handleSubmit,
-  recipient,
-}) => {
+const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
   const [
     messageNumber,
     setMessageNumber,
-  ] = useState(1)
-  const [
-    messageArr,
-    setMessageArr,
-  ] = useState([])
-  const SMSTemplate = [
-    {
-      name: 'Appointment Reminder',
-      value: 'Appointment Reminder',
-    },
-    {
-      name: 'Birthday Reminder',
-      value: 'Birthday Reminder',
-    },
-  ]
-
-  const splitMessage = (message, arr, limit) => {
-    let i = 0
-    while (message) {
-      if (i + limit >= message.length) {
-        arr.push(message.slice(i, message.length))
-        break
-      }
-      let end = message.slice(0, i + limit).lastIndexOf(' ')
-      arr.push(message.slice(i, end + 1))
-      i = end + 1
-    }
-  }
-
-  const handleClick = () => {
-    onSend(messageArr)
-    setFieldValue('message', '')
-    setMessageNumber(1)
-    setMessageArr([])
-  }
+  ] = useState()
 
   const handleChange = ({ target }) => {
     const { value } = target
-    let arr = []
     if (value) {
-      // splitMessage(value, arr, 160)
-      setMessageArr(arr)
-      setMessageNumber(arr.length)
+      setMessageNumber(Math.ceil(value.length / 160))
+    } else {
+      setMessageNumber(0)
     }
   }
 
@@ -93,11 +50,11 @@ const New = ({
           name='template'
           render={(args) => {
             return (
-              <Select
+              <CodeSelect
                 label={formatMessage({
                   id: 'sms.template',
                 })}
-                options={SMSTemplate}
+                code='ctSmsTemplate'
                 {...args}
               />
             )
@@ -129,11 +86,6 @@ const New = ({
                 label={formatMessage({
                   id: 'sms.message',
                 })}
-                inputProps={{
-                  inputProps: {
-                    maxLength: 160,
-                  },
-                }}
                 {...args}
               />
             )

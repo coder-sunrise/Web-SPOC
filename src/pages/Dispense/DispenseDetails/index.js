@@ -142,26 +142,36 @@ const DispenseDetails = ({
                   gstAmtField: 'gstAmount',
                 }}
                 onValueChanged={(v) => {
-                  setFieldValue('invoice.invoiceTotal', v.summary.total)
-                  setFieldValue(
-                    'invoice.invoiceTotalAftAdj',
-                    v.summary.totalAfterAdj,
-                  )
-                  setFieldValue(
-                    'invoice.invoiceTotalAftGST',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'invoice.outstandingBalance',
-                    v.summary.totalWithGST,
-                  )
-                  // console.log({ v })
+                  const newInvoice = {
+                    ...values.invoice,
+                    invoiceTotal: v.summary.total,
+                    invoiceTotalAftAdj: v.summary.totalAfterAdj,
+                    invoiceTotalAftGST: v.summary.totalWithGST,
+                    outstandingBalance: v.summary.totalWithGST,
+                    invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+                    invoiceAdjustment: v.adjustments,
+                  }
+                  setFieldValue('invoice', newInvoice)
+                  // setFieldValue('invoice.invoiceTotal', v.summary.total)
+                  // setFieldValue(
+                  //   'invoice.invoiceTotalAftAdj',
+                  //   v.summary.totalAfterAdj,
+                  // )
+                  // setFieldValue(
+                  //   'invoice.invoiceTotalAftGST',
+                  //   v.summary.totalWithGST,
+                  // )
+                  // setFieldValue(
+                  //   'invoice.outstandingBalance',
+                  //   v.summary.totalWithGST,
+                  // )
+                  // // console.log({ v })
 
-                  setFieldValue(
-                    'invoice.invoiceGSTAmt',
-                    Math.round(v.summary.gst * 100) / 100,
-                  )
-                  setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+                  // setFieldValue(
+                  //   'invoice.invoiceGSTAmt',
+                  //   Math.round(v.summary.gst * 100) / 100,
+                  // )
+                  // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
                   dispatch({
                     type: `dispense/updateState`,
                     payload: {

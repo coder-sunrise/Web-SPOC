@@ -29,7 +29,12 @@ class RadioEditorBase extends PureComponent {
   }
 
   componentDidMount () {
-    onComponentDidMount.call(this)
+    const { gridId, row, columnName } = onComponentDidMount.call(this)
+    if (!radioSelectedMap[gridId]) radioSelectedMap[gridId] = {}
+    if (row[columnName]) {
+      radioSelectedMap[gridId][columnName] = row.id
+      this.forceUpdate()
+    }
   }
 
   _onChange = (e, checked) => {
@@ -41,8 +46,6 @@ class RadioEditorBase extends PureComponent {
       ) || {}
     const { checkedValue = true, uncheckedValue = false, gridId } = cfg
 
-    if (!radioSelectedMap[gridId][columnName])
-      radioSelectedMap[gridId][columnName] = {}
     if (checked) {
       radioSelectedMap[gridId][columnName] = row.id
     }
@@ -113,7 +116,7 @@ class RadioEditorBase extends PureComponent {
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     const { checkedValue = true, uncheckedValue = false, gridId } = cfg
-
+    if (!radioSelectedMap[gridId]) return null
     const {
       type,
       code,
@@ -124,14 +127,11 @@ class RadioEditorBase extends PureComponent {
     } = getCommonConfig.call(this)
     commonCfg.onChange = this._onChange
 
-    if (!radioSelectedMap[gridId]) radioSelectedMap[gridId] = {}
-
     let checked = row[columnName] === checkedValue
-    if (checked && radioSelectedMap[gridId][columnName]) {
-      checked = radioSelectedMap[gridId][columnName] === row.id
+    if (checked) {
+      commonCfg.checked = radioSelectedMap[gridId][columnName] === row.id
     }
-    commonCfg.checked = checked
-    // console.log(commonCfg)
+    console.log(commonCfg, row, radioSelectedMap[gridId])
     return <Radio {...commonCfg} />
   }
 }
@@ -227,7 +227,9 @@ class RadioTypeProvider extends PureComponent {
   }
 
   // shouldComponentUpdate () {
-  //   return false
+  //   return
+  //   this.props.editingRowIds !== nextProps.editingRowIds ||
+  //     this.props.commitCount !== nextProps.commitCount
   // }
 
   render () {
