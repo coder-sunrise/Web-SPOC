@@ -750,6 +750,9 @@ const consultationDocumentTypes = [
           DocumentDetails: [
             {
               ...row,
+              issueDate: moment(row.issueDate).format(
+                dateFormatLong,
+              ),
             },
           ],
         }
@@ -922,9 +925,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
+      { ...criteriaForTenantCodes, ...params },
+      convertExcludeFields,
+    )
 
   // console.log(`fetch code: ${code}`)
   const response = await request(`${url}${code}`, {
