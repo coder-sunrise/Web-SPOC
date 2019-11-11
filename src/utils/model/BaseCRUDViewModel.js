@@ -232,7 +232,7 @@ export default class BaseCRUDViewModel {
       // },
 
       *upsert ({ payload, history }, { select, call, put }) {
-        console.log('upsert', payload, namespace, config)
+        // console.log('upsert', payload, namespace, config)
         const { cfg = {} } = payload
         const newPayload = cleanFieldValue(_.cloneDeep(payload))
         const r = yield call(service.upsert, newPayload)
@@ -248,7 +248,7 @@ export default class BaseCRUDViewModel {
         }
 
         const { codetable } = config
-        console.log(codetable)
+        // console.log(codetable)
         if (codetable) {
           if (typeof codetable === 'function') {
             sendNotification('CodetableUpdated', codetable(newPayload))
