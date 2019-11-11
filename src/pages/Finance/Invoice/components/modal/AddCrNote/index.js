@@ -62,44 +62,70 @@ const crNoteItemSchema = Yup.object().shape({
       remark,
       finalCredit,
     } = values
+    const payload = {
+      generatedDate: moment().formatUTC(false),
+      invoicePayerFK,
+      isStockIn,
+      remark,
+      total: finalCredit,
+      totalAftGST: finalCredit,
+      creditNoteItem: creditNoteItem
+        .filter((x) => x.isSelected)
+        .map((selectedItem) => {
+          if (
+            selectedItem.itemType.toLowerCase() === 'misc' ||
+            selectedItem.itemType.toLowerCase() === 'service'
+          ) {
+            selectedItem.isInventoryItem = false
+          } else {
+            selectedItem.isInventoryItem = true
+          }
+          delete selectedItem.id
+          delete selectedItem.concurrencyToken
+          selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
+          selectedItem.itemDescription = selectedItem.itemName
+          return { ...selectedItem }
+        }),
+    }
 
-    dispatch({
-      type: 'invoiceCreditNote/upsert',
-      payload: {
-        generatedDate: moment().formatUTC(false),
-        invoicePayerFK,
-        isStockIn,
-        remark,
-        total: finalCredit,
-        totalAftGST: finalCredit,
-        creditNoteItem: creditNoteItem
-          .filter((x) => x.isSelected)
-          .map((selectedItem) => {
-            if (
-              selectedItem.itemType.toLowerCase() === 'misc' ||
-              selectedItem.itemType.toLowerCase() === 'service'
-            ) {
-              selectedItem.isInventoryItem = false
-            } else {
-              selectedItem.isInventoryItem = true
-            }
-            delete selectedItem.id
-            delete selectedItem.concurrencyToken
-            selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
-            selectedItem.itemDescription = selectedItem.itemName
-            return { ...selectedItem }
-          }),
-      },
-    }).then((r) => {
-      if (r) {
-        if (onConfirm) onConfirm()
-        // Refresh invoice & invoicePayer
-        onRefresh()
-        // dispatch({
-        //   type: 'settingClinicService/query',
-        // })
-      }
-    })
+    console.log({ payload })
+    // dispatch({
+    //   type: 'invoiceCreditNote/upsert',
+    //   payload: {
+    //     generatedDate: moment().formatUTC(false),
+    //     invoicePayerFK,
+    //     isStockIn,
+    //     remark,
+    //     total: finalCredit,
+    //     totalAftGST: finalCredit,
+    //     creditNoteItem: creditNoteItem
+    //       .filter((x) => x.isSelected)
+    //       .map((selectedItem) => {
+    //         if (
+    //           selectedItem.itemType.toLowerCase() === 'misc' ||
+    //           selectedItem.itemType.toLowerCase() === 'service'
+    //         ) {
+    //           selectedItem.isInventoryItem = false
+    //         } else {
+    //           selectedItem.isInventoryItem = true
+    //         }
+    //         delete selectedItem.id
+    //         delete selectedItem.concurrencyToken
+    //         selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
+    //         selectedItem.itemDescription = selectedItem.itemName
+    //         return { ...selectedItem }
+    //       }),
+    //   },
+    // }).then((r) => {
+    //   if (r) {
+    //     if (onConfirm) onConfirm()
+    //     // Refresh invoice & invoicePayer
+    //     onRefresh()
+    //     // dispatch({
+    //     //   type: 'settingClinicService/query',
+    //     // })
+    //   }
+    // })
   },
 })
 class AddCrNote extends Component {
@@ -137,7 +163,7 @@ class AddCrNote extends Component {
 
     filterCreditNoteItem.map((x) => {
       x.isSelected = true
-      finalCreditTotal += x.totalAfterItemAdjustment
+      finalCreditTotal += x.totalAfterGST
       return finalCreditTotal
     })
 
@@ -231,7 +257,7 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
-    console.log({ creditNoteItem })
+
     return (
       <div>
         <CrNoteForm />
@@ -299,7 +325,7 @@ class AddCrNote extends Component {
               currency: true,
             },
             {
-              columnName: 'totalAfterItemAdjustment',
+              columnName: 'totalAfterGST',
               type: 'currency',
               currency: true,
             },

@@ -155,9 +155,10 @@ class CoPayer extends Component {
               label='Corporate Copayer'
               code='ctcopayer'
               labelField='displayValue'
-              remoteFilter={{
-                coPayerTypeFK: 1,
-              }}
+              // remoteFilter={{
+              //   coPayerTypeFK: 1,
+              // }}
+              localFilter={(item) => item.coPayerTypeFK === 1}
               value={coPayer}
               onChange={this.handleCopayerChange}
             />

@@ -161,7 +161,6 @@ export default createFormViewModel({
       *submitVoidWriteOff ({ payload }, { call }) {
         const response = yield call(service.voidWriteOff, payload)
         const { status } = response
-        console.log({ response })
         if (status === '200') {
           notification.success({
             message: 'Saved',
@@ -188,7 +187,6 @@ export default createFormViewModel({
     reducers: {
       queryDone (state, { payload }) {
         const { data } = payload
-        console.log({ data })
         let paymentResult
         if (data) {
           paymentResult = data.map((payment) => {

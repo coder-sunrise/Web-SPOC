@@ -51,7 +51,7 @@ class AllergyGrid extends PureComponent {
         },
         {
           columnName: 'allergyName',
-          onChange: (val, row) => {
+          onChange: ({ val, row }) => {
             row.allergyCode = val
             row.allergyFK = 1
           },
