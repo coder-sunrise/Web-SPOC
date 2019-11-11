@@ -690,13 +690,13 @@ const navigateDirtyCheck = ({
   openConfirmContent,
   ...restProps
 }) => (e) => {
-  console.log(
-    onConfirm,
-    displayName,
-    restProps,
-    window.beforeReloadHandlerAdded,
-    window.dirtyForms,
-  )
+  // console.log(
+  //   onConfirm,
+  //   displayName,
+  //   restProps,
+  //   window.beforeReloadHandlerAdded,
+  //   window.dirtyForms,
+  // )
   if (window.beforeReloadHandlerAdded) {
     let f = {}
     if (displayName) {
@@ -1002,6 +1002,9 @@ const removeFields = (obj, fields = []) => {
     })
   }
 }
+
+export const currencyFormatter = (value) =>
+  numeral(value).format(`$${config.currencyFormat}`)
 
 module.exports = {
   ...cdrssUtil,

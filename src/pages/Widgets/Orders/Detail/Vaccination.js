@@ -129,12 +129,11 @@ class Vaccination extends PureComponent {
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit } = this.props
     // console.log(this.props)
-    let currentVaccination = Object.values(vaccination).length
-      ? vaccination
-      : undefined
+    let currentVaccination =
+      vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
-    console.log(currentVaccination, values)
+    // console.log(currentVaccination, values)
     if (currentVaccination && currentVaccination.dispensingQuantity) {
       newTotalQuantity = currentVaccination.dispensingQuantity
     } else {

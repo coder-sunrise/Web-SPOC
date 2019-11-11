@@ -5,12 +5,14 @@ import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
-  Checkbox,
   DatePicker,
   GridContainer,
   GridItem,
   SizeContainer,
+  RadioGroup,
+  CodeSelect,
 } from '@/components'
+import { DiagnosisSelect } from '@/components/_medisys'
 
 const styles = (theme) => ({
   generateBtn: {
@@ -35,11 +37,45 @@ const FilterBar = ({ classes, handleSubmit }) => {
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
-
+          <GridItem md={2}>
+            <FastField
+              name='viewBy'
+              render={(args) => (
+                <RadioGroup
+                  {...args}
+                  label='View By'
+                  options={[
+                    {
+                      value: 'Monthly',
+                      label: 'Monthly',
+                    },
+                    {
+                      value: 'Weekly',
+                      label: 'Weekly',
+                    },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
           <GridItem md={2} className={classes.generateBtn}>
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
+          </GridItem>
+          <GridItem md={8}>
+            <FastField
+              name='diagnosisIds'
+              render={(args) => (
+                <DiagnosisSelect
+                  {...args}
+                  mode='multiple'
+                  onChange={(v, op) => {
+                    console.log(v, op)
+                  }}
+                />
+              )}
+            />
           </GridItem>
         </GridContainer>
       </React.Fragment>

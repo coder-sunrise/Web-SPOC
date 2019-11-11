@@ -155,13 +155,10 @@ const styles = (theme) => ({
         }
 
     const userProfile = constructUserProfile(values, role)
-    console.log({ userProfile })
+
     const payload = {
       ...restValues,
       doctorProfile,
-      // doctorProfile: isDoctor
-      //   ? restValues.doctorProfile
-      //   : { ...restValues.doctorProfile, isDeleted: true },
       effectiveStartDate: values.effectiveDates[0],
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
@@ -172,6 +169,7 @@ const styles = (theme) => ({
       payload,
     }).then((response) => {
       if (response) {
+        sessionStorage.removeItem('user')
         if (currentUser) {
           dispatch({
             type: 'user/fetchCurrent',

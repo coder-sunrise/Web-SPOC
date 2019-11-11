@@ -117,7 +117,7 @@ class BasicLayout extends React.PureComponent {
     this.resize = _.debounce(this.resize, 500, {
       leading: true,
     })
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch } = this.props
 
     this.initUserData()
     initStream()
@@ -409,7 +409,6 @@ class BasicLayout extends React.PureComponent {
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
-    // console.log(loading)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -425,7 +424,7 @@ class BasicLayout extends React.PureComponent {
     } = this.props
     // console.log(this.props)
     const isTop = PropsLayout === 'topmenu'
-    const routerConfig = this.matchParamsPath(pathname)
+    // const routerConfig = this.matchParamsPath(pathname)
     // console.log('routerConfig', routerConfig)
     const mainPanel = `${classes.mainPanel} ${cx({
       [classes.mainPanelSidebarMini]: collapsed,

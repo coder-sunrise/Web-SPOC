@@ -41,6 +41,8 @@ const withFormikExtend = (props) => (Component) => {
       // str: JSON.stringify(values),
     }
     const ob = window.g_app._store.getState().formik[displayName]
+    // console.log('dirty', dirty, displayName, _lastFormikUpdate)
+
     if (dirty) {
       window.dirtyForms[displayName] = {
         displayName,
@@ -52,27 +54,27 @@ const withFormikExtend = (props) => (Component) => {
         },
       }
     }
-    if (_.isEqual(_lastFormikUpdate, ob)) {
-      return
-    }
-    window.g_app._store.dispatch({
-      type: 'formik/updateState',
-      payload: {
-        [displayName]: _lastFormikUpdate,
-      },
-    })
 
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
 
       window.addEventListener('beforeunload', confirmBeforeReload)
-    } else if (!dirty && window.beforeReloadHandlerAdded) {
+    } else if (!dirty) {
       delete window.dirtyForms[displayName]
 
       if (Object.values(window.dirtyForms).length === 0) {
         window.beforeReloadHandlerAdded = false
         window.removeEventListener('beforeunload', confirmBeforeReload)
       }
+    }
+
+    if (!_.isEqual(_lastFormikUpdate, ob)) {
+      window.g_app._store.dispatch({
+        type: 'formik/updateState',
+        payload: {
+          [displayName]: _lastFormikUpdate,
+        },
+      })
     }
   }
 
@@ -140,17 +142,19 @@ const withFormikExtend = (props) => (Component) => {
 
     componentWillUnmount () {
       startDirtyChecking = false
-
+      // console.log(displayName, window.dirtyForms[displayName])
       if (displayName) {
-        if (window.dirtyForms[displayName]) {
+        const ob = window.g_app._store.getState().formik[displayName]
+        if (ob)
           window.g_app._store.dispatch({
             type: 'formik/updateState',
             payload: {
               [displayName]: undefined,
             },
           })
+        if (window.dirtyForms[displayName]) {
+          delete window.dirtyForms[displayName]
         }
-        delete window.dirtyForms[displayName]
 
         if (Object.values(window.dirtyForms).length === 0) {
           window.beforeReloadHandlerAdded = false

@@ -103,10 +103,10 @@ export default createFormViewModel({
           })
 
           yield take('billing/query/@@end')
-          yield put({
-            type: 'formik/clean',
-            payload: 'BillingForm',
-          })
+          // yield put({
+          //   type: 'formik/clean',
+          //   payload: 'BillingForm',
+          // })
 
           return response
         }

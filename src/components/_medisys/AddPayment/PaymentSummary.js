@@ -48,7 +48,6 @@ const PaymentSummary = ({
             name='cashReceived'
             render={(args) => (
               <NumberInput
-                simple
                 onChange={handleCashReceivedChange}
                 min={shouldDisableCashReceived ? 0 : minCashReceived}
                 disabled={shouldDisableCashReceived}

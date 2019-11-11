@@ -92,10 +92,10 @@ class EditOrder extends Component {
           message: 'Order signed',
         })
 
-        dispatch({
-          type: `formik/clean`,
-          payload: 'OrderPage',
-        })
+        // dispatch({
+        //   type: `formik/clean`,
+        //   payload: 'OrderPage',
+        // })
       }
     })
   }

@@ -238,7 +238,7 @@ class Medication extends PureComponent {
 
           newTotalQuantity +=
             dosage.multiplier *
-            frequency.multipler *
+            frequency.multiplier *
             prescriptionItem[i].duration
         }
       }

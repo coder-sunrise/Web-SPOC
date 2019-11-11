@@ -47,7 +47,7 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
       notification.success({
         message: 'Change password success.',
       })
-
+      sessionStorage.removeItem('user')
       // fetch again to refresh
       dispatch({ type: 'user/fetchCurrent' })
       onConfirm()

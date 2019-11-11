@@ -415,10 +415,10 @@ class Form extends React.PureComponent {
               },
             })
           } else {
-            dispatch({
-              type: 'formik/clean',
-              payload: 'AppointmentForm',
-            })
+            // dispatch({
+            //   type: 'formik/clean',
+            //   payload: 'AppointmentForm',
+            // })
             resetForm()
             onClose()
           }

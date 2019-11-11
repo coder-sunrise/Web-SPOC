@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatMessage } from 'umi/locale'
 // formik
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -11,7 +11,6 @@ import {
   Select,
   CodeSelect,
   DateRangePicker,
-  Field,
 } from '@/components'
 // medisys component
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
@@ -43,7 +42,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
         />
       </GridItem>
       <GridItem xs={4}>
-        <FastField
+        <Field
           name='appointmentType'
           render={(args) => {
             return (
