@@ -185,9 +185,9 @@ const Grid = ({
       <CommonModal
         open={showMessageModal}
         title='Send SMS'
+        observe='Sms'
         onClose={() => setShowMessageModal(false)}
         onConfirm={() => setShowMessageModal(false)}
-        showFooter={false}
       >
         {showMessageModal ? <MessageListing {...messageListingProps} /> : null}
       </CommonModal>

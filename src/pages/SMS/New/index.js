@@ -9,11 +9,11 @@ import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
   GridItem,
-  Select,
   OutlinedTextField,
   Button,
   withFormikExtend,
   FastField,
+  CodeSelect,
 } from '@/components'
 
 const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
@@ -21,17 +21,6 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
     messageNumber,
     setMessageNumber,
   ] = useState()
-
-  const SMSTemplate = [
-    {
-      name: 'Appointment Reminder',
-      value: 'Appointment Reminder',
-    },
-    {
-      name: 'Birthday Reminder',
-      value: 'Birthday Reminder',
-    },
-  ]
 
   const handleChange = ({ target }) => {
     const { value } = target
@@ -61,11 +50,11 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
           name='template'
           render={(args) => {
             return (
-              <Select
+              <CodeSelect
                 label={formatMessage({
                   id: 'sms.template',
                 })}
-                options={SMSTemplate}
+                code='ctSmsTemplate'
                 {...args}
               />
             )
