@@ -9,8 +9,27 @@ import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const compareString = (a, b) => a.localeCompare(b)
-const compareDoctor = (a, b) =>
-  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
+const compareDoctor = (a, b) => {
+  const titleA = a.clinicianProfile.title ? `${a.clinicianProfile.title} ` : ''
+  const nameA = `${titleA}${a.clinicianProfile.name}`
+
+  const titleB = b.clinicianProfile.title ? `${b.clinicianProfile.title} ` : ''
+  const nameB = `${titleB}${b.clinicianProfile.name}`
+  return nameA.localeCompare(nameB)
+}
+
+const compareTime = (a, b) => {
+  if (a === '-' && b !== '-') return -1
+  if (a !== '-' && b === '-') return 1
+
+  const momentA = moment(a)
+  const momentB = moment(b)
+  if (momentA.isSameOrBefore(momentB)) return -1
+  if (momentA.isSameOrAfter(momentB)) return 1
+
+  return 0
+}
+
 const compareQueueNo = (a, b) => {
   const floatA = parseFloat(a)
   const floatB = parseFloat(b)
@@ -192,11 +211,14 @@ export const QueueColumnExtensions = [
   {
     columnName: 'timeOut',
     width: 160,
-    render: (row) =>
-      DateFormatter({
+    compare: compareTime,
+    render: (row) => {
+      if (!row.timeOut) return '-'
+      return DateFormatter({
         value: row.timeOut,
         full: true,
-      }),
+      })
+    },
   },
   {
     columnName: 'gender/age',
@@ -232,6 +254,7 @@ export const QueueColumnExtensions = [
   {
     columnName: 'appointmentTime',
     width: 160,
+    compare: compareTime,
     render: (row) => {
       if (row.appointmentTime) {
         const appointmentDate = moment(row.appointmentTime).format(dateFormat)
