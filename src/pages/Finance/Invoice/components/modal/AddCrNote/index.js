@@ -2,14 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
-import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
-import Yup from '@/utils/yup'
 // common components
 import {
   CommonTableGrid,
-  EditableTableGrid,
   withFormikExtend,
   GridContainer,
   GridItem,
@@ -23,18 +20,16 @@ import {
   SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
-import { CrNoteColumns, TableConfig } from './variables'
+import { roundToTwoDecimals } from '@/utils/utils'
+import { CrNoteColumns } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
 
-const crNoteItemSchema = Yup.object().shape({
-  quantity: Yup.number().min(0).required(),
-})
-
-@connect(({ invoiceCreditNote }) => ({
+@connect(({ invoiceCreditNote, invoiceDetail }) => ({
   invoiceCreditNote,
+  invoiceDetail: invoiceDetail.entity,
 }))
 @withFormikExtend({
   name: 'invoiceCreditNote',
@@ -53,7 +48,7 @@ const crNoteItemSchema = Yup.object().shape({
     return errors
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, onRefresh } = props
+    const { invoiceDetail, dispatch, onConfirm, onRefresh } = props
     // console.log({ values, props })
     const {
       creditNoteItem,
@@ -62,79 +57,58 @@ const crNoteItemSchema = Yup.object().shape({
       remark,
       finalCredit,
     } = values
+    const gstAmount = creditNoteItem.reduce(
+      (totalGstAmount, item) =>
+        item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
+      0,
+    )
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
       isStockIn,
       remark,
+      gstAmt: roundToTwoDecimals(gstAmount),
+      gstValue: invoiceDetail.gstValue,
       total: finalCredit,
       totalAftGST: finalCredit,
       creditNoteItem: creditNoteItem
         .filter((x) => x.isSelected)
         .map((selectedItem) => {
-          if (
-            selectedItem.itemType.toLowerCase() === 'misc' ||
-            selectedItem.itemType.toLowerCase() === 'service'
-          ) {
-            selectedItem.isInventoryItem = false
-          } else {
-            selectedItem.isInventoryItem = true
+          const { id, concurrencyToken, ...restProps } = selectedItem
+
+          const item = {
+            ...restProps,
+            isInventoryItem:
+              restProps.itemType.toLowerCase() === 'misc' ||
+              restProps.itemType.toLowerCase() === 'service',
+            subTotal: restProps.totalAfterGST,
+            itemDescription: restProps.itemName,
           }
-          delete selectedItem.id
-          delete selectedItem.concurrencyToken
-          selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
-          selectedItem.itemDescription = selectedItem.itemName
-          return { ...selectedItem }
+          return { ...item }
         }),
     }
 
     console.log({ payload })
-    // dispatch({
-    //   type: 'invoiceCreditNote/upsert',
-    //   payload: {
-    //     generatedDate: moment().formatUTC(false),
-    //     invoicePayerFK,
-    //     isStockIn,
-    //     remark,
-    //     total: finalCredit,
-    //     totalAftGST: finalCredit,
-    //     creditNoteItem: creditNoteItem
-    //       .filter((x) => x.isSelected)
-    //       .map((selectedItem) => {
-    //         if (
-    //           selectedItem.itemType.toLowerCase() === 'misc' ||
-    //           selectedItem.itemType.toLowerCase() === 'service'
-    //         ) {
-    //           selectedItem.isInventoryItem = false
-    //         } else {
-    //           selectedItem.isInventoryItem = true
-    //         }
-    //         delete selectedItem.id
-    //         delete selectedItem.concurrencyToken
-    //         selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
-    //         selectedItem.itemDescription = selectedItem.itemName
-    //         return { ...selectedItem }
-    //       }),
-    //   },
-    // }).then((r) => {
-    //   if (r) {
-    //     if (onConfirm) onConfirm()
-    //     // Refresh invoice & invoicePayer
-    //     onRefresh()
-    //     // dispatch({
-    //     //   type: 'settingClinicService/query',
-    //     // })
-    //   }
-    // })
+    dispatch({
+      type: 'invoiceCreditNote/upsert',
+      payload,
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        // Refresh invoice & invoicePayer
+        onRefresh()
+        // dispatch({
+        //   type: 'settingClinicService/query',
+        // })
+      }
+    })
   },
 })
 class AddCrNote extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      selectedRows: [
-        undefined,
-      ],
+      selectedRows: [],
     }
 
     this.handleOnChangeQuantity = _.debounce(this.handleOnChangeQuantity, 100)
@@ -149,34 +123,26 @@ class AddCrNote extends Component {
 
     const { setFieldValue, values } = this.props
     const { creditNoteItem } = values
-    let finalCreditTotal = 0
 
-    creditNoteItem.map((x) => {
-      x.isSelected = false
-      return null
-    })
-
-    let filterCreditNoteItem = creditNoteItem.filter(
-      (o) =>
-        rowSelection.includes(+o.id) || o.itemType.toLowerCase() === 'misc',
-    )
-
-    filterCreditNoteItem.map((x) => {
-      x.isSelected = true
-      finalCreditTotal += x.totalAfterGST
-      return finalCreditTotal
-    })
-
-    setFieldValue('finalCredit', finalCreditTotal)
+    const finalCreditTotal = creditNoteItem.reduce((total, item) => {
+      if (
+        rowSelection.includes(item.id) ||
+        item.itemType.toLowerCase() === 'misc'
+      )
+        return total + item.totalAfterGST
+      return total
+    }, 0)
+    setFieldValue('finalCredit', roundToTwoDecimals(finalCreditTotal))
   }
 
   handleSelectionChange = (selection) => {
-    let newSelection = selection
-
-    newSelection.includes(undefined)
-      ? newSelection
-      : newSelection.push(undefined)
-    this.setState({ selectedRows: newSelection })
+    const { values, setFieldValue } = this.props
+    const newCreditNoteItem = values.creditNoteItem.map((item) => ({
+      ...item,
+      isSelected: selection.includes(item.id),
+    }))
+    setFieldValue('creditNoteItem', newCreditNoteItem)
+    this.setState({ selectedRows: selection })
 
     this.handleCalcCrNoteItem(selection)
   }
@@ -184,7 +150,6 @@ class AddCrNote extends Component {
   onCommitChanges = ({ rows, deleted }) => {
     const { setFieldValue, values } = this.props
     const { creditNoteItem } = values
-    // console.log('onCommitChanges1', { rows, deleted })
 
     if (deleted) {
       const selectedCrItem = creditNoteItem.find(
@@ -257,7 +222,6 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
-
     return (
       <div>
         <CrNoteForm />
