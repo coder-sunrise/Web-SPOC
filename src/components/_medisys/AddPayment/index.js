@@ -226,7 +226,12 @@ class AddPayment extends Component {
         'cashReturned',
         roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
       )
-    else setFieldValue('cashReturned', 0)
+    else if (totalPaid < finalPayable) {
+      setFieldValue(
+        'cashReturned',
+        _cashReceived - (cashPayment.amt + cashRounding),
+      )
+    } else setFieldValue('cashReturned', 0)
   }
 
   handlePaymentDateChange = (value) => {

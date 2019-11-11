@@ -235,33 +235,34 @@ class PaymentDetails extends Component {
     this.setState({ showAddCrNote: true })
   }
 
-  onPrinterClick = (type, itemID) => {
+  onPrinterClick = (type, itemID, invoicePayerFK) => {
     const { invoicePayment } = this.props
+
     switch (type) {
       case 'Payment':
-        this.onShowReport('InvoicePaymentId', 29, itemID)
+        this.onShowReport(29, { InvoicePaymentId: itemID })
         break
       case 'Credit Note':
-        this.onShowReport('CreditNoteId', 18, itemID)
+        this.onShowReport(18, { CreditNoteId: itemID })
         break
       case 'TaxInvoice':
-        this.onShowReport(
-          'InvoiceId',
-          15,
-          invoicePayment ? invoicePayment.currentId : '',
-        )
+        this.onShowReport(15, {
+          InvoiceId: invoicePayment ? invoicePayment.currentId : '',
+          CopayerId: invoicePayerFK,
+        })
         break
       default:
         break
     }
   }
 
-  onShowReport = (paramKey, reportID, itemID) => {
+  onShowReport = (reportID, reportParameters) => {
     this.setState({
       showReport: true,
       reportPayload: {
         reportID,
-        reportParameters: { [paramKey]: itemID },
+        reportParameters,
+        // reportParameters: { [paramKey]: itemID },
       },
     })
   }
