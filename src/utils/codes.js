@@ -926,7 +926,7 @@ export const fetchAndSaveCodeTable = async (
         { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
-  console.log({ useGeneral, newParams, params, body })
+  // console.log({ useGeneral, newParams, params, body })
   // console.log(`fetch code: ${code}`)
   const response = await request(`${url}${code}`, {
     method: 'GET',

@@ -31,15 +31,16 @@ const reloadDispense = (props, effect = 'query') => {
     payload: dispense.visitID,
   }).then((o) => {
     resetForm(o)
-    dispatch({
-      type: `formik/clean`,
-      payload: 'DispensePage',
-    })
+    // dispatch({
+    //   type: `formik/clean`,
+    //   payload: 'DispensePage',
+    // })
   })
 }
 @withFormikExtend({
   authority: 'queue.dispense',
   enableReinitialize: true,
+  notDirtyDuration: 3,
   mapPropsToValues: ({ dispense = {}, clinicSettings }) => {
     const _temp = dispense.entity || dispense.default
     const { settings } = clinicSettings

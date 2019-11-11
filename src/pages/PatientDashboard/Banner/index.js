@@ -158,7 +158,7 @@ class Banner extends PureComponent {
       type: 'patient/refreshChasBalance',
       payload: { ...entity, patientCoPaymentSchemeFK },
     }).then((result) => {
-      console.log('result ==========', result)
+      // console.log('result ==========', result)
       if (result) {
         dispatch({
           type: 'patient/query',

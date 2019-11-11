@@ -179,14 +179,14 @@ class CommonModal extends React.PureComponent {
           })
           return false
         }
-        this.props.dispatch({
-          type: 'formik/updateState',
-          payload: {
-            [o]: undefined,
-          },
-        })
-        window.beforeReloadHandlerAdded = false
-        window.removeEventListener('beforeunload', confirmBeforeReload)
+        // this.props.dispatch({
+        //   type: 'formik/updateState',
+        //   payload: {
+        //     [o]: undefined,
+        //   },
+        // })
+        // window.beforeReloadHandlerAdded = false
+        // window.removeEventListener('beforeunload', confirmBeforeReload)
       }
     }
 
@@ -200,14 +200,14 @@ class CommonModal extends React.PureComponent {
 
   onConfirm = (cb) => {
     // console.log('onConfirm')
-    window.beforeReloadHandlerAdded = false
-    window.removeEventListener('beforeunload', confirmBeforeReload)
-    this.props.dispatch({
-      type: 'formik/updateState',
-      payload: {
-        [this.props.observe]: undefined,
-      },
-    })
+    // window.beforeReloadHandlerAdded = false
+    // window.removeEventListener('beforeunload', confirmBeforeReload)
+    // this.props.dispatch({
+    //   type: 'formik/updateState',
+    //   payload: {
+    //     [this.props.observe]: undefined,
+    //   },
+    // })
     if (this.props.onConfirm) {
       this.props.onConfirm()
     }
@@ -389,11 +389,11 @@ class CommonModal extends React.PureComponent {
                     this.setState({
                       openConfirm: false,
                     })
-                    window.beforeReloadHandlerAdded = false
-                    window.removeEventListener(
-                      'beforeunload',
-                      confirmBeforeReload,
-                    )
+                    // window.beforeReloadHandlerAdded = false
+                    // window.removeEventListener(
+                    //   'beforeunload',
+                    //   confirmBeforeReload,
+                    // )
                     this.onClose(true)
                   }}
                 >

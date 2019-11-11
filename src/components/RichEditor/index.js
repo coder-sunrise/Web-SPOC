@@ -207,7 +207,7 @@ class RichEditor extends React.PureComponent {
   }
 
   onChange = (editorState) => {
-    console.log(editorState)
+    // console.log(editorState)
 
     // console.log(editorState)
     // const {onChange}=this.props
@@ -428,6 +428,7 @@ class RichEditor extends React.PureComponent {
     const labelProps = {
       shrink: true,
     }
+    // console.log('render richeditor', props)
 
     return (
       <React.Fragment>

@@ -125,7 +125,7 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              <Badge
+              {/* <Badge
                 badgeContent={notifications.length}
                 color='primary'
                 anchorOrigin={{
@@ -136,7 +136,7 @@ class HeaderLinks extends React.Component {
                 <Button justIcon color='transparent'>
                   <Notifications fontSize='large' />
                 </Button>
-              </Badge>
+              </Badge> */}
               <Button justIcon color='transparent'>
                 {signalRConnected ? (
                   <Badge

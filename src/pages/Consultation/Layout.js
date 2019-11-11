@@ -253,7 +253,7 @@ class Layout extends PureComponent {
     }
   }
 
-  componentDidMount () {}
+  // componentDidMount () {}
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)

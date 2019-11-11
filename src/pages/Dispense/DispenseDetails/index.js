@@ -83,7 +83,7 @@ const DispenseDetails = ({
     }
   }
 
-  console.log({ values })
+  // console.log({ values })
   return (
     <React.Fragment>
       <GridItem>

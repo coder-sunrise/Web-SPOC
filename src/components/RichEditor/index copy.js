@@ -207,7 +207,7 @@ class RichEditor extends React.PureComponent {
   }
 
   onChange = (editorState) => {
-    console.log(editorState)
+    // console.log(editorState)
 
     // console.log(editorState)
     // const {onChange}=this.props

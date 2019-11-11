@@ -149,7 +149,12 @@ class AntdSelect extends React.PureComponent {
           'tags',
         ].includes(mode)
       ) {
-        if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
+        if (
+          Array.isArray(v) &&
+          v.indexOf(allValue) >= 0 &&
+          options.length > 1 &&
+          v.length === 1
+        ) {
           v = [
             allValue,
             ...options.map((o) => o[valueField]),
