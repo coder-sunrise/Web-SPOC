@@ -113,11 +113,6 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
       if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
       return false
-
-      // if (momentStartDate.diff(momentDate, 'day') === 0) {
-      //   return true
-      // }
-      // return false
     })
 
     if (publicHoliday.length > 0) {
@@ -127,7 +122,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
         <Tooltip
           title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
           placement='top'
-          enterDelay={500}
+          enterDelay={250}
           classes={{ tooltip: classes.customMaxWidth }}
         >
           <div className={classes.calendarHoliday}>
@@ -426,7 +421,7 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   publicHolidays: calendar.publicHolidayList || [],
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
-  loading:
-    loading.effects['calendar/getCalendarList'] ||
-    loading.effects['calendar/getAppointmentDetails'],
+  loading: loading.models.calendar,
+  // loading.effects['calendar/getCalendarList'] ||
+  // loading.effects['calendar/getAppointmentDetails'],
 }))(CalendarView)

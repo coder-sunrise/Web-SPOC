@@ -181,6 +181,7 @@ class OutlinedTextField extends PureComponent {
       fullWidth = true,
       prefix,
       suffix,
+      maxLength = 200,
     } = props
     // console.log(this.state, this.state.value)
     if (this.state && this.state.value !== undefined) {

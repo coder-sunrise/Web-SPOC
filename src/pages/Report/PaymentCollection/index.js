@@ -1,35 +1,26 @@
 import React, { useEffect, useReducer } from 'react'
-import * as Yup from 'yup'
+import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
 import { Accordion, CardContainer, GridContainer, GridItem } from '@/components'
+import { AccordionTitle } from '@/components/_medisys'
 // sub components
 import FilterBar from './FilterBar'
 import ReportLayoutWrapper from '../ReportLayout'
-import { ReportDataGrid, AccordionTitle } from '@/components/_medisys'
 // services
 import { getRawData } from '@/services/report'
-
-const PaymentCollectionColumns = [
-  { name: 'patientReferenceNo', title: 'Date' },
-  { name: 'patientAccountNo', title: 'Receipt No.' },
-  { name: 'patientName', title: 'Ref. No.' },
-  { name: 'lastVisitDate', title: 'Payer Name' },
-  { name: 'vC_Gender', title: 'Invoice No.' },
-  { name: 'vC_AgeInYear', title: 'Inv. Date' },
-  { name: 'vC_Nationality', title: 'Amount' },
-  { name: 'vC_MobileNo', title: 'Write Off' },
-  { name: 'vC_EmailAddress', title: 'Net Amount' },
-]
+import PaymentCollectionList from './PaymentCollectionList'
+import Summary from './Summary'
+import SumList from './SumList'
 
 const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  paymentCollectionData: [],
+  params: {},
 }
 const reducer = (state, action) => {
   switch (action.type) {
@@ -52,12 +43,11 @@ const reducer = (state, action) => {
 const reportID = 4
 const fileName = 'Payment Collection Details'
 
-const PatientListing = ({ values, validateForm }) => {
+const PaymentCollection = ({ values, validateForm }) => {
   const [
     state,
     dispatch,
   ] = useReducer(reducer, initialState)
-
   const handleActivePanelChange = (event, panel) =>
     dispatch({
       type: 'setActivePanel',
@@ -67,21 +57,26 @@ const PatientListing = ({ values, validateForm }) => {
     dispatch({
       type: 'toggleLoading',
     })
-    const result = await getRawData(reportID, values)
+    const params = {
+      ...values,
+      isPatientPayer:
+        values.payerType === 'All' || values.payerType === 'Patient',
+      isCompanyPayer:
+        values.payerType === 'All' || values.payerType === 'Company',
+      groupByPaymentMode: values.groupBy === 'PaymentMode',
+      groupByDoctor: values.groupBy === 'Doctor',
+    }
+    const reportDatas = await getRawData(reportID, params)
 
-    if (result) {
+    if (reportDatas) {
       dispatch({
         type: 'updateState',
         payload: {
           activePanel: 0,
           loaded: true,
           isLoading: false,
-          paymentCollectionData: result.PaymentCollectionDetails.map(
-            (item, index) => ({
-              ...item,
-              id: `paymentCollectionDetails-${index}`,
-            }),
-          ),
+          reportDatas,
+          params,
         },
       })
     } else {
@@ -94,7 +89,6 @@ const PatientListing = ({ values, validateForm }) => {
       })
     }
   }
-
   const onSubmitClick = async () => {
     dispatch({
       type: 'setLoaded',
@@ -106,9 +100,9 @@ const PatientListing = ({ values, validateForm }) => {
   }
 
   useEffect(() => {
-    /* 
+    /*
     clean up function
-    set data to empty array when leaving the page 
+    set data to empty array when leaving the page
     */
     return () =>
       dispatch({
@@ -126,7 +120,7 @@ const PatientListing = ({ values, validateForm }) => {
           <ReportLayoutWrapper
             loading={state.isLoading}
             reportID={reportID}
-            reportParameters={values}
+            reportParameters={state.params}
             loaded={state.loaded}
             fileName={fileName}
           >
@@ -137,14 +131,16 @@ const PatientListing = ({ values, validateForm }) => {
               expandIcon={<SolidExpandMore fontSize='large' />}
               collapses={[
                 {
-                  title: <AccordionTitle title='Patient Listing Summary' />,
-                  content: (
-                    <ReportDataGrid
-                      height={500}
-                      data={state.paymentCollectionData}
-                      columns={PaymentCollectionColumns}
-                    />
-                  ),
+                  title: <AccordionTitle title='Payment Collection Details' />,
+                  content: <PaymentCollectionList {...state} />,
+                },
+                {
+                  title: <AccordionTitle title='Summary' />,
+                  content: <Summary {...state} />,
+                },
+                {
+                  title: <AccordionTitle title='Summary By Payment Model' />,
+                  content: <SumList {...state} />,
                 },
               ]}
             />
@@ -155,15 +151,13 @@ const PatientListing = ({ values, validateForm }) => {
   )
 }
 
-const PatientListingWithFormik = withFormik({
-  validationSchema: Yup.object().shape(
-    {
-      // patientCriteria: Yup.string().required(),
-    },
-  ),
+const PaymentCollectionWithFormik = withFormik({
   mapPropsToValues: () => ({
-    patientCriteria: '',
+    dateFrom: moment(new Date()).startOf('month').toDate(),
+    dateTo: moment(new Date()).endOf('month').toDate(),
+    payerType: 'All',
+    groupBy: 'None',
   }),
-})(PatientListing)
+})(PaymentCollection)
 
-export default PatientListingWithFormik
+export default PaymentCollectionWithFormik

@@ -10,6 +10,15 @@ export const ValidationSchema = Yup.object().shape({
   collectableAmount: Yup.number(),
   outstandingBalance: Yup.number(),
   outstandingAfterPayment: Yup.number(),
+  showPaymentDate: Yup.boolean(),
+  paymentReceivedDate: Yup.string().when('showPaymentDate', {
+    is: (val) => val,
+    then: Yup.string().required(),
+  }),
+  paymentReceivedBizSessionFK: Yup.string().when('showPaymentDate', {
+    is: (val) => val,
+    then: Yup.string().required(),
+  }),
   paymentList: Yup.array().when(
     [
       'finalPayable',
@@ -40,7 +49,7 @@ export const ValidationSchema = Yup.object().shape({
               .required(),
             creditCardPayment: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              creditCardNo: Yup.number().required(),
+              // creditCardNo: Yup.number().required(),
             }),
             chequePayment: Yup.object().shape({
               chequeNo: Yup.string().required(),
@@ -61,15 +70,15 @@ export const ValidationSchema = Yup.object().shape({
           amt: Yup.number()
             .min(0)
             .max(
-              collectableAmount,
-              `Total amount paid cannot exceed $${collectableAmount}`,
+              finalPayable,
+              `Total amount paid cannot exceed $${finalPayable}`,
             )
             .required(),
           creditCardPayment: Yup.object().when('paymentModeFK', {
             is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
             then: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              creditCardNo: Yup.number().required(),
+              // creditCardNo: Yup.number().required(),
             }),
           }),
           chequePayment: Yup.object().when('paymentModeFK', {
@@ -121,7 +130,7 @@ export const InitialValue = {
     remarks: '',
     creditCardPayment: {
       creditCardTypeFK: undefined,
-      creditCardNo: null,
+      creditCardNo: undefined,
     },
   },
   [PAYMENT_MODE.CHEQUE]: {

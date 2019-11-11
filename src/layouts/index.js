@@ -66,21 +66,21 @@ const compare = (...props) => (Component) => {
   }
 }
 
-const withFormikExtend = (props) => (Component) => {
-  @withFormik(props)
-  class BasicComponent extends React.Component {
-    shouldComponentUpdate (nextProps, nextStates) {
-      return false
-    }
+// const withFormikExtend = (props) => (Component) => {
+//   @withFormik(props)
+//   class BasicComponent extends React.Component {
+//     shouldComponentUpdate (nextProps, nextStates) {
+//       return false
+//     }
 
-    render () {
-      console.log(props, Component)
-      return <Component {...this.props} />
-    }
-  }
+//     render () {
+//       console.log(props, Component)
+//       return <Component {...this.props} />
+//     }
+//   }
 
-  return BasicComponent
-}
+//   return BasicComponent
+// }
 
 // function withFormikExtend (_a) {
 //   var _b = _a.mapPropsToValues,
@@ -177,7 +177,7 @@ const withFormikExtend = (props) => (Component) => {
 // }
 
 module.exports = {
-  withFormikExtend,
+  // withFormikExtend,
   compare,
   ...module.exports,
 }

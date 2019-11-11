@@ -341,13 +341,6 @@ class SystemSetting extends PureComponent {
               }
             })
           }}
-          onKeyDown={(e) => {
-            if (e.keyCode === 13) {
-              const currentUrl = history.location.pathname
-              const searchValue = this.state.searchText
-              history.push(`${currentUrl}/${searchValue}`)
-            }
-          }}
           value={this.state.searchText}
         />
         <Accordion

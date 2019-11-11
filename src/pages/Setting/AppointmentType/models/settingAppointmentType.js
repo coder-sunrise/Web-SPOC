@@ -4,7 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingAppointmentType',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Appointment Type updated',
+      code: 'ctappointmenttype',
+    },
+  },
   param: {
     service,
     state: {

@@ -44,22 +44,13 @@ export default createFormViewModel({
               currentId: query.uid,
             },
           })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: undefined,
-              sddCode: undefined,
-              sddDescription: undefined,
-            },
-          })
         }
       })
       dispatch({
         type: 'medicPrecautionList',
         payload: {
-          pagesize: 99999,
+          isActive: true,
+          pagesize: 999,
         },
       })
     },
@@ -71,7 +62,7 @@ export default createFormViewModel({
         const response = yield call(queryMedicPrecaution, payload)
         yield put({
           type: 'getMedicPrecautionList',
-          payload: response.status == '200' ? response.data : {},
+          payload: response.status === '200' ? response.data : {},
         })
       },
     },
@@ -83,7 +74,7 @@ export default createFormViewModel({
           ctmedicationprecaution: data.map((x) => {
             return {
               medicationPrecautionFK: x.id,
-              value: x.name,
+              value: x.displayValue,
             }
           }),
         }

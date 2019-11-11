@@ -13,6 +13,7 @@ const PayerHeader = ({
   classes,
   patient,
   invoice,
+  invoicePayerName,
   outstandingAfterPayment,
 }) => {
   const { totalClaim } = invoice
@@ -21,7 +22,7 @@ const PayerHeader = ({
     <GridContainer justify='space-between' className={classes.payerHeader}>
       <GridItem {...columnConfig} className={classes.leftAlignText}>
         <h4>Payer: </h4>
-        <h4>{patient.name}</h4>
+        <h4>{invoicePayerName}</h4>
       </GridItem>
       <GridItem {...columnConfig} className={classes.centerText}>
         <h4>Total Payable: </h4>
@@ -47,8 +48,8 @@ const PayerHeader = ({
   )
 }
 
-const ConnectedPayerHeader = connect(({ patient }) => ({
-  patient: patient.entity || patient.default,
-}))(PayerHeader)
+// const ConnectedPayerHeader = connect(({ patient }) => ({
+//   patient: patient.entity || patient.default,
+// }))(PayerHeader)
 
-export default withStyles(styles, { name: 'PayerHeader' })(ConnectedPayerHeader)
+export default withStyles(styles, { name: 'PayerHeader' })(PayerHeader)

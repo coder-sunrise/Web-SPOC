@@ -15,6 +15,7 @@ import Down from '@material-ui/icons/ArrowDropDown'
 import Print from '@material-ui/icons/Print'
 // common component
 import { Button, Danger, GridContainer, GridItem } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 // utils
 import {
   arrayBufferToBase64,
@@ -27,6 +28,7 @@ import {
 import {
   getPDF,
   getUnsavedPDF,
+  exportUnsavedReport,
   exportPdfReport,
   exportExcelReport,
 } from '@/services/report'
@@ -43,6 +45,10 @@ const ReportViewer = ({
   classes,
   showTopDivider = true,
 }) => {
+  const [
+    exporting,
+    setExporting,
+  ] = useState(false)
   const [
     scale,
     setScale,
@@ -120,21 +126,21 @@ const ReportViewer = ({
     printJS({ printable: pdfData, type: 'pdf', base64: true })
 
   const onExportClick = async ({ key }) => {
-    // let result
-    // const fileName = REPORT_TYPE[reportID] || 'Report'
-    // let fileExtension = '.pdf'
-
-    // if (result) {
-    //   const base64Result = arrayBufferToBase64(result)
-    //   downloadFile(base64Result, `${fileName}${fileExtension}`)
-    // }
-
+    setExporting(true)
+    if (unsavedReport) {
+      const reportFormat = key === 'export-excel' ? 'excel' : 'pdf'
+      await exportUnsavedReport(reportID, reportFormat, reportContent)
+      setExporting(false)
+      return true
+    }
     if (key === 'export-excel') {
-      exportExcelReport(reportID, reportParameters)
+      await exportExcelReport(reportID, JSON.stringify(reportParameters))
       // fileExtension = '.xls'
     } else {
-      exportPdfReport(reportID, reportParameters)
+      await exportPdfReport(reportID, reportParameters)
     }
+    setExporting(false)
+    return true
   }
 
   const onPageNumberChange = (value) => {
@@ -143,122 +149,124 @@ const ReportViewer = ({
 
   return (
     <div className={classes.root}>
-      {showTopDivider && <Divider className={classes.divider} />}
-      <GridContainer>
-        <GridItem md={3}>
-          <Dropdown
-            disabled={!pdfData}
-            overlay={
-              <Menu onClick={onExportClick}>
-                <Menu.Item key='export-pdf' id='pdf'>
-                  <span>PDF</span>
-                </Menu.Item>
-                <Menu.Item key='export-excel' id='excel'>
-                  <span>Excel</span>
-                </Menu.Item>
-              </Menu>
-            }
-            trigger={[
-              'click',
-            ]}
-          >
-            <Button color='info' size='sm' disabled={!pdfData}>
-              <Down />
-              Export As
+      <LoadingWrapper loading={exporting} text='Exporting report...'>
+        {showTopDivider && <Divider className={classes.divider} />}
+        <GridContainer>
+          <GridItem md={3}>
+            <Dropdown
+              disabled={!pdfData}
+              overlay={
+                <Menu onClick={onExportClick}>
+                  <Menu.Item key='export-pdf' id='pdf'>
+                    <span>PDF</span>
+                  </Menu.Item>
+                  <Menu.Item key='export-excel' id='excel'>
+                    <span>Excel</span>
+                  </Menu.Item>
+                </Menu>
+              }
+              trigger={[
+                'click',
+              ]}
+            >
+              <Button color='info' size='sm' disabled={!pdfData}>
+                <Down />
+                Export As
+              </Button>
+            </Dropdown>
+            <Button
+              onClick={onPrintClick}
+              size='sm'
+              justIcon
+              color='info'
+              disabled={!pdfData}
+            >
+              <Print />
             </Button>
-          </Dropdown>
-          <Button
-            onClick={onPrintClick}
-            size='sm'
-            justIcon
-            color='info'
-            disabled={!pdfData}
-          >
-            <Print />
-          </Button>
-        </GridItem>
-        <GridItem md={6} className={classes.midButtonGroup}>
-          <Button
-            size='sm'
-            justIcon
-            color='primary'
-            className={classes.previousPageBtn}
-            disabled={!pdfData || pageNumber <= 1}
-            onClick={onPreviousClick}
-          >
-            <ArrowLeft />
-          </Button>
-          <div className={classes.pageNumber}>
-            <span>Page: </span>
-            <InputNumber
-              min={1}
-              max={numOfPages}
-              value={pageNumber}
-              onChange={onPageNumberChange}
-            />
-            <span> of {numOfPages}</span>
-          </div>
-          <Button
-            onClick={onNextClick}
-            size='sm'
-            justIcon
-            color='primary'
-            disabled={!pdfData || pageNumber >= numOfPages}
-          >
-            <ArrowRight />
-          </Button>
-        </GridItem>
-        <GridItem md={3} className={classes.rightButtonGroup}>
-          <Button
-            color='primary'
-            // size='sm'
-            justIcon
-            disabled={!pdfData || scale === maxScale}
-            onClick={zoom(0)}
-          >
-            <ZoomIn />
-          </Button>
-          <Button
-            color='primary'
-            // size='sm'
-            justIcon
-            disabled={!pdfData || scale === minScale}
-            onClick={zoom(1)}
-          >
-            <ZoomOut />
-          </Button>
-        </GridItem>
-      </GridContainer>
-      <div className={classes.reportContainer}>
-        {pdfData && (
-          <Document
-            // renderMode='svg'
-            file={pdfData ? `${BASE64_MARKER}${pdfData}` : ''}
-            onLoadSuccess={onDocumentLoadSuccess}
-            loading={<CircularProgress />}
-          >
-            <Page
-              className={classes.page}
-              pageNumber={pageNumber}
-              width={screenSize - 200}
-              height={screenSize - 200}
-              scale={scale}
-            />
-          </Document>
-        )}
-        {!pdfData &&
-        !showError && (
-          <React.Fragment>
-            <CircularProgress />
-            <h5>Loading report...</h5>
-          </React.Fragment>
-        )}
-        {showError && (
-          <Danger>
-            <h3 style={{ fontWeight: 500 }}>Failed to load report</h3>
-          </Danger>
-        )}
-      </div>
+          </GridItem>
+          <GridItem md={6} className={classes.midButtonGroup}>
+            <Button
+              size='sm'
+              justIcon
+              color='primary'
+              className={classes.previousPageBtn}
+              disabled={!pdfData || pageNumber <= 1}
+              onClick={onPreviousClick}
+            >
+              <ArrowLeft />
+            </Button>
+            <div className={classes.pageNumber}>
+              <span>Page: </span>
+              <InputNumber
+                min={1}
+                max={numOfPages}
+                value={pageNumber}
+                onChange={onPageNumberChange}
+              />
+              <span> of {numOfPages}</span>
+            </div>
+            <Button
+              onClick={onNextClick}
+              size='sm'
+              justIcon
+              color='primary'
+              disabled={!pdfData || pageNumber >= numOfPages}
+            >
+              <ArrowRight />
+            </Button>
+          </GridItem>
+          <GridItem md={3} className={classes.rightButtonGroup}>
+            <Button
+              color='primary'
+              // size='sm'
+              justIcon
+              disabled={!pdfData || scale === maxScale}
+              onClick={zoom(0)}
+            >
+              <ZoomIn />
+            </Button>
+            <Button
+              color='primary'
+              // size='sm'
+              justIcon
+              disabled={!pdfData || scale === minScale}
+              onClick={zoom(1)}
+            >
+              <ZoomOut />
+            </Button>
+          </GridItem>
+        </GridContainer>
+        <div className={classes.reportContainer}>
+          {pdfData && (
+            <Document
+              // renderMode='svg'
+              file={pdfData ? `${BASE64_MARKER}${pdfData}` : ''}
+              onLoadSuccess={onDocumentLoadSuccess}
+              loading={<CircularProgress />}
+            >
+              <Page
+                className={classes.page}
+                pageNumber={pageNumber}
+                width={screenSize - 200}
+                height={screenSize - 200}
+                scale={scale}
+              />
+            </Document>
+          )}
+          {!pdfData &&
+          !showError && (
+            <React.Fragment>
+              <CircularProgress />
+              <h5>Loading report...</h5>
+            </React.Fragment>
+          )}
+          {showError && (
+            <Danger>
+              <h3 style={{ fontWeight: 500 }}>Failed to load report</h3>
+            </Danger>
+          )}
+        </div>
+      </LoadingWrapper>
     </div>
   )
 }

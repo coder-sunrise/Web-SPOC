@@ -75,4 +75,4 @@ export IconButton from './Button/IconButton'
 export Fab from './Button/Fab'
 export Snackbar from './Snackbar'
 export WarningSnackbar from './WarningSnackbar'
-
+export { default as ScribbleNoteItem } from './ScribbleNoteItem'

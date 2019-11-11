@@ -74,7 +74,7 @@ const styles = (theme) => ({
 class Diagnosis extends PureComponent {
   // constructor (props) {
   //   super(props)
-  //   console.log(this.state, props)
+  //   console.log(this.state, props, 'constructor')
   // }
 
   componentDidMount () {
@@ -93,7 +93,14 @@ class Diagnosis extends PureComponent {
       nextProps.diagnosis.shouldAddNew
     ) {
       // console.log('shouldAddNew')
-      this.addDiagnosis(this.diagnosises.length + 1)
+
+      let index = 0
+      if (this.diagnosises.length === 0) {
+        index = 1
+      } else {
+        index = this.diagnosises[this.diagnosises.length - 1].sequence
+      }
+      this.addDiagnosis(index + 1)
       this.props.dispatch({
         type: 'diagnosis/updateState',
         payload: {
@@ -108,6 +115,7 @@ class Diagnosis extends PureComponent {
       onsetDate: moment(),
       uid: getUniqueGUID(),
       sequence: index,
+      isNew: true,
     })
   }
 

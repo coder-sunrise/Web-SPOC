@@ -1,17 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import Remove from '@material-ui/icons/Remove'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Yup from '@/utils/yup'
-import {
-  CardContainer,
-  Tooltip,
-  Button,
-  GridContainer,
-  GridItem,
-  EditableTableGrid,
-} from '@/components'
+import { CardContainer, GridContainer, GridItem } from '@/components'
 import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
+import InventoryType from './InventoryType'
 
 const styles = () => ({
   displayDiv: {
@@ -58,29 +50,6 @@ const InventoryTypeListing = ({
     vaccinationPackageItem,
     servicePackageItem,
   } = values
-
-  const Cell = ({ column, row, ...p }) => {
-    if (column.name === 'Action') {
-      return (
-        <Table.Cell {...p}>
-          <Tooltip title='Remove' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={() => console.log(row)}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Remove />
-            </Button>
-          </Tooltip>
-        </Table.Cell>
-      )
-    }
-    return <Table.Cell {...p} />
-  }
-  const TableCell = (p) => Cell({ ...p, dispatch })
 
   const medicationSchema = Yup.object().shape({
     inventoryMedicationFK: Yup.number().required(),
@@ -157,14 +126,6 @@ const InventoryTypeListing = ({
     serviceCenterFK,
     setServiceCenterFK,
   ] = useState(() => {})
-  const [
-    editingRowIds,
-    setEditingRowIds,
-  ] = useState([])
-  const [
-    rowChanges,
-    setRowChanges,
-  ] = useState({})
 
   const fetchCodes = async () => {
     await dispatch({
@@ -179,16 +140,16 @@ const InventoryTypeListing = ({
       setServicess(services)
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
-      if (
-        packDetail.entity &&
-        packDetail.entity.servicePackageItem.length > 0
-      ) {
-        servicePackageItem.forEach((o) => {
-          o.serviceName = serviceCenterServices.find(
-            (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-          ).serviceCenterId
-        })
-      }
+      // if (
+      //   packDetail.entity &&
+      //   packDetail.entity.servicePackageItem.length > 0
+      // ) {
+      //   servicePackageItem.forEach((o) => {
+      //     o.serviceName = serviceCenterServices.find(
+      //       (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+      //     ).serviceCenterId
+      //   })
+      // }
     })
 
     podoOrderType.forEach((x) => {
@@ -324,55 +285,53 @@ const InventoryTypeListing = ({
     ],
   )
 
-  useEffect(
-    () => {
-      if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
-        const newServiceRows = serviceRows.map((o) => {
-          if (o.tempServiceCenterServiceFK) {
-            return {
-              ...o,
-            }
-          }
-          return {
-            ...o,
-            serviceCenterServiceFK: serviceCenterServicess.find(
-              (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-            ).serviceId,
-            serviceName: serviceCenterServicess.find(
-              (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
-            ).serviceCenterId,
-          }
-        })
+  // useEffect(
+  //   () => {
+  //     if (serviceRows.length > 0 && serviceCenterServicess.length > 0) {
+  //       const newServiceRows = serviceRows.map((o) => {
+  //         if (o.tempServiceCenterServiceFK) {
+  //           return {
+  //             ...o,
+  //           }
+  //         }
+  //         return {
+  //           ...o,
+  //           serviceCenterServiceFK: serviceCenterServicess.find(
+  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+  //           ).serviceId,
+  //           serviceName: serviceCenterServicess.find(
+  //             (s) => s.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+  //           ).serviceCenterId,
+  //         }
+  //       })
 
-        setServiceRows(newServiceRows)
+  //       setServiceRows(newServiceRows)
 
-        dispatch({
-          // force current edit row components to update
-          type: 'global/updateState',
-          payload: {
-            commitCount: (commitCount += 1),
-          },
-        })
-        dispatch({
-          type: 'packDetail/updateState',
-          payload: {
-            entity: {
-              ...values,
-              servicePackageItem: newServiceRows,
-            },
-          },
-        })
-      }
-    },
-    [
-      serviceCenterServicess,
-    ],
-  )
+  //       dispatch({
+  //         // force current edit row components to update
+  //         type: 'global/updateState',
+  //         payload: {
+  //           commitCount: (commitCount += 1),
+  //         },
+  //       })
+  //       dispatch({
+  //         type: 'packDetail/updateState',
+  //         payload: {
+  //           entity: {
+  //             ...values,
+  //             servicePackageItem: newServiceRows,
+  //           },
+  //         },
+  //       })
+  //     }
+  //   },
+  //   [
+  //     serviceCenterServicess,
+  //   ],
+  // )
 
-  const onCommitChanges = (type) => ({ rows, deleted }) => {
+  const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
     if (deleted) {
-      const deletedSet = new Set(deleted)
-      const changedRows = rows.filter((row) => !deletedSet.has(row.id))
       const tempArray = [
         ...values[type],
       ]
@@ -406,59 +365,138 @@ const InventoryTypeListing = ({
           return rows
         }
       }
-    }
-    switch (type) {
-      case 'medicationPackageItem': {
-        setMedicationRows([
-          ...medicationRows,
-          rows[0],
-        ])
-        return setFieldValue(`${type}`, medicationRows)
+    } else if (added) {
+      switch (type) {
+        case 'medicationPackageItem': {
+          setMedicationRows([
+            ...medicationRows,
+            rows[0],
+          ])
+          return setFieldValue(`${type}`, medicationRows)
+        }
+        case 'consumablePackageItem': {
+          setConsumableRows([
+            ...consumableRows,
+            rows[0],
+          ])
+          return setFieldValue(`${type}`, consumableRows)
+        }
+        case 'vaccinationPackageItem': {
+          setVaccinationRows([
+            ...vaccinationRows,
+            rows[0],
+          ])
+          return setFieldValue(`${type}`, vaccinationRows)
+        }
+        case 'servicePackageItem': {
+          const { serviceCenterServiceFK, serviceName } = rows[0]
+          const serviceCenterService =
+            serviceCenterServicess.find(
+              (o) =>
+                o.serviceId === serviceCenterServiceFK &&
+                o.serviceCenterId === serviceName,
+            ) || {}
+          if (serviceCenterService) {
+            rows[0] = {
+              ...rows[0],
+              isDeleted: false,
+              tempServiceCenterServiceFK:
+                serviceCenterService.serviceCenter_ServiceId,
+              tempServiceName: servicess.find((o) => o.value === serviceFK)
+                .name,
+            }
+          }
+
+          setServiceRows([
+            ...serviceRows,
+            rows[0],
+          ])
+          setServiceCenterFK()
+          setServiceFK()
+          return setFieldValue(`${type}`, serviceRows)
+        }
+        default:
+          return rows
       }
-      case 'consumablePackageItem': {
-        setConsumableRows([
-          ...consumableRows,
-          rows[0],
-        ])
-        return setFieldValue(`${type}`, consumableRows)
-      }
-      case 'vaccinationPackageItem': {
-        setVaccinationRows([
-          ...vaccinationRows,
-          rows[0],
-        ])
-        return setFieldValue(`${type}`, vaccinationRows)
-      }
-      case 'servicePackageItem': {
-        const { serviceCenterServiceFK, serviceName } = rows[0]
-        const serviceCenterService =
-          serviceCenterServicess.find(
-            (o) =>
-              o.serviceId === serviceCenterServiceFK &&
-              o.serviceCenterId === serviceName,
-          ) || {}
-        if (serviceCenterService) {
-          rows[0] = {
-            ...rows[0],
-            isDeleted: false,
-            tempServiceCenterServiceFK:
-              serviceCenterService.serviceCenter_ServiceId,
-            tempServiceName: servicess.find((o) => o.value === serviceFK).name,
+    } else if (changed) {
+      Object.entries(changed).map(([ key, value,
+      ]) => {
+        const getType = (t) => {
+          switch (t) {
+            case 'medicationPackageItem': {
+              return {
+                stateRows: medicationRows,
+                setStateRow: (v) => setMedicationRows(v),
+              }
+            }
+            case 'consumablePackageItem': {
+              return {
+                stateRows: consumableRows,
+                setStateRow: (v) => setConsumableRows(v),
+              }
+            }
+            case 'vaccinationPackageItem': {
+              return {
+                stateRows: vaccinationRows,
+                setStateRow: (v) => setVaccinationRows(v),
+              }
+            }
+            case 'servicePackageItem': {
+              return {
+                stateRows: serviceRows,
+                setStateRow: (v) => setServiceRows(v),
+              }
+            }
+            default: {
+              return null
+            }
           }
         }
 
-        setServiceRows([
-          ...serviceRows,
-          rows[0],
-        ])
-        return setFieldValue(`${type}`, serviceRows)
-      }
-      default:
-        return rows
+        const edittedType = getType(type)
+        const newArray = edittedType.stateRows.map((item) => {
+          if (item.id === parseInt(key, 10)) {
+            const {
+              medicationName,
+              inventoryMedication,
+              consumableName,
+              inventoryConsumable,
+              vaccinationName,
+              inventoryVaccination,
+              service,
+              ...restFields
+            } = item
+
+            let tempServiceCenterServiceFK
+            const tempServiceId = serviceFK || item.serviceCenterServiceFK
+            const tempServiceCenterId = serviceCenterFK || item.serviceName
+            const serviceCenterService =
+              serviceCenterServicess.find(
+                (o) =>
+                  o.serviceId === tempServiceId &&
+                  o.serviceCenterId === tempServiceCenterId,
+              ) || {}
+            if (serviceCenterService) {
+              tempServiceCenterServiceFK =
+                serviceCenterService.serviceCenter_ServiceId
+            }
+            const obj = {
+              ...restFields,
+              ...value,
+              tempServiceCenterServiceFK,
+            }
+            return obj
+          }
+          return item
+        })
+
+        setServiceCenterFK()
+        setServiceFK()
+        edittedType.setStateRow(newArray)
+        return setFieldValue(`${type}`, newArray)
+      })
     }
   }
-
-  const onEditingRowIdsChange = (type) => ({ rows, deleted }) => {}
 
   const getServiceCenterService = (row) => {
     const { serviceCenterServiceFK, serviceName } = row
@@ -479,9 +517,14 @@ const InventoryTypeListing = ({
   const calSubtotal = (e) => {
     const { value, row } = e
     row.subTotal = value * row.unitPrice
+    dispatch({
+      // force current edit row components to update
+      type: 'global/updateState',
+      payload: {
+        commitCount: (commitCount += 1),
+      },
+    })
   }
-
-  const onRowChangesChange = (rows) => {}
 
   const onAddedRowsChange = (type) => (addedRows) => {
     if (addedRows.length > 0) {
@@ -570,6 +613,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -608,6 +652,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -648,6 +693,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -672,17 +718,30 @@ const InventoryTypeListing = ({
       {
         columnName: 'serviceCenterServiceFK',
         type: 'select',
-        options: () =>
-          servicess.filter(
+        options: (row) => {
+          const tempArray = [
+            ...servicess,
+          ]
+          if (row.id) {
+            if (!row.serviceName) {
+              return tempArray
+            }
+            const cat = tempArray.filter((o) =>
+              o.serviceCenters.find((m) => m.value === row.serviceName),
+            )
+            return cat
+          }
+          return tempArray.filter(
             (o) =>
               !serviceCenterFK ||
               o.serviceCenters.find((m) => m.value === serviceCenterFK),
-          ),
-
+          )
+        },
         onChange: (e) => {
           setServiceFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
+          e.row.serviceCenterServiceFK = e.val
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -696,7 +755,19 @@ const InventoryTypeListing = ({
         columnName: 'serviceName',
         type: 'select',
         options: (row) => {
-          return serviceCenterss.filter(
+          const tempArray = [
+            ...serviceCenterss,
+          ]
+          if (row.id) {
+            if (!row.serviceCenterServiceFK) {
+              return tempArray
+            }
+            const test = tempArray.filter((o) =>
+              o.services.find((m) => m.value === row.serviceCenterServiceFK),
+            )
+            return test
+          }
+          return tempArray.filter(
             (o) =>
               !serviceFK ||
               o.services.find(
@@ -709,6 +780,7 @@ const InventoryTypeListing = ({
           setServiceCenterFK(e.val)
           handleItemOnChange
           getServiceCenterService(e.row)
+          e.row.serviceName = e.val
           dispatch({
             // force current edit row components to update
             type: 'global/updateState',
@@ -730,6 +802,7 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         currency: true,
+        onChange: (e) => calSubtotal(e),
       },
       {
         columnName: 'subTotal',
@@ -741,12 +814,52 @@ const InventoryTypeListing = ({
     ],
   }
 
+  const medicationEditingProps = {
+    messages: {
+      deleteCommand: 'Delete medication',
+    },
+    showAddCommand: true,
+    showEditCommand: true,
+    onCommitChanges: onCommitChanges('medicationPackageItem'),
+    onAddedRowsChange: onAddedRowsChange('medication'),
+  }
+
+  const consumableEditingProps = {
+    messages: {
+      deleteCommand: 'Delete consumable',
+    },
+    showAddCommand: true,
+    showEditCommand: true,
+    onAddedRowsChange: onAddedRowsChange('consumable'),
+    onCommitChanges: onCommitChanges('consumablePackageItem'),
+  }
+
+  const vaccinationEditingProps = {
+    messages: {
+      deleteCommand: 'Delete vaccination',
+    },
+    showAddCommand: true,
+    showEditCommand: true,
+    onCommitChanges: onCommitChanges('vaccinationPackageItem'),
+    onAddedRowsChange: onAddedRowsChange('vaccination'),
+  }
+
+  const serviceEditingProps = {
+    messages: {
+      deleteCommand: 'Delete service',
+    },
+    showAddCommand: true,
+    showEditCommand: true,
+    onAddedRowsChange: onAddedRowsChange('service'),
+    onCommitChanges: onCommitChanges('servicePackageItem'),
+  }
+
   return (
     <div>
       <CardContainer
         hideHeader
         style={{
-          margin: theme.spacing(2),
+          margin: theme.spacing(1),
           maxHeight: 700,
           minHeight: 700,
         }}
@@ -768,94 +881,40 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <GridItem xs={12}>
-            <h4 className={classes.tableSectionHeader}>
-              <b>Medication</b>
-            </h4>
-            <EditableTableGrid
-              {...medicationProps}
-              editingRowIds={editingRowIds}
-              onEditingRowIdsChange={onEditingRowIdsChange()}
-              rowChanges={rowChanges}
-              onRowChangesChange={onRowChangesChange()}
-              schema={medicationSchema}
-              rows={medicationRows}
-              onRowDoubleClick={undefined}
-              FuncProps={{ pager: false }}
-              EditingProps={{
-                messages: {
-                  deleteCommand: 'Delete medication',
-                },
-                showAddCommand: true,
-                showEditCommand: false,
-                onCommitChanges: onCommitChanges('medicationPackageItem'),
-                onAddedRowsChange: onAddedRowsChange('medication'),
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} className={classes.tableHeader}>
-            <h4 className={classes.tableSectionHeader}>
-              <b>Consumable</b>
-            </h4>
-            <EditableTableGrid
-              {...consumableProps}
-              schema={consumableSchema}
-              rows={consumableRows}
-              FuncProps={{ pager: false }}
-              onRowDoubleClick={undefined}
-              EditingProps={{
-                messages: {
-                  deleteCommand: 'Delete consumable',
-                },
-                showAddCommand: true,
-                showEditCommand: false,
-                onAddedRowsChange: onAddedRowsChange('consumable'),
-                onCommitChanges: onCommitChanges('consumablePackageItem'),
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} className={classes.tableHeader}>
-            <h4 className={classes.tableSectionHeader}>
-              <b>Vaccination</b>
-            </h4>
-            <EditableTableGrid
-              {...vaccinationProps}
-              schema={vaccinationSchema}
-              rows={vaccinationRows}
-              FuncProps={{ pager: false }}
-              onRowDoubleClick={undefined}
-              EditingProps={{
-                messages: {
-                  deleteCommand: 'Delete vaccination',
-                },
-                showAddCommand: true,
-                showEditCommand: false,
-                onCommitChanges: onCommitChanges('vaccinationPackageItem'),
-                onAddedRowsChange: onAddedRowsChange('vaccination'),
-              }}
-            />
-          </GridItem>
-          <GridItem xs={12} className={classes.tableHeader}>
-            <h4 className={classes.tableSectionHeader}>
-              <b>Service</b>
-            </h4>
-            <EditableTableGrid
-              {...serviceProps}
-              schema={serviceSchema}
-              rows={serviceRows}
-              FuncProps={{ pager: false }}
-              onRowDoubleClick={undefined}
-              EditingProps={{
-                messages: {
-                  deleteCommand: 'Delete service',
-                },
-                showAddCommand: true,
-                showEditCommand: false,
-                onAddedRowsChange: onAddedRowsChange('service'),
-                onCommitChanges: onCommitChanges('servicePackageItem'),
-              }}
-            />
-          </GridItem>
+          <InventoryType
+            title='Medication'
+            inventoryTypeProps={medicationProps}
+            schema={medicationSchema}
+            rows={medicationRows}
+            editingProps={medicationEditingProps}
+          />
+
+          <InventoryType
+            title='Consumable'
+            inventoryTypeProps={consumableProps}
+            schema={consumableSchema}
+            rows={consumableRows}
+            editingProps={consumableEditingProps}
+            style={{ marginTop: 15 }}
+          />
+
+          <InventoryType
+            title='Vaccination'
+            inventoryTypeProps={vaccinationProps}
+            schema={vaccinationSchema}
+            rows={vaccinationRows}
+            editingProps={vaccinationEditingProps}
+            style={{ marginTop: 15 }}
+          />
+
+          <InventoryType
+            title='Service'
+            inventoryTypeProps={serviceProps}
+            schema={serviceSchema}
+            rows={serviceRows}
+            editingProps={serviceEditingProps}
+            style={{ marginTop: 15 }}
+          />
         </GridContainer>
       </CardContainer>
     </div>

@@ -3,9 +3,9 @@ import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // custom type
+import { FastField, Field, withFormik } from 'formik'
 import TimeSchemaType from './YupTime'
 // formik
-import { FastField, Field, withFormik } from 'formik'
 // common component
 import {
   Button,
@@ -14,12 +14,18 @@ import {
   GridContainer,
   GridItem,
   TimePicker,
+  NumberInput,
   CommonModal,
   Select,
   TextField,
 } from '@/components'
 // component
 import { ReportViewer } from '@/components/_medisys'
+
+const doctors = [
+  { value: 'bao', name: 'Bao' },
+  { value: 'cheah', name: 'Cheah' },
+]
 
 @connect(({ codetable }) => ({ codetable }))
 @withFormik({
@@ -124,15 +130,89 @@ class Report extends React.Component {
         <GridContainer>
           <GridItem md={3}>
             <FastField
-              name='start'
+              name='copaymentschemename'
               render={(args) => (
-                <TextField
+                <CodeSelect
                   {...args}
-                  label='Start'
-                  // format='hh:mm A'
-                  // inputProps={{ maxLength: 5 }}
-                  maxLength={5}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
                 />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='copaymentschemename'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
+                  localFilter={(opt) => opt.schemeCategoryName === 'Corporate'}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='ctMedicationDosage'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Medication dosage'
+                  labelField='displayValue'
+                  code='ctMedicationDosage'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <FastField
+              name='inventoryMedicationFK'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Name'
+                    code='inventorymedication'
+                    labelField='displayValue'
+                    temp
+                    // onChange={this.changeMedication}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+
+          <GridItem sm={3}>
+            <FastField
+              name='doctor'
+              render={(args) => (
+                <Select
+                  mode='tags'
+                  maxSelected={1}
+                  label='Filter by Doctor (Tags)'
+                  onChange={(v) => {
+                    console.log(v)
+                  }}
+                  options={doctors}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+
+          {/* <GridItem md={3}>
+            <FastField
+              name='ctMedicationDosage'
+              render={(args) => <DoctorProfileSelect />}
+            />
+          </GridItem> */}
+          <GridItem md={3}>
+            <FastField
+              name='Amount'
+              render={(args) => (
+                <NumberInput {...args} currency label='Amount' />
               )}
             />
           </GridItem>

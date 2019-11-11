@@ -112,7 +112,6 @@ class BaseMenu extends PureComponent {
       collapsed,
       color,
     } = this.props
-
     const collapseItemMini = `${classes.collapseItemMini} ${cx({
       [classes.collapseItemMiniRTL]: rtlActive,
     })}`
@@ -145,6 +144,7 @@ class BaseMenu extends PureComponent {
             replace={item.path === location.pathname}
             onClick={(e) => {
               this.openCollapse(key)
+              e.preventDefault()
               return false
             }}
             className={navLinkClasses}
@@ -154,7 +154,9 @@ class BaseMenu extends PureComponent {
                 <Icon>{item.icon}</Icon>
               ) : (
                 // <item.icon />
-                <span className={collapseItemMini}>{item.mini || ''}</span>
+                <span className={collapseItemMini}>
+                  {collapsed ? item.mini || '' : ''}
+                </span>
               )}
             </ListItemIcon>
             <ListItemText
@@ -221,6 +223,7 @@ class BaseMenu extends PureComponent {
         (o) => o === item.path,
       ),
     })}`
+    // console.log(item)
     return (
       <ListItem key={item.path} className={classes.item}>
         <Link
@@ -232,11 +235,17 @@ class BaseMenu extends PureComponent {
               () => {
                 onCollapse(true)
               }
-            ) : (
+            ) : (e)=>{
+              const {  route: { routes } } = this.props
+              const rt = routes.map(o=>o.routes || []).reduce((a,b)=>{
+                  return a.concat(b)
+              },[]).find(o=>location.pathname===o.path) ||{}
+
               navigateDirtyCheck({
                 redirectUrl: itemPath,
-              })
-            )
+                displayName:rt.observe,
+              })(e)
+            }
           }
           className={navLinkClasses}
         >
@@ -245,7 +254,9 @@ class BaseMenu extends PureComponent {
               <Icon>{item.icon}</Icon>
             </ListItemIcon>
           ) : (
-            <span className={collapseItemMini}>{item.mini || ''}</span>
+            <span className={collapseItemMini}>
+              {collapsed ? item.mini || '' : ''}
+            </span>
           )}
 
           <ListItemText

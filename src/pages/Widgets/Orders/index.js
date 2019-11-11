@@ -59,11 +59,13 @@ class Orders extends PureComponent {
     const { entity: vistEntity } = visitRegistration
     const { visit = {} } = vistEntity
 
-    let codeTableNameArray = []
+    const codeTableNameArray = []
     codeTableNameArray.push('ctMedicationUsage')
     codeTableNameArray.push('ctMedicationDosage')
     codeTableNameArray.push('ctMedicationUnitOfMeasurement')
     codeTableNameArray.push('ctMedicationFrequency')
+    codeTableNameArray.push('ctVaccinationUsage')
+    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
 
     codeTableNameArray.forEach((o) => {
       dispatch({
@@ -89,6 +91,8 @@ class Orders extends PureComponent {
       setValues({
         ...values,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceCode: this.state.services.find((o) => o.value === serviceFK)
+          .code,
         serviceName: this.state.services.find((o) => o.value === serviceFK)
           .name,
         unitPrice: serviceCenterService.unitPrice,
@@ -109,6 +113,7 @@ class Orders extends PureComponent {
       visitRegistration,
       codetable,
     } = props
+
     return (
       <div className={className}>
         <Detail {...props} />

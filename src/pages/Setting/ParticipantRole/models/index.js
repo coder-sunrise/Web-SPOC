@@ -5,7 +5,10 @@ import * as service from '../services'
 export default createListViewModel({
   namespace: 'settingParticipantRole',
   config: {
-    // queryOnLoad: false,
+    codetable: {
+      message: 'Participant Role updated',
+      code: 'ctparticipantrole',
+    },
   },
   param: {
     service,

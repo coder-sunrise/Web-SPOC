@@ -13,6 +13,7 @@ import {
   CommonTableGrid,
   GridContainer,
   GridItem,
+  ProgressButton,
   Select,
   TextField,
   Tooltip,
@@ -92,7 +93,7 @@ class UserProfile extends React.Component {
             combineCondition: 'or',
           },
         ],
-        current: 1,
+        // current: 1,
         isActive: values.status,
       },
     })
@@ -148,9 +149,13 @@ class UserProfile extends React.Component {
             />
           </GridItem>
           <GridItem md={12} className={classes.verticalSpacing}>
-            <Button color='primary' onClick={this.handleSearchClick}>
+            <ProgressButton
+              color='primary'
+              onClick={this.handleSearchClick}
+              icon={null}
+            >
               Search
-            </Button>
+            </ProgressButton>
             <Button color='primary' onClick={this.openModal}>
               Add New
             </Button>

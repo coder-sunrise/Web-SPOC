@@ -162,7 +162,8 @@ class AddConsultationDocument extends PureComponent {
 
   getLoader = (editor, setFieldValue, currentType) => {
     const { classes, parentProps, codetable } = this.props
-    const { documenttemplate } = codetable
+    const { documenttemplate = [] } = codetable
+    console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>
@@ -194,7 +195,6 @@ class AddConsultationDocument extends PureComponent {
           options={loadFromCodes}
           valueField='value'
           onChange={(val, option) => {
-            console.log(val, option)
             if (!val) return
             const { values } = parentProps
             const v = option.getter

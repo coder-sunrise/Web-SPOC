@@ -46,6 +46,13 @@ const PatientInfoSideBanner = ({
       },
     }).then((result) => {
       if (result) {
+        dispatch({
+          type: 'patient/query',
+          payload: {
+            id: entity.id,
+          },
+        })
+
         const {
           balance,
           schemeTypeFk,
@@ -55,6 +62,8 @@ const PatientInfoSideBanner = ({
           acuteVisitClinicBalance,
           isSuccessful,
           statusDescription,
+          acuteBalanceStatusCode,
+          chronicBalanceStatusCode,
         } = result
         let isShowReplacementModal = false
         if (!isSuccessful) {
@@ -77,6 +86,8 @@ const PatientInfoSideBanner = ({
             acuteVisitPatientBalance,
             acuteVisitClinicBalance,
             isSuccessful,
+            acuteBalanceStatusCode,
+            chronicBalanceStatusCode,
           })
         }
       }
@@ -106,6 +117,11 @@ const PatientInfoSideBanner = ({
         ? undefined
         : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
+    const chronicStatus =
+      schemeData.patientSchemeBalance.length <= 0
+        ? undefined
+        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+
     return {
       balance,
       patientCoPaymentSchemeFK: schemeData.id,
@@ -115,6 +131,20 @@ const PatientInfoSideBanner = ({
       acuteVisitPatientBalance: acuteVPBal,
       acuteVisitClinicBalance: acuteVCBal,
       statusDescription: refreshedSchemeData.statusDescription,
+      acuteBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : undefined,
+      chronicBalanceStatusCode:
+        !_.isEmpty(refreshedSchemeData) &&
+        refreshedSchemeData.isSuccessful === false
+          ? 'ERROR'
+          : chronicStatus,
+      isSuccessful:
+        refreshedSchemeData.isSuccessful !== ''
+          ? refreshedSchemeData.isSuccessful
+          : '',
     }
   }
 
@@ -140,14 +170,12 @@ const PatientInfoSideBanner = ({
         ({Math.floor(
           moment.duration(moment().diff(entity.dob)).asYears(),
         )},&nbsp;
-        {
-          <CodeSelect
-            code='ctGender'
-            // optionLabelLength={1}
-            text
-            value={entity.genderFK}
-          />
-        })
+        <CodeSelect
+          code='ctGender'
+          // optionLabelLength={1}
+          text
+          value={entity.genderFK}
+        />)
       </p>
 
       <Divider light />
@@ -155,9 +183,8 @@ const PatientInfoSideBanner = ({
         className={classes.schemeContainer}
         style={{ maxHeight: height - 455 - 20 }}
       >
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).map((o) => {
+        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
           const schemeData = getSchemeDetails(o)
-
           return (
             <div style={{ marginBottom: theme.spacing(1) }}>
               <p style={{ fontWeight: 500 }}>
@@ -192,7 +219,11 @@ const PatientInfoSideBanner = ({
                 <div>
                   <p>
                     Balance:{' '}
-                    <NumberInput text currency value={schemeData.balance} />
+                    {schemeData.chronicBalanceStatusCode === 'SC105' ? (
+                      'Full Balance'
+                    ) : (
+                      <NumberInput text currency value={schemeData.balance} />
+                    )}
                   </p>
                   <p>
                     Validity:{' '}
@@ -210,9 +241,7 @@ const PatientInfoSideBanner = ({
                       value={schemeData.validTo}
                     />
                   </p>
-                  <p style={{ color: 'red' }}>
-                    {schemeData.statusDescription}
-                  </p>
+                  <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
                 </div>
               )}
             </div>

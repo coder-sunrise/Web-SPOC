@@ -101,7 +101,7 @@ const Detail = ({
     <CardContainer
       hideHeader
       style={{
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         minHeight: 700,
         maxHeight: 700,
       }}
@@ -215,7 +215,7 @@ const Detail = ({
             </GridItem>
             <GridItem xs={2} />
             <GridItem xs={10}>
-              <FastField
+              <Field
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker

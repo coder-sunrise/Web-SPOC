@@ -61,15 +61,19 @@ const SMS = ({ classes, sms, dispatch }) => {
     if (e === '0') type = 'Appointment'
     else type = 'Patient'
     dispatch({
-      type: 'sms/querySMSData',
-      smsType: type,
+      type: 'sms/query',
+      payload: {
+        smsType: type,
+      },
     })
   }
 
   useEffect(() => {
     dispatch({
-      type: 'sms/querySMSData',
-      smsType: 'Appointment',
+      type: 'sms/query',
+      payload: {
+        smsType: 'Appointment',
+      },
     })
   }, [])
 

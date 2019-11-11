@@ -60,6 +60,9 @@ const styles = (theme) => ({
         newPurchaseOrderDetails.purchaseOrder.remark = null
         newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
+      } else if (newPurchaseOrderDetails.type === 'new') {
+        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
+        newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
       }
 
       if (newPurchaseOrderDetails.purchaseOrder) {
@@ -524,7 +527,8 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = () => {
+    const isEditable = (poItem) => {
+      if (poItem && poStatus !== 1) return false
       if (poStatus === 6) return false
       if (isWriteOff) return false
       return true
@@ -552,7 +556,7 @@ class Index extends Component {
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={isEditable()}
+          isEditable={isEditable('poItem')}
           {...this.props}
         />
         <AuthorizedContext.Provider

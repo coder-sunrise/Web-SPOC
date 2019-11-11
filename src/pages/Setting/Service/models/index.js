@@ -4,7 +4,7 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingClinicService',
-  config: { queryOnLoad: false },
+  config: {},
   param: {
     service,
     state: {

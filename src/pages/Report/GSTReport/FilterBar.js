@@ -9,16 +9,10 @@ import {
   GridContainer,
   GridItem,
   SizeContainer,
-  CodeSelect,
 } from '@/components'
-
-import {
-  DoctorLabel,
-} from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 const FilterBar = ({ handleSubmit }) => {
-  const renderDropdown = (option) => <DoctorLabel doctor={option} />
-  const maxDoctorTagCount = 1
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -53,28 +47,17 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='doctorIDs'
               render={(args) => (
-                <CodeSelect
+                <DoctorProfileSelect
+                  mode='multiple'
                   {...args}
-                  // allLabel='All Doctors'
                   allValue={-99}
                   allValueOption={{
+                    id: -99,
                     clinicianProfile: {
                       name: 'All',
                     },
-                    id: -99,
                   }}
-                  allowClear={false}
-                  label='Doctor'
-                  mode='multiple'
-                  filter={{
-                    'clinicianProfile.isActive': true,
-                  }}
-                  code='doctorprofile'
                   labelField='clinicianProfile.name'
-                  valueField='id'
-                  maxTagCount={maxDoctorTagCount}
-                  maxTagPlaceholder='doctors'
-                  renderDropdown={renderDropdown}
                 />
               )}
             />

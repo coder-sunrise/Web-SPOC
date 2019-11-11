@@ -13,6 +13,7 @@ const TableGrid = ({
   columns,
   columnExtensions,
   tableConfig,
+  FuncProps,
   selection,
   onSelectionChange,
   onContextMenuItemClick,
@@ -94,7 +95,7 @@ const TableGrid = ({
       // rows={data}
       columns={columns}
       columnExtensions={columnExtensions}
-      {...tableConfig}
+      FuncProps={FuncProps}
       selection={selection}
       onSelectionChange={onSelectionChange}
       ActionProps={{ TableCellComponent: Cell }}

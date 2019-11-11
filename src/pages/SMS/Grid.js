@@ -97,12 +97,6 @@ const Grid = ({
     setRecipient(recordRow)
     switch (id) {
       case '0':
-        dispatch({
-          type: 'sms/querySMSHistory',
-          payload: {
-            Recipient: recordRow.patientContactNo,
-          },
-        })
         setShowMessageModal(true)
         break
       default:

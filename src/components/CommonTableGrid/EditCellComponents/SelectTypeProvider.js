@@ -96,7 +96,7 @@ const SelectDisplay = (columnExtensions, state) => ({
 
   const label = Object.byString(v, labelField)
   const vEl = v ? (
-    <Tooltip title={label} enterDelay={1500}>
+    <Tooltip title={label} enterDelay={750}>
       <span style={{ color: v.color || 'inherit' }}>{label}</span>
     </Tooltip>
   ) : (
@@ -115,7 +115,6 @@ class SelectTypeProvider extends React.Component {
   }
 
   constructor (props) {
-    // console.log('SelectTypeProvider constructor')
     super(props)
 
     const { columnExtensions, codetable, dispatch } = this.props
@@ -138,13 +137,11 @@ class SelectTypeProvider extends React.Component {
       if (!labelField) {
         labelField = 'name'
       }
-      // console.log(labelField)
       o.compare = (a, b) => {
         const codes = this.state[`${columnName}Option`]
         const aa = codes.find((m) => m[valueField] === a)
         const bb = codes.find((m) => m[valueField] === b)
-        // console.log(aa, bb)
-        // console.log(aa ? aa[labelField] : a, bb ? bb[labelField] : b)
+
         // eslint-disable-next-line no-nested-ternary
         return (aa ? aa[labelField] : a || '') > (bb ? bb[labelField] : b || '')
           ? 1
@@ -157,23 +154,36 @@ class SelectTypeProvider extends React.Component {
     }
     for (let i = 0; i < colFor.length; i++) {
       const f = colFor[i]
+
       if (f.code) {
         const isExisted = codetable[f.code.toLowerCase()]
+        const isPreviouslyFiltered = codetable.hasFilterProps.includes(
+          f.code.toLowerCase(),
+        )
+        // const force = f.remoteFilter !== undefined || isPreviouslyFiltered
+        const { force, localFilter } = f
 
-        if (isExisted) {
-          payload[`${f.columnName}Option`] = codetable[f.code.toLowerCase()]
+        if (isExisted && !force) {
+          payload[`${f.columnName}Option`] = localFilter
+            ? codetable[f.code.toLowerCase()].filter(localFilter)
+            : codetable[f.code.toLowerCase()]
           payload.codeLoaded += 1
         } else {
           dispatch({
             type: 'codetable/fetchCodes',
             payload: {
               code: f.code.toLowerCase(),
+              // filter: f.remoteFilter,
+              force: true,
             },
           }).then((response) => {
             if (response) {
               this.setState((prevState) => {
+                const filtered = localFilter
+                  ? response.filter(localFilter)
+                  : response
                 return {
-                  [`${f.columnName}Option`]: response,
+                  [`${f.columnName}Option`]: filtered,
                   codeLoaded: ++prevState.codeLoaded,
                 }
               })
@@ -186,6 +196,7 @@ class SelectTypeProvider extends React.Component {
       for: colFor,
       ...payload,
     }
+
     this.SelectEditor = (ces) => (editorProps) => {
       // console.log(ces, editorProps)
       return (

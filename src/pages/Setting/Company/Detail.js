@@ -80,10 +80,7 @@ const styles = (theme) => ({})
     const { dispatch, onConfirm, settingCompany } = props
     const { id, name } = settingCompany.companyType
     dispatch({
-      type:
-        id === 1
-          ? 'settingCompany/upsertCopayer'
-          : 'settingCompany/upsertSupplier',
+      type: 'settingCompany/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],

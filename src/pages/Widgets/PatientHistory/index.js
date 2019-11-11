@@ -263,11 +263,29 @@ class PatientHistory extends Component {
 
   componentDidMount () {
     const { dispatch } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'ctComplication',
-      },
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'ctComplication',
+    //   },
+    // })
+
+    const codeTableNameArray = []
+    codeTableNameArray.push('ctComplication')
+    codeTableNameArray.push('ctMedicationUsage')
+    codeTableNameArray.push('ctMedicationDosage')
+    codeTableNameArray.push('ctMedicationUnitOfMeasurement')
+    codeTableNameArray.push('ctMedicationFrequency')
+    codeTableNameArray.push('ctVaccinationUsage')
+    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
+
+    codeTableNameArray.forEach((o) => {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: o,
+        },
+      })
     })
 
     dispatch({
@@ -297,12 +315,13 @@ class PatientHistory extends Component {
 
   getContent = (row) => {
     const { patientHistory, mode, clinicSettings } = this.props
+    const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
 
     let newArray = []
     if (
-      clinicSettings.settings.showConsultationVersioning === false ||
-      clinicSettings.settings.showConsultationVersioning === undefined
+      settings.showConsultationVersioning === false ||
+      settings.showConsultationVersioning === undefined
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
@@ -320,6 +339,7 @@ class PatientHistory extends Component {
         disablePadding
       >
         {newArray.map((o) => {
+          const _title = o.doctorTitle ? `${o.doctorTitle} ` : ''
           return (
             <React.Fragment>
               <ListItem
@@ -385,7 +405,7 @@ class PatientHistory extends Component {
                         <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${o.doctorTitle} ${o.doctorName}`}
+                            value={`V${o.versionNumber}, ${_title}${o.doctorName}`}
                           />
                         </GridItem>
                       </GridContainer>
@@ -477,7 +497,7 @@ class PatientHistory extends Component {
       widget,
       showEditPatient,
     } = this.props
-    const { entity, selected } = patientHistory
+    const { entity, selected, patientID } = patientHistory
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
     return (
@@ -523,18 +543,23 @@ class PatientHistory extends Component {
                   size='sm'
                   onClick={() => {
                     dispatch({
+                      type: 'patient/closePatientModal',
+                    })
+                    dispatch({
                       type: `consultation/edit`,
                       payload: {
                         id: selected.id,
                         version: patientHistory.version,
                       },
                     }).then((o) => {
-                      if (o)
+                      if (o) {
+                        dispatch({
+                          type: 'patient/closePatientModal',
+                        })
                         router.push(
-                          `/reception/queue/patientdashboard?qid=${findGetParameter(
-                            'qid',
-                          )}&cid=${o.id}&v=${patientHistory.version}&md2=cons`,
+                          `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                         )
+                      }
                     })
                   }}
                 >
@@ -544,7 +569,7 @@ class PatientHistory extends Component {
             </GridItem>
           </Authorized>
           <GridItem md={7} style={{ textAlign: 'right' }}>
-            Updated Date:
+            Updated Date:&nbsp;
             {patientHistory.selectedSubRow.signOffDate && (
               <DatePicker
                 text
@@ -596,9 +621,13 @@ class PatientHistory extends Component {
       clinicSettings,
       mode = 'split',
     } = this.props
-
+    const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
+
     const cfg = {}
+
+    if (!clinicSettings) return null
+
     if (mode === 'split') {
       cfg.style = style
     } else if (mode === 'integrated') {
@@ -617,14 +646,14 @@ class PatientHistory extends Component {
           hideHeader
           size='sm'
           className={classnames({
-            [classes.leftPanel]: !widget ? true : false,
+            [classes.leftPanel]: !widget,
             [classes.integratedLeftPanel]: mode === 'integrated',
-            [override.leftPanel]: !widget ? true : false,
+            [override.leftPanel]: !widget,
           })}
         >
           {sortedPatientHistory ? sortedPatientHistory.length >
-          0 ? clinicSettings.settings.showConsultationVersioning === false ||
-          clinicSettings.settings.showConsultationVersioning === undefined ? (
+          0 ? settings.showConsultationVersioning === false ||
+          settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
             <Accordion

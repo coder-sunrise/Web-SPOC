@@ -61,7 +61,7 @@ import styles from './style'
   }),
 )
 @withFormikExtend({
-  notDirtyDuration: 0.5,
+  // notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
@@ -133,13 +133,14 @@ class Form extends React.PureComponent {
     const { showSearchPatientModal } = this.state
     this.setState({ showSearchPatientModal: !showSearchPatientModal })
     if (showSearchPatientModal) {
-      this.props.dispatch({
-        type: 'patientSearch/updateState',
-        payload: {
-          filter: {},
-          list: [],
-        },
-      })
+      // this.props.dispatch({
+      //   type: 'patientSearch/updateState',
+      //   payload: {
+      //     filter: {},
+      //     list: [],
+      //   },
+      // })
+      this.resetPatientSearchResult()
     }
   }
 
@@ -197,6 +198,16 @@ class Form extends React.PureComponent {
     this.showSearchResult()
   }
 
+  resetPatientSearchResult = () => {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
+
   showSearchResult = () => {
     const { patientSearchResult } = this.props
 
@@ -205,6 +216,7 @@ class Form extends React.PureComponent {
 
       if (shouldPopulate) {
         this.onSelectPatientClick(patientSearchResult[0], true)
+        this.resetPatientSearchResult()
       } else this.toggleSearchPatientModal()
     }
   }
@@ -327,12 +339,6 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    // has 1 primary doctor
-    // const hasPrimaryDoctor = datagrid.reduce(
-    //   (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
-    //   false,
-    // )
-    // if (!hasPrimaryDoctor) isDataGridValid = false
     // this.setState({ isDataGridValid })
     const newDataGrid =
       datagrid.length === 1
@@ -348,6 +354,14 @@ class Form extends React.PureComponent {
         : [
             ...datagrid,
           ]
+
+    // has 1 primary doctor
+    const hasPrimaryDoctor = newDataGrid.reduce(
+      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
+      false,
+    )
+    if (!hasPrimaryDoctor) isDataGridValid = false
+
     this.setState({ isDataGridValid, datagrid: newDataGrid })
   }
 
@@ -599,7 +613,11 @@ class Form extends React.PureComponent {
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
-      pdroomid: primaryDoctorResource.roomFk, // primary clinician id
+    }
+
+    if (primaryDoctorResource.roomFk) {
+      // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
+      parameters.pdroomid = primaryDoctorResource.roomFk
     }
 
     this.onCloseFormClick()

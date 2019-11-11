@@ -5,6 +5,7 @@ import Print from '@material-ui/icons/Print'
 // common component
 import {
   Button,
+  ProgressButton,
   GridContainer,
   GridItem,
   withFormikExtend,
@@ -95,6 +96,23 @@ const reloadDispense = (props, effect = 'query') => {
   handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, dispense } = props
     const vid = dispense.visitID
+    // const prescription = values.prescription.map((o) => {
+    //   return {
+    //     ...o,
+    //     batchNo: o.batchNo ? o.batchNo[0] : undefined,
+    //   }
+    // })
+    values.prescription.forEach((o) => {
+      if (o.batchNo instanceof Array) {
+        if (o.batchNo && o.batchNo.length > 0) {
+          const [
+            firstIndex,
+          ] = o.batchNo
+          o.batchNo = firstIndex
+        }
+      }
+    })
+
     dispatch({
       type: `dispense/save`,
       payload: {
@@ -116,9 +134,19 @@ const reloadDispense = (props, effect = 'query') => {
   displayName: 'DispensePage',
 })
 class Main extends Component {
+  componentDidMount () {
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
+  }
+
   makePayment = () => {
     const { dispatch, dispense, values } = this.props
-
     dispatch({
       type: 'dispense/finalize',
       payload: {
@@ -169,7 +197,6 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit } = this.props
-    console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -197,19 +224,27 @@ class Main extends Component {
 
           <GridItem justify='flex-end' container className={classes.footerRow}>
             <Authorized authority='queue.dispense.savedispense'>
-              <Button color='success' size='sm' onClick={handleSubmit}>
+              <ProgressButton color='success' size='sm' onClick={handleSubmit}>
                 Save Dispense
-              </Button>
+              </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.editorder'>
-              <Button color='primary' size='sm' onClick={this.editOrder}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                onClick={this.editOrder}
+              >
                 Edit Order
-              </Button>
+              </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
-              <Button color='primary' size='sm' onClick={this.makePayment}>
+              <ProgressButton
+                color='primary'
+                size='sm'
+                onClick={this.makePayment}
+              >
                 Make Payment
-              </Button>
+              </ProgressButton>
             </Authorized>
           </GridItem>
         </GridContainer>

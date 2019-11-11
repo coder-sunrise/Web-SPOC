@@ -224,50 +224,32 @@ export default ({
           width: 300,
           render: (row) => {
             let text = ''
-            const {
-              ctmedicationusage,
-              ctmedicationunitofmeasurement,
-              ctmedicationfrequency,
-              ctmedicationdosage,
-            } = codetable
-            if (
-              !ctmedicationusage ||
-              !ctmedicationunitofmeasurement ||
-              !ctmedicationfrequency ||
-              !ctmedicationdosage
-            )
-              return null
+            if (row.usageMethodFK && row.dosageFK && row.uomfk) {
+              text = `${row.usageMethodDisplayValue
+                ? row.usageMethodDisplayValue
+                : ''} ${row.dosageDisplayValue
+                ? row.dosageDisplayValue
+                : ''} ${row.uomDisplayValue ? row.uomDisplayValue : ''} `
+            }
+
             return (
               <div>
                 {row.corPrescriptionItemInstruction ? (
                   row.corPrescriptionItemInstruction.map((item) => {
-                    text = ''
-                    const usageMethod = ctmedicationusage.filter(
-                      (codeTableItem) =>
-                        codeTableItem.id === item.usageMethodFK,
-                    )
-                    text += `${usageMethod[0].name} `
-                    text += ' '
-                    const dosage = ctmedicationdosage.filter(
-                      (codeTableItem) => codeTableItem.id === item.dosageFK,
-                    )
-                    text += `${dosage[0].displayValue} `
-                    const prescribe = ctmedicationunitofmeasurement.filter(
-                      (codeTableItem) =>
-                        codeTableItem.id === item.prescribeUOMFK,
-                    )
-                    text += `${prescribe[0].name} `
-                    const drugFrequency = ctmedicationfrequency.filter(
-                      (codeTableItem) =>
-                        codeTableItem.id === item.drugFrequencyFK,
-                    )
-                    text += `${drugFrequency[0].displayValue} For `
-                    text += `${item.duration} day(s)`
+                    text = `${item.usageMethodDisplayValue
+                      ? item.usageMethodDisplayValue
+                      : ''} ${item.dosageDisplayValue
+                      ? item.dosageDisplayValue
+                      : ''} ${item.prescribeUOMDisplayValue
+                      ? item.prescribeUOMDisplayValue
+                      : ''} ${item.drugFrequencyDisplayValue
+                      ? item.drugFrequencyDisplayValue
+                      : ''} For ${item.duration ? item.duration : ''} day(s)`
 
                     return <p>{text}</p>
                   })
                 ) : (
-                  ''
+                  text
                 )}
               </div>
             )

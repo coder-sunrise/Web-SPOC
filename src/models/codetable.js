@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import { getCodes, getAllCodes } from '@/utils/codes'
+import { subscribeNotification } from '@/utils/realtime'
 
 export default createListViewModel({
   namespace: 'codetable',
@@ -12,88 +13,73 @@ export default createListViewModel({
       tenantCodes: {}, // prepare for future use
       hasFilterProps: [],
     },
-    subscriptions: {},
+    subscriptions: ({ dispatch }) => {
+      subscribeNotification('CodetableUpdated', {
+        callback: ({ code }) => {
+          console.log(code, 'rete')
+          window.g_app._store.dispatch({
+            type: 'codetable/refreshCodes',
+            payload: { code },
+          })
+        },
+      })
+    },
     effects: {
       *fetchAllCachedCodetable (_, { call, put }) {
+        console.time('fetchAllCachedCodetable')
         const response = yield call(getAllCodes)
-        if (response) {
-          yield put({
-            type: 'updateState',
-            payload: response.reduce((allCodetable, codetable) => {
-              // skip snomeddiagnosis codetable in development mode
-              // if (
-              //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
-              //   process.env.NODE_ENV === 'development'
-              // ) {
-              //   return {
-              //     ...allCodetable,
-              //     // [codetable.code.toLowerCase()]: codetable.data,
-              //   }
-              // }
+        // console.log(response)
+        // if (response) {
+        //   const ct = response.reduce((allCodetable, codetable) => {
+        //     // skip snomeddiagnosis codetable in development mode
+        //     // if (
+        //     //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
+        //     //   process.env.NODE_ENV === 'development'
+        //     // ) {
+        //     //   return {
+        //     //     ...allCodetable,
+        //     //     // [codetable.code.toLowerCase()]: codetable.data,
+        //     //   }
+        //     // }
 
-              return {
-                ...allCodetable,
-                [codetable.code.toLowerCase()]: codetable.data,
-              }
-            }, {}),
-          })
-        }
+        //     return {
+        //       ...allCodetable,
+        //       [codetable.code.toLowerCase()]: codetable.data,
+        //     }
+        //   }, {})
+        yield put({
+          type: 'updateState',
+          payload: response,
+        })
+        console.timeEnd('fetchAllCachedCodetable')
       },
+
       *refreshCodes ({ payload }, { call, put }) {
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
-        if (response.length > 0) {
-          yield put({
-            type: 'saveCodetable',
-            payload: {
-              code,
-              data: response,
-            },
-          })
-          return response
-        }
-        return []
+        yield put({
+          type: 'saveCodetable',
+          payload: {
+            force: true,
+            code,
+            data: response,
+          },
+        })
+        return response
       },
       *fetchCodes ({ payload }, { select, call, put }) {
-        let ctcode = payload
-        let hasFilter = false
+        let ctcode
         if (typeof payload === 'object') {
-          ctcode = payload.code
-          hasFilter = payload.filter !== undefined
+          ctcode = payload.code.toLowerCase()
+        } else {
+          ctcode = payload.toLowerCase()
         }
-
         const codetableState = yield select((state) => state.codetable)
 
-        if (hasFilter) {
-          yield put({
-            type: 'addToHasFilterList',
-            payload: {
-              code: ctcode,
-            },
-          })
-        } else {
-          const filteredBefore = codetableState.hasFilterProps.includes(ctcode)
-          if (filteredBefore) {
-            payload.force = true
-            yield put({
-              type: 'removeFromFilterList',
-              payload: {
-                code: ctcode,
-              },
-            })
-          }
-        }
-
         if (ctcode !== undefined) {
-          if (
-            codetableState[ctcode] === undefined ||
-            payload.force ||
-            hasFilter
-          ) {
+          if (codetableState[ctcode] === undefined || payload.force) {
             const response = yield call(getCodes, payload)
-            // console.log({ ctcode, response })
             if (response.length > 0) {
-              // list = { ...list, [lowerCaseCode]: response }
               yield put({
                 type: 'saveCodetable',
                 payload: {
@@ -112,25 +98,7 @@ export default createListViewModel({
       },
     },
     reducers: {
-      removeFromFilterList (state, { payload }) {
-        return {
-          ...state,
-          hasFilterProps: state.hasFilterProps.filter(
-            (code) => payload.code !== code,
-          ),
-        }
-      },
-      addToHasFilterList (state, { payload }) {
-        return {
-          ...state,
-          hasFilterProps: [
-            ...state.hasFilterProps,
-            payload.code,
-          ],
-        }
-      },
       saveCodetable (state, { payload }) {
-        // console.log({ payload })
         return { ...state, [payload.code.toLowerCase()]: payload.data }
       },
     },

@@ -63,12 +63,12 @@ Yup.setLocale({
     number: '',
     notType: function notType (_ref) {
       // console.log(_ref)
-      const path = _ref.path
+      const { path } = _ref
 
-      const type = _ref.type
-      const value = _ref.value
+      const { type } = _ref
+      const { value } = _ref
 
-      const originalValue = _ref.originalValue
+      const { originalValue } = _ref
       let isCast = originalValue != null && originalValue !== value
       // let msg = `${path} ${_printValue(
       //   originalValue,
@@ -214,6 +214,38 @@ function laterThan (ref, msg) {
 }
 
 Yup.addMethod(Yup.string, 'laterThan', laterThan)
+
+export const compareEqual = (start, end) => {
+  const { hour: startHour, minute: startMinute } = start
+  const { hour: endHour, minute: endMinute } = end
+  if (startHour > endHour || (startHour === endHour && startMinute > endMinute))
+    return false
+
+  return true
+}
+
+function equalAndLaterThan (ref, msg) {
+  return this.test({
+    name: 'laterThan',
+    exclusive: false,
+    // eslint-disable-next-line no-template-curly-in-string
+    message: msg || '${path} must be later than ${reference}',
+    params: {
+      reference: ref.path,
+    },
+    test (value) {
+      const start = this.resolve(ref)
+      const startTimeObject = getTimeObject(start)
+      const endTimeObject = getTimeObject(value)
+      if (startTimeObject && endTimeObject)
+        return compareEqual(startTimeObject, endTimeObject)
+
+      return false
+    },
+  })
+}
+
+Yup.addMethod(Yup.string, 'equalAndLaterThan', equalAndLaterThan)
 
 Yup.string.prototype.required = function (message) {
   if (message === undefined) {

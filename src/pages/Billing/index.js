@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-
+import moment from 'moment'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
   Accordion,
@@ -44,24 +45,28 @@ const styles = (theme) => ({
     textAlign: 'right',
   },
   dispenseContainer: {
-    maxHeight: '40vh',
-    overflow: 'auto',
+    // maxHeight: '40vh',
+    // overflow: 'auto',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
 })
 
 const bannerStyle = {
+  position: 'sticky',
+  top: headerHeight,
   zIndex: 1000,
   paddingLeft: 16,
   paddingRight: 16,
 }
 
-@connect(({ billing, user, dispense, loading }) => ({
+@connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
   dispense,
   loading,
+  patient: patient.entity || patient.default,
   user: user.data,
+  sessionInfo: queueLog.sessionInfo,
 }))
 @withFormikExtend({
   notDirtyDuration: 3,
@@ -70,7 +75,7 @@ const bannerStyle = {
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const { invoicePayer, invoicePayment } = billing.entity
+        const { invoicePayer = [] } = billing.entity
 
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
@@ -81,20 +86,22 @@ const bannerStyle = {
             ),
           0,
         )
-        const totalPaid = invoicePayment.reduce(
-          (total, payment) => total + payment.totalAmtPaid,
-          0,
-        )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return {
+          ...billing.default,
+          ...billing.entity,
+          finalClaim,
+          finalPayable,
+          visitId: billing.visitID,
+        }
       }
     } catch (error) {
       console.log({ error })
     }
-    return billing.default
+    return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
@@ -103,8 +110,8 @@ const bannerStyle = {
       visitId,
       visitStatus = 'BILLING',
       invoice,
-      invoicePayer,
-      invoicePayment,
+      invoicePayer = [],
+      invoicePayment = [],
       mode,
     } = values
 
@@ -340,15 +347,23 @@ class Billing extends Component {
 
   render () {
     const { showReport, showAddPaymentModal } = this.state
-    const { classes, values, dispense, loading, setFieldValue } = this.props
+    const {
+      classes,
+      values,
+      dispense,
+      loading,
+      setFieldValue,
+      patient,
+      sessionInfo,
+      user,
+    } = this.props
     const formikBag = {
       values,
       setFieldValue,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
-        <PatientBanner style={bannerStyle} />
+        <PatientBanner />
         <div className={classes.accordionContainer}>
           <LoadingWrapper
             linear
@@ -362,9 +377,9 @@ class Billing extends Component {
                 {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
-                    <Paper elevation={3} className={classes.dispenseContainer}>
+                    <div className={classes.dispenseContainer}>
                       <DispenseDetails viewOnly values={dispense.entity} />
-                    </Paper>
+                    </div>
                   ),
                 },
               ]}
@@ -424,9 +439,13 @@ class Billing extends Component {
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
+            invoicePayerName={patient.name}
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
+              paymentReceivedDate: moment().formatUTC(),
+              paymentReceivedByUserFK: user.id,
+              paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
             }}

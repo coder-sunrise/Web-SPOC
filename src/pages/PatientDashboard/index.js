@@ -20,8 +20,8 @@ import router from 'umi/router'
 import { unstable_Box as Box } from '@material-ui/core/Box'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 import Loadable from 'react-loadable'
-import { findGetParameter } from '@/utils/utils'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
+import { findGetParameter , getAppendUrl } from '@/utils/utils'
 import {
   PictureUpload,
   GridContainer,
@@ -38,7 +38,7 @@ import {
 } from '@/components'
 
 import avatar from '@/assets/img/faces/marc.jpg'
-import { getAppendUrl } from '@/utils/utils'
+
 
 import Loading from '@/components/PageLoading/index'
 import Banner from './Banner'
@@ -128,11 +128,11 @@ class PatientDashboard extends PureComponent {
     // const { visitRegistration = {} } = this.props
     // const { visitInfo = {} } = visitRegistration
 
-    this.props.history.push(
-      getAppendUrl({
-        md2: 'cons',
-      }),
-    )
+    // this.props.history.push(
+    //   getAppendUrl({
+    //     md2: 'cons',
+    //   }),
+    // )
 
     const version = Date.now()
     this.props
@@ -153,9 +153,9 @@ class PatientDashboard extends PureComponent {
           // )
 
           router.push(
-            `/reception/queue/patientdashboard?qid=${findGetParameter(
+            `/reception/queue/consultation?qid=${findGetParameter(
               'qid',
-            )}&cid=${o.id}&v=${version}&md2=cons`,
+            )}&cid=${o.id}&v=${version}`,
           )
       })
   }
@@ -173,7 +173,6 @@ class PatientDashboard extends PureComponent {
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {} } = entity
-    // console.log(visit)
 
     return (
       <div className={classes.root}>

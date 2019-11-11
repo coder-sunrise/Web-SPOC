@@ -88,10 +88,11 @@ const submitKey = 'login/getToken'
     const { location } = routing
 
     const credential = { username, password, clinic_code: clinicCode }
-    let loginDestination = '/'
-    if (location.query && location.query.redirect !== undefined) {
-      loginDestination = location.query.redirect
-    }
+    const loginDestination = '/reception/queue' // always land at reception/queue
+
+    // if (location.query && location.query.redirect !== undefined) {
+    //   loginDestination = location.query.redirect
+    // }
 
     dispatch({
       type: 'login/getToken',
@@ -109,7 +110,6 @@ const submitKey = 'login/getToken'
             },
           })
           localStorage.setItem('clinicCode', clinicCode)
-
           router.push(loginDestination)
         }
       })

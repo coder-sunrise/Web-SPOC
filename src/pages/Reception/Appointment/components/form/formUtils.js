@@ -98,7 +98,9 @@ export const mapPropsToValues = ({
     _patientAccountNo = accNo
     _patientProfileFK = id
   }
-
+  let _title = user.clinicianProfile.title
+    ? `${user.clinicianProfile.title} `
+    : ''
   let values = {
     patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,
@@ -107,7 +109,7 @@ export const mapPropsToValues = ({
     isEnableRecurrence: false,
     isEditedAsSingleAppointment: false,
     overwriteEntireSeries: false,
-    bookedByUser: user.clinicianProfile.name,
+    bookedByUser: `${_title}${user.clinicianProfile.name}`,
     bookedByUserFK: user.id,
     currentAppointment: {
       appointmentDate: moment(selectedSlot.start).formatUTC(),
@@ -147,12 +149,19 @@ export const mapPropsToValues = ({
         patientName = name
         patientAccountNo = accNo
       }
+      _title =
+        clinicianProfile && clinicianProfile.title
+          ? `${clinicianProfile.title} `
+          : ''
+      const bookedByUser = clinicianProfile
+        ? `${_title}${clinicianProfile.name}`
+        : ''
       values = {
         ...restViewingAppointment,
         patientContactNo,
         patientName,
         patientAccountNo,
-        bookedByUser: clinicianProfile ? clinicianProfile.name : '',
+        bookedByUser,
         overwriteEntireSeries: false,
         recurrenceChanged: false,
         recurrenceDto:

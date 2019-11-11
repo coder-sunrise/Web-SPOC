@@ -18,6 +18,7 @@ import {
   CodeSelect,
 } from '@/components'
 import { tagList } from '@/utils/codes'
+import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
 const styles = (theme) => ({})
 
@@ -68,7 +69,7 @@ class Detail extends PureComponent {
       setFieldValue,
       height,
     } = props
-
+    // console.log(htmlDecodeByRegExp(props.values.templateContent))
     return (
       <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
@@ -133,14 +134,14 @@ class Detail extends PureComponent {
                   return (
                     <RichEditor
                       // toolbarHidden={() => true}
-                      handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
                       {...cfg}
                       {...args}
-                      // onBlur={(html, text) => {
-                      //   this.props.setFieldValue('templateContent', text)
-                      // }}
+                      onBlur={(html, text) => {
+                        console.log(htmlDecodeByRegExp(html), text)
+                        // this.props.setFieldValue('templateContent', text)
+                      }}
                     />
                   )
                 }}

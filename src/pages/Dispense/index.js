@@ -28,7 +28,7 @@ import { postPDF, exportPdfReport } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 import { queryDrugLabelDetails } from '@/services/dispense'
-// model
+
 @connect(
   ({
     dispense,
@@ -119,7 +119,7 @@ class Dispense extends PureComponent {
               this.wsConnection.send(`["${base64Result}"]`)
             } else {
               notification.error({
-                message: `The printing client application didn\'t running up, please start it.`,
+                message: `SEMR printing tool is not running, please start it.`,
               })
             }
           }
@@ -135,11 +135,20 @@ class Dispense extends PureComponent {
           return
         }
         const { downloadConfig } = documentType
-
-        exportPdfReport(
-          downloadConfig.id,
-          `${downloadConfig.key}:${row.sourceFK}`,
-        )
+        const reportParameters = {
+          [downloadConfig.key]: row.sourceFK,
+        }
+        this.props.dispatch({
+          type: 'global/updateState',
+          payload: {
+            reportTypeID: downloadConfig.id,
+            reportParameters: {
+              ...reportParameters,
+              isSaved: true,
+            },
+          },
+        })
+        // exportPdfReport(downloadConfig.id, reportParameters)
       }
     }
   }
@@ -193,7 +202,6 @@ class Dispense extends PureComponent {
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
-            style={{}}
             patientInfo={dispense.patientInfo}
             extraCmt={this.getExtraComponent()}
           />

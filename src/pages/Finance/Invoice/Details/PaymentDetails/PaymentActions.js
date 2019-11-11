@@ -15,6 +15,7 @@ const PaymentActions = ({
   type,
   invoicePayerFK,
   readOnly,
+  hasActiveSession,
 }) => {
   const ButtonProps = {
     icon: true,
@@ -22,11 +23,14 @@ const PaymentActions = ({
     color: 'primary',
     size: 'sm',
   }
+
   return (
     <React.Fragment>
       <Button
         onClick={() => handleAddPayment(invoicePayerFK)}
-        disabled={!handleAddPayment || readOnly}
+        disabled={
+          hasActiveSession ? !handleAddPayment || readOnly : !hasActiveSession
+        }
         {...ButtonProps}
       >
         <Add />
@@ -36,7 +40,9 @@ const PaymentActions = ({
         <Button
           // onClick={() => handleAddCrNote(type)}
           onClick={() => handleAddCrNote(invoicePayerFK)}
-          disabled={!handleAddCrNote || readOnly}
+          disabled={
+            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
+          }
           {...ButtonProps}
         >
           <Add />
@@ -46,7 +52,9 @@ const PaymentActions = ({
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleWriteOff(invoicePayerFK)}
-          disabled={!handleWriteOff || readOnly}
+          disabled={
+            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
+          }
           {...ButtonProps}
         >
           <Add />
@@ -55,7 +63,7 @@ const PaymentActions = ({
       )}
       <Button
         onClick={() => handlePrinterClick('TaxInvoice')}
-        disabled={!handlePrinterClick || readOnly}
+        disabled={!handlePrinterClick}
         {...ButtonProps}
       >
         <Printer />

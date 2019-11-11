@@ -24,7 +24,6 @@ const initialState = {
   loaded: false,
   isLoading: false,
   activePanel: -1,
-  incomeData: [],
 }
 
 const reducer = (state, action) => {
@@ -172,8 +171,8 @@ const GSTReportWithFormik = withFormik({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    dateFrom: moment.utc('2019-08-01').startOf('month').toDate(),
-    dateTo: undefined,
+    dateFrom: moment(new Date()).startOf('month').toDate(),
+    dateTo: moment(new Date()).endOf('month').toDate(),
   }),
 })(GSTReport)
 

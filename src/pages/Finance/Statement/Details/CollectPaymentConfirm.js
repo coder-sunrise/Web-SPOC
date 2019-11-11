@@ -171,7 +171,7 @@ class CollectPaymentConfirm extends PureComponent {
       type: 'statement/bizSessionList',
       payload: {
         sessionNoPrefix: e,
-        pagesize: 999999,
+        pagesize: 999,
       },
     }).then(() => {
       const { bizSessionList } = this.props.statement

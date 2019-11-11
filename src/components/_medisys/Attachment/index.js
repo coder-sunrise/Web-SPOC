@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 // import fetch from 'dva/fetch'
 // material ui
@@ -68,6 +69,7 @@ const getFileName = (filename) => {
 }
 
 const Attachment = ({
+  dispatch,
   classes,
   handleUpdateAttachments,
   attachmentType = '',
@@ -161,7 +163,15 @@ const Attachment = ({
   const onFileChange = async (event) => {
     try {
       setUploading(true)
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: true,
+        },
+      })
+
       const { files } = event.target
+
       // const numberOfNewFiles = Object.keys(files).length
       let totalFilesSize = 0
       const maxUploadSize = 31457280
@@ -174,12 +184,20 @@ const Attachment = ({
           totalFilesSize += o.size
         })
       attachments.forEach((o) => {
-        totalFilesSize += o.fileSize
+        if (!o.isDeleted) {
+          totalFilesSize += o.fileSize
+        }
       })
 
       if (totalFilesSize > maxUploadSize) {
         setErrorText('Cannot upload more than 30MB')
         setUploading(false)
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
         return
       }
 
@@ -197,6 +215,12 @@ const Attachment = ({
           .map((key) => mapFileToUploadObject(files[key])),
       )
       setUploading(false)
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          disableSave: false,
+        },
+      })
       handleUpdateAttachments({
         added: selectedFiles,
       })
@@ -286,4 +310,6 @@ const Attachment = ({
   )
 }
 
-export default withStyles(styles, { name: 'Attachment' })(Attachment)
+const ConnectAttachment = connect()(Attachment)
+
+export default withStyles(styles, { name: 'Attachment' })(ConnectAttachment)

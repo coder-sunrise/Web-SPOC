@@ -54,6 +54,11 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Sales Listing Report',
+    url: '/report/saleslistingreport',
+  },
+  {
+    title: 'Finance',
     text: 'Patient Listing Report',
     url: '/report/patientlisting',
   },
@@ -64,14 +69,48 @@ const menuData = [
   },
   {
     title: 'Finance',
+    text: 'Credit Note Listing Report',
+    url: '/report/creditnotelistingreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Void Credit Note & Payment Report',
+    url: '/report/voidcreditnotereport',
+  },
+  {
+    title: 'Finance',
+    text: 'Deposit Transaction Report',
+    url: '/report/deposittransactionreport',
+  },
+  {
+    title: 'Finance',
+    text: 'Outstanding Payment Report',
+    url: '/report/outstandingpaymentreport',
+  },
+  {
+    title: 'Finance',
     text: 'CHAS Claim Report',
     url: '',
   },
-
   {
     title: 'Inventory',
-    text: 'Drug Movement Report',
-    url: '',
+    text: 'Medication Movement Report',
+    url: '/report/medicationmovementreport',
+  },
+  {
+    title: 'Inventory',
+    text: 'Consumable Movement Report',
+    url: '/report/consumablemovementreport',
+  },
+  {
+    title: 'Inventory',
+    text: 'Low Stock Medication Report',
+    url: '/report/lowstockmedicationreport',
+  },
+  {
+    title: 'Inventory',
+    text: 'Low Stock Consumables Report',
+    url: '/report/lowstockconsumablesreport',
   },
   {
     title: 'Other',

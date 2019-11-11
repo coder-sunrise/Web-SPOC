@@ -57,7 +57,7 @@ class Allergies extends PureComponent {
                   <Checkbox
                     disabled={allergyDisabled}
                     simple
-                    label={"This patient doesn't has any allergy"}
+                    label={"This patient doesn't have any allergy"}
                     {...args}
                   />
                 )
@@ -77,7 +77,7 @@ class Allergies extends PureComponent {
                       { name: 'No', value: false },
                     ]}
                     label='G6PD Deficiency:'
-                    disabled={allergyDisabled}
+                    // disabled={allergyDisabled}
                   />
                 )
               }}

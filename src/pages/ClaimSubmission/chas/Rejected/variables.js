@@ -1,4 +1,4 @@
-export const NewCHASColumns = [
+export const RejectedCHASColumns = [
   {
     name: 'visitDate',
     title: 'Visit Date',
@@ -20,11 +20,11 @@ export const NewCHASColumns = [
     title: 'Diagnosis',
   },
   {
-    name: 'schemeType',
+    name: 'schemeTypeDisplayValue',
     title: 'Scheme Type',
   },
   {
-    name: 'schemeCategory',
+    name: 'schemeCategoryDisplayValue',
     title: 'Scheme Category',
   },
   {
@@ -53,19 +53,9 @@ export const NewCHASColumns = [
   },
 ]
 
-export const NewCHASColumnExtensions = [
+export const RejectedCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
-
-export const TableConfig = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: {
-      showSelectAll: true,
-      rowSelectionEnabled: (row) => true,
-    },
-  },
-}

@@ -617,7 +617,7 @@ export const updateCellValue = (
       return []
       // row._$error = false
     } catch (er) {
-      // console.log(er)
+      console.log(er)
       // window.g_app._store.dispatch({
       //   type: 'global/updateState',
       //   payload: {
@@ -676,19 +676,31 @@ const confirmBeforeReload = (e) => {
 }
 
 const _checkCb = ({ redirectUrl, onProceed }, e) => {
+  if (onProceed) {
+    onProceed(e)
+  }
   if (redirectUrl) {
     router.push(redirectUrl)
-  } else if (onProceed) {
-    onProceed(e)
   }
 }
 
-const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
-  e,
-) => {
-  // console.log(restProps)
+const navigateDirtyCheck = ({
+  onConfirm,
+  displayName,
+  openConfirmContent,
+  ...restProps
+}) => (e) => {
+  console.log(
+    onConfirm,
+    displayName,
+    restProps,
+    window.beforeReloadHandlerAdded,
+    window.dirtyForms,
+  )
   if (window.beforeReloadHandlerAdded) {
+    let f = {}
     if (displayName) {
+      f = window.dirtyForms[displayName]
       const ob = window.g_app._store.getState().formik[displayName]
       if (ob && !ob.dirty) {
         return
@@ -699,9 +711,12 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: formatMessage({
-          id: 'app.general.leave-without-save',
-        }),
+        openConfirmContent:
+          openConfirmContent ||
+          f.dirtyCheckMessage ||
+          formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
         onConfirmSave: onConfirm,
         openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
@@ -712,20 +727,27 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
                 [displayName]: undefined,
               },
             })
-            // delete window._localFormik[displayName]
+
+            if (f.onDirtyDiscard) f.onDirtyDiscard()
+            delete window.dirtyForms[displayName]
           } else {
-            window.dirtyForms.forEach((f) => {
+            Object.values(window.dirtyForms).forEach((f) => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
-                  [f]: undefined,
+                  [f.displayName]: undefined,
                 },
               })
+              if (f.onDirtyDiscard) f.onDirtyDiscard()
             })
+            window.dirtyForms = {}
             // delete window._localFormik[displayName]
           }
-          window.beforeReloadHandlerAdded = false
-          window.removeEventListener('beforeunload', confirmBeforeReload)
+          if (Object.values(window.dirtyForms).length === 0) {
+            window.beforeReloadHandlerAdded = false
+            window.removeEventListener('beforeunload', confirmBeforeReload)
+          }
+
           _checkCb(restProps, e)
         },
       },
@@ -743,6 +765,7 @@ const calculateAdjustAmount = (
   initialAmout = 0,
   adj = 0,
 ) => {
+  // console.log({ initialAmout, adj })
   let amount = initialAmout
   let adjAmount
   if (isExactAmount) {
@@ -851,7 +874,18 @@ const getRefreshChasBalanceStatus = (status = []) => {
   }
 
   const successCode = 'SC100'
+  const fullBalanceSuccessCode = 'SC105'
   const { statusCode, statusDescription } = status[0]
+
+  if (
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
+  ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
 
   if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
@@ -883,7 +917,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total
+    r.weightage = r[totalField] / total || 0
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -907,12 +941,13 @@ const calculateAmount = (
   )
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
-    notification.error({
-      message: 'Could not load GST Setting',
-    })
+    // notification.error({
+    //   message: 'Could not load GST Setting',
+    // })
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
+
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
@@ -921,10 +956,8 @@ const calculateAmount = (
     } else {
       gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
-        r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
-        r[gstField] = roundToTwoDecimals(
-          r[totalField] * (1 + gSTPercentage) + r.subAdjustment,
-        )
+        r[gstAmtField] = roundToTwoDecimals(r[adjustedField] * gSTPercentage)
+        r[gstField] = roundToTwoDecimals(r[adjustedField] * (1 + gSTPercentage))
       })
     }
   }

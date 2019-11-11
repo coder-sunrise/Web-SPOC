@@ -5,11 +5,14 @@ import Refresh from '@material-ui/icons/Refresh'
 import Print from '@material-ui/icons/Print'
 // common component
 import { Button, GridContainer, GridItem, notification } from '@/components'
-import { convertToConsultation } from '@/pages/PatientDashboard/Consultation/utils'
+import { convertToConsultation } from '@/pages/Consultation/utils'
 // utils
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
+import model from '@/pages/Widgets/Orders/models'
+
+window.g_app.replaceModel(model)
 
 // model
 @Authorized.Secured('queue.dispense.editorder')

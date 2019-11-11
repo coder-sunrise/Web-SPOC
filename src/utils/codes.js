@@ -32,6 +32,25 @@ const osBalanceStatus = [
   { value: 'no', name: 'No', color: 'no' },
 ]
 
+const sessionOptions = [
+  { value: 'all', name: 'All Sessions' },
+  { value: 'current', name: 'Current Session' },
+]
+
+const outgoingSMSStatus = [
+  { value: 1, name: 'Sent' },
+  { value: 2, name: 'Failed' },
+  { value: 3, name: 'Delivered' },
+  { value: 4, name: 'Undelivered' },
+  { value: 5, name: 'Receiving' },
+  { value: 6, name: 'Received' },
+  { value: 7, name: 'Accepted' },
+  { value: 8, name: 'Scheduled' },
+  { value: 9, name: 'Read' },
+  { value: 10, name: 'Queued' },
+  { value: 11, name: 'Sending' },
+]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -607,6 +626,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 7,
       key: 'MedicalCertificateId',
+      subject: 'Medical Certificate',
       draft: (row) => {
         return {
           MedicalCertificateDetails: [
@@ -632,13 +652,14 @@ const consultationDocumentTypes = [
     convert: (r) => {
       return {
         ...r,
-        attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
-        attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
+        // attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
+        // attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
     },
     downloadConfig: {
       id: 8,
       key: 'CertificateOfAttendanceId',
+      subject: 'Certificate Of Attendance',
       draft: (row) => {
         return {
           CertificateOfAttendanceDetails: [
@@ -658,6 +679,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 9,
       key: 'ReferralLetterId',
+      subject: 'Referral Letter',
       draft: (row) => {
         return {
           ReferralLetterDetails: [
@@ -677,6 +699,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 11,
       key: 'memoid',
+      subject: 'Memo',
       draft: (row) => {
         return {
           MemoDetails: [
@@ -698,6 +721,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 10,
       key: 'vaccinationcertificateid',
+      subject: 'Vaccination Certificate',
       draft: (row) => {
         return {
           VaccinationCertificateDetails: [
@@ -720,6 +744,7 @@ const consultationDocumentTypes = [
     downloadConfig: {
       id: 12,
       key: 'documentid',
+      subject: 'Other Documents',
       draft: (row) => {
         return {
           DocumentDetails: [
@@ -826,7 +851,7 @@ const tenantCodes = [
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
   'ctMedicationFrequency',
-  'ltinvoiceitemtype',
+  // 'ltinvoiceitemtype',
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
@@ -848,26 +873,30 @@ const noIsActiveProp = [
 ]
 
 const defaultParams = {
+  sorting: [
+    { columnName: 'sortOrder', direction: 'asc' },
+  ],
   excludeInactiveCodes: true,
 }
 
 const convertExcludeFields = [
   // 'excludeInactiveCodes',
+  'temp',
+  'refresh',
 ]
 
-const _fetchAndSaveCodeTable = async (
+export const fetchAndSaveCodeTable = async (
   code,
   params,
-  multiplier = 1,
   refresh = false,
+  temp = false,
 ) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
-  const multipleCodes = code.split(',')
   const baseURL = '/api/CodeTable'
   const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
-  let url = useGeneral ? generalCodetableURL : searchURL
+  let url = searchURL
   let criteriaForTenantCodes = noIsActiveProp.reduce(
     (codes, tenantCode) =>
       tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
@@ -889,12 +918,14 @@ const _fetchAndSaveCodeTable = async (
     ...defaultParams,
     ...params,
   }
+
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...params, ...criteriaForTenantCodes },
+        { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
+
   // console.log(`fetch code: ${code}`)
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -904,39 +935,38 @@ const _fetchAndSaveCodeTable = async (
   let { status: statusCode, data } = response
   let newData = []
   if (parseInt(statusCode, 10) === 200) {
-    if (code.split(',').length > 1) {
-      const codes = code.split(',')
-      newData = [
-        ...codes.reduce(
-          (merged, c) => [
-            ...merged,
-            ...data[c],
-          ],
-          [],
-        ),
-      ]
-    } else {
-      newData = useGeneral
-        ? [
-            ...data[code],
-          ]
-        : [
-            ...data.data,
-          ]
-    }
+    newData = [
+      ...data.data,
+    ]
+    // if (code.split(',').length > 1) {
+    //   const codes = code.split(',')
+    //   newData = [
+    //     ...codes.reduce(
+    //       (merged, c) => [
+    //         ...merged,
+    //         ...data[c],
+    //       ],
+    //       [],
+    //     ),
+    //   ]
+    // } else {
+    //   console.log({ data, code, useGeneral })
+    //   newData = [
+    //     ...data.data,
+    //   ]
+    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    const result = multiplyCodetable(newData, multiplier)
-
+    // console.log(newData, temp)
+    // if (!temp)
     await db.codetable.put({
       code,
-      data: result,
-      createDate: new Date(),
-      updateDate: refresh ? null : new Date(),
-      // shouldRefresh: refresh,
+      data: newData,
+      updateDate: new Date(), // refresh ? null : new Date(),
+      params,
     })
-    return result
+    return newData
   }
 
   return []
@@ -947,16 +977,28 @@ export const getAllCodes = async () => {
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
   const ct = await db.codetable.toArray((code) => {
-    return code
-      .filter((_i) => {
-        const { updateDate } = _i
-        const parsedUpdateDate =
-          updateDate === null ? moment('2001-01-01') : moment(updateDate)
-        return parsedUpdateDate.isAfter(parsedLastLoginDate)
-      })
-      .map((_i) => ({ code: _i.code, data: _i.data }))
-  })
+    const results = code.filter((_i) => {
+      const { updateDate } = _i
+      const parsedUpdateDate =
+        updateDate === null ? moment('2001-01-01') : moment(updateDate)
+      return parsedUpdateDate.isAfter(parsedLastLoginDate)
+    })
+    // .map((_i) => ({
+    //   code: _i.code,
+    //   data: _i.data,
+    //   updateDate: _i.updateDate,
+    // }))
 
+    const cts = {
+      config: {},
+    }
+    results.forEach((r) => {
+      const { code: c, data, ...others } = r
+      cts[c.toLowerCase()] = data
+      cts.config[c.toLowerCase()] = others
+    })
+    return cts
+  })
   return ct || []
 }
 
@@ -965,6 +1007,8 @@ export const getCodes = async (payload) => {
   let params
   let multiply = 1
   let _force = false
+  let _temp = false
+
   const { refresh = false } = payload
   if (typeof payload === 'string') ctcode = payload.toLowerCase()
   if (typeof payload === 'object') {
@@ -972,6 +1016,7 @@ export const getCodes = async (payload) => {
     params = payload.filter
     multiply = payload.multiplier
     _force = payload.force
+    _temp = payload.temp || false
   }
 
   let result = []
@@ -986,7 +1031,7 @@ export const getCodes = async (payload) => {
 
     /* not exist in current table, make network call to retrieve data */
     if (ct === undefined || refresh || _force) {
-      result = _fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
+      result = fetchAndSaveCodeTable(ctcode, params, multiply, refresh)
     } else {
       /*  compare updateDate with lastLoginDate
           if updateDate > lastLoginDate, do nothing
@@ -1002,7 +1047,7 @@ export const getCodes = async (payload) => {
       //   lastLogin: parsedLastLoginDate.format(),
       // })
       result = parsedUpdateDate.isBefore(parsedLastLoginDate)
-        ? _fetchAndSaveCodeTable(ctcode, params, multiply)
+        ? fetchAndSaveCodeTable(ctcode, params, multiply)
         : existedData
     }
   } catch (error) {
@@ -1014,13 +1059,15 @@ export const getCodes = async (payload) => {
 export const checkShouldRefresh = async (payload) => {
   try {
     const { code, filter } = payload
-    if (filter !== undefined) return true
 
     await db.open()
     const ct = await db.codetable.get(code.toLowerCase())
 
     if (ct === undefined) return true
-    const { updateDate } = ct
+
+    const { updateDate, params } = ct
+    if (!_.isEqual(params, filter)) return true
+
     return updateDate === null
   } catch (error) {
     console.log({ error })
@@ -1071,6 +1118,7 @@ export const getServices = (data) => {
   const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
     return {
       value: o[0].serviceId,
+      code: o[0].code,
       name: o[0].displayValue,
       serviceCenters: o.map((m) => {
         return {
@@ -1192,9 +1240,12 @@ const tagList = [
     text: '<#AppointmentDateTime#>',
     url: '',
     getter: () => {
-      const { patient } = window.g_app._store.getState()
-      if (patient && patient.entity) {
-        return patient.entity.name
+      const { visitRegistration = {} } = window.g_app._store.getState()
+      const { entity } = visitRegistration
+      if (entity && entity.visit && entity.visit.appointmentDatetTime) {
+        return moment(entity.visit.appointmentDatetTime).format(
+          dateFormatLongWithTime,
+        )
       }
       return 'N.A.'
     },
@@ -1370,12 +1421,15 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
+  outgoingSMSStatus,
   // country,
+  sessionOptions,
   consultationDocumentTypes,
   getServices,
   tagList,
   osBalanceStatus,
   buttonTypes,
   inventoryAdjustmentStatus,
+  fetchAndSaveCodeTable,
   ...module.exports,
 }
