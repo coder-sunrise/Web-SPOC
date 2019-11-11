@@ -35,7 +35,7 @@ import styles from './styles'
       itemName: values.description,
       quantity: 1,
       unitPrice: values.total,
-      totalAfterItemAdjustment: values.total,
+      totalAfterGST: values.total,
       isDeleted: false,
     }
     handleAddMiscItem(miscItem)

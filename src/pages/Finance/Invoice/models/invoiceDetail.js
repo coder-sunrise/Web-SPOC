@@ -27,7 +27,20 @@ export default createFormViewModel({
         }
       })
     },
-    effects: {},
+    effects: {
+      *queryDone ({ payload }, { call, put }) {
+        const { data } = payload
+        if (data && data.patientProfileFK) {
+          console.log({ data })
+          yield put({
+            type: 'patient/query',
+            payload: {
+              id: data.patientProfileFK,
+            },
+          })
+        }
+      },
+    },
     reducers: {},
   },
 })

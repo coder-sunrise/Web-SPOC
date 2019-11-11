@@ -25,7 +25,7 @@ import InvoiceSummary from './components/InvoiceSummary'
 // utils
 import { computeTotalForAllSavedClaim } from './utils'
 import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
-import { INVOICE_ITEM_TYPE } from '@/utils/constants'
+import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
 
@@ -443,6 +443,7 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
+              payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
               paymentReceivedDate: moment().formatUTC(),
               paymentReceivedByUserFK: user.id,
               paymentReceivedBizSessionFK: sessionInfo.id,

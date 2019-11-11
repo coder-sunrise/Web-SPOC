@@ -26,12 +26,14 @@ class InvoiceDetails extends Component {
 
   refresh = () => {
     const { dispatch, invoiceDetail } = this.props
+
     dispatch({
       type: 'invoiceDetail/query',
       payload: {
         id: invoiceDetail.currentId,
       },
     })
+
     dispatch({
       type: 'invoicePayment/query',
       payload: {

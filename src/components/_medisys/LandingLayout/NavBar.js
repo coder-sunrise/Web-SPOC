@@ -70,7 +70,7 @@ class NavBar extends PureComponent {
         </ListItem>
         <ListItem className={classes.listItem}>
           <NavLink
-            to='/auth/forgotpassword'
+            to='/login/forgotpassword'
             className={cx(classes.navLink, {
               [classes.navLinkActive]: this.activeRoute('/forgotpassword'),
             })}

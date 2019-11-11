@@ -341,7 +341,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const eligibleAmount =
             totalPayableBalance -
             (currentItemClaimedAmount - currentClaimAmount)
-          if (eligibleAmount === 0 || toBeChangeAmount <= eligibleAmount)
+          if (
+            eligibleAmount === 0 ||
+            toBeChangeAmount <= eligibleAmount ||
+            Number.isNaN(eligibleAmount)
+          )
             return { ...item, claimAmount: toBeChangeAmount, error: undefined }
 
           return {

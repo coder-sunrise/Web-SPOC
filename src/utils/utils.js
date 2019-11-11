@@ -1003,6 +1003,9 @@ const removeFields = (obj, fields = []) => {
   }
 }
 
+export const currencyFormatter = (value) =>
+  numeral(value).format(`$${config.currencyFormat}`)
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
