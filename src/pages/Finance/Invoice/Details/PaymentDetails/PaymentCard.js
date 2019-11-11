@@ -42,6 +42,7 @@ const PaymentCard = ({
   // payerID = 'N/A',
   // payerName = 'N/A',
   coPaymentSchemeFK = undefined,
+  companyFK = undefined,
   companyName = '',
   patientName = 'N/A',
   payerType = '',
@@ -135,6 +136,7 @@ const PaymentCard = ({
           <PaymentActions
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
+            companyFK={companyFK}
             readOnly={readOnly}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
