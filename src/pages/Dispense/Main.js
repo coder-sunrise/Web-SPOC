@@ -40,6 +40,7 @@ const reloadDispense = (props, effect = 'query') => {
 @withFormikExtend({
   authority: 'queue.dispense',
   enableReinitialize: true,
+  notDirtyDuration: 3,
   mapPropsToValues: ({ dispense = {}, clinicSettings }) => {
     const _temp = dispense.entity || dispense.default
     const { settings } = clinicSettings

@@ -246,6 +246,11 @@ class Main extends React.Component {
       (this.props.visitRegistration.entity || {}).id
     )
       return true
+    if (
+      nextProps.orders.summary.totalWithGST !==
+      this.props.orders.summary.totalWithGST
+    )
+      return true
     return false
   }
 
