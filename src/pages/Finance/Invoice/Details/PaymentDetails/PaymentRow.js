@@ -8,6 +8,7 @@ import Cross from '@material-ui/icons/HighlightOff'
 // common components
 import { GridContainer, GridItem, Tooltip, dateFormatLong } from '@/components'
 import styles from './styles'
+import { currencyFormatter } from '@/utils/utils'
 
 const PaymentRow = ({
   // id,
@@ -63,7 +64,9 @@ const PaymentRow = ({
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>
-          <span className={classes.currency}>${amount.toFixed(2)}</span>
+          <span className={classes.currency}>
+            {amount ? currencyFormatter(amount) : 'N/A'}
+          </span>
         </GridItem>
         <GridItem>
           <Tooltip

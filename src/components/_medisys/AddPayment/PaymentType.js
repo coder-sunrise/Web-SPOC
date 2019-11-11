@@ -12,6 +12,7 @@ import { PAYMENT_MODE } from '@/utils/constants'
 const PayerHeader = ({
   classes,
   disableCash,
+  hideDeposit,
   handlePaymentTypeClick,
   patientInfo,
 }) => (
@@ -66,16 +67,18 @@ const PayerHeader = ({
         <Add />
         GIRO
       </Button>
-      <Button
-        color='primary'
-        size='sm'
-        id={PAYMENT_MODE.DEPOSIT}
-        onClick={handlePaymentTypeClick}
-        disabled={patientInfo.patientDeposit === undefined}
-      >
-        <Add />
-        Deposit
-      </Button>
+      {!hideDeposit && (
+        <Button
+          color='primary'
+          size='sm'
+          id={PAYMENT_MODE.DEPOSIT}
+          onClick={handlePaymentTypeClick}
+          disabled={patientInfo.patientDeposit === undefined}
+        >
+          <Add />
+          Deposit
+        </Button>
+      )}
     </GridItem>
   </GridContainer>
 )

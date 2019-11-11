@@ -71,18 +71,18 @@ const DiagnosisTrending = ({ values, validateForm }) => {
         (grouped, data, index) =>
           grouped[data.groupName] === undefined
             ? {
-                ...grouped,
-                [data.groupName]: [
-                  { ...data, id: `${data.groupName}-${index}` },
-                ],
-              }
+              ...grouped,
+              [data.groupName]: [
+                { ...data, id: `${data.groupName}-${index}` },
+              ],
+            }
             : {
-                ...grouped,
-                [data.groupName]: [
-                  ...grouped[data.groupName],
-                  { ...data, id: `${data.groupName}-${index}` },
-                ],
-              },
+              ...grouped,
+              [data.groupName]: [
+                ...grouped[data.groupName],
+                { ...data, id: `${data.groupName}-${index}` },
+              ],
+            },
         {},
       )
 
@@ -171,7 +171,8 @@ const DiagnosisTrendingWithFormik = withFormik({
     },
   ),
   mapPropsToValues: () => ({
-    listingFrom: moment.utc().startOf('month').toDate(),
+    listingFrom: moment(new Date()).startOf('month').toDate(),
+    listingTo: moment(new Date()).endOf('month').toDate(),
     viewBy: 'monthly',
   }),
 })(DiagnosisTrending)
