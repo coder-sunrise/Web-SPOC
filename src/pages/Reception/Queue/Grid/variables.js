@@ -202,6 +202,7 @@ export const QueueColumnExtensions = [
   {
     columnName: 'timeIn',
     width: 160,
+    compare: compareTime,
     render: (row) =>
       DateFormatter({
         value: row.timeIn,

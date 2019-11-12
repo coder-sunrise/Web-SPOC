@@ -72,13 +72,15 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         // }),
       ]
 
-@connect(({ calendar, codetable }) => ({
+@connect(({ calendar, codetable, clinicInfo }) => ({
   calendar,
   // doctorProfiles: codetable.doctorprofile || [],
+  clinicInfo,
   doctorprofile: codetable.doctorprofile || [],
 }))
 class Appointment extends React.PureComponent {
   state = {
+    primaryClinicianFK: undefined,
     showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
@@ -97,7 +99,7 @@ class Appointment extends React.PureComponent {
   }
 
   componentWillMount () {
-    const { dispatch } = this.props
+    const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment().startOf('month').add(-8, 'hours').formatUTC()
     const endOfMonth = moment().endOf('month').add(-8, 'hours').formatUTC()
 
@@ -114,12 +116,27 @@ class Appointment extends React.PureComponent {
       type: 'codetable/fetchCodes',
       payload: { code: 'doctorprofile' },
     }).then((response) => {
+      const primaryClinician = response.find(
+        (item) =>
+          parseInt(item.id, 10) ===
+          parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
+      )
+
       this.setState({
-        resources: response.map((item) => ({
-          clinicianFK: item.clinicianProfile.id,
-          doctorName: item.clinicianProfile.name,
-        })),
+        primaryClinicianFK: primaryClinician.clinicianProfile.id,
+        resources: [
+          {
+            clinicianFK: primaryClinician.clinicianProfile.id,
+            doctorName: primaryClinician.clinicianProfile.name,
+          },
+        ],
       })
+      // this.setState({
+      //   resources: response.map((item) => ({
+      //     clinicianFK: item.clinicianProfile.id,
+      //     doctorName: item.clinicianProfile.name,
+      //   })),
+      // })
     })
     dispatch({
       type: 'calendar/initState',
@@ -387,6 +404,7 @@ class Appointment extends React.PureComponent {
       popoverEvent,
       filter,
       selectedAppointmentFK,
+      primaryClinicianFK,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -426,6 +444,7 @@ class Appointment extends React.PureComponent {
         </Popover>
 
         <FilterBar
+          primaryRegisteredDoctorFK={primaryClinicianFK}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
