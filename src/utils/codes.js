@@ -784,6 +784,12 @@ const consultationDocumentTypes = [
   },
 ]
 
+import Medication from '@/pages/Widgets/Orders/Detail/Medication'
+import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
+import Service from '@/pages/Widgets/Orders/Detail/Service'
+import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
+import Package from '@/pages/Widgets/Orders/Detail/Package'
+
 const orderTypes = [
   {
     name: 'Medication',
@@ -793,24 +799,28 @@ const orderTypes = [
     getSubject: (r) => {
       return r.drugName
     },
+    component: (props) => <Medication {...props} />,
   },
   {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
     getSubject: (r) => r.vaccinationName,
+    component: (props) => <Vaccination {...props} />,
   },
   {
     name: 'Service',
     value: '3',
     prop: 'corService',
     getSubject: (r) => r.serviceName,
+    component: (props) => <Service {...props} />,
   },
   {
     name: 'Consumable',
     value: '4',
     prop: 'corConsumable',
     getSubject: (r) => r.consumableName,
+    component: (props) => <Consumable {...props} />,
   },
   {
     name: 'Open Prescription',
@@ -818,10 +828,12 @@ const orderTypes = [
     prop: 'corPrescriptionItem',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
+    component: (props) => <Medication openPrescription {...props} />,
   },
   {
     name: 'Package',
     value: '6',
+    component: (props) => <Package {...props} />,
   },
 ]
 const buttonTypes = [
