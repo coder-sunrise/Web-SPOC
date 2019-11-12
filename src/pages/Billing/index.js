@@ -23,7 +23,7 @@ import DispenseDetails from '@/pages/Dispense/DispenseDetails'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
-import { computeTotalForAllSavedClaim } from './utils'
+import { computeTotalForAllSavedClaim, constructPayload } from './utils'
 import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
 import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 
@@ -74,6 +74,7 @@ const bannerStyle = {
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     try {
+      console.log({ entity: billing.entity })
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity
 
@@ -105,94 +106,12 @@ const bannerStyle = {
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
-    const {
-      concurrencyToken,
-      visitId,
-      visitStatus = 'BILLING',
-      invoice,
-      invoicePayer = [],
-      invoicePayment = [],
-      mode,
-    } = values
-
-    const { invoiceItems, ...restInvoice } = invoice
-
-    const payload = {
-      mode,
-      concurrencyToken,
-      visitId,
-      visitStatus,
-      invoicePayment: invoicePayment
-        .filter((item) => {
-          if (item.id && item.isCancelled) return true
-          if (!item.id) return true
-          return false
-        })
-        .map((item) => ({
-          ...item,
-          invoicePayerFK: undefined,
-        })),
-      invoice: restInvoice,
-      invoicePayer: invoicePayer
-        .map((item, index) => ({ ...item, sequence: index }))
-        .filter((payer) => {
-          if (payer.id === undefined && payer.isCancelled) return false
-          return true
-        })
-        .filter((payer) => (payer.id ? payer.isModified : true))
-        .map((payer) => {
-          const {
-            schemeConfig,
-            _indexInClaimableSchemes,
-            _isConfirmed,
-            claimableSchemes,
-            _isDeleted,
-            _isEditing,
-            _isValid,
-            isModified,
-            ...restPayer
-          } = payer
-          const _payer = {
-            ...restPayer,
-            isModified: restPayer.id ? isModified : false,
-            invoicePayerItem: payer.invoicePayerItem
-              .filter((item) => item.claimAmount > 0)
-              .map((item) => {
-                if (item.invoiceItemFK) {
-                  return { ...item }
-                }
-                const {
-                  invoiceItemFK,
-                  _claimedAmount,
-                  disabled,
-                  itemCode,
-                  rowIndex,
-                  notClaimableBySchemeIds,
-                  invoiceItemTypeFK,
-                  itemDescription,
-                  coverage,
-                  payableBalance,
-                  id,
-                  ...restItem
-                } = item
-
-                const _invoicePayerItem = {
-                  ...restItem,
-                  invoiceItemFK: id,
-                  payableBalance,
-                  invoiceItemTypeFK,
-                  itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
-                  itemName: itemDescription,
-                }
-                return _invoicePayerItem
-              }),
-          }
-          return _payer
-        }),
-    }
-
+    const { visitStatus } = values
+    const payload = constructPayload(values)
+    // console.log({ payload })
+    // return true
     dispatch({
-      type: 'billing/submit',
+      type: 'billing/save',
       payload,
     }).then((response) => {
       if (response) {
@@ -216,6 +135,7 @@ class Billing extends Component {
     showReport: false,
     showAddPaymentModal: false,
     isEditing: false,
+    submitCount: 0,
   }
 
   componentWillUnmount () {
@@ -266,38 +186,79 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
+  upsertBilling = () => {
+    this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+    this.props.handleSubmit()
+  }
+
   shouldDisableSaveAndCompleteButton = () => {
     const { values } = this.props
-    const { invoicePayer = [], payments = [], invoice } = values
+    const { invoicePayer = [], invoice } = values
     if (invoice === null) return true
-    // if (payments.length === 0) return true
     if (invoicePayer.length === 0) return false
 
     return false
   }
 
   onSavePaymentClick = async () => {
-    const { setFieldValue, handleSubmit } = this.props
+    const { setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'BILLING')
-    handleSubmit()
+    this.upsertBilling()
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue, handleSubmit, values } = this.props
+    const { setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    handleSubmit()
+    this.upsertBilling()
+  }
+
+  onPrintInvoiceClick = () => {
+    const { values, dispatch } = this.props
+    const { invoicePayer } = values
+    const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
+      if (payer.id === undefined && payer.isCancelled) return false
+      if (payer.id) return payer.isModified
+      return true
+    })
+    if (modifiedOrNewAddedPayer.length > 0) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent: `Save changes and print invoice?`,
+          onConfirmSave: () => {
+            const payload = constructPayload({
+              ...values,
+              visitStatus: 'BILLING',
+            })
+            dispatch({
+              type: 'billing/save',
+              payload,
+            }).then((response) => {
+              if (response) {
+                this.setState((preState) => ({
+                  submitCount: preState.submitCount + 1,
+                }))
+                this.toggleReport()
+              }
+            })
+          },
+        },
+      })
+    } else this.toggleReport()
   }
 
   handleAddPayment = async (payment) => {
-    const { values, setFieldValue, setValues, handleSubmit } = this.props
+    const { values, setValues } = this.props
     const { outstandingBalance, ...rest } = payment
     const invoicePayment = [
       ...values.invoicePayment.filter((item) => item.id),
       rest,
     ]
-
     const _newValues = {
       ...values,
       invoicePayment,
@@ -307,11 +268,11 @@ class Billing extends Component {
     await setValues(_newValues)
     this.calculateOutstandingBalance(invoicePayment)
     this.toggleAddPaymentModal()
-    handleSubmit()
+    this.upsertBilling()
   }
 
   handleDeletePayment = async (id) => {
-    const { values, setValues, user, handleSubmit } = this.props
+    const { values, setValues, user } = this.props
     const { invoicePayment } = values
     let _newInvoicePayment = [
       ...invoicePayment,
@@ -342,17 +303,18 @@ class Billing extends Component {
     }
     await setValues(_newValues)
     this.calculateOutstandingBalance(_newInvoicePayment)
-    handleSubmit()
+    this.upsertBilling()
   }
 
   render () {
-    const { showReport, showAddPaymentModal } = this.state
+    const { showReport, showAddPaymentModal, submitCount } = this.state
     const {
       classes,
       values,
       dispense,
       loading,
       setFieldValue,
+      setValues,
       patient,
       sessionInfo,
       user,
@@ -360,6 +322,7 @@ class Billing extends Component {
     const formikBag = {
       values,
       setFieldValue,
+      setValues,
     }
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
@@ -391,9 +354,8 @@ class Billing extends Component {
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
               <ApplyClaims
-                handleAddCopayerClick={this.toggleCopayerModal}
                 handleIsEditing={this.handleIsEditing}
-                // values={values}
+                submitCount={submitCount}
                 {...formikBag}
               />
             </GridContainer>
@@ -402,7 +364,7 @@ class Billing extends Component {
                 disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
-                handlePrintInvoiceClick={this.toggleReport}
+                handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 {...formikBag}
               />
             </GridContainer>

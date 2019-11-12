@@ -69,6 +69,7 @@ const getFileName = (filename) => {
 }
 
 const Attachment = ({
+  global,
   dispatch,
   classes,
   handleUpdateAttachments,
@@ -250,6 +251,7 @@ const Attachment = ({
   const clearValue = (e) => {
     e.target.value = null
   }
+
   return (
     <GridContainer>
       {label && (
@@ -294,7 +296,7 @@ const Attachment = ({
             color='rose'
             size='sm'
             onClick={onUploadClick}
-            disabled={uploading}
+            disabled={uploading || global.disableSave}
           >
             <AttachFile />
             Upload
@@ -310,6 +312,6 @@ const Attachment = ({
   )
 }
 
-const ConnectAttachment = connect()(Attachment)
+const ConnectAttachment = connect(({ global }) => ({ global }))(Attachment)
 
 export default withStyles(styles, { name: 'Attachment' })(ConnectAttachment)

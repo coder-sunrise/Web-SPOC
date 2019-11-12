@@ -923,6 +923,7 @@ const defaultParams = {
   sorting: [
     { columnName: 'sortOrder', direction: 'asc' },
   ],
+  isActive: true,
   excludeInactiveCodes: true,
 }
 

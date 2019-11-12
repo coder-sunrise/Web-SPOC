@@ -80,6 +80,7 @@ const reloadDispense = (props, effect = 'query') => {
       invoice: {
         ...obj.invoice,
         invoiceTotal,
+        invoiceTotalAftAdj: invoiceTotal,
         invoiceGSTAmt,
         invoiceTotalAftGST,
         outstandingBalance,

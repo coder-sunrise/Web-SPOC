@@ -96,7 +96,7 @@ class CoPayer extends Component {
       selectedRows.includes(item.id),
     )
     const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
-    console.log({ copayer })
+
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmt: invoicePayerItem.reduce(

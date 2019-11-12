@@ -47,6 +47,7 @@ export default createFormViewModel({
     effects: {
       *initState ({ payload }, { select, put, take }) {
         const patientState = yield select((st) => st.patient)
+        const queueLogState = yield select((st) => st.queueLog)
         if (!patientState.entity || patientState.entity.id !== payload.pid) {
           yield put({
             type: 'patient/query',
@@ -56,6 +57,15 @@ export default createFormViewModel({
           })
           yield take('patient/query/@@end')
         }
+
+        if (!queueLogState.sessionInfo.id) {
+          yield put({
+            type: 'queueLog/getCurrentActiveSessionInfo',
+          })
+
+          yield take('queueLog/getCurrentActiveSessionInfo/@@end')
+        }
+
         yield put({
           type: 'query',
           payload: {
@@ -93,6 +103,7 @@ export default createFormViewModel({
       },
       *save ({ payload }, { call, put, take }) {
         const response = yield call(service.save, payload)
+        console.log({ response })
         if (response) {
           yield put({
             type: 'query',
@@ -100,7 +111,6 @@ export default createFormViewModel({
               id: payload.visitId,
             },
           })
-
           yield take('billing/query/@@end')
           // yield put({
           //   type: 'formik/clean',
@@ -111,22 +121,22 @@ export default createFormViewModel({
         }
         return false
       },
-      *complete ({ payload }, { call, put }) {
-        const response = yield call(service.complete, payload)
-        if (response) {
-          yield put({ type: 'formik/clean', payload: 'BillingForm' })
-          yield put({
-            type: 'updateState',
-            payload: {
-              entity: null,
-            },
-          })
-          notification.success({
-            message: 'Billing completed',
-          })
-          router.push('/reception/queue')
-        }
-      },
+      // *complete ({ payload }, { call, put }) {
+      //   const response = yield call(service.complete, payload)
+      //   if (response) {
+      //     yield put({ type: 'formik/clean', payload: 'BillingForm' })
+      //     yield put({
+      //       type: 'updateState',
+      //       payload: {
+      //         entity: null,
+      //       },
+      //     })
+      //     notification.success({
+      //       message: 'Billing completed',
+      //     })
+      //     router.push('/reception/queue')
+      //   }
+      // },
       *refresh ({ payload }, { put }) {
         yield put({
           type: 'query',

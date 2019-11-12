@@ -943,6 +943,10 @@ const calculateAmount = (
   const totalAfterAdj = roundToTwoDecimals(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
+  // console.log('after calculate totalAfterAdj', {
+  //   activeRows,
+  //   mapped: activeRows.map((o) => o[adjustedField]),
+  // })
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     // notification.error({

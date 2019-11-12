@@ -311,8 +311,14 @@ class Form extends React.PureComponent {
     }
     if (deleted) {
       const { datagrid } = this.state
-      const newDatagrid = datagrid.filter(
-        (event) => !deleted.includes(event.id),
+      // const newDatagrid = datagrid.filter(
+      //   (event) => !deleted.includes(event.id),
+      // )
+      const newDatagrid = datagrid.map(
+        (event) =>
+          deleted.includes(event.id)
+            ? { ...event, isDeleted: true }
+            : { ...event },
       )
       const newRows =
         newDatagrid.length === 1
@@ -341,30 +347,47 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    // this.setState({ isDataGridValid })
-    const newDataGrid =
-      datagrid.length === 1
-        ? [
-            {
-              ...datagrid[0],
-              isPrimaryClinician:
-                datagrid[0].isPrimaryClinician === undefined
-                  ? true
-                  : datagrid[0].isPrimaryClinician,
-            },
-          ]
-        : [
-            ...datagrid,
-          ]
-
-    // has 1 primary doctor
-    const hasPrimaryDoctor = newDataGrid.reduce(
-      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
+    const filterDeleted = datagrid.filter((item) => !item.isDeleted)
+    const hasPrimary = filterDeleted.reduce(
+      (hasPrimaryClinician, item) =>
+        item.isPrimaryClinician || hasPrimaryClinician,
       false,
     )
-    if (!hasPrimaryDoctor) isDataGridValid = false
 
-    this.setState({ isDataGridValid, datagrid: newDataGrid })
+    if (!hasPrimary) isDataGridValid = false
+    // const hasOneRowOnly =
+    //   datagrid.filter((item) => !item.isDeleted).length === 1
+    // let newDataGrid = [
+    //   ...datagrid,
+    // ]
+    // if (hasOneRowOnly) {
+    //   newDataGrid = datagrid.reduce(
+    //     (datas, item) => [
+    //       ...datas,
+    //       { ...item, isPrimaryClinician: !item.isDeleted },
+    //     ],
+    //     [],
+    //   )
+    // }
+    // const newDataGrid =
+    //   datagrid.length === 1
+    //     ? [
+    //         {
+    //           ...datagrid[0],
+    //           isPrimaryClinician:
+    //             datagrid[0].isPrimaryClinician === undefined
+    //               ? true
+    //               : datagrid[0].isPrimaryClinician,
+    //         },
+    //       ]
+    //     : [
+    //         ...datagrid,
+    //       ]
+
+    this.setState({
+      isDataGridValid,
+      // datagrid: newDataGrid,
+    })
   }
 
   _submit = async (validate = false, preSubmit = false) => {
