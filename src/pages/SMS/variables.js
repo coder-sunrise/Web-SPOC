@@ -73,7 +73,8 @@ const appointmentColumnsExtensions = [
       const apptType = row.appointmentTypes
         ? row.appointmentTypes.join(', ')
         : null
-      return <Tooltip title='apptType'>apptType</Tooltip>
+      return apptType
+      // return <Tooltip title='apptType'>apptType</Tooltip>
     },
   },
   {

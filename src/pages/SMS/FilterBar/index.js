@@ -106,12 +106,12 @@ export default compose(
         'AppointmentStatusFkNavigation.Code': appointmentStatus,
         'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.code': lastSMSSendStatus,
         isReminderSent,
-        'in_AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor.join(
-          '|',
-        ),
-        'in_AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType.join(
-          '|',
-        ),
+        'in_AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor
+          ? doctor.join('|')
+          : undefined,
+        'in_AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType
+          ? appointmentType.join('|')
+          : undefined,
       }
       const patientPayload = {
         group: [
