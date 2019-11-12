@@ -15,7 +15,6 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
-import { orderTypes } from '@/utils/codes'
 import config from '@/utils/config'
 
 const { qtyFormat } = config
@@ -414,7 +413,7 @@ class Package extends PureComponent {
     }
 
     this.changePackage = (v, op) => {
-      const { setValues, values } = this.props
+      const { setValues, values, orderTypes } = this.props
       let rows = []
       if (op && op.medicationPackageItem) {
         rows = rows.concat(

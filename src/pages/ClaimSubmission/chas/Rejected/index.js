@@ -110,12 +110,12 @@ class RejectedCHAS extends React.Component {
           values={values}
           modelsName='claimSubmissionRejected'
         />
-        <GridContainer>
-          <LoadingWrapper
-            linear
-            loading={isLoading}
-            text='Re-submitting Claim...'
-          >
+        <LoadingWrapper
+          linear
+          loading={isLoading}
+          text='Re-submitting Claim...'
+        >
+          <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
@@ -156,8 +156,8 @@ class RejectedCHAS extends React.Component {
                 </ProgressButton>
               </Authorized>
             </GridItem>
-          </LoadingWrapper>
-        </GridContainer>
+          </GridContainer>
+        </LoadingWrapper>
       </CardContainer>
     )
   }

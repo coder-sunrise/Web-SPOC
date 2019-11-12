@@ -412,7 +412,7 @@ const convertToQuery = (
 
   // console.log(query)
   let newQuery = {}
-  const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
+  const refilter = /\b([^_]{0,6}(?=_))?_?(.*)\b/
   newQuery.columnCriteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')
@@ -429,6 +429,7 @@ const convertToQuery = (
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
+          console.log(val)
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
             let s = ''
@@ -922,6 +923,9 @@ const calculateAmount = (
 
     // console.log(r)
   })
+  if (total === 0 && activeRows[0]) {
+    activeRows[0].weightage = 1
+  }
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     activeRows.forEach((o) => {
       o.subAdjustment = 0

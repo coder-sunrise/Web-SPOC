@@ -242,7 +242,7 @@ const request = (url, option, showNotification = true) => {
   try {
     let r = $.when(
       $.ajax({
-        timeout: 140000,
+        timeout: 30000,
         ...newOptions,
         url: newUrl,
         type: newOptions.method,
@@ -257,7 +257,7 @@ const request = (url, option, showNotification = true) => {
             'Content-Type',
             options.contentType || defaultContentType,
           )
-          console.time(newUrl)
+          // console.time(newUrl)
         },
       }),
     )

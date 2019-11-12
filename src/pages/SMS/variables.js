@@ -5,6 +5,7 @@ import {
   dateFormatLong,
   timeFormat24HourWithSecond,
   timeFormatSmallCase,
+  Tooltip,
 } from '@/components'
 
 const appointmentColumns = [
@@ -34,8 +35,17 @@ const patientColumns = [
 
 const appointmentColumnsExtensions = [
   {
+    columnName: 'patientName',
+    sortBy: 'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Name',
+  },
+  {
+    columnName: 'patientContactNo',
+    sortingEnabled: false,
+  },
+  {
     columnName: 'upcomingAppointmentDate',
     width: 190,
+    sortBy: 'AppointmentDate',
     render: (row) => {
       const { upcomingAppointmentDate, upcomingAppointmentStartTime } = row
       return `${moment(upcomingAppointmentDate).format(
@@ -47,15 +57,32 @@ const appointmentColumnsExtensions = [
     },
   },
   {
+    columnName: 'doctor',
+    sortBy: 'Appointment_Resources.ClinicianFKNavigation.Name',
+  },
+  {
+    columnName: 'appointmentStatus',
+    sortBy: 'AppointmentStatusFkNavigation.displayValue',
+  },
+  {
     columnName: 'appointmentType',
     sortingEnabled: false,
     render: (row) => {
-      return row.appointmentTypes ? row.appointmentTypes.join(', ') : null
+      const apptType = row.appointmentTypes
+        ? row.appointmentTypes.join(', ')
+        : null
+      return (
+        <Tooltip title={apptType}>
+          <span>{apptType}</span>
+        </Tooltip>
+      )
     },
   },
   {
     columnName: 'lastVisitDate',
     width: 190,
+    sortBy:
+      'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Visit.VisitDate',
     render: (row) =>
       DateFormatter({
         value: row.lastVisitDate,
@@ -65,16 +92,22 @@ const appointmentColumnsExtensions = [
   {
     columnName: 'lastSMSSendStatus',
     sortBy:
-      'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
+      'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
   },
   {
     columnName: 'lastSMSSendDate',
     width: 190,
+    sortBy:
+      'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.SendDate',
     render: (row) =>
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
       }),
+  },
+  {
+    columnName: 'lastSMSSendStatus',
+    sortBy: 'IsReminderSent',
   },
   {
     columnName: 'Action',

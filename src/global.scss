@@ -240,7 +240,7 @@
 }
 
 .react-grid-item.react-grid-placeholder {
-  background: red;
+  background: green;
   opacity: 0.2;
   transition-duration: 100ms;
   z-index: 2;
@@ -333,6 +333,9 @@
 
 .ant-input-affix-wrapper .ant-input:not(:last-child) {
   padding-right: 0;
+}
+.ant-tabs {
+  font-size: inherit;
 }
 
 .antdwrapper {

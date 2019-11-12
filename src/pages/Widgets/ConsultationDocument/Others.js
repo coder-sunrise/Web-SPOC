@@ -70,6 +70,7 @@ class Others extends PureComponent {
       currentType,
       rowHeight,
       setFieldValue,
+      height,
     } = this.props
     return (
       <div>
@@ -114,8 +115,16 @@ class Others extends PureComponent {
             <FastField
               name='content'
               render={(args) => {
+                const cfg = {}
+                if (height && height > 450) {
+                  cfg.height = height - 336
+                }
                 return (
-                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                  <RichEditor
+                    editorRef={this.setEditorReference}
+                    {...cfg}
+                    {...args}
+                  />
                 )
               }}
             />
