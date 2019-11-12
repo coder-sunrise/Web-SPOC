@@ -39,7 +39,7 @@ class Teamviewer extends PureComponent {
             alignItems: 'center',
             textAlign: 'center',
             margin: 20,
-            marginBottom: 50,
+            marginBottom: 30,
           }}
         >
           <CardContainer
@@ -95,7 +95,11 @@ class Teamviewer extends PureComponent {
             }}
           />
         </GridItem>
-        <GridItem xs={4} md={4} style={{ marginLeft: 20, ...centerAlignStyle }}>
+        <GridItem
+          xs={4}
+          md={4}
+          style={{ marginLeft: 20, marginBottom: 10, ...centerAlignStyle }}
+        >
           <React.Fragment>
             <div
               style={{ textAlign: 'left', display: 'inline-block', width: 550 }}
@@ -105,7 +109,7 @@ class Teamviewer extends PureComponent {
               </h3>
               <div style={{ marginLeft: 10, fontSize: 16 }}>
                 <p>Our support engineers are standing by to help.</p>
-                <p style={{ marginTop: 10 }}>1-888-xxxx-xxx</p>
+                <p style={{ marginTop: 10 }}>6283 5016 (Press 3)</p>
                 <p style={{ marginTop: 10 }}>
                   Download&nbsp;
                   <a

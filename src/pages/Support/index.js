@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import _ from 'lodash'
-import { DesktopWindows, Print } from '@material-ui/icons'
+import { Print, Call } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 
 import { GridContainer, GridItem, CardContainer, Button } from '@/components'
@@ -9,9 +9,9 @@ import { GridContainer, GridItem, CardContainer, Button } from '@/components'
 const menuData = [
   {
     title: 'Download',
-    text: 'Teamviewer',
-    url: '/support/teamviewer',
-    icon: <DesktopWindows />,
+    text: 'Contact Us',
+    url: '/support/contactus',
+    icon: <Call style={{ transform: 'rotate(-90deg)' }} />,
   },
   {
     title: 'Download',
