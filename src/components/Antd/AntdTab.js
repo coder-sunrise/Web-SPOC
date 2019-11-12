@@ -1,11 +1,20 @@
 import { Tabs } from 'antd'
+import withStyles from '@material-ui/core/styles/withStyles'
+// import { classes } from 'istanbul-lib-coverage'
 
 const { TabPane } = Tabs
-export default ({ options, ...props }) => {
+
+const STYLES = (theme) => {
+  return {
+    main: {},
+  }
+}
+const AntdTab = ({ classes, options, tabStyle, ...props }) => {
   return (
     <Tabs
       type='card'
       // animated={false}
+      className={classes.main}
       tabBarStyle={{
         paddingLeft: 8,
         top: 1,
@@ -20,10 +29,12 @@ export default ({ options, ...props }) => {
             tab={o.name}
             key={o.id}
             disabled={o.disabled}
-            style={{
-              // border: '1px solid #e8e8e8',
-              padding: 8,
-            }}
+            style={
+              tabStyle || {
+                // border: '1px solid #e8e8e8',
+                padding: 8,
+              }
+            }
           >
             {o.content}
           </TabPane>
@@ -32,3 +43,5 @@ export default ({ options, ...props }) => {
     </Tabs>
   )
 }
+
+export default withStyles(STYLES, { name: 'Tabs', withTheme: true })(AntdTab)

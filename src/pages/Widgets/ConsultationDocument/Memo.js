@@ -62,6 +62,7 @@ class Memo extends PureComponent {
       parentProps,
       templateLoader,
       currentType,
+      height,
     } = this.props
     // console.log(this.props.values, this.props.dirty, this.props)
 
@@ -111,8 +112,16 @@ class Memo extends PureComponent {
             <FastField
               name='content'
               render={(args) => {
+                const cfg = {}
+                if (height && height > 450) {
+                  cfg.height = height - 336
+                }
                 return (
-                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                  <RichEditor
+                    editorRef={this.setEditorReference}
+                    {...cfg}
+                    {...args}
+                  />
                 )
               }}
             />

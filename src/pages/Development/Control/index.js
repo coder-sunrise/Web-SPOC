@@ -60,6 +60,7 @@ import {
   NumberInput,
   Switch,
   ButtonSelect,
+  OutlinedTextField,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -531,6 +532,29 @@ class ControlTest extends PureComponent {
                           {option.displayvalue}
                         </span>
                       )
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='name'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Text Input'
+                    multiline
+                    rowsMax={3}
+                    rows={3}
+                    maxLength={20}
+                    onChange={(v) => {
+                      console.log(v)
+                    }}
+                    onBlur={(v) => {
+                      console.log('blur', v)
                     }}
                     {...args}
                   />

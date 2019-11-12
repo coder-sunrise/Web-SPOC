@@ -293,12 +293,14 @@ class BaseInput extends React.PureComponent {
           ? children({
               getClass: this.getClass,
               error,
+              help,
               showErrorIcon,
               form,
               field,
               focus,
               ...cfg,
               ...props,
+              inputProps,
             })
           : false) || (
           <Input

@@ -218,8 +218,9 @@ class TextField extends React.PureComponent {
       value,
       uppercase,
       lowercase,
+      maxLength,
     } = props
-    const { field, form, maxLength, ...resetProps } = props
+    const { field, form, ...resetProps } = props
     // console.log(this.state, this.state.value)
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
@@ -241,7 +242,7 @@ class TextField extends React.PureComponent {
       if (!error) {
         cfg.error = shouldShow && !!rawError
       }
-      const touched = Object.byString(form.touched, field.name)
+      // const touched = Object.byString(form.touched, field.name)
       // console.log({ error, rawError, shouldShow, touched, showErrorIcon })
       if (cfg.error) {
         focus = focus || this.shouldFocus(error)
