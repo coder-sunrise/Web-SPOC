@@ -91,11 +91,22 @@ export default compose(
         upcomingAppointmentDate,
         appointmentStatus,
         isReminderSent,
-        doctor,
-        appointmentType,
+        doctor = [],
+        appointmentType = [],
       } = values
-      console.log({ doctor })
       const { dispatch, type } = props
+      let stringDoctors = Number(doctor)
+      let doctorProperty = 'Appointment_Resources.ClinicianFK'
+      if (doctor.length > 1) {
+        doctorProperty = 'in_Appointment_Resources.ClinicianFK'
+        stringDoctors = doctor.join('|')
+      }
+      let stringAppType = Number(appointmentType)
+      let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'
+      if (appointmentType.length > 1) {
+        apptTypeProperty = 'in_Appointment_Resources.AppointmentTypeFK'
+        stringAppType = appointmentType.join('|')
+      }
       const appointmentPayload = {
         lgteql_AppointmentDate: upcomingAppointmentDate
           ? moment(upcomingAppointmentDate[0]).formatUTC()
@@ -103,15 +114,11 @@ export default compose(
         lsteql_AppointmentDate: upcomingAppointmentDate
           ? moment(upcomingAppointmentDate[1]).formatUTC(false)
           : undefined,
-        'AppointmentStatusFkNavigation.Code': appointmentStatus,
-        'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.code': lastSMSSendStatus,
+        AppointmentStatusFk: appointmentStatus,
+        'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
         isReminderSent,
-        'in_AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor
-          ? doctor.join('|')
-          : undefined,
-        'in_AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType
-          ? appointmentType.join('|')
-          : undefined,
+        [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
+        [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
       }
       const patientPayload = {
         group: [
@@ -122,7 +129,7 @@ export default compose(
             combineCondition: 'or',
           },
         ],
-        'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue': lastSMSSendStatus,
+        'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
         'PatientPdpaConsent.IsConsent': consent,
         'lgteql_Visit.VisitDate': lastVisitDate
           ? moment(lastVisitDate[0]).formatUTC()
@@ -145,6 +152,13 @@ export default compose(
           ...payload,
           smsType: type,
         },
+      }).then(() => {
+        dispatch({
+          type: 'sms/updateState',
+          payload: {
+            filter: undefined,
+          },
+        })
       })
     },
   }),

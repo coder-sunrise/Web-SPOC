@@ -40,11 +40,11 @@ const sessionOptions = [
 const smsStatus = [
   {
     name: 'Sent',
-    value: 'Sent',
+    value: 1,
   },
   {
     name: 'Failed',
-    value: 'Failed',
+    value: 2,
   },
 ]
 
@@ -66,15 +66,15 @@ const appointmentStatus = [
   },
   {
     name: 'Draft',
-    value: 'Draft',
+    value: 2,
   },
   {
     name: 'Scheduled',
-    value: 'Scheduled',
+    value: 1,
   },
   {
     name: 'Rescheduled',
-    value: 'Rescheduled',
+    value: 5,
   },
 ]
 // const paymentMethods = [
@@ -693,8 +693,12 @@ const consultationDocumentTypes = [
             {
               ...row,
               issueDate: moment(row.issueDate).format(dateFormatLong),
-              attendanceStartTime: moment(row.attendanceStartTime).format('hh:mm A'),
-              attendanceEndTime: moment(row.attendanceEndTime).format('hh:mm A'),
+              attendanceStartTime: moment(row.attendanceStartTime).format(
+                'hh:mm A',
+              ),
+              attendanceEndTime: moment(row.attendanceEndTime).format(
+                'hh:mm A',
+              ),
             },
           ],
         }
@@ -779,9 +783,7 @@ const consultationDocumentTypes = [
           DocumentDetails: [
             {
               ...row,
-              issueDate: moment(row.issueDate).format(
-                dateFormatLong,
-              ),
+              issueDate: moment(row.issueDate).format(dateFormatLong),
             },
           ],
         }
@@ -967,9 +969,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',

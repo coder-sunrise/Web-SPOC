@@ -36,8 +36,7 @@ const patientColumns = [
 const appointmentColumnsExtensions = [
   {
     columnName: 'patientName',
-    sortBy:
-      'AppointmentReminders.PatientOutgoingSMSNavigation.PatientProfileFKNavigation.Name',
+    sortBy: 'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Name',
   },
   {
     columnName: 'patientContactNo',
@@ -59,8 +58,7 @@ const appointmentColumnsExtensions = [
   },
   {
     columnName: 'doctor',
-    sortBy:
-      'AppointmentReminders.PatientOutgoingSMSNavigation.PatientProfileFKNavigation.Visit.DoctorProfileFkNavigation.ClinicianProfile.Name',
+    sortBy: 'Appointment_Resources.ClinicianFKNavigation.Name',
   },
   {
     columnName: 'appointmentStatus',
@@ -73,7 +71,6 @@ const appointmentColumnsExtensions = [
       const apptType = row.appointmentTypes
         ? row.appointmentTypes.join(', ')
         : null
-      // return apptType
       return (
         <Tooltip title={apptType}>
           <span>{apptType}</span>
@@ -85,7 +82,7 @@ const appointmentColumnsExtensions = [
     columnName: 'lastVisitDate',
     width: 190,
     sortBy:
-      'AppointmentReminders.PatientOutgoingSMSNavigation.PatientProfileFKNavigation.Visit.VisitDate',
+      'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Visit.VisitDate',
     render: (row) =>
       DateFormatter({
         value: row.lastVisitDate,
