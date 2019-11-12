@@ -854,8 +854,8 @@ const routes = [
             component: './Support',
           },
           {
-            path: '/support/teamviewer',
-            name: 'teamviewer',
+            path: '/support/contactus',
+            name: 'contactus',
             component: './support/teamviewer',
           },
           {
