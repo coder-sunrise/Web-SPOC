@@ -412,7 +412,7 @@ const convertToQuery = (
 
   // console.log(query)
   let newQuery = {}
-  const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
+  const refilter = /\b([^_]{0,6}(?=_))?_?(.*)\b/
   newQuery.columnCriteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')

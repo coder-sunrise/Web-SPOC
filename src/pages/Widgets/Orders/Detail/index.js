@@ -169,6 +169,7 @@ class Details extends PureComponent {
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
       type,
+      orderTypes,
       ...props,
     }
 

@@ -76,6 +76,7 @@ const styles = (theme) => ({
   tableCursorPointer: {
     cursor: 'default',
   },
+
   tableStriped: {
     '& > tbody > tr:nth-of-type(odd), & > thead > tr': {
       // backgroundColor: colorManipulator.fade(
@@ -388,6 +389,13 @@ class CommonTableGrid extends PureComponent {
         Pagination: {
           button: {
             fontWeight: 300,
+          },
+        },
+        SortLabel: {
+          root: {
+            '& .Mui-disabled > svg': {
+              display: 'none',
+            },
           },
         },
         ...sizeConfig[size],

@@ -260,6 +260,9 @@ class AntdSelect extends React.PureComponent {
             ...options.map((o) => Object.byString(o, valueField)),
           ]
         }
+        if (v.indexOf(allValue) < 0 && options.length === v.length) {
+          v.unshift(allValue)
+        }
       }
       if (!_.isEqual(v, this.state.value)) {
         this.setState({

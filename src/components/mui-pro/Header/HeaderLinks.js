@@ -136,7 +136,7 @@ class HeaderLinks extends React.Component {
                 <Button justIcon color='transparent'>
                   <Notifications fontSize='large' />
                 </Button>
-              </Badge> */}
+              </Badge>
               <Button justIcon color='transparent'>
                 {signalRConnected ? (
                   <Badge
@@ -166,7 +166,7 @@ class HeaderLinks extends React.Component {
                   </Badge>
                 )}
               </Button>
-
+ */}
               <Button
                 justIcon
                 color='transparent'
