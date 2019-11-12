@@ -10,7 +10,6 @@ import {
   GridItem,
   SizeContainer,
   RadioGroup,
-  CodeSelect,
 } from '@/components'
 import { DiagnosisSelect } from '@/components/_medisys'
 
