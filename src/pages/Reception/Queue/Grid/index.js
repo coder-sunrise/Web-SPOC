@@ -119,6 +119,7 @@ const Grid = ({
 
     if (selfOnly)
       data = data.filter((item) => {
+        if (!item.doctor) return false
         const { doctor: { id } } = item
         return doctorProfile ? id === doctorProfile.id : false
       })

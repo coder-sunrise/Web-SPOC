@@ -290,6 +290,11 @@ class Billing extends Component {
     handleSubmit()
   }
 
+  onPrintInvoiceClick = () => {
+    const { values } = this.props
+    console.log({ values })
+  }
+
   handleAddPayment = async (payment) => {
     const { values, setFieldValue, setValues, handleSubmit } = this.props
     const { outstandingBalance, ...rest } = payment
@@ -402,7 +407,7 @@ class Billing extends Component {
                 disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
-                handlePrintInvoiceClick={this.toggleReport}
+                handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 {...formikBag}
               />
             </GridContainer>

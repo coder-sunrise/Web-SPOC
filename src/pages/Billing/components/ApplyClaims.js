@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
+import Save from '@material-ui/icons/Save'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
@@ -393,6 +394,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const schemeConfig = flattenSchemes.find((item) => item.id === value)
     const {
       balance = null,
+      isBalanceCheckRequired = false,
       copayerFK,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
@@ -697,6 +699,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       )
     },
     [
+      handleClaimAmountChange,
       refTempInvociePayer.current,
     ],
   )
@@ -730,7 +733,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           Reset
         </Button>
       </GridItem>
-      <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+      <GridItem md={12} style={{ maxHeight: '55vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer.isCancelled) return null
 
@@ -877,7 +880,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         onClick={handleAppliedSchemeSaveClick(index)}
                         disabled={_isSubtotalLessThanZero(index)}
                       >
-                        Save
+                        Apply
                       </Button>
                     </React.Fragment>
                   )}
@@ -898,6 +901,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           )
         })}
       </GridItem>
+      {/* <GridItem md={12} style={{ textAlign: 'right' }}>
+        <Button size='sm' color='success'>
+          Save Changes
+        </Button>
+      </GridItem> */}
       {/* <GridItem md={12}>
         <Paper className={classes.gridRow}>
           <Primary>
