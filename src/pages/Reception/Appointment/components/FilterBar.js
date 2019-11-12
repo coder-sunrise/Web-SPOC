@@ -160,9 +160,9 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
 export default memo(
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: () => ({
+    mapPropsToValues: ({ primaryRegisteredDoctorFK }) => ({
       filterByDoctor: [
-        -99,
+        primaryRegisteredDoctorFK,
       ],
       filterByApptType: [
         -99,
