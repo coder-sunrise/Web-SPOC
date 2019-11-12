@@ -76,7 +76,14 @@ const styles = (theme) => ({
   },
 })
 
-const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
+const ApplyClaims = ({
+  classes,
+  values,
+  setValues,
+  setFieldValue,
+  submitCount,
+  handleIsEditing,
+}) => {
   const { invoice, invoicePayment, claimableSchemes } = values
 
   const [
@@ -369,10 +376,26 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       let finalPayable = roundToTwoDecimals(invoice.totalAftGst - finalClaim)
 
       const updatedInvoiceItems = updateOriginalInvoiceItemList()
-      setFieldValue('finalClaim', finalClaim)
-      setFieldValue('finalPayable', finalPayable)
-      setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
-      setFieldValue('invoicePayer', tempInvoicePayer)
+      const _values = {
+        ...values,
+        finalClaim,
+        finalPayable,
+        invoice: {
+          ...values.invoice,
+          outstandingBalance: finalPayable,
+          invoiceItems: updatedInvoiceItems,
+        },
+        invoicePayer: tempInvoicePayer,
+      }
+      setValues(_values)
+      // setFieldValue('finalClaim', finalClaim)
+      // setFieldValue('finalPayable', finalPayable)
+      // setFieldValue(
+      //   'invoice.outstandingBalance',
+      //   roundToTwoDecimals(finalPayable - finalClaim),
+      // )
+      // setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
+      // setFieldValue('invoicePayer', tempInvoicePayer)
       handleIsEditing(hasEditing())
 
       refTempInvociePayer.current = tempInvoicePayer
@@ -537,10 +560,16 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         setInitialState([
           _invoicePayer,
         ])
+      } else {
+        setInitialState([])
+        setTempInvoicePayer([])
+        setCurEditInvoicePayerBackup(undefined)
+        refTempInvociePayer.current = []
       }
     },
     [
       values.id,
+      submitCount,
     ],
   )
 
@@ -703,7 +732,6 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       refTempInvociePayer.current,
     ],
   )
-
   return (
     <React.Fragment>
       <GridItem md={2}>

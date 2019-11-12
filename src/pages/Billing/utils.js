@@ -1,4 +1,4 @@
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 export const flattenInvoicePayersInvoiceItemList = (
   preInvoicePayerInvoiceItems,
@@ -296,10 +296,91 @@ export const validateInvoicePayerItems = (invoicePayerItem) => {
   return returnData
 }
 
-// export const flattenInvoicePayerItems = (invoiceItems, payer) => {
-//   const { invoicePayerItem } = payer
-//   return [
-//     ...invoiceItems,
-//     ...invoicePayerItem,
-//   ]
-// }
+export const constructPayload = (values) => {
+  const {
+    concurrencyToken,
+    visitId,
+    visitStatus = 'BILLING',
+    invoice,
+    invoicePayer = [],
+    invoicePayment = [],
+    mode,
+  } = values
+
+  const { invoiceItems, ...restInvoice } = invoice
+
+  const payload = {
+    mode,
+    concurrencyToken,
+    visitId,
+    visitStatus,
+    invoicePayment: invoicePayment
+      .filter((item) => {
+        if (item.id && item.isCancelled) return true
+        if (!item.id) return true
+        return false
+      })
+      .map((item) => ({
+        ...item,
+        invoicePayerFK: undefined,
+      })),
+    invoice: restInvoice,
+    invoicePayer: invoicePayer
+      .map((item, index) => ({ ...item, sequence: index }))
+      .filter((payer) => {
+        if (payer.id === undefined && payer.isCancelled) return false
+        return true
+      })
+      .filter((payer) => (payer.id ? payer.isModified : true))
+      .map((payer) => {
+        const {
+          schemeConfig,
+          _indexInClaimableSchemes,
+          _isConfirmed,
+          claimableSchemes,
+          _isDeleted,
+          _isEditing,
+          _isValid,
+          isModified,
+          ...restPayer
+        } = payer
+        const _payer = {
+          ...restPayer,
+          isModified: restPayer.id ? isModified : false,
+          invoicePayerItem: payer.invoicePayerItem
+            .filter((item) => item.claimAmount > 0)
+            .map((item) => {
+              if (item.invoiceItemFK) {
+                return { ...item }
+              }
+              const {
+                invoiceItemFK,
+                _claimedAmount,
+                disabled,
+                itemCode,
+                rowIndex,
+                notClaimableBySchemeIds,
+                invoiceItemTypeFK,
+                itemDescription,
+                coverage,
+                payableBalance,
+                id,
+                ...restItem
+              } = item
+
+              const _invoicePayerItem = {
+                ...restItem,
+                invoiceItemFK: id,
+                payableBalance,
+                invoiceItemTypeFK,
+                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
+                itemName: itemDescription,
+              }
+              return _invoicePayerItem
+            }),
+        }
+        return _payer
+      }),
+  }
+  return payload
+}
