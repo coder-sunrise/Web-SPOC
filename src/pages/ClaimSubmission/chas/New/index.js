@@ -124,8 +124,8 @@ class NewCHAS extends React.Component {
           values={values}
           modelsName='claimSubmissionNew'
         />
-        <GridContainer>
-          <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
+        <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
+          <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
@@ -177,8 +177,8 @@ class NewCHAS extends React.Component {
                 </ProgressButton>
               </Authorized>
             </GridItem>
-          </LoadingWrapper>
-        </GridContainer>
+          </GridContainer>
+        </LoadingWrapper>
       </CardContainer>
     )
   }

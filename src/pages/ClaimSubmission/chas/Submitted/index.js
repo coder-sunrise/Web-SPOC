@@ -111,8 +111,8 @@ class SubmittedCHAS extends React.Component {
           values={values}
           modelsName='claimSubmissionSubmitted'
         />
-        <GridContainer>
-          <LoadingWrapper linear loading={isLoading} text='Get status...'>
+        <LoadingWrapper linear loading={isLoading} text='Get status...'>
+          <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
@@ -141,8 +141,8 @@ class SubmittedCHAS extends React.Component {
                 Get Status
               </ProgressButton>
             </GridItem>
-          </LoadingWrapper>
-        </GridContainer>
+          </GridContainer>
+        </LoadingWrapper>
       </CardContainer>
     )
   }

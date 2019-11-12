@@ -22,7 +22,9 @@ const styles = (theme) => ({
   },
 })
 const FilterByAppointment = ({ classes, values, setFieldValue }) => {
-  const { appointmentType } = values
+  const { appointmentType = [], doctor = [] } = values
+  const maxAppointmentTagCount = appointmentType.length <= 1 ? 1 : 0
+  const maxDoctorTagCount = doctor.length <= 1 ? 1 : 0
   return (
     <React.Fragment>
       <GridItem md={4}>
@@ -59,6 +61,9 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
                     label={option.displayValue}
                   />
                 )}
+                filter={{
+                  'clinicianProfile.isActive': true,
+                }}
                 defaultOptions={[
                   {
                     isExtra: true,
@@ -66,7 +71,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
                     displayValue: 'All appointment types',
                   },
                 ]}
-                maxTagCount={appointmentType.length <= 1 ? 1 : 0}
+                maxTagCount={maxAppointmentTagCount}
                 maxTagPlaceholder='appointment types'
               />
             )
@@ -83,9 +88,19 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
                 label={formatMessage({
                   id: 'sms.doctor',
                 })}
+                allValue={-99}
+                allValueOption={{
+                  clinicianProfile: {
+                    name: 'All',
+                    id: -99,
+                  },
+                }}
                 code='doctorProfile'
+                mode='multiple'
                 labelField='clinicianProfile.name'
                 valueField='clinicianProfile.id'
+                maxTagCount={maxDoctorTagCount}
+                maxTagPlaceholder='doctors'
                 renderDropdown={(option) => <DoctorLabel doctor={option} />}
                 {...args}
               />
