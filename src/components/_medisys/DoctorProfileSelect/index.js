@@ -10,7 +10,7 @@ const DoctorProfileSelect = ({ ...props }) => (
     allowClear
     label='Doctor'
     code='doctorprofile'
-    filter={{
+    remoteFilter={{
       'clinicianProfile.isActive': true,
     }}
     labelField='clinicianProfile.name'

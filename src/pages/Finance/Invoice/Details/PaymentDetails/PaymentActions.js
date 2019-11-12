@@ -14,6 +14,7 @@ const PaymentActions = ({
   handlePrinterClick,
   type,
   invoicePayerFK,
+  companyFK,
   readOnly,
   hasActiveSession,
 }) => {
@@ -62,8 +63,7 @@ const PaymentActions = ({
         </Button>
       )}
       <Button
-        onClick={() =>
-          handlePrinterClick('TaxInvoice', undefined, invoicePayerFK)}
+        onClick={() => handlePrinterClick('TaxInvoice', undefined, companyFK)}
         disabled={!handlePrinterClick}
         {...ButtonProps}
       >

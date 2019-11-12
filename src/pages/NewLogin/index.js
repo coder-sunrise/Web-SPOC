@@ -87,7 +87,7 @@ const submitKey = 'login/getToken'
     const { dispatch, routing } = props
     const { location } = routing
 
-    const credential = { username, password, clinic_code: clinicCode }
+    const credential = { username, password, clinicCode }
     const loginDestination = '/reception/queue' // always land at reception/queue
 
     // if (location.query && location.query.redirect !== undefined) {
