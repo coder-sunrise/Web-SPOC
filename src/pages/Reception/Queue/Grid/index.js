@@ -380,7 +380,8 @@ const Grid = ({
   if (!queryingList && queryingFormData) loadingText = ''
 
   return (
-    <div style={{ minHeight: '76vh' }}>
+    // <div style={{ minHeight: '76vh' }}>
+    <div>
       <LoadingWrapper
         linear
         loading={isLoading || queryingFormData}
