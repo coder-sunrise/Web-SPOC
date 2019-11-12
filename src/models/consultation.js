@@ -269,7 +269,7 @@ export default createFormViewModel({
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        console.log('queryDone', payload)
+        // console.log('queryDone', payload)
         const { data, page } = payload
         if (!data) return null
         let cdRows = []
@@ -321,7 +321,6 @@ export default createFormViewModel({
         //     type: 'addAutoOrder',
         //   })
         // }
-        console.log(oRows)
         yield put({
           type: 'orders/updateState',
           payload: {

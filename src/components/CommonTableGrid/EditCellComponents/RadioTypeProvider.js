@@ -35,6 +35,7 @@ class RadioEditorBase extends PureComponent {
       radioSelectedMap[gridId][columnName] = row.id
       this.forceUpdate()
     }
+    // console.log('RadioEditorBase', row, radioSelectedMap[gridId])
   }
 
   _onChange = (e, checked) => {

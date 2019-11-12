@@ -314,17 +314,19 @@ class Form extends React.PureComponent {
       const newDatagrid = datagrid.filter(
         (event) => !deleted.includes(event.id),
       )
+      const newRows =
+        newDatagrid.length === 1
+          ? [
+              { ...newDatagrid[0], isPrimaryClinician: true },
+            ]
+          : newDatagrid
       this.setState(
         {
-          datagrid:
-            newDatagrid.length === 1
-              ? [
-                  { ...newDatagrid[0], isPrimaryClinician: true },
-                ]
-              : newDatagrid,
+          datagrid: newRows,
         },
         this.validateDataGrid,
       )
+      return newRows
     }
   }
 
@@ -374,7 +376,7 @@ class Form extends React.PureComponent {
         setSubmitting,
         handleSubmit,
         values,
-        onClose,
+        onConfirm,
         dispatch,
       } = this.props
       const {
@@ -419,8 +421,8 @@ class Form extends React.PureComponent {
             //   type: 'formik/clean',
             //   payload: 'AppointmentForm',
             // })
-            resetForm()
-            onClose()
+            // resetForm()
+            onConfirm()
           }
         }
       })

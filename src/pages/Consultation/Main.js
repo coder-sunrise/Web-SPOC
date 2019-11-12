@@ -59,7 +59,7 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
-import model from '@/pages/Widgets/Orders/models'
+// import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
@@ -70,7 +70,7 @@ import Layout from './Layout'
 import schema from './schema'
 import styles from './style'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 const discardMessage = 'Discard consultation?'
 const formName = 'ConsultationPage'
