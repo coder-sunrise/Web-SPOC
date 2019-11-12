@@ -25,7 +25,7 @@ class LoginPage extends PureComponent {
 
   onLogin = (username, password, clinicCode) => {
     const { dispatch } = this.props
-    const credential = { username, password, clinic_code: clinicCode }
+    const credential = { username, password, clinicCode }
     dispatch({
       type: 'login/getToken',
       credentialPayload: credential,
