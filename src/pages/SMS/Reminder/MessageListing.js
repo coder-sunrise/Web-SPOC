@@ -93,11 +93,11 @@ const MessageListing = ({
     setCurrentPage,
   ] = useState(1)
 
-  const getSMSHistory = (current) => {
+  const getSMSHistory = () => {
     dispatch({
       type: 'sms/querySMSHistory',
       payload: {
-        Recipient: recipient.patientContactNo,
+        Recipient: parseInt(recipient.patientContactNo, 10),
         current: currentPage,
         pagesize: 10,
       },
