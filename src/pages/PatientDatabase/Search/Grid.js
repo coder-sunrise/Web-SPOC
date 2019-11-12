@@ -59,6 +59,7 @@ class Grid extends PureComponent {
           columnName: 'status',
           sortBy: 'isActive',
           type: 'select',
+          sortingEnabled: false,
           options: statusString,
           align: 'center',
         },

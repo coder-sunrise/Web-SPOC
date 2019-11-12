@@ -159,6 +159,10 @@ class PatientHistory extends Component {
     ],
   }
 
+  static defaultProps = {
+    mode: 'split',
+  }
+
   constructor (props) {
     super(props)
     this.widgets = [
@@ -262,7 +266,7 @@ class PatientHistory extends Component {
   }
 
   componentDidMount () {
-    const { dispatch } = this.props
+    const { dispatch, mode } = this.props
     // dispatch({
     //   type: 'codetable/fetchCodes',
     //   payload: {
@@ -295,6 +299,7 @@ class PatientHistory extends Component {
         version: Number(findGetParameter('v')) || undefined,
         visitID: findGetParameter('visit'),
         patientID: Number(findGetParameter('pid')) || 0,
+        mode,
       },
     })
 
@@ -619,7 +624,7 @@ class PatientHistory extends Component {
       dispatch,
       widget,
       clinicSettings,
-      mode = 'split',
+      mode,
     } = this.props
     const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
