@@ -63,6 +63,7 @@ const Grid = ({
 
   const isAssignedDoctor = useCallback(
     (row) => {
+      if (!row.doctor) return false
       const { doctor: { id }, visitStatus } = row
       const { clinicianProfile: { doctorProfile } } = user.data
 

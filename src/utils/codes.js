@@ -678,6 +678,7 @@ const consultationDocumentTypes = [
     convert: (r) => {
       return {
         ...r,
+        issueDate: moment(r.issueDate).format(dateFormatLong),
         // attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
         // attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
@@ -692,6 +693,8 @@ const consultationDocumentTypes = [
             {
               ...row,
               issueDate: moment(row.issueDate).format(dateFormatLong),
+              attendanceStartTime: moment(row.attendanceStartTime).format('hh:mm A'),
+              attendanceEndTime: moment(row.attendanceEndTime).format('hh:mm A'),
             },
           ],
         }
@@ -776,6 +779,9 @@ const consultationDocumentTypes = [
           DocumentDetails: [
             {
               ...row,
+              issueDate: moment(row.issueDate).format(
+                dateFormatLong,
+              ),
             },
           ],
         }
@@ -950,11 +956,10 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
-  // console.log({ useGeneral, newParams, params, body })
-  // console.log(`fetch code: ${code}`)
+      { ...criteriaForTenantCodes, ...params },
+      convertExcludeFields,
+    )
+
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body,
