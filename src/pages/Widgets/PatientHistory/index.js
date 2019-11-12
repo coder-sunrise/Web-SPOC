@@ -313,25 +313,6 @@ class PatientHistory extends Component {
     })
   }
 
-  onChangeVisit = (visit, row) => {
-    this.props
-      .dispatch({
-        type: 'patientHistory/queryOne',
-        payload: row.id,
-      })
-      .then((r) => {
-        if (r) {
-          this.props.dispatch({
-            type: 'patientHistory/updateState',
-            payload: {
-              selected: visit,
-              selectedSubRow: row,
-            },
-          })
-        }
-      })
-  }
-
   getContent = (row) => {
     const { patientHistory, mode, clinicSettings } = this.props
     const { settings = [] } = clinicSettings
@@ -372,7 +353,28 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  this.onChangeVisit(row, o)
+                  this.props
+                    .dispatch({
+                      type: 'patientHistory/queryOne',
+                      payload: o.id,
+                    })
+                    .then((r) => {
+                      if (r) {
+                        this.props.dispatch({
+                          type: 'patientHistory/updateState',
+                          payload: {
+                            selected: row,
+                            selectedSubRow: o,
+                          },
+                        })
+                        // this.props.dispatch({
+                        //   type: 'consultationDocument/updateState',
+                        //   payload: {
+                        //     rows: r.documents,
+                        //   },
+                        // })
+                      }
+                    })
                 }}
               >
                 <ListItemText
@@ -442,6 +444,48 @@ class PatientHistory extends Component {
       </div>
     )
   }
+
+  // <GridItem sm={5} style={{ textAlign: 'right' }}>
+  //           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
+  //             ( <DatePicker text value={row.visitDate} /> )
+  //           </span>
+  //           <div className={this.props.classes.note}>&nbsp;</div>
+  //         </GridItem>
+
+  // eslint-disable-next-line camelcase
+  // UNSAFE_componentWillReceiveProps (nextProps) {
+  //   // console.log(this.props, nextProps, nextProps.patientHistory.version)
+  //   if (
+  //     nextProps.patientHistory.version &&
+  //     this.props.patientHistory.version !== nextProps.patientHistory.version
+  //   ) {
+  //     nextProps
+  //       .dispatch({
+  //         type: 'patientHistory/query',
+  //         payload: {
+  //           patientProfileFK: nextProps.patientHistory.patientID,
+  //           sorting: [
+  //             {
+  //               columnName: 'VisitDate',
+  //               direction: 'desc',
+  //             },
+  //           ],
+  //           version:
+  //         },
+  //       })
+  //       .then((o) => {
+  //         // this.props.resetForm(o)
+  //         nextProps.dispatch({
+  //           type: 'patientHistory/updateState',
+  //           payload: {
+  //             selected: undefined,
+  //             selectedSubRow: undefined,
+  //             entity: undefined,
+  //           },
+  //         })
+  //       })
+  //   }
+  // }
 
   getDetailPanel = () => {
     const {
