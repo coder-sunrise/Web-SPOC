@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
+import moment from 'moment'
 import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
 import New from './New'
@@ -66,6 +67,21 @@ const SMS = ({ classes, sms, dispatch }) => {
     })
   }
 
+  const defaultSearchQuery = (type) => {
+    if (type === 'Appointment') {
+      return {
+        lgteql_AppointmentDate: moment().formatUTC(),
+
+        lsteql_AppointmentDate: moment().add(1, 'months').formatUTC(false),
+      }
+    }
+    return {
+      'lgteql_Visit.VisitDate': moment().subtract(1, 'months').formatUTC(),
+      'lsteql_Visit.VisitDate': moment().formatUTC(false),
+      'PatientPdpaConsent.IsConsent': true,
+    }
+  }
+
   const getSMSData = (e) => {
     let type = ''
     if (e === '0') type = 'Appointment'
@@ -75,6 +91,7 @@ const SMS = ({ classes, sms, dispatch }) => {
       type: 'sms/query',
       payload: {
         smsType: type,
+        ...defaultSearchQuery(type),
       },
     })
   }
@@ -85,6 +102,7 @@ const SMS = ({ classes, sms, dispatch }) => {
       type: 'sms/query',
       payload: {
         smsType: 'Appointment',
+        ...defaultSearchQuery('Appointment'),
       },
     })
   }, [])
