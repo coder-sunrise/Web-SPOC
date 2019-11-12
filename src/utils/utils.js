@@ -635,7 +635,7 @@ export const updateCellValue = (
       return er.inner || []
       // row._$error = true
     }
-  } else if (value !== val) {
+  } else if (value !== val && onValueChange) {
     onValueChange(val)
   }
   return []
