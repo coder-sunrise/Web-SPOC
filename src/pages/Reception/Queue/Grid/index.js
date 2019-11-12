@@ -63,6 +63,7 @@ const Grid = ({
 
   const isAssignedDoctor = useCallback(
     (row) => {
+      if (!row.doctor) return false
       const { doctor: { id }, visitStatus } = row
       const { clinicianProfile: { doctorProfile } } = user.data
 
@@ -119,6 +120,7 @@ const Grid = ({
 
     if (selfOnly)
       data = data.filter((item) => {
+        if (!item.doctor) return false
         const { doctor: { id } } = item
         return doctorProfile ? id === doctorProfile.id : false
       })
