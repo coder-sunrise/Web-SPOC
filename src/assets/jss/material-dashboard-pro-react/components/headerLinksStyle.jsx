@@ -160,7 +160,7 @@ const headerLinksStyle = (theme) => ({
     verticalAlign: 'middle',
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(3.5),
-    paddingBottom: 2,
+    // paddingBottom: 2,
     '& > span': {
       fontSize: '1.2rem',
     },

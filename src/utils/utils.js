@@ -922,6 +922,9 @@ const calculateAmount = (
 
     // console.log(r)
   })
+  if (total === 0 && activeRows[0]) {
+    activeRows[0].weightage = 1
+  }
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     activeRows.forEach((o) => {
       o.subAdjustment = 0
