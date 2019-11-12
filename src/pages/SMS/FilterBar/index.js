@@ -76,8 +76,8 @@ export default compose(
       appointmentType: [],
 
       lastVisitDate: [
+        moment().subtract(1, 'months'),
         moment(),
-        moment().add(1, 'months'),
       ],
       consent: true,
     }),
@@ -94,6 +94,7 @@ export default compose(
         doctor,
         appointmentType,
       } = values
+      console.log({ doctor })
       const { dispatch, type } = props
       const appointmentPayload = {
         lgteql_AppointmentDate: upcomingAppointmentDate
@@ -105,8 +106,12 @@ export default compose(
         'AppointmentStatusFkNavigation.Code': appointmentStatus,
         'AppointmentReminder.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.code': lastSMSSendStatus,
         isReminderSent,
-        'AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor,
-        'AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType,
+        'in_AppointmentReminders.AppointmentFKNavigation.Appointment_Resources.ClinicianFkNavigation.DoctorProfileFK': doctor.join(
+          '|',
+        ),
+        'in_AppointmentReminder.AppointmentFKNavigation.AppointmentGroupFK': appointmentType.join(
+          '|',
+        ),
       }
       const patientPayload = {
         group: [
