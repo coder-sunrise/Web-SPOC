@@ -314,25 +314,43 @@ class Form extends React.PureComponent {
       // const newDatagrid = datagrid.filter(
       //   (event) => !deleted.includes(event.id),
       // )
-      const newDatagrid = datagrid.map(
-        (event) =>
-          deleted.includes(event.id)
-            ? { ...event, isDeleted: true }
-            : { ...event },
-      )
-      const newRows =
-        newDatagrid.length === 1
-          ? [
-              { ...newDatagrid[0], isPrimaryClinician: true },
-            ]
-          : newDatagrid
+      const afterDelete = datagrid.map((item) => ({
+        ...item,
+        isDeleted: deleted.includes(item.id),
+      }))
+      const hasOneRowOnlyAfterDelete =
+        afterDelete.filter((item) => !item.isDeleted).length === 1
+      let newDataGrid = [
+        ...afterDelete,
+      ]
+      if (hasOneRowOnlyAfterDelete) {
+        newDataGrid = afterDelete.reduce(
+          (datas, item) => [
+            ...datas,
+            { ...item, isPrimaryClinician: !item.isDeleted },
+          ],
+          [],
+        )
+      }
+      // const newDatagrid = datagrid.map(
+      //   (event) =>
+      //     deleted.includes(event.id)
+      //       ? { ...event, isDeleted: true }
+      //       : { ...event },
+      // )
+      // const newRows =
+      //   newDatagrid.length === 1
+      //     ? [
+      //         { ...newDatagrid[0], isPrimaryClinician: true },
+      //       ]
+      //     : newDatagrid
       this.setState(
         {
-          datagrid: newRows,
+          datagrid: newDataGrid,
         },
         this.validateDataGrid,
       )
-      return newRows
+      return newDataGrid
     }
   }
 
