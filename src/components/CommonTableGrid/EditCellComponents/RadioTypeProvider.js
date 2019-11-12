@@ -131,7 +131,7 @@ class RadioEditorBase extends PureComponent {
     if (checked) {
       commonCfg.checked = radioSelectedMap[gridId][columnName] === row.id
     }
-    console.log(commonCfg, row, radioSelectedMap[gridId])
+    // console.log(commonCfg, row, radioSelectedMap[gridId])
     return <Radio {...commonCfg} />
   }
 }
