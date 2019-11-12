@@ -10,20 +10,24 @@ export default createListViewModel({
     service,
     state: {
       default: {},
-      pageMode: '',
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-        dispatch({
-          type: 'updateState',
-          payload: {
-            pageMode:
-              pathname.indexOf('/reception/queue/patientdashboard') === 0
-                ? 'split'
-                : 'integrated',
-          },
-        })
+        // const { pathname, search, query = {} } = loct
+        // if (
+        //   pathname.indexOf('/reception/queue/patientdashboard') === 0 ||
+        //   query.md === 'pt'
+        // ) {
+        //   dispatch({
+        //     type: 'initState',
+        //     payload: {
+        //       queueID: Number(query.qid) || 0,
+        //       version: Number(query.v) || undefined,
+        //       visitID: query.visit,
+        //       patientID: Number(query.pid) || 0,
+        //     },
+        //   })
+        // }
       })
     },
     effects: {
@@ -79,12 +83,11 @@ export default createListViewModel({
         })
       },
       *queryDone ({ payload }, { call, put, select, take }) {
-        const pageMode = yield select((state) => state.patientHistory.pageMode)
         let sortedList = payload.data.data
           ? payload.data.data.filter((o) => o.coHistory.length >= 1)
           : ''
-        // console.log('queryDone', this.mode)
-        if (pageMode === 'split' && sortedList.length > 0) {
+
+        if (sortedList.length > 0) {
           yield put({
             type: 'queryOne',
             payload: sortedList[0].coHistory[0].id,
