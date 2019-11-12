@@ -429,7 +429,7 @@ const convertToQuery = (
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
-          console.log(val)
+          // console.log(val)
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
             let s = ''

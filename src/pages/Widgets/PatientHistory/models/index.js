@@ -32,7 +32,7 @@ export default createListViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        let { queueID, version, patientID } = payload
+        let { queueID, version, patientID, mode } = payload
 
         if (!patientID) {
           yield put({
@@ -66,13 +66,19 @@ export default createListViewModel({
             version,
           },
         })
+        yield take('query/@@end')
 
-        // yield put({
-        //   type: 'patientHistory/queryOne',
-        //   payload: o.id,
-        // })
-        // console.log("****")
-        // console.log(test)
+        if (mode === 'split') {
+          const st = yield select((st) => st.patientHistory)
+
+          const { list } = st
+          if (list.filter((o) => o.coHistory.length >= 1).length > 0) {
+            yield put({
+              type: 'queryOne',
+              payload: list[0].coHistory[0].id,
+            })
+          }
+        }
 
         yield put({
           type: 'updateState',
@@ -81,18 +87,6 @@ export default createListViewModel({
             patientID,
           },
         })
-      },
-      *queryDone ({ payload }, { call, put, select, take }) {
-        let sortedList = payload.data.data
-          ? payload.data.data.filter((o) => o.coHistory.length >= 1)
-          : ''
-
-        if (sortedList.length > 0) {
-          yield put({
-            type: 'queryOne',
-            payload: sortedList[0].coHistory[0].id,
-          })
-        }
       },
     },
     reducers: {
