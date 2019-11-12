@@ -1,7 +1,7 @@
 {
   "name": "semrv2",
   "version": "2.1.1",
-  "description": "SEMR GEN 2",
+  "description": "SEMR 2",
   "private": true,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",
