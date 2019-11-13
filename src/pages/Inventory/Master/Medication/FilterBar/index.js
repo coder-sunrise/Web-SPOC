@@ -135,6 +135,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                     payload: {
                       entity: undefined,
                       currentId: undefined,
+                      sddCode: undefined,
+                      sddDescription: undefined,
                     },
                   })
                   history.push('/inventory/master/medication')

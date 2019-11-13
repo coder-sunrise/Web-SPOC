@@ -53,12 +53,14 @@ const Detail = ({
 
   useEffect(() => {
     if (medicationDetail.currentId) {
+      let tempCode
+      let tempName
       dispatch({
         type: 'medicationDetail/query',
         payload: {
           id: medicationDetail.currentId,
         },
-      }).then((med) => {
+      }).then(async (med) => {
         const { sddfk } = med
         if (sddfk) {
           dispatch({
@@ -69,15 +71,17 @@ const Detail = ({
           }).then((sdd) => {
             const { data } = sdd
             const { code, name } = data[0]
-            dispatch({
-              type: 'medicationDetail/updateState',
-              payload: {
-                sddCode: code,
-                sddDescription: name,
-              },
-            })
+            tempCode = code
+            tempName = name
           })
         }
+        dispatch({
+          type: 'medicationDetail/updateState',
+          payload: {
+            sddCode: tempCode,
+            sddDescription: tempName,
+          },
+        })
       })
     }
   }, [])
