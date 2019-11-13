@@ -12,6 +12,7 @@ import {
   TextField,
   CodeSelect,
   Select,
+  ProgressButton,
 } from '@/components'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
@@ -106,7 +107,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
+            <ProgressButton
               variant='contained'
               color='primary'
               onClick={() => {
@@ -133,7 +134,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
             >
               <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
 
             <Authorized authority='scheme.newscheme'>
               <Button
