@@ -4,11 +4,11 @@ import { CodeSelect } from '@/components'
 // medisys component
 import { DoctorLabel } from '@/components/_medisys'
 
-const DoctorProfileSelect = ({ ...props }) => (
+const DoctorProfileSelect = ({ label = 'Doctor', ...props }) => (
   <CodeSelect
     {...props}
     allowClear
-    label='Doctor'
+    label={label}
     code='doctorprofile'
     remoteFilter={{
       'clinicianProfile.isActive': true,

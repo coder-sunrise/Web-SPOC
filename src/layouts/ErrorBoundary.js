@@ -1,48 +1,62 @@
 import React from 'react'
-import ErrorPage from '../pages/404'
+// import ErrorPage from '../pages/404'
+import ErrorPage from '@/pages/500'
 
-let errorCount = 0
 class ErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { error: null, errorInfo: null, count: 0 }
+    this.state = { hasError: false, error: null, errorInfo: null, count: 0 }
   }
 
+  static getDerivedStateFromError (error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true, error }
+  }
+
+  /*
+    @changed by ZheBin
+    change setState to getDerivedStateFromError because
+    setState in componentDidCatch will be deprecated in future release
+    source link: https://reactjs.org/docs/react-component.html#componentdidcatch
+  */
   componentDidCatch (error, errorInfo) {
     // Catch errors in any components below and re-render with error message
+    // You can also log error messages to an error reporting service here
     console.error(error)
     console.error(errorInfo)
-    if (process.env.NODE_ENV === 'development') {
-      this.setState((prevError) => {
-        errorCount += 1
-        return {
-          error,
-          errorInfo,
-          count: prevError.count + 1,
-        }
-      })
-      // You can also log error messages to an error reporting service here
-    }
+
+    // if (process.env.NODE_ENV === 'development') {
+    //   this.setState((prevError) => {
+    //     errorCount += 1
+    //     return {
+    //       error,
+    //       errorInfo,
+    //       count: prevError.count + 1,
+    //     }
+    //   })
+    //
+    // }
   }
 
   render () {
-    if (this.state.errorInfo) {
+    if (this.state.hasError) {
       // Error path
-      if (process.env.NODE_ENV === 'development')
+      if (process.env.NODE_ENV === 'development') {
         return (
           <div>
             <h2>Something went wrong.</h2>
             <details style={{ whiteSpace: 'pre-wrap' }}>
               {this.state.error && this.state.error.toString()}
               <br />
-              {this.state.errorInfo.componentStack}
+              <p>Stack trace</p>
+              {this.state.error.stack}
             </details>
           </div>
         )
-      else {
-        return <ErrorPage />
       }
+      return <ErrorPage />
     }
+
     // Normally, just render children
     return this.props.children
   }
