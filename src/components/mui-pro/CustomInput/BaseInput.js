@@ -59,9 +59,11 @@ class BaseInput extends React.PureComponent {
     // console.log(e, this)
     if (e.which === 13) {
       // onEnterPressed
-      const { onEnterPressed } = this.props
+      const { onEnterPressed, loseFocusOnEnterPressed = false } = this.props
       if (onEnterPressed) onEnterPressed(e)
-
+      if (loseFocusOnEnterPressed) {
+        document.activeElement.blur()
+      }
       let loop = 0
       let target = $(e.target)
       while (loop < 100) {

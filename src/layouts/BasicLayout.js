@@ -41,6 +41,7 @@ import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
+import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
@@ -322,13 +323,13 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname)
 
     if (!currRouterData) {
-      return 'SEMR V2'
+      return defaultSettings.appTitle
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     })
-    return `${pageName} - SEMR V2`
+    return `${pageName} - ${defaultSettings.appTitle}`
   }
 
   getLayoutStyle = () => {
@@ -448,7 +449,7 @@ class BasicLayout extends React.PureComponent {
                           {isTop && !isMobile ? null : (
                             <SiderMenu
                               logo={logo}
-                              logoText='SEMR V2'
+                              logoText={defaultSettings.appTitle}
                               theme={navTheme}
                               // onCollapse={this.handleMenuCollapse}
                               menuData={menuData}

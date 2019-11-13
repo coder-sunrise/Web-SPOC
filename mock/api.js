@@ -10,6 +10,7 @@ const titles = [
   'React',
   'Vue',
   'Webpack',
+  'Medicloud',
 ]
 const avatars = [
   'https://gw.alipayobjects.com/zos/rmsportal/WdGqmHpayyMjiEhcKoVE.png', // Alipay

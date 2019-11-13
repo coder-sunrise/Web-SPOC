@@ -78,6 +78,8 @@ class Vaccination extends PureComponent {
     this.setState({
       selectedVaccination: op,
     })
+
+    setFieldValue('isActive', op.isActive)
     setFieldValue(
       'dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
