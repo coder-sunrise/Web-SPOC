@@ -57,7 +57,7 @@ const STYLES = (theme) => ({
 @control()
 class AntdTimePicker extends PureComponent {
   static defaultProps = {
-    format: 'HH:mm',
+    format: 'hh:mm a',
     disabled: false,
     size: 'default',
   }

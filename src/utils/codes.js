@@ -37,20 +37,46 @@ const sessionOptions = [
   { value: 'current', name: 'Current Session' },
 ]
 
-const outgoingSMSStatus = [
-  { value: 1, name: 'Sent' },
-  { value: 2, name: 'Failed' },
-  { value: 3, name: 'Delivered' },
-  { value: 4, name: 'Undelivered' },
-  { value: 5, name: 'Receiving' },
-  { value: 6, name: 'Received' },
-  { value: 7, name: 'Accepted' },
-  { value: 8, name: 'Scheduled' },
-  { value: 9, name: 'Read' },
-  { value: 10, name: 'Queued' },
-  { value: 11, name: 'Sending' },
+const smsStatus = [
+  {
+    name: 'Sent',
+    value: 1,
+  },
+  {
+    name: 'Failed',
+    value: 2,
+  },
 ]
 
+const messageStatus = [
+  {
+    name: 'Read',
+    value: 'Read',
+  },
+  {
+    name: 'Unread',
+    value: 'Unread',
+  },
+]
+
+const appointmentStatus = [
+  {
+    name: 'All',
+    value: undefined,
+  },
+  {
+    name: 'Draft',
+    value: 2,
+  },
+  {
+    name: 'Scheduled',
+    value: 1,
+  },
+  {
+    name: 'Rescheduled',
+    value: 5,
+  },
+]
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -652,6 +678,7 @@ const consultationDocumentTypes = [
     convert: (r) => {
       return {
         ...r,
+        issueDate: moment(r.issueDate).format(dateFormatLong),
         // attendanceStartTime: moment(r.attendanceStartTime).format('HH:mm'),
         // attendanceEndTime: moment(r.attendanceEndTime).format('HH:mm'),
       }
@@ -666,6 +693,12 @@ const consultationDocumentTypes = [
             {
               ...row,
               issueDate: moment(row.issueDate).format(dateFormatLong),
+              attendanceStartTime: moment(row.attendanceStartTime).format(
+                'hh:mm A',
+              ),
+              attendanceEndTime: moment(row.attendanceEndTime).format(
+                'hh:mm A',
+              ),
             },
           ],
         }
@@ -750,6 +783,7 @@ const consultationDocumentTypes = [
           DocumentDetails: [
             {
               ...row,
+              issueDate: moment(row.issueDate).format(dateFormatLong),
             },
           ],
         }
@@ -757,6 +791,12 @@ const consultationDocumentTypes = [
     },
   },
 ]
+
+import Medication from '@/pages/Widgets/Orders/Detail/Medication'
+import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
+import Service from '@/pages/Widgets/Orders/Detail/Service'
+import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
+import Package from '@/pages/Widgets/Orders/Detail/Package'
 
 const orderTypes = [
   {
@@ -767,24 +807,28 @@ const orderTypes = [
     getSubject: (r) => {
       return r.drugName
     },
+    component: (props) => <Medication {...props} />,
   },
   {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
     getSubject: (r) => r.vaccinationName,
+    component: (props) => <Vaccination {...props} />,
   },
   {
     name: 'Service',
     value: '3',
     prop: 'corService',
     getSubject: (r) => r.serviceName,
+    component: (props) => <Service {...props} />,
   },
   {
     name: 'Consumable',
     value: '4',
     prop: 'corConsumable',
     getSubject: (r) => r.consumableName,
+    component: (props) => <Consumable {...props} />,
   },
   {
     name: 'Open Prescription',
@@ -792,10 +836,12 @@ const orderTypes = [
     prop: 'corPrescriptionItem',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
+    component: (props) => <Medication openPrescription {...props} />,
   },
   {
     name: 'Package',
     value: '6',
+    component: (props) => <Package {...props} />,
   },
 ]
 const buttonTypes = [
@@ -877,6 +923,7 @@ const defaultParams = {
   sorting: [
     { columnName: 'sortOrder', direction: 'asc' },
   ],
+  isActive: true,
   excludeInactiveCodes: true,
 }
 
@@ -926,8 +973,7 @@ export const fetchAndSaveCodeTable = async (
         { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
-  console.log({ useGeneral, newParams, params, body })
-  // console.log(`fetch code: ${code}`)
+
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body,
@@ -1412,6 +1458,7 @@ module.exports = {
   // preferredContactMode,
   // countries,
   // schemes,
+  appointmentStatus,
   recurrenceTypes,
   status,
   statusString,
@@ -1422,7 +1469,8 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
-  outgoingSMSStatus,
+  messageStatus,
+  smsStatus,
   // country,
   sessionOptions,
   consultationDocumentTypes,

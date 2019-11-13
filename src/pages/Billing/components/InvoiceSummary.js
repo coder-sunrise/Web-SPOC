@@ -263,7 +263,7 @@ const InvoiceSummary = ({
                 simple
                 size='sm'
                 className={classes.invoiceButton}
-                disabled={shouldDisablePrintInvoice()}
+                // disabled={shouldDisablePrintInvoice()}
                 onClick={handlePrintInvoiceClick}
               >
                 Print Invoice

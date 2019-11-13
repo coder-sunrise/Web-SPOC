@@ -117,16 +117,16 @@ const Grid = ({
         label: 'View SMS History',
         Icon: ForumIcon,
       },
-      {
-        id: 1,
-        label: 'Mark as Read',
-        Icon: DraftsIcon,
-      },
-      {
-        id: 1,
-        label: 'Mark as Unread',
-        Icon: MarkunreadIcon,
-      },
+      // {
+      //   id: 1,
+      //   label: 'Mark as Read',
+      //   Icon: DraftsIcon,
+      // },
+      // {
+      //   id: 1,
+      //   label: 'Mark as Unread',
+      //   Icon: MarkunreadIcon,
+      // },
     ]
     const options = defaultContextMenuOptions
 
@@ -173,15 +173,21 @@ const Grid = ({
         selection={selectedRows}
         columnExtensions={colExtensions}
         ActionProps={{ TableCellComponent: Cell }}
-        FuncProps={{ selectable: true }}
+        FuncProps={{
+          selectable: true,
+          selectConfig: {
+            showSelectAll: true,
+            rowSelectionEnabled: () => true,
+          },
+        }}
         {...tableParas}
       />
       <CommonModal
         open={showMessageModal}
         title='Send SMS'
+        observe='Sms'
         onClose={() => setShowMessageModal(false)}
         onConfirm={() => setShowMessageModal(false)}
-        showFooter={false}
       >
         {showMessageModal ? <MessageListing {...messageListingProps} /> : null}
       </CommonModal>

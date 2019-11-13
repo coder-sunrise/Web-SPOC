@@ -28,6 +28,7 @@ export default ({
   codetable,
 }) => {
   const { rows, summary, finalAdjustments } = orders
+  // console.log(orders)
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
@@ -215,6 +216,7 @@ export default ({
                 ) : (
                   ''
                 )}
+                {row.isActive ? '' : '(Inactive)'}
               </div>
             )
           },

@@ -29,7 +29,6 @@ const withFormikExtend = (props) => (Component) => {
   }
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
-
     const { errors, dirty, initialValues, values } = ps
     // console.log({ initialValues, values })
     const _lastFormikUpdate = {
@@ -41,6 +40,8 @@ const withFormikExtend = (props) => (Component) => {
       // str: JSON.stringify(values),
     }
     const ob = window.g_app._store.getState().formik[displayName]
+    // console.log('dirty', dirty, displayName, _lastFormikUpdate)
+
     if (dirty) {
       window.dirtyForms[displayName] = {
         displayName,
@@ -52,21 +53,12 @@ const withFormikExtend = (props) => (Component) => {
         },
       }
     }
-    if (_.isEqual(_lastFormikUpdate, ob)) {
-      return
-    }
-    window.g_app._store.dispatch({
-      type: 'formik/updateState',
-      payload: {
-        [displayName]: _lastFormikUpdate,
-      },
-    })
 
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
 
       window.addEventListener('beforeunload', confirmBeforeReload)
-    } else if (!dirty && window.beforeReloadHandlerAdded) {
+    } else if (!dirty) {
       delete window.dirtyForms[displayName]
 
       if (Object.values(window.dirtyForms).length === 0) {
@@ -74,9 +66,23 @@ const withFormikExtend = (props) => (Component) => {
         window.removeEventListener('beforeunload', confirmBeforeReload)
       }
     }
+
+    if (!_.isEqual(_lastFormikUpdate, ob)) {
+      console.log('updateDirtyState', displayName, _lastFormikUpdate)
+
+      window.g_app._store.dispatch({
+        type: 'formik/updateState',
+        payload: {
+          [displayName]: _lastFormikUpdate,
+        },
+      })
+    }
   }
 
-  const _updateDirtyState = _.debounce(updateDirtyState, 250, { maxWait: 1000 })
+  // const updateDirtyState = _.throttle(updateDirtyState, 250, {
+  //   maxWait: 1000,
+  //   leading: true,
+  // })
 
   // const { mapPropsToValues } = props
   // console.log(props, lastVersion)
@@ -119,7 +125,7 @@ const withFormikExtend = (props) => (Component) => {
 
     // constructor (ps) {
     //   super(ps)
-    //   _updateDirtyState.bind(this)
+    //   updateDirtyState.bind(this)
     // }
 
     componentDidMount () {
@@ -135,22 +141,24 @@ const withFormikExtend = (props) => (Component) => {
     componentWillReceiveProps (nextProps) {
       // console.log(this.props, nextProps)
 
-      if (startDirtyChecking) _updateDirtyState(nextProps)
+      if (startDirtyChecking) updateDirtyState(nextProps)
     }
 
     componentWillUnmount () {
       startDirtyChecking = false
-
+      // console.log(displayName, window.dirtyForms[displayName])
       if (displayName) {
-        if (window.dirtyForms[displayName]) {
+        const ob = window.g_app._store.getState().formik[displayName]
+        if (ob)
           window.g_app._store.dispatch({
             type: 'formik/updateState',
             payload: {
               [displayName]: undefined,
             },
           })
+        if (window.dirtyForms[displayName]) {
+          delete window.dirtyForms[displayName]
         }
-        delete window.dirtyForms[displayName]
 
         if (Object.values(window.dirtyForms).length === 0) {
           window.beforeReloadHandlerAdded = false

@@ -136,6 +136,20 @@ export default createListViewModel({
 
         // return response
       },
+      *getCurrentActiveSessionInfo (_, { call, put }) {
+        const bizSessionPayload = {
+          IsClinicSessionClosed: false,
+        }
+        const response = yield call(service.getBizSession, bizSessionPayload)
+        const { data } = response
+        if (data && data.totalRecords === 1) {
+          const { data: sessionData } = data
+          yield put({
+            type: 'updateSessionInfo',
+            payload: { ...sessionData[0] },
+          })
+        }
+      },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
         { call, put, all, select, take },
@@ -186,7 +200,7 @@ export default createListViewModel({
           const queryPayload = {
             combineCondition: 'and',
             eql_appointmentDate: today,
-            in_appointmentStatusFk: '1|2|5',
+            in_appointmentStatusFk: '1|5',
           }
           const response = yield call(
             service.queryAppointmentListing,

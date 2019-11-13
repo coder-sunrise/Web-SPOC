@@ -221,6 +221,7 @@ const schemaSchemes = {
         validRange: Yup.array().when('schemeTypeFK', {
           is: (val) => {
             const st = schemeTypes.find((o) => o.id === val)
+            if (!st) return false
             return (
               [
                 'MEDI500VISUT',

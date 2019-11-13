@@ -21,6 +21,17 @@ class OutstandingPaymentReport extends ReportBase {
     }
   }
 
+
+  formatReportParams = (params) => {
+    return {
+      ...params,
+      isPatientPayer:
+        params.payerType === 'All' || params.payerType === 'Patient',
+      isCompanyPayer:
+        params.payerType === 'All' || params.payerType === 'Company',
+    }
+  }
+
   renderFilterBar = (handleSubmit) => {
     return <FilterBar handleSubmit={handleSubmit} />
   }

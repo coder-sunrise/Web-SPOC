@@ -41,6 +41,7 @@ import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
+import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
@@ -117,7 +118,7 @@ class BasicLayout extends React.PureComponent {
     this.resize = _.debounce(this.resize, 500, {
       leading: true,
     })
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch } = this.props
 
     this.initUserData()
     initStream()
@@ -322,13 +323,13 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname)
 
     if (!currRouterData) {
-      return 'SEMR V2'
+      return defaultSettings.appTitle
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     })
-    return `${pageName} - SEMR V2`
+    return `${pageName} - ${defaultSettings.appTitle}`
   }
 
   getLayoutStyle = () => {
@@ -398,18 +399,18 @@ class BasicLayout extends React.PureComponent {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false })
     }
-    this.props.dispatch({
-      type: 'global/updateState',
-      payload: {
-        mainDivHeight: window.mainPanel.offsetHeight - 62,
-      },
-    })
+    if (window.mainPanel)
+      this.props.dispatch({
+        type: 'global/updateState',
+        payload: {
+          mainDivHeight: window.mainPanel.offsetHeight - 62,
+        },
+      })
   }
 
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
-    // console.log(loading)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -425,7 +426,7 @@ class BasicLayout extends React.PureComponent {
     } = this.props
     // console.log(this.props)
     const isTop = PropsLayout === 'topmenu'
-    const routerConfig = this.matchParamsPath(pathname)
+    // const routerConfig = this.matchParamsPath(pathname)
     // console.log('routerConfig', routerConfig)
     const mainPanel = `${classes.mainPanel} ${cx({
       [classes.mainPanelSidebarMini]: collapsed,
@@ -448,7 +449,7 @@ class BasicLayout extends React.PureComponent {
                           {isTop && !isMobile ? null : (
                             <SiderMenu
                               logo={logo}
-                              logoText='SEMR V2'
+                              logoText={defaultSettings.appTitle}
                               theme={navTheme}
                               // onCollapse={this.handleMenuCollapse}
                               menuData={menuData}

@@ -24,6 +24,11 @@ function onComponentDidMount () {
   )
 
   latestRow._errors = errors
+  return {
+    row,
+    gridId,
+    columnName,
+  }
 }
 function onComponentChange (args) {
   const {

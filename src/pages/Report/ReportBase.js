@@ -40,19 +40,15 @@ export default class ReportBase extends React.Component {
     }))
   }
 
-  setReportInfo = (reportId, fileName) => {
-    this.setState((state) => ({
-      ...state,
-      reportId,
-      fileName,
-    }))
-  }
-
   handleActivePanelChange = (event, panel) => {
     this.setState((state) => ({
       ...state,
       activePanel: state.activePanel === panel.key ? -1 : panel.key,
     }))
+  }
+
+  formatReportParams = (params) => {
+    return params
   }
 
   onSubmitClick = async () => {
@@ -66,7 +62,8 @@ export default class ReportBase extends React.Component {
       isLoading: true,
       reportDatas: null,
     }))
-    const reportDatas = await getRawData(this.state.reportId, this.props.values)
+    const params = this.formatReportParams(this.props.values)
+    const reportDatas = await getRawData(this.state.reportId, params)
 
     if (reportDatas) {
       this.setState((state) => ({
@@ -111,8 +108,8 @@ export default class ReportBase extends React.Component {
           <GridItem md={12}>
             <ReportLayoutWrapper
               loading={this.state.isLoading}
-              reportID={this.props.reportId}
-              reportParameters={this.props.values}
+              reportID={this.state.reportId}
+              reportParameters={this.formatReportParams(this.props.values)}
               loaded={this.state.loaded}
               fileName={this.state.fileName}
             >

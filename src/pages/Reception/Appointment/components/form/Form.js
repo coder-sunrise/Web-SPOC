@@ -311,20 +311,46 @@ class Form extends React.PureComponent {
     }
     if (deleted) {
       const { datagrid } = this.state
-      const newDatagrid = datagrid.filter(
-        (event) => !deleted.includes(event.id),
-      )
+      // const newDatagrid = datagrid.filter(
+      //   (event) => !deleted.includes(event.id),
+      // )
+      const afterDelete = datagrid.map((item) => ({
+        ...item,
+        isDeleted: deleted.includes(item.id),
+      }))
+      const hasOneRowOnlyAfterDelete =
+        afterDelete.filter((item) => !item.isDeleted).length === 1
+      let newDataGrid = [
+        ...afterDelete,
+      ]
+      if (hasOneRowOnlyAfterDelete) {
+        newDataGrid = afterDelete.reduce(
+          (datas, item) => [
+            ...datas,
+            { ...item, isPrimaryClinician: !item.isDeleted },
+          ],
+          [],
+        )
+      }
+      // const newDatagrid = datagrid.map(
+      //   (event) =>
+      //     deleted.includes(event.id)
+      //       ? { ...event, isDeleted: true }
+      //       : { ...event },
+      // )
+      // const newRows =
+      //   newDatagrid.length === 1
+      //     ? [
+      //         { ...newDatagrid[0], isPrimaryClinician: true },
+      //       ]
+      //     : newDatagrid
       this.setState(
         {
-          datagrid:
-            newDatagrid.length === 1
-              ? [
-                  { ...newDatagrid[0], isPrimaryClinician: true },
-                ]
-              : newDatagrid,
+          datagrid: newDataGrid,
         },
         this.validateDataGrid,
       )
+      return newDataGrid
     }
   }
 
@@ -339,30 +365,47 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    // this.setState({ isDataGridValid })
-    const newDataGrid =
-      datagrid.length === 1
-        ? [
-            {
-              ...datagrid[0],
-              isPrimaryClinician:
-                datagrid[0].isPrimaryClinician === undefined
-                  ? true
-                  : datagrid[0].isPrimaryClinician,
-            },
-          ]
-        : [
-            ...datagrid,
-          ]
-
-    // has 1 primary doctor
-    const hasPrimaryDoctor = newDataGrid.reduce(
-      (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
+    const filterDeleted = datagrid.filter((item) => !item.isDeleted)
+    const hasPrimary = filterDeleted.reduce(
+      (hasPrimaryClinician, item) =>
+        item.isPrimaryClinician || hasPrimaryClinician,
       false,
     )
-    if (!hasPrimaryDoctor) isDataGridValid = false
 
-    this.setState({ isDataGridValid, datagrid: newDataGrid })
+    if (!hasPrimary) isDataGridValid = false
+    // const hasOneRowOnly =
+    //   datagrid.filter((item) => !item.isDeleted).length === 1
+    // let newDataGrid = [
+    //   ...datagrid,
+    // ]
+    // if (hasOneRowOnly) {
+    //   newDataGrid = datagrid.reduce(
+    //     (datas, item) => [
+    //       ...datas,
+    //       { ...item, isPrimaryClinician: !item.isDeleted },
+    //     ],
+    //     [],
+    //   )
+    // }
+    // const newDataGrid =
+    //   datagrid.length === 1
+    //     ? [
+    //         {
+    //           ...datagrid[0],
+    //           isPrimaryClinician:
+    //             datagrid[0].isPrimaryClinician === undefined
+    //               ? true
+    //               : datagrid[0].isPrimaryClinician,
+    //         },
+    //       ]
+    //     : [
+    //         ...datagrid,
+    //       ]
+
+    this.setState({
+      isDataGridValid,
+      // datagrid: newDataGrid,
+    })
   }
 
   _submit = async (validate = false, preSubmit = false) => {
@@ -374,7 +417,7 @@ class Form extends React.PureComponent {
         setSubmitting,
         handleSubmit,
         values,
-        onClose,
+        onConfirm,
         dispatch,
       } = this.props
       const {
@@ -415,12 +458,7 @@ class Form extends React.PureComponent {
               },
             })
           } else {
-            dispatch({
-              type: 'formik/clean',
-              payload: 'AppointmentForm',
-            })
-            resetForm()
-            onClose()
+            onConfirm()
           }
         }
       })

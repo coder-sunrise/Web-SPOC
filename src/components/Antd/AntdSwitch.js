@@ -8,7 +8,7 @@ import _ from 'lodash'
 import withStyles from '@material-ui/core/styles/withStyles'
 
 // ant
-import { CustomInputWrapper, BaseInput, CustomInput } from '@/components'
+import { CustomInputWrapper, CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
 
 import { extendFunc } from '@/utils/utils'

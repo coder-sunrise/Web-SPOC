@@ -64,7 +64,13 @@ const styles = () => ({
   },
 })
 
-const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
+const MessageListing = ({
+  classes,
+  recipient,
+  dispatch,
+  onConfirm,
+  footer,
+}) => {
   const [
     historyList,
     setHistoryList,
@@ -80,7 +86,7 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
   const [
     totalHistory,
     setTotalHistory,
-  ] = useState(true)
+  ] = useState(0)
 
   const [
     currentPage,
@@ -91,7 +97,7 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
     dispatch({
       type: 'sms/querySMSHistory',
       payload: {
-        Recipient: recipient.patientContactNo,
+        Recipient: parseInt(recipient.patientContactNo, 10),
         current: currentPage,
         pagesize: 10,
       },
@@ -103,7 +109,6 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
           ...data,
         ])
         setTotalHistory(totalRecords)
-        setCurrentPage(currentPage + 1)
         setLoading(false)
       }
     })
@@ -166,7 +171,7 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
   }
 
   const checkIsItLoadedAllHistory = () => {
-    if (historyList.length >= totalHistory) {
+    if (historyList.length >= totalHistory && currentPage > 1) {
       message.warning('Infinite List loaded all')
       setHasMore(false)
       setLoading(false)
@@ -175,25 +180,27 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
     return false
   }
 
-  const fetchDataCallback = useCallback(
+  useEffect(
     () => {
-      getSMSHistory()
+      getSMSHistory(currentPage)
     },
     [
-      historyList,
       currentPage,
     ],
   )
 
+  const refresh = () => {
+    setHistoryList([])
+    setTotalHistory(0)
+    setHasMore(true)
+    setCurrentPage(1)
+  }
+
   const handleInfiniteOnLoad = () => {
     setLoading(true)
     if (checkIsItLoadedAllHistory()) return
-    fetchDataCallback()
+    setCurrentPage(currentPage + 1)
   }
-
-  useEffect(() => {
-    getSMSHistory()
-  }, [])
 
   return (
     <React.Fragment>
@@ -223,6 +230,14 @@ const MessageListing = ({ classes, recipient, dispatch, onConfirm }) => {
           <New {...newMessageProps} />
         </Paper>
       </Grid>
+      {footer &&
+        footer({
+          onConfirm: refresh,
+          confirmBtnText: 'Refresh',
+          confirmProps: {
+            disabled: false,
+          },
+        })}
     </React.Fragment>
   )
 }

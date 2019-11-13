@@ -103,7 +103,7 @@ const styles = (theme) => ({})
       adjAmount: values.finalAmount - values.initialAmout,
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
     }
-    console.log(newVals)
+    // console.log(newVals)
     dispatch({
       type: 'global/updateState',
       payload: {

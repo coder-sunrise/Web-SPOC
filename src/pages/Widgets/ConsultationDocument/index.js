@@ -30,9 +30,9 @@ import {
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 const styles = (theme) => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
@@ -89,7 +89,7 @@ export const printRow = async (row, props) => {
 }
 
 export const viewReport = (row, props, useID = false) => {
-  console.log({ row, props, useID })
+  console.log('viewReport', { row, props, useID })
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )

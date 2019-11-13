@@ -26,7 +26,7 @@ import { getBizSession } from '@/services/queue'
   patient: patient.entity,
 }))
 @withFormikExtend({
-  notDirtyDuration: 0,
+  notDirtyDuration: 3,
   displayName: 'AddPaymentForm',
   mapPropsToValues: ({ invoice, showPaymentDate }) => {
     const { outstandingBalance } = invoice
@@ -226,7 +226,12 @@ class AddPayment extends Component {
         'cashReturned',
         roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
       )
-    else setFieldValue('cashReturned', 0)
+    else if (totalPaid < finalPayable) {
+      setFieldValue(
+        'cashReturned',
+        _cashReceived - (cashPayment.amt + cashRounding),
+      )
+    } else setFieldValue('cashReturned', 0)
   }
 
   handlePaymentDateChange = (value) => {

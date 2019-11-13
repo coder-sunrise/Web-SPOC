@@ -1,7 +1,7 @@
 {
-  "name": "semrv2",
+  "name": "Medicloud",
   "version": "2.1.1",
-  "description": "SEMR GEN 2",
+  "description": "Medicloud System",
   "private": true,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",

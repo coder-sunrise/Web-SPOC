@@ -31,15 +31,16 @@ const reloadDispense = (props, effect = 'query') => {
     payload: dispense.visitID,
   }).then((o) => {
     resetForm(o)
-    dispatch({
-      type: `formik/clean`,
-      payload: 'DispensePage',
-    })
+    // dispatch({
+    //   type: `formik/clean`,
+    //   payload: 'DispensePage',
+    // })
   })
 }
 @withFormikExtend({
   authority: 'queue.dispense',
   enableReinitialize: true,
+  notDirtyDuration: 3,
   mapPropsToValues: ({ dispense = {}, clinicSettings }) => {
     const _temp = dispense.entity || dispense.default
     const { settings } = clinicSettings
@@ -79,6 +80,7 @@ const reloadDispense = (props, effect = 'query') => {
       invoice: {
         ...obj.invoice,
         invoiceTotal,
+        invoiceTotalAftAdj: invoiceTotal,
         invoiceGSTAmt,
         invoiceTotalAftGST,
         outstandingBalance,
@@ -112,7 +114,7 @@ const reloadDispense = (props, effect = 'query') => {
         }
       }
     })
-
+    console.log({ values })
     dispatch({
       type: `dispense/save`,
       payload: {

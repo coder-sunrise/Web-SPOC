@@ -129,12 +129,6 @@ export const REPORT_TYPE = {
   27: 'Patient Label',
 }
 
-export const GENDER = {
-  1: 'MALE',
-  2: 'FEMALE',
-  3: 'UNKNOWN',
-}
-
 export const INVOICE_STATUS = {
   PAID: 1,
   OVERPAID: 2,

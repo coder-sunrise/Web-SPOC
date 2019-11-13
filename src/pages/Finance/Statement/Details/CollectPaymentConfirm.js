@@ -14,6 +14,7 @@ import {
   Field,
   DatePicker,
   Select,
+  ProgressButton,
 } from '@/components'
 
 const styles = () => ({
@@ -306,9 +307,9 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
 
             <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
-              <Button color='primary' onClick={handleSubmit}>
+              <ProgressButton color='primary' onClick={handleSubmit}>
                 Confirm Payment
-              </Button>
+              </ProgressButton>
             </GridItem>
           </GridItem>
         </GridContainer>

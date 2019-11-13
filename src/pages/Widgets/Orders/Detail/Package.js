@@ -15,7 +15,6 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { getUniqueId } from '@/utils/utils'
-import { orderTypes } from '@/utils/codes'
 import config from '@/utils/config'
 
 const { qtyFormat } = config
@@ -414,7 +413,7 @@ class Package extends PureComponent {
     }
 
     this.changePackage = (v, op) => {
-      const { setValues, values } = this.props
+      const { setValues, values, orderTypes } = this.props
       let rows = []
       if (op && op.medicationPackageItem) {
         rows = rows.concat(
@@ -458,19 +457,17 @@ class Package extends PureComponent {
               type: '3',
               typeName:
                 orderTypes.find((type) => type.value === '3').name +
-                (o.service.isActive === true &&
-                o.service.ctServiceCenter_ServiceNavigation[0].isActive ===
-                  true &&
+                // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
+                (o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
                   .serviceCenterFKNavigation.isActive === true
                   ? ''
                   : ' (Inactive)'),
+              // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
               isActive:
-                o.service.isActive === true &&
-                o.service.ctServiceCenter_ServiceNavigation[0].isActive ===
-                  true &&
+                o.service.isActive &&
                 o.service.ctServiceCenter_ServiceNavigation[0]
-                  .serviceCenterFKNavigation.isActive === true,
+                  .serviceCenterFKNavigation.isActive,
             }
           }),
         )

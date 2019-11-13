@@ -4,6 +4,7 @@ import Link from 'umi/link'
 import isEqual from 'lodash/isEqual'
 import memoizeOne from 'memoize-one'
 import router from 'umi/router'
+import _ from 'lodash'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
 
 import { NavLink } from 'react-router-dom'
@@ -24,7 +25,7 @@ import StarBorder from '@material-ui/icons/StarBorder'
 import Icon from '@material-ui/core/Icon'
 import sidebarStyle from 'mui-pro-jss/material-dashboard-pro-react/components/sidebarStyle.jsx'
 import cx from 'classnames'
-import { isUrl, confirmBeforeReload, navigateDirtyCheck } from '@/utils/utils'
+import { isUrl, confirmBeforeReload, navigateDirtyCheck,difference } from '@/utils/utils'
 import styles from './index.less'
 import { getMenuMatches } from './SiderMenuUtils'
 import { urlToList } from '../_utils/pathTools'
@@ -50,7 +51,7 @@ const getSelectedMenuKeys = (pathname, props) => {
     getMenuMatches(flatMenuKeys, itemPath).pop(),
   )
 }
-class BaseMenu extends PureComponent {
+class BaseMenu extends React.Component {
   state = {}
 
   static getDerivedStateFromProps (nextProps, prevState) {
@@ -70,6 +71,15 @@ class BaseMenu extends PureComponent {
     }
     return null
   }
+
+  shouldComponentUpdate=(nextProps,nextStates)=>{
+    // console.log(nextProps, this.props)
+    // console.log(difference(nextStates,this.state))
+    // console.log(difference(nextProps, this.props))
+    if(!_.isEqual(nextStates,this.state))return true
+    if(nextProps.collapsed!==this.props.collapsed)return true
+      return false
+    }
 
   /**
    * 获得菜单子节点

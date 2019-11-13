@@ -152,7 +152,7 @@ class EditableTableGrid extends PureComponent {
       getRowId = (row) => row.id,
     } = this.props
     const { onCommitChanges = (f) => f } = EditingProps
-    // console.log(added, changed, deleted)
+    // console.log(added, changed, deleted, rows)
     // this.setState({
 
     // })
@@ -240,12 +240,21 @@ class EditableTableGrid extends PureComponent {
     //   // )
     // }
     // console.log({ newRows, t: window.$tempGridRow })
-    onCommitChanges({
+    const updatedRows = onCommitChanges({
       rows: newRows,
       added,
       changed,
       deleted,
     })
+    // window.$tempGridRow[this.gridId]={}
+    if (updatedRows) {
+      // console.log(updatedRows, window.$tempGridRow[this.gridId])
+      window.$tempGridRow[this.gridId] = {}
+      updatedRows.forEach((r) => {
+        window.$tempGridRow[this.gridId][r.id] = r
+      })
+      // window.$tempGridRow[this.gridId] = updatedRows
+    }
   }
 
   getAddRowComponent = (selector = '.medisys-table') => {

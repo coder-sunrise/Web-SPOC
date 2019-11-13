@@ -33,19 +33,11 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import Item from './Item'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
-const styles = (theme) => ({
-  money: {
-    width: 16,
-    height: 16,
-    top: 3,
-    position: 'relative',
-    color: 'green',
-  },
-})
+const styles = (theme) => ({})
 
 // @compare('diagnosis')
 // @withFormikExtend({
