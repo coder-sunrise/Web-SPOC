@@ -52,6 +52,9 @@ class UserProfile extends React.Component {
   componentDidMount = () => {
     this.props.dispatch({
       type: 'settingUserProfile/query',
+      payload: {
+        isActive: this.props.values.status,
+      },
     })
   }
 
