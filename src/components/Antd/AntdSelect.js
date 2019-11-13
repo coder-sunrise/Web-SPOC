@@ -232,7 +232,11 @@ class AntdSelect extends React.PureComponent {
           }
           form.setFieldValue(field.name, v)
         }
-        if (v.indexOf(allValue) < 0 && options.length === v.length) {
+        if (
+          v.indexOf(allValue) < 0 &&
+          options.length &&
+          options.length === v.length
+        ) {
           v.unshift(allValue)
           form.setFieldValue(field.name, v)
         }
@@ -265,7 +269,11 @@ class AntdSelect extends React.PureComponent {
             ...options.map((o) => Object.byString(o, valueField)),
           ]
         }
-        if (v.indexOf(allValue) < 0 && options.length === v.length) {
+        if (
+          v.indexOf(allValue) < 0 &&
+          options.length &&
+          options.length === v.length
+        ) {
           v.unshift(allValue)
         }
       }

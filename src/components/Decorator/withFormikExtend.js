@@ -29,7 +29,6 @@ const withFormikExtend = (props) => (Component) => {
   }
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
-
     const { errors, dirty, initialValues, values } = ps
     // console.log({ initialValues, values })
     const _lastFormikUpdate = {
@@ -69,6 +68,8 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     if (!_.isEqual(_lastFormikUpdate, ob)) {
+      console.log('updateDirtyState', displayName, _lastFormikUpdate)
+
       window.g_app._store.dispatch({
         type: 'formik/updateState',
         payload: {
@@ -78,7 +79,10 @@ const withFormikExtend = (props) => (Component) => {
     }
   }
 
-  const _updateDirtyState = _.debounce(updateDirtyState, 250, { maxWait: 1000 })
+  // const updateDirtyState = _.throttle(updateDirtyState, 250, {
+  //   maxWait: 1000,
+  //   leading: true,
+  // })
 
   // const { mapPropsToValues } = props
   // console.log(props, lastVersion)
@@ -121,7 +125,7 @@ const withFormikExtend = (props) => (Component) => {
 
     // constructor (ps) {
     //   super(ps)
-    //   _updateDirtyState.bind(this)
+    //   updateDirtyState.bind(this)
     // }
 
     componentDidMount () {
@@ -137,7 +141,7 @@ const withFormikExtend = (props) => (Component) => {
     componentWillReceiveProps (nextProps) {
       // console.log(this.props, nextProps)
 
-      if (startDirtyChecking) _updateDirtyState(nextProps)
+      if (startDirtyChecking) updateDirtyState(nextProps)
     }
 
     componentWillUnmount () {
