@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { status } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -48,7 +49,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
@@ -81,6 +82,7 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import {
   MenuList,
   Popper,
@@ -8,7 +9,6 @@ import {
   ClickAwayListener,
   MenuItem,
 } from '@material-ui/core'
-import { INVENTORY_TYPE } from '@/utils/constants'
 import {
   withFormikExtend,
   FastField,
@@ -20,6 +20,7 @@ import {
   ProgressButton,
   DateRangePicker,
   Field,
+  Button,
 } from '@/components'
 import { inventoryAdjustmentStatus } from '@/utils/codes'
 
@@ -123,7 +124,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { transactionNo, status, transDates, allDate } = values
 
@@ -155,7 +156,7 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <ProgressButton
+              <Button
                 color='primary'
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
@@ -172,9 +173,10 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
-              </ProgressButton>
-              <ProgressButton
+              </Button>
+              <Button
                 color='primary'
                 icon={null}
                 onClick={this.handleToggle}
@@ -183,7 +185,7 @@ class Filter extends PureComponent {
                 }}
               >
                 Mass Adjustment
-              </ProgressButton>
+              </Button>
               <Popper
                 open={open}
                 anchorEl={this.anchorElAccount}
