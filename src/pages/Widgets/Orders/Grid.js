@@ -203,7 +203,6 @@ export default ({
           // type: 'select',
           // options: orderTypes,
           render: (row) => {
-            console.log({ row })
             return (
               <div>
                 <Select

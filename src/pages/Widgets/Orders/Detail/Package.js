@@ -362,7 +362,6 @@ class Package extends PureComponent {
         {
           columnName: 'typeName',
           render: (row) => {
-            console.log({ row })
             if (row.isActive === true) {
               return <CustomInput text value={row.typeName} />
             }
@@ -458,16 +457,17 @@ class Package extends PureComponent {
               type: '3',
               typeName:
                 orderTypes.find((type) => type.value === '3').name +
-                (o.service.isActive
-                  ? // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
-                    // o.service.ctServiceCenter_ServiceNavigation[0]
-                    //   .serviceCenterFKNavigation.isActive === true
-                    ''
+                // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
+                (o.service.isActive &&
+                o.service.ctServiceCenter_ServiceNavigation[0]
+                  .serviceCenterFKNavigation.isActive === true
+                  ? ''
                   : ' (Inactive)'),
-              isActive: o.service.isActive,
               // o.service.ctServiceCenter_ServiceNavigation[0].isActive &&
-              // o.service.ctServiceCenter_ServiceNavigation[0]
-              //   .serviceCenterFKNavigation.isActive ,
+              isActive:
+                o.service.isActive &&
+                o.service.ctServiceCenter_ServiceNavigation[0]
+                  .serviceCenterFKNavigation.isActive,
             }
           }),
         )
