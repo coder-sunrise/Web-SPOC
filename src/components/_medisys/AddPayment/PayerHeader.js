@@ -3,7 +3,12 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridContainer, GridItem } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  NumberInput,
+  SizeContainer,
+} from '@/components'
 // styling
 import styles from './styles'
 
@@ -26,23 +31,26 @@ const PayerHeader = ({
       </GridItem>
       <GridItem {...columnConfig} className={classes.centerText}>
         <h4>Total Payable: </h4>
-        <h4 className={classes.currencyText}>
-          $ {parseToTwoDecimalString(invoice.totalAftGst)}
-        </h4>
+        {/*  <h4 className={classes.currencyText}>
+        $ {parseToTwoDecimalString(invoice.totalAftGst)}
+      </h4> */}
+        <NumberInput text currency value={invoice.totalAftGst} />
       </GridItem>
       {totalClaim !== undefined && (
         <GridItem {...columnConfig} className={classes.centerText}>
           <h4>Total Claim: </h4>
-          <h4 className={classes.currencyText}>
+          {/* <h4 className={classes.currencyText}>
             $ {parseToTwoDecimalString(totalClaim)}
-          </h4>
+          </h4> */}
+          <NumberInput text currency value={totalClaim} />
         </GridItem>
       )}
       <GridItem {...columnConfig} className={classes.rightAlignText}>
         <h4>Outstanding: </h4>
-        <h4 className={classes.currencyText}>
+        {/* <h4 className={classes.currencyText}>
           $ {parseToTwoDecimalString(outstandingAfterPayment)}
-        </h4>
+        </h4> */}
+        <NumberInput text currency value={outstandingAfterPayment} />
       </GridItem>
     </GridContainer>
   )

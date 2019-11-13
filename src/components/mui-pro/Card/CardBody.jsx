@@ -9,7 +9,7 @@ import withStyles from '@material-ui/core/styles/withStyles'
 // core components
 import cardBodyStyle from 'mui-pro-jss/material-dashboard-pro-react/components/cardBodyStyle.jsx'
 
-function CardBody ({ ...props }) {
+function CardBody ({ style, ...props }) {
   const {
     classes,
     className,

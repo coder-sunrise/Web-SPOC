@@ -299,7 +299,7 @@ class Medication extends PureComponent {
         defaultBatch ? defaultBatch.expiryDate : undefined,
       )
     }
-
+    setFieldValue('isActive', op.isActive)
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
       op.medicationUsage ? op.medicationUsage.id : undefined,
@@ -447,7 +447,11 @@ class Medication extends PureComponent {
                 name='drugName'
                 render={(args) => {
                   return (
-                    <TextField label='Name' {...args} autocomplete='nope' />
+                    <TextField
+                      label='Open Prescription Name'
+                      {...args}
+                      autocomplete='nope'
+                    />
                   )
                 }}
               />
@@ -458,7 +462,7 @@ class Medication extends PureComponent {
                   return (
                     <CodeSelect
                       temp
-                      label='Name'
+                      label='Medication Name'
                       code='inventorymedication'
                       labelField='displayValue'
                       onChange={this.changeMedication}

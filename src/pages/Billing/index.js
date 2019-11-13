@@ -324,6 +324,7 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
+    console.log({ test: process.env.NODE_ENV, test2: process.env.client_env })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />

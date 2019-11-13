@@ -146,7 +146,7 @@ const DiagnosisItem = ({
               return (
                 <Select
                   label='Complication'
-                  mode='tags'
+                  mode='multiple'
                   options={ctComplicationPairedWithDiag}
                   labelField='displayValue'
                   valueField='id'
