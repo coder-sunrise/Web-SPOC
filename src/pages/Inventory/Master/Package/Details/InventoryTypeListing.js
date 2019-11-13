@@ -531,17 +531,17 @@ const InventoryTypeListing = ({
         serviceName,
       } = newRow
 
-      const total = () => {
-        if (quantity && unitPrice) {
-          return quantity * unitPrice
-        }
-        return 0.0
-      }
+      // const total = () => {
+      //   if (quantity && unitPrice) {
+      //     return quantity * unitPrice
+      //   }
+      //   return 0.0
+      // }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
           const returnRow = addedRows.map((row) => ({
             ...row,
-            subTotal: total(),
+            // subTotal: total(),
           }))
           return returnRow
         }
@@ -549,14 +549,14 @@ const InventoryTypeListing = ({
         return addedRows.map((row) => ({
           ...row,
           unitPrice: undefined,
-          subTotal: total(),
+          // subTotal: total(),
         }))
       }
 
       if (selectedItem) {
         return addedRows.map((row) => ({
           ...row,
-          subTotal: total(),
+          // subTotal: total(),
         }))
       }
     }
