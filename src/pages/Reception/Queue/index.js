@@ -177,7 +177,7 @@ class Queue extends React.Component {
     })
   }
 
-  toggleRegisterNewPatient = () => {
+  toggleRegisterNewPatient = (shouldRedirect = true) => {
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
@@ -185,7 +185,7 @@ class Queue extends React.Component {
           this.props.dispatch({
             type: 'patient/closePatientModal',
           })
-          this.redirectToVisitRegistration()
+          if (shouldRedirect) this.redirectToVisitRegistration()
         },
       },
     })
