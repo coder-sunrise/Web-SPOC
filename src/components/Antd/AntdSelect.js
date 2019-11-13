@@ -44,7 +44,7 @@ const STYLES = () => {
       },
       '& .ant-select-selection--single': {
         height: '100%',
-        lineHeight: '1em',
+        lineHeight: '1.2em',
       },
       '& .ant-select-selection--multiple': {
         height: '100%',
