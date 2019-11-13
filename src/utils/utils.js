@@ -412,7 +412,7 @@ const convertToQuery = (
 
   // console.log(query)
   let newQuery = {}
-  const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
+  const refilter = /\b([^_]{0,6}(?=_))?_?(.*)\b/
   newQuery.columnCriteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')
@@ -431,18 +431,10 @@ const convertToQuery = (
           val = val.trim()
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
-            let s = ''
-            match[2].split('$').forEach((item) => {
-              s += `${item}.`
-            })
-            match[2] = s.substring(0, s.length - 1)
-            const prop = match[3] || match[2]
-            const combineKey = prop.split('/')
-            // console.log(match)
             newQuery.columnCriteria.push({
-              prop: combineKey.length > 1 ? combineKey : prop,
+              prop: match[2],
               val,
-              opr: filterType[match[1]],
+              opr: filterType[match[1]] || filterType.like,
               // property: match[3] ? s.substring(0, s.length - 1) : null,
               // valueType: match[4] ? valueType[match[4]] : null,
             })
@@ -635,7 +627,7 @@ export const updateCellValue = (
       return er.inner || []
       // row._$error = true
     }
-  } else if (value !== val) {
+  } else if (value !== val && onValueChange) {
     onValueChange(val)
   }
   return []
@@ -922,6 +914,9 @@ const calculateAmount = (
 
     // console.log(r)
   })
+  if (total === 0 && activeRows[0]) {
+    activeRows[0].weightage = 1
+  }
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     activeRows.forEach((o) => {
       o.subAdjustment = 0
@@ -939,6 +934,10 @@ const calculateAmount = (
   const totalAfterAdj = roundToTwoDecimals(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
+  // console.log('after calculate totalAfterAdj', {
+  //   activeRows,
+  //   mapped: activeRows.map((o) => o[adjustedField]),
+  // })
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     // notification.error({

@@ -28,6 +28,7 @@ export default ({
   codetable,
 }) => {
   const { rows, summary, finalAdjustments } = orders
+  // console.log(orders)
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
@@ -215,6 +216,7 @@ export default ({
                 ) : (
                   ''
                 )}
+                {row.isActive ? '' : '(Inactive)'}
               </div>
             )
           },
@@ -224,10 +226,6 @@ export default ({
           width: 300,
           render: (row) => {
             let text = ''
-            let isActiveLabel = ''
-            if (row.isActive !== undefined || row.isActive !== null) {
-              isActiveLabel = row.isActive ? '' : ' (Inactive)'
-            }
             if (row.usageMethodFK && row.dosageFK && row.uomfk) {
               text = `${row.usageMethodDisplayValue
                 ? row.usageMethodDisplayValue
@@ -250,15 +248,10 @@ export default ({
                       ? item.drugFrequencyDisplayValue
                       : ''} For ${item.duration ? item.duration : ''} day(s)`
 
-                    return (
-                      <p>
-                        {text}
-                        {isActiveLabel}
-                      </p>
-                    )
+                    return <p>{text}</p>
                   })
                 ) : (
-                  `${text}${isActiveLabel}`
+                  text
                 )}
               </div>
             )

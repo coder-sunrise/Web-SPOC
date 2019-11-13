@@ -33,9 +33,9 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import Item from './Item'
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 const styles = (theme) => ({})
 

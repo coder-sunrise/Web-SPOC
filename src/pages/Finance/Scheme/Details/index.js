@@ -124,7 +124,7 @@ export default compose(
       name: Yup.string().required().max(100),
       schemeCategoryFK: Yup.number().required(),
       copayerFK: Yup.number().required(),
-      coverageMaxCap: Yup.number().required(),
+      // coverageMaxCap: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     }),
     enableReinitialize: true,

@@ -25,7 +25,9 @@ const PaymentRow = ({
   ...payment
 }) => {
   const { id, type, itemID, date, amount, reason, isCancelled } = payment
-
+  let tooltipMsg = ''
+  if (type === 'Payment') tooltipMsg = 'Print Receipt'
+  else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
   return (
     <GridContainer
       justify='center'
@@ -35,7 +37,7 @@ const PaymentRow = ({
     >
       <GridItem md={2}>
         {type === 'Payment' || type === 'Credit Note' ? (
-          <Tooltip title='Print Receipt'>
+          <Tooltip title={tooltipMsg}>
             <IconButton
               // payerID='N/A'
               id={itemID}

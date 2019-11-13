@@ -169,6 +169,7 @@ class Details extends PureComponent {
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
       type,
+      orderTypes,
       ...props,
     }
 
@@ -183,8 +184,10 @@ class Details extends PureComponent {
                   return {
                     id: o.value,
                     name: o.name,
+                    content: o.component(cfg),
                   }
                 })}
+                tabStyle={{}}
                 onChange={(key) => {
                   dispatch({
                     type: 'orders/updateState',
@@ -197,14 +200,14 @@ class Details extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          <div>
+          {/* <div>
             {type === '1' && <Medication {...cfg} />}
             {type === '2' && <Vaccination {...cfg} />}
             {type === '3' && <Service {...cfg} />}
             {type === '4' && <Consumable {...cfg} />}
             {type === '5' && <Medication {...cfg} openPrescription />}
             {type === '6' && <Package {...cfg} />}
-          </div>
+          </div> */}
         </div>
       </div>
     )

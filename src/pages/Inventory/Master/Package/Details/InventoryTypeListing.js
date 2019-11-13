@@ -515,15 +515,9 @@ const InventoryTypeListing = ({
     }
   }
   const calSubtotal = (e) => {
-    const { value, row } = e
-    row.subTotal = value * row.unitPrice
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    const { row } = e
+    const { unitPrice, quantity } = row
+    row.subTotal = unitPrice * quantity
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {

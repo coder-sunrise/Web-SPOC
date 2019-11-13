@@ -163,7 +163,7 @@ class AddConsultationDocument extends PureComponent {
   getLoader = (editor, setFieldValue, currentType) => {
     const { classes, parentProps, codetable } = this.props
     const { documenttemplate = [] } = codetable
-    console.log({ documenttemplate })
+    // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>

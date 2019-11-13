@@ -148,6 +148,6 @@ export default {
   'menu.report.viewreport': 'View Report',
 
   'menu.support': 'Support',
-  'menu.support.teamviewer': 'Teamviewer',
+  'menu.support.contactus': 'Contact Us',
   'menu.support.druglabel': 'Drug Label',
 }

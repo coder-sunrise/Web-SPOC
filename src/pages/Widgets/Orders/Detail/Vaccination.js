@@ -78,6 +78,8 @@ class Vaccination extends PureComponent {
     this.setState({
       selectedVaccination: op,
     })
+
+    setFieldValue('isActive', op.isActive)
     setFieldValue(
       'dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
@@ -208,7 +210,7 @@ class Vaccination extends PureComponent {
                 return (
                   <CodeSelect
                     temp
-                    label='Inventory Medication'
+                    label='Vaccination Name'
                     labelField='displayValue'
                     code='inventoryvaccination'
                     onChange={this.changeVaccination}

@@ -40,11 +40,11 @@ const sessionOptions = [
 const smsStatus = [
   {
     name: 'Sent',
-    value: 'Sent',
+    value: 1,
   },
   {
     name: 'Failed',
-    value: 'Failed',
+    value: 2,
   },
 ]
 
@@ -66,15 +66,15 @@ const appointmentStatus = [
   },
   {
     name: 'Draft',
-    value: 'Draft',
+    value: 2,
   },
   {
     name: 'Scheduled',
-    value: 'Scheduled',
+    value: 1,
   },
   {
     name: 'Rescheduled',
-    value: 'Rescheduled',
+    value: 5,
   },
 ]
 // const paymentMethods = [
@@ -693,8 +693,12 @@ const consultationDocumentTypes = [
             {
               ...row,
               issueDate: moment(row.issueDate).format(dateFormatLong),
-              attendanceStartTime: moment(row.attendanceStartTime).format('hh:mm A'),
-              attendanceEndTime: moment(row.attendanceEndTime).format('hh:mm A'),
+              attendanceStartTime: moment(row.attendanceStartTime).format(
+                'hh:mm A',
+              ),
+              attendanceEndTime: moment(row.attendanceEndTime).format(
+                'hh:mm A',
+              ),
             },
           ],
         }
@@ -779,9 +783,7 @@ const consultationDocumentTypes = [
           DocumentDetails: [
             {
               ...row,
-              issueDate: moment(row.issueDate).format(
-                dateFormatLong,
-              ),
+              issueDate: moment(row.issueDate).format(dateFormatLong),
             },
           ],
         }
@@ -789,6 +791,12 @@ const consultationDocumentTypes = [
     },
   },
 ]
+
+import Medication from '@/pages/Widgets/Orders/Detail/Medication'
+import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
+import Service from '@/pages/Widgets/Orders/Detail/Service'
+import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
+import Package from '@/pages/Widgets/Orders/Detail/Package'
 
 const orderTypes = [
   {
@@ -799,24 +807,28 @@ const orderTypes = [
     getSubject: (r) => {
       return r.drugName
     },
+    component: (props) => <Medication {...props} />,
   },
   {
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
     getSubject: (r) => r.vaccinationName,
+    component: (props) => <Vaccination {...props} />,
   },
   {
     name: 'Service',
     value: '3',
     prop: 'corService',
     getSubject: (r) => r.serviceName,
+    component: (props) => <Service {...props} />,
   },
   {
     name: 'Consumable',
     value: '4',
     prop: 'corConsumable',
     getSubject: (r) => r.consumableName,
+    component: (props) => <Consumable {...props} />,
   },
   {
     name: 'Open Prescription',
@@ -824,10 +836,12 @@ const orderTypes = [
     prop: 'corPrescriptionItem',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
+    component: (props) => <Medication openPrescription {...props} />,
   },
   {
     name: 'Package',
     value: '6',
+    component: (props) => <Package {...props} />,
   },
 ]
 const buttonTypes = [
@@ -909,6 +923,7 @@ const defaultParams = {
   sorting: [
     { columnName: 'sortOrder', direction: 'asc' },
   ],
+  isActive: true,
   excludeInactiveCodes: true,
 }
 
@@ -955,9 +970,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',

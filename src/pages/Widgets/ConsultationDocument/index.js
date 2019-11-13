@@ -30,9 +30,9 @@ import {
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 const styles = (theme) => ({})
 export const printRow = async (row, props) => {
   const type = consultationDocumentTypes.find(
@@ -416,10 +416,10 @@ class ConsultationDocument extends PureComponent {
           observe='AddConsultationDocument'
           maxWidth='md'
           bodyNoPadding
-        // showFooter=
-        // footProps={{
-        //   confirmBtnText: 'Save',
-        // }}
+          // showFooter=
+          // footProps={{
+          //   confirmBtnText: 'Save',
+          // }}
         >
           <AddConsultationDocument
             {...this.props}

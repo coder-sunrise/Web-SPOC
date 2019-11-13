@@ -35,6 +35,7 @@ class RadioEditorBase extends PureComponent {
       radioSelectedMap[gridId][columnName] = row.id
       this.forceUpdate()
     }
+    // console.log('RadioEditorBase', row, radioSelectedMap[gridId])
   }
 
   _onChange = (e, checked) => {
@@ -131,7 +132,7 @@ class RadioEditorBase extends PureComponent {
     if (checked) {
       commonCfg.checked = radioSelectedMap[gridId][columnName] === row.id
     }
-    console.log(commonCfg, row, radioSelectedMap[gridId])
+    // console.log(commonCfg, row, radioSelectedMap[gridId])
     return <Radio {...commonCfg} />
   }
 }

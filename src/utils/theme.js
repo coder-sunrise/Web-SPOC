@@ -377,6 +377,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+    Tabs: {
+      main: {
+        '& .ant-tabs-bar': {
+          zoom: '100%',
+        },
+      },
+    },
   },
 })
 
@@ -535,6 +542,13 @@ export const smallTheme = createMuiTheme({
       wrapper: {
         '& .rdw-editor-toolbar': {
           zoom: '70%',
+        },
+      },
+    },
+    Tabs: {
+      main: {
+        '& .ant-tabs-bar': {
+          zoom: '80%',
         },
       },
     },

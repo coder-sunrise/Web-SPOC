@@ -226,9 +226,19 @@ class AntdSelect extends React.PureComponent {
             allValue,
             ...options.map((o) => Object.byString(o, valueField)),
           ]
+
           if (maxSelected) {
             v = v.slice(Math.max(v.length - maxSelected, 1))
           }
+          form.setFieldValue(field.name, v)
+        }
+        if (
+          mode === 'multiple' &&
+          v.indexOf(allValue) < 0 &&
+          options.length &&
+          options.length === v.length
+        ) {
+          v.unshift(allValue)
           form.setFieldValue(field.name, v)
         }
       }
@@ -259,6 +269,14 @@ class AntdSelect extends React.PureComponent {
             allValue,
             ...options.map((o) => Object.byString(o, valueField)),
           ]
+        }
+        if (
+          mode === 'multiple' &&
+          v.indexOf(allValue) < 0 &&
+          options.length &&
+          options.length === v.length
+        ) {
+          v.unshift(allValue)
         }
       }
       if (!_.isEqual(v, this.state.value)) {

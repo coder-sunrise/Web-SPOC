@@ -22,7 +22,7 @@ const Detail = ({ height, ...props }) => {
       hideHeader
       style={{
         height,
-        overflow: 'auto',
+        // overflow: 'auto',
       }}
     >
       <GridContainer gutter={0}>
