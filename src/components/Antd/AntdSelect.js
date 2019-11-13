@@ -233,6 +233,7 @@ class AntdSelect extends React.PureComponent {
           form.setFieldValue(field.name, v)
         }
         if (
+          mode === 'multiple' &&
           v.indexOf(allValue) < 0 &&
           options.length &&
           options.length === v.length
@@ -270,6 +271,7 @@ class AntdSelect extends React.PureComponent {
           ]
         }
         if (
+          mode === 'multiple' &&
           v.indexOf(allValue) < 0 &&
           options.length &&
           options.length === v.length
