@@ -150,6 +150,7 @@ const style = () => ({
       }
     })
   },
+  displayName: 'Deposit',
 })
 class Modal extends PureComponent {
   constructor (props) {
