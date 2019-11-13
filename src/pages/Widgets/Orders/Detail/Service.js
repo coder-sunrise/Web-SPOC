@@ -166,7 +166,7 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service'
+                    label='Service Name'
                     options={services.filter(
                       (o) =>
                         !serviceCenterFK ||
@@ -190,7 +190,7 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service Centre'
+                    label='Service Centre Name'
                     options={serviceCenters.filter(
                       (o) =>
                         !serviceFK ||

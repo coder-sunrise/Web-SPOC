@@ -208,7 +208,7 @@ class Vaccination extends PureComponent {
                 return (
                   <CodeSelect
                     temp
-                    label='Inventory Medication'
+                    label='Vaccination Name'
                     labelField='displayValue'
                     code='inventoryvaccination'
                     onChange={this.changeVaccination}
