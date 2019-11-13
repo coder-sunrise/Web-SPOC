@@ -3,6 +3,9 @@ export default (theme) => ({
     '& h4': {
       display: 'inline',
     },
+    '& input': {
+      fontSize: '1.3em',
+    },
   },
   leftAlignText: {
     textAlign: 'left',

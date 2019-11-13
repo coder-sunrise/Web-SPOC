@@ -1,5 +1,5 @@
 export default {
-  'app.login.title': 'SEMR 2',
+  'app.login.title': 'Medicloud',
   'app.login.username': 'Username',
   'app.login.email': 'Email',
   'app.login.password': 'Password',

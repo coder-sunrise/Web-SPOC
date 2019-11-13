@@ -115,6 +115,7 @@ class Service extends PureComponent {
     if (serviceCenterService) {
       setValues({
         ...values,
+        isActive: serviceCenterService.isActive,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
         serviceCode: this.state.services.find((o) => o.value === serviceFK)
           .code,

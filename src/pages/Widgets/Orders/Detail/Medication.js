@@ -299,7 +299,7 @@ class Medication extends PureComponent {
         defaultBatch ? defaultBatch.expiryDate : undefined,
       )
     }
-
+    setFieldValue('isActive', op.isActive)
     setFieldValue(
       'corPrescriptionItemInstruction[0].usageMethodFK',
       op.medicationUsage ? op.medicationUsage.id : undefined,
