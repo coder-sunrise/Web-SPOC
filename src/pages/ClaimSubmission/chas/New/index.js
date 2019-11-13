@@ -66,8 +66,17 @@ class NewCHAS extends React.Component {
     this.setState({ selectedRows: selection })
 
   refreshDataGrid = () => {
+    const { selectedRows } = this.state
+
     this.props.dispatch({
-      type: 'claimSubmissionNew/query',
+      type: 'claimSubmissionNew/refreshPatientDetails',
+      payload:{claimIds: selectedRows},
+    }).then((r)=>{
+      if(!r){
+        this.props.dispatch({
+          type: 'claimSubmissionNew/query',
+        })
+      }
     })
   }
 

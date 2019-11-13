@@ -1,5 +1,9 @@
 export const SubmittedCHASColumns = [
   {
+    name:'submissionDate',
+    title:'Submission Date',
+  },
+  {
     name: 'visitDate',
     title: 'Visit Date',
   },
@@ -44,16 +48,13 @@ export const SubmittedCHASColumns = [
     title: 'Claim Amt.',
   },
   {
-    name: 'rejectionReason',
-    title: 'Rejection Reason',
-  },
-  {
     name: 'action',
     title: 'Action',
   },
 ]
 
 export const SubmittedCHASColumnExtensions = [
+  { columnName: 'submissionDate', type: 'date' },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },

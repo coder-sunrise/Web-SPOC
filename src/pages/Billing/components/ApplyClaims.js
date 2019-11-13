@@ -59,10 +59,6 @@ const styles = (theme) => ({
   rightEndBtn: {
     marginRight: 0,
   },
-  dangerText: {
-    fontWeight: 500,
-    color: '#cf1322',
-  },
   currencyText: {
     fontWeight: 500,
     color: 'darkblue',
@@ -774,12 +770,12 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                   <GridItem md={2}>
                     <div>
                       {!invoicePayer.schemeConfig.balance ? (
-                        <span className={classes.dangerText}>
-                          Insufficient balance
+                        <span>
+                          Full balance
                         </span>
                       ) : (
                         <span className={classes.currencyText}>
-                          Balace: ${invoicePayer.schemeConfig.balance}
+                          balance: ${invoicePayer.schemeConfig.balance}
                         </span>
                       )}
                     </div>
