@@ -113,7 +113,7 @@ class Consumable extends PureComponent {
                 return (
                   <CodeSelect
                     temp
-                    label='Name'
+                    label='Consumable Name'
                     code='inventoryconsumable'
                     labelField='displayValue'
                     onChange={this.changeConsumable}
