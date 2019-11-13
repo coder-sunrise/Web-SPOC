@@ -63,7 +63,7 @@ const Detail = ({
       }).then(async (med) => {
         const { sddfk } = med
         if (sddfk) {
-          dispatch({
+          await dispatch({
             type: 'sddDetail/queryOne',
             payload: {
               id: sddfk,
