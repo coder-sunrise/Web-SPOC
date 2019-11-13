@@ -14,7 +14,7 @@ const receivingDetailsSchema = Yup.object().shape({
   code: Yup.number().required(),
   // name: Yup.string().required(),
   orderQuantity: Yup.number().min(1).required(),
-  bonusQuantity: Yup.number().min(1).required(),
+  bonusQuantity: Yup.number().min(1),
 })
 
 class Grid extends PureComponent {
@@ -91,7 +91,7 @@ class Grid extends PureComponent {
     row.name = ''
     row.uom = ''
     row.orderQuantity = 0
-    row.bonusQuantity = 0
+    // row.bonusQuantity = 0
     row.totalQuantity = 0
     row.quantityReceived = 0
     row.unitPrice = 0
@@ -191,7 +191,7 @@ class Grid extends PureComponent {
         newAddedRows = addedRows.map((row) => ({
           ...row,
           orderQuantity: 0,
-          bonusQuantity: 0,
+          // bonusQuantity: 0,
           totalQuantity: 0,
           quantityReceived: 0,
           unitPrice: 0,
