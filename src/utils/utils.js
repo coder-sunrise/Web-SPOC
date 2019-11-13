@@ -429,21 +429,12 @@ const convertToQuery = (
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
-          // console.log(val)
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
-            let s = ''
-            match[2].split('$').forEach((item) => {
-              s += `${item}.`
-            })
-            match[2] = s.substring(0, s.length - 1)
-            const prop = match[3] || match[2]
-            const combineKey = prop.split('/')
-            // console.log(match)
             newQuery.columnCriteria.push({
-              prop: combineKey.length > 1 ? combineKey : prop,
+              prop: match[2],
               val,
-              opr: filterType[match[1]],
+              opr: filterType[match[1]] || filterType.like,
               // property: match[3] ? s.substring(0, s.length - 1) : null,
               // valueType: match[4] ? valueType[match[4]] : null,
             })
