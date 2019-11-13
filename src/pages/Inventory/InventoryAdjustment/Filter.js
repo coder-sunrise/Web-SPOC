@@ -157,6 +157,7 @@ class Filter extends PureComponent {
 
               <ProgressButton
                 color='primary'
+                icon={null}
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
                   this.props.dispatch({
