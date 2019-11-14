@@ -158,6 +158,7 @@ class Filter extends PureComponent {
 
               <Button
                 color='primary'
+                icon={null}
                 onClick={() => {
                   const { inventoryAdjustment } = this.props
                   this.props.dispatch({
