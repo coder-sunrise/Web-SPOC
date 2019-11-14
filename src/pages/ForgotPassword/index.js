@@ -57,7 +57,7 @@ class ForgotPassword extends React.Component {
   }
 
   handleCancelClick = () => {
-    this.props.history.push('/login')
+    this.props.history.push('/user/login')
   }
 
   handleBackClick = () => {
@@ -73,7 +73,7 @@ class ForgotPassword extends React.Component {
         notification.success({
           message: 'Reset password success',
         })
-        history.push('/login')
+        history.push('/user/login')
       }
 
       if (!response) {

@@ -168,7 +168,7 @@ class NewLogin extends React.Component {
   }
 
   onForgotPasswordClick = () => {
-    router.push('/login/forgotpassword')
+    router.push('/user/forgotpassword')
   }
 
   render () {
