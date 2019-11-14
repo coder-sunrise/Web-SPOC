@@ -16,7 +16,14 @@ import {
   CodeSelect,
 } from '@/components'
 
-const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
+const New = ({
+  values,
+  errors,
+  selectedRows,
+  handleSubmit,
+  recipient,
+  setFieldValue,
+}) => {
   const [
     messageNumber,
     setMessageNumber,
@@ -54,7 +61,12 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
                 label={formatMessage({
                   id: 'sms.template',
                 })}
-                code='ctSmsTemplate'
+                code='SmsTemplate'
+                labelField='displayValue'
+                onChange={(e, op = {}) => {
+                  const { templateMessage } = op
+                  setFieldValue('content', templateMessage)
+                }}
                 {...args}
               />
             )
@@ -86,6 +98,7 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
                 label={formatMessage({
                   id: 'sms.message',
                 })}
+                maxLength={9999999999}
                 {...args}
               />
             )
