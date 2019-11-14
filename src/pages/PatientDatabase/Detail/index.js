@@ -333,7 +333,7 @@ class PatientDetail extends PureComponent {
         (o) => o.id === (this.state.selectedMenu || currentComponent),
       ) || {}
     const CurrentComponent = currentMenu.component
-    console.log({ values })
+
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={2}>
