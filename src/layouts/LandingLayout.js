@@ -1,5 +1,6 @@
 import React from 'react'
 import NProgress from 'nprogress'
+import DocumentTitle from 'react-document-title'
 // material ui
 import { withStyles } from '@material-ui/core'
 // umi
@@ -11,6 +12,7 @@ import { LoginNavbar } from '@/components/_medisys'
 // Import static files
 import authStyle from '@/assets/jss/material-dashboard-pro-react/layouts/authStyle'
 import loginBackground from '@/assets/img/login.jpeg'
+import defaultSettings from '@/defaultSettings'
 
 const styles = (theme) => ({
   ...authStyle(theme),
@@ -32,21 +34,23 @@ class LandingLayout extends React.Component {
     NProgress.done()
     const { children, classes } = this.props
     return (
-      <div className={classes.wrapper}>
-        <SizeContainer size='lg'>
-          <React.Fragment>
-            <LoginNavbar {...this.props} />
-            <div className={classes.content}>
-              <div
-                className={classes.fullPage}
-                style={{ backgroundImage: `url(${this.getBgImage()})` }}
-              >
-                {children}
+      <DocumentTitle title={defaultSettings.appTitle}>
+        <div className={classes.wrapper}>
+          <SizeContainer size='lg'>
+            <React.Fragment>
+              <LoginNavbar {...this.props} />
+              <div className={classes.content}>
+                <div
+                  className={classes.fullPage}
+                  style={{ backgroundImage: `url(${this.getBgImage()})` }}
+                >
+                  {children}
+                </div>
               </div>
-            </div>
-          </React.Fragment>
-        </SizeContainer>
-      </div>
+            </React.Fragment>
+          </SizeContainer>
+        </div>
+      </DocumentTitle>
     )
   }
 }

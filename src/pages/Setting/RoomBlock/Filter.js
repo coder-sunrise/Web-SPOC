@@ -39,8 +39,8 @@ const styles = (theme) => ({
   mapPropsToValues: () => {
     return {
       roomBlockGroupFK: [],
-      dateFrom: moment().subtract(6, 'months'),
-      dateTo: moment(),
+      dateFrom: moment(),
+      dateTo: moment().add(6, 'months'),
       recurrence: undefined,
     }
   },
@@ -81,6 +81,7 @@ const styles = (theme) => ({
         lsteql_endDateTime: dateTo
           ? moment(dateTo).endOf('day').formatUTC(false)
           : undefined,
+        pagesize: 999,
       },
     }).then(() => {
       dispatch({

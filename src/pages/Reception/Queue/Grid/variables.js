@@ -87,8 +87,8 @@ export const ApptColumnExtensions = [
   {
     columnName: 'gender/age',
     render: (row) => {
-      const { genderFK, dob } = row
-
+      const { genderFK, dob, patientProfileFk } = row
+      if (!patientProfileFk) return null
       const gender = (
         <CodeSelect
           text
