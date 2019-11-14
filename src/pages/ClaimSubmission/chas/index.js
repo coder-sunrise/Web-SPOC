@@ -210,7 +210,7 @@ class CHAS extends React.Component {
 
         <CommonModal
           title='Submit Claim Status'
-          maxWidth='xs'
+          maxWidth='sm'
           open={showSubmitClaimStatus}
           onClose={this.closeSubmitClaimStatus}
           onConfirm={this.closeSubmitClaimStatus}
