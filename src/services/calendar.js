@@ -25,6 +25,7 @@ import * as commonService from '@/services/common'
 const url = '/api/appointment'
 const rescheduleURL = '/api/appointment/reschedule'
 const cancelURL = '/api/appointment/cancel'
+const updateAppointmentLinkingURL = '/api/Appointment/updatepatient'
 
 export const upsert = (params) => commonService.upsert(url, params)
 
@@ -54,3 +55,6 @@ export const deleteDraft = (payload) => commonService.remove(url, payload)
 
 export const validate = (params) =>
   request(`${url}/validate`, { method: 'POST', body: params })
+
+export const updateLinking = (params) =>
+  request(updateAppointmentLinkingURL, { method: 'PUT', body: params })

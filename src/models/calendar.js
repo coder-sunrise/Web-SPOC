@@ -499,6 +499,10 @@ export default createListViewModel({
           }),
         ])
       },
+      *updateAppointmentLinking ({ payload }, { call, put }) {
+        const response = yield call(service.updateLinking, payload)
+        return response
+      },
     },
     reducers: {
       saveConflict (state, { payload }) {
