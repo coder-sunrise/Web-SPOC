@@ -1,5 +1,7 @@
 import { RRule } from 'rrule'
 import moment from 'moment'
+// common components
+import { dateFormatLong } from '@/components'
 // constants
 import { RECURRENCE_PATTERN, RECURRENCE_RANGE, DAYS_OF_WEEK } from './const.js'
 // utils
@@ -125,14 +127,14 @@ export const computeRRule = ({ date, recurrenceDto }) => {
 export const computeLabel = ({ rule, date, recurrenceDto }) => {
   let label = ''
   try {
-    const startDate = formatDateToText(date)
+    const startDate = moment(date).format(dateFormatLong)
     let stopDate = formatDateToText(moment())
 
     if (rule.options.until === null) {
       const allDates = rule.all()
-      stopDate = formatDateToText(allDates[allDates.length - 1])
+      stopDate = moment(allDates[allDates.length - 1]).format(dateFormatLong)
     } else {
-      stopDate = formatDateToText(rule.options.until)
+      stopDate = moment(rule.options.until).format(dateFormatLong)
     }
 
     const {
@@ -140,6 +142,7 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       recurrenceFrequency,
       recurrenceDayOfTheMonth,
       recurrenceDaysOfTheWeek,
+      recurrenceStartDate,
     } = recurrenceDto
     if (
       (recurrencePatternFK === RECURRENCE_PATTERN.DAILY &&
@@ -152,18 +155,21 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       throw Error('Not enough info to compute label')
 
     const plural = recurrenceFrequency > 1 ? 's' : ''
+    const effectiveStartDate = recurrenceStartDate
+      ? moment(recurrenceStartDate).format(dateFormatLong)
+      : startDate
     switch (recurrencePatternFK) {
       case RECURRENCE_PATTERN.DAILY: {
-        label = `Occur every ${recurrenceFrequency} day${plural} effective ${startDate}`
+        label = `Occur every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
         break
       }
       case RECURRENCE_PATTERN.WEEKLY: {
         const days = joinWeekDays(recurrenceDaysOfTheWeek)
-        label = `Occur every ${recurrenceFrequency} week${plural} on ${days} effective ${startDate} until ${stopDate} `
+        label = `Occur every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
         break
       }
       case RECURRENCE_PATTERN.MONTHLY: {
-        label = `Occurs day ${recurrenceDayOfTheMonth} of every ${recurrenceFrequency} month${plural} effective ${startDate} until ${stopDate}`
+        label = `Occurs day ${recurrenceDayOfTheMonth} of every ${recurrenceFrequency} month${plural} effective ${effectiveStartDate} until ${stopDate}`
         break
       }
       default:
