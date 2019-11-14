@@ -810,7 +810,7 @@ const ApplyClaims = ({
                         </span>
                       ) : (
                         <span className={classes.currencyText}>
-                          Balace: ${invoicePayer.schemeConfig.balance}
+                          Balance: ${invoicePayer.schemeConfig.balance}
                         </span>
                       )}
                     </div>

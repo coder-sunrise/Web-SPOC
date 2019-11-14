@@ -55,7 +55,7 @@ class NavBar extends PureComponent {
         */}
         <ListItem className={classes.listItem}>
           <NavLink
-            to='/login'
+            to='/user/login'
             className={cx(classes.navLink, {
               [classes.navLinkActive]: this.activeRoute('/login'),
             })}
@@ -70,7 +70,7 @@ class NavBar extends PureComponent {
         </ListItem>
         <ListItem className={classes.listItem}>
           <NavLink
-            to='/login/forgotpassword'
+            to='/user/forgotpassword'
             className={cx(classes.navLink, {
               [classes.navLinkActive]: this.activeRoute('/forgotpassword'),
             })}

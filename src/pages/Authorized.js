@@ -10,7 +10,7 @@ export default ({ children, ...restProps }) => {
   return (
     <Authorized
       authority={children.props.route.authority}
-      noMatch={<Redirect to='/login' />}
+      noMatch={<Redirect to='/user/login' />}
     >
       {children}
     </Authorized>
