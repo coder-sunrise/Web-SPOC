@@ -64,6 +64,7 @@ const styles = (theme) => ({
   },
   body: {
     marginBottom: '15px',
+    padding: theme.spacing(2),
   },
 })
 

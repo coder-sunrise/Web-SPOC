@@ -151,6 +151,7 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleBlur = () => {
+    // console.log(this.state.value)
     this._onChange(
       this.state.value || this.state.value === 0
         ? numeral(this.state.value)._value
