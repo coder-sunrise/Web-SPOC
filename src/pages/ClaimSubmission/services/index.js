@@ -4,6 +4,7 @@ import request from '@/utils/request'
 const url = '/api/InvoiceClaim'
 const countUrl = '/api/InvoiceClaim/Count'
 const chasClaimUrl = '/api/InvoiceClaim/SubmitChasClaim'
+const refreshPatientUrl = '/api/InvoiceClaim/RefreshPatientDetails'
 const chasClaimStatusUrl = '/api/InvoiceClaim/RefreshStatus'
 const bizSessionAPIURL = '/api/bizsession'
 const invoicePayment = '/api/InvoicePayment'
@@ -27,6 +28,14 @@ module.exports = {
   getStatus: async (params) => {
     let r
     r = await request(chasClaimStatusUrl, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
+  refreshPatientDetails: async (params) => {
+    let r
+    r = await request(refreshPatientUrl, {
       method: 'PUT',
       body: params,
     })
