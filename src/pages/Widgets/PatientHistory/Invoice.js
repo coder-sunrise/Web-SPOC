@@ -49,6 +49,7 @@ export default ({ classes, current, setFieldValue }) => {
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
   }
+
   return (
     <div>
       {current.invoice ? (
@@ -57,7 +58,7 @@ export default ({ classes, current, setFieldValue }) => {
             <TextField
               prefix='Invoice No: '
               text
-              defaultValue={current.invoice.invoiceNo}
+              value={current.invoice.invoiceNo}
               noUnderline
             />
           </GridItem>
@@ -65,7 +66,7 @@ export default ({ classes, current, setFieldValue }) => {
             <DatePicker
               prefix='Invoice Date: '
               text
-              defaultValue={current.invoice.invoiceDate}
+              value={current.invoice.invoiceDate}
               noUnderline
             />
           </GridItem>

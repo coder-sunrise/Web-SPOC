@@ -201,7 +201,7 @@ class PurchaseReceive extends Component {
           <CommonModal
             open={showWriteOff}
             title='Write-Off'
-            maxWidth='xs'
+            maxWidth='sm'
             onConfirm={this.closeWriteOffModal}
             onClose={this.closeWriteOffModal}
           >

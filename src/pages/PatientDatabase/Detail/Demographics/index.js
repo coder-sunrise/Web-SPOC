@@ -164,6 +164,15 @@ class Demographic extends PureComponent {
     })
   }
 
+  onReferredByChange = (event) => {
+    const { setFieldValue } = this.props
+    const { target } = event
+    const { value } = target
+    if (value === '') {
+      setFieldValue('referredByPatientFK', undefined)
+    }
+  }
+
   render () {
     const { props } = this
     const { values, theme, setFieldValue, classes } = props
@@ -517,6 +526,7 @@ class Demographic extends PureComponent {
                           label: 'Patient',
                         },
                       ]}
+                      onChange={this.onReferredByChange}
                       {...args}
                     />
                   )}

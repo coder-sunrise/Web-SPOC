@@ -111,6 +111,7 @@ const { qtyFormat } = config
         )
 
         item = {
+          isActive: inventoryMedication.isActive,
           inventoryMedicationFK: inventoryMedication.id,
           drugCode: inventoryMedication.code,
           drugName: inventoryMedication.displayValue,
@@ -194,6 +195,7 @@ const { qtyFormat } = config
         )
 
         item = {
+          isActive: inventoryVaccination.isActive,
           inventoryVaccinationFK: inventoryVaccination.id,
           vaccinationGivenDate: moment().format(serverDateTimeFormatFull),
           vaccinationCode: inventoryVaccination.code,
@@ -240,10 +242,11 @@ const { qtyFormat } = config
       let item
       if (
         service.isActive === true &&
-        serviceCenterService.isActive === true &&
+        // serviceCenterService.isActive === true &&
         serviceCenter.isActive === true
       ) {
         item = {
+          isActive: serviceCenter.isActive && service.isActive,
           serviceCenterServiceFK: serviceCenterService.id,
           quantity: packageItem.quantity,
           unitPrice: packageItem.unitPrice,
@@ -271,6 +274,7 @@ const { qtyFormat } = config
         item = {
           inventoryConsumableFK: inventoryConsumable.id,
           // unitOfMeasurement:,
+          isActive: inventoryConsumable.isActive,
           quantity: packageItem.quantity,
           unitPrice: packageItem.unitPrice,
           totalPrice: packageItem.unitPrice * packageItem.quantity,

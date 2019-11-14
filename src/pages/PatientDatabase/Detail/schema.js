@@ -137,7 +137,7 @@ const schemaDemographic = {
     then: Yup.string().required(),
   }),
   referredByPatientFK: Yup.number().when('referredBy', {
-    is: 'Patient',
+    is: (value) => value === 'Patient',
     then: Yup.number().required(),
   }),
   // dialect: Yup.string().required(),
