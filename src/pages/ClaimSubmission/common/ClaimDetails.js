@@ -52,7 +52,10 @@ const styles = (theme) => ({
         if (o.isSelected) diagnosisOptions.push(o.id)
       })
     }
-    console.log(diagnosisOptions)
+
+    if (diagnosis.length === diagnosisOptions.length) {
+      diagnosisOptions.push(-99)
+    }
 
     return {
       ...returnValue,
@@ -101,7 +104,6 @@ class ClaimDetails extends Component {
         o.isSelected = false
       }
     })
-    console.log(values.diagnosis)
     dispatch({
       type: 'claimSubmission/updateState',
       payload: {
@@ -139,9 +141,9 @@ class ClaimDetails extends Component {
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
-    let patientNameLabel = `${patientName} (${patientGender
-      ? patientGender.code
-      : ''}/${age})`
+    // let patientNameLabel = `${patientName} (${patientGender
+    //   ? patientGender.code
+    //   : ''}/${age})`
 
     return (
       <SizeContainer size='md'>
@@ -169,10 +171,11 @@ class ClaimDetails extends Component {
                 />
               </GridItem>
               <GridItem md={12}>
-                <TextField
-                  value={patientNameLabel}
-                  disabled
-                  label='Patient Name'
+                <FastField
+                  name='patientName'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Patient Name' />
+                  )}
                 />
               </GridItem>
             </GridItem>
