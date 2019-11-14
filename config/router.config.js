@@ -13,16 +13,16 @@ const routes = [
   //
   // login
   {
-    path: '/login',
+    path: '/user',
     component: '../layouts/LandingLayout',
     routes: [
       {
-        path: '/login',
+        path: '/user/login',
         component: './NewLogin',
         hideInMenu: true,
       },
       {
-        path: '/login/forgotpassword',
+        path: '/user/forgotpassword',
         component: './ForgotPassword',
         hideInMenu: true,
       },

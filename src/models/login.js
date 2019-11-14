@@ -50,7 +50,7 @@ export default createFormViewModel({
         sessionStorage.clear()
         reloadAuthorized()
 
-        yield put(routerRedux.push({ pathname: '/login' }))
+        yield put(routerRedux.push({ pathname: '/user/login' }))
 
         // const redirect =
         //   routing.location.pathname !== '/login'
