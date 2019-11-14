@@ -3,10 +3,10 @@ import React from 'react'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Search from '@material-ui/icons/Search'
+import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 // common components
 import {
-  Button,
   DatePicker,
   GridContainer,
   GridItem,
@@ -62,8 +62,7 @@ const BaseSearchBar = ({
           <GridItem md={6} className={classes.searchButton}>
             <ProgressButton
               color='primary'
-              text='Search'
-              icon={null}
+              icon={<Search />}
               onClick={() => {
                 const { patientName, patientAccountNo, invoiceNo } = values
                 dispatch({
@@ -102,7 +101,9 @@ const BaseSearchBar = ({
               //     },
               //   })
               // }}
-            />
+            >
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
           </GridItem>
         </GridItem>
         <GridItem container md={4}>

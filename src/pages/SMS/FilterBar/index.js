@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
 import moment from 'moment'
-import { GridContainer, GridItem, Button } from '@/components'
+import { GridContainer, GridItem, ProgressButton } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
@@ -55,10 +55,14 @@ const FilterBar = ({
       </GridContainer>
       <GridItem xs={12}>
         <div className={classes.filterBtn}>
-          <Button variant='contained' color='primary' onClick={handleSubmit}>
-            <Search />
+          <ProgressButton
+            icon={<Search />}
+            variant='contained'
+            color='primary'
+            onClick={handleSubmit}
+          >
             <FormattedMessage id='sms.search' />
-          </Button>
+          </ProgressButton>
         </div>
       </GridItem>
     </div>

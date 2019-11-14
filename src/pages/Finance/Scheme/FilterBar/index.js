@@ -29,7 +29,7 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
+const FilterBar = ({ classes, dispatch, history, values }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -108,6 +108,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
             <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               onClick={() => {
@@ -132,7 +133,6 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                 })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
             </ProgressButton>
 

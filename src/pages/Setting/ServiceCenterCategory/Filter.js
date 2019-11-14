@@ -1,13 +1,12 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
-  Button,
   TextField,
-  Select,
   ProgressButton,
 } from '@/components'
 
@@ -37,7 +36,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue } = this.props.values
                   this.props.dispatch({

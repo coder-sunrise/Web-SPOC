@@ -9,7 +9,7 @@ import { Search, Replay, AddBox } from '@material-ui/icons'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withFormik, FastField } from 'formik'
 
-import { DatePicker, Select } from '@/components'
+import { DatePicker, Select, ProgressButton } from '@/components'
 
 const styles = {
   addNewBtn: {
@@ -110,15 +110,15 @@ class SearchBar extends PureComponent {
         </GridItem>
         <GridItem xs={12} sm={12} md={9}>
           <div className={classes.deButtonContainer}>
-            <Button
+            <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               type='submit'
               onClick={handleSubmit}
             >
-              <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
             <Button variant='contained' type='reset'>
               <Replay />
               <FormattedMessage id='form.reset' />
