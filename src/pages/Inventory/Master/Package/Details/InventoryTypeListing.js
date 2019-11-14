@@ -517,7 +517,8 @@ const InventoryTypeListing = ({
   const calSubtotal = (e) => {
     const { row } = e
     const { unitPrice, quantity } = row
-    row.subTotal = unitPrice * quantity
+
+    if (unitPrice && quantity) row.subTotal = unitPrice * quantity
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {
@@ -531,17 +532,17 @@ const InventoryTypeListing = ({
         serviceName,
       } = newRow
 
-      const total = () => {
-        if (quantity && unitPrice) {
-          return quantity * unitPrice
-        }
-        return 0.0
-      }
+      // const total = () => {
+      //   if (quantity && unitPrice) {
+      //     return quantity * unitPrice
+      //   }
+      //   return 0.0
+      // }
       if (type === 'service') {
         if (serviceCenterServiceFK && serviceName) {
           const returnRow = addedRows.map((row) => ({
             ...row,
-            subTotal: total(),
+            // subTotal: total(),
           }))
           return returnRow
         }
@@ -549,14 +550,14 @@ const InventoryTypeListing = ({
         return addedRows.map((row) => ({
           ...row,
           unitPrice: undefined,
-          subTotal: total(),
+          // subTotal: total(),
         }))
       }
 
       if (selectedItem) {
         return addedRows.map((row) => ({
           ...row,
-          subTotal: total(),
+          // subTotal: total(),
         }))
       }
     }
