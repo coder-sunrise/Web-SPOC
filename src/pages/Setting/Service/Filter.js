@@ -1,9 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, PermIdentity } from '@material-ui/icons'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { standardRowHeight } from 'mui-pro-jss'
-import { getAppendUrl } from '@/utils/utils'
 import { status } from '@/utils/codes'
 
 import {
@@ -11,7 +10,6 @@ import {
   GridItem,
   Button,
   TextField,
-  Checkbox,
   CodeSelect,
   Select,
   ProgressButton,
@@ -81,7 +79,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const {
                     codeDisplayValue,
@@ -119,6 +117,7 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

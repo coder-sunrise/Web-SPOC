@@ -1,14 +1,12 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
-import { status } from '@/utils/codes'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import {
   withFormikExtend,
   FastField,
   GridContainer,
   GridItem,
   Button,
-  TextField,
-  Checkbox,
   CodeSelect,
   Select,
   DatePicker,
@@ -83,7 +81,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   this.props.dispatch({
                     type: 'settingRoomBlock/query',
@@ -106,6 +104,7 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>
