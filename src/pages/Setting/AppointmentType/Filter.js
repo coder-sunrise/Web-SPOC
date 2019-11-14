@@ -1,6 +1,7 @@
 import React from 'react'
 // umi locale
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 // formik
 import { FastField } from 'formik'
 // common components
@@ -50,7 +51,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
         <GridItem>
           <ProgressButton
             color='primary'
-            icon={null}
+            icon={<Search />}
             onClick={() => {
               const { codeDisplayValue, isActive } = values
               dispatch({
@@ -71,6 +72,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
             <FormattedMessage id='form.search' />
           </ProgressButton>
           <Button color='primary' onClick={handleAddNew}>
+            <Add />
             Add New
           </Button>
         </GridItem>

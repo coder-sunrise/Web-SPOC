@@ -1,6 +1,7 @@
 import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { Search } from '@material-ui/icons'
 // common components
 import {
   Button,
@@ -34,7 +35,10 @@ const AccessRight = ({ classes }) => {
         />
       </GridItem>
       <GridItem>
-        <Button color='primary'>Search</Button>
+        <Button color='primary'>
+          <Search />
+          Search
+        </Button>
       </GridItem>
       <GridItem md={12}>
         <CommonTableGrid2 rows={[]} columns={columns} />

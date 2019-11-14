@@ -12,9 +12,9 @@ export default {
   'vitalsign.heightCM': 'heightCM',
   'vitalsign.bmi': 'bmi',
 
-  'referral.referralPersonFK': 'referralPersonFK',
+  'referral.referralPersonFK': 'referralBy',
   'referral.referralDate': 'referralDate',
-  'referral.referralCompanyFK': 'referralCompanyFK',
+  'referral.referralCompanyFK': 'referralInstitution',
 
   'participant.participant': 'participant',
   'participant.participants': 'participants',
