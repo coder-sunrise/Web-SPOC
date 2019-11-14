@@ -29,45 +29,45 @@ export default createFormViewModel({
         itemGroupValueDtoRdoValue: 'all',
         patientMinCoPaymentAmountType: 'ExactAmount',
         overalCoPaymentValueType: 'ExactAmount',
-        patientMinCoPaymentAmount: 0.0,
-        // coverageMaxCap: 0.0,
+        patientMinCoPaymentAmount: 0,
+        // coverageMaxCap: 0,
         itemGroupMaxCapacityDto: {
           // consumableMaxCapacity: {
-          //   maxCapValue: 0.0,
+          //   maxCapValue: 0,
           // },
           // medicationMaxCapacity: {
-          //   maxCapValue: 0.0,
+          //   maxCapValue: 0,
           // },
           // vaccinationMaxCapacity: {
-          //   maxCapValue: 0.0,
+          //   maxCapValue: 0,
           // },
           // serviceMaxCapacity: {
-          //   maxCapValue: 0.0,
+          //   maxCapValue: 0,
           // },
           // packageMaxCapacity: {
-          //   maxCapValue: 0.0,
+          //   maxCapValue: 0,
           // },
         },
-        // overalCoPaymentValue: 0.0,
+        overalCoPaymentValue: 0,
         itemGroupValueDto: {
           // consumableGroupValue: {
-          //   itemGroupValue: 0.0,
+          //   itemGroupValue: 0,
           //   groupValueType: 'ExactAmount',
           // },
           // medicationGroupValue: {
-          //   itemGroupValue: 0.0,
+          //   itemGroupValue: 0,
           //   groupValueType: 'ExactAmount',
           // },
           // vaccinationGroupValue: {
-          //   itemGroupValue: 0.0,
+          //   itemGroupValue: 0,
           //   groupValueType: 'ExactAmount',
           // },
           // serviceGroupValue: {
-          //   itemGroupValue: 0.0,
+          //   itemGroupValue: 0,
           //   groupValueType: 'ExactAmount',
           // },
           // packageGroupValue: {
-          //   itemGroupValue: 0.0,
+          //   itemGroupValue: 0,
           //   groupValueType: 'ExactAmount',
           // },
         },
