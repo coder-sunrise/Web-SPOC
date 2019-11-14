@@ -10,12 +10,12 @@ import { extendFunc, toUTC, toLocal } from '@/utils/utils'
 import { control } from '@/components/Decorator'
 import {
   CustomInputWrapper,
-  BaseInput,
   CustomInput,
   dateFormat,
   dateFormatWithTime,
   dateFormatLong,
   dateFormatLongWithTime,
+  additionalShortcutFormats,
   serverDateTimeFormatFull,
 } from '@/components'
 
@@ -166,10 +166,10 @@ class AntdDateRangePicker extends PureComponent {
             ? // eslint-disable-next-line no-nested-ternary
               i === 0
               ? showTime
-                ? o.formatUTC()
+                ? o.formatUTC(false)
                 : o.set({ hour: 0, minute: 0, second: 0 }).formatUTC(false)
               : showTime
-                ? o.formatUTC()
+                ? o.formatUTC(false)
                 : o.set({ hour: 23, minute: 59, second: 59 }).formatUTC(false)
             : o
         })
@@ -284,7 +284,10 @@ class AntdDateRangePicker extends PureComponent {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
-          format={format}
+          format={[
+            format,
+            ...additionalShortcutFormats,
+          ]}
           value={this.state.value.map(
             (o, i) =>
               moment.isMoment(o)

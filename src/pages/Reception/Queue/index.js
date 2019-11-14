@@ -93,30 +93,28 @@ class Queue extends React.Component {
   componentWillMount = () => {
     const { dispatch, queueLog, history } = this.props
     const { location: { query } } = history
-    if (Object.keys(query).length === 0) {
-      const { sessionInfo } = queueLog
+    const { sessionInfo } = queueLog
+    dispatch({
+      type: `${modelKey}initState`,
+    })
+    // dispatch({
+    //   type: 'calendar/updateState',
+    //   payload: {
+    //     list: [],
+    //   },
+    // })
+    if (sessionInfo.id === '') {
       dispatch({
-        type: `${modelKey}initState`,
+        type: `${modelKey}getSessionInfo`,
       })
-      // dispatch({
-      //   type: 'calendar/updateState',
-      //   payload: {
-      //     list: [],
-      //   },
-      // })
-      if (sessionInfo.id === '') {
-        dispatch({
-          type: `${modelKey}getSessionInfo`,
-        })
-      } else {
-        dispatch({
-          type: `${modelKey}refresh`,
-        })
-      }
-      this._timer = setInterval(() => {
-        dispatch({ type: `${modelKey}refresh` })
-      }, 900000)
+    } else {
+      dispatch({
+        type: `${modelKey}refresh`,
+      })
     }
+    this._timer = setInterval(() => {
+      dispatch({ type: `${modelKey}refresh` })
+    }, 900000)
   }
 
   componentWillUnmount () {
@@ -179,15 +177,41 @@ class Queue extends React.Component {
     })
   }
 
-  toggleRegisterNewPatient = () => {
+  updateAppointmentLinking = (row, patientProfileFK) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'calendar/updateAppointmentLinking',
+      payload: {
+        id: row.id,
+        patientProfileFK,
+      },
+    }).then((response) => {
+      if (response) {
+        dispatch({
+          type: 'queueLog/refresh',
+        })
+      }
+    })
+  }
+
+  toggleRegisterNewPatient = (shouldRedirect = true, row = undefined) => {
+    if (row) {
+      this.props.dispatch({
+        type: 'patient/updateDefaultEntity',
+        payload: {
+          patientName: row.patientName,
+        },
+      })
+    }
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
-        callback: () => {
+        callback: (patientProfileFK) => {
           this.props.dispatch({
             type: 'patient/closePatientModal',
           })
-          this.redirectToVisitRegistration()
+          if (shouldRedirect) this.redirectToVisitRegistration()
+          if (row) this.updateAppointmentLinking(row, patientProfileFK)
         },
       },
     })
@@ -302,11 +326,6 @@ class Queue extends React.Component {
         patientID: patientSearchResult[0].id,
       })
     if (totalRecords > 1) {
-      this.props.history.push(
-        getAppendUrl({
-          v: Date.now(),
-        }),
-      )
       return this.setState({ showPatientSearch: true })
     }
     return this.toggleRegisterNewPatient()
@@ -350,6 +369,7 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
+
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}

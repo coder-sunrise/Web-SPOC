@@ -112,7 +112,7 @@ const Stock = ({
     <CardContainer
       hideHeader
       style={{
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         minHeight: 700,
         maxHeight: 700,
       }}

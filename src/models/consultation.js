@@ -30,7 +30,7 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
 
         if (
-          pathname.indexOf('/reception/queue/patientdashboard') === 0 &&
+          pathname.indexOf('/reception/queue/consultation') === 0 &&
           Number(query.cid)
         ) {
           dispatch({
@@ -39,6 +39,8 @@ export default createFormViewModel({
               version: Number(query.v) || undefined,
               consultationID: Number(query.cid),
               md: query.md2,
+              queueID: Number(query.qid) || 0,
+              patientID: Number(query.pid) || 0,
             },
           })
         }
@@ -46,7 +48,28 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        const { version, consultationID, md } = payload
+        const { queueID, patientID, version } = payload
+
+        let visit
+        if (queueID) {
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: queueID, version },
+          })
+          yield take('visitRegistration/query/@@end')
+          const visitRegistration = yield select((st) => st.visitRegistration)
+          visit = visitRegistration.entity.visit
+          if (!visit) return
+        }
+
+        yield put({
+          type: 'patient/query',
+          payload: { id: patientID || visit.patientProfileFK, version },
+        })
+
+        yield take('patient/query/@@end')
+
+        const { consultationID, md } = payload
         yield put({
           type: 'query',
           payload: {
@@ -55,16 +78,16 @@ export default createFormViewModel({
           },
         })
 
-        yield take('query/@@end')
-        if (md === 'cons') {
-          yield put({
-            type: 'global/updateState',
-            payload: {
-              fullscreen: true,
-              showConsultationPanel: true,
-            },
-          })
-        }
+        // yield take('query/@@end')
+        // if (md === 'cons') {
+        //   yield put({
+        //     type: 'global/updateState',
+        //     payload: {
+        //       fullscreen: true,
+        //       showConsultationPanel: true,
+        //     },
+        //   })
+        // }
       },
 
       *start ({ payload }, { call, put, select, take }) {
@@ -178,17 +201,17 @@ export default createFormViewModel({
         return response
       },
       *discard ({ payload }, { call, put }) {
-        if (!payload) {
-          yield put({ type: 'closeModal' })
-          return null
-        }
+        // if (!payload) {
+        //   yield put({ type: 'closeModal' })
+        //   return null
+        // }
         const response = yield call(service.remove, payload)
 
         if (response) {
           sendNotification('QueueListing', {
             message: `Consultation discarded`,
           })
-          yield put({ type: 'closeModal' })
+          // yield put({ type: 'closeModal', payload })
         }
         return response
       },
@@ -222,10 +245,10 @@ export default createFormViewModel({
       },
       *signOrder ({ payload }, { call, put }) {
         const response = yield call(service.signOrder, payload)
-        console.log(response)
         return response
       },
-      *closeModal ({ payload }, { call, put, take }) {
+      *closeModal ({ payload = { history: {} } }, { call, put, take }) {
+        const { history = {} } = payload
         yield put({
           type: 'global/updateAppState',
           payload: {
@@ -235,13 +258,14 @@ export default createFormViewModel({
           },
         })
         yield take('global/updateAppState/@@end')
-        yield put({
-          type: 'formik/updateState',
-          payload: {
-            ConsultationPage: undefined,
-            ConsultationDocumentList: undefined,
-          },
-        })
+        // yield put({
+        //   type: 'formik/updateState',
+        //   payload: {
+        //     ConsultationPage: undefined,
+        //     ConsultationDocumentList: undefined,
+        //   },
+        // })
+
         router.push('/reception/queue')
       },
       *queryDone ({ payload }, { call, put, select, take }) {
@@ -300,11 +324,13 @@ export default createFormViewModel({
         yield put({
           type: 'orders/updateState',
           payload: {
+            type: '1',
             rows: _.sortBy(oRows, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,
             })),
+            entity: undefined,
           },
         })
 

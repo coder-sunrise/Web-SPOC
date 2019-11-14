@@ -137,7 +137,7 @@ const schemaDemographic = {
     then: Yup.string().required(),
   }),
   referredByPatientFK: Yup.number().when('referredBy', {
-    is: 'Patient',
+    is: (value) => value === 'Patient',
     then: Yup.number().required(),
   }),
   // dialect: Yup.string().required(),
@@ -221,6 +221,7 @@ const schemaSchemes = {
         validRange: Yup.array().when('schemeTypeFK', {
           is: (val) => {
             const st = schemeTypes.find((o) => o.id === val)
+            if (!st) return false
             return (
               [
                 'MEDI500VISUT',

@@ -50,6 +50,10 @@ const styles = (theme) => ({
   },
 })
 
+const errorMessage = (v) => {
+  return `The value must between ${v} and 5.0`
+}
+
 @connect(({ printoutSetting, formik, global }) => ({
   printoutSetting,
   formik,
@@ -65,35 +69,31 @@ const styles = (theme) => ({
     }
   },
 
-  // markupMargin: Yup.number()
-  // .min(0, 'Markup Margin must between 0 and 999,999.9')
-  // .max(999999.9, 'Markup Margin must between 0 and 999,999.9'),
-
   validationSchema: Yup.object().shape({
     customLetterHeadHeight: Yup.number()
-      .min(0, 'The value must between 0 and 5')
-      .max(5, 'The value must between 0 and 5')
+      .min(0.1, errorMessage(0.1))
+      .max(5, errorMessage(0.1))
       .when('isDisplayCustomLetterHead', {
         is: (v) => v === true,
         then: Yup.number().required(),
       }),
     standardHeaderInfoHeight: Yup.number()
-      .min(0, 'The value must between 0 and 5')
-      .max(5, 'The value must between 0 and 5')
+      .min(0.1, errorMessage(0.1))
+      .max(5, errorMessage(0.1))
       .when('isDisplayStandardHeader', {
         is: (v) => v === true,
         then: Yup.number().required(),
       }),
     footerInfoHeight: Yup.number()
-      .min(0, 'The value must between 0 and 5')
-      .max(5, 'The value must between 0 and 5')
+      .min(0.1, errorMessage(0.1))
+      .max(5, errorMessage(0.1))
       .when('isDisplayFooterInfo', {
         is: (v) => v === true,
         then: Yup.number().required(),
       }),
     footerDisclaimerHeight: Yup.number()
-      .min(0, 'The value must between 0 and 5')
-      .max(5, 'The value must between 0 and 5')
+      .min(0.1, errorMessage(0.1))
+      .max(5, errorMessage(0.1))
       .when('isDisplayFooterInfoDisclaimer', {
         is: (v) => v === true,
         then: Yup.number().required(),
@@ -394,21 +394,23 @@ class printoutSetting extends PureComponent {
                 </GridItem>
               </GridContainer>
 
-              <GridContainer className={classes.verticalSpacing} />
-
-              <GridContainer className={classes.indentDisclaimer}>
+              <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={1}>
-                  <h4>Disclaimer</h4>
+                  <h4>
+                    <b>Disclaimer</b>
+                  </h4>
                 </GridItem>
                 <GridItem md={3}>
                   <FastField
                     name='isDisplayFooterInfoDisclaimer'
                     render={(args) => (
-                      <Switch style={{ marginTop: 0, left: -22 }} {...args} />
+                      <Switch style={{ marginTop: 0 }} {...args} />
                     )}
                   />
                 </GridItem>
               </GridContainer>
+
+              <GridContainer className={classes.indentDisclaimer} />
               <GridContainer className={classes.indent}>
                 <GridItem direction='column' md={6}>
                   <GridItem md={6}>

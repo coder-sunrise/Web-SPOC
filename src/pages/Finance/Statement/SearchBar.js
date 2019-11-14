@@ -10,7 +10,7 @@ import {
   MenuItem,
   MenuList,
 } from '@material-ui/core'
-import { Search } from '@material-ui/icons'
+import { Search, Add } from '@material-ui/icons'
 import moment from 'moment'
 import {
   GridContainer,
@@ -127,7 +127,14 @@ class SearchBar extends PureComponent {
             <FastField
               name='copayerFK'
               render={(args) => {
-                return <CodeSelect {...args} label='Company' code='ctCopayer' />
+                return (
+                  <CodeSelect
+                    {...args}
+                    label='Company'
+                    code='ctCopayer'
+                    labelField='displayValue'
+                  />
+                )
               }}
             />
           </GridItem>
@@ -225,6 +232,7 @@ class SearchBar extends PureComponent {
                 history.push('/finance/statement/newstatement')
               }}
             >
+              <Add />
               New Statement
             </Button>
           </GridItem>

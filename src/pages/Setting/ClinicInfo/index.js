@@ -147,6 +147,7 @@ class ClinicInfo extends PureComponent {
               render={(args) => (
                 <Select
                   {...args}
+                  allowClear={false}
                   label='Primary Clinician'
                   options={primaryClinician}
                   onChange={(option) =>

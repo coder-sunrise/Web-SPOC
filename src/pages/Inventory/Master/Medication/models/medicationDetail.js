@@ -31,11 +31,12 @@ export default createFormViewModel({
         medicationStock: [],
         isChasAcuteClaimable: true,
         isChasChronicClaimable: true,
+        prescriptionToDispenseConversion: 1.0,
       },
     },
-    subscriptions: ({ dispatch, history, searchField }) => {
+    subscriptions: ({ dispatch, history }) => {
       history.listen((loct) => {
-        const { query = {} } = loct
+        const { pathname, query = {} } = loct
         if (query.uid) {
           dispatch({
             type: 'updateState',
@@ -43,23 +44,19 @@ export default createFormViewModel({
               currentId: query.uid,
             },
           })
-        } else {
+        }
+        if (
+          pathname === '/inventory/master/editmedication' ||
+          pathname === '/inventory/master/medication'
+        ) {
           dispatch({
-            type: 'updateState',
+            type: 'medicPrecautionList',
             payload: {
-              currentId: '',
-              entity: undefined,
-              sddCode: undefined,
-              sddDescription: undefined,
+              isActive: true,
+              pagesize: 999,
             },
           })
         }
-      })
-      dispatch({
-        type: 'medicPrecautionList',
-        payload: {
-          pagesize: 99999,
-        },
       })
     },
     effects: {
@@ -70,7 +67,7 @@ export default createFormViewModel({
         const response = yield call(queryMedicPrecaution, payload)
         yield put({
           type: 'getMedicPrecautionList',
-          payload: response.status == '200' ? response.data : {},
+          payload: response.status === '200' ? response.data : {},
         })
       },
     },
@@ -82,7 +79,7 @@ export default createFormViewModel({
           ctmedicationprecaution: data.map((x) => {
             return {
               medicationPrecautionFK: x.id,
-              value: x.name,
+              value: x.displayValue,
             }
           }),
         }

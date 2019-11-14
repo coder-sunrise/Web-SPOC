@@ -14,7 +14,7 @@ import {
   TextField,
   Tooltip,
 } from '@/components'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundToTwoDecimals, currencyFormatter } from '@/utils/utils'
 import styles from '../styles'
 
 const Deposit = ({
@@ -35,7 +35,7 @@ const Deposit = ({
       <p style={{ display: 'inline', marginLeft: 8 }}>
         Balance:&nbsp;
         <span style={{ color: 'darkblue', fontWeight: 500 }}>
-          $ {roundToTwoDecimals(maxAmount).toFixed(2)}
+          {currencyFormatter(maxAmount)}
         </span>
       </p>
       <Tooltip title='Delete payment' placement='top-end'>
@@ -64,7 +64,7 @@ const Deposit = ({
         </GridItem>
         <GridItem md={6}>
           <FastField
-            name={`paymentList[${index}].remarks`}
+            name={`paymentList[${index}].remark`}
             render={(args) => <TextField label='Remarks' {...args} />}
           />
         </GridItem>

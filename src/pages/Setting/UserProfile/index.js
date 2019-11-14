@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -13,6 +15,7 @@ import {
   CommonTableGrid,
   GridContainer,
   GridItem,
+  ProgressButton,
   Select,
   TextField,
   Tooltip,
@@ -50,7 +53,16 @@ class UserProfile extends React.Component {
 
   componentDidMount = () => {
     this.props.dispatch({
+      type: 'settingUserProfile/updateState',
+      payload: {
+        filter: undefined,
+      },
+    })
+    this.props.dispatch({
       type: 'settingUserProfile/query',
+      payload: {
+        isActive: this.props.values.status,
+      },
     })
   }
 
@@ -92,7 +104,7 @@ class UserProfile extends React.Component {
             combineCondition: 'or',
           },
         ],
-        current: 1,
+        // current: 1,
         isActive: values.status,
       },
     })
@@ -148,10 +160,15 @@ class UserProfile extends React.Component {
             />
           </GridItem>
           <GridItem md={12} className={classes.verticalSpacing}>
-            <Button color='primary' onClick={this.handleSearchClick}>
-              Search
-            </Button>
+            <ProgressButton
+              color='primary'
+              onClick={this.handleSearchClick}
+              icon={<Search />}
+            >
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
             <Button color='primary' onClick={this.openModal}>
+              <Add />
               Add New
             </Button>
           </GridItem>

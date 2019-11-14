@@ -49,6 +49,7 @@ export default ({ classes, current, setFieldValue }) => {
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
   }
+
   return (
     <div>
       {current.invoice ? (
@@ -57,7 +58,7 @@ export default ({ classes, current, setFieldValue }) => {
             <TextField
               prefix='Invoice No: '
               text
-              defaultValue={current.invoice.invoiceNo}
+              value={current.invoice.invoiceNo}
               noUnderline
             />
           </GridItem>
@@ -65,7 +66,7 @@ export default ({ classes, current, setFieldValue }) => {
             <DatePicker
               prefix='Invoice Date: '
               text
-              defaultValue={current.invoice.invoiceDate}
+              value={current.invoice.invoiceDate}
               noUnderline
             />
           </GridItem>
@@ -86,18 +87,6 @@ export default ({ classes, current, setFieldValue }) => {
         ]}
         FuncProps={{ pager: false }}
         columnExtensions={[
-          {
-            columnName: 'itemType',
-    
-            render: (row) => {
-              return (
-                <div>
-                  {row.itemType}
-                  {row.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
-                </div>
-              )
-            },
-          },
           { columnName: 'adjAmt', type: 'number', currency: true },
           {
             columnName: 'totalAfterItemAdjustment',
@@ -121,6 +110,7 @@ export default ({ classes, current, setFieldValue }) => {
               adjustedField: 'totalAfterOverallAdjustment',
             }}
             onValueChanged={(v) => {
+              // console.log('onValueChanged', v)
               if (setFieldValue) {
                 setFieldValue(
                   'current.invoice.invoiceTotalAftGST',

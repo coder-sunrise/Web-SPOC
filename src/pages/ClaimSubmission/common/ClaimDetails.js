@@ -3,6 +3,7 @@ import { connect } from 'dva'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common components
+import moment from 'moment'
 import {
   Button,
   DatePicker,
@@ -16,6 +17,7 @@ import {
   withFormikExtend,
   dateFormatLong,
   dateFormatLongWithTimeNoSec,
+  Field,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -42,7 +44,20 @@ const styles = (theme) => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ claimSubmission }) => {
-    return claimSubmission.entity || {}
+    const returnValue = claimSubmission.entity || {}
+    const { diagnosis } = returnValue
+    let diagnosisOptions = []
+    if (diagnosis) {
+      diagnosis.forEach((o) => {
+        if (o.isSelected) diagnosisOptions.push(o.id)
+      })
+    }
+    console.log(diagnosisOptions)
+
+    return {
+      ...returnValue,
+      diagnosisSelections: diagnosisOptions,
+    }
   },
 })
 class ClaimDetails extends Component {
@@ -74,6 +89,30 @@ class ClaimDetails extends Component {
     setFieldValue('diagnosis', val)
   }
 
+  save = () => {
+    const { dispatch, onConfirm, values } = this.props
+    const { diagnosisSelections } = values
+
+    values.diagnosis.forEach((o) => {
+      const selectedId = diagnosisSelections.find((i) => i === o.id)
+      if (selectedId) {
+        o.isSelected = true
+      } else {
+        o.isSelected = false
+      }
+    })
+    console.log(values.diagnosis)
+    dispatch({
+      type: 'claimSubmission/updateState',
+      payload: {
+        entity: {
+          ...values,
+        },
+      },
+    })
+    onConfirm()
+  }
+
   render () {
     const { readOnly } = true
     const {
@@ -88,7 +127,7 @@ class ClaimDetails extends Component {
     const { ctgender = [] } = codetable
     const {
       clinicianProfile: { title, name, doctorProfile },
-      patientDetail: { age, genderFK },
+      patientDetail: { dob, genderFK },
       patientName,
       // tier: maxDiagnosisSelectionCount,
       visitDate,
@@ -96,14 +135,13 @@ class ClaimDetails extends Component {
       invoiceDate,
       diagnosis,
     } = values
+    const age = moment().diff(dob, 'years')
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
     let patientNameLabel = `${patientName} (${patientGender
       ? patientGender.code
       : ''}/${age})`
-
-    const maxDiagnosisSelectionCount = 2
 
     return (
       <SizeContainer size='md'>
@@ -210,7 +248,7 @@ class ClaimDetails extends Component {
               <GridItem md={12} container>
                 <GridItem md={5}>
                   <FastField
-                    name='schemeType'
+                    name='schemeTypeDisplayValue'
                     render={(args) => (
                       <TextField {...args} disabled label='Scheme Type' />
                     )}
@@ -219,7 +257,7 @@ class ClaimDetails extends Component {
                 <GridItem md={7} />
                 <GridItem md={5}>
                   <FastField
-                    name='schemeCategory'
+                    name='schemeCategoryDisplayValue'
                     render={(args) => (
                       <TextField {...args} disabled label='Scheme Category' />
                     )}
@@ -236,45 +274,21 @@ class ClaimDetails extends Component {
                 </GridItem>
                 <GridItem md={4} />
                 <GridItem md={5}>
-                  {/* <FastField
-                    name='diagnosis'
+                  <Field
+                    name='diagnosisSelections'
                     render={(args) => (
                       <Select
+                        label='Diagnosis'
                         disabled={!allowEdit}
-                        maxSelected={maxDiagnosisSelectionCount}
                         mode='multiple'
-                        // options={[
-                        //   { name: 'Chief Complaints', value: '1' },
-                        //   { name: 'Plan', value: '2' },
-                        //   { name: 'Diagnosis', value: '3' },
-                        //   { name: 'Consultation Document', value: '4' },
-                        //   { name: 'Orders', value: '5' },
-                        //   { name: 'Invoice', value: '7' },
-                        // ]}
                         options={diagnosis}
-                        onChange={this.onSelectChange}
-                        maxTagCount={2}
+                        labelField='diagnosisDescription'
+                        valueField='id'
+                        maxTagCount={diagnosis.length > 0 ? 0 : 0}
+                        maxTagPlaceholder='diagnosis'
                         {...args}
                       />
                     )}
-                  /> */}
-
-                  <Select
-                    disabled={!allowEdit}
-                    maxSelected={maxDiagnosisSelectionCount}
-                    mode='multiple'
-                    options={diagnosis}
-                    // options={[
-                    //   { name: 'Chief Complaints', value: 1 },
-                    //   { name: 'Plan', value: 2 },
-                    //   { name: 'Diagnosis', value: 3 },
-                    //   { name: 'Consultation Document', value: 4 },
-                    //   { name: 'Orders', value: 5 },
-                    //   { name: 'Invoice', value: 7 },
-                    // ]}
-                    value={[]}
-                    onChange={this.onSelectChange}
-                    maxTagCount={2}
                   />
                 </GridItem>
                 <GridItem md={7} />
@@ -300,7 +314,7 @@ class ClaimDetails extends Component {
                 Close
               </Button>
               {allowEdit ? (
-                <Button color='primary' onClick={onConfirm}>
+                <Button color='primary' onClick={this.save}>
                   Save
                 </Button>
               ) : (

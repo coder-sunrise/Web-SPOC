@@ -17,7 +17,8 @@ const styles = () => ({
     textAlign: 'center',
     marginLeft: '5px',
     marginRight: '5px',
-    width: '110px',
+    width: 100,
+    minWidth: 'auto',
     '& button': {
       borderRadius: '0px !important',
       borderBottomRightRadius: '4px !important',
@@ -239,9 +240,9 @@ const StatusFilterButton = ({
   )
 }
 
-const ConnectedStatusFilterButton = connect(({ queueLog, calendar }) => ({
+const ConnectedStatusFilterButton = connect(({ queueLog }) => ({
   queueLog,
-  appointments: calendar.list || [],
+  appointments: queueLog.appointmentList || [],
 }))(StatusFilterButton)
 
 export default memo(withStyles(styles)(ConnectedStatusFilterButton))

@@ -4,7 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingMedicationDosage',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Medication Dosage updated',
+      code: 'ctmedicationdosage',
+    },
+  },
   param: {
     service,
     state: {

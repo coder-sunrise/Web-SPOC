@@ -155,6 +155,7 @@ class Grid extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
           maxWidth='sm'
+          observe='Deposit'
           showFooter={false}
           bodyNoPadding
         >

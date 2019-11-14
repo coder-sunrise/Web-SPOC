@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Field, FastField } from 'formik'
+import _ from 'lodash'
 import { Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
@@ -18,6 +19,9 @@ import {
   Select,
   ButtonSelect,
 } from '@/components'
+import { fetchAndSaveCodeTable } from '@/utils/codes'
+import { queryList } from '@/services/common'
+import { DiagnosisSelect } from '@/components/_medisys'
 
 const filterOptions = [
   {
@@ -50,42 +54,20 @@ const DiagnosisItem = ({
   ] = useState(false)
 
   const [
-    removeConfirmMessage,
-    setRemoveConfirmMessage,
-  ] = useState('Confirm to remove a diagnosis?')
-  const [
     ctComplicationPairedWithDiag,
     setCtComplicationPairedWithDiag,
   ] = useState([])
 
+  const [
+    showPersistMsg,
+    setShowPersistMsg,
+  ] = useState(false)
+
   const { form } = arrayHelpers
 
-  useEffect(() => {
-    try {
-      if (
-        form.values.corDiagnosis[index] &&
-        form.values.corDiagnosis[index].diagnosisFK
-      ) {
-        const { diagnosisFK } = form.values.corDiagnosis[index]
-        const ctsnomeddiagnosis = codetable['codetable/ctsnomeddiagnosis'] || []
-        // const { ctcomplication } = codetable
-        const diagnosis = ctsnomeddiagnosis.find(
-          (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
-        )
-        if (diagnosis) {
-          setCtComplicationPairedWithDiag(diagnosis.complication || [])
-        }
-      }
-    } catch (error) {
-      console.log({ error })
-    }
-  }, [])
-
-  const onDiagnosisChange = async (v, op) => {
+  const onDiagnosisChange = (v, op) => {
     const { setFieldValue } = form
     if (op) {
-      // setFieldValue(`corDiagnosis[${index}]_complication`, op.complication)
-
       setFieldValue(
         `corDiagnosis[${index}]diagnosisDescription`,
         op.displayvalue,
@@ -102,77 +84,49 @@ const DiagnosisItem = ({
       }
     }
   }
-
-  const [
-    diagnosisFilter,
-    setDiagnosisFilter,
-  ] = useState(filterOptions.map((o) => o.value))
-  // console.log(diagnosisFilter)
+  const onDataSouceChange = (data) => {
+    if (
+      form.values.corDiagnosis[index] &&
+      form.values.corDiagnosis[index].diagnosisFK
+    ) {
+      const { diagnosisFK } = form.values.corDiagnosis[index]
+      const ctsnomeddiagnosis = data || []
+      // const { ctcomplication } = codetable
+      const diagnosis = ctsnomeddiagnosis.find(
+        (item) => parseInt(item.id, 10) === parseInt(diagnosisFK, 10),
+      )
+      if (diagnosis) {
+        setCtComplicationPairedWithDiag(diagnosis.complication || [])
+      }
+    }
+  }
   return (
     <React.Fragment>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={6} style={{ position: 'relative' }}>
+        <GridItem xs={6}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
-              <CodeSelect
-                label='Diagnosis'
-                code='codetable/ctsnomeddiagnosis'
-                remoteFilter={{
-                  props:
-                    'id,displayvalue,code,complication,isChasAcuteClaimable,isChasChronicClaimable,isHazeClaimable',
-                  sorting: [
-                    { columnName: 'displayvalue', direction: 'asc' },
-                  ],
-                }}
-                localFilter={(row) => {
-                  if (diagnosisFilter.length === 0) return true
-                  for (let i = 0; i < diagnosisFilter.length; i++) {
-                    const df = diagnosisFilter[i]
-                    if (row[df]) return true
-                  }
-                  return false
-                }}
-                labelField='displayvalue'
-                autoComplete
-                renderDropdown={(option) => {
-                  const {
-                    isChasAcuteClaimable,
-                    isChasChronicClaimable,
-                    isHazeClaimable,
-                  } = option
-                  return (
-                    <span>
-                      {(isChasAcuteClaimable ||
-                        isChasChronicClaimable ||
-                        isHazeClaimable) && (
-                        <AttachMoney className={classes.money} />
-                      )}
-
-                      {option.displayvalue}
-                    </span>
-                  )
-                }}
+              <DiagnosisSelect
                 onChange={onDiagnosisChange}
+                onDataSouceChange={onDataSouceChange}
                 {...args}
               />
             )}
           />
-          <ButtonSelect
-            options={filterOptions}
-            mode='multiple'
-            textField='name'
-            valueField='value'
-            value={diagnosisFilter}
-            justIcon
-            style={{ position: 'absolute', bottom: 2, right: -35 }}
-            onChange={(v, option) => {
-              if (v !== diagnosisFilter) setDiagnosisFilter(v)
-            }}
-          >
-            <FilterList />
-          </ButtonSelect>
         </GridItem>
+        {/* <GridItem xs={6}>
+          {form.values && (
+            <DiagnosisSelect
+              mode='multiple'
+              value={[
+                form.values.corDiagnosis[index].diagnosisFK,
+              ]}
+              onChange={onDiagnosisChange}
+              onDataSouceChange={onDataSouceChange}
+            />
+          )}
+        </GridItem> */}
         <GridItem xs={12}>
           <Field
             name={`corDiagnosis[${index}].complication`}
@@ -237,13 +191,39 @@ const DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={6}>
+        <GridItem xs={1}>
           <FastField
             name={`corDiagnosis[${index}].isPersist`}
             render={(args) => {
-              return <Checkbox inputLabel='Persist' {...args} />
+              return (
+                <Checkbox
+                  inputLabel='Persist'
+                  {...args}
+                  onChange={({ target }) => {
+                    if (
+                      target.value === false &&
+                      !form.values.corDiagnosis[index].isNew
+                    ) {
+                      setShowPersistMsg(true)
+                    } else {
+                      setShowPersistMsg(false)
+                    }
+                  }}
+                />
+              )
             }}
           />
+        </GridItem>
+        <GridItem style={{ alignItems: 'center', display: 'flex' }} xs={5}>
+          <React.Fragment>
+            {showPersistMsg === true ? (
+              <div>
+                Diagnosis will be removed from patient's medical problem
+              </div>
+            ) : (
+              ''
+            )}
+          </React.Fragment>
         </GridItem>
         <GridItem xs={11}>
           <FastField
@@ -258,9 +238,17 @@ const DiagnosisItem = ({
         <GridItem xs={1} style={{ position: 'relative' }}>
           <Popover
             content={
-              <div>
+              <div
+                style={{
+                  width:
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].isPersist
+                      ? '180px'
+                      : '340px',
+                }}
+              >
                 <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
-                  {removeConfirmMessage}
+                  Remove diagnosis?
                 </p>
                 <Button
                   onClick={() => {
@@ -277,10 +265,19 @@ const DiagnosisItem = ({
                     // arrayHelpers.remove(index)
                   }}
                 >
-                  Remove Current Visit
+                  {form.values.corDiagnosis[index].isNew === true ||
+                  !form.values.corDiagnosis[index].isPersist ? (
+                    'Confirm'
+                  ) : (
+                    'Current Visit'
+                  )}
                 </Button>
                 <Button
                   color='primary'
+                  hidden={
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].isPersist
+                  }
                   onClick={() => {
                     // arrayHelpers.remove(index)
                     form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
@@ -290,7 +287,7 @@ const DiagnosisItem = ({
                     )
                   }}
                 >
-                  Remove Permanently
+                  Permanently
                 </Button>
               </div>
             }
@@ -306,19 +303,6 @@ const DiagnosisItem = ({
                 justIcon
                 color='danger'
                 size='sm'
-                onClick={() => {
-                  let diagnosis = form.values.corDiagnosis[index]
-                  if (diagnosis && diagnosis.diagnosisFK >= 0) {
-                    setRemoveConfirmMessage(
-                      `Confirm to remove a ${diagnosis.isPersist === true
-                        ? 'persist'
-                        : ''} diagnosis?`,
-                    )
-                  } else {
-                    setRemoveConfirmMessage('Remove diagnosis?')
-                  }
-                  setShow(true)
-                }}
               >
                 <DeleteIcon />
               </Button>

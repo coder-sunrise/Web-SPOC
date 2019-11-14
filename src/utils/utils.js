@@ -412,7 +412,7 @@ const convertToQuery = (
 
   // console.log(query)
   let newQuery = {}
-  const refilter = /(.*?)_([^!_]*)!?([^_]*)_?([^_]*)\b/
+  const refilter = /\b([^_]{0,6}(?=_))?_?(.*)\b/
   newQuery.columnCriteria = []
   newQuery.conditionGroups = []
   // //console.log('convert to query')
@@ -431,18 +431,10 @@ const convertToQuery = (
           val = val.trim()
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
-            let s = ''
-            match[2].split('$').forEach((item) => {
-              s += `${item}.`
-            })
-            match[2] = s.substring(0, s.length - 1)
-            const prop = match[3] || match[2]
-            const combineKey = prop.split('/')
-            // console.log(match)
             newQuery.columnCriteria.push({
-              prop: combineKey.length > 1 ? combineKey : prop,
+              prop: match[2],
               val,
-              opr: filterType[match[1]],
+              opr: filterType[match[1]] || filterType.like,
               // property: match[3] ? s.substring(0, s.length - 1) : null,
               // valueType: match[4] ? valueType[match[4]] : null,
             })
@@ -602,7 +594,7 @@ export const updateCellValue = (
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
-      if (value !== val) {
+      if (value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
       const r = validationSchema.validateSync(
@@ -617,7 +609,7 @@ export const updateCellValue = (
       return []
       // row._$error = false
     } catch (er) {
-      // console.log(er)
+      console.log(er)
       // window.g_app._store.dispatch({
       //   type: 'global/updateState',
       //   payload: {
@@ -635,7 +627,7 @@ export const updateCellValue = (
       return er.inner || []
       // row._$error = true
     }
-  } else if (value !== val) {
+  } else if (value !== val && onValueChange) {
     onValueChange(val)
   }
   return []
@@ -676,19 +668,31 @@ const confirmBeforeReload = (e) => {
 }
 
 const _checkCb = ({ redirectUrl, onProceed }, e) => {
+  if (onProceed) {
+    onProceed(e)
+  }
   if (redirectUrl) {
     router.push(redirectUrl)
-  } else if (onProceed) {
-    onProceed(e)
   }
 }
 
-const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
-  e,
-) => {
-  // console.log(restProps)
+const navigateDirtyCheck = ({
+  onConfirm,
+  displayName,
+  openConfirmContent,
+  ...restProps
+}) => (e) => {
+  // console.log(
+  //   onConfirm,
+  //   displayName,
+  //   restProps,
+  //   window.beforeReloadHandlerAdded,
+  //   window.dirtyForms,
+  // )
   if (window.beforeReloadHandlerAdded) {
+    let f = {}
     if (displayName) {
+      f = window.dirtyForms[displayName]
       const ob = window.g_app._store.getState().formik[displayName]
       if (ob && !ob.dirty) {
         return
@@ -699,9 +703,12 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: formatMessage({
-          id: 'app.general.leave-without-save',
-        }),
+        openConfirmContent:
+          openConfirmContent ||
+          f.dirtyCheckMessage ||
+          formatMessage({
+            id: 'app.general.leave-without-save',
+          }),
         onConfirmSave: onConfirm,
         openConfirmText: onConfirm ? 'Save Changes' : 'Confirm',
         onConfirmDiscard: () => {
@@ -712,20 +719,27 @@ const navigateDirtyCheck = ({ onConfirm, displayName, ...restProps }) => (
                 [displayName]: undefined,
               },
             })
-            // delete window._localFormik[displayName]
+
+            if (f.onDirtyDiscard) f.onDirtyDiscard()
+            delete window.dirtyForms[displayName]
           } else {
-            window.dirtyForms.forEach((f) => {
+            Object.values(window.dirtyForms).forEach((f) => {
               window.g_app._store.dispatch({
                 type: 'formik/updateState',
                 payload: {
-                  [f]: undefined,
+                  [f.displayName]: undefined,
                 },
               })
+              if (f.onDirtyDiscard) f.onDirtyDiscard()
             })
+            window.dirtyForms = {}
             // delete window._localFormik[displayName]
           }
-          window.beforeReloadHandlerAdded = false
-          window.removeEventListener('beforeunload', confirmBeforeReload)
+          if (Object.values(window.dirtyForms).length === 0) {
+            window.beforeReloadHandlerAdded = false
+            window.removeEventListener('beforeunload', confirmBeforeReload)
+          }
+
           _checkCb(restProps, e)
         },
       },
@@ -743,6 +757,7 @@ const calculateAdjustAmount = (
   initialAmout = 0,
   adj = 0,
 ) => {
+  // console.log({ initialAmout, adj })
   let amount = initialAmout
   let adjAmount
   if (isExactAmount) {
@@ -851,7 +866,18 @@ const getRefreshChasBalanceStatus = (status = []) => {
   }
 
   const successCode = 'SC100'
+  const fullBalanceSuccessCode = 'SC105'
   const { statusCode, statusDescription } = status[0]
+
+  if (
+    statusCode.trim().toLowerCase() ===
+    fullBalanceSuccessCode.trim().toLowerCase()
+  ) {
+    return {
+      ...defaultResponse,
+      isSuccessful: true,
+    }
+  }
 
   if (statusCode.trim().toLowerCase() !== successCode.trim().toLowerCase()) {
     return {
@@ -883,11 +909,14 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total
+    r.weightage = r[totalField] / total || 0
     r[adjustedField] = r[totalField]
 
     // console.log(r)
   })
+  if (total === 0 && activeRows[0]) {
+    activeRows[0].weightage = 1
+  }
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
     activeRows.forEach((o) => {
       o.subAdjustment = 0
@@ -905,14 +934,19 @@ const calculateAmount = (
   const totalAfterAdj = roundToTwoDecimals(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
+  // console.log('after calculate totalAfterAdj', {
+  //   activeRows,
+  //   mapped: activeRows.map((o) => o[adjustedField]),
+  // })
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
-    notification.error({
-      message: 'Could not load GST Setting',
-    })
+    // notification.error({
+    //   message: 'Could not load GST Setting',
+    // })
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
+
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
@@ -921,10 +955,8 @@ const calculateAmount = (
     } else {
       gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
-        r[gstAmtField] = roundToTwoDecimals(r[totalField] * gSTPercentage)
-        r[gstField] = roundToTwoDecimals(
-          r[totalField] * (1 + gSTPercentage) + r.subAdjustment,
-        )
+        r[gstAmtField] = roundToTwoDecimals(r[adjustedField] * gSTPercentage)
+        r[gstField] = roundToTwoDecimals(r[adjustedField] * (1 + gSTPercentage))
       })
     }
   }
@@ -969,6 +1001,9 @@ const removeFields = (obj, fields = []) => {
     })
   }
 }
+
+export const currencyFormatter = (value) =>
+  numeral(value).format(`$${config.currencyFormat}`)
 
 module.exports = {
   ...cdrssUtil,

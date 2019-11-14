@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react'
+import React from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, Add, Print, Edit } from '@material-ui/icons'
+import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import { compose } from 'redux'
+import { status } from '@/utils/codes'
 
 import {
   GridContainer,
@@ -14,6 +14,7 @@ import {
   Button,
   TextField,
   DateRangePicker,
+  ProgressButton,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -35,7 +36,7 @@ const FilterBar = (props) => {
     const { setFieldValue } = props
     setFieldValue(name, value)
   }
-  const { classes, theme, values, history } = props
+  const { classes, values, history } = props
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -95,7 +96,8 @@ const FilterBar = (props) => {
         </GridItem>
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
+            <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               onClick={() => {
@@ -104,9 +106,8 @@ const FilterBar = (props) => {
                 // })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
             <Button
               variant='contained'
               color='primary'

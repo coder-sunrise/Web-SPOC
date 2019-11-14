@@ -4,18 +4,14 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, PermIdentity } from '@material-ui/icons'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { getAppendUrl } from '@/utils/utils'
-
 import {
   GridContainer,
   GridItem,
-  Select,
   Button,
   TextField,
-  NumberField,
   Checkbox,
-  DatePicker,
   DateRangePicker,
+  ProgressButton,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -105,7 +101,8 @@ class FilterBar extends PureComponent {
 
           <GridItem xs={12} md={12}>
             <div className={classes.filterBtn}>
-              <Button
+              <ProgressButton
+                icon={null}
                 variant='contained'
                 color='primary'
                 onClick={() => {
@@ -144,7 +141,7 @@ class FilterBar extends PureComponent {
               >
                 <Search />
                 <FormattedMessage id='form.search' />
-              </Button>
+              </ProgressButton>
 
               <Button
                 variant='contained'
@@ -157,6 +154,7 @@ class FilterBar extends PureComponent {
                         this.props.dispatch({
                           type: 'patient/closePatientModal',
                         })
+                        queryDepositListing()
                       },
                     },
                   })

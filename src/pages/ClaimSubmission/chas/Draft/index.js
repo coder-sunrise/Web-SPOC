@@ -6,6 +6,7 @@ import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 // common components
 import NearMe from '@material-ui/icons/NearMe'
+import { Progress } from 'antd'
 import {
   ProgressButton,
   GridContainer,
@@ -16,12 +17,7 @@ import {
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 // variables
-import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  TableConfig,
-} from './variables'
-import { Progress } from 'antd'
+import { DraftCHASColumnExtensions, DraftCHASColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -87,12 +83,20 @@ class DraftCHAS extends React.Component {
           <GridItem md={12}>
             <TableGrid
               data={list}
-              columnExtensions={NewCHASColumnExtensions}
-              columns={NewCHASColumns}
-              tableConfig={TableConfig}
+              columnExtensions={DraftCHASColumnExtensions}
+              columns={DraftCHASColumns}
+              // tableConfig={TableConfig}
+              // FuncProps={{
+              //   selectable: false,
+              //   selectConfig: {
+              //     showSelectAll: true,
+              //     rowSelectionEnabled: () => true,
+              //   },
+              // }}
               onContextMenuItemClick={handleContextMenuItemClick}
               contextMenuOptions={overrideContextMenuOptions}
               isDraft
+              type='draft'
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>

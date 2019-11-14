@@ -1,10 +1,12 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import moment from 'moment'
 // common components
 import {
-  Button,
+  ProgressButton,
   DateRangePicker,
   GridContainer,
   GridItem,
@@ -12,10 +14,66 @@ import {
   TextField,
   Select,
 } from '@/components'
-
-import { osBalanceStatus } from '@/utils/codes'
+import { getBizSession } from '@/services/queue'
+import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
+  const getBizSessionId = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    if (data.length > 0) {
+      return data[0].id
+    }
+    return null
+  }
+
+  const onSearchClick = async () => {
+    const {
+      invoiceNo,
+      patientName,
+      patientAccountNo,
+      invoiceDates,
+      outstandingBalanceStatus,
+      session,
+    } = values
+    let SessionID
+    if (session === 'current') {
+      SessionID = await getBizSessionId()
+    }
+    dispatch({
+      type: 'invoiceList/query',
+      payload: {
+        // combineCondition: 'and',
+        lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
+        lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
+        lgt_OutstandingBalance:
+          outstandingBalanceStatus === 'yes' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
+        lsteql_OutstandingBalance:
+          outstandingBalanceStatus === 'no' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
+        apiCriteria: {
+          SessionID,
+        },
+        group: [
+          {
+            invoiceNo,
+            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+            'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+            combineCondition: 'and',
+          },
+        ],
+      },
+    })
+  }
+
   return (
     <SizeContainer>
       <React.Fragment>
@@ -34,6 +92,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <DateRangePicker
                     label='Invoice Date From'
                     label2='Invoice Date To'
+                    allowClear={false}
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     {...args}
                   />
@@ -71,51 +130,24 @@ const FilterBar = ({ classes, dispatch, values }) => {
               render={(args) => <TextField label='Patient Name' {...args} />}
             />
           </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='session'
+              render={(args) => (
+                <Select label='Session' options={sessionOptions} {...args} />
+              )}
+            />
+          </GridItem>
         </GridContainer>
+
         <div className={classes.searchButton}>
-          <Button
+          <ProgressButton
             color='primary'
-            onClick={() => {
-              const {
-                invoiceNo,
-                patientName,
-                patientAccountNo,
-                invoiceDates,
-                outstandingBalanceStatus,
-              } = values
-              dispatch({
-                type: 'invoiceList/query',
-                payload: {
-                  lgteql_invoiceDate: invoiceDates
-                    ? invoiceDates[0]
-                    : undefined,
-                  lsteql_invoiceDate: invoiceDates
-                    ? invoiceDates[1]
-                    : undefined,
-                  lgt_OutstandingBalance:
-                    outstandingBalanceStatus === 'yes' &&
-                    outstandingBalanceStatus !== 'all'
-                      ? '0'
-                      : undefined,
-                  lsteql_OutstandingBalance:
-                    outstandingBalanceStatus === 'no' &&
-                    outstandingBalanceStatus !== 'all'
-                      ? '0'
-                      : undefined,
-                  group: [
-                    {
-                      invoiceNo,
-                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
-                      'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-                      combineCondition: 'or',
-                    },
-                  ],
-                },
-              })
-            }}
+            icon={<Search />}
+            onClick={onSearchClick}
           >
-            Search
-          </Button>
+            <FormattedMessage id='form.search' />
+          </ProgressButton>
           {/* <i>Double click on record to view invoice</i> */}
         </div>
       </React.Fragment>

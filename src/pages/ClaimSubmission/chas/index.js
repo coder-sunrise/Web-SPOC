@@ -6,6 +6,11 @@ import { CommonModal, Tabs } from '@/components'
 import ClaimDetails from '../common/ClaimDetails'
 import SubmitClaimStatus from '../common/SubmitClaimStatus'
 import { ClaimSubmissionChasTabOption } from './variables'
+import Draft from './Draft'
+import New from './New'
+import Submitted from './Submitted'
+import Approved from './Approved'
+import Rejected from './Rejected'
 
 @connect(({ claimSubmission, global }) => ({
   claimSubmission,
@@ -27,12 +32,32 @@ class CHAS extends React.Component {
   openSubmitClaimStatus = (count) =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
-  closeClaimDetails = () =>
+  closeClaimDetailsModal = () => {
     this.setState({
       showClaimDetails: false,
       claimDetails: {},
       allowEdit: false,
     })
+  }
+
+  closeClaimDetails = () => {
+    this.closeClaimDetailsModal()
+  }
+
+  saveClaimDetails = () => {
+    if (!this.state.allowEdit) return this.closeClaimDetailsModal()
+    const { claimSubmission, dispatch } = this.props
+    const { entity } = claimSubmission
+    dispatch({
+      type: 'claimSubmissionNew/upsert',
+      payload: { ...entity },
+    }).then((r) => {
+      if (r) {
+        this.closeClaimDetailsModal()
+      }
+    })
+    return null
+  }
 
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
@@ -92,13 +117,61 @@ class CHAS extends React.Component {
 
     return (
       // <CardContainer hideHeader size='sm'>
-      <React.Fragment>
+      <div>
         <Tabs
           style={{ marginTop: 20 }}
           activeKey={activeTab}
           defaultActivekey='2'
           onChange={this.onChangeTab}
-          options={ClaimSubmissionChasTabOption(claimSubmissionActionProps)}
+          // options={ClaimSubmissionChasTabOption(claimSubmissionActionProps)}
+          options={[
+            {
+              id: 1,
+              name: 'Draft',
+              content: (
+                <Draft
+                  handleContextMenuItemClick={this.handleContextMenuItemClick}
+                />
+              ),
+            },
+            {
+              id: 2,
+              name: 'New',
+              content: (
+                <New
+                  handleSubmitClaimStatus={this.openSubmitClaimStatus}
+                  handleContextMenuItemClick={this.handleContextMenuItemClick}
+                />
+              ),
+            },
+            {
+              id: 3,
+              name: 'Submitted',
+              content: (
+                <Submitted
+                  handleContextMenuItemClick={this.handleContextMenuItemClick}
+                />
+              ),
+            },
+            {
+              id: 4,
+              name: 'Approved',
+              content: (
+                <Approved
+                  handleContextMenuItemClick={this.handleContextMenuItemClick}
+                />
+              ),
+            },
+            {
+              id: 5,
+              name: 'Rejected',
+              content: (
+                <Rejected
+                  handleContextMenuItemClick={this.handleContextMenuItemClick}
+                />
+              ),
+            },
+          ]}
         />
         {/* <NavPills
           active={1}
@@ -150,21 +223,21 @@ class CHAS extends React.Component {
           title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
-          onConfirm={this.closeClaimDetails}
+          onConfirm={this.saveClaimDetails}
         >
           <ClaimDetails claimDetails={claimDetails} allowEdit={allowEdit} />
         </CommonModal>
 
         <CommonModal
           title='Submit Claim Status'
-          maxWidth='xs'
+          maxWidth='sm'
           open={showSubmitClaimStatus}
           onClose={this.closeSubmitClaimStatus}
           onConfirm={this.closeSubmitClaimStatus}
         >
           <SubmitClaimStatus count={failedCount} />
         </CommonModal>
-      </React.Fragment>
+      </div>
       // </CardContainer>
     )
   }

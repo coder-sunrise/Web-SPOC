@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'dva'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
-import { Divider } from '@material-ui/core'
 import { FastField } from 'formik'
 import { compose } from 'redux'
 import { getBizSession } from '@/services/queue'
@@ -12,12 +10,10 @@ import {
   TextField,
   GridContainer,
   GridItem,
-  Select,
-  DatePicker,
-  Switch,
   DateRangePicker,
   dateFormatLong,
   CheckboxGroup,
+  Field,
 } from '@/components'
 
 const styles = () => ({})
@@ -33,10 +29,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    if (data && data.length > 0) {
-      const { isClinicSessionClosed } = data[0]
-      setHasActiveSession(!isClinicSessionClosed)
-    }
+    setHasActiveSession(data.length > 0)
   }
 
   useEffect(() => {
@@ -50,11 +43,12 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
       checkHasActiveSession()
     }
   }, [])
+
   return (
     <CardContainer
       hideHeader
       style={{
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         minHeight: 700,
         maxHeight: 700,
       }}
@@ -224,7 +218,7 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker

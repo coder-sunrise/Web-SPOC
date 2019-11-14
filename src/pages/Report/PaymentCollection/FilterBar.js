@@ -22,13 +22,13 @@ const FilterBar = ({ handleSubmit }) => {
           {/* 1st row  */}
           <GridItem md={2}>
             <FastField
-              name='listingFrom'
+              name='dateFrom'
               render={(args) => <DatePicker {...args} label='From' />}
             />
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='listingTo'
+              name='dateTo'
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
@@ -46,6 +46,8 @@ const FilterBar = ({ handleSubmit }) => {
                   {...args}
                   // code='ctcopayer,ctsupplier'
                   code='ctcopayer'
+                  labelField='displayValue'
+                  mode='multiple'
                   label='Company'
                 />
               )}
@@ -53,12 +55,15 @@ const FilterBar = ({ handleSubmit }) => {
           </GridItem>
           <GridItem md={2}>
             <FastField
-              name='paymentMode'
+              name='paymentModes'
               render={(args) => (
                 <CodeSelect
                   {...args}
-                  code='ctpaymentmode'
                   label='Payment Mode'
+                  mode='multiple'
+                  code='ctpaymentmode'
+                  labelField='displayValue'
+                  valueField='code'
                 />
               )}
             />
@@ -74,15 +79,15 @@ const FilterBar = ({ handleSubmit }) => {
                   label='Payer Type'
                   options={[
                     {
-                      value: '1',
+                      value: 'All',
                       label: 'All',
                     },
                     {
-                      value: '2',
+                      value: 'Company',
                       label: 'Company',
                     },
                     {
-                      value: '3',
+                      value: 'Patient',
                       label: 'Patient',
                     },
                   ]}
@@ -98,17 +103,18 @@ const FilterBar = ({ handleSubmit }) => {
                 <RadioGroup
                   {...args}
                   label='Group By'
+                  defaultValue='3'
                   options={[
                     {
-                      value: '1',
+                      value: 'PaymentMode',
                       label: 'Payment Mode',
                     },
                     {
-                      value: '2',
+                      value: 'Doctor',
                       label: 'Doctor',
                     },
                     {
-                      value: '3',
+                      value: 'None',
                       label: 'None',
                     },
                   ]}

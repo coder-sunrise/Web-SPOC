@@ -1,5 +1,5 @@
-import { queryNotices } from '@/services/api'
 import { createBasicModel } from 'medisys-model'
+import { queryNotices } from '@/services/api'
 import { notification } from '@/components'
 
 import config from '@/utils/config'
@@ -21,7 +21,7 @@ export default createBasicModel({
     effects: {},
     reducers: {
       clean (state, { payload }) {
-        window.beforeReloadHandlerAdded = false
+        // window.beforeReloadHandlerAdded = false
         return { ...state, [payload]: undefined }
       },
     },

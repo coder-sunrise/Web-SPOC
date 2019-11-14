@@ -310,11 +310,11 @@ class SystemSetting extends PureComponent {
       classes,
       height,
       user,
+      history,
       linkProps = {},
       onMenuClick = (p) => p,
       ...resetProps
     } = this.props
-    // console.log(this.props)
     const { accessRights = [] } = user
     return (
       <CardContainer hideHeader>
@@ -335,11 +335,13 @@ class SystemSetting extends PureComponent {
         <TextField
           prefix={<Search />}
           onChange={(e) => {
-            console.log(e.target)
-            this.setState({
-              searchText: e.target.value.toLowerCase(),
+            this.setState(() => {
+              return {
+                searchText: e.target.value.toLowerCase(),
+              }
             })
           }}
+          value={this.state.searchText}
         />
         <Accordion
           defaultActive={0}

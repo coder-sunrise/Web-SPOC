@@ -16,6 +16,7 @@ import {
   Field,
   GridContainer,
   GridItem,
+  ScribbleNoteItem,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
 import UploadAttachment from './UploadAttachment'
@@ -131,13 +132,13 @@ class ClinicalNotes extends Component {
   }
 
   resize = () => {
-    if (window.innerWidth >= 1812) {
+    if (window.innerWidth <= 1785) {
       this.setState({
-        width: window.innerWidth / 4,
+        width: window.innerWidth / 11,
       })
     } else {
       this.setState({
-        width: window.innerWidth / 7.8,
+        width: window.innerWidth / 5.8,
       })
     }
   }
@@ -323,6 +324,20 @@ class ClinicalNotes extends Component {
     })
   }
 
+  scribbleNoteUpdateState = (
+    categoryValue,
+    arrayNameValue,
+    categoryIndexValue,
+    selectedDataValue,
+  ) => {
+    this.setState({
+      category: categoryValue,
+      arrayName: arrayNameValue,
+      categoryIndex: categoryIndexValue,
+      selectedData: selectedDataValue,
+    })
+  }
+
   getScribbleValue = (test) => {}
 
   updateAttachments = (args) => ({ added, deleted }) => {
@@ -381,28 +396,6 @@ class ClinicalNotes extends Component {
     })
   }
 
-  //   <IconButton
-  //   onClick={() => {
-  //     this.setState({
-  //       category: 'ClinicianNote',
-  //       arrayName: 'notesScribbleArray',
-  //       categoryIndex: 2,
-  //       selectedData: '',
-  //     })
-
-  //     window.g_app._store.dispatch({
-  //       type: 'scriblenotes/updateState',
-  //       payload: {
-  //         entity: '',
-  //         showScribbleModal: true,
-  //         editEnable: false,
-  //       },
-  //     })
-  //   }}
-  // >
-  //   <InsertPhoto />
-  // </IconButton>
-
   render () {
     const {
       prefix = 'corDoctorNote[0].',
@@ -422,9 +415,7 @@ class ClinicalNotes extends Component {
               const { form } = arrayHelpers
               this.form = form
               const { values } = form
-              // console.log('diagnosis', values)
 
-              // this.arrayHelpers = arrayHelpers
               if (!values || !values.corScribbleNotes) return null
               let chiefComplaints = values.corScribbleNotes.filter(
                 (o) => o.scribbleNoteTypeFK === 1,
@@ -436,9 +427,6 @@ class ClinicalNotes extends Component {
                 (o) => o.scribbleNoteTypeFK === 3,
               )
 
-              // scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
-              // scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
-              // scriblenotes.Plan.planScribbleArray = plan
               if (this.state.runOnce === false) {
                 setTimeout(() => {
                   this.props.dispatch({
@@ -457,9 +445,6 @@ class ClinicalNotes extends Component {
                       },
                     },
                   })
-                  // scriblenotes.ClinicianNote.notesScribbleArray = clinicianNote
-                  // scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray = chiefComplaints
-                  // scriblenotes.Plan.planScribbleArray = plan
                 }, 500)
                 this.setState({
                   runOnce: true,
@@ -467,21 +452,6 @@ class ClinicalNotes extends Component {
               }
 
               return null
-              // if (diagnosises.length === 0) {
-              //   this.addDiagnosis()
-              //   return null
-              // }
-              // return diagnosises.map((v, i) => {
-              //   return (
-              //     <div key={`test${i}`}>
-              //       <Item
-              //         {...this.props}
-              //         index={i}
-              //         arrayHelpers={arrayHelpers}
-              //       />
-              //     </div>
-              //   )
-              // })
             }}
           />
 
@@ -490,144 +460,17 @@ class ClinicalNotes extends Component {
             render={(args) => {
               return (
                 <div>
-                  <div className={classes.editorBtn}>
-                    <Button
-                      color='info'
-                      onClick={() => {
-                        this.setState({
-                          category: 'ClinicianNote',
-                          arrayName: 'notesScribbleArray',
-                          categoryIndex: 2,
-                          selectedData: '',
-                        })
+                  <ScribbleNoteItem
+                    scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+                    category='ClinicianNote'
+                    arrayName='notesScribbleArray'
+                    categoryIndex={2}
+                    scribbleNoteArray={
+                      scriblenotes.ClinicianNote.notesScribbleArray
+                    }
+                    gridItemWidth={this.state.width}
+                  />
 
-                        window.g_app._store.dispatch({
-                          type: 'scriblenotes/updateState',
-                          payload: {
-                            entity: '',
-                            showScribbleModal: true,
-                            editEnable: false,
-                          },
-                        })
-                      }}
-                    >
-                      Scribble Note
-                    </Button>
-
-                    <div
-                      style={{ display: 'inline-block', position: 'absolute' }}
-                    >
-                      {scriblenotes.ClinicianNote.notesScribbleArray.length >
-                      0 ? (
-                        <GridContainer>
-                          <div
-                            className={classes.root}
-                            style={{ width: this.state.width, paddingLeft: 20 }}
-                          >
-                            <GridList
-                              className={classes.gridList}
-                              cols={0}
-                              cellHeight={20}
-                            >
-                              {scriblenotes.ClinicianNote.notesScribbleArray.map(
-                                (item, i) => {
-                                  return (
-                                    <GridListTile key={i} cols={0}>
-                                      <GridItem>
-                                        <Button
-                                          link
-                                          style={{
-                                            textDecoration: 'underline',
-                                            minWidth: 150,
-                                          }}
-                                          // className={classes.linkBtn}
-                                          value={item}
-                                          onClick={() => {
-                                            if (item.scribbleNoteLayers) {
-                                              this.setState({
-                                                category: 'ClinicianNote',
-                                                arrayName: 'notesScribbleArray',
-                                                categoryIndex: 2,
-                                                selectedData: item,
-                                              })
-                                              window.g_app._store.dispatch({
-                                                type:
-                                                  'scriblenotes/updateState',
-                                                payload: {
-                                                  selectedIndex: i,
-                                                  showScribbleModal: true,
-                                                  editEnable: true,
-                                                  entity: item,
-                                                },
-                                              })
-                                            } else {
-                                              window.g_app._store
-                                                .dispatch({
-                                                  type: 'scriblenotes/query',
-                                                  payload: {
-                                                    id: item.id,
-                                                  },
-                                                })
-                                                .then((v) => {
-                                                  this.setState({
-                                                    category: 'ClinicianNote',
-                                                    arrayName:
-                                                      'notesScribbleArray',
-                                                    categoryIndex: 2,
-                                                    selectedData: v,
-                                                  })
-
-                                                  const newArrayItems = [
-                                                    ...scriblenotes
-                                                      .ClinicianNote
-                                                      .notesScribbleArray,
-                                                  ]
-                                                  newArrayItems[
-                                                    i
-                                                  ].scribbleNoteLayers =
-                                                    v.scribbleNoteLayers
-
-                                                  this.props.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      ...scriblenotes,
-                                                      [this.state.category]: {
-                                                        [this.state
-                                                          .arrayName]: newArrayItems,
-                                                      },
-                                                    },
-                                                  })
-
-                                                  window.g_app._store.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      selectedIndex: i,
-                                                      showScribbleModal: true,
-                                                      editEnable: true,
-                                                      entity: v,
-                                                    },
-                                                  })
-                                                })
-                                            }
-                                          }}
-                                        >
-                                          {item.subject}
-                                        </Button>
-                                      </GridItem>
-                                    </GridListTile>
-                                  )
-                                },
-                              )}
-                            </GridList>
-                          </div>
-                        </GridContainer>
-                      ) : (
-                        ' '
-                      )}
-                    </div>
-                  </div>
                   <RichEditor
                     // handlePastedText={() => false}
                     handlePastedText={() => false}
@@ -648,168 +491,17 @@ class ClinicalNotes extends Component {
             render={(args) => {
               return (
                 <div>
-                  <div className={classes.editorBtn}>
-                    <Button
-                      color='info'
-                      onClick={() => {
-                        this.setState({
-                          category: 'ChiefComplaints',
-                          arrayName: 'chiefComplaintsScribbleArray',
-                          categoryIndex: 1,
-                          selectedData: '',
-                        })
+                  <ScribbleNoteItem
+                    scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+                    category='ChiefComplaints'
+                    arrayName='chiefComplaintsScribbleArray'
+                    categoryIndex={1}
+                    scribbleNoteArray={
+                      scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
+                    }
+                    gridItemWidth={this.state.width}
+                  />
 
-                        window.g_app._store.dispatch({
-                          type: 'scriblenotes/updateState',
-                          payload: {
-                            entity: '',
-                            showScribbleModal: true,
-                            editEnable: false,
-                          },
-                        })
-                      }}
-                    >
-                      Scribble Note
-                    </Button>
-                    <div
-                      style={{ display: 'inline-block', position: 'absolute' }}
-                    >
-                      {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
-                        .length > 0 ? (
-                        <GridContainer>
-                          <div
-                            className={classes.root}
-                            style={{ width: this.state.width, paddingLeft: 20 }}
-                          >
-                            <GridList
-                              className={classes.gridList}
-                              cols={0}
-                              cellHeight={20}
-                            >
-                              {scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray.map(
-                                (item, i) => {
-                                  return (
-                                    <GridListTile key={i} cols={0}>
-                                      <GridItem>
-                                        <Button
-                                          link
-                                          // className={classes.linkBtn}
-                                          style={{
-                                            textDecoration: 'underline',
-                                            minWidth: 150,
-                                          }}
-                                          value={item}
-                                          onClick={() => {
-                                            if (item.scribbleNoteLayers) {
-                                              this.setState({
-                                                category: 'ChiefComplaints',
-                                                arrayName:
-                                                  'chiefComplaintsScribbleArray',
-                                                categoryIndex: 1,
-                                                selectedData: item,
-                                              })
-                                              window.g_app._store.dispatch({
-                                                type:
-                                                  'scriblenotes/updateState',
-                                                payload: {
-                                                  selectedIndex: i,
-                                                  showScribbleModal: true,
-                                                  editEnable: true,
-                                                  entity: item,
-                                                },
-                                              })
-                                            } else {
-                                              window.g_app._store
-                                                .dispatch({
-                                                  type: 'scriblenotes/query',
-                                                  payload: {
-                                                    id: item.id,
-                                                  },
-                                                })
-                                                .then((v) => {
-                                                  this.setState({
-                                                    category: 'ChiefComplaints',
-                                                    arrayName:
-                                                      'chiefComplaintsScribbleArray',
-                                                    categoryIndex: 1,
-                                                    selectedData: v,
-                                                  })
-
-                                                  const newArrayItems = [
-                                                    ...scriblenotes
-                                                      .ChiefComplaints
-                                                      .chiefComplaintsScribbleArray,
-                                                  ]
-                                                  newArrayItems[
-                                                    i
-                                                  ].scribbleNoteLayers =
-                                                    v.scribbleNoteLayers
-
-                                                  this.props.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      ...scriblenotes,
-                                                      [this.state.category]: {
-                                                        [this.state
-                                                          .arrayName]: newArrayItems,
-                                                      },
-                                                    },
-                                                  })
-
-                                                  window.g_app._store.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      selectedIndex: i,
-                                                      showScribbleModal: true,
-                                                      editEnable: true,
-                                                      entity: v,
-                                                    },
-                                                  })
-                                                })
-                                            }
-
-                                            // dispatch({
-                                            //   type: 'scriblenotes/query',
-                                            //   payload: {
-                                            //     id: item.id,
-                                            //   },
-                                            // }).then((v) => {
-                                            //   this.setState({
-                                            //     category: 'ChiefComplaints',
-                                            //     arrayName:
-                                            //       'chiefComplaintsScribbleArray',
-                                            //     categoryIndex: 1,
-                                            //     selectedData: v,
-                                            //   })
-                                            //   window.g_app._store.dispatch({
-                                            //     type:
-                                            //       'scriblenotes/updateState',
-                                            //     payload: {
-                                            //       showScribbleModal: true,
-                                            //       selectedIndex: i,
-                                            //       editEnable: true,
-                                            //     },
-                                            //   })
-                                            // })
-                                          }}
-                                        >
-                                          {item.subject}
-                                        </Button>
-                                      </GridItem>
-                                    </GridListTile>
-                                  )
-                                },
-                              )}
-                            </GridList>
-                          </div>
-                        </GridContainer>
-                      ) : (
-                        ' '
-                      )}
-                    </div>
-                  </div>
                   <RichEditor
                     handlePastedText={() => false}
                     strongLabel
@@ -830,165 +522,14 @@ class ClinicalNotes extends Component {
             render={(args) => {
               return (
                 <div>
-                  <div className={classes.editorBtn}>
-                    <Button
-                      color='info'
-                      onClick={() => {
-                        this.setState({
-                          category: 'Plan',
-                          arrayName: 'planScribbleArray',
-                          categoryIndex: 3,
-                          selectedData: '',
-                        })
-
-                        window.g_app._store.dispatch({
-                          type: 'scriblenotes/updateState',
-                          payload: {
-                            entity: '',
-                            showScribbleModal: true,
-                            editEnable: false,
-                          },
-                        })
-                      }}
-                    >
-                      Scribble Note
-                    </Button>
-
-                    <div
-                      style={{ display: 'inline-block', position: 'absolute' }}
-                    >
-                      {scriblenotes.Plan.planScribbleArray.length > 0 ? (
-                        <GridContainer>
-                          <div
-                            className={classes.root}
-                            style={{ width: this.state.width, paddingLeft: 20 }}
-                          >
-                            <GridList
-                              className={classes.gridList}
-                              cols={0}
-                              cellHeight={20}
-                            >
-                              {scriblenotes.Plan.planScribbleArray.map(
-                                (item, i) => {
-                                  return (
-                                    <GridListTile key={i} cols={0}>
-                                      <GridItem>
-                                        <Button
-                                          link
-                                          // className={classes.linkBtn}
-                                          style={{
-                                            textDecoration: 'underline',
-                                            minWidth: 150,
-                                          }}
-                                          value={item}
-                                          onClick={() => {
-                                            if (item.scribbleNoteLayers) {
-                                              this.setState({
-                                                category: 'Plan',
-                                                arrayName: 'planScribbleArray',
-                                                categoryIndex: 3,
-                                                selectedData: item,
-                                              })
-                                              window.g_app._store.dispatch({
-                                                type:
-                                                  'scriblenotes/updateState',
-                                                payload: {
-                                                  selectedIndex: i,
-                                                  showScribbleModal: true,
-                                                  editEnable: true,
-                                                  entity: item,
-                                                },
-                                              })
-                                            } else {
-                                              window.g_app._store
-                                                .dispatch({
-                                                  type: 'scriblenotes/query',
-                                                  payload: {
-                                                    id: item.id,
-                                                  },
-                                                })
-                                                .then((v) => {
-                                                  this.setState({
-                                                    category: 'Plan',
-                                                    arrayName:
-                                                      'planScribbleArray',
-                                                    categoryIndex: 3,
-                                                    selectedData: v,
-                                                  })
-
-                                                  const newArrayItems = [
-                                                    ...scriblenotes.Plan
-                                                      .planScribbleArray,
-                                                  ]
-                                                  newArrayItems[
-                                                    i
-                                                  ].scribbleNoteLayers =
-                                                    v.scribbleNoteLayers
-
-                                                  this.props.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      ...scriblenotes,
-                                                      [this.state.category]: {
-                                                        [this.state
-                                                          .arrayName]: newArrayItems,
-                                                      },
-                                                    },
-                                                  })
-
-                                                  window.g_app._store.dispatch({
-                                                    type:
-                                                      'scriblenotes/updateState',
-                                                    payload: {
-                                                      selectedIndex: i,
-                                                      showScribbleModal: true,
-                                                      editEnable: true,
-                                                      entity: v,
-                                                    },
-                                                  })
-                                                })
-                                            }
-
-                                            // dispatch({
-                                            //   type: 'scriblenotes/query',
-                                            //   payload: {
-                                            //     id: item.id,
-                                            //   },
-                                            // }).then((v) => {
-                                            //   this.setState({
-                                            //     category: 'Plan',
-                                            //     arrayName: 'planScribbleArray',
-                                            //     categoryIndex: 1,
-                                            //     selectedData: v,
-                                            //   })
-                                            //   window.g_app._store.dispatch({
-                                            //     type:
-                                            //       'scriblenotes/updateState',
-                                            //     payload: {
-                                            //       showScribbleModal: true,
-                                            //       selectedIndex: i,
-                                            //       editEnable: true,
-                                            //     },
-                                            //   })
-                                            // })
-                                          }}
-                                        >
-                                          {item.subject}
-                                        </Button>
-                                      </GridItem>
-                                    </GridListTile>
-                                  )
-                                },
-                              )}
-                            </GridList>
-                          </div>
-                        </GridContainer>
-                      ) : (
-                        ' '
-                      )}
-                    </div>
-                  </div>
+                  <ScribbleNoteItem
+                    scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+                    category='Plan'
+                    arrayName='planScribbleArray'
+                    categoryIndex={3}
+                    scribbleNoteArray={scriblenotes.Plan.planScribbleArray}
+                    gridItemWidth={this.state.width}
+                  />
 
                   <RichEditor
                     handlePastedText={() => false}

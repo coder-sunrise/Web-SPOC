@@ -41,9 +41,10 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders, visitRegistration }) => ({
+@connect(({ orders, visitRegistration, codetable }) => ({
   orders,
   visitRegistration,
+  codetable,
 }))
 class Orders extends PureComponent {
   state = {
@@ -57,6 +58,23 @@ class Orders extends PureComponent {
     const { dispatch, status, visitRegistration } = this.props
     const { entity: vistEntity } = visitRegistration
     const { visit = {} } = vistEntity
+
+    const codeTableNameArray = []
+    codeTableNameArray.push('ctMedicationUsage')
+    codeTableNameArray.push('ctMedicationDosage')
+    codeTableNameArray.push('ctMedicationUnitOfMeasurement')
+    codeTableNameArray.push('ctMedicationFrequency')
+    codeTableNameArray.push('ctVaccinationUsage')
+    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
+
+    codeTableNameArray.forEach((o) => {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: o,
+        },
+      })
+    })
   }
 
   getServiceCenterService = () => {
@@ -73,6 +91,8 @@ class Orders extends PureComponent {
       setValues({
         ...values,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceCode: this.state.services.find((o) => o.value === serviceFK)
+          .code,
         serviceName: this.state.services.find((o) => o.value === serviceFK)
           .name,
         unitPrice: serviceCenterService.unitPrice,
@@ -85,8 +105,15 @@ class Orders extends PureComponent {
 
   render () {
     const { state, props } = this
-    const { theme, classes, orders, className, visitRegistration } = props
-    // console.log(orders)
+    const {
+      theme,
+      classes,
+      orders,
+      className,
+      visitRegistration,
+      codetable,
+    } = props
+
     return (
       <div className={className}>
         <Detail {...props} />

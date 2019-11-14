@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
+import Save from '@material-ui/icons/Save'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
@@ -75,7 +76,14 @@ const styles = (theme) => ({
   },
 })
 
-const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
+const ApplyClaims = ({
+  classes,
+  values,
+  setValues,
+  setFieldValue,
+  submitCount,
+  handleIsEditing,
+}) => {
   const { invoice, invoicePayment, claimableSchemes } = values
 
   const [
@@ -341,13 +349,17 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const eligibleAmount =
             totalPayableBalance -
             (currentItemClaimedAmount - currentClaimAmount)
-
-          if (eligibleAmount < 0 || toBeChangeAmount <= eligibleAmount)
+          if (
+            eligibleAmount === 0 ||
+            toBeChangeAmount <= eligibleAmount ||
+            Number.isNaN(eligibleAmount)
+          )
             return { ...item, claimAmount: toBeChangeAmount, error: undefined }
 
           return {
             ...item,
-            error: `Cannot claim more than $${currentClaimAmount.toFixed(2)}`,
+            claimAmount: toBeChangeAmount,
+            error: `Cannot claim more than $${eligibleAmount.toFixed(2)}`,
           }
         }
         return { ...item, error: undefined }
@@ -364,10 +376,26 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       let finalPayable = roundToTwoDecimals(invoice.totalAftGst - finalClaim)
 
       const updatedInvoiceItems = updateOriginalInvoiceItemList()
-      setFieldValue('finalClaim', finalClaim)
-      setFieldValue('finalPayable', finalPayable)
-      setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
-      setFieldValue('invoicePayer', tempInvoicePayer)
+      const _values = {
+        ...values,
+        finalClaim,
+        finalPayable,
+        invoice: {
+          ...values.invoice,
+          outstandingBalance: finalPayable,
+          invoiceItems: updatedInvoiceItems,
+        },
+        invoicePayer: tempInvoicePayer,
+      }
+      setValues(_values)
+      // setFieldValue('finalClaim', finalClaim)
+      // setFieldValue('finalPayable', finalPayable)
+      // setFieldValue(
+      //   'invoice.outstandingBalance',
+      //   roundToTwoDecimals(finalPayable - finalClaim),
+      // )
+      // setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
+      // setFieldValue('invoicePayer', tempInvoicePayer)
       handleIsEditing(hasEditing())
 
       refTempInvociePayer.current = tempInvoicePayer
@@ -389,6 +417,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     const schemeConfig = flattenSchemes.find((item) => item.id === value)
     const {
       balance = null,
+      isBalanceCheckRequired = false,
       copayerFK,
       coverageMaxCap = 0,
       coPaymentSchemeName = '',
@@ -531,10 +560,16 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
         setInitialState([
           _invoicePayer,
         ])
+      } else {
+        setInitialState([])
+        setTempInvoicePayer([])
+        setCurEditInvoicePayerBackup(undefined)
+        refTempInvociePayer.current = []
       }
     },
     [
       values.id,
+      submitCount,
     ],
   )
 
@@ -586,8 +621,8 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
       const updatedRow = {
         ...tempInvoicePayer[index],
         ...curEditInvoicePayerBackup,
-        _isConfirmed: false,
-        _isEditing: true,
+        _isConfirmed: true,
+        _isEditing: false,
         _isDeleted: false,
         isCancelled: false,
       }
@@ -675,6 +710,28 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
     return isEditing || hasUnappliedScheme
   }
 
+  const renderClaimAmount = useCallback(
+    (index) => (row) => {
+      const { _isConfirmed: shouldDisable } = refTempInvociePayer.current[index]
+
+      return shouldDisable ? (
+        <NumberInput currency text value={row.claimAmount} />
+      ) : (
+        <NumberInput
+          currency
+          min={0}
+          onChange={handleClaimAmountChange(
+            row.invoiceItemFK ? row.invoiceItemFK : row.id,
+          )}
+          value={row.claimAmount}
+        />
+      )
+    },
+    [
+      handleClaimAmountChange,
+      refTempInvociePayer.current,
+    ],
+  )
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -704,7 +761,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           Reset
         </Button>
       </GridItem>
-      <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+      <GridItem md={12} style={{ maxHeight: '55vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {
           if (invoicePayer.isCancelled) return null
 
@@ -712,23 +769,9 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           const claimAmountColExt = {
             columnName: 'claimAmount',
             align: 'right',
-            render: (row) => {
-              const {
-                _isConfirmed: shouldDisable,
-              } = refTempInvociePayer.current[index]
-              return (
-                <NumberInput
-                  currency
-                  min={0}
-                  disabled={shouldDisable}
-                  onChange={handleClaimAmountChange(
-                    row.invoiceItemFK ? row.invoiceItemFK : row.id,
-                  )}
-                  value={row.claimAmount}
-                />
-              )
-            },
+            render: renderClaimAmount(index),
           }
+
           return (
             <Paper
               key={`invoicePayer-${index}`}
@@ -808,41 +851,39 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                 >
                   <DeleteWithPopover
                     index={index}
+                    disabled={invoicePayer._isEditing ? false : hasEditing()}
                     onConfirmDelete={handleAppliedSchemeRemoveClick}
                   />
                 </GridItem>
                 <GridItem md={12}>
-                  {
-                    <CommonTableGrid
-                      key={`invoicePayer-${index}`}
-                      size='sm'
-                      FuncProps={{ pager: false }}
-                      // EditingProps={{
-                      //   showAddCommand: false,
-                      //   showDeleteCommand: false,
-                      //   showEditCommand: false,
-                      //   onEditingRowIdsChange: handleEditingRowIdsChange(index),
-                      //   onCommitChanges: handleCommitChanges(index),
-                      //   // editingRowIds: _isEditing
-                      //   //   ? invoicePayerItem.map((item) => item.id)
-                      //   //   : [],
-                      // }}
-                      // schema={validationSchema}
-                      columns={
-                        invoicePayer.payerTypeFK ===
-                        INVOICE_PAYER_TYPE.SCHEME ? (
-                          SchemeInvoicePayerColumn
-                        ) : (
-                          CompanyInvoicePayerColumn
-                        )
-                      }
-                      columnExtensions={[
-                        ...ApplyClaimsColumnExtension,
-                        claimAmountColExt,
-                      ]}
-                      rows={invoicePayer.invoicePayerItem}
-                    />
-                  }
+                  <CommonTableGrid
+                    key={`invoicePayer-${index}`}
+                    size='sm'
+                    FuncProps={{ pager: false }}
+                    // EditingProps={{
+                    //   showAddCommand: false,
+                    //   showDeleteCommand: false,
+                    //   showEditCommand: false,
+                    //   onEditingRowIdsChange: handleEditingRowIdsChange(index),
+                    //   onCommitChanges: handleCommitChanges(index),
+                    //   // editingRowIds: _isEditing
+                    //   //   ? invoicePayerItem.map((item) => item.id)
+                    //   //   : [],
+                    // }}
+                    // schema={validationSchema}
+                    columns={
+                      invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
+                        SchemeInvoicePayerColumn
+                      ) : (
+                        CompanyInvoicePayerColumn
+                      )
+                    }
+                    columnExtensions={[
+                      ...ApplyClaimsColumnExtension,
+                      claimAmountColExt,
+                    ]}
+                    rows={invoicePayer.invoicePayerItem}
+                  />
                 </GridItem>
                 <GridItem md={8} />
                 <GridItem md={4} className={classes.gridActionBtn}>
@@ -867,7 +908,7 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
                         onClick={handleAppliedSchemeSaveClick(index)}
                         disabled={_isSubtotalLessThanZero(index)}
                       >
-                        Save
+                        Apply
                       </Button>
                     </React.Fragment>
                   )}
@@ -888,6 +929,11 @@ const ApplyClaims = ({ classes, values, setFieldValue, handleIsEditing }) => {
           )
         })}
       </GridItem>
+      {/* <GridItem md={12} style={{ textAlign: 'right' }}>
+        <Button size='sm' color='success'>
+          Save Changes
+        </Button>
+      </GridItem> */}
       {/* <GridItem md={12}>
         <Paper className={classes.gridRow}>
           <Primary>

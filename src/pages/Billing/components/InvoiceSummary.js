@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react'
 import classnames from 'classnames'
+import numeral from 'numeral'
 // formik
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 // material ui
-import { withStyles, IconButton } from '@material-ui/core'
-import Delete from '@material-ui/icons/Delete'
+import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
@@ -19,6 +19,9 @@ import {
 import DeleteWithPopover from './DeleteWithPopover'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
+import config from '@/utils/config'
+
+const { currencyFormat } = config
 
 const styles = () => ({
   crossed: {
@@ -48,7 +51,10 @@ const styles = () => ({
   },
 })
 
-const parseToTwoDecimalString = (value = 0.0) => value.toFixed(2)
+const parseToTwoDecimalString = (value = 0.0) => {
+  // value.toFixed(2)
+  return numeral(value).format(`$${currencyFormat}`)
+}
 
 const InvoiceSummary = ({
   classes,
@@ -60,10 +66,6 @@ const InvoiceSummary = ({
   setFieldValue,
 }) => {
   const errorMessage = 'Cancel reason is required'
-  const [
-    cancelReason,
-    setCancelReason,
-  ] = useState('')
 
   const [
     showError,
@@ -88,7 +90,6 @@ const InvoiceSummary = ({
     },
     [
       invoicePayment,
-      cancelReason,
     ],
   )
 
@@ -120,6 +121,13 @@ const InvoiceSummary = ({
     ],
   )
 
+  const shouldDisablePrintInvoice = useCallback(
+    () => values.invoicePayment && values.invoicePayment.length === 0,
+    [
+      values.invoicePayment,
+    ],
+  )
+
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -135,7 +143,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                $ {parseToTwoDecimalString(roundToTwoDecimals(gstAmount))}
+                {parseToTwoDecimalString(roundToTwoDecimals(gstAmount))}
               </h5>
             </GridItem>
             <GridItem md={6}>
@@ -143,7 +151,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                ${parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
+                {parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
               </h5>
             </GridItem>
             <GridItem md={6}>
@@ -151,7 +159,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                $ {parseToTwoDecimalString(values.finalClaim)}
+                {parseToTwoDecimalString(values.finalClaim)}
               </h5>
             </GridItem>
             <GridItem md={12}>
@@ -168,7 +176,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                $ {parseToTwoDecimalString(values.finalPayable)}
+                {parseToTwoDecimalString(values.finalPayable)}
               </h5>
             </GridItem>
           </GridContainer>
@@ -231,7 +239,7 @@ const InvoiceSummary = ({
                         </GridItem>
                         <GridItem md={6} className={classes.rightAlign}>
                           <p className={classes.currencyValue}>
-                            $ {parseToTwoDecimalString(payment.amt)}
+                            {parseToTwoDecimalString(payment.amt)}
                           </p>
                         </GridItem>
                       </React.Fragment>
@@ -255,7 +263,7 @@ const InvoiceSummary = ({
                 simple
                 size='sm'
                 className={classes.invoiceButton}
-                disabled={disabled}
+                // disabled={shouldDisablePrintInvoice()}
                 onClick={handlePrintInvoiceClick}
               >
                 Print Invoice

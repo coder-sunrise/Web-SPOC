@@ -1,38 +1,14 @@
-import React, { Component, PureComponent } from 'react'
-import { connect } from 'dva'
+import React, { PureComponent } from 'react'
 import classnames from 'classnames'
-import {
-  Divider,
-  CircularProgress,
-  Paper,
-  withStyles,
-  IconButton,
-} from '@material-ui/core'
-import Yup from '@/utils/yup'
+import { Divider, withStyles } from '@material-ui/core'
 import { orderTypes } from '@/utils/codes'
 
 import {
-  withFormikExtend,
-  FastField,
   Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  TextField,
   notification,
-  Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
+  Tabs,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
 
@@ -67,10 +43,13 @@ const styles = (theme) => ({
 })
 
 class Details extends PureComponent {
-  state = {}
+  state = {
+    disableEdit: false,
+  }
 
-  footerBtns = ({ onSave, showAdjustment = true }) => {
+  footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
+    // console.log(this.props)
     const { entity } = orders
     return (
       <React.Fragment>
@@ -81,12 +60,13 @@ class Details extends PureComponent {
             <Button
               link
               style={{ float: 'left' }}
+              disabled={this.state.disableEdit}
               onClick={this.showAdjustment}
             >
               {currencySymbol} Adjustment
             </Button>
           )}
-          {!!entity && (
+          {/* {!!entity && (
             <Button
               color='danger'
               onClick={() => {
@@ -102,22 +82,24 @@ class Details extends PureComponent {
             >
               New
             </Button>
-          )}
-          {!entity && (
-            <Button
-              color='danger'
-              onClick={() => {
+          )} */}
+          <Button
+            color='danger'
+            onClick={() => {
+              if (entity) {
                 this.props.dispatch({
                   type: 'orders/updateState',
                   payload: {
-                    type: undefined,
+                    entity: undefined,
                   },
                 })
-              }}
-            >
-              Discard
-            </Button>
-          )}
+              } else {
+                onReset()
+              }
+            }}
+          >
+            Discard
+          </Button>
           <Button color='primary' onClick={onSave}>
             Save
           </Button>
@@ -170,24 +152,24 @@ class Details extends PureComponent {
     }, 1)
   }
 
+  setDisable = (value) => {
+    this.setState({
+      disableEdit: value,
+    })
+  }
+
   render () {
-    const { props, state } = this
-    const {
-      theme,
-      classes,
-      orders,
-      values,
-      rowHeight,
-      footer,
-      dispatch,
-    } = props
-    const { type, entity } = orders
-    // console.log(values)
-    
+    const { props } = this
+    const { classes, orders, dispatch } = props
+    const { type } = orders
+
     const cfg = {
+      disableEdit: this.state.disableEdit,
+      setDisable: this.setDisable,
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
       type,
+      orderTypes,
       ...props,
     }
 
@@ -195,32 +177,37 @@ class Details extends PureComponent {
       <div>
         <div className={classes.detail}>
           <GridContainer>
-            <GridItem xs={6}>
-              <Select
-                label='Type'
-                options={orderTypes}
-                allowClear={false}
-                value={type}
-                disabled={!!entity}
-                onChange={(v) => {
+            <GridItem xs={12}>
+              <Tabs
+                activeKey={type}
+                options={orderTypes.map((o) => {
+                  return {
+                    id: o.value,
+                    name: o.name,
+                    content: o.component(cfg),
+                  }
+                })}
+                tabStyle={{}}
+                onChange={(key) => {
                   dispatch({
                     type: 'orders/updateState',
                     payload: {
-                      type: v,
+                      entity: undefined,
+                      type: key,
                     },
                   })
                 }}
               />
             </GridItem>
           </GridContainer>
-          <div>
+          {/* <div>
             {type === '1' && <Medication {...cfg} />}
             {type === '2' && <Vaccination {...cfg} />}
             {type === '3' && <Service {...cfg} />}
             {type === '4' && <Consumable {...cfg} />}
             {type === '5' && <Medication {...cfg} openPrescription />}
             {type === '6' && <Package {...cfg} />}
-          </div>
+          </div> */}
         </div>
       </div>
     )

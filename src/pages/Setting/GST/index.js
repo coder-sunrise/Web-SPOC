@@ -16,6 +16,7 @@ import {
   TextField,
   Button,
   WarningSnackbar,
+  NumberInput,
 } from '@/components'
 
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -100,8 +101,10 @@ class clinicSettings extends PureComponent {
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
 
-    this.setState({
-      hasActiveSession: data.length > 0,
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
     })
   }
 
@@ -147,7 +150,7 @@ class clinicSettings extends PureComponent {
       gSTRegistrationNumber,
       gSTPercentage,
     } = this.props.values
-    // console.log(this.props.values)
+
     const payload = [
       {
         ...isEnableGST,
@@ -233,11 +236,12 @@ class clinicSettings extends PureComponent {
               <Field
                 name='gSTPercentage.settingValue'
                 render={(args) => (
-                  <TextField
+                  <NumberInput
                     label='GST Rate'
                     {...args}
                     disabled={!enableGst || !!hasActiveSession}
                     suffix='%'
+                    format='0.00'
                   />
                 )}
               />

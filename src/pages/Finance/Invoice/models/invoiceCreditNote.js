@@ -44,13 +44,12 @@ export default createFormViewModel({
           (x) => x.id === invoicePayerFK,
         )
 
-        const creditNoteBalance = filterInvPayment[0].totalPaid
+        const creditNoteBalance = filterInvPayment[0].outStanding
         const { creditNote } = filterInvPayment[0]
 
         const filteredCreditNote = creditNote.filter(
           (x) => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
         )
-
         const pastCreditNoteItems = filteredCreditNote
           .reduce((filtered, item) => {
             return [
@@ -66,7 +65,7 @@ export default createFormViewModel({
                     [item.itemCode]:
                       itemSubtotal[item.itemCode] + item.quantity,
                   }
-                : { [item.itemCode]: item.quantity },
+                : { ...itemSubtotal, [item.itemCode]: item.quantity },
             {},
           )
 

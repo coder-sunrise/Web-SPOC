@@ -108,8 +108,11 @@ class GeneralSetting extends PureComponent {
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    this.setState({
-      hasActiveSession: data.length > 0,
+
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
     })
   }
 

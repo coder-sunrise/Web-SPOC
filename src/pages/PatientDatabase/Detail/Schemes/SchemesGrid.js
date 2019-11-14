@@ -142,9 +142,10 @@ class SchemesGrid extends PureComponent {
           type: 'codeSelect',
           // code: 'ctschemecategory',
           code: 'coPaymentScheme',
-          filter: {
-            schemeCategoryFK: 5,
-          },
+          // remoteFilter: {
+          //   schemeCategoryFK: 5,
+          // },
+          localFilter: (opt) => opt.schemeCategoryName === 'Corporate',
           isDisabled: (row) => !this.isCorporate(row),
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
@@ -291,8 +292,8 @@ class SchemesGrid extends PureComponent {
 
   render () {
     const { editingRowIds, rowChanges } = this.state
-    const { type, rows, schema } = this.props
-    // console.log('schema', schema)
+    const { type, rows, schema, errors } = this.props
+    // console.log('schema', schema, errors)
     const EditingProps = {
       showAddCommand: true,
 

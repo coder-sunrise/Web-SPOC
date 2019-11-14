@@ -12,28 +12,50 @@ import {
   FastField,
   Field,
   ClinicianSelect,
+  timeFormat24HourWithSecond as timeFormat,
 } from '@/components'
 import * as service from '@/services/common'
 
+const isSameOrAfterTime = (startTime, endTime) =>
+  moment(startTime, timeFormat).isSameOrAfter(endTime)
+
 @withFormikExtend({
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
-    const values = {
-      ...(consultationDocument.entity ||
-        consultationDocument.defaultCertOfAttendance),
-      attendanceStartTime: visitEntity.visit
-        ? moment(visitEntity.visit.visitDate).format('HH:mm')
-        : moment().format('HH:mm'),
-      attendanceEndTime: moment().format('HH:mm'),
+    const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
+    const currentTime = moment().format('HH:mm')
+
+    if (consultationDocument.entity === undefined) {
+      return {
+        ...(consultationDocument.entity ||
+          consultationDocument.defaultCertOfAttendance),
+        attendanceStartTime: visitEntity.visit
+          ? moment(visitEntity.visit.visitDate).format('HH:mm')
+          : moment().format('HH:mm'),
+        attendanceEndTime: moment(visitDataValue, timeFormat).isAfter(
+          moment(currentTime, timeFormat),
+        )
+          ? moment(visitEntity.visit.visitDate).format('HH:mm')
+          : moment().format('HH:mm'),
+      }
     }
-    return values
+    return {
+      ...consultationDocument.entity,
+      attendanceStartTime: moment(
+        consultationDocument.entity.attendanceStartTime,
+      ).format('HH:mm'),
+      attendanceEndTime: moment(
+        consultationDocument.entity.attendanceEndTime,
+      ).format('HH:mm'),
+    }
   },
+
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
     accompaniedBy: Yup.string().required(),
     attendanceStartTime: Yup.string().required(),
     attendanceEndTime: Yup.string()
-      .laterThan(
+      .equalAndLaterThan(
         Yup.ref('attendanceStartTime'),
         'Time From must be later than Time To',
       )
@@ -44,11 +66,28 @@ import * as service from '@/services/common'
     const { dispatch, onConfirm, consultationDocument, currentType } = props
     const { rows } = consultationDocument
 
+    const fullFormatAttendanceEndTime = `${moment().format(
+      'YYYY-MM-DD',
+    )}T${values.attendanceEndTime}`
+    const fullFormatAttendanceStartTime = `${moment().format(
+      'YYYY-MM-DD',
+    )}T${values.attendanceStartTime}`
+
+    const newValues = {
+      ...values,
+      attendanceEndTime: moment(fullFormatAttendanceEndTime).format(
+        'YYYY-MM-DDTHH:mm:ss',
+      ),
+      attendanceStartTime: moment(fullFormatAttendanceStartTime).format(
+        'YYYY-MM-DDTHH:mm:ss',
+      ),
+    }
+
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
         sequence: rows.length,
-        ...values,
+        ...newValues,
         subject: currentType.getSubject(values),
       },
     })

@@ -15,11 +15,11 @@ import { extendFunc, toLocal, toUTC } from '@/utils/utils'
 import { control } from '@/components/Decorator'
 import {
   CustomInputWrapper,
-  BaseInput,
   CustomInput,
   dateFormatLong,
   dateFormatWithTime,
-  dateFormatLongWithTime,
+  additionalShortcutFormats,
+  timeFormat24HourWithSecond,
   serverDateTimeFormatFull,
 } from '@/components'
 
@@ -143,7 +143,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
-    // console.log({ date, dateString })
+    console.log({ date, dateString })
     // if (date) {
     //   date.utcOffset()
     // }
@@ -151,7 +151,7 @@ class AntdDatePicker extends PureComponent {
     // eslint-disable-next-line no-nested-ternary
     const v = date
       ? showTime
-        ? date.formatUTC()
+        ? date.formatUTC(false)
         : date.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
       : ''
     if (form && field) {
@@ -242,11 +242,12 @@ class AntdDatePicker extends PureComponent {
 
     if (!format) {
       if (restProps.showTime) {
-        format = dateFormatLongWithTime
+        format = `${dateFormatLong} ${timeFormat24HourWithSecond}`
       } else {
         format = dateFormatLong
       }
     }
+
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text)
@@ -283,7 +284,14 @@ class AntdDatePicker extends PureComponent {
             onOpenChange,
             this.handleDatePickerOpenChange,
           )}
-          format={format}
+          format={[
+            format,
+            ...(restProps.showTime
+              ? additionalShortcutFormats.map(
+                  (o) => `${o} ${timeFormat24HourWithSecond}`,
+                )
+              : additionalShortcutFormats),
+          ]}
           value={_toMoment(this.state.value, local, restProps.showTime)}
           {...restProps}
         />

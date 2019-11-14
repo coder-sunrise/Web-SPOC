@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 // common components
 import { notification } from '@/components'
@@ -18,10 +19,14 @@ export default createListViewModel({
       history.listen(async (location) => {
         const { pathname } = location
         if (pathname === '/setting/doctorblock') {
+          const dateFrom = moment().formatUTC()
+          const dateTo = moment().add(6, 'months').endOf('day').formatUTC()
           dispatch({
             type: 'query',
             payload: {
-              pagesize: 99999,
+              pagesize: 999,
+              lgteql_startDateTime: dateFrom,
+              lsteql_endDateTime: dateTo,
             },
           })
         }
@@ -37,12 +42,21 @@ export default createListViewModel({
       //   }
       //   return false
       // },
+      // *queryAll ({ payload }, { call, put }) {
+      //   const response = yield call(service.getAllList, payload)
+      //   const { status, data } = response
+      //   if (parseInt(status, 10) === 200) {
+      //     yield put({
+      //       type: 'updateState',
+      //       payload: {
+      //         list: data.data,
+      //       },
+      //     })
+      //   }
+      // },
       *refresh (_, { call, put }) {
         yield put({
-          type: 'query',
-          payload: {
-            pagesize: 99999,
-          },
+          type: 'queryAll',
         })
       },
       *update ({ payload }, { call }) {

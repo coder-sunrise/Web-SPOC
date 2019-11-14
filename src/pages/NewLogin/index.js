@@ -29,6 +29,13 @@ import { container } from '@/assets/jss'
 
 const styles = (theme) => ({
   // ...loginPageStyle(theme),
+  uatText: {
+    width: '100%',
+    marginTop: theme.spacing(4),
+    color: 'white',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+  },
   cardHidden: {
     opacity: '0',
     transform: 'translate3d(0, -60px, 0)',
@@ -55,6 +62,7 @@ const styles = (theme) => ({
   },
   body: {
     marginBottom: '15px',
+    padding: theme.spacing(2),
   },
 })
 
@@ -87,11 +95,12 @@ const submitKey = 'login/getToken'
     const { dispatch, routing } = props
     const { location } = routing
 
-    const credential = { username, password, clinic_code: clinicCode }
-    let loginDestination = '/'
-    if (location.query && location.query.redirect !== undefined) {
-      loginDestination = location.query.redirect
-    }
+    const credential = { username, password, clinicCode }
+    const loginDestination = '/reception/queue' // always land at reception/queue
+
+    // if (location.query && location.query.redirect !== undefined) {
+    //   loginDestination = location.query.redirect
+    // }
 
     dispatch({
       type: 'login/getToken',
@@ -109,7 +118,6 @@ const submitKey = 'login/getToken'
             },
           })
           localStorage.setItem('clinicCode', clinicCode)
-
           router.push(loginDestination)
         }
       })
@@ -168,88 +176,99 @@ class NewLogin extends React.Component {
     const { isInvalidLogin } = login
     const { cardAnimation } = this.state
     return (
-      <div className={classes.container}>
-        <GridContainer justify='center'>
-          <GridItem md={4}>
-            <Card login className={classes[cardAnimation]}>
-              <CardHeader
-                className={`${classes.cardHeader} ${classes.textCenter}`}
-                color='primary'
-              >
-                <h3 className={classes.cardTitle}>Login</h3>
-                <h3>
-                  <FormattedMessage id='app.login.title' />
-                </h3>
-              </CardHeader>
+      <React.Fragment>
+        <div className={classes.container}>
+          <GridContainer justify='center'>
+            <GridItem md={4}>
+              <Card login className={classes[cardAnimation]}>
+                <CardHeader
+                  className={`${classes.cardHeader} ${classes.textCenter}`}
+                  color='primary'
+                >
+                  <h3 className={classes.cardTitle}>Login</h3>
+                  <h3>
+                    <FormattedMessage id='app.login.title' />
+                  </h3>
+                </CardHeader>
 
-              <CardBody className={classnames(classes.body)}>
-                {isInvalidLogin && (
-                  <Transition show={isInvalidLogin}>
-                    <div style={{ textAlign: 'center' }}>
-                      <Danger>
-                        <h4>
-                          <FormattedMessage id='app.login.message-invalid-credentials' />
-                        </h4>
-                        <p>
-                          <FormattedMessage id='app.login.message-invalid-credentials-info' />
-                        </p>
-                      </Danger>
-                    </div>
-                  </Transition>
-                )}
-                <FastField
-                  name='username'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      label={formatMessage({ id: 'app.login.username' })}
-                    />
+                <CardBody className={classnames(classes.body)}>
+                  {isInvalidLogin && (
+                    <Transition show={isInvalidLogin}>
+                      <div style={{ textAlign: 'center' }}>
+                        <Danger>
+                          <h4>
+                            <FormattedMessage id='app.login.message-invalid-credentials' />
+                          </h4>
+                          <p>
+                            <FormattedMessage id='app.login.message-invalid-credentials-info' />
+                          </p>
+                        </Danger>
+                      </div>
+                    </Transition>
                   )}
-                />
-                <FastField
-                  name='password'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      type='password'
-                      label={formatMessage({ id: 'app.login.password' })}
-                    />
-                  )}
-                />
-                <FastField
-                  name='clinicCode'
-                  render={(args) => (
-                    <TextField
-                      {...args}
-                      label={formatMessage({ id: 'app.login.clinicCode' })}
-                    />
-                  )}
-                />
-              </CardBody>
-              <CardFooter className={classnames(classes.justifyContentCenter)}>
-                <GridContainer>
-                  <GridItem md={12}>
-                    <ProgressButton
-                      submitKey={submitKey}
-                      text='Enter'
-                      icon={<LockOpen />}
-                      block
-                      color='primary'
-                      onClick={this.onEnterPressed}
-                    />
-                  </GridItem>
-                  <GridItem
-                    md={12}
-                    style={{ marginTop: 12, textAlign: 'right' }}
-                  >
-                    <a onClick={this.onForgotPasswordClick}>Forgot Password</a>
-                  </GridItem>
-                </GridContainer>
-              </CardFooter>
-            </Card>
-          </GridItem>
-        </GridContainer>
-      </div>
+                  <FastField
+                    name='username'
+                    render={(args) => (
+                      <TextField
+                        {...args}
+                        label={formatMessage({ id: 'app.login.username' })}
+                      />
+                    )}
+                  />
+                  <FastField
+                    name='password'
+                    render={(args) => (
+                      <TextField
+                        {...args}
+                        type='password'
+                        label={formatMessage({ id: 'app.login.password' })}
+                      />
+                    )}
+                  />
+                  <FastField
+                    name='clinicCode'
+                    render={(args) => (
+                      <TextField
+                        {...args}
+                        label={formatMessage({ id: 'app.login.clinicCode' })}
+                      />
+                    )}
+                  />
+                </CardBody>
+                <CardFooter
+                  className={classnames(classes.justifyContentCenter)}
+                >
+                  <GridContainer>
+                    <GridItem md={12}>
+                      <ProgressButton
+                        submitKey={submitKey}
+                        text='Enter'
+                        icon={<LockOpen />}
+                        block
+                        color='primary'
+                        onClick={this.onEnterPressed}
+                      />
+                    </GridItem>
+                    <GridItem
+                      md={12}
+                      style={{ marginTop: 12, textAlign: 'right' }}
+                    >
+                      <a onClick={this.onForgotPasswordClick}>
+                        Forgot Password
+                      </a>
+                    </GridItem>
+                  </GridContainer>
+                </CardFooter>
+              </Card>
+            </GridItem>
+          </GridContainer>
+          {process.env.client_env === 'uat' && (
+            <h3 className={classes.uatText}>
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA
+            </h3>
+          )}
+        </div>
+      </React.Fragment>
     )
   }
 }

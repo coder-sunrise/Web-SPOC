@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-
+import moment from 'moment'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
   Accordion,
@@ -18,13 +19,13 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
-import { computeTotalForAllSavedClaim } from './utils'
+import { computeTotalForAllSavedClaim, constructPayload } from './utils'
 import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
-import { INVOICE_ITEM_TYPE } from '@/utils/constants'
+import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
 
@@ -44,22 +45,28 @@ const styles = (theme) => ({
     textAlign: 'right',
   },
   dispenseContainer: {
+    // maxHeight: '40vh',
+    // overflow: 'auto',
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
 })
 
 const bannerStyle = {
+  position: 'sticky',
+  top: headerHeight,
   zIndex: 1000,
   paddingLeft: 16,
   paddingRight: 16,
 }
 
-@connect(({ billing, user, dispense, loading }) => ({
+@connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
   dispense,
   loading,
+  patient: patient.entity || patient.default,
   user: user.data,
+  sessionInfo: queueLog.sessionInfo,
 }))
 @withFormikExtend({
   notDirtyDuration: 3,
@@ -67,8 +74,9 @@ const bannerStyle = {
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     try {
+      console.log({ entity: billing.entity })
       if (billing.entity) {
-        const { invoicePayer, invoicePayment } = billing.entity
+        const { invoicePayer = [] } = billing.entity
 
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
@@ -79,111 +87,31 @@ const bannerStyle = {
             ),
           0,
         )
-        const totalPaid = invoicePayment.reduce(
-          (total, payment) => total + payment.totalAmtPaid,
-          0,
-        )
         const finalPayable = roundToTwoDecimals(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
-        return { ...billing.entity, finalClaim, finalPayable }
+        return {
+          ...billing.default,
+          ...billing.entity,
+          finalClaim,
+          finalPayable,
+          visitId: billing.visitID,
+        }
       }
     } catch (error) {
       console.log({ error })
     }
-    return billing.default
+    return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch } = props
-    const {
-      concurrencyToken,
-      visitId,
-      visitStatus = 'BILLING',
-      invoice,
-      invoicePayer,
-      invoicePayment,
-      mode,
-    } = values
-
-    const { invoiceItems, ...restInvoice } = invoice
-
-    const payload = {
-      mode,
-      concurrencyToken,
-      visitId,
-      visitStatus,
-      invoicePayment: invoicePayment
-        .filter((item) => {
-          if (item.id && item.isCancelled) return true
-          if (!item.id) return true
-          return false
-        })
-        .map((item) => ({
-          ...item,
-          invoicePayerFK: undefined,
-        })),
-      invoice: restInvoice,
-      invoicePayer: invoicePayer
-        .map((item, index) => ({ ...item, sequence: index }))
-        .filter((payer) => {
-          if (payer.id === undefined && payer.isCancelled) return false
-          return true
-        })
-        .filter((payer) => (payer.id ? payer.isModified : true))
-        .map((payer) => {
-          const {
-            schemeConfig,
-            _indexInClaimableSchemes,
-            _isConfirmed,
-            claimableSchemes,
-            _isDeleted,
-            _isEditing,
-            _isValid,
-            isModified,
-            ...restPayer
-          } = payer
-          const _payer = {
-            ...restPayer,
-            isModified: restPayer.id ? isModified : false,
-            invoicePayerItem: payer.invoicePayerItem
-              .filter((item) => item.claimAmount > 0)
-              .map((item) => {
-                if (item.invoiceItemFK) {
-                  return { ...item }
-                }
-                const {
-                  invoiceItemFK,
-                  _claimedAmount,
-                  disabled,
-                  itemCode,
-                  rowIndex,
-                  notClaimableBySchemeIds,
-                  invoiceItemTypeFK,
-                  itemDescription,
-                  coverage,
-                  payableBalance,
-                  id,
-                  ...restItem
-                } = item
-
-                const _invoicePayerItem = {
-                  ...restItem,
-                  invoiceItemFK: id,
-                  payableBalance,
-                  invoiceItemTypeFK,
-                  itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
-                  itemName: itemDescription,
-                }
-                return _invoicePayerItem
-              }),
-          }
-          return _payer
-        }),
-    }
-
+    const { visitStatus } = values
+    const payload = constructPayload(values)
+    // console.log({ payload })
+    // return true
     dispatch({
-      type: 'billing/submit',
+      type: 'billing/save',
       payload,
     }).then((response) => {
       if (response) {
@@ -207,6 +135,7 @@ class Billing extends Component {
     showReport: false,
     showAddPaymentModal: false,
     isEditing: false,
+    submitCount: 0,
   }
 
   componentWillUnmount () {
@@ -257,38 +186,79 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
+  upsertBilling = () => {
+    this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+    this.props.handleSubmit()
+  }
+
   shouldDisableSaveAndCompleteButton = () => {
     const { values } = this.props
-    const { invoicePayer = [], payments = [], invoice } = values
+    const { invoicePayer = [], invoice } = values
     if (invoice === null) return true
-    // if (payments.length === 0) return true
     if (invoicePayer.length === 0) return false
 
     return false
   }
 
   onSavePaymentClick = async () => {
-    const { setFieldValue, handleSubmit } = this.props
+    const { setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'BILLING')
-    handleSubmit()
+    this.upsertBilling()
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue, handleSubmit, values } = this.props
+    const { setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    handleSubmit()
+    this.upsertBilling()
+  }
+
+  onPrintInvoiceClick = () => {
+    const { values, dispatch } = this.props
+    const { invoicePayer } = values
+    const modifiedOrNewAddedPayer = invoicePayer.filter((payer) => {
+      if (payer.id === undefined && payer.isCancelled) return false
+      if (payer.id) return payer.isModified
+      return true
+    })
+    if (modifiedOrNewAddedPayer.length > 0) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent: `Save changes and print invoice?`,
+          onConfirmSave: () => {
+            const payload = constructPayload({
+              ...values,
+              visitStatus: 'BILLING',
+            })
+            dispatch({
+              type: 'billing/save',
+              payload,
+            }).then((response) => {
+              if (response) {
+                this.setState((preState) => ({
+                  submitCount: preState.submitCount + 1,
+                }))
+                this.toggleReport()
+              }
+            })
+          },
+        },
+      })
+    } else this.toggleReport()
   }
 
   handleAddPayment = async (payment) => {
-    const { values, setFieldValue, setValues, handleSubmit } = this.props
+    const { values, setValues } = this.props
     const { outstandingBalance, ...rest } = payment
     const invoicePayment = [
       ...values.invoicePayment.filter((item) => item.id),
       rest,
     ]
-
     const _newValues = {
       ...values,
       invoicePayment,
@@ -298,11 +268,11 @@ class Billing extends Component {
     await setValues(_newValues)
     this.calculateOutstandingBalance(invoicePayment)
     this.toggleAddPaymentModal()
-    handleSubmit()
+    this.upsertBilling()
   }
 
   handleDeletePayment = async (id) => {
-    const { values, setValues, user, handleSubmit } = this.props
+    const { values, setValues, user } = this.props
     const { invoicePayment } = values
     let _newInvoicePayment = [
       ...invoicePayment,
@@ -333,20 +303,31 @@ class Billing extends Component {
     }
     await setValues(_newValues)
     this.calculateOutstandingBalance(_newInvoicePayment)
-    handleSubmit()
+    this.upsertBilling()
   }
 
   render () {
-    const { showReport, showAddPaymentModal } = this.state
-    const { classes, values, dispense, loading, setFieldValue } = this.props
+    const { showReport, showAddPaymentModal, submitCount } = this.state
+    const {
+      classes,
+      values,
+      dispense,
+      loading,
+      setFieldValue,
+      setValues,
+      patient,
+      sessionInfo,
+      user,
+    } = this.props
     const formikBag = {
       values,
       setFieldValue,
+      setValues,
     }
 
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
-        <PatientBanner style={bannerStyle} />
+        <PatientBanner />
         <div className={classes.accordionContainer}>
           <LoadingWrapper
             linear
@@ -360,9 +341,9 @@ class Billing extends Component {
                 {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
-                    <Paper elevation={3} className={classes.dispenseContainer}>
+                    <div className={classes.dispenseContainer}>
                       <DispenseDetails viewOnly values={dispense.entity} />
-                    </Paper>
+                    </div>
                   ),
                 },
               ]}
@@ -374,9 +355,8 @@ class Billing extends Component {
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
               <ApplyClaims
-                handleAddCopayerClick={this.toggleCopayerModal}
                 handleIsEditing={this.handleIsEditing}
-                // values={values}
+                submitCount={submitCount}
                 {...formikBag}
               />
             </GridContainer>
@@ -385,7 +365,7 @@ class Billing extends Component {
                 disabled={this.state.isEditing}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
-                handlePrintInvoiceClick={this.toggleReport}
+                handlePrintInvoiceClick={this.onPrintInvoiceClick}
                 {...formikBag}
               />
             </GridContainer>
@@ -422,9 +402,14 @@ class Billing extends Component {
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}
+            invoicePayerName={patient.name}
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
+              payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
+              paymentReceivedDate: moment().formatUTC(),
+              paymentReceivedByUserFK: user.id,
+              paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,
             }}

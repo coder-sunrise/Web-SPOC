@@ -60,6 +60,7 @@ import {
   NumberInput,
   Switch,
   ButtonSelect,
+  OutlinedTextField,
 } from '@/components'
 
 import { widgets } from '@/utils/widgets'
@@ -121,6 +122,7 @@ const styles = (theme) => ({
 const initValues = {
   doctorRemarks: 'Testing multiple lines of input',
   timing2: '08:30',
+  numberField: 123,
   doctor: [
     'bao',
   ],
@@ -197,7 +199,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
-    // console.log(this.props)
+    console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -234,6 +236,29 @@ class ControlTest extends PureComponent {
     const testComponents = (
       <div style={{ marginBottom: theme.spacing(5) }}>
         <GridContainer>
+          <GridItem sm={3}>
+            {/* <TextField
+              value={`${this.state.val}`}
+              prefix={<Search />}
+              label='Name'
+              onChange={(e) => {
+                this.setState({
+                  val: e.target.value,
+                })
+              }}
+            /> */}
+
+            <FastField
+              name='coPaymentSchemeName'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Copayment Scheme name'
+                  code='coPaymentScheme'
+                />
+              )}
+            />
+          </GridItem>
           <GridItem sm={3}>
             {/* <TextField
               value={`${this.state.val}`}
@@ -507,6 +532,29 @@ class ControlTest extends PureComponent {
                           {option.displayvalue}
                         </span>
                       )
+                    }}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem sm={3}>
+            <FastField
+              name='name'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Text Input'
+                    multiline
+                    rowsMax={3}
+                    rows={3}
+                    maxLength={20}
+                    onChange={(v) => {
+                      console.log(v)
+                    }}
+                    onBlur={(v) => {
+                      console.log('blur', v)
                     }}
                     {...args}
                   />

@@ -7,6 +7,7 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { LoadingWrapper } from '@/components/_medisys'
 import {
+  CommonTableGrid,
   ProgressButton,
   GridContainer,
   GridItem,
@@ -18,11 +19,7 @@ import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
 import Authorized from '@/utils/Authorized'
 // variables
-import {
-  NewCHASColumnExtensions,
-  NewCHASColumns,
-  TableConfig,
-} from './variables'
+import { NewCHASColumnExtensions, NewCHASColumns } from './variables'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -33,6 +30,16 @@ const styles = (theme) => ({
     marginBottom: theme.spacing(1),
   },
 })
+
+const TableConfig2 = {
+  FuncProps: {
+    selectable: true,
+    selectConfig: {
+      showSelectAll: true,
+      rowSelectionEnabled: () => true,
+    },
+  },
+}
 
 @connect(({ claimSubmissionNew }) => ({
   claimSubmissionNew,
@@ -46,8 +53,11 @@ class NewCHAS extends React.Component {
     isLoading: false,
   }
 
-  componentDidMount () {
-    this.refreshDataGrid()
+  componentWillMount () {
+    // this.refreshDataGrid()
+    this.props.dispatch({
+      type: 'claimSubmissionNew/query',
+    })
   }
 
   onRefreshClicked = () => this.refreshDataGrid()
@@ -114,19 +124,38 @@ class NewCHAS extends React.Component {
           values={values}
           modelsName='claimSubmissionNew'
         />
-        <GridContainer>
-          <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
+        <LoadingWrapper linear loading={isLoading} text='Submitting Claim...'>
+          <GridContainer>
             <GridItem md={12}>
               <TableGrid
                 data={list}
                 columnExtensions={NewCHASColumnExtensions}
                 columns={NewCHASColumns}
-                tableConfig={TableConfig}
+                // tableConfig={TableConfig2}
+                FuncProps={{
+                  selectable: true,
+                  selectConfig: {
+                    showSelectAll: true,
+                    rowSelectionEnabled: () => true,
+                  },
+                }}
                 selection={this.state.selectedRows}
                 onSelectionChange={this.handleSelectionChange}
                 onContextMenuItemClick={(row, id) =>
                   handleContextMenuItemClick(row, id, true)}
+                type='new'
               />
+              {/* <CommonTableGrid
+                getRowId={(row) => row.id}
+                type='claimSubmissionNew'
+                // rows={data}
+                columns={NewCHASColumns}
+                columnExtensions={NewCHASColumnExtensions}
+                // {...TableConfig}
+                // selection={selection}
+                // onSelectionChange={onSelectionChange}
+                // ActionProps={{ TableCellComponent: Cell }}
+              /> */}
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
@@ -148,8 +177,8 @@ class NewCHAS extends React.Component {
                 </ProgressButton>
               </Authorized>
             </GridItem>
-          </LoadingWrapper>
-        </GridContainer>
+          </GridContainer>
+        </LoadingWrapper>
       </CardContainer>
     )
   }

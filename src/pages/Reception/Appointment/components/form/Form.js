@@ -61,7 +61,7 @@ import styles from './style'
   }),
 )
 @withFormikExtend({
-  notDirtyDuration: 0.5,
+  // notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
   enableReinitialize: true,
   validationSchema: ValidationSchema,
@@ -133,13 +133,14 @@ class Form extends React.PureComponent {
     const { showSearchPatientModal } = this.state
     this.setState({ showSearchPatientModal: !showSearchPatientModal })
     if (showSearchPatientModal) {
-      this.props.dispatch({
-        type: 'patientSearch/updateState',
-        payload: {
-          filter: {},
-          list: [],
-        },
-      })
+      // this.props.dispatch({
+      //   type: 'patientSearch/updateState',
+      //   payload: {
+      //     filter: {},
+      //     list: [],
+      //   },
+      // })
+      this.resetPatientSearchResult()
     }
   }
 
@@ -197,6 +198,16 @@ class Form extends React.PureComponent {
     this.showSearchResult()
   }
 
+  resetPatientSearchResult = () => {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        filter: {},
+        list: [],
+      },
+    })
+  }
+
   showSearchResult = () => {
     const { patientSearchResult } = this.props
 
@@ -205,6 +216,7 @@ class Form extends React.PureComponent {
 
       if (shouldPopulate) {
         this.onSelectPatientClick(patientSearchResult[0], true)
+        this.resetPatientSearchResult()
       } else this.toggleSearchPatientModal()
     }
   }
@@ -299,20 +311,46 @@ class Form extends React.PureComponent {
     }
     if (deleted) {
       const { datagrid } = this.state
-      const newDatagrid = datagrid.filter(
-        (event) => !deleted.includes(event.id),
-      )
+      // const newDatagrid = datagrid.filter(
+      //   (event) => !deleted.includes(event.id),
+      // )
+      const afterDelete = datagrid.map((item) => ({
+        ...item,
+        isDeleted: deleted.includes(item.id),
+      }))
+      const hasOneRowOnlyAfterDelete =
+        afterDelete.filter((item) => !item.isDeleted).length === 1
+      let newDataGrid = [
+        ...afterDelete,
+      ]
+      if (hasOneRowOnlyAfterDelete) {
+        newDataGrid = afterDelete.reduce(
+          (datas, item) => [
+            ...datas,
+            { ...item, isPrimaryClinician: !item.isDeleted },
+          ],
+          [],
+        )
+      }
+      // const newDatagrid = datagrid.map(
+      //   (event) =>
+      //     deleted.includes(event.id)
+      //       ? { ...event, isDeleted: true }
+      //       : { ...event },
+      // )
+      // const newRows =
+      //   newDatagrid.length === 1
+      //     ? [
+      //         { ...newDatagrid[0], isPrimaryClinician: true },
+      //       ]
+      //     : newDatagrid
       this.setState(
         {
-          datagrid:
-            newDatagrid.length === 1
-              ? [
-                  { ...newDatagrid[0], isPrimaryClinician: true },
-                ]
-              : newDatagrid,
+          datagrid: newDataGrid,
         },
         this.validateDataGrid,
       )
+      return newDataGrid
     }
   }
 
@@ -327,28 +365,47 @@ class Form extends React.PureComponent {
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
 
-    // has 1 primary doctor
-    // const hasPrimaryDoctor = datagrid.reduce(
-    //   (hasPrimary, row) => (row.isPrimaryClinician ? true : hasPrimary),
-    //   false,
-    // )
-    // if (!hasPrimaryDoctor) isDataGridValid = false
-    // this.setState({ isDataGridValid })
-    const newDataGrid =
-      datagrid.length === 1
-        ? [
-            {
-              ...datagrid[0],
-              isPrimaryClinician:
-                datagrid[0].isPrimaryClinician === undefined
-                  ? true
-                  : datagrid[0].isPrimaryClinician,
-            },
-          ]
-        : [
-            ...datagrid,
-          ]
-    this.setState({ isDataGridValid, datagrid: newDataGrid })
+    const filterDeleted = datagrid.filter((item) => !item.isDeleted)
+    const hasPrimary = filterDeleted.reduce(
+      (hasPrimaryClinician, item) =>
+        item.isPrimaryClinician || hasPrimaryClinician,
+      false,
+    )
+
+    if (!hasPrimary) isDataGridValid = false
+    // const hasOneRowOnly =
+    //   datagrid.filter((item) => !item.isDeleted).length === 1
+    // let newDataGrid = [
+    //   ...datagrid,
+    // ]
+    // if (hasOneRowOnly) {
+    //   newDataGrid = datagrid.reduce(
+    //     (datas, item) => [
+    //       ...datas,
+    //       { ...item, isPrimaryClinician: !item.isDeleted },
+    //     ],
+    //     [],
+    //   )
+    // }
+    // const newDataGrid =
+    //   datagrid.length === 1
+    //     ? [
+    //         {
+    //           ...datagrid[0],
+    //           isPrimaryClinician:
+    //             datagrid[0].isPrimaryClinician === undefined
+    //               ? true
+    //               : datagrid[0].isPrimaryClinician,
+    //         },
+    //       ]
+    //     : [
+    //         ...datagrid,
+    //       ]
+
+    this.setState({
+      isDataGridValid,
+      // datagrid: newDataGrid,
+    })
   }
 
   _submit = async (validate = false, preSubmit = false) => {
@@ -360,7 +417,7 @@ class Form extends React.PureComponent {
         setSubmitting,
         handleSubmit,
         values,
-        onClose,
+        onConfirm,
         dispatch,
       } = this.props
       const {
@@ -401,12 +458,7 @@ class Form extends React.PureComponent {
               },
             })
           } else {
-            dispatch({
-              type: 'formik/clean',
-              payload: 'AppointmentForm',
-            })
-            resetForm()
-            onClose()
+            onConfirm()
           }
         }
       })
@@ -599,7 +651,11 @@ class Form extends React.PureComponent {
       pid: values.patientProfileFK,
       apptid: values.currentAppointment.id,
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
-      pdroomid: primaryDoctorResource.roomFk, // primary clinician id
+    }
+
+    if (primaryDoctorResource.roomFk) {
+      // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
+      parameters.pdroomid = primaryDoctorResource.roomFk
     }
 
     this.onCloseFormClick()
@@ -646,6 +702,12 @@ class Form extends React.PureComponent {
     if (_disabledStatus.includes(currentAppointment.appointmentStatusFk))
       return true
     return false
+  }
+
+  shouldDisableAppointmentDate = () => {
+    const { values } = this.props
+    if (!values.id) return false
+    return values.isEnableRecurrence
   }
 
   render () {
@@ -699,8 +761,8 @@ class Form extends React.PureComponent {
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
+    const _disableAppointmentDate = this.shouldDisableAppointmentDate()
 
-    // console.log({ show, loadingEffects: loading.effects, isSubmitting })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
@@ -719,7 +781,7 @@ class Form extends React.PureComponent {
                   patientProfileFK={values.patientProfileFK}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
-                <AppointmentDateInput />
+                <AppointmentDateInput disabled={_disableAppointmentDate} />
               </GridItem>
               <GridItem xs md={6} className={classnames(classes.remarksField)}>
                 <Field

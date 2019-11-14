@@ -4,165 +4,25 @@ import router from 'umi/router'
 // material ui
 import { Popover } from '@material-ui/core'
 // medisys component
-import { LoadingWrapper, DoctorLabel } from '@/components/_medisys'
-import { CommonTableGrid, DateFormatter, notification } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
+import { CommonTableGrid, notification } from '@/components'
 // medisys component
 // sub component
 import ActionButton from './ActionButton'
-import StatusBadge from './StatusBadge'
+import ContextMenu from './ContextMenu'
 // utils
 import { getAppendUrl } from '@/utils/utils'
-import { calculateAgeFromDOB } from '@/utils/dateUtils'
-import { flattenAppointmentDateToCalendarEvents } from '@/pages/Reception/Appointment'
-import { filterData, formatAppointmentTimes } from '../utils'
+import { filterData } from '../utils'
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
-import { GENDER } from '@/utils/constants'
 
-const compareQueueNo = (a, b) => {
-  const floatA = parseFloat(a)
-  const floatB = parseFloat(b)
-  if (Number.isNaN(floatA) || Number.isNaN(floatB)) {
-    return -1
-  }
-
-  return floatA < floatB ? -1 : 1
-}
-
-const compareString = (a, b) => a.localeCompare(b)
-const compareDoctor = (a, b) =>
-  a.clinicianProfile.name.localeCompare(b.clinicianProfile.name)
-
-const FuncConfig = {
-  pager: false,
-  sort: true,
-  sortConfig: {
-    defaultSorting: [
-      { columnName: 'queueNo', direction: 'asc' },
-    ],
-  },
-}
-const TableConfig = {
-  columns: [
-    { name: 'visitStatus', title: 'Status' },
-    { name: 'queueNo', title: 'Q. No.' },
-    { name: 'patientName', title: 'Patient Name' },
-    { name: 'patientAccountNo', title: 'Acc. No.' },
-    { name: 'gender/age', title: 'Gender / Age' },
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'appointmentTime', title: 'Appt. Time' },
-    { name: 'roomNo', title: 'Room No.' },
-    { name: 'timeIn', title: 'Time In' },
-    { name: 'timeOut', title: 'Time Out' },
-    { name: 'invoiceNo', title: 'Invoice No' },
-    { name: 'invoiceStatus', title: 'Invoice Status' },
-    { name: 'invoiceAmount', title: 'Invoice Amt.' },
-    { name: 'invoicePaymentMode', title: 'Payment Mode' },
-    { name: 'invoiceGST', title: 'GST' },
-    { name: 'invoicePaymentAmount', title: 'Payment' },
-    { name: 'invoiceOutstanding', title: 'Outstanding' },
-    { name: 'patientScheme', title: 'Scheme' },
-    { name: 'patientMobile', title: 'Phone' },
-    { name: 'action', title: 'Action' },
-  ],
-  leftColumns: [
-    'visitStatus',
-    'queueNo',
-  ],
-}
-
-const columnExtensions = [
-  {
-    columnName: 'visitStatus',
-    width: 180,
-    render: (row) => <StatusBadge row={row} />,
-  },
-  { columnName: 'queueNo', width: 80, compare: compareQueueNo },
-  { columnName: 'patientAccountNo', compare: compareString },
-  { columnName: 'visitStatus', type: 'status', width: 150 },
-  { columnName: 'invoiceNo', render: (row) => row.invoiceNo || '-' },
-  {
-    columnName: 'roomNo',
-    render: (row) => row.roomNo || '-',
-  },
-  {
-    columnName: 'patientScheme',
-    render: (row) => row.patientScheme || '-',
-  },
-  {
-    columnName: 'invoicePaymentMode',
-    width: 150,
-    render: (row) => row.invoicePaymentMode || '-',
-  },
-  {
-    columnName: 'patientName',
-    width: 250,
-    compare: compareString,
-  },
-  { columnName: 'referralCompany', width: 150 },
-  { columnName: 'referralPerson', width: 150 },
-  { columnName: 'referralRemarks', width: 150 },
-  { columnName: 'invoiceAmount', type: 'number', currency: true },
-  { columnName: 'invoicePaymentAmount', type: 'number', currency: true },
-  { columnName: 'invoiceGST', type: 'number', currency: true },
-  { columnName: 'invoiceOutstanding', type: 'number', currency: true },
-  { columnName: 'Action', width: 100, align: 'center' },
-  {
-    columnName: 'timeIn',
-    width: 160,
-    render: (row) =>
-      DateFormatter({
-        value: row.timeIn,
-        full: true,
-      }),
-  },
-  {
-    columnName: 'timeOut',
-    width: 160,
-    render: (row) =>
-      DateFormatter({
-        value: row.timeOut,
-        full: true,
-      }),
-  },
-  {
-    columnName: 'gender/age',
-    render: (row) => {
-      if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
-        const { patientProfile } = row
-        const { genderFK, dob } = patientProfile
-        const gender = GENDER[genderFK] ? GENDER[genderFK].substr(0, 1) : 'U'
-        const age = calculateAgeFromDOB(dob)
-        return `${gender}/${age}`
-      }
-      const { dob, gender = 'U' } = row
-
-      const ageLabel = calculateAgeFromDOB(dob)
-      return `${gender}/${ageLabel}`
-    },
-    sortingEnabled: false,
-  },
-  {
-    columnName: 'appointmentTime',
-    width: 160,
-    render: (row) => {
-      if (row.appointmentTime) {
-        return DateFormatter({
-          value: row.appointmentTime,
-          full: true,
-        })
-      }
-
-      if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
-      return '-'
-    },
-  },
-  {
-    columnName: 'doctor',
-    compare: compareDoctor,
-    render: (row) => <DoctorLabel doctor={row.doctor} hideMCR />,
-  },
-]
+import {
+  FuncConfig,
+  QueueTableConfig,
+  QueueColumnExtensions,
+  AppointmentTableConfig,
+  ApptColumnExtensions,
+} from './variables'
 
 const gridHeight = window.innerHeight - 250
 
@@ -186,14 +46,24 @@ const Grid = ({
     anchorEl,
     setAnchorEl,
   ] = useState(null)
-  const handlePopoverOpen = (event) => setAnchorEl(event.currentTarget)
 
-  const handlePopoverClose = () => setAnchorEl(null)
+  const [
+    rightClickedRow,
+    setRightClickedRow,
+  ] = useState(undefined)
+
+  const handlePopoverOpen = (event) => setAnchorEl(event.target)
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
+    setRightClickedRow(undefined)
+  }
 
   const openContextMenu = Boolean(anchorEl)
 
   const isAssignedDoctor = useCallback(
     (row) => {
+      if (!row.doctor) return false
       const { doctor: { id }, visitStatus } = row
       const { clinicianProfile: { doctorProfile } } = user.data
 
@@ -233,15 +103,15 @@ const Grid = ({
     })
   }
 
-  const calendarData = useMemo(
-    () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
-    [
-      calendarEvents,
-    ],
-  )
+  // const calendarData = useMemo(
+  //   () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),
+  //   [
+  //     calendarEvents,
+  //   ],
+  // )
 
   const computeQueueListingData = () => {
-    if (filter === StatusIndicator.APPOINTMENT) return calendarData
+    if (filter === StatusIndicator.APPOINTMENT) return calendarEvents
     let data = [
       ...queueList,
     ]
@@ -250,6 +120,7 @@ const Grid = ({
 
     if (selfOnly)
       data = data.filter((item) => {
+        if (!item.doctor) return false
         const { doctor: { id } } = item
         return doctorProfile ? id === doctorProfile.id : false
       })
@@ -354,7 +225,7 @@ const Grid = ({
             }).then((o) => {
               if (o)
                 router.push(
-                  `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                  `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                 )
             })
           }
@@ -376,12 +247,12 @@ const Grid = ({
               }).then((o) => {
                 if (o)
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
               })
             } else {
               router.push(
-                `/reception/queue/patientdashboard?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}&md2=cons`,
+                `/reception/queue/consultation?qid=${row.id}&cid=${row.clinicalObjectRecordFK}&v=${version}`,
               )
             }
           }
@@ -423,7 +294,7 @@ const Grid = ({
                           },
                         }).then((c) => {
                           router.push(
-                            `/reception/queue/patientdashboard?qid=${row.id}&cid=${c.id}&v=${version}&md2=cons`,
+                            `/reception/queue/consultation?qid=${row.id}&cid=${c.id}&v=${version}`,
                           )
                         })
                       },
@@ -431,7 +302,7 @@ const Grid = ({
                   })
                 } else {
                   router.push(
-                    `/reception/queue/patientdashboard?qid=${row.id}&cid=${o.id}&v=${version}&md2=cons`,
+                    `/reception/queue/consultation?qid=${row.id}&cid=${o.id}&v=${version}`,
                   )
                 }
             })
@@ -439,20 +310,20 @@ const Grid = ({
           break
         }
         case '8': {
+          const { clinicianprofile = [] } = codetable
+          const doctorProfile = clinicianprofile.find(
+            (item) => item.id === row.clinicianProfileFk,
+          )
           handleActualizeAppointment({
             patientID: row.patientProfileFk,
             appointmentID: row.id,
-            primaryClinicianFK: row.appointment_Resources.find(
-              (item) => item.isPrimaryClinician,
-            ).clinicianFK,
-            primaryClinicianRoomFK: row.appointment_Resources.find(
-              (item) => item.isPrimaryClinician,
-            ).roomFk,
+            primaryClinicianFK: doctorProfile ? doctorProfile.id : undefined,
+            primaryClinicianRoomFK: row.roomFk,
           })
           break
         }
         case '9':
-          onRegisterPatientClick()
+          onRegisterPatientClick(false, row)
           break
         default:
           break
@@ -489,72 +360,113 @@ const Grid = ({
     ],
   )
 
+  const handleContextMenuClick = useCallback(
+    (menuItem) => {
+      handlePopoverClose()
+      onClick(rightClickedRow, menuItem.key)
+    },
+    [
+      rightClickedRow,
+    ],
+  )
+
+  const onOutsidePopoverRightClick = (event) => {
+    event.preventDefault()
+    handlePopoverClose()
+  }
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
 
   return (
-    <div style={{ minHeight: '76vh' }}>
+    // <div style={{ minHeight: '76vh' }}>
+    <div>
       <LoadingWrapper
         linear
         loading={isLoading || queryingFormData}
         text={loadingText}
       >
-        <CommonTableGrid
-          size='sm'
-          TableProps={{ height: gridHeight }}
-          rows={queueListingData}
-          onContextMenu={(row, event) => {
-            // event.preventDefault()
-            // handlePopoverOpen(event)
-          }}
-          columnExtensions={[
-            ...columnExtensions,
-            {
-              columnName: 'action',
-              align: 'center',
-              render: renderActionButton,
-            },
-          ]}
-          FuncProps={FuncConfig}
-          onRowDoubleClick={onRowDoubleClick}
-          {...TableConfig}
-        />
+        {filter !== StatusIndicator.APPOINTMENT && (
+          <CommonTableGrid
+            size='sm'
+            TableProps={{ height: gridHeight }}
+            rows={queueListingData}
+            columnExtensions={[
+              ...QueueColumnExtensions,
+              {
+                columnName: 'action',
+                align: 'center',
+                render: renderActionButton,
+              },
+            ]}
+            FuncProps={FuncConfig}
+            onRowDoubleClick={onRowDoubleClick}
+            onContextMenu={(row, event) => {
+              event.preventDefault()
+              handlePopoverOpen(event)
+              setRightClickedRow(row)
+            }}
+            {...QueueTableConfig}
+          />
+        )}
+        {filter === StatusIndicator.APPOINTMENT && (
+          <CommonTableGrid
+            size='sm'
+            TableProps={{ height: gridHeight }}
+            rows={queueListingData}
+            columnExtensions={[
+              ...ApptColumnExtensions,
+              {
+                columnName: 'action',
+                align: 'center',
+                render: renderActionButton,
+              },
+            ]}
+            FuncProps={FuncConfig}
+            onRowDoubleClick={onRowDoubleClick}
+            {...AppointmentTableConfig}
+          />
+        )}
       </LoadingWrapper>
-      {/* <Popover
-        open={openContextMenu}
-        anchorEl={anchorEl}
-        // anchorOrigin={{
-        //   vertical: 'center',
-        //   horizontal: 'center',
-        // }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'center',
-        }}
-        onClose={handlePopoverClose}
-        // style={{ width: 500, height: 500 }}
-      >
-        <div style={{ width: 200, height: 400 }}>123f</div>
-      </Popover> */}
+      {rightClickedRow && (
+        <Popover
+          open={openContextMenu}
+          onContextMenu={onOutsidePopoverRightClick}
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'center',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          onClose={handlePopoverClose}
+        >
+          <ContextMenu
+            show={openContextMenu}
+            handleClick={handleContextMenuClick}
+            row={rightClickedRow}
+          />
+        </Popover>
+      )}
     </div>
   )
 }
 
-export default connect(
-  ({ queueLog, calendar, global, loading, user, codetable }) => ({
-    user,
-    codetable,
-    filter: queueLog.currentFilter,
-    selfOnly: queueLog.selfOnly,
-    queueList: queueLog.list || [],
-    calendarEvents: calendar.list || [],
-    showingVisitRegistration: global.showVisitRegistration,
-    queryingList:
-      loading.effects['queueLog/refresh'] ||
-      loading.effects['queueLog/getSessionInfo'] ||
-      loading.effects['queueLog/query'] ||
-      loading.effects['calendar/getCalendarList'],
-    queryingFormData: loading.effects['dispense/initState'],
-  }),
-)(Grid)
+export default connect(({ queueLog, global, loading, user, codetable }) => ({
+  user,
+  codetable,
+  filter: queueLog.currentFilter,
+  selfOnly: queueLog.selfOnly,
+  queueList: queueLog.list || [],
+  calendarEvents: queueLog.appointmentList || [],
+  showingVisitRegistration: global.showVisitRegistration,
+  queryingList:
+    loading.effects['queueLog/refresh'] ||
+    loading.effects['queueLog/getSessionInfo'] ||
+    loading.effects['queueLog/query'] ||
+    loading.effects['calendar/getCalendarList'],
+  queryingFormData: loading.effects['dispense/initState'],
+}))(Grid)

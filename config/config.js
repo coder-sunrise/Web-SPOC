@@ -19,7 +19,7 @@ const plugins = [
       locale: {
         enable: true, // default false
         default: 'en-US', // default zh-CN
-        baseNavigator: true, // default true, when it is true, will use `navigator.language` overwrite default
+        baseNavigator: false, // default true, when it is true, will use `navigator.language` overwrite default
       },
       dynamicImport: {
         loadingComponent: './components/PageLoading/index',
@@ -70,9 +70,12 @@ export default {
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
+    'process.env.client_env': 'development',
+    'process.env.client_secret':
+      '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
     'process.env.url': 'https://semr2dev2010.emr.com.sg',
     'process.env.signalrUrl':
-      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub',
+      'https://ec2-18-136-119-96.ap-southeast-1.compute.amazonaws.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,

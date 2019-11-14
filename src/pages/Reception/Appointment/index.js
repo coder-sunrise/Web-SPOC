@@ -72,13 +72,15 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         // }),
       ]
 
-@connect(({ calendar, codetable }) => ({
+@connect(({ calendar, codetable, clinicInfo }) => ({
   calendar,
   // doctorProfiles: codetable.doctorprofile || [],
-  clinicianProfiles: codetable.clinicianprofile || [],
+  clinicInfo,
+  doctorprofile: codetable.doctorprofile || [],
 }))
 class Appointment extends React.PureComponent {
   state = {
+    primaryClinicianFK: undefined,
     showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
@@ -97,7 +99,7 @@ class Appointment extends React.PureComponent {
   }
 
   componentWillMount () {
-    const { dispatch } = this.props
+    const { dispatch, clinicInfo } = this.props
     const startOfMonth = moment().startOf('month').add(-8, 'hours').formatUTC()
     const endOfMonth = moment().endOf('month').add(-8, 'hours').formatUTC()
 
@@ -110,18 +112,39 @@ class Appointment extends React.PureComponent {
       },
     })
 
-    // dispatch({
-    //   type: 'calendar/getPublicHolidayList',
-    //   payload: { start: startOfMonth },
-    // })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'doctorprofile' },
+    }).then((response) => {
+      const primaryClinician = response.find(
+        (item) =>
+          parseInt(item.id, 10) ===
+          parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
+      )
+
+      this.setState({
+        primaryClinicianFK: primaryClinician.clinicianProfile.id,
+        resources: [
+          {
+            clinicianFK: primaryClinician.clinicianProfile.id,
+            doctorName: primaryClinician.clinicianProfile.name,
+          },
+        ],
+      })
+      // this.setState({
+      //   resources: response.map((item) => ({
+      //     clinicianFK: item.clinicianProfile.id,
+      //     doctorName: item.clinicianProfile.name,
+      //   })),
+      // })
+    })
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },
     })
     dispatch({
-      type: 'doctorBlock/query',
+      type: 'doctorBlock/queryAll',
       payload: {
-        pagesize: 9999,
         lgteql_startDateTime: startOfMonth,
       },
     })
@@ -172,11 +195,13 @@ class Appointment extends React.PureComponent {
   }
 
   onSelectSlot = (props) => {
-    let { start, end } = props
+    const { start, end, resourceId } = props
+
     const selectedSlot = {
       allDay: start - end === 0,
       start,
       end,
+      resourceId,
     }
 
     this.setState({
@@ -283,16 +308,16 @@ class Appointment extends React.PureComponent {
 
   onFilterUpdate = (filter) => {
     const { filterByDoctor = [] } = filter
-    const { clinicianProfiles } = this.props
+    const { doctorprofile } = this.props
 
-    const newResources = clinicianProfiles.reduce(
+    const newResources = doctorprofile.reduce(
       (resources, doctor) =>
-        filterByDoctor.includes(doctor.id)
+        filterByDoctor.includes(doctor.clinicianProfile.id)
           ? [
               ...resources,
               {
-                clinicianFK: doctor.id,
-                doctorName: doctor.name,
+                clinicianFK: doctor.clinicianProfile.id,
+                doctorName: doctor.clinicianProfile.name,
               },
             ]
           : [
@@ -379,6 +404,7 @@ class Appointment extends React.PureComponent {
       popoverEvent,
       filter,
       selectedAppointmentFK,
+      primaryClinicianFK,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -418,6 +444,7 @@ class Appointment extends React.PureComponent {
         </Popover>
 
         <FilterBar
+          primaryRegisteredDoctorFK={primaryClinicianFK}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}

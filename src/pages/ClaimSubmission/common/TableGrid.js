@@ -4,19 +4,21 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import NearMe from '@material-ui/icons/NearMe'
 import Money from '@material-ui/icons/AttachMoney'
 // common components
+import { GridContextMenuButton as GridButton } from 'medisys-components'
 import { CommonTableGrid, Tooltip } from '@/components'
 // sub component
-import { GridContextMenuButton as GridButton } from 'medisys-components'
 
 const TableGrid = ({
   data,
   columns,
   columnExtensions,
   tableConfig,
+  FuncProps,
   selection,
   onSelectionChange,
   onContextMenuItemClick,
   contextMenuOptions = undefined,
+  type,
 }) => {
   const Cell = React.memo(({ ...tableProps }) => {
     const handleMenuItemClick = (row, id) => {
@@ -63,12 +65,37 @@ const TableGrid = ({
     return <Table.Cell {...tableProps} />
   })
 
+  const currentType = () => {
+    switch (type) {
+      case 'draft': {
+        return 'claimSubmissionDraft'
+      }
+      case 'new': {
+        return 'claimSubmissionNew'
+      }
+      case 'approved': {
+        return 'claimSubmissionApproved'
+      }
+      case 'rejected': {
+        return 'claimSubmissionRejected'
+      }
+      case 'submitted': {
+        return 'claimSubmissionSubmitted'
+      }
+      default: {
+        return 'claimSubmissionNew'
+      }
+    }
+  }
+
   return (
     <CommonTableGrid
-      rows={data}
+      getRowId={(row) => row.id}
+      type={currentType()}
+      // rows={data}
       columns={columns}
       columnExtensions={columnExtensions}
-      {...tableConfig}
+      FuncProps={FuncProps}
       selection={selection}
       onSelectionChange={onSelectionChange}
       ActionProps={{ TableCellComponent: Cell }}

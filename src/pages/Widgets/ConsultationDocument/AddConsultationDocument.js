@@ -162,7 +162,8 @@ class AddConsultationDocument extends PureComponent {
 
   getLoader = (editor, setFieldValue, currentType) => {
     const { classes, parentProps, codetable } = this.props
-    const { documenttemplate } = codetable
+    const { documenttemplate = [] } = codetable
+    // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
     return (
       <div className={classes.editorBtn}>
@@ -177,8 +178,8 @@ class AddConsultationDocument extends PureComponent {
             const match = msg.match(templateReg) || []
             // console.log(msg, templateReg, match, tagList)
             match.forEach((s) => {
-              const text = s.match(/data-value="(.*?)"/)[1]
-              const m = tagList.find((o) => o.text === text)
+              const value = s.match(/data-value="(.*?)"/)[1]
+              const m = tagList.find((o) => o.value === value)
               // console.log(text, m)
               if (m && m.getter) msg = msg.replace(s, m.getter())
             })
@@ -194,7 +195,6 @@ class AddConsultationDocument extends PureComponent {
           options={loadFromCodes}
           valueField='value'
           onChange={(val, option) => {
-            console.log(val, option)
             if (!val) return
             const { values } = parentProps
             const v = option.getter

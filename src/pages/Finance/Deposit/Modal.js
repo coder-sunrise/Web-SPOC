@@ -150,6 +150,7 @@ const style = () => ({
       }
     })
   },
+  displayName: 'Deposit',
 })
 class Modal extends PureComponent {
   constructor (props) {
@@ -216,7 +217,7 @@ class Modal extends PureComponent {
       type: 'deposit/bizSessionList',
       payload: {
         sessionNoPrefix: e,
-        pagesize: 999999,
+        pagesize: 999,
       },
     }).then(() => {
       const { bizSessionList } = this.props.deposit

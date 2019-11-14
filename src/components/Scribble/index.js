@@ -121,7 +121,6 @@ let temp = null
     return scriblenotes.entity === '' ? '' : scriblenotes.entity
   },
   validationSchema: Yup.object().shape({
-    drawing: Yup.string().required(),
     subject: Yup.string()
       .required()
       .max(20, 'Subject should not exceed 20 characters'),
@@ -150,7 +149,7 @@ class Scribble extends React.Component {
       imageVisible: false,
       textVisible: false,
       text: '',
-      fillColor: '#68CCCA',
+      fillColor: '#FFFFFF',
       fillWithColor: false,
       fillWithBackgroundColor: false,
       canUndo: false,
@@ -382,14 +381,12 @@ class Scribble extends React.Component {
   }
 
   toolShapeHandleClickAway = () => {
-
     this.setState({
       toolsShapeColor: false,
     })
   }
 
   colorHandleClickAway = () => {
-
     this.setState({
       selectColorColor: false,
     })
@@ -474,7 +471,10 @@ class Scribble extends React.Component {
                     })
                   }}
                 >
-                  <Select color={this.state.selectColor ? 'primary' : ''} />
+                  <Select
+                    color={this.state.selectColor ? 'primary' : ''}
+                    style={{ color: this.state.selectColor ? '' : '#191919' }}
+                  />
                 </ToggleButton>
               </Tooltip>
 
@@ -559,10 +559,13 @@ class Scribble extends React.Component {
                   }))
                 }}
               >
-                <Tooltip title='Colors'>
+                <Tooltip title='Drawing type'>
                   <ToggleButton key={2} type='primary'>
                     <Pen
                       color={this.state.toolsDrawingColor ? 'primary' : ''}
+                      style={{
+                        color: this.state.toolsDrawingColor ? '' : '#191919',
+                      }}
                     />
                   </ToggleButton>
                 </Tooltip>
@@ -651,10 +654,13 @@ class Scribble extends React.Component {
                   }))
                 }}
               >
-                <Tooltip title='Colors'>
+                <Tooltip title='Shape'>
                   <ToggleButton key={3} type='primary'>
                     <Rectangle
                       color={this.state.toolsShapeColor ? 'primary' : ''}
+                      style={{
+                        color: this.state.toolsShapeColor ? '' : '#191919',
+                      }}
                     />
                   </ToggleButton>
                 </Tooltip>
@@ -667,10 +673,7 @@ class Scribble extends React.Component {
                     <div>
                       <GridContainer>
                         <GridItem xs={12} md={12}>
-                          <div style={{ paddingBottom: 10 }}>
-                            <Typography>Colors</Typography>
-                            <Divider />
-                          </div>
+                          <div style={{ paddingBottom: 10 }} />
                           <Typography>Line Color</Typography>
                           <CompactPicker
                             id='lineColor'
@@ -723,6 +726,9 @@ class Scribble extends React.Component {
                   <ToggleButton key={4}>
                     <ColorLens
                       color={this.state.selectColorColor ? 'primary' : ''}
+                      style={{
+                        color: this.state.selectColorColor ? '' : '#191919',
+                      }}
                     />
                   </ToggleButton>
                 </Tooltip>
@@ -813,6 +819,7 @@ class Scribble extends React.Component {
                   <ToggleButton key={5}>
                     <InsertPhoto
                       color={this.state.imageColor ? 'primary' : ''}
+                      style={{ color: this.state.imageColor ? '' : '#191919' }}
                     />
                   </ToggleButton>
                 </Tooltip>
@@ -865,7 +872,10 @@ class Scribble extends React.Component {
               >
                 <Tooltip title='Add Text'>
                   <ToggleButton key={6}>
-                    <Title color={this.state.textColor ? 'primary' : ''} />
+                    <Title
+                      color={this.state.textColor ? 'primary' : ''}
+                      style={{ color: this.state.textColor ? '' : '#191919' }}
+                    />
                   </ToggleButton>
                 </Tooltip>
               </Popover>
@@ -887,7 +897,10 @@ class Scribble extends React.Component {
                     })
                   }}
                 >
-                  <Erase color={this.state.eraserColor ? 'primary' : ''} />
+                  <Erase
+                    color={this.state.eraserColor ? 'primary' : ''}
+                    style={{ color: this.state.eraserColor ? '' : '#191919' }}
+                  />
                 </ToggleButton>
               </Tooltip>
               <Tooltip title='Save'>
@@ -904,7 +917,7 @@ class Scribble extends React.Component {
                     })
                   }}
                 >
-                  <Save />
+                  <Save style={{ color: '#191919' }} />
                 </ToggleButton>
               </Tooltip>
               <Tooltip title='Undo'>

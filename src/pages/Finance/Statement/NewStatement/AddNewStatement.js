@@ -173,10 +173,10 @@ class AddNewStatement extends PureComponent {
     const payload = {
       'invoicePayer.CompanyFK': e || copayerFK,
       invoiceNo: InvoiceNo,
-      'visit.session.issessioncloseed': true,
       lgteql_invoiceDate: effectiveDates ? effectiveDates[0] : undefined,
       lsteql_invoiceDate: effectiveDates ? effectiveDates[1] : undefined,
     }
+
     dispatch({
       type: 'statement/queryInvoiceList',
       payload,
@@ -251,6 +251,7 @@ class AddNewStatement extends PureComponent {
                       <CodeSelect
                         label='Co-Payer'
                         code='ctcopayer'
+                        labelField='displayValue'
                         // onChange={(e) => this.getInvoiceList(e)}
                         disabled={statement.entity}
                         {...args}
@@ -407,9 +408,9 @@ class AddNewStatement extends PureComponent {
             >
               Close
             </Button>
-            <Button color='primary' onClick={() => handleSubmit()}>
+            <ProgressButton color='primary' onClick={() => handleSubmit()}>
               Save
-            </Button>
+            </ProgressButton>
           </GridItem>
         </CardContainer>
       </React.Fragment>

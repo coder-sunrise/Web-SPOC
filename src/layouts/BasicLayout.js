@@ -41,6 +41,7 @@ import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
+import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
@@ -103,8 +104,8 @@ const query = {
   },
 }
 
-const sessionTimeoutTimer = 30 * 60 * 1000
-// const sessionTimeoutTimer = 2500
+const sessionTimeoutTimer = 15 * 60 * 1000
+// const sessionTimeoutTimer = 5000
 
 class BasicLayout extends React.PureComponent {
   constructor (props) {
@@ -113,71 +114,13 @@ class BasicLayout extends React.PureComponent {
       mobileOpen: false,
       authorized: false,
     }
-    this.resizeFunction = this.resizeFunction.bind(this)
-
-    const { dispatch, route: { routes, authority } } = this.props
-
-    dispatch({
-      type: 'user/fetchCurrent',
-    }).then(async (d) => {
-      if (!d) return
-      reloadAuthorized()
-      await dispatch({
-        type: 'codetable/fetchAllCachedCodetable',
-      })
-      const getClinicSettings = sessionStorage.getItem('clinicSettings')
-      const getClinicInfo = sessionStorage.getItem('clinicInfo')
-      if (getClinicSettings === null) {
-        await dispatch({
-          type: 'clinicSettings/query',
-        })
-      } else {
-        const parsedClinicSettings = JSON.parse(getClinicSettings)
-        dispatch({
-          type: 'clinicSettings/updateState',
-          payload: {
-            settings: parsedClinicSettings,
-          },
-        })
-      }
-
-      if (getClinicInfo == null) {
-        await dispatch({
-          type: 'clinicInfo/query',
-          payload: localStorage.getItem('clinicCode'),
-        })
-      } else {
-        const parsedClinicInfo = JSON.parse(getClinicInfo)
-        dispatch({
-          type: 'clinicInfo/updateState',
-          payload: {
-            settings: parsedClinicInfo,
-          },
-        })
-      }
-
-      // console.log(routes, authority)
-      const menus = await dispatch({
-        type: 'menu/getMenuData',
-        payload: { routes, authority },
-      })
-      this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
-      this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
-      // console.log(this.breadcrumbNameMap)
-
-      this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
-      this.getPageTitle = memoizeOne(this.getPageTitle)
-      this.menus = menus
-      // this.forceUpdate()
-      await dispatch({
-        type: 'global/getUserSettings',
-      })
-
-      this.setState({
-        authorized: true,
-      })
+    // this.resize = this.resize.bind(this)
+    this.resize = _.debounce(this.resize, 500, {
+      leading: true,
     })
+    const { dispatch } = this.props
 
+    this.initUserData()
     initStream()
 
     let sessionTimeOutTimer = null
@@ -241,9 +184,9 @@ class BasicLayout extends React.PureComponent {
     // const accessToken = localStorage.getItem('token')
     // !accessToken && router.push('/login')
 
-    window.addEventListener('resize', this.resizeFunction)
-
-    const { dispatch, route: { routes, authority } } = this.props
+    window.addEventListener('resize', this.resize)
+    this.resize()
+    // const { dispatch, route: { routes, authority } } = this.props
   }
 
   componentDidUpdate (e) {
@@ -267,17 +210,11 @@ class BasicLayout extends React.PureComponent {
     // if (navigator.platform.indexOf("Win") > -1) {
     //   ps.destroy()
     // }
-    window.removeEventListener('resize', this.resizeFunction)
+    window.removeEventListener('resize', this.resize)
   }
 
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen })
-  }
-
-  resizeFunction () {
-    if (window.innerWidth >= 960) {
-      this.setState({ mobileOpen: false })
-    }
   }
 
   getContext () {
@@ -308,6 +245,71 @@ class BasicLayout extends React.PureComponent {
     return routerMap
   }
 
+  initUserData = async () => {
+    const { dispatch, route: { routes, authority } } = this.props
+
+    const user = await dispatch({
+      type: 'user/fetchCurrent',
+    })
+
+    if (!user) return
+    reloadAuthorized()
+    await dispatch({
+      type: 'codetable/fetchAllCachedCodetable',
+    })
+    const getClinicSettings = sessionStorage.getItem('clinicSettings')
+    const getClinicInfo = sessionStorage.getItem('clinicInfo')
+    if (getClinicSettings === null) {
+      await dispatch({
+        type: 'clinicSettings/query',
+      })
+    } else {
+      const parsedClinicSettings = JSON.parse(getClinicSettings)
+      dispatch({
+        type: 'clinicSettings/updateState',
+        payload: {
+          settings: parsedClinicSettings,
+        },
+      })
+    }
+
+    if (getClinicInfo == null) {
+      await dispatch({
+        type: 'clinicInfo/query',
+        payload: localStorage.getItem('clinicCode'),
+      })
+    } else {
+      const parsedClinicInfo = JSON.parse(getClinicInfo)
+      dispatch({
+        type: 'clinicInfo/updateState',
+        payload: {
+          ...parsedClinicInfo,
+        },
+      })
+    }
+
+    // console.log(routes, authority)
+    const menus = await dispatch({
+      type: 'menu/getMenuData',
+      payload: { routes, authority },
+    })
+    this.getBreadcrumbNameMap = memoizeOne(this.getBreadcrumbNameMap, isEqual)
+    this.breadcrumbNameMap = this.getBreadcrumbNameMap(menus)
+    // console.log(this.breadcrumbNameMap)
+
+    this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
+    this.getPageTitle = memoizeOne(this.getPageTitle)
+    this.menus = menus
+    // this.forceUpdate()
+    await dispatch({
+      type: 'global/getUserSettings',
+    })
+
+    this.setState({
+      authorized: true,
+    })
+  }
+
   matchParamsPath = (pathname) => {
     if (!this.breadcrumbNameMap) return null
     // console.log('matchParamsPath', pathname, this.breadcrumbNameMap)
@@ -321,13 +323,13 @@ class BasicLayout extends React.PureComponent {
     const currRouterData = this.matchParamsPath(pathname)
 
     if (!currRouterData) {
-      return 'SEMR V2'
+      return defaultSettings.appTitle
     }
     const pageName = formatMessage({
       id: currRouterData.locale || currRouterData.name,
       defaultMessage: currRouterData.name,
     })
-    return `${pageName} - SEMR V2`
+    return `${pageName} - ${defaultSettings.appTitle}`
   }
 
   getLayoutStyle = () => {
@@ -393,10 +395,22 @@ class BasicLayout extends React.PureComponent {
     })
   }
 
+  resize = () => {
+    if (window.innerWidth >= 960) {
+      this.setState({ mobileOpen: false })
+    }
+    if (window.mainPanel)
+      this.props.dispatch({
+        type: 'global/updateState',
+        payload: {
+          mainDivHeight: window.mainPanel.offsetHeight - 62,
+        },
+      })
+  }
+
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
-    // console.log(loading)
     NProgress.start()
     if (!loading.global) {
       NProgress.done()
@@ -412,13 +426,14 @@ class BasicLayout extends React.PureComponent {
     } = this.props
     // console.log(this.props)
     const isTop = PropsLayout === 'topmenu'
-    const routerConfig = this.matchParamsPath(pathname)
+    // const routerConfig = this.matchParamsPath(pathname)
     // console.log('routerConfig', routerConfig)
     const mainPanel = `${classes.mainPanel} ${cx({
       [classes.mainPanelSidebarMini]: collapsed,
     })}`
     // console.log(this.props)
     // console.log(this)
+    // console.log(this.state.mainDivHeight, window.mainPanel)
     return (
       <React.Fragment>
         <MuiThemeProvider theme={_theme}>
@@ -434,7 +449,7 @@ class BasicLayout extends React.PureComponent {
                           {isTop && !isMobile ? null : (
                             <SiderMenu
                               logo={logo}
-                              logoText='SEMR V2'
+                              logoText={defaultSettings.appTitle}
                               theme={navTheme}
                               // onCollapse={this.handleMenuCollapse}
                               menuData={menuData}
@@ -502,7 +517,9 @@ class BasicLayout extends React.PureComponent {
                         </div>
                       )}
 
-                      <GlobalModalContainer {...props} />
+                      {this.state.authorized && (
+                        <GlobalModalContainer {...props} />
+                      )}
                     </div>
                   </ErrorBoundary>
                 </Context.Provider>

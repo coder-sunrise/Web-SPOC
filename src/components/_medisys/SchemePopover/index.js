@@ -28,7 +28,18 @@ const SchemePopover = ({
     setShowReplacementModal,
   ] = useState(isShowReplacementModal)
 
-  const { isSuccessful } = schemeData
+  const {
+    isSuccessful,
+    schemeTypeFK,
+    validFrom,
+    validTo,
+    balance,
+    acuteBalanceStatusCode,
+    acuteVisitPatientBalance,
+    acuteVisitClinicBalance,
+    chronicBalanceStatusCode,
+    statusDescription,
+  } = schemeData
 
   const handleReplacementModalVisibility = (show = false) => {
     setShowReplacementModal(show)
@@ -44,7 +55,7 @@ const SchemePopover = ({
       isShowReplacementModal,
     ],
   )
-  console.log('scheme data ', schemeData)
+
   return (
     <React.Fragment>
       <Popover
@@ -60,52 +71,52 @@ const SchemePopover = ({
                     paddingLeft: 0,
                   }}
                 >
-                  <CodeSelect
-                    text
-                    code='ctSchemeType'
-                    value={schemeData.schemeTypeFK}
-                  />
+                  <CodeSelect text code='ctSchemeType' value={schemeTypeFK} />
 
-                  <div
-                    style={{ display: 'inline-block', position: 'absolute' }}
+                  {/* <div
+                    style={{
+                      display: 'inline-block',
+                      position: 'absolute',
+                      float: 'right',
+                    }}
                   >
                     <IconButton onClick={handleRefreshChasBalance}>
-                      {' '}
                       <Refresh fontSize='large' />
                     </IconButton>
-                  </div>
+                  </div> */}
                 </div>
               </GridItem>
+              <GridItem>
+                <IconButton onClick={handleRefreshChasBalance}>
+                  <Refresh fontSize='large' />
+                </IconButton>
+              </GridItem>
             </GridContainer>
-
             <GridContainer>
               <GridItem>
                 <p>
                   Validity:{' '}
-                  <DatePicker
-                    text
-                    format={dateFormatLong}
-                    value={schemeData.validFrom}
-                  />
-                  {' - '}
-                  <DatePicker
-                    text
-                    format={dateFormatLong}
-                    value={schemeData.validTo}
-                  />
+                  <DatePicker text format={dateFormatLong} value={validFrom} />
+                  -
+                  <DatePicker text format={dateFormatLong} value={validTo} />
                 </p>
               </GridItem>
             </GridContainer>
             <GridContainer>
-              <GridItem>
-                {' '}
-                Balance:{' '}
-                <NumberInput text currency value={schemeData.balance} />
-              </GridItem>
+              {chronicBalanceStatusCode === 'SC105' ? (
+                <GridItem> Balance: Full Balance</GridItem>
+              ) : (
+                <GridItem>
+                  {' '}
+                  Balance: <NumberInput text currency value={balance} />
+                </GridItem>
+              )}
             </GridContainer>
             <GridContainer>
-              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
-                <GridItem>
+              {acuteBalanceStatusCode === 'SC100' ||
+              (acuteVisitPatientBalance !== undefined &&
+                acuteBalanceStatusCode === undefined) ? (
+                  <GridItem>
                   Patient Acute Visit Balance:{' '}
                   <div
                     style={{
@@ -114,7 +125,7 @@ const SchemePopover = ({
                       paddingLeft: 2,
                     }}
                   >
-                    {schemeData.acuteVisitPatientBalance} Remaining{' '}
+                    {acuteVisitPatientBalance} Remaining{' '}
                   </div>{' '}
                   for Year {moment().year()}
                 </GridItem>
@@ -123,8 +134,10 @@ const SchemePopover = ({
               )}
             </GridContainer>
             <GridContainer>
-              {schemeData.acuteBalanceStatusCode === 'SC100' ? (
-                <GridItem>
+              {acuteBalanceStatusCode === 'SC100' ||
+              (acuteVisitClinicBalance !== undefined &&
+                acuteBalanceStatusCode === undefined) ? (
+                  <GridItem>
                   Patient Acute Clinic Balance:
                   <div
                     style={{
@@ -133,7 +146,7 @@ const SchemePopover = ({
                       paddingLeft: 2,
                     }}
                   >
-                    {schemeData.acuteVisitClinicBalance} Remaining
+                    {acuteVisitClinicBalance} Remaining
                   </div>{' '}
                   for {moment().format('MMMM')} {moment().year()}
                 </GridItem>
@@ -141,9 +154,10 @@ const SchemePopover = ({
                 <GridItem> Patient Acute Clinic Balance: NA</GridItem>
               )}
             </GridContainer>
+
             <GridContainer>
               <GridItem>
-                <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
+                <p style={{ color: 'red' }}>{statusDescription}</p>
               </GridItem>
             </GridContainer>
           </div>

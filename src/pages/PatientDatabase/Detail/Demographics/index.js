@@ -23,6 +23,7 @@ import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
 import { widgets } from '@/utils/widgets'
+import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
 
 const styles = () => ({
@@ -57,7 +58,6 @@ class Demographic extends PureComponent {
     const { values, classes } = this.props
     return (
       <Select
-        remote
         query={(v) => {
           const search = {}
           if (typeof v === 'number') {
@@ -72,6 +72,7 @@ class Demographic extends PureComponent {
             combineCondition: 'or',
           })
         }}
+        valueField='id'
         label='Patient Name/Account No./Mobile No.'
         renderDropdown={(p) => {
           // console.log(p)
@@ -114,6 +115,62 @@ class Demographic extends PureComponent {
         {...args}
       />
     )
+  }
+
+  queryOccupation = (value) => {
+    const search = {}
+    if (typeof value === 'number') {
+      search.id = value
+    } else {
+      search.displayValue = value
+    }
+
+    return fetchAndSaveCodeTable('ctoccupation', {
+      ...search,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
+  queryCountry = (value) => {
+    return fetchAndSaveCodeTable('ctcountry', {
+      displayValue: value,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
+  queryNationality = (value) => {
+    const search = {}
+    if (typeof value === 'number') {
+      search.id = value
+    } else {
+      search.displayValue = value
+    }
+
+    return fetchAndSaveCodeTable('ctnationality', {
+      ...search,
+      pagesize: 25,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+      temp: true,
+    })
+  }
+
+  onReferredByChange = (event) => {
+    const { setFieldValue } = this.props
+    const { target } = event
+    const { value } = target
+    if (value === '') {
+      setFieldValue('referredByPatientFK', undefined)
+    }
   }
 
   render () {
@@ -246,6 +303,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
+                      query={this.queryNationality}
                       max={5}
                       {...args}
                     />
@@ -289,7 +347,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Occupation'
                       code='ctOccupation'
-                      autoComplete
+                      query={this.queryOccupation}
                       {...args}
                     />
                   )}
@@ -303,6 +361,8 @@ class Demographic extends PureComponent {
                       label='Remarks'
                       multiline
                       rowsMax={4}
+                      maxLength={500}
+                      inputProps={{ maxLength: 500 }}
                       {...args}
                     />
                   )}
@@ -373,9 +433,9 @@ class Demographic extends PureComponent {
                   name='pdpaConsent'
                   render={(args) => (
                     <CheckboxGroup
+                      // prefix='PDPA Consent: '
                       label='PDPA Consent - Agree to receive marketing material via:'
                       horizontal
-                      simple
                       valueField='id'
                       textField='name'
                       options={[
@@ -466,6 +526,7 @@ class Demographic extends PureComponent {
                           label: 'Patient',
                         },
                       ]}
+                      onChange={this.onReferredByChange}
                       {...args}
                     />
                   )}
@@ -545,15 +606,15 @@ class Demographic extends PureComponent {
                       {values.contact.contactAddress.map((val, i) => {
                         return (
                           <Address
-                            key={val.id}
+                            key={val.id || i}
                             addressIndex={i}
                             theme={theme}
                             arrayHelpers={arrayHelpers}
                             propName='contact.contactAddress'
                             style={{
-                              padding: theme.spacing.unit,
-                              marginTop: theme.spacing.unit,
-                              marginBottom: theme.spacing.unit,
+                              padding: theme.spacing(),
+                              marginTop: theme.spacing(),
+                              marginBottom: theme.spacing(),
                             }}
                             values={values}
                             {...props}

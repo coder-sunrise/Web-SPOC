@@ -31,14 +31,19 @@ const styles = (theme) => ({
   displayName: 'podoPayment',
   enableReinitialize: true,
   mapPropsToValues: ({ podoPayment }) => {
-    let outstandingAmt = 0
-    if (podoPayment.purchaseOrderDetails) {
-      const { outstandingAmount } = podoPayment.purchaseOrderDetails
-      outstandingAmt = outstandingAmount
+    let outstandingAmount = {}
+    if (
+      podoPayment &&
+      podoPayment.purchaseOrderDetails &&
+      podoPayment.purchaseOrderDetails.outstandingAmount
+    ) {
+      outstandingAmount = {
+        outstandingAmt: podoPayment.purchaseOrderDetails.outstandingAmount,
+      }
     }
     return {
       ...podoPayment,
-      outstandingAmt,
+      ...outstandingAmount,
     }
   },
   handleSubmit: (values, { props }) => {

@@ -4,8 +4,8 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
-import { status } from '@/utils/codes'
 import { compose } from 'redux'
+import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 import {
   GridContainer,
@@ -14,6 +14,7 @@ import {
   Button,
   TextField,
   CodeSelect,
+  ProgressButton,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -99,7 +100,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
 
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
+            <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               onClick={() => {
@@ -117,14 +119,20 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
             <Authorized authority='inventorymaster.newinventoryitem'>
               <Button
                 variant='contained'
                 color='primary'
                 onClick={() => {
+                  dispatch({
+                    type: 'vaccinationDetail/updateState',
+                    payload: {
+                      entity: undefined,
+                      currentId: undefined,
+                    },
+                  })
                   history.push('/inventory/master/vaccination')
                 }}
               >

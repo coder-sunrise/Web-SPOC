@@ -33,39 +33,39 @@ export default createFormViewModel({
         const { pathname, search, query = {} } = loct
 
         // console.log(loct, method)
-        if (query.md === 'pt') {
-          // dispatch({
-          //   type: 'updateState',
-          //   payload: {
-          //     fullscreen: true,
-          //     showPatientInfoPanel: true,
-          //   },
-          // })
-        } else if (query.md2 === 'cons') {
-          // dispatch({
-          //   type: 'updateState',
-          //   payload: {
-          //     fullscreen: true,
-          //     showConsultationPanel: true,
-          //   },
-          // })
-        } else if (query.md2 === 'disp') {
-          // dispatch({
-          //   type: 'updateState',
-          //   payload: {
-          //     fullscreen: true,
-          //     showDispensePanel: true,
-          //   },
-          // })
-        } else {
-          // dispatch({
-          //   type: 'updateState',
-          //   payload: {
-          //     showPatientInfoPanel: false,
-          //     showConsultationPanel: false,
-          //   },
-          // })
-        }
+        // if (query.md === 'pt') {
+        //   // dispatch({
+        //   //   type: 'updateState',
+        //   //   payload: {
+        //   //     fullscreen: true,
+        //   //     showPatientInfoPanel: true,
+        //   //   },
+        //   // })
+        // } else if (query.md2 === 'cons') {
+        //   // dispatch({
+        //   //   type: 'updateState',
+        //   //   payload: {
+        //   //     fullscreen: true,
+        //   //     showConsultationPanel: true,
+        //   //   },
+        //   // })
+        // } else if (query.md2 === 'disp') {
+        //   // dispatch({
+        //   //   type: 'updateState',
+        //   //   payload: {
+        //   //     fullscreen: true,
+        //   //     showDispensePanel: true,
+        //   //   },
+        //   // })
+        // } else {
+        //   // dispatch({
+        //   //   type: 'updateState',
+        //   //   payload: {
+        //   //     showPatientInfoPanel: false,
+        //   //     showConsultationPanel: false,
+        //   //   },
+        //   // })
+        // }
         // if (typeof window.ga !== 'undefined') {
         //   window.ga('send', 'pageview', pathname + search)
         // }
@@ -129,6 +129,7 @@ export default createFormViewModel({
         })
       },
       *changeLayoutCollapsed ({ payload }, { put, select }) {
+        // console.log(payload, 'menuCollapsed')
         localStorage.setItem('menuCollapsed', payload ? 1 : 0)
 
         yield put({
@@ -139,7 +140,7 @@ export default createFormViewModel({
         })
       },
       *getUserSettings ({ payload }, { put, select }) {
-        localStorage.setItem('menuCollapsed', payload ? 1 : 0)
+        // localStorage.setItem('menuCollapsed', payload ? 1 : 0)
         const mockUserConfig = {
           currencySymbol: '$',
         }

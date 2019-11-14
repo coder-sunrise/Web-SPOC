@@ -1,15 +1,16 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { ChangePassword } from 'medisys-components'
+import { ChangePassword, SessionTimeout } from 'medisys-components'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
-import Consultation from '@/pages/PatientDashboard/Consultation'
+// import Consultation from '@/pages/Consultation'
 // import Dispense from '@/pages/Dispense'
 // import Billing from '@/pages/Dispense/Billing'
 import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
+import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
 
 const styles = (theme) => ({
   patientModal: {
@@ -42,7 +43,7 @@ class GlobalModalContainer extends PureComponent {
         this.props.dispatch({
           type: 'login/logout',
         })
-      }, 10000)
+      }, 60000)
     }
   }
 
@@ -132,7 +133,7 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showDispensePanel && <Dispense />}
-        </CommonModal> */}
+        </CommonModal> 
         <CommonModal
           open={global.showConsultationPanel}
           title='Consultation'
@@ -154,7 +155,7 @@ class GlobalModalContainer extends PureComponent {
           {global.showConsultationPanel && <Consultation {...this.props} />}
         </CommonModal>
 
-        {/* <CommonModal
+        <CommonModal
           open={global.showBillingPanel}
           title='Billing'
           observe='BillingForm'
@@ -179,11 +180,17 @@ class GlobalModalContainer extends PureComponent {
           onClose={() => {
             dispatch({
               type: 'patient/closePatientModal',
+              payload: {
+                history: this.props.history,
+              },
             })
           }}
           onConfirm={() => {
             dispatch({
               type: 'patient/closePatientModal',
+              payload: {
+                history: this.props.history,
+              },
             })
           }}
           // onConfirm={this.toggleModal}
@@ -211,6 +218,18 @@ class GlobalModalContainer extends PureComponent {
           title='Session Timeout'
           maxWidth='sm'
           onClose={() => {
+            this.props.dispatch({
+              type: 'login/logout',
+            })
+            // clearTimeout(this._timer)
+            // dispatch({
+            //   type: 'global/updateAppState',
+            //   payload: {
+            //     showSessionTimeout: false,
+            //   },
+            // })
+          }}
+          onConfirm={() => {
             clearTimeout(this._timer)
             dispatch({
               type: 'global/updateAppState',
@@ -219,24 +238,11 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
-          onConfirm={() => {
-            this.props.dispatch({
-              type: 'login/logout',
-            })
-          }}
-          showFooter
+          cancelText='No'
+          // showFooter
+          // footer={{ cancelText: 'No', confirmBtnText: 'Yes' }}
         >
-          <div
-            style={{
-              textAlign: 'center',
-              minHeight: 100,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
-          >
-            Your session will be disconnected in 1 minutes
-          </div>
+          <SessionTimeout />
         </CommonModal>
 
         <CommonModal
@@ -337,6 +343,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
+        {global.reportTypeID && <ReportModal />}
       </div>
     )
   }

@@ -65,7 +65,23 @@ class CoPayer extends Component {
     // .map((item) => ({ ...item, claimAmount: 0 })) || [],
   }
 
+  populateClaimAmount = (selected) => {
+    const { invoiceItems } = this.state
+
+    const selectedItems = invoiceItems.map((item) => {
+      if (
+        selected.includes(item.id) &&
+        (item.claimAmount === 0 || item.claimAmount === undefined)
+      )
+        return { ...item, claimAmount: item.payableBalance }
+      return { ...item }
+    })
+
+    this.setState({ invoiceItems: selectedItems })
+  }
+
   handleSelectionChange = (selection) => {
+    this.populateClaimAmount(selection)
     this.setState({ selectedRows: selection })
   }
 
@@ -80,6 +96,7 @@ class CoPayer extends Component {
       selectedRows.includes(item.id),
     )
     const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
+
     const returnValue = {
       invoicePayerItem,
       payerDistributedAmt: invoicePayerItem.reduce(
@@ -87,7 +104,7 @@ class CoPayer extends Component {
         0,
       ),
       payerTypeFK: INVOICE_PAYER_TYPE.COMPANY,
-      name: copayer.name,
+      name: copayer.displayValue,
       companyFK: copayer.id,
       isModified: false,
       _isConfirmed: true,
@@ -129,7 +146,7 @@ class CoPayer extends Component {
 
   render () {
     const { classes, onClose } = this.props
-    const { selectedRows, invoiceItems } = this.state
+    const { selectedRows, invoiceItems, coPayer } = this.state
     return (
       <div className={classes.container}>
         <GridContainer>
@@ -137,6 +154,12 @@ class CoPayer extends Component {
             <CodeSelect
               label='Corporate Copayer'
               code='ctcopayer'
+              labelField='displayValue'
+              // remoteFilter={{
+              //   coPayerTypeFK: 1,
+              // }}
+              localFilter={(item) => item.coPayerTypeFK === 1}
+              value={coPayer}
               onChange={this.handleCopayerChange}
             />
           </GridItem>

@@ -19,8 +19,16 @@ import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
+export default ({
+  orders,
+  dispatch,
+  classes,
+  theme,
+  handleAddAdjustment,
+  codetable,
+}) => {
   const { rows, summary, finalAdjustments } = orders
+  // console.log(orders)
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
@@ -110,7 +118,7 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
       columns={[
         { name: 'type', title: 'Type' },
         { name: 'subject', title: 'Name' },
-        { name: 'remark', title: 'Description' },
+        { name: 'description', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
         { name: 'action', title: 'Action' },
@@ -194,16 +202,57 @@ export default ({ orders, dispatch, classes, theme, handleAddAdjustment }) => {
           columnName: 'type',
           // type: 'select',
           // options: orderTypes,
-          render: (r) => {
+          render: (row) => {
             return (
               <div>
                 <Select
                   text
                   options={orderTypes}
                   labelField='name'
-                  value={r.type}
+                  value={row.type}
                 />
-                {r.isExternalPrescription === true ? <span> (Ext.) </span> : ''}
+                {row.isExternalPrescription === true ? (
+                  <span> (Ext.) </span>
+                ) : (
+                  ''
+                )}
+                {row.isActive ? '' : '(Inactive)'}
+              </div>
+            )
+          },
+        },
+        {
+          columnName: 'description',
+          width: 300,
+          render: (row) => {
+            let text = ''
+            if (row.usageMethodFK && row.dosageFK && row.uomfk) {
+              text = `${row.usageMethodDisplayValue
+                ? row.usageMethodDisplayValue
+                : ''} ${row.dosageDisplayValue
+                ? row.dosageDisplayValue
+                : ''} ${row.uomDisplayValue ? row.uomDisplayValue : ''} `
+            }
+
+            return (
+              <div>
+                {row.corPrescriptionItemInstruction ? (
+                  row.corPrescriptionItemInstruction.map((item) => {
+                    text = `${item.usageMethodDisplayValue
+                      ? item.usageMethodDisplayValue
+                      : ''} ${item.dosageDisplayValue
+                      ? item.dosageDisplayValue
+                      : ''} ${item.prescribeUOMDisplayValue
+                      ? item.prescribeUOMDisplayValue
+                      : ''} ${item.drugFrequencyDisplayValue
+                      ? item.drugFrequencyDisplayValue
+                      : ''} For ${item.duration ? item.duration : ''} day(s)`
+
+                    return <p>{text}</p>
+                  })
+                ) : (
+                  text
+                )}
               </div>
             )
           },

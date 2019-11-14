@@ -157,10 +157,12 @@ const headerLinksStyle = (theme) => ({
   },
   clinicShortCode: {
     display: 'inline-block',
+    verticalAlign: 'middle',
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(3.5),
+    // paddingBottom: 2,
     '& > span': {
-      fontSize: '1rem',
+      fontSize: '1.2rem',
     },
   },
 })

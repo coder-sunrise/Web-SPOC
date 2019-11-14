@@ -3,23 +3,12 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
 import {
-  getAppendUrl,
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
 } from '@/utils/utils'
-import {
-  NavPills,
-  ProgressButton,
-  Button,
-  withFormikExtend,
-  Tabs,
-} from '@/components'
+import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
-import DetailPanel from './Detail'
-import Pricing from '../../Pricing'
-import Stock from '../../Stock'
-import Setting from '../../Setting'
 
 const styles = () => ({
   actionDiv: {
@@ -39,8 +28,6 @@ const Detail = ({
   setFieldValue,
   ...props
 }) => {
-  const { currentTab } = vaccination
-
   const detailProps = {
     vaccinationDetail,
     dispatch,
@@ -149,6 +136,7 @@ export default compose(
       revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
       prescribingUOMFK: Yup.number().required(),
+      prescriptionToDispenseConversion: Yup.number().required(),
       dispensingUOMFK: Yup.number().required(),
       averageCostPrice: Yup.number()
         .min(0, 'Average Cost Price must between 0 and 999,999.9999')

@@ -12,6 +12,7 @@ import {
   TextField,
   CodeSelect,
   Select,
+  ProgressButton,
 } from '@/components'
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
@@ -28,7 +29,7 @@ const styles = (theme) => ({
     },
   },
 })
-const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
+const FilterBar = ({ classes, dispatch, history, values }) => {
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -73,6 +74,7 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                     id: 'finance.scheme.search.cpname',
                   })}
                   code='ctCopayer'
+                  labelField='displayValue'
                   {...args}
                 />
               )
@@ -105,7 +107,8 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
         </GridItem>
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
+            <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               onClick={() => {
@@ -130,9 +133,8 @@ const FilterBar = ({ classes, dispatch, history, schemeDetail, values }) => {
                 })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
 
             <Authorized authority='scheme.newscheme'>
               <Button

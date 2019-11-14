@@ -12,5 +12,7 @@ module.exports = {
     }
     return service.queryList(urlSupplier, restParams)
   },
-  upsertSup: (params) => service.upsert(urlSupplier, params),
+  upsert: ({ companyTypeFK, ...restParams }) =>
+    service.upsert(companyTypeFK === 1 ? urlCoyer : urlSupplier, restParams),
+  // upsertSup: (params) => service.upsert(urlSupplier, params),
 }

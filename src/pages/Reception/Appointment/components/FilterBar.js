@@ -15,13 +15,10 @@ import {
   GridItem,
   TextField,
   CodeSelect,
+  ProgressButton,
 } from '@/components'
 // sub components
-import {
-  AppointmentTypeLabel,
-  DoctorLabel,
-  DoctorProfileSelect,
-} from '@/components/_medisys'
+import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
@@ -129,10 +126,13 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem md={2}>
-          <Button color='primary' onClick={onFilterClick}>
-            <Search />
+          <ProgressButton
+            icon={<Search />}
+            color='primary'
+            onClick={onFilterClick}
+          >
             Filter
-          </Button>
+          </ProgressButton>
         </GridItem>
 
         <GridItem xs md={12}>
@@ -160,9 +160,9 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
 export default memo(
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: () => ({
+    mapPropsToValues: ({ primaryRegisteredDoctorFK }) => ({
       filterByDoctor: [
-        -99,
+        primaryRegisteredDoctorFK,
       ],
       filterByApptType: [
         -99,

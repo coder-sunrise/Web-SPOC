@@ -72,7 +72,7 @@ export default createListViewModel({
       currentViewAppointment: {
         appointments: [],
       },
-      calendarView: BigCalendar.Views.MONTH,
+      calendarView: BigCalendar.Views.DAY,
       publicHolidayList: [],
       clinicBreakHourList: [],
       clinicOperationHourList: [],
@@ -304,7 +304,7 @@ export default createListViewModel({
               },
             }
           }
-
+          // console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -367,7 +367,6 @@ export default createListViewModel({
       *getClinicBreakHourList (_, { call, put }) {
         const result = yield call(queryClinicBreakHour, {
           isActive: true,
-          pagesize: 99999,
         })
 
         if (result.status === '200') {
@@ -380,7 +379,6 @@ export default createListViewModel({
       *getClinicOperationHourList (_, { call, put }) {
         const result = yield call(queryClinicOperationHour, {
           isActive: true,
-          pagesize: 99999,
         })
 
         if (result.status === '200') {
@@ -394,7 +392,6 @@ export default createListViewModel({
         const result = yield call(queryPublicHolidays, {
           isActive: true,
           lgteql_startDate: payload.start,
-          pagesize: 99999,
         })
 
         if (result.status === '200') {
@@ -494,24 +491,17 @@ export default createListViewModel({
 
         yield all([
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
-          put({ type: 'initState', payload: { start } }),
           put({
             type: 'doctorBlock/query',
             payload: {
-              pagesize: 9999,
               lgteql_startDateTime: start,
             },
           }),
         ])
-        // yield put({ type: 'getCalendarList', payload: getCalendarListPayload })
-        // yield put({ type: 'getPublicHolidayList', payload: { start } })
-        // yield put({
-        //   type: 'doctorBlock/query',
-        //   payload: {
-        //     pagesize: 9999,
-        //     lgteql_startDateTime: start,
-        //   },
-        // })
+      },
+      *updateAppointmentLinking ({ payload }, { call, put }) {
+        const response = yield call(service.updateLinking, payload)
+        return response
       },
     },
     reducers: {

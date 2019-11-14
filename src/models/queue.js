@@ -3,7 +3,10 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { subscribeNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
-import { StatusIndicator } from '@/pages/Reception/Queue/variables'
+import {
+  StatusIndicator,
+  VISIT_STATUS,
+} from '@/pages/Reception/Queue/variables'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -26,6 +29,7 @@ export default createListViewModel({
       list: [],
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
+      appointmentList: [],
       currentFilter: StatusIndicator.ALL,
       selfOnly: false,
       error: {
@@ -78,7 +82,6 @@ export default createListViewModel({
           yield put({
             type: 'query',
             payload: {
-              pagesize: 999999,
               'VisitFKNavigation.BizSessionFK': response.id,
             },
           })
@@ -133,15 +136,26 @@ export default createListViewModel({
 
         // return response
       },
+      *getCurrentActiveSessionInfo (_, { call, put }) {
+        const bizSessionPayload = {
+          IsClinicSessionClosed: false,
+        }
+        const response = yield call(service.getBizSession, bizSessionPayload)
+        const { data } = response
+        if (data && data.totalRecords === 1) {
+          const { data: sessionData } = data
+          yield put({
+            type: 'updateSessionInfo',
+            payload: { ...sessionData[0] },
+          })
+        }
+      },
       *getSessionInfo (
         { payload = { shouldGetTodayAppointments: true } },
         { call, put, all, select, take },
       ) {
         let user = yield select((state) => state.user.data)
         let { clinicianProfile: { userProfile: { role: userRole } } } = user
-        if (userRole === undefined) {
-          yield take('user/fetchCurrent/@@end')
-        }
 
         const { shouldGetTodayAppointments = true } = payload
         const bizSessionPayload = {
@@ -158,7 +172,7 @@ export default createListViewModel({
             put({
               type: 'query',
               payload: {
-                pagesize: 999999,
+                pagesize: 999,
                 'VisitFKNavigation.BizSessionFK': sessionData[0].id,
               },
             }),
@@ -178,20 +192,32 @@ export default createListViewModel({
         }
         return false
       },
-      *getTodayAppointments ({ payload }, { put }) {
+      *getTodayAppointments ({ payload }, { call, put }) {
         const { shouldGetTodayAppointments = true } = payload
-
+        // TODO: integrate with new appointment listing api
         if (shouldGetTodayAppointments) {
           const today = moment().formatUTC()
-
-          yield put({
-            type: 'calendar/getCalendarList',
-            payload: {
-              combineCondition: 'and',
-              eql_appointmentDate: today,
-              in_appointmentStatusFk: '1|2|5',
-            },
-          })
+          const queryPayload = {
+            combineCondition: 'and',
+            eql_appointmentDate: today,
+            in_appointmentStatusFk: '1|5',
+          }
+          const response = yield call(
+            service.queryAppointmentListing,
+            queryPayload,
+          )
+          if (response) {
+            const { data: { data = [] } } = response
+            yield put({
+              type: 'updateState',
+              payload: {
+                appointmentList: data.map((item) => ({
+                  ...item,
+                  visitStatus: VISIT_STATUS.UPCOMING_APPT,
+                })),
+              },
+            })
+          }
         }
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {

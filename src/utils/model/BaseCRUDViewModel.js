@@ -10,6 +10,7 @@ import {
 } from 'medisys-util'
 import update from 'immutability-helper'
 import { notification } from '@/components'
+import { sendNotification } from '@/utils/realtime'
 
 import { getUniqueGUID } from '@/utils/utils'
 
@@ -115,10 +116,12 @@ export default class BaseCRUDViewModel {
           )
             return list || entity
           if (typeof payload === 'object') {
+            const current = !payload.current ? 1 : payload.current
             filter = {
               ...fixedFilter,
               ...filter,
               ...payload,
+              current,
             }
           } else {
             filter = payload
@@ -229,7 +232,7 @@ export default class BaseCRUDViewModel {
       // },
 
       *upsert ({ payload, history }, { select, call, put }) {
-        // console.log('upsert', payload)
+        // console.log('upsert', payload, namespace, config)
         const { cfg = {} } = payload
         const newPayload = cleanFieldValue(_.cloneDeep(payload))
         const r = yield call(service.upsert, newPayload)
@@ -242,6 +245,16 @@ export default class BaseCRUDViewModel {
             // duration:0,`
             message,
           })
+        }
+
+        const { codetable } = config
+        // console.log(codetable)
+        if (codetable) {
+          if (typeof codetable === 'function') {
+            sendNotification('CodetableUpdated', codetable(newPayload))
+          } else {
+            sendNotification('CodetableUpdated', codetable)
+          }
         }
 
         return r

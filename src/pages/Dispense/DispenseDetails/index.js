@@ -1,6 +1,8 @@
 import React from 'react'
+import { connect } from 'dva'
+import { compose } from 'redux'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { Paper, withStyles } from '@material-ui/core'
 // sub components
 import TableData from './TableData'
 // common component
@@ -26,6 +28,14 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 // })
 
 const styles = (theme) => ({
+  paper: {
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(2),
+  },
+  gridContainer: {
+    maxHeight: '60vh',
+    overflow: 'auto',
+  },
   gridRow: {
     '&:not(:first-child)': {
       marginTop: theme.spacing(2),
@@ -41,43 +51,82 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  onPrint2,
+  codetable,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
   const { invoiceItem = [], invoiceAdjustment = [] } = invoice
+
+  const { inventorymedication } = codetable
+
+  const handleSelectedBatch = (e, op = {}, row) => {
+    // console.log({ e, op, row })
+    if (op && op.length > 0) {
+      // const currentItem = inventorymedication.find(
+      //   (o) => o.id === row.inventoryMedicationFK,
+      // )
+      // let batchNoOptions = []
+      // if (currentItem) {
+      //   batchNoOptions = currentItem.medicationStock
+      // }
+      // const batchNo = batchNoOptions.find(
+      //   (item) => parseInt(item.id, 10) === parseInt(e[0], 10),
+      // )
+
+      const { expiryDate } = op[0]
+
+      // setFieldValue(`prescription[${row.rowIndex}]batchNo`, batchNo.batchNo)
+      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
+    } else {
+      setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
+    }
+  }
+
   return (
     <React.Fragment>
       <GridItem>
-        <GridContainer>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Prescription'
-              height={200}
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(viewOnly, onPrint)}
-              data={prescription}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Vaccination'
-              height={150}
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
-          </GridItem>
-          <GridItem className={classes.gridRow}>
-            <TableData
-              title='Other Orders'
-              height={150}
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
-              data={otherOrder}
-            />
-          </GridItem>
-        </GridContainer>
+        <Paper className={classes.paper}>
+          <GridContainer className={classes.gridContainer}>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Prescription'
+                // height={200}
+                columns={PrescriptionColumns}
+                colExtensions={PrescriptionColumnExtensions(
+                  viewOnly,
+                  onPrint,
+                  inventorymedication,
+                  handleSelectedBatch,
+                )}
+                data={prescription}
+              />
+            </GridItem>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Vaccination'
+                // TableProps={{
+                //   height: 200,
+                // }}
+                columns={VaccinationColumn}
+                colExtensions={VaccinationColumnExtensions(viewOnly)}
+                data={vaccination}
+              />
+            </GridItem>
+            <GridItem className={classes.gridRow}>
+              <TableData
+                title='Other Orders'
+                // TableProps={{
+                //   height: 200,
+                // }}
+                columns={OtherOrdersColumns}
+                colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
+                data={otherOrder}
+              />
+            </GridItem>
+          </GridContainer>
+        </Paper>
         {!viewOnly && (
           <GridContainer className={classes.summaryPanel}>
             <GridItem xs={2} md={9} />
@@ -93,26 +142,36 @@ const DispenseDetails = ({
                   gstAmtField: 'gstAmount',
                 }}
                 onValueChanged={(v) => {
-                  setFieldValue('invoice.invoiceTotal', v.summary.total)
-                  setFieldValue(
-                    'invoice.invoiceTotalAftAdj',
-                    v.summary.totalAfterAdj,
-                  )
-                  setFieldValue(
-                    'invoice.invoiceTotalAftGST',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'invoice.outstandingBalance',
-                    v.summary.totalWithGST,
-                  )
-                  // console.log({ v })
+                  const newInvoice = {
+                    ...values.invoice,
+                    invoiceTotal: v.summary.total,
+                    invoiceTotalAftAdj: v.summary.totalAfterAdj,
+                    invoiceTotalAftGST: v.summary.totalWithGST,
+                    outstandingBalance: v.summary.totalWithGST,
+                    invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+                    invoiceAdjustment: v.adjustments,
+                  }
+                  setFieldValue('invoice', newInvoice)
+                  // setFieldValue('invoice.invoiceTotal', v.summary.total)
+                  // setFieldValue(
+                  //   'invoice.invoiceTotalAftAdj',
+                  //   v.summary.totalAfterAdj,
+                  // )
+                  // setFieldValue(
+                  //   'invoice.invoiceTotalAftGST',
+                  //   v.summary.totalWithGST,
+                  // )
+                  // setFieldValue(
+                  //   'invoice.outstandingBalance',
+                  //   v.summary.totalWithGST,
+                  // )
+                  // // console.log({ v })
 
-                  setFieldValue(
-                    'invoice.invoiceGSTAmt',
-                    Math.round(v.summary.gst * 100) / 100,
-                  )
-                  setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+                  // setFieldValue(
+                  //   'invoice.invoiceGSTAmt',
+                  //   Math.round(v.summary.gst * 100) / 100,
+                  // )
+                  // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
                   dispatch({
                     type: `dispense/updateState`,
                     payload: {
@@ -129,6 +188,9 @@ const DispenseDetails = ({
   )
 }
 
-export default withStyles(styles, { name: 'DispenseDetailsGrid' })(
-  DispenseDetails,
-)
+export default compose(
+  withStyles(styles, { name: 'DispenseDetailsGrid' }),
+  connect(({ codetable }) => ({
+    codetable,
+  })),
+)(DispenseDetails)

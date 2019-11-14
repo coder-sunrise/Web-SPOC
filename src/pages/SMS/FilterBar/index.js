@@ -1,22 +1,23 @@
 import React from 'react'
 import { compose } from 'redux'
 // umi
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
 // formik
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
 import { Search } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
-import { GridContainer, GridItem, Button, RadioGroup } from '@/components'
+import moment from 'moment'
+import { GridContainer, GridItem, ProgressButton } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
 
 const styles = (theme) => ({
   filterBar: {
-    marginBottom: '10px',
+    marginBottom: '20px',
   },
   filterBtn: {
     // paddingTop: '13px',
@@ -28,56 +29,42 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes, values }) => {
+const FilterBar = ({
+  classes,
+  type,
+  values,
+  dispatch,
+  handleSubmit,
+  setFieldValue,
+}) => {
+  const props = {
+    values,
+    type,
+    dispatch,
+    setFieldValue,
+  }
+
   return (
     <div className={classes.filterBar}>
-      <GridContainer alignItems='center'>
-        <GridItem xs={6}>
-          <FastField
-            name='searchBy'
-            render={(args) => (
-              <RadioGroup
-                label='Search By'
-                simple
-                defaultValue='patient'
-                options={[
-                  {
-                    value: 'appointment',
-                    label: formatMessage({ id: 'sms.appointment' }),
-                  },
-                  {
-                    value: 'patient',
-                    label: formatMessage({ id: 'sms.patient' }),
-                  },
-                ]}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-        <GridItem xs={6} />
-        {values.SearchBy === 'appointment' ? (
-          <FilterByAppointment />
+      <GridContainer>
+        {type === 'Appointment' ? (
+          <FilterByAppointment {...props} />
         ) : (
-          <FilterByPatient />
+          <FilterByPatient {...props} />
         )}
-        <GridItem xs={12}>
-          <div className={classes.filterBtn}>
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                // props.dispatch({
-                //   type: 'consumable/query',
-                // })
-              }}
-            >
-              <Search />
-              <FormattedMessage id='sms.search' />
-            </Button>
-          </div>
-        </GridItem>
       </GridContainer>
+      <GridItem xs={12}>
+        <div className={classes.filterBtn}>
+          <ProgressButton
+            icon={<Search />}
+            variant='contained'
+            color='primary'
+            onClick={handleSubmit}
+          >
+            <FormattedMessage id='sms.search' />
+          </ProgressButton>
+        </div>
+      </GridItem>
     </div>
   )
 }
@@ -86,8 +73,98 @@ export default compose(
   withStyles(styles, { withTheme: true }),
   withFormik({
     mapPropsToValues: () => ({
-      SearchBy: 'appointment',
+      upcomingAppointmentDate: [
+        moment(),
+        moment().add(1, 'months'),
+      ],
+      appointmentType: [],
+
+      lastVisitDate: [
+        moment().subtract(1, 'months'),
+        moment(),
+      ],
+      consent: true,
     }),
+
+    handleSubmit: (values, { props }) => {
+      const {
+        patientName,
+        consent,
+        lastSMSSendStatus,
+        lastVisitDate,
+        upcomingAppointmentDate,
+        appointmentStatus,
+        isReminderSent,
+        doctor = [],
+        appointmentType = [],
+      } = values
+      const { dispatch, type } = props
+      let stringDoctors = Number(doctor)
+      let doctorProperty = 'Appointment_Resources.ClinicianFK'
+      if (doctor.length > 1) {
+        doctorProperty = 'in_Appointment_Resources.ClinicianFK'
+        stringDoctors = doctor.join('|')
+      }
+      let stringAppType = Number(appointmentType)
+      let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'
+      if (appointmentType.length > 1) {
+        apptTypeProperty = 'in_Appointment_Resources.AppointmentTypeFK'
+        stringAppType = appointmentType.join('|')
+      }
+      const appointmentPayload = {
+        lgteql_AppointmentDate: upcomingAppointmentDate
+          ? moment(upcomingAppointmentDate[0]).formatUTC()
+          : undefined,
+        lsteql_AppointmentDate: upcomingAppointmentDate
+          ? moment(upcomingAppointmentDate[1]).formatUTC(false)
+          : undefined,
+        AppointmentStatusFk: appointmentStatus,
+        'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
+        isReminderSent,
+        [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
+        [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
+      }
+      const patientPayload = {
+        group: [
+          {
+            name: patientName,
+            patientAccountNo: patientName,
+            'ContactFkNavigation.contactNumber.number': patientName,
+            combineCondition: 'or',
+          },
+        ],
+        'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
+        'PatientPdpaConsent.IsConsent': consent,
+        'lgteql_Visit.VisitDate': lastVisitDate
+          ? moment(lastVisitDate[0]).formatUTC()
+          : undefined,
+        'lsteql_Visit.VisitDate': lastVisitDate
+          ? moment(lastVisitDate[1]).formatUTC(false)
+          : undefined,
+      }
+
+      let payload = {}
+      if (type === 'Appointment') {
+        payload = appointmentPayload
+      } else {
+        payload = patientPayload
+      }
+
+      dispatch({
+        type: 'sms/query',
+        payload: {
+          ...payload,
+          smsType: type,
+        },
+      }).then(() => {
+        dispatch({
+          type: 'sms/updateState',
+          payload: {
+            filter: undefined,
+          },
+        })
+      })
+    },
   }),
   React.memo,
 )(FilterBar)

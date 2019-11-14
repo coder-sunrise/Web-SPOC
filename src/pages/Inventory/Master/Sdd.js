@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import { compose } from 'redux'
 import { connect } from 'dva'
 import {
@@ -18,13 +19,12 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
     dispatch({
       type: 'sddDetail/query',
       payload: {
-       // keepFilter: true,
-       sorting: [
-        { columnName: 'displayValue', direction: 'asc' },
-      ],
+        // keepFilter: true,
+        sorting: [
+          { columnName: 'displayValue', direction: 'asc' },
+        ],
       },
-    }).then((response) => {
-    })
+    }).then((response) => {})
   }, [])
 
   const selectRow = (row, e) => {
@@ -74,7 +74,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
   }
 
   return (
-    <div style={{ margin: theme.spacing(2) }}>
+    <div style={{ margin: theme.spacing(1) }}>
       <GridContainer>
         <GridItem xs={5}>
           <FastField
@@ -99,7 +99,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
 
           <ProgressButton
             color='primary'
-            icon={null}
+            icon={<Search />}
             onClick={() => {
               const { sddIdName } = props.values
 
@@ -113,7 +113,6 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
                       combineCondition: 'or',
                     },
                   ],
-                  
                 },
               })
             }}

@@ -67,6 +67,7 @@ class ReferralLetter extends PureComponent {
       classes,
       setFieldValue,
       templateLoader,
+      height,
     } = this.props
     return (
       <div>
@@ -122,8 +123,16 @@ class ReferralLetter extends PureComponent {
             <FastField
               name='content'
               render={(args) => {
+                const cfg = {}
+                if (height && height > 495) {
+                  cfg.height = height - 381
+                }
                 return (
-                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                  <RichEditor
+                    editorRef={this.setEditorReference}
+                    {...cfg}
+                    {...args}
+                  />
                 )
               }}
             />

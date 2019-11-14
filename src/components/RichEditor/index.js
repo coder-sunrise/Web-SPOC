@@ -1,5 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
+import jss from 'jss'
 import _ from 'lodash'
 import {
   EditorState,
@@ -15,18 +16,22 @@ import withStyles from '@material-ui/core/styles/withStyles'
 import classnames from 'classnames'
 import htmlToDraft from 'html-to-draftjs'
 import htmlEscape from 'react-escape-html'
-import Button from '@material-ui/core/Button'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import { control } from '@/components/Decorator'
-import { CustomInput } from '@/components'
+import { CustomInput, Button } from '@/components'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
 const STYLES = (theme) => {
   return {
-    wrapper: {},
+    wrapper: {
+      // height: '90%',
+    },
     editor: {
       minHeight: 120,
+      '& > div': {
+        height: '99%',
+      },
     },
   }
 }
@@ -64,6 +69,7 @@ class RichEditor extends React.PureComponent {
       value: EditorState.moveSelectionToEnd(editorState),
       anchorEl: null,
       isEditorFocused: false,
+      sheet: this.calculateEditorHeight(),
     }
 
     this.editorCfg = {
@@ -88,20 +94,22 @@ class RichEditor extends React.PureComponent {
         link: { inDropdown: true },
       },
     }
-
     this.setDomEditorRef = (ref) => (this.domEditor = ref)
 
     // this.debouncedOnChange = _.debounce(this._onChange.bind(this), 300)
   }
 
-  componentDidMount () {}
+  componentDidMount () {
+    window.addEventListener('resize', this.resize.bind(this))
+  }
 
   // eslint-disable-next-line camelcase
   // eslint-disable-next-line react/sort-comp
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value } = nextProps
+    const { field, value, height } = nextProps
     const { isEditorFocused } = this.state
     let v = value || ''
+
     if (field) {
       v = field.value || ''
       // v = field.value || ''
@@ -146,7 +154,61 @@ class RichEditor extends React.PureComponent {
     }
   }
 
+  resize () {
+    this.setState({
+      sheet: this.calculateEditorHeight(),
+    })
+  }
+
+  calculateEditorHeight = () => {
+    const { height = 'auto', tagList, theme = {}, ...restProps } = this.props
+    const { props: themeProps = {} } = theme
+    const { size } = themeProps
+    const editorCfg = {}
+    if (Number.isInteger(height)) {
+      switch (size) {
+        case 'md':
+          editorCfg.height = height - 120
+          if (!tagList) editorCfg.height += 39
+
+          break
+        case 'sm':
+          editorCfg.height = height - 64
+          if (!tagList) editorCfg.height += 29
+
+          break
+        default:
+          break
+      }
+      if (editorCfg.height) {
+        editorCfg.height = `${editorCfg.height}px`
+      }
+    }
+    return jss
+      .createStyleSheet({
+        editor: {
+          ...editorCfg,
+        },
+      })
+      .attach()
+  }
+
+  handlePastedText = (text, styles, editorState) => {
+    console.log(
+      text,
+      styles,
+      editorState,
+      draftToHtml(convertToRaw(editorState.getCurrentContent())),
+    )
+    // this.setState({
+    //   editorState: removeEditorStyles(text, editorState),
+    // })
+    return editorState
+  }
+
   onChange = (editorState) => {
+    // console.log(editorState)
+
     // console.log(editorState)
     // const {onChange}=this.props
     this.setState({
@@ -182,7 +244,7 @@ class RichEditor extends React.PureComponent {
 
   _onFocus = () => {
     this.setState((prevState) => ({
-      isEditorFocused: false,
+      isEditorFocused: true,
       // value: EditorState.moveFocusToEnd(prevState.value),
     }))
   }
@@ -271,7 +333,7 @@ class RichEditor extends React.PureComponent {
       newContentState = Modifier.replaceText(
         currentContentState,
         currentEditorSelection,
-        `@${selectedValue}$nbsp;`,
+        `@${selectedValue}`,
         null,
         entityKey,
       )
@@ -318,11 +380,13 @@ class RichEditor extends React.PureComponent {
           })}
           editorClassName={classnames({
             [classes.editor]: true,
-            [this.editorClassName]: true,
+            [this.state.sheet.classes.editor]: true,
           })}
           onEditorStateChange={this.onChange}
           onFocus={this._onFocus}
           editorRef={this.setEditorReference}
+          stripPastedStyles
+          // handlePastedText={this.handlePastedText}
           {...metionCfg}
           {...this.editorCfg}
           {...this.props}
@@ -334,61 +398,19 @@ class RichEditor extends React.PureComponent {
 
   getTagButtonComponent = () => {
     const { tagList } = this.props
-    const { anchorEl } = this.state
-    const ITEM_HEIGHT = 64
-
-    // <Button
-    //       onClick={this.tagButtonHandleClick}
-    //       aria-controls='customized-menu'
-    //       aria-haspopup='true'
-    //       variant='contained'
-    //       color='primary'
-    //     >
-    //       Tag
-    //     </Button>
-
-    // <Menu
-    //       id='long-menu'
-    //       anchorEl={anchorEl}
-    //       keepMounted
-    //       open={Boolean(anchorEl)}
-    //       onClose={this.tagButtonHandleClose}
-    //       PaperProps={{
-    //         style: {
-    //           maxHeight: ITEM_HEIGHT * 4.5,
-    //           width: 250,
-    //         },
-    //       }}
-    //     >
-    //       {tagList.map((tag) => (
-    //         <MenuItem
-    //           key={tag.id}
-    //           onClick={() => {
-    //             this.tagButtonOnClick(tag.text)
-    //             this.tagButtonHandleClose()
-    //           }}
-    //         >
-    //           {tag.text}
-    //         </MenuItem>
-    //       ))}
-    //     </Menu>
 
     return (
       <div>
         {tagList.map((tag) => (
           <Button
             key={tag.id}
+            color='info'
             style={{
-              marginRight: 5,
-              marginTop: 5,
-              backgroundColor: '#48C9B0',
-              color: 'white',
-              fontWeight: 'normal',
-              padding: 8,
-              fontSize: 12,
+              marginRight: 2,
+              marginBottom: 2,
             }}
             onClick={() => {
-              this.tagButtonOnClick(tag.text)
+              this.tagButtonOnClick(tag.value)
               this.tagButtonHandleClose()
             }}
           >
@@ -406,6 +428,7 @@ class RichEditor extends React.PureComponent {
     const labelProps = {
       shrink: true,
     }
+    // console.log('render richeditor', props)
 
     return (
       <React.Fragment>
@@ -476,4 +499,6 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
   return EditorState.push(editorState, newContentState, 'insert-fragment')
 }
 
-export default withStyles(STYLES, { name: 'RichEditor' })(RichEditor)
+export default withStyles(STYLES, { name: 'RichEditor', withTheme: true })(
+  RichEditor,
+)

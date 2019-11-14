@@ -8,6 +8,7 @@ import Cross from '@material-ui/icons/HighlightOff'
 // common components
 import { GridContainer, GridItem, Tooltip, dateFormatLong } from '@/components'
 import styles from './styles'
+import { currencyFormatter } from '@/utils/utils'
 
 const PaymentRow = ({
   // id,
@@ -24,6 +25,9 @@ const PaymentRow = ({
   ...payment
 }) => {
   const { id, type, itemID, date, amount, reason, isCancelled } = payment
+  let tooltipMsg = ''
+  if (type === 'Payment') tooltipMsg = 'Print Receipt'
+  else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
   return (
     <GridContainer
       justify='center'
@@ -33,14 +37,17 @@ const PaymentRow = ({
     >
       <GridItem md={2}>
         {type === 'Payment' || type === 'Credit Note' ? (
-          <IconButton
-            // payerID='N/A'
-            id={itemID}
-            className={classes.printButton}
-            onClick={() => handlePrinterClick(type, id)}
-          >
-            <Printer />
-          </IconButton>
+          <Tooltip title={tooltipMsg}>
+            <IconButton
+              // payerID='N/A'
+              id={itemID}
+              className={classes.printButton}
+              disabled={isCancelled}
+              onClick={() => handlePrinterClick(type, id)}
+            >
+              <Printer />
+            </IconButton>
+          </Tooltip>
         ) : (
           <Tooltip title={reason}>
             <IconButton className={classes.infoButton}>
@@ -59,11 +66,13 @@ const PaymentRow = ({
       </GridItem>
       <GridItem md={6} container justify='flex-end' alignItems='center'>
         <GridItem>
-          <span className={classes.currency}>${amount}</span>
+          <span className={classes.currency}>
+            {amount ? currencyFormatter(amount) : 'N/A'}
+          </span>
         </GridItem>
         <GridItem>
           <Tooltip
-            title='Void'
+            title='Delete Selected item'
             style={{
               visibility: isCancelled === undefined ? 'hidden' : 'visible',
             }}

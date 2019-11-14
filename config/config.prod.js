@@ -70,9 +70,11 @@ export default {
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
-    'process.env.url': 'https://semr2dev2010.emr.com.sg',
-    'process.env.signalrUrl':
-      'https://ec2-175-41-131-73.ap-southeast-1.compute.amazonaws.com/notificationHub',
+    'process.env.client_env': 'production',
+    'process.env.client_secret':
+      'TiOserstaKdhu0af4zOzFFhBaLsgh8XsrzmHxnIpIvHjW7adSPELPYDlLJfDfGzA',
+    'process.env.url': 'https://api.semr2.com',
+    'process.env.signalrUrl': 'https//socket.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,

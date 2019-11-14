@@ -54,7 +54,7 @@ const styles = (theme) => ({})
       ).amount
       defaultValues.adjustment = Math.abs(defaultValues.adjValue || 0)
     }
-    console.log(defaultValues)
+
     return {
       initialAmout: 0,
       isExactAmount: true,
@@ -103,7 +103,7 @@ const styles = (theme) => ({})
       adjAmount: values.finalAmount - values.initialAmout,
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
     }
-    console.log(newVals)
+    // console.log(newVals)
     dispatch({
       type: 'global/updateState',
       payload: {
@@ -163,7 +163,7 @@ class Adjustment extends PureComponent {
       isMinus,
       showAmountPreview = true,
     } = openAdjustmentConfig
-    console.log(this.props)
+
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>

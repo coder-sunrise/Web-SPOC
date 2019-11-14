@@ -8,6 +8,66 @@ import {
   getRefreshChasBalanceStatus,
 } from '@/utils/utils'
 
+const defaultPatientEntity = {
+  effectiveStartDate: moment().formatUTC(),
+  effectiveEndDate: moment('2099-12-31').formatUTC(),
+  patientAccountNo: '',
+  patientEmergencyContact: [],
+  patientAllergy: [],
+  patientAllergyMetaData: [],
+  patientMedicalAlert: [],
+  patientScheme: [],
+  schemePayer: [],
+  referredBy: '',
+  // dob: new Date(),
+  contact: {
+    contactAddress: [
+      {
+        // Id: getUniqueGUID(),
+        countryFK: undefined,
+        isPrimary: true,
+        isMailing: true,
+      },
+    ],
+    contactEmailAddress: {
+      emailAddress: '',
+    },
+    mobileContactNumber: {
+      number: undefined,
+      countryCodeFK: 1,
+    },
+    homeContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    officeContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    faxContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    contactWebsite: {
+      website: '',
+    },
+  },
+  patientPdpaConsent: [
+    {
+      pdpaConsentTypeFK: 1,
+      isConsent: true,
+    },
+    {
+      pdpaConsentTypeFK: 2,
+      isConsent: false,
+    },
+    {
+      pdpaConsentTypeFK: 3,
+      isConsent: false,
+    },
+  ],
+}
+
 export default createFormViewModel({
   namespace: 'patient',
   config: {
@@ -18,65 +78,7 @@ export default createFormViewModel({
     state: {
       menuErrors: {},
       currentComponent: '1',
-      default: {
-        effectiveStartDate: moment().formatUTC(),
-        effectiveEndDate: moment('2099-12-31').formatUTC(),
-        patientAccountNo: '',
-        patientEmergencyContact: [],
-        patientAllergy: [],
-        patientAllergyMetaData: [],
-        patientMedicalAlert: [],
-        patientScheme: [],
-        schemePayer: [],
-        referredBy: '',
-        // dob: new Date(),
-        contact: {
-          contactAddress: [
-            {
-              // Id: getUniqueGUID(),
-              countryFK: undefined,
-              isPrimary: true,
-              isMailing: true,
-            },
-          ],
-          contactEmailAddress: {
-            emailAddress: '',
-          },
-          mobileContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          homeContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          officeContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          faxContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          contactWebsite: {
-            website: '',
-          },
-        },
-        patientPdpaConsent: [
-          {
-            pdpaConsentTypeFK: 1,
-            isConsent: true,
-          },
-          {
-            pdpaConsentTypeFK: 2,
-            isConsent: false,
-          },
-          {
-            pdpaConsentTypeFK: 3,
-            isConsent: false,
-          },
-        ],
-      },
+      default: defaultPatientEntity,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -94,6 +96,7 @@ export default createFormViewModel({
               type: 'initState',
               payload: {
                 md: query.md,
+                newPatient: query.new,
                 version: Number(query.v) || undefined,
                 currentId: Number(query.pid) || undefined,
               },
@@ -104,12 +107,16 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { call, put, select, take }) {
-        let { currentId, version, currentComponent, md } = payload
-        const patient = yield select((state) => state.patient)
+        let { currentId, version, currentComponent, md, newPatient } = payload
+        if (newPatient) {
+          yield put({ type: 'updateState', payload: { entity: null } })
+        }
 
+        const patient = yield select((state) => state.patient)
         if (
-          patient.version !== version ||
-          (patient.entity && patient.entity.id !== currentId)
+          !newPatient &&
+          (patient.version !== version ||
+            (patient.entity && patient.entity.id !== currentId))
         ) {
           yield put({
             type: 'query',
@@ -158,22 +165,47 @@ export default createFormViewModel({
       //   })
       // },
       *closePatientModal ({ payload }, { all, put }) {
-        router.push(
-          getRemovedUrl([
+        const { history } = payload || { history: undefined }
+
+        // do not remove PID query in these URLs
+        const exceptionalPaths = [
+          'billing',
+          'dispense',
+          'consultation',
+          'patientdashboard',
+        ]
+
+        const matchesExceptionalPath =
+          history &&
+          exceptionalPaths.reduce(
+            (matched, url) =>
+              history.location.pathname.indexOf(url) > 0 ? true : matched,
+            false,
+          )
+
+        let shouldRemoveQueries = [
+          'md',
+          'cmt',
+          'pid',
+          'new',
+          'qid',
+          'v',
+        ]
+        if (matchesExceptionalPath) {
+          shouldRemoveQueries = [
             'md',
             'cmt',
-            'pid',
             'new',
-            'v',
-          ]),
-        )
+          ]
+        }
+        router.push(getRemovedUrl(shouldRemoveQueries))
         // yield put({
         //   type: 'updateState',
         //   payload: {
         //     entity: undefined,
         //   },
         // })
-        yield all([
+        return yield all([
           yield put({
             type: 'global/updateAppState',
             payload: {
@@ -187,11 +219,11 @@ export default createFormViewModel({
             type: 'updateState',
             paylad: {
               callback: undefined,
+              default: defaultPatientEntity,
             },
           }),
         ])
       },
-
       *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {
         if (payload.callback) {
           yield put({
@@ -244,6 +276,17 @@ export default createFormViewModel({
       },
     },
     reducers: {
+      updateDefaultEntity (state, { payload }) {
+        const { patientName } = payload
+        return {
+          ...state,
+          default: {
+            ...defaultPatientEntity,
+            name: patientName,
+            callingName: patientName,
+          },
+        }
+      },
       queryDone (st, { payload }) {
         const { data } = payload
         // console.log(payload)

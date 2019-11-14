@@ -42,10 +42,7 @@ const Detail = ({
     }
     const result = await getBizSession(bizSessionPayload)
     const { data } = result.data
-    if (data && data.length > 0) {
-      const { isClinicSessionClosed } = data[0]
-      setHasActiveSession(!isClinicSessionClosed)
-    }
+    setHasActiveSession(data.length > 0)
   }
 
   useEffect(() => {
@@ -104,7 +101,7 @@ const Detail = ({
     <CardContainer
       hideHeader
       style={{
-        margin: theme.spacing(2),
+        margin: theme.spacing(1),
         minHeight: 700,
         maxHeight: 700,
       }}
@@ -218,7 +215,7 @@ const Detail = ({
             </GridItem>
             <GridItem xs={2} />
             <GridItem xs={10}>
-              <FastField
+              <Field
                 name='effectiveDates'
                 render={(args) => (
                   <DateRangePicker

@@ -32,7 +32,7 @@ const WriteOff = ({ classes, handleSubmit, onClose }) => {
           <Button
             color='primary'
             onClick={() => handleSubmit(reason)}
-            disabled={reason === ''}
+            disabled={reason.trim() === ''}
           >
             Confirm
           </Button>

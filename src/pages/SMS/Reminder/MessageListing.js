@@ -1,17 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
 import { Paper, Grid } from '@material-ui/core'
-import { GridContainer } from '@/components'
+import { List, message, Avatar, Spin } from 'antd'
+import InfiniteScroll from 'react-infinite-scroller'
 import {
   ThemeProvider,
   MessageList,
   Message,
   MessageText,
-  Avatar,
   Row,
 } from '@livechat/ui-kit'
+import { dateFormatLongWithTimeNoSec, timeFormat24Hour } from '@/components'
 
 import New from '../New'
 
@@ -47,166 +48,197 @@ const styles = () => ({
     borderColor: 'rgba(0, 0, 0, 0.05)',
     borderImage: 'initial',
   },
+
+  demoInfiniteContainer: {
+    border: '1px solid #e8e8e8',
+    borderRadius: 4,
+    overflow: 'auto',
+    padding: '8px 24px',
+    height: 400,
+  },
+  demoLoadingContainer: {
+    // position: 'absolute',
+    // bottom: 40,
+    width: '100%',
+    textAlign: 'center',
+  },
 })
 
-const MessageListing = ({ classes }) => {
-  const [ list, setList ] = useState([
-    {
-      date: '2019-05-01 21:37',
-      text: 'Hi Tan Ah Kow',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn Smith',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 1,
-    },
-    {
-      date: '2019-05-01 22:38',
-      text: 'Hi ',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn',
-      isOwn: false,
-      id: 2,
-    },
-    {
-      date: '2019-05-01 22:39',
-      text: 'How Are you ',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 3,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Are you okay',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Sent',
-      id: 4,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 5,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 6,
-    },
-    {
-      date: '2019-05-01 22:37',
-      text: 'Yes doctor',
-      avatar:
-        'https://static.staging.livechatinc.com/1520/P10B78E30V/dfd1830ebb68b4eefe6432d7ac2be2be/Cat-BusinessSidekick_Wallpapers.png',
-      // authorName: 'Jonn Smith',
-      isOwn: false,
-      id: 7,
-    },
-    {
-      date: '2019-05-01 23:37',
-      text: 'Can we make appointment on 2019-02-31',
-      avatar: 'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-      // authorName: 'Jonn',
-      isOwn: true,
-      deliveryStatus: 'Pending',
-      id: 8,
-    },
-  ])
-  const renderMessages = (messages) => {
-    let i = 0
-    let messageCount = messages.length
-    let m = []
+const MessageListing = ({
+  classes,
+  recipient,
+  dispatch,
+  onConfirm,
+  footer,
+}) => {
+  const [
+    historyList,
+    setHistoryList,
+  ] = useState([])
+  const [
+    loading,
+    setLoading,
+  ] = useState(false)
+  const [
+    hasMore,
+    setHasMore,
+  ] = useState(true)
+  const [
+    totalHistory,
+    setTotalHistory,
+  ] = useState(0)
 
-    while (i < messageCount) {
-      let previous = messages[i - 1]
-      let current = messages[i]
-      let currentMoment = moment(current.date)
-      let showTimestamp = true
+  const [
+    currentPage,
+    setCurrentPage,
+  ] = useState(1)
 
-      if (previous) {
-        let previousMoment = moment(previous.date)
-        let previousDuration = moment.duration(
-          currentMoment.diff(previousMoment),
-        )
-        if (previousDuration.as('hours') < 1) {
-          showTimestamp = false
-        }
+  const getSMSHistory = () => {
+    dispatch({
+      type: 'sms/querySMSHistory',
+      payload: {
+        Recipient: parseInt(recipient.patientContactNo, 10),
+        current: currentPage,
+        pagesize: 10,
+      },
+    }).then((v) => {
+      if (v) {
+        const { data, totalRecords } = v.data
+        setHistoryList((prevList) => [
+          ...prevList,
+          ...data,
+        ])
+        setTotalHistory(totalRecords)
+        setLoading(false)
       }
-      const { date, text, avatar, isOwn, deliveryStatus } = current
-      let p = { text, avatar, isOwn, deliveryStatus }
-      m = m.concat(
-        <React.Fragment key={current.id}>
-          {showTimestamp && <div style={{ textAlign: 'center' }}>{date}</div>}
-          <Row reverse={!!isOwn}>
-            <Avatar imgUrl={avatar} />
-            <Message {...p}>
-              <MessageText
-                className={
-                  current.isOwn ? classes.sentMessage : classes.repliedMessage
-                }
+    })
+  }
+
+  const renderMessages = (messages) => {
+    if (messages) {
+      let i = 0
+      let messageCount = messages.length
+      let m = []
+
+      while (i < messageCount) {
+        let previous = messages[i - 1]
+        let current = messages[i]
+        let currentMoment = moment(current.sendDate)
+        let showTimestamp = true
+
+        if (previous) {
+          let previousMoment = moment(previous.sendDate)
+          let previousDuration = moment.duration(
+            previousMoment.diff(currentMoment),
+          )
+          if (previousDuration.asMinutes() < 2) {
+            showTimestamp = false
+          }
+        }
+        const { sendDate, content, status } = current
+        let p = { content, status }
+        m = m.concat(
+          <React.Fragment key={current.id}>
+            {showTimestamp && (
+              <div style={{ textAlign: 'center' }}>
+                {moment(sendDate).format(dateFormatLongWithTimeNoSec)}
+              </div>
+            )}
+            <Row reverse>
+              <Message
+                {...p}
+                date={moment(sendDate).format(timeFormat24Hour)}
+                isOwn
+                showMetaOnClick
               >
-                {text}
-              </MessageText>
-            </Message>
-          </Row>
-        </React.Fragment>,
-      )
-      i += 1
+                <MessageText className={classes.sentMessage}>
+                  {content}
+                </MessageText>
+              </Message>
+            </Row>
+          </React.Fragment>,
+        )
+        i += 1
+      }
+      return m
     }
-    return m
+    return null
   }
   const newMessageProps = {
-    onSend: (arr) => {
-      setList([
-        ...list,
-        ...arr.map((m, index) => {
-          return {
-            date: moment().format('YYYY-MM-DD HH-mm'),
-            text: m,
-            avatar:
-              'https://livechat.s3.amazonaws.com/default/avatars/male_8.jpg',
-            // authorName: 'Jonn Smith',
-            isOwn: true,
-            deliveryStatus: 'Pending',
-            id: list.length + 1 + index,
-          }
-        }),
-      ])
-    },
+    recipient,
+    dispatch,
+    onConfirm,
   }
+
+  const checkIsItLoadedAllHistory = () => {
+    if (historyList.length >= totalHistory && currentPage > 1) {
+      message.warning('Infinite List loaded all')
+      setHasMore(false)
+      setLoading(false)
+      return true
+    }
+    return false
+  }
+
+  useEffect(
+    () => {
+      getSMSHistory(currentPage)
+    },
+    [
+      currentPage,
+    ],
+  )
+
+  const refresh = () => {
+    setHistoryList([])
+    setTotalHistory(0)
+    setHasMore(true)
+    setCurrentPage(1)
+  }
+
+  const handleInfiniteOnLoad = () => {
+    setLoading(true)
+    if (checkIsItLoadedAllHistory()) return
+    setCurrentPage(currentPage + 1)
+  }
+
   return (
-    <ThemeProvider>
-      <GridContainer
-        style={{
-          overflowY: 'auto',
-        }}
-        direction='column'
-        spacing={8}
-      >
-        <Grid item>
-          <Paper className={classes.messageBar}>
-            <MessageList active>{renderMessages(list)}</MessageList>
-          </Paper>
-        </Grid>
-        <Grid item>
-          <Paper className={classes.sendBar}>
-            <New {...newMessageProps} />
-          </Paper>
-        </Grid>
-      </GridContainer>
-    </ThemeProvider>
+    <React.Fragment>
+      <div className={classes.demoInfiniteContainer}>
+        <InfiniteScroll
+          initialLoad={false}
+          pageStart={0}
+          loadMore={handleInfiniteOnLoad}
+          hasMore={!loading && hasMore}
+          useWindow={false}
+        >
+          <ThemeProvider>
+            <Paper>
+              <MessageList active>{renderMessages(historyList)}</MessageList>
+              {loading &&
+              hasMore && (
+                <div className={classes.demoLoadingContainer}>
+                  <Spin />
+                </div>
+              )}
+            </Paper>
+          </ThemeProvider>
+        </InfiniteScroll>
+      </div>
+      <Grid item>
+        <Paper className={classes.sendBar}>
+          <New {...newMessageProps} />
+        </Paper>
+      </Grid>
+      {footer &&
+        footer({
+          onConfirm: refresh,
+          confirmBtnText: 'Refresh',
+          confirmProps: {
+            disabled: false,
+          },
+        })}
+    </React.Fragment>
   )
 }
 export default compose(withStyles(styles, { withTheme: true }), React.memo)(

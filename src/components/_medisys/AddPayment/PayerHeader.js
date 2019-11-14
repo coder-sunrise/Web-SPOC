@@ -3,7 +3,12 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { GridContainer, GridItem } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  NumberInput,
+  SizeContainer,
+} from '@/components'
 // styling
 import styles from './styles'
 
@@ -13,6 +18,7 @@ const PayerHeader = ({
   classes,
   patient,
   invoice,
+  invoicePayerName,
   outstandingAfterPayment,
 }) => {
   const { totalClaim } = invoice
@@ -21,34 +27,37 @@ const PayerHeader = ({
     <GridContainer justify='space-between' className={classes.payerHeader}>
       <GridItem {...columnConfig} className={classes.leftAlignText}>
         <h4>Payer: </h4>
-        <h4>{patient.name}</h4>
+        <h4>{invoicePayerName}</h4>
       </GridItem>
       <GridItem {...columnConfig} className={classes.centerText}>
         <h4>Total Payable: </h4>
-        <h4 className={classes.currencyText}>
-          $ {parseToTwoDecimalString(invoice.totalAftGst)}
-        </h4>
+        {/*  <h4 className={classes.currencyText}>
+        $ {parseToTwoDecimalString(invoice.totalAftGst)}
+      </h4> */}
+        <NumberInput text currency value={invoice.totalAftGst} />
       </GridItem>
       {totalClaim !== undefined && (
         <GridItem {...columnConfig} className={classes.centerText}>
           <h4>Total Claim: </h4>
-          <h4 className={classes.currencyText}>
+          {/* <h4 className={classes.currencyText}>
             $ {parseToTwoDecimalString(totalClaim)}
-          </h4>
+          </h4> */}
+          <NumberInput text currency value={totalClaim} />
         </GridItem>
       )}
       <GridItem {...columnConfig} className={classes.rightAlignText}>
         <h4>Outstanding: </h4>
-        <h4 className={classes.currencyText}>
+        {/* <h4 className={classes.currencyText}>
           $ {parseToTwoDecimalString(outstandingAfterPayment)}
-        </h4>
+        </h4> */}
+        <NumberInput text currency value={outstandingAfterPayment} />
       </GridItem>
     </GridContainer>
   )
 }
 
-const ConnectedPayerHeader = connect(({ patient }) => ({
-  patient: patient.entity || patient.default,
-}))(PayerHeader)
+// const ConnectedPayerHeader = connect(({ patient }) => ({
+//   patient: patient.entity || patient.default,
+// }))(PayerHeader)
 
-export default withStyles(styles, { name: 'PayerHeader' })(ConnectedPayerHeader)
+export default withStyles(styles, { name: 'PayerHeader' })(PayerHeader)

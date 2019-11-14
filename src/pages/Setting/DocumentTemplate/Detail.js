@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { FormattedMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
@@ -14,37 +14,13 @@ import {
   RichEditor,
   Field,
   Select,
+  SizeContainer,
   CodeSelect,
 } from '@/components'
+import { tagList } from '@/utils/codes'
+import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 
 const styles = (theme) => ({})
-
-const tagList = [
-  {
-    id: 1,
-    text: '<#PatientName#>',
-  },
-  {
-    id: 2,
-    text: '<#AppointmentDateTime#>',
-  },
-  {
-    id: 3,
-    text: '<#Doctor#>',
-  },
-  {
-    id: 4,
-    text: '<#NewLine#>',
-  },
-  {
-    id: 5,
-    text: '<#PatientCallingName#>',
-  },
-  {
-    id: 6,
-    text: '<#LastVisitDate#>',
-  },
-]
 
 @withFormikExtend({
   mapPropsToValues: ({ settingDocumentTemplate }) =>
@@ -53,15 +29,14 @@ const tagList = [
     documentTemplateTypeFK: Yup.string().required(),
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
-    templateContent: Yup.string()
-      .required(),
-     // .max(2000, 'Message should not exceed 2000 characters'),
+    templateContent: Yup.string().required(),
+    // .max(2000, 'Message should not exceed 2000 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
-    //console.log(restValues)
+    // console.log(restValues)
 
     dispatch({
       type: 'settingDocumentTemplate/upsert',
@@ -87,10 +62,16 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingDocumentTemplate, setFieldValue } = props
-
+    const {
+      theme,
+      footer,
+      settingDocumentTemplate,
+      setFieldValue,
+      height,
+    } = props
+    // console.log(htmlDecodeByRegExp(props.values.templateContent))
     return (
-      <React.Fragment>
+      <SizeContainer size='sm'>
         <div style={{ margin: theme.spacing(1) }}>
           <GridContainer>
             <GridItem md={6}>
@@ -117,7 +98,7 @@ class Detail extends PureComponent {
                     label='Code'
                     autoFocused
                     {...args}
-                    disabled={settingDocumentTemplate.entity ? true : false}
+                    disabled={!!settingDocumentTemplate.entity}
                   />
                 )}
               />
@@ -146,16 +127,21 @@ class Detail extends PureComponent {
               <Field
                 name='templateContent'
                 render={(args) => {
+                  const cfg = {}
+                  if (height && height > 538) {
+                    cfg.height = height - 338
+                  }
                   return (
                     <RichEditor
                       // toolbarHidden={() => true}
-                      handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
+                      {...cfg}
                       {...args}
-                      // onBlur={(html, text) => {
-                      //   this.props.setFieldValue('templateContent', text)
-                      // }}
+                      onBlur={(html, text) => {
+                        console.log(htmlDecodeByRegExp(html), text)
+                        // this.props.setFieldValue('templateContent', text)
+                      }}
                     />
                   )
                 }}
@@ -171,7 +157,7 @@ class Detail extends PureComponent {
               disabled: false,
             },
           })}
-      </React.Fragment>
+      </SizeContainer>
     )
   }
 }

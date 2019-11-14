@@ -1,15 +1,13 @@
 import React from 'react'
-import _ from 'lodash'
 import moment from 'moment'
 // material ui
-import { IconButton, withStyles } from '@material-ui/core'
-import Printer from '@material-ui/icons/Print'
+import { withStyles } from '@material-ui/core'
 // common components
 import {
+  CodeSelect,
   CardContainer,
   GridContainer,
   GridItem,
-  CodeSelect,
 } from '@/components'
 // sub component
 import PaymentRow from './PaymentRow'
@@ -18,6 +16,7 @@ import PaymentSummary from './PaymentSummary'
 // styles
 import styles from './styles'
 import { PayerType } from './variables'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const DefaultPaymentInfo = {
   id: 0,
@@ -30,8 +29,11 @@ const DefaultPaymentInfo = {
 }
 
 const payerTypeToString = {
-  [PayerType.PATIENT]: 'Patient',
-  [PayerType.COPAYER]: 'Co-Payer',
+  // [PayerType.PATIENT]: 'Patient',
+  // [PayerType.COPAYER]: 'Co-Payer',
+  [INVOICE_PAYER_TYPE.PATIENT]: 'Patient',
+  [INVOICE_PAYER_TYPE.SCHEME]: 'Co-Payer',
+  [INVOICE_PAYER_TYPE.COMPANY]: 'Co-Payer',
   // [PayerType.GOVT_COPAYER]: 'Co-Payer',
 }
 
@@ -39,30 +41,67 @@ const PaymentCard = ({
   classes,
   // payerID = 'N/A',
   // payerName = 'N/A',
+  coPaymentSchemeFK = undefined,
+  companyFK = undefined,
+  companyName = '',
   patientName = 'N/A',
-  payerType = PayerType.PATIENT,
+  payerType = '',
+  payerTypeFK = PayerType.PATIENT,
   payments = [],
   totalPaid,
   outstanding,
   invoicePayerFK,
   readOnly,
+  hasActiveSession,
   actions: { handleVoidClick, handlePrinterClick, ...buttonActions },
 }) => {
+  let _payerName = (
+    <p className={classes.title}>
+      {payerTypeToString[payerTypeFK]} ({patientName})
+    </p>
+  )
+  if (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
+    // _payerName = (
+    //   <p className={classes.title}>
+    //     {payerTypeToString[payerTypeFK]} ({payerType})
+    //   </p>
+    // )
+    _payerName = (
+      <p className={classes.title}>
+        <span>{payerTypeToString[payerTypeFK]}&nbsp;</span>
+        (<CodeSelect
+          text
+          code='copaymentscheme'
+          valueField='id'
+          value={coPaymentSchemeFK}
+        />)
+      </p>
+    )
+  }
+  if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY) {
+    _payerName = (
+      <p className={classes.title}>
+        {payerTypeToString[payerTypeFK]} ({companyName})
+      </p>
+    )
+  }
+
   return (
     <CardContainer hideHeader>
-      <p className={classes.title}>
-        {payerTypeToString[payerType]} (
-        {payerType !== 1 ? (
+      {/* <p className={classes.title}>
+        {payerTypeToString[payerTypeFK]} (
+        {payerTypeFK !== 1 ? (
           <CodeSelect
             className={classes.title}
             text
             code='LTInvoicePayerType'
-            value={payerType}
+            value={payerTypeFK}
           />
         ) : (
           patientName
         )})
-      </p>
+      </p> */}
+      {_payerName}
 
       <CardContainer hideHeader size='sm'>
         {/* <IconButton
@@ -95,9 +134,11 @@ const PaymentCard = ({
       <GridContainer alignItems='center'>
         <GridItem md={7}>
           <PaymentActions
-            type={payerType}
+            type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
+            companyFK={companyFK}
             readOnly={readOnly}
+            hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             {...buttonActions}
           />

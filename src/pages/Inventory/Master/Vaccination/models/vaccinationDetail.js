@@ -14,6 +14,9 @@ export default createFormViewModel({
     service,
     state: {
       currentId: '',
+      config: {
+        dispenseQuantityFormat: '0',
+      },
       default: {
         effectiveDates: [
           moment().formatUTC(),
@@ -31,6 +34,7 @@ export default createFormViewModel({
         vaccinationStock: [],
         isChasAcuteClaimable: true,
         isChasChronicClaimable: true,
+        prescriptionToDispenseConversion: 1.0,
       },
       // entity: {},
     },
@@ -42,14 +46,6 @@ export default createFormViewModel({
             type: 'updateState',
             payload: {
               currentId: query.uid,
-            },
-          })
-        } else {
-          dispatch({
-            type: 'updateState',
-            payload: {
-              currentId: '',
-              entity: undefined,
             },
           })
         }

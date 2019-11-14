@@ -15,6 +15,16 @@ const paymentMode = [
   { type: 'Giro', objName: 'giroPayment', paymentModeFK: 5 },
 ]
 
+const InitialSessionInfo = {
+  isClinicSessionClosed: true,
+  id: '',
+  // sessionNo: `${moment().format('YYMMDD')}-01`,
+  sessionNo: 'N/A',
+  sessionNoPrefix: '',
+  sessionStartDate: '',
+  sessionCloseDate: '',
+}
+
 export default createFormViewModel({
   namespace: 'invoicePayment',
   config: {},
@@ -22,6 +32,7 @@ export default createFormViewModel({
     service,
     state: {
       default: {},
+      currentBizSessionInfo: { ...InitialSessionInfo },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -59,9 +70,12 @@ export default createFormViewModel({
             type: 'setCurrentBizSession',
             payload: { ...sessionData[0] },
           })
-          return true
+        } else {
+          yield put({
+            type: 'setCurrentBizSession',
+            payload: InitialSessionInfo,
+          })
         }
-        return false
       },
       *submitWriteOff ({ payload }, { call, put }) {
         const response = yield call(service.writeOff, payload)
@@ -79,48 +93,52 @@ export default createFormViewModel({
         const bizSessionState = yield select(
           (state) => state.invoicePayment.currentBizSessionInfo,
         )
+        console.log({ payload, bizSessionState })
         const { invoicePaymentList, invoicePayerFK } = payload
         let addPaymentPayload = {}
-        let invoicePaymentMode = []
+        // let invoicePaymentMode = []
         const {
           cashReceived,
           cashReturned,
+          cashRounding,
           totalAmtPaid,
-          paymentModes,
+          invoicePaymentMode,
+          paymentReceivedDate,
+          paymentReceivedBizSessionFK,
         } = invoicePaymentList
 
-        invoicePaymentMode = invoicePaymentMode.concat(
-          paymentModes.map((x) => {
-            const pMode = paymentMode.filter(
-              (y) => x.paymentModeFK === y.paymentModeFK,
-            )[0]
-            return {
-              ...x,
-              [pMode.objName]: [
-                { ...x },
-              ],
-            }
-          }),
-        )
+        // invoicePaymentMode = invoicePaymentMode.concat(
+        //   paymentModes.map((x) => {
+        //     const pMode = paymentMode.filter(
+        //       (y) => x.paymentModeFK === y.paymentModeFK,
+        //     )[0]
+        //     return {
+        //       ...x,
+        //       [pMode.objName]: [
+        //         { ...x },
+        //       ],
+        //     }
+        //   }),
+        // )
 
-        addPaymentPayload = {
-          totalAmtPaid,
-          cashReceived,
-          cashReturned,
-          paymentReceivedDate: moment().formatUTC(false),
-          paymentReceivedByUserFK: userState.id,
-          paymentReceivedBizSessionFK: bizSessionState.id,
-          paymentCreatedBizSessionFK: bizSessionState.id,
-          invoicePayerFK,
-          invoicePaymentMode,
-        }
+        addPaymentPayload = [
+          {
+            totalAmtPaid,
+            cashReceived,
+            cashReturned,
+            paymentReceivedDate,
+            paymentReceivedByUserFK: userState.id,
+            paymentReceivedBizSessionFK,
+            paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
+            invoicePayerFK,
+            invoicePaymentMode,
+          },
+        ]
 
         const response = yield call(service.addPayment, addPaymentPayload)
-        const { status } = response
-
-        if (status === '200') {
+        if (response) {
           notification.success({
-            message: 'Saved',
+            message: 'Payment added',
           })
           return true
         }
@@ -143,7 +161,6 @@ export default createFormViewModel({
       *submitVoidWriteOff ({ payload }, { call }) {
         const response = yield call(service.voidWriteOff, payload)
         const { status } = response
-
         if (status === '200') {
           notification.success({
             message: 'Saved',

@@ -83,6 +83,7 @@ class VaccinationCertificate extends PureComponent {
       currentType,
       setFieldValue,
       codetable,
+      height,
     } = this.props
 
     return (
@@ -135,8 +136,16 @@ class VaccinationCertificate extends PureComponent {
             <FastField
               name='content'
               render={(args) => {
+                const cfg = {}
+                if (height && height > 450) {
+                  cfg.height = height - 336
+                }
                 return (
-                  <RichEditor editorRef={this.setEditorReference} {...args} />
+                  <RichEditor
+                    editorRef={this.setEditorReference}
+                    {...cfg}
+                    {...args}
+                  />
                 )
               }}
             />

@@ -1,26 +1,12 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import _ from 'lodash'
 
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
   Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
   Field,
   withFormikExtend,
@@ -31,13 +17,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultService),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultService,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     serviceFK: Yup.number().required(),
@@ -45,8 +26,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     total: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -78,7 +59,6 @@ class Service extends PureComponent {
         },
       },
     }).then((list) => {
-      // console.log(list)
       // eslint-disable-next-line compat/compat
       const { services, serviceCenters, serviceCenterServices } = getServices(
         list,
@@ -88,11 +68,6 @@ class Service extends PureComponent {
         serviceCenters,
         serviceCenterServices,
       })
-      // console.log("service ", services)
-      // console.log("serviceCenterServices ", serviceCenterServices)
-      // console.log("serviceCenters ", serviceCenters)
-
-      // console.log(services, serviceCenters, serviceCenterServices)
       // this.setState((ps) => {
       //   return {
       //     pagination: {
@@ -128,11 +103,11 @@ class Service extends PureComponent {
   }
 
   getServiceCenterService = () => {
-    const { values, setFieldValue, setValues } = this.props
+    const { values, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
 
     if (!serviceCenterFK || !serviceFK) return
-    const serviceCenterService =  
+    const serviceCenterService =
       this.state.serviceCenterServices.find(
         (o) =>
           o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
@@ -140,7 +115,10 @@ class Service extends PureComponent {
     if (serviceCenterService) {
       setValues({
         ...values,
+        isActive: serviceCenterService.isActive,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
+        serviceCode: this.state.services.find((o) => o.value === serviceFK)
+          .code,
         serviceName: this.state.services.find((o) => o.value === serviceFK)
           .name,
         unitPrice: serviceCenterService.unitPrice,
@@ -152,7 +130,7 @@ class Service extends PureComponent {
   }
 
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',
@@ -167,15 +145,16 @@ class Service extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
+  }
+
   render () {
-    const {
-      theme,
-      orders,
-      classes,
-      values = {},
-      footer,
-      handleSubmit,
-    } = this.props
+    const { theme, classes, values = {}, footer, handleSubmit } = this.props
     const { services, serviceCenters } = this.state
     const { serviceFK, serviceCenterFK } = values
 
@@ -188,19 +167,18 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service'
+                    label='Service Name'
                     options={services.filter(
                       (o) =>
                         !serviceCenterFK ||
                         o.serviceCenters.find(
-                           (m) => m.value === serviceCenterFK,
+                          (m) => m.value === serviceCenterFK,
                         ),
                     )}
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)
-                    }
+                      }, 1)}
                     {...args}
                   />
                 )
@@ -213,7 +191,7 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service Centre'
+                    label='Service Centre Name'
                     options={serviceCenters.filter(
                       (o) =>
                         !serviceFK ||
@@ -222,8 +200,7 @@ class Service extends PureComponent {
                     onChange={() =>
                       setTimeout(() => {
                         this.getServiceCenterService()
-                      }, 1)
-                    }
+                      }, 1)}
                     {...args}
                   />
                 )
@@ -239,7 +216,7 @@ class Service extends PureComponent {
                 return (
                   <NumberInput
                     label='Total'
-                    min={0.01}
+                    min={0}
                     currency
                     onChange={(e) => {
                       this.updateTotalPrice(e.target.value)
@@ -281,6 +258,7 @@ class Service extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

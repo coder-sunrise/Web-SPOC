@@ -11,6 +11,7 @@ import {
   GridContainer,
   GridItem,
   DateRangePicker,
+  Select,
 } from '@/components'
 
 const styles = () => ({})
@@ -21,7 +22,7 @@ const Detail = ({ height, ...props }) => {
       hideHeader
       style={{
         height,
-        overflow: 'auto',
+        // overflow: 'auto',
       }}
     >
       <GridContainer gutter={0}>
@@ -130,11 +131,15 @@ const Detail = ({ height, ...props }) => {
             <FastField
               name='copayerFK'
               render={(args) => (
-                <CodeSelect
+                <Select
                   label={formatMessage({
                     id: 'finance.scheme.detail.coPayer',
                   })}
-                  code='ctCopayer'
+                  // code='ctCopayer'
+                  options={props.codetable.ctcopayer.filter(
+                    (copayerList) => copayerList.coPayerTypeFK === 1,
+                  )}
+                  labelField='displayValue'
                   max={50}
                   {...args}
                 />

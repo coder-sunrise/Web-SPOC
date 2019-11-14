@@ -2,14 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
 import moment from 'moment'
-import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import Warning from '@material-ui/icons/Error'
-import Yup from '@/utils/yup'
 // common components
 import {
   CommonTableGrid,
-  EditableTableGrid,
   withFormikExtend,
   GridContainer,
   GridItem,
@@ -19,22 +16,20 @@ import {
   IconButton,
   Tooltip,
   Popconfirm,
+  notification,
   SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
-import { notification } from '@/components'
-import { CrNoteColumns, TableConfig } from './variables'
+import { roundToTwoDecimals } from '@/utils/utils'
+import { CrNoteColumns } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
 import Summary from './Summary'
 import MiscCrNote from './MiscCrNote'
 
-const crNoteItemSchema = Yup.object().shape({
-  quantity: Yup.number().min(0).required(),
-})
-
-@connect(({ invoiceCreditNote }) => ({
+@connect(({ invoiceCreditNote, invoiceDetail }) => ({
   invoiceCreditNote,
+  invoiceDetail: invoiceDetail.entity,
 }))
 @withFormikExtend({
   name: 'invoiceCreditNote',
@@ -46,14 +41,14 @@ const crNoteItemSchema = Yup.object().shape({
     const { creditNoteBalance, finalCredit } = values
     const errors = {}
     if (creditNoteBalance - finalCredit < 0) {
-      errors.finalCredit = `Total Credit Notes amount cannot be more than Net Amount. (Balance: $${creditNoteBalance.toFixed(
+      errors.finalCredit = `Total Credit Notes amount cannot be more than Outstanding Amount. (Balance: $${creditNoteBalance.toFixed(
         2,
       )})`
     }
     return errors
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, onRefresh } = props
+    const { invoiceDetail, dispatch, onConfirm, onRefresh } = props
     // console.log({ values, props })
     const {
       creditNoteItem,
@@ -62,31 +57,41 @@ const crNoteItemSchema = Yup.object().shape({
       remark,
       finalCredit,
     } = values
+    const gstAmount = creditNoteItem.reduce(
+      (totalGstAmount, item) =>
+        item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
+      0,
+    )
+    const payload = {
+      generatedDate: moment().formatUTC(false),
+      invoicePayerFK,
+      isStockIn,
+      remark,
+      gstAmt: roundToTwoDecimals(gstAmount),
+      gstValue: invoiceDetail.gstValue,
+      total: finalCredit,
+      totalAftGST: finalCredit,
+      creditNoteItem: creditNoteItem
+        .filter((x) => x.isSelected)
+        .map((selectedItem) => {
+          const { id, concurrencyToken, ...restProps } = selectedItem
 
+          const item = {
+            ...restProps,
+            isInventoryItem:
+              restProps.itemType.toLowerCase() === 'misc' ||
+              restProps.itemType.toLowerCase() === 'service',
+            subTotal: restProps.totalAfterGST,
+            itemDescription: restProps.itemName,
+          }
+          return { ...item }
+        }),
+    }
+
+    console.log({ payload })
     dispatch({
       type: 'invoiceCreditNote/upsert',
-      payload: {
-        generatedDate: moment().formatUTC(false),
-        invoicePayerFK,
-        isStockIn,
-        remark,
-        total: finalCredit,
-        totalAftGST: finalCredit,
-        creditNoteItem: creditNoteItem
-          .filter((x) => x.isSelected)
-          .map((selectedItem) => {
-            if (selectedItem.itemType.toLowerCase() === 'misc') {
-              selectedItem.isInventoryItem = false
-              selectedItem.itemDescription = selectedItem.itemName
-            } else {
-              selectedItem.isInventoryItem = true
-            }
-            delete selectedItem.id
-            delete selectedItem.concurrencyToken
-            selectedItem.subTotal = selectedItem.totalAfterItemAdjustment
-            return { ...selectedItem }
-          }),
-      },
+      payload,
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
@@ -103,9 +108,7 @@ class AddCrNote extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      selectedRows: [
-        undefined,
-      ],
+      selectedRows: [],
     }
 
     this.handleOnChangeQuantity = _.debounce(this.handleOnChangeQuantity, 100)
@@ -120,34 +123,26 @@ class AddCrNote extends Component {
 
     const { setFieldValue, values } = this.props
     const { creditNoteItem } = values
-    let finalCreditTotal = 0
 
-    creditNoteItem.map((x) => {
-      x.isSelected = false
-      return null
-    })
-
-    let filterCreditNoteItem = creditNoteItem.filter(
-      (o) =>
-        rowSelection.includes(+o.id) || o.itemType.toLowerCase() === 'misc',
-    )
-
-    filterCreditNoteItem.map((x) => {
-      x.isSelected = true
-      finalCreditTotal += x.totalAfterItemAdjustment
-      return finalCreditTotal
-    })
-
-    setFieldValue('finalCredit', finalCreditTotal)
+    const finalCreditTotal = creditNoteItem.reduce((total, item) => {
+      if (
+        rowSelection.includes(item.id) ||
+        item.itemType.toLowerCase() === 'misc'
+      )
+        return total + item.totalAfterGST
+      return total
+    }, 0)
+    setFieldValue('finalCredit', roundToTwoDecimals(finalCreditTotal))
   }
 
   handleSelectionChange = (selection) => {
-    let newSelection = selection
-
-    newSelection.includes(undefined)
-      ? newSelection
-      : newSelection.push(undefined)
-    this.setState({ selectedRows: newSelection })
+    const { values, setFieldValue } = this.props
+    const newCreditNoteItem = values.creditNoteItem.map((item) => ({
+      ...item,
+      isSelected: selection.includes(item.id),
+    }))
+    setFieldValue('creditNoteItem', newCreditNoteItem)
+    this.setState({ selectedRows: selection })
 
     this.handleCalcCrNoteItem(selection)
   }
@@ -155,7 +150,6 @@ class AddCrNote extends Component {
   onCommitChanges = ({ rows, deleted }) => {
     const { setFieldValue, values } = this.props
     const { creditNoteItem } = values
-    // console.log('onCommitChanges1', { rows, deleted })
 
     if (deleted) {
       const selectedCrItem = creditNoteItem.find(
@@ -210,6 +204,21 @@ class AddCrNote extends Component {
     setTimeout(() => this.handleCalcCrNoteItem(), 100)
   }
 
+  handleAddMiscItem = (newItem) => {
+    const { values, setFieldValue } = this.props
+    const { creditNoteItem } = values
+
+    const tempID = creditNoteItem.reduce((smallestNegativeID, item) => {
+      if (item.id < 0 && item.id < smallestNegativeID) return item.id
+      return smallestNegativeID
+    }, 0)
+    setFieldValue('creditNoteItem', [
+      ...creditNoteItem,
+      { ...newItem, id: tempID },
+    ])
+    setTimeout(() => this.handleCalcCrNoteItem(), 100)
+  }
+
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
@@ -218,7 +227,15 @@ class AddCrNote extends Component {
         <CrNoteForm />
         <CommonTableGrid
           size='sm'
-          {...TableConfig}
+          // {...TableConfig}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: false,
+              rowSelectionEnabled: (row) => row.itemType !== 'Misc',
+            },
+            pager: false,
+          }}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}
           rows={creditNoteItem}
@@ -242,6 +259,7 @@ class AddCrNote extends Component {
                             min={1}
                             // max={row.originRemainingQty}
                             {...args}
+                            format='0.0'
                           />
                           {quantity > originRemainingQty ? (
                             <Tooltip
@@ -271,7 +289,7 @@ class AddCrNote extends Component {
               currency: true,
             },
             {
-              columnName: 'totalAfterItemAdjustment',
+              columnName: 'totalAfterGST',
               type: 'currency',
               currency: true,
             },
@@ -290,9 +308,11 @@ class AddCrNote extends Component {
                           this.handleDeleteRow(row)
                         }}
                       >
-                        <Button size='sm' justIcon color='danger'>
-                          <Delete />
-                        </Button>
+                        <Tooltip title='Delete Misc. Item' placement='top-end'>
+                          <Button size='sm' justIcon color='danger'>
+                            <Delete />
+                          </Button>
+                        </Tooltip>
                       </Popconfirm>
                     ) : (
                       ''
@@ -306,15 +326,19 @@ class AddCrNote extends Component {
 
         <Summary />
         <MiscCrNote
+          handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
-          {...this.props}
+          // {...this.props}
         />
 
         <GridContainer>
           <GridItem md={9}>
             <p>Note: Total Price($) are after GST.</p>
           </GridItem>
-          <GridItem md={3} style={{textAlign: 'right'}}>
+          <GridItem md={3} style={{ textAlign: 'right' }}>
+            <Button color='danger' onClick={onConfirm}>
+              Cancel
+            </Button>
             <Button
               color='primary'
               onClick={handleSubmit}
@@ -326,9 +350,6 @@ class AddCrNote extends Component {
               }
             >
               Save
-            </Button>
-            <Button color='danger' onClick={onConfirm}>
-              Cancel
             </Button>
           </GridItem>
         </GridContainer>

@@ -2,14 +2,13 @@ import { CommonTableGrid, DatePicker } from '@/components'
 
 export default ({ current, classes, theme, codetable }) => {
   const complicationData = (complicationList) => {
+    const { ctcomplication = [] } = codetable
     let complicationValue = ''
 
     for (let i = 0; i < complicationList.length; i++) {
-      for (let b = 0; b < codetable.ctcomplication.length; b++) {
-        if (
-          complicationList[i].complicationFK === codetable.ctcomplication[b].id
-        ) {
-          complicationValue += codetable.ctcomplication[b].name
+      for (let b = 0; b < ctcomplication.length; b++) {
+        if (complicationList[i].complicationFK === ctcomplication[b].id) {
+          complicationValue += ctcomplication[b].name
         }
       }
     }
@@ -28,11 +27,8 @@ export default ({ current, classes, theme, codetable }) => {
         >
           {' '}
           {current.diagnosis.map((o, i) => (
-            <li key={i}>
-              {o.diagnosisDescription} (<DatePicker
-                text
-                value={o.onsetDate}
-              />)
+            <li key={i} style={{ paddingBottom: 10 }}>
+              {o.diagnosisDescription} (<DatePicker text value={o.onsetDate} />)
               {o.corComplication.length > 0 ? <br /> : ''}
               {o.corComplication.length > 0 ? (
                 `Complication: ${complicationData(o.corComplication)}`

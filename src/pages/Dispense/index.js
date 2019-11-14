@@ -24,11 +24,11 @@ import EditOrder from './EditOrder'
 import style from './style'
 // utils
 import { getAppendUrl } from '@/utils/utils'
-import { postPDF, getPDF } from '@/services/report'
+import { postPDF, exportPdfReport } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 import { queryDrugLabelDetails } from '@/services/dispense'
-// model
+
 @connect(
   ({
     dispense,
@@ -104,16 +104,25 @@ class Dispense extends PureComponent {
 
   setHandleClickPrint () {
     this.handleOnPrint = async (type, row) => {
-      this.connectWebSocket()
-      let printResult
-
       if (type === 'Medication') {
+        this.connectWebSocket()
         let drugLableSource = await this.generateDrugLablePrintSource(row)
         if (drugLableSource) {
-          printResult = await postPDF(
+          let printResult = await postPDF(
             drugLableSource.reportId,
             drugLableSource.payload,
           )
+
+          if (printResult) {
+            const base64Result = arrayBufferToBase64(printResult)
+            if (this.iswsConnect === true) {
+              this.wsConnection.send(`["${base64Result}"]`)
+            } else {
+              notification.error({
+                message: `SEMR printing tool is not running, please start it.`,
+              })
+            }
+          }
         }
       } else {
         const documentType = consultationDocumentTypes.find(
@@ -126,20 +135,20 @@ class Dispense extends PureComponent {
           return
         }
         const { downloadConfig } = documentType
-        const payload = JSON.parse(`{"${downloadConfig.key}":${row.sourceFK}}`)
-
-        printResult = await getPDF(downloadConfig.id, payload)
-      }
-
-      if (printResult) {
-        const base64Result = arrayBufferToBase64(printResult)
-        if (this.iswsConnect === true) {
-          this.wsConnection.send(`["${base64Result}"]`)
-        } else {
-          notification.error({
-            message: `The printing client application didn\'t running up, please start it.`,
-          })
+        const reportParameters = {
+          [downloadConfig.key]: row.sourceFK,
         }
+        this.props.dispatch({
+          type: 'global/updateState',
+          payload: {
+            reportTypeID: downloadConfig.id,
+            reportParameters: {
+              ...reportParameters,
+              isSaved: true,
+            },
+          },
+        })
+        // exportPdfReport(downloadConfig.id, reportParameters)
       }
     }
   }
@@ -168,6 +177,7 @@ class Dispense extends PureComponent {
       ]
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
+    return null
   }
 
   connectWebSocket () {
@@ -193,7 +203,6 @@ class Dispense extends PureComponent {
       <div className={classes.root}>
         <LoadingWrapper loading={loading.models.dispense}>
           <Banner
-            style={{}}
             patientInfo={dispense.patientInfo}
             extraCmt={this.getExtraComponent()}
           />

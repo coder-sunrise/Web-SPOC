@@ -13,8 +13,12 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
   // name: Yup.string().required(),
-  orderQuantity: Yup.number().min(1).required(),
-  bonusQuantity: Yup.number().min(0).required(),
+  orderQuantity: Yup.number()
+    .min(1, 'Order Quantity nust be greater than or equal to 1')
+    .required(),
+  bonusQuantity: Yup.number()
+    .min(0, 'Bonus Quantity nust be greater than or equal to 0')
+    .required(),
 })
 
 class Grid extends PureComponent {
@@ -241,9 +245,17 @@ class Grid extends PureComponent {
     return []
   }
 
+  calculateTotalPrice = (e) => {
+    const { row } = e
+    if (row) {
+      const { orderQuantity, unitPrice } = row
+      row.totalPrice = orderQuantity * unitPrice
+    }
+  }
+
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable, isWriteOff } = this.props
+    const { values, isEditable } = this.props
     const { rows } = values
 
     const tableParas = {
@@ -321,6 +333,7 @@ class Grid extends PureComponent {
         {
           columnName: 'orderQuantity',
           type: 'number',
+          onChange: this.calculateTotalPrice,
         },
         {
           columnName: 'bonusQuantity',
@@ -340,7 +353,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          // disabled: true,
+          onChange: this.calculateTotalPrice,
         },
         {
           columnName: 'totalPrice',
@@ -364,9 +377,9 @@ class Grid extends PureComponent {
               pager: false,
             }}
             EditingProps={{
-              showAddCommand: isEditable || !isWriteOff,
-              showEditCommand: false,
-              showDeleteCommand: isEditable || !isWriteOff,
+              showAddCommand: isEditable,
+              showEditCommand: isEditable,
+              showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges,
               onAddedRowsChange: this.onAddedRowsChange,
             }}

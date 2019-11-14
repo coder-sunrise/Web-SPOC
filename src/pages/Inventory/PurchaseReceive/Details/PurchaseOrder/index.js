@@ -49,27 +49,34 @@ const styles = (theme) => ({
   mapPropsToValues: ({ purchaseOrderDetails }) => {
     const newPurchaseOrderDetails = purchaseOrderDetails
 
-    if(newPurchaseOrderDetails){
-
-      if(newPurchaseOrderDetails.type && newPurchaseOrderDetails.type === 'dup' && newPurchaseOrderDetails.purchaseOrder){
+    if (newPurchaseOrderDetails) {
+      if (
+        newPurchaseOrderDetails.type &&
+        newPurchaseOrderDetails.type === 'dup' &&
+        newPurchaseOrderDetails.purchaseOrder
+      ) {
         newPurchaseOrderDetails.purchaseOrder.purchaseOrderNo = null
         newPurchaseOrderDetails.purchaseOrder.invoiceDate = null
         newPurchaseOrderDetails.purchaseOrder.remark = null
         newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
+      } else if (newPurchaseOrderDetails.type === 'new') {
+        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
+        newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
       }
 
-      if(newPurchaseOrderDetails.purchaseOrder)
-      {
-        const { isGSTEnabled, isGstInclusive } = newPurchaseOrderDetails.purchaseOrder
+      if (newPurchaseOrderDetails.purchaseOrder) {
+        const {
+          isGSTEnabled,
+          isGstInclusive,
+        } = newPurchaseOrderDetails.purchaseOrder
         newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = isGSTEnabled
         newPurchaseOrderDetails.purchaseOrder.IsGSTInclusive = isGstInclusive
       }
-
     }
     return {
       ...purchaseOrderDetails,
-      }
+    }
   },
   validationSchema: Yup.object().shape({
     purchaseOrder: Yup.object().shape({
@@ -189,10 +196,10 @@ class Index extends Component {
         }).then((r) => {
           if (r) {
             const { id } = r
-            dispatch({
-              type: `formik/clean`,
-              payload: 'purchaseOrderDetails',
-            })
+            // dispatch({
+            //   type: `formik/clean`,
+            //   payload: 'purchaseOrderDetails',
+            // })
             this.getPOdata(id)
           }
         })
@@ -482,14 +489,12 @@ class Index extends Component {
       })
     }
 
-
     setTimeout(() => {
       setFieldValue('purchaseOrder.gstAmount', gstAmount)
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
-      setFieldValue('purchaseOrder.AdjustmentAmount',totalAdjustmentAmount)
-      setFieldValue('purchaseOrder.GSTValue',gstValue)
+      setFieldValue('purchaseOrder.AdjustmentAmount', totalAdjustmentAmount)
+      setFieldValue('purchaseOrder.GSTValue', gstValue)
     }, 1)
-
   }
 
   handleDeleteInvoiceAdjustment = (adjustmentList) => {
@@ -522,7 +527,8 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = () => {
+    const isEditable = (poItem) => {
+      if (poItem && poStatus !== 1) return false
       if (poStatus === 6) return false
       if (isWriteOff) return false
       return true
@@ -550,8 +556,7 @@ class Index extends Component {
         {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
         <POGrid
           calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={isPOStatusDraft(poStatus)}
-          isWriteOff={isWriteOff}
+          isEditable={isEditable('poItem')}
           {...this.props}
         />
         <AuthorizedContext.Provider

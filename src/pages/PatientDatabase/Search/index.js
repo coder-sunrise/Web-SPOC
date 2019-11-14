@@ -73,8 +73,19 @@ class PatientSearch extends PureComponent {
     }
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'patientSearch/updateState',
+      payload: {
+        // list: [],
+        filter: {},
+      },
+    })
+  }
+
   render () {
     const { props } = this
+    // console.log(props)
     const {
       classes,
       renderActionFn = this.defaultAction,

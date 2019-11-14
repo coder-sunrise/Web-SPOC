@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
 import _ from 'lodash'
+import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -36,12 +37,19 @@ const receivingDetailsSchema = Yup.object().shape({
   // quantityReceived: Yup.number().min(0).required(),
   // totalBonusReceived: Yup.number().min(0).required(),
   currentReceivingQty: Yup.number()
-    .min(0, 'Value must be greater than 0')
-    .max(Yup.ref('maxCurrentReceivingQty'))
+    .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
+    .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
+      return `Current Receiving Quantity must be less than or equal to ${e.max}`
+    })
     .required(),
   currentReceivingBonusQty: Yup.number()
-    .min(0, 'Value must be greater than 0')
-    .max(Yup.ref('maxCurrentReceivingBonusQty'))
+    .min(
+      0,
+      'Current Receiving Bonus Quantity must be greater than or equal to 0',
+    )
+    .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
+      return `Current Receiving Bonus Quantity must be less than or equal to ${e.max}`
+    })
     .required(),
 })
 
@@ -74,13 +82,14 @@ const receivingDetailsSchema = Yup.object().shape({
       // const itemType = podoOrderType.find((y) => y.value === x.type)
       return {
         ...x,
-        inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
+        // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
         purchaseOrderItemFK: x.id,
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
         batchNo: x.batchNo ? x.batchNo[0] : undefined,
         expiryDate: x.expiryDate,
+        expiryDate1: moment(x.expiryDate).formatUTC(),
         sortOrder: index + 1,
       }
     })
@@ -273,17 +282,25 @@ class DODetails extends PureComponent {
   }
 
   handleItemOnChange = (e, type) => {
-    const { dispatch } = this.props
+    const { dispatch, deliveryOrderDetails } = this.props
     const { option, row } = e
     const { sellingPrice, uom, name, value } = option
-
     if (type === 'code') {
-      row.name = option.name
+      row.name = value
     } else {
-      row.code = option.code
+      row.code = value
     }
 
     row.uom = option.uom
+
+    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+    let osItem = purchaseOrderOutstandingItem.filter(
+      (x) => x.code === option.value,
+    )[0]
+
+    row.maxCurrentReceivingQty = osItem.orderQuantity
+    row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
 
     this.setState({
       selectedItem: option,
@@ -297,7 +314,6 @@ class DODetails extends PureComponent {
 
   handleSelectedBatch = (e) => {
     // console.log('handleSelectedBatch', e)
-    console.log(e)
     const { option, row, val } = e
     if (val) {
       row.batchNo = val[0]
@@ -364,7 +380,6 @@ class DODetails extends PureComponent {
           )[0]
 
           this.setState({ onClickColumn: undefined })
-
           return addedRows.map((row) => ({
             ...row,
             itemFK: selectedItem.value,
@@ -385,7 +400,7 @@ class DODetails extends PureComponent {
             tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
               ? ''
               : tempCurrentReceivingBonusQty
-          this.forceUpdate()
+          // this.forceUpdate()
         }
 
         this.setState({ onClickColumn: undefined })

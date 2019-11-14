@@ -18,7 +18,8 @@ import Popper from '@material-ui/core/Popper'
 // @material-ui/icons
 import Person from '@material-ui/icons/Person'
 import Notifications from '@material-ui/icons/Notifications'
-import Dashboard from '@material-ui/icons/Dashboard'
+import Link from '@material-ui/icons/Link'
+import LinkOff from '@material-ui/icons/LinkOff'
 import Search from '@material-ui/icons/Search'
 
 // core components
@@ -27,14 +28,13 @@ import Button from 'mui-pro-components/CustomButtons'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
+import { Badge, SizeContainer, TextField } from '@/components'
 import { updateAPIType } from '@/utils/request'
 
-@connect(({ user, clinicInfo }) => ({
+@connect(({ user, clinicInfo, header }) => ({
   user,
-  clinicShortCode:
-    clinicInfo && clinicInfo.settings
-      ? clinicInfo.settings.clinicShortCode
-      : '',
+  clinicInfo,
+  header,
 }))
 class HeaderLinks extends React.Component {
   state = {
@@ -91,9 +91,9 @@ class HeaderLinks extends React.Component {
   }
 
   render () {
-    const { classes, rtlActive, user, clinicShortCode } = this.props
+    const { classes, rtlActive, user, clinicInfo, header } = this.props
     const { openNotification, openAccount, openDomain, title } = this.state
-
+    const { signalRConnected, notifications } = header
     // console.log(openNotification, openAccount)
     const searchButton = `${classes.top} ${classes.searchButton} ${classNames({
       [classes.searchRTL]: rtlActive,
@@ -118,34 +118,85 @@ class HeaderLinks extends React.Component {
         ? user.data.clinicianProfile.title
         : ''
 
+    const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
+
     return (
       <div className={wrapper}>
         <div className={managerClasses}>
-          <Button
-            justIcon
-            color='transparent'
-            aria-label='Person'
-            aria-haspopup='true'
-            aria-owns={openAccount ? 'menu-list' : null}
-            onClick={this.handleClick('Account')}
-            className={classes.buttonLink}
-            buttonRef={(node) => {
-              this.anchorElAccount = node
-            }}
-          >
-            <Person
-              className={`${classes.headerLinksSvg} ${rtlActive
-                ? `${classes.links} ${classes.linksRTL}`
-                : classes.links}`}
-            />
-            <span className={classes.username}>
-              {userTitle} {name}
-            </span>
-          </Button>
-          <Divider type='vertical' style={{ background: '#999' }} />
-          <div className={classes.clinicShortCode}>
-            <span>{clinicShortCode}</span>
-          </div>
+          <SizeContainer size='lg'>
+            <div>
+              {/* <Badge
+                badgeContent={notifications.length}
+                color='primary'
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+              >
+                <Button justIcon color='transparent'>
+                  <Notifications fontSize='large' />
+                </Button>
+              </Badge>
+              <Button justIcon color='transparent'>
+                {signalRConnected ? (
+                  <Badge
+                    ripple
+                    color='info'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <Link />
+                  </Badge>
+                ) : (
+                  <Badge
+                    ripple
+                    color='danger'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <LinkOff />
+                  </Badge>
+                )}
+              </Button>
+ */}
+              <Button
+                justIcon
+                color='transparent'
+                aria-label='Person'
+                aria-haspopup='true'
+                aria-owns={openAccount ? 'menu-list' : null}
+                onClick={this.handleClick('Account')}
+                className={classes.buttonLink}
+                buttonRef={(node) => {
+                  this.anchorElAccount = node
+                }}
+              >
+                <Person />
+                <span className={classes.username}>
+                  {userTitle} {name}
+                </span>
+              </Button>
+              <Divider
+                type='vertical'
+                style={{ background: '#999', height: '1.2rem' }}
+              />
+              <div className={classes.clinicShortCode}>
+                <span>{clinicShortCode}</span>
+              </div>
+              {/* <Divider type='vertical' style={{ background: '#999' }} />
+            <div className={classes.clinicShortCode}>
+              <span>{clinicShortCode}</span>
+            </div> */}
+            </div>
+          </SizeContainer>
           {/* 
           <Button color='transparent' justIcon className={classes.buttonLink}>
             

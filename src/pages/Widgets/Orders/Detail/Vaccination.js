@@ -1,43 +1,29 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
   DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
+  Field,
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
+let i = 0
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultVaccination),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {} }) =>
+    orders.entity || orders.defaultVaccination,
   enableReinitialize: true,
+
   validationSchema: Yup.object().shape({
     inventoryVaccinationFK: Yup.number().required(),
-    unitPrice: Yup.number().required(),
+    // unitPrice: Yup.number().required(),
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
@@ -46,8 +32,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     uomfk: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm, resetForm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -58,12 +44,19 @@ import { calculateAdjustAmount } from '@/utils/utils'
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
+    }).then(() => {
+      resetForm(orders.defaultVaccination)
     })
+
     if (onConfirm) onConfirm()
   },
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
+  state = {
+    selectedVaccination: undefined,
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
@@ -82,18 +75,48 @@ class Vaccination extends PureComponent {
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values } = this.props
 
+    this.setState({
+      selectedVaccination: op,
+    })
+
+    setFieldValue('isActive', op.isActive)
     setFieldValue(
       'dosageFK',
       op.prescribingDosage ? op.prescribingDosage.id : undefined,
     )
+    setFieldValue(
+      'dosageCode',
+      op.prescribingDosage ? op.prescribingDosage.code : undefined,
+    )
+    setFieldValue(
+      'dosageDisplayValue',
+      op.prescribingDosage ? op.prescribingDosage.name : undefined,
+    )
     setFieldValue('uomfk', op.prescribingUOM ? op.prescribingUOM.id : undefined)
+    setFieldValue(
+      'uomCode',
+      op.prescribingUOM ? op.prescribingUOM.code : undefined,
+    )
+    setFieldValue(
+      'uomDisplayValue',
+      op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
     setFieldValue(
       'usageMethodFK',
       op.vaccinationUsage ? op.vaccinationUsage.id : undefined,
     )
+    setFieldValue(
+      'usageMethodCode',
+      op.vaccinationUsage ? op.vaccinationUsage.code : undefined,
+    )
+    setFieldValue(
+      'usageMethodDisplayValue',
+      op.vaccinationUsage ? op.vaccinationUsage.name : undefined,
+    )
     setFieldValue('vaccinationName', op.displayValue)
     setFieldValue('vaccinationCode', op.code)
 
+    this.calculateQuantity(op)
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -105,8 +128,54 @@ class Vaccination extends PureComponent {
     }
   }
 
+  calculateQuantity = (vaccination) => {
+    const { codetable, setFieldValue, values, disableEdit } = this.props
+    // console.log(this.props)
+    let currentVaccination =
+      vaccination && Object.values(vaccination).length ? vaccination : undefined
+    if (!currentVaccination) currentVaccination = this.state.selectedVaccination
+    let newTotalQuantity = 0
+    // console.log(currentVaccination, values)
+    if (currentVaccination && currentVaccination.dispensingQuantity) {
+      newTotalQuantity = currentVaccination.dispensingQuantity
+    } else {
+      const { ctmedicationdosage } = codetable
+
+      const dosage = ctmedicationdosage.find(
+        (o) =>
+          o.id ===
+          (values.dosageFK || currentVaccination.prescribingDosage
+            ? currentVaccination.prescribingDosage.id
+            : undefined),
+      )
+      if (dosage) {
+        newTotalQuantity = Math.round(dosage.multiplier)
+      }
+
+      const { prescriptionToDispenseConversion } = currentVaccination
+      if (prescriptionToDispenseConversion)
+        newTotalQuantity = Math.round(
+          newTotalQuantity / prescriptionToDispenseConversion,
+        )
+    }
+    setFieldValue(`quantity`, newTotalQuantity)
+    // console.log(newTotalQuantity)
+    if (currentVaccination.sellingPrice) {
+      setFieldValue('unitPrice', currentVaccination.sellingPrice)
+      setFieldValue(
+        'totalPrice',
+        currentVaccination.sellingPrice * newTotalQuantity,
+      )
+      this.updateTotalPrice(currentVaccination.sellingPrice * newTotalQuantity)
+    } else {
+      setFieldValue('unitPrice', undefined)
+      setFieldValue('totalPrice', undefined)
+      this.updateTotalPrice(undefined)
+    }
+  }
+
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',
@@ -121,25 +190,27 @@ class Vaccination extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultService,
+      type: orders.type,
+    })
+  }
+
   render () {
-    const {
-      theme,
-      classes,
-      values,
-      footer,
-      handleSubmit,
-      setFieldValue,
-    } = this.props
+    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>
           <GridItem xs={12}>
-            <FastField
+            <Field
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Name'
+                    temp
+                    label='Vaccination Name'
                     labelField='displayValue'
                     code='inventoryvaccination'
                     onChange={this.changeVaccination}
@@ -162,7 +233,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         <GridContainer>
           <GridItem xs={4}>
-            <FastField
+            <Field
               name='usageMethodFK'
               render={(args) => {
                 return (
@@ -170,6 +241,13 @@ class Vaccination extends PureComponent {
                     label='Usage'
                     allowClear={false}
                     code='ctVaccinationUsage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('usageMethodCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'usageMethodDisplayValue',
+                        op ? op.name : undefined,
+                      )
+                    }}
                     {...args}
                   />
                 )
@@ -185,8 +263,15 @@ class Vaccination extends PureComponent {
                     label='Dosage'
                     labelField='displayValue'
                     allowClear={false}
-                    code='ctMedicationDosage'
-                    labelField='displayValue'
+                    code='ctmedicationdosage'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('dosageCode', op ? op.code : undefined)
+                      setFieldValue(
+                        'dosageDisplayValue',
+                        op ? op.displayValue : undefined,
+                      )
+                      setTimeout(this.calculateQuantity, 1)
+                    }}
                     valueFiled='id'
                     {...args}
                   />
@@ -202,7 +287,11 @@ class Vaccination extends PureComponent {
                   <CodeSelect
                     label='UOM'
                     allowClear={false}
-                    code='ctVaccinationUnitOfMeasurement'
+                    code='ctvaccinationunitofmeasurement'
+                    onChange={(v, op = {}) => {
+                      setFieldValue('uomCode', op ? op.code : undefined)
+                      setFieldValue('uomDisplayValue', op ? op.name : undefined)
+                    }}
                     {...args}
                   />
                 )
@@ -280,6 +369,7 @@ class Vaccination extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

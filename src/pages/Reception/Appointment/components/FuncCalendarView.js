@@ -68,6 +68,7 @@ const applyFilter = (filter, data) => {
   let returnData = [
     ...data,
   ]
+
   try {
     // filter by patient name and ignore doctorblock
     if (search !== '') {
@@ -82,9 +83,12 @@ const applyFilter = (filter, data) => {
 
     // filter by doctor
     if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
-      returnData = returnData.filter((eachData) =>
-        filterByDoctor.includes(eachData.clinicianFK),
-      )
+      returnData = returnData.filter((eachData) => {
+        if (eachData.isDoctorBlock)
+          return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
+
+        return filterByDoctor.includes(eachData.clinicianFK)
+      })
     }
 
     // filter by appointment type
@@ -113,11 +117,6 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
       if (momentDate.isBetween(momentStartDate, momentEndDate, 'days', '[]'))
         return true
       return false
-
-      // if (momentStartDate.diff(momentDate, 'day') === 0) {
-      //   return true
-      // }
-      // return false
     })
 
     if (publicHoliday.length > 0) {
@@ -127,7 +126,7 @@ const MonthDateHeader = withStyles(styles, { name: 'MonthDateHeader' })(
         <Tooltip
           title={<span style={{ wordWrap: 'break-word' }}>{holidayLabel}</span>}
           placement='top'
-          enterDelay={500}
+          enterDelay={250}
           classes={{ tooltip: classes.customMaxWidth }}
         >
           <div className={classes.calendarHoliday}>
@@ -355,6 +354,8 @@ const CalendarView = ({
         ...eventList,
         ...doctorBlocks.map((item) => ({
           ...item,
+          isDoctorBlock: true,
+          resourceId: item.doctor.clinicianProfile.id,
           start: moment(item.startDateTime).toDate(),
           end: moment(item.endDateTime).toDate(),
         })),
@@ -366,6 +367,7 @@ const CalendarView = ({
       eventList,
     ],
   )
+
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar
@@ -426,7 +428,7 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   publicHolidays: calendar.publicHolidayList || [],
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
-  loading:
-    loading.effects['calendar/getCalendarList'] ||
-    loading.effects['calendar/getAppointmentDetails'],
+  loading: loading.models.calendar,
+  // loading.effects['calendar/getCalendarList'] ||
+  // loading.effects['calendar/getAppointmentDetails'],
 }))(CalendarView)

@@ -1,24 +1,11 @@
-import React, { Component, PureComponent } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import {
-  Button,
   GridContainer,
   GridItem,
   TextField,
-  notification,
-  Select,
   CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  SizeContainer,
-  RichEditor,
   NumberInput,
-  CustomInputWrapper,
-  Popconfirm,
   FastField,
   withFormikExtend,
 } from '@/components'
@@ -28,13 +15,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ global }) => ({ global }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultVaccination),
-      type,
-    }
-    return v
-  },
+  mapPropsToValues: ({ orders = {}, type }) =>
+    orders.entity || orders.defaultConsumable,
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
     inventoryConsumableFK: Yup.number().required(),
@@ -43,8 +25,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     quantity: Yup.number().required(),
   }),
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, orders, currentType } = props
+  handleSubmit: (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType } = props
     const { rows } = orders
     const data = {
       sequence: rows.length,
@@ -78,8 +60,12 @@ class Consumable extends PureComponent {
 
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values } = this.props
-    console.log(v, op)
+    // console.log(v, op)
+    setFieldValue('isActive', true)
+    setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
+    setFieldValue('unitOfMeasurement', op.uom ? op.uom.name : undefined)
+
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -92,7 +78,7 @@ class Consumable extends PureComponent {
   }
 
   updateTotalPrice = (v) => {
-    if (v !== undefined) {
+    if (v || v === 0) {
       const { adjType, adjValue } = this.props.values
       const adjustment = calculateAdjustAmount(
         adjType === 'ExactAmount',
@@ -107,16 +93,16 @@ class Consumable extends PureComponent {
     }
   }
 
+  handleReset = () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultConsumable,
+      type: orders.type,
+    })
+  }
+
   render () {
-    const {
-      theme,
-      classes,
-      values,
-      footer,
-      handleSubmit,
-      setFieldValue,
-    } = this.props
-    // console.log(values)
+    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
     return (
       <div>
         <GridContainer>
@@ -126,7 +112,8 @@ class Consumable extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Name'
+                    temp
+                    label='Consumable Name'
                     code='inventoryconsumable'
                     labelField='displayValue'
                     onChange={this.changeConsumable}
@@ -209,6 +196,7 @@ class Consumable extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
+          onReset: this.handleReset,
         })}
       </div>
     )

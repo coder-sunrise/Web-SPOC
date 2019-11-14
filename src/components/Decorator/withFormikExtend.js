@@ -11,19 +11,24 @@ import Authorized from '@/utils/Authorized'
 import Exception403 from '@/pages/Exception/403'
 
 window.beforeReloadHandlerAdded = false
-window.dirtyForms = []
+window.dirtyForms = {}
 // window._localFormik = {}
 const _localAuthority = {}
 let lastVersion = null
 const withFormikExtend = (props) => (Component) => {
-  const { displayName, authority, notDirtyDuration = 1.5 } = props
+  const {
+    displayName,
+    authority,
+    notDirtyDuration = 1.5,
+    onDirtyDiscard,
+    dirtyCheckMessage,
+  } = props
   let startDirtyChecking = false
   if (displayName) {
     _localAuthority[displayName] = {}
   }
   const updateDirtyState = (ps) => {
     if (!displayName || displayName.indexOf('Filter') > 0) return
-
     const { errors, dirty, initialValues, values } = ps
     // console.log({ initialValues, values })
     const _lastFormikUpdate = {
@@ -35,29 +40,49 @@ const withFormikExtend = (props) => (Component) => {
       // str: JSON.stringify(values),
     }
     const ob = window.g_app._store.getState().formik[displayName]
+    // console.log('dirty', dirty, displayName, _lastFormikUpdate)
 
-    if (_.isEqual(_lastFormikUpdate, ob)) {
-      return
+    if (dirty) {
+      window.dirtyForms[displayName] = {
+        displayName,
+        dirtyCheckMessage,
+        onDirtyDiscard: () => {
+          if (onDirtyDiscard) {
+            onDirtyDiscard(ps)
+          }
+        },
+      }
     }
-    window.g_app._store.dispatch({
-      type: 'formik/updateState',
-      payload: {
-        [displayName]: _lastFormikUpdate,
-      },
-    })
 
     if (dirty && !window.beforeReloadHandlerAdded) {
       window.beforeReloadHandlerAdded = true
-      window.dirtyForms.push(displayName)
+
       window.addEventListener('beforeunload', confirmBeforeReload)
-    } else if (!dirty && window.beforeReloadHandlerAdded) {
-      window.beforeReloadHandlerAdded = false
-      window.removeEventListener('beforeunload', confirmBeforeReload)
-      window.dirtyForms = _.reject(window.dirtyForms, (v) => v === displayName)
+    } else if (!dirty) {
+      delete window.dirtyForms[displayName]
+
+      if (Object.values(window.dirtyForms).length === 0) {
+        window.beforeReloadHandlerAdded = false
+        window.removeEventListener('beforeunload', confirmBeforeReload)
+      }
+    }
+
+    if (!_.isEqual(_lastFormikUpdate, ob)) {
+      console.log('updateDirtyState', displayName, _lastFormikUpdate)
+
+      window.g_app._store.dispatch({
+        type: 'formik/updateState',
+        payload: {
+          [displayName]: _lastFormikUpdate,
+        },
+      })
     }
   }
 
-  const _updateDirtyState = _.debounce(updateDirtyState, 250, { maxWait: 1000 })
+  // const updateDirtyState = _.throttle(updateDirtyState, 250, {
+  //   maxWait: 1000,
+  //   leading: true,
+  // })
 
   // const { mapPropsToValues } = props
   // console.log(props, lastVersion)
@@ -98,8 +123,9 @@ const withFormikExtend = (props) => (Component) => {
       authority,
     }
 
-    // constructor (props) {
-    //   super(props)
+    // constructor (ps) {
+    //   super(ps)
+    //   updateDirtyState.bind(this)
     // }
 
     componentDidMount () {
@@ -113,13 +139,32 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     componentWillReceiveProps (nextProps) {
-      // console.log(nextProps)
+      // console.log(this.props, nextProps)
 
-      if (startDirtyChecking) _updateDirtyState(nextProps)
+      if (startDirtyChecking) updateDirtyState(nextProps)
     }
 
     componentWillUnmount () {
       startDirtyChecking = false
+      // console.log(displayName, window.dirtyForms[displayName])
+      if (displayName) {
+        const ob = window.g_app._store.getState().formik[displayName]
+        if (ob)
+          window.g_app._store.dispatch({
+            type: 'formik/updateState',
+            payload: {
+              [displayName]: undefined,
+            },
+          })
+        if (window.dirtyForms[displayName]) {
+          delete window.dirtyForms[displayName]
+        }
+
+        if (Object.values(window.dirtyForms).length === 0) {
+          window.beforeReloadHandlerAdded = false
+          window.removeEventListener('beforeunload', confirmBeforeReload)
+        }
+      }
     }
 
     render () {

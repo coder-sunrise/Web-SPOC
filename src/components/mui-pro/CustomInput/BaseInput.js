@@ -30,7 +30,7 @@ const _config = {
       'defaultValue',
       'onChange',
       // 'onBlur',
-      'onFocus',
+      // 'onFocus',
       'autoFocus',
       'multiline',
       'rows',
@@ -59,9 +59,11 @@ class BaseInput extends React.PureComponent {
     // console.log(e, this)
     if (e.which === 13) {
       // onEnterPressed
-      const { onEnterPressed } = this.props
+      const { onEnterPressed, loseFocusOnEnterPressed = false } = this.props
       if (onEnterPressed) onEnterPressed(e)
-
+      if (loseFocusOnEnterPressed) {
+        document.activeElement.blur()
+      }
       let loop = 0
       let target = $(e.target)
       while (loop < 100) {
@@ -108,6 +110,7 @@ class BaseInput extends React.PureComponent {
       inputRootCustomClasses,
       negative,
       text,
+      inActive,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -137,6 +140,7 @@ class BaseInput extends React.PureComponent {
       [classes.whiteUnderline]: white,
       [classes.currency]: text && currency,
       [classes.negativeCurrency]: text && negative,
+      [classes.inActive]: text && inActive,
     })
     // console.log(underlineClasses)
     const marginTop = classNames({
@@ -206,6 +210,7 @@ class BaseInput extends React.PureComponent {
       onKeyDown,
       text,
       onBlur,
+      onFocus,
     } = props
 
     // console.log(this.state, this.state.value)
@@ -213,10 +218,10 @@ class BaseInput extends React.PureComponent {
     //   inputProps.value = this.state.value
     // }
 
-    // console.log(this.props,)
-
+    const { rowsMax, ...resetProps } = inputProps
     const cfg = {
       onBlur,
+      onFocus,
     }
     if (prefix) {
       cfg.startAdornment = (
@@ -277,7 +282,6 @@ class BaseInput extends React.PureComponent {
     ) {
       labelProps.shrink = true
     }
-    // console.log(labelProps, props, inputProps, cfg)
     const element = (
       <CustomInputWrapper
         id={inputIdPrefix + inputIdCounter}
@@ -291,12 +295,14 @@ class BaseInput extends React.PureComponent {
           ? children({
               getClass: this.getClass,
               error,
+              help,
               showErrorIcon,
               form,
               field,
               focus,
               ...cfg,
               ...props,
+              inputProps,
             })
           : false) || (
           <Input
@@ -306,7 +312,8 @@ class BaseInput extends React.PureComponent {
             inputRef={this.getRef}
             {...cfg}
             inputProps={inputProps}
-            {...inputProps}
+            {...resetProps}
+            // {...inputProps}
             // onBlur={() => {
             //   console.log(123)
             // }}

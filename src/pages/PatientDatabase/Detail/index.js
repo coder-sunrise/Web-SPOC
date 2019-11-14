@@ -63,7 +63,6 @@ const styles = () => ({
   authority: 'patientdatabase.patientprofiledetails',
   enableReinitialize: true,
   mapPropsToValues: ({ patient }) => {
-    // console.log(patient)
     const mappedValues = {
       ...(patient.entity || patient.default),
       pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
@@ -115,7 +114,7 @@ const styles = () => ({
             id: r.id || values.id,
           },
         }).then(() => {
-          if (patient.callback) patient.callback()
+          if (patient.callback) patient.callback(r.id)
         })
         if (onConfirm) onConfirm()
         resetForm()
@@ -282,9 +281,15 @@ class PatientDetail extends PureComponent {
   // }
 
   registerVisit = () => {
-    router.push(
-      `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
-    )
+    this.props
+      .dispatch({
+        type: 'patient/closePatientModal',
+      })
+      .then(() => {
+        router.push(
+          `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+        )
+      })
   }
 
   handleOpenReplacementModal = () =>
@@ -447,6 +452,9 @@ class PatientDetail extends PureComponent {
               onCancel: () => {
                 dispatch({
                   type: 'patient/closePatientModal',
+                  payload: {
+                    history: this.props.history,
+                  },
                 })
               },
               onConfirm: handleSubmit,

@@ -112,6 +112,7 @@ const widgets = [
             <Tooltip title='Add Diagnosis'>
               <IconButton
                 style={{ float: 'left' }}
+                className='non-dragable'
                 onClick={() => {
                   window.g_app._store.dispatch({
                     type: 'diagnosis/updateState',
@@ -154,6 +155,7 @@ const widgets = [
             <Tooltip title='Add Consultation Document'>
               <IconButton
                 style={{ float: 'left' }}
+                className='non-dragable'
                 onClick={() => {
                   window.g_app._store.dispatch({
                     type: 'consultationDocument/updateState',
@@ -260,6 +262,7 @@ const widgets = [
       <Tooltip title='Add Vital Sign'>
         <IconButton
           style={{ float: 'left' }}
+          className='non-dragable'
           onClick={() => {
             window.g_app._store.dispatch({
               type: 'patientVitalSign/updateState',

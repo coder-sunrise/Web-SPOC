@@ -16,9 +16,6 @@ const Content = ({ classes, ...restProps }) => {
   const { invoiceDetail, invoicePayment } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
-  const currentBizSessionFK = currentBizSessionInfo
-    ? currentBizSessionInfo.id
-    : undefined
   const invoiceBizSessionFK = entity ? entity.bizSessionFK : undefined
 
   const [
@@ -27,11 +24,24 @@ const Content = ({ classes, ...restProps }) => {
   ] = useState('1')
 
   const isInvoiceCurrentBizSession = () => {
-    if (currentBizSessionFK && invoiceBizSessionFK) {
-      if (currentBizSessionFK === invoiceBizSessionFK) {
-        return true
-      }
-      return false
+    const { id: bizSessionFK } = currentBizSessionInfo
+
+    // no active session, return false, all the other buttons will be read only
+    if (bizSessionFK === '') return false
+
+    if (bizSessionFK && invoiceBizSessionFK) {
+      const isSameBizSessionAndIsSessionClosed =
+        parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
+        !currentBizSessionInfo.isClinicSessionClosed
+
+      return isSameBizSessionAndIsSessionClosed
+      // if (
+      //   parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
+      //   !currentBizSessionInfo.isClinicSessionClosed
+      // ) {
+      //   return true
+      // }
+      // return false
     }
 
     return false
@@ -45,7 +55,7 @@ const Content = ({ classes, ...restProps }) => {
         return (
           <PaymentDetails
             invoiceDetail={restProps.values}
-            readOnly={!currentBizSessionFK}
+            readOnly={!currentBizSessionInfo.id}
           />
         )
       default:
