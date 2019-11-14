@@ -52,6 +52,7 @@ export const DraftCHASColumns = [
 export const DraftCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]

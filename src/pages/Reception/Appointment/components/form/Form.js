@@ -704,6 +704,12 @@ class Form extends React.PureComponent {
     return false
   }
 
+  shouldDisableAppointmentDate = () => {
+    const { values } = this.props
+    if (!values.id) return false
+    return values.isEnableRecurrence
+  }
+
   render () {
     const {
       classes,
@@ -755,8 +761,8 @@ class Form extends React.PureComponent {
 
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
+    const _disableAppointmentDate = this.shouldDisableAppointmentDate()
 
-    // console.log({ show, loadingEffects: loading.effects, isSubmitting })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
@@ -775,7 +781,7 @@ class Form extends React.PureComponent {
                   patientProfileFK={values.patientProfileFK}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
                 />
-                <AppointmentDateInput />
+                <AppointmentDateInput disabled={_disableAppointmentDate} />
               </GridItem>
               <GridItem xs md={6} className={classnames(classes.remarksField)}>
                 <Field

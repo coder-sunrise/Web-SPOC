@@ -177,15 +177,41 @@ class Queue extends React.Component {
     })
   }
 
-  toggleRegisterNewPatient = (shouldRedirect = true) => {
+  updateAppointmentLinking = (row, patientProfileFK) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'calendar/updateAppointmentLinking',
+      payload: {
+        id: row.id,
+        patientProfileFK,
+      },
+    }).then((response) => {
+      if (response) {
+        dispatch({
+          type: 'queueLog/refresh',
+        })
+      }
+    })
+  }
+
+  toggleRegisterNewPatient = (shouldRedirect = true, row = undefined) => {
+    if (row) {
+      this.props.dispatch({
+        type: 'patient/updateDefaultEntity',
+        payload: {
+          patientName: row.patientName,
+        },
+      })
+    }
     this.props.dispatch({
       type: 'patient/openPatientModal',
       payload: {
-        callback: () => {
+        callback: (patientProfileFK) => {
           this.props.dispatch({
             type: 'patient/closePatientModal',
           })
           if (shouldRedirect) this.redirectToVisitRegistration()
+          if (row) this.updateAppointmentLinking(row, patientProfileFK)
         },
       },
     })

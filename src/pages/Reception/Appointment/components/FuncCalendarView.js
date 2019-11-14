@@ -68,6 +68,7 @@ const applyFilter = (filter, data) => {
   let returnData = [
     ...data,
   ]
+
   try {
     // filter by patient name and ignore doctorblock
     if (search !== '') {
@@ -82,9 +83,12 @@ const applyFilter = (filter, data) => {
 
     // filter by doctor
     if (filterByDoctor.length > 0 && filterByDoctor.indexOf(-99) !== 0) {
-      returnData = returnData.filter((eachData) =>
-        filterByDoctor.includes(eachData.clinicianFK),
-      )
+      returnData = returnData.filter((eachData) => {
+        if (eachData.isDoctorBlock)
+          return filterByDoctor.includes(eachData.doctor.clinicianProfile.id)
+
+        return filterByDoctor.includes(eachData.clinicianFK)
+      })
     }
 
     // filter by appointment type
@@ -350,6 +354,8 @@ const CalendarView = ({
         ...eventList,
         ...doctorBlocks.map((item) => ({
           ...item,
+          isDoctorBlock: true,
+          resourceId: item.doctor.clinicianProfile.id,
           start: moment(item.startDateTime).toDate(),
           end: moment(item.endDateTime).toDate(),
         })),
@@ -361,6 +367,7 @@ const CalendarView = ({
       eventList,
     ],
   )
+
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar

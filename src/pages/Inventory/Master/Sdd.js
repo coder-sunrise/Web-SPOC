@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import { compose } from 'redux'
 import { connect } from 'dva'
 import {
@@ -98,7 +99,7 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
 
           <ProgressButton
             color='primary'
-            icon={null}
+            icon={<Search />}
             onClick={() => {
               const { sddIdName } = props.values
 

@@ -34,9 +34,9 @@ export default createFormViewModel({
         prescriptionToDispenseConversion: 1.0,
       },
     },
-    subscriptions: ({ dispatch, history, searchField }) => {
+    subscriptions: ({ dispatch, history }) => {
       history.listen((loct) => {
-        const { query = {} } = loct
+        const { pathname, query = {} } = loct
         if (query.uid) {
           dispatch({
             type: 'updateState',
@@ -45,13 +45,18 @@ export default createFormViewModel({
             },
           })
         }
-      })
-      dispatch({
-        type: 'medicPrecautionList',
-        payload: {
-          isActive: true,
-          pagesize: 999,
-        },
+        if (
+          pathname === '/inventory/master/editmedication' ||
+          pathname === '/inventory/master/medication'
+        ) {
+          dispatch({
+            type: 'medicPrecautionList',
+            payload: {
+              isActive: true,
+              pagesize: 999,
+            },
+          })
+        }
       })
     },
     effects: {

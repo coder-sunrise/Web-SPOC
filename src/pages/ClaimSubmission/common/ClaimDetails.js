@@ -48,10 +48,12 @@ const styles = (theme) => ({
     const { diagnosis } = returnValue
     let diagnosisOptions = []
     if (diagnosis) {
-      diagnosisOptions = diagnosis.map((o) => {
-        return o.id
+      diagnosis.forEach((o) => {
+        if (o.isSelected) diagnosisOptions.push(o.id)
       })
     }
+    console.log(diagnosisOptions)
+
     return {
       ...returnValue,
       diagnosisSelections: diagnosisOptions,
@@ -85,6 +87,30 @@ class ClaimDetails extends Component {
     })
 
     setFieldValue('diagnosis', val)
+  }
+
+  save = () => {
+    const { dispatch, onConfirm, values } = this.props
+    const { diagnosisSelections } = values
+
+    values.diagnosis.forEach((o) => {
+      const selectedId = diagnosisSelections.find((i) => i === o.id)
+      if (selectedId) {
+        o.isSelected = true
+      } else {
+        o.isSelected = false
+      }
+    })
+    console.log(values.diagnosis)
+    dispatch({
+      type: 'claimSubmission/updateState',
+      payload: {
+        entity: {
+          ...values,
+        },
+      },
+    })
+    onConfirm()
   }
 
   render () {
@@ -288,7 +314,7 @@ class ClaimDetails extends Component {
                 Close
               </Button>
               {allowEdit ? (
-                <Button color='primary' onClick={onConfirm}>
+                <Button color='primary' onClick={this.save}>
                   Save
                 </Button>
               ) : (

@@ -4,7 +4,7 @@ import { FastField } from 'formik'
 // custom component
 import { GridContainer, GridItem, DatePicker, TextField } from '@/components'
 
-const AppointmentDate = () => (
+const AppointmentDate = ({ disabled }) => (
   <GridContainer item xs md={12}>
     <GridItem xs md={6}>
       <FastField
@@ -13,7 +13,7 @@ const AppointmentDate = () => (
         render={(args) => (
           <DatePicker
             {...args}
-            disabled
+            disabled={disabled}
             allowClear={false}
             label='Appointment Date'
           />

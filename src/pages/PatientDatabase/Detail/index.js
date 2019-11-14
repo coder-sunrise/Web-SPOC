@@ -96,7 +96,7 @@ const styles = () => ({
       // create new patient will return patient entity, r === true
       if (r) {
         if (r.id) {
-          if (!patient.callback)
+          if (!patient.callback) {
             history.push(
               getRemovedUrl(
                 [
@@ -107,6 +107,7 @@ const styles = () => ({
                 }),
               ),
             )
+          }
         }
         dispatch({
           type: 'patient/query',
@@ -114,9 +115,11 @@ const styles = () => ({
             id: r.id || values.id,
           },
         }).then(() => {
-          if (patient.callback) patient.callback()
+          if (patient.callback) patient.callback(r.id)
         })
-        if (onConfirm) onConfirm()
+        if (onConfirm) {
+          onConfirm()
+        }
         resetForm()
       }
     })

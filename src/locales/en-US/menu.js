@@ -44,6 +44,7 @@ export default {
   'menu.finance.credit/debitnote': 'Credit / Debit Note',
   'menu.finance.corporate-billing': 'Corporate Billing',
   'menu.finance.corporate-billing.detail': 'Invoices',
+  'menu.finance.corporate-billing/detail': 'Corporate Billing',
   'menu.finance.statement': 'Statement',
   'menu.finance.statement/newstatement': 'New Statement',
   'menu.finance.statement/editstatement': 'Edit Statement',
@@ -96,6 +97,7 @@ export default {
   'menu.labsresult': 'Labs Result',
   'menu.humanResource': 'Human Resource',
   'menu.setting': 'Setting',
+  'menu.setting.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
   'menu.setting.room': 'Room',
@@ -138,6 +140,7 @@ export default {
   'menu.setting.appointmenttype': 'Appointment Type',
 
   'menu.report': 'Report',
+  'menu.report.report': 'Report',
   'menu.report.queueListingReport': 'Queue Listing Report',
   'menu.report.patientListingReport': 'Patient Listing Report',
   'menu.report.paymentCollection': 'Payment Collection Report',
@@ -148,6 +151,7 @@ export default {
   'menu.report.viewreport': 'View Report',
 
   'menu.support': 'Support',
+  'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',
   'menu.support.druglabel': 'Drug Label',
 }

@@ -19,7 +19,7 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
@@ -324,7 +324,7 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
-    console.log({ test: process.env.NODE_ENV, test2: process.env.client_env })
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />

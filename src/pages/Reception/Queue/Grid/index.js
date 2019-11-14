@@ -323,7 +323,7 @@ const Grid = ({
           break
         }
         case '9':
-          onRegisterPatientClick(false)
+          onRegisterPatientClick(false, row)
           break
         default:
           break

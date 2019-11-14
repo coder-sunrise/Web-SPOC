@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import * as Yup from 'yup'
@@ -53,8 +54,8 @@ const recurrenceTypes = [
 @withFormik({
   mapPropsToValues: () => ({
     doctorName: [],
-    dateFrom: moment().subtract(6, 'months'),
-    dateTo: moment(),
+    dateFrom: moment(),
+    dateTo: moment().add(6, 'months'),
     recurrence: undefined,
   }),
   validationSchema: Yup.object().shape({
@@ -172,7 +173,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
@@ -187,6 +188,7 @@ class Filter extends PureComponent {
                   })
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

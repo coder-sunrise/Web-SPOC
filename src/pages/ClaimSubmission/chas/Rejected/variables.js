@@ -1,5 +1,9 @@
 export const RejectedCHASColumns = [
   {
+    name: 'submissionDate',
+    title: 'Submission Date',
+  },
+  {
     name: 'visitDate',
     title: 'Visit Date',
   },
@@ -44,6 +48,10 @@ export const RejectedCHASColumns = [
     title: 'Claim Amt.',
   },
   {
+    name: 'rejectionDate',
+    title: 'Rejection Date',
+  },
+  {
     name: 'rejectionReason',
     title: 'Rejection Reason',
   },
@@ -56,6 +64,10 @@ export const RejectedCHASColumns = [
 export const RejectedCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
+  { columnName: 'rejectionDate', type: 'date', width: 130 },
+  { columnName: 'submissionDate', type: 'date', width: 140 },
+  { columnName: 'rejectionReason', width: 145 },
+  { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
 ]
