@@ -54,8 +54,8 @@ const recurrenceTypes = [
 @withFormik({
   mapPropsToValues: () => ({
     doctorName: [],
-    dateFrom: moment().subtract(6, 'months'),
-    dateTo: moment(),
+    dateFrom: moment(),
+    dateTo: moment().add(6, 'months'),
     recurrence: undefined,
   }),
   validationSchema: Yup.object().shape({

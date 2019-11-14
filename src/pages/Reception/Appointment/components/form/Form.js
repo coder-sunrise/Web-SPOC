@@ -762,7 +762,7 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-    console.log({ values })
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer>
