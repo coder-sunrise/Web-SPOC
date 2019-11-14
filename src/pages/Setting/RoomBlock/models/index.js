@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 import { notification } from '@/components'
 import * as service from '../services'
@@ -19,8 +20,15 @@ export default createListViewModel({
       history.listen(async (location) => {
         const { pathname } = location
         if (pathname === '/setting/roomblock') {
+          const dateFrom = moment().formatUTC()
+          const dateTo = moment().add(6, 'months').endOf('day').formatUTC()
           dispatch({
-            type: 'queryAll',
+            type: 'query',
+            payload: {
+              pagesize: 999,
+              lgteql_startDateTime: dateFrom,
+              lsteql_endDateTime: dateTo,
+            },
           })
         }
       })
