@@ -179,6 +179,10 @@ class Address extends Component {
                   <TextField
                     label='Postal Code'
                     onChange={this.handleOnChange}
+                    inputProps={{
+                      maxLength: 10,
+                    }}
+                    maxLength={10}
                     {...args}
                   />
                 )}
