@@ -491,7 +491,12 @@ class UserProfileForm extends React.PureComponent {
                 <FastField
                   name='phoneNumber'
                   render={(args) => (
-                    <NumberInput {...args} label='Contact No.' />
+                    <NumberInput
+                      {...args}
+                      label='Contact No.'
+                      max={1000000000000000}
+                      // maxLength={15}
+                    />
                   )}
                 />
               </GridItem>
