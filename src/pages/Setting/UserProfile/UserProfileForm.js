@@ -175,25 +175,25 @@ const styles = (theme) => ({
       userProfile,
     }
     console.log({ payload })
-    // dispatch({
-    //   type: 'settingUserProfile/upsert',
-    //   payload,
-    // }).then((response) => {
-    //   if (response) {
-    //     sessionStorage.removeItem('user')
-    //     if (currentUser) {
-    //       dispatch({
-    //         type: 'user/fetchCurrent',
-    //       })
-    //     }
-    //     dispatch({ type: 'settingUserProfile/query' })
-    //     dispatch({
-    //       type: 'settingUserProfile/refreshAllRelatedCodetables',
-    //     })
-    //     resetForm()
-    //     onConfirm()
-    //   }
-    // })
+    dispatch({
+      type: 'settingUserProfile/upsert',
+      payload,
+    }).then((response) => {
+      if (response) {
+        sessionStorage.removeItem('user')
+        if (currentUser) {
+          dispatch({
+            type: 'user/fetchCurrent',
+          })
+        }
+        dispatch({ type: 'settingUserProfile/query' })
+        dispatch({
+          type: 'settingUserProfile/refreshAllRelatedCodetables',
+        })
+        resetForm()
+        onConfirm()
+      }
+    })
   },
 })
 class UserProfileForm extends React.PureComponent {
@@ -316,8 +316,10 @@ class UserProfileForm extends React.PureComponent {
         const effectiveEndDate = moment(effectiveDates[1])
         const deactivating = today.isSameOrAfter(effectiveEndDate)
         const isPrimaryClinician =
-          parseInt(doctorProfile.id, 10) ===
-          parseInt(primaryRegisteredDoctorFK, 10)
+          currentSelectedRole.clinicalRoleName === 'Doctor'
+            ? parseInt(doctorProfile.id, 10) ===
+              parseInt(primaryRegisteredDoctorFK, 10)
+            : false
 
         if (deactivating && isPrimaryClinician) {
           return this.handleDeactivating(
