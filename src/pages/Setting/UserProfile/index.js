@@ -60,6 +60,9 @@ class UserProfile extends React.Component {
     })
     this.props.dispatch({
       type: 'settingUserProfile/query',
+      payload: {
+        isActive: this.props.values.status,
+      },
     })
   }
 
