@@ -115,6 +115,7 @@ class Service extends PureComponent {
     if (serviceCenterService) {
       setValues({
         ...values,
+        isActive: serviceCenterService.isActive,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
         serviceCode: this.state.services.find((o) => o.value === serviceFK)
           .code,
@@ -166,7 +167,7 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service'
+                    label='Service Name'
                     options={services.filter(
                       (o) =>
                         !serviceCenterFK ||
@@ -190,7 +191,7 @@ class Service extends PureComponent {
               render={(args) => {
                 return (
                   <Select
-                    label='Service Centre'
+                    label='Service Centre Name'
                     options={serviceCenters.filter(
                       (o) =>
                         !serviceFK ||

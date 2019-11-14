@@ -70,8 +70,9 @@ export default {
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
+    'process.env.client_env': 'production',
     'process.env.client_secret':
-      '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
+      'TiOserstaKdhu0af4zOzFFhBaLsgh8XsrzmHxnIpIvHjW7adSPELPYDlLJfDfGzA',
     'process.env.url': 'https://api.semr2.com',
     'process.env.signalrUrl': 'https//socket.semr2.com/notificationHub',
   },

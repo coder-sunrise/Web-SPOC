@@ -199,7 +199,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
-    // console.log(this.props)
+    console.log(this.props)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -500,7 +500,7 @@ class ControlTest extends PureComponent {
             <FastField
               name='numberField'
               render={(args) => {
-                return <NumberInput text currency label='Number' {...args} />
+                return <NumberInput currency label='Number' {...args} />
               }}
             />
           </GridItem>

@@ -46,6 +46,7 @@ const PatientInfoInput = ({
                 defaultValue={undefined}
                 label='Patient Name / Acc. No.'
                 disabled={isEdit}
+                loseFocusOnEnterPressed
               />
             )
           }}

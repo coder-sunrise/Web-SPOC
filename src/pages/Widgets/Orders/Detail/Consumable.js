@@ -60,7 +60,8 @@ class Consumable extends PureComponent {
 
   changeConsumable = (v, op = {}) => {
     const { setFieldValue, values } = this.props
-    console.log(v, op)
+    // console.log(v, op)
+    setFieldValue('isActive', true)
     setFieldValue('consumableCode', op.code)
     setFieldValue('consumableName', op.displayValue)
     setFieldValue('unitOfMeasurement', op.uom ? op.uom.name : undefined)
@@ -112,7 +113,7 @@ class Consumable extends PureComponent {
                 return (
                   <CodeSelect
                     temp
-                    label='Name'
+                    label='Consumable Name'
                     code='inventoryconsumable'
                     labelField='displayValue'
                     onChange={this.changeConsumable}

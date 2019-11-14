@@ -408,9 +408,9 @@ class AddNewStatement extends PureComponent {
             >
               Close
             </Button>
-            <Button color='primary' onClick={() => handleSubmit()}>
+            <ProgressButton color='primary' onClick={() => handleSubmit()}>
               Save
-            </Button>
+            </ProgressButton>
           </GridItem>
         </CardContainer>
       </React.Fragment>

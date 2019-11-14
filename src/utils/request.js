@@ -315,7 +315,7 @@ const request = (url, option, showNotification = true) => {
         return data
       })
       .catch((response, s, xhr) => {
-        // console.log(response, s, xhr)
+        // console.log({ response, s, xhr })
 
         let msg
         let status
@@ -335,6 +335,7 @@ const request = (url, option, showNotification = true) => {
                 response.status === 401) &&
               url !== '/connect/token'
             ) {
+              console.log('redirect')
               window.g_app._store.dispatch({
                 type: 'login/logout',
               })
