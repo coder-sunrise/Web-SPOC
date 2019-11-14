@@ -135,6 +135,9 @@ class SchemesGrid extends PureComponent {
             //   },
             // })
           },
+          isDisabled: (row) => {
+            return this.isExistingRow(row)
+          },
         },
         {
           columnName: 'coPaymentSchemeFK',
@@ -223,6 +226,13 @@ class SchemesGrid extends PureComponent {
     const ctSchemeTypes = codetable[ctSchemeType.toLowerCase()] || []
     const r = ctSchemeTypes.find((o) => o.id === schemeTypeFK)
     return r && r.code.startsWith('CHAS')
+  }
+
+  isExistingRow = (row) => {
+    if(this.isCHAS(row.schemeTypeFK) && row.id && row.id > 0){
+        return true
+    }
+    return false
   }
 
   isMedisaveOrPHPC = (row) => {

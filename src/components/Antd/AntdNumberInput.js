@@ -479,7 +479,7 @@ class AntdNumberInput extends React.PureComponent {
         //   field.value !== '' &&
         //   !Number.isNaN(field.value),
       })
-    } else if (value) {
+    } else if (value || value === 0) {
       this.setState({
         value: value === undefined || Number.isNaN(value) ? '' : Number(value),
         // focused:

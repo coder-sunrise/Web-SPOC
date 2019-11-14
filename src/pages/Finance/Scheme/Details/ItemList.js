@@ -22,6 +22,7 @@ const ItemList = ({
   dispatch,
   values,
   setValues,
+  theme,
   // ...props
 }) => {
   function callback (key) {
@@ -104,7 +105,6 @@ const ItemList = ({
   }
 
   const options = () => [
-   
     {
       id: 1,
       name: 'Medication',
@@ -254,7 +254,7 @@ const ItemList = ({
     },
   }
   return (
-    <div>
+    <div style={{ marginTop: theme.spacing(1) }}>
       <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
 
       <CommonTableGrid rows={itemList} {...tableConfigs} />

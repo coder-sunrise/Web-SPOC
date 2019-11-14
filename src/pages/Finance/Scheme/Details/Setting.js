@@ -77,7 +77,7 @@ const Setting = (props) => {
               <CoverageCap
                 setFieldValue={setFieldValue}
                 values={values}
-                classes={classes}
+                {...props}
               />
             </FieldSet>
           </GridItem>
@@ -87,7 +87,7 @@ const Setting = (props) => {
                 schemeDetail={schemeDetail}
                 setFieldValue={setFieldValue}
                 values={values}
-                classes={classes}
+                {...props}
               />
             </FieldSet>
           </GridItem>
