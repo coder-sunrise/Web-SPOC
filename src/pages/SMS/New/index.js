@@ -86,6 +86,7 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
                 label={formatMessage({
                   id: 'sms.message',
                 })}
+                maxLength={9999999999}
                 {...args}
               />
             )
