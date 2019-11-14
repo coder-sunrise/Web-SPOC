@@ -32,12 +32,32 @@ class CHAS extends React.Component {
   openSubmitClaimStatus = (count) =>
     this.setState({ showSubmitClaimStatus: true, failedCount: count })
 
-  closeClaimDetails = () =>
+  closeClaimDetailsModal = () => {
     this.setState({
       showClaimDetails: false,
       claimDetails: {},
       allowEdit: false,
     })
+  }
+
+  closeClaimDetails = () => {
+    this.closeClaimDetailsModal()
+  }
+
+  saveClaimDetails = () => {
+    if (!this.state.allowEdit) return this.closeClaimDetailsModal()
+    const { claimSubmission, dispatch } = this.props
+    const { entity } = claimSubmission
+    dispatch({
+      type: 'claimSubmissionNew/upsert',
+      payload: { ...entity },
+    }).then((r) => {
+      if (r) {
+        this.closeClaimDetailsModal()
+      }
+    })
+    return null
+  }
 
   closeSubmitClaimStatus = () =>
     this.setState({ showSubmitClaimStatus: false, failedCount: 0 })
@@ -203,7 +223,7 @@ class CHAS extends React.Component {
           title='Claim Details'
           open={showClaimDetails}
           onClose={this.closeClaimDetails}
-          onConfirm={this.closeClaimDetails}
+          onConfirm={this.saveClaimDetails}
         >
           <ClaimDetails claimDetails={claimDetails} allowEdit={allowEdit} />
         </CommonModal>

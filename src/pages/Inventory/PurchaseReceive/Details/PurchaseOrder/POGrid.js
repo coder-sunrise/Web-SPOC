@@ -14,7 +14,7 @@ const receivingDetailsSchema = Yup.object().shape({
   code: Yup.number().required(),
   // name: Yup.string().required(),
   orderQuantity: Yup.number().min(1).required(),
-  bonusQuantity: Yup.number().min(0).required(),
+  bonusQuantity: Yup.number().min(0),
 })
 
 class Grid extends PureComponent {

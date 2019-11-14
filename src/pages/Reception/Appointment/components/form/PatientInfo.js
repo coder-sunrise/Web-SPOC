@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { Search } from '@material-ui/icons'
 // custom component
 import {
   Button,
@@ -63,7 +64,7 @@ const PatientInfoInput = ({
                 submitKey='patientSearch/query'
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
-                icon={null}
+                icon={<Search />}
               >
                 Search
               </ProgressButton>
