@@ -15,6 +15,7 @@ import {
   Button,
   TextField,
   CodeSelect,
+  ProgressButton,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -99,7 +100,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         </GridItem>
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
-            <Button
+            <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
               onClick={() => {
@@ -120,9 +122,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
             <Authorized authority='inventorymaster.newinventoryitem'>
               <Button
                 variant='contained'
@@ -133,6 +134,8 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                     payload: {
                       entity: undefined,
                       currentId: undefined,
+                      sddCode: undefined,
+                      sddDescription: undefined,
                     },
                   })
                   history.push('/inventory/master/medication')

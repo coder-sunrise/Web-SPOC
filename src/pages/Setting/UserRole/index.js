@@ -2,6 +2,8 @@ import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 // devexpress react grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common component
@@ -14,6 +16,7 @@ import {
   GridItem,
   TextField,
   Tooltip,
+  ProgressButton,
 } from '@/components'
 // sub component
 import UserRoleForm from './UserRoleForm'
@@ -35,8 +38,7 @@ class UserRole extends React.Component {
     showUserProfileForm: false,
   }
 
-  onTextFieldChange = (event, value) => {
-  }
+  onTextFieldChange = (event, value) => {}
 
   handleActionButtonClick = (row) => {
     this.toggleModal()
@@ -85,8 +87,11 @@ class UserRole extends React.Component {
           </GridItem>
 
           <GridItem md={12} className={classes.verticalSpacing}>
-            <Button color='primary'>Search</Button>
+            <ProgressButton icon={<Search />} color='primary'>
+              <FormattedMessage id='form.search' />
+            </ProgressButton>
             <Button color='primary' onClick={this.toggleModal}>
+              <Add />
               Add New
             </Button>
           </GridItem>

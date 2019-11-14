@@ -114,7 +114,7 @@ const styles = () => ({
             id: r.id || values.id,
           },
         }).then(() => {
-          if (patient.callback) patient.callback()
+          if (patient.callback) patient.callback(r.id)
         })
         if (onConfirm) onConfirm()
         resetForm()

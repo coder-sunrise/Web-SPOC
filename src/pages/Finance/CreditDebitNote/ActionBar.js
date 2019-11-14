@@ -9,11 +9,11 @@ import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 // custom component
 import {
-  Button,
   GridContainer,
   GridItem,
   DateRangePicker,
   TextField,
+  ProgressButton,
 } from '@/components'
 
 const styles = () => ({
@@ -111,10 +111,13 @@ class ActionBar extends PureComponent {
             />
           </GridItem>
           <GridItem xs md={3}>
-            <Button className={classnames(classes.searchBtn)} color='primary'>
-              <Search />
+            <ProgressButton
+              icon={<Search />}
+              className={classnames(classes.searchBtn)}
+              color='primary'
+            >
               <FormattedMessage id='form.search' />
-            </Button>
+            </ProgressButton>
           </GridItem>
         </GridItem>
       </GridContainer>

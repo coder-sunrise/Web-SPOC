@@ -67,8 +67,8 @@ class PurchaseReceive extends PureComponent {
         <CommonModal
           open={purchasingReceiving.showWriteOffModal}
           observe='PurchaseReceivingWriteOffDetail'
-          title={'Write-Off'}
-          maxWidth='xs'
+          title='Write-Off'
+          maxWidth='sm'
           onClose={this.toggleWriteOffModal}
           onConfirm={this.toggleWriteOffModal}
         >
@@ -77,8 +77,8 @@ class PurchaseReceive extends PureComponent {
         <CommonModal
           open={purchasingReceiving.showDuplicatePOModal}
           observe='PurchaseOrderConfirmationDetail'
-          title={'Duplicate Purchase Order'}
-          maxWidth='xs'
+          title='Duplicate Purchase Order'
+          maxWidth='sm'
           onClose={this.toggleDuplicatePOModal}
           onConfirm={this.toggleDuplicatePOModal}
         >

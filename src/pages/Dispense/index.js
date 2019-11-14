@@ -177,6 +177,7 @@ class Dispense extends PureComponent {
       ]
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
+    return null
   }
 
   connectWebSocket () {

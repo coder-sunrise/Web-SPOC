@@ -491,7 +491,6 @@ export default createListViewModel({
 
         yield all([
           put({ type: 'getCalendarList', payload: getCalendarListPayload }),
-          put({ type: 'initState', payload: { start } }),
           put({
             type: 'doctorBlock/query',
             payload: {
@@ -499,15 +498,10 @@ export default createListViewModel({
             },
           }),
         ])
-        // yield put({ type: 'getCalendarList', payload: getCalendarListPayload })
-        // yield put({ type: 'getPublicHolidayList', payload: { start } })
-        // yield put({
-        //   type: 'doctorBlock/query',
-        //   payload: {
-        //     pagesize: 9999,
-        //     lgteql_startDateTime: start,
-        //   },
-        // })
+      },
+      *updateAppointmentLinking ({ payload }, { call, put }) {
+        const response = yield call(service.updateLinking, payload)
+        return response
       },
     },
     reducers: {

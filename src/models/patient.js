@@ -8,6 +8,66 @@ import {
   getRefreshChasBalanceStatus,
 } from '@/utils/utils'
 
+const defaultPatientEntity = {
+  effectiveStartDate: moment().formatUTC(),
+  effectiveEndDate: moment('2099-12-31').formatUTC(),
+  patientAccountNo: '',
+  patientEmergencyContact: [],
+  patientAllergy: [],
+  patientAllergyMetaData: [],
+  patientMedicalAlert: [],
+  patientScheme: [],
+  schemePayer: [],
+  referredBy: '',
+  // dob: new Date(),
+  contact: {
+    contactAddress: [
+      {
+        // Id: getUniqueGUID(),
+        countryFK: undefined,
+        isPrimary: true,
+        isMailing: true,
+      },
+    ],
+    contactEmailAddress: {
+      emailAddress: '',
+    },
+    mobileContactNumber: {
+      number: undefined,
+      countryCodeFK: 1,
+    },
+    homeContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    officeContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    faxContactNumber: {
+      number: '',
+      countryCodeFK: 1,
+    },
+    contactWebsite: {
+      website: '',
+    },
+  },
+  patientPdpaConsent: [
+    {
+      pdpaConsentTypeFK: 1,
+      isConsent: true,
+    },
+    {
+      pdpaConsentTypeFK: 2,
+      isConsent: false,
+    },
+    {
+      pdpaConsentTypeFK: 3,
+      isConsent: false,
+    },
+  ],
+}
+
 export default createFormViewModel({
   namespace: 'patient',
   config: {
@@ -18,65 +78,7 @@ export default createFormViewModel({
     state: {
       menuErrors: {},
       currentComponent: '1',
-      default: {
-        effectiveStartDate: moment().formatUTC(),
-        effectiveEndDate: moment('2099-12-31').formatUTC(),
-        patientAccountNo: '',
-        patientEmergencyContact: [],
-        patientAllergy: [],
-        patientAllergyMetaData: [],
-        patientMedicalAlert: [],
-        patientScheme: [],
-        schemePayer: [],
-        referredBy: '',
-        // dob: new Date(),
-        contact: {
-          contactAddress: [
-            {
-              // Id: getUniqueGUID(),
-              countryFK: undefined,
-              isPrimary: true,
-              isMailing: true,
-            },
-          ],
-          contactEmailAddress: {
-            emailAddress: '',
-          },
-          mobileContactNumber: {
-            number: undefined,
-            countryCodeFK: 1,
-          },
-          homeContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          officeContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          faxContactNumber: {
-            number: '',
-            countryCodeFK: 1,
-          },
-          contactWebsite: {
-            website: '',
-          },
-        },
-        patientPdpaConsent: [
-          {
-            pdpaConsentTypeFK: 1,
-            isConsent: true,
-          },
-          {
-            pdpaConsentTypeFK: 2,
-            isConsent: false,
-          },
-          {
-            pdpaConsentTypeFK: 3,
-            isConsent: false,
-          },
-        ],
-      },
+      default: defaultPatientEntity,
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
@@ -217,11 +219,11 @@ export default createFormViewModel({
             type: 'updateState',
             paylad: {
               callback: undefined,
+              default: defaultPatientEntity,
             },
           }),
         ])
       },
-
       *openPatientModal ({ payload = { callback: undefined } }, { call, put }) {
         if (payload.callback) {
           yield put({
@@ -274,6 +276,17 @@ export default createFormViewModel({
       },
     },
     reducers: {
+      updateDefaultEntity (state, { payload }) {
+        const { patientName } = payload
+        return {
+          ...state,
+          default: {
+            ...defaultPatientEntity,
+            name: patientName,
+            callingName: patientName,
+          },
+        }
+      },
       queryDone (st, { payload }) {
         const { data } = payload
         // console.log(payload)
