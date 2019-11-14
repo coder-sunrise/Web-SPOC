@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
+import { Search, Add } from '@material-ui/icons'
 import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import {
@@ -161,7 +162,7 @@ class FilterBar extends PureComponent {
           <div className={classes.buttonGroup}>
             <ProgressButton
               color='primary'
-              icon={null}
+              icon={<Search />}
               onClick={() => {
                 const {
                   purchaseOrderNo,
@@ -200,6 +201,7 @@ class FilterBar extends PureComponent {
             </ProgressButton>
             <Authorized authority='purchasingandreceiving.newpurchasingandreceiving'>
               <Button onClick={() => handleNavigate('new')} color='primary'>
+                <Add />
                 Add New
               </Button>
             </Authorized>

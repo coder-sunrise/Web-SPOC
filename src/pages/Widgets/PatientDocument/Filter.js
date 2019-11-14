@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import {
   FastField,
   GridContainer,
@@ -11,14 +12,11 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ patientAttachment }) =>
-  patientAttachment.filter || {},
+  mapPropsToValues: ({ patientAttachment }) => patientAttachment.filter || {},
   handleSubmit: () => {},
   displayName: 'DocumentTemplateFilter',
 })
 class Filter extends PureComponent {
-  
-
   render () {
     const { classes } = this.props
     return (
@@ -49,7 +47,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, effectiveDates } = this.props.values
                   this.props.dispatch({

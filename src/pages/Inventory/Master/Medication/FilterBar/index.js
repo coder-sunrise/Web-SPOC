@@ -101,9 +101,9 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
         <GridItem xs={12}>
           <div className={classes.filterBtn}>
             <ProgressButton
+              icon={<Search />}
               variant='contained'
               color='primary'
-              icon={null}
               onClick={() => {
                 const {
                   code,
@@ -122,7 +122,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 })
               }}
             >
-              <Search />
               <FormattedMessage id='form.search' />
             </ProgressButton>
             <Authorized authority='inventorymaster.newinventoryitem'>
