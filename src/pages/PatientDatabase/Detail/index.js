@@ -117,10 +117,10 @@ const styles = () => ({
         }).then(() => {
           if (patient.callback) patient.callback(r.id)
         })
-        if (onConfirm) {
+        if (onConfirm && !r.id) {
           onConfirm()
         }
-        resetForm()
+        resetForm({})
       }
     })
   },
