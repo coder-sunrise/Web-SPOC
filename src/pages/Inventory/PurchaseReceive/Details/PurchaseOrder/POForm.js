@@ -285,6 +285,9 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                 render={(args) => {
                   return (
                     <NumberInput
+                      min='0'
+                      maxLength='15'
+                      max='999999999999999'
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactNo',
                       })}
@@ -301,6 +304,9 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                 render={(args) => {
                   return (
                     <NumberInput
+                      min='0'
+                      maxLength='15'
+                      max='999999999999999'
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.faxNo',
                       })}

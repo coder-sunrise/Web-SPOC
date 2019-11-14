@@ -42,16 +42,16 @@ export default createListViewModel({
             },
           ],
           mobileContactNumber: {
-            number: '',
+            number: undefined,
           },
           officeContactNumber: {
-            number: '',
+            number: undefined,
           },
           faxContactNumber: {
-            number: '',
+            number: undefined,
           },
           contactWebsite: {
-            website: '',
+            website: undefined,
           },
           contactEmailAddress: {
             emailAddress: undefined,
