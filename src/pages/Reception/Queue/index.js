@@ -312,6 +312,7 @@ class Queue extends React.Component {
           {
             [`${prefix}name`]: searchQuery,
             [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}patientReferenceNo`]: searchQuery,
             [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
             combineCondition: 'or',
           },

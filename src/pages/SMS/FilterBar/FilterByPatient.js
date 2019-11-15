@@ -28,7 +28,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           render={(args) => (
             <TextField
               {...args}
-              label='Patient Details (Patient Name, Acc No., Phone No.)'
+              label='Patient Details (Patient Name, Acc No., Patient Ref. No., Contact No.)'
             />
           )}
         />

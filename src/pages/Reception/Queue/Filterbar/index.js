@@ -59,7 +59,7 @@ const Filterbar = ({
               inputProps={{
                 autocomplete: 'queue-listing-filterbar-search',
               }}
-              label='Patient Name, Acc No., Phone No.'
+              label='Patient Name, Acc No., Patient Ref. No., Contact No.'
               onChange={(e) => setSearch(e.target.value)}
               bind='patientSearch/query'
             />
