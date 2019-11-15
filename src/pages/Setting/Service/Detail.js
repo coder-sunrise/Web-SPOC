@@ -346,7 +346,7 @@ class Detail extends PureComponent {
                   />
                 </GridItem>
                 <GridItem xs={6}>
-                  <FastField
+                  <Field
                     name='effectiveDates'
                     render={(args) => {
                       return (
@@ -355,7 +355,7 @@ class Detail extends PureComponent {
                           label2='End Date'
                           disabled={
                             settingClinicService.entity ? (
-                              !this.state.hasActiveSession
+                              this.state.hasActiveSession
                             ) : (
                               false
                             )

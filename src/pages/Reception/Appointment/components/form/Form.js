@@ -440,15 +440,19 @@ class Form extends React.PureComponent {
         datagrid,
         tempNewAppointmentStatusFK: appointmentStatusFK,
       } = this.state
-      handleSubmit() // fake submit to touch all fields
-      setSubmitting(true)
-      const formError = await validateForm(values)
 
-      if (Object.keys(formError).length > 0) {
-        console.log({ formError })
-        setSubmitting(false)
-        return
+      if (!validate) {
+        handleSubmit() // fake submit to touch all fields
+        setSubmitting(true)
+        const formError = await validateForm(values)
+
+        if (Object.keys(formError).length > 0) {
+          console.log({ formError })
+          setSubmitting(false)
+          return
+        }
       }
+
       const submitPayload = {
         validate,
         datagrid,
@@ -705,6 +709,13 @@ class Form extends React.PureComponent {
     return false
   }
 
+  shouldDisableCheckAvailabilityButtonAction = () => {
+    const { isDataGridValid } = this.state
+    if (!isDataGridValid) return true
+
+    return false
+  }
+
   shouldDisableDatagrid = () => {
     const { values } = this.props
 
@@ -750,6 +761,7 @@ class Form extends React.PureComponent {
     const { currentAppointment = {} } = values
     const disablePatientInfo = this.shouldDisablePatientInfo()
     const disableFooterButton = this.shouldDisableButtonAction()
+    const disableCheckAvailabilityFooterButton = this.shouldDisableCheckAvailabilityButtonAction()
     const disableDataGrid = this.shouldDisableDatagrid()
 
     const _datagrid =
@@ -841,6 +853,7 @@ class Form extends React.PureComponent {
               appointmentStatusFK={currentAppointment.appointmentStatusFk}
               onClose={onClose}
               disabled={disableFooterButton}
+              disabledCheckAvailability={disableCheckAvailabilityFooterButton}
               handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
               handleSaveDraftClick={this.onSaveDraftClick}
               handleConfirmClick={this.onConfirmClick}
