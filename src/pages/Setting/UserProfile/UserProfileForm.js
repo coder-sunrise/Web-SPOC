@@ -22,7 +22,7 @@ import {
   WarningSnackbar,
   withFormikExtend,
 } from '@/components'
-import { ChangePassword, LoadingWrapper } from '@/components/_medisys'
+import { ChangePassword, LoadingWrapper, Mobile } from '@/components/_medisys'
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
@@ -493,12 +493,13 @@ class UserProfileForm extends React.PureComponent {
                 <FastField
                   name='phoneNumber'
                   render={(args) => (
-                    <NumberInput
-                      {...args}
-                      label='Contact No.'
-                      max={1000000000000000}
-                      // maxLength={15}
-                    />
+                    // <NumberInput
+                    //   {...args}
+                    //   label='Contact No.'
+                    //   max={1000000000000000}
+                    //   // maxLength={15}
+                    // />
+                    <Mobile {...args} />
                   )}
                 />
               </GridItem>

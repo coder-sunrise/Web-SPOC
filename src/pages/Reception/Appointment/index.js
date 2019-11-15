@@ -121,22 +121,16 @@ class Appointment extends React.PureComponent {
           parseInt(item.id, 10) ===
           parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
       )
-
-      this.setState({
-        primaryClinicianFK: primaryClinician.clinicianProfile.id,
-        resources: [
-          {
-            clinicianFK: primaryClinician.clinicianProfile.id,
-            doctorName: primaryClinician.clinicianProfile.name,
-          },
-        ],
-      })
-      // this.setState({
-      //   resources: response.map((item) => ({
-      //     clinicianFK: item.clinicianProfile.id,
-      //     doctorName: item.clinicianProfile.name,
-      //   })),
-      // })
+      if (primaryClinician)
+        this.setState({
+          primaryClinicianFK: primaryClinician.clinicianProfile.id,
+          resources: [
+            {
+              clinicianFK: primaryClinician.clinicianProfile.id,
+              doctorName: primaryClinician.clinicianProfile.name,
+            },
+          ],
+        })
     })
     dispatch({
       type: 'calendar/initState',
