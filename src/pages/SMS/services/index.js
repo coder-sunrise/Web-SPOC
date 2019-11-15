@@ -11,7 +11,6 @@ module.exports = {
 
   queryList: (params) => {
     const { smsType, ...restParams } = params
-    console.log({ smsType })
     return service.queryList(
       smsType === 'Appointment' ? appointmentUrl : patientUrl,
       restParams,
