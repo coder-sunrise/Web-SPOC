@@ -33,7 +33,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem>
-      <GridItem md={4}>
+      {/* <GridItem md={4}>
         <FastField
           name='lastVisitDate'
           render={(args) => (
@@ -47,7 +47,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
             />
           )}
         />
-      </GridItem>
+      </GridItem> */}
       <GridItem md={4} />
       <GridItem md={2}>
         <FastField
