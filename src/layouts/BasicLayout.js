@@ -247,21 +247,24 @@ class BasicLayout extends React.PureComponent {
 
   initUserData = async () => {
     const { dispatch, route: { routes, authority } } = this.props
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'doctorprofile',
-        filter: {
-          'clinicianProfile.isActive': true,
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'doctorprofile',
+          filter: {
+            'clinicianProfile.isActive': true,
+          },
         },
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'clinicianprofile',
-      },
-    })
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'clinicianprofile',
+        },
+      }),
+    ])
+
     const user = await dispatch({
       type: 'user/fetchCurrent',
     })

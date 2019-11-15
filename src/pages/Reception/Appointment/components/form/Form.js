@@ -86,12 +86,12 @@ class Form extends React.PureComponent {
 
   componentDidMount () {
     Promise.all([
-      this.props.dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'clinicianprofile',
-        },
-      }),
+      // this.props.dispatch({
+      //   type: 'codetable/fetchCodes',
+      //   payload: {
+      //     code: 'clinicianprofile',
+      //   },
+      // }),
       this.props.dispatch({
         type: 'codetable/fetchCodes',
         payload: { code: 'ltappointmentstatus' },
