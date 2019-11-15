@@ -129,6 +129,7 @@ export default compose(
           {
             name: patientName,
             patientAccountNo: patientName,
+            patientReferenceNo: patientName,
             'ContactFkNavigation.contactNumber.number': patientName,
             combineCondition: 'or',
           },

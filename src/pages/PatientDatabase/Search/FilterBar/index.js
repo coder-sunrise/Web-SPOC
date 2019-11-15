@@ -105,6 +105,7 @@ class FilterBar extends PureComponent {
                           // [`${prefix}patientReferenceNo`]: search,
                           [`${prefix}name`]: search,
                           [`${prefix}patientAccountNo`]: search,
+                          [`${prefix}patientReferenceNo`]: search,
                           [`${prefix}contactFkNavigation.contactNumber.number`]: search,
                           combineCondition: 'or',
                         },
