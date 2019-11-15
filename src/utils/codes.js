@@ -904,6 +904,12 @@ const tenantCodes = [
   'ctcopayer',
 ]
 
+// always get latest codetable
+const skipCache = [
+  'doctorprofile',
+  'clinicianprofile',
+]
+
 // const codes = [
 //   {
 //     code: 'ctservice',
@@ -986,28 +992,11 @@ export const fetchAndSaveCodeTable = async (
     newData = [
       ...data.data,
     ]
-    // if (code.split(',').length > 1) {
-    //   const codes = code.split(',')
-    //   newData = [
-    //     ...codes.reduce(
-    //       (merged, c) => [
-    //         ...merged,
-    //         ...data[c],
-    //       ],
-    //       [],
-    //     ),
-    //   ]
-    // } else {
-    //   console.log({ data, code, useGeneral })
-    //   newData = [
-    //     ...data.data,
-    //   ]
-    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    // console.log(newData, temp)
-    // if (!temp)
+    if (skipCache.includes(code)) return newData
+
     await db.codetable.put({
       code,
       data: newData,

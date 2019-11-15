@@ -49,7 +49,7 @@ const Vaccination = ({
     {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
-      code: 'ctvaccinationunitofmeasurement',
+      code: 'ctmedicationunitofmeasurement',
       sortBy: 'dispensingUOMFkNavigation.displayValue',
       width: 110,
     },

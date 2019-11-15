@@ -65,13 +65,13 @@ export default createListViewModel({
           type: 'updateState',
           payload: {
             list: [],
+            sessionInfo: { ...InitialSessionInfo },
             selfOnly: userRole && userRole.clinicRoleFK === 1,
           },
         })
       },
       *startSession (_, { call, put }) {
         const response = yield call(service.startSession)
-        console.log('start session', { response })
 
         if (response) {
           // start session successfully
@@ -96,7 +96,7 @@ export default createListViewModel({
       },
       *endSession ({ sessionID }, { call, put }) {
         const response = yield call(service.endSession, sessionID)
-        console.log({ response })
+
         if (response) {
           yield put({
             type: 'updateState',

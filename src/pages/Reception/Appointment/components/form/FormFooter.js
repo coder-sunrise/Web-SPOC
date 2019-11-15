@@ -21,6 +21,7 @@ const ButtonText = {
 const FormFooter = ({
   classes,
   disabled = false,
+  disabledCheckAvailability = false,
   appointmentStatusFK,
   onClose,
   handleCancelOrDeleteClick,
@@ -46,7 +47,7 @@ const FormFooter = ({
             {ButtonText.CANCEL}
           </Button>
           <Button
-            disabled={disabled || isTurnedUp}
+            disabled={disabledCheckAvailability || isTurnedUp}
             color='success'
             onClick={handleValidateClick}
           >

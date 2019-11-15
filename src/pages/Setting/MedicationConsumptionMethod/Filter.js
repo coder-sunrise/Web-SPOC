@@ -54,6 +54,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingMedicationConsumptionMethod/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {

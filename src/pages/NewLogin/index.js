@@ -264,7 +264,7 @@ class NewLogin extends React.Component {
           </GridContainer>
           {process.env.client_env === 'uat' && (
             <h3 className={classes.uatText}>
-              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
             </h3>
           )}
         </div>

@@ -81,7 +81,7 @@ const FilterBar = ({
                 // code='clinicianprofile'
                 // labelField='name'
                 // valueField='id'
-                filter={{
+                remoteFilter={{
                   'clinicianProfile.isActive': true,
                 }}
                 code='doctorprofile'

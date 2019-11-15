@@ -428,8 +428,12 @@ class AntdSelect extends React.PureComponent {
     }
     if (proceed) {
       if (form && field) {
-        form.setFieldValue(field.name, newVal)
-        form.setFieldTouched(field.name, true)
+        field.onChange({
+          target: {
+            name: field.name,
+            value: newVal,
+          },
+        })
       }
       this.setState((ps) => {
         return {

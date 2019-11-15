@@ -52,7 +52,7 @@ const ReportViewer = ({
   const [
     scale,
     setScale,
-  ] = useState(minScale)
+  ] = useState(1.75)
   const [
     screenSize,
     setScreenSize,
@@ -134,7 +134,7 @@ const ReportViewer = ({
       return true
     }
     if (key === 'export-excel') {
-      await exportExcelReport(reportID, JSON.stringify(reportParameters))
+      await exportExcelReport(reportID, reportParameters)
       // fileExtension = '.xls'
     } else {
       await exportPdfReport(reportID, reportParameters)

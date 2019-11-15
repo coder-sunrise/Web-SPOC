@@ -14,6 +14,7 @@ import {
   NumberInput,
   ProgressButton,
 } from '@/components'
+import { Mobile } from '@/components/_medisys'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -105,11 +106,15 @@ const PatientInfoInput = ({
         <FastField
           name='patientContactNo'
           render={(args) => (
-            <NumberInput
+            <Mobile
               {...args}
               disabled={isRegisteredPatient || disabled || isEdit}
-              label='Contact No.'
             />
+            // <NumberInput
+            //   {...args}
+            //   disabled={isRegisteredPatient || disabled || isEdit}
+            //   label='Contact No.'
+            // />
           )}
         />
       </GridItem>
