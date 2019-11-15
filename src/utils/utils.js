@@ -693,12 +693,13 @@ const navigateDirtyCheck = ({
     let f = {}
     if (displayName) {
       f = window.dirtyForms[displayName]
+
       const ob = window.g_app._store.getState().formik[displayName]
-      if (ob && !ob.dirty) {
+      if ((ob && !ob.dirty) || !f) {
+        _checkCb(restProps, e)
         return
       }
     }
-
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {

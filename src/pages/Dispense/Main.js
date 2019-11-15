@@ -114,7 +114,6 @@ const reloadDispense = (props, effect = 'query') => {
         }
       }
     })
-    console.log({ values })
     dispatch({
       type: `dispense/save`,
       payload: {
