@@ -44,7 +44,7 @@ const STYLES = () => {
       },
       '& .ant-select-selection--single': {
         height: '100%',
-        lineHeight: '1.2em',
+        lineHeight: '1.4em',
       },
       '& .ant-select-selection--multiple': {
         height: '100%',
@@ -207,7 +207,7 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = nextProps
     let v = this.state.value
-
+    // console.log(field)
     if (field) {
       v = [
         'multiple',
