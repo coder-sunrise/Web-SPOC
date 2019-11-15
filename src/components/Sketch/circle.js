@@ -73,6 +73,8 @@ class Circle extends FabricCanvasTool {
     let circle = new fabric.Group([
       this.circle,
     ])
+    circle.selectable = false
+    circle.evented = false
     canvas.add(circle)
   }
 }
