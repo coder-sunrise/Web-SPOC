@@ -131,8 +131,7 @@ class ScribbleNoteItem extends React.Component {
                                     )
 
                                     const newArrayItems = [
-                                      ...scriblenotes.ClinicianNote
-                                        .notesScribbleArray,
+                                      ...scriblenotes[category][arrayName],
                                     ]
                                     newArrayItems[i].scribbleNoteLayers =
                                       v.scribbleNoteLayers

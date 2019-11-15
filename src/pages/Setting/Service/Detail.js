@@ -52,7 +52,7 @@ const itemSchema = Yup.object().shape({
         ctServiceCenter_ServiceNavigation[0].isDefault = true
       }
     }
-    // console.log('returnValue', returnValue)
+
     return returnValue
   },
 
@@ -131,7 +131,7 @@ class Detail extends PureComponent {
         type: 'radio',
         checkedValue: true,
         uncheckedValue: false,
-        onRadioChange: ({ row, checked }) => {
+        onChange: ({ row, checked }) => {
           // console.log(this)
           if (checked) {
             const { values, setFieldValue, setFieldTouched } = this.props
@@ -145,6 +145,7 @@ class Detail extends PureComponent {
             if (r) {
               r.isDefault = true
             }
+            this.setState({ serviceSettings: serviceSettingItem })
             setFieldValue(
               'ctServiceCenter_ServiceNavigation',
               serviceSettingItem,
@@ -345,7 +346,7 @@ class Detail extends PureComponent {
                   />
                 </GridItem>
                 <GridItem xs={6}>
-                  <FastField
+                  <Field
                     name='effectiveDates'
                     render={(args) => {
                       return (
@@ -354,7 +355,7 @@ class Detail extends PureComponent {
                           label2='End Date'
                           disabled={
                             settingClinicService.entity ? (
-                              !this.state.hasActiveSession
+                              this.state.hasActiveSession
                             ) : (
                               false
                             )

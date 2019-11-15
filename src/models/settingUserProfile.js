@@ -33,6 +33,9 @@ export default createListViewModel({
           type: 'codetable/fetchCodes',
           payload: {
             code: 'doctorprofile',
+            filter: {
+              'clinicianProfile.isActive': true,
+            },
             force: true,
           },
         })

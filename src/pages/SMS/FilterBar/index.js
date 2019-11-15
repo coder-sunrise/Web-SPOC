@@ -144,25 +144,22 @@ export default compose(
       }
 
       let payload = {}
+      let dispatchType = ''
       if (type === 'Appointment') {
+        dispatchType = 'smsAppointment'
         payload = appointmentPayload
       } else {
+        dispatchType = 'smsPatient'
         payload = patientPayload
       }
 
       dispatch({
-        type: 'sms/query',
+        type: `${dispatchType}/query`,
         payload: {
+          keepFilter: false,
           ...payload,
           smsType: type,
         },
-      }).then(() => {
-        dispatch({
-          type: 'sms/updateState',
-          payload: {
-            filter: undefined,
-          },
-        })
       })
     },
   }),

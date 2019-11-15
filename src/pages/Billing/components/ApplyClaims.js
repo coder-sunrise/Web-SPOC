@@ -374,6 +374,11 @@ const ApplyClaims = ({
         tempInvoicePayer.reduce(computeTotalForAllSavedClaim, 0),
       )
       let finalPayable = roundToTwoDecimals(invoice.totalAftGst - finalClaim)
+      const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
+        if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+        return totalAmtPaid
+      }, 0)
+      const newOutstandingBalance = roundToTwoDecimals(finalPayable - totalPaid)
 
       const updatedInvoiceItems = updateOriginalInvoiceItemList()
       const _values = {
@@ -382,7 +387,7 @@ const ApplyClaims = ({
         finalPayable,
         invoice: {
           ...values.invoice,
-          outstandingBalance: finalPayable,
+          outstandingBalance: newOutstandingBalance,
           invoiceItems: updatedInvoiceItems,
         },
         invoicePayer: tempInvoicePayer,

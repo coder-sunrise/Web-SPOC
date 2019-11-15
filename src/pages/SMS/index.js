@@ -33,21 +33,29 @@ const styles = {
   },
 }
 
-const SMS = ({ classes, sms, dispatch }) => {
+const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
   const [
     selectedRows,
     setSelectedRows,
   ] = useState([])
 
+  const [
+    currentTab,
+    setCurrentTab,
+  ] = useState('0')
+
   const newMessageProps = {
     selectedRows,
-    sms,
     dispatch,
     setSelectedRows,
+    smsAppointment,
+    smsPatient,
+    currentTab,
   }
   const gridProps = {
     classes,
-    sms,
+    smsAppointment,
+    smsPatient,
     dispatch,
     setSelectedRows,
     selectedRows,
@@ -57,15 +65,6 @@ const SMS = ({ classes, sms, dispatch }) => {
   const contentClass = classnames({
     [classes.blur]: showWarning,
   })
-
-  const clearFilter = () => {
-    dispatch({
-      type: 'sms/updateState',
-      payload: {
-        filter: undefined,
-      },
-    })
-  }
 
   const defaultSearchQuery = (type) => {
     if (type === 'Appointment') {
@@ -82,27 +81,19 @@ const SMS = ({ classes, sms, dispatch }) => {
     }
   }
 
-  const getSMSData = (e) => {
-    let type = ''
-    if (e === '0') type = 'Appointment'
-    else type = 'Patient'
-    clearFilter()
-    dispatch({
-      type: 'sms/query',
-      payload: {
-        smsType: type,
-        ...defaultSearchQuery(type),
-      },
-    })
-  }
-
   useEffect(() => {
-    clearFilter()
     dispatch({
-      type: 'sms/query',
+      type: 'smsAppointment/query',
       payload: {
         smsType: 'Appointment',
         ...defaultSearchQuery('Appointment'),
+      },
+    })
+    dispatch({
+      type: 'smsPatient/query',
+      payload: {
+        smsType: 'Patient',
+        ...defaultSearchQuery(),
       },
     })
   }, [])
@@ -124,7 +115,7 @@ const SMS = ({ classes, sms, dispatch }) => {
         <Tabs
           defaultActiveKey='0'
           options={SmsOption(gridProps)}
-          onChange={getSMSData}
+          onChange={(e) => setCurrentTab(e)}
         />
         <div className={classes.sendBar}>
           <New {...newMessageProps} />
@@ -136,7 +127,8 @@ const SMS = ({ classes, sms, dispatch }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ sms }) => ({
-    sms,
+  connect(({ smsAppointment, smsPatient }) => ({
+    smsAppointment,
+    smsPatient,
   })),
 )(SMS)

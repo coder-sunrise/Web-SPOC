@@ -29,7 +29,6 @@ export default createListViewModel({
     reducers: {
       getSMSHistory (st, { payload }) {
         const { data } = payload
-        console.log({ payload })
         return {
           ...st,
           smsHistory: data.map((o) => {

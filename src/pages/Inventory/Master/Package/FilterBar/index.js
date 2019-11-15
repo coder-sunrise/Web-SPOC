@@ -77,6 +77,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 dispatch({
                   type: 'pack/query',
                   payload: {
+                    keepFilter: false,
                     code,
                     displayValue,
                     isActive,

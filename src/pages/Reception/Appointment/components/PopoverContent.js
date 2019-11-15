@@ -18,6 +18,7 @@ import {
   timeFormat,
   timeFormat24Hour,
 } from '@/components'
+import { Mobile } from '@/components/_medisys'
 
 const styles = () => ({
   icon: {
@@ -161,11 +162,12 @@ class PopoverContent extends React.Component {
               <TextField disabled label='Patient Name' value={patientName} />
             </GridItem>
             <GridItem>
-              <TextField
+              {/* <TextField
                 disabled
                 label='Contact No.'
                 value={patientContactNo}
-              />
+              /> */}
+              <Mobile disabled value={patientContactNo} />
             </GridItem>
             <GridItem md={12}>
               <CodeSelect

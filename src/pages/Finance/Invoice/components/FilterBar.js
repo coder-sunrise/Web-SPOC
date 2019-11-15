@@ -46,6 +46,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
     dispatch({
       type: 'invoiceList/query',
       payload: {
+        keepFilter: false,
         // combineCondition: 'and',
         lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
         lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,

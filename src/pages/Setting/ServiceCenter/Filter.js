@@ -66,8 +66,6 @@ class Filter extends PureComponent {
                 color='primary'
                 icon={<Search />}
                 onClick={() => {
-                  console.log('search', this.props.values)
-
                   const {
                     codeDisplayValue,
                     isActive,
@@ -77,6 +75,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingServiceCenter/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {

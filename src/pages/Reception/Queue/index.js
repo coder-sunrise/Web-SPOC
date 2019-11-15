@@ -97,21 +97,24 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}initState`,
     })
+    dispatch({
+      type: `${modelKey}refresh`,
+    })
+
     // dispatch({
     //   type: 'calendar/updateState',
     //   payload: {
     //     list: [],
     //   },
     // })
-    if (sessionInfo.id === '') {
-      dispatch({
-        type: `${modelKey}getSessionInfo`,
-      })
-    } else {
-      dispatch({
-        type: `${modelKey}refresh`,
-      })
-    }
+
+    // if (sessionInfo.id === '') {
+    //   dispatch({
+    //     type: `${modelKey}getSessionInfo`,
+    //   })
+    // } else {
+
+    // }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -199,7 +202,8 @@ class Queue extends React.Component {
       this.props.dispatch({
         type: 'patient/updateDefaultEntity',
         payload: {
-          patientName: row.patientName,
+          name: row.patientName,
+          callingName: row.patientName,
         },
       })
     }

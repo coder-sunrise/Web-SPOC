@@ -55,6 +55,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingServiceCategory/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {
