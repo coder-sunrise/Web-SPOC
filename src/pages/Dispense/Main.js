@@ -15,9 +15,9 @@ import {
 import DispenseDetails from './DispenseDetails'
 // utils
 import {
+  calculateAmount,
   getAppendUrl,
   navigateDirtyCheck,
-  roundToTwoDecimals,
 } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import Authorized from '@/utils/Authorized'
@@ -41,51 +41,43 @@ const reloadDispense = (props, effect = 'query') => {
   authority: 'queue.dispense',
   enableReinitialize: true,
   notDirtyDuration: 3,
-  mapPropsToValues: ({ dispense = {}, clinicSettings }) => {
-    const _temp = dispense.entity || dispense.default
-    const { settings } = clinicSettings
-    const invoiceTotal = roundToTwoDecimals(
-      _temp.invoice.invoiceItem.reduce(
-        (sum, item) => sum + item.totalAfterItemAdjustment,
-        0,
-      ),
+  mapPropsToValues: ({ dispense = {} }) => {
+    const obj = dispense.entity || dispense.default
+    const output = calculateAmount(
+      obj.invoice.invoiceItem,
+      obj.invoice.invoiceAdjustment,
+      {
+        isGSTInclusive: obj.invoice.isGSTInclusive,
+        totalField: 'totalAfterItemAdjustment',
+        adjustedField: 'totalAfterOverallAdjustment',
+        gstField: 'totalAfterGST',
+        gstAmtField: 'gstAmount',
+      },
     )
-    let invoiceGSTAmt = 0
-
-    if (settings.isEnableGST) {
-      if (_temp.isGSTInclusive) {
-        invoiceGSTAmt = roundToTwoDecimals(
-          _temp.invoice.invoiceItem.reduce(
-            (gstamt, item) =>
-              gstamt +
-              item.totalAfterOverallAdjustment -
-              item.totalAfterOverallAdjustment / (1 + settings.gSTPercentage),
-            0,
-          ),
-        )
-      } else {
-        invoiceGSTAmt = roundToTwoDecimals(
-          invoiceTotal * settings.gSTPercentage,
-        )
+    let invoiceSummary = {}
+    if (output && output.summary) {
+      const { summary } = output
+      invoiceSummary = {
+        invoiceTotal: summary.total,
+        invoiceTotalAftAdj: summary.totalAfterAdj,
+        invoiceTotalAftGST: summary.totalWithGST,
+        outstandingBalance: summary.totalWithGST,
+        invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
       }
     }
-
-    const invoiceTotalAftGST = _temp.isGSTInclusive
-      ? invoiceTotal
-      : roundToTwoDecimals(invoiceGSTAmt + invoiceTotal)
-    const outstandingBalance = invoiceTotalAftGST
-    const obj = dispense.entity || dispense.default
-    return {
+    const _values = {
       ...obj,
       invoice: {
         ...obj.invoice,
-        invoiceTotal,
-        invoiceTotalAftAdj: invoiceTotal,
-        invoiceGSTAmt,
-        invoiceTotalAftGST,
-        outstandingBalance,
+        ...invoiceSummary,
+        // invoiceTotal,
+        // invoiceTotalAftAdj: invoiceTotal,
+        // invoiceGSTAmt,
+        // invoiceTotalAftGST,
+        // outstandingBalance,
       },
     }
+    return _values
   },
   validationSchema: Yup.object().shape({
     prescription: Yup.array().of(
