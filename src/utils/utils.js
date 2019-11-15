@@ -910,7 +910,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total || 0
+    r.weightage = roundToTwoDecimals(r[totalField] / total || 0)
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -924,21 +924,21 @@ const calculateAmount = (
     })
     activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      const adj = r.weightage * fa.adjAmount
+      const adj = roundToTwoDecimals(r.weightage * fa.adjAmount)
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
 
-      r[adjustedField] += adj
+      r[adjustedField] = roundToTwoDecimals(r[adjustedField] + adj)
       r.subAdjustment += adj
     })
   })
+  // activeRows.forEach((r) => {
+  //   r[adjustedField] = roundToTwoDecimals(r[adjustedField])
+  // })
 
   const totalAfterAdj = roundToTwoDecimals(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
-  // console.log('after calculate totalAfterAdj', {
-  //   activeRows,
-  //   mapped: activeRows.map((o) => o[adjustedField]),
-  // })
+
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     // notification.error({
@@ -951,7 +951,9 @@ const calculateAmount = (
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
-        gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
+        gst += roundToTwoDecimals(
+          r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
+        )
       })
     } else {
       gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
@@ -962,7 +964,6 @@ const calculateAmount = (
     }
   }
 
-  // console.log(totalAfterAdj, gst)
   const r = {
     rows,
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
