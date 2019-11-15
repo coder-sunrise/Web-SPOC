@@ -7,6 +7,7 @@ import { Tooltip, withStyles } from '@material-ui/core'
 
 const STYLES = () => ({
   tooltip: {
+    fontSize: '0.8rem',
     // padding: '5px 7px',
     // minWidth: '130px',
     // color: '#FFFFFF',
@@ -50,13 +51,15 @@ class CommonTooltip extends PureComponent {
       title,
       children,
       enterDelay = 150,
-      placement = 'top',
+      placement = 'top-start',
       ...restProps
     } = this.props
 
     return (
       <Tooltip
         classes={{ tooltip: classes.tooltip }}
+        // interactive
+        // leaveDelay={999999}
         title={title}
         enterDelay={enterDelay}
         placement={placement}

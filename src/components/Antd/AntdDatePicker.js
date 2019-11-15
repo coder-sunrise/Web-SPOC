@@ -143,7 +143,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
-    console.log({ date, dateString })
+    // console.log({ date, dateString })
     // if (date) {
     //   date.utcOffset()
     // }
@@ -151,8 +151,8 @@ class AntdDatePicker extends PureComponent {
     // eslint-disable-next-line no-nested-ternary
     const v = date
       ? showTime
-        ? date.formatUTC(false)
-        : date.set({ hour: 0, minute: 0, second: 0 }).formatUTC()
+        ? moment(date).formatUTC(false)
+        : moment(date.set({ hour: 0, minute: 0, second: 0 })).formatUTC()
       : ''
     if (form && field) {
       form.setFieldValue(field.name, v)
