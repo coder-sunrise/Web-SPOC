@@ -495,7 +495,6 @@ RichEditor.insertBlock = (editorState, blocks, isBefore) => {
     selectionBefore: currentEditorSelection,
     selectionAfter: currentEditorSelection,
   })
-
   return EditorState.push(editorState, newContentState, 'insert-fragment')
 }
 
