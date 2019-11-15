@@ -529,7 +529,7 @@ class UserProfileForm extends React.PureComponent {
                 <FastField
                   name='dob'
                   render={(args) => (
-                    <DatePicker {...args} label='Date Of Birth' />
+                    <DatePicker {...args} dobRestrict label='Date Of Birth' />
                   )}
                 />
               </GridItem>

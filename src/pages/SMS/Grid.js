@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { compose } from 'redux'
-import moment from 'moment'
 // devexpress react grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common components
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import ForumIcon from '@material-ui/icons/Forum'
 import DraftsIcon from '@material-ui/icons/Drafts'
@@ -13,15 +12,9 @@ import MarkunreadIcon from '@material-ui/icons/Markunread'
 import { GridContextMenuButton as GridButton } from 'medisys-components'
 import MessageListing from './Reminder/MessageListing'
 
-import {
-  CommonTableGrid,
-  Tooltip,
-  GridContainer,
-  CommonModal,
-} from '@/components'
+import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
-import FilterByAppointment from './FilterBar/FilterByAppointment'
 import FilterBar from './FilterBar'
 
 const styles = (theme) => ({
@@ -37,25 +30,10 @@ const styles = (theme) => ({
     },
   },
 })
-const generateRowData = () => {
-  // let data = []
-  // for (let i = 0; i < 10; i++) {
-  //   data.push({
-  //     id: `row-${i}-data`,
-  //     patientName: `Tan ${i}`,
-  //     contactNo: `1234567${i}`,
-  //     upComingAppt: moment().format('DD-MMM-YYYY HH:MM'),
-  //     remarks: '',
-  //     doctor: 'Dr Levine',
-  //     status: 'Confirmed',
-  //     apptType: 'Screening',
-  //     reminderSent: 'Yes',
-  //   })
-  // }
-  // return data
-}
+
 const Grid = ({
-  sms,
+  smsAppointment,
+  smsPatient,
   dispatch,
   type,
   columns,
@@ -104,8 +82,6 @@ const Grid = ({
     }
   }
 
-  const gridGetRowID = (row) => row.id
-
   const Cell = React.memo(({ ...tableProps }) => {
     const handleMenuItemClick = (row, id) => {
       handleContextMenuClick(row, id)
@@ -152,10 +128,11 @@ const Grid = ({
   })
 
   const messageListingProps = {
-    sms,
     recipient,
     dispatch,
     setSelectedRows,
+    smsAppointment,
+    smsPatient,
   }
 
   const filterBarProps = {
@@ -167,8 +144,7 @@ const Grid = ({
     <React.Fragment>
       <FilterBar {...filterBarProps} />
       <CommonTableGrid
-        type='sms'
-        entity={sms}
+        type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
         onSelectionChange={handleSelectionChange}
         selection={selectedRows}
         columnExtensions={colExtensions}
@@ -197,10 +173,6 @@ const Grid = ({
 // export default compose(React.memo)(Grid)
 export default compose(
   withStyles(styles, { withTheme: true }),
-  withFormik({
-    mapPropsToValues: () => ({
-      SearchBy: 'appointment',
-    }),
-  }),
+  withFormik({}),
   React.memo,
 )(Grid)
