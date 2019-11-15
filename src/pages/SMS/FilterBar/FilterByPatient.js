@@ -48,7 +48,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem> */}
-      <GridItem md={4} />
+      {/* <GridItem md={4} /> */}
       <GridItem md={2}>
         <FastField
           name='lastSMSSendStatus'
@@ -60,7 +60,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       <GridItem xs={4} className={classes.checkbox}>
         <FastField
           name='consent'
-          render={(args) => <Checkbox simple label='PDPA Consent' {...args} />}
+          render={(args) => <Checkbox label='PDPA Consent' {...args} />}
         />
       </GridItem>
       <GridItem md={6} />
