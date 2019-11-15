@@ -63,7 +63,7 @@ export default {
     'process.env.client_secret':
       'TiOserstaKdhu0af4zOzFFhBaLsgh8XsrzmHxnIpIvHjW7adSPELPYDlLJfDfGzA',
     'process.env.url': 'https://api.semr2.com',
-    'process.env.signalrUrl': 'https//socket.semr2.com/notificationHub',
+    'process.env.signalrUrl': 'https//websocket.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
