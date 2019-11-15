@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
+import { getBizSession } from '@/services/queue'
 import {
   withFormikExtend,
   FastField,
+  Field,
   GridContainer,
   GridItem,
   TextField,
@@ -54,10 +56,28 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   state = {
     isSaveDisabled: false,
+    hasActiveSession: false,
+  }
+
+  componentDidMount () {
+    this.checkHasActiveSession()
   }
 
   componentDidUpdate () {
     this.checkSaveButtonStatus()
+  }
+
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
   }
 
   checkSaveButtonStatus = () => {
@@ -71,7 +91,10 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingServiceCenter } = props
-    // console.log('detail', props)
+    const disabledDateRange = settingServiceCenter.entity
+      ? this.state.hasActiveSession
+      : false
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -97,13 +120,14 @@ class Detail extends PureComponent {
             </GridItem>
 
             <GridItem md={6}>
-              <FastField
+              <Field
                 name='effectiveDates'
                 render={(args) => {
                   return (
                     <DateRangePicker
                       label='Effective Start Date'
                       label2='End Date'
+                      disabled={disabledDateRange}
                       {...args}
                     />
                   )
