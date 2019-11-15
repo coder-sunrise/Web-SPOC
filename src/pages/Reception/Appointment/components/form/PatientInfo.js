@@ -106,7 +106,10 @@ const PatientInfoInput = ({
         <FastField
           name='patientContactNo'
           render={(args) => (
-            <Mobile disabled={isRegisteredPatient || disabled || isEdit} />
+            <Mobile
+              {...args}
+              disabled={isRegisteredPatient || disabled || isEdit}
+            />
             // <NumberInput
             //   {...args}
             //   disabled={isRegisteredPatient || disabled || isEdit}

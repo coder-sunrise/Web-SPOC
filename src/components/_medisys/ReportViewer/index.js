@@ -52,7 +52,7 @@ const ReportViewer = ({
   const [
     scale,
     setScale,
-  ] = useState(minScale)
+  ] = useState(1.75)
   const [
     screenSize,
     setScreenSize,
