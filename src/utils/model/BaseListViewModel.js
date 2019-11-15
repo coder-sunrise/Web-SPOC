@@ -115,7 +115,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
       ...super.reducers(),
       querySuccess (st, { payload = {} }) {
         // console.log(st)
-        const { data, filter = {}, version } = payload
+        const { data, filter = {}, version, keepFilter = true } = payload
         // const { entities, filter } = data
         // // //console.log('list query')
         // console.log(filter)
@@ -130,7 +130,7 @@ export default class BaseListViewModel extends BaseCRUDViewModel {
         return {
           ...st,
           list,
-          filter,
+          filter: keepFilter ? filter : {},
           pagination: {
             ...st.pagination,
             current: data.currentPage || 1,

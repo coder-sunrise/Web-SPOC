@@ -96,6 +96,7 @@ export default class BaseCRUDViewModel {
           { payload = { keepFilter: true }, history },
           { call, put, select },
         ) {
+          const { keepFilter = true } = payload
           if (!service || !service[queryFnName]) return
           let {
             filter = {},
@@ -147,7 +148,12 @@ export default class BaseCRUDViewModel {
           if (status === '200' || data) {
             yield put({
               type: 'querySuccess',
-              payload: { data, filter, version: filter.version },
+              payload: {
+                data,
+                filter,
+                keepFilter,
+                version: filter.version,
+              },
             })
             yield put({
               type: 'queryDone',

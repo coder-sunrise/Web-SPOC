@@ -153,6 +153,7 @@ export default compose(
       dispatch({
         type: 'sms/query',
         payload: {
+          keepFilter: false,
           ...payload,
           smsType: type,
         },
