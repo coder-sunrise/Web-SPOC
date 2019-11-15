@@ -40,7 +40,9 @@ const receivingDetailsSchema = Yup.object().shape({
   currentReceivingQty: Yup.number()
     .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
     .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
-      return `Current Receiving Quantity must be less than or equal to ${e.max}`
+      return `Current Receiving Quantity must be less than or equal to ${e.max.toFixed(
+        1,
+      )}`
     })
     .required(),
   currentReceivingBonusQty: Yup.number()
@@ -49,7 +51,9 @@ const receivingDetailsSchema = Yup.object().shape({
       'Current Receiving Bonus Quantity must be greater than or equal to 0',
     )
     .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
-      return `Current Receiving Bonus Quantity must be less than or equal to ${e.max}`
+      return `Current Receiving Bonus Quantity must be less than or equal to ${e.max.toFixed(
+        1,
+      )}`
     })
     .required(),
 })
@@ -568,32 +572,38 @@ class DODetails extends PureComponent {
         {
           columnName: 'orderQuantity',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'bonusQuantity',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'quantityReceived',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'totalBonusReceived',
           type: 'number',
+          format: '0.0',
           width: 180,
           disabled: true,
         },
         {
           columnName: 'currentReceivingQty',
           type: 'number',
+          format: '0.0',
           width: 150,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
+          format: '0.0',
           width: 180,
         },
         {
