@@ -304,9 +304,10 @@ class DODetails extends PureComponent {
     let osItem = purchaseOrderOutstandingItem.filter(
       (x) => x.code === option.value,
     )[0]
-
-    row.maxCurrentReceivingQty = osItem.orderQuantity
-    row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
+    if (osItem) {
+      row.maxCurrentReceivingQty = osItem.orderQuantity
+      row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
+    }
 
     this.setState({
       selectedItem: option,
