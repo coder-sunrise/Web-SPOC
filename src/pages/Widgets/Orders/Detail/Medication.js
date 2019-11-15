@@ -243,10 +243,10 @@ class Medication extends PureComponent {
         }
       }
 
-      newTotalQuantity = Math.round(newTotalQuantity * 10) / 10 || 0
+      newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
       const { prescriptionToDispenseConversion } = currentMedicaiton
       if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.round(
+        newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
         )
     }

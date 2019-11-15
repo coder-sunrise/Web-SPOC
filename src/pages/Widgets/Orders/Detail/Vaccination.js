@@ -146,11 +146,11 @@ class Vaccination extends PureComponent {
           o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
       )
       if (dosage) {
-        newTotalQuantity = Math.round(dosage.multiplier)
+        newTotalQuantity = Math.ceil(dosage.multiplier)
       }
       const { prescriptionToDispenseConversion } = currentVaccination
       if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.round(
+        newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
         )
     }
