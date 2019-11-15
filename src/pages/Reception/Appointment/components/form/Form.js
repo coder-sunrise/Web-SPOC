@@ -86,12 +86,12 @@ class Form extends React.PureComponent {
 
   componentDidMount () {
     Promise.all([
-      this.props.dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'clinicianprofile',
-        },
-      }),
+      // this.props.dispatch({
+      //   type: 'codetable/fetchCodes',
+      //   payload: {
+      //     code: 'clinicianprofile',
+      //   },
+      // }),
       this.props.dispatch({
         type: 'codetable/fetchCodes',
         payload: { code: 'ltappointmentstatus' },
@@ -149,6 +149,7 @@ class Form extends React.PureComponent {
     const entity = {
       ...patientProfileDefaultValue,
       name: values.patientName,
+      callingName: values.patientName,
       contact: {
         ...patientProfileDefaultValue.contact,
         mobileContactNumber: {
@@ -157,21 +158,36 @@ class Form extends React.PureComponent {
         },
       },
     }
-    this.setState(
-      (preState) => ({
-        ...preState,
-        showPatientProfile: !preState.showPatientProfile,
-      }),
-      () => {
-        dispatch({
-          type: 'patient/updateState',
-          payload: {
-            entity,
-            currentId: undefined,
-          },
-        })
+
+    dispatch({
+      type: 'patient/openPatientModal',
+      payload: {
+        callback: this.onConfirmCreatePatient,
       },
-    )
+    })
+    dispatch({
+      type: 'patient/updateDefaultEntity',
+      payload: {
+        ...entity,
+        // currentId: undefined,
+      },
+    })
+
+    // this.setState(
+    //   (preState) => ({
+    //     ...preState,
+    //     showPatientProfile: !preState.showPatientProfile,
+    //   }),
+    //   () => {
+    //     dispatch({
+    //       type: 'patient/updateState',
+    //       payload: {
+    //         entity,
+    //         currentId: undefined,
+    //       },
+    //     })
+    //   },
+    // )
   }
 
   checkShouldPopulate = (patientSearchResult) =>
@@ -251,7 +267,7 @@ class Form extends React.PureComponent {
     })
   }
 
-  onConfirmCreatePatient = async () => {
+  onConfirmCreatePatient = () => {
     const { patientProfile, dispatch } = this.props
     const { id, name, contact, patientAccountNo } = patientProfile
     const payload = {
@@ -263,11 +279,11 @@ class Form extends React.PureComponent {
     dispatch({
       type: 'patient/closePatientModal',
     })
-    this.togglePatientProfileModal()
-    const doneUpdateFields = await this.onSelectPatientClick(payload, true)
-    if (doneUpdateFields) {
-      this._submit(false, true)
-    }
+    // const doneUpdateFields = await this.onSelectPatientClick(payload, true)
+    this.onSelectPatientClick(payload, true)
+    // if (doneUpdateFields && values.id) {
+    //   this._submit(false, true)
+    // }
   }
 
   onConfirmCancelAppointment = ({ type, reasonType, reason }) => {
@@ -408,7 +424,7 @@ class Form extends React.PureComponent {
     })
   }
 
-  _submit = async (validate = false, preSubmit = false) => {
+  _submit = async (validate = false) => {
     try {
       const {
         cachedPayload,
@@ -438,9 +454,7 @@ class Form extends React.PureComponent {
         datagrid,
         formikValues: values,
         appointmentResources: [],
-        newAppointmentStatusFK: preSubmit
-          ? values.appointmentStatusFk
-          : appointmentStatusFK,
+        newAppointmentStatusFK: appointmentStatusFK,
       }
 
       setSubmitting(false)
@@ -450,16 +464,17 @@ class Form extends React.PureComponent {
         payload: submitPayload,
       }).then((response) => {
         if (response) {
-          if (preSubmit) {
-            dispatch({
-              type: 'calendar/getAppointmentDetails',
-              payload: {
-                ...cachedPayload,
-              },
-            })
-          } else {
-            onConfirm()
-          }
+          onConfirm()
+          // if (preSubmit) {
+          //   dispatch({
+          //     type: 'calendar/getAppointmentDetails',
+          //     payload: {
+          //       ...cachedPayload,
+          //     },
+          //   })
+          // } else {
+          //   onConfirm()
+          // }
         }
       })
     } catch (error) {

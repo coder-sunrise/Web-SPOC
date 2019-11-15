@@ -117,6 +117,7 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
+                      keepFilter: false,
                       'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
                         ? transactionDates[0]
                         : undefined,

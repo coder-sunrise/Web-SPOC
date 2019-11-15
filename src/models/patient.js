@@ -282,8 +282,9 @@ export default createFormViewModel({
           ...state,
           default: {
             ...defaultPatientEntity,
-            name: patientName,
-            callingName: patientName,
+            ...payload,
+            // name: patientName,
+            // callingName: patientName,
           },
         }
       },

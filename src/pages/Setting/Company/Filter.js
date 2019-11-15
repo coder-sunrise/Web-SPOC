@@ -100,6 +100,7 @@ class Filter extends PureComponent {
                       type: 'settingCompany/query',
                       payload: {
                         // companyType,
+                        keepFilter: false,
                         coPayerTypeFK,
                         isActive,
                         group: [
