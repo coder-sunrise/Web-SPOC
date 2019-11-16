@@ -85,6 +85,18 @@ const itemSchema = Yup.object().shape({
         dispatch({
           type: 'settingClinicService/query',
         })
+
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'ctservice',
+            filter: {
+              'serviceFKNavigation.IsActive': true,
+              'serviceCenterFKNavigation.IsActive': true,
+              combineCondition: 'and',
+            },
+          },
+        })
       }
     })
   },

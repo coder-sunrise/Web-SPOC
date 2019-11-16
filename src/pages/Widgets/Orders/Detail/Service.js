@@ -55,7 +55,8 @@ class Service extends PureComponent {
         code: 'ctservice',
         filter: {
           'serviceFKNavigation.IsActive': true,
-          combineCondition: 'or',
+          'serviceCenterFKNavigation.IsActive': true,
+          combineCondition: 'and',
         },
       },
     }).then((list) => {
