@@ -266,8 +266,16 @@ export default class BaseCRUDViewModel {
         return r
       },
       *delete ({ payload }, { call, put }) {
+        const { cfg = {} } = payload
         const response = yield call(service.remove, payload)
         // console.log(response)
+        let _message = 'Deleted'
+        if (cfg.message) {
+          _message = cfg.message
+          notification.success({
+            message: _message,
+          })
+        }
         return response
       },
 

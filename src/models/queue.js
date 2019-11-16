@@ -32,6 +32,7 @@ export default createListViewModel({
       appointmentList: [],
       currentFilter: StatusIndicator.ALL,
       selfOnly: false,
+      _modifiedSelftOnly: false,
       error: {
         hasError: false,
         message: '',
@@ -45,12 +46,11 @@ export default createListViewModel({
       })
     },
     effects: {
-      *initState (_, { select, put, take }) {
+      *initState (_, { select, put }) {
         let user = yield select((state) => state.user.data)
-
+        const queueLogState = yield select((state) => state.queueLog)
         let { clinicianProfile: { userProfile: { role: userRole } } } = user
         if (userRole === undefined) {
-          yield take('user/fetchCurrent/@@end')
           user = yield select((state) => state.user.data)
           userRole = user.clinicianProfile.userProfile.role
 
@@ -61,12 +61,15 @@ export default createListViewModel({
             },
           })
         }
+
         yield put({
           type: 'updateState',
           payload: {
             list: [],
             sessionInfo: { ...InitialSessionInfo },
-            selfOnly: userRole && userRole.clinicRoleFK === 1,
+            selfOnly: !queueLogState._modifiedSelftOnly
+              ? userRole && userRole.clinicRoleFK === 1
+              : queueLogState.selfOnly,
           },
         })
       },
@@ -255,7 +258,7 @@ export default createListViewModel({
     },
     reducers: {
       toggleSelfOnly (state) {
-        return { ...state, selfOnly: !state.selfOnly }
+        return { ...state, selfOnly: !state.selfOnly, _modifiedSelftOnly: true }
       },
       toggleError (state, { error = {} }) {
         return { ...state, error: { ...error } }

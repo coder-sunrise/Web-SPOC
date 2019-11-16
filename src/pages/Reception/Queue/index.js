@@ -175,9 +175,11 @@ class Queue extends React.Component {
 
   redirectToVisitRegistration = () => {
     const { patient } = this.props
-    this.showVisitRegistration({
-      patientID: patient.id,
-    })
+    if (patient) {
+      this.showVisitRegistration({
+        patientID: patient.id,
+      })
+    }
   }
 
   updateAppointmentLinking = (row, patientProfileFK) => {

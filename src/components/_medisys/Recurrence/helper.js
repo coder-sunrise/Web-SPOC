@@ -46,8 +46,9 @@ const getMonthConfig = (dayOfMonth) => {
 }
 
 const joinWeekDays = (selectedDays) => {
+  const _days = selectedDays.filter((item) => item !== -99)
   const days = [
-    ...selectedDays,
+    ..._days,
   ]
     .sort()
     .map((d) => DAYS_OF_WEEK[d])

@@ -571,7 +571,7 @@ class Demographic extends PureComponent {
               )}
               <GridItem xs={12}>
                 <Field
-                  name='translationFK'
+                  name='translationLinkFK'
                   render={(args) => {
                     return (
                       <CodeSelect
