@@ -308,7 +308,7 @@ class Detail extends PureComponent {
               <FastField
                 name='durationHour'
                 render={(args) => (
-                  <Select {...args} label='Hour' options={durationHours} />
+                  <Select {...args} label='Hour(s)' options={durationHours} />
                 )}
               />
             </GridItem>
@@ -316,7 +316,11 @@ class Detail extends PureComponent {
               <FastField
                 name='durationMinute'
                 render={(args) => (
-                  <Select {...args} label='Minute' options={durationMinutes} />
+                  <Select
+                    {...args}
+                    label='Minute(s)'
+                    options={durationMinutes}
+                  />
                 )}
               />
             </GridItem>
