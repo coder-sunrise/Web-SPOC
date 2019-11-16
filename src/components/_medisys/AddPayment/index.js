@@ -4,7 +4,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { dateFormatLong, Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import PayerHeader from './PayerHeader'
@@ -40,7 +40,7 @@ import { getBizSession } from '@/services/queue'
       outstandingAfterPayment: outstandingBalance,
       collectableAmount: outstandingBalance,
       paymentList: [],
-      paymentReceivedDate: moment().format(dateFormatLong),
+      paymentReceivedDate: moment().formatUTC(false),
       // finalPayable: _finalPayable,
     }
   },
