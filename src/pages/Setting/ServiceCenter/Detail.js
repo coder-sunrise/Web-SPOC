@@ -48,6 +48,18 @@ const styles = (theme) => ({})
         dispatch({
           type: 'settingServiceCenter/query',
         })
+
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: 'ctservice',
+            filter: {
+              'serviceFKNavigation.IsActive': true,
+              'serviceCenterFKNavigation.IsActive': true,
+              combineCondition: 'and',
+            },
+          },
+        })
       }
     })
   },
