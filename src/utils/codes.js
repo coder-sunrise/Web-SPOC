@@ -850,6 +850,15 @@ const buttonTypes = [
   'Fab',
 ]
 
+export const countryCodes = [
+  { name: '+65 Singapore', value: '65' },
+  { name: '+60 Malaysia', value: '60' },
+  { name: '+62 Indonesia', value: '62' },
+  { name: '+63 Philippines', value: '63' },
+  { name: '+66 Thailand', value: '66' },
+  { name: '+81 Japan', value: '81' },
+]
+
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {

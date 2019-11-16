@@ -429,6 +429,7 @@ const convertToQuery = (
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
+          if (val === '') continue
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
             newQuery.columnCriteria.push({
@@ -466,7 +467,7 @@ const convertToQuery = (
           // console.log({ newQuery })
         } else if (typeof val === 'object' && Object.keys(val).length === 1) {
           const v = val[Object.keys(val)[0]]
-          if (v !== undefined) {
+          if (v !== undefined && v.toString().trim() !== '') {
             newQuery.columnCriteria.push({
               prop: `${p}.${Object.keys(val)[0]}`,
               val: v,
@@ -483,18 +484,20 @@ const convertToQuery = (
           // let valType = null
           // if (typeof val === 'boolean') valType = valueType.b
           // else if (typeof val === 'number') valType = valType.i
-          newQuery.columnCriteria.push({
-            prop: p,
-            val,
-            // valueType: valType,
-            opr:
-              [
-                'boolean',
-                'number',
-              ].indexOf(typeof val) >= 0
-                ? filterType.eql
-                : filterType.like,
-          })
+          if (val.toString().trim() !== '') {
+            newQuery.columnCriteria.push({
+              prop: p,
+              val,
+              // valueType: valType,
+              opr:
+                [
+                  'boolean',
+                  'number',
+                ].indexOf(typeof val) >= 0
+                  ? filterType.eql
+                  : filterType.like,
+            })
+          }
         }
       }
     }

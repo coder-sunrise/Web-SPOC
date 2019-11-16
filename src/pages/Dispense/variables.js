@@ -275,13 +275,19 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     align: 'right',
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return null
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
       return <NumberInput text currency value={row.unitPrice} />
     },
   },
   {
     columnName: 'totalAfterItemAdjustment',
-    type: 'currency',
+    // type: 'currency',
+    align: 'right',
+    render: (row) => {
+      const { type } = row
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+    },
   },
   {
     columnName: 'totalPrice',
@@ -289,7 +295,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     align: 'right',
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return null
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
       return <NumberInput text currency value={row.totalPrice} />
     },
   },
