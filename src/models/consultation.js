@@ -208,7 +208,7 @@ export default createFormViewModel({
             message: `Consultation signed`,
           })
           yield put({ type: 'closeModal' })
-          console.log('payload ', payload)
+          // console.log('payload ', payload)
         }
         return response
       },

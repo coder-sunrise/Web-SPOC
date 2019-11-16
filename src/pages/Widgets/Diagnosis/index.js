@@ -58,10 +58,11 @@ const styles = (theme) => ({})
 //   handleSubmit: () => {},
 //   displayName: 'Diagnosis',
 // })
-@connect(({ diagnosis, components, codetable }) => ({
+@connect(({ diagnosis, components, codetable, consultation }) => ({
   diagnosis,
   components,
   codetable,
+  consultation,
 }))
 class Diagnosis extends PureComponent {
   // constructor (props) {
