@@ -31,6 +31,7 @@ const styles = () => ({
 })
 
 const FilterBar = ({
+  loading,
   classes,
   onDoctorEventClick,
   onAddAppointmentClick,
@@ -137,13 +138,23 @@ const FilterBar = ({
 
         <GridItem xs md={12}>
           <Authorized authority='appointment.newappointment'>
-            <Button color='primary' size='sm' onClick={onAddAppointmentClick}>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onAddAppointmentClick}
+              disabled={loading}
+            >
               <AddIcon />
               Add Appointment
             </Button>
           </Authorized>
 
-          <Button color='primary' size='sm' onClick={onDoctorEventClick}>
+          <Button
+            color='primary'
+            size='sm'
+            onClick={onDoctorEventClick}
+            disabled={loading}
+          >
             <AddIcon />
             Add Doctor Block
           </Button>

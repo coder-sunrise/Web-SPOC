@@ -30,6 +30,7 @@ import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/component
 
 import { Badge, SizeContainer, TextField } from '@/components'
 import { updateAPIType } from '@/utils/request'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 @connect(({ user, clinicInfo, header }) => ({
   user,
@@ -53,12 +54,17 @@ class HeaderLinks extends React.Component {
     if (cb) cb()
   }
 
-  logout = () => {
-    // localStorage.removeItem('token')
-    // location.href = '/login'
-    this.props.dispatch({
-      type: 'login/logout',
+  onLogoutClick = (event) => {
+    this.setState({
+      openAccount: false,
     })
+
+    navigateDirtyCheck({
+      onProceed: () =>
+        this.props.dispatch({
+          type: 'login/logout',
+        }),
+    })(event)
   }
 
   openUserProfileForm = () => {
@@ -241,7 +247,7 @@ class HeaderLinks extends React.Component {
                         Change Password
                       </MenuItem>
                       <MenuItem
-                        onClick={this.handleClose('Account', this.logout)}
+                        onClick={this.onLogoutClick}
                         className={dropdownItem}
                       >
                         Logout
