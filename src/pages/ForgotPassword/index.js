@@ -29,7 +29,9 @@ class ForgotPassword extends React.Component {
   state = {
     step: 1,
     gettingOTP: false,
-    firstStepPayload: {},
+    firstStepPayload: {
+      countryCode: '65',
+    },
   }
 
   handleResetClick = (values) => {
