@@ -30,6 +30,8 @@ import { getBizSession } from '@/services/queue'
   displayName: 'AddPaymentForm',
   mapPropsToValues: ({ invoice, showPaymentDate }) => {
     const { outstandingBalance } = invoice
+    const paymentReceivedDate = moment().formatUTC(false)
+
     return {
       ...invoice,
       showPaymentDate,
@@ -252,7 +254,7 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList } = this.state
-
+    // console.log({ values })
     return (
       <div>
         <PayerHeader
