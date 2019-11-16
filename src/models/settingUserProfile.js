@@ -5,6 +5,10 @@ export default createListViewModel({
   namespace: 'settingUserProfile',
   config: {
     queryOnLoad: false,
+    codetable: {
+      message: 'User profiles updated',
+      code: 'clinicianprofile',
+    },
   },
   param: {
     service,
