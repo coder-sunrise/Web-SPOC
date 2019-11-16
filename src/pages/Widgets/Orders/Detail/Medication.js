@@ -209,13 +209,13 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, values, disableEdit } = this.props
+    const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
     // console.log(this.props)
     let currentMedicaiton = medication
     if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
-    if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
+    if (currentMedicaiton && currentMedicaiton.dispensingQuantity && !dirty) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
       const prescriptionItem = form.values.corPrescriptionItemInstruction
@@ -243,10 +243,10 @@ class Medication extends PureComponent {
         }
       }
 
-      newTotalQuantity = Math.round(newTotalQuantity * 10) / 10 || 0
+      newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
       const { prescriptionToDispenseConversion } = currentMedicaiton
       if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.round(
+        newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
         )
     }

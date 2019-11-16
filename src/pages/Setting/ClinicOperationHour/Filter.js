@@ -81,6 +81,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingClinicOperationHour/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {

@@ -17,6 +17,16 @@ export default createListViewModel({
       subscribeNotification('CodetableUpdated', {
         callback: ({ code }) => {
           console.log(code, 'rete')
+          if (code === 'clinicianprofile') {
+            window.g_app._store.dispatch({
+              type: 'codetable/refreshCodes',
+              payload: {
+                code: 'doctorprofile',
+                filter: { 'clinicianProfile.isActive': true },
+              },
+            })
+          }
+
           window.g_app._store.dispatch({
             type: 'codetable/refreshCodes',
             payload: { code },

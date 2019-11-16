@@ -97,21 +97,24 @@ class Queue extends React.Component {
     dispatch({
       type: `${modelKey}initState`,
     })
+    dispatch({
+      type: `${modelKey}refresh`,
+    })
+
     // dispatch({
     //   type: 'calendar/updateState',
     //   payload: {
     //     list: [],
     //   },
     // })
-    if (sessionInfo.id === '') {
-      dispatch({
-        type: `${modelKey}getSessionInfo`,
-      })
-    } else {
-      dispatch({
-        type: `${modelKey}refresh`,
-      })
-    }
+
+    // if (sessionInfo.id === '') {
+    //   dispatch({
+    //     type: `${modelKey}getSessionInfo`,
+    //   })
+    // } else {
+
+    // }
     this._timer = setInterval(() => {
       dispatch({ type: `${modelKey}refresh` })
     }, 900000)
@@ -172,9 +175,11 @@ class Queue extends React.Component {
 
   redirectToVisitRegistration = () => {
     const { patient } = this.props
-    this.showVisitRegistration({
-      patientID: patient.id,
-    })
+    if (patient) {
+      this.showVisitRegistration({
+        patientID: patient.id,
+      })
+    }
   }
 
   updateAppointmentLinking = (row, patientProfileFK) => {
@@ -199,7 +204,8 @@ class Queue extends React.Component {
       this.props.dispatch({
         type: 'patient/updateDefaultEntity',
         payload: {
-          patientName: row.patientName,
+          name: row.patientName,
+          callingName: row.patientName,
         },
       })
     }
@@ -308,6 +314,7 @@ class Queue extends React.Component {
           {
             [`${prefix}name`]: searchQuery,
             [`${prefix}patientAccountNo`]: searchQuery,
+            [`${prefix}patientReferenceNo`]: searchQuery,
             [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
             combineCondition: 'or',
           },

@@ -11,6 +11,12 @@ import {
 } from '@/components'
 import { UNFIT_TYPE } from '@/utils/constants'
 
+import Medication from '@/pages/Widgets/Orders/Detail/Medication'
+import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
+import Service from '@/pages/Widgets/Orders/Detail/Service'
+import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
+import Package from '@/pages/Widgets/Orders/Detail/Package'
+
 const status = [
   { value: false, name: 'Inactive', color: 'red' },
   { value: true, name: 'Active', color: 'green' },
@@ -792,12 +798,6 @@ const consultationDocumentTypes = [
   },
 ]
 
-import Medication from '@/pages/Widgets/Orders/Detail/Medication'
-import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
-import Service from '@/pages/Widgets/Orders/Detail/Service'
-import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
-import Package from '@/pages/Widgets/Orders/Detail/Package'
-
 const orderTypes = [
   {
     name: 'Medication',
@@ -893,6 +893,7 @@ const tenantCodes = [
   'role',
   'ctsupplier',
   'ctpaymentmode',
+  'SmsTemplate',
   // 'ctsnomeddiagnosis',
   'codetable/ctsnomeddiagnosis',
   'documenttemplate',
@@ -901,6 +902,12 @@ const tenantCodes = [
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
+]
+
+// always get latest codetable
+const skipCache = [
+  'doctorprofile',
+  'clinicianprofile',
 ]
 
 // const codes = [
@@ -985,28 +992,11 @@ export const fetchAndSaveCodeTable = async (
     newData = [
       ...data.data,
     ]
-    // if (code.split(',').length > 1) {
-    //   const codes = code.split(',')
-    //   newData = [
-    //     ...codes.reduce(
-    //       (merged, c) => [
-    //         ...merged,
-    //         ...data[c],
-    //       ],
-    //       [],
-    //     ),
-    //   ]
-    // } else {
-    //   console.log({ data, code, useGeneral })
-    //   newData = [
-    //     ...data.data,
-    //   ]
-    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    // console.log(newData, temp)
-    // if (!temp)
+    if (skipCache.includes(code)) return newData
+
     await db.codetable.put({
       code,
       data: newData,

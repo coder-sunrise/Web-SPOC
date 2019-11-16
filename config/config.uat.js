@@ -51,17 +51,6 @@ const plugins = [
   ],
 ]
 
-// // 针对 preview.pro.ant.design 的 GA 统计代码
-// // 业务上不需要这个
-// if (process.env.APP_TYPE === 'site') {
-//   plugins.push([
-//     'umi-plugin-ga',
-//     {
-//       code: 'UA-72788897-6',
-//     },
-//   ])
-// }
-
 export default {
   // add for transfer to umi
   plugins,
@@ -75,7 +64,7 @@ export default {
       '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
     'process.env.url': 'https://semr2uat2010.emr.com.sg',
     'process.env.signalrUrl':
-      'https://semr2uat2010-realtime.emr.com.sg/notificationHub',
+      'https://semr2uat2010-websocket.emr.com.sg/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,

@@ -26,7 +26,7 @@ import { getBizSession } from '@/services/queue'
   patient: patient.entity,
 }))
 @withFormikExtend({
-  notDirtyDuration: 3,
+  notDirtyDuration: 0.5,
   displayName: 'AddPaymentForm',
   mapPropsToValues: ({ invoice, showPaymentDate }) => {
     const { outstandingBalance } = invoice

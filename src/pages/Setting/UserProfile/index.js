@@ -97,6 +97,7 @@ class UserProfile extends React.Component {
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
+        keepFilter: false,
         group: [
           {
             name: values.searchQuery,

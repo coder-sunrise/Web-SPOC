@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import moment from 'moment'
 import { compose } from 'redux'
@@ -70,6 +70,8 @@ const MessageListing = ({
   dispatch,
   onConfirm,
   footer,
+  smsAppointment,
+  smsPatient,
 }) => {
   const [
     historyList,
@@ -168,6 +170,8 @@ const MessageListing = ({
     recipient,
     dispatch,
     onConfirm,
+    smsAppointment,
+    smsPatient,
   }
 
   const checkIsItLoadedAllHistory = () => {

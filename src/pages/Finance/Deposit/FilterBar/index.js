@@ -43,7 +43,7 @@ class FilterBar extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem xs sm={12} md={4} style={{ position: 'relative' }}>
+          <GridItem xs sm={12} md={4}>
             <FastField
               name='ExpenseType'
               render={(args) => {
@@ -57,10 +57,9 @@ class FilterBar extends PureComponent {
                 )
               }}
             />
-            {/* <div className={classes.tansactionCheck} /> */}
           </GridItem>
 
-          <GridItem xs={6} md={6}>
+          <GridItem xs={6} md={3}>
             <FastField
               name='transactionDates'
               render={(args) => {
@@ -74,6 +73,7 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
+          <GridItem md={3} />
 
           <GridItem xs sm={6} md={3}>
             <FastField
@@ -117,6 +117,7 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
+                      keepFilter: false,
                       'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
                         ? transactionDates[0]
                         : undefined,

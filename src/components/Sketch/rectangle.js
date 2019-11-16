@@ -65,6 +65,8 @@ class Rectangle extends FabricCanvasTool {
     let rect = new fabric.Group([
       this.rect,
     ])
+    rect.selectable = false
+    rect.evented = false
     canvas.add(rect)
   }
 }

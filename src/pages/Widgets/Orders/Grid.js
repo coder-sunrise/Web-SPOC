@@ -121,7 +121,7 @@ export default ({
         { name: 'description', title: 'Description' },
         { name: 'adjAmount', title: 'Adj.' },
         { name: 'totalAfterItemAdjustment', title: 'Total' },
-        { name: 'action', title: 'Action' },
+        { name: 'actions', title: 'Actions' },
       ]}
       FuncProps={{
         pager: false,
@@ -286,7 +286,9 @@ export default ({
           },
         },
         {
-          columnName: 'action',
+          columnName: 'actions',
+          align: 'center',
+          sortingEnabled: false,
           render: (row) => {
             return (
               <React.Fragment>

@@ -74,7 +74,7 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values } = this.props
-
+    console.log(v, op)
     this.setState({
       selectedVaccination: op,
     })
@@ -129,32 +129,28 @@ class Vaccination extends PureComponent {
   }
 
   calculateQuantity = (vaccination) => {
-    const { codetable, setFieldValue, values, disableEdit } = this.props
+    const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
     // console.log(this.props)
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
     // console.log(currentVaccination, values)
-    if (currentVaccination && currentVaccination.dispensingQuantity) {
+    if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
       newTotalQuantity = currentVaccination.dispensingQuantity
-    } else {
+    } else if (currentVaccination.prescribingDosage) {
       const { ctmedicationdosage } = codetable
 
       const dosage = ctmedicationdosage.find(
         (o) =>
-          o.id ===
-          (values.dosageFK || currentVaccination.prescribingDosage
-            ? currentVaccination.prescribingDosage.id
-            : undefined),
+          o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
       )
       if (dosage) {
-        newTotalQuantity = Math.round(dosage.multiplier)
+        newTotalQuantity = Math.ceil(dosage.multiplier)
       }
-
       const { prescriptionToDispenseConversion } = currentVaccination
       if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.round(
+        newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
         )
     }
@@ -199,7 +195,15 @@ class Vaccination extends PureComponent {
   }
 
   render () {
-    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
+    const {
+      theme,
+      values,
+      footer,
+      handleSubmit,
+      setFieldValue,
+      ...reset
+    } = this.props
+    // console.log(values, reset)
     return (
       <div>
         <GridContainer>

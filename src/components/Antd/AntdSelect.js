@@ -207,7 +207,7 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = nextProps
     let v = this.state.value
-    console.log(field)
+    // console.log(field)
     if (field) {
       v = [
         'multiple',
@@ -428,8 +428,12 @@ class AntdSelect extends React.PureComponent {
     }
     if (proceed) {
       if (form && field) {
-        form.setFieldValue(field.name, newVal)
-        form.setFieldTouched(field.name, true)
+        field.onChange({
+          target: {
+            name: field.name,
+            value: newVal,
+          },
+        })
       }
       this.setState((ps) => {
         return {
