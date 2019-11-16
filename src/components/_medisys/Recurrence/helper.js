@@ -162,12 +162,12 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       : startDate
     switch (recurrencePatternFK) {
       case RECURRENCE_PATTERN.DAILY: {
-        label = `Occur every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
+        label = `Occurs every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
         break
       }
       case RECURRENCE_PATTERN.WEEKLY: {
         const days = joinWeekDays(recurrenceDaysOfTheWeek)
-        label = `Occur every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
+        label = `Occurs every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
         break
       }
       case RECURRENCE_PATTERN.MONTHLY: {

@@ -168,7 +168,7 @@ const DoctorEventForm = ({
             <FastField
               name='durationHour'
               render={(args) => (
-                <Select {...args} label='Hour' options={durationHours} />
+                <Select {...args} label='Hour(s)' options={durationHours} />
               )}
             />
           </GridItem>
@@ -176,7 +176,7 @@ const DoctorEventForm = ({
             <FastField
               name='durationMinute'
               render={(args) => (
-                <Select {...args} label='Minute' options={durationMinutes} />
+                <Select {...args} label='Minute(s)' options={durationMinutes} />
               )}
             />
           </GridItem>
