@@ -65,12 +65,14 @@ const PatientInfoInput = ({
                 submitKey='patientSearch/query'
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
+                // tabIndex={-1}
                 icon={<Search />}
               >
                 Search
               </ProgressButton>
               {!isEdit && (
                 <Button
+                  // tabIndex={-2}
                   size='sm'
                   color='primary'
                   disabled={disabled}
