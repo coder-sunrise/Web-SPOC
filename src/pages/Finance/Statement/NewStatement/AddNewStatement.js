@@ -252,7 +252,7 @@ class AddNewStatement extends PureComponent {
                         label='Co-Payer'
                         code='ctcopayer'
                         labelField='displayValue'
-                        // onChange={(e) => this.getInvoiceList(e)}
+                        localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
                         {...args}
                       />
