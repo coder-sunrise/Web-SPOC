@@ -92,6 +92,7 @@ class Grid extends PureComponent {
             width: 120,
             type: 'select',
             options: isAutoOrder,
+            sortBy: 'serviceFKNavigation.isAutoOrder',
           },
           {
             columnName: 'isActive',

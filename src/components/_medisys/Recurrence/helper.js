@@ -82,7 +82,9 @@ export const computeRRule = ({ date, recurrenceDto }) => {
     if (recurrenceCount < 0 || recurrenceFrequency < 0) {
       return undefined
     }
-    const _tempDate = moment(date).toDate()
+    const _tempDate = moment(date)
+      .set({ hour: 0, minute: 0, second: 0 })
+      .toDate()
 
     const start = new Date(
       Date.UTC(
@@ -132,9 +134,7 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
 
     if (rule.options.until === null) {
       const allDates = rule.all()
-      stopDate = moment(allDates[allDates.length - 1])
-        .subtract(1, 'day')
-        .format(dateFormatLong)
+      stopDate = moment(allDates[allDates.length - 1]).format(dateFormatLong)
     } else {
       stopDate = moment(rule.options.until).format(dateFormatLong)
     }
