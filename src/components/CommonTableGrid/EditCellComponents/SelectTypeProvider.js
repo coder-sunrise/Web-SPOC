@@ -43,6 +43,7 @@ class SelectEditor extends PureComponent {
       code,
       columnName,
       options,
+      localFilter,
       row,
       ...commonCfg
     } = getCommonConfig.call(this)
@@ -51,7 +52,7 @@ class SelectEditor extends PureComponent {
       typeof options === 'function'
         ? options(row)
         : options || codes[`${columnName}Option`] || []
-
+    if (localFilter) commonCfg.options = commonCfg.options.filter(localFilter)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -192,6 +193,7 @@ class SelectTypeProvider extends React.Component {
         }
       }
     }
+
     this.state = {
       for: colFor,
       ...payload,
@@ -214,8 +216,8 @@ class SelectTypeProvider extends React.Component {
   // }
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    // console.log(nextProps, this.props)
-    // console.log(nextState, this.state)
+    // console.log('props', nextProps, this.props)
+    // console.log('state', nextState, this.state)
     return (
       // optionsUpdate ||
       // this.props.editingRowIds !== nextProps.editingRowIds ||
