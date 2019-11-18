@@ -161,7 +161,7 @@ class AddConsultationDocument extends PureComponent {
   }
 
   getLoader = (editor, setFieldValue, currentType) => {
-    const { classes, parentProps, codetable } = this.props
+    const { classes, parentProps, consultation, codetable } = this.props
     const { documenttemplate = [] } = codetable
     // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
@@ -196,11 +196,10 @@ class AddConsultationDocument extends PureComponent {
           valueField='value'
           onChange={(val, option) => {
             if (!val) return
-            const { values } = parentProps
+            const { entity } = consultation
             const v = option.getter
-              ? option.getter(values)
-              : Object.byString(values, option.value) || '-'
-            console.log(parentProps, option.value)
+              ? option.getter(entity)
+              : Object.byString(entity, option.value) || '-'
             const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
             const { editorState } = editor.props
             editor.update(

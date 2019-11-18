@@ -10,6 +10,7 @@ module.exports = {
     if (companyTypeFK === 1) {
       return service.queryList(urlCoyer, restParams)
     }
+    console.log({ restParams, params })
     return service.queryList(urlSupplier, restParams)
   },
   upsert: ({ companyTypeFK, ...restParams }) =>

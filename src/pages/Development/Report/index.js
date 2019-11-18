@@ -14,6 +14,8 @@ import {
   GridContainer,
   GridItem,
   TimePicker,
+  DatePicker,
+  DateRangePicker,
   NumberInput,
   CommonModal,
   Select,
@@ -210,10 +212,20 @@ class Report extends React.Component {
           </GridItem> */}
           <GridItem md={3}>
             <FastField
-              name='Amount'
+              name='effectiveDates'
               render={(args) => (
-                <NumberInput {...args} currency label='Amount' />
+                <DateRangePicker
+                  {...args}
+                  label='Effective Start Date'
+                  label2='Effective End Date'
+                />
               )}
+            />
+          </GridItem>
+          <GridItem xs md={3}>
+            <FastField
+              name='dateTo'
+              render={(args) => <DatePicker {...args} label='Date from' />}
             />
           </GridItem>
           <GridItem md={3}>

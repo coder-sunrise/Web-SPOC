@@ -15,7 +15,6 @@ import {
   Paper,
   withStyles,
   IconButton,
-  Popper,
   Fade,
   ClickAwayListener,
   Divider,
@@ -232,6 +231,7 @@ class Main extends React.Component {
   }
 
   componentDidMount () {
+    // console.log('Main')
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
@@ -242,8 +242,8 @@ class Main extends React.Component {
     if (nextProps.consultation.version !== this.props.consultation.version)
       return true
     if (
-      (nextProps.visitRegistration.entity || {}).id !==
-      (this.props.visitRegistration.entity || {}).id
+      nextProps.visitRegistration.version !==
+      this.props.visitRegistration.version
     )
       return true
     if (

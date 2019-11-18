@@ -123,6 +123,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 dispatch({
                   type: 'copaymentScheme/query',
                   payload: {
+                    keepFilter: false,
                     name,
                     schemeTypeFK,
                     schemeCategory,

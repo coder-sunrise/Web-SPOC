@@ -850,6 +850,15 @@ const buttonTypes = [
   'Fab',
 ]
 
+export const countryCodes = [
+  { name: '+65 Singapore', value: '65' },
+  { name: '+60 Malaysia', value: '60' },
+  { name: '+62 Indonesia', value: '62' },
+  { name: '+63 Philippines', value: '63' },
+  { name: '+66 Thailand', value: '66' },
+  { name: '+81 Japan', value: '81' },
+]
+
 // const localCodes = {}
 // export async function getCodes (code) {
 //   if (!localCodes[code]) {
@@ -902,6 +911,12 @@ const tenantCodes = [
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
+]
+
+// always get latest codetable
+const skipCache = [
+  'doctorprofile',
+  'clinicianprofile',
 ]
 
 // const codes = [
@@ -986,28 +1001,11 @@ export const fetchAndSaveCodeTable = async (
     newData = [
       ...data.data,
     ]
-    // if (code.split(',').length > 1) {
-    //   const codes = code.split(',')
-    //   newData = [
-    //     ...codes.reduce(
-    //       (merged, c) => [
-    //         ...merged,
-    //         ...data[c],
-    //       ],
-    //       [],
-    //     ),
-    //   ]
-    // } else {
-    //   console.log({ data, code, useGeneral })
-    //   newData = [
-    //     ...data.data,
-    //   ]
-    // }
   }
 
   if (parseInt(statusCode, 10) === 200) {
-    // console.log(newData, temp)
-    // if (!temp)
+    if (skipCache.includes(code)) return newData
+
     await db.codetable.put({
       code,
       data: newData,

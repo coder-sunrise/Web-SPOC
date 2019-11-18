@@ -180,6 +180,7 @@ class EmergencyContact extends PureComponent {
       nokPatientProfileFK: o.id,
       address: `${primaryAddress.blockNo || ''} ${primaryAddress.buildingName ||
         ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street || ''}`,
+      primaryContactNo: o.contact.mobileContactNumber.number,
     })
     setFieldValue('patientEmergencyContact', patientEmergencyContact)
     this.setState((prevState) => {

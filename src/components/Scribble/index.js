@@ -188,9 +188,10 @@ class Scribble extends React.Component {
     dispatch({
       type: 'scriblenotes/queryTemplateList',
     }).then((templateList) => {
-      this.setState({
-        templateList: templateList.data.data,
-      })
+      if (templateList && templateList.data)
+        this.setState({
+          templateList: templateList.data.data,
+        })
     })
 
     if (this.props.scribbleData !== '') {

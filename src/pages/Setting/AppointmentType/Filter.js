@@ -57,6 +57,7 @@ const Filter = ({ classes, dispatch, values, toggleModal }) => {
               dispatch({
                 type: 'settingAppointmentType/query',
                 payload: {
+                  keepFilter: false,
                   isActive,
                   group: [
                     {

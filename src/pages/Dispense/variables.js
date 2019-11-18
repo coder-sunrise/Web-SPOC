@@ -43,11 +43,15 @@ export const PrescriptionColumns = [
   },
   {
     name: 'unitPrice',
-    title: 'Unit Price',
+    title: 'Unit Price ($)',
+  },
+  {
+    name: 'totalAfterItemAdjustment',
+    title: 'Adj ($)',
   },
   {
     name: 'totalPrice',
-    title: 'Total Price',
+    title: 'Total Price ($)',
   },
   {
     name: 'action',
@@ -64,6 +68,10 @@ export const PrescriptionColumnExtensions = (
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
+    type: 'currency',
+  },
+  {
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
@@ -172,6 +180,10 @@ export const VaccinationColumn = [
     title: 'Unit Price ($)',
   },
   {
+    name: 'totalAfterItemAdjustment',
+    title: 'Adj ($)',
+  },
+  {
     name: 'totalPrice',
     title: 'Total Price ($)',
   },
@@ -182,6 +194,10 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
     columnName: 'totalPrice',
+    type: 'currency',
+  },
+  {
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
@@ -226,11 +242,15 @@ export const OtherOrdersColumns = [
   },
   {
     name: 'unitPrice',
-    title: 'Unit Price',
+    title: 'Unit Price ($)',
+  },
+  {
+    name: 'totalAfterItemAdjustment',
+    title: 'Adj ($)',
   },
   {
     name: 'totalPrice',
-    title: 'Total Price',
+    title: 'Total Price ($)',
   },
   {
     name: 'action',
@@ -255,18 +275,27 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     align: 'right',
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return null
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
       return <NumberInput text currency value={row.unitPrice} />
     },
   },
-
+  {
+    columnName: 'totalAfterItemAdjustment',
+    // type: 'currency',
+    align: 'right',
+    render: (row) => {
+      const { type } = row
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+    },
+  },
   {
     columnName: 'totalPrice',
     // type: 'currency',
     align: 'right',
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return null
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
       return <NumberInput text currency value={row.totalPrice} />
     },
   },

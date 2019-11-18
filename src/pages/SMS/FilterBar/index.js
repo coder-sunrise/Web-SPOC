@@ -91,7 +91,7 @@ export default compose(
         patientName,
         consent,
         lastSMSSendStatus,
-        lastVisitDate,
+        // lastVisitDate,
         upcomingAppointmentDate,
         appointmentStatus,
         isReminderSent,
@@ -129,18 +129,19 @@ export default compose(
           {
             name: patientName,
             patientAccountNo: patientName,
+            patientReferenceNo: patientName,
             'ContactFkNavigation.contactNumber.number': patientName,
             combineCondition: 'or',
           },
         ],
         'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
         'PatientPdpaConsent.IsConsent': consent,
-        'lgteql_Visit.VisitDate': lastVisitDate
-          ? moment(lastVisitDate[0]).formatUTC()
-          : undefined,
-        'lsteql_Visit.VisitDate': lastVisitDate
-          ? moment(lastVisitDate[1]).formatUTC(false)
-          : undefined,
+        // 'lgteql_Visit.VisitDate': lastVisitDate
+        //   ? moment(lastVisitDate[0]).formatUTC()
+        //   : undefined,
+        // 'lsteql_Visit.VisitDate': lastVisitDate
+        //   ? moment(lastVisitDate[1]).formatUTC(false)
+        //   : undefined,
       }
 
       let payload = {}
@@ -156,6 +157,7 @@ export default compose(
       dispatch({
         type: `${dispatchType}/query`,
         payload: {
+          keepFilter: false,
           ...payload,
           smsType: type,
         },

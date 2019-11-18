@@ -51,17 +51,6 @@ const plugins = [
   ],
 ]
 
-// // 针对 preview.pro.ant.design 的 GA 统计代码
-// // 业务上不需要这个
-// if (process.env.APP_TYPE === 'site') {
-//   plugins.push([
-//     'umi-plugin-ga',
-//     {
-//       code: 'UA-72788897-6',
-//     },
-//   ])
-// }
-
 export default {
   // add for transfer to umi
   plugins,
@@ -74,7 +63,7 @@ export default {
     'process.env.client_secret':
       'TiOserstaKdhu0af4zOzFFhBaLsgh8XsrzmHxnIpIvHjW7adSPELPYDlLJfDfGzA',
     'process.env.url': 'https://api.semr2.com',
-    'process.env.signalrUrl': 'https//socket.semr2.com/notificationHub',
+    'process.env.signalrUrl': 'https//websocket.semr2.com/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,

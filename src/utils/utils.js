@@ -429,6 +429,7 @@ const convertToQuery = (
         let val = customQuerys[p]
         if (typeof val === 'string') {
           val = val.trim()
+          if (val === '') continue
           const match = refilter.exec(p)
           if (!!match && match.length > 1) {
             newQuery.columnCriteria.push({
@@ -466,7 +467,7 @@ const convertToQuery = (
           // console.log({ newQuery })
         } else if (typeof val === 'object' && Object.keys(val).length === 1) {
           const v = val[Object.keys(val)[0]]
-          if (v !== undefined) {
+          if (v !== undefined && v.toString().trim() !== '') {
             newQuery.columnCriteria.push({
               prop: `${p}.${Object.keys(val)[0]}`,
               val: v,
@@ -483,18 +484,20 @@ const convertToQuery = (
           // let valType = null
           // if (typeof val === 'boolean') valType = valueType.b
           // else if (typeof val === 'number') valType = valType.i
-          newQuery.columnCriteria.push({
-            prop: p,
-            val,
-            // valueType: valType,
-            opr:
-              [
-                'boolean',
-                'number',
-              ].indexOf(typeof val) >= 0
-                ? filterType.eql
-                : filterType.like,
-          })
+          if (val.toString().trim() !== '') {
+            newQuery.columnCriteria.push({
+              prop: p,
+              val,
+              // valueType: valType,
+              opr:
+                [
+                  'boolean',
+                  'number',
+                ].indexOf(typeof val) >= 0
+                  ? filterType.eql
+                  : filterType.like,
+            })
+          }
         }
       }
     }
@@ -693,12 +696,13 @@ const navigateDirtyCheck = ({
     let f = {}
     if (displayName) {
       f = window.dirtyForms[displayName]
+
       const ob = window.g_app._store.getState().formik[displayName]
-      if (ob && !ob.dirty) {
+      if ((ob && !ob.dirty) || !f) {
+        _checkCb(restProps, e)
         return
       }
     }
-
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {
@@ -909,7 +913,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total || 0
+    r.weightage = roundToTwoDecimals(r[totalField] / total || 0)
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -923,21 +927,21 @@ const calculateAmount = (
     })
     activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      const adj = r.weightage * fa.adjAmount
+      const adj = roundToTwoDecimals(r.weightage * fa.adjAmount)
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
 
-      r[adjustedField] += adj
+      r[adjustedField] = roundToTwoDecimals(r[adjustedField] + adj)
       r.subAdjustment += adj
     })
   })
+  // activeRows.forEach((r) => {
+  //   r[adjustedField] = roundToTwoDecimals(r[adjustedField])
+  // })
 
   const totalAfterAdj = roundToTwoDecimals(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
-  // console.log('after calculate totalAfterAdj', {
-  //   activeRows,
-  //   mapped: activeRows.map((o) => o[adjustedField]),
-  // })
+
   const { clinicSettings } = window.g_app._store.getState()
   if (!clinicSettings || !clinicSettings.settings) {
     // notification.error({
@@ -950,7 +954,9 @@ const calculateAmount = (
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
-        gst += r[adjustedField] - r[adjustedField] / (1 + gSTPercentage)
+        gst += roundToTwoDecimals(
+          r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
+        )
       })
     } else {
       gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
@@ -961,7 +967,6 @@ const calculateAmount = (
     }
   }
 
-  // console.log(totalAfterAdj, gst)
   const r = {
     rows,
     adjustments: adjustments.map((o, index) => ({ ...o, index })),

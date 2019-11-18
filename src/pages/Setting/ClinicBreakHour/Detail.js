@@ -16,7 +16,7 @@ import {
 } from '@/components'
 
 const styles = (theme) => ({})
-
+const DATEERRORMSG = 'TO must be later than FROM'
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicBreakHour }) =>
     settingClinicBreakHour.entity || settingClinicBreakHour.default,
@@ -27,59 +27,50 @@ const styles = (theme) => ({})
     monFromBreak: Yup.string().nullable(),
     monToBreak: Yup.string().nullable().when('monFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('monFromBreak'),
-        'TO must be later than FROM',
-      ),
-      otherwise: Yup.string().nullable(),
+      then: Yup.string().laterThan(Yup.ref('monFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     tueFromBreak: Yup.string().nullable(),
     tueToBreak: Yup.string().nullable().when('tueFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('tueFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('tueFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     wedFromBreak: Yup.string().nullable(),
     wedToBreak: Yup.string().nullable().when('wedFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('wedFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('wedFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     thursFromBreak: Yup.string().nullable(),
     thursToBreak: Yup.string().nullable().when('thursFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('thursFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('thursFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     friFromBreak: Yup.string().nullable(),
     friToBreak: Yup.string().nullable().when('friFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('friFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('friFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     satFromBreak: Yup.string().nullable(),
     satToBreak: Yup.string().nullable().when('satFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('satFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('satFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
+
     sunFromBreak: Yup.string().nullable(),
     sunToBreak: Yup.string().nullable().when('sunFromBreak', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('sunFromBreak'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('sunFromBreak'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
   }),
   handleSubmit: (values, { props, resetForm }) => {

@@ -18,6 +18,7 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 export const baseUrl = process.env.url
 
 let dynamicURL = baseUrl
+// let dynamicURL = 'http://semr2-dev-api.ap-southeast-1.elasticbeanstalk.com'
 // if (process.env.NODE_ENV === 'development')
 //   dynamicURL = 'http://localhost:55314'
 

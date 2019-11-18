@@ -223,7 +223,7 @@ class Modal extends PureComponent {
       const { bizSessionList } = this.props.deposit
       setFieldValue(
         'patientDepositTransaction.transactionBizSessionFK',
-        bizSessionList.length === 0 || bizSessionList === undefined
+        bizSessionList === undefined || bizSessionList.length === 0
           ? undefined
           : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
       )
@@ -244,20 +244,17 @@ class Modal extends PureComponent {
     }
   }
 
-  calculateBalanceAfter = () => {
+  calculateBalanceAfter = (event) => {
+    const { value } = event.target
+
     const { isDeposit, errors, initialValues, setFieldValue } = this.props
-    const { balance, patientDepositTransaction } = this.props.values || 0
-    const { amount } = patientDepositTransaction
+    const { balance } = this.props.values || 0
     let finalBalance
     if (!errors.amount) {
-      finalBalance = isDeposit ? balance + amount : balance - amount
+      finalBalance = isDeposit ? balance + value : balance - value
     } else {
       finalBalance = initialValues.balance
     }
-    this.setState({
-      balanceAfter: finalBalance,
-    })
-
     setFieldValue('balanceAfter', finalBalance)
   }
 
