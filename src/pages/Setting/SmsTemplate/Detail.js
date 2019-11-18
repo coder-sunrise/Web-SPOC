@@ -71,7 +71,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
-                    autoFocused
+                    autoFocus
                     {...args}
                     disabled={!!settingSmsTemplate.entity}
                   />

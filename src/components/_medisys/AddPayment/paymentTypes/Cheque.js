@@ -43,6 +43,7 @@ const Cheque = ({
                 label='Amount'
                 {...args}
                 currency
+                autoFocus
                 onChange={handleAmountChange}
               />
             )}

@@ -73,7 +73,7 @@ class Memo extends PureComponent {
             <FastField
               name='memoDate'
               render={(args) => {
-                return <DatePicker label='Date' {...args} />
+                return <DatePicker label='Date' autoFocus {...args} />
               }}
             />
           </GridItem>

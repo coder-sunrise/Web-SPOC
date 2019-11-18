@@ -127,7 +127,7 @@ class Detail extends PureComponent {
                   render={(args) => (
                     <TextField
                       label={name === type ? 'Co-Payer Code' : 'Company Code'}
-                      autoFocused
+                      autoFocus
                       {...args}
                       disabled={!!settingCompany.entity}
                     />
