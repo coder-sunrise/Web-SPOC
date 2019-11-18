@@ -586,7 +586,7 @@ class AntdSelect extends React.PureComponent {
               : []),
             ...options,
           ]
-    // console.log({ source })
+
     const cfg = {
       value: this.state.value,
     }

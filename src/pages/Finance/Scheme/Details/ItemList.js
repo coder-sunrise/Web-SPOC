@@ -100,6 +100,20 @@ const ItemList = ({
                   }
                   onChange={(e, option) => onItemSelect(e, option, type)}
                   code={type}
+                  renderDropdown={(option) => {
+                    let suffix = ''
+                    if (type === 'ctservice') {
+                      suffix = option.serviceCenter
+                        ? `(${option.serviceCenter})`
+                        : ''
+                    }
+                    return (
+                      <span>
+                        {option.displayValue}&nbsp;
+                        {suffix}
+                      </span>
+                    )
+                  }}
                   {...args}
                 />
               )
@@ -165,7 +179,6 @@ const ItemList = ({
             (x) => x.value === row.type,
           )[0]
           const { ctName, itemFKName } = inventory
-          console.log({ row })
           return row.name ? row.name : ''
           // return (
           //   <FastField

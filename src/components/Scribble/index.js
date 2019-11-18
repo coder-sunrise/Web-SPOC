@@ -412,6 +412,7 @@ class Scribble extends React.Component {
       handleSubmit,
       deleteScribbleNote,
       setFieldValue,
+      dispatch,
     } = this.props
     return (
       <div className={classes.layout}>
@@ -1015,7 +1016,20 @@ class Scribble extends React.Component {
             <div className={classes.rightButton}>
               <div className={classes.actionDiv}>
                 {this.state.deleteEnable ? (
-                  <Button color='danger' onClick={deleteScribbleNote}>
+                  <Button
+                    color='danger'
+                    onClick={() => {
+                      dispatch({
+                        type: 'global/updateAppState',
+                        payload: {
+                          openConfirm: true,
+                          openConfirmContent:
+                            'Are you sure want to delete this scribble note ?',
+                          onConfirmSave: () => deleteScribbleNote(),
+                        },
+                      })
+                    }}
+                  >
                     Delete
                   </Button>
                 ) : (
