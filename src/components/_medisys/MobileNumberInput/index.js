@@ -2,7 +2,7 @@ import React from 'react'
 // common components
 import { NumberInput } from '@/components'
 
-const Mobile = ({ ...props }) => (
+const MobileNumberInput = ({ ...props }) => (
   <NumberInput
     {...props}
     label='Contact No.'
@@ -12,4 +12,4 @@ const Mobile = ({ ...props }) => (
   />
 )
 
-export default Mobile
+export default MobileNumberInput
