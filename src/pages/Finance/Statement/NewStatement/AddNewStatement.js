@@ -348,7 +348,7 @@ class AddNewStatement extends PureComponent {
               </b>
             </h4>
           </div>
-          <GridContainer style={{ margin: theme.spacing(2), marginTop: 0 }}>
+          <GridContainer style={{ margin: theme.spacing(1), marginTop: 0 }}>
             <GridItem container direction='row' spacing={0}>
               <GridItem xs md={3}>
                 <FastField
