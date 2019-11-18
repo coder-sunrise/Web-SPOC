@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { notification } from '@/components'
 
 let connection = null
@@ -5,7 +6,7 @@ const connectionObserver = {}
 
 const initStream = () => {
   const signalREndPoint = process.env.signalrUrl
-
+  console.log(connection)
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
       accessTokenFactory: () => localStorage.getItem('token'),
@@ -117,6 +118,10 @@ const sendNotification = (type, data) => {
   })
 }
 
+const debouncedSendNotification = _.debounce(sendNotification, 500, {
+  leading: true,
+})
+
 const subscribeNotification = (type, payload) => {
   const { callback } = payload
   connectionObserver[type] = callback
@@ -124,6 +129,6 @@ const subscribeNotification = (type, payload) => {
 
 module.exports = {
   initStream,
-  sendNotification,
+  sendNotification: debouncedSendNotification,
   subscribeNotification,
 }
