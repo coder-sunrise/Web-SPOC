@@ -24,6 +24,7 @@ export default createFormViewModel({
       notices: [],
       currencySymbol: '$',
       disableSave: false,
+      showSessionTimeout: false,
     },
     setting: {
       skipDefaultListen: true,
