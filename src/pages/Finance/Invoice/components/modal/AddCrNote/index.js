@@ -88,7 +88,6 @@ import MiscCrNote from './MiscCrNote'
         }),
     }
 
-    console.log({ payload })
     dispatch({
       type: 'invoiceCreditNote/upsert',
       payload,
