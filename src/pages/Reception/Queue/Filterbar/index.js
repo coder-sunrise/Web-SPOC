@@ -50,7 +50,7 @@ const Filterbar = ({
       justify='flex-start'
       alignItems='center'
     >
-      <GridItem xs={3} sm={3} md={3} lg={2}>
+      <GridItem xs={3} sm={3} md={3} lg={3}>
         <FastField
           name='search'
           render={(args) => (
@@ -68,7 +68,7 @@ const Filterbar = ({
           )}
         />
       </GridItem>
-      <GridItem xs={7} sm={7} md={7} lg={5}>
+      <GridItem xs={7} sm={7} md={7} lg={4}>
         <Authorized authority='queue.registervisit'>
           <ProgressButton
             variant='contained'
