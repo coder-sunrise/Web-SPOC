@@ -129,7 +129,7 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              <Badge
+              {/* <Badge
                 badgeContent={notifications.length}
                 color='primary'
                 anchorOrigin={{
@@ -169,7 +169,7 @@ class HeaderLinks extends React.Component {
                     <LinkOff />
                   </Badge>
                 )}
-              </Button>
+              </Button> */}
 
               {/* <Button
                 justIcon

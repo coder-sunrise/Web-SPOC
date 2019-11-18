@@ -40,43 +40,41 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
   // const { className, style, ...resetBtnProps } = children.props
 
   return (
-    <React.Fragment>
-      <span {...triggerProps}>
-        {children}
-        <Popper
-          open={Boolean(anchorEl)}
-          anchorEl={anchorEl}
-          transition
-          // disablePortal
-          onClose={() => {
-            setAnchorEl(null)
-          }}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'center',
-          }}
-          {...props}
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow {...TransitionProps}>
-              <Paper>
-                <ClickAwayListener
-                  onClickAway={() => {
-                    console.log('onClickAway')
-                    trigger !== 'hover' ? setAnchorEl(null) : undefined
-                  }}
-                >
-                  {overlay}
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
-      </span>
-    </React.Fragment>
+    <span {...triggerProps}>
+      {children}
+      <Popper
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        transition
+        // disablePortal
+        onClose={() => {
+          setAnchorEl(null)
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'center',
+          horizontal: 'center',
+        }}
+        {...props}
+      >
+        {({ TransitionProps, placement }) => (
+          <Grow {...TransitionProps}>
+            <Paper>
+              <ClickAwayListener
+                onClickAway={() => {
+                  console.log('onClickAway')
+                  trigger !== 'hover' ? setAnchorEl(null) : undefined
+                }}
+              >
+                {overlay}
+              </ClickAwayListener>
+            </Paper>
+          </Grow>
+        )}
+      </Popper>
+    </span>
   )
 }
