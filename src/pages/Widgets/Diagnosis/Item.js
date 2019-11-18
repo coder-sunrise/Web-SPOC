@@ -46,6 +46,8 @@ const DiagnosisItem = ({
   arrayHelpers,
   diagnosises,
   classes,
+  values,
+  consultation,
   ...props
 }) => {
   const [
@@ -66,22 +68,28 @@ const DiagnosisItem = ({
   const { form } = arrayHelpers
 
   const onDiagnosisChange = (v, op) => {
-    const { setFieldValue } = form
+    const { setFieldValue, values: vals, setValues } = form
+    const { entity } = consultation
     if (op) {
-      setFieldValue(
-        `corDiagnosis[${index}]diagnosisDescription`,
-        op.displayvalue,
-      )
-
-      setFieldValue(`corDiagnosis[${index}]diagnosisCode`, op.code)
+      vals.corDiagnosis[index].diagnosisDescription = op.displayvalue
+      vals.corDiagnosis[index].diagnosisCode = op.code
 
       if (op.complication && op.complication.length) {
         setCtComplicationPairedWithDiag(op.complication)
       } else {
-        setFieldValue(`corDiagnosis[${index}]complication`, [])
-        setFieldValue(`corDiagnosis[${index}]corComplication`, [])
+        vals.corDiagnosis[index].complication = []
+        vals.corDiagnosis[index].corComplication = []
+
         setCtComplicationPairedWithDiag([])
       }
+      setValues(vals)
+      entity.corDiagnosis = vals.corDiagnosis
+      dispatch({
+        type: 'consultation/updateState',
+        payload: {
+          entity,
+        },
+      })
     }
   }
   const onDataSouceChange = (data) => {

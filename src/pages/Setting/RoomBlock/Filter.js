@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import * as Yup from 'yup'
@@ -38,8 +39,8 @@ const styles = (theme) => ({
   mapPropsToValues: () => {
     return {
       roomBlockGroupFK: [],
-      dateFrom: moment().subtract(6, 'months'),
-      dateTo: moment(),
+      dateFrom: moment(),
+      dateTo: moment().add(6, 'months'),
       recurrence: undefined,
     }
   },
@@ -70,6 +71,7 @@ const styles = (theme) => ({
     dispatch({
       type: 'roomBlock/queryAll',
       payload: {
+        keepFilter: false,
         [type]:
           stringRoomBlockGroupFK === 0 ? undefined : stringRoomBlockGroupFK,
 
@@ -80,6 +82,7 @@ const styles = (theme) => ({
         lsteql_endDateTime: dateTo
           ? moment(dateTo).endOf('day').formatUTC(false)
           : undefined,
+        pagesize: 999,
       },
     }).then(() => {
       dispatch({
@@ -200,7 +203,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
@@ -215,6 +218,7 @@ class Filter extends PureComponent {
                   // })
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

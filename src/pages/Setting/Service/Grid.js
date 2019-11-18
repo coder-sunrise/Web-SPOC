@@ -55,7 +55,7 @@ class Grid extends PureComponent {
         getRowId={(r) => r.serviceCenter_ServiceId}
         type='settingClinicService'
         onRowDoubleClick={this.editRow}
-        getRowId={(row) => row.serviceId}
+        // getRowId={(row) => row.serviceId}
         columns={[
           { name: 'code', title: 'Code' },
           { name: 'displayValue', title: 'Display Value' },
@@ -92,6 +92,7 @@ class Grid extends PureComponent {
             width: 120,
             type: 'select',
             options: isAutoOrder,
+            sortBy: 'serviceFKNavigation.isAutoOrder',
           },
           {
             columnName: 'isActive',

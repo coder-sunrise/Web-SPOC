@@ -1,5 +1,9 @@
 export const ApprovedCHASColumns = [
   {
+    name: 'submissionDate',
+    title: 'Submission Date',
+  },
+  {
     name: 'visitDate',
     title: 'Visit Date',
   },
@@ -44,10 +48,6 @@ export const ApprovedCHASColumns = [
     title: 'Claim Amt.',
   },
   {
-    name: 'submissionDate',
-    title: 'Submission Date',
-  },
-  {
     name: 'chasClaimStatusDescription',
     title: 'Claim Status',
   },
@@ -68,7 +68,8 @@ export const ApprovedCHASColumns = [
 export const ApprovedCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'submissionDate', type: 'date' },
+  { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
+  { columnName: 'submissionDate', type: 'date', width: 140 },
   { columnName: 'invoiceAmount', type: 'currency', currency: true },
   { columnName: 'claimAmount', type: 'currency', currency: true },
   { columnName: 'collectedAmount', type: 'currency', currency: true },

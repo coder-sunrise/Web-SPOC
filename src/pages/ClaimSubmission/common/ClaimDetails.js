@@ -48,10 +48,15 @@ const styles = (theme) => ({
     const { diagnosis } = returnValue
     let diagnosisOptions = []
     if (diagnosis) {
-      diagnosisOptions = diagnosis.map((o) => {
-        return o.id
+      diagnosis.forEach((o) => {
+        if (o.isSelected) diagnosisOptions.push(o.id)
       })
     }
+
+    if (diagnosis.length === diagnosisOptions.length) {
+      diagnosisOptions.push(-99)
+    }
+
     return {
       ...returnValue,
       diagnosisSelections: diagnosisOptions,
@@ -87,6 +92,29 @@ class ClaimDetails extends Component {
     setFieldValue('diagnosis', val)
   }
 
+  save = () => {
+    const { dispatch, onConfirm, values } = this.props
+    const { diagnosisSelections } = values
+
+    values.diagnosis.forEach((o) => {
+      const selectedId = diagnosisSelections.find((i) => i === o.id)
+      if (selectedId) {
+        o.isSelected = true
+      } else {
+        o.isSelected = false
+      }
+    })
+    dispatch({
+      type: 'claimSubmission/updateState',
+      payload: {
+        entity: {
+          ...values,
+        },
+      },
+    })
+    onConfirm()
+  }
+
   render () {
     const { readOnly } = true
     const {
@@ -113,9 +141,9 @@ class ClaimDetails extends Component {
     let patientGender = ctgender.find((x) => x.id === genderFK)
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
-    let patientNameLabel = `${patientName} (${patientGender
-      ? patientGender.code
-      : ''}/${age})`
+    // let patientNameLabel = `${patientName} (${patientGender
+    //   ? patientGender.code
+    //   : ''}/${age})`
 
     return (
       <SizeContainer size='md'>
@@ -143,10 +171,11 @@ class ClaimDetails extends Component {
                 />
               </GridItem>
               <GridItem md={12}>
-                <TextField
-                  value={patientNameLabel}
-                  disabled
-                  label='Patient Name'
+                <FastField
+                  name='patientName'
+                  render={(args) => (
+                    <TextField {...args} disabled label='Patient Name' />
+                  )}
                 />
               </GridItem>
             </GridItem>
@@ -288,7 +317,7 @@ class ClaimDetails extends Component {
                 Close
               </Button>
               {allowEdit ? (
-                <Button color='primary' onClick={onConfirm}>
+                <Button color='primary' onClick={this.save}>
                   Save
                 </Button>
               ) : (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Send from '@material-ui/icons/Send'
 import MailIcon from '@material-ui/icons/Mail'
 import { compose } from 'redux'
@@ -14,23 +14,17 @@ import {
   withFormikExtend,
   FastField,
   CodeSelect,
+  Field,
 } from '@/components'
 
-const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
-  const [
-    messageNumber,
-    setMessageNumber,
-  ] = useState()
-
-  const handleChange = ({ target }) => {
-    const { value } = target
-    if (value) {
-      setMessageNumber(Math.ceil(value.length / 160))
-    } else {
-      setMessageNumber(0)
-    }
-  }
-
+const New = ({
+  values,
+  errors,
+  selectedRows,
+  handleSubmit,
+  recipient,
+  setFieldValue,
+}) => {
   const allowSent = () => {
     if (recipient && values.content) {
       return true
@@ -46,7 +40,7 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
   return (
     <GridContainer>
       <GridItem md={9}>
-        <FastField
+        <Field
           name='template'
           render={(args) => {
             return (
@@ -54,7 +48,16 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
                 label={formatMessage({
                   id: 'sms.template',
                 })}
-                code='ctSmsTemplate'
+                code='SmsTemplate'
+                labelField='displayValue'
+                onChange={(e, op = {}) => {
+                  const { templateMessage } = op
+                  if (templateMessage) {
+                    setFieldValue('content', values.content + templateMessage)
+                  } else {
+                    setFieldValue('content', undefined)
+                  }
+                }}
                 {...args}
               />
             )
@@ -80,12 +83,12 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
           render={(args) => {
             return (
               <OutlinedTextField
-                onChange={handleChange}
                 rows='4'
                 multiline
                 label={formatMessage({
                   id: 'sms.message',
                 })}
+                maxLength={9999999999}
                 {...args}
               />
             )
@@ -96,7 +99,12 @@ const New = ({ values, errors, selectedRows, handleSubmit, recipient }) => {
         {values.content ? values.content.length : 0}/160
       </GridItem>
       <GridItem md={11}>
-        <Badge badgeContent={messageNumber} color='error'>
+        <Badge
+          badgeContent={
+            values.content ? Math.ceil(values.content.length / 160) : null
+          }
+          color='error'
+        >
           <Button justIcon color='primary'>
             <MailIcon />
           </Button>
@@ -114,11 +122,12 @@ export default compose(
         dispatch,
         onConfirm,
         selectedRows,
-        sms,
         recipient,
         setSelectedRows,
+        currentTab,
+        smsAppointment,
+        smsPatient,
       } = props
-
       let payload = []
       const createPayload = (patientProfFK, o) => {
         let patientProfileFK = patientProfFK
@@ -135,7 +144,6 @@ export default compose(
               appointmentFK,
             },
           },
-          sms: undefined,
           selectedRows: undefined,
         }
         payload.push(tempObject)
@@ -145,8 +153,10 @@ export default compose(
         const { id, patientProfileFK } = recipient
         createPayload(patientProfileFK, id)
       } else {
+        let currentList = smsAppointment.list
+        if (currentTab === '1') currentList = smsPatient.list
         selectedRows.forEach((o) => {
-          const { patientProfileFK } = sms.list.find((r) => r.id === o)
+          const { patientProfileFK } = currentList.find((r) => r.id === o)
           createPayload(patientProfileFK, o)
         })
       }
@@ -156,7 +166,9 @@ export default compose(
         payload,
       }).then((r) => {
         if (r) {
-          if (setSelectedRows) setSelectedRows([])
+          if (setSelectedRows) {
+            setSelectedRows([])
+          }
           resetForm()
           if (onConfirm) onConfirm()
           dispatch({

@@ -35,13 +35,13 @@ export default ({
   }
   const tagButtonHandleClose = (e) => {
     setAnchorEl(undefined)
-    if (form) form.setFieldValue(field.name, selected)
-    onChange(
-      selected,
-      mode === 'multiple'
-        ? options.filter((o) => (selected || []).indexOf(o[valueField]) >= 0)
-        : options.find((o) => o[valueField] === selected),
-    )
+    if (mode === 'multiple') {
+      if (form) form.setFieldValue(field.name, selected)
+      onChange(
+        selected,
+        options.filter((o) => (selected || []).indexOf(o[valueField]) >= 0),
+      )
+    }
   }
   // useEffect(
   //   () => {

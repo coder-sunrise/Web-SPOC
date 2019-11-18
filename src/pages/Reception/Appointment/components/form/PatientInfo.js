@@ -4,6 +4,7 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { Search } from '@material-ui/icons'
 // custom component
 import {
   Button,
@@ -13,6 +14,7 @@ import {
   NumberInput,
   ProgressButton,
 } from '@/components'
+import { Mobile } from '@/components/_medisys'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -63,7 +65,7 @@ const PatientInfoInput = ({
                 submitKey='patientSearch/query'
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
-                icon={null}
+                icon={<Search />}
               >
                 Search
               </ProgressButton>
@@ -104,11 +106,15 @@ const PatientInfoInput = ({
         <FastField
           name='patientContactNo'
           render={(args) => (
-            <NumberInput
+            <Mobile
               {...args}
               disabled={isRegisteredPatient || disabled || isEdit}
-              label='Contact No.'
             />
+            // <NumberInput
+            //   {...args}
+            //   disabled={isRegisteredPatient || disabled || isEdit}
+            //   label='Contact No.'
+            // />
           )}
         />
       </GridItem>

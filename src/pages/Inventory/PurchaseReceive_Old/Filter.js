@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { formatMessage, FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import {
   withFormikExtend,
   Field,
@@ -12,7 +13,6 @@ import {
   Select,
   CodeSelect,
   ProgressButton,
-  DatePicker,
   Tooltip,
   DateRangePicker,
 } from '@/components'
@@ -150,7 +150,7 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { poNo, supplier, status } = this.props.values
 
@@ -177,6 +177,7 @@ class Filter extends PureComponent {
                 onClick={navigatePdoDetails}
                 color='primary'
               >
+                <Add />
                 Add New
               </Button>
             </div>

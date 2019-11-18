@@ -10,7 +10,7 @@ import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
 import moment from 'moment'
-import { GridContainer, GridItem, Button } from '@/components'
+import { GridContainer, GridItem, ProgressButton } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
@@ -55,10 +55,14 @@ const FilterBar = ({
       </GridContainer>
       <GridItem xs={12}>
         <div className={classes.filterBtn}>
-          <Button variant='contained' color='primary' onClick={handleSubmit}>
-            <Search />
+          <ProgressButton
+            icon={<Search />}
+            variant='contained'
+            color='primary'
+            onClick={handleSubmit}
+          >
             <FormattedMessage id='sms.search' />
-          </Button>
+          </ProgressButton>
         </div>
       </GridItem>
     </div>
@@ -87,7 +91,7 @@ export default compose(
         patientName,
         consent,
         lastSMSSendStatus,
-        lastVisitDate,
+        // lastVisitDate,
         upcomingAppointmentDate,
         appointmentStatus,
         isReminderSent,
@@ -125,40 +129,38 @@ export default compose(
           {
             name: patientName,
             patientAccountNo: patientName,
+            patientReferenceNo: patientName,
             'ContactFkNavigation.contactNumber.number': patientName,
             combineCondition: 'or',
           },
         ],
         'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
         'PatientPdpaConsent.IsConsent': consent,
-        'lgteql_Visit.VisitDate': lastVisitDate
-          ? moment(lastVisitDate[0]).formatUTC()
-          : undefined,
-        'lsteql_Visit.VisitDate': lastVisitDate
-          ? moment(lastVisitDate[1]).formatUTC(false)
-          : undefined,
+        // 'lgteql_Visit.VisitDate': lastVisitDate
+        //   ? moment(lastVisitDate[0]).formatUTC()
+        //   : undefined,
+        // 'lsteql_Visit.VisitDate': lastVisitDate
+        //   ? moment(lastVisitDate[1]).formatUTC(false)
+        //   : undefined,
       }
 
       let payload = {}
+      let dispatchType = ''
       if (type === 'Appointment') {
+        dispatchType = 'smsAppointment'
         payload = appointmentPayload
       } else {
+        dispatchType = 'smsPatient'
         payload = patientPayload
       }
 
       dispatch({
-        type: 'sms/query',
+        type: `${dispatchType}/query`,
         payload: {
+          keepFilter: false,
           ...payload,
           smsType: type,
         },
-      }).then(() => {
-        dispatch({
-          type: 'sms/updateState',
-          payload: {
-            filter: undefined,
-          },
-        })
       })
     },
   }),

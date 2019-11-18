@@ -16,6 +16,7 @@ import {
 } from '@/components'
 
 const styles = (theme) => ({})
+const DATEERRORMSG = 'TO must be later than FROM'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicOperationHour }) =>
@@ -27,64 +28,50 @@ const styles = (theme) => ({})
     monFromOpHour: Yup.string().nullable(),
     monToOpHour: Yup.string().nullable().when('monFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('monFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('monFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     tueFromOpHour: Yup.string().nullable(),
     tueToOpHour: Yup.string().nullable().when('tueFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('tueFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('tueFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     wedFromOpHour: Yup.string().nullable(),
     wedToOpHour: Yup.string().nullable().when('wedFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('wedFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('wedFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     thursFromOpHour: Yup.string().nullable(),
     thursToOpHour: Yup.string().nullable().when('thursFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('thursFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('thursFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     friFromOpHour: Yup.string().nullable(),
     friToOpHour: Yup.string().nullable().when('friFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('friFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('friFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     satFromOpHour: Yup.string().nullable(),
     satToOpHour: Yup.string().nullable().when('satFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('satFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('satFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
 
     sunFromOpHour: Yup.string().nullable(),
     sunToOpHour: Yup.string().nullable().when('sunFromOpHour', {
       is: (val) => val !== null && val !== undefined && val !== '',
-      then: Yup.string().laterThan(
-        Yup.ref('sunFromOpHour'),
-        'TO must be later than FROM',
-      ),
+      then: Yup.string().laterThan(Yup.ref('sunFromOpHour'), DATEERRORMSG),
+      otherwise: Yup.string().nullable().max('', DATEERRORMSG),
     }),
   }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -146,7 +133,7 @@ class Detail extends PureComponent {
                   <TextField
                     label='Code'
                     {...args}
-                    disabled={settingClinicOperationHour.entity ? true : false}
+                    disabled={!!settingClinicOperationHour.entity}
                   />
                 )}
               />

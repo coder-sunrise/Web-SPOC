@@ -30,6 +30,7 @@ export default createListViewModel({
         const { data } = payload
         return {
           ...st,
+          // filter: {},
           list: data.data.map((o) => {
             return {
               ...o,

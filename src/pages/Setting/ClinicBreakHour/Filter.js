@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import { FastField } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { standardRowHeight } from 'mui-pro-jss'
+import { Search, Add } from '@material-ui/icons'
 import { status } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -74,12 +75,13 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingClinicBreakHour/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {
@@ -106,6 +108,7 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

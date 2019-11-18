@@ -427,9 +427,10 @@ class Detail extends PureComponent {
               o[getType.typeName].batchNo,
             ],
             expiryDate: o[getType.typeName].expiryDate,
-            stock: o[getType.typeName][getType.stock]
-              ? o[getType.typeName][getType.stock].stock
-              : undefined,
+            // stock: o[getType.typeName][getType.stock]
+            //   ? o[getType.typeName][getType.stock].stock
+            //   : undefined,
+            stock: o.oldQty,
             restValues: o[getType.typeName],
           }
         })

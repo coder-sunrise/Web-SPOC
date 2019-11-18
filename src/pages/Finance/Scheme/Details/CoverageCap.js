@@ -9,7 +9,7 @@ import {
   NumberInput,
 } from '@/components'
 
-const CoverageCap = ({ values, classes, setFieldValue }) => {
+const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
   // console.log({ values })
   const onRadioButtonChange = (event) => {
     const { target } = event
@@ -18,23 +18,23 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
       setFieldValue('coverageMaxCap', undefined)
       setFieldValue(
         'itemGroupMaxCapacityDto.medicationMaxCapacity.maxCapValue',
-        0.0,
+        undefined,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.consumableMaxCapacity.maxCapValue',
-        0.0,
+        undefined,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.vaccinationMaxCapacity.maxCapValue',
-        0.0,
+        undefined,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue',
-        0.0,
+        undefined,
       )
       setFieldValue(
         'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
-        0.0,
+        undefined,
       )
     }
 
@@ -175,6 +175,7 @@ const CoverageCap = ({ values, classes, setFieldValue }) => {
             />
           )}
         />
+        <p style={{ marginTop: theme.spacing(1) }}>Leave blank if no cap</p>
       </GridItem>
     </GridContainer>
   )

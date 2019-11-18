@@ -283,7 +283,7 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-select-selection--single .ant-select-selection-selected-value': {
           position: 'relative',
-          top: 1,
+          top: 2,
         },
         // '& .ant-select-selection--single': {
         //   marginTop: 4,
@@ -461,6 +461,10 @@ export const smallTheme = createMuiTheme({
           right: 13,
           top: 8,
         },
+        '& .ant-select-selection--single .ant-select-selection-selected-value': {
+          position: 'relative',
+          top: 1,
+        },
         '& .ant-select-selection--single .ant-select-selection__clear': {
           top: 6,
         },
@@ -489,7 +493,7 @@ export const smallTheme = createMuiTheme({
         padding: 0,
         '& textarea:first-of-type': {
           position: 'relative',
-          marginBottom: 3,
+          marginBottom: 4,
           top: 3,
         },
       },

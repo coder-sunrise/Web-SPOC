@@ -1,5 +1,5 @@
 import { stringify } from 'qs'
-import request, { download} from '@/utils/request'
+import request, { download } from '@/utils/request'
 import { convertToQuery, commonDataWriterTransform } from '@/utils/utils'
 import { REPORT_TYPE } from '@/utils/constants'
 // static data
@@ -65,7 +65,7 @@ export const exportPdfReport = async (reportID, payload, subject) => {
   const _subject = subject || REPORT_TYPE[reportID]
 
   return download(
-    `${baseURL}/${reportID}?ReportFormat=pdf&ReportParameters=${JSON.stringify(
+    `${baseURL}/${reportID}?reportFormat=pdf&ReportParameters=${JSON.stringify(
       payload,
     )}`,
     { subject: _subject || 'Report', type: 'pdf' },
@@ -75,9 +75,9 @@ export const exportPdfReport = async (reportID, payload, subject) => {
 export const exportExcelReport = async (reportID, payload) => {
   const baseURL = '/api/reports'
   return download(
-    `${baseURL}/${reportID}?ReportFormat=excel&ReportParameters={${JSON.stringify(
+    `${baseURL}/${reportID}?reportFormat=Excel&ReportParameters=${JSON.stringify(
       payload,
-    )}}`,
+    )}`,
     { subject: REPORT_TYPE[reportID] || 'Report', type: 'xls' },
   )
 }

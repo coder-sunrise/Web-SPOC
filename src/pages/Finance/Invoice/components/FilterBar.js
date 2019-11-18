@@ -1,6 +1,8 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import { FormattedMessage } from 'umi/locale'
+import { Search } from '@material-ui/icons'
 import moment from 'moment'
 // common components
 import {
@@ -44,6 +46,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
     dispatch({
       type: 'invoiceList/query',
       payload: {
+        keepFilter: false,
         // combineCondition: 'and',
         lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
         lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
@@ -139,8 +142,12 @@ const FilterBar = ({ classes, dispatch, values }) => {
         </GridContainer>
 
         <div className={classes.searchButton}>
-          <ProgressButton color='primary' onClick={onSearchClick}>
-            Search
+          <ProgressButton
+            color='primary'
+            icon={<Search />}
+            onClick={onSearchClick}
+          >
+            <FormattedMessage id='form.search' />
           </ProgressButton>
           {/* <i>Double click on record to view invoice</i> */}
         </div>

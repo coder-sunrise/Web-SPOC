@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { standardRowHeight } from 'mui-pro-jss'
 import { status } from '@/utils/codes'
 
@@ -63,12 +64,13 @@ class Filter extends PureComponent {
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
                     type: 'settingParticipantRole/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {
@@ -93,6 +95,7 @@ class Filter extends PureComponent {
                   })
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

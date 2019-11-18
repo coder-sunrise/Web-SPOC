@@ -10,7 +10,7 @@ import {
   MenuItem,
   MenuList,
 } from '@material-ui/core'
-import { Search } from '@material-ui/icons'
+import { Search, Add } from '@material-ui/icons'
 import moment from 'moment'
 import {
   GridContainer,
@@ -203,6 +203,7 @@ class SearchBar extends PureComponent {
                 this.props.dispatch({
                   type: 'statement/query',
                   payload: {
+                    keepFilter: false,
                     statementNo,
                     copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
                     lgteql_statementDate: statementDateFrom,
@@ -232,6 +233,7 @@ class SearchBar extends PureComponent {
                 history.push('/finance/statement/newstatement')
               }}
             >
+              <Add />
               New Statement
             </Button>
           </GridItem>

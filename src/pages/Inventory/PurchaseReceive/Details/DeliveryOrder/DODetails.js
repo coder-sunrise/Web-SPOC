@@ -18,6 +18,7 @@ import {
   getInventoryItem,
   getInventoryItemList,
 } from '@/utils/codes'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 let commitCount = 2201 // uniqueNumber
 
@@ -37,12 +38,23 @@ const receivingDetailsSchema = Yup.object().shape({
   // quantityReceived: Yup.number().min(0).required(),
   // totalBonusReceived: Yup.number().min(0).required(),
   currentReceivingQty: Yup.number()
-    .min(0, 'Value must be greater than 0')
-    .max(Yup.ref('maxCurrentReceivingQty'))
+    .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
+    .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
+      return `Current Receiving Quantity must be less than or equal to ${e.max.toFixed(
+        1,
+      )}`
+    })
     .required(),
   currentReceivingBonusQty: Yup.number()
-    .min(0, 'Value must be greater than 0')
-    .max(Yup.ref('maxCurrentReceivingBonusQty'))
+    .min(
+      0,
+      'Current Receiving Bonus Quantity must be greater than or equal to 0',
+    )
+    .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
+      return `Current Receiving Bonus Quantity must be less than or equal to ${e.max.toFixed(
+        1,
+      )}`
+    })
     .required(),
 })
 
@@ -84,6 +96,7 @@ const receivingDetailsSchema = Yup.object().shape({
         expiryDate: x.expiryDate,
         expiryDate1: moment(x.expiryDate).formatUTC(),
         sortOrder: index + 1,
+        id: values.id ? x.id : undefined,
       }
     })
     dispatch({
@@ -291,9 +304,10 @@ class DODetails extends PureComponent {
     let osItem = purchaseOrderOutstandingItem.filter(
       (x) => x.code === option.value,
     )[0]
-
-    row.maxCurrentReceivingQty = osItem.orderQuantity
-    row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
+    if (osItem) {
+      row.maxCurrentReceivingQty = osItem.orderQuantity
+      row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
+    }
 
     this.setState({
       selectedItem: option,
@@ -482,6 +496,7 @@ class DODetails extends PureComponent {
       classes,
     } = props
     const { rows } = values
+
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
@@ -558,32 +573,38 @@ class DODetails extends PureComponent {
         {
           columnName: 'orderQuantity',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'bonusQuantity',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'quantityReceived',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'totalBonusReceived',
           type: 'number',
+          format: '0.0',
           width: 180,
           disabled: true,
         },
         {
           columnName: 'currentReceivingQty',
           type: 'number',
+          format: '0.0',
           width: 150,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
+          format: '0.0',
           width: 180,
         },
         {
@@ -614,65 +635,72 @@ class DODetails extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
           <GridContainer>
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <FastField
-                    name='deliveryOrderNo'
-                    render={(args) => {
-                      return (
-                        <TextField
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderNo',
-                          })}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-                <GridItem xs={12}>
-                  <FastField
-                    name='deliveryOrderDate'
-                    render={(args) => {
-                      return (
-                        <DatePicker
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.deliveryOrderDate',
-                          })}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
+            <AuthorizedContext.Provider
+              value={{
+                rights: values.id ? 'disable' : 'enable',
+                // rights: 'disable',
+              }}
+            >
+              <GridItem xs={12} md={5}>
+                <GridContainer>
+                  <GridItem xs={12}>
+                    <FastField
+                      name='deliveryOrderNo'
+                      render={(args) => {
+                        return (
+                          <TextField
+                            label={formatMessage({
+                              id: 'inventory.pr.detail.dod.deliveryOrderNo',
+                            })}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                  <GridItem xs={12}>
+                    <FastField
+                      name='deliveryOrderDate'
+                      render={(args) => {
+                        return (
+                          <DatePicker
+                            label={formatMessage({
+                              id: 'inventory.pr.detail.dod.deliveryOrderDate',
+                            })}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
 
-            <GridItem xs={12} md={1} />
+              <GridItem xs={12} md={1} />
 
-            <GridItem xs={12} md={5}>
-              <GridContainer>
-                <GridItem xs={12}>
-                  <FastField
-                    name='remark'
-                    render={(args) => {
-                      return (
-                        <OutlinedTextField
-                          label={formatMessage({
-                            id: 'inventory.pr.detail.dod.remarks',
-                          })}
-                          multiline
-                          rowsMax={2}
-                          rows={2}
-                          {...args}
-                        />
-                      )
-                    }}
-                  />
-                </GridItem>
-              </GridContainer>
-            </GridItem>
+              <GridItem xs={12} md={5}>
+                <GridContainer>
+                  <GridItem xs={12}>
+                    <FastField
+                      name='remark'
+                      render={(args) => {
+                        return (
+                          <OutlinedTextField
+                            label={formatMessage({
+                              id: 'inventory.pr.detail.dod.remarks',
+                            })}
+                            multiline
+                            rowsMax={2}
+                            rows={2}
+                            {...args}
+                          />
+                        )
+                      }}
+                    />
+                  </GridItem>
+                </GridContainer>
+              </GridItem>
+            </AuthorizedContext.Provider>
           </GridContainer>
 
           <GridItem xs={12} md={11}>
@@ -686,6 +714,7 @@ class DODetails extends PureComponent {
             {errors.rows && (
               <p className={classes.errorMsgStyle}>{errors.rows}</p>
             )}
+
             <EditableTableGrid
               getRowId={(r) => r.uid}
               rows={rows}
@@ -696,7 +725,7 @@ class DODetails extends PureComponent {
               }}
               EditingProps={{
                 showAddCommand: isEditable,
-                showEditCommand: isEditable,
+                showEditCommand: !values.id,
                 showDeleteCommand: isEditable,
                 onCommitChanges: this.onCommitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
@@ -709,9 +738,6 @@ class DODetails extends PureComponent {
               align: 'center',
               onConfirm: props.handleSubmit,
               confirmBtnText: 'Save',
-              confirmProps: {
-                disabled: false,
-              },
             })}
         </div>
       </React.Fragment>

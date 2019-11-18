@@ -51,6 +51,7 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  onPrint2,
   codetable,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
@@ -83,7 +84,6 @@ const DispenseDetails = ({
     }
   }
 
-  // console.log({ values })
   return (
     <React.Fragment>
       <GridItem>

@@ -25,6 +25,7 @@ import { queryList } from '@/services/patient'
 import { widgets } from '@/utils/widgets'
 import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
+import { Mobile } from '@/components/_medisys'
 
 const styles = () => ({
   contactIcon: {
@@ -162,6 +163,15 @@ class Demographic extends PureComponent {
       ],
       temp: true,
     })
+  }
+
+  onReferredByChange = (event) => {
+    const { setFieldValue } = this.props
+    const { target } = event
+    const { value } = target
+    if (value === '') {
+      setFieldValue('referredByPatientFK', undefined)
+    }
   }
 
   render () {
@@ -380,7 +390,8 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.number'
-                  render={(args) => <NumberInput label='Mobile' {...args} />}
+                  render={(args) => <Mobile {...args} />}
+                  // render={(args) => <NumberInput label='Mobile' {...args} />}
                 />
               </GridItem>
               <GridItem xs={3}>
@@ -517,6 +528,7 @@ class Demographic extends PureComponent {
                           label: 'Patient',
                         },
                       ]}
+                      onChange={this.onReferredByChange}
                       {...args}
                     />
                   )}
@@ -559,7 +571,7 @@ class Demographic extends PureComponent {
               )}
               <GridItem xs={12}>
                 <Field
-                  name='translationFK'
+                  name='translationLinkFK'
                   render={(args) => {
                     return (
                       <CodeSelect

@@ -5,6 +5,10 @@ export default createListViewModel({
   namespace: 'settingUserProfile',
   config: {
     queryOnLoad: false,
+    codetable: {
+      message: 'User profiles updated',
+      code: 'clinicianprofile',
+    },
   },
   param: {
     service,
@@ -33,6 +37,9 @@ export default createListViewModel({
           type: 'codetable/fetchCodes',
           payload: {
             code: 'doctorprofile',
+            filter: {
+              'clinicianProfile.isActive': true,
+            },
             force: true,
           },
         })

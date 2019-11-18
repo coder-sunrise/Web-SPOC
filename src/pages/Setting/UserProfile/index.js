@@ -1,6 +1,8 @@
 import React from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -58,6 +60,9 @@ class UserProfile extends React.Component {
     })
     this.props.dispatch({
       type: 'settingUserProfile/query',
+      payload: {
+        isActive: this.props.values.status,
+      },
     })
   }
 
@@ -92,6 +97,7 @@ class UserProfile extends React.Component {
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
+        keepFilter: false,
         group: [
           {
             name: values.searchQuery,
@@ -158,11 +164,12 @@ class UserProfile extends React.Component {
             <ProgressButton
               color='primary'
               onClick={this.handleSearchClick}
-              icon={null}
+              icon={<Search />}
             >
-              Search
+              <FormattedMessage id='form.search' />
             </ProgressButton>
             <Button color='primary' onClick={this.openModal}>
+              <Add />
               Add New
             </Button>
           </GridItem>

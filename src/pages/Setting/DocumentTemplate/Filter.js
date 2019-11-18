@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+import { FormattedMessage } from 'umi/locale'
+import { Search, Add } from '@material-ui/icons'
 import { status } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -8,7 +9,6 @@ import {
   GridItem,
   Button,
   TextField,
-  Checkbox,
   Select,
   ProgressButton,
   CodeSelect,
@@ -58,25 +58,28 @@ class Filter extends PureComponent {
           </GridItem>
         </GridContainer>
 
-        
-
         <GridContainer>
           <GridItem xs={6} md={3}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 color='primary'
-                icon={null}
+                icon={<Search />}
                 onClick={() => {
-                  const { codeDisplayValue,isActive, documentTemplateTypeFK } = this.props.values
+                  const {
+                    codeDisplayValue,
+                    isActive,
+                    documentTemplateTypeFK,
+                  } = this.props.values
                   this.props.dispatch({
                     type: 'settingDocumentTemplate/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          documentTemplateTypeFK: documentTemplateTypeFK,
+                          documentTemplateTypeFK,
                           combineCondition: 'or',
                         },
                       ],
@@ -99,6 +102,7 @@ class Filter extends PureComponent {
                   this.props.toggleModal()
                 }}
               >
+                <Add />
                 Add New
               </Button>
             </div>

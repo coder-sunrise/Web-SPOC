@@ -91,6 +91,12 @@ export default createFormViewModel({
       },
 
       *start ({ payload }, { call, put, select, take }) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: undefined,
+          },
+        })
         const response = yield call(service.create, payload.id)
         const { id } = response
         if (id) {
@@ -128,6 +134,12 @@ export default createFormViewModel({
       },
 
       *resume ({ payload }, { call, put, select }) {
+        yield put({
+          type: 'updateState',
+          payload: {
+            entity: undefined,
+          },
+        })
         const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
@@ -196,7 +208,7 @@ export default createFormViewModel({
             message: `Consultation signed`,
           })
           yield put({ type: 'closeModal' })
-          console.log('payload ', payload)
+          // console.log('payload ', payload)
         }
         return response
       },

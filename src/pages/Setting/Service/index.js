@@ -31,6 +31,9 @@ class Service extends PureComponent {
   componentDidMount () {
     this.props.dispatch({
       type: 'settingClinicService/query',
+      payload: {
+        keepFilter: false,
+      },
     })
   }
 
@@ -55,7 +58,6 @@ class Service extends PureComponent {
         },
       })
     }
-
   }
 
   render () {

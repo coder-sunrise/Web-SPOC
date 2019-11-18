@@ -72,8 +72,9 @@ export const flattenAppointmentDateToCalendarEvents = (massaged, event) =>
         // }),
       ]
 
-@connect(({ calendar, codetable, clinicInfo }) => ({
+@connect(({ calendar, codetable, clinicInfo, loading }) => ({
   calendar,
+  calendarLoading: loading.models.calendar,
   // doctorProfiles: codetable.doctorprofile || [],
   clinicInfo,
   doctorprofile: codetable.doctorprofile || [],
@@ -121,22 +122,22 @@ class Appointment extends React.PureComponent {
           parseInt(item.id, 10) ===
           parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
       )
-
-      this.setState({
-        primaryClinicianFK: primaryClinician.clinicianProfile.id,
-        resources: [
-          {
-            clinicianFK: primaryClinician.clinicianProfile.id,
-            doctorName: primaryClinician.clinicianProfile.name,
+      if (primaryClinician)
+        this.setState((preState) => ({
+          filter: {
+            ...preState.filter,
+            filterByDoctor: [
+              primaryClinician.clinicianProfile.id,
+            ],
           },
-        ],
-      })
-      // this.setState({
-      //   resources: response.map((item) => ({
-      //     clinicianFK: item.clinicianProfile.id,
-      //     doctorName: item.clinicianProfile.name,
-      //   })),
-      // })
+          primaryClinicianFK: primaryClinician.clinicianProfile.id,
+          resources: [
+            {
+              clinicianFK: primaryClinician.clinicianProfile.id,
+              doctorName: primaryClinician.clinicianProfile.name,
+            },
+          ],
+        }))
     })
     dispatch({
       type: 'calendar/initState',
@@ -391,7 +392,7 @@ class Appointment extends React.PureComponent {
   }
 
   render () {
-    const { calendar: CalendarModel, classes } = this.props
+    const { calendar: CalendarModel, classes, calendarLoading } = this.props
     const {
       showPopup,
       popupAnchor,
@@ -444,6 +445,7 @@ class Appointment extends React.PureComponent {
         </Popover>
 
         <FilterBar
+          loading={calendarLoading}
           primaryRegisteredDoctorFK={primaryClinicianFK}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}

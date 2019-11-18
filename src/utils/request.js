@@ -18,6 +18,7 @@ import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
 export const baseUrl = process.env.url
 
 let dynamicURL = baseUrl
+// let dynamicURL = 'http://semr2-dev-api.ap-southeast-1.elasticbeanstalk.com'
 // if (process.env.NODE_ENV === 'development')
 //   dynamicURL = 'http://localhost:55314'
 
@@ -315,7 +316,7 @@ const request = (url, option, showNotification = true) => {
         return data
       })
       .catch((response, s, xhr) => {
-        // console.log(response, s, xhr)
+        // console.log({ response, s, xhr })
 
         let msg
         let status
@@ -335,6 +336,7 @@ const request = (url, option, showNotification = true) => {
                 response.status === 401) &&
               url !== '/connect/token'
             ) {
+              console.log('redirect')
               window.g_app._store.dispatch({
                 type: 'login/logout',
               })

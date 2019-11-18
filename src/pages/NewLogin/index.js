@@ -30,13 +30,11 @@ import { container } from '@/assets/jss'
 const styles = (theme) => ({
   // ...loginPageStyle(theme),
   uatText: {
-    position: 'absolute',
     width: '100%',
-    bottom: '15%',
+    marginTop: theme.spacing(4),
     color: 'white',
     textAlign: 'center',
     textTransform: 'uppercase',
-    zIndex: 99,
   },
   cardHidden: {
     opacity: '0',
@@ -64,6 +62,7 @@ const styles = (theme) => ({
   },
   body: {
     marginBottom: '15px',
+    padding: theme.spacing(2),
   },
 })
 
@@ -169,7 +168,7 @@ class NewLogin extends React.Component {
   }
 
   onForgotPasswordClick = () => {
-    router.push('/login/forgotpassword')
+    router.push('/user/forgotpassword')
   }
 
   render () {
@@ -263,12 +262,12 @@ class NewLogin extends React.Component {
               </Card>
             </GridItem>
           </GridContainer>
+          {process.env.client_env === 'uat' && (
+            <h3 className={classes.uatText}>
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
+            </h3>
+          )}
         </div>
-        {process.env.client_env === 'uat' && (
-          <h3 className={classes.uatText}>
-            THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA
-          </h3>
-        )}
       </React.Fragment>
     )
   }
