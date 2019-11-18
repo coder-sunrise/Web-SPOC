@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { connect } from 'dva'
 // umi locale
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi/locale'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -59,7 +59,9 @@ const Filterbar = ({
               inputProps={{
                 autocomplete: 'queue-listing-filterbar-search',
               }}
-              label='Patient Name, Acc No., Patient Ref. No., Contact No.'
+              label={formatMessage({
+                id: 'reception.queue.patientSearchPlaceholder',
+              })}
               onChange={(e) => setSearch(e.target.value)}
               bind='patientSearch/query'
             />
