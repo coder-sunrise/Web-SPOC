@@ -116,7 +116,6 @@ export const computeRRule = ({ date, recurrenceDto }) => {
       ...otherConfig,
       ...endType,
     }
-
     rule = new RRule(ruleConfig)
   } catch (error) {
     rule = undefined
@@ -133,7 +132,9 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
 
     if (rule.options.until === null) {
       const allDates = rule.all()
-      stopDate = moment(allDates[allDates.length - 1]).format(dateFormatLong)
+      stopDate = moment(allDates[allDates.length - 1])
+        .subtract(1, 'day')
+        .format(dateFormatLong)
     } else {
       stopDate = moment(rule.options.until).format(dateFormatLong)
     }
@@ -161,12 +162,12 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       : startDate
     switch (recurrencePatternFK) {
       case RECURRENCE_PATTERN.DAILY: {
-        label = `Occur every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
+        label = `Occurs every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
         break
       }
       case RECURRENCE_PATTERN.WEEKLY: {
         const days = joinWeekDays(recurrenceDaysOfTheWeek)
-        label = `Occur every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
+        label = `Occurs every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
         break
       }
       case RECURRENCE_PATTERN.MONTHLY: {

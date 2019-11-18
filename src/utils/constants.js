@@ -151,3 +151,12 @@ export const INVOICE_STATUS_TEXT = {
   OUTSTANDING: 'Outstanding',
   WRITEOFF: 'Write-Off',
 }
+
+export const COUNTRY_CODE = {
+  1: '+65 Singapore',
+  2: '+60 Malaysia',
+  3: '+62 Indonesia',
+  4: '+63 Philippines',
+  5: '+66 Thailand',
+  6: '+81 Japan',
+}

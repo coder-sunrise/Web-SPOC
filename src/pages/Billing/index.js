@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-import moment from 'moment'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -23,9 +22,9 @@ import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrap
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
-import { computeTotalForAllSavedClaim, constructPayload } from './utils'
-import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
-import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { constructPayload } from './utils'
+import { roundToTwoDecimals } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
 
@@ -107,7 +106,6 @@ const bannerStyle = {
     const { dispatch } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
-    console.log({ payload })
 
     dispatch({
       type: 'billing/save',
@@ -330,7 +328,6 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
-    console.log({ values })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />
@@ -413,7 +410,7 @@ class Billing extends Component {
             invoice={{
               ...values.invoice,
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
-              paymentReceivedDate: moment().formatUTC(),
+              // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,
               paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,

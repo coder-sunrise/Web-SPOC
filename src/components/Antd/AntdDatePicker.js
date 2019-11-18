@@ -98,7 +98,7 @@ class AntdDatePicker extends PureComponent {
         form.setFieldValue(
           field.name,
           showTime
-            ? moment(this.state.value).formatUTC()
+            ? moment(this.state.value).formatUTC(false)
             : moment(this.state.value)
                 .set({ hour: 0, minute: 0, second: 0 })
                 .formatUTC(),

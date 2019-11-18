@@ -94,9 +94,10 @@ window.g_app.replaceModel(model)
 //   handleSubmit: () => {},
 //   displayName: 'WidgetClinicalNotes',
 // })
-@connect(({ clinicalnotes, scriblenotes }) => ({
+@connect(({ clinicalnotes, scriblenotes, consultation }) => ({
   clinicalnotes,
   scriblenotes,
+  consultation,
 }))
 class ClinicalNotes extends Component {
   state = {
@@ -144,7 +145,7 @@ class ClinicalNotes extends Component {
   }
 
   scribbleNoteDrawing = (values, temp) => {
-    const { scriblenotes } = this.props
+    const { scriblenotes, dispatch } = this.props
     const { category, arrayName, categoryIndex } = this.state
     let previousData = this.form.values.corScribbleNotes
     let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
@@ -166,7 +167,7 @@ class ClinicalNotes extends Component {
       newArrayItems[scriblenotes.selectedIndex].subject = values
       newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
 
-      this.props.dispatch({
+      dispatch({
         type: 'scriblenotes/updateState',
         payload: {
           ...scriblenotes,
@@ -198,7 +199,7 @@ class ClinicalNotes extends Component {
         previousData.push(planArray[i])
       }
     } else {
-      this.props.dispatch({
+      dispatch({
         type: 'scriblenotes/updateState',
         payload: {
           ...scriblenotes,
@@ -227,7 +228,7 @@ class ClinicalNotes extends Component {
   }
 
   deleteScribbleNote = () => {
-    const { scriblenotes } = this.props
+    const { scriblenotes, dispatch } = this.props
     const { category, arrayName } = this.state
     let previousData = this.form.values.corScribbleNotes
     let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
@@ -246,7 +247,7 @@ class ClinicalNotes extends Component {
       }
     }
 
-    this.props.dispatch({
+    dispatch({
       type: 'scriblenotes/updateState',
       payload: {
         ...scriblenotes,
@@ -264,7 +265,7 @@ class ClinicalNotes extends Component {
       planArray = newArrayItems
     }
 
-    this.props.dispatch({
+    dispatch({
       type: 'scriblenotes/updateState',
       payload: {
         ...scriblenotes,
@@ -396,6 +397,22 @@ class ClinicalNotes extends Component {
     })
   }
 
+  onEditorChange = (type) => (v) => {
+    const { entity } = this.props.consultation
+    entity.corDoctorNote = [
+      {
+        ...entity.corDoctorNote[0],
+        [type]: v,
+      },
+    ]
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity,
+      },
+    })
+  }
+
   render () {
     const {
       prefix = 'corDoctorNote[0].',
@@ -403,6 +420,8 @@ class ClinicalNotes extends Component {
       classes,
       scriblenotes,
       theme,
+      dispatch,
+      consultation,
     } = this.props
     return (
       <div>
@@ -429,7 +448,7 @@ class ClinicalNotes extends Component {
 
               if (this.state.runOnce === false) {
                 setTimeout(() => {
-                  this.props.dispatch({
+                  dispatch({
                     type: 'scriblenotes/updateState',
                     payload: {
                       entity: '',
@@ -472,9 +491,8 @@ class ClinicalNotes extends Component {
                   />
 
                   <RichEditor
-                    // handlePastedText={() => false}
-                    handlePastedText={() => false}
                     strongLabel
+                    onBlur={this.onEditorChange('clinicianNote')}
                     label='Clinical Notes'
                     {...args}
                   />
@@ -503,8 +521,8 @@ class ClinicalNotes extends Component {
                   />
 
                   <RichEditor
-                    handlePastedText={() => false}
                     strongLabel
+                    onBlur={this.onEditorChange('chiefComplaints')}
                     label='Chief Complaints'
                     {...args}
                   />
@@ -532,8 +550,8 @@ class ClinicalNotes extends Component {
                   />
 
                   <RichEditor
-                    handlePastedText={() => false}
                     strongLabel
+                    onBlur={this.onEditorChange('plan')}
                     label='Plan'
                     {...args}
                   />
