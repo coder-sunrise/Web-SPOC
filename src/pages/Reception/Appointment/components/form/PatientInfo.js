@@ -14,7 +14,7 @@ import {
   NumberInput,
   ProgressButton,
 } from '@/components'
-import { Mobile } from '@/components/_medisys'
+import { MobileNumberInput } from '@/components/_medisys'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -65,12 +65,14 @@ const PatientInfoInput = ({
                 submitKey='patientSearch/query'
                 disabled={disabled || isEdit}
                 onClick={onSearchPatientClick}
+                // tabIndex={-1}
                 icon={<Search />}
               >
                 Search
               </ProgressButton>
               {!isEdit && (
                 <Button
+                  // tabIndex={-2}
                   size='sm'
                   color='primary'
                   disabled={disabled}
@@ -106,7 +108,7 @@ const PatientInfoInput = ({
         <FastField
           name='patientContactNo'
           render={(args) => (
-            <Mobile
+            <MobileNumberInput
               {...args}
               disabled={isRegisteredPatient || disabled || isEdit}
             />

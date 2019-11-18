@@ -17,12 +17,15 @@ import {
   DateRangePicker,
   GridContainer,
   GridItem,
-  NumberInput,
   TextField,
   WarningSnackbar,
   withFormikExtend,
 } from '@/components'
-import { ChangePassword, LoadingWrapper, Mobile } from '@/components/_medisys'
+import {
+  ChangePassword,
+  LoadingWrapper,
+  MobileNumberInput,
+} from '@/components/_medisys'
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
@@ -499,7 +502,7 @@ class UserProfileForm extends React.PureComponent {
                     //   max={1000000000000000}
                     //   // maxLength={15}
                     // />
-                    <Mobile {...args} />
+                    <MobileNumberInput {...args} />
                   )}
                 />
               </GridItem>

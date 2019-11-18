@@ -69,3 +69,24 @@ export const applyFilter = (data, filter) => {
 
   return returnData
 }
+
+export const constructClinicBreakHoursData = (breakHoursList) => {
+  const result = breakHoursList.reduce((breakHoursMap, breakHour) => {
+    return [
+      ...breakHoursMap,
+      {
+        displayValue: breakHour.displayValue,
+        startDate: breakHour.effectiveStartDate,
+        endDate: breakHour.effectiveEndDate,
+        0: { to: breakHour.sunToBreak, from: breakHour.sunFromBreak },
+        1: { to: breakHour.monToBreak, from: breakHour.monFromBreak },
+        2: { to: breakHour.tueToBreak, from: breakHour.tueFromBreak },
+        3: { to: breakHour.wedToBreak, from: breakHour.wedFromBreak },
+        4: { to: breakHour.thursToBreak, from: breakHour.thursFromBreak },
+        5: { to: breakHour.friToBreak, from: breakHour.friFromBreak },
+        6: { to: breakHour.satToBreak, from: breakHour.satFromBreak },
+      },
+    ]
+  }, [])
+  return result
+}

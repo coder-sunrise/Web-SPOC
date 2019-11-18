@@ -17,15 +17,12 @@ import {
   DatePicker,
   RadioGroup,
   CheckboxGroup,
-  NumberInput,
 } from '@/components'
-import Authorized from '@/utils/Authorized'
 import { getUniqueNumericId } from '@/utils/utils'
 import { queryList } from '@/services/patient'
-import { widgets } from '@/utils/widgets'
 import { fetchAndSaveCodeTable } from '@/utils/codes'
 import Address from './Address'
-import { Mobile } from '@/components/_medisys'
+import { MobileNumberInput } from '@/components/_medisys'
 
 const styles = () => ({
   contactIcon: {
@@ -190,6 +187,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         // hideIfNoEditRights
+                        autoFocus
                         label='Account Type'
                         code='ctPatientAccountNoType'
                         width={350}
@@ -390,7 +388,7 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.mobileContactNumber.number'
-                  render={(args) => <Mobile {...args} />}
+                  render={(args) => <MobileNumberInput {...args} />}
                   // render={(args) => <NumberInput label='Mobile' {...args} />}
                 />
               </GridItem>
