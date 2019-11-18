@@ -190,7 +190,12 @@ class ClinicInfo extends PureComponent {
             <Field
               name='clinicShortCode'
               render={(args) => (
-                <TextField label='Clinic Short Code' {...args} />
+                <TextField
+                  label='Clinic Short Code'
+                  {...args}
+                  inputProps={{ maxLength: 20 }}
+                  maxLength={20}
+                />
               )}
             />
           </GridItem>

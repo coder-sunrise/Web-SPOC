@@ -10,19 +10,19 @@ const VitalSignMessage = {
 }
 
 const schema = Yup.object().shape({
-  corPrescriptionItem: Yup.array().of(
-    Yup.object().shape({
-      // Description: Yup.string().required('Description is required'),
-      // UnitPrice: Yup.number().required('Unit Price is required'),
-      corPrescriptionItemPrecaution: Yup.array().of(
-        Yup.object().shape(
-          {
-            // prescriptionItemFK:
-          },
-        ),
-      ),
-    }),
-  ),
+  // corPrescriptionItem: Yup.array().of(
+  //   Yup.object().shape({
+  //     // Description: Yup.string().required('Description is required'),
+  //     // UnitPrice: Yup.number().required('Unit Price is required'),
+  //     corPrescriptionItemPrecaution: Yup.array().of(
+  //       Yup.object().shape(
+  //         {
+  //           // prescriptionItemFK:
+  //         },
+  //       ),
+  //     ),
+  //   }),
+  // ),
   corPatientNoteVitalSign: Yup.array().of(
     Yup.object().shape({
       temperatureC: Yup.number()

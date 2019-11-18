@@ -428,7 +428,7 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               header={
-                <div>
+                <div style={{ color: 'red' }}>
                   {this.state.showWarning ? (
                     <IconButton disabled>
                       <Warining color='error' />

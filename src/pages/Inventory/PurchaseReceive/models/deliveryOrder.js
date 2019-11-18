@@ -75,9 +75,10 @@ export default createFormViewModel({
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
-          (x) => x.totalQuantity - x.quantityReceived - x.bonusReceived > 0,
+          (x) =>
+            x.totalQuantity - x.quantityReceived - x.bonusReceived > 0 &&
+            !x.isDeleted,
         )
-
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
             return {
@@ -235,7 +236,10 @@ export default createFormViewModel({
 
       deleteRow (state, { payload }) {
         const { rows } = state.entity
-        rows.find((v) => v.uid === payload).isDeleted = true
+        // rows.find((v) => v.uid === payload).isDeleted = true
+        const deletedRow = rows.find((v) => v.uid === payload)
+        if (deletedRow) deletedRow.isDeleted = true
+
         // let newRows = rows.filter((v) => v.uid !== payload)
 
         return { ...state, entity: { ...state.entity, rows } }

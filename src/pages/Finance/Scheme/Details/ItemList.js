@@ -22,6 +22,7 @@ const ItemList = ({
   dispatch,
   values,
   setValues,
+  theme,
   // ...props
 }) => {
   function callback (key) {
@@ -61,18 +62,26 @@ const ItemList = ({
       [itemFieldName.itemFKName]: values.tempSelectedItemFK,
       itemFK: values.tempSelectedItemFK,
       unitPrice: values.tempSelectedItemSellingPrice,
+      name: values.tempSelectedItemName,
       itemValueType: 'ExactAmount',
       itemValue: 0,
     }
+
     addItemToRows(newItemRow)
   }
 
-  const onItemSelect = (e, option) => {
-    if (e) {
+  const onItemSelect = (e, option, type) => {
+    setFieldValue('tempSelectedItemName', option.displayValue)
+    if (e && type !== 'ctservice') {
       const { sellingPrice, totalPrice } = option
       // console.log('onItemSelect', option)
       setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
       setFieldValue('tempSelectedItemTotalPrice', totalPrice)
+    }
+
+    if (e && type === 'ctservice') {
+      const { unitPrice } = option
+      setFieldValue('tempSelectedItemSellingPrice', unitPrice)
     }
   }
 
@@ -86,7 +95,10 @@ const ItemList = ({
               return (
                 <CodeSelect
                   labelField='displayValue'
-                  onChange={(e, option) => onItemSelect(e, option)}
+                  valueField={
+                    type === 'ctservice' ? 'serviceCenter_ServiceId' : 'id'
+                  }
+                  onChange={(e, option) => onItemSelect(e, option, type)}
                   code={type}
                   {...args}
                 />
@@ -104,7 +116,6 @@ const ItemList = ({
   }
 
   const options = () => [
-   
     {
       id: 1,
       name: 'Medication',
@@ -154,23 +165,31 @@ const ItemList = ({
             (x) => x.value === row.type,
           )[0]
           const { ctName, itemFKName } = inventory
-
-          return (
-            <FastField
-              name={`rows[${row.rowIndex}].${itemFKName}`}
-              render={(args) => {
-                // console.log(args)
-                return (
-                  <CodeSelect
-                    text
-                    labelField='displayValue'
-                    code={ctName}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          )
+          console.log({ row })
+          return row.name ? row.name : ''
+          // return (
+          //   <FastField
+          //     name={`rows[${row.rowIndex}].${itemFKName}`}
+          //     render={(args) => {
+          //       // console.log(args)
+          //       return (
+          //         <CodeSelect
+          //           text
+          //           labelField='displayValue'
+          //           valueField={
+          //             row.type === 'ctservice' ? (
+          //               'serviceCenter_ServiceId'
+          //             ) : (
+          //               'id'
+          //             )
+          //           }
+          //           code={ctName}
+          //           {...args}
+          //         />
+          //       )
+          //     }}
+          //   />
+          // )
         },
       },
       {
@@ -254,7 +273,7 @@ const ItemList = ({
     },
   }
   return (
-    <div>
+    <div style={{ marginTop: theme.spacing(1) }}>
       <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
 
       <CommonTableGrid rows={itemList} {...tableConfigs} />

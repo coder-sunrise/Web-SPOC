@@ -333,20 +333,24 @@ class Grid extends PureComponent {
         {
           columnName: 'orderQuantity',
           type: 'number',
+          format: '0.0',
           onChange: this.calculateTotalPrice,
         },
         {
           columnName: 'bonusQuantity',
           type: 'number',
+          format: '0.0',
         },
         {
           columnName: 'totalQuantity',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {
           columnName: 'quantityReceived',
           type: 'number',
+          format: '0.0',
           disabled: true,
         },
         {

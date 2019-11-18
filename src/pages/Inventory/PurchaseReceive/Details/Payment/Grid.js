@@ -9,7 +9,14 @@ const purchaseOrderPaymentSchema = (outstandingAmount) =>
     // paymentDate: Yup.string().required(),
     paymentModeFK: Yup.string().required(),
     // reference: Yup.string().required(),
-    paymentAmount: Yup.number().min(0).max(outstandingAmount).required(),
+    paymentAmount: Yup.number()
+      .min(0)
+      .max(outstandingAmount, (e) => {
+        return `Payment Amount must be less than or equal to ${e.max.toFixed(
+          2,
+        )}`
+      })
+      .required(),
     // Remarks: Yup.string().required(),
   })
 let commitCount = 1000 // uniqueNumber

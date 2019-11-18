@@ -549,7 +549,9 @@ const InventoryTypeListing = ({
 
         return addedRows.map((row) => ({
           ...row,
+          quantity: undefined,
           unitPrice: undefined,
+          subTotal: undefined,
           // subTotal: total(),
         }))
       }
@@ -570,6 +572,7 @@ const InventoryTypeListing = ({
     setSelectedItem(option)
     row.quantity = undefined
     row.unitPrice = sellingPrice
+    row.subTotal = undefined
 
     dispatch({
       // force current edit row components to update
@@ -717,20 +720,18 @@ const InventoryTypeListing = ({
           const tempArray = [
             ...servicess,
           ]
-          if (row.id) {
-            if (!row.serviceName) {
-              return tempArray
-            }
-            const cat = tempArray.filter((o) =>
-              o.serviceCenters.find((m) => m.value === row.serviceName),
-            )
-            return cat
+          if (!row.serviceName) {
+            return tempArray
           }
-          return tempArray.filter(
-            (o) =>
-              !serviceCenterFK ||
-              o.serviceCenters.find((m) => m.value === serviceCenterFK),
+          const options = tempArray.filter((o) =>
+            o.serviceCenters.find((m) => m.value === row.serviceName),
           )
+          return options
+          // return tempArray.filter(
+          //   (o) =>
+          //     !serviceCenterFK ||
+          //     o.serviceCenters.find((m) => m.value === serviceCenterFK),
+          // )
         },
         onChange: (e) => {
           setServiceFK(e.val)
@@ -753,22 +754,20 @@ const InventoryTypeListing = ({
           const tempArray = [
             ...serviceCenterss,
           ]
-          if (row.id) {
-            if (!row.serviceCenterServiceFK) {
-              return tempArray
-            }
-            const test = tempArray.filter((o) =>
-              o.services.find((m) => m.value === row.serviceCenterServiceFK),
-            )
-            return test
+          if (!row.serviceCenterServiceFK) {
+            return tempArray
           }
-          return tempArray.filter(
-            (o) =>
-              !serviceFK ||
-              o.services.find(
-                (m) => m.value === serviceFK || m.value === row.serviceName,
-              ),
+          const options = tempArray.filter((o) =>
+            o.services.find((m) => m.value === row.serviceCenterServiceFK),
           )
+          return options
+          // return tempArray.filter(
+          //   (o) =>
+          //     !serviceFK ||
+          //     o.services.find(
+          //       (m) => m.value === serviceFK || m.value === row.serviceName,
+          //     ),
+          // )
         },
 
         onChange: (e) => {

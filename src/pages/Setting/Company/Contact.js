@@ -69,7 +69,13 @@ const Contact = (props) => {
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
-                <NumberInput label='Contact Number' {...args} />
+                <NumberInput
+                  label='Contact Number'
+                  maxLength='15'
+                  min='0'
+                  max='999999999999999'
+                  {...args}
+                />
               )}
             />
           </GridItem>
@@ -79,7 +85,15 @@ const Contact = (props) => {
             ) : (
               <FastField
                 name='contact.officeContactNumber.number'
-                render={(args) => <TextField label='Office Number' {...args} />}
+                render={(args) => (
+                  <NumberInput
+                    label='Office Number'
+                    maxLength='15'
+                    min='0'
+                    max='999999999999999'
+                    {...args}
+                  />
+                )}
               />
             )}
           </GridItem>
@@ -90,7 +104,15 @@ const Contact = (props) => {
             ) : (
               <FastField
                 name='contact.faxContactNumber.number'
-                render={(args) => <TextField label='Fax Number' {...args} />}
+                render={(args) => (
+                  <NumberInput
+                    label='Fax Number'
+                    maxLength='15'
+                    min='0'
+                    max='999999999999999'
+                    {...args}
+                  />
+                )}
               />
             )}
           </GridItem>

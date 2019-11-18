@@ -157,7 +157,7 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleChange = (dateArray, dateString) => {
-    // console.log(dateArray, dateString)
+    console.log({ dateArray, dateString })
     const { form, field, onChange, showTime, dateOnly } = this.props
     const v = Array.isArray(dateArray)
       ? dateArray.map((o, i) => {
@@ -166,16 +166,21 @@ class AntdDateRangePicker extends PureComponent {
             ? // eslint-disable-next-line no-nested-ternary
               i === 0
               ? showTime
-                ? o.formatUTC(false)
-                : o.set({ hour: 0, minute: 0, second: 0 }).formatUTC(false)
+                ? moment(o).formatUTC(false)
+                : moment(o.set({ hour: 0, minute: 0, second: 0 })).formatUTC(
+                    false,
+                  )
               : showTime
-                ? o.formatUTC(false)
-                : o.set({ hour: 23, minute: 59, second: 59 }).formatUTC(false)
+                ? moment(o).formatUTC(false)
+                : moment(o.set({ hour: 23, minute: 59, second: 59 })).formatUTC(
+                    false,
+                  )
             : o
         })
       : []
     this.setState({
       value: v,
+      shrink: dateArray.length > 0,
     })
     if (form && field) {
       // console.log(date.formatUTC())
@@ -276,7 +281,12 @@ class AntdDateRangePicker extends PureComponent {
           className={classnames(classes.datepickerContainer)}
           dropdownClassName={classnames(classes.dropdownMenu)}
           allowClear
-          placeholder=''
+          placeholder={[
+            '',
+            '',
+          ]}
+          // startPlaceholder=''
+          // endPlaceholder=''
           onChange={this.handleChange}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}

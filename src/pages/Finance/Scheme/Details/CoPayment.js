@@ -10,7 +10,7 @@ import {
   Switch,
 } from '@/components'
 
-const CoPayment = ({ values, classes, setFieldValue }) => {
+const CoPayment = ({ values, theme, classes, setFieldValue }) => {
   const CPNumber = (label, type, radType) => (args) => {
     return (
       <NumberInput
@@ -20,6 +20,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
         disabled={values.itemGroupValueDtoRdoValue !== radType}
         // defaultValue='0.00'
         format='$0,0.00'
+        allowEmpty={false}
         min={0}
         {...args}
       />
@@ -49,40 +50,31 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
     if (target.value === 'sub') {
       setFieldValue('overalCoPaymentValue', undefined)
       setFieldValue('overalCoPaymentValueType', 'ExactAmount')
-      setFieldValue(
-        'itemGroupValueDto.consumableGroupValue.itemGroupValue',
-        0.0,
-      )
+      setFieldValue('itemGroupValueDto.consumableGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.consumableGroupValue.groupValueType',
         'ExactAmount',
       )
 
-      setFieldValue(
-        'itemGroupValueDto.medicationGroupValue.itemGroupValue',
-        0.0,
-      )
+      setFieldValue('itemGroupValueDto.medicationGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.medicationGroupValue.groupValueType',
         'ExactAmount',
       )
 
-      setFieldValue(
-        'itemGroupValueDto.vaccinationGroupValue.itemGroupValue',
-        0.0,
-      )
+      setFieldValue('itemGroupValueDto.vaccinationGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.vaccinationGroupValue.groupValueType',
         'ExactAmount',
       )
 
-      setFieldValue('itemGroupValueDto.serviceGroupValue.itemGroupValue', 0.0)
+      setFieldValue('itemGroupValueDto.serviceGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.serviceGroupValue.groupValueType',
         'ExactAmount',
       )
 
-      setFieldValue('itemGroupValueDto.packageGroupValue.itemGroupValue', 0.0)
+      setFieldValue('itemGroupValueDto.packageGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.packageGroupValue.groupValueType',
         'ExactAmount',
@@ -90,6 +82,8 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
     }
 
     if (target.value === 'all') {
+      setFieldValue('overalCoPaymentValue', 0)
+
       if (!values.id) setFieldValue('itemGroupValueDto', {})
       else {
         setFieldValue('itemGroupValueDto.medicationGroupValue.isDeleted', true)
@@ -203,6 +197,7 @@ const CoPayment = ({ values, classes, setFieldValue }) => {
             'sub',
           )}
         />
+        <p style={{ marginTop: theme.spacing(1) }}>&nbsp;</p>
       </GridItem>
       <GridItem xs={2}>
         <Field name='overalCoPaymentValueType' render={CPSwitch('all')} />

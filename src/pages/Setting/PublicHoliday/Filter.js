@@ -76,6 +76,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingPublicHoliday/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {

@@ -203,6 +203,7 @@ class SearchBar extends PureComponent {
                 this.props.dispatch({
                   type: 'statement/query',
                   payload: {
+                    keepFilter: false,
                     statementNo,
                     copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
                     lgteql_statementDate: statementDateFrom,

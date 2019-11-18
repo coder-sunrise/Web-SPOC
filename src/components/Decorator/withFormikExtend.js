@@ -68,7 +68,7 @@ const withFormikExtend = (props) => (Component) => {
     }
 
     if (!_.isEqual(_lastFormikUpdate, ob)) {
-      console.log('updateDirtyState', displayName, _lastFormikUpdate)
+      // console.log('updateDirtyState', displayName, _lastFormikUpdate)
 
       window.g_app._store.dispatch({
         type: 'formik/updateState',
@@ -89,6 +89,7 @@ const withFormikExtend = (props) => (Component) => {
   @withFormik({
     // enableReinitialize: lastVersion !== findGetParameter('v'),
     ...props,
+
     // mapPropsToValues: (p) => {
     //   // console.log(2, p, props)
 

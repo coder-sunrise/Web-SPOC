@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 import { connect } from 'dva'
-import moment from 'moment'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
@@ -23,9 +22,9 @@ import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrap
 import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
-import { computeTotalForAllSavedClaim, constructPayload } from './utils'
-import { getRemovedUrl, getAppendUrl, roundToTwoDecimals } from '@/utils/utils'
-import { INVOICE_ITEM_TYPE, INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { constructPayload } from './utils'
+import { roundToTwoDecimals } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
 
@@ -74,7 +73,6 @@ const bannerStyle = {
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
     try {
-      console.log({ entity: billing.entity })
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity
 
@@ -108,8 +106,7 @@ const bannerStyle = {
     const { dispatch } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
-    // console.log({ payload })
-    // return true
+
     dispatch({
       type: 'billing/save',
       payload,
@@ -163,14 +160,20 @@ class Billing extends Component {
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
 
-  calculateOutstandingBalance = (invoicePayment) => {
+  calculateOutstandingBalance = async (invoicePayment) => {
     const { values, setFieldValue } = this.props
 
     const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
       if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
-    setFieldValue('invoice.outstandingBalance', values.finalPayable - totalPaid)
+    const newOutstandingBalance = roundToTwoDecimals(
+      values.finalPayable - totalPaid,
+    )
+    await setFieldValue('invoice', {
+      ...values.invoice,
+      outstandingBalance: newOutstandingBalance,
+    })
   }
 
   onExpandDispenseDetails = () => {
@@ -266,7 +269,8 @@ class Billing extends Component {
       visitStatus: 'BILLING',
     }
     await setValues(_newValues)
-    this.calculateOutstandingBalance(invoicePayment)
+    await this.calculateOutstandingBalance(invoicePayment)
+
     this.toggleAddPaymentModal()
     this.upsertBilling()
   }
@@ -302,7 +306,7 @@ class Billing extends Component {
       visitStatus: 'BILLING',
     }
     await setValues(_newValues)
-    this.calculateOutstandingBalance(_newInvoicePayment)
+    await this.calculateOutstandingBalance(_newInvoicePayment)
     this.upsertBilling()
   }
 
@@ -324,7 +328,6 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />
@@ -407,7 +410,7 @@ class Billing extends Component {
             invoice={{
               ...values.invoice,
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
-              paymentReceivedDate: moment().formatUTC(),
+              // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,
               paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,

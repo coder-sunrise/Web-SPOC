@@ -53,6 +53,7 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingSmsTemplate/query',
                     payload: {
+                      keepFilter: false,
                       isActive,
                       group: [
                         {

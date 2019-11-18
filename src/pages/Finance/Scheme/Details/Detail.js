@@ -17,6 +17,12 @@ import {
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
+  console.log(
+    props.values,
+    props.codetable.ctcopayer.filter(
+      (copayerList) => copayerList.coPayerTypeFK === 1,
+    ),
+  )
   return (
     <CardContainer
       hideHeader
@@ -139,6 +145,7 @@ const Detail = ({ height, ...props }) => {
                   options={props.codetable.ctcopayer.filter(
                     (copayerList) => copayerList.coPayerTypeFK === 1,
                   )}
+                  valueField='id'
                   labelField='displayValue'
                   max={50}
                   {...args}

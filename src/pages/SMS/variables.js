@@ -58,7 +58,8 @@ const appointmentColumnsExtensions = [
   },
   {
     columnName: 'doctor',
-    sortBy: 'Appointment_Resources.ClinicianFKNavigation.Name',
+    sortingEnabled: false,
+    // sortBy: 'Appointment_Resources.ClinicianFKNavigation.Name',
   },
   {
     columnName: 'appointmentStatus',
@@ -111,6 +112,7 @@ const appointmentColumnsExtensions = [
     columnName: 'Action',
     width: 100,
     align: 'center',
+    sortingEnabled: false,
   },
 ]
 
@@ -155,6 +157,7 @@ const patientColumnsExtensions = [
     columnName: 'Action',
     width: 100,
     align: 'center',
+    sortingEnabled: false,
   },
 ]
 

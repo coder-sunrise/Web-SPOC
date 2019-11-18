@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { compose } from 'redux'
 import moment from 'moment'
 import * as Yup from 'yup'
@@ -6,8 +6,7 @@ import { connect } from 'dva'
 // formik
 import { FastField, Field } from 'formik'
 // material ui
-import { Popover, withStyles } from '@material-ui/core'
-import Info from '@material-ui/icons/Info'
+import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
@@ -16,10 +15,8 @@ import {
   Select,
   DatePicker,
   TimePicker,
-  SizeContainer,
   TextField,
   dateFormatLong,
-  timeFormat24Hour,
   withFormikExtend,
 } from '@/components'
 // import Recurrence from './Recurrence'
@@ -55,6 +52,15 @@ const STYLES = (theme) => ({
     marginTop: 'auto',
     marginBottom: theme.spacing(0.5),
   },
+  footer: {
+    marginTop: theme.spacing(2),
+  },
+  confirmationButtons: {
+    textAlign: 'right',
+  },
+  confirm: {
+    marginRight: '0px !important',
+  },
 })
 
 // const dateFormatLong = { dateFormatLong }
@@ -84,8 +90,36 @@ const convertReccurenceDaysOfTheWeek = (week = '') =>
     ? week.split(', ').map((eachDay) => parseInt(eachDay, 10))
     : week
 
-const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
-  const { hasConflict } = values
+const DoctorEventForm = ({
+  classes,
+  dispatch,
+  handleSubmit,
+  values,
+  onClose,
+}) => {
+  const handleDelete = () => {
+    dispatch({
+      type: 'doctorBlock/delete',
+      payload: {
+        cfg: { message: 'Deleted doctor block' },
+        id: values.doctorBlockFK,
+      },
+    }).then(() => {
+      onClose()
+
+      if (window.location) {
+        const { pathname } = window.location
+        if (pathname === '/reception/appointment')
+          dispatch({
+            type: 'calendar/refresh',
+          })
+        else
+          dispatch({
+            type: 'doctorBlock/refresh',
+          })
+      }
+    })
+  }
 
   return (
     <div style={{ padding: 8 }}>
@@ -134,7 +168,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
             <FastField
               name='durationHour'
               render={(args) => (
-                <Select {...args} label='Hour' options={durationHours} />
+                <Select {...args} label='Hour(s)' options={durationHours} />
               )}
             />
           </GridItem>
@@ -142,7 +176,7 @@ const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
             <FastField
               name='durationMinute'
               render={(args) => (
-                <Select {...args} label='Minute' options={durationMinutes} />
+                <Select {...args} label='Minute(s)' options={durationMinutes} />
               )}
             />
           </GridItem>
@@ -165,11 +199,32 @@ const DoctorEventForm = ({ classes, handleSubmit, values, footer }) => {
           />
         </GridItem>
       </GridContainer>
-      {footer &&
+      <GridContainer className={classes.footer}>
+        <GridItem md={2}>
+          {values.id && (
+            <Button color='danger' onClick={handleDelete}>
+              Delete
+            </Button>
+          )}
+        </GridItem>
+        <GridItem md={10} className={classes.confirmationButtons}>
+          <Button color='danger' onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            className={classes.confirm}
+            color='primary'
+            onClick={handleSubmit}
+          >
+            Confirm
+          </Button>
+        </GridItem>
+      </GridContainer>
+      {/* footer &&
         footer({
           confirmText: 'Confirm',
           onConfirm: handleSubmit,
-        })}
+        }) */}
     </div>
   )
 }
@@ -316,6 +371,7 @@ export default compose(
 
         return {
           ...restValues,
+          doctorBlockFK: doctorBlock.id,
           eventDate: start.formatUTC(),
           eventTime: start.format(_timeFormat),
           durationHour: hour,

@@ -46,8 +46,9 @@ const getMonthConfig = (dayOfMonth) => {
 }
 
 const joinWeekDays = (selectedDays) => {
+  const _days = selectedDays.filter((item) => item !== -99)
   const days = [
-    ...selectedDays,
+    ..._days,
   ]
     .sort()
     .map((d) => DAYS_OF_WEEK[d])
@@ -81,7 +82,9 @@ export const computeRRule = ({ date, recurrenceDto }) => {
     if (recurrenceCount < 0 || recurrenceFrequency < 0) {
       return undefined
     }
-    const _tempDate = moment(date).toDate()
+    const _tempDate = moment(date)
+      .set({ hour: 0, minute: 0, second: 0 })
+      .toDate()
 
     const start = new Date(
       Date.UTC(
@@ -115,7 +118,6 @@ export const computeRRule = ({ date, recurrenceDto }) => {
       ...otherConfig,
       ...endType,
     }
-
     rule = new RRule(ruleConfig)
   } catch (error) {
     rule = undefined
@@ -160,12 +162,12 @@ export const computeLabel = ({ rule, date, recurrenceDto }) => {
       : startDate
     switch (recurrencePatternFK) {
       case RECURRENCE_PATTERN.DAILY: {
-        label = `Occur every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
+        label = `Occurs every ${recurrenceFrequency} day${plural} effective ${effectiveStartDate}`
         break
       }
       case RECURRENCE_PATTERN.WEEKLY: {
         const days = joinWeekDays(recurrenceDaysOfTheWeek)
-        label = `Occur every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
+        label = `Occurs every ${recurrenceFrequency} week${plural} on ${days} effective ${effectiveStartDate} until ${stopDate} `
         break
       }
       case RECURRENCE_PATTERN.MONTHLY: {
