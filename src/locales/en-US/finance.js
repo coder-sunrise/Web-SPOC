@@ -24,8 +24,6 @@ export default {
   'finance.payment.add.payment.date': 'Date',
 
   'finance.deposit.title': 'Deposit',
-  'finance.deposit.search.patient':
-    'Eg. Patient Name, Acc No., Patient Ref. No., Contact No.',
   'finance.deposit.search.gender': 'Gender',
   'finance.deposit.search.age.start': 'Age from',
   'finance.deposit.search.age.end': 'To',

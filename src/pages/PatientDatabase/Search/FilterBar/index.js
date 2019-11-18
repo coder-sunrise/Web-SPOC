@@ -55,7 +55,7 @@ class FilterBar extends PureComponent {
                 return (
                   <TextField
                     label={formatMessage({
-                      id: 'patient.search.message',
+                      id: 'reception.queue.patientSearchPlaceholder',
                     })}
                     {...args}
                   />

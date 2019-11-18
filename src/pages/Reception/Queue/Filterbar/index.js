@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import { connect } from 'dva'
 // umi locale
-import { FormattedMessage } from 'umi/locale'
+import { FormattedMessage, formatMessage } from 'umi/locale'
 // formik
 import { FastField, withFormik } from 'formik'
 // material ui
@@ -50,7 +50,7 @@ const Filterbar = ({
       justify='flex-start'
       alignItems='center'
     >
-      <GridItem xs={3} sm={3} md={3} lg={2}>
+      <GridItem xs={3} sm={3} md={3} lg={3}>
         <FastField
           name='search'
           render={(args) => (
@@ -59,14 +59,16 @@ const Filterbar = ({
               inputProps={{
                 autocomplete: 'queue-listing-filterbar-search',
               }}
-              label='Patient Name, Acc No., Patient Ref. No., Contact No.'
+              label={formatMessage({
+                id: 'reception.queue.patientSearchPlaceholder',
+              })}
               onChange={(e) => setSearch(e.target.value)}
               bind='patientSearch/query'
             />
           )}
         />
       </GridItem>
-      <GridItem xs={7} sm={7} md={7} lg={5}>
+      <GridItem xs={7} sm={7} md={7} lg={4}>
         <Authorized authority='queue.registervisit'>
           <ProgressButton
             variant='contained'

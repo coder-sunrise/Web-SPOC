@@ -1,6 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import { formatMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
@@ -28,7 +29,9 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           render={(args) => (
             <TextField
               {...args}
-              label='Patient Details (Patient Name, Acc No., Patient Ref. No., Contact No.)'
+              label={formatMessage({
+                id: 'reception.queue.patientSearchPlaceholder',
+              })}
             />
           )}
         />
