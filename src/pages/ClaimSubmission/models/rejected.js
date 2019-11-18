@@ -26,6 +26,14 @@ export default createListViewModel({
         }
         return false
       },
+      *refreshPatientDetails ({payload},{put,call}){
+        const response = yield call(service.refreshPatientDetails, payload)
+        const { data, status } = response
+        if (status === '200') {
+          return data
+        }
+        return false
+      },
     },
     reducers: {
       queryDone (st, { payload }) {

@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -10,7 +11,7 @@ import {
   GridContainer,
   GridItem,
   notification,
-  CardContainer,
+  CardContainer, Tooltip,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import Authorized from '@/utils/Authorized'
@@ -49,9 +50,18 @@ class RejectedCHAS extends React.Component {
   onRefreshClicked = () => this.refreshDataGrid()
 
   refreshDataGrid = () => {
+    const { selectedRows } = this.state
     this.props.dispatch({
-      type: 'claimSubmissionRejected/query',
+      type: 'claimSubmissionRejected/refreshPatientDetails',
+      payload:{claimIds: selectedRows},
+    }).then((r)=>{
+      if(!r){
+        this.props.dispatch({
+          type: 'claimSubmissionRejected/query',
+        })
+      }
     })
+
   }
 
   handleSelectionChange = (selection) =>
@@ -138,13 +148,24 @@ class RejectedCHAS extends React.Component {
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
-              <ProgressButton
-                icon={null}
-                color='info'
-                onClick={this.onRefreshClicked}
+              <Tooltip placement='bottom-start'
+                title={formatMessage({
+                         id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                       })}
               >
-                Refresh
-              </ProgressButton>
+                <div style={{ display: 'inline-block' }}>
+                  <ProgressButton
+                    icon={null}
+                    color='info'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onRefreshClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                    })}
+                  </ProgressButton>
+                </div>
+              </Tooltip>
               <Authorized authority='claimsubmission.submitclaim'>
                 <ProgressButton
                   icon={null}
@@ -152,7 +173,9 @@ class RejectedCHAS extends React.Component {
                   disabled={selectedRows.length <= 0}
                   onClick={this.onReSubmitClaimClicked}
                 >
-                  Re-Submit Claim
+                  {formatMessage({
+                  id: 'claimsubmission.invoiceClaim.ResubmitClaim',
+                })}
                 </ProgressButton>
               </Authorized>
             </GridItem>
