@@ -13,7 +13,6 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import Paper from '@material-ui/core/Paper'
 import Grow from '@material-ui/core/Grow'
 import Hidden from '@material-ui/core/Hidden'
-import Popper from '@material-ui/core/Popper'
 
 // @material-ui/icons
 import Person from '@material-ui/icons/Person'
@@ -24,11 +23,10 @@ import Search from '@material-ui/icons/Search'
 
 // core components
 import CustomInput from 'mui-pro-components/CustomInput'
-import Button from 'mui-pro-components/CustomButtons'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
-import { Badge, SizeContainer, TextField } from '@/components'
+import { Badge, SizeContainer, TextField, Popper, Button } from '@/components'
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -131,7 +129,7 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              {/* <Badge
+              <Badge
                 badgeContent={notifications.length}
                 color='primary'
                 anchorOrigin={{
@@ -172,8 +170,8 @@ class HeaderLinks extends React.Component {
                   </Badge>
                 )}
               </Button>
- */}
-              <Button
+
+              {/* <Button
                 justIcon
                 color='transparent'
                 aria-label='Person'
@@ -189,7 +187,50 @@ class HeaderLinks extends React.Component {
                 <span className={classes.username}>
                   {userTitle} {name}
                 </span>
-              </Button>
+              </Button> */}
+
+              <Popper
+                className={classNames({
+                  [classes.pooperResponsive]: true,
+                  [classes.pooperNav]: true,
+                })}
+                overlay={
+                  <MenuList role='menu'>
+                    <MenuItem
+                      onClick={this.openUserProfileForm}
+                      className={dropdownItem}
+                    >
+                      My Account
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.openChangePasswordForm}
+                      className={dropdownItem}
+                    >
+                      Change Password
+                    </MenuItem>
+                    <MenuItem
+                      onClick={this.onLogoutClick}
+                      className={dropdownItem}
+                    >
+                      Logout
+                    </MenuItem>
+                  </MenuList>
+                }
+              >
+                <Button
+                  justIcon
+                  color='transparent'
+                  aria-label='Person'
+                  aria-haspopup='true'
+                  aria-owns={openAccount ? 'menu-list' : null}
+                  className={classes.buttonLink}
+                >
+                  <Person />
+                  <span className={classes.username}>
+                    {userTitle} {name}
+                  </span>
+                </Button>
+              </Popper>
               <Divider
                 type='vertical'
                 style={{ background: '#999', height: '1.2rem' }}
@@ -207,57 +248,6 @@ class HeaderLinks extends React.Component {
           <Button color='transparent' justIcon className={classes.buttonLink}>
             
           </Button> */}
-          <Popper
-            open={openAccount}
-            anchorEl={this.anchorElAccount}
-            transition
-            disablePortal
-            placement='bottom-end'
-            className={classNames({
-              [classes.popperClose]: !openAccount,
-              [classes.pooperResponsive]: true,
-              [classes.pooperNav]: true,
-            })}
-          >
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                id='menu-list'
-                style={{ transformOrigin: '0 0 0' }}
-              >
-                <Paper className={classes.dropdown}>
-                  <ClickAwayListener onClickAway={this.handleClose('Account')}>
-                    <MenuList role='menu'>
-                      <MenuItem
-                        onClick={this.handleClose(
-                          'Account',
-                          this.openUserProfileForm,
-                        )}
-                        className={dropdownItem}
-                      >
-                        My Account
-                      </MenuItem>
-                      <MenuItem
-                        onClick={this.handleClose(
-                          'ChangePassword',
-                          this.openChangePasswordForm,
-                        )}
-                        className={dropdownItem}
-                      >
-                        Change Password
-                      </MenuItem>
-                      <MenuItem
-                        onClick={this.onLogoutClick}
-                        className={dropdownItem}
-                      >
-                        Logout
-                      </MenuItem>
-                    </MenuList>
-                  </ClickAwayListener>
-                </Paper>
-              </Grow>
-            )}
-          </Popper>
         </div>
       </div>
     )
