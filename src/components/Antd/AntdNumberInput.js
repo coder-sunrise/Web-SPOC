@@ -103,6 +103,7 @@ class AntdNumberInput extends React.PureComponent {
     allowEmpty: PropTypes.bool,
     max: PropTypes.number,
     min: PropTypes.number,
+    debounceDuration: PropTypes.number,
   }
 
   static defaultProps = {
@@ -111,11 +112,12 @@ class AntdNumberInput extends React.PureComponent {
     allowEmpty: true,
     max: 999999999,
     min: -999999999,
+    debounceDuration: 1000,
   }
 
   constructor (props) {
     super(props)
-    const { field = {}, defaultValue, value } = props
+    const { field = {}, defaultValue, value, debounceDuration } = props
     this.state = {
       value:
         field.value !== undefined && field.value !== ''
@@ -125,9 +127,13 @@ class AntdNumberInput extends React.PureComponent {
     }
     // console.log(this.state.value)
 
-    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 1000, {
-      leading: true,
-    })
+    this.debouncedOnChange = _.debounce(
+      this._onChange.bind(this),
+      debounceDuration,
+      {
+        leading: true,
+      },
+    )
   }
 
   handleFocus = (e) => {
