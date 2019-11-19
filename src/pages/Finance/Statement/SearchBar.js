@@ -1,15 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
-import {
-  withStyles,
-  Grow,
-  Paper,
-  Popper,
-  ClickAwayListener,
-  MenuItem,
-  MenuList,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Search, Add } from '@material-ui/icons'
 import moment from 'moment'
 import {
@@ -21,9 +13,7 @@ import {
   DateRangePicker,
   CodeSelect,
   ProgressButton,
-  CommonModal,
 } from '@/components'
-import { ReportViewer } from '@/components/_medisys'
 
 const styles = () => ({
   container: {
@@ -60,7 +50,6 @@ class SearchBar extends PureComponent {
   state = {
     showReport: false,
     showReportSelection: false,
-    reportGroupBy: '',
   }
 
   handleOnChange = (name, checked) => (event) => {
@@ -69,7 +58,6 @@ class SearchBar extends PureComponent {
   }
 
   toggleReport = (v) => {
-    this.setState({ reportGroupBy: v })
     this.setState((preState) => ({ showReport: !preState.showReport }))
   }
 
@@ -80,14 +68,8 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values, selectedRows } = this.props
-    let statementId = ''
-    if (selectedRows && selectedRows.length > 0) {
-      const [
-        firstIndex,
-      ] = selectedRows
-      statementId = firstIndex
-    }
+    const { classes, history, dispatch, values } = this.props
+
     return (
       <GridContainer className={classes.container}>
         <GridItem container xs md={12}>
@@ -237,70 +219,7 @@ class SearchBar extends PureComponent {
               New Statement
             </Button>
           </GridItem>
-          <GridItem xs sm={6} md={6} lg={4} container justify='flex-end'>
-            <Button
-              color='primary'
-              onClick={this.toggleReportSelection}
-              buttonRef={(node) => {
-                this.anchorElAccount = node
-              }}
-              disabled={selectedRows ? selectedRows.length < 1 : true}
-            >
-              Print Statement
-            </Button>
-          </GridItem>
         </GridItem>
-        <Popper
-          open={this.state.showReportSelection}
-          anchorEl={this.anchorElAccount}
-          transition
-          disablePortal
-          placement='bottom-end'
-          style={{
-            zIndex: 2,
-            width: 175,
-            left: -10,
-          }}
-        >
-          {({ TransitionProps, placement }) => (
-            <Grow
-              {...TransitionProps}
-              id='menu-list'
-              style={{ transformOrigin: '0 0 -30' }}
-            >
-              <Paper className={classes.dropdown}>
-                <ClickAwayListener onClickAway={this.toggleReportSelection}>
-                  <MenuList role='menu'>
-                    <MenuItem onClick={() => this.toggleReport('Patient')}>
-                      Patient
-                    </MenuItem>
-                    <MenuItem onClick={() => this.toggleReport('Doctor')}>
-                      Doctor
-                    </MenuItem>
-                    <MenuItem onClick={() => this.toggleReport('Item')}>
-                      Item
-                    </MenuItem>
-                  </MenuList>
-                </ClickAwayListener>
-              </Paper>
-            </Grow>
-          )}
-        </Popper>
-
-        <CommonModal
-          open={this.state.showReport}
-          onClose={this.toggleReport}
-          title='Statement'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={25}
-            reportParameters={{
-              StatementId: statementId,
-              GroupBy: this.state.reportGroupBy,
-            }}
-          />
-        </CommonModal>
       </GridContainer>
     )
   }

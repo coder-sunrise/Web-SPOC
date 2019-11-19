@@ -76,11 +76,11 @@ class Filter extends PureComponent {
                     type: 'settingServiceCenter/query',
                     payload: {
                       isActive,
+                      serviceCenterCategoryFK,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          serviceCenterCategoryFK,
                           combineCondition: 'or',
                         },
                       ],
