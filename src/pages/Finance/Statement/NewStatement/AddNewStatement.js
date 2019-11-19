@@ -388,7 +388,13 @@ class AddNewStatement extends PureComponent {
               rows={invoiceRows}
               columns={columns}
               columnExtensions={columnExtensions}
-              FuncProps={{ selectable: true }}
+              FuncProps={{
+                selectable: true,
+                selectConfig: {
+                  showSelectAll: true,
+                  rowSelectionEnabled: () => true,
+                },
+              }}
               selection={this.state.selectedRows}
               onSelectionChange={this.handleSelectionChange}
             />
