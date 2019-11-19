@@ -24,7 +24,7 @@ export default createListViewModel({
           dispatch({
             type: 'query',
             payload: {
-              pagesize: 999,
+              // pagesize: 999,
               lgteql_startDateTime: dateFrom,
               lsteql_endDateTime: dateTo,
             },

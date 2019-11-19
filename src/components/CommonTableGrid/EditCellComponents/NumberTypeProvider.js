@@ -65,10 +65,10 @@ class NumberEditor extends PureComponent {
     const { currency, type, ...commonCfg } = getCommonConfig.call(this)
     commonCfg.onChange = this._onChange
     commonCfg.currency = currency || type === 'currency'
-
     return (
       <div ref={this.myRef}>
         <NumberInput
+          debounceDuration={0}
           inputProps={{
             fullWidth: true,
           }}

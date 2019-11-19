@@ -76,6 +76,7 @@ import { getBizSession } from '@/services/queue'
       paymentReceivedByUserFK,
       paymentReceivedDate,
       paymentReceivedBizSessionFK,
+      paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
     }
     handleSubmit(returnValue)
   },

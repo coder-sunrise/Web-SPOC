@@ -13,7 +13,6 @@ import {
   Input,
   Paper,
   withStyles,
-  Popper,
   Fade,
   ClickAwayListener,
   Divider,

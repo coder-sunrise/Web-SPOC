@@ -11,7 +11,6 @@ import {
   CommonTableGrid,
   Tooltip,
 } from '@/components'
-import { LoadingWrapper } from '@/components/_medisys'
 
 const TableParams = {
   FuncProps: {
@@ -33,6 +32,7 @@ const TableParams = {
 export default ({ dataSource, onEditClick, onDeleteClick }) => {
   const GroupCellContent = ({ row }) => {
     let label = 'Room'
+    if (!dataSource) return ''
     const data = dataSource.find((item) => item.roomBlockGroupFK === row.value)
     if (data) {
       const { displayValue } = data.room
@@ -52,55 +52,26 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
     setExpandedGroups(e)
   }
 
-  const [
-    tableConfig,
-    setTableConfig,
-  ] = useState(TableParams)
-
   useEffect(
     () => {
       if (dataSource) {
-        let tempArray = []
-        dataSource.forEach((o) => {
-          tempArray.push(o.roomBlockGroupFK.toString())
-        })
-
-        setExpandedGroups(tempArray)
+        const groups = dataSource.reduce(
+          (distinct, data) =>
+            distinct.includes(data.roomBlockGroupFK.toString())
+              ? [
+                  ...distinct,
+                ]
+              : [
+                  ...distinct,
+                  data.roomBlockGroupFK.toString(),
+                ],
+          [],
+        )
+        setExpandedGroups(groups)
       }
     },
     [
       dataSource,
-    ],
-  )
-
-  useEffect(
-    () => {
-      if (dataSource) {
-        const tempTableConfig = {
-          ...TableParams,
-          FuncProps: {
-            ...TableParams.FuncProps,
-            groupingConfig: {
-              state: {
-                grouping: [
-                  { columnName: 'roomBlockGroupFK' },
-                ],
-                expandedGroups: [
-                  ...expandedGroups,
-                ],
-                onExpandedGroupsChange: handleExpandedGroupsChange,
-              },
-              row: {
-                contentComponent: GroupCellContent,
-              },
-            },
-          },
-        }
-        setTableConfig(tempTableConfig)
-      }
-    },
-    [
-      expandedGroups,
     ],
   )
 
@@ -178,7 +149,25 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
       rows={dataSource}
       onRowDoubleClick={handleDoubleClick}
       columnExtensions={columnExtensions}
-      {...tableConfig}
+      // {...tableConfig}
+      {...TableParams}
+      FuncProps={{
+        ...TableParams.FuncProps,
+        groupingConfig: {
+          state: {
+            grouping: [
+              { columnName: 'roomBlockGroupFK' },
+            ],
+            expandedGroups: [
+              ...expandedGroups,
+            ],
+            onExpandedGroupsChange: handleExpandedGroupsChange,
+          },
+          row: {
+            contentComponent: GroupCellContent,
+          },
+        },
+      }}
     />
   )
 }
