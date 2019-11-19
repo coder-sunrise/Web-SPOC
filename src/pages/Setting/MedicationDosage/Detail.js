@@ -21,8 +21,8 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     multiplier: Yup.number()
-      .min(0, 'Multiplier must between 0 and 999,999.9999')
-      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999')
+      .min(0, 'Multiplier must between 0 and 999,999.99')
+      .max(999999.99, 'Multiplier must between 0 and 999,999.99')
       .required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     sortOrder: Yup.number()
@@ -129,8 +129,8 @@ class Detail extends PureComponent {
                   <NumberInput
                     label='Multiplier'
                     maxLength={11}
-                    max={999999.9999}
-                    format='0.0000'
+                    max={999999.99}
+                    format='0.00'
                     {...args}
                   />
                 )}
