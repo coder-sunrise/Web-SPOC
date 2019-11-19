@@ -43,7 +43,7 @@ class Grid extends PureComponent {
         // FuncProps={{ pager: false }}
         columnExtensions={[
           {
-            columnName: 'TranslatedDisplayValue',
+            columnName: 'translatedDisplayValue',
             sortingEnabled: false,
           },
           {
