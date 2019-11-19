@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common component
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 // medisys component
 import { LoadingWrapper } from '@/components/_medisys'
 // sub component
@@ -29,6 +29,7 @@ const DoctorFormValidation = Yup.object().shape({
   doctorBlock,
   loading: loading.effects['doctorBlock/query'],
 }))
+@withSettingBase({ modelName: 'doctorBlock' })
 class DoctorBlock extends PureComponent {
   state = {
     showModal: false,
@@ -83,6 +84,12 @@ class DoctorBlock extends PureComponent {
     })
   }
 
+  handleAfterSubmit = () => {
+    this.props.dispatch({
+      type: 'doctorBlock/query',
+    })
+  }
+
   render () {
     const { showModal } = this.state
     const { doctorBlock, loading, dispatch } = this.props
@@ -106,7 +113,10 @@ class DoctorBlock extends PureComponent {
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <DoctorBlockForm validationSchema={DoctorFormValidation} />
+          <DoctorBlockForm
+            validationSchema={DoctorFormValidation}
+            handleAfterSubmit={this.handleAfterSubmit}
+          />
         </CommonModal>
       </CardContainer>
     )

@@ -517,8 +517,9 @@ const InventoryTypeListing = ({
   const calSubtotal = (e) => {
     const { row } = e
     const { unitPrice, quantity } = row
-
+    console.log(unitPrice, quantity)
     if (unitPrice && quantity) row.subTotal = unitPrice * quantity
+    console.log(row.subTotal)
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {
@@ -604,14 +605,14 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         format: '0.0',
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'unitPrice',
         width: 150,
         type: 'number',
         currency: true,
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'subTotal',
@@ -643,14 +644,14 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         format: '0.0',
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'unitPrice',
         width: 150,
         type: 'number',
         currency: true,
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'subTotal',
@@ -684,14 +685,14 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         format: '0.0',
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'unitPrice',
         width: 150,
         type: 'number',
         currency: true,
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'subTotal',
@@ -789,14 +790,14 @@ const InventoryTypeListing = ({
         width: 150,
         type: 'number',
         format: '0.0',
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'unitPrice',
         width: 150,
         type: 'number',
         currency: true,
-        onChange: (e) => calSubtotal(e),
+        onChange: calSubtotal,
       },
       {
         columnName: 'subTotal',

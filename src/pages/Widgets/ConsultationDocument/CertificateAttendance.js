@@ -134,7 +134,7 @@ class CertificateAttendance extends PureComponent {
             <FastField
               name='issueDate'
               render={(args) => {
-                return <DatePicker label='Issue Date' {...args} />
+                return <DatePicker label='Issue Date' autoFocus {...args} />
               }}
             />
           </GridItem>

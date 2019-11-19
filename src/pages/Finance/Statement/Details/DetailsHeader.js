@@ -58,7 +58,14 @@ class DetailsHeader extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='statementNo'
-                render={(args) => <TextField disabled noUnderline {...args} />}
+                render={(args) => (
+                  <TextField
+                    disabled
+                    noUnderline
+                    style={{ padding: 0 }}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
             <GridItem md={5}>
@@ -97,7 +104,15 @@ class DetailsHeader extends PureComponent {
             <GridItem md={3}>
               <Field
                 name='paymentTerm'
-                render={(args) => <TextField disabled noUnderline {...args} />}
+                render={(args) => (
+                  <TextField
+                    disabled
+                    noUnderline
+                    suffix='Days'
+                    style={{ padding: 0 }}
+                    {...args}
+                  />
+                )}
               />
             </GridItem>
           </GridContainer>

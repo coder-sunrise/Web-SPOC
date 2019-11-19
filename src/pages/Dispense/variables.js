@@ -1,5 +1,6 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
+import { FormattedMessage } from 'umi/locale'
 import {
   NumberInput,
   TextField,
@@ -46,11 +47,11 @@ export const PrescriptionColumns = [
     title: 'Unit Price ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
+    name: 'adjAmt',
     title: 'Adj ($)',
   },
   {
-    name: 'totalPrice',
+    name: 'totalAfterItemAdjustment',
     title: 'Total Price ($)',
   },
   {
@@ -67,11 +68,11 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalPrice',
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
-    columnName: 'totalAfterItemAdjustment',
+    columnName: 'adjAmt',
     type: 'currency',
   },
   {
@@ -142,7 +143,11 @@ export const PrescriptionColumnExtensions = (
     width: 80,
     render: (row) => {
       return (
-        <Tooltip title='Print'>
+        <Tooltip
+          title={
+            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+          }
+        >
           <Button
             color='primary'
             onClick={() => {
@@ -180,11 +185,11 @@ export const VaccinationColumn = [
     title: 'Unit Price ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
+    name: 'adjAmt',
     title: 'Adj ($)',
   },
   {
-    name: 'totalPrice',
+    name: 'totalAfterItemAdjustment',
     title: 'Total Price ($)',
   },
 ]
@@ -193,11 +198,11 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalPrice',
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
-    columnName: 'totalAfterItemAdjustment',
+    columnName: 'adjAmt',
     type: 'currency',
   },
   {
@@ -245,11 +250,11 @@ export const OtherOrdersColumns = [
     title: 'Unit Price ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
+    name: 'adjAmt',
     title: 'Adj ($)',
   },
   {
-    name: 'totalPrice',
+    name: 'totalAfterItemAdjustment',
     title: 'Total Price ($)',
   },
   {
@@ -280,6 +285,16 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
+    columnName: 'adjAmt',
+    // type: 'currency',
+    align: 'right',
+    render: (row) => {
+      const { type } = row
+      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      return <NumberInput text currency value={row.adjAmt} />
+    },
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
@@ -287,16 +302,6 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
       return <NumberInput text currency value={row.totalAfterItemAdjustment} />
-    },
-  },
-  {
-    columnName: 'totalPrice',
-    // type: 'currency',
-    align: 'right',
-    render: (row) => {
-      const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalPrice} />
     },
   },
   {

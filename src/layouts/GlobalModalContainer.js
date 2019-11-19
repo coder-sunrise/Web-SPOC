@@ -221,13 +221,6 @@ class GlobalModalContainer extends PureComponent {
             this.props.dispatch({
               type: 'login/logout',
             })
-            // clearTimeout(this._timer)
-            // dispatch({
-            //   type: 'global/updateAppState',
-            //   payload: {
-            //     showSessionTimeout: false,
-            //   },
-            // })
           }}
           onConfirm={() => {
             clearTimeout(this._timer)
@@ -238,9 +231,6 @@ class GlobalModalContainer extends PureComponent {
               },
             })
           }}
-          cancelText='No'
-          // showFooter
-          // footer={{ cancelText: 'No', confirmBtnText: 'Yes' }}
         >
           <SessionTimeout />
         </CommonModal>

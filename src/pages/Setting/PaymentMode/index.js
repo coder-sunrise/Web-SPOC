@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -14,10 +14,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingPaymentMode, global }) => ({
+@connect(({ settingPaymentMode }) => ({
   settingPaymentMode,
-  global,
 }))
+@withSettingBase({ modelName: 'settingPaymentMode' })
 class Room extends PureComponent {
   state = {}
 

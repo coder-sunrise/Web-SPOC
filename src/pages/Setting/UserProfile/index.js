@@ -19,6 +19,7 @@ import {
   Select,
   TextField,
   Tooltip,
+  withSettingBase,
 } from '@/components'
 import { UserProfileTableConfig } from './const'
 
@@ -30,6 +31,7 @@ const styles = (theme) => ({
 })
 
 @connect(({ settingUserProfile }) => ({ settingUserProfile }))
+@withSettingBase({ modelName: 'settingUserProfile' })
 @withFormik({
   mapPropsToValues: () => ({
     status: true,
@@ -97,7 +99,6 @@ class UserProfile extends React.Component {
     dispatch({
       type: 'settingUserProfile/query',
       payload: {
-        keepFilter: false,
         group: [
           {
             name: values.searchQuery,

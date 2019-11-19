@@ -133,8 +133,20 @@ class Detail extends PureComponent {
     columnExtensions: [
       {
         columnName: 'serviceCenterFK',
+        // type: 'select',
+        // labelField: 'name',
+        // valueField: 'id',
+        // options: ctservicecenter,
+
         type: 'codeSelect',
         code: 'ctServiceCenter',
+        localFilter: (opt) => {
+          const selectedServiceCenter = this.state.serviceSettings
+            .filter((item) => !item.isDeleted)
+            .map((item) => item.serviceCenterFK)
+
+          return !selectedServiceCenter.includes(opt.id)
+        },
       },
       { columnName: 'costPrice', type: 'number', currency: true },
       { columnName: 'unitPrice', type: 'number', currency: true },
@@ -343,6 +355,7 @@ class Detail extends PureComponent {
                     render={(args) => (
                       <TextField
                         label='Code'
+                        autoFocus
                         {...args}
                         disabled={!!settingClinicService.entity}
                       />

@@ -367,7 +367,14 @@ class Banner extends PureComponent {
     const info = entity
     const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
-
+    const allergiesStyle = () => {
+      if (this.state.showWarning) {
+        return {
+          color: 'red',
+        }
+      }
+      return null
+    }
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -428,7 +435,7 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               header={
-                <div style={{ color: 'red' }}>
+                <div style={allergiesStyle()}>
                   {this.state.showWarning ? (
                     <IconButton disabled>
                       <Warining color='error' />
@@ -456,8 +463,8 @@ class Banner extends PureComponent {
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
                       <IconButton onClick={this.refreshChasBalance}>
-                      <Refresh />
-                    </IconButton>
+                        <Refresh />
+                      </IconButton>
                   ) : (
                     ''
                   )}

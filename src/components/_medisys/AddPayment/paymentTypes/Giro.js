@@ -42,6 +42,7 @@ const Giro = ({
               <NumberInput
                 label='Amount'
                 {...args}
+                autoFocus
                 onChange={handleAmountChange}
                 currency
               />

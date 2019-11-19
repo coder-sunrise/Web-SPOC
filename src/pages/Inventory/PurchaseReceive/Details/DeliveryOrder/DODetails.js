@@ -575,25 +575,28 @@ class DODetails extends PureComponent {
           type: 'number',
           format: '0.0',
           disabled: true,
+          width: 90,
         },
         {
           columnName: 'bonusQuantity',
           type: 'number',
           format: '0.0',
           disabled: true,
+          width: 90,
         },
         {
           columnName: 'quantityReceived',
           type: 'number',
           format: '0.0',
           disabled: true,
+          width: 120,
         },
         {
           columnName: 'totalBonusReceived',
           type: 'number',
           format: '0.0',
-          width: 180,
           disabled: true,
+          width: 150,
         },
         {
           columnName: 'currentReceivingQty',
@@ -649,6 +652,7 @@ class DODetails extends PureComponent {
                       render={(args) => {
                         return (
                           <TextField
+                            autoFocus
                             label={formatMessage({
                               id: 'inventory.pr.detail.dod.deliveryOrderNo',
                             })}

@@ -40,6 +40,7 @@ const Cash = ({
             name={`paymentList[${index}].amt`}
             render={(args) => (
               <NumberInput
+                autoFocus
                 label='Amount'
                 {...args}
                 currency
