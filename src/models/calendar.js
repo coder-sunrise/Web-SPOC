@@ -17,6 +17,7 @@ import {
   mapDatagridToAppointmentResources,
   compareDto,
 } from '@/pages/Reception/Appointment/components/form/formUtils'
+import { constructClinicBreakHoursData } from '@/pages/Reception/Appointment/utils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {
@@ -370,9 +371,11 @@ export default createListViewModel({
         })
 
         if (result.status === '200') {
+          const { data } = result
+
           yield put({
             type: 'saveClinicBreakHours',
-            payload: result.data.data,
+            payload: data.data,
           })
         }
       },

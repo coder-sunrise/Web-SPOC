@@ -16,9 +16,8 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  NumberInput,
 } from '@/components'
-import { Mobile } from '@/components/_medisys'
+import { MobileNumberInput } from '@/components/_medisys'
 import { countryCodes } from '@/utils/codes'
 // styles
 import { container } from '@/assets/jss'
@@ -95,7 +94,9 @@ const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
           <GridItem md={6}>
             <FastField
               name='phoneNumber'
-              render={(args) => <Mobile {...args} label='Mobile Number' />}
+              render={(args) => (
+                <MobileNumberInput {...args} label='Mobile Number' />
+              )}
             />
           </GridItem>
           <GridItem md={12} className={classes.buttonRow}>

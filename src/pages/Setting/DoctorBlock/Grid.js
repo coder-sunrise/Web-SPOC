@@ -11,7 +11,7 @@ import {
   CommonTableGrid,
   Tooltip,
 } from '@/components'
-import { DoctorLabel, LoadingWrapper } from '@/components/_medisys'
+import { DoctorLabel } from '@/components/_medisys'
 
 const TableParams = {
   FuncProps: {
@@ -33,6 +33,7 @@ const TableParams = {
 export default ({ dataSource, onEditClick, onDeleteClick }) => {
   const GroupCellContent = ({ row }) => {
     let label = 'Doctor'
+    if (!dataSource) return ''
     const data = dataSource.find(
       (item) => item.doctorBlockGroupFK === row.value,
     )
@@ -54,55 +55,27 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
     setExpandedGroups(e)
   }
 
-  const [
-    tableConfig,
-    setTableConfig,
-  ] = useState(TableParams)
-
   useEffect(
     () => {
       if (dataSource) {
-        let tempArray = []
-        dataSource.forEach((o) => {
-          tempArray.push(o.doctorBlockGroupFK.toString())
-        })
+        const groups = dataSource.reduce(
+          (distinct, data) =>
+            distinct.includes(data.doctorBlockGroupFK.toString())
+              ? [
+                  ...distinct,
+                ]
+              : [
+                  ...distinct,
+                  data.doctorBlockGroupFK.toString(),
+                ],
+          [],
+        )
 
-        setExpandedGroups(tempArray)
+        setExpandedGroups(groups)
       }
     },
     [
       dataSource,
-    ],
-  )
-
-  useEffect(
-    () => {
-      if (dataSource) {
-        const tempTableConfig = {
-          ...TableParams,
-          FuncProps: {
-            ...TableParams.FuncProps,
-            groupingConfig: {
-              state: {
-                grouping: [
-                  { columnName: 'doctorBlockGroupFK' },
-                ],
-                expandedGroups: [
-                  ...expandedGroups,
-                ],
-                onExpandedGroupsChange: handleExpandedGroupsChange,
-              },
-              row: {
-                contentComponent: GroupCellContent,
-              },
-            },
-          },
-        }
-        setTableConfig(tempTableConfig)
-      }
-    },
-    [
-      expandedGroups,
     ],
   )
 
@@ -181,7 +154,25 @@ export default ({ dataSource, onEditClick, onDeleteClick }) => {
       rows={dataSource}
       onRowDoubleClick={handleDoubleClick}
       columnExtensions={columnExtensions}
-      {...tableConfig}
+      // {...tableConfig}
+      {...TableParams}
+      FuncProps={{
+        ...TableParams.FuncProps,
+        groupingConfig: {
+          state: {
+            grouping: [
+              { columnName: 'doctorBlockGroupFK' },
+            ],
+            expandedGroups: [
+              ...expandedGroups,
+            ],
+            onExpandedGroupsChange: handleExpandedGroupsChange,
+          },
+          row: {
+            contentComponent: GroupCellContent,
+          },
+        },
+      }}
     />
   )
 }

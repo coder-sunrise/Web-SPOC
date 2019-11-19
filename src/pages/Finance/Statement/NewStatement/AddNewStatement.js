@@ -252,7 +252,7 @@ class AddNewStatement extends PureComponent {
                         label='Co-Payer'
                         code='ctcopayer'
                         labelField='displayValue'
-                        // onChange={(e) => this.getInvoiceList(e)}
+                        localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
                         {...args}
                       />
@@ -348,7 +348,7 @@ class AddNewStatement extends PureComponent {
               </b>
             </h4>
           </div>
-          <GridContainer style={{ margin: theme.spacing(2), marginTop: 0 }}>
+          <GridContainer style={{ margin: theme.spacing(1), marginTop: 0 }}>
             <GridItem container direction='row' spacing={0}>
               <GridItem xs md={3}>
                 <FastField
