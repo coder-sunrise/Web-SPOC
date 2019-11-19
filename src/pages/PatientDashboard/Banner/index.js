@@ -463,8 +463,8 @@ class Banner extends PureComponent {
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 ? (
                       <IconButton onClick={this.refreshChasBalance}>
-                      <Refresh />
-                    </IconButton>
+                        <Refresh />
+                      </IconButton>
                   ) : (
                     ''
                   )}

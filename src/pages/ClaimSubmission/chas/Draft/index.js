@@ -2,16 +2,17 @@ import React from 'react'
 import { connect } from 'dva'
 // formik
 import { withFormik } from 'formik'
+import { formatMessage } from 'umi/locale'
 // material ui
 import { withStyles } from '@material-ui/core'
-// common components
+// common components1
 import NearMe from '@material-ui/icons/NearMe'
 import { Progress } from 'antd'
 import {
   ProgressButton,
   GridContainer,
   GridItem,
-  CardContainer,
+  CardContainer, Tooltip,
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
@@ -36,15 +37,33 @@ const styles = (theme) => ({
   mapPropsToValues: () => ({}),
 })
 class DraftCHAS extends React.Component {
+  state = {
+    selectedRows: [],
+    isLoading: false,
+  }
+
+
+
   componentDidMount () {
     this.refreshDataGrid()
   }
 
   refreshDataGrid = () => {
+    const { selectedRows } = this.state
     this.props.dispatch({
-      type: 'claimSubmissionDraft/query',
+      type: 'claimSubmissionDraft/refreshPatientDetails',
+      payload:{claimIds: selectedRows},
+    }).then((r)=>{
+      if(!r){
+        this.props.dispatch({
+          type: 'claimSubmissionDraft/query',
+        })
+      }
     })
   }
+
+  handleSelectionChange = (selection) =>
+    this.setState({ selectedRows: selection })
 
   onRefreshClicked = () => this.refreshDataGrid()
 
@@ -64,7 +83,7 @@ class DraftCHAS extends React.Component {
       dispatch,
     } = this.props
     const { list } = claimSubmissionDraft || []
-
+    const { isLoading, selectedRows } = this.state
     return (
       <CardContainer
         hideHeader
@@ -86,13 +105,15 @@ class DraftCHAS extends React.Component {
               columnExtensions={DraftCHASColumnExtensions}
               columns={DraftCHASColumns}
               // tableConfig={TableConfig}
-              // FuncProps={{
-              //   selectable: false,
-              //   selectConfig: {
-              //     showSelectAll: true,
-              //     rowSelectionEnabled: () => true,
-              //   },
-              // }}
+              FuncProps={{
+                selectable: true,
+                selectConfig: {
+                  showSelectAll: true,
+                  rowSelectionEnabled: () => true,
+                },
+              }}
+              selection={this.state.selectedRows}
+              onSelectionChange={this.handleSelectionChange}
               onContextMenuItemClick={handleContextMenuItemClick}
               contextMenuOptions={overrideContextMenuOptions}
               isDraft
@@ -100,13 +121,24 @@ class DraftCHAS extends React.Component {
             />
           </GridItem>
           <GridItem md={4} className={classes.buttonGroup}>
-            <ProgressButton
-              icon={null}
-              color='info'
-              onClick={this.onRefreshClicked}
+            <Tooltip placement='bottom-start'
+              title={formatMessage({
+                       id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                     })}
             >
-              Refresh
-            </ProgressButton>
+              <div style={{ display: 'inline-block' }}>
+                <ProgressButton
+                  icon={null}
+                  color='info'
+                  disabled={selectedRows.length <= 0}
+                  onClick={this.onRefreshClicked}
+                >
+                  {formatMessage({
+                    id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                  })}
+                </ProgressButton>
+              </div>
+            </Tooltip>
           </GridItem>
         </GridContainer>
       </CardContainer>
