@@ -88,9 +88,6 @@ export default createFormViewModel({
               totalAfterItemAdjustment:
                 (item.quantity - pastItemQuantity) * item.unitPrice,
               _totalAfterGST: item.totalAfterGST,
-              _totalAfterItemAdjustment:
-                (item.quantity - pastItemQuantity) * item.unitPrice,
-              _totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
             }
           }
           return {
@@ -100,8 +97,6 @@ export default createFormViewModel({
             originRemainingQty: item.quantity,
             totalAfterItemAdjustment: item.quantity * item.unitPrice,
             _totalAfterGST: item.totalAfterGST,
-            _totalAfterItemAdjustment: item.quantity * item.unitPrice,
-            _totalAfterOverallAdjustment: item.totalAfterOverallAdjustment,
           }
         })
 

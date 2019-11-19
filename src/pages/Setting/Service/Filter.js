@@ -90,11 +90,11 @@ class Filter extends PureComponent {
                     type: 'settingClinicService/query',
                     payload: {
                       'ServiceFKNavigation.isActive': isActive,
+                      serviceCenterFK,
                       group: [
                         {
                           'ServiceFKNavigation.Code': codeDisplayValue,
                           'ServiceFKNavigation.DisplayValue': codeDisplayValue,
-                          serviceCenterFK,
                           combineCondition: 'or',
                         },
                       ],

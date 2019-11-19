@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import Refresh from '@material-ui/icons/Refresh'
-import Print from '@material-ui/icons/Print'
+import { Refresh, Print, Edit, AttachMoney } from '@material-ui/icons'
 // common component
 import {
   Button,
@@ -226,6 +225,7 @@ class Main extends Component {
               <ProgressButton
                 color='primary'
                 size='sm'
+                icon={<Edit />}
                 onClick={this.editOrder}
               >
                 Edit Order
@@ -235,6 +235,7 @@ class Main extends Component {
               <ProgressButton
                 color='primary'
                 size='sm'
+                icon={<AttachMoney />}
                 onClick={this.makePayment}
               >
                 Make Payment

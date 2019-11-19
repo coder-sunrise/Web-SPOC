@@ -254,14 +254,12 @@ export default createFormViewModel({
       //   return yield call(service.upsert, payload)
       // },
       *refreshChasBalance ({ payload }, { call }) {
-        const { patientAccountNo, patientCoPaymentSchemeFK, patientScheme } = payload
-        const patientChasSchemeConcurrencyToken = patientScheme.find( o => o.id === patientCoPaymentSchemeFK).concurrencyToken
-       const newPayload = {
+        const { patientAccountNo, patientCoPaymentSchemeFK } = payload
+        const newPayload = {
           patientNric: patientAccountNo,
           patientCoPaymentSchemeFK,
           year: moment().year(),
           isSaveToDb: true,
-          concurrencyToken: patientChasSchemeConcurrencyToken,
         }
 
         const response = yield call(service.requestChasBalance, newPayload)

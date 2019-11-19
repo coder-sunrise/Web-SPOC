@@ -71,11 +71,12 @@ export default createListViewModel({
         if (mode === 'split') {
           const st = yield select((st) => st.patientHistory)
 
-          const { list } = st
-          if (list.filter((o) => o.coHistory.length >= 1).length > 0) {
+          const { list = [] } = st
+          const filteredList = list.filter((o) => o.coHistory.length >= 1)
+          if (filteredList.length > 0) {
             yield put({
               type: 'queryOne',
-              payload: list[0].coHistory[0].id,
+              payload: filteredList[0].coHistory[0].id,
             })
           }
         }
@@ -95,7 +96,7 @@ export default createListViewModel({
 
         let sortedPatientHistory = st.list
           ? st.list.filter((o) => o.coHistory.length >= 1)
-          : ''
+          : []
 
         return {
           ...st,

@@ -187,7 +187,7 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         // hideIfNoEditRights
-                        autoFocus
+                        // autoFocus
                         label='Account Type'
                         code='ctPatientAccountNoType'
                         width={350}

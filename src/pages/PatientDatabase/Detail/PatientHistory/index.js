@@ -35,7 +35,7 @@ class History extends PureComponent {
   render () {
     // console.log({ props: this.props })
     // return <PatientHistory {...this.props} showEditPatient />
-    return <PatientHistory />
+    return <PatientHistory mode='integrated' />
   }
 }
 
