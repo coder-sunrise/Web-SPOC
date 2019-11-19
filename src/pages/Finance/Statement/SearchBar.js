@@ -237,7 +237,7 @@ class SearchBar extends PureComponent {
               New Statement
             </Button>
           </GridItem>
-          <GridItem xs sm={6} md={6} lg={4} container justify='flex-end'>
+          {/* <GridItem xs sm={6} md={6} lg={4} container justify='flex-end'>
             <Button
               color='primary'
               onClick={this.toggleReportSelection}
@@ -248,9 +248,9 @@ class SearchBar extends PureComponent {
             >
               Print Statement
             </Button>
-          </GridItem>
+          </GridItem> */}
         </GridItem>
-        <Popper
+        {/* <Popper
           open={this.state.showReportSelection}
           anchorEl={this.anchorElAccount}
           transition
@@ -300,7 +300,7 @@ class SearchBar extends PureComponent {
               GroupBy: this.state.reportGroupBy,
             }}
           />
-        </CommonModal>
+        </CommonModal> */}
       </GridContainer>
     )
   }
