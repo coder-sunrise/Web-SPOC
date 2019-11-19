@@ -505,6 +505,10 @@ class PatientHistory extends Component {
     const { entity, selected, patientID } = patientHistory
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
+
+    const { location } = window
+
+    const fromConsultation = location.pathname.includes('consultation')
     return (
       <CardContainer
         hideHeader
@@ -541,7 +545,7 @@ class PatientHistory extends Component {
           </GridItem>
           <Authorized authority='patientdashboard.editconsultation'>
             <GridItem md={3}>
-              {(!widget || !findGetParameter('cid')) && (
+              {!fromConsultation && (
                 <ProgressButton
                   color='primary'
                   style={{ marginLeft: theme.spacing(2) }}
