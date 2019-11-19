@@ -38,10 +38,12 @@ export default createListViewModel({
         message: '',
       },
     },
-    subscriptions: ({ dispatch }) => {
+    subscriptions: ({ history, dispatch }) => {
       subscribeNotification('QueueListing', {
         callback: () => {
-          dispatch({ type: 'refresh' })
+          const { location } = history
+          if (location.pathname === '/reception/queue')
+            dispatch({ type: 'refresh' })
         },
       })
     },

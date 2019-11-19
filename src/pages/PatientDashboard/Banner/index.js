@@ -453,6 +453,27 @@ class Banner extends PureComponent {
                       const schemeData = this.getSchemeDetails(o)
                       return (
                         <div>
+                          {schemeData.statusDescription && (
+                            <div
+                              style={{
+                                fontWeight: 500,
+                                display: 'inline-block',
+                              }}
+                            >
+                              <Tooltip
+                                title={
+                                  <p style={{ color: 'red', fontSize: 14 }}>
+                                    {schemeData.statusDescription}
+                                  </p>
+                                }
+                                placement='bottom-end'
+                              >
+                                <IconButton>
+                                  <Warining color='error' />
+                                </IconButton>
+                              </Tooltip>
+                            </div>
+                          )}
                           <CodeSelect
                             text
                             code='ctSchemeType'
@@ -490,29 +511,7 @@ class Banner extends PureComponent {
                             entity={entity}
                             schemeData={schemeData}
                           />
-                          {schemeData.statusDescription ? (
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              <Tooltip
-                                title={
-                                  <p style={{ color: 'red', fontSize: 14 }}>
-                                    {schemeData.statusDescription}
-                                  </p>
-                                }
-                                placement='bottom-end'
-                              >
-                                <IconButton>
-                                  <Warining color='error' />
-                                </IconButton>
-                              </Tooltip>
-                            </div>
-                          ) : (
-                            ''
-                          )}
+
                           {/* <p style={{ color: 'red' }}>
                             {schemeData.statusDescription}
                           </p> */}

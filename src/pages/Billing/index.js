@@ -412,6 +412,7 @@ class Billing extends Component {
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
               // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,
+              paymentCreatedBizSessionFK: sessionInfo.id,
               paymentReceivedBizSessionFK: sessionInfo.id,
               finalPayable: values.finalPayable,
               totalClaim: values.finalClaim,

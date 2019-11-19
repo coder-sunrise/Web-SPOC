@@ -183,10 +183,10 @@ const PatientInfoSideBanner = ({
         className={classes.schemeContainer}
         style={{ maxHeight: height - 455 - 20 }}
       >
-        <LoadingWrapper loading={loading}>
-          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
-            const schemeData = getSchemeDetails(o)
-            return (
+        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
+          const schemeData = getSchemeDetails(o)
+          return (
+            <LoadingWrapper loading={loading}>
               <div style={{ marginBottom: theme.spacing(1) }}>
                 <p style={{ fontWeight: 500 }}>
                   {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
@@ -247,9 +247,9 @@ const PatientInfoSideBanner = ({
                   </div>
                 )}
               </div>
-            )
-          })}
-        </LoadingWrapper>
+            </LoadingWrapper>
+          )
+        })}
       </div>
       {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
         <Divider light />
