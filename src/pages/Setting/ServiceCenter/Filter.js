@@ -75,13 +75,12 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingServiceCenter/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
+                      serviceCenterCategoryFK,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          serviceCenterCategoryFK,
                           combineCondition: 'or',
                         },
                       ],

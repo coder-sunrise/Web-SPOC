@@ -652,6 +652,7 @@ class DODetails extends PureComponent {
                       render={(args) => {
                         return (
                           <TextField
+                            autoFocus
                             label={formatMessage({
                               id: 'inventory.pr.detail.dod.deliveryOrderNo',
                             })}

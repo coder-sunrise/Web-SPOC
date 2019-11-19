@@ -15,6 +15,7 @@ import Button from 'mui-pro-components/CustomButtons'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 import Loading from '@/components/PageLoading/index'
 import { SizeContainer, ProgressButton, Tooltip } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 import { confirmBeforeReload } from '@/utils/utils'
 
 function Transition (props) {
@@ -244,6 +245,7 @@ class CommonModal extends React.PureComponent {
       className,
       displayCloseIcon = true,
       closeIconTooltip = 'Close',
+      loadingText = 'Loading...',
     } = this.props
     if (!children || !open) return null
     // console.log(bodyNoPadding)
@@ -330,33 +332,39 @@ class CommonModal extends React.PureComponent {
               <h4 className={classes.modalTitle}>{title}</h4>
             </DialogTitle>
           )}
-          <DialogContent
-            // id="classic-modal-slide-description"
-            className={`${classes.modalBody} ${bodyNoPadding
-              ? classes.modalBodyNoPadding
-              : classes.modalBodyPadding}`}
-            style={{ maxHeight: this.state.height }}
+          <LoadingWrapper
+            loading={!overrideLoading && loading.global}
+            text={loadingText}
           >
-            {!overrideLoading && loading.global ? (
-              <Loading
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  zIndex: 99999,
-                  height: `${this.myRef.current
-                    ? this.myRef.current.offsetHeight + (bodyNoPadding ? 0 : 16)
-                    : this.state.height}px`,
-                  backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                  margin: bodyNoPadding ? 0 : -8,
-                }}
-              />
-            ) : null}
-            <div ref={this.myRef}>
-              {open ? (
-                <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
-              ) : null}
-            </div>
-          </DialogContent>
+            <DialogContent
+              // id="classic-modal-slide-description"
+              className={`${classes.modalBody} ${bodyNoPadding
+                ? classes.modalBodyNoPadding
+                : classes.modalBodyPadding}`}
+              style={{ maxHeight: this.state.height }}
+            >
+              {/* !overrideLoading && loading.global ? (
+                <Loading
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    zIndex: 99999,
+                    height: `${this.myRef.current
+                      ? this.myRef.current.offsetHeight +
+                        (bodyNoPadding ? 0 : 16)
+                      : this.state.height}px`,
+                    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                    margin: bodyNoPadding ? 0 : -8,
+                  }}
+                />
+              ) : null */}
+              <div ref={this.myRef}>
+                {open ? (
+                  <SizeContainer size='md'>{childrenWithProps}</SizeContainer>
+                ) : null}
+              </div>
+            </DialogContent>
+          </LoadingWrapper>
           {showFooter &&
             this.footer({
               onConfirm: this.onConfirm,

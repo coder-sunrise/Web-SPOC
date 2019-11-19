@@ -54,7 +54,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingRevenue/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
                       group: [
                         {

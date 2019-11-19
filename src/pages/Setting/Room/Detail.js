@@ -60,7 +60,7 @@ class Detail extends PureComponent {
                   return (
                     <TextField
                       label='Code'
-                      autoFocused
+                      autoFocus
                       disabled={!!values.id}
                       {...args}
                     />

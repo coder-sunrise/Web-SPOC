@@ -28,7 +28,7 @@ class TextField extends React.PureComponent {
   validationCount = 0
 
   static defaultProps = {
-    autocomplete: 'nope',
+    autoComplete: 'nope',
   }
 
   constructor (props) {
@@ -307,7 +307,7 @@ TextField.propTypes = {
     PropTypes.bool,
     PropTypes.string,
   ]),
-  autocomplete: PropTypes.oneOf([
+  autoComplete: PropTypes.oneOf([
     'off',
     'on',
     'nope',

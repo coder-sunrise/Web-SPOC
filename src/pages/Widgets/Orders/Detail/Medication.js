@@ -94,12 +94,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-            ? item.dosageDisplayValue
-            : ''} ${item.prescribeUOMDisplayValue
-            ? item.prescribeUOMDisplayValue
-            : ''} ${item.drugFrequencyDisplayValue
-            ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration ? item.duration : ''} day(s)`
+              ? item.dosageDisplayValue
+              : ''} ${item.prescribeUOMDisplayValue
+                ? item.prescribeUOMDisplayValue
+                : ''} ${item.drugFrequencyDisplayValue
+                  ? item.drugFrequencyDisplayValue
+                  : ''} For ${item.duration ? item.duration : ''} day(s)`
         }
       }
       return instruction
@@ -168,8 +168,8 @@ class Medication extends PureComponent {
                 this.calculateQuantity()
               }, 1)
             }}
-            // okText='Yes'
-            // cancelText='No'
+          // okText='Yes'
+          // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -457,21 +457,21 @@ class Medication extends PureComponent {
               />
             ) : (
               <FastField
-                name='inventoryMedicationFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      temp
-                      label='Medication Name'
-                      code='inventorymedication'
-                      labelField='displayValue'
-                      onChange={this.changeMedication}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            )}
+                  name='inventoryMedicationFK'
+                  render={(args) => {
+                    return (
+                      <CodeSelect
+                        temp
+                        label='Medication Name'
+                        code='inventorymedication'
+                        labelField='displayValue'
+                        onChange={this.changeMedication}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              )}
           </GridItem>
         </GridContainer>
         <GridContainer gutter={0}>
@@ -895,7 +895,7 @@ class Medication extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Batch No'
+                    label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedMedication.medicationStock}

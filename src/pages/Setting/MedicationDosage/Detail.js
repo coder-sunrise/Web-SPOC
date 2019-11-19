@@ -38,9 +38,13 @@ const styles = (theme) => ({})
     translationLink: Yup.object().shape({
       translationMasters: Yup.array().of(
         Yup.object().shape({
-          displayValue: Yup.string().when('languageFK', {
+          displayValue: Yup.string().when('tempLanguageFK', {
             is: (v) => v !== undefined,
             then: Yup.string().required(),
+          }),
+          languageFK: Yup.number().when('displayValue', {
+            is: (v) => v !== undefined && v !== null && v.trim() !== '',
+            then: Yup.number().required(),
           }),
         }),
       ),
@@ -73,7 +77,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingMedicationDosage } = props
+    const { theme, footer, settingMedicationDosage, setFieldValue } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -85,7 +89,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
-                    autoFocused
+                    autoFocus
                     {...args}
                     disabled={!!settingMedicationDosage.entity}
                   />
@@ -159,6 +163,12 @@ class Detail extends PureComponent {
                     <CodeSelect
                       label='Translation Language'
                       code='ctLanguage'
+                      onChange={(value) => {
+                        setFieldValue(
+                          `translationLink.translationMasters[0].tempLanguageFK`,
+                          value,
+                        )
+                      }}
                       {...args}
                     />
                   )

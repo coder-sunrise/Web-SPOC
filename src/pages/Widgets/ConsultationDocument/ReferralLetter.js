@@ -76,7 +76,7 @@ class ReferralLetter extends PureComponent {
             <FastField
               name='referralDate'
               render={(args) => {
-                return <DatePicker label='Date' {...args} />
+                return <DatePicker label='Date' autoFocus {...args} />
               }}
             />
           </GridItem>
