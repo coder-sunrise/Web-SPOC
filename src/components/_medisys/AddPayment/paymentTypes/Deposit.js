@@ -56,6 +56,7 @@ const Deposit = ({
                 label='Amount'
                 {...args}
                 currency
+                autoFocus
                 max={maxAmount}
                 onChange={handleAmountChange}
               />

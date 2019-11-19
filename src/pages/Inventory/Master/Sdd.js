@@ -80,7 +80,9 @@ const Sdd = ({ dispatch, handleSelectSdd, theme, ...props }) => {
           <FastField
             name='sddIdName'
             render={(args) => {
-              return <TextField label='SDD ID/Description' {...args} />
+              return (
+                <TextField label='SDD ID/Description' autoFocus {...args} />
+              )
             }}
           />
         </GridItem>

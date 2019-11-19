@@ -4,8 +4,8 @@ import { formatMessage } from 'umi/locale'
 
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
-import { DatePicker, Select, NumberInput, TextField } from '@/components'
 import { GridContainer, GridItem } from 'mui-pro-components'
+import { DatePicker, Select, NumberInput, TextField } from '@/components'
 
 const styles = (theme) => ({
   formContainer: {
@@ -39,6 +39,7 @@ class ExpenseDetail extends PureComponent {
                   <DatePicker
                     label={formatMessage({ id: 'finance.doctor-expense.date' })}
                     timeFormat={false}
+                    autoFocus
                     {...args}
                   />
                 )}

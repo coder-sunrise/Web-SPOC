@@ -41,6 +41,7 @@ const DeleteConfirmation = ({
       <GridItem md={10} className={classes.spacing}>
         <TextField
           label='Reason'
+          autoFocus
           onChange={(e) => setCancelReason(e.target.value)}
         />
       </GridItem>

@@ -27,7 +27,7 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
             <FastField
               name='code'
               render={(args) => (
-                <TextField {...args} disabled={isEdit} label='Code' />
+                <TextField {...args} disabled={isEdit} autoFocus label='Code' />
               )}
             />
           </GridItem>
