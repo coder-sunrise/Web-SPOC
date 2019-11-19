@@ -77,11 +77,11 @@ class Filter extends PureComponent {
                     payload: {
                       keepFilter: false,
                       isActive,
+                      serviceCenterCategoryFK,
                       group: [
                         {
                           code: codeDisplayValue,
                           displayValue: codeDisplayValue,
-                          serviceCenterCategoryFK,
                           combineCondition: 'or',
                         },
                       ],
