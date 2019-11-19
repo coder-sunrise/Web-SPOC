@@ -62,7 +62,6 @@ const VisitInfoCard = ({
             name={FormField['visit.visitType']}
             render={(args) => (
               <CodeSelect
-                autoFocus
                 disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitType',

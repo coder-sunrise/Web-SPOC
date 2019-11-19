@@ -15,6 +15,7 @@ import {
   dateFormatLong,
   NumberInput,
 } from '@/components'
+import { MoreButton } from '@/components/_medisys'
 
 const SchemePopover = ({
   isBanner = false,
@@ -116,7 +117,7 @@ const SchemePopover = ({
               {acuteBalanceStatusCode === 'SC100' ||
               (acuteVisitPatientBalance !== undefined &&
                 acuteBalanceStatusCode === undefined) ? (
-                  <GridItem>
+                <GridItem>
                   Patient Acute Visit Balance:{' '}
                   <div
                     style={{
@@ -137,7 +138,7 @@ const SchemePopover = ({
               {acuteBalanceStatusCode === 'SC100' ||
               (acuteVisitClinicBalance !== undefined &&
                 acuteBalanceStatusCode === undefined) ? (
-                  <GridItem>
+                <GridItem>
                   Patient Acute Clinic Balance:
                   <div
                     style={{
@@ -173,6 +174,21 @@ const SchemePopover = ({
           }}
         >
           {isBanner ? (
+            <MoreButton />
+          ) : (
+            <IconButton>
+              <More />
+            </IconButton>
+          )}
+        </div>
+        {/* <div
+          style={{
+            display: 'inline-block',
+            right: 10,
+            position: isBanner ? '' : 'absolute',
+          }}
+        >
+          {isBanner ? (
             <Button simple variant='outlined' color='info' size='sm'>
               More
             </Button>
@@ -181,7 +197,7 @@ const SchemePopover = ({
               <More />
             </IconButton>
           )}
-        </div>
+        </div> */}
       </Popover>
       <CommonModal
         open={showReplacementModal}
