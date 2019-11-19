@@ -164,11 +164,11 @@ export const QueueTableConfig = {
 }
 
 export const QueueColumnExtensions = [
-  {
-    columnName: 'visitStatus',
-    width: 180,
-    render: (row) => <VisitStatusTag row={row} />,
-  },
+  // {
+  //   columnName: 'visitStatus',
+  //   width: 180,
+  //   render: (row) => <VisitStatusTag row={row} />,
+  // },
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
 

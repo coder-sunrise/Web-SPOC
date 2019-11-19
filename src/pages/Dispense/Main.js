@@ -11,7 +11,8 @@ import {
   notification,
 } from '@/components'
 // sub component
-import DispenseDetails from './DispenseDetails'
+// import DispenseDetails from './DispenseDetails'
+import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
 // utils
 import {
   calculateAmount,
@@ -189,7 +190,7 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit } = this.props
-    console.log({ values: this.props.values })
+
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
