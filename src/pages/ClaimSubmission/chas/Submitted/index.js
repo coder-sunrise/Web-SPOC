@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
 // material ui
@@ -95,7 +96,7 @@ class SubmittedCHAS extends React.Component {
       dispatch,
       values,
     } = this.props
-    const { isLoading } = this.state
+    const { isLoading,selectedRows } = this.state
     const { list } = claimSubmissionSubmitted || []
 
     return (
@@ -136,9 +137,12 @@ class SubmittedCHAS extends React.Component {
               <ProgressButton
                 icon={null}
                 color='primary'
+                disabled={selectedRows.length <= 0}
                 onClick={this.handleGetStatusClicked}
               >
-                Get Status
+                {formatMessage({
+                  id: 'claimsubmission.invoiceClaim.GetStatus',
+                })}
               </ProgressButton>
             </GridItem>
           </GridContainer>

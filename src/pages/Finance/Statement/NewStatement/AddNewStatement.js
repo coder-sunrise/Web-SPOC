@@ -88,13 +88,13 @@ class AddNewStatement extends PureComponent {
       {
         name: this.props.statement.entity
           ? 'payableAmount'
-          : 'patientPayableAmount',
+          : 'copayerPayableAmount',
         title: 'Payable Amount',
       },
       {
         name: this.props.statement.entity
           ? 'outstandingAmount'
-          : 'patientOutstanding',
+          : 'copayerOutstanding',
         title: 'Outstanding Amount',
       },
       { name: 'remark', title: 'Remarks' },
@@ -103,14 +103,14 @@ class AddNewStatement extends PureComponent {
       {
         columnName: this.props.statement.entity
           ? 'payableAmount'
-          : 'patientPayableAmount',
+          : 'copayerPayableAmount',
         type: 'number',
         currency: true,
       },
       {
         columnName: this.props.statement.entity
           ? 'outstandingAmount'
-          : 'patientOutstanding',
+          : 'copayerOutstanding',
         type: 'number',
         currency: true,
       },
@@ -388,7 +388,13 @@ class AddNewStatement extends PureComponent {
               rows={invoiceRows}
               columns={columns}
               columnExtensions={columnExtensions}
-              FuncProps={{ selectable: true }}
+              FuncProps={{
+                selectable: true,
+                selectConfig: {
+                  showSelectAll: true,
+                  rowSelectionEnabled: () => true,
+                },
+              }}
               selection={this.state.selectedRows}
               onSelectionChange={this.handleSelectionChange}
             />
