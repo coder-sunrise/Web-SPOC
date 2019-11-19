@@ -225,7 +225,7 @@ const DiagnosisItem = ({
         <GridItem style={{ alignItems: 'center', display: 'flex' }} xs={5}>
           <React.Fragment>
             {showPersistMsg === true ? (
-              <div>
+              <div style={{ fontSize: 12 }}>
                 Diagnosis will be removed from patient's medical problem
               </div>
             ) : (
