@@ -8,7 +8,7 @@ import { headerHeight } from 'mui-pro-jss'
 import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
-import { SchemePopover } from 'medisys-components'
+import { SchemePopover, MoreButton } from '@/components/_medisys'
 import {
   GridContainer,
   GridItem,
@@ -21,9 +21,11 @@ import {
   Popover,
   Button,
   NumberInput,
+  Info,
 } from '@/components'
 import { getAppendUrl } from '@/utils/utils'
 import Block from './Block'
+import HistoryDiagnosis from './HistoryDiagnosis'
 import { control } from '@/components/Decorator'
 
 @control()
@@ -71,14 +73,12 @@ class Banner extends PureComponent {
 
     let allergyData = ' '
 
-    if (da.length) {
+    if (da.length > 0) {
       if (da.length >= 2) {
         allergyData = `${da[0].name}, ${da[1].name}`
       } else {
         allergyData = `${da[0].name}`
       }
-    } else {
-      allergyData = '-'
     }
 
     if (da.length) {
@@ -108,12 +108,12 @@ class Banner extends PureComponent {
         ) : (
           <div>
             {allergyData.length > 25 ? (
-              `${allergyData.substring(0, 25)}...`
+              `${allergyData.substring(0, 25).trim()}...`
             ) : (
               allergyData
             )}
 
-            {da.length ? (
+            {da.length > 0 && (
               <Popover
                 icon={null}
                 content={
@@ -132,14 +132,10 @@ class Banner extends PureComponent {
                 trigger='click'
                 placement='bottomLeft'
               >
-                <div>
-                  <Button simple variant='outlined' color='info' size='sm'>
-                    More
-                  </Button>
+                <div style={{ display: 'inline-block' }}>
+                  <MoreButton />
                 </div>
               </Popover>
-            ) : (
-              ' '
             )}
           </div>
         )}
@@ -276,69 +272,51 @@ class Banner extends PureComponent {
     }
   }
 
-  displayMedicalProblemData (entity) {
+  displayMedicalProblemData (entity = { patientHistoryDiagnosis: [] }) {
     let medicalProblemData = ''
+    const { patientHistoryDiagnosis = [] } = entity
 
-    if (
-      entity &&
-      entity.patientHistoryDiagnosis &&
-      entity.patientHistoryDiagnosis.length > 1
-    ) {
-      if (entity.patientHistoryDiagnosis.length >= 2) {
-        medicalProblemData = `${entity.patientHistoryDiagnosis[0]
-          .diagnosisDescription}, ${entity.patientHistoryDiagnosis[1]
+    if (patientHistoryDiagnosis.length > 0) {
+      if (patientHistoryDiagnosis.length >= 2) {
+        medicalProblemData = `${patientHistoryDiagnosis[0]
+          .diagnosisDescription}, ${patientHistoryDiagnosis[1]
           .diagnosisDescription}`
       } else {
-        medicalProblemData = `${entity.patientHistoryDiagnosis[0]
+        medicalProblemData = `${patientHistoryDiagnosis[0]
           .diagnosisDescription}`
       }
-    } else {
-      medicalProblemData = '-'
     }
+
     return (
-      <div>
-        <div style={{ paddingTop: 5 }}>
+      <div style={{ display: 'inline-block' }}>
+        <div style={{ paddingTop: 5, display: 'inline-block' }}>
           {medicalProblemData.length > 25 ? (
-            `${medicalProblemData.substring(0, 25)}...`
+            `${medicalProblemData.substring(0, 25).trim()}...`
           ) : (
             medicalProblemData
           )}
         </div>
 
-        {entity.patientHistoryDiagnosis &&
-        entity.patientHistoryDiagnosis.length ? (
+        {patientHistoryDiagnosis.length > 0 && (
           <Popover
             icon={null}
             content={
-              <div>
-                {entity.patientHistoryDiagnosis.map((item, i) => {
-                  return (
-                    <GridContainer>
-                      <GridItem>
-                        {i + 1}. {item.diagnosisDescription}
-                      </GridItem>
-                    </GridContainer>
-                  )
-                })}
-              </div>
+              <HistoryDiagnosis
+                patientHistoryDiagnosis={entity.patientHistoryDiagnosis}
+              />
             }
             trigger='click'
             placement='bottomLeft'
           >
-            <div>
-              <Button simple variant='outlined' color='info' size='sm'>
-                More
-              </Button>
+            <div style={{ display: 'inline-block' }}>
+              <MoreButton />
             </div>
           </Popover>
-        ) : (
-          ' '
         )}
       </div>
     )
   }
 
-  // {da.length ? `${da[0].name}${da.length > 1 ? ' ...' : ''}` : '-'}
   render () {
     const { props } = this
     const {
@@ -436,14 +414,12 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div style={allergiesStyle()}>
-                  {this.state.showWarning ? (
+                  {this.state.showWarning && (
                     <IconButton disabled>
                       <Warining color='error' />
                     </IconButton>
-                  ) : (
-                    ''
                   )}
-                  {'Allergies'} {this.getAllergyLink('link')}
+                  Allergies&nbsp;{this.getAllergyLink('link')}
                 </div>
               }
               body={this.getAllergyLink(' ')}
@@ -459,14 +435,12 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  {'Scheme'}{' '}
+                  Scheme&nbsp;
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
-                    .length > 0 ? (
-                      <IconButton onClick={this.refreshChasBalance}>
-                        <Refresh />
-                      </IconButton>
-                  ) : (
-                    ''
+                    .length > 0 && (
+                    <IconButton onClick={this.refreshChasBalance}>
+                      <Refresh />
+                    </IconButton>
                   )}
                 </div>
               }
@@ -502,7 +476,7 @@ class Banner extends PureComponent {
                               />
                             )}
                           </div>
-                          <br />
+
                           <SchemePopover
                             isBanner
                             isShowReplacementModal={
