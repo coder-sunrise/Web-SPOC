@@ -61,7 +61,8 @@ class Detail extends PureComponent {
                   <TextField
                     label='Code'
                     {...args}
-                    disabled={settingParticipantRole.entity ? true : false}
+                    autoFocus
+                    disabled={!!settingParticipantRole.entity}
                   />
                 )}
               />

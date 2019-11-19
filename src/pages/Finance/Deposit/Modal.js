@@ -295,6 +295,7 @@ class Modal extends PureComponent {
                     onChange={this.onChangeDate}
                     disabledDate={(d) => !d || d.isAfter(moment())}
                     label='Date'
+                    autoFocus
                     {...args}
                   />
                 )}

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { FormattedMessage } from 'umi/locale'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
@@ -60,9 +60,9 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
-                    autoFocused
+                    autoFocus
                     {...args}
-                    disabled={settingServiceCategory.entity ? true : false}
+                    disabled={!!settingServiceCategory.entity}
                   />
                 )}
               />

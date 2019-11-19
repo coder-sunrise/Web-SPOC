@@ -46,6 +46,7 @@ const CreditCard = ({
                 {...args}
                 label='Card Type'
                 code='ctcreditcardtype'
+                autoFocus
                 onChange={(value) => {
                   setFieldValue(
                     `paymentList[${index}].creditCardPayment.creditCardType`,

@@ -87,20 +87,20 @@ import MiscCrNote from './MiscCrNote'
           return { ...item }
         }),
     }
-
-    dispatch({
-      type: 'invoiceCreditNote/upsert',
-      payload,
-    }).then((r) => {
-      if (r) {
-        if (onConfirm) onConfirm()
-        // Refresh invoice & invoicePayer
-        onRefresh()
-        // dispatch({
-        //   type: 'settingClinicService/query',
-        // })
-      }
-    })
+    console.log({ payload })
+    // dispatch({
+    //   type: 'invoiceCreditNote/upsert',
+    //   payload,
+    // }).then((r) => {
+    //   if (r) {
+    //     if (onConfirm) onConfirm()
+    //     // Refresh invoice & invoicePayer
+    //     onRefresh()
+    //     // dispatch({
+    //     //   type: 'settingClinicService/query',
+    //     // })
+    //   }
+    // })
   },
 })
 class AddCrNote extends Component {
@@ -221,6 +221,7 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
+    console.log({ values })
     return (
       <div>
         <CrNoteForm />
@@ -244,6 +245,7 @@ class AddCrNote extends Component {
               columnName: 'quantity',
               render: (row) => {
                 const { quantity, originRemainingQty } = row
+                console.log({ row })
                 return (
                   <Field
                     name={`creditNoteItem[${row.rowIndex}].quantity`}
@@ -254,7 +256,7 @@ class AddCrNote extends Component {
                             size='sm'
                             style={{ width: '92%' }}
                             disabled={row.itemType.toLowerCase() === 'misc'}
-                            onChange={() => this.handleOnChangeQuantity()}
+                            onChange={this.handleOnChangeQuantity}
                             min={1}
                             // max={row.originRemainingQty}
                             {...args}
@@ -289,8 +291,20 @@ class AddCrNote extends Component {
             },
             {
               columnName: 'totalAfterGST',
-              type: 'currency',
-              currency: true,
+              // type: 'currency',
+              // currency: true,
+              render: (row) => {
+                return (
+                  <Field
+                    name={`creditNoteItem[${row.rowIndex}]._totalAfterGST`}
+                    render={(args) => (
+                      <SizeContainer size='sm'>
+                        <NumberInput {...args} currency />
+                      </SizeContainer>
+                    )}
+                  />
+                )
+              },
             },
 
             {

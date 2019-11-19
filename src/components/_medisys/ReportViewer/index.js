@@ -198,6 +198,7 @@ const ReportViewer = ({
             <div className={classes.pageNumber}>
               <span>Page: </span>
               <InputNumber
+                autoFocus
                 min={1}
                 max={numOfPages}
                 value={pageNumber}

@@ -43,6 +43,7 @@ const Nets = ({
                 label='Amount'
                 {...args}
                 currency
+                autoFocus
                 onChange={handleAmountChange}
               />
             )}

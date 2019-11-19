@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common component
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 // medisys component
 import { LoadingWrapper } from '@/components/_medisys'
 // sub component
@@ -21,6 +21,7 @@ const styles = (theme) => ({
   roomBlock,
   loading: loading.models.roomBlock,
 }))
+@withSettingBase({ modelName: 'roomBlock' })
 class RoomBlock extends PureComponent {
   state = {
     showModal: false,

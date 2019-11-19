@@ -23,6 +23,7 @@ const WriteOff = ({ classes, handleSubmit, onClose }) => {
             label='Reason'
             onChange={(e) => setReason(e.target.value)}
             defaultValue=''
+            autoFocus
           />
         </GridItem>
         <Button color='danger' onClick={onClose}>

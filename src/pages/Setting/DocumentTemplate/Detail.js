@@ -82,6 +82,7 @@ class Detail extends PureComponent {
                     <CodeSelect
                       code='LTDocumentTemplateType'
                       label='Document Type'
+                      autoFocus
                       {...args}
                     />
                   )

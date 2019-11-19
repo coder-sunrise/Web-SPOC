@@ -122,7 +122,7 @@ export default withFormik({
   validationSchema: Yup.object().shape({
     clinicCode: Yup.string().required('Cinic Code is a required field'),
     userName: Yup.string().required('Username is a required field'),
-    countryCodes: Yup.string().required('Country Code is a required field'),
+    countryCode: Yup.string().required('Country Code is a required field'),
     phoneNumber: Yup.number().required('Mobile Number is a required field'),
   }),
   mapPropsToValues: ({ payload }) => ({

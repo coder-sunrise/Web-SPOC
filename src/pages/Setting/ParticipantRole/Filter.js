@@ -70,7 +70,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingParticipantRole/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
                       group: [
                         {

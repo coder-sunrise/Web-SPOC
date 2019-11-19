@@ -79,7 +79,7 @@ class Others extends PureComponent {
             <FastField
               name='title'
               render={(args) => {
-                return <TextField label='Title' {...args} />
+                return <TextField label='Title' autoFocus {...args} />
               }}
             />
           </GridItem>

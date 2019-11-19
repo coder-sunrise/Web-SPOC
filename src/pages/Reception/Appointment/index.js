@@ -391,6 +391,12 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  handleAfterSubmitDoctorBlock = () => {
+    this.props.dispatch({
+      type: 'calendar/refresh',
+    })
+  }
+
   render () {
     const { calendar: CalendarModel, classes, calendarLoading } = this.props
     const {
@@ -494,6 +500,7 @@ class Appointment extends React.PureComponent {
           <DoctorBlockForm
             initialProps={selectedSlot}
             validationSchema={DoctorFormValidation}
+            handleAfterSubmit={this.handleAfterSubmitDoctorBlock}
           />
         </CommonModal>
         <CommonModal

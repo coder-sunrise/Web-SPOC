@@ -110,7 +110,7 @@ class MedicalCertificate extends PureComponent {
             <FastField
               name='mcIssueDate'
               render={(args) => {
-                return <DatePicker label='Issue Date' {...args} />
+                return <DatePicker label='Issue Date' autoFocus {...args} />
               }}
             />
           </GridItem>

@@ -93,7 +93,7 @@ class VaccinationCertificate extends PureComponent {
             <FastField
               name='certificateDate'
               render={(args) => {
-                return <DatePicker label='Date' {...args} />
+                return <DatePicker label='Date' autoFocus {...args} />
               }}
             />
           </GridItem>

@@ -76,7 +76,6 @@ const recurrenceTypes = [
     props.dispatch({
       type: 'doctorBlock/query',
       payload: {
-        keepFilter: false,
         // [`${prefix}name`]: values.doctorName,
         [`${prefix}DoctorBlockGroupFKNavigation.DoctorBlockUserFkNavigation.ClinicianProfile.DoctorProfileFkNavigation.Id`]: doctorIDs,
         lgteql_startDateTime: values.dateFrom

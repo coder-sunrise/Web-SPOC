@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -18,6 +18,7 @@ const styles = (theme) => ({
   settingServiceCenter,
   global,
 }))
+@withSettingBase({ modelName: 'settingServiceCenter' })
 class ServiceCenter extends PureComponent {
   state = {}
 
@@ -48,7 +49,13 @@ class ServiceCenter extends PureComponent {
         <CommonModal
           open={settingServiceCenter.showModal}
           observe='ServiceCenterDetail'
-          title={settingServiceCenter.entity ? 'Edit Service Center' : 'Add Service Center'} 
+          title={
+            settingServiceCenter.entity ? (
+              'Edit Service Center'
+            ) : (
+              'Add Service Center'
+            )
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

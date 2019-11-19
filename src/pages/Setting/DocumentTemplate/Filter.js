@@ -73,7 +73,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingDocumentTemplate/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
                       group: [
                         {

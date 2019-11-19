@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles, Divider } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -18,6 +18,7 @@ const styles = (theme) => ({
   settingServiceCenterCategory,
   global,
 }))
+@withSettingBase({ modelName: 'settingServiceCenterCategory' })
 class ServiceCenterCategory extends PureComponent {
   state = {}
 
@@ -31,7 +32,7 @@ class ServiceCenterCategory extends PureComponent {
     return (
       <CardContainer hideHeader>
         <Filter {...this.props} />
-        <Grid  {...this.props} />
+        <Grid {...this.props} />
       </CardContainer>
     )
   }

@@ -222,6 +222,7 @@ class CollectPaymentConfirm extends PureComponent {
                     {...args}
                     currency
                     label='Amount'
+                    autoFocus
                     onChange={this.handlePaymentAmount}
                   />
                 )}
