@@ -16,9 +16,8 @@ import {
   GridContainer,
   GridItem,
   TextField,
-  NumberInput,
 } from '@/components'
-import { Mobile } from '@/components/_medisys'
+import { MobileNumberInput } from '@/components/_medisys'
 import { countryCodes } from '@/utils/codes'
 // styles
 import { container } from '@/assets/jss'
@@ -95,7 +94,9 @@ const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
           <GridItem md={6}>
             <FastField
               name='phoneNumber'
-              render={(args) => <Mobile {...args} label='Mobile Number' />}
+              render={(args) => (
+                <MobileNumberInput {...args} label='Mobile Number' />
+              )}
             />
           </GridItem>
           <GridItem md={12} className={classes.buttonRow}>
@@ -121,7 +122,7 @@ export default withFormik({
   validationSchema: Yup.object().shape({
     clinicCode: Yup.string().required('Cinic Code is a required field'),
     userName: Yup.string().required('Username is a required field'),
-    countryCodes: Yup.string().required('Country Code is a required field'),
+    countryCode: Yup.string().required('Country Code is a required field'),
     phoneNumber: Yup.number().required('Mobile Number is a required field'),
   }),
   mapPropsToValues: ({ payload }) => ({

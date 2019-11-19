@@ -54,7 +54,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingConsumableUOM/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
                       group: [
                         {

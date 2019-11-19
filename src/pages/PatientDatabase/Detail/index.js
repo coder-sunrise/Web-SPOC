@@ -79,7 +79,10 @@ const styles = () => ({
           [],
         ),
     }
-    return mappedValues
+    return {
+      ...mappedValues,
+      nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
+    }
   },
   validationSchema: schema,
 

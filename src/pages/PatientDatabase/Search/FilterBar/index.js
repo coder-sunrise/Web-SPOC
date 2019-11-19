@@ -54,8 +54,9 @@ class FilterBar extends PureComponent {
               render={(args) => {
                 return (
                   <TextField
+                    autoFocus
                     label={formatMessage({
-                      id: 'patient.search.message',
+                      id: 'reception.queue.patientSearchPlaceholder',
                     })}
                     {...args}
                   />

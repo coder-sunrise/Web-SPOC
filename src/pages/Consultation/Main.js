@@ -15,7 +15,6 @@ import {
   Paper,
   withStyles,
   IconButton,
-  Popper,
   Fade,
   ClickAwayListener,
   Divider,

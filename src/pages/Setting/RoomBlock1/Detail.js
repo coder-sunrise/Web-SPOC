@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
-import Yup from '@/utils/yup'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import moment from 'moment'
+import Yup from '@/utils/yup'
 import {
   withFormikExtend,
   FastField,
@@ -93,7 +93,7 @@ class Detail extends PureComponent {
               <FastField
                 name='roomFK'
                 render={(args) => (
-                  <CodeSelect label='Room' code='ctRoom' {...args} />
+                  <CodeSelect label='Room' autoFocus code='ctRoom' {...args} />
                 )}
               />
             </GridItem>

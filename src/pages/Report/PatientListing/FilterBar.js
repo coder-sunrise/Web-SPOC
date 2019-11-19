@@ -1,6 +1,7 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import { formatMessage } from 'umi/locale'
 // common components
 import {
   Button,
@@ -29,7 +30,9 @@ const FilterBar = ({ handleSubmit }) => {
               render={(args) => (
                 <TextField
                   {...args}
-                  label='Patient Name, Acc. No., Ref. No., Contact No.'
+                  label={formatMessage({
+                    id: 'reception.queue.patientSearchPlaceholder',
+                  })}
                 />
               )}
             />
@@ -38,17 +41,13 @@ const FilterBar = ({ handleSubmit }) => {
           <GridItem md={1}>
             <FastField
               name='ageFrom'
-              render={(args) => (
-                <NumberInput {...args} label='Age From'/>
-              )}
+              render={(args) => <NumberInput {...args} label='Age From' />}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='ageTo'
-              render={(args) => (
-                <NumberInput {...args} label='Age To'/>
-              )}
+              render={(args) => <NumberInput {...args} label='Age To' />}
             />
           </GridItem>
           <GridItem md={2}>
@@ -62,16 +61,14 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='dateFrom'
               render={(args) => (
-                <DatePicker {...args} label='Visit Date From'/>
+                <DatePicker {...args} label='Visit Date From' />
               )}
             />
           </GridItem>
           <GridItem md={2}>
             <FastField
               name='dateTo'
-              render={(args) => (
-                <DatePicker {...args} label='Visit Date To'/>
-              )}
+              render={(args) => <DatePicker {...args} label='Visit Date To' />}
             />
           </GridItem>
           <GridItem md={1}>

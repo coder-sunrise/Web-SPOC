@@ -88,18 +88,27 @@ class Grid extends PureComponent {
   cancelRow = (row) => {
     const { dispatch, inventoryAdjustment } = this.props
 
-    this.props
-      .dispatch({
-        type: 'inventoryAdjustment/removeRow',
-        payload: {
-          id: row.id,
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to delete record - ${row.transactionNo} ?`,
+        onConfirmDiscard: () => {
+          this.props
+            .dispatch({
+              type: 'inventoryAdjustment/removeRow',
+              payload: {
+                id: row.id,
+              },
+            })
+            .then(() => {
+              this.props.dispatch({
+                type: 'inventoryAdjustment/query',
+              })
+            })
         },
-      })
-      .then(() => {
-        this.props.dispatch({
-          type: 'inventoryAdjustment/query',
-        })
-      })
+      },
+    })
   }
 
   render () {
