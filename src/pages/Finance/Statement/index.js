@@ -234,17 +234,17 @@ class Statement extends PureComponent {
                             <MenuItem
                               onClick={() => this.toggleReport('Patient', row)}
                             >
-                              Patient
+                              By Patient
                             </MenuItem>
                             <MenuItem
                               onClick={() => this.toggleReport('Doctor', row)}
                             >
-                              Doctor
+                              By Doctor
                             </MenuItem>
                             <MenuItem
                               onClick={() => this.toggleReport('Item', row)}
                             >
-                              Item
+                              By Item
                             </MenuItem>
                           </MenuList>
                         }
