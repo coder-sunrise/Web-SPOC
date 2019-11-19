@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -18,6 +18,7 @@ const styles = (theme) => ({
   settingServiceCategory,
   global,
 }))
+@withSettingBase({ modelName: 'settingServiceCategory' })
 class ServiceCategory extends PureComponent {
   state = {}
 

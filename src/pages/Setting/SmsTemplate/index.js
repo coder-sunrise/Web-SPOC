@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
 import Filter from './Filter'
 import Grid from './Grid'
@@ -14,10 +14,10 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingSmsTemplate, global }) => ({
+@connect(({ settingSmsTemplate }) => ({
   settingSmsTemplate,
-  global,
 }))
+@withSettingBase({ modelName: 'settingSmsTemplate' })
 class ServiceCenter extends PureComponent {
   state = {}
 
@@ -51,7 +51,7 @@ class ServiceCenter extends PureComponent {
     const { settingSmsTemplate } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
-    } 
+    }
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
@@ -60,7 +60,7 @@ class ServiceCenter extends PureComponent {
           open={settingSmsTemplate.showModal}
           observe='TemplateMessageDetail'
           // title={this.getModalTitle(settingSmsTemplate.entity)}
-          title={`${settingSmsTemplate.entity ? 'Edit ' : 'Add '  }SMS Template`}
+          title={`${settingSmsTemplate.entity ? 'Edit ' : 'Add '}SMS Template`}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

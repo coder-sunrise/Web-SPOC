@@ -53,7 +53,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingPaymentMode/query',
                     payload: {
-                      keepFilter: false,
                       isActive,
                       group: [
                         {
