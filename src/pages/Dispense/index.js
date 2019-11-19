@@ -209,7 +209,7 @@ class Dispense extends PureComponent {
           <SizeContainer size='sm'>
             <React.Fragment>
               {!editingOrder ? (
-                <Main {...this.props} onPrint={this.handleOnPrint} />
+                <Main {...this.props} />
               ) : (
                 <EditOrder {...this.props} />
               )}
