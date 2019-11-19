@@ -345,7 +345,7 @@ class PatientDetail extends PureComponent {
         <GridItem xs={12} sm={12} md={2}>
           <Card profile>
             <CardBody profile>
-              <PatientInfoSideBanner entity={entity} dispatch={dispatch} />
+              <PatientInfoSideBanner entity={entity} />
               <MenuList>
                 {this.widgets
                   .filter(

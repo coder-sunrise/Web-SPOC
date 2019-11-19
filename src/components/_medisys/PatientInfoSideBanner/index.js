@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
+import { connect } from 'dva'
 import classnames from 'classnames'
 import moment from 'moment'
 import _ from 'lodash'
-// antd
-import { Skeleton } from 'antd'
 // material ui
 import { withStyles, Divider } from '@material-ui/core'
 // common components
@@ -25,6 +24,7 @@ const PatientInfoSideBanner = ({
   theme,
   classes,
   entity,
+  loading,
   dispatch,
 }) => {
   const entityNameClass = classnames({
@@ -156,12 +156,12 @@ const PatientInfoSideBanner = ({
           text
           code='ctSalutation'
           value={entity.salutationFK}
-        />{' '}
+        />&nbsp;
         {entity.name}
       </h4>
       <p>{entity.patientReferenceNo}</p>
       <p>
-        {entity.patientAccountNo},{' '}
+        {entity.patientAccountNo},&nbsp;
         <CodeSelect text code='ctNationality' value={entity.nationalityFK} />
       </p>
 
@@ -183,70 +183,73 @@ const PatientInfoSideBanner = ({
         className={classes.schemeContainer}
         style={{ maxHeight: height - 455 - 20 }}
       >
-        {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
-          const schemeData = getSchemeDetails(o)
-          return (
-            <div style={{ marginBottom: theme.spacing(1) }}>
-              <p style={{ fontWeight: 500 }}>
-                {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
-                <CodeSelect
-                  text
-                  code='ctSchemeType'
-                  value={schemeData.schemeTypeFK}
-                />
-                <IconButton>
-                  <Refresh
-                    onClick={() =>
+        <LoadingWrapper loading={loading}>
+          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
+            const schemeData = getSchemeDetails(o)
+            return (
+              <div style={{ marginBottom: theme.spacing(1) }}>
+                <p style={{ fontWeight: 500 }}>
+                  {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}
+                  <CodeSelect
+                    text
+                    code='ctSchemeType'
+                    value={schemeData.schemeTypeFK}
+                  />
+                  <IconButton>
+                    <Refresh
+                      onClick={() =>
+                        refreshChasBalance(
+                          schemeData.patientCoPaymentSchemeFK,
+                          schemeData.schemeTypeFK,
+                        )}
+                    />
+                  </IconButton>
+
+                  <SchemePopover
+                    isShowReplacementModal={schemeData.isShowReplacementModal}
+                    handleRefreshChasBalance={() =>
                       refreshChasBalance(
                         schemeData.patientCoPaymentSchemeFK,
                         schemeData.schemeTypeFK,
                       )}
+                    entity={entity}
+                    schemeData={schemeData}
                   />
-                </IconButton>
-
-                <SchemePopover
-                  isShowReplacementModal={schemeData.isShowReplacementModal}
-                  handleRefreshChasBalance={() =>
-                    refreshChasBalance(
-                      schemeData.patientCoPaymentSchemeFK,
-                      schemeData.schemeTypeFK,
-                    )}
-                  entity={entity}
-                  schemeData={schemeData}
-                />
-              </p>
-              {schemeData.validFrom && (
-                <div>
-                  <p>
-                    Balance:{' '}
-                    {schemeData.chronicBalanceStatusCode === 'SC105' ? (
-                      'Full Balance'
-                    ) : (
-                      <NumberInput text currency value={schemeData.balance} />
-                    )}
-                  </p>
-                  <p>
-                    Validity:{' '}
-                    <DatePicker
-                      text
-                      format={dateFormatLong}
-                      // value={o.validFrom}
-                      value={schemeData.validFrom}
-                    />{' '}
-                    -{' '}
-                    <DatePicker
-                      text
-                      format={dateFormatLong}
-                      // value={o.validTo}
-                      value={schemeData.validTo}
-                    />
-                  </p>
-                  <p style={{ color: 'red' }}>{schemeData.statusDescription}</p>
-                </div>
-              )}
-            </div>
-          )
-        })}
+                </p>
+                {schemeData.validFrom && (
+                  <div>
+                    <p>
+                      Balance:&nbsp;
+                      {schemeData.chronicBalanceStatusCode === 'SC105' ? (
+                        'Full Balance'
+                      ) : (
+                        <NumberInput text currency value={schemeData.balance} />
+                      )}
+                    </p>
+                    <p>
+                      Validity:&nbsp;
+                      <DatePicker
+                        text
+                        format={dateFormatLong}
+                        // value={o.validFrom}
+                        value={schemeData.validFrom}
+                      />&nbsp; -&nbsp;
+                      <DatePicker
+                        text
+                        format={dateFormatLong}
+                        // value={o.validTo}
+                        value={schemeData.validTo}
+                      />
+                    </p>
+                    <p style={{ color: 'red' }}>
+                      {schemeData.statusDescription}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </LoadingWrapper>
       </div>
       {entity.patientScheme.filter((o) => o.schemeTypeFK <= 5).length > 0 && (
         <Divider light />
@@ -255,7 +258,11 @@ const PatientInfoSideBanner = ({
   ) : null
 }
 
+const ConnectedPatientInfoSideBanner = connect(({ loading }) => ({
+  loading: loading.models.patient,
+}))(PatientInfoSideBanner)
+
 export default withStyles(styles, {
   withTheme: true,
   name: 'PatientInfoSideBanner',
-})(PatientInfoSideBanner)
+})(ConnectedPatientInfoSideBanner)
