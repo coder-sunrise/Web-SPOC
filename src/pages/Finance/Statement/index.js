@@ -1,6 +1,4 @@
 import React, { PureComponent } from 'react'
-import classNames from 'classnames'
-
 import { connect } from 'dva'
 // material ui
 import { Print, Edit, Delete } from '@material-ui/icons'
@@ -12,8 +10,6 @@ import {
   DialogContent,
   DialogContentText,
   withStyles,
-  MenuItem,
-  MenuList,
 } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import {
@@ -22,12 +18,10 @@ import {
   Tooltip,
   dateFormatLong,
   CardContainer,
-  Popper,
-  CommonModal,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
-import { ReportViewer } from '@/components/_medisys'
+import PrintStatementReport from './PrintStatementReport'
 
 const styles = () => ({})
 
@@ -39,7 +33,6 @@ class Statement extends PureComponent {
     selectedRows: [],
     open: false,
     selectedStatementNo: '',
-    reportGroupBy: '',
 
     columns: [
       { name: 'statementNo', title: 'Statement No.' },
@@ -107,18 +100,10 @@ class Statement extends PureComponent {
     })
   }
 
-  toggleReport = (v, row) => {
-    this.setState((preState) => ({
-      showReport: !preState.showReport,
-      reportGroupBy: v,
-      selectedStatementNo: row ? row.id : null,
-    }))
-  }
-
   render () {
     // console.log('rows', this.state.rows)
 
-    const { history, dispatch, classes } = this.props
+    const { history, dispatch } = this.props
     const editRow = (row, e) => {
       dispatch({
         type: 'statement/updateState',
@@ -221,40 +206,13 @@ class Statement extends PureComponent {
                           <Delete />
                         </Button>
                       </Tooltip>
-                      <Popper
-                        className={classNames({
-                          [classes.pooperResponsive]: true,
-                          [classes.pooperNav]: true,
-                        })}
-                        style={{
-                          zIndex: 1,
-                        }}
-                        overlay={
-                          <MenuList role='menu'>
-                            <MenuItem
-                              onClick={() => this.toggleReport('Patient', row)}
-                            >
-                              By Patient
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => this.toggleReport('Doctor', row)}
-                            >
-                              By Doctor
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => this.toggleReport('Item', row)}
-                            >
-                              By Item
-                            </MenuItem>
-                          </MenuList>
-                        }
-                      >
+                      <PrintStatementReport id={row ? row.id : null}>
                         <Tooltip title='Print Statement'>
                           <Button size='sm' justIcon color='primary'>
                             <Print />
                           </Button>
                         </Tooltip>
-                      </Popper>
+                      </PrintStatementReport>
                     </Authorized>
                   </React.Fragment>
                 )
@@ -288,21 +246,6 @@ class Statement extends PureComponent {
             </Button>
           </DialogActions>
         </Dialog>
-
-        <CommonModal
-          open={this.state.showReport}
-          onClose={this.toggleReport}
-          title='Statement'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={25}
-            reportParameters={{
-              StatementId: selectedStatementNo,
-              GroupBy: this.state.reportGroupBy,
-            }}
-          />
-        </CommonModal>
       </CardContainer>
     )
   }
