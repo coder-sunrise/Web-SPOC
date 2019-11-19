@@ -39,6 +39,7 @@ import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
+import { queryList } from '@/services/patient'
 
 // moment.updateLocale('en', {
 //   relativeTime: {
@@ -94,7 +95,10 @@ const styles = () => ({
     }
     dispatch({
       type: 'patient/upsert',
-      payload: { ...values, cfg },
+      payload: {
+        ...values,
+        cfg,
+      },
     }).then((r) => {
       // create new patient will return patient entity, r === true
       if (r) {
@@ -304,6 +308,36 @@ class PatientDetail extends PureComponent {
   handleCloseReplacementModal = () =>
     this.setState({ showReplacementModal: false })
 
+  validatePatient = async () => {
+    const { handleSubmit, dispatch, values } = this.props
+
+    const search = {
+      eql_patientAccountNo: values.patientAccountNo,
+      neql_id: values.id ? `${values.id}` : undefined,
+    }
+
+    const response = await queryList({
+      ...search,
+      combineCondition: 'and',
+    })
+
+    const { data } = response
+    if (data && data.totalRecords > 0) {
+      return dispatch({
+        type: 'global/updateAppState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'OK',
+          openConfirmContent:
+            'Duplicate Account No. found. OK to continue or Cancel to make changes',
+          onConfirmSave: handleSubmit,
+        },
+      })
+    }
+    return handleSubmit()
+  }
+
   render () {
     const {
       theme,
@@ -314,14 +348,7 @@ class PatientDetail extends PureComponent {
       ...resetProps
     } = this.props
 
-    const {
-      patient,
-      global,
-      handleSubmit,
-      resetForm,
-      values,
-      dispatch,
-    } = resetProps
+    const { patient, global, resetForm, values, dispatch } = resetProps
     if (!patient) return null
     const { currentComponent, currentId, menuErrors, entity } = patient
 
@@ -463,7 +490,7 @@ class PatientDetail extends PureComponent {
                   },
                 })
               },
-              onConfirm: handleSubmit,
+              onConfirm: this.validatePatient,
               confirmBtnText: 'Save',
             })}
           </div>
