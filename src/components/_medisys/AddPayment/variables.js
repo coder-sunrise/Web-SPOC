@@ -21,17 +21,9 @@ export const ValidationSchema = Yup.object().shape({
   paymentList: Yup.array().when(
     [
       'finalPayable',
-      'collectableAmount',
-      'outstandingAfterPayment',
       'totalAmtPaid',
     ],
-    (
-      finalPayable,
-      collectableAmount,
-      outstandingAfterPayment,
-      totalAmtPaid,
-      schema,
-    ) => {
+    (finalPayable, totalAmtPaid, schema) => {
       if (totalAmtPaid > finalPayable)
         return schema.of(
           Yup.object().shape({
@@ -50,15 +42,15 @@ export const ValidationSchema = Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
               // creditCardNo: Yup.number().required(),
             }),
-            chequePayment: Yup.object().shape({
-              chequeNo: Yup.string().required(),
-            }),
-            netsPayment: Yup.object().shape({
-              refNo: Yup.string().required(),
-            }),
-            giroPayment: Yup.object().shape({
-              refNo: Yup.string().required(),
-            }),
+            // chequePayment: Yup.object().shape({
+            //   chequeNo: Yup.string().required(),
+            // }),
+            // netsPayment: Yup.object().shape({
+            //   refNo: Yup.string().required(),
+            // }),
+            // giroPayment: Yup.object().shape({
+            //   refNo: Yup.string().required(),
+            // }),
           }),
         )
 
@@ -80,24 +72,24 @@ export const ValidationSchema = Yup.object().shape({
               // creditCardNo: Yup.number().required(),
             }),
           }),
-          chequePayment: Yup.object().when('paymentModeFK', {
-            is: (val) => val === PAYMENT_MODE.CHEQUE,
-            then: Yup.object().shape({
-              chequeNo: Yup.string().required(),
-            }),
-          }),
-          netsPayment: Yup.object().when('paymentModeFK', {
-            is: (val) => val === PAYMENT_MODE.NETS,
-            then: Yup.object().shape({
-              refNo: Yup.string().required(),
-            }),
-          }),
-          giroPayment: Yup.object().when('paymentModeFK', {
-            is: (val) => val === PAYMENT_MODE.GIRO,
-            then: Yup.object().shape({
-              refNo: Yup.string().required(),
-            }),
-          }),
+          // chequePayment: Yup.object().when('paymentModeFK', {
+          //   is: (val) => val === PAYMENT_MODE.CHEQUE,
+          //   then: Yup.object().shape({
+          //     chequeNo: Yup.string().required(),
+          //   }),
+          // }),
+          // netsPayment: Yup.object().when('paymentModeFK', {
+          //   is: (val) => val === PAYMENT_MODE.NETS,
+          //   then: Yup.object().shape({
+          //     refNo: Yup.string().required(),
+          //   }),
+          // }),
+          // giroPayment: Yup.object().when('paymentModeFK', {
+          //   is: (val) => val === PAYMENT_MODE.GIRO,
+          //   then: Yup.object().shape({
+          //     refNo: Yup.string().required(),
+          //   }),
+          // }),
         }),
       )
     },
@@ -129,39 +121,39 @@ export const paymentTypes = {
   giro: 'Giro',
 }
 
-export const InitialValue = {
-  [PAYMENT_MODE.CASH]: {
-    amt: null,
-    remarks: '',
-  },
-  [PAYMENT_MODE.NETS]: {
-    amt: null,
-    remarks: '',
-    netsPayment: {
-      refNo: null,
-    },
-  },
-  [PAYMENT_MODE.CREDIT_CARD]: {
-    amt: null,
-    remarks: '',
-    creditCardPayment: {
-      creditCardTypeFK: undefined,
-      creditCardNo: undefined,
-    },
-  },
-  [PAYMENT_MODE.CHEQUE]: {
-    amt: null,
-    remarks: '',
-    chequePayment: { chequeNo: null },
-  },
-  [PAYMENT_MODE.GIRO]: {
-    amt: null,
-    remarks: '',
-    giroPayment: {
-      refNo: null,
-    },
-  },
-}
+// export const InitialValue = {
+//   [PAYMENT_MODE.CASH]: {
+//     amt: null,
+//     remarks: '',
+//   },
+//   [PAYMENT_MODE.NETS]: {
+//     amt: null,
+//     remarks: '',
+//     netsPayment: {
+//       refNo: null,
+//     },
+//   },
+//   [PAYMENT_MODE.CREDIT_CARD]: {
+//     amt: null,
+//     remarks: '',
+//     creditCardPayment: {
+//       creditCardTypeFK: undefined,
+//       creditCardNo: undefined,
+//     },
+//   },
+//   [PAYMENT_MODE.CHEQUE]: {
+//     amt: null,
+//     remarks: '',
+//     chequePayment: { chequeNo: null },
+//   },
+//   [PAYMENT_MODE.GIRO]: {
+//     amt: null,
+//     remarks: '',
+//     giroPayment: {
+//       refNo: null,
+//     },
+//   },
+// }
 
 export const getLargestID = (list) => {
   return list.reduce(

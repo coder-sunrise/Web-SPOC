@@ -5,13 +5,11 @@ import { Search, PersonAdd } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import Authorized from '@/utils/Authorized'
-
 import {
   GridContainer,
   GridItem,
   Button,
   TextField,
-  Checkbox,
   ProgressButton,
 } from '@/components'
 
@@ -43,7 +41,7 @@ const styles = (theme) => ({
 })
 class FilterBar extends PureComponent {
   render () {
-    const { classes, dispatch, disableAdd } = this.props
+    const { classes, dispatch, disableAdd, simple } = this.props
 
     return (
       <div className={classes.filterBar}>
@@ -54,7 +52,7 @@ class FilterBar extends PureComponent {
               render={(args) => {
                 return (
                   <TextField
-                    autoFocus
+                    autoFocus={!simple}
                     label={formatMessage({
                       id: 'reception.queue.patientSearchPlaceholder',
                     })}

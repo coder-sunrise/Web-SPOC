@@ -127,6 +127,7 @@ export const REPORT_TYPE = {
   25: 'Statement',
   26: 'Purchase Order',
   27: 'Patient Label',
+  29: 'Payment Receipt',
 }
 
 export const INVOICE_STATUS = {

@@ -22,11 +22,12 @@ export default (theme) => ({
   },
   paymentTypeContainer: {
     maxHeight: '50vh',
-    overflowX: 'auto',
+    overflowX: 'hidden',
+    overflowY: 'auto',
   },
   paymentTypeRow: {
-    marginTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
   },
   paymentItemHeader: {
     display: 'inline',
@@ -35,17 +36,28 @@ export default (theme) => ({
   },
   trashBin: {
     position: 'absolute',
-    right: theme.spacing.unit,
-    top: theme.spacing.unit * 2,
+    right: theme.spacing(1),
+    top: theme.spacing(2),
   },
   paymentSummary: {
     textAlign: 'right',
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2),
     fontSize: '1rem',
   },
   addPaymentActionButtons: {
     textAlign: 'right',
-    marginBottom: theme.spacing.unit,
-    marginTop: theme.spacing.unit * 2,
+    marginBottom: theme.spacing(1),
+    marginTop: theme.spacing(2),
+  },
+  noPaddingLeft: {
+    paddingLeft: '0px !important',
+  },
+  paymentModeContainer: {
+    maxHeight: '50vh',
+    overflowX: 'auto',
+    padding: theme.spacing(1),
+  },
+  paymentContent: {
+    marginTop: theme.spacing(2),
   },
 })

@@ -48,6 +48,7 @@ class PatientSearch extends PureComponent {
       return (
         <Component
           renderActionFn={this.Cell}
+          onRowDblClick={this.handleDoubleClick}
           simple
           size='sm'
           disableQueryOnLoad
@@ -72,6 +73,10 @@ class PatientSearch extends PureComponent {
       Select Patient
     </Button>
   )
+
+  handleDoubleClick = (row) => {
+    this.props.handleSelectClick(row)
+  }
 
   render () {
     const { loading } = this.props

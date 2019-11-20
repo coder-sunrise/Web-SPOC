@@ -12,14 +12,15 @@ import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
 
-const styles = (theme) => ({
+const styles = () => ({
   patientModal: {
     // zIndex: '1390 !important',
   },
 })
 
-@connect(({ global, user }) => ({
+@connect(({ global, user, report }) => ({
   global,
+  report,
   loggedInUserID: user.data && user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
@@ -76,8 +77,21 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
+  closeConfirmationPrompt = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: false,
+        openConfirmTitle: undefined,
+        openConfirmContent: undefined,
+        openConfirmText: 'Confirm',
+      },
+    })
+  }
+
   render () {
-    const { global, dispatch, loggedInUserID, classes } = this.props
+    const { global, report, dispatch, loggedInUserID, classes } = this.props
     return (
       <div>
         {/* <SimpleModal
@@ -258,12 +272,7 @@ class GlobalModalContainer extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
-                  dispatch({
-                    type: 'global/updateAppState',
-                    payload: {
-                      openConfirm: false,
-                    },
-                  })
+                  this.closeConfirmationPrompt()
                   if (global.onConfirmDiscard) {
                     global.onConfirmDiscard()
                   }
@@ -274,12 +283,7 @@ class GlobalModalContainer extends PureComponent {
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                  dispatch({
-                    type: 'global/updateAppState',
-                    payload: {
-                      openConfirm: false,
-                    },
-                  })
+                  this.closeConfirmationPrompt()
                   global.onConfirmSave()
                 }
               : undefined,
@@ -287,14 +291,7 @@ class GlobalModalContainer extends PureComponent {
           onClose={() => {
             global.onConfirmClose ? global.onConfirmClose() : null
             clearTimeout(this._timer)
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                openConfirm: false,
-                openConfirmTitle: undefined,
-                openConfirmText: 'Confirm',
-              },
-            })
+            this.closeConfirmationPrompt()
           }}
           showFooter
         >
@@ -333,7 +330,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
-        {global.reportTypeID && <ReportModal />}
+        {report.reportTypeID && <ReportModal />}
       </div>
     )
   }
