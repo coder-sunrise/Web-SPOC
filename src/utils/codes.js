@@ -41,6 +41,7 @@ const osBalanceStatus = [
 const sessionOptions = [
   { value: 'all', name: 'All Sessions' },
   { value: 'current', name: 'Current Session' },
+  { value: 'past', name: 'Past Session' },
 ]
 
 const smsStatus = [
@@ -1467,17 +1468,60 @@ export const getInventoryItem = (
   outstandingItem = undefined,
 ) => {
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
+
+  const groupByFKArray = _(newRows)
+    .groupBy((x) => x[itemFKName])
+    .map((v, key) => ({
+      [itemFKName]: parseInt(key, 10),
+      totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
+    }))
+    .value()
+
+  let fullyReceivedArray = []
+  if (outstandingItem) {
+    fullyReceivedArray = groupByFKArray.filter((o) => {
+      const item = outstandingItem.find((i) => i[itemFKName] === o[itemFKName])
+      if (item.orderQuantity === o.totalCurrentReceivingQty) {
+        return {
+          ...o,
+        }
+      }
+      return null
+    })
+  }
+
+  newRows = newRows.filter((o) =>
+    fullyReceivedArray.find((i) => i[itemFKName] === o[itemFKName]),
+  )
+
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   if (outstandingItem) {
     const filterOutstandingItem = outstandingItem.filter(
       (x) => x.type === value,
     )
+
     inventoryItemList = _.intersectionBy(
       inventoryItemList,
       filterOutstandingItem,
       itemFKName,
     )
+  }
+
+  if (outstandingItem) {
+    inventoryItemList = inventoryItemList.map((o) => {
+      const { orderQuantity } = outstandingItem.find(
+        (i) => i[itemFKName] === o[itemFKName],
+      )
+      const { totalCurrentReceivingQty } = groupByFKArray.find(
+        (i) => i[itemFKName] === o[itemFKName],
+      )
+      const remainingQty = orderQuantity - totalCurrentReceivingQty
+      return {
+        ...o,
+        remainingQty,
+      }
+    })
   }
 
   return {
