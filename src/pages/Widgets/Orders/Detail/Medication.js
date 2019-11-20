@@ -94,12 +94,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-              ? item.dosageDisplayValue
-              : ''} ${item.prescribeUOMDisplayValue
-                ? item.prescribeUOMDisplayValue
-                : ''} ${item.drugFrequencyDisplayValue
-                  ? item.drugFrequencyDisplayValue
-                  : ''} For ${item.duration ? item.duration : ''} day(s)`
+            ? item.dosageDisplayValue
+            : ''} ${item.prescribeUOMDisplayValue
+            ? item.prescribeUOMDisplayValue
+            : ''} ${item.drugFrequencyDisplayValue
+            ? item.drugFrequencyDisplayValue
+            : ''} For ${item.duration ? item.duration : ''} day(s)`
         }
       }
       return instruction
@@ -168,8 +168,8 @@ class Medication extends PureComponent {
                 this.calculateQuantity()
               }, 1)
             }}
-          // okText='Yes'
-          // cancelText='No'
+            // okText='Yes'
+            // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -359,7 +359,7 @@ class Medication extends PureComponent {
       op.inventoryMedication_MedicationPrecaution.forEach((im, i) => {
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].medicationPrecautionFK`,
-          im.id,
+          im.medicationPrecautionFK,
         )
         setFieldValue(
           `corPrescriptionItemPrecaution[${i}].precaution`,
@@ -715,6 +715,7 @@ class Medication extends PureComponent {
               <FieldArray
                 name='corPrescriptionItemPrecaution'
                 render={(arrayHelpers) => {
+                  console.log(values.corPrescriptionItemPrecaution)
                   if (!values || !values.corPrescriptionItemPrecaution)
                     return null
                   return values.corPrescriptionItemPrecaution.map((val, i) => {
