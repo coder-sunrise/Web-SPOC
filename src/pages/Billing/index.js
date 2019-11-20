@@ -217,6 +217,17 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  onPrintReceiptClick = (invoicePaymentID) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 29,
+        reportParameters: { isSaved: true, invoicePaymentID },
+      },
+    })
+  }
+
   onPrintInvoiceClick = () => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
@@ -369,6 +380,7 @@ class Billing extends Component {
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
+                handlePrintReceiptClick={this.onPrintReceiptClick}
                 {...formikBag}
               />
             </GridContainer>

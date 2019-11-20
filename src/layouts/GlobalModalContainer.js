@@ -18,8 +18,9 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ global, user }) => ({
+@connect(({ global, user, report }) => ({
   global,
+  report,
   loggedInUserID: user.data && user.data.id,
 }))
 class GlobalModalContainer extends PureComponent {
@@ -77,7 +78,7 @@ class GlobalModalContainer extends PureComponent {
   }
 
   render () {
-    const { global, dispatch, loggedInUserID, classes } = this.props
+    const { global, report, dispatch, loggedInUserID, classes } = this.props
     return (
       <div>
         {/* <SimpleModal
@@ -333,7 +334,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <Adjustment />
         </CommonModal>
-        {global.reportTypeID && <ReportModal />}
+        {report.reportTypeID && <ReportModal />}
       </div>
     )
   }

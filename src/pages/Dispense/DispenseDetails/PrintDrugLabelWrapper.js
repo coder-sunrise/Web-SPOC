@@ -58,7 +58,7 @@ class PrintDrugLabelWrapper extends React.Component {
         [downloadConfig.key]: row.sourceFK,
       }
       this.props.dispatch({
-        type: 'global/updateState',
+        type: 'report/updateState',
         payload: {
           reportTypeID: downloadConfig.id,
           reportParameters: {
