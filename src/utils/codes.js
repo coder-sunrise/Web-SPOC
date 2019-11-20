@@ -638,7 +638,7 @@ const coPayerType = [
 
 const consultationDocumentTypes = [
   {
-    value: '3',
+    value: '5',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
     getSubject: (r) => {
@@ -675,7 +675,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '4',
+    value: '6',
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: (r) => {
@@ -752,7 +752,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '6',
+    value: '3',
     name: 'Vaccination Certificate',
     code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
@@ -776,7 +776,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '5',
+    value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
     downloadKey: 'documentid',
@@ -890,57 +890,6 @@ const multiplyCodetable = (data, multiplier) => {
   return result
 }
 
-const tenantCodes = [
-  'doctorProfile',
-  'clinicianprofile',
-  'ctappointmenttype',
-  'ctservice',
-  'inventorymedication',
-  'inventoryconsumable',
-  'inventoryvaccination',
-  'inventorypackage',
-  'role',
-  'ctsupplier',
-  'ctpaymentmode',
-  'SmsTemplate',
-  // 'ctsnomeddiagnosis',
-  'codetable/ctsnomeddiagnosis',
-  'documenttemplate',
-  'ctMedicationFrequency',
-  // 'ltinvoiceitemtype',
-  'ctMedicationDosage',
-  'coPaymentScheme',
-  'ctcopayer',
-  'ctmedicationprecaution',
-]
-
-// always get latest codetable
-const skipCache = [
-  'doctorprofile',
-  'clinicianprofile',
-]
-
-// const codes = [
-//   {
-//     code: 'ctservice',
-//     query: {
-//       'serviceFKNavigation.IsActive': true,
-//     },
-//   },
-// ]
-
-const noIsActiveProp = [
-  'doctorProfile',
-  'role',
-  'ctservice',
-]
-
-const noSortOrderProp = [
-  'doctorprofile',
-  'clinicianprofile',
-  'role',
-]
-
 const defaultParams = {
   pagesize: 99999,
   sorting: [
@@ -949,6 +898,156 @@ const defaultParams = {
   isActive: true,
   excludeInactiveCodes: true,
 }
+
+const tenantCodesMap = new Map([
+  [
+    'doctorprofile',
+    {
+      ...defaultParams,
+      isActive: undefined,
+      sorting: [],
+    },
+  ],
+  [
+    'clinicianprofile',
+    {
+      ...defaultParams,
+      sorting: [],
+    },
+  ],
+  [
+    'ctappointmenttype',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctservice',
+    {
+      ...defaultParams,
+      isActive: undefined,
+      sorting: [
+        { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventorymedication',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventoryconsumable',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventoryvaccination',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventorypackage',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'role',
+    {
+      ...defaultParams,
+      sorting: [],
+      isActive: undefined,
+    },
+  ],
+  [
+    'ctsupplier',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctpaymentmode',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'smstemplate',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'codetable/ctsnomeddiagnosis',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'documenttemplate',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationfrequency',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationdosage',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'copaymentscheme',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctcopayer',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationprecaution',
+    {
+      ...defaultParams,
+    },
+  ],
+])
+
+// always get latest codetable
+const skipCache = [
+  'doctorprofile',
+  'clinicianprofile',
+]
+
+const noSortOrderProp = [
+  'doctorprofile',
+  'clinicianprofile',
+  'role',
+]
 
 const convertExcludeFields = [
   // 'excludeInactiveCodes',
@@ -964,37 +1063,18 @@ export const fetchAndSaveCodeTable = async (
 ) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
-  const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
+  // const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
   let url = searchURL
-  let criteriaForTenantCodes = noIsActiveProp.reduce(
-    (codes, tenantCode) =>
-      tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
-    false,
-  )
-    ? {
-        ...defaultParams,
-        isActive: undefined,
-      }
-    : {
-        ...defaultParams,
-      }
 
-  criteriaForTenantCodes.sorting = noSortOrderProp.includes(code)
-    ? []
-    : criteriaForTenantCodes.sorting
-
-  if (
-    tenantCodes.reduce(
-      (codes, tenantCode) =>
-        tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
-      false,
-    )
-  ) {
+  let criteriaForTenantCodes = defaultParams
+  if (tenantCodesMap.has(code.toLowerCase())) {
     url = '/api/'
     useGeneral = false
+    criteriaForTenantCodes = tenantCodesMap.get(code.toLowerCase())
   }
+
   const newParams = {
     ...defaultParams,
     ...params,
@@ -1156,8 +1236,10 @@ export const checkIsCodetableAPI = (url) => {
   try {
     const paths = url.split('/')
 
+    // paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isTenantCodes =
-      paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
+      paths.length >= 3 ? tenantCodesMap.has(paths[2].toLowerCase()) : false
+
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
     // console.log({ isTenantCodes, isCodetable })
     return isTenantCodes || isCodetable
@@ -1179,34 +1261,48 @@ export const getTenantCodes = async (tenantCode) => {
 
 export const getServices = (data) => {
   // eslint-disable-next-line compat/compat
-  const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
-    return {
-      value: o[0].serviceId,
-      code: o[0].code,
-      name: o[0].displayValue,
-      serviceCenters: o.map((m) => {
-        return {
-          value: m.serviceCenterId,
-          name: m.serviceCenter,
-        }
-      }),
-    }
-  })
+  const services = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceId')).map((o) => {
+      return {
+        value: o[0].serviceId,
+        code: o[0].code,
+        name: o[0].displayValue,
+        serviceCenters: o.map((m) => {
+          return {
+            value: m.serviceCenterId,
+            name: m.serviceCenter,
+          }
+        }),
+      }
+    }),
+    [
+      'name',
+    ],
+    [
+      'asc',
+    ],
+  )
   // eslint-disable-next-line compat/compat
-  const serviceCenters = Object.values(
-    _.groupBy(data, 'serviceCenterId'),
-  ).map((o) => {
-    return {
-      value: o[0].serviceCenterId,
-      name: o[0].serviceCenter,
-      services: o.map((m) => {
-        return {
-          value: m.serviceId,
-          name: m.displayValue,
-        }
-      }),
-    }
-  })
+  const serviceCenters = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceCenterId')).map((o) => {
+      return {
+        value: o[0].serviceCenterId,
+        name: o[0].serviceCenter,
+        services: o.map((m) => {
+          return {
+            value: m.serviceId,
+            name: m.displayValue,
+          }
+        }),
+      }
+    }),
+    [
+      'name',
+    ],
+    [
+      'asc',
+    ],
+  )
 
   return {
     serviceCenterServices: data,

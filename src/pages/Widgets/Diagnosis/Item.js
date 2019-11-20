@@ -199,39 +199,44 @@ const DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={1}>
-          <FastField
-            name={`corDiagnosis[${index}].isPersist`}
-            render={(args) => {
-              return (
-                <Checkbox
-                  inputLabel='Persist'
-                  {...args}
-                  onChange={({ target }) => {
-                    if (
-                      target.value === false &&
-                      !form.values.corDiagnosis[index].isNew
-                    ) {
-                      setShowPersistMsg(true)
-                    } else {
-                      setShowPersistMsg(false)
-                    }
-                  }}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem style={{ alignItems: 'center', display: 'flex' }} xs={5}>
-          <React.Fragment>
+        <GridItem xs={6}>
+          <div style={{ position: 'relative' }}>
+            <FastField
+              name={`corDiagnosis[${index}].isPersist`}
+              render={(args) => {
+                return (
+                  <Checkbox
+                    inputLabel='Persist'
+                    {...args}
+                    onChange={({ target }) => {
+                      if (
+                        target.value === false &&
+                        !form.values.corDiagnosis[index].isNew
+                      ) {
+                        setShowPersistMsg(true)
+                      } else {
+                        setShowPersistMsg(false)
+                      }
+                    }}
+                  />
+                )
+              }}
+            />
             {showPersistMsg === true ? (
-              <div style={{ fontSize: '0.85em' }}>
+              <div
+                style={{
+                  fontSize: '0.9em',
+                  position: 'absolute',
+                  bottom: 2,
+                  left: 50,
+                }}
+              >
                 Diagnosis will be removed from patient's medical problem
               </div>
             ) : (
               ''
             )}
-          </React.Fragment>
+          </div>
         </GridItem>
         <GridItem xs={11}>
           <FastField
