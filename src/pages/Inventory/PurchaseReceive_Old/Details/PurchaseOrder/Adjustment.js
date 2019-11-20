@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { formatMessage } from 'umi/locale'
+import Delete from '@material-ui/icons/Delete'
 import {
   GridContainer,
   GridItem,
@@ -8,10 +8,9 @@ import {
   Popconfirm,
   Field,
 } from '@/components'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
 class Adjustment extends PureComponent {
-  render() {
+  render () {
     const {
       index,
       arrayHelpers,
@@ -21,9 +20,9 @@ class Adjustment extends PureComponent {
       dispatch,
       ...amountProps
     } = this.props
-    const adjRemark = purchaseOrderAdjustment[index].adjRemark
-    //const adjTitle = adjustmentList[index].adjTitle
-    //const adjAmount = adjustmentList[index].adjAmount
+    const { adjRemark } = purchaseOrderAdjustment[index]
+    // const adjTitle = adjustmentList[index].adjTitle
+    // const adjAmount = adjustmentList[index].adjAmount
     return (
       <GridContainer>
         <GridItem xs={2} md={9} />
@@ -32,14 +31,14 @@ class Adjustment extends PureComponent {
             <Popconfirm
               title='Do you want to remove this adjustment?'
               onConfirm={() => {
-                //arrayHelpers.remove(index)
+                // arrayHelpers.remove(index)
 
                 purchaseOrderAdjustment[index].isDeleted = true
 
                 dispatch({
                   type: 'purchaseOrderDetails/deleteAdjustment',
                   payload: {
-                    purchaseOrderAdjustment
+                    purchaseOrderAdjustment,
                   },
                 })
 
@@ -47,7 +46,7 @@ class Adjustment extends PureComponent {
               }}
             >
               <Button color='danger' size='sm' aria-label='Delete' justIcon>
-                <DeleteOutline />
+                <Delete />
               </Button>
             </Popconfirm>
             {adjRemark}

@@ -7,7 +7,7 @@ import {
   Popconfirm,
   Field,
 } from '@/components'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
+import Delete from '@material-ui/icons/Delete'
 
 const InvoiceAdjustment = ({
   index,
@@ -44,7 +44,7 @@ const InvoiceAdjustment = ({
             }}
           >
             <Button color='danger' size='sm' aria-label='Delete' justIcon>
-              <DeleteOutline />
+              <Delete />
             </Button>
           </Popconfirm>
           {adjRemark}

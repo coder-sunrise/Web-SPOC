@@ -3,15 +3,15 @@ import classnames from 'classnames'
 // moment
 import moment from 'moment'
 // react-datetime
-import Datetime from 'react-datetime'
-import { DatePicker, Calendar } from 'antd'
+import { Calendar } from 'antd'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 // material ui
-import { Popover, IconButton, withStyles } from '@material-ui/core'
-import { ChevronLeft, ChevronRight } from '@material-ui/icons'
+import { Popover, withStyles } from '@material-ui/core'
+import ArrowLeft from '@material-ui/icons/ArrowLeft'
+import ArrowRight from '@material-ui/icons/ArrowRight'
 // components
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, Tooltip } from '@/components'
 
 const styles = () => ({
   btnContainer: {
@@ -104,29 +104,42 @@ class CalendarToolbar extends React.PureComponent {
     return (
       <GridContainer className={classnames(classes.container)}>
         <GridItem xs md={2}>
-          <div>
-            <Button justIcon simple color='info' onClick={this.subtractDate}>
-              <ChevronLeft />
-            </Button>
-            <Button simple color='info' onClick={this.returnToday}>
+          <Tooltip title='Jump to today' placement='bottom'>
+            <Button color='info' onClick={this.returnToday}>
               Today
             </Button>
-            <Button justIcon simple color='info' onClick={this.addDate}>
-              <ChevronRight />
-            </Button>
-          </div>
+          </Tooltip>
         </GridItem>
         <GridItem xs md={8} container justify='center'>
+          <Tooltip title={`Previous ${view}`}>
+            <Button
+              justIcon
+              color='info'
+              // variant='outlined'
+              onClick={this.subtractDate}
+            >
+              <ArrowLeft />
+            </Button>
+          </Tooltip>
           <Button
-            block
-            simple
+            color='info'
+            // variant='outlined'
             size='lg'
             className={classnames(classes.dateButton)}
-            color='info'
             onClick={this.onDateButtonClick}
           >
             {label}
           </Button>
+          <Tooltip title={`Next ${view}`}>
+            <Button
+              justIcon
+              color='info'
+              // variant='outlined'
+              onClick={this.addDate}
+            >
+              <ArrowRight />
+            </Button>
+          </Tooltip>
           <Popover
             id='react-datetime'
             open={showDateOverlay}

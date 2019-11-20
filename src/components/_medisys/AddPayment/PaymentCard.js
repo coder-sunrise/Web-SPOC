@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-// formik
-import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
@@ -12,6 +10,7 @@ import CreditCardPayment from './paymentTypes/CreditCard'
 import ChequePayment from './paymentTypes/Cheque'
 import GiroPayment from './paymentTypes/Giro'
 import DepositPayment from './paymentTypes/Deposit'
+import OtherPayment from './paymentTypes/Other'
 import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
 
@@ -24,19 +23,32 @@ const MapPaymentType = {
   [PAYMENT_MODE.DEPOSIT]: (props) => <DepositPayment {...props} />,
 }
 
+const predefinedMode = [
+  ...Object.entries(PAYMENT_MODE).values(),
+]
+
 class PaymentCard extends Component {
-  MapPaymentTypeToComponent = (payment, index) => (
-    <GridItem md={12} key={`addpayment-paymentCard-${index}`}>
-      {MapPaymentType[payment.paymentModeFK]({
-        payment,
-        index,
-        handleDeletePayment: this.props.handleDeletePayment,
-        handleAmountChange: this.props.handleAmountChange,
-        setFieldValue: this.props.setFieldValue,
-        patientInfo: this.props.patientInfo,
-      })}
-    </GridItem>
-  )
+  MapPaymentTypeToComponent = (payment, index) => {
+    const props = {
+      payment,
+      index,
+      handleDeletePayment: this.props.handleDeletePayment,
+      handleAmountChange: this.props.handleAmountChange,
+      setFieldValue: this.props.setFieldValue,
+      patientInfo: this.props.patientInfo,
+    }
+    if (predefinedMode.includes(payment.paymentModeFK))
+      return (
+        <GridItem md={12} key={`addpayment-paymentCard-${index}`}>
+          {MapPaymentType[payment.paymentModeFK](props)}
+        </GridItem>
+      )
+    return (
+      <GridItem md={12} key={`addpayment-paymentCard-${index}`}>
+        <OtherPayment {...props} />
+      </GridItem>
+    )
+  }
 
   render () {
     const { classes, paymentList } = this.props

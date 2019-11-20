@@ -79,6 +79,7 @@ class PatientSearch extends PureComponent {
       return (
         <Component
           renderActionFn={this.Cell}
+          onRowDblClick={this.handleDoubleClick}
           simple
           size='sm'
           search={search}
@@ -91,6 +92,10 @@ class PatientSearch extends PureComponent {
       )
     },
   })
+
+  handleDoubleClick = (row) => {
+    this.registerVisitClick(row.id)
+  }
 
   registerVisitClick = (patientID) => {
     const { handleRegisterVisitClick } = this.props

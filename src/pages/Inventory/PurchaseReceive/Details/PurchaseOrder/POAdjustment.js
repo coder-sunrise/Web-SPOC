@@ -1,4 +1,5 @@
 import React from 'react'
+import Delete from '@material-ui/icons/Delete'
 import {
   GridContainer,
   GridItem,
@@ -7,7 +8,6 @@ import {
   Popconfirm,
   Field,
 } from '@/components'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
 
 const POAdjustment = ({
   index,
@@ -34,7 +34,7 @@ const POAdjustment = ({
             }}
           >
             <Button color='danger' size='sm' aria-label='Delete' justIcon>
-              <DeleteOutline />
+              <Delete />
             </Button>
           </Popconfirm>
           {adjRemark}

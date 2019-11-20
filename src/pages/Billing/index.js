@@ -5,7 +5,6 @@ import { connect } from 'dva'
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
   Accordion,
@@ -50,14 +49,6 @@ const styles = (theme) => ({
     paddingBottom: theme.spacing(2),
   },
 })
-
-const bannerStyle = {
-  position: 'sticky',
-  top: headerHeight,
-  zIndex: 1000,
-  paddingLeft: 16,
-  paddingRight: 16,
-}
 
 @connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
@@ -217,6 +208,17 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  onPrintReceiptClick = (invoicePaymentID) => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'report/updateState',
+      payload: {
+        reportTypeID: 29,
+        reportParameters: { isSaved: true, invoicePaymentID },
+      },
+    })
+  }
+
   onPrintInvoiceClick = () => {
     const { values, dispatch } = this.props
     const { invoicePayer } = values
@@ -369,6 +371,7 @@ class Billing extends Component {
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
+                handlePrintReceiptClick={this.onPrintReceiptClick}
                 {...formikBag}
               />
             </GridContainer>
@@ -402,6 +405,7 @@ class Billing extends Component {
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
+          maxWidth='lg'
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}

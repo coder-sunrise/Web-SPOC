@@ -4,7 +4,8 @@ import { CommonModal } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import { REPORT_TYPE } from '@/utils/constants'
 
-const ReportModal = ({ dispatch, reportTypeID, reportParameters }) => {
+const ReportModal = ({ dispatch, report }) => {
+  const { reportTypeID, reportParameters } = report
   const [
     showReport,
     setShowReport,
@@ -17,11 +18,7 @@ const ReportModal = ({ dispatch, reportTypeID, reportParameters }) => {
 
   const resetReportParameters = () => {
     dispatch({
-      type: 'global/updateState',
-      payload: {
-        reportTypeID: undefined,
-        reportParameters: {},
-      },
+      type: 'report/reset',
     })
   }
 
@@ -76,7 +73,4 @@ const ReportModal = ({ dispatch, reportTypeID, reportParameters }) => {
   )
 }
 
-export default connect(({ global }) => ({
-  reportTypeID: global.reportTypeID,
-  reportParameters: global.reportParameters,
-}))(ReportModal)
+export default connect(({ report }) => ({ report }))(ReportModal)
