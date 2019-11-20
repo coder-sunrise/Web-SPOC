@@ -405,6 +405,7 @@ class Billing extends Component {
           title='Add Payment'
           onClose={this.toggleAddPaymentModal}
           observe='AddPaymentForm'
+          maxWidth='lg'
         >
           <AddPayment
             handleSubmit={this.handleAddPayment}

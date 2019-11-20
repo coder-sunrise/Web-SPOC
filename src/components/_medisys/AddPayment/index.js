@@ -14,7 +14,7 @@ import PaymentSummary from './PaymentSummary'
 import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 // styling
 import styles from './styles'
-import { ValidationSchema, getLargestID, InitialValue } from './variables'
+import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
 import { roundToTwoDecimals } from '@/utils/utils'
 import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
@@ -86,9 +86,20 @@ class AddPayment extends Component {
   state = {
     cashPaymentAmount: 0,
     bizSessionList: [],
+    paymentModes: [],
   }
 
   componentWillMount = () => {
+    this.props
+      .dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'ctpaymentmode' },
+      })
+      .then((response) => {
+        this.setState({
+          paymentModes: response,
+        })
+      })
     if (this.props.showPaymentDate) {
       this.fetchBizSessionList(moment())
       this.fetchCurrentActiveBizSession()
@@ -133,21 +144,24 @@ class AddPayment extends Component {
     })
   }
 
-  onPaymentTypeClick = async (event) => {
+  onPaymentTypeClick = async (paymentMode) => {
     const { values, setFieldValue } = this.props
-    const { currentTarget: { id: type } } = event
-    const paymentMode = Object.keys(PAYMENT_MODE).find(
-      (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
-    )
+    // const { currentTarget: { id: type } } = event
+    // const paymentMode = Object.keys(PAYMENT_MODE).find(
+    //   (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
+    // )
+    const { id: type, displayValue } = paymentMode
     const amount =
       values.paymentList.length === 0 ? values.outstandingAfterPayment : null
     const payment = {
       id: getLargestID(values.paymentList) + 1,
+      displayValue,
       paymentModeFK: parseInt(type, 10),
-      paymentMode,
-      ...InitialValue[type],
+      paymentMode: displayValue,
+
       amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
     }
+
     const newPaymentList = [
       ...values.paymentList,
       payment,
@@ -156,11 +170,10 @@ class AddPayment extends Component {
     this.calculatePayment()
   }
 
-  onDeleteClick = async (event) => {
-    const { currentTarget: { id } } = event
+  onDeleteClick = async (paymentID) => {
     const { values, setFieldValue } = this.props
     const newPaymentList = values.paymentList.filter(
-      (payment) => payment.id !== parseFloat(id, 10),
+      (payment) => payment.id !== parseFloat(paymentID, 10),
     )
 
     await setFieldValue('paymentList', newPaymentList)
@@ -267,8 +280,8 @@ class AddPayment extends Component {
       invoicePayerName = '',
     } = this.props
     const { paymentList } = values
-    const { bizSessionList } = this.state
-    // console.log({ values })
+    const { bizSessionList, paymentModes } = this.state
+    console.log({ values })
     return (
       <div>
         <PayerHeader
@@ -283,24 +296,34 @@ class AddPayment extends Component {
               handleDateChange={this.handlePaymentDateChange}
             />
           )}
-          <PaymentType
-            disableCash={values.paymentList.reduce(
-              (noCashPaymentMode, payment) =>
-                payment.paymentModeFK === PAYMENT_MODE.CASH ||
-                noCashPaymentMode,
-              false,
-            )}
-            hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
-            patientInfo={patient}
-            handlePaymentTypeClick={this.onPaymentTypeClick}
-          />
-          <PaymentCard
-            paymentList={paymentList}
-            handleDeletePayment={this.onDeleteClick}
-            handleAmountChange={this.handleAmountChange}
-            setFieldValue={this.props.setFieldValue}
-            patientInfo={patient}
-          />
+          <GridContainer className={classes.paymentContent}>
+            <GridItem md={12}>
+              <h4>Payment Mode: </h4>
+            </GridItem>
+            <GridItem md={3} className={classes.noPaddingLeft}>
+              <PaymentType
+                paymentModes={paymentModes}
+                disableCash={values.paymentList.reduce(
+                  (noCashPaymentMode, payment) =>
+                    payment.paymentModeFK === PAYMENT_MODE.CASH ||
+                    noCashPaymentMode,
+                  false,
+                )}
+                hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
+                patientInfo={patient}
+                handlePaymentTypeClick={this.onPaymentTypeClick}
+              />
+            </GridItem>
+            <GridItem md={9}>
+              <PaymentCard
+                paymentList={paymentList}
+                handleDeletePayment={this.onDeleteClick}
+                handleAmountChange={this.handleAmountChange}
+                setFieldValue={this.props.setFieldValue}
+                patientInfo={patient}
+              />
+            </GridItem>
+          </GridContainer>
 
           <GridContainer alignItems='flex-end'>
             <PaymentSummary

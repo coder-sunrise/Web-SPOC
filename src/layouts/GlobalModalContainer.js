@@ -77,6 +77,18 @@ class GlobalModalContainer extends PureComponent {
     })
   }
 
+  closeConfirmationPrompt = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: false,
+        openConfirmTitle: undefined,
+        openConfirmText: 'Confirm',
+      },
+    })
+  }
+
   render () {
     const { global, report, dispatch, loggedInUserID, classes } = this.props
     return (
@@ -259,12 +271,7 @@ class GlobalModalContainer extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
-                  dispatch({
-                    type: 'global/updateAppState',
-                    payload: {
-                      openConfirm: false,
-                    },
-                  })
+                  this.closeConfirmationPrompt()
                   if (global.onConfirmDiscard) {
                     global.onConfirmDiscard()
                   }
@@ -275,12 +282,7 @@ class GlobalModalContainer extends PureComponent {
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                  dispatch({
-                    type: 'global/updateAppState',
-                    payload: {
-                      openConfirm: false,
-                    },
-                  })
+                  this.closeConfirmationPrompt()
                   global.onConfirmSave()
                 }
               : undefined,
@@ -288,14 +290,7 @@ class GlobalModalContainer extends PureComponent {
           onClose={() => {
             global.onConfirmClose ? global.onConfirmClose() : null
             clearTimeout(this._timer)
-            dispatch({
-              type: 'global/updateAppState',
-              payload: {
-                openConfirm: false,
-                openConfirmTitle: undefined,
-                openConfirmText: 'Confirm',
-              },
-            })
+            this.closeConfirmationPrompt()
           }}
           showFooter
         >
