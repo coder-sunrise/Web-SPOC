@@ -13,9 +13,10 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import LowStockInfo from './LowStockInfo'
 
 let i = 0
-@connect(({ global }) => ({ global }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {} }) =>
     orders.entity || orders.defaultVaccination,
@@ -234,14 +235,18 @@ class Vaccination extends PureComponent {
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Vaccination Name'
-                    labelField='displayValue'
-                    code='inventoryvaccination'
-                    onChange={this.changeVaccination}
-                    {...args}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <CodeSelect
+                      temp
+                      label='Vaccination Name'
+                      labelField='displayValue'
+                      code='inventoryvaccination'
+                      onChange={this.changeVaccination}
+                      {...args}
+                      style={{ paddingRight: 20 }}
+                    />
+                    <LowStockInfo sourceType='vaccination' {...this.props} />
+                  </div>
                 )
               }}
             />

@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import Add from '@material-ui/icons/Add'
-import Delete from '@material-ui/icons/Delete'
+import { Add, Delete } from '@material-ui/icons'
 import { formatMessage } from 'umi/locale'
+import LowStockInfo from './LowStockInfo'
 import {
   Button,
   GridContainer,
@@ -437,41 +437,46 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    // console.log(this.props)
     return (
       <div>
         <GridContainer>
           <GridItem xs={10}>
-            {openPrescription ? (
-              <FastField
-                name='drugName'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Open Prescription Name'
-                      {...args}
-                      autocomplete='nope'
-                    />
-                  )
-                }}
-              />
-            ) : (
-              <FastField
-                  name='inventoryMedicationFK'
+            <React.Fragment>
+              {openPrescription ? (
+                <FastField
+                  name='drugName'
                   render={(args) => {
                     return (
-                      <CodeSelect
-                        temp
-                        label='Medication Name'
-                        code='inventorymedication'
-                        labelField='displayValue'
-                        onChange={this.changeMedication}
+                      <TextField
+                        label='Open Prescription Name'
                         {...args}
+                        autocomplete='nope'
                       />
                     )
                   }}
                 />
+              ) : (
+                <FastField
+                  name='inventoryMedicationFK'
+                  render={(args) => {
+                    return (
+                      <div style={{ position: 'relative' }}>
+                        <CodeSelect
+                          temp
+                          label='Medication Name'
+                          code='inventorymedication'
+                          labelField='displayValue'
+                          onChange={this.changeMedication}
+                          {...args}
+                          style={{ paddingRight: 20 }}
+                        />
+                        <LowStockInfo sourceType='medication' {...this.props} />
+                      </div>
+                    )
+                  }}
+                />
               )}
+            </React.Fragment>
           </GridItem>
         </GridContainer>
         <GridContainer gutter={0}>
