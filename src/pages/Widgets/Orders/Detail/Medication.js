@@ -715,7 +715,6 @@ class Medication extends PureComponent {
               <FieldArray
                 name='corPrescriptionItemPrecaution'
                 render={(arrayHelpers) => {
-                  console.log(values.corPrescriptionItemPrecaution)
                   if (!values || !values.corPrescriptionItemPrecaution)
                     return null
                   return values.corPrescriptionItemPrecaution.map((val, i) => {
