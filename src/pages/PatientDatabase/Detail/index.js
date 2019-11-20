@@ -311,6 +311,9 @@ class PatientDetail extends PureComponent {
   validatePatient = async () => {
     const { handleSubmit, dispatch, values } = this.props
 
+    if (values.patientAccountNo === undefined || values.patientAccountNo === '')
+      return handleSubmit()
+
     const search = {
       eql_patientAccountNo: values.patientAccountNo,
       neql_id: values.id ? `${values.id}` : undefined,

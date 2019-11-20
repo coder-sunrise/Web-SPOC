@@ -255,9 +255,32 @@ const DiagnosisItem = ({
                       : '340px',
                 }}
               >
-                <p style={{ paddingLeft: 20, paddingBottom: theme.spacing(2) }}>
-                  Remove diagnosis?
+                <p
+                  style={{
+                    paddingLeft: 20,
+                    paddingBottom: theme.spacing(2),
+                    fontSize: '0.8em',
+                  }}
+                >
+                  {form.values.corDiagnosis[index].isNew === true ||
+                  !form.values.corDiagnosis[index].defaultIsPersist ? (
+                    'Remove diagnosis?'
+                  ) : (
+                    'Remove persist diagnosis?'
+                  )}
                 </p>
+                {!form.values.corDiagnosis[index].isNew &&
+                form.values.corDiagnosis[index].defaultIsPersist &&
+                form.values.corDiagnosis[index].isPersist && (
+                  <div
+                    style={{
+                      fontSize: '0.8em',
+                      paddingBottom: theme.spacing(2),
+                    }}
+                  >
+                    Diagnosis will be removed from patient's medical problem
+                  </div>
+                )}
                 <Button
                   onClick={() => {
                     setShow(false)
