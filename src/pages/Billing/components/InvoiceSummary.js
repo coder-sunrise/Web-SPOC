@@ -1,22 +1,11 @@
 import React, { useState, useCallback } from 'react'
-import classnames from 'classnames'
 import numeral from 'numeral'
-// formik
-import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  TextField,
-  Danger,
-} from '@/components'
-import DeleteWithPopover from './DeleteWithPopover'
+import { Button, CardContainer, GridContainer, GridItem } from '@/components'
 import Payments from './Payments'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
@@ -120,13 +109,6 @@ const InvoiceSummary = ({
     },
     [
       invoicePayment,
-    ],
-  )
-
-  const shouldDisablePrintInvoice = useCallback(
-    () => values.invoicePayment && values.invoicePayment.length === 0,
-    [
-      values.invoicePayment,
     ],
   )
 

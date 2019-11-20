@@ -5,7 +5,6 @@ import { connect } from 'dva'
 import { Paper, withStyles } from '@material-ui/core'
 import ArrowBack from '@material-ui/icons/ArrowBack'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-import { headerHeight } from 'mui-pro-jss'
 // common components
 import {
   Accordion,
@@ -50,14 +49,6 @@ const styles = (theme) => ({
     paddingBottom: theme.spacing(2),
   },
 })
-
-const bannerStyle = {
-  position: 'sticky',
-  top: headerHeight,
-  zIndex: 1000,
-  paddingLeft: 16,
-  paddingRight: 16,
-}
 
 @connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
