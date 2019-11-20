@@ -1,22 +1,12 @@
 import React, { useState, useCallback } from 'react'
-import classnames from 'classnames'
 import numeral from 'numeral'
-// formik
-import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
-import {
-  Button,
-  CardContainer,
-  GridContainer,
-  GridItem,
-  TextField,
-  Danger,
-} from '@/components'
-import DeleteWithPopover from './DeleteWithPopover'
+import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import Payments from './Payments'
 // utils
 import { roundToTwoDecimals } from '@/utils/utils'
 import config from '@/utils/config'
@@ -61,6 +51,7 @@ const InvoiceSummary = ({
   handleAddPaymentClick,
   handleDeletePaymentClick,
   handlePrintInvoiceClick,
+  handlePrintReceiptClick,
   disabled,
   values,
   setFieldValue,
@@ -121,13 +112,6 @@ const InvoiceSummary = ({
     ],
   )
 
-  const shouldDisablePrintInvoice = useCallback(
-    () => values.invoicePayment && values.invoicePayment.length === 0,
-    [
-      values.invoicePayment,
-    ],
-  )
-
   return (
     <React.Fragment>
       <GridItem md={12}>
@@ -137,9 +121,7 @@ const InvoiceSummary = ({
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>
-                GST ({parseToTwoDecimalString(roundToTwoDecimals(gstValue))}%)
-              </h5>
+              <h5>GST {roundToTwoDecimals(gstValue).toFixed(2)}%</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
@@ -187,66 +169,15 @@ const InvoiceSummary = ({
           <h4 style={{ fontWeight: 500 }}>Payment</h4>
           <GridContainer justify='space-between'>
             <GridItem container md={12}>
-              {invoicePayment.map((item, index) => {
-                const titleClass = classnames({
-                  [classes.crossed]: item.isCancelled,
-                })
-                return (
-                  <React.Fragment>
-                    <GridItem md={11}>
-                      <h5 className={titleClass}>
-                        Receipt No: {item.receiptNo || 'N/A'}
-                      </h5>
-                    </GridItem>
-                    <GridItem md={1}>
-                      <DeleteWithPopover
-                        index={item.id}
-                        title='Cancel Payment'
-                        contentText='Confirm to cancel this payment?'
-                        extraCmd={
-                          item.id ? (
-                            <div className={classes.errorContainer}>
-                              <FastField
-                                name={`invoicePayment[${index}].cancelReason`}
-                                render={(args) => (
-                                  <TextField
-                                    label='Cancel Reason'
-                                    {...args}
-                                    onChange={onCancelReasonChange}
-                                  />
-                                )}
-                              />
-                              {showError && (
-                                <Danger>
-                                  <span>{errorMessage}</span>
-                                </Danger>
-                              )}
-                            </div>
-                          ) : (
-                            undefined
-                          )
-                        }
-                        onCancelClick={handleCancelClick}
-                        onConfirmDelete={handleConfirmDelete}
-                      />
-                    </GridItem>
-
-                    {item.invoicePaymentMode.map((payment) => (
-                      <React.Fragment>
-                        <GridItem md={1} />
-                        <GridItem md={5}>
-                          <p>{payment.paymentMode}</p>
-                        </GridItem>
-                        <GridItem md={6} className={classes.rightAlign}>
-                          <p className={classes.currencyValue}>
-                            {parseToTwoDecimalString(payment.amt)}
-                          </p>
-                        </GridItem>
-                      </React.Fragment>
-                    ))}
-                  </React.Fragment>
-                )
-              })}
+              <Payments
+                invoicePayment={invoicePayment}
+                onCancelReasonChange={onCancelReasonChange}
+                showError={showError}
+                errorMessage={errorMessage}
+                handleCancelClick={handleCancelClick}
+                handleConfirmDelete={handleConfirmDelete}
+                handlePrintReceiptClick={handlePrintReceiptClick}
+              />
             </GridItem>
             <GridItem md={12}>
               <Divider
@@ -263,7 +194,6 @@ const InvoiceSummary = ({
                 simple
                 size='sm'
                 className={classes.invoiceButton}
-                // disabled={shouldDisablePrintInvoice()}
                 onClick={handlePrintInvoiceClick}
               >
                 Print Invoice

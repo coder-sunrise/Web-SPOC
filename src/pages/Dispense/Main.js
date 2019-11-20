@@ -1,15 +1,7 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import { Refresh, Print, Edit, AttachMoney } from '@material-ui/icons'
 // common component
-import {
-  Button,
-  ProgressButton,
-  GridContainer,
-  GridItem,
-  withFormikExtend,
-  notification,
-} from '@/components'
+import { withFormikExtend, notification } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
 import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
@@ -20,7 +12,6 @@ import {
   navigateDirtyCheck,
 } from '@/utils/utils'
 import Yup from '@/utils/yup'
-import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm } = props
@@ -193,57 +184,15 @@ class Main extends Component {
 
     return (
       <div className={classes.root}>
-        <GridContainer direction='column' className={classes.content}>
-          <GridItem justify='flex-end' container>
-            <Button
-              color='info'
-              size='sm'
-              onClick={() => {
-                reloadDispense(this.props, 'refresh')
-              }}
-            >
-              <Refresh />
-              Refresh
-            </Button>
-            <Button color='primary' size='sm'>
-              <Print />
-              Drug Label
-            </Button>
-            <Button color='primary' size='sm'>
-              <Print />
-              Patient Label
-            </Button>
-          </GridItem>
-          <DispenseDetails {...this.props} />
-
-          <GridItem justify='flex-end' container className={classes.footerRow}>
-            <Authorized authority='queue.dispense.savedispense'>
-              <ProgressButton color='success' size='sm' onClick={handleSubmit}>
-                Save Dispense
-              </ProgressButton>
-            </Authorized>
-            <Authorized authority='queue.dispense.editorder'>
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<Edit />}
-                onClick={this.editOrder}
-              >
-                Edit Order
-              </ProgressButton>
-            </Authorized>
-            <Authorized authority='queue.dispense.makepayment'>
-              <ProgressButton
-                color='primary'
-                size='sm'
-                icon={<AttachMoney />}
-                onClick={this.makePayment}
-              >
-                Make Payment
-              </ProgressButton>
-            </Authorized>
-          </GridItem>
-        </GridContainer>
+        <DispenseDetails
+          {...this.props}
+          onSaveClick={handleSubmit}
+          onEditOrderClick={this.editOrder}
+          onFinalizeClick={this.makePayment}
+          onReloadClick={() => {
+            reloadDispense(this.props, 'refresh')
+          }}
+        />
       </div>
     )
   }

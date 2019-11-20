@@ -2,7 +2,7 @@ import { stringify } from 'qs'
 import request from '@/utils/request'
 
 const FORM_DATA = {
-  grant_type: 'password',
+  grant_type: 'password', // refresh_token for refresh token
   client_id: 'SEMRWebApp',
   scope: 'offline_access',
   client_secret: process.env.client_secret,

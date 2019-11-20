@@ -1,5 +1,5 @@
 import React from 'react'
-import DeleteOutline from '@material-ui/icons/DeleteOutline'
+import Delete from '@material-ui/icons/Delete'
 import {
   GridContainer,
   GridItem,
@@ -30,7 +30,7 @@ const Adjustment = ({
             }}
           >
             <Button color='danger' size='sm' aria-label='Delete' justIcon>
-              <DeleteOutline />
+              <Delete />
             </Button>
           </Popconfirm>
           {adjRemark}
