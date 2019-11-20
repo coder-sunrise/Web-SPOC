@@ -5,13 +5,11 @@ import { Search, PersonAdd } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import Authorized from '@/utils/Authorized'
-
 import {
   GridContainer,
   GridItem,
   Button,
   TextField,
-  Checkbox,
   ProgressButton,
 } from '@/components'
 
