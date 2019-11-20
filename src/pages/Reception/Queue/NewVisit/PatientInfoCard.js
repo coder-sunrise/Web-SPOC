@@ -18,7 +18,7 @@ const PatientInfoCard = ({ entity, dispatch }) => (
             entity === null
           }
         >
-          <PatientInfoSideBanner entity={entity} dispatch={dispatch} />
+          <PatientInfoSideBanner entity={entity} />
         </Skeleton>
       </div>
     </CardBody>

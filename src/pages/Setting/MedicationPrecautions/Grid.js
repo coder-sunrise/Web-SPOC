@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import * as service from './services'
 
 class Grid extends PureComponent {
@@ -42,6 +42,10 @@ class Grid extends PureComponent {
         ]}
         // FuncProps={{ pager: false }}
         columnExtensions={[
+          {
+            columnName: 'translatedDisplayValue',
+            sortingEnabled: false,
+          },
           {
             columnName: 'isActive',
             sortingEnabled: false,

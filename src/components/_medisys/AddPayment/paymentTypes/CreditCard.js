@@ -2,23 +2,20 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // material ui
-import { withStyles, IconButton } from '@material-ui/core'
-import TrashBin from '@material-ui/icons/Delete'
+import { withStyles } from '@material-ui/core'
 // common component
 import {
   CodeSelect,
-  CardContainer,
   GridContainer,
   GridItem,
   NumberInput,
   TextField,
-  Tooltip,
 } from '@/components'
+import PaymentBase from './PaymentBase'
 import styles from '../styles'
 import { CREDIT_CARD_TYPE } from '@/utils/constants'
 
 const CreditCard = ({
-  classes,
   payment,
   index,
   handleAmountChange,
@@ -26,17 +23,7 @@ const CreditCard = ({
   setFieldValue,
 }) => {
   return (
-    <CardContainer hideHeader>
-      <h5 className={classes.paymentItemHeader}>Credit Card</h5>
-      <Tooltip title='Delete payment' placement='top-end'>
-        <IconButton
-          className={classes.trashBin}
-          id={payment.id}
-          onClick={handleDeletePayment}
-        >
-          <TrashBin />
-        </IconButton>
-      </Tooltip>
+    <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
       <GridContainer>
         <GridItem md={6}>
           <FastField
@@ -46,7 +33,6 @@ const CreditCard = ({
                 {...args}
                 label='Card Type'
                 code='ctcreditcardtype'
-                autoFocus
                 onChange={(value) => {
                   setFieldValue(
                     `paymentList[${index}].creditCardPayment.creditCardType`,
@@ -93,7 +79,7 @@ const CreditCard = ({
           />
         </GridItem>
       </GridContainer>
-    </CardContainer>
+    </PaymentBase>
   )
 }
 

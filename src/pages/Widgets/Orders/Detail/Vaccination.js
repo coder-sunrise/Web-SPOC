@@ -55,7 +55,11 @@ let i = 0
 })
 class Vaccination extends PureComponent {
   state = {
-    selectedVaccination: undefined,
+    selectedVaccination: {
+      vaccinationStock: [],
+    },
+    batchNo: '',
+    expiryDate: '',
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
@@ -74,8 +78,17 @@ class Vaccination extends PureComponent {
   }
 
   changeVaccination = (v, op = {}) => {
-    const { setFieldValue, values } = this.props
-    // console.log(v, op)
+    const { setFieldValue, values, disableEdit } = this.props
+    console.log(v, op)
+    let defaultBatch
+    if (op.vaccinationStock) {
+      defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
+      if (defaultBatch)
+        this.setState({
+          batchNo: defaultBatch.batchNo,
+          expiryDate: defaultBatch.expiryDate,
+        })
+    }
     this.setState({
       selectedVaccination: op,
     })
@@ -127,6 +140,13 @@ class Vaccination extends PureComponent {
       setFieldValue('totalPrice', undefined)
       this.updateTotalPrice(undefined)
     }
+    if (disableEdit === false) {
+      setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
+      setFieldValue(
+        'expiryDate',
+        defaultBatch ? defaultBatch.expiryDate : undefined,
+      )
+    }
   }
 
   calculateQuantity = (vaccination) => {
@@ -137,26 +157,23 @@ class Vaccination extends PureComponent {
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
     // console.log(currentVaccination, values)
-    if (currentVaccination) {
-      if (currentVaccination.dispensingQuantity && !dirty) {
-        newTotalQuantity = currentVaccination.dispensingQuantity
-      } else if (currentVaccination.prescribingDosage) {
-        const { ctmedicationdosage } = codetable
+    if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
+      newTotalQuantity = currentVaccination.dispensingQuantity
+    } else if (currentVaccination.prescribingDosage) {
+      const { ctmedicationdosage } = codetable
 
-        const dosage = ctmedicationdosage.find(
-          (o) =>
-            o.id ===
-            (values.dosageFK || currentVaccination.prescribingDosage.id),
-        )
-        if (dosage) {
-          newTotalQuantity = Math.ceil(dosage.multiplier)
-        }
-        const { prescriptionToDispenseConversion } = currentVaccination
-        if (prescriptionToDispenseConversion)
-          newTotalQuantity = Math.ceil(
-            newTotalQuantity / prescriptionToDispenseConversion,
-          )
+      const dosage = ctmedicationdosage.find(
+        (o) =>
+          o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
+      )
+      if (dosage) {
+        newTotalQuantity = Math.ceil(dosage.multiplier)
       }
+      const { prescriptionToDispenseConversion } = currentVaccination
+      if (prescriptionToDispenseConversion)
+        newTotalQuantity = Math.ceil(
+          newTotalQuantity / prescriptionToDispenseConversion,
+        )
     }
     setFieldValue(`quantity`, newTotalQuantity)
     // console.log(newTotalQuantity)
@@ -205,6 +222,8 @@ class Vaccination extends PureComponent {
       footer,
       handleSubmit,
       setFieldValue,
+      classes,
+      disableEdit,
       ...reset
     } = this.props
     // console.log(values, reset)
@@ -367,7 +386,41 @@ class Vaccination extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='batchNo'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Batch No.'
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectedVaccination.vaccinationStock}
+                    onChange={(e, op = {}) => {
+                      setFieldValue('expiryDate', op.expiryDate)
+                    }}
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='expiryDate'
+              render={(args) => {
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={8} className={classes.editor}>
             <FastField
               name='remarks'
               render={(args) => {

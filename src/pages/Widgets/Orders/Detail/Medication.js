@@ -94,12 +94,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-            ? item.dosageDisplayValue
-            : ''} ${item.prescribeUOMDisplayValue
-            ? item.prescribeUOMDisplayValue
-            : ''} ${item.drugFrequencyDisplayValue
-            ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration ? item.duration : ''} day(s)`
+              ? item.dosageDisplayValue
+              : ''} ${item.prescribeUOMDisplayValue
+                ? item.prescribeUOMDisplayValue
+                : ''} ${item.drugFrequencyDisplayValue
+                  ? item.drugFrequencyDisplayValue
+                  : ''} For ${item.duration ? item.duration : ''} day(s)`
         }
       }
       return instruction
@@ -168,8 +168,8 @@ class Medication extends PureComponent {
                 this.calculateQuantity()
               }, 1)
             }}
-            // okText='Yes'
-            // cancelText='No'
+          // okText='Yes'
+          // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -478,26 +478,6 @@ class Medication extends PureComponent {
               )}
             </React.Fragment>
           </GridItem>
-          {/* <GridItem
-            xs={1}
-            gutter={theme.spacing(1)}
-            style={{
-              display: 'flex',
-              textAlign: 'center',
-            }}
-          >
-            <FastField
-              render={(args) => {
-                return (
-                  <Button justIcon color='info' onClick={() => {}}>
-                    <Tooltip title='low stock'>
-                      <Info />
-                    </Tooltip>
-                  </Button>
-                )
-              }}
-            />
-          </GridItem> */}
         </GridContainer>
         <GridContainer gutter={0}>
           <GridItem xs={12}>
@@ -921,7 +901,7 @@ class Medication extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Batch No'
+                    label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedMedication.medicationStock}

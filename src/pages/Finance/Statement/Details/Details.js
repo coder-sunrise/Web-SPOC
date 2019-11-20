@@ -16,6 +16,7 @@ import {
 } from '@/components'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
+import PrintStatementReport from '../PrintStatementReport'
 
 const styles = () => ({
   gridContainer: {
@@ -107,10 +108,12 @@ class Details extends PureComponent {
                 <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </ProgressButton>
-              <Button color='primary'>
-                <Print />
-                <FormattedMessage id='finance.statement.details.printStatement' />
-              </Button>
+              <PrintStatementReport id={values.id}>
+                <Button color='primary'>
+                  <Print />
+                  <FormattedMessage id='finance.statement.details.printStatement' />
+                </Button>
+              </PrintStatementReport>
             </GridItem>
           </GridContainer>
         </GridContainer>

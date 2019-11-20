@@ -1,5 +1,6 @@
 import moment from 'moment'
 import Print from '@material-ui/icons/Print'
+import { FormattedMessage } from 'umi/locale'
 import {
   NumberInput,
   TextField,
@@ -142,7 +143,11 @@ export const PrescriptionColumnExtensions = (
     width: 80,
     render: (row) => {
       return (
-        <Tooltip title='Print'>
+        <Tooltip
+          title={
+            <FormattedMessage id='reception.queue.dispense.printDrugLabel' />
+          }
+        >
           <Button
             color='primary'
             onClick={() => {

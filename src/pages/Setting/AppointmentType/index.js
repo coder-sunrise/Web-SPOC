@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 // styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 // common components
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Form from './Form'
 import Grid from './Grid'
@@ -80,9 +80,13 @@ const AppointmentType = ({
   )
 }
 
+const AppointmentTypeSettingBase = withSettingBase({
+  modeName: 'settingAppointmentType',
+})(AppointmentType)
+
 const ConnectedAppointmentType = connect(({ settingAppointmentType }) => ({
   settingAppointmentType,
-}))(AppointmentType)
+}))(AppointmentTypeSettingBase)
 
 export default withStyles(styles, { name: 'AppointmentTypeSetting' })(
   ConnectedAppointmentType,

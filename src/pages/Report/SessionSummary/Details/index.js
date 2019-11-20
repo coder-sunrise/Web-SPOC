@@ -1,214 +1,70 @@
-import React, { useEffect, useReducer } from 'react'
-import * as Yup from 'yup'
-import moment from 'moment'
-// formik
-import { withFormik } from 'formik'
-// material ui
-import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
+import React from 'react'
 // common components
 import {
-  CardContainer,
-  DatePicker,
   GridContainer,
   GridItem,
-  NumberInput,
-  TextField,
 } from '@/components'
-// sub components
-import ReportLayoutWrapper from '../../ReportLayout'
-import { ReportDataGrid } from '@/components/_medisys'
-// services
-import { getRawData } from '@/services/report'
+import PaymentCollections from './PaymentCollections'
+import PaymentSummary from './PaymentSummary'
+import SessionDetails from './SessionDetails'
+import ReportBase from '../../ReportBase'
 
-const PaymentDetailsColumns = [
-  { name: 'paymentMode', title: 'Payment Mode' },
-  { name: 'currentCollected', title: 'This Session' },
-  { name: 'pastCollected', title: 'Past Session' },
-  { name: 'subTotal', title: 'Sub Total' },
-]
-const PaymentDetailsColumnsExtensions = [
-  { columnName: 'currentCollected', type: 'currency', currency: true },
-  { columnName: 'pastCollected', type: 'currency', currency: true },
-  { columnName: 'subTotal', type: 'currency', currency: true },
-]
-const initialState = {
-  loaded: false,
-  isLoading: false,
-  paymentDetailsData: [],
-  sessionDetails: {},
-  companyDetails: {},
-}
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'toggleLoading':
-      return { ...state, isLoading: !state.isLoading }
-    case 'setActivePanel':
-      return { ...state, activePanel: action.payload }
-    case 'setLoaded':
-      return { ...state, loaded: action.payload }
-    case 'updateState': {
-      return { ...state, ...action.payload }
-    }
-    case 'reset':
-      return { ...initialState }
-    default:
-      throw new Error()
-  }
-}
-
-const reportID = 5
+const reportId = 5
 const fileName = 'Session Summary Report'
 
-const SessionSummary = ({ match, sessionID }) => {
-  const [
-    state,
-    dispatch,
-  ] = useReducer(reducer, initialState)
-
-  const values = { sessionID: match ? match.params.id : sessionID }
-
-  const asyncGetData = async () => {
-    dispatch({
-      type: 'toggleLoading',
-    })
-    const result = await getRawData(reportID, values)
-
-    if (result) {
-      const totalCurrentCollected = result.PaymentDetails
-        .map((t) => t.currentCollected)
-        .reduce((pre, cur) => pre + cur, 0)
-      const totalPastCollected = result.PaymentDetails
-        .map((t) => t.pastCollected)
-        .reduce((pre, cur) => pre + cur, 0)
-      dispatch({
-        type: 'updateState',
-        payload: {
-          activePanel: 0,
-          loaded: true,
-          isLoading: false,
-          sessionDetails: result.SessionDetails[0],
-          companyDetails: result.CompanyDetails[0],
-          paymentDetailsData: [
-            ...result.PaymentDetails.map((item, index) => ({
-              ...item,
-              id: `paymentDetails-${index}`,
-              subTotal: item.currentCollected + item.pastCollected,
-            })),
-            {
-              paymentMode: 'Total',
-              currentCollected: totalCurrentCollected,
-              pastCollected: totalPastCollected,
-              subTotal: totalCurrentCollected + totalPastCollected,
-            },
-          ],
-        },
-      })
+class SessionSummary extends ReportBase {
+  constructor (props) {
+    super(props)
+    this.state = {
+      ...super.state,
+      reportId,
+      fileName,
     }
   }
 
-  useEffect(() => {
-    /*
-    clean up function
-    set data to empty array when leaving the page
-    */
-    asyncGetData()
-    return () =>
-      dispatch({
-        type: 'reset',
-      })
-  }, [])
+  componentDidMount () {
+    this.setState((state) => ({
+      ...state.default,
+    }))
+    this.onSubmitClick()
+  }
 
-  const { sessionDetails, paymentDetailsData, companyDetails } = state
-  console.log({ sessionDetails })
-  return (
-    <CardContainer hideHeader>
+  formatReportParams = () => {
+    return { sessionID: this.props.match ? this.props.match.params.id : this.props.sessionID }
+  }
+
+  renderFilterBar = () => {
+    return null
+  }
+
+  renderContent = (reportDatas) => {
+    if (!reportDatas) return null
+    return (
       <GridContainer>
+        <SessionDetails sessionDetails={reportDatas.SessionDetails[0]} companyDetails={reportDatas.CompanyDetails[0]} />
+        <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+          <h4>Payment Collections</h4>
+        </GridItem>
         <GridItem md={12}>
-          <ReportLayoutWrapper
-            simple
-            loading={state.isLoading}
-            reportID={reportID}
-            reportParameters={values}
-            loaded={state.loaded}
-            fileName={fileName}
-          >
-            <GridContainer>
-              <GridItem md={3}>
-                <TextField
-                  label='Session No.'
-                  disabled
-                  value={sessionDetails.sessionNo}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <NumberInput
-                  label='Total Visits'
-                  disabled
-                  value={sessionDetails.totalVisit}
-                />
-              </GridItem>
-
-              <GridItem md={3}>
-                <DatePicker
-                  label='Session Start Date'
-                  disabled
-                  value={sessionDetails.sessionStartDate}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <DatePicker
-                  label='Session Close Date'
-                  disabled
-                  value={sessionDetails.sessionCloseDate}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <NumberInput
-                  label='Total Charges'
-                  disabled
-                  currency
-                  value={sessionDetails.totalSessionCharges}
-                />
-              </GridItem>
-              <GridItem md={3} style={{ marginBottom: 16 }}>
-                <NumberInput
-                  label='Total O/S Bal.'
-                  disabled
-                  currency
-                  value={sessionDetails.totalSessionOutstandingBalance}
-                />
-              </GridItem>
-              <GridItem md={3} style={{ marginBottom: 16 }}>
-                <NumberInput
-                  label='Company'
-                  disabled
-                  currency
-                  value={
-                    companyDetails.TotalCompanyAmount ? (
-                      companyDetails.TotalCompanyAmount
-                    ) : (
-                      0
-                    )
-                  }
-                />
-              </GridItem>
-              <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
-                <h4>Payment Summary</h4>
-              </GridItem>
-              <GridItem md={12}>
-                <ReportDataGrid
-                  height='auto'
-                  data={paymentDetailsData}
-                  columns={PaymentDetailsColumns}
-                  columnExtensions={PaymentDetailsColumnsExtensions}
-                />
-              </GridItem>
-            </GridContainer>
-          </ReportLayoutWrapper>
+          <PaymentCollections PaymentCollectionsDetails={reportDatas.PaymentCollections} TotalDetails={reportDatas.PaymentTotal} />
+        </GridItem>
+        <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+          <h4>Payment Collections for Past Invoices</h4>
+        </GridItem>
+        <GridItem md={12}>
+          <PaymentCollections PaymentCollectionsDetails={reportDatas.PastPaymentCollections} TotalDetails={reportDatas.PastPaymentTotal} />
+        </GridItem>
+        <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+          <h4>Payment Summary</h4>
+        </GridItem>
+        <GridItem md={12}>
+          <PaymentSummary PaymentSummaryDetails={reportDatas.PaymentDetails} />
         </GridItem>
       </GridContainer>
-    </CardContainer>
-  )
+    )
+  }
 }
+
+
 
 export default SessionSummary

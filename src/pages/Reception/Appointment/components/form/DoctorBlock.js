@@ -264,7 +264,7 @@ export default compose(
     validationSchema: ({ validationSchema = Yup.object().shape({}) }) =>
       validationSchema,
     handleSubmit: (values, { props, resetForm }) => {
-      const { dispatch, onClose } = props
+      const { dispatch, onClose, handleAfterSubmit } = props
       const {
         restDoctorBlock,
         doctorBlockUserFk,
@@ -341,13 +341,9 @@ export default compose(
           payload,
         }).then((response) => {
           if (response) {
-            dispatch({
-              type: 'calendar/refresh',
-            })
-            // dispatch({
-            //   type: 'formik/clean',
-            //   payload: 'DoctorBlockForm',
-            // })
+            if (handleAfterSubmit) {
+              handleAfterSubmit()
+            }
             resetForm()
             onClose()
           }
