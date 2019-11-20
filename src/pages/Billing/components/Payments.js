@@ -3,7 +3,7 @@ import classnames from 'classnames'
 // formik
 import { FastField } from 'formik'
 // material ui
-import { IconButton, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 // common components
 import { Button, GridItem, NumberInput, TextField, Danger } from '@/components'
@@ -53,13 +53,15 @@ const Payments = ({
     return (
       <React.Fragment key={`payment-${item.id}`}>
         <GridItem md={11}>
-          <IconButton
-            size='small'
+          <Button
+            justIcon
+            color='primary'
+            size='sm'
             className={classes.printerButton}
             onClick={onPrintClick}
           >
             <Print />
-          </IconButton>
+          </Button>
           <h5 className={titleClass}>Receipt No: {item.receiptNo || 'N/A'}</h5>
         </GridItem>
         <GridItem md={1}>
