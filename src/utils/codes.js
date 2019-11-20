@@ -638,7 +638,7 @@ const coPayerType = [
 
 const consultationDocumentTypes = [
   {
-    value: '3',
+    value: '5',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
     getSubject: (r) => {
@@ -675,7 +675,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '4',
+    value: '6',
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: (r) => {
@@ -752,7 +752,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '6',
+    value: '3',
     name: 'Vaccination Certificate',
     code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
@@ -776,7 +776,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '5',
+    value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
     downloadKey: 'documentid',
