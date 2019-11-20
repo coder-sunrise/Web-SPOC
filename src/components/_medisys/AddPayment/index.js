@@ -106,6 +106,30 @@ class AddPayment extends Component {
     }
   }
 
+  // componentDidMount = () => {
+  //   document.addEventListener('keydown', this.handleKeyDown)
+  // }
+
+  // componentWillUnmount () {
+  //   // unbind keyDown listener
+  //   document.removeEventListener('keydown', this.handleKeyDown)
+  // }
+
+  handleKeyDown = (event) => {
+    event.preventDefault()
+    const min = 112
+    const max = 123
+    const { keyCode } = event
+    if (keyCode < min || keyCode > max) return
+
+    console.log({ keyCode })
+    // TODO: add payment base on keyCode and paymentMode hotkey setting
+    switch (keyCode) {
+      default:
+        break
+    }
+  }
+
   fetchCurrentActiveBizSession = () => {
     const activeBizSessionPayload = {
       IsClinicSessionClosed: false,
@@ -151,14 +175,12 @@ class AddPayment extends Component {
     //   (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
     // )
     const { id: type, displayValue } = paymentMode
-    const amount =
-      values.paymentList.length === 0 ? values.outstandingAfterPayment : null
+    const amount = values.outstandingAfterPayment
     const payment = {
       id: getLargestID(values.paymentList) + 1,
       displayValue,
       paymentModeFK: parseInt(type, 10),
       paymentMode: displayValue,
-
       amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
     }
 
@@ -204,7 +226,7 @@ class AddPayment extends Component {
       )
       this.setState(
         {
-          cashPaymentAmount: cashPayment.amt,
+          cashPaymentAmount: cashAfterRounding,
         },
         () => {
           setFieldValue('cashReceived', cashAfterRounding)

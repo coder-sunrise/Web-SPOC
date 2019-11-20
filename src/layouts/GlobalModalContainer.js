@@ -12,7 +12,7 @@ import UserProfileForm from '@/pages/Setting/UserProfile/UserProfileForm'
 import Adjustment from '@/pages/Shared/Adjustment'
 import ReportModal from '@/pages/Widgets/ConsultationDocument/ReportModal'
 
-const styles = (theme) => ({
+const styles = () => ({
   patientModal: {
     // zIndex: '1390 !important',
   },
@@ -84,6 +84,7 @@ class GlobalModalContainer extends PureComponent {
       payload: {
         openConfirm: false,
         openConfirmTitle: undefined,
+        openConfirmContent: undefined,
         openConfirmText: 'Confirm',
       },
     })

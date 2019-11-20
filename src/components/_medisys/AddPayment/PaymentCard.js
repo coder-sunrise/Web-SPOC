@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
-// formik
-import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component

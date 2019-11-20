@@ -31,25 +31,16 @@ const PayerHeader = ({
       </GridItem>
       <GridItem {...columnConfig} className={classes.centerText}>
         <h4>Total Payable: </h4>
-        {/*  <h4 className={classes.currencyText}>
-        $ {parseToTwoDecimalString(invoice.totalAftGst)}
-      </h4> */}
         <NumberInput text currency value={invoice.totalAftGst} />
       </GridItem>
       {totalClaim !== undefined && (
         <GridItem {...columnConfig} className={classes.centerText}>
           <h4>Total Claim: </h4>
-          {/* <h4 className={classes.currencyText}>
-            $ {parseToTwoDecimalString(totalClaim)}
-          </h4> */}
           <NumberInput text currency value={totalClaim} />
         </GridItem>
       )}
       <GridItem {...columnConfig} className={classes.rightAlignText}>
         <h4>Outstanding: </h4>
-        {/* <h4 className={classes.currencyText}>
-          $ {parseToTwoDecimalString(outstandingAfterPayment)}
-        </h4> */}
         <NumberInput text currency value={outstandingAfterPayment} />
       </GridItem>
     </GridContainer>

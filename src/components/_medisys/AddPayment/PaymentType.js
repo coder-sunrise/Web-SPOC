@@ -1,14 +1,11 @@
 import React from 'react'
 // material ui
-import { Paper, withStyles } from '@material-ui/core'
-import Add from '@material-ui/icons/Add'
+import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import { CardContainer } from '@/components'
 import PaymentTypeRow from './PaymentTypeRow'
 // styling
 import styles from './styles'
-import { paymentTypes } from './variables'
-import { PAYMENT_MODE } from '@/utils/constants'
 
 const PayerHeader = ({
   classes,
@@ -23,6 +20,9 @@ const PayerHeader = ({
       {paymentModes.map((mode) => (
         <PaymentTypeRow
           mode={mode}
+          hideDeposit={hideDeposit}
+          patientInfo={patientInfo}
+          disableCash={disableCash}
           onPaymentModeClick={handlePaymentTypeClick}
         />
       ))}

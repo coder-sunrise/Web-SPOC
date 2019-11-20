@@ -1,8 +1,8 @@
 import React from 'react'
-import color from 'color'
 // material ui
-import { Paper, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { Button, GridContainer, GridItem } from '@/components'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 const styles = (theme) => ({
   button: {
@@ -21,14 +21,37 @@ const styles = (theme) => ({
   },
 })
 
-const PaymentTypeRow = ({ classes, mode, onPaymentModeClick }) => {
+const PaymentTypeRow = ({
+  classes,
+  mode,
+  hideDeposit = false,
+  patientInfo,
+  disableCash,
+  onPaymentModeClick,
+}) => {
   const handleClick = () => onPaymentModeClick(mode)
+
+  let shouldDisable = false
+
+  switch (mode.id) {
+    case PAYMENT_MODE.CASH:
+      shouldDisable = disableCash
+      break
+    case PAYMENT_MODE.DEPOSIT:
+      shouldDisable = patientInfo.patientDeposit === undefined
+      break
+    default:
+      shouldDisable = false
+      break
+  }
+  if (mode.id === PAYMENT_MODE.DEPOSIT && hideDeposit) return null
   return (
     <Button
       block
       color='primary'
       className={classes.button}
       onClick={handleClick}
+      disabled={shouldDisable}
     >
       <GridContainer alignItems='center'>
         <GridItem md={8}>
