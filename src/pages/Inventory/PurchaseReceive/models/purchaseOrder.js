@@ -195,6 +195,7 @@ export default createFormViewModel({
             code: x[itemType.prop][itemType.itemFKName],
             name: x[itemType.prop][itemType.itemFKName],
             uom: x[itemType.prop][itemType.itemFKName],
+            totalReceived: x.bonusReceived + x.quantityReceived,
           }
         })
 

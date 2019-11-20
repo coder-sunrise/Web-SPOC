@@ -45,17 +45,17 @@ const receivingDetailsSchema = Yup.object().shape({
       )}`
     })
     .required(),
-  currentReceivingBonusQty: Yup.number()
-    .min(
-      0,
-      'Current Receiving Bonus Quantity must be greater than or equal to 0',
-    )
-    .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
-      return `Current Receiving Bonus Quantity must be less than or equal to ${e.max.toFixed(
-        1,
-      )}`
-    })
-    .required(),
+  // currentReceivingBonusQty: Yup.number()
+  //   .min(
+  //     0,
+  //     'Current Receiving Bonus Quantity must be greater than or equal to 0',
+  //   )
+  //   .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
+  //     return `Current Receiving Bonus Quantity must be less than or equal to ${e.max.toFixed(
+  //       1,
+  //     )}`
+  //   })
+  //   .required(),
 })
 
 @withFormikExtend({
@@ -83,18 +83,44 @@ const receivingDetailsSchema = Yup.object().shape({
       onConfirm,
     } = props
     const { list } = deliveryOrderDetails
+
+    const getPurchaseOrderItemFK = (v) => {
+      if (v.id <= 0) {
+        let itemFKName = ''
+        switch (v.type) {
+          case 1: {
+            itemFKName = 'inventoryMedicationFK'
+            break
+          }
+          case 2: {
+            itemFKName = 'inventoryVaccinationFK'
+            break
+          }
+          case 3: {
+            itemFKName = 'inventoryConsumableFK'
+            break
+          }
+          default: {
+            break
+          }
+        }
+        const { id } = rows.find((o) => o[itemFKName] === v[itemFKName])
+        return id
+      }
+      return v.id
+    }
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
+      delete x.purchaseOrderMedicationItem
       return {
         ...x,
         // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
-        purchaseOrderItemFK: x.id,
+        purchaseOrderItemFK: getPurchaseOrderItemFK(x),
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
         batchNo: x.batchNo ? x.batchNo[0] : undefined,
         expiryDate: x.expiryDate,
-        expiryDate1: moment(x.expiryDate).formatUTC(),
         sortOrder: index + 1,
         id: values.id ? x.id : undefined,
       }
@@ -290,7 +316,7 @@ class DODetails extends PureComponent {
   handleItemOnChange = (e, type) => {
     const { dispatch, deliveryOrderDetails } = this.props
     const { option, row } = e
-    const { sellingPrice, uom, name, value } = option
+    const { sellingPrice, uom, name, value, remainingQty } = option
     if (type === 'code') {
       row.name = value
     } else {
@@ -298,16 +324,10 @@ class DODetails extends PureComponent {
     }
 
     row.uom = option.uom
+    row.currentReceivingQty = remainingQty
 
-    const { purchaseOrderDetails } = deliveryOrderDetails
-    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
-    let osItem = purchaseOrderOutstandingItem.filter(
-      (x) => x.code === option.value,
-    )[0]
-    if (osItem) {
-      row.maxCurrentReceivingQty = osItem.orderQuantity
-      row.maxCurrentReceivingBonusQty = osItem.bonusQuantity
-    }
+    row.maxCurrentReceivingQty = remainingQty
+    row.maxCurrentReceivingBonusQty = remainingQty
 
     this.setState({
       selectedItem: option,
@@ -394,9 +414,9 @@ class DODetails extends PureComponent {
             bonusQuantity: osItem.bonusQuantity,
             quantityReceived: osItem.quantityReceived,
             totalBonusReceived: osItem.totalBonusReceived,
-            currentReceivingQty: osItem.orderQuantity - osItem.quantityReceived,
-            currentReceivingBonusQty:
-              osItem.bonusQuantity - osItem.bonusReceived,
+            // currentReceivingQty: osItem.orderQuantity - osItem.quantityReceived,
+            // currentReceivingBonusQty:
+            //   osItem.bonusQuantity - osItem.bonusReceived,
           }))
         } else {
           tempCurrentReceivingQty =
@@ -419,8 +439,8 @@ class DODetails extends PureComponent {
           quantityReceived: tempQuantityReceived,
           totalBonusReceived: tempTotalBonusReceived,
           itemFK: selectedItem.value,
-          currentReceivingQty: tempCurrentReceivingQty,
-          currentReceivingBonusQty: tempCurrentReceivingBonusQty,
+          // currentReceivingQty: tempCurrentReceivingQty,
+          // currentReceivingBonusQty: tempCurrentReceivingBonusQty,
         }))
       } else {
         // Initialize new generated row
