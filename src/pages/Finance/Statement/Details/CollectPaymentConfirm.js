@@ -158,6 +158,7 @@ class CollectPaymentConfirm extends PureComponent {
 
     setValues({
       ...values,
+      amount: e.target.value,
       statementInvoice: test,
     })
   }
