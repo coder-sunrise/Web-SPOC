@@ -3,7 +3,6 @@ import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-
 import {
   CodeSelect,
   CardContainer,
@@ -13,22 +12,17 @@ import {
   DateRangePicker,
   Select,
 } from '@/components'
+import Setting from './Setting'
 
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
-  console.log(
-    props.values,
-    props.codetable.ctcopayer.filter(
-      (copayerList) => copayerList.coPayerTypeFK === 1,
-    ),
-  )
   return (
     <CardContainer
       hideHeader
       style={{
         height,
-        // overflow: 'auto',
+        overflowX: 'hidden',
       }}
     >
       <GridContainer gutter={0}>
@@ -168,6 +162,7 @@ const Detail = ({ height, ...props }) => {
             />
           </GridItem>
         </GridItem>
+        <Setting {...props} />
       </GridContainer>
     </CardContainer>
   )
