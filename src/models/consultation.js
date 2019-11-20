@@ -357,6 +357,13 @@ export default createFormViewModel({
           },
         })
 
+        data.corDiagnosis = data.corDiagnosis.map((diagnosis) => {
+          return {
+            ...diagnosis,
+            defaultIsPersist: diagnosis.isPersist,
+          }
+        })
+
         // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
         //   data.corDiagnosis.forEach((cd) => {
         //     cd.complication = cd.corComplication.map((o) => o.complicationFK)
