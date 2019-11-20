@@ -135,27 +135,30 @@ class PaymentCollectionList extends PureComponent {
       console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
         <GridItem md={12}>
-          <ReportDataGrid
-            height={500}
-            data={cashData}
-            columns={CashDetailsCols}
-            columnExtensions={CashColsExtension}
-            FuncProps={CashFuncProps}
-          />
-          <ReportDataGrid
-            height={500}
-            data={giroData}
-            columns={OtherPaymentModeDetailsCols}
-            columnExtensions={PaymentCollectionDetailsExtensions}
-            FuncProps={FuncProps}
-          />
-          <ReportDataGrid
-            height={500}
-            data={otherData}
-            columns={GIRODetailsCols}
-            columnExtensions={PaymentCollectionDetailsExtensions}
-            FuncProps={FuncProps}
-          />
+          {cashData && cashData.length > 0 &&
+            <ReportDataGrid
+              height={500}
+              data={cashData}
+              columns={CashDetailsCols}
+              columnExtensions={CashColsExtension}
+              FuncProps={CashFuncProps}
+            />}
+          {giroData && giroData.length > 0 &&
+            <ReportDataGrid
+              height={500}
+              data={giroData}
+              columns={OtherPaymentModeDetailsCols}
+              columnExtensions={PaymentCollectionDetailsExtensions}
+              FuncProps={FuncProps}
+            />}
+          {otherData && otherData.length > 0 &&
+            <ReportDataGrid
+              height={500}
+              data={otherData}
+              columns={GIRODetailsCols}
+              columnExtensions={PaymentCollectionDetailsExtensions}
+              FuncProps={FuncProps}
+            />}
         </GridItem>
       )
     }
