@@ -27,7 +27,7 @@ const Setting = ({
   ] = useState('')
 
   const { medicationDetail, vaccinationDetail, theme, values } = props
-
+  const optionLabelLength = 40
   const [
     list,
     setList,
@@ -112,8 +112,8 @@ const Setting = ({
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                    'ctvaccinationunitofmeasurement'
-                  )
+                      'ctvaccinationunitofmeasurement'
+                    )
                 }
                 {...args}
               />
@@ -233,7 +233,7 @@ const Setting = ({
             )}
           />
         </GridItem>
-        <GridItem xs={1} style={{ flex: 0 }}>
+        <GridItem>
           <FastField
             name='prescribingUOMFK'
             render={(args) => (
@@ -242,12 +242,13 @@ const Setting = ({
                 label=''
                 text
                 labelField='name'
+                optionLabelLength={optionLabelLength}
                 code={
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                    'ctvaccinationunitofmeasurement'
-                  )
+                      'ctvaccinationunitofmeasurement'
+                    )
                 }
                 {...args}
               />
@@ -259,12 +260,13 @@ const Setting = ({
             <div style={{ marginTop: 30, fontSize: 16 }}>= 1.0</div>
           </React.Fragment>
         </GridItem>
-        <GridItem xs={1}>
+        <GridItem>
           <FastField
             name='dispensingUOMFK'
             render={(args) => (
               <CodeSelect
                 style={{ marginTop: 15 }}
+                optionLabelLength={optionLabelLength}
                 text
                 label=''
                 labelField='name'

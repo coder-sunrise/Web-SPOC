@@ -415,13 +415,13 @@ class AntdSelect extends React.PureComponent {
         const opts = (autoComplete || query
           ? this.state.data
           : options).filter((o) =>
-          newVal.find(
-            (m) =>
-              valueField === 'id'
-                ? parseInt(m, 10) === o[valueField]
-                : m === o[valueField],
-          ),
-        )
+            newVal.find(
+              (m) =>
+                valueField === 'id'
+                  ? parseInt(m, 10) === o[valueField]
+                  : m === o[valueField],
+            ),
+          )
         newVal = mode === 'tags' && newVal.length === 0 ? '' : newVal
         proceed = onChange(newVal, opts) !== false
       }
@@ -523,8 +523,8 @@ class AntdSelect extends React.PureComponent {
             optionLabelLength ? (
               option.label.substring(0, optionLabelLength)
             ) : (
-              option.label
-            )
+                option.label
+              )
           }
           key={`select-${option.value}`}
           value={mode === 'tags' ? `${option.value}` : option.value}
@@ -534,8 +534,8 @@ class AntdSelect extends React.PureComponent {
           {typeof renderDropdown === 'function' ? (
             renderDropdown(option)
           ) : (
-            option.label
-          )}
+              option.label
+            )}
         </Select.Option>
       ))
   }
@@ -573,19 +573,19 @@ class AntdSelect extends React.PureComponent {
       autoComplete || query
         ? this.state.data
         : [
-            ...([
-              'multiple',
-              'tags',
-            ].includes(restProps.mode) && !disableAll
-              ? [
-                  allValueOption || {
-                    [valueField]: allValue,
-                    [labelField]: allLabel,
-                  },
-                ]
-              : []),
-            ...options,
-          ]
+          ...([
+            'multiple',
+            'tags',
+          ].includes(restProps.mode) && !disableAll
+            ? [
+              allValueOption || {
+                [valueField]: allValue,
+                [labelField]: allLabel,
+              },
+            ]
+            : []),
+          ...options,
+        ]
 
     const cfg = {
       value: this.state.value,
@@ -613,10 +613,11 @@ class AntdSelect extends React.PureComponent {
       if (match) text = match[this.props.labelField]
       return (
         <AutosizeInput
+          title={text}
           readOnly
           inputClassName={props.className}
           value={
-            optionLabelLength ? text.substring(0, optionLabelLength) : text
+            (optionLabelLength && text && text.length > optionLabelLength) ? `${text.substring(0, optionLabelLength)}...` : text
           }
         />
       )
@@ -652,13 +653,13 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                {this.state.fetchId === 0 && (autoComplete || query) ? (
-                  'Input Search Text'
-                ) : (
-                  'Not Found'
-                )}
-              </p>
-            )
+                  {this.state.fetchId === 0 && (autoComplete || query) ? (
+                    'Input Search Text'
+                  ) : (
+                      'Not Found'
+                    )}
+                </p>
+              )
           }
           {...cfg}
           {...restProps}

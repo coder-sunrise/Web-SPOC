@@ -934,6 +934,12 @@ const noIsActiveProp = [
   'ctservice',
 ]
 
+const noSortOrderProp = [
+  'doctorprofile',
+  'clinicianprofile',
+  'role',
+]
+
 const defaultParams = {
   pagesize: 99999,
   sorting: [
@@ -966,8 +972,18 @@ export const fetchAndSaveCodeTable = async (
       tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
     false,
   )
-    ? { pagesize: 99999 }
-    : { pagesize: 99999, isActive: true }
+    ? {
+        ...defaultParams,
+        isActive: undefined,
+      }
+    : {
+        ...defaultParams,
+      }
+
+  criteriaForTenantCodes.sorting = noSortOrderProp.includes(code)
+    ? []
+    : criteriaForTenantCodes.sorting
+
   if (
     tenantCodes.reduce(
       (codes, tenantCode) =>
@@ -982,6 +998,7 @@ export const fetchAndSaveCodeTable = async (
     ...defaultParams,
     ...params,
   }
+  newParams.sorting = noSortOrderProp.includes(code) ? [] : newParams.sorting
 
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)

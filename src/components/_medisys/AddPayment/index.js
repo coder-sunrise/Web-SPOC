@@ -30,7 +30,6 @@ import { getBizSession } from '@/services/queue'
   displayName: 'AddPaymentForm',
   mapPropsToValues: ({ invoice, showPaymentDate }) => {
     const { outstandingBalance } = invoice
-    const paymentReceivedDate = moment().formatUTC(false)
 
     return {
       ...invoice,
@@ -58,6 +57,7 @@ import { getBizSession } from '@/services/queue'
       paymentReceivedByUserFK,
       paymentReceivedDate,
       paymentReceivedBizSessionFK,
+      paymentCreatedBizSessionFK,
     } = values
 
     const returnValue = {
@@ -76,8 +76,9 @@ import { getBizSession } from '@/services/queue'
       paymentReceivedByUserFK,
       paymentReceivedDate,
       paymentReceivedBizSessionFK,
-      paymentCreatedBizSessionFK: paymentReceivedBizSessionFK,
+      paymentCreatedBizSessionFK,
     }
+
     handleSubmit(returnValue)
   },
 })
@@ -88,36 +89,48 @@ class AddPayment extends Component {
   }
 
   componentWillMount = () => {
-    this.fetchBizSessionList()
+    if (this.props.showPaymentDate) {
+      this.fetchBizSessionList(moment())
+      this.fetchCurrentActiveBizSession()
+    }
   }
 
-  fetchBizSessionList = (date = undefined) => {
-    const { showPaymentDate, values, setFieldValue } = this.props
-    if (showPaymentDate) {
-      getBizSession({
-        pagesize: 999,
-        sessionNoPrefix: moment(!date ? values.paymentDate : date).format(
-          'YYMMDD',
-        ),
-      }).then((response) => {
-        const { status, data } = response
-        if (parseInt(status, 10) === 200) {
-          const bizSessionList = data.data.map((item) => ({
-            value: item.id,
-            name: item.sessionNo,
-          }))
-          this.setState({
-            bizSessionList,
-          })
-
-          if (bizSessionList.length > 0)
-            setFieldValue(
-              'paymentReceivedBizSessionFK',
-              bizSessionList[0].value,
-            )
-        }
-      })
+  fetchCurrentActiveBizSession = () => {
+    const activeBizSessionPayload = {
+      IsClinicSessionClosed: false,
     }
+    getBizSession(activeBizSessionPayload).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200 && data.totalRecords === 1) {
+        const { data: sessionData } = data
+        this.props.setFieldValue(
+          'paymentCreatedBizSessionFK',
+          sessionData[0].id,
+        )
+      }
+    })
+  }
+
+  fetchBizSessionList = (date) => {
+    const { setFieldValue } = this.props
+    getBizSession({
+      pagesize: 999,
+      sessionNoPrefix: moment(date).format('YYMMDD'),
+    }).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200) {
+        const bizSessionList = data.data.map((item) => ({
+          value: item.id,
+          name: item.sessionNo,
+        }))
+        this.setState({
+          bizSessionList,
+        })
+
+        if (bizSessionList.length > 0)
+          setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
+      }
+    })
   }
 
   onPaymentTypeClick = async (event) => {

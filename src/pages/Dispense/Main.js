@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import Refresh from '@material-ui/icons/Refresh'
-import Print from '@material-ui/icons/Print'
+import { Refresh, Print, Edit, AttachMoney } from '@material-ui/icons'
 // common component
 import {
   Button,
@@ -12,7 +11,8 @@ import {
   notification,
 } from '@/components'
 // sub component
-import DispenseDetails from './DispenseDetails'
+// import DispenseDetails from './DispenseDetails'
+import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
 // utils
 import {
   calculateAmount,
@@ -190,7 +190,7 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit } = this.props
-    console.log({ values: this.props.values })
+
     return (
       <div className={classes.root}>
         <GridContainer direction='column' className={classes.content}>
@@ -226,6 +226,7 @@ class Main extends Component {
               <ProgressButton
                 color='primary'
                 size='sm'
+                icon={<Edit />}
                 onClick={this.editOrder}
               >
                 Edit Order
@@ -235,6 +236,7 @@ class Main extends Component {
               <ProgressButton
                 color='primary'
                 size='sm'
+                icon={<AttachMoney />}
                 onClick={this.makePayment}
               >
                 Make Payment

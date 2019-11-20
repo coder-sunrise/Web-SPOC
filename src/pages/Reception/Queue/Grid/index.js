@@ -4,7 +4,7 @@ import router from 'umi/router'
 // material ui
 import { Popover } from '@material-ui/core'
 // medisys component
-import { LoadingWrapper } from '@/components/_medisys'
+import { VisitStatusTag, LoadingWrapper } from '@/components/_medisys'
 import { CommonTableGrid, notification } from '@/components'
 // medisys component
 // sub component
@@ -375,6 +375,34 @@ const Grid = ({
     handlePopoverClose()
   }
 
+  const handleStatusTagClick = (row) => {
+    let id = '5' // default as Start Consultation
+    const { visitStatus } = row
+    if (visitStatus === VISIT_STATUS.UPCOMING_APPT) return
+
+    switch (visitStatus) {
+      case VISIT_STATUS.WAITING:
+        id = '5'
+        break
+      case VISIT_STATUS.IN_CONS:
+      case VISIT_STATUS.PAUSED:
+        id = '6'
+        break
+      case VISIT_STATUS.DISPENSE:
+      case VISIT_STATUS.ORDER_UPDATED:
+        id = '1'
+        break
+      case VISIT_STATUS.BILLING:
+      case VISIT_STATUS.COMPLETED:
+        id = '1.1'
+        break
+      default:
+        id = undefined
+        break
+    }
+    if (id) onClick(row, id)
+  }
+
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
@@ -394,6 +422,13 @@ const Grid = ({
             rows={queueListingData}
             columnExtensions={[
               ...QueueColumnExtensions,
+              {
+                columnName: 'visitStatus',
+                width: 180,
+                render: (row) => (
+                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
+                ),
+              },
               {
                 columnName: 'action',
                 align: 'center',
@@ -417,6 +452,7 @@ const Grid = ({
             rows={queueListingData}
             columnExtensions={[
               ...ApptColumnExtensions,
+
               {
                 columnName: 'action',
                 align: 'center',

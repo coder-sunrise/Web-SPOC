@@ -98,9 +98,8 @@ class ChangePassword extends React.PureComponent {
                     {...args}
                     label='Current Password'
                     type='password'
-                    autoFocus
                     inputProps={{
-                      autocomplete: 'off',
+                      autoComplete: 'nope',
                     }}
                   />
                 </React.Fragment>

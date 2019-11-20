@@ -57,11 +57,13 @@ import MiscCrNote from './MiscCrNote'
       remark,
       finalCredit,
     } = values
+    console.log({ creditNoteItem })
     const gstAmount = creditNoteItem.reduce(
       (totalGstAmount, item) =>
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
       0,
     )
+
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
@@ -87,20 +89,20 @@ import MiscCrNote from './MiscCrNote'
           return { ...item }
         }),
     }
-    console.log({ payload })
-    // dispatch({
-    //   type: 'invoiceCreditNote/upsert',
-    //   payload,
-    // }).then((r) => {
-    //   if (r) {
-    //     if (onConfirm) onConfirm()
-    //     // Refresh invoice & invoicePayer
-    //     onRefresh()
-    //     // dispatch({
-    //     //   type: 'settingClinicService/query',
-    //     // })
-    //   }
-    // })
+
+    dispatch({
+      type: 'invoiceCreditNote/upsert',
+      payload,
+    }).then((r) => {
+      if (r) {
+        if (onConfirm) onConfirm()
+        // Refresh invoice & invoicePayer
+        onRefresh()
+        // dispatch({
+        //   type: 'settingClinicService/query',
+        // })
+      }
+    })
   },
 })
 class AddCrNote extends Component {
@@ -218,10 +220,27 @@ class AddCrNote extends Component {
     setTimeout(() => this.handleCalcCrNoteItem(), 100)
   }
 
+  handleTotalChange = (row) => (event) => {
+    const { target } = event
+    const { values, setFieldValue } = this.props
+    const { gstValue } = values
+    let gstAmt = row.gstAmount
+
+    if (target && target.value && event.target.name !== '') {
+      const parseValue = Number(target.value)
+      gstAmt = roundToTwoDecimals(
+        parseValue - parseValue / (1 + gstValue / 100),
+      )
+      const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
+      setFieldValue(gstFieldName, gstAmt)
+      setTimeout(() => this.handleCalcCrNoteItem(), 100)
+    }
+  }
+
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit } = values
-    console.log({ values })
+
     return (
       <div>
         <CrNoteForm />
@@ -245,7 +264,7 @@ class AddCrNote extends Component {
               columnName: 'quantity',
               render: (row) => {
                 const { quantity, originRemainingQty } = row
-                console.log({ row })
+
                 return (
                   <Field
                     name={`creditNoteItem[${row.rowIndex}].quantity`}
@@ -296,10 +315,15 @@ class AddCrNote extends Component {
               render: (row) => {
                 return (
                   <Field
-                    name={`creditNoteItem[${row.rowIndex}]._totalAfterGST`}
+                    name={`creditNoteItem[${row.rowIndex}].totalAfterGST`}
                     render={(args) => (
                       <SizeContainer size='sm'>
-                        <NumberInput {...args} currency />
+                        <NumberInput
+                          {...args}
+                          currency
+                          text={!row.isSelected}
+                          onChange={this.handleTotalChange(row)}
+                        />
                       </SizeContainer>
                     )}
                   />
@@ -341,6 +365,7 @@ class AddCrNote extends Component {
         <MiscCrNote
           handleAddMiscItem={this.handleAddMiscItem}
           handleCalcFinalTotal={this.handleCalcCrNoteItem}
+          gstValue={values.gstValue}
           // {...this.props}
         />
 
