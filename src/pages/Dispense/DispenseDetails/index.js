@@ -3,10 +3,14 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
+import Print from '@material-ui/icons/Print'
+import Refresh from '@material-ui/icons/Refresh'
+import Edit from '@material-ui/icons/Edit'
+import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
 // common component
-import { GridItem, GridContainer } from '@/components'
+import { Button, ProgressButton, GridItem, GridContainer } from '@/components'
 // variables
 import {
   PrescriptionColumns,
@@ -17,6 +21,7 @@ import {
   OtherOrdersColumnExtensions,
 } from '../variables'
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
 
 // const styles = (theme) => ({
 //   gridRow: {
@@ -29,16 +34,27 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 
 const styles = (theme) => ({
   paper: {
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(2),
   },
+  actionButtons: {
+    marginTop: theme.spacing(2),
+  },
   gridContainer: {
-    maxHeight: '60vh',
     overflow: 'auto',
   },
   gridRow: {
     '&:not(:first-child)': {
       marginTop: theme.spacing(2),
+    },
+  },
+  rightActionButtons: {
+    marginTop: theme.spacing(2),
+    textAlign: 'right',
+    '& > button:last-child': {
+      marginRight: '0px !important',
     },
   },
 })
@@ -51,7 +67,10 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
-  onPrint2,
+  onReloadClick,
+  onSaveClick,
+  onEditOrderClick,
+  onFinalizeClick,
   codetable,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
@@ -85,106 +104,134 @@ const DispenseDetails = ({
   }
 
   return (
-    <React.Fragment>
-      <GridItem>
-        <Paper className={classes.paper}>
-          <GridContainer className={classes.gridContainer}>
-            <GridItem className={classes.gridRow}>
-              <TableData
-                title='Prescription'
-                // height={200}
-                columns={PrescriptionColumns}
-                colExtensions={PrescriptionColumnExtensions(
-                  viewOnly,
-                  onPrint,
-                  inventorymedication,
-                  handleSelectedBatch,
-                )}
-                data={prescription}
-              />
-            </GridItem>
-            <GridItem className={classes.gridRow}>
-              <TableData
-                title='Vaccination'
-                // TableProps={{
-                //   height: 200,
-                // }}
-                columns={VaccinationColumn}
-                colExtensions={VaccinationColumnExtensions(viewOnly)}
-                data={vaccination}
-              />
-            </GridItem>
-            <GridItem className={classes.gridRow}>
-              <TableData
-                title='Other Orders'
-                // TableProps={{
-                //   height: 200,
-                // }}
-                columns={OtherOrdersColumns}
-                colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
-                data={otherOrder}
-              />
-            </GridItem>
-          </GridContainer>
-        </Paper>
+    <GridContainer>
+      <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
         {!viewOnly && (
-          <GridContainer className={classes.summaryPanel}>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <AmountSummary
-                rows={invoiceItem}
-                adjustments={invoiceAdjustment}
-                config={{
-                  isGSTInclusive: invoice.isGSTInclusive,
-                  totalField: 'totalAfterItemAdjustment',
-                  adjustedField: 'totalAfterOverallAdjustment',
-                  gstField: 'totalAfterGST',
-                  gstAmtField: 'gstAmount',
-                }}
-                onValueChanged={(v) => {
-                  const newInvoice = {
-                    ...values.invoice,
-                    invoiceTotal: v.summary.total,
-                    invoiceTotalAftAdj: v.summary.totalAfterAdj,
-                    invoiceTotalAftGST: v.summary.totalWithGST,
-                    outstandingBalance: v.summary.totalWithGST,
-                    invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
-                    invoiceAdjustment: v.adjustments,
-                  }
-                  setFieldValue('invoice', newInvoice)
-                  // setFieldValue('invoice.invoiceTotal', v.summary.total)
-                  // setFieldValue(
-                  //   'invoice.invoiceTotalAftAdj',
-                  //   v.summary.totalAfterAdj,
-                  // )
-                  // setFieldValue(
-                  //   'invoice.invoiceTotalAftGST',
-                  //   v.summary.totalWithGST,
-                  // )
-                  // setFieldValue(
-                  //   'invoice.outstandingBalance',
-                  //   v.summary.totalWithGST,
-                  // )
-                  // // console.log({ v })
-
-                  // setFieldValue(
-                  //   'invoice.invoiceGSTAmt',
-                  //   Math.round(v.summary.gst * 100) / 100,
-                  // )
-                  // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
-                  dispatch({
-                    type: `dispense/updateState`,
-                    payload: {
-                      totalWithGST: v.summary.totalWithGST,
-                    },
-                  })
-                }}
-              />
-            </GridItem>
-          </GridContainer>
+          <Button color='info' size='sm' onClick={onReloadClick}>
+            <Refresh />
+            Refresh
+          </Button>
         )}
+        <Button color='primary' size='sm'>
+          <Print />
+          Drug Label
+        </Button>
+        <Button color='primary' size='sm'>
+          <Print />
+          Patient Label
+        </Button>
       </GridItem>
-    </React.Fragment>
+      {!viewOnly && (
+        <GridItem className={classes.rightActionButtons} md={6}>
+          <Authorized authority='queue.dispense.savedispense'>
+            <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+              Save Dispense
+            </ProgressButton>
+          </Authorized>
+          <Authorized authority='queue.dispense.editorder'>
+            <ProgressButton
+              color='primary'
+              size='sm'
+              icon={<Edit />}
+              onClick={onEditOrderClick}
+            >
+              Edit Order
+            </ProgressButton>
+          </Authorized>
+          <Authorized authority='queue.dispense.makepayment'>
+            <ProgressButton
+              color='primary'
+              size='sm'
+              icon={<AttachMoney />}
+              onClick={onFinalizeClick}
+            >
+              Finalize
+            </ProgressButton>
+          </Authorized>
+        </GridItem>
+      )}
+      <GridItem md={12}>
+        <Paper className={classes.paper}>
+          <TableData
+            title='Prescription'
+            columns={PrescriptionColumns}
+            colExtensions={PrescriptionColumnExtensions(
+              viewOnly,
+              onPrint,
+              inventorymedication,
+              handleSelectedBatch,
+            )}
+            data={prescription}
+          />
+          <TableData
+            title='Vaccination'
+            columns={VaccinationColumn}
+            colExtensions={VaccinationColumnExtensions(viewOnly)}
+            data={vaccination}
+          />
+          <TableData
+            title='Other Orders'
+            columns={OtherOrdersColumns}
+            colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
+            data={otherOrder}
+          />
+        </Paper>
+      </GridItem>
+      <GridItem xs={2} md={9} />
+      {!viewOnly && (
+        <GridItem xs={10} md={3}>
+          <AmountSummary
+            rows={invoiceItem}
+            adjustments={invoiceAdjustment}
+            config={{
+              isGSTInclusive: invoice.isGSTInclusive,
+              totalField: 'totalAfterItemAdjustment',
+              adjustedField: 'totalAfterOverallAdjustment',
+              gstField: 'totalAfterGST',
+              gstAmtField: 'gstAmount',
+            }}
+            onValueChanged={(v) => {
+              const newInvoice = {
+                ...values.invoice,
+                invoiceTotal: v.summary.total,
+                invoiceTotalAftAdj: v.summary.totalAfterAdj,
+                invoiceTotalAftGST: v.summary.totalWithGST,
+                outstandingBalance: v.summary.totalWithGST,
+                invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+                invoiceAdjustment: v.adjustments,
+              }
+              setFieldValue('invoice', newInvoice)
+              // setFieldValue('invoice.invoiceTotal', v.summary.total)
+              // setFieldValue(
+              //   'invoice.invoiceTotalAftAdj',
+              //   v.summary.totalAfterAdj,
+              // )
+              // setFieldValue(
+              //   'invoice.invoiceTotalAftGST',
+              //   v.summary.totalWithGST,
+              // )
+              // setFieldValue(
+              //   'invoice.outstandingBalance',
+              //   v.summary.totalWithGST,
+              // )
+              // // console.log({ v })
+
+              // setFieldValue(
+              //   'invoice.invoiceGSTAmt',
+              //   Math.round(v.summary.gst * 100) / 100,
+              // )
+              // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
+              dispatch({
+                type: `dispense/updateState`,
+                payload: {
+                  totalWithGST: v.summary.totalWithGST,
+                },
+              })
+            }}
+          />
+        </GridItem>
+      )}
+    </GridContainer>
   )
 }
 
