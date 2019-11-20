@@ -61,14 +61,21 @@ const styles = () => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, statementInvoice, ...restValues } = values
     const { dispatch, history } = props
-    statementInvoice.forEach((o) => {
+
+    const newStatementInvoice = statementInvoice.map((o) => {
       delete o.id
+      return {
+        ...o,
+        invoicePayerFK: o.copayerInvoicePayerId,
+        payableAmount: o.copayerPayableAmount,
+        outstandingAmount: o.copayerOutstanding,
+      }
     })
     dispatch({
       type: 'statement/upsert',
       payload: {
         ...restValues,
-        statementInvoice,
+        statementInvoice: newStatementInvoice,
       },
     }).then((r) => {
       if (r) {
@@ -143,14 +150,33 @@ class AddNewStatement extends PureComponent {
     defaultSelectedRows: [],
   }
 
+  // handleSelectionChange = (rows) => {
+  //   const { setValues, values } = this.props
+  //   const { invoiceRows, defaultSelectedRows, selectedRows } = this.state
+  //   const found = selectedRows.some((r) => defaultSelectedRows.indexOf(r) >= 0)
+  //   if (found) {
+  //     return
+  //   }
+  //   this.setState({ selectedRows: rows })
+  //   let statementInvoiceRows = []
+  //   rows.forEach((o) => {
+  //     const invoice = invoiceRows.find((r) => r.id === o)
+  //     if (invoice) {
+  //       invoice.invoicePayerFK = values.copayerFK
+  //       invoice.invoiceFK = o
+  //       statementInvoiceRows.push(invoice)
+  //     }
+  //   })
+  //   setValues({
+  //     ...values,
+  //     statementInvoice: statementInvoiceRows,
+  //   })
+  // }
+
   handleSelectionChange = (rows) => {
     const { setValues, values } = this.props
     const { invoiceRows, defaultSelectedRows, selectedRows } = this.state
-    const found = selectedRows.some((r) => defaultSelectedRows.indexOf(r) >= 0)
-    if (found) {
-      return
-    }
-    this.setState({ selectedRows: rows })
+
     let statementInvoiceRows = []
     rows.forEach((o) => {
       const invoice = invoiceRows.find((r) => r.id === o)
@@ -160,10 +186,13 @@ class AddNewStatement extends PureComponent {
         statementInvoiceRows.push(invoice)
       }
     })
-    setValues({
-      ...values,
-      statementInvoice: statementInvoiceRows,
-    })
+    if (rows) {
+      setValues({
+        ...values,
+        statementInvoice: statementInvoiceRows,
+      })
+    }
+    this.setState({ selectedRows: rows })
   }
 
   getInvoiceList = (e) => {
@@ -183,17 +212,23 @@ class AddNewStatement extends PureComponent {
     }).then((invoiceList) => {
       if (invoiceList) {
         const { data } = invoiceList.data
-        this.setState((prevState) => {
+        const newData = data.map((o) => {
+          return {
+            ...o,
+            payableAmount: o.copayerPayableAmount,
+            outstandingAmount: o.copayerOutstanding,
+          }
+        })
+        this.setState(() => {
           if (statement.entity) {
             const updatedInvoiceRows = [
-              ...prevState.invoiceRows,
-              ...data,
+              ...values.statementInvoice,
+              ...newData,
             ]
             return {
               invoiceRows: updatedInvoiceRows,
             }
           }
-
           return {
             invoiceRows: data,
           }
@@ -206,6 +241,14 @@ class AddNewStatement extends PureComponent {
     const { history, resetForm } = this.props
     resetForm()
     history.goBack()
+  }
+
+  clearInvoiceList = () => {
+    this.setState(() => {
+      return {
+        invoiceRows: [],
+      }
+    })
   }
 
   componentDidMounts () {
@@ -233,9 +276,8 @@ class AddNewStatement extends PureComponent {
       handleSubmit,
       statement,
     } = this.props
-    const { invoiceRows, columns, columnExtensions } = this.state
+    const { invoiceRows, columns, columnExtensions, selectedRows } = this.state
     // console.log('values', values)
-    // console.log('state', this.state)
     // console.log('props', this.props)
 
     return (
@@ -254,6 +296,7 @@ class AddNewStatement extends PureComponent {
                         labelField='displayValue'
                         localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
+                        onChange={this.clearInvoiceList}
                         {...args}
                       />
                     )
@@ -282,6 +325,7 @@ class AddNewStatement extends PureComponent {
                       id: 'finance.statement.paymentTerms',
                     })}
                     max={999}
+                    min={0}
                     inputProps={{ maxLength: 3 }}
                     maxLength={3}
                     {...args}
@@ -385,14 +429,18 @@ class AddNewStatement extends PureComponent {
             </GridItem>
             <CommonTableGrid
               style={{ margin: theme.spacing(2) }}
-              rows={invoiceRows}
+              rows={
+                invoiceRows.length > 0 ? invoiceRows : values.statementInvoice
+              }
               columns={columns}
               columnExtensions={columnExtensions}
               FuncProps={{
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
-                  rowSelectionEnabled: () => true,
+                  rowSelectionEnabled: (row) => {
+                    return !row.statementFK
+                  },
                 },
               }}
               selection={this.state.selectedRows}
@@ -414,7 +462,13 @@ class AddNewStatement extends PureComponent {
             >
               Close
             </Button>
-            <ProgressButton color='primary' onClick={() => handleSubmit()}>
+            <ProgressButton
+              color='primary'
+              onClick={() => {
+                this.setState({ selectedRows: [] })
+                handleSubmit()
+              }}
+            >
               Save
             </ProgressButton>
           </GridItem>

@@ -48,8 +48,6 @@ class Details extends PureComponent {
       { name: 'remark', title: 'Remarks' },
     ],
 
-    FuncProps: { selectable: true },
-
     showCollectPayment: false,
   }
 
@@ -93,7 +91,7 @@ class Details extends PureComponent {
   }
 
   render () {
-    const { columns, showCollectPayment, FuncProps, showModal } = this.state
+    const { columns, showCollectPayment, showModal } = this.state
     const { classes, statement, values, theme } = this.props
     return (
       <div>
@@ -143,7 +141,15 @@ class Details extends PureComponent {
               format: { dateFormatLong },
             },
           ]}
-          FuncProps={FuncProps}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: true,
+              rowSelectionEnabled: (row) => {
+                return !row.statementInvoicePayment.length > 0
+              },
+            },
+          }}
           getRowId={this.gridGetRowID}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}

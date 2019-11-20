@@ -48,14 +48,14 @@ class PurchaseReceive extends Component {
   }
 
   componentDidMount () {
-    // this.props.dispatch({
-    //   type: 'purchaseReceiveList/query',
-    //   payload: {
-    //     sorting: [
-    //       { columnName: 'purchaseOrderNo', direction: 'asc' },
-    //     ],
-    //   },
-    // })
+   this.props.dispatch({
+      type: 'purchaseReceiveList/query',
+      payload: {
+        sorting: [
+          { columnName: 'purchaseOrderNo', direction: 'asc' },
+        ],
+      },
+    })
   }
 
   printPOReport = (rowId) => {
@@ -134,6 +134,11 @@ class PurchaseReceive extends Component {
           })
           dispatch({
             type: 'purchaseReceiveList/query',
+            payload: {
+              sorting: [
+                { columnName: 'purchaseOrderNo', direction: 'asc' },
+              ],
+            },
           })
         }
       })

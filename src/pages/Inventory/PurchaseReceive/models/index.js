@@ -22,16 +22,16 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
-        if (pathname === '/inventory/pr') {
-          dispatch({
-            type: 'purchaseReceiveList/query',
-            payload: {
-              sorting: [
-                { columnName: 'purchaseOrderNo', direction: 'asc' },
-              ],
-            },
-          })
-        }
+        //   if (pathname === '/inventory/pr') {
+        //     dispatch({
+        //       type: 'purchaseReceiveList/query',
+        //       payload: {
+        //         sorting: [
+        //           { columnName: 'purchaseOrderNo', direction: 'asc' },
+        //         ],
+        //       },
+        //     })
+        //   }
       })
     },
     effects: {

@@ -40,8 +40,13 @@ const FilterBar = ({ classes, dispatch, values }) => {
       session,
     } = values
     let SessionID
+    let SessionType
     if (session === 'current') {
       SessionID = await getBizSessionId()
+      SessionType = 'CurrentSession'
+    } else if (session === 'past') {
+      SessionID = await getBizSessionId()
+      SessionType = 'PastSession'
     }
     dispatch({
       type: 'invoiceList/query',
@@ -62,6 +67,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
             : undefined,
         apiCriteria: {
           SessionID,
+          SessionType,
         },
         group: [
           {
