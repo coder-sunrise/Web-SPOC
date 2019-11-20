@@ -95,7 +95,7 @@ class PatientSearch extends PureComponent {
     } = props
     const newChildren = (
       <React.Fragment>
-        <FilterBar {...restProps} />
+        <FilterBar {...restProps} simple={simple} />
         <Grid
           renderActionFn={renderActionFn}
           onRowDblClick={onRowDblClick}
