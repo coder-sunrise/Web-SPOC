@@ -61,7 +61,6 @@ const styles = (theme) => ({
 
 const DispenseDetails = ({
   classes,
-  dispense,
   setFieldValue,
   values,
   dispatch,

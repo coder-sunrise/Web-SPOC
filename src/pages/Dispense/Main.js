@@ -1,15 +1,7 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-import { Refresh, Print, Edit, AttachMoney } from '@material-ui/icons'
 // common component
-import {
-  Button,
-  ProgressButton,
-  GridContainer,
-  GridItem,
-  withFormikExtend,
-  notification,
-} from '@/components'
+import { withFormikExtend, notification } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
 import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
@@ -20,7 +12,6 @@ import {
   navigateDirtyCheck,
 } from '@/utils/utils'
 import Yup from '@/utils/yup'
-import Authorized from '@/utils/Authorized'
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm } = props

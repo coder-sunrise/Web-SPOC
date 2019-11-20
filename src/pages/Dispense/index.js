@@ -1,33 +1,17 @@
-import React, { Component, PureComponent } from 'react'
-import router from 'umi/router'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Refresh from '@material-ui/icons/Refresh'
-import Print from '@material-ui/icons/Print'
-import { consultationDocumentTypes } from '@/utils/codes'
 // common component
-import {
-  Button,
-  GridContainer,
-  GridItem,
-  SizeContainer,
-  NumberInput,
-  notification,
-} from '@/components'
+import { GridContainer, SizeContainer, NumberInput } from '@/components'
 // sub component
 import Banner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from './DispenseDetails'
 import Main from './Main'
 import EditOrder from './EditOrder'
 
 import style from './style'
 // utils
-import { getAppendUrl } from '@/utils/utils'
-import { postPDF, exportPdfReport } from '@/services/report'
-import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 import { LoadingWrapper } from '@/components/_medisys'
-import { queryDrugLabelDetails } from '@/services/dispense'
 
 @connect(
   ({
@@ -71,7 +55,7 @@ class Dispense extends PureComponent {
   }
 
   getExtraComponent = () => {
-    const { classes, dispense, values, orders } = this.props
+    const { dispense, orders } = this.props
     const { totalWithGST, editingOrder } = dispense
 
     if (!editingOrder) return null
