@@ -741,11 +741,12 @@ class Medication extends PureComponent {
                                       }}
                                       // label='Precaution'
                                       // simple
-                                      code='ctMedicationPrecaution'
+                                      code='ctmedicationprecaution'
+                                      labelField='displayValue'
                                       onChange={(v, option = {}) => {
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
-                                          option.name,
+                                          option.displayValue,
                                         )
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precautionCode`,

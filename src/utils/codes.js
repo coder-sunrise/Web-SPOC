@@ -911,6 +911,7 @@ const tenantCodes = [
   'ctMedicationDosage',
   'coPaymentScheme',
   'ctcopayer',
+  'ctmedicationprecaution',
 ]
 
 // always get latest codetable
