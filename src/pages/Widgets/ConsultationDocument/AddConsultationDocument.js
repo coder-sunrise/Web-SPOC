@@ -395,10 +395,10 @@ class AddConsultationDocument extends PureComponent {
           </GridContainer>
           {type === '1' && <ReferralLetter {...cfg} />}
           {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <MedicalCertificate {...cfg} />}
-          {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />}
-          {type === '6' && <VaccinationCertificate {...cfg} />}
+          {type === '3' && <VaccinationCertificate {...cfg} />}
+          {type === '4' && <Others {...cfg} />}
+          {type === '5' && <MedicalCertificate {...cfg} />}
+          {type === '6' && <CertificateAttendance {...cfg} />}
         </div>
       </div>
     )

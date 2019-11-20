@@ -12,9 +12,9 @@ export default createFormViewModel({
   param: {
     service: {},
     state: {
-      type: '3',
+      type: '5',
       defaultMedicalCertificate: {
-        type: '3',
+        type: '5',
         mcDays: 1,
         mcReferenceNo: '-',
         mcStartEndDate: [
@@ -29,7 +29,7 @@ export default createFormViewModel({
         memoDate: moment(),
       },
       defaultCertOfAttendance: {
-        type: '4',
+        type: '6',
         issueDate: moment(),
         referenceNo: '-',
         // attendanceStartTime: moment().format('HH:mm'),
@@ -40,11 +40,11 @@ export default createFormViewModel({
         referralDate: moment(),
       },
       defaultVaccinationCertificate: {
-        type: '6',
+        type: '3',
         certificateDate: moment(),
       },
       defaultOthers: {
-        type: '5',
+        type: '4',
         issueDate: moment(),
       },
       default: {},
