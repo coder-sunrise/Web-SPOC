@@ -12,8 +12,9 @@ import {
 
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import LowStockInfo from './LowStockInfo'
 
-@connect(({ global }) => ({ global }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) =>
     orders.entity || orders.defaultConsumable,
@@ -111,14 +112,18 @@ class Consumable extends PureComponent {
               name='inventoryConsumableFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Consumable Name'
-                    code='inventoryconsumable'
-                    labelField='displayValue'
-                    onChange={this.changeConsumable}
-                    {...args}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <CodeSelect
+                      temp
+                      label='Consumable Name'
+                      code='inventoryconsumable'
+                      labelField='displayValue'
+                      onChange={this.changeConsumable}
+                      {...args}
+                      style={{ paddingRight: 20 }}
+                    />
+                    <LowStockInfo sourceType='consumable' {...this.props} />
+                  </div>
                 )
               }}
             />

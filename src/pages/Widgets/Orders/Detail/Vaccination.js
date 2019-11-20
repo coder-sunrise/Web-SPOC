@@ -13,9 +13,10 @@ import {
 } from '@/components'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import LowStockInfo from './LowStockInfo'
 
 let i = 0
-@connect(({ global }) => ({ global }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {} }) =>
     orders.entity || orders.defaultVaccination,
@@ -74,7 +75,7 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values } = this.props
-    console.log(v, op)
+    // console.log(v, op)
     this.setState({
       selectedVaccination: op,
     })
@@ -136,23 +137,26 @@ class Vaccination extends PureComponent {
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
     let newTotalQuantity = 0
     // console.log(currentVaccination, values)
-    if (currentVaccination && currentVaccination.dispensingQuantity && !dirty) {
-      newTotalQuantity = currentVaccination.dispensingQuantity
-    } else if (currentVaccination.prescribingDosage) {
-      const { ctmedicationdosage } = codetable
+    if (currentVaccination) {
+      if (currentVaccination.dispensingQuantity && !dirty) {
+        newTotalQuantity = currentVaccination.dispensingQuantity
+      } else if (currentVaccination.prescribingDosage) {
+        const { ctmedicationdosage } = codetable
 
-      const dosage = ctmedicationdosage.find(
-        (o) =>
-          o.id === (values.dosageFK || currentVaccination.prescribingDosage.id),
-      )
-      if (dosage) {
-        newTotalQuantity = Math.ceil(dosage.multiplier)
-      }
-      const { prescriptionToDispenseConversion } = currentVaccination
-      if (prescriptionToDispenseConversion)
-        newTotalQuantity = Math.ceil(
-          newTotalQuantity / prescriptionToDispenseConversion,
+        const dosage = ctmedicationdosage.find(
+          (o) =>
+            o.id ===
+            (values.dosageFK || currentVaccination.prescribingDosage.id),
         )
+        if (dosage) {
+          newTotalQuantity = Math.ceil(dosage.multiplier)
+        }
+        const { prescriptionToDispenseConversion } = currentVaccination
+        if (prescriptionToDispenseConversion)
+          newTotalQuantity = Math.ceil(
+            newTotalQuantity / prescriptionToDispenseConversion,
+          )
+      }
     }
     setFieldValue(`quantity`, newTotalQuantity)
     // console.log(newTotalQuantity)
@@ -212,14 +216,18 @@ class Vaccination extends PureComponent {
               name='inventoryVaccinationFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Vaccination Name'
-                    labelField='displayValue'
-                    code='inventoryvaccination'
-                    onChange={this.changeVaccination}
-                    {...args}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <CodeSelect
+                      temp
+                      label='Vaccination Name'
+                      labelField='displayValue'
+                      code='inventoryvaccination'
+                      onChange={this.changeVaccination}
+                      {...args}
+                      style={{ paddingRight: 20 }}
+                    />
+                    <LowStockInfo sourceType='vaccination' {...this.props} />
+                  </div>
                 )
               }}
             />
