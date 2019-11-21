@@ -112,33 +112,104 @@ class Appointment extends React.PureComponent {
         lsteql_appointmentDate: endOfMonth,
       },
     })
+    Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctappointmenttype',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: { code: 'doctorprofile' },
+      }),
+    ]).then((response) => {
+      const [
+        appointmentTypes,
+        doctorprofile,
+      ] = response
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'doctorprofile' },
-    }).then((response) => {
-      const primaryClinician = response.find(
-        (item) =>
-          parseInt(item.id, 10) ===
-          parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
-      )
-      if (primaryClinician)
-        this.setState((preState) => ({
-          filter: {
-            ...preState.filter,
-            filterByDoctor: [
-              primaryClinician.clinicianProfile.id,
-            ],
-          },
-          primaryClinicianFK: primaryClinician.clinicianProfile.id,
-          resources: [
+      let filterByApptType = []
+      let filterByDoctor = []
+      let resources = []
+      let primaryClinicianFK
+
+      if (appointmentTypes) {
+        filterByApptType = appointmentTypes.map((item) => item.id)
+      }
+
+      if (doctorprofile) {
+        const primaryClinician = doctorprofile.find(
+          (item) =>
+            parseInt(item.id, 10) ===
+            parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
+        )
+        if (primaryClinician) {
+          filterByDoctor = [
+            primaryClinician.clinicianProfile.id,
+          ]
+          primaryClinicianFK = primaryClinician.clinicianProfile.id
+          resources = [
             {
               clinicianFK: primaryClinician.clinicianProfile.id,
               doctorName: primaryClinician.clinicianProfile.name,
             },
-          ],
-        }))
+          ]
+
+          // this.setState({
+          //   primaryClinicianFK: primaryClinician.clinicianProfile.id,
+          //   resources: [
+          //     {
+          //       clinicianFK: primaryClinician.clinicianProfile.id,
+          //       doctorName: primaryClinician.clinicianProfile.name,
+          //     },
+          //   ],
+          // })
+        }
+      }
+      console.log({
+        filterByApptType,
+        filterByDoctor,
+        primaryClinicianFK,
+        resources,
+      })
+      this.setState((preState) => ({
+        filter: {
+          ...preState.filter,
+          filterByApptType,
+          filterByDoctor,
+        },
+        primaryClinicianFK,
+        resources,
+      }))
     })
+
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: { code: 'doctorprofile' },
+    // }).then((response) => {
+    //   const primaryClinician = response.find(
+    //     (item) =>
+    //       parseInt(item.id, 10) ===
+    //       parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
+    //   )
+    //   if (primaryClinician)
+    //     this.setState((preState) => ({
+    //       filter: {
+    //         ...preState.filter,
+    //         filterByDoctor: [
+    //           primaryClinician.clinicianProfile.id,
+    //         ],
+    //       },
+    //       primaryClinicianFK: primaryClinician.clinicianProfile.id,
+    //       resources: [
+    //         {
+    //           clinicianFK: primaryClinician.clinicianProfile.id,
+    //           doctorName: primaryClinician.clinicianProfile.name,
+    //         },
+    //       ],
+    //     }))
+    // })
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },
@@ -391,6 +462,12 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  handleAfterSubmitDoctorBlock = () => {
+    this.props.dispatch({
+      type: 'calendar/refresh',
+    })
+  }
+
   render () {
     const { calendar: CalendarModel, classes, calendarLoading } = this.props
     const {
@@ -447,6 +524,7 @@ class Appointment extends React.PureComponent {
         <FilterBar
           loading={calendarLoading}
           primaryRegisteredDoctorFK={primaryClinicianFK}
+          filterByApptType={filter.filterByApptType}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
@@ -494,6 +572,7 @@ class Appointment extends React.PureComponent {
           <DoctorBlockForm
             initialProps={selectedSlot}
             validationSchema={DoctorFormValidation}
+            handleAfterSubmit={this.handleAfterSubmitDoctorBlock}
           />
         </CommonModal>
         <CommonModal

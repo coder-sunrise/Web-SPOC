@@ -37,54 +37,181 @@ import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
 
-const loadFromCodes = [
-  {
-    value: 'corDoctorNote[0].clinicianNote',
-    name: 'Clinical Notes',
-  },
-  {
-    value: 'corDoctorNote[0].chiefComplaints',
-    name: 'Chief Complaints',
-  },
-  { value: 'corDoctorNote[0].plan', name: 'Plan' },
-  {
-    value: 'corDiagnosis',
-    name: 'Diagnosis',
-    getter: (v) => {
-      const { corDiagnosis = [] } = v
-      return corDiagnosis
-        .filter((o) => !!o.diagnosisDescription)
-        .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
+const loadFromCodesConfig = {
+  mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
+    return rows.map((o) => {
+      const {
+        instruction,
+        corPrescriptionItemPrecaution: precaution = [],
+        remarks = '',
+      } = o
+
+      const { ctmedicationprecaution = [] } = codetable
+      const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
+        ? ' (Ext.)'
+        : ''}</li>`
+      const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
+      const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+      const precautionHtml = precaution
+        .map((i) => {
+          const codetablePrecaution = ctmedicationprecaution.find(
+            (c) => c.id === i.medicationPrecautionFK,
+          )
+          if (codetablePrecaution && codetablePrecaution.translationLink) {
+            const {
+              translationLink: { translationMasters = [] },
+            } = codetablePrecaution
+
+            const transHtml = translationMasters
+              .filter((t) => patient.translationLinkFK === t.languageFK)
+              .map((m) => {
+                return `<li>${m.displayValue}</li>`
+              })
+              .join('')
+
+            if (i.precaution !== '' && transHtml !== '') {
+              return `<li>${i.precaution}</li>
+                    ${transHtml}`
+            }
+          }
+          return ''
+        })
         .join('')
-    },
+
+      return `<ul>${subjectHtml}<ul>${instHtml}${precautionHtml}${remarksHtml}</ul></ul>`
+    })
   },
-  {
-    value: 'order',
-    name: 'Orders',
-    getter: (v) => {
-      const { orders } = window.g_app._store.getState()
-      if (!orders) return '-'
-      const { rows = [] } = orders
-      return rows
-        .filter((o) => !o.isDeleted)
-        .map((o) => `<p>- ${o.subject}</p>`)
-        .join('')
-    },
+  InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
+    const pRows = rows.filter(
+      (o) =>
+        !o.isDeleted &&
+        o.type === '1' &&
+        (o.isExternalPrescription || false) === isExtPrescription,
+    )
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
+        pRows,
+        codetable,
+        patient,
+        isExtPrescription,
+      )
+      return `<ul>
+              <li><p><strong>${isExtPrescription
+                ? 'External Prescription'
+                : 'Medication'}</strong></p></li>
+               ${rowHTMLs.join('')}
+            </ul>`
+    }
+    return ''
   },
-  {
-    value: 'externalPrescription',
-    name: 'External Prescription',
-    getter: (v) => {
-      const { orders } = window.g_app._store.getState()
-      if (!orders) return '-'
-      const { rows = [] } = orders
-      return rows
-        .filter((o) => !o.isDeleted && o.isExternalPrescription)
-        .map((o) => `<p>- ${o.subject}</p>`)
-        .join('')
-    },
+  InsertVaccination: (rows, patient) => {
+    const vRows = rows
+      .filter((o) => !o.isDeleted && o.type === '2')
+      .map((v) => {
+        const {
+          subject = '',
+          usageMethodDisplayValue: usage = '',
+          dosageDisplayValue: dosage = '',
+          uomDisplayValue: uom = '',
+          remarks = '',
+        } = v
+
+        const subjectHtml = `<li> - ${subject}</li>`
+        const precautionHtml =
+          usage + dosage + uom !== ''
+            ? `<li>${usage} ${dosage} ${uom} </li>`
+            : ''
+        const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+
+        return `<ul>${subjectHtml} <ul> ${precautionHtml} ${remarksHtml}</ul></ul>`
+      })
+    if (vRows && vRows.length > 0)
+      return `<ul>
+              <li><p><strong>Vaccination</strong></p></li>
+              ${vRows.join('')}
+            </ul>`
+    return ''
   },
-]
+
+  InsertOpenPrescription: (rows, codetable, patient) => {
+    const pRows = rows.filter((o) => !o.isDeleted && o.type === '5')
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
+        pRows,
+        codetable,
+        patient,
+      )
+      return `<ul>
+              <li><p><strong>Open Prescription</strong></p></li>
+              ${rowHTMLs.join('')}
+           </ul>`
+    }
+    return ''
+  },
+  loadFromCodes: [
+    {
+      value: 'corDoctorNote[0].clinicianNote',
+      name: 'Clinical Notes',
+    },
+    {
+      value: 'corDoctorNote[0].chiefComplaints',
+      name: 'Chief Complaints',
+    },
+    { value: 'corDoctorNote[0].plan', name: 'Plan' },
+    {
+      value: 'corDiagnosis',
+      name: 'Diagnosis',
+      getter: (v) => {
+        const { corDiagnosis = [] } = v
+        return corDiagnosis
+          .filter((o) => !!o.diagnosisDescription)
+          .map((o) => `<p>- ${o.diagnosisDescription}</p>`)
+          .join('')
+      },
+    },
+    {
+      value: 'order',
+      name: 'Orders',
+      getter: (v, codetable, patient) => {
+        const { orders } = window.g_app._store.getState()
+        if (!orders) return '-'
+
+        const { rows = [] } = orders
+
+        let service = rows
+          .filter((o) => !o.isDeleted && o.type === '3')
+          .map((s) => `<p>- ${s.subject}</p>`)
+          .join('')
+
+        const ordersHTML = [
+          loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
+          loadFromCodesConfig.InsertVaccination(rows, codetable, patient),
+          loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
+          service,
+        ]
+
+        return ordersHTML.join('<p/>')
+      },
+    },
+    {
+      value: 'externalPrescription',
+      name: 'External Prescription',
+      getter: (v, codetable, patient) => {
+        const { orders } = window.g_app._store.getState()
+        if (!orders) return '-'
+        const { rows = [] } = orders
+
+        return loadFromCodesConfig.InsertMedication(
+          rows,
+          codetable,
+          patient,
+          true,
+        )
+      },
+    },
+  ],
+}
+
 const styles = (theme) => ({
   editor: {
     // marginTop: theme.spacing(1),
@@ -129,12 +256,15 @@ const templateReg = /<a.*?data-value="(.*?)".*?<\/a>/gm
 //   handleSubmit: () => {},
 //   displayName: 'AddConsultationDocument',
 // })
-@connect(({ consultationDocument, user, codetable, visitRegistration }) => ({
-  consultationDocument,
-  user,
-  codetable,
-  visitEntity: visitRegistration.entity || {},
-}))
+@connect(
+  ({ consultationDocument, user, codetable, visitRegistration, patient }) => ({
+    consultationDocument,
+    user,
+    codetable,
+    visitEntity: visitRegistration.entity || {},
+    patient,
+  }),
+)
 class AddConsultationDocument extends PureComponent {
   constructor (props) {
     super(props)
@@ -161,7 +291,13 @@ class AddConsultationDocument extends PureComponent {
   }
 
   getLoader = (editor, setFieldValue, currentType) => {
-    const { classes, parentProps, consultation, codetable } = this.props
+    const {
+      classes,
+      parentProps,
+      consultation,
+      codetable,
+      patient,
+    } = this.props
     const { documenttemplate = [] } = codetable
     // console.log({ documenttemplate })
     const documentType = parseInt(currentType.value, 10) || -1
@@ -192,13 +328,13 @@ class AddConsultationDocument extends PureComponent {
           Load Template
         </ButtonSelect>
         <ButtonSelect
-          options={loadFromCodes}
+          options={loadFromCodesConfig.loadFromCodes}
           valueField='value'
           onChange={(val, option) => {
             if (!val) return
             const { entity } = consultation
             const v = option.getter
-              ? option.getter(entity)
+              ? option.getter(entity, codetable, patient.entity)
               : Object.byString(entity, option.value) || '-'
             const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
             const { editorState } = editor.props
@@ -230,7 +366,7 @@ class AddConsultationDocument extends PureComponent {
       codetable,
     } = props
     const { entity = {}, type } = consultationDocument
-
+    const { loadFromCodes } = loadFromCodesConfig
     const cfg = {
       ...props,
       loadFromCodes,
@@ -262,10 +398,10 @@ class AddConsultationDocument extends PureComponent {
           </GridContainer>
           {type === '1' && <ReferralLetter {...cfg} />}
           {type === '2' && <Memo {...cfg} />}
-          {type === '3' && <MedicalCertificate {...cfg} />}
-          {type === '4' && <CertificateAttendance {...cfg} />}
-          {type === '5' && <Others {...cfg} />}
-          {type === '6' && <VaccinationCertificate {...cfg} />}
+          {type === '3' && <VaccinationCertificate {...cfg} />}
+          {type === '4' && <Others {...cfg} />}
+          {type === '5' && <MedicalCertificate {...cfg} />}
+          {type === '6' && <CertificateAttendance {...cfg} />}
         </div>
       </div>
     )

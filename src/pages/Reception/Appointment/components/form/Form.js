@@ -81,7 +81,6 @@ class Form extends React.PureComponent {
     tempNewAppointmentStatusFK: -1,
     isDataGridValid: false,
     editingRows: [],
-    _tempCallback: undefined,
   }
 
   componentDidMount () {
@@ -427,9 +426,7 @@ class Form extends React.PureComponent {
   _submit = async (validate = false) => {
     try {
       const {
-        cachedPayload,
         validateForm,
-        resetForm,
         setSubmitting,
         handleSubmit,
         values,
@@ -469,16 +466,6 @@ class Form extends React.PureComponent {
       }).then((response) => {
         if (response) {
           onConfirm()
-          // if (preSubmit) {
-          //   dispatch({
-          //     type: 'calendar/getAppointmentDetails',
-          //     payload: {
-          //       ...cachedPayload,
-          //     },
-          //   })
-          // } else {
-          //   onConfirm()
-          // }
         }
       })
     } catch (error) {
@@ -601,14 +588,13 @@ class Form extends React.PureComponent {
     }
   }
 
-  openRescheduleForm = (callback) => {
-    this.setState({ showRescheduleForm: true, _tempCallback: callback })
+  openRescheduleForm = () => {
+    this.setState({ showRescheduleForm: true })
   }
 
-  openSeriesUpdateConfirmation = (callback) => {
+  openSeriesUpdateConfirmation = () => {
     this.setState({
       showSeriesUpdateConfirmation: true,
-      _tempCallback: callback,
     })
   }
 
@@ -617,7 +603,7 @@ class Form extends React.PureComponent {
   }
 
   closeRescheduleForm = () => {
-    this.setState({ showRescheduleForm: false, _tempCallback: undefined })
+    this.setState({ showRescheduleForm: false })
   }
 
   onConfirmSeriesUpdate = async (type) => {
@@ -742,7 +728,6 @@ class Form extends React.PureComponent {
       onClose,
       loading,
       values,
-      isSubmitting,
       mode,
       conflicts,
       selectedSlot,

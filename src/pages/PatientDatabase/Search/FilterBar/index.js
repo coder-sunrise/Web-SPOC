@@ -1,17 +1,15 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, PermIdentity } from '@material-ui/icons'
+import { Search, PersonAdd } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import Authorized from '@/utils/Authorized'
-
 import {
   GridContainer,
   GridItem,
   Button,
   TextField,
-  Checkbox,
   ProgressButton,
 } from '@/components'
 
@@ -43,17 +41,18 @@ const styles = (theme) => ({
 })
 class FilterBar extends PureComponent {
   render () {
-    const { classes, dispatch, disableAdd } = this.props
+    const { classes, dispatch, disableAdd, simple } = this.props
 
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem md={12} lg={7} style={{ position: 'relative' }}>
+          <GridItem md={12} lg={3} style={{ position: 'relative' }}>
             <FastField
               name='search'
               render={(args) => {
                 return (
                   <TextField
+                    autoFocus={!simple}
                     label={formatMessage({
                       id: 'reception.queue.patientSearchPlaceholder',
                     })}
@@ -134,8 +133,8 @@ class FilterBar extends PureComponent {
                       })
                     }}
                   >
-                    <PermIdentity />
-                    Register New Patient
+                    <PersonAdd />
+                    <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
                   </Button>
                 )}
               </Authorized>

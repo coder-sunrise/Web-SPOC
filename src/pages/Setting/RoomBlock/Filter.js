@@ -69,9 +69,8 @@ const styles = (theme) => ({
     }
 
     dispatch({
-      type: 'roomBlock/queryAll',
+      type: 'roomBlock/query',
       payload: {
-        keepFilter: false,
         [type]:
           stringRoomBlockGroupFK === 0 ? undefined : stringRoomBlockGroupFK,
 
@@ -84,13 +83,6 @@ const styles = (theme) => ({
           : undefined,
         pagesize: 999,
       },
-    }).then(() => {
-      dispatch({
-        type: 'roomBlock/updateState',
-        payload: {
-          filter: undefined,
-        },
-      })
     })
   },
 })

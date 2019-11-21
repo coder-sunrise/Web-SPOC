@@ -8,7 +8,11 @@ import {
 } from '@/utils/utils'
 
 function onComponentDidMount () {
-  const { columnExtensions, row, column: { name: columnName } } = this.props
+  const {
+    columnExtensions,
+    row = {},
+    column: { name: columnName },
+  } = this.props
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -82,7 +86,7 @@ function getCommonConfig () {
   const {
     columnExtensions,
     column: { name: columnName },
-    row,
+    row = {},
     text,
     editMode,
   } = this.props
@@ -102,7 +106,7 @@ function getCommonConfig () {
   } = cfg
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
-    : row
+    : row || {}
   // console.log(latestRow)
   const errorObj = (latestRow._errors || [])
     .find(

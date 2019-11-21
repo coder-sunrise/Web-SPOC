@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import moment from 'moment'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
@@ -64,11 +65,12 @@ class CollectPaymentConfirm extends PureComponent {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`statementInvoice[${row.rowIndex}].invoicePayment.totalAmtPaid`}
+                name={`statementInvoice[${row.rowIndex}].tempOutstandingAmount`}
                 render={(args) => (
                   <NumberInput
                     {...args}
                     currency
+                    min={0}
                     onChange={(e) => this.handlePaymentAmount(e, 'grid')}
                   />
                 )}
@@ -84,6 +86,7 @@ class CollectPaymentConfirm extends PureComponent {
     const { statement, setValues, values } = this.props
     const { statementInvoice } = statement.entity
     let total = 0
+
     const newStatementInvoice = statementInvoice.map((o) => {
       const { statementInvoicePayment, ...restStatementValues } = o
       total += o.outstandingAmount
@@ -94,23 +97,19 @@ class CollectPaymentConfirm extends PureComponent {
       }
       return {
         ...o,
-        invoicePayment,
+        tempOutstandingAmount: o.outstandingAmount,
         statementInvoicePayment: [
-          {
-            ...restStatementValues,
-            invoicePayment,
-          },
+          ...statementInvoicePayment,
         ],
       }
     })
     this.getBizList(moment().formatUTC('YYMMDD'))
-
     setValues({
       ...values,
       paymentDate: moment(),
       amount: total,
       maxAmount: total,
-      paymentMode: 5,
+      paymentModeFK: 5, // GIRO
       statementInvoice: newStatementInvoice,
     })
     this.setState({
@@ -123,40 +122,65 @@ class CollectPaymentConfirm extends PureComponent {
 
     if (from === 'grid') {
       this.setState({ totalAmount: e.target.value })
-      setFieldValue('amount', e.target.value)
+      const totalAmountPaid = _.sumBy(
+        values.statementInvoice,
+        'tempOutstandingAmount',
+      )
+
+      setFieldValue('amount', totalAmountPaid)
       return
     }
     this.setState({ totalAmount: e.target.value })
     let tempAmount = e.target.value
     const test = values.statementInvoice.map((o) => {
       let totalAmtPaid
-      const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
-        if (tempAmount >= i.outstandingAmount) {
-          totalAmtPaid = i.outstandingAmount
-          tempAmount -= i.outstandingAmount
-        } else {
-          totalAmtPaid = tempAmount
-        }
-        return {
-          ...i,
-          invoicePayment: {
-            totalAmtPaid,
-            receiptNo: i.invoiceNo,
-            invoicePayerFK: i.invoicePayerFK,
-          },
-        }
-      })
-      return {
-        ...o,
-        statementInvoicePayment: newStatementInvoicePayment,
+      // const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
+      //   if (tempAmount >= i.outstandingAmount) {
+      //     totalAmtPaid = i.outstandingAmount
+      //     tempAmount -= i.outstandingAmount
+      //   } else {
+      //     totalAmtPaid = tempAmount
+      //   }
+      //   return {
+      //     ...i,
+      //     invoicePayment: {
+      //       totalAmtPaid,
+      //       receiptNo: i.invoiceNo,
+      //       invoicePayerFK: i.invoicePayerFK,
+      //     },
+      // }
+
+      if (tempAmount >= o.outstandingAmount) {
+        totalAmtPaid = o.outstandingAmount
+        tempAmount -= o.outstandingAmount
+      } else {
+        totalAmtPaid = tempAmount
+        tempAmount = 0
+      }
+
+      const newStatementInvoicePayment = {
         invoicePayment: {
           totalAmtPaid,
+          receiptNo: o.invoiceNo,
+          invoicePayerFK: o.invoicePayerFK,
         },
       }
-    })
 
+      return {
+        ...o,
+        tempOutstandingAmount: totalAmtPaid,
+        statementInvoicePayment: [
+          ...o.statementInvoicePayment,
+          newStatementInvoicePayment,
+        ],
+        // invoicePayment: {
+        //   totalAmtPaid,
+        // },
+      }
+    })
     setValues({
       ...values,
+      amount: e.target.value,
       statementInvoice: test,
     })
   }
@@ -222,6 +246,7 @@ class CollectPaymentConfirm extends PureComponent {
                     {...args}
                     currency
                     label='Amount'
+                    autoFocus
                     onChange={this.handlePaymentAmount}
                   />
                 )}
@@ -253,7 +278,7 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
 
             <GridItem>
-              <FastField
+              <Field
                 name='paymentModeFK'
                 render={(args) => (
                   <CodeSelect

@@ -116,8 +116,7 @@ class PopoverContent extends React.Component {
       patientProfile,
     } = popoverEvent
 
-    let { patientName, patientContactNo } = popoverEvent
-
+    let { patientName, patientContactNo, appointmentRemarks } = popoverEvent
     // const _contactNo =
     //   patientProfile &&
     //   patientProfile.contactNumbers.find((item) => item.numberTypeFK === 1)
@@ -188,6 +187,9 @@ class PopoverContent extends React.Component {
                 valueField='id'
                 value={appointmentTypeFK}
               />
+            </GridItem>
+            <GridItem>
+              <TextField disabled label='Remarks' value={appointmentRemarks} />
             </GridItem>
           </GridContainer>
         )}

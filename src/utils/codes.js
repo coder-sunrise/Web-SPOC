@@ -41,6 +41,7 @@ const osBalanceStatus = [
 const sessionOptions = [
   { value: 'all', name: 'All Sessions' },
   { value: 'current', name: 'Current Session' },
+  { value: 'past', name: 'Past Session' },
 ]
 
 const smsStatus = [
@@ -638,7 +639,7 @@ const coPayerType = [
 
 const consultationDocumentTypes = [
   {
-    value: '3',
+    value: '5',
     name: 'Medical Certificate',
     prop: 'corMedicalCertificate',
     getSubject: (r) => {
@@ -675,7 +676,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '4',
+    value: '6',
     name: 'Certificate of Attendance',
     prop: 'corCertificateOfAttendance',
     getSubject: (r) => {
@@ -752,7 +753,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '6',
+    value: '3',
     name: 'Vaccination Certificate',
     code: 'Vaccination Cert',
     prop: 'corVaccinationCert',
@@ -776,7 +777,7 @@ const consultationDocumentTypes = [
     },
   },
   {
-    value: '5',
+    value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
     downloadKey: 'documentid',
@@ -890,50 +891,6 @@ const multiplyCodetable = (data, multiplier) => {
   return result
 }
 
-const tenantCodes = [
-  'doctorProfile',
-  'clinicianprofile',
-  'ctappointmenttype',
-  'ctservice',
-  'inventorymedication',
-  'inventoryconsumable',
-  'inventoryvaccination',
-  'inventorypackage',
-  'role',
-  'ctsupplier',
-  'ctpaymentmode',
-  'SmsTemplate',
-  // 'ctsnomeddiagnosis',
-  'codetable/ctsnomeddiagnosis',
-  'documenttemplate',
-  'ctMedicationFrequency',
-  // 'ltinvoiceitemtype',
-  'ctMedicationDosage',
-  'coPaymentScheme',
-  'ctcopayer',
-]
-
-// always get latest codetable
-const skipCache = [
-  'doctorprofile',
-  'clinicianprofile',
-]
-
-// const codes = [
-//   {
-//     code: 'ctservice',
-//     query: {
-//       'serviceFKNavigation.IsActive': true,
-//     },
-//   },
-// ]
-
-const noIsActiveProp = [
-  'doctorProfile',
-  'role',
-  'ctservice',
-]
-
 const defaultParams = {
   pagesize: 99999,
   sorting: [
@@ -942,6 +899,156 @@ const defaultParams = {
   isActive: true,
   excludeInactiveCodes: true,
 }
+
+const tenantCodesMap = new Map([
+  [
+    'doctorprofile',
+    {
+      ...defaultParams,
+      isActive: undefined,
+      sorting: [],
+    },
+  ],
+  [
+    'clinicianprofile',
+    {
+      ...defaultParams,
+      sorting: [],
+    },
+  ],
+  [
+    'ctappointmenttype',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctservice',
+    {
+      ...defaultParams,
+      isActive: undefined,
+      sorting: [
+        { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventorymedication',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventoryconsumable',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventoryvaccination',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'inventorypackage',
+    {
+      ...defaultParams,
+      sorting: [
+        { columnName: 'displayValue', direction: 'asc' },
+      ],
+    },
+  ],
+  [
+    'role',
+    {
+      ...defaultParams,
+      sorting: [],
+      isActive: undefined,
+    },
+  ],
+  [
+    'ctsupplier',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctpaymentmode',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'smstemplate',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'codetable/ctsnomeddiagnosis',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'documenttemplate',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationfrequency',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationdosage',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'copaymentscheme',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctcopayer',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctmedicationprecaution',
+    {
+      ...defaultParams,
+    },
+  ],
+])
+
+// always get latest codetable
+const skipCache = [
+  'doctorprofile',
+  'clinicianprofile',
+]
+
+const noSortOrderProp = [
+  'doctorprofile',
+  'clinicianprofile',
+  'role',
+]
 
 const convertExcludeFields = [
   // 'excludeInactiveCodes',
@@ -957,32 +1064,23 @@ export const fetchAndSaveCodeTable = async (
 ) => {
   let useGeneral = params === undefined || Object.keys(params).length === 0
   const baseURL = '/api/CodeTable'
-  const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
+  // const generalCodetableURL = `${baseURL}?excludeInactiveCodes=true&ctnames=`
   const searchURL = `${baseURL}/search?excludeInactiveCodes=true&ctname=`
 
   let url = searchURL
-  let criteriaForTenantCodes = noIsActiveProp.reduce(
-    (codes, tenantCode) =>
-      tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
-    false,
-  )
-    ? { pagesize: 99999 }
-    : { pagesize: 99999, isActive: true }
-  if (
-    tenantCodes.reduce(
-      (codes, tenantCode) =>
-        tenantCode.toLowerCase() === code.toLowerCase() ? true : codes,
-      false,
-    )
-  ) {
+
+  let criteriaForTenantCodes = defaultParams
+  if (tenantCodesMap.has(code.toLowerCase())) {
     url = '/api/'
     useGeneral = false
+    criteriaForTenantCodes = tenantCodesMap.get(code.toLowerCase())
   }
+
   const newParams = {
     ...defaultParams,
     ...params,
   }
-
+  newParams.sorting = noSortOrderProp.includes(code) ? [] : newParams.sorting
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
@@ -1138,8 +1236,10 @@ export const checkIsCodetableAPI = (url) => {
   try {
     const paths = url.split('/')
 
+    // paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
     const isTenantCodes =
-      paths.length >= 3 ? tenantCodes.includes(paths[2].toLowerCase()) : false
+      paths.length >= 3 ? tenantCodesMap.has(paths[2].toLowerCase()) : false
+
     const isCodetable = paths.length >= 3 ? paths[2].startsWith('ct') : false
     // console.log({ isTenantCodes, isCodetable })
     return isTenantCodes || isCodetable
@@ -1161,34 +1261,48 @@ export const getTenantCodes = async (tenantCode) => {
 
 export const getServices = (data) => {
   // eslint-disable-next-line compat/compat
-  const services = Object.values(_.groupBy(data, 'serviceId')).map((o) => {
-    return {
-      value: o[0].serviceId,
-      code: o[0].code,
-      name: o[0].displayValue,
-      serviceCenters: o.map((m) => {
-        return {
-          value: m.serviceCenterId,
-          name: m.serviceCenter,
-        }
-      }),
-    }
-  })
+  const services = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceId')).map((o) => {
+      return {
+        value: o[0].serviceId,
+        code: o[0].code,
+        name: o[0].displayValue,
+        serviceCenters: o.map((m) => {
+          return {
+            value: m.serviceCenterId,
+            name: m.serviceCenter,
+          }
+        }),
+      }
+    }),
+    [
+      'name',
+    ],
+    [
+      'asc',
+    ],
+  )
   // eslint-disable-next-line compat/compat
-  const serviceCenters = Object.values(
-    _.groupBy(data, 'serviceCenterId'),
-  ).map((o) => {
-    return {
-      value: o[0].serviceCenterId,
-      name: o[0].serviceCenter,
-      services: o.map((m) => {
-        return {
-          value: m.serviceId,
-          name: m.displayValue,
-        }
-      }),
-    }
-  })
+  const serviceCenters = _.orderBy(
+    Object.values(_.groupBy(data, 'serviceCenterId')).map((o) => {
+      return {
+        value: o[0].serviceCenterId,
+        name: o[0].serviceCenter,
+        services: o.map((m) => {
+          return {
+            value: m.serviceId,
+            name: m.displayValue,
+          }
+        }),
+      }
+    }),
+    [
+      'name',
+    ],
+    [
+      'asc',
+    ],
+  )
 
   return {
     serviceCenterServices: data,
@@ -1353,17 +1467,60 @@ export const getInventoryItem = (
   outstandingItem = undefined,
 ) => {
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
+
+  const groupByFKArray = _(newRows)
+    .groupBy((x) => x[itemFKName])
+    .map((v, key) => ({
+      [itemFKName]: parseInt(key, 10),
+      totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
+    }))
+    .value()
+
+  let fullyReceivedArray = []
+  if (outstandingItem) {
+    fullyReceivedArray = groupByFKArray.filter((o) => {
+      const item = outstandingItem.find((i) => i[itemFKName] === o[itemFKName])
+      if (item.orderQuantity === o.totalCurrentReceivingQty) {
+        return {
+          ...o,
+        }
+      }
+      return null
+    })
+  }
+
+  newRows = newRows.filter((o) =>
+    fullyReceivedArray.find((i) => i[itemFKName] === o[itemFKName]),
+  )
+
   let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
 
   if (outstandingItem) {
     const filterOutstandingItem = outstandingItem.filter(
       (x) => x.type === value,
     )
+
     inventoryItemList = _.intersectionBy(
       inventoryItemList,
       filterOutstandingItem,
       itemFKName,
     )
+  }
+
+  if (outstandingItem) {
+    inventoryItemList = inventoryItemList.map((o) => {
+      const { orderQuantity } = outstandingItem.find(
+        (i) => i[itemFKName] === o[itemFKName],
+      )
+      const { totalCurrentReceivingQty } = groupByFKArray.find(
+        (i) => i[itemFKName] === o[itemFKName],
+      )
+      const remainingQty = orderQuantity - totalCurrentReceivingQty
+      return {
+        ...o,
+        remainingQty,
+      }
+    })
   }
 
   return {
@@ -1386,6 +1543,8 @@ export const getInventoryItemList = (
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
       stateName,
+      itemFK: x.id,
+      isActive: x.isActive,
     }
   })
   return {
@@ -1429,6 +1588,21 @@ export const inventoryAdjustmentStatus = [
   { value: 1, name: 'Draft' },
   { value: 2, name: 'Finalized' },
   { value: 3, name: 'Discarded' },
+]
+
+export const shortcutKeys = [
+  { value: 'F1', name: 'F1' },
+  { value: 'F2', name: 'F2' },
+  { value: 'F3', name: 'F3' },
+  { value: 'F4', name: 'F4' },
+  { value: 'F5', name: 'F5' },
+  { value: 'F6', name: 'F6' },
+  { value: 'F7', name: 'F7' },
+  { value: 'F8', name: 'F8' },
+  { value: 'F9', name: 'F9' },
+  { value: 'F10', name: 'F10' },
+  { value: 'F11', name: 'F11' },
+  { value: 'F12', name: 'F12' },
 ]
 
 module.exports = {
@@ -1479,5 +1653,6 @@ module.exports = {
   buttonTypes,
   inventoryAdjustmentStatus,
   fetchAndSaveCodeTable,
+  shortcutKeys,
   ...module.exports,
 }

@@ -89,13 +89,12 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingClinicService/query',
                     payload: {
-                      keepFilter: false,
                       'ServiceFKNavigation.isActive': isActive,
+                      serviceCenterFK,
                       group: [
                         {
                           'ServiceFKNavigation.Code': codeDisplayValue,
                           'ServiceFKNavigation.DisplayValue': codeDisplayValue,
-                          serviceCenterFK,
                           combineCondition: 'or',
                         },
                       ],

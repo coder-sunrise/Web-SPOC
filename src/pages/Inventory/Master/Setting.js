@@ -27,7 +27,7 @@ const Setting = ({
   ] = useState('')
 
   const { medicationDetail, vaccinationDetail, theme, values } = props
-
+  const optionLabelLength = 40
   const [
     list,
     setList,
@@ -36,11 +36,16 @@ const Setting = ({
   const { ctmedicationprecaution, entity, config = {} } =
     medicationDetail || vaccinationDetail
   const entityData = entity || []
+  let addedItems = []
+  if (entityData && entityData.inventoryMedication_MedicationPrecaution.length > 0) {
+    addedItems = entityData.inventoryMedication_MedicationPrecaution.map((item) => ({
+      medicationPrecautionFK: item.medicationPrecautionFK,
+      value: item.medicationPrecaution.name,
+    }))
+  }
   const settingProps = {
     items: ctmedicationprecaution ? list : [],
-    addedItems: entityData
-      ? entityData.inventoryMedication_MedicationPrecaution
-      : [],
+    addedItems,
     classes,
     label: 'Precaution',
     limitTitle: formatMessage({
@@ -112,8 +117,8 @@ const Setting = ({
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                    'ctvaccinationunitofmeasurement'
-                  )
+                      'ctvaccinationunitofmeasurement'
+                    )
                 }
                 {...args}
               />
@@ -233,7 +238,7 @@ const Setting = ({
             )}
           />
         </GridItem>
-        <GridItem xs={1} style={{ flex: 0 }}>
+        <GridItem>
           <FastField
             name='prescribingUOMFK'
             render={(args) => (
@@ -242,12 +247,13 @@ const Setting = ({
                 label=''
                 text
                 labelField='name'
+                optionLabelLength={optionLabelLength}
                 code={
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                    'ctvaccinationunitofmeasurement'
-                  )
+                      'ctvaccinationunitofmeasurement'
+                    )
                 }
                 {...args}
               />
@@ -259,12 +265,13 @@ const Setting = ({
             <div style={{ marginTop: 30, fontSize: 16 }}>= 1.0</div>
           </React.Fragment>
         </GridItem>
-        <GridItem xs={1}>
+        <GridItem>
           <FastField
             name='dispensingUOMFK'
             render={(args) => (
               <CodeSelect
                 style={{ marginTop: 15 }}
+                optionLabelLength={optionLabelLength}
                 text
                 label=''
                 labelField='name'
@@ -285,51 +292,6 @@ const Setting = ({
         </React.Fragment>
       )}
     </CardContainer>
-    // <GridContainer>
-    //   <GridItem xs={6}>
-    //     <Card>
-    //       <CardHeader color='primary' text>
-    //         <CardText color='primary'>
-    //           <h5 className={classes.cardTitle}>Prescribing</h5>
-    //         </CardText>
-    //       </CardHeader>
-    //       <CardBody>
-    //
-    //       </CardBody>
-    //     </Card>
-    //   </GridItem>
-    //   <GridItem xs={6}>
-    //     <Card style={{ height: 250 }}>
-    //       <CardHeader color='primary' text>
-    //         <CardText color='primary'>
-    //           <h5 className={classes.cardTitle}>Dispensing</h5>
-    //         </CardText>
-    //       </CardHeader>
-    //       <CardBody>
-    //
-    //       </CardBody>
-    //     </Card>
-    //   </GridItem>
-    //   <GridItem xs={12}>
-    //     <p style={{ textAlign: 'Center' }}>
-    //       1 Dispense UOM = <u>1.00</u> Prescribing UOM
-    //     </p>
-    //   </GridItem>
-    //   {showTransfer && (
-    //     <GridItem xs={12}>
-    //       <Card>
-    //         <CardHeader color='primary' text>
-    //           <CardText color='primary'>
-    //             <h5 className={classes.cardTitle}>Medication Precaution</h5>
-    //           </CardText>
-    //         </CardHeader>
-    //         <CardBody>
-    //           <Transfer {...settingProps} />
-    //         </CardBody>
-    //       </Card>
-    //     </GridItem>
-    //   )}
-    // </GridContainer>
   )
 }
 export default compose(withStyles(styles, { withTheme: true }), React.memo)(

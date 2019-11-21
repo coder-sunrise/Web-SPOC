@@ -1,5 +1,6 @@
 import React from 'react'
 import * as Yup from 'yup'
+import color from 'color'
 import classnames from 'classnames'
 // formik
 import { withFormik, FastField } from 'formik'
@@ -60,7 +61,7 @@ const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
 
   return (
     <Card login>
-      <CardHeader color='primary' className={headerClass}>
+      <CardHeader color='login' className={headerClass}>
         <h3>Reset Password</h3>
         <h4>Enter your username and mobile number to reset your password</h4>
       </CardHeader>
@@ -103,7 +104,7 @@ const ResetPassForm = ({ classes, loading, handleSubmit, onCancelClick }) => {
             <Button color='danger' onClick={onCancelClick}>
               Cancel
             </Button>
-            <Button color='primary' onClick={handleSubmit} disabled={loading}>
+            <Button color='login' onClick={handleSubmit} disabled={loading}>
               {loading && <Refresh className='spin-custom' />}
               Get OTP
             </Button>
@@ -122,7 +123,7 @@ export default withFormik({
   validationSchema: Yup.object().shape({
     clinicCode: Yup.string().required('Cinic Code is a required field'),
     userName: Yup.string().required('Username is a required field'),
-    countryCodes: Yup.string().required('Country Code is a required field'),
+    countryCode: Yup.string().required('Country Code is a required field'),
     phoneNumber: Yup.number().required('Mobile Number is a required field'),
   }),
   mapPropsToValues: ({ payload }) => ({

@@ -10,7 +10,7 @@ import Input from '@material-ui/core/Input'
 
 // ant
 import { Select, Spin } from 'antd'
-import { CustomInput } from '@/components'
+import { CustomInput, Tooltip } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 
@@ -623,15 +623,21 @@ class AntdSelect extends React.PureComponent {
       )
       let text = ''
       if (match) text = match[this.props.labelField]
+      text =
+        optionLabelLength && text && text.length > optionLabelLength
+          ? `${text.substring(0, optionLabelLength)}...`
+          : text
+
       return (
-        <AutosizeInput
-          readOnly
-          onMouseLeave={onMouseLeave}
-          inputClassName={props.className}
-          value={
-            optionLabelLength ? text.substring(0, optionLabelLength) : text
-          }
-        />
+        <Tooltip title={text} enterDelay={750}>
+          <AutosizeInput
+            title=''
+            readOnly
+            onMouseLeave={onMouseLeave}
+            inputClassName={props.className}
+            value={text}
+          />
+        </Tooltip>
       )
     }
     // console.log(classes.selectContainer, classes.className)

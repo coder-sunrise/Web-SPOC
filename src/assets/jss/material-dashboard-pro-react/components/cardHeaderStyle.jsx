@@ -5,6 +5,7 @@ import {
   infoCardHeader,
   primaryCardHeader,
   roseCardHeader,
+  loginCardHeader,
 } from 'mui-pro-jss'
 
 const cardHeaderStyle = {
@@ -17,7 +18,8 @@ const cardHeaderStyle = {
     '& h4': {
       color: 'rgba(0, 0, 0, 0.85)',
     },
-    '&$cardHeaderPlain,&$cardHeaderImage,&$cardHeaderContact,&$cardHeaderSignup,&$cardHeaderIcon,&$cardHeaderStats,&$warningCardHeader,&$successCardHeader,&$dangerCardHeader,&$infoCardHeader,&$primaryCardHeader,&$roseCardHeader': {
+
+    '&$cardHeaderPlain,&$cardHeaderImage,&$cardHeaderContact,&$cardHeaderSignup,&$cardHeaderIcon,&$cardHeaderStats,&$warningCardHeader,&$successCardHeader,&$dangerCardHeader,&$infoCardHeader,&$primaryCardHeader,&$roseCardHeader,&$loginCardHeader': {
       margin: '15px 15px 0 15px',
       padding: '0',
       position: 'relative',
@@ -30,6 +32,13 @@ const cardHeaderStyle = {
       '&:not($cardHeaderIcon):not($cardHeaderImage):not($cardHeaderText)': {
         borderRadius: '3px',
         marginTop: '-20px',
+        padding: '15px',
+      },
+    },
+    '&$loginCardHeader': {
+      '&:not($cardHeaderIcon):not($cardHeaderImage):not($cardHeaderText)': {
+        borderRadius: '3px',
+        marginTop: '-65px',
         padding: '15px',
       },
     },
@@ -157,6 +166,12 @@ const cardHeaderStyle = {
     color: '#FFFFFF',
     '&:not($cardHeaderText):not($cardHeaderIcon)': {
       ...primaryCardHeader,
+    },
+  },
+  loginCardHeader: {
+    color: '#FFFFFF',
+    '&:not($cardHeaderText):not($cardHeaderIcon)': {
+      ...loginCardHeader,
     },
   },
   roseCardHeader: {

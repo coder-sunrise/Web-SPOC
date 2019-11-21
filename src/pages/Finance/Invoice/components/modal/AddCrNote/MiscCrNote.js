@@ -12,6 +12,7 @@ import {
   TextField,
   withFormik,
 } from '@/components'
+import { roundToTwoDecimals } from '@/utils/utils'
 // styles
 import styles from './styles'
 
@@ -21,14 +22,18 @@ import styles from './styles'
     total: Yup.number().min(0.01),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { handleAddMiscItem } = props
+    const { handleAddMiscItem, gstValue } = props
     // const newCreditNoteItem = props.values.creditNoteItem || []
     // const tempID = newCreditNoteItem.reduce((smallestNegativeID, item) => {
     //   if (item.id < 0 && item.id < smallestNegativeID) return item.id
     //   return smallestNegativeID
     // }, 0)
+    const gstAmount = roundToTwoDecimals(
+      values.total - values.total / (1 + gstValue / 100),
+    )
     const miscItem = {
       // id: tempID - 1,
+      gstAmount,
       itemType: 'Misc',
       itemCode: 'MISC',
       itemTypeFK: 6,
@@ -37,6 +42,7 @@ import styles from './styles'
       unitPrice: values.total,
       totalAfterGST: values.total,
       isDeleted: false,
+      isSelected: true,
     }
     handleAddMiscItem(miscItem)
     resetForm({})

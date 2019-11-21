@@ -181,7 +181,6 @@ export default createFormViewModel({
 
       setPurchaseOrder (state, { payload }) {
         const { purchaseOrderAdjustment, purchaseOrderItem } = payload
-
         const itemRows = purchaseOrderItem.map((x) => {
           const itemType = podoOrderType.find(
             (y) => y.value === x.inventoryItemTypeFK,
@@ -195,6 +194,8 @@ export default createFormViewModel({
             code: x[itemType.prop][itemType.itemFKName],
             name: x[itemType.prop][itemType.itemFKName],
             uom: x[itemType.prop][itemType.itemFKName],
+            totalReceived: x.bonusReceived + x.quantityReceived,
+            itemFK: x[itemType.prop][itemType.itemFKName],
           }
         })
 

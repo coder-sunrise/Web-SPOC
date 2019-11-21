@@ -2,38 +2,15 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // material ui
-import { withStyles, IconButton } from '@material-ui/core'
-import TrashBin from '@material-ui/icons/Delete'
+import { withStyles } from '@material-ui/core'
 // common component
-import {
-  CardContainer,
-  GridContainer,
-  GridItem,
-  NumberInput,
-  TextField,
-  Tooltip,
-} from '@/components'
+import { GridContainer, GridItem, NumberInput, TextField } from '@/components'
+import PaymentBase from './PaymentBase'
 import styles from '../styles'
 
-const Nets = ({
-  classes,
-  payment,
-  index,
-  handleDeletePayment,
-  handleAmountChange,
-}) => {
+const Nets = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
   return (
-    <CardContainer hideHeader>
-      <h5 className={classes.paymentItemHeader}>Nets</h5>
-      <Tooltip title='Delete payment' placement='top-end'>
-        <IconButton
-          className={classes.trashBin}
-          id={payment.id}
-          onClick={handleDeletePayment}
-        >
-          <TrashBin />
-        </IconButton>
-      </Tooltip>
+    <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
       <GridContainer>
         <GridItem md={6}>
           <FastField
@@ -61,7 +38,7 @@ const Nets = ({
           />
         </GridItem>
       </GridContainer>
-    </CardContainer>
+    </PaymentBase>
   )
 }
 

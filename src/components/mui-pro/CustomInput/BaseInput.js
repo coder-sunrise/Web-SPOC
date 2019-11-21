@@ -13,10 +13,9 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 import { InputAdornment, CircularProgress } from '@material-ui/core'
 import numeral from 'numeral'
 import Error from '@material-ui/icons/Error'
-import Tooltip from '@material-ui/core/Tooltip'
-
 import Input from '@material-ui/core/Input'
 import customInputStyle from 'mui-pro-jss/material-dashboard-pro-react/components/customInputStyle.jsx'
+import { Tooltip } from '@/components'
 import { extendFunc, currencyFormat } from '@/utils/utils'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
@@ -297,7 +296,14 @@ class BaseInput extends React.PureComponent {
     if (text) {
       cfg.inputComponent = ({ className }) => {
         return (
-          <AutosizeInput readOnly inputClassName={className} {...inputProps} />
+          <Tooltip title={inputProps.value} enterDelay={750}>
+            <AutosizeInput
+              readOnly
+              inputClassName={className}
+              {...inputProps}
+              title=''
+            />
+          </Tooltip>
         )
       }
     }

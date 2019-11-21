@@ -75,6 +75,7 @@ class AllergyGrid extends PureComponent {
     this.onAddedRowsChange = (addedRows) => {
       return addedRows.map((row) => ({
         onsetDate: moment(),
+        patientAllergyStatusFK: 1,
         ...row,
         confirmedByUserFK: props.user.data.id,
         isConfirmed: true,

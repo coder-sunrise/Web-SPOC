@@ -38,69 +38,35 @@ const Transfer = ({
   search,
   setSearch,
 }) => {
+  if (!items || items.length === 0) return null
+
+  const initAddList = items.filter((x) => !addedItems.find(
+    (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+  ))
+
   const [
     addedList,
     setAddedList,
-  ] = useState(items || [])
+  ] = useState(initAddList || [])
+
+  console.log({ initAddList, addedList })
 
   const [
     removedList,
     setRemovedList,
-  ] = useState([])
+  ] = useState(addedItems || [])
 
   const [
     searchField,
     setSearchField,
   ] = useState('')
 
-  useEffect(
-    () => {
-      setAddedList(items || [])
-    },
-    [
-      items,
-    ],
-  )
-
-  const initAddedItems = (initialItems) => {
-    setRemovedList(initialItems)
-
-    const tempList = addedList.filter(
-      (x) =>
-        !initialItems.find(
-          (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
-        ),
-    )
-
-    setAddedList(tempList)
-  }
-
-  useEffect(
-    () => {
-      if (addedItems) {
-        const filter = addedList.filter((x) =>
-          addedItems.find(
-            (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
-          ),
-        )
-        initAddedItems(filter)
-      }
-    },
-    [
-      addedItems,
-    ],
-  )
-
   const addClick = (index) => () => {
-    const tempList = [
-      ...removedList,
-      ...addedList.slice(index, index + 1),
-    ]
+    const tempList = [...removedList, addedList[index]]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
     }
-
     setAddedList([
       ...addedList.slice(0, index),
       ...addedList.slice(index + 1, addedList.length),
@@ -110,7 +76,7 @@ const Transfer = ({
   const removeClick = (index) => () => {
     setAddedList([
       ...addedList,
-      ...removedList.slice(index, index + 1),
+      removedList[index],
     ])
     const tempList = [
       ...removedList.slice(0, index),

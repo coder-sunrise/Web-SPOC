@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { EditableTableGrid, GridContainer, GridItem } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
   getInventoryItemList,
+  fetchAndSaveCodeTable,
 } from '@/utils/codes'
 
 let commitCount = 2200 // uniqueNumber
@@ -16,9 +18,9 @@ const receivingDetailsSchema = Yup.object().shape({
   orderQuantity: Yup.number()
     .min(1, 'Order Quantity nust be greater than or equal to 1')
     .required(),
-  bonusQuantity: Yup.number()
-    .min(0, 'Bonus Quantity nust be greater than or equal to 0')
-    .required(),
+  // bonusReceived: Yup.number()
+  //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
+  //   .required(),
 })
 
 class Grid extends PureComponent {
@@ -45,12 +47,19 @@ class Grid extends PureComponent {
   initializeStateItemList = async () => {
     const { dispatch } = this.props
 
+    const excludeInactiveCodes = () => {
+      const { values } = this.props
+      if (!Number.isNaN(values.id)) {
+        return undefined
+      }
+      return true
+    }
+
     await podoOrderType.map((x) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: x.ctName,
-        },
+      fetchAndSaveCodeTable(x.ctName, {
+        // excludeInactiveCodes: excludeInactiveCodes(),
+        // excludeInactiveCodes: false,
+        isActive: excludeInactiveCodes(),
       }).then((list) => {
         const { inventoryItemList } = getInventoryItemList(
           list,
@@ -95,9 +104,9 @@ class Grid extends PureComponent {
     row.name = ''
     row.uom = ''
     row.orderQuantity = 0
-    row.bonusQuantity = 0
+    row.bonusReceived = 0
     row.totalQuantity = 0
-    row.quantityReceived = 0
+    row.totalReceived = 0
     row.unitPrice = 0
     row.totalPrice = 0
 
@@ -125,9 +134,9 @@ class Grid extends PureComponent {
     row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
-    row.bonusQuantity = 0
+    row.bonusReceived = 0
     row.totalQuantity = 0
-    row.quantityReceived = 0
+    row.totalReceived = 0
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
@@ -150,9 +159,9 @@ class Grid extends PureComponent {
         const { onClickColumn, selectedItem } = this.state
         let tempRow = addedRows[0]
         let tempOrderQty = tempRow.orderQuantity
-        let tempBonusQty = tempRow.bonusQuantity
+        let tempBonusQty = tempRow.bonusReceived
         let tempTotalQty = tempRow.totalQuantity
-        let tempQuantityReceived = tempRow.quantityReceived
+        let tempQuantityReceived = tempRow.totalReceived
         let tempUnitPrice = tempRow.unitPrice
         let tempTotalPrice = tempRow.totalPrice
 
@@ -195,9 +204,9 @@ class Grid extends PureComponent {
         newAddedRows = addedRows.map((row) => ({
           ...row,
           orderQuantity: 0,
-          bonusQuantity: 0,
+          bonusReceived: 0,
           totalQuantity: 0,
-          quantityReceived: 0,
+          totalReceived: 0,
           unitPrice: 0,
           totalPrice: 0,
           isFocused: true,
@@ -207,7 +216,7 @@ class Grid extends PureComponent {
     return newAddedRows
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows, added, changed, deleted }) => {
     const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
@@ -215,7 +224,7 @@ class Grid extends PureComponent {
         type: 'purchaseOrderDetails/deleteRow',
         payload: deleted[0],
       })
-    } else {
+    } else if (added || changed) {
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
         payload: rows[0],
@@ -226,21 +235,64 @@ class Grid extends PureComponent {
     return rows
   }
 
-  rowOptions = (row) => {
+  rowOptions = (row, rows = []) => {
+    const getUnusedItem = (stateName) => {
+      rows = rows.filter((o) => !o.isDeleted)
+
+      const unusedInventoryItem = _.differenceBy(
+        this.state[stateName],
+        rows,
+        'itemFK',
+      )
+      // console.log('asda', unusedInventoryItem)
+
+      return unusedInventoryItem
+    }
+
+    const getCurrentOptions = (stateName, filteredOptions) => {
+      const selectedItem = this.state[stateName].find(
+        (o) => o.itemFK === row.itemFK,
+      )
+      let currentOptions = filteredOptions
+      if (selectedItem) {
+        currentOptions = [
+          ...filteredOptions,
+          selectedItem,
+        ]
+      }
+      return currentOptions
+    }
+
+    const filterActiveCode = (ops) => {
+      return ops.filter((o) => o.isActive === true)
+    }
+
     if (row.type === 1) {
-      return row.uid
-        ? this.state.MedicationItemList
-        : this.state.filterMedicationItemList
+      const filteredOptions = getUnusedItem('MedicationItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'MedicationItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 2) {
-      return row.uid
-        ? this.state.VaccinationItemList
-        : this.state.filterVaccinationItemList
+      const filteredOptions = getUnusedItem('VaccinationItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'VaccinationItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 3) {
-      return row.uid
-        ? this.state.ConsumableItemList
-        : this.state.filterConsumableItemList
+      const filteredOptions = getUnusedItem('ConsumableItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'ConsumableItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     return []
   }
@@ -255,8 +307,19 @@ class Grid extends PureComponent {
 
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable } = this.props
+    const { values, isEditable, dispatch } = this.props
     const { rows } = values
+    // console.log('banana', rows)
+
+    if (rows && rows.length > 1) {
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    }
 
     const tableParas = {
       columns: [
@@ -265,9 +328,9 @@ class Grid extends PureComponent {
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
-        { name: 'bonusQuantity', title: 'Bonus Qty' },
+        { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
-        { name: 'quantityReceived', title: 'Total Received' },
+        { name: 'totalReceived', title: 'Total Received' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
       ],
@@ -289,7 +352,7 @@ class Grid extends PureComponent {
           labelField: 'code',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row)
+            return this.rowOptions(row, rows)
           },
           onChange: (e) => {
             if (e.option) {
@@ -303,7 +366,7 @@ class Grid extends PureComponent {
           labelField: 'name',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row)
+            return this.rowOptions(row, values.rows)
           },
           onChange: (e) => {
             if (e.option) {
@@ -337,9 +400,10 @@ class Grid extends PureComponent {
           onChange: this.calculateTotalPrice,
         },
         {
-          columnName: 'bonusQuantity',
+          columnName: 'bonusReceived',
           type: 'number',
           format: '0.0',
+          disabled: true,
         },
         {
           columnName: 'totalQuantity',
@@ -348,7 +412,7 @@ class Grid extends PureComponent {
           disabled: true,
         },
         {
-          columnName: 'quantityReceived',
+          columnName: 'totalReceived',
           type: 'number',
           format: '0.0',
           disabled: true,

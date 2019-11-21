@@ -571,7 +571,7 @@ export const updateCellValue = (
     columnExtensions,
     classes,
     config = {},
-    row,
+    row = {},
   },
   element,
   val,

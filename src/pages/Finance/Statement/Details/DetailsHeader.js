@@ -99,6 +99,7 @@ class DetailsHeader extends PureComponent {
               render={(args) => (
                 <TextField
                   prefix='Payment Term:'
+                  suffix='Day(s)'
                   rightAlign
                   text
                   {...cfg}
@@ -164,10 +165,10 @@ class DetailsHeader extends PureComponent {
           <GridItem md={12} style={{ textAlign: 'right' }}>
             <a
               // style={{
-              //   position: 'absolute',
-              //   bottom: 0,
-              //   right: 0,
-              //   margin: 10,
+              // position: 'absolute',
+              // bottom: 0,
+              // right: 0,
+              // margin: 10,
               // }}
               onClick={() => history.push(`/finance/statement/editstatement`)}
             >

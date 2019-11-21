@@ -36,7 +36,7 @@ const UserRoleForm = ({ classes, footer, handleSubmit, ...props }) => {
         <GridItem md={4}>
           <FastField
             name='name'
-            render={(args) => <TextField {...args} label='Name' />}
+            render={(args) => <TextField autoFocus {...args} label='Name' />}
           />
         </GridItem>
         <GridItem md={4}>
@@ -83,6 +83,5 @@ const UserRoleForm = ({ classes, footer, handleSubmit, ...props }) => {
 
 export default withFormik({
   mapPropsToValues: () => ({}),
-  handleSubmit: () => {
-  },
+  handleSubmit: () => {},
 })(withStyles(styles, { name: 'UserProfileForm' })(UserRoleForm))
