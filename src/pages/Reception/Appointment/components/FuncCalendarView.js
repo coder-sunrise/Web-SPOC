@@ -316,6 +316,7 @@ const CalendarView = ({
           patientContactNo,
           isEnableRecurrence,
           appointment_Resources: apptResources,
+          appointmentRemarks,
         } = appointment
 
         const apptEvents = apptResources.map((item) => ({
@@ -326,6 +327,7 @@ const CalendarView = ({
           patientName,
           patientContactNo,
           isEnableRecurrence,
+          appointmentRemarks,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,
