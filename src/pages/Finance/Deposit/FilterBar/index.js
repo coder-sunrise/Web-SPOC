@@ -50,7 +50,7 @@ class FilterBar extends PureComponent {
                 return (
                   <TextField
                     label={formatMessage({
-                      id: 'finance.deposit.search.patient',
+                      id: 'reception.queue.patientSearchPlaceholder',
                     })}
                     {...args}
                   />

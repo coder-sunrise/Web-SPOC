@@ -99,7 +99,7 @@ class ChangePassword extends React.PureComponent {
                     label='Current Password'
                     type='password'
                     inputProps={{
-                      autocomplete: 'off',
+                      autoComplete: 'nope',
                     }}
                   />
                 </React.Fragment>

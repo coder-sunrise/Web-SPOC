@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import { CardContainer, CommonModal } from '@/components'
+import { CardContainer, CommonModal, withSettingBase } from '@/components'
 import Filter from './Filter'
 import Grid from './Grid'
 import Detail from './Detail'
@@ -14,6 +14,7 @@ const styles = (theme) => ({
 @connect(({ settingParticipantRole }) => ({
   settingParticipantRole,
 }))
+@withSettingBase({ modelName: 'settingParticipantRole' })
 class ParticipantRole extends PureComponent {
   state = {}
 

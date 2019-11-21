@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
+import { formatMessage } from 'umi/locale'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui
@@ -201,9 +202,12 @@ class ApprovedCHAS extends React.Component {
               <ProgressButton
                 icon={null}
                 color='primary'
+                disabled={selectedRows.length <= 0}
                 onClick={this.handleGetStatusClicked}
               >
-                Get Status
+                {formatMessage({
+                  id: 'claimsubmission.invoiceClaim.GetStatus',
+                })}
               </ProgressButton>
               <ProgressButton
                 icon={null}
@@ -211,7 +215,9 @@ class ApprovedCHAS extends React.Component {
                 onClick={this.onClickCollectPayment}
                 disabled={selectedRows.length <= 0}
               >
-                Collect Payment
+                {formatMessage({
+                  id: 'claimsubmission.invoiceClaim.CollectPayment',
+                })}
               </ProgressButton>
             </GridItem>
           </GridContainer>

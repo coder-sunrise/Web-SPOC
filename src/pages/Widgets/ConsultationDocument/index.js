@@ -100,7 +100,7 @@ export const viewReport = (row, props, useID = false) => {
   }
   if (row.id && useID) {
     window.g_app._store.dispatch({
-      type: 'global/updateState',
+      type: 'report/updateState',
       payload: {
         reportTypeID: downloadConfig.id,
         reportParameters: {
@@ -130,7 +130,7 @@ export const viewReport = (row, props, useID = false) => {
     reportParameters.patientName = entity.name
     reportParameters.patientAccountNo = entity.patientAccountNo
     window.g_app._store.dispatch({
-      type: 'global/updateState',
+      type: 'report/updateState',
       payload: {
         reportTypeID: downloadConfig.id,
         reportParameters: {

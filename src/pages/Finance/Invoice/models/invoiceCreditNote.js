@@ -37,14 +37,19 @@ export default createFormViewModel({
       mapCreditNote (state, { payload }) {
         const { invoicePayerFK, invoiceDetail, invoicePaymentDetails } = payload
 
-        const { invoiceTotalAftGST, invoiceItem } = invoiceDetail
+        const {
+          invoiceTotalAftGST,
+          invoiceItem,
+          gstValue,
+          invoiceGSTAmt,
+        } = invoiceDetail
         const sum = (a) => a.reduce((x, y) => x + y)
 
         const filterInvPayment = invoicePaymentDetails.filter(
           (x) => x.id === invoicePayerFK,
         )
 
-        const creditNoteBalance = filterInvPayment[0].outStanding
+        const creditNoteBalance = filterInvPayment[0].payerDistributedAmt
         const { creditNote } = filterInvPayment[0]
 
         const filteredCreditNote = creditNote.filter(
@@ -82,6 +87,7 @@ export default createFormViewModel({
               // totalAfterItemAdjustment: remaining quantity multiply unit price
               totalAfterItemAdjustment:
                 (item.quantity - pastItemQuantity) * item.unitPrice,
+              _totalAfterGST: item.totalAfterGST,
             }
           }
           return {
@@ -90,6 +96,7 @@ export default createFormViewModel({
             itemTypeFK: item.invoiceItemTypeFK,
             originRemainingQty: item.quantity,
             totalAfterItemAdjustment: item.quantity * item.unitPrice,
+            _totalAfterGST: item.totalAfterGST,
           }
         })
 
@@ -101,6 +108,8 @@ export default createFormViewModel({
 
         return {
           ...InitialCreditNote,
+          gstValue,
+          invoiceGSTAmt,
           invoicePayerFK,
           invoiceTotal: invoiceTotalAftGST,
           creditNoteItem: remainingItems

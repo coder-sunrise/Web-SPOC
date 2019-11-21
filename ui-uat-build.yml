@@ -5,12 +5,12 @@
 
 trigger: none
 
-schedules:
-- cron: '0 10 * * *'
-  displayName: 'Nightly Build'
-  branches:
-    include:
-    - dev
+#schedules:
+#- cron: '0 10 * * *'
+#  displayName: 'Nightly Build'
+#  branches:
+#    include:
+#    - dev
 
 pool:
   name: 'SEMRGen2'

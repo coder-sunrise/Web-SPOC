@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import Add from '@material-ui/icons/Add'
-import Delete from '@material-ui/icons/Delete'
+import { Add, Delete } from '@material-ui/icons'
 import { formatMessage } from 'umi/locale'
+import LowStockInfo from './LowStockInfo'
 import {
   Button,
   GridContainer,
@@ -94,12 +94,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
-            ? item.dosageDisplayValue
-            : ''} ${item.prescribeUOMDisplayValue
-            ? item.prescribeUOMDisplayValue
-            : ''} ${item.drugFrequencyDisplayValue
-            ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration ? item.duration : ''} day(s)`
+              ? item.dosageDisplayValue
+              : ''} ${item.prescribeUOMDisplayValue
+                ? item.prescribeUOMDisplayValue
+                : ''} ${item.drugFrequencyDisplayValue
+                  ? item.drugFrequencyDisplayValue
+                  : ''} For ${item.duration ? item.duration : ''} day(s)`
         }
       }
       return instruction
@@ -168,8 +168,8 @@ class Medication extends PureComponent {
                 this.calculateQuantity()
               }, 1)
             }}
-            // okText='Yes'
-            // cancelText='No'
+          // okText='Yes'
+          // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -437,41 +437,46 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    // console.log(this.props)
     return (
       <div>
         <GridContainer>
           <GridItem xs={10}>
-            {openPrescription ? (
-              <FastField
-                name='drugName'
-                render={(args) => {
-                  return (
-                    <TextField
-                      label='Open Prescription Name'
-                      {...args}
-                      autocomplete='nope'
-                    />
-                  )
-                }}
-              />
-            ) : (
-              <FastField
-                name='inventoryMedicationFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      temp
-                      label='Medication Name'
-                      code='inventorymedication'
-                      labelField='displayValue'
-                      onChange={this.changeMedication}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            )}
+            <React.Fragment>
+              {openPrescription ? (
+                <FastField
+                  name='drugName'
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label='Open Prescription Name'
+                        {...args}
+                        autocomplete='nope'
+                      />
+                    )
+                  }}
+                />
+              ) : (
+                <FastField
+                  name='inventoryMedicationFK'
+                  render={(args) => {
+                    return (
+                      <div style={{ position: 'relative' }}>
+                        <CodeSelect
+                          temp
+                          label='Medication Name'
+                          code='inventorymedication'
+                          labelField='displayValue'
+                          onChange={this.changeMedication}
+                          {...args}
+                          style={{ paddingRight: 20 }}
+                        />
+                        <LowStockInfo sourceType='medication' {...this.props} />
+                      </div>
+                    )
+                  }}
+                />
+              )}
+            </React.Fragment>
           </GridItem>
         </GridContainer>
         <GridContainer gutter={0}>
@@ -741,11 +746,12 @@ class Medication extends PureComponent {
                                       }}
                                       // label='Precaution'
                                       // simple
-                                      code='ctMedicationPrecaution'
+                                      code='ctmedicationprecaution'
+                                      labelField='displayValue'
                                       onChange={(v, option = {}) => {
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precaution`,
-                                          option.name,
+                                          option.displayValue,
                                         )
                                         setFieldValue(
                                           `corPrescriptionItemPrecaution[${i}].precautionCode`,
@@ -895,7 +901,7 @@ class Medication extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label='Batch No'
+                    label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedMedication.medicationStock}

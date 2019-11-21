@@ -22,7 +22,7 @@ const CrNoteForm = ({ classes }) => {
           <GridItem md={12}>
             <FastField
               name='generatedDate'
-              render={(args) => <DatePicker {...args} label='Date' />}
+              render={(args) => <DatePicker {...args} autoFocus label='Date' />}
             />
           </GridItem>
           <GridItem md={12}>

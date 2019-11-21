@@ -8,7 +8,8 @@ const addContent = (type, props) => {
     case 1:
       return <DetailPanel {...props} />
     default:
-      return <Setting {...props} />
+      return <DetailPanel {...props} />
+    // return <Setting {...props} />
   }
 }
 
@@ -51,9 +52,9 @@ export const SchemeDetailOption = (detailsProps) => [
     name: tabHeader('Details', detailsProps),
     content: addContent(1, detailsProps),
   },
-  {
-    id: 1,
-    name: tabHeader('Setting', detailsProps),
-    content: addContent(2, detailsProps),
-  },
+  // {
+  //   id: 1,
+  //   name: tabHeader('Setting', detailsProps),
+  //   content: addContent(2, detailsProps),
+  // },
 ]

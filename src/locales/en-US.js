@@ -15,6 +15,7 @@ import sms from './en-US/sms'
 import finance from './en-US/finance'
 import reception from './en-US/reception'
 import general from './en-US/general'
+import claimsubmission from './en-US/claimSubmission'
 
 export default {
   'navBar.lang': 'Languages',
@@ -42,4 +43,5 @@ export default {
   ...reception,
   ...inventory,
   ...sms,
+  ...claimsubmission,
 }

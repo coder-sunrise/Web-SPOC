@@ -105,6 +105,7 @@ export default class BaseCRUDViewModel {
             entity = {},
             version,
             list,
+            pagination,
           } = yield select((st) => st[namespace])
           // const disableAutoQuery = yield select(st => st[namespace].disableAutoQuery)
           // if (!disableAutoQuery) {
@@ -117,8 +118,10 @@ export default class BaseCRUDViewModel {
           )
             return list || entity
           if (typeof payload === 'object') {
+            const { sorting = [] } = pagination || {}
             const current = !payload.current ? 1 : payload.current
             filter = {
+              sorting,
               ...fixedFilter,
               ...filter,
               ...payload,

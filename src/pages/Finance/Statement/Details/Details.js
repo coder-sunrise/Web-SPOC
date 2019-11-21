@@ -16,6 +16,7 @@ import {
 } from '@/components'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
+import PrintStatementReport from '../PrintStatementReport'
 
 const styles = () => ({
   gridContainer: {
@@ -46,8 +47,6 @@ class Details extends PureComponent {
       { name: 'outstandingAmount', title: 'Outstanding' },
       { name: 'remark', title: 'Remarks' },
     ],
-
-    FuncProps: { selectable: true },
 
     showCollectPayment: false,
   }
@@ -92,7 +91,7 @@ class Details extends PureComponent {
   }
 
   render () {
-    const { columns, showCollectPayment, FuncProps, showModal } = this.state
+    const { columns, showCollectPayment, showModal } = this.state
     const { classes, statement, values, theme } = this.props
     return (
       <div>
@@ -107,10 +106,12 @@ class Details extends PureComponent {
                 <Refresh />
                 <FormattedMessage id='finance.statement.details.refreshStatement' />
               </ProgressButton>
-              <Button color='primary'>
-                <Print />
-                <FormattedMessage id='finance.statement.details.printStatement' />
-              </Button>
+              <PrintStatementReport id={values.id}>
+                <Button color='primary'>
+                  <Print />
+                  <FormattedMessage id='finance.statement.details.printStatement' />
+                </Button>
+              </PrintStatementReport>
             </GridItem>
           </GridContainer>
         </GridContainer>
@@ -140,7 +141,15 @@ class Details extends PureComponent {
               format: { dateFormatLong },
             },
           ]}
-          FuncProps={FuncProps}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: true,
+              rowSelectionEnabled: (row) => {
+                return !row.statementInvoicePayment.length > 0
+              },
+            },
+          }}
           getRowId={this.gridGetRowID}
           selection={this.state.selectedRows}
           onSelectionChange={this.handleSelectionChange}

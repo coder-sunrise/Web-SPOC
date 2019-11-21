@@ -1,13 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { formatMessage } from 'umi/locale'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-
 import { withStyles } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
-import Assignment from '@material-ui/icons/Assignment'
 import { getAppendUrl } from '@/utils/utils'
-
 import { compare } from '@/layouts'
 import { CardContainer, Button, Tooltip } from '@/components'
 import FilterBar from './FilterBar'
@@ -95,7 +90,7 @@ class PatientSearch extends PureComponent {
     } = props
     const newChildren = (
       <React.Fragment>
-        <FilterBar {...restProps} />
+        <FilterBar {...restProps} simple={simple} />
         <Grid
           renderActionFn={renderActionFn}
           onRowDblClick={onRowDblClick}

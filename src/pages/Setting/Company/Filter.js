@@ -39,7 +39,7 @@ class Filter extends PureComponent {
     const { companyType } = settingCompany
     this.checkIsCopayer(name)
     const { isCopayer } = this.state
-
+    console.log({ companyType })
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -99,7 +99,7 @@ class Filter extends PureComponent {
                     this.props.dispatch({
                       type: 'settingCompany/query',
                       payload: {
-                        // companyType,
+                        companyTypeFK: companyType.id,
                         keepFilter: false,
                         coPayerTypeFK,
                         isActive,

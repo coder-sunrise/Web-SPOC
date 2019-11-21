@@ -8,12 +8,15 @@ import {
   NumberInput,
   FastField,
   withFormikExtend,
+  Field,
+  DatePicker,
 } from '@/components'
 
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
+import LowStockInfo from './LowStockInfo'
 
-@connect(({ global }) => ({ global }))
+@connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) =>
     orders.entity || orders.defaultConsumable,
@@ -43,6 +46,14 @@ import { calculateAdjustAmount } from '@/utils/utils'
   displayName: 'OrderPage',
 })
 class Consumable extends PureComponent {
+  state = {
+    selectedConsumable: {
+      consumableStock: [],
+    },
+    batchNo: '',
+    expiryDate: '',
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (
       (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
@@ -59,7 +70,24 @@ class Consumable extends PureComponent {
   }
 
   changeConsumable = (v, op = {}) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, disableEdit } = this.props
+
+    let defaultBatch
+    if (op.consumableStock) {
+      defaultBatch = op.consumableStock.find((o) => o.isDefault === true)
+      if (defaultBatch)
+        this.setState({
+          batchNo: defaultBatch.batchNo,
+          expiryDate: defaultBatch.expiryDate,
+        })
+    }
+    if (disableEdit === false) {
+      setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
+      setFieldValue(
+        'expiryDate',
+        defaultBatch ? defaultBatch.expiryDate : undefined,
+      )
+    }
     // console.log(v, op)
     setFieldValue('isActive', true)
     setFieldValue('consumableCode', op.code)
@@ -102,7 +130,7 @@ class Consumable extends PureComponent {
   }
 
   render () {
-    const { theme, values, footer, handleSubmit, setFieldValue } = this.props
+    const { theme, values, footer, handleSubmit, setFieldValue, classes, disableEdit } = this.props
     return (
       <div>
         <GridContainer>
@@ -111,14 +139,18 @@ class Consumable extends PureComponent {
               name='inventoryConsumableFK'
               render={(args) => {
                 return (
-                  <CodeSelect
-                    temp
-                    label='Consumable Name'
-                    code='inventoryconsumable'
-                    labelField='displayValue'
-                    onChange={this.changeConsumable}
-                    {...args}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <CodeSelect
+                      temp
+                      label='Consumable Name'
+                      code='inventoryconsumable'
+                      labelField='displayValue'
+                      onChange={this.changeConsumable}
+                      {...args}
+                      style={{ paddingRight: 20 }}
+                    />
+                    <LowStockInfo sourceType='consumable' {...this.props} />
+                  </div>
                 )
               }}
             />
@@ -182,7 +214,41 @@ class Consumable extends PureComponent {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='batchNo'
+              render={(args) => {
+                return (
+                  <CodeSelect
+                    label='Batch No.'
+                    labelField='batchNo'
+                    valueField='batchNo'
+                    options={this.state.selectedConsumable.consumableStock}
+                    onChange={(e, op = {}) => {
+                      setFieldValue('expiryDate', op.expiryDate)
+                    }}
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.editor}>
+            <Field
+              name='expiryDate'
+              render={(args) => {
+                return (
+                  <DatePicker
+                    label='Expiry Date'
+                    disabled={disableEdit}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={8} className={classes.editor}>
             <FastField
               name='remarks'
               render={(args) => {

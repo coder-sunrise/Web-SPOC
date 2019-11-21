@@ -23,8 +23,8 @@ const styles = (theme) => ({})
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     // shortcutKey: Yup.string().required(),
     multiplier: Yup.number()
-      .min(0, 'Multiplier must between 0 and 999,999.9999')
-      .max(999999.9999, 'Multiplier must between 0 and 999,999.9999')
+      .min(0, 'Multiplier must between 0 and 999,999.99')
+      .max(999999.99, 'Multiplier must between 0 and 999,999.99')
       .required(),
     sortOrder: Yup.number()
       .min(
@@ -40,9 +40,13 @@ const styles = (theme) => ({})
     translationLink: Yup.object().shape({
       translationMasters: Yup.array().of(
         Yup.object().shape({
-          displayValue: Yup.string().when('languageFK', {
+          displayValue: Yup.string().when('tempLanguageFK', {
             is: (v) => v !== undefined,
             then: Yup.string().required(),
+          }),
+          languageFK: Yup.number().when('displayValue', {
+            is: (v) => v !== undefined && v !== null && v.trim() !== '',
+            then: Yup.number().required(),
           }),
         }),
       ),
@@ -75,7 +79,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingMedicationFrequency } = props
+    const { theme, footer, settingMedicationFrequency, setFieldValue } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -87,7 +91,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
-                    autoFocused
+                    autoFocus
                     {...args}
                     disabled={!!settingMedicationFrequency.entity}
                   />
@@ -131,9 +135,9 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <NumberInput
                     label='Multiplier'
-                    max={999999.9999}
+                    max={999999.99}
                     maxLength={11}
-                    format='0.0000'
+                    format='0.00'
                     {...args}
                   />
                 )}
@@ -162,6 +166,12 @@ class Detail extends PureComponent {
                     <CodeSelect
                       label='Translation Language'
                       code='ctLanguage'
+                      onChange={(value) => {
+                        setFieldValue(
+                          `translationLink.translationMasters[0].tempLanguageFK`,
+                          value,
+                        )
+                      }}
                       {...args}
                     />
                   )

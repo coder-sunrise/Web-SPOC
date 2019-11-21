@@ -179,6 +179,10 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       multiline
                       rowsMax={2}
                       rows={2}
+                      inputProps={{
+                        maxLength: 500,
+                      }}
+                      maxLength={500}
                       // disabled={!isReadOnly}
                       {...args}
                     />

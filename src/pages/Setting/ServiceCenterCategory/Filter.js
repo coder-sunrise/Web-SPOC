@@ -42,7 +42,6 @@ class Filter extends PureComponent {
                   this.props.dispatch({
                     type: 'settingServiceCenterCategory/query',
                     payload: {
-                      keepFilter: false,
                       group: [
                         {
                           code: codeDisplayValue,

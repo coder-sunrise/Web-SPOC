@@ -133,6 +133,7 @@ const withFormikExtend = (props) => (Component) => {
       if (!this.props.values.id) {
         this.props.validateForm()
       }
+
       startDirtyChecking = false
       setTimeout(() => {
         startDirtyChecking = true

@@ -4,8 +4,10 @@ import * as commonService from '@/services/common'
 const url = '/api/doctorblock'
 
 export const upsert = (params) => commonService.upsert(url, params)
-export const query = (params) => commonService.query(url, { ...params })
-export const queryList = (params) => commonService.queryList(url, params)
+export const query = (params) =>
+  commonService.query(url, { ...params, pagesize: 999 })
+export const queryList = (params) =>
+  commonService.queryList(url, { ...params, pagesize: 999 })
 export const getAllList = (params) => commonService.queryAll(url, params)
 export const remove = (params) =>
   request(`${url}/${params.id}/false`, { method: 'DELETE' })

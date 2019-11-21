@@ -69,6 +69,7 @@ class CollectPaymentConfirm extends PureComponent {
                   <NumberInput
                     {...args}
                     currency
+                    min={0}
                     onChange={(e) => this.handlePaymentAmount(e, 'grid')}
                   />
                 )}
@@ -110,7 +111,7 @@ class CollectPaymentConfirm extends PureComponent {
       paymentDate: moment(),
       amount: total,
       maxAmount: total,
-      paymentMode: 5,
+      paymentModeFK: 5, // GIRO
       statementInvoice: newStatementInvoice,
     })
     this.setState({
@@ -157,6 +158,7 @@ class CollectPaymentConfirm extends PureComponent {
 
     setValues({
       ...values,
+      amount: e.target.value,
       statementInvoice: test,
     })
   }
@@ -203,6 +205,7 @@ class CollectPaymentConfirm extends PureComponent {
     const { rows, columns, columnExtensions, isCardPayment } = this.state
     const { values, statement, handleSubmit } = this.props
     const { bizSessionList } = statement
+    console.log({ values })
     return (
       <React.Fragment>
         <CommonTableGrid
@@ -222,6 +225,7 @@ class CollectPaymentConfirm extends PureComponent {
                     {...args}
                     currency
                     label='Amount'
+                    autoFocus
                     onChange={this.handlePaymentAmount}
                   />
                 )}
@@ -253,7 +257,7 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
 
             <GridItem>
-              <FastField
+              <Field
                 name='paymentModeFK'
                 render={(args) => (
                   <CodeSelect

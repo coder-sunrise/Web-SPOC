@@ -6,14 +6,17 @@ const DoctorLabel = ({ doctor, hideMCR = false }) => {
     let { clinicianProfile, doctorMCRNo } = doctor
     if (clinicianProfile === undefined) clinicianProfile = doctor
 
-    const designation = clinicianProfile.title || ''
+    const title =
+      clinicianProfile.title && clinicianProfile.title !== 'Other'
+        ? `${clinicianProfile.title} `
+        : ''
     let mcrNo = doctorMCRNo ? `(${doctorMCRNo})` : ''
     if (clinicianProfile.doctorProfile)
       mcrNo = `(${clinicianProfile.doctorProfile.doctorMCRNo})`
 
     if (hideMCR) mcrNo = ''
 
-    label = `${designation} ${clinicianProfile.name} ${mcrNo}`
+    label = `${title}${clinicianProfile.name} ${mcrNo}`
   } catch (error) {
     // console.log({ error })
   }

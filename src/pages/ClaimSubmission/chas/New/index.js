@@ -5,6 +5,7 @@ import { withFormik } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
+import { formatMessage } from 'umi/locale'
 import { LoadingWrapper } from '@/components/_medisys'
 import {
   CommonTableGrid,
@@ -12,7 +13,7 @@ import {
   GridContainer,
   GridItem,
   notification,
-  CardContainer,
+  CardContainer, Tooltip,
 } from '@/components'
 // sub components
 import BaseSearchBar from '../../common/BaseSearchBar'
@@ -168,13 +169,24 @@ class NewCHAS extends React.Component {
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
-              <ProgressButton
-                icon={null}
-                color='info'
-                onClick={this.onRefreshClicked}
+              <Tooltip placement='bottom-start'
+                title={formatMessage({
+                    id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                  })}
               >
-                Refresh
-              </ProgressButton>
+                <div style={{ display: 'inline-block' }}>
+                  <ProgressButton
+                    icon={null}
+                    color='info'
+                    disabled={selectedRows.length <= 0}
+                    onClick={this.onRefreshClicked}
+                  >
+                    {formatMessage({
+                      id: 'claimsubmission.invoiceClaim.refreshPatientDetail',
+                    })}
+                  </ProgressButton>
+                </div>
+              </Tooltip>
               <Authorized authority='claimsubmission.submitclaim'>
                 <ProgressButton
                   icon={null}
@@ -182,7 +194,9 @@ class NewCHAS extends React.Component {
                   disabled={selectedRows.length <= 0}
                   onClick={this.onSubmitClaimClicked}
                 >
-                  Submit Claim
+                  {formatMessage({
+                    id: 'claimsubmission.invoiceClaim.SubmitClaim',
+                  })}
                 </ProgressButton>
               </Authorized>
             </GridItem>
