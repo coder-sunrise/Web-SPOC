@@ -26,11 +26,13 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
   } else return ''
 
   const {
-    isLowStock = false,
+    criticalThreshold = 0.0,
     stock = 0.0,
     isChasAcuteClaimable,
     isChasChronicClaimable,
   } = source
+
+  const isLowStock = stock <= criticalThreshold
 
   return (
     <Popover

@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import color from 'color'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // formik
@@ -25,14 +26,19 @@ import {
 
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
+import logo from '@/assets/img/logo/logo_medicloud.png'
 import { container } from '@/assets/jss'
 
 const styles = (theme) => ({
   // ...loginPageStyle(theme),
   uatText: {
     width: '100%',
-    marginTop: theme.spacing(4),
-    color: 'white',
+    // marginTop: theme.spacing(4),
+    position: 'absolute',
+    top: '5%',
+    left: 0,
+    color: 'red',
+    fontWeight: 700,
     textAlign: 'center',
     textTransform: 'uppercase',
   },
@@ -47,6 +53,9 @@ const styles = (theme) => ({
       paddingBottom: '100px',
     },
   },
+  textCenter: {
+    textAlign: 'center',
+  },
   cardTitle: {
     marginTop: '0',
     minHeight: 'auto',
@@ -54,6 +63,7 @@ const styles = (theme) => ({
     fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
     marginBottom: '3px',
     textDecoration: 'none',
+    textAlign: 'center',
     color: 'white',
   },
   centerItem: {
@@ -63,6 +73,19 @@ const styles = (theme) => ({
   body: {
     marginBottom: '15px',
     padding: theme.spacing(2),
+  },
+  loginButton: {
+    backgroundColor: '#0093f1',
+    '&:hover': {
+      // backgroundColor: color('#0093f1').darken(0.2).hex(),
+    },
+  },
+  forgotPasswordAnchor: {
+    color: '#0093f1',
+    '&:hover': {
+      color: color('#0093f1').darken(0.2).hex(),
+      textDecoration: 'underline',
+    },
   },
 })
 
@@ -137,28 +160,11 @@ class NewLogin extends React.Component {
     this.timeOutFunction = setTimeout(() => {
       this.setState({ cardAnimation: '' })
     }, cardAnimationDuration)
-
-    // bind keyDown listener to document
-    // document.addEventListener('keydown', this.handleKeyDown)
   }
 
   componentWillUnmount () {
     clearTimeout(this.timeOutFunction)
     this.timeOutFunction = null
-
-    // unbind keyDown listener
-    // document.removeEventListener('keydown', this.handleKeyDown)
-  }
-
-  handleKeyDown = (event) => {
-    const ENTER_KEY = 13
-    switch (event.keyCode) {
-      case ENTER_KEY:
-        this.onEnterPressed()
-        break
-      default:
-        break
-    }
   }
 
   onEnterPressed = () => {
@@ -178,17 +184,26 @@ class NewLogin extends React.Component {
     return (
       <React.Fragment>
         <div className={classes.container}>
+          {process.env.client_env === 'uat' && (
+            <h2 className={classes.uatText}>
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
+            </h2>
+          )}
           <GridContainer justify='center'>
             <GridItem md={4}>
               <Card login className={classes[cardAnimation]}>
                 <CardHeader
                   className={`${classes.cardHeader} ${classes.textCenter}`}
-                  color='primary'
+                  color='login'
                 >
-                  <h3 className={classes.cardTitle}>Login</h3>
-                  <h3>
+                  <h3 className={classes.cardTitle}>
                     <FormattedMessage id='app.login.title' />
                   </h3>
+                  <img
+                    src={logo}
+                    alt='logo'
+                    style={{ height: '100px', width: '100px' }}
+                  />
                 </CardHeader>
 
                 <CardBody className={classnames(classes.body)}>
@@ -245,15 +260,21 @@ class NewLogin extends React.Component {
                         text='Enter'
                         icon={<LockOpen />}
                         block
-                        color='primary'
+                        color='login'
                         onClick={this.onEnterPressed}
                       />
                     </GridItem>
                     <GridItem
                       md={12}
-                      style={{ marginTop: 12, textAlign: 'right' }}
+                      style={{
+                        marginTop: 12,
+                        textAlign: 'right',
+                      }}
                     >
-                      <a onClick={this.onForgotPasswordClick}>
+                      <a
+                        onClick={this.onForgotPasswordClick}
+                        className={classes.forgotPasswordAnchor}
+                      >
                         Forgot Password
                       </a>
                     </GridItem>
@@ -262,11 +283,6 @@ class NewLogin extends React.Component {
               </Card>
             </GridItem>
           </GridContainer>
-          {process.env.client_env === 'uat' && (
-            <h3 className={classes.uatText}>
-              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
-            </h3>
-          )}
         </div>
       </React.Fragment>
     )
