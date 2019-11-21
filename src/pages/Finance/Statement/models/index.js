@@ -54,7 +54,9 @@ export default createListViewModel({
             type: 'queryOneDone',
             payload: res,
           })
+          return true
         }
+        return false
       },
       *bizSessionList ({ payload }, { call, put }) {
         const response = yield call(service.queryBizSession, payload)
