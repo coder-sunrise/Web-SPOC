@@ -8,7 +8,8 @@ class CodeSelect extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      maxTagCount: this.props.maxTagCount ? this.props.maxTagCount : 5,
+      maxTagCount:
+        this.props.maxTagCount !== undefined ? this.props.maxTagCount : 5,
     }
     const { dispatch, codetable } = props
     if (props.code) {
@@ -49,15 +50,19 @@ class CodeSelect extends React.PureComponent {
     const options =
       code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
+
     return (
-      <Select options={filteredOptions || []}
-        ref={this.codeSelectRef}
+      <Select
+        options={filteredOptions || []}
         valueField='id'
         {...this.props}
+        ref={this.codeSelectRef}
         maxTagCount={this.state.maxTagCount}
         onChange={(values, opts) => {
           if (this.props.mode && this.props.mode === 'multiple') {
-            this.setState({ maxTagCount: (values && values.length === 1) ? 1 : 0 })
+            this.setState({
+              maxTagCount: values && values.length === 1 ? 1 : 0,
+            })
           }
           if (this.props.onChange) {
             this.props.onChange(values, opts)

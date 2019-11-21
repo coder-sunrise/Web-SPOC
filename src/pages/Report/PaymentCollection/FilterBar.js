@@ -64,6 +64,8 @@ const FilterBar = ({ handleSubmit }) => {
                   code='ctpaymentmode'
                   labelField='displayValue'
                   valueField='code'
+                  maxTagCount={5}
+                  maxTagPlaceholder='appointment types'
                 />
               )}
             />
