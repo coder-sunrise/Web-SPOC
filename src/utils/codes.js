@@ -1081,7 +1081,6 @@ export const fetchAndSaveCodeTable = async (
     ...params,
   }
   newParams.sorting = noSortOrderProp.includes(code) ? [] : newParams.sorting
-
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
@@ -1544,6 +1543,8 @@ export const getInventoryItemList = (
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
       stateName,
+      itemFK: x.id,
+      isActive: x.isActive,
     }
   })
   return {
