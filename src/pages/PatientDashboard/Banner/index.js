@@ -348,7 +348,7 @@ class Banner extends PureComponent {
     const name = `${salt.name || ''} ${info.name}`
     const allergiesStyle = () => {
       return {
-        color: this.state.showWarning ? 'red' : 'blue',
+        color: this.state.showWarning ? 'red' : 'darkblue',
         fontWeight: 500,
       }
     }
@@ -426,7 +426,7 @@ class Banner extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block
-              header={<b style={{ color: 'blue' }}>Medical Problem</b>}
+              header={<b style={{ color: 'darkblue' }}>Medical Problem</b>}
               body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
@@ -434,7 +434,7 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  <b style={{ color: 'blue' }}>Scheme </b>
+                  <b style={{ color: 'darkblue' }}>Scheme </b>
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 && (
                     <IconButton onClick={this.refreshChasBalance}>
