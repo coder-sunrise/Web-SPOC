@@ -43,16 +43,10 @@ const CPNumber = (label, type) => (args) => {
   )
 }
 const Setting = (props) => {
-  const { schemeDetail, height, classes, values, setFieldValue } = props
+  const { schemeDetail, height, classes, values, setFieldValue, theme } = props
 
   return (
-    <CardContainer
-      hideHeader
-      style={{
-        height,
-        overflow: 'auto',
-      }}
-    >
+    <div style={{ marginTop: theme.spacing(1) }}>
       <SizeContainer size='sm'>
         <GridContainer>
           <GridItem xs={8} md={5}>
@@ -100,7 +94,7 @@ const Setting = (props) => {
           setFieldValue={setFieldValue}
         />
       </SizeContainer>
-    </CardContainer>
+    </div>
   )
 }
 

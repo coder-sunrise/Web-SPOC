@@ -16,9 +16,9 @@ const receivingDetailsSchema = Yup.object().shape({
   orderQuantity: Yup.number()
     .min(1, 'Order Quantity nust be greater than or equal to 1')
     .required(),
-  bonusQuantity: Yup.number()
-    .min(0, 'Bonus Quantity nust be greater than or equal to 0')
-    .required(),
+  // bonusReceived: Yup.number()
+  //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
+  //   .required(),
 })
 
 class Grid extends PureComponent {
@@ -95,9 +95,9 @@ class Grid extends PureComponent {
     row.name = ''
     row.uom = ''
     row.orderQuantity = 0
-    row.bonusQuantity = 0
+    row.bonusReceived = 0
     row.totalQuantity = 0
-    row.quantityReceived = 0
+    row.totalReceived = 0
     row.unitPrice = 0
     row.totalPrice = 0
 
@@ -125,9 +125,9 @@ class Grid extends PureComponent {
     row.unitPrice = option.sellingPrice
     row.uom = option.uom
     row.orderQuantity = 0
-    row.bonusQuantity = 0
+    row.bonusReceived = 0
     row.totalQuantity = 0
-    row.quantityReceived = 0
+    row.totalReceived = 0
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
@@ -150,9 +150,9 @@ class Grid extends PureComponent {
         const { onClickColumn, selectedItem } = this.state
         let tempRow = addedRows[0]
         let tempOrderQty = tempRow.orderQuantity
-        let tempBonusQty = tempRow.bonusQuantity
+        let tempBonusQty = tempRow.bonusReceived
         let tempTotalQty = tempRow.totalQuantity
-        let tempQuantityReceived = tempRow.quantityReceived
+        let tempQuantityReceived = tempRow.totalReceived
         let tempUnitPrice = tempRow.unitPrice
         let tempTotalPrice = tempRow.totalPrice
 
@@ -195,9 +195,9 @@ class Grid extends PureComponent {
         newAddedRows = addedRows.map((row) => ({
           ...row,
           orderQuantity: 0,
-          bonusQuantity: 0,
+          bonusReceived: 0,
           totalQuantity: 0,
-          quantityReceived: 0,
+          totalReceived: 0,
           unitPrice: 0,
           totalPrice: 0,
           isFocused: true,
@@ -265,9 +265,9 @@ class Grid extends PureComponent {
         { name: 'name', title: 'Name' },
         { name: 'uom', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
-        { name: 'bonusQuantity', title: 'Bonus Qty' },
+        { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
-        { name: 'quantityReceived', title: 'Total Received' },
+        { name: 'totalReceived', title: 'Total Received' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
       ],
@@ -337,9 +337,10 @@ class Grid extends PureComponent {
           onChange: this.calculateTotalPrice,
         },
         {
-          columnName: 'bonusQuantity',
+          columnName: 'bonusReceived',
           type: 'number',
           format: '0.0',
+          disabled: true,
         },
         {
           columnName: 'totalQuantity',
@@ -348,7 +349,7 @@ class Grid extends PureComponent {
           disabled: true,
         },
         {
-          columnName: 'quantityReceived',
+          columnName: 'totalReceived',
           type: 'number',
           format: '0.0',
           disabled: true,

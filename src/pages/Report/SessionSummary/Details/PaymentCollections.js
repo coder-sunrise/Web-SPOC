@@ -13,13 +13,27 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
     return null
   let listData = []
   if (PaymentCollectionsDetails) {
-    listData = PaymentCollectionsDetails.map(
-      (item, index, array) => ({
-        ...item,
-        id: `${item.invoiceNo}-${item.receiptNo}`,
-        countNumber: (index > 0 && array[index - 1].invoiceNo === item.invoiceNo) ? 0 : 1,
-      }),
-    )
+    let paymentCount = 0
+    for (let i = PaymentCollectionsDetails.length - 1; i >= 0; i--) {
+      const item = PaymentCollectionsDetails[i]
+      paymentCount += 1
+      if (i === 0 || PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo) {
+        listData.splice(0, 0, {
+          ...item,
+          id: `${item.invoiceNo}-${item.receiptNo}`,
+          countNumber: 1,
+          rowspan: paymentCount,
+        })
+        paymentCount = 0
+      } else {
+        listData.splice(0, 0, {
+          ...item,
+          id: `${item.invoiceNo}-${item.receiptNo}`,
+          countNumber: 0,
+          rowspan: 0,
+        })
+      }
+    }
   }
 
   const PaymentCollectionsColumns = [
@@ -41,9 +55,22 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      return <Table.Row {...p}>{children}</Table.Row>
+      const newchildren = children.map((item, index) => index < 4 ? {
+        ...children[index],
+        props: {
+          ...children[index].props,
+          rowSpan: row.rowspan,
+        },
+      } : item)
+      return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    const newchildren = [<Table.Cell colSpan='4'></Table.Cell>, children[4], children[5]]
+    const newchildren = [{
+      ...children[4],
+      props: {
+        ...children[4].props,
+        style: { paddingLeft: 8 },
+      },
+    }, children[5]]
     return <Table.Row {...p}>{newchildren}</Table.Row>
   }
   const FuncProps = {

@@ -17,6 +17,7 @@ import {
   GridContainer,
   GridItem,
   ScribbleNoteItem,
+  TextField,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
 import UploadAttachment from './UploadAttachment'
@@ -94,11 +95,14 @@ window.g_app.replaceModel(model)
 //   handleSubmit: () => {},
 //   displayName: 'WidgetClinicalNotes',
 // })
-@connect(({ clinicalnotes, scriblenotes, consultation }) => ({
-  clinicalnotes,
-  scriblenotes,
-  consultation,
-}))
+@connect(
+  ({ clinicalnotes, scriblenotes, consultation, visitRegistration }) => ({
+    clinicalnotes,
+    scriblenotes,
+    consultation,
+    visitRegistration,
+  }),
+)
 class ClinicalNotes extends Component {
   state = {
     test: this.props.clinicalnotes,
@@ -422,7 +426,9 @@ class ClinicalNotes extends Component {
       theme,
       dispatch,
       consultation,
+      visitRegistration,
     } = this.props
+    const { visit } = visitRegistration.entity
     return (
       <div>
         <div className={classes.editor}>
@@ -564,7 +570,26 @@ class ClinicalNotes extends Component {
         <div style={{ marginTop: theme.spacing(1) }}>
           <UploadAttachment updateAttachments={this.updateAttachments} />
         </div>
-
+        <div
+          style={{
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
+          }}
+        >
+          <GridContainer>
+            <GridItem>
+              <span>Visit Remarks:</span>
+            </GridItem>
+            <GridItem xs md={12}>
+              <TextField
+                noUnderline
+                multiline
+                disabled
+                value={visit.visitRemarks}
+              />
+            </GridItem>
+          </GridContainer>
+        </div>
         {/* <CommonModal
           open={clinicalnotes.showAttachmentModal}
           title='Upload Attachment'

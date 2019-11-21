@@ -104,6 +104,7 @@ class Statement extends PureComponent {
     // console.log('rows', this.state.rows)
 
     const { history, dispatch } = this.props
+
     const editRow = (row, e) => {
       dispatch({
         type: 'statement/updateState',
