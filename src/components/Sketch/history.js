@@ -37,11 +37,9 @@ class History {
   Get all list
 */
 
-
   getOriginalList () {
     return this.originalList
   }
-
 
   getSaveLayerList () {
     return this.saveLayerList
@@ -98,39 +96,46 @@ class History {
             }
           }
         }
-      }else if(mainObject.id === 'move'){
+      } else if (mainObject.id === 'move') {
         let movingObject = JSON.stringify(mainObject.__originalState)
         let movingJsonObject = JSON.parse(movingObject)
         delete movingJsonObject.left
         delete movingJsonObject.top
         delete movingJsonObject.scaleX
         delete movingJsonObject.scaleY
+        delete movingJsonObject.top
+        delete movingJsonObject.left
+        delete movingJsonObject.height
+        delete movingJsonObject.width
 
-
-        for(let i = 0; i < this.saveLayerList.length; i++){
+        for (let i = 0; i < this.saveLayerList.length; i++) {
           let layerContent = JSON.parse(this.saveLayerList[i].layerContent)
           delete layerContent.left
           delete layerContent.top
           delete layerContent.scaleX
           delete layerContent.scaleY
+          delete layerContent.top
+          delete layerContent.left
+          delete layerContent.height
+          delete layerContent.width
 
-          if(JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)){
+          if (
+            JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)
+          ) {
             this.saveLayerList[i].layerContent = movingObject
           }
-
         }
-
-      } else if (mainObject.id !== 'pan' || mainObject.id === null){
-         // this.redoList = []
-          this.originalList.push(obj)
-          this.saveLayerList.push({
-            layerType: mainObject.type,
-            layerNumber: this.count,
-            layerContent: JSON.stringify(mainObject),
-            templateFK: this.templateId,
-          })
-          this.templateId = ''
-          this.count = 0
+      } else if (mainObject.id !== 'pan' || mainObject.id === null) {
+        // this.redoList = []
+        this.originalList.push(obj)
+        this.saveLayerList.push({
+          layerType: mainObject.type,
+          layerNumber: this.count,
+          layerContent: JSON.stringify(mainObject),
+          templateFK: this.templateId,
+        })
+        this.templateId = ''
+        this.count = 0
       }
 
       if (this.current) {
@@ -140,8 +145,6 @@ class History {
         this.undoList.shift()
       }
       this.current = obj
-
-      
     } finally {
       this.print()
     }
@@ -176,7 +179,6 @@ class History {
         //   }
         // }
 
-
         if (this.redoList.length > this.undoLimit) {
           this.redoList.shift()
         }
@@ -199,7 +201,6 @@ class History {
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
   redo () {
-
     try {
       if (this.redoList.length > 0) {
         if (this.current) this.undoList.push(this.current)
@@ -245,7 +246,7 @@ class History {
    */
   clear () {
     // this.undoList = []
-    for(let i = 0 ; i < this.undoList.length ; i++){
+    for (let i = 0; i < this.undoList.length; i++) {
       let [
         undoObj,
       ] = this.undoList[i]
@@ -253,18 +254,17 @@ class History {
       undoObj.__removed = true
       undoObj.set({
         removeObject: true,
-      }) 
+      })
     }
 
     let [
       originalObj,
     ] = this.originalList[this.originalList.length - 1]
 
-
-    originalObj.__removed = true   
+    originalObj.__removed = true
     originalObj.set({
       removeObject: true,
-    }) 
+    })
 
     this.current = this.originalList[this.originalList.length - 1]
     // this.originalList = []
