@@ -69,6 +69,7 @@ const styles = () => ({
         invoicePayerFK: o.copayerInvoicePayerId,
         payableAmount: o.copayerPayableAmount,
         outstandingAmount: o.copayerOutstanding,
+        invoiceAmt: o.copayerPayableAmount,
       }
     })
     dispatch({

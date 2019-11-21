@@ -80,9 +80,14 @@ class Details extends PureComponent {
     const { statement } = this.props
     let rows = []
     this.state.selectedRows.forEach((o) => {
-      rows.push(
-        statement.entity.statementInvoice.find((r) => r.invoiceNo === o),
+      const invoice = statement.entity.statementInvoice.find(
+        (r) => r.invoiceNo === o,
       )
+      if (!invoice) {
+        rows = []
+        return
+      }
+      rows.push(invoice)
     })
     this.setState({ extractRows: rows })
     this.setState((prevState) => {
@@ -156,9 +161,9 @@ class Details extends PureComponent {
         />
 
         <p style={{ margin: theme.spacing(1) }}>
-          {`Last Refreshed On ${moment(values.lastRefreshTime).format(
-            dateFormatLongWithTime,
-          ) || '-'}`}
+          {`Last Refreshed On ${values.lastRefreshTime
+            ? moment(values.lastRefreshTime).format(dateFormatLongWithTime)
+            : '-'}`}
         </p>
 
         <CommonModal
@@ -174,7 +179,7 @@ class Details extends PureComponent {
           <CollectPaymentConfirm />
         </CommonModal>
         <CommonModal
-          title='Extract As Single'
+          title='Statement'
           open={showModal}
           maxWidth='md'
           bodyNoPadding

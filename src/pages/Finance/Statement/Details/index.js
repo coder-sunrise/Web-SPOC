@@ -43,7 +43,6 @@ const styles = () => ({})
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history, user } = props
     const { paymentCreatedBizSessionFK } = values
-
     const paymentReceivedByUserFK = user.data.id
     values.statementInvoice.forEach((o) => {
       o.statementInvoicePayment.forEach((i) => {
@@ -84,7 +83,7 @@ class StatementDetails extends PureComponent {
           id: statement.currentId,
         },
       }).then((v) => {
-        this.setState({ type: v.adminChargeValueType })
+        if (v) this.setState({ type: v.adminChargeValueType })
       })
     } else {
       history.push('/finance/statement/')
