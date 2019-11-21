@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
+import { shortcutKeys } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -10,6 +11,7 @@ import {
   TextField,
   DateRangePicker,
   NumberInput,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -121,6 +123,21 @@ class Detail extends PureComponent {
                       disabled={!!values.id}
                       rowsMax={4}
                       {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='hotKey'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      {...args}
+                      valueField='value'
+                      label='Shortcut Key'
+                      options={shortcutKeys}
                     />
                   )
                 }}

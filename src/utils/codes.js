@@ -1589,6 +1589,21 @@ export const inventoryAdjustmentStatus = [
   { value: 3, name: 'Discarded' },
 ]
 
+export const shortcutKeys = [
+  { value: 'F1', name: 'F1' },
+  { value: 'F2', name: 'F2' },
+  { value: 'F3', name: 'F3' },
+  { value: 'F4', name: 'F4' },
+  { value: 'F5', name: 'F5' },
+  { value: 'F6', name: 'F6' },
+  { value: 'F7', name: 'F7' },
+  { value: 'F8', name: 'F8' },
+  { value: 'F9', name: 'F9' },
+  { value: 'F10', name: 'F10' },
+  { value: 'F11', name: 'F11' },
+  { value: 'F12', name: 'F12' },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1637,5 +1652,6 @@ module.exports = {
   buttonTypes,
   inventoryAdjustmentStatus,
   fetchAndSaveCodeTable,
+  shortcutKeys,
   ...module.exports,
 }
