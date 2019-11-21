@@ -62,13 +62,23 @@ class NumberEditor extends PureComponent {
   }
 
   render () {
-    const { currency, type, ...commonCfg } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
+    const { currency, type, editMode, ...commonCfg } = getCommonConfig.call(
+      this,
+    )
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+      commonCfg.onKeyDown = this.props.onKeyDown
+      commonCfg.onBlur = this.props.onBlur
+      commonCfg.onFocus = this.props.onFocus
+      commonCfg.autoFocus = true
+      commonCfg.debounceDuration = 0
+    }
+
     commonCfg.currency = currency || type === 'currency'
+
     return (
       <div ref={this.myRef}>
         <NumberInput
-          debounceDuration={0}
           inputProps={{
             fullWidth: true,
           }}
@@ -137,8 +147,14 @@ class NumberTypeProvider extends React.Component {
 
   constructor (props) {
     super(props)
-    this.NumberEditor = (ces) => (editorProps) => {
-      return <NumberEditor columnExtensions={ces} {...editorProps} />
+    this.NumberEditor = (ces, text) => (editorProps) => {
+      return (
+        <NumberEditor
+          editMode={!text}
+          columnExtensions={ces}
+          {...editorProps}
+        />
+      )
     }
   }
 
@@ -159,7 +175,7 @@ class NumberTypeProvider extends React.Component {
               ].indexOf(o.type) >= 0,
           )
           .map((o) => o.columnName)}
-        formatterComponent={NumberFormatter(columnExtensions)}
+        formatterComponent={this.NumberEditor(columnExtensions, true)}
         editorComponent={this.NumberEditor(columnExtensions)}
       />
     )

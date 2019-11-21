@@ -5,6 +5,7 @@ import {
   confirmBeforeReload,
   commonDataReaderTransform,
   findGetParameter,
+  difference,
 } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
@@ -116,7 +117,7 @@ const withFormikExtend = (props) => (Component) => {
     //   }, 200)
     // },
   })
-  class FormComponet extends React.Component {
+  class FormComponet extends PureComponent {
     // shouldComponentUpdate (nextProps, nextStates) {
     //   return false
     // }
@@ -124,10 +125,10 @@ const withFormikExtend = (props) => (Component) => {
       authority,
     }
 
-    // constructor (ps) {
-    //   super(ps)
-    //   updateDirtyState.bind(this)
-    // }
+    constructor (ps) {
+      super(ps)
+      // console.log('FormComponet', displayName)
+    }
 
     componentDidMount () {
       if (!this.props.values.id) {
@@ -145,6 +146,21 @@ const withFormikExtend = (props) => (Component) => {
 
       if (startDirtyChecking) updateDirtyState(nextProps)
     }
+
+    // shouldComponentUpdate = (nextProps) => {
+    //   // console.log(
+    //   //   nextProps.values,
+    //   //   this.props.values,
+    //   //   _.isEqual(nextProps.values, this.props.values),
+    //   //   difference(nextProps.values, this.props.values),
+    //   // )
+    //   // console.log(nextProps)
+    //   // if (nextProps.isValidating) return false
+    //   return (
+    //     !_.isEqual(nextProps.values, this.props.values) ||
+    //     !_.isEqual(nextProps.errors, this.props.errors)
+    //   )
+    // }
 
     componentWillUnmount () {
       startDirtyChecking = false
@@ -181,18 +197,18 @@ const withFormikExtend = (props) => (Component) => {
           rights.edit = { name: authority.edit, rights: 'enable' }
         }
       }
-      if (_localAuthority[displayName].matches) {
-        return (
-          <AuthorizedContext.Provider
-            value={_localAuthority[displayName].matches}
-          >
-            <Component
-              {...this.props}
-              rights={_localAuthority[displayName].matches.rights}
-            />
-          </AuthorizedContext.Provider>
-        )
-      }
+      // if (_localAuthority[displayName].matches) {
+      //   return (
+      //     <AuthorizedContext.Provider
+      //       value={_localAuthority[displayName].matches}
+      //     >
+      //       <Component
+      //         {...this.props}
+      //         rights={_localAuthority[displayName].matches.rights}
+      //       />
+      //     </AuthorizedContext.Provider>
+      //   )
+      // }
 
       return authority ? (
         <Authorized
@@ -204,18 +220,18 @@ const withFormikExtend = (props) => (Component) => {
           }}
         >
           {(matches) => {
-            window.g_app._store.dispatch({
-              type: 'components/updateState',
-              payload: {
-                [displayName]: matches,
-                // [displayName]: {
-                //   matches,
-                //   view: !!matches.find((o) => o.name.indexOf('.view') >= 0),
-                //   edit: !!matches.find((o) => o.name.indexOf('.edit') >= 0),
-                // },
-              },
-            })
-            _localAuthority[displayName].matches = matches
+            // window.g_app._store.dispatch({
+            //   type: 'components/updateState',
+            //   payload: {
+            //     [displayName]: matches,
+            //     // [displayName]: {
+            //     //   matches,
+            //     //   view: !!matches.find((o) => o.name.indexOf('.view') >= 0),
+            //     //   edit: !!matches.find((o) => o.name.indexOf('.edit') >= 0),
+            //     // },
+            //   },
+            // })
+            // _localAuthority[displayName].matches = matches
 
             const r = Authorized.generalCheck(
               matches,

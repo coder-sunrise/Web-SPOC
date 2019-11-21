@@ -35,7 +35,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'clinicalnotes',
-
+    persist: true,
     disabled: true,
     layoutConfig: {
       minW: 12,

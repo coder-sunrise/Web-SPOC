@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
 import AutosizeInput from 'react-input-autosize'
+import $ from 'jquery'
 import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -13,6 +14,13 @@ import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 
+const focus = (el) => {
+  $(el).find('.ant-select').trigger('click')
+}
+const debounceFocus = _.debounce(focus, 100, {
+  leading: true,
+  trailing: false,
+})
 const STYLES = () => {
   return {
     // dropdownMenu: {
@@ -114,6 +122,8 @@ class AntdSelect extends React.PureComponent {
       allValue,
       value,
     } = props
+    this.myRef = React.createRef()
+
     let v = form && field ? field.value : props.value || props.defaultValue
     if (field) {
       v = [
@@ -331,10 +341,11 @@ class AntdSelect extends React.PureComponent {
 
   handleFocus = () => {
     this.setState({ shrink: true, focus: true })
+    debounceFocus(this.myRef.current)
   }
 
   handleBlur = () => {
-    // console.log(this.state.value)
+    // console.log(this.state.value, 'handleBlur')
     if (
       this.state.value === undefined ||
       this.state.value === null ||
@@ -566,6 +577,7 @@ class AntdSelect extends React.PureComponent {
       maxTagPlaceholder,
       value,
       isLoading,
+      onMouseLeave,
       ...restProps
     } = this.props
     // console.log(options)
@@ -614,6 +626,7 @@ class AntdSelect extends React.PureComponent {
       return (
         <AutosizeInput
           readOnly
+          onMouseLeave={onMouseLeave}
           inputClassName={props.className}
           value={
             optionLabelLength ? text.substring(0, optionLabelLength) : text
@@ -624,7 +637,12 @@ class AntdSelect extends React.PureComponent {
     // console.log(classes.selectContainer, classes.className)
     const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
-      <div style={{ width: '100%' }} {...props}>
+      <div
+        style={{ width: '100%' }}
+        {...props}
+        ref={this.myRef}
+        onMouseLeave={onMouseLeave}
+      >
         <Select
           className={classnames([
             classes.selectContainer,

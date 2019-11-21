@@ -229,8 +229,8 @@ class SchemesGrid extends PureComponent {
   }
 
   isExistingRow = (row) => {
-    if(this.isCHAS(row.schemeTypeFK) && row.id && row.id > 0){
-        return true
+    if (this.isCHAS(row.schemeTypeFK) && row.id && row.id > 0) {
+      return true
     }
     return false
   }

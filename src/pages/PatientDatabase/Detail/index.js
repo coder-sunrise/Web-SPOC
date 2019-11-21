@@ -34,12 +34,13 @@ import {
   DatePicker,
   Button,
   CommonModal,
+  withFormik,
 } from '@/components'
 import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import schema from './schema'
-
+import EmergencyContact from './EmergencyContact'
 // moment.updateLocale('en', {
 //   relativeTime: {
 //     past: '%s',
@@ -61,7 +62,7 @@ const styles = () => ({
 }))
 @withFormikExtend({
   authority: 'patientdatabase.patientprofiledetails',
-  enableReinitialize: true,
+  enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
     const mappedValues = {
       ...(patient.entity || patient.default),
@@ -132,6 +133,7 @@ class PatientDetail extends PureComponent {
   constructor (props) {
     // console.log('PatientDetail constructor')
     super(props)
+    console.log('PatientDetail')
     this.widgets = [
       {
         id: '1',
@@ -239,23 +241,14 @@ class PatientDetail extends PureComponent {
   }
 
   // componentDidMount () {
-  //   if (this.props.patient.currentId) {
-  //     this.props
-  //       .dispatch({
-  //         type: 'patient/query',
-  //         payload: {
-  //           id: this.props.patient.currentId,
-  //         },
-  //       })
-  //       .then((o) => {
-  //         this.props.resetForm(o)
-  //       })
-  //   }
+  //   console.log('PatientDetail componentDidMount')
   // }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { errors, dispatch, patient } = nextProps
-
+    const { errors, dispatch, patient, values, validateForm } = nextProps
+    // validateForm(values).then((o) => {
+    //   console.log(o)
+    // })
     const menuErrors = {}
     Object.keys(errors).forEach((k) => {
       this.widgets.forEach((w) => {
@@ -327,7 +320,7 @@ class PatientDetail extends PureComponent {
       : false
 
     // console.log(this.props)
-    // // console.log('patient', patient)
+    console.log('patient', this.props)
     // // console.log('xx', resetProps)
     // console.log(this.props.values)
 
@@ -393,9 +386,9 @@ class PatientDetail extends PureComponent {
                             {menuErrors[o.id] ? (
                               <Error
                                 style={{
-                                  position: 'relative',
-                                  top: 5,
-                                  left: 6,
+                                  position: 'absolute',
+                                  top: 13,
+                                  right: 8,
                                 }}
                               />
                             ) : null}

@@ -55,7 +55,7 @@ const customInputStyle = {
   },
   textControl: {
     display: 'inline-block',
-    width: 'auto',
+    // width: 'auto',
     margin: 0,
     '& .Mui-disabled': {
       cursor: 'initial',
@@ -96,7 +96,7 @@ const customInputStyle = {
       fontWeight: 200,
     },
   },
-  
+
   negativeCurrency: {
     '& input': {
       color: 'red',
@@ -196,6 +196,11 @@ const customInputStyle = {
       color: '#FFFFFF',
       opacity: '1',
     },
+  },
+
+  textAdornment: {
+    top: '2px !important',
+    marginLeft: -2,
   },
 }
 

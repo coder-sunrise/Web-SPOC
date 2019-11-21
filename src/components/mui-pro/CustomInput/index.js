@@ -29,6 +29,7 @@ class TextField extends React.PureComponent {
 
   static defaultProps = {
     autocomplete: 'nope',
+    debounceDuration: 1000,
   }
 
   constructor (props) {
@@ -40,6 +41,7 @@ class TextField extends React.PureComponent {
       inputProps = {},
       defaultValue = '',
       value,
+      debounceDuration,
     } = props
     // console.log(this.state, props)
     this.state = {
@@ -55,9 +57,13 @@ class TextField extends React.PureComponent {
     // } else {
     //   this.debouncedOnChange = this._onChange
     // }
-    this.debouncedOnChange = _.debounce(this._onChange.bind(this), 1000, {
-      leading: true,
-    })
+    this.debouncedOnChange = _.debounce(
+      this._onChange.bind(this),
+      debounceDuration,
+      {
+        leading: true,
+      },
+    )
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -170,6 +176,7 @@ class TextField extends React.PureComponent {
   }
 
   handleBlur = (e) => {
+    // console.log('input blur')
     this.setState({
       focused: false,
     })
@@ -317,6 +324,7 @@ TextField.propTypes = {
   help: PropTypes.node,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
+  debounceDuration: PropTypes.number,
 }
 
 export default TextField

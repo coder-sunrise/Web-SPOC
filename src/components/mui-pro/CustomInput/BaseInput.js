@@ -31,6 +31,7 @@ const _config = {
       'onChange',
       // 'onBlur',
       // 'onFocus',
+      'onMouseLeave',
       'autoFocus',
       'multiline',
       'rows',
@@ -142,6 +143,7 @@ class BaseInput extends React.PureComponent {
       [classes.negativeCurrency]: text && negative,
       [classes.inActive]: text && inActive,
     })
+
     // console.log(underlineClasses)
     const marginTop = classNames({
       [inputRootCustomClasses]: inputRootCustomClasses !== undefined,
@@ -204,6 +206,7 @@ class BaseInput extends React.PureComponent {
       focus = false,
       isDebouncing = false,
       preventDefaultKeyDownEvent,
+      preventDefaultChangeEvent,
       size,
       style,
       onKeyUp,
@@ -220,9 +223,11 @@ class BaseInput extends React.PureComponent {
 
     const { rowsMax, ...resetProps } = inputProps
     const cfg = {
-      onBlur,
-      onFocus,
+      fullWidth: fullWidth || !text,
     }
+    const adornmentClasses = classNames({
+      [classes.textAdornment]: !!text,
+    })
     if (prefix) {
       cfg.startAdornment = (
         <InputAdornment position='start' {...prefixProps}>
@@ -234,14 +239,32 @@ class BaseInput extends React.PureComponent {
     }
     if (suffix || isDebouncing) {
       cfg.endAdornment = isDebouncing ? (
-        <InputAdornment position='end' {...suffixProps}>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: adornmentClasses,
+          }}
+          {...suffixProps}
+        >
           <CircularProgress />
         </InputAdornment>
       ) : (
-        <InputAdornment position='end' {...suffixProps}>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: adornmentClasses,
+          }}
+          {...suffixProps}
+        >
           {suffix}
         </InputAdornment>
       )
+    }
+    if (!preventDefaultChangeEvent) {
+      // console.log('preventDefaultChangeEvent input blur')
+
+      cfg.onBlur = onBlur
+      cfg.onFocus = onFocus
     }
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
@@ -250,7 +273,13 @@ class BaseInput extends React.PureComponent {
     // console.log({ error, showErrorIcon })
     if (error && error.length && showErrorIcon) {
       cfg.endAdornment = (
-        <InputAdornment position='end'>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: adornmentClasses,
+          }}
+          style={{ width: 'auto' }}
+        >
           <Tooltip
             title={
               typeof error === 'string' ? (
@@ -308,7 +337,6 @@ class BaseInput extends React.PureComponent {
           <Input
             id={inputIdPrefix + inputIdCounter}
             classes={this.getClass(classes)}
-            fullWidth
             inputRef={this.getRef}
             {...cfg}
             inputProps={inputProps}

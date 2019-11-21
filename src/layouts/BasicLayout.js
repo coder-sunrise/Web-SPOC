@@ -54,6 +54,9 @@ import GlobalModalContainer from './GlobalModalContainer'
 
 moment.locale('en')
 
+// setInterval(() => {
+//   console.log(document.activeElement)
+// }, 2000)
 const _theme = createMuiTheme({
   typography: {
     useNextVariants: true,

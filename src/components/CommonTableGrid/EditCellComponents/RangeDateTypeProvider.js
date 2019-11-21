@@ -5,7 +5,7 @@ import moment from 'moment'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
-import { DateRangePicker, DateFormatter } from '@/components'
+import { DateRangePicker, DateFormatter, dateFormatLong } from '@/components'
 
 import {
   onComponentDidMount,
@@ -26,6 +26,7 @@ class DateEditorBase extends React.Component {
   }
 
   _onChange = (date, moments, org) => {
+    // console.log(date, moments, org)
     onComponentChange.call(this, { date, moments, org })
   }
 
@@ -88,12 +89,34 @@ class DateEditorBase extends React.Component {
       columnName,
       options,
       row,
+      format,
+      editMode,
       ...commonCfg
     } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
+
     if (!commonCfg.timeFormat) {
       commonCfg.timeFormat = false
     }
+    if (!editMode && !format) {
+      commonCfg.format = dateFormatLong
+    }
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+
+      commonCfg.onBlur = (e) => {
+        this.isFocused = false
+
+        setTimeout(() => {
+          if (!this.isFocused) this.props.onBlur(e)
+        }, 1)
+      }
+      commonCfg.onFocus = () => {
+        this.isFocused = true
+      }
+      commonCfg.open = true
+      commonCfg.autoFocus = true
+    }
+    // console.log(commonCfg)
     return (
       <div ref={this.myRef}>
         <DateRangePicker {...commonCfg} />
@@ -131,7 +154,11 @@ class RangeDateTypeProvider extends React.Component {
 
     this.DateEditorBase = (ces, text) => (editorProps) => {
       return (
-        <DateEditorBase columnExtensions={ces} {...editorProps} text={text} />
+        <DateEditorBase
+          editMode={!text}
+          columnExtensions={ces}
+          {...editorProps}
+        />
       )
     }
   }
