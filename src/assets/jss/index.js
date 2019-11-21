@@ -225,6 +225,14 @@ const primaryCardHeader = {
     .hex()})`,
   ...primaryBoxShadow,
 }
+const loginCardHeader = {
+  background: `linear-gradient(0deg, ${color('#0093f1').hex()}, ${color(
+    '#0093f1',
+  )
+    .darken(0.2)
+    .hex()})`,
+  ...primaryBoxShadow,
+}
 const roseCardHeader = {
   background: 'linear-gradient(60deg, #ec407a, #d81b60)',
   ...roseBoxShadow,
@@ -365,6 +373,7 @@ export {
   dangerCardHeader,
   infoCardHeader,
   primaryCardHeader,
+  loginCardHeader,
   cardActions,
   cardHeader,
   defaultBoxShadow,

@@ -90,7 +90,7 @@ const NewPasswordForm = ({
 
   return (
     <Card login>
-      <CardHeader color='primary' className={headerClass}>
+      <CardHeader color='login' className={headerClass}>
         <h3>Reset Your Password</h3>
       </CardHeader>
       <CardBody>
@@ -144,7 +144,7 @@ const NewPasswordForm = ({
             <Button color='info' onClick={onBackClick}>
               Back
             </Button>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button color='login' onClick={handleSubmit}>
               Change Password
             </Button>
           </GridItem>
