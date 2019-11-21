@@ -96,31 +96,35 @@ class EditableTableGrid extends React.Component {
   }
 
   _onEditingCellsChange = (editingCells) => {
-    const errorCells = this.getErrorCells()
     // console.log(errorCells)
-    const { global } = window.g_app._store.getState()
-    if (window.$tempGridRow[this.gridId] && errorCells.length) {
-      if (!global.disableSave)
+    setTimeout(() => {
+      const errorCells = this.getErrorCells()
+      const { global } = window.g_app._store.getState()
+      if (window.$tempGridRow[this.gridId] && errorCells.length) {
+        if (!global.disableSave)
+          window.g_app._store.dispatch({
+            type: 'global/updateState',
+            payload: {
+              disableSave: true,
+            },
+          })
+      } else if (!errorCells.length && global.disableSave) {
         window.g_app._store.dispatch({
           type: 'global/updateState',
           payload: {
-            disableSave: true,
+            disableSave: false,
           },
         })
-    } else if (!errorCells.length && global.disableSave) {
-      window.g_app._store.dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
+      }
+      this.setState({
+        errorCells,
       })
-    }
+    }, 1)
     // this.setState({
     //   editingCells: _.unionWith(editingCells, errorCells, _.isEqual),
     //   errorCells,
     // })
     this.setState({
-      errorCells,
       editingCells,
     })
   }
@@ -342,7 +346,7 @@ class EditableTableGrid extends React.Component {
       })
       // window.$tempGridRow[this.gridId] = updatedRows
     }
-    // this._onEditingCellsChange(this.state.editingCells)
+    this._onEditingCellsChange(this.state.editingCells)
   }
 
   getAddRowComponent = (selector = '.medisys-table') => {
