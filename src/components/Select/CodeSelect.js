@@ -1,13 +1,15 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
 import Select from '../Antd/AntdSelect'
-import { checkShouldRefresh } from '@/utils/codes'
 
 @connect(({ codetable }) => ({ codetable }))
 class CodeSelect extends React.PureComponent {
   constructor (props) {
     super(props)
+    this.state = {
+      maxTagCount: this.props.maxTagCount ? this.props.maxTagCount : 5,
+    }
     const { dispatch, codetable } = props
     if (props.code) {
       const isExisted = codetable[props.code.toLowerCase()]
@@ -48,7 +50,20 @@ class CodeSelect extends React.PureComponent {
       code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
     return (
-      <Select options={filteredOptions || []} valueField='id' {...this.props} />
+      <Select options={filteredOptions || []}
+        ref={this.codeSelectRef}
+        valueField='id'
+        {...this.props}
+        maxTagCount={this.state.maxTagCount}
+        onChange={(values, opts) => {
+          if (this.props.mode && this.props.mode === 'multiple') {
+            this.setState({ maxTagCount: (values && values.length === 1) ? 1 : 0 })
+          }
+          if (this.props.onChange) {
+            this.props.onChange(values, opts)
+          }
+        }}
+      />
     )
   }
 }
