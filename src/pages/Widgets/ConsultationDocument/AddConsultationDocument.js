@@ -38,7 +38,7 @@ import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
 
 const loadFromCodesConfig = {
-  mapPrescriptions: (rows, codetable, patient) => {
+  mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
     return rows.map((o) => {
       const {
         instruction,
@@ -47,7 +47,9 @@ const loadFromCodesConfig = {
       } = o
 
       const { ctmedicationprecaution = [] } = codetable
-      const subjectHtml = `<li> - ${o.subject}</li>`
+      const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
+        ? ' (Ext.)'
+        : ''}</li>`
       const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
       const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
       const precautionHtml = precaution
@@ -91,6 +93,7 @@ const loadFromCodesConfig = {
         pRows,
         codetable,
         patient,
+        isExtPrescription,
       )
       return `<ul>
               <li><p><strong>${isExtPrescription
