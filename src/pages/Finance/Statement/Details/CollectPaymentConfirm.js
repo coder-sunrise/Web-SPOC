@@ -95,7 +95,6 @@ class CollectPaymentConfirm extends PureComponent {
       }
       return {
         ...o,
-        invoicePayment,
         statementInvoicePayment: [
           {
             ...restStatementValues,
