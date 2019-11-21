@@ -181,7 +181,6 @@ export default createFormViewModel({
 
       setPurchaseOrder (state, { payload }) {
         const { purchaseOrderAdjustment, purchaseOrderItem } = payload
-        console.log({ purchaseOrderItem })
         const itemRows = purchaseOrderItem.map((x) => {
           const itemType = podoOrderType.find(
             (y) => y.value === x.inventoryItemTypeFK,
