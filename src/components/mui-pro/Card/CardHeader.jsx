@@ -55,6 +55,7 @@ CardHeader.propTypes = {
     'info',
     'primary',
     'rose',
+    'login',
   ]),
   plain: PropTypes.bool,
   image: PropTypes.bool,

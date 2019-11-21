@@ -11,7 +11,8 @@ import { SizeContainer } from '@/components'
 import { LoginNavbar } from '@/components/_medisys'
 // Import static files
 import authStyle from '@/assets/jss/material-dashboard-pro-react/layouts/authStyle'
-import loginBackground from '@/assets/img/login.jpeg'
+// import loginBackground from '@/assets/img/login.jpeg'
+import loginBackground from '@/assets/img/login_background.jpg'
 import defaultSettings from '@/defaultSettings'
 
 const styles = (theme) => ({
@@ -38,7 +39,7 @@ class LandingLayout extends React.Component {
         <div className={classes.wrapper}>
           <SizeContainer size='lg'>
             <React.Fragment>
-              <LoginNavbar {...this.props} />
+              {/* <LoginNavbar {...this.props} /> */}
               <div className={classes.content}>
                 <div
                   className={classes.fullPage}

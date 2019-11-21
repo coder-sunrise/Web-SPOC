@@ -28,10 +28,10 @@ const pagesStyle = (theme) => ({
       width: '100%',
       border: 'none !important',
     },
-    '&:before': {
-      // backgroundColor: 'rgba(' + hexToRgb(blackColor) + ', 0.65)',
-      backgroundColor: `rgba(${hexToRgb(blackColor)}, 0.7)`,
-    },
+    // '&:before': {
+    //   // backgroundColor: 'rgba(' + hexToRgb(blackColor) + ', 0.65)',
+    //   backgroundColor: `rgba(${hexToRgb(blackColor)}, 0.7)`,
+    // },
     '&:before,&:after': {
       display: 'block',
       content: '""',
