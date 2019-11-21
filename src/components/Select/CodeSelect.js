@@ -7,31 +7,20 @@ import Select from '../Antd/AntdSelect'
 class CodeSelect extends React.PureComponent {
   constructor (props) {
     super(props)
-    this.state = {
-      maxTagCount:
-        this.props.maxTagCount !== undefined ? this.props.maxTagCount : 5,
+    console.log({ props })
+    if (this.props.maxTagCount === undefined && this.props.mode && this.props.mode === 'multiple') {
+      const initMaxTagCount = (this.props.field && this.props.field.value && this.props.field.value.length === 1) ? 1 : 0
+      this.state = {
+        maxTagCount: this.props.maxTagCount !== undefined ? this.props.maxTagCount : initMaxTagCount,
+      }
     }
+
     const { dispatch, codetable } = props
     if (props.code) {
       const isExisted = codetable[props.code.toLowerCase()]
       const { temp } = props
       if (isExisted && !temp) {
         return
-        // checkShouldRefresh({
-        //   code: props.code,
-        //   filter: props.remoteFilter,
-        // }).then((response) => {
-        //   if (response) {
-        //     dispatch({
-        //       type: 'codetable/fetchCodes',
-        //       payload: {
-        //         code: props.code.toLowerCase(),
-        //         filter: props.remoteFilter,
-        //         force: true,
-        //       },
-        //     })
-        //   }
-        // })
       }
       dispatch({
         type: 'codetable/fetchCodes',
@@ -50,19 +39,17 @@ class CodeSelect extends React.PureComponent {
     const options =
       code !== undefined ? codetable[code.toLowerCase()] || [] : []
     const filteredOptions = localFilter ? options.filter(localFilter) : options
-
+    let selectProps = this.props
+    if (this.props.maxTagCount === undefined && this.props.mode && this.props.mode === 'multiple') {
+      selectProps = { ...this.props, maxTagCount: this.state.maxTagCount }
+    }
     return (
-      <Select
-        options={filteredOptions || []}
+      <Select options={filteredOptions || []}
         valueField='id'
-        {...this.props}
-        ref={this.codeSelectRef}
-        maxTagCount={this.state.maxTagCount}
+        {...selectProps}
         onChange={(values, opts) => {
-          if (this.props.mode && this.props.mode === 'multiple') {
-            this.setState({
-              maxTagCount: values && values.length === 1 ? 1 : 0,
-            })
+          if (this.props.maxTagCount === undefined && this.props.mode && this.props.mode === 'multiple') {
+            this.setState({ maxTagCount: (values && values.length === 1) ? 1 : 0 })
           }
           if (this.props.onChange) {
             this.props.onChange(values, opts)
