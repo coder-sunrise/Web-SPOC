@@ -255,7 +255,7 @@ const DiagnosisItem = ({
                 style={{
                   width:
                     form.values.corDiagnosis[index].isNew === true ||
-                    !form.values.corDiagnosis[index].isPersist
+                    !form.values.corDiagnosis[index].defaultIsPersist
                       ? '180px'
                       : '340px',
                 }}
@@ -302,7 +302,7 @@ const DiagnosisItem = ({
                   }}
                 >
                   {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].isPersist ? (
+                  !form.values.corDiagnosis[index].defaultIsPersist ? (
                     'Confirm'
                   ) : (
                     'Current Visit'
@@ -312,7 +312,7 @@ const DiagnosisItem = ({
                   color='primary'
                   hidden={
                     form.values.corDiagnosis[index].isNew === true ||
-                    !form.values.corDiagnosis[index].isPersist
+                    !form.values.corDiagnosis[index].defaultIsPersist
                   }
                   onClick={() => {
                     // arrayHelpers.remove(index)
