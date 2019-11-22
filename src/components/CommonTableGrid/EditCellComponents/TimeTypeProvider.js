@@ -2,6 +2,8 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import { DataTypeProvider } from '@devexpress/dx-react-grid'
+
 import { updateCellValue } from 'utils'
 import {
   TimePicker,
@@ -39,23 +41,32 @@ class TimeEditorBase extends PureComponent {
   }
 
   onOpenChange = (open) => {
-    if (!open) onComponentChange.call(this, { value: this.state.value })
+    if (!open && this.state.value !== undefined)
+      onComponentChange.call(this, { value: this.state.value })
   }
 
   render () {
-    const { allowClear = false, ...commonCfg } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
-    commonCfg.onOpenChange = this.onOpenChange
-
-    return (
-      <div ref={this.myRef}>
-        <TimePicker allowClear={allowClear} {...commonCfg} />
-      </div>
+    const { allowClear = false, editMode, ...commonCfg } = getCommonConfig.call(
+      this,
     )
+    // console.log(editMode, commonCfg)
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+      commonCfg.onOpenChange = this.onOpenChange
+      commonCfg.onKeyDown = this.props.onKeyDown
+      commonCfg.onBlur = (e) => {
+        setTimeout(() => {
+          this.props.onBlur(e)
+        }, 1)
+      }
+      // commonCfg.open = true
+      commonCfg.autoFocus = true
+    }
+    return <TimePicker allowClear={allowClear} {...commonCfg} />
   }
 }
 
-class TimeTypeProvider extends PureComponent {
+class TimeTypeProvider extends React.Component {
   static propTypes = {
     columnExtensions: PropTypes.array,
   }
@@ -63,16 +74,26 @@ class TimeTypeProvider extends PureComponent {
   constructor (props) {
     super(props)
 
-    this.TimeEditorBase = (ces) => (editorProps) => {
-      return <TimeEditorBase columnExtensions={ces} {...editorProps} />
+    this.TimeEditorBase = (ces, text) => (editorProps) => {
+      return (
+        <TimeEditorBase
+          editMode={!text}
+          columnExtensions={ces}
+          {...editorProps}
+        />
+      )
     }
   }
+
+  shouldComponentUpdate = (nextProps, nextState) =>
+    this.props.editingRowIds !== nextProps.editingRowIds ||
+    this.props.commitCount !== nextProps.commitCount
 
   render () {
     const { columnExtensions } = this.props
 
     return (
-      <TimeTypeProviderOrg
+      <DataTypeProvider
         for={columnExtensions
           .filter(
             (o) =>
@@ -82,6 +103,7 @@ class TimeTypeProvider extends PureComponent {
           )
           .map((o) => o.columnName)}
         editorComponent={this.TimeEditorBase(columnExtensions)}
+        formatterComponent={this.TimeEditorBase(columnExtensions, true)}
         {...this.props}
       />
     )

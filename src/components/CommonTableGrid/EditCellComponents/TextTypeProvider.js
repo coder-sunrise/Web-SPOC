@@ -19,11 +19,6 @@ const styles = (theme) => ({})
 class TextEditorBase extends PureComponent {
   state = {}
 
-  constructor (props) {
-    super(props)
-    this.myRef = React.createRef()
-  }
-
   componentDidMount () {
     onComponentDidMount.call(this)
   }
@@ -72,14 +67,45 @@ class TextEditorBase extends PureComponent {
   // }
 
   render () {
-    const { ...commonCfg } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
+    const {
+      type,
+      render,
+      onClick,
+      row,
+      link,
+      editMode,
+      ...commonCfg
+    } = getCommonConfig.call(this)
+    if (render) {
+      return render(row)
+    }
 
-    return (
-      <div ref={this.myRef}>
-        <TextField {...commonCfg} />
-      </div>
-    )
+    if (type === 'link') {
+      return (
+        <Tooltip title={commonCfg.value} enterDelay={750}>
+          <a
+            onClick={(e) => {
+              e.preventDefault()
+              if (onClick) onClick(row)
+            }}
+            href={link || '#'}
+          >
+            {commonCfg.value}
+          </a>
+        </Tooltip>
+      )
+    }
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+      commonCfg.onKeyDown = this.props.onKeyDown
+      commonCfg.onBlur = this.props.onBlur
+      commonCfg.onFocus = this.props.onFocus
+      commonCfg.autoFocus = true
+      commonCfg.debounceDuration = 0
+    }
+
+    // console.log(commonCfg, window.$tempGridRow)
+    return <TextField {...commonCfg} />
   }
 }
 
@@ -96,7 +122,7 @@ const TextFormatter = (columnExtensions) =>
       if (render) {
         return render(row)
       }
-      // console.log(props, cfg)
+      // console.log('TextFormatter', props)
       if (type === 'link') {
         return (
           <Tooltip title={value} enterDelay={750}>
@@ -144,8 +170,14 @@ class TextTypeProvider extends React.Component {
 
   constructor (props) {
     super(props)
-    this.TextEditor = (columns) => (editorProps) => {
-      return <TextEditor columnExtensions={columns} {...editorProps} />
+    this.TextEditor = (columns, text) => (editorProps) => {
+      return (
+        <TextEditor
+          editMode={!text}
+          columnExtensions={columns}
+          {...editorProps}
+        />
+      )
     }
   }
 
@@ -163,6 +195,7 @@ class TextTypeProvider extends React.Component {
             'number',
             'select',
             'date',
+            'action',
           ].indexOf(o.type) < 0,
       )
       // .filter(
@@ -175,7 +208,7 @@ class TextTypeProvider extends React.Component {
     return (
       <DataTypeProvider
         for={columns}
-        formatterComponent={TextFormatter(columnExtensions)}
+        formatterComponent={this.TextEditor(columnExtensions, true)}
         editorComponent={this.TextEditor(columnExtensions)}
         {...this.props}
       />

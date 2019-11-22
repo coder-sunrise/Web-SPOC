@@ -93,7 +93,7 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={3} className={classes.gridItem}>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='paymentTerm'
               render={(args) => (
@@ -108,7 +108,7 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={3} className={classes.gridItem}>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <Field
               name='adminChargeValue'
               render={(args) => {
@@ -123,7 +123,7 @@ class DetailsHeader extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={3} className={classes.gridItem}>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='totalAmount'
               render={(args) => (
@@ -136,7 +136,7 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={3} className={classes.gridItem}>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='collectedAmount'
               render={(args) => (
@@ -149,7 +149,7 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={3} className={classes.gridItem}>
+          <GridItem md={3} xs={12} className={classes.gridItem}>
             <FastField
               name='outstandingBalance'
               render={(args) => (
@@ -162,7 +162,7 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={12} style={{ textAlign: 'right' }}>
+          <GridItem md={12} xs={12} style={{ textAlign: 'right' }}>
             <a
               // style={{
               // position: 'absolute',

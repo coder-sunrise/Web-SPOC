@@ -571,7 +571,7 @@ export const updateCellValue = (
     columnExtensions,
     classes,
     config = {},
-    row,
+    row = {},
   },
   element,
   val,
@@ -607,7 +607,8 @@ export const updateCellValue = (
         },
       )
 
-      $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+      if (element)
+        $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       return []
       // row._$error = false

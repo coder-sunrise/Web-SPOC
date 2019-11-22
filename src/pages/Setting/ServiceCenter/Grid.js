@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import * as service from './services'
 
 class Grid extends PureComponent {
@@ -54,7 +54,7 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Tooltip title='Edit service center' placement='top-end'>
+                <Tooltip title='Edit service center'>
                   <Button
                     size='sm'
                     onClick={() => {
@@ -73,13 +73,7 @@ class Grid extends PureComponent {
           {
             columnName: 'serviceCenterCategoryFK',
             sortingEnabled: false,
-            render: (row) => {
-              return (
-                <React.Fragment>
-                  {row.serviceCenterCategoryFKNavigation.displayValue}
-                </React.Fragment>
-              )
-            },
+            render: (row) => row.serviceCenterCategoryFKNavigation.displayValue,
           },
         ]}
       />

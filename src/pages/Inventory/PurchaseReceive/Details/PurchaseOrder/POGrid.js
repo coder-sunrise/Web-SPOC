@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { EditableTableGrid, GridContainer, GridItem } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
   getInventoryItemList,
+  fetchAndSaveCodeTable,
 } from '@/utils/codes'
 
 let commitCount = 2200 // uniqueNumber
@@ -45,12 +47,19 @@ class Grid extends PureComponent {
   initializeStateItemList = async () => {
     const { dispatch } = this.props
 
+    const excludeInactiveCodes = () => {
+      const { values } = this.props
+      if (!Number.isNaN(values.id)) {
+        return undefined
+      }
+      return true
+    }
+
     await podoOrderType.map((x) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: x.ctName,
-        },
+      fetchAndSaveCodeTable(x.ctName, {
+        // excludeInactiveCodes: excludeInactiveCodes(),
+        // excludeInactiveCodes: false,
+        isActive: excludeInactiveCodes(),
       }).then((list) => {
         const { inventoryItemList } = getInventoryItemList(
           list,
@@ -207,7 +216,7 @@ class Grid extends PureComponent {
     return newAddedRows
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows, added, changed, deleted }) => {
     const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
@@ -215,7 +224,7 @@ class Grid extends PureComponent {
         type: 'purchaseOrderDetails/deleteRow',
         payload: deleted[0],
       })
-    } else {
+    } else if (added || changed) {
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
         payload: rows[0],
@@ -226,21 +235,64 @@ class Grid extends PureComponent {
     return rows
   }
 
-  rowOptions = (row) => {
+  rowOptions = (row, rows = []) => {
+    const getUnusedItem = (stateName) => {
+      rows = rows.filter((o) => !o.isDeleted)
+
+      const unusedInventoryItem = _.differenceBy(
+        this.state[stateName],
+        rows,
+        'itemFK',
+      )
+      // console.log('asda', unusedInventoryItem)
+
+      return unusedInventoryItem
+    }
+
+    const getCurrentOptions = (stateName, filteredOptions) => {
+      const selectedItem = this.state[stateName].find(
+        (o) => o.itemFK === row.itemFK,
+      )
+      let currentOptions = filteredOptions
+      if (selectedItem) {
+        currentOptions = [
+          ...filteredOptions,
+          selectedItem,
+        ]
+      }
+      return currentOptions
+    }
+
+    const filterActiveCode = (ops) => {
+      return ops.filter((o) => o.isActive === true)
+    }
+
     if (row.type === 1) {
-      return row.uid
-        ? this.state.MedicationItemList
-        : this.state.filterMedicationItemList
+      const filteredOptions = getUnusedItem('MedicationItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'MedicationItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 2) {
-      return row.uid
-        ? this.state.VaccinationItemList
-        : this.state.filterVaccinationItemList
+      const filteredOptions = getUnusedItem('VaccinationItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'VaccinationItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 3) {
-      return row.uid
-        ? this.state.ConsumableItemList
-        : this.state.filterConsumableItemList
+      const filteredOptions = getUnusedItem('ConsumableItemList')
+      const activeOptions = filterActiveCode(filteredOptions)
+      const currentOptions = getCurrentOptions(
+        'ConsumableItemList',
+        activeOptions,
+      )
+      return row.uid ? currentOptions : activeOptions
     }
     return []
   }
@@ -255,8 +307,19 @@ class Grid extends PureComponent {
 
   render () {
     // const { purchaseOrderItems } = this.props
-    const { values, isEditable } = this.props
+    const { values, isEditable, dispatch } = this.props
     const { rows } = values
+    // console.log('banana', rows)
+
+    if (rows && rows.length > 1) {
+      dispatch({
+        // force current edit row components to update
+        type: 'global/updateState',
+        payload: {
+          commitCount: (commitCount += 1),
+        },
+      })
+    }
 
     const tableParas = {
       columns: [
@@ -289,7 +352,7 @@ class Grid extends PureComponent {
           labelField: 'code',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row)
+            return this.rowOptions(row, rows)
           },
           onChange: (e) => {
             if (e.option) {
@@ -303,7 +366,7 @@ class Grid extends PureComponent {
           labelField: 'name',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row)
+            return this.rowOptions(row, values.rows)
           },
           onChange: (e) => {
             if (e.option) {

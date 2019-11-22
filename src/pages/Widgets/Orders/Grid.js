@@ -107,7 +107,6 @@ export default ({
       </span>
     )
   })
-
   return (
     <CommonTableGrid
       size='sm'
@@ -277,12 +276,7 @@ export default ({
         {
           columnName: 'remark',
           render: (r) => {
-            const rmk = r.remark || r.remarks || ''
-            return (
-              <Tooltip title={rmk} placement='top-end'>
-                <span>{rmk}</span>
-              </Tooltip>
-            )
+            return r.remark || r.remarks || ''
           },
         },
         {

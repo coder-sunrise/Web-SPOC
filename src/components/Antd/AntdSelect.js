@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes, { instanceOf } from 'prop-types'
 import classnames from 'classnames'
 import AutosizeInput from 'react-input-autosize'
+import $ from 'jquery'
 import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -9,10 +10,17 @@ import Input from '@material-ui/core/Input'
 
 // ant
 import { Select, Spin } from 'antd'
-import { CustomInput } from '@/components'
+import { CustomInput, Tooltip } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 
+const focus = (el) => {
+  $(el).find('.ant-select').trigger('click')
+}
+const debounceFocus = _.debounce(focus, 100, {
+  leading: true,
+  trailing: false,
+})
 const STYLES = () => {
   return {
     // dropdownMenu: {
@@ -114,6 +122,8 @@ class AntdSelect extends React.PureComponent {
       allValue,
       value,
     } = props
+    this.myRef = React.createRef()
+
     let v = form && field ? field.value : props.value || props.defaultValue
     if (field) {
       v = [
@@ -331,10 +341,11 @@ class AntdSelect extends React.PureComponent {
 
   handleFocus = () => {
     this.setState({ shrink: true, focus: true })
+    debounceFocus(this.myRef.current)
   }
 
   handleBlur = () => {
-    // console.log(this.state.value)
+    // console.log(this.state.value, 'handleBlur')
     if (
       this.state.value === undefined ||
       this.state.value === null ||
@@ -361,7 +372,6 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = this.props
     let newVal = val
-
     if (
       [
         'multiple',
@@ -415,13 +425,13 @@ class AntdSelect extends React.PureComponent {
         const opts = (autoComplete || query
           ? this.state.data
           : options).filter((o) =>
-            newVal.find(
-              (m) =>
-                valueField === 'id'
-                  ? parseInt(m, 10) === o[valueField]
-                  : m === o[valueField],
-            ),
-          )
+          newVal.find(
+            (m) =>
+              valueField === 'id'
+                ? parseInt(m, 10) === o[valueField]
+                : m === o[valueField],
+          ),
+        )
         newVal = mode === 'tags' && newVal.length === 0 ? '' : newVal
         proceed = onChange(newVal, opts) !== false
       }
@@ -523,8 +533,8 @@ class AntdSelect extends React.PureComponent {
             optionLabelLength ? (
               option.label.substring(0, optionLabelLength)
             ) : (
-                option.label
-              )
+              option.label
+            )
           }
           key={`select-${option.value}`}
           value={mode === 'tags' ? `${option.value}` : option.value}
@@ -534,8 +544,8 @@ class AntdSelect extends React.PureComponent {
           {typeof renderDropdown === 'function' ? (
             renderDropdown(option)
           ) : (
-              option.label
-            )}
+            option.label
+          )}
         </Select.Option>
       ))
   }
@@ -566,6 +576,7 @@ class AntdSelect extends React.PureComponent {
       maxTagPlaceholder,
       value,
       isLoading,
+      onMouseLeave,
       ...restProps
     } = this.props
     // console.log(options)
@@ -573,19 +584,19 @@ class AntdSelect extends React.PureComponent {
       autoComplete || query
         ? this.state.data
         : [
-          ...([
-            'multiple',
-            'tags',
-          ].includes(restProps.mode) && !disableAll
-            ? [
-              allValueOption || {
-                [valueField]: allValue,
-                [labelField]: allLabel,
-              },
-            ]
-            : []),
-          ...options,
-        ]
+            ...([
+              'multiple',
+              'tags',
+            ].includes(restProps.mode) && !disableAll
+              ? [
+                  allValueOption || {
+                    [valueField]: allValue,
+                    [labelField]: allLabel,
+                  },
+                ]
+              : []),
+            ...options,
+          ]
 
     const cfg = {
       value: this.state.value,
@@ -607,25 +618,37 @@ class AntdSelect extends React.PureComponent {
     // console.log(opts)
     if (this.props.text) {
       const match = source.find(
-        (o) => o[this.props.valueField] === this.state.value,
+        (o) => Object.byString(o, this.props.valueField) === this.state.value,
       )
       let text = ''
-      if (match) text = match[this.props.labelField]
+      if (match) text = Object.byString(match, labelField)
+      // console.log(match, text, labelField)
+      text =
+        optionLabelLength && text && text.length > optionLabelLength
+          ? `${text.substring(0, optionLabelLength)}...`
+          : text
+
       return (
-        <AutosizeInput
-          title={text}
-          readOnly
-          inputClassName={props.className}
-          value={
-            (optionLabelLength && text && text.length > optionLabelLength) ? `${text.substring(0, optionLabelLength)}...` : text
-          }
-        />
+        <Tooltip title={text} enterDelay={750}>
+          <AutosizeInput
+            title=''
+            readOnly
+            onMouseLeave={onMouseLeave}
+            inputClassName={props.className}
+            value={text}
+          />
+        </Tooltip>
       )
     }
     // console.log(classes.selectContainer, classes.className)
     const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
-      <div style={{ width: '100%' }} {...props}>
+      <div
+        style={{ width: '100%' }}
+        {...props}
+        ref={this.myRef}
+        onMouseLeave={onMouseLeave}
+      >
         <Select
           className={classnames([
             classes.selectContainer,
@@ -653,13 +676,13 @@ class AntdSelect extends React.PureComponent {
               <Spin size='small' />
             ) : (
               <p>
-                  {this.state.fetchId === 0 && (autoComplete || query) ? (
-                    'Input Search Text'
-                  ) : (
-                      'Not Found'
-                    )}
-                </p>
-              )
+                {this.state.fetchId === 0 && (autoComplete || query) ? (
+                  'Input Search Text'
+                ) : (
+                  'Not Found'
+                )}
+              </p>
+            )
           }
           {...cfg}
           {...restProps}

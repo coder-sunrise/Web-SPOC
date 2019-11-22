@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import _ from 'lodash'
 import moment from 'moment'
 import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
@@ -64,7 +65,7 @@ class CollectPaymentConfirm extends PureComponent {
           return (
             <GridItem xs={8}>
               <FastField
-                name={`statementInvoice[${row.rowIndex}].invoicePayment.totalAmtPaid`}
+                name={`statementInvoice[${row.rowIndex}].tempOutstandingAmount`}
                 render={(args) => (
                   <NumberInput
                     {...args}
@@ -85,6 +86,7 @@ class CollectPaymentConfirm extends PureComponent {
     const { statement, setValues, values } = this.props
     const { statementInvoice } = statement.entity
     let total = 0
+
     const newStatementInvoice = statementInvoice.map((o) => {
       const { statementInvoicePayment, ...restStatementValues } = o
       total += o.outstandingAmount
@@ -95,17 +97,13 @@ class CollectPaymentConfirm extends PureComponent {
       }
       return {
         ...o,
-        invoicePayment,
+        tempOutstandingAmount: o.outstandingAmount,
         statementInvoicePayment: [
-          {
-            ...restStatementValues,
-            invoicePayment,
-          },
+          ...statementInvoicePayment,
         ],
       }
     })
     this.getBizList(moment().formatUTC('YYMMDD'))
-
     setValues({
       ...values,
       paymentDate: moment(),
@@ -124,38 +122,62 @@ class CollectPaymentConfirm extends PureComponent {
 
     if (from === 'grid') {
       this.setState({ totalAmount: e.target.value })
-      setFieldValue('amount', e.target.value)
+      const totalAmountPaid = _.sumBy(
+        values.statementInvoice,
+        'tempOutstandingAmount',
+      )
+
+      setFieldValue('amount', totalAmountPaid)
       return
     }
     this.setState({ totalAmount: e.target.value })
     let tempAmount = e.target.value
     const test = values.statementInvoice.map((o) => {
       let totalAmtPaid
-      const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
-        if (tempAmount >= i.outstandingAmount) {
-          totalAmtPaid = i.outstandingAmount
-          tempAmount -= i.outstandingAmount
-        } else {
-          totalAmtPaid = tempAmount
-        }
-        return {
-          ...i,
-          invoicePayment: {
-            totalAmtPaid,
-            receiptNo: i.invoiceNo,
-            invoicePayerFK: i.invoicePayerFK,
-          },
-        }
-      })
-      return {
-        ...o,
-        statementInvoicePayment: newStatementInvoicePayment,
+      // const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
+      //   if (tempAmount >= i.outstandingAmount) {
+      //     totalAmtPaid = i.outstandingAmount
+      //     tempAmount -= i.outstandingAmount
+      //   } else {
+      //     totalAmtPaid = tempAmount
+      //   }
+      //   return {
+      //     ...i,
+      //     invoicePayment: {
+      //       totalAmtPaid,
+      //       receiptNo: i.invoiceNo,
+      //       invoicePayerFK: i.invoicePayerFK,
+      //     },
+      // }
+
+      if (tempAmount >= o.outstandingAmount) {
+        totalAmtPaid = o.outstandingAmount
+        tempAmount -= o.outstandingAmount
+      } else {
+        totalAmtPaid = tempAmount
+        tempAmount = 0
+      }
+
+      const newStatementInvoicePayment = {
         invoicePayment: {
           totalAmtPaid,
+          receiptNo: o.invoiceNo,
+          invoicePayerFK: o.invoicePayerFK,
         },
       }
-    })
 
+      return {
+        ...o,
+        tempOutstandingAmount: totalAmtPaid,
+        statementInvoicePayment: [
+          ...o.statementInvoicePayment,
+          newStatementInvoicePayment,
+        ],
+        // invoicePayment: {
+        //   totalAmtPaid,
+        // },
+      }
+    })
     setValues({
       ...values,
       amount: e.target.value,
@@ -205,7 +227,6 @@ class CollectPaymentConfirm extends PureComponent {
     const { rows, columns, columnExtensions, isCardPayment } = this.state
     const { values, statement, handleSubmit } = this.props
     const { bizSessionList } = statement
-    console.log({ values })
     return (
       <React.Fragment>
         <CommonTableGrid

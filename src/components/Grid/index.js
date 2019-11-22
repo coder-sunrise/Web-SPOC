@@ -114,20 +114,28 @@ const timeFormat24Hour = 'HH:mm'
 const timeFormat24HourWithSecond = 'HH:mm:ss'
 const additionalShortcutFormats = [
   'DD/MM/YY',
+  'DD-MM-YY',
   'D/MM/YY',
+  'D-MM-YY',
   'DD/M/YY',
+  'DD-M-YY',
   'D/M/YY',
+  'D-M-YY',
   'DD/MM/YYYY',
+  'DD-MM-YYYY',
   'D/MM/YYYY',
+  'D-MM-YYYY',
   'DD/M/YYYY',
+  'DD-M-YYYY',
   'D/M/YYYY',
+  'D-M-YYYY',
   'YYYY/MM/DD',
   'YYYY-MM-DD',
   'YYYYMMDD',
 ]
 
 const TimeFormatter = ({ value, ...rest }) => {
-  if (!value) return value
+  if (!value) return ''
 
   if (moment.isMoment(value)) {
     return value.format(timeFormat)

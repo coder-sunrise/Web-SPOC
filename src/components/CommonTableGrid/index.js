@@ -360,7 +360,7 @@ class CommonTableGrid extends PureComponent {
         TableCell: cellStyle,
         EditCell: {
           cell: {
-            padding: '7px 4px 7px 4px',
+            padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
           },
         },
@@ -377,10 +377,15 @@ class CommonTableGrid extends PureComponent {
         },
         MuiTableCell: {
           root: {
-            padding: '10px 8px 10px 8px',
+            padding: '7px 4px 7px 4px',
             fontSize: '1em',
           },
         },
+        // PrivateRadioButtonIcon: {
+        //   root: {
+        //     display: 'none',
+        //   },
+        // },
         PrivateSwitchBase: {
           root: {
             padding: 0,
@@ -488,7 +493,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-
+    // window.$tempGridRow[this.gridId] = {}
     if (query) {
       query({
         callback: (data) => {
@@ -552,14 +557,40 @@ class CommonTableGrid extends PureComponent {
   }
 
   Cell = (p) => {
-    const { classes, ...restProps } = p
+    const { columnExtensions = [], extraState, getRowId } = this.props
+    const { classes, onClick, ...restProps } = p
     const { column, row } = restProps
+    const { cellEditingDisabled } = column
     // console.log(p2)
     // return null
+    // console.log(restProps)
+    let cfg = {
+      // tabIndex: 0,
+    }
+    if (extraState) {
+      const colCfg = columnExtensions.find((o) => o.columnName === column.name)
+      const latestRow = window.$tempGridRow[this.gridId]
+        ? window.$tempGridRow[this.gridId][getRowId(row)] || row
+        : row
+      // try {
+      //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
+      // } catch (error) {}
+      if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
+        cfg = {
+          tabIndex: 0,
+          onFocus: onClick,
+          // onBlur: () => {
+          //   console.log(111)
+          // },
+        }
+      }
+    }
+    // console.log(p, columnExtensions)
+
     if (column && column.name === 'rowMove') {
       const cls = {
-        width: 20,
-        height: 20,
+        width: 18,
+        height: 18,
         padding: 1,
         margin: '0 auto',
       }
@@ -570,6 +601,8 @@ class CommonTableGrid extends PureComponent {
       return (
         <Table.Cell
           {...restProps}
+          // {...cfg}
+          editingEnabled={false}
           className='td-move-cell'
           style={{ padding: 0 }}
         >
@@ -592,7 +625,7 @@ class CommonTableGrid extends PureComponent {
         </Table.Cell>
       )
     }
-    return <Table.Cell {...restProps} />
+    return <Table.Cell {...cfg} {...restProps} />
   }
 
   getChildRows = (row, rootRows) => {
@@ -687,6 +720,7 @@ class CommonTableGrid extends PureComponent {
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
+    // console.log('index', rows)
     // console.log(this.props)
     // console.log(
     //   filter,
@@ -807,8 +841,8 @@ class CommonTableGrid extends PureComponent {
       commitCount: global.commitCount,
       errorCount: global.errorCount,
     }
-    const allowSelectRowByClick =
-      columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
+    // const allowSelectRowByClick =
+    //   columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
 
     const HeaderRow = this.TableHeaderRow
 
@@ -928,14 +962,17 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               <TextTypeProvider {...cellComponentConfig} />
-              <SelectTypeProvider {...cellComponentConfig} />
               <NumberTypeProvider {...cellComponentConfig} />
+              <SelectTypeProvider {...cellComponentConfig} />
+              <RadioTypeProvider {...cellComponentConfig} />
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
-              <RadioTypeProvider {...cellComponentConfig} />
-
               <TimeTypeProvider {...cellComponentConfig} />
-              <RowErrorTypeProvider {...cellComponentConfig} />
+
+              {/* 
+              
+
+              <RowErrorTypeProvider {...cellComponentConfig} /> */}
 
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}

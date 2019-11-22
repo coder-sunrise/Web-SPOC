@@ -107,6 +107,9 @@ const receivingDetailsSchema = Yup.object().shape({
         const { id } = rows.find((o) => o[itemFKName] === v[itemFKName])
         return id
       }
+      if (values.id) {
+        return v.purchaseOrderItemFK
+      }
       return v.id
     }
     let deliveryOrderItem = rows.map((x, index) => {

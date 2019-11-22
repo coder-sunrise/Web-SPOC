@@ -185,11 +185,9 @@ class NewLogin extends React.Component {
       <React.Fragment>
         <div className={classes.container}>
           {process.env.client_env === 'uat' && (
-            <div style={{ opacity: 0.8 }}>
-              <h2 className={classes.uatText}>
-                THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
-              </h2>
-            </div>
+            <h2 className={classes.uatText}>
+              THIS IS TRIAL ENVIRONMENT. DO NOT USE REAL PATIENT DATA.
+            </h2>
           )}
           <GridContainer justify='center'>
             <GridItem md={4}>

@@ -2,6 +2,9 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import { DataTypeProvider } from '@devexpress/dx-react-grid'
+
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 import {
@@ -35,15 +38,29 @@ class DateEditorBase extends PureComponent {
   }
 
   render () {
-    const { currency, text, format, ...commonCfg } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
+    const { currency, format, editMode, ...commonCfg } = getCommonConfig.call(
+      this,
+    )
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+      commonCfg.onBlur = (e) => {
+        this.isFocused = false
 
-    if (text && !format) {
+        setTimeout(() => {
+          if (!this.isFocused) this.props.onBlur(e)
+        }, 1)
+      }
+      commonCfg.onFocus = () => {
+        this.isFocused = true
+      }
+      commonCfg.autoFocus = true
+    }
+    if (!editMode && !format) {
       commonCfg.format = dateFormatLong
     }
     return (
       <div ref={this.myRef}>
-        <DatePicker timeFormat={false} text={text} {...commonCfg} />
+        <DatePicker timeFormat={false} {...commonCfg} />
       </div>
     )
   }
@@ -59,7 +76,11 @@ class DateTypeProvider extends React.Component {
 
     this.DateEditorBase = (ces, text) => (editorProps) => {
       return (
-        <DateEditorBase columnExtensions={ces} {...editorProps} text={text} />
+        <DateEditorBase
+          editMode={!text}
+          columnExtensions={ces}
+          {...editorProps}
+        />
       )
     }
   }
@@ -72,7 +93,7 @@ class DateTypeProvider extends React.Component {
     const { columnExtensions } = this.props
 
     return (
-      <DateTypeProviderOrg
+      <DataTypeProvider
         for={columnExtensions
           .filter(
             (o) =>

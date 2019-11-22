@@ -133,6 +133,11 @@ const sharedOverrides = {
         border: '1px solid rgba(0, 0, 0, 0.42)',
       },
     },
+    fullWidth: {
+      '& > div': {
+        width: '100%',
+      },
+    },
   },
   // RadioGroup: {
   //   label: {
@@ -381,6 +386,14 @@ export const defaultTheme = createMuiTheme({
       main: {
         '& .ant-tabs-bar': {
           zoom: '100%',
+        },
+      },
+    },
+    RadioEditor: {
+      main: {
+        '& svg': {
+          width: '0.95rem',
+          height: '0.95rem',
         },
       },
     },

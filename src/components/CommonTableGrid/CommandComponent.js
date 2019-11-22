@@ -14,6 +14,7 @@ let commitCount = 0
 const EditButton = ({ onExecute, text, editingRowIds, disabled = false }) => (
   <Tooltip title={text} placement='top'>
     <Button
+      tabindex='0'
       size='sm'
       onClick={(e) => {
         onExecute(e)
@@ -50,25 +51,28 @@ const CancelButton = ({
 }) => (
   <Tooltip title={text} placement='top'>
     <Button
+      tabindex='0'
       size='sm'
       onClick={(e) => {
-        // delete window.$tempGridRow[gridId][row.id]
-        // updateGlobalVariable('gridIgnoreValidation', true)
-        // console.log(editingRowIds, Object.keys(window.$tempGridRow[gridId]))
-        const id = getRowId(row)
-        if (
-          (!id && editingRowIds.length === 0) ||
-          (id &&
-            editingRowIds.length === 1 &&
-            !window.$tempGridRow[gridId][undefined])
-        ) {
-          window.g_app._store.dispatch({
-            type: 'global/updateState',
-            payload: {
-              disableSave: false,
-            },
-          })
-        }
+        // // delete window.$tempGridRow[gridId][row.id]
+        // // updateGlobalVariable('gridIgnoreValidation', true)
+        // // console.log(editingRowIds, Object.keys(window.$tempGridRow[gridId]))
+        // const id = getRowId(row)
+        // console.log(id, editingRowIds, window.$tempGridRow, gridId)
+        // if (
+        //   (!id && editingRowIds.length === 0) ||
+        //   (id &&
+        //     editingRowIds.length === 1 &&
+        //     window.$tempGridRow[gridId] &&
+        //     !window.$tempGridRow[gridId][undefined])
+        // ) {
+        //   window.g_app._store.dispatch({
+        //     type: 'global/updateState',
+        //     payload: {
+        //       disableSave: false,
+        //     },
+        //   })
+        // }
         onExecute(e)
       }}
       justIcon
@@ -84,6 +88,7 @@ const DeleteButton = ({ onExecute, text }) => {
   return (
     <Tooltip title={text} placement='top'>
       <Button
+        tabindex='0'
         size='sm'
         onClick={(e) => {
           // updateGlobalVariable('gridIgnoreValidation', true)
@@ -102,6 +107,7 @@ const AddButton = ({ onExecute, text }) => (
   <Tooltip title='Create New Row'>
     <div style={{ textAlign: 'center' }}>
       <Button
+        tabindex='0'
         color='primary'
         onClick={(e) => {
           // updateGlobalVariable('gridIgnoreValidation', false)
@@ -171,6 +177,7 @@ class CommitButton extends React.PureComponent {
       <div ref={this.myRef} style={{ display: 'inline-block' }}>
         <Tooltip title={text} placement='top'>
           <Button
+            tabindex='0'
             size='sm'
             disabled={this.state.disabled}
             onClick={(e) => {
@@ -206,17 +213,17 @@ class CommitButton extends React.PureComponent {
               // }
 
               // updateGlobalVariable('gridIgnoreValidation', false)
-              if (
-                (!row.id && editingRowIds.length === 0) ||
-                (row.id && editingRowIds.length === 1)
-              ) {
-                window.g_app._store.dispatch({
-                  type: 'global/updateState',
-                  payload: {
-                    disableSave: false,
-                  },
-                })
-              }
+              // if (
+              //   (!row.id && editingRowIds.length === 0) ||
+              //   (row.id && editingRowIds.length === 1)
+              // ) {
+              //   window.g_app._store.dispatch({
+              //     type: 'global/updateState',
+              //     payload: {
+              //       disableSave: false,
+              //     },
+              //   })
+              // }
               // delete window.$tempGridRow[gridId][row.id]
               // console.log(window.$tempGridRow[gridId])
               onExecute(e)

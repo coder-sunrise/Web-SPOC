@@ -10,40 +10,54 @@ import {
   CommonTableGrid,
   CodeSelect,
   dateFormatLong,
+  Field,
 } from '@/components'
 
 const styles = (theme) => ({})
+const medicationSchema = Yup.object().shape({
+  coPayer: Yup.number().required(),
+})
 @connect(({ statement }) => ({
   statement,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ selectedRows }) => selectedRows,
-  // validationSchema: Yup.object().shape({
-  //   code: Yup.string().required(),
-  //   displayValue: Yup.string().required(),
-  //   effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
-  // }),
+  mapPropsToValues: ({ selectedRows }) => {
+    return {
+      rows: selectedRows,
+    }
+  },
+  validationSchema: Yup.object().shape({
+    rows: Yup.array().of(
+      Yup.object().shape({
+        copayerFK: Yup.number().required(),
+      }),
+    ),
+  }),
   handleSubmit: (values, { props }) => {
-    const invoiceExtractionDetails = values.map((o) => {
+    const { rows } = values
+    const invoiceExtractionDetails = rows.map((o) => {
       return {
-        invoiceId: o.id,
+        invoiceId: o.invoiceFK,
         copayerFK: o.copayerFK,
       }
     })
 
-    const { dispatch, onConfirm, statement } = props
+    const { dispatch, onConfirm, statement, onClose } = props
     dispatch({
       type: 'statement/extractAsSingle',
       payload: {
         id: statement.entity.id,
+        statement: statement.entity,
         invoiceExtractionDetails,
       },
     }).then((r) => {
       if (r) {
-        if (onConfirm) onConfirm()
-        dispatch({
-          type: 'statement/query',
-        })
+        if (onConfirm) {
+          onConfirm()
+        }
+        // dispatch({
+        //   type: 'statement/query',
+        // })
       }
     })
   },
@@ -60,31 +74,36 @@ class ExtractAsSingle extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        width: 120,
+      },
+      {
         columnName: 'invoiceDate',
         type: 'date',
         format: { dateFormatLong },
+        width: 120,
       },
       {
         columnName: 'invoiceAmt',
         type: 'number',
         currency: true,
+        width: 120,
       },
       {
         columnName: 'coPayer',
+
         render: (row) => {
           return (
-            <GridItem xs={8}>
-              <FastField
-                name={`[${row.rowIndex}].copayerFK`}
-                render={(args) => (
-                  <CodeSelect
-                    code='ctCopayer'
-                    labelField='displayValue'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
+            <FastField
+              name={`rows[${row.rowIndex}].copayerFK`}
+              render={(args) => (
+                <CodeSelect
+                  code='ctCopayer'
+                  labelField='displayValue'
+                  {...args}
+                />
+              )}
+            />
           )
         },
       },
@@ -94,21 +113,27 @@ class ExtractAsSingle extends PureComponent {
   render () {
     const { props } = this
     const { columns, columnExtensions } = this.state
-    const { theme, footer, selectedRows } = props
+    const { theme, footer, selectedRows, handleSubmit, values } = props
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
           <CommonTableGrid
-            rows={selectedRows}
+            rows={selectedRows || []}
             columns={columns}
             columnExtensions={columnExtensions}
+            schema={medicationSchema}
             FuncProps={{ pager: false }}
           />
+          <p style={{ margin: theme.spacing(1) }}>
+            <i>
+              Changing the co-payer will update co-payer in patient invoice.
+            </i>
+          </p>
         </div>
         {footer &&
           selectedRows.length > 0 &&
           footer({
-            onConfirm: props.handleSubmit,
+            onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,

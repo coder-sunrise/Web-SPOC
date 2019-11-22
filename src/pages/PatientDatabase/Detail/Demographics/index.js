@@ -187,7 +187,6 @@ class Demographic extends PureComponent {
                     return (
                       <CodeSelect
                         // hideIfNoEditRights
-                        // autoFocus
                         label='Account Type'
                         code='ctPatientAccountNoType'
                         width={350}
@@ -204,6 +203,7 @@ class Demographic extends PureComponent {
                     return (
                       <TextField
                         label='Account No.'
+                        autoFocus
                         uppercase
                         inputProps={{ maxLength: 9 }}
                         {...args}
@@ -343,9 +343,10 @@ class Demographic extends PureComponent {
                 <FastField
                   name='occupationFK'
                   render={(args) => (
-                    <CodeSelect
+                    <Select
                       label='Occupation'
-                      code='ctOccupation'
+                      // code='ctOccupation'
+                      valueField='id'
                       query={this.queryOccupation}
                       {...args}
                     />

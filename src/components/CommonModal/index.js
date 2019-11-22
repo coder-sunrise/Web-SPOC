@@ -288,7 +288,7 @@ class CommonModal extends React.PureComponent {
           fullScreen={this.props.fullScreen}
           fullWidth={adaptFullWidth}
           maxWidth={maxWidth}
-          TransitionComponent={Transition}
+          // TransitionComponent={Transition}
           keepMounted={keepMounted}
           onClose={this.onClose}
           aria-labelledby='classic-modal-slide-title'

@@ -54,7 +54,7 @@ class CommonTooltip extends PureComponent {
       placement = 'top-start',
       ...restProps
     } = this.props
-
+    // console.log(placement, restProps)
     return (
       <Tooltip
         classes={{ tooltip: classes.tooltip }}

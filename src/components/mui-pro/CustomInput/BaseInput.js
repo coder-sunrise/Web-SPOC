@@ -13,10 +13,9 @@ import FormHelperText from '@material-ui/core/FormHelperText'
 import { InputAdornment, CircularProgress } from '@material-ui/core'
 import numeral from 'numeral'
 import Error from '@material-ui/icons/Error'
-import Tooltip from '@material-ui/core/Tooltip'
-
 import Input from '@material-ui/core/Input'
 import customInputStyle from 'mui-pro-jss/material-dashboard-pro-react/components/customInputStyle.jsx'
+import { Tooltip } from '@/components'
 import { extendFunc, currencyFormat } from '@/utils/utils'
 import CustomInputWrapper from '../CustomInputWrapper'
 import FormatInput from './FormatInput'
@@ -31,6 +30,7 @@ const _config = {
       'onChange',
       // 'onBlur',
       // 'onFocus',
+      'onMouseLeave',
       'autoFocus',
       'multiline',
       'rows',
@@ -142,6 +142,7 @@ class BaseInput extends React.PureComponent {
       [classes.negativeCurrency]: text && negative,
       [classes.inActive]: text && inActive,
     })
+
     // console.log(underlineClasses)
     const marginTop = classNames({
       [inputRootCustomClasses]: inputRootCustomClasses !== undefined,
@@ -204,6 +205,7 @@ class BaseInput extends React.PureComponent {
       focus = false,
       isDebouncing = false,
       preventDefaultKeyDownEvent,
+      preventDefaultChangeEvent,
       size,
       style,
       onKeyUp,
@@ -220,12 +222,21 @@ class BaseInput extends React.PureComponent {
 
     const { rowsMax, ...resetProps } = inputProps
     const cfg = {
-      onBlur,
-      onFocus,
+      fullWidth: fullWidth || !text,
     }
+    const adornmentClasses = classNames({
+      [classes.adornment]: true,
+      // [classes.textAdornment]: !!text,
+    })
     if (prefix) {
       cfg.startAdornment = (
-        <InputAdornment position='start' {...prefixProps}>
+        <InputAdornment
+          classes={{
+            root: adornmentClasses,
+          }}
+          position='start'
+          {...prefixProps}
+        >
           {prefix}
         </InputAdornment>
       )
@@ -234,14 +245,32 @@ class BaseInput extends React.PureComponent {
     }
     if (suffix || isDebouncing) {
       cfg.endAdornment = isDebouncing ? (
-        <InputAdornment position='end' {...suffixProps}>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: adornmentClasses,
+          }}
+          {...suffixProps}
+        >
           <CircularProgress />
         </InputAdornment>
       ) : (
-        <InputAdornment position='end' {...suffixProps}>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: adornmentClasses,
+          }}
+          {...suffixProps}
+        >
           {suffix}
         </InputAdornment>
       )
+    }
+    if (!preventDefaultChangeEvent) {
+      // console.log('preventDefaultChangeEvent input blur')
+
+      cfg.onBlur = onBlur
+      cfg.onFocus = onFocus
     }
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
@@ -250,7 +279,13 @@ class BaseInput extends React.PureComponent {
     // console.log({ error, showErrorIcon })
     if (error && error.length && showErrorIcon) {
       cfg.endAdornment = (
-        <InputAdornment position='end'>
+        <InputAdornment
+          position='end'
+          classes={{
+            root: classNames(adornmentClasses, classes.errorAdornment),
+          }}
+          style={{ width: 'auto' }}
+        >
           <Tooltip
             title={
               typeof error === 'string' ? (
@@ -268,7 +303,14 @@ class BaseInput extends React.PureComponent {
     if (text) {
       cfg.inputComponent = ({ className }) => {
         return (
-          <AutosizeInput readOnly inputClassName={className} {...inputProps} />
+          <Tooltip title={inputProps.value} enterDelay={750}>
+            <AutosizeInput
+              readOnly
+              inputClassName={className}
+              {...inputProps}
+              title=''
+            />
+          </Tooltip>
         )
       }
     }
@@ -308,7 +350,6 @@ class BaseInput extends React.PureComponent {
           <Input
             id={inputIdPrefix + inputIdCounter}
             classes={this.getClass(classes)}
-            fullWidth
             inputRef={this.getRef}
             {...cfg}
             inputProps={inputProps}

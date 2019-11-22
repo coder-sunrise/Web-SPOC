@@ -1,5 +1,6 @@
 /* eslint-disable react/no-multi-comp */
 import React, { PureComponent, Component } from 'react'
+import $ from 'jquery'
 import { connect } from 'dva'
 import _ from 'lodash'
 import PropTypes from 'prop-types'
@@ -45,14 +46,32 @@ class SelectEditor extends PureComponent {
       options,
       localFilter,
       row,
+      editMode,
       ...commonCfg
     } = getCommonConfig.call(this)
-    commonCfg.onChange = this._onChange
+
+    if (editMode) {
+      commonCfg.onChange = this._onChange
+      commonCfg.onBlur = this.props.onBlur
+      commonCfg.autoFocus = true
+    }
+
     commonCfg.options =
       typeof options === 'function'
         ? options(row)
         : options || codes[`${columnName}Option`] || []
+
+    // commonCfg.onFocus = () => {
+    //   setTimeout(() => {
+    //     // console.log($(this.myRef.current).find('.ant-select'))
+    //     $(this.myRef.current).find('.ant-select').trigger('click')
+    //   }, 1)
+    // }
+
+    // if (!commonCfg.error) commonCfg.open = true
+
     if (localFilter) commonCfg.options = commonCfg.options.filter(localFilter)
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -199,10 +218,11 @@ class SelectTypeProvider extends React.Component {
       ...payload,
     }
 
-    this.SelectEditor = (ces) => (editorProps) => {
+    this.SelectEditor = (ces, text) => (editorProps) => {
       // console.log(ces, editorProps)
       return (
         <SelectEditor
+          editMode={!text}
           columnExtensions={ces}
           {...editorProps}
           codes={this.state}
@@ -234,7 +254,7 @@ class SelectTypeProvider extends React.Component {
       <DataTypeProvider
         for={this.state.for.map((o) => o.columnName)}
         editorComponent={this.SelectEditor(columnExtensions)}
-        formatterComponent={SelectDisplay(columnExtensions, this.state)}
+        formatterComponent={this.SelectEditor(columnExtensions, true)}
       />
     )
   }

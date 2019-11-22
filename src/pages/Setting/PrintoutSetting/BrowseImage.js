@@ -127,6 +127,7 @@ const BrowseImage = (props) => {
         ),
       )
     },
+    ...props,
   })
 
   const thumbs = files.map((file) => {
@@ -166,7 +167,7 @@ const BrowseImage = (props) => {
       >
         <input {...getInputProps()} />
         <p style={description}>
-          Drag 'n' drop the image here, or click to select image for
+          Drag and drop the image here, or click to select image for
           <b> {title}</b>
         </p>
       </div>
