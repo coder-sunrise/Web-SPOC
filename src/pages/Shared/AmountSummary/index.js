@@ -83,6 +83,7 @@ class AmountSummary extends PureComponent {
 
     this.setState((prevState) => {
       const newState = calculateAmount(rows, adjustments, config)
+      console.log(newState, config)
       if (prevState.summary.totalWithGST !== newState.summary.totalWithGST) {
         onValueChanged(newState)
       }
@@ -182,7 +183,6 @@ class AmountSummary extends PureComponent {
       gst,
       isGSTInclusive,
     } = summary
-    console.log(summary)
     const {
       settings = {
         totalField: 'totalAfterItemAdjustment',
@@ -266,6 +266,7 @@ class AmountSummary extends PureComponent {
                   placement='bottom'
                 >
                   <Checkbox
+                    style={{ top: 1 }}
                     label={formatMessage({
                       id: 'inventory.pr.detail.pod.summary.inclusiveGST',
                     })}
