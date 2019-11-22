@@ -619,10 +619,11 @@ class AntdSelect extends React.PureComponent {
     // console.log(opts)
     if (this.props.text) {
       const match = source.find(
-        (o) => o[this.props.valueField] === this.state.value,
+        (o) => Object.byString(o, this.props.valueField) === this.state.value,
       )
       let text = ''
-      if (match) text = match[this.props.labelField]
+      if (match) text = Object.byString(match, labelField)
+      // console.log(match, text, labelField)
       text =
         optionLabelLength && text && text.length > optionLabelLength
           ? `${text.substring(0, optionLabelLength)}...`

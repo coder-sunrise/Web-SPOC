@@ -572,6 +572,9 @@ class CommonTableGrid extends PureComponent {
       const latestRow = window.$tempGridRow[this.gridId]
         ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
+      // try {
+      //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
+      // } catch (error) {}
       if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
         cfg = {
           tabIndex: 0,
