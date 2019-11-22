@@ -114,7 +114,7 @@ export default {
   'inventory.pr.detail.pod.complete': 'Complete PO',
   'inventory.pr.detail.pod.finalize': 'Finalize Order',
   'inventory.pr.detail.pod.summary.subTotal': 'Sub Total:',
-  'inventory.pr.detail.pod.summary.adjustment': 'Adjustment: ',
+  'inventory.pr.detail.pod.summary.adjustment': 'Invoice Adjustment: ',
   'inventory.pr.detail.pod.summary.gst': 'GST (7.00%): ',
   'inventory.pr.detail.pod.summary.inclusiveGST': 'Inclusive GST',
   'inventory.pr.detail.pod.summary.total': 'Total: ',
