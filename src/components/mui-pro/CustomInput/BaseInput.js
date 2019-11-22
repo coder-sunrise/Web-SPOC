@@ -225,11 +225,18 @@ class BaseInput extends React.PureComponent {
       fullWidth: fullWidth || !text,
     }
     const adornmentClasses = classNames({
-      [classes.textAdornment]: !!text,
+      [classes.adornment]: true,
+      // [classes.textAdornment]: !!text,
     })
     if (prefix) {
       cfg.startAdornment = (
-        <InputAdornment position='start' {...prefixProps}>
+        <InputAdornment
+          classes={{
+            root: adornmentClasses,
+          }}
+          position='start'
+          {...prefixProps}
+        >
           {prefix}
         </InputAdornment>
       )
@@ -275,7 +282,7 @@ class BaseInput extends React.PureComponent {
         <InputAdornment
           position='end'
           classes={{
-            root: adornmentClasses,
+            root: classNames(adornmentClasses, classes.errorAdornment),
           }}
           style={{ width: 'auto' }}
         >

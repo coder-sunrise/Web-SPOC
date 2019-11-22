@@ -49,6 +49,7 @@ class TimeEditorBase extends PureComponent {
     const { allowClear = false, editMode, ...commonCfg } = getCommonConfig.call(
       this,
     )
+    // console.log(editMode, commonCfg)
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onOpenChange = this.onOpenChange

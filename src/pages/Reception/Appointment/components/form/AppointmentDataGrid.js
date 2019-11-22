@@ -187,12 +187,12 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
-
+    console.log(AppointmentDataColumn, this.columnExtensions)
     return (
       <div className={classes.container}>
         <EditableTableGrid
-          disabled={disabled}
-          rows={data}
+          // disabled={disabled}
+          rows={data.length ? data : data.concat(defaultNewRows)}
           columns={AppointmentDataColumn}
           columnExtensions={this.columnExtensions}
           FuncProps={{
@@ -204,18 +204,18 @@ class AppointmentDataGrid extends React.Component {
               ],
             },
           }}
-          onRowDoubleClick={undefined}
+          // onRowDoubleClick={undefined}
           EditingProps={{
             messages: {
               deleteCommand: 'Delete appointment slot',
             },
-            editingRowIds: editingRows,
+            // editingRowIds: editingRows,
             showAddCommand: !disabled,
-            showEditCommand: !disabled,
-            showDeleteCommand: !disabled && data.length !== 1,
+            // showEditCommand: !disabled,
+            showDeleteCommand: !!data.length,
             onCommitChanges: handleCommitChanges,
-            onEditingRowIdsChange: handleEditingRowsChange,
-            defaultNewRow: defaultNewRows,
+            // onEditingRowIdsChange: handleEditingRowsChange,
+            // defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />
