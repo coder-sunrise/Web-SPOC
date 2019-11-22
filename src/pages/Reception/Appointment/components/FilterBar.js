@@ -120,7 +120,7 @@ const FilterBar = ({
                     displayValue: 'All appointment types',
                   },
                 ]}
-                maxTagCount={maxAppointmentTagCount}
+                maxTagCount={0}
                 maxTagPlaceholder='appointment types'
               />
             )}
@@ -171,12 +171,12 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
 export default memo(
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ primaryRegisteredDoctorFK }) => ({
+    mapPropsToValues: ({ primaryRegisteredDoctorFK, filterByApptType }) => ({
       filterByDoctor: [
         primaryRegisteredDoctorFK,
       ],
       filterByApptType: [
-        -99,
+        ...filterByApptType,
       ],
     }),
   })(StyledFilterBar),

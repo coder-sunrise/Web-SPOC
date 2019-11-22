@@ -30,7 +30,8 @@ class Schemes extends PureComponent {
           values={values}
           {...restProps}
         />
-        <h4
+        {/* TODO: hide medisave payer until feature is fully built */}
+        {/* <h4
           style={{
             marginTop: theme.spacing(2),
           }}
@@ -43,7 +44,7 @@ class Schemes extends PureComponent {
           schema={schema.schemePayer._subType}
           values={values}
           {...restProps}
-        />
+        /> */}
       </div>
     )
   }

@@ -109,11 +109,13 @@ class AntdDatePicker extends PureComponent {
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
+    // console.log(value)
+    if (value) console.log(value.target)
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
       })
-    } else if (value) {
+    } else if (value && typeof value === 'string') {
       this.setState({
         value,
       })
@@ -173,7 +175,7 @@ class AntdDatePicker extends PureComponent {
     this.setState({ shrink: true })
   }
 
-  handleBlur = () => {
+  handleBlur = (e) => {
     if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
     }
@@ -300,7 +302,7 @@ class AntdDatePicker extends PureComponent {
   }
 
   render () {
-    const { classes, theme, ...restProps } = this.props
+    const { classes, theme, onChange, ...restProps } = this.props
 
     const labelProps = {
       shrink: !!this.state.value || this.state.shrink,

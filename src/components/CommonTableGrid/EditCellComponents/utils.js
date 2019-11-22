@@ -8,7 +8,11 @@ import {
 } from '@/utils/utils'
 
 function onComponentDidMount () {
-  const { columnExtensions, row, column: { name: columnName } } = this.props
+  const {
+    columnExtensions,
+    row = {},
+    column: { name: columnName },
+  } = this.props
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -17,11 +21,7 @@ function onComponentDidMount () {
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
-  const errors = updateCellValue(
-    this.props,
-    this.myRef.current,
-    latestRow[columnName],
-  )
+  const errors = updateCellValue(this.props, null, latestRow[columnName])
 
   latestRow._errors = errors
   return {
@@ -52,11 +52,7 @@ function onComponentChange (args) {
     getRowId,
     ...restProps
   } = cfg
-  let errors = updateCellValue(
-    this.props,
-    this.myRef.current,
-    Object.values(args)[0],
-  )
+  let errors = updateCellValue(this.props, null, Object.values(args)[0])
 
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
@@ -80,11 +76,7 @@ function onComponentChange (args) {
       })
 
       // incase other row value has been change, re-valid
-      errors = updateCellValue(
-        this.props,
-        this.myRef.current,
-        latestRow[cfg.columnName],
-      )
+      errors = updateCellValue(this.props, null, latestRow[cfg.columnName])
       latestRow._errors = errors
     }
   }
@@ -94,8 +86,9 @@ function getCommonConfig () {
   const {
     columnExtensions,
     column: { name: columnName },
-    row,
+    row = {},
     text,
+    editMode,
   } = this.props
 
   const cfg =
@@ -113,27 +106,31 @@ function getCommonConfig () {
   } = cfg
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
-    : row
+    : row || {}
   // console.log(latestRow)
   const errorObj = (latestRow._errors || [])
     .find(
       (o) =>
         o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
     )
-
+  const disabled = isDisabled(latestRow)
   const error = errorObj ? errorObj.message : ''
+
   const commonCfg = {
+    editMode,
     simple: true,
     showErrorIcon: true,
     error,
     value: latestRow[columnName],
     defaultValue: getInitialValue ? getInitialValue(row) : undefined,
-    disabled: isDisabled(latestRow),
+    disabled,
     row: latestRow,
-    text,
+    text: text || !editMode,
     ...restProps,
   }
-
+  if (editMode && disabled) {
+    commonCfg.onMouseLeave = this.props.onBlur
+  }
   return commonCfg
 }
 

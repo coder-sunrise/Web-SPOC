@@ -108,6 +108,20 @@ const buttonStyle = {
       backgroundColor: color(grayColor).darken(0.2).hex(),
     },
   },
+  login: {
+    boxShadow:
+      '0px 1px 5px 0px rgba(28, 26, 124,0.2), 0px 2px 2px 0px rgba(28, 26, 124,0.14), 0px 3px 1px -2px rgba(28, 26, 124,0.12)',
+    '&:hover': {
+      boxShadow:
+        '0 14px 26px -12px rgba(28, 26, 124, 0.42), 0 4px 23px 0px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(28, 26, 124, 0.2)',
+    },
+  },
+  containedlogin: {
+    backgroundColor: '#0093f1',
+    '&:hover:not($simple):not($link):not($transparent)': {
+      backgroundColor: color('#0093f1').darken(0.2).hex(),
+    },
+  },
   primary: {
     boxShadow:
       '0px 1px 5px 0px rgba(28, 26, 124,0.2), 0px 2px 2px 0px rgba(28, 26, 124,0.14), 0px 3px 1px -2px rgba(28, 26, 124,0.12)',

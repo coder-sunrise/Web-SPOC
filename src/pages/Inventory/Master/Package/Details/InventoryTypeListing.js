@@ -331,6 +331,7 @@ const InventoryTypeListing = ({
   // )
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
+    console.log(rows, deleted, added, changed)
     if (deleted) {
       const tempArray = [
         ...values[type],
@@ -814,7 +815,6 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete medication',
     },
     showAddCommand: true,
-    showEditCommand: true,
     onCommitChanges: onCommitChanges('medicationPackageItem'),
     onAddedRowsChange: onAddedRowsChange('medication'),
   }
@@ -824,7 +824,6 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete consumable',
     },
     showAddCommand: true,
-    showEditCommand: true,
     onAddedRowsChange: onAddedRowsChange('consumable'),
     onCommitChanges: onCommitChanges('consumablePackageItem'),
   }
@@ -834,7 +833,6 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete vaccination',
     },
     showAddCommand: true,
-    showEditCommand: true,
     onCommitChanges: onCommitChanges('vaccinationPackageItem'),
     onAddedRowsChange: onAddedRowsChange('vaccination'),
   }
@@ -844,7 +842,6 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete service',
     },
     showAddCommand: true,
-    showEditCommand: true,
     onAddedRowsChange: onAddedRowsChange('service'),
     onCommitChanges: onCommitChanges('servicePackageItem'),
   }

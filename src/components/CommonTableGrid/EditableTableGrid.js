@@ -14,7 +14,7 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
+import { getGlobalVariable, getUniqueId } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -25,31 +25,108 @@ let uniqueGid = 0
 
 const styles = (theme) => ({})
 
-class EditableTableGrid extends PureComponent {
+class EditableTableGrid extends React.Component {
+  static defaultProps = {
+    EditingProps: {},
+    getRowId: (r) => r.id,
+  }
+
   constructor (props) {
     super(props)
-    const { EditingProps } = props
+    const { EditingProps = {} } = props
     this.state = {
       editingRowIds: [],
       deletedRowIds: [],
       addedRows: EditingProps.addedRows || EditingProps.defaultNewRow || [],
+      editingCells: [],
+      errorCells: [],
       // hasError: false,
       // errorRows: [],
     }
     this.gridId = `edit-${uniqueGid++}`
+    console.log(this.gridId)
   }
 
-  static getDerivedStateFromProps (nextProps, preState) {
-    // console.log({ preState })
-    const { EditingProps = {}, rows, errors = [] } = nextProps
-    const { editingRowIds, addedRows } = EditingProps
-    // console.log(nextProps.EditingRowIds, preState.editingRowIds)
-    if (editingRowIds)
-      return {
-        editingRowIds,
-      }
+  // static getDerivedStateFromProps (nextProps, preState) {
+  //   // console.log({ preState })
+  //   const { EditingProps = {}, rows, errors = [] } = nextProps
+  //   const { editingRowIds, addedRows } = EditingProps
+  //   // console.log(nextProps.EditingRowIds, preState.editingRowIds)
 
-    return null
+  //   if (editingRowIds)
+  //     return {
+  //       editingRowIds,
+  //     }
+
+  //   return null
+  // }
+
+  // componentWillReceiveProps (nextProps) {
+  //   const { EditingProps = {}, rows, errors = [] } = nextProps
+  //   if (!_.isEqual(rows, this.props.rows)) {
+  //     const cells = this.getErrorCells(nextProps)
+  //     console.log(cells)
+  //   }
+  // }
+
+  getErrorCells = (props) => {
+    const { getRowId } = props || this.props
+
+    const errorRows = Object.values(window.$tempGridRow[this.gridId]).filter(
+      (o) => o._errors && o._errors.length && !o.isDeleted,
+    )
+    // console.log(
+    //   errorRows,
+    //   this.state.editingCells,
+    //   window.$tempGridRow[this.gridId],
+    // )
+    const errorCells = []
+    errorRows.forEach((r) => {
+      const { _errors } = r
+      const rowId = getRowId(r)
+      _errors.forEach((e) => {
+        const { path } = e
+        errorCells.push({
+          rowId,
+          columnName: path,
+        })
+      })
+    })
+    return errorCells
+  }
+
+  _onEditingCellsChange = (editingCells) => {
+    // console.log(errorCells)
+    setTimeout(() => {
+      const errorCells = this.getErrorCells()
+      const { global } = window.g_app._store.getState()
+      if (window.$tempGridRow[this.gridId] && errorCells.length) {
+        if (!global.disableSave)
+          window.g_app._store.dispatch({
+            type: 'global/updateState',
+            payload: {
+              disableSave: true,
+            },
+          })
+      } else if (!errorCells.length && global.disableSave) {
+        window.g_app._store.dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+      }
+      this.setState({
+        errorCells,
+      })
+    }, 1)
+    // this.setState({
+    //   editingCells: _.unionWith(editingCells, errorCells, _.isEqual),
+    //   errorCells,
+    // })
+    this.setState({
+      editingCells,
+    })
   }
 
   _onAddedRowsChange = (addedRows) => {
@@ -58,14 +135,17 @@ class EditableTableGrid extends PureComponent {
     if (this.props.EditingProps.onAddedRowsChange) {
       row = this.props.EditingProps.onAddedRowsChange(addedRows)
     }
-    this.setState({
-      addedRows: row,
-    })
+    // this.setState({
+    //   addedRows: row,
+    // })
     if (row.length === 0) {
-      delete window.$tempGridRow[this.gridId][undefined]
+      console.log(window.$tempGridRow, this.gridId)
+      if (window.$tempGridRow[this.gridId])
+        delete window.$tempGridRow[this.gridId][undefined]
     } else if (window.$tempGridRow[this.gridId]) {
       window.$tempGridRow[this.gridId][undefined] = row[0]
     }
+    return row
   }
 
   _onEditingRowIdsChange = (ids) => {
@@ -95,6 +175,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onRowChangesChange = (changes) => {
+    // console.log('_onRowChangesChange', changes)
     const { EditingProps, rows } = this.props
     const { onRowChangesChange } = EditingProps
 
@@ -109,7 +190,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   onRowDoubleClick = (row, e) => {
-    const { getRowId = (r) => r.id } = this.props
+    const { getRowId } = this.props
     if (
       [
         'svg',
@@ -145,28 +226,33 @@ class EditableTableGrid extends PureComponent {
   }
 
   _onCommitChanges = ({ added, changed, deleted }) => {
-    const {
-      EditingProps,
-      rows,
-      schema,
-      getRowId = (row) => row.id,
-    } = this.props
+    const { EditingProps, rows = [], schema, getRowId } = this.props
+
     const { onCommitChanges = (f) => f } = EditingProps
+    let shouldUpdate = false
+    if (added && Object.values(added)[0]) shouldUpdate = true
+    if (changed && Object.values(changed)[0]) shouldUpdate = true
+    if (deleted && deleted.length > 0) shouldUpdate = true
+    if (!shouldUpdate) return
+
     // console.log(added, changed, deleted, rows)
+
     // this.setState({
 
     // })
-    // console.log('commitChanges')
+    // console.log('commitChanges', added, changed, deleted, rows)
     // const { values, setFieldValue } = this.props
     let newRows = _.cloneDeep(rows)
     if (added) {
       // console.log(added, window.$tempGridRow, window.$tempGridRow[this.gridId])
+      if (!window.$tempGridRow[this.gridId])
+        window.$tempGridRow[this.gridId] = {}
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       // console.log(tempNewData)
 
       newRows = added
         .map((o) => {
-          const id = getUniqueNumericId()
+          const id = getUniqueId()
           window.$tempGridRow[this.gridId][id] = {
             id,
             isNew: true,
@@ -187,7 +273,7 @@ class EditableTableGrid extends PureComponent {
         const n = changed[getRowId(row)]
           ? {
               ...row,
-              ...window.$tempGridRow[this.gridId][getRowId(row)],
+              // ...window.$tempGridRow[this.gridId][getRowId(row)],
               ...changed[getRowId(row)],
             }
           : row
@@ -209,6 +295,7 @@ class EditableTableGrid extends PureComponent {
       )
       deletedEcs.forEach((o) => {
         o.isDeleted = true
+        delete window.$tempGridRow[this.gridId][getRowId(o)]
       })
     }
     // console.log({ newRows, added, changed, deleted, temp: window.$tempGridRow })
@@ -240,6 +327,8 @@ class EditableTableGrid extends PureComponent {
     //   // )
     // }
     // console.log({ newRows, t: window.$tempGridRow })
+    // console.log(newRows, rows, _.isEqual(newRows, rows))
+    // if (_.isEqual(newRows, rows)) return
     const updatedRows = onCommitChanges({
       rows: newRows,
       added,
@@ -247,14 +336,17 @@ class EditableTableGrid extends PureComponent {
       deleted,
     })
     // window.$tempGridRow[this.gridId]={}
-    if (updatedRows) {
+    if (updatedRows && Array.isArray(updatedRows)) {
       // console.log(updatedRows, window.$tempGridRow[this.gridId])
       window.$tempGridRow[this.gridId] = {}
       updatedRows.forEach((r) => {
+        if (!window.$tempGridRow[this.gridId][r.id])
+          window.$tempGridRow[this.gridId][r.id] = {}
         window.$tempGridRow[this.gridId][r.id] = r
       })
       // window.$tempGridRow[this.gridId] = updatedRows
     }
+    this._onEditingCellsChange(this.state.editingCells)
   }
 
   getAddRowComponent = (selector = '.medisys-table') => {
@@ -275,23 +367,28 @@ class EditableTableGrid extends PureComponent {
           <Button
             // hideIfNoEditRights
             onClick={(e) => {
-              setTimeout(() => {
-                window.g_app._store.dispatch({
-                  type: 'global/updateState',
-                  payload: {
-                    disableSave: true,
-                  },
-                })
-              }, 1)
+              this._onCommitChanges({
+                added: this._onAddedRowsChange([
+                  {},
+                ]),
+              })
+              // setTimeout(() => {
+              //   window.g_app._store.dispatch({
+              //     type: 'global/updateState',
+              //     payload: {
+              //       disableSave: true,
+              //     },
+              //   })
+              // }, 1)
 
-              $(e.target)
-                .parents(selector)
-                .find('.medisys-table-add')
-                .trigger('click')
+              // $(e.target)
+              //   .parents(selector)
+              //   .find('.medisys-table-add')
+              //   .trigger('click')
             }}
             color='primary'
             link
-            disabled={this.state.addedRows && this.state.addedRows.length > 0}
+            disabled={this.state.errorCells.length > 0}
             {...addCommandProps}
           >
             <Add />
@@ -365,18 +462,24 @@ class EditableTableGrid extends PureComponent {
         },
         // EditCell = DefaultEditCell,
       } = {},
-      getRowId = (r) => r.id,
+      getRowId,
       ...props
     } = this.props
 
-    // console.log('editabletablegrid', { props: this.props })
+    // console.log('editabletablegrid', props.rows)
 
     const { FuncProps: { pager = true } } = {
       FuncProps: {},
       ...props,
     }
-    const { editingRowIds, deletedRowIds, rowChanges, addedRows } = this.state
-    // console.log(this.state, this.props)
+    const {
+      editingRowIds,
+      deletedRowIds,
+      rowChanges,
+      addedRows,
+      editingCells,
+    } = this.state
+    // console.log(editingCells)
     // console.log(editingRowIds, this.state.errorRows)
     // console.log('this.containerComponent', this.containerComponent)
     const cfg = {}
@@ -387,7 +490,7 @@ class EditableTableGrid extends PureComponent {
       gridId: this.gridId,
       columnExtensions,
       editingRowIds,
-      onRowDoubleClick: this.onRowDoubleClick,
+      // onRowDoubleClick: this.onRowDoubleClick,
       ...cfg,
       ...props,
     }
@@ -404,6 +507,8 @@ class EditableTableGrid extends PureComponent {
           addedRows={addedRows}
           onAddedRowsChange={this._onAddedRowsChange}
           onEditingRowIdsChange={this._onEditingRowIdsChange}
+          editingCells={editingCells}
+          onEditingCellsChange={this._onEditingCellsChange}
           onDeletedRowIdsChange={this._onDeletedRowIdsChange}
           onRowChangesChange={this._onRowChangesChange}
           onCommitChanges={this._onCommitChanges}
@@ -420,33 +525,33 @@ class EditableTableGrid extends PureComponent {
         <TableEditColumn
           key={`TableEditColumn-${uniqueGid}`}
           showAddCommand={this.addable}
-          showEditCommand={showEditCommand}
+          // showEditCommand={showEditCommand}
           showDeleteCommand={showDeleteCommand}
           commandComponent={CommandComponent}
           messages={messages}
-          cellComponent={(cellProps) => {
-            const { children, ...p } = cellProps
-            return (
-              <Table.Cell {...p}>
-                {children.map((o) => {
-                  if (o) {
-                    // console.log(12311231,o.props)
-                    return React.cloneElement(o, {
-                      row: p.row,
-                      disabled: p.row.disabled,
-                      editingRowIds,
-                      getRowId,
-                      key: o.props.id,
-                      schema: this.props.schema,
-                      gridId: this.gridId,
-                      ...o.props,
-                    })
-                  }
-                  return null
-                })}
-              </Table.Cell>
-            )
-          }}
+          // cellComponent={(cellProps) => {
+          //   const { children, ...p } = cellProps
+          //   return (
+          //     <Table.Cell {...p}>
+          //       {children.map((o) => {
+          //         if (o) {
+          //           // console.log(12311231,o.props)
+          //           return React.cloneElement(o, {
+          //             row: p.row,
+          //             disabled: p.row.disabled,
+          //             editingRowIds,
+          //             getRowId,
+          //             key: o.props.id,
+          //             schema: this.props.schema,
+          //             gridId: this.gridId,
+          //             ...o.props,
+          //           })
+          //         }
+          //         return null
+          //       })}
+          //     </Table.Cell>
+          //   )
+          // }}
         />,
       ],
       extraGetter: [
@@ -470,13 +575,42 @@ class EditableTableGrid extends PureComponent {
             return cols
           }}
         />,
+        <TableInlineCellEditing
+          key={`TableInlineCellEditing-${uniqueGid}`}
+          // cellComponent={(p) => {
+          //   console.log(p)
+          //   const { classes, onClick, onFocus, ...restProps } = p
+          //   const { column, row } = restProps
+          //   const { name } = column
+          //   // console.log(p2)
+          //   // return null
+          //   // console.log(restProps)
+          //   // if (name === 'rowMove') return <Table.Cell {...restProps} />
+
+          //   // // return null
+          //   // // return (
+          //   // //   <Table.Cell editingEnabled={name !== 'rowMove'} {...restProps} />
+          //   // // )
+
+          //   return (
+          //     <TableInlineCellEditing.Cell
+          //       editingEnabled={name !== 'rowMove'}
+          //       onFocus={false}
+          //       {...restProps}
+          //     />
+          //   )
+          // }}
+          startEditAction='click'
+          selectTextOnEditStart
+        />,
       ],
     }
     // console.log('EditableTableGrid')
-
+    // console.log(editableCfg)
     const element = (
       <Authorized.Context.Consumer>
         {(matches) => {
+          // console.log(matches)
           return Authorized.generalCheck(
             matches,
             this.props,

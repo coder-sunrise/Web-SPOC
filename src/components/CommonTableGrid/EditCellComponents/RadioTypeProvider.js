@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { FastField } from 'formik'
 import { withStyles, Radio } from '@material-ui/core'
@@ -16,7 +17,9 @@ import {
 //   TextTypeProvider as TextTypeProviderOrg,
 // } from '@/components'
 
-const styles = (theme) => ({})
+const styles = (theme) => ({
+  main: {},
+})
 
 const radioSelectedMap = {}
 
@@ -110,7 +113,11 @@ class RadioEditorBase extends PureComponent {
   // }
 
   render () {
-    const { columnExtensions, column: { name: columnName } } = this.props
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      classes,
+    } = this.props
 
     const cfg =
       columnExtensions.find(
@@ -124,6 +131,7 @@ class RadioEditorBase extends PureComponent {
       options,
       row,
       value,
+      editMode,
       ...commonCfg
     } = getCommonConfig.call(this)
     commonCfg.onChange = this._onChange
@@ -132,8 +140,22 @@ class RadioEditorBase extends PureComponent {
     if (checked) {
       commonCfg.checked = radioSelectedMap[gridId][columnName] === row.id
     }
-    // console.log(commonCfg, row, radioSelectedMap[gridId])
-    return <Radio {...commonCfg} />
+    if (editMode) {
+      commonCfg.onBlur = this.props.onBlur
+      commonCfg.autoFocus = true
+      // if (!commonCfg.checked) {
+      //   commonCfg.checked = true
+      //   row[columnName] = checkedValue
+      // }
+    }
+    return (
+      <Radio
+        className={classnames({
+          [classes.main]: true,
+        })}
+        {...commonCfg}
+      />
+    )
   }
 }
 
@@ -212,7 +234,10 @@ class RadioEditorBase extends PureComponent {
 //   },
 // )
 
-export const RadioEditor = withStyles(styles)(RadioEditorBase)
+export const RadioEditor = withStyles(styles, {
+  name: 'RadioEditor',
+  withTheme: true,
+})(RadioEditorBase)
 
 class RadioTypeProvider extends PureComponent {
   static propTypes = {
@@ -222,8 +247,14 @@ class RadioTypeProvider extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.RadioEditor = (columns) => (editorProps) => {
-      return <RadioEditor columnExtensions={columns} {...editorProps} />
+    this.RadioEditor = (columns, text) => (editorProps) => {
+      return (
+        <RadioEditor
+          editMode={!text}
+          columnExtensions={columns}
+          {...editorProps}
+        />
+      )
     }
   }
 
@@ -249,7 +280,7 @@ class RadioTypeProvider extends PureComponent {
       <DataTypeProvider
         for={columns}
         editorComponent={this.RadioEditor(columnExtensions)}
-        formatterComponent={this.RadioEditor(columnExtensions)}
+        formatterComponent={this.RadioEditor(columnExtensions, true)}
         {...this.props}
       />
     )

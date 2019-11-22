@@ -1081,7 +1081,6 @@ export const fetchAndSaveCodeTable = async (
     ...params,
   }
   newParams.sorting = noSortOrderProp.includes(code) ? [] : newParams.sorting
-
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
@@ -1544,6 +1543,8 @@ export const getInventoryItemList = (
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
       stateName,
+      itemFK: x.id,
+      isActive: x.isActive,
     }
   })
   return {
@@ -1587,6 +1588,21 @@ export const inventoryAdjustmentStatus = [
   { value: 1, name: 'Draft' },
   { value: 2, name: 'Finalized' },
   { value: 3, name: 'Discarded' },
+]
+
+export const shortcutKeys = [
+  { value: 'F1', name: 'F1' },
+  { value: 'F2', name: 'F2' },
+  { value: 'F3', name: 'F3' },
+  { value: 'F4', name: 'F4' },
+  { value: 'F5', name: 'F5' },
+  { value: 'F6', name: 'F6' },
+  { value: 'F7', name: 'F7' },
+  { value: 'F8', name: 'F8' },
+  { value: 'F9', name: 'F9' },
+  { value: 'F10', name: 'F10' },
+  { value: 'F11', name: 'F11' },
+  { value: 'F12', name: 'F12' },
 ]
 
 module.exports = {
@@ -1637,5 +1653,6 @@ module.exports = {
   buttonTypes,
   inventoryAdjustmentStatus,
   fetchAndSaveCodeTable,
+  shortcutKeys,
   ...module.exports,
 }

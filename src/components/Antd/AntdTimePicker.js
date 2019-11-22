@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
+import AutosizeInput from 'react-input-autosize'
+import $ from 'jquery'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -65,6 +67,7 @@ class AntdTimePicker extends PureComponent {
   constructor (props) {
     super(props)
     const { field = {}, format, value } = props
+    this.myRef = React.createRef()
 
     this.state = {
       shrink: field.value !== undefined && field.value !== '',
@@ -122,22 +125,51 @@ class AntdTimePicker extends PureComponent {
     }
   }
 
+  handleOpenChange = (open) => {
+    const { onBlur, onOpenChange } = this.props
+    if (onOpenChange) onOpenChange(open)
+    if (!open && onBlur) onBlur()
+  }
+
+  handleFocus = (e) => {
+    const { onFocus, onOpenChange } = this.props
+
+    if (onFocus) onFocus(e)
+    // setTimeout(() => {
+    //   $(this.myRef.current).find('.ant-time-picker').trigger('click')
+    // }, 1)
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
       onChange,
-      onFocus,
+      // onFocus,
       onBlur,
       onOpenChange,
       use12Hours = true,
       minuteStep = 1,
+      text,
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
+
+    if (text)
+      return (
+        <AutosizeInput
+          readOnly
+          inputClassName={props.className}
+          value={
+            this.state.value ? _toMoment(this.state.value).format(format) : ''
+          }
+        />
+      )
+    // console.log(restProps)
     return (
-      <div style={{ width: '100%' }} {...props}>
+      <div style={{ width: '100%' }} {...props} ref={this.myRef}>
         <TimePicker
           {...restProps}
+          onFocus={this.handleFocus}
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}
@@ -148,7 +180,7 @@ class AntdTimePicker extends PureComponent {
           minuteStep={minuteStep}
           defaultOpenValue={moment('00:00', 'HH:mm')}
           onChange={this.handleChange}
-          onOpenChange={onOpenChange}
+          onOpenChange={this.handleOpenChange}
           value={_toMoment(this.state.value)}
         />
       </div>
@@ -167,6 +199,7 @@ class AntdTimePicker extends PureComponent {
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
+        preventDefaultKeyDownEvent
         {...restProps}
         // value={this.state.selectValue}
       />

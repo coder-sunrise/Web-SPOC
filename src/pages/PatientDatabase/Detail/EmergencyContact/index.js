@@ -11,7 +11,7 @@ import {
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
 import { query } from '@/services/patient'
-import { getUniqueNumericId } from '@/utils/utils'
+import { getUniqueId } from '@/utils/utils'
 
 class EmergencyContact extends PureComponent {
   state = {
@@ -28,7 +28,10 @@ class EmergencyContact extends PureComponent {
       { name: 'relationshipFK', title: 'Relationship' },
       { name: 'address', title: 'Address' },
       { name: 'primaryContactNo', title: 'Primary Contact' },
-      { name: 'isPrimaryContact', title: 'Priority' },
+      {
+        name: 'isPrimaryContact',
+        title: 'Priority',
+      },
       { name: 'remark', title: 'Remarks' },
     ],
     columnExtensions: [
@@ -138,6 +141,7 @@ class EmergencyContact extends PureComponent {
 
   commitChanges = ({ rows }) => {
     const { setFieldValue } = this.props
+    // console.log(rows)
     setFieldValue('patientEmergencyContact', rows)
   }
 
@@ -166,7 +170,7 @@ class EmergencyContact extends PureComponent {
     }
     const primaryAddress =
       o.contact.contactAddress.find((m) => m.isPrimary) || {}
-    const newId = getUniqueNumericId()
+    const newId = getUniqueId()
     patientEmergencyContact.push({
       id: newId,
       isNew: true,
@@ -181,21 +185,22 @@ class EmergencyContact extends PureComponent {
       address: `${primaryAddress.blockNo || ''} ${primaryAddress.buildingName ||
         ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street || ''}`,
       primaryContactNo: o.contact.mobileContactNumber.number,
+      remark: '-',
     })
     setFieldValue('patientEmergencyContact', patientEmergencyContact)
-    this.setState((prevState) => {
-      return {
-        editingRowIds: prevState.editingRowIds.concat([
-          newId,
-        ]),
-      }
-    })
-    dispatch({
-      type: 'global/updateState',
-      payload: {
-        disableSave: true,
-      },
-    })
+    // // this.setState((prevState) => {
+    // //   return {
+    // //     editingRowIds: prevState.editingRowIds.concat([
+    // //       newId,
+    // //     ]),
+    // //   }
+    // // })
+    // dispatch({
+    //   type: 'global/updateState',
+    //   payload: {
+    //     disableSave: true,
+    //   },
+    // })
     this.toggleModal()
   }
 
@@ -221,6 +226,8 @@ class EmergencyContact extends PureComponent {
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
+    console.log('render', values.patientEmergencyContact, this.tableParas)
+
     return (
       <div>
         <EditableTableGrid
@@ -250,12 +257,13 @@ class EmergencyContact extends PureComponent {
             //   },
             // ],
             showAddCommand: true,
-            editingRowIds: this.state.editingRowIds,
-            onEditingRowIdsChange: this.onEditingRowIdsChange,
+            // editingRowIds: this.state.editingRowIds,
+            // onEditingRowIdsChange: this.onEditingRowIdsChange,
             onCommitChanges: this.commitChanges,
             // onAddedRowsChange: (rows) => {
             //   return rows.map((o) => ({
             //     name: 'dff',
+            //     accountNoTypeFK: 1,
             //     ...o,
             //   }))
             // },

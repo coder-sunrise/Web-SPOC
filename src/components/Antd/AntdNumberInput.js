@@ -329,7 +329,7 @@ class AntdNumberInput extends React.PureComponent {
     const {
       currency,
       percentage,
-      formatter,
+      formatter = (f) => f,
       max,
       min,
       parser,

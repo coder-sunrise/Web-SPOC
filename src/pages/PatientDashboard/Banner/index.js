@@ -331,6 +331,7 @@ class Banner extends PureComponent {
         paddingLeft: 16,
         paddingRight: 16,
         // maxHeight: 100,
+        backgroundColor: '#f0f8ff',
       },
     } = props
 
@@ -346,12 +347,10 @@ class Banner extends PureComponent {
     const salt = ctsalutation.find((o) => o.id === info.salutationFK) || {}
     const name = `${salt.name || ''} ${info.name}`
     const allergiesStyle = () => {
-      if (this.state.showWarning) {
-        return {
-          color: 'red',
-        }
+      return {
+        color: this.state.showWarning ? 'red' : 'darkblue',
+        fontWeight: 500,
       }
-      return null
     }
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
@@ -415,7 +414,7 @@ class Banner extends PureComponent {
               header={
                 <div style={allergiesStyle()}>
                   {this.state.showWarning && (
-                    <IconButton disabled>
+                    <IconButton disabled style={{ marginBottom: 5 }}>
                       <Warining color='error' />
                     </IconButton>
                   )}
@@ -427,7 +426,7 @@ class Banner extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block
-              header='Medical Problem'
+              header={<b style={{ color: 'darkblue' }}>Medical Problem</b>}
               body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
@@ -435,7 +434,7 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  Scheme&nbsp;
+                  <b style={{ color: 'darkblue' }}>Scheme </b>
                   {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                     .length > 0 && (
                     <IconButton onClick={this.refreshChasBalance}>
