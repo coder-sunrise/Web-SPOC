@@ -27,7 +27,7 @@ const styles = (theme) => ({})
     displayValue: Yup.string().required(),
     templateMessage: Yup.string()
       .required()
-      .max(2000, 'Message should not exceed 2000 characters'),
+      .max(1500, 'Message should not exceed 1500 characters'),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
@@ -108,6 +108,7 @@ class Detail extends PureComponent {
                       // handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
+                      height={450}
                       onBlur={(html, text) => {
                         this.props.setFieldValue('templateMessage', text)
                       }}
