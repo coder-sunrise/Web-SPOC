@@ -187,16 +187,16 @@ class DODetails extends PureComponent {
     await this.initializeStateItemList()
   }
 
-  forceUpdate = () => {
-    const { dispatch } = this.props
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
-  }
+  // forceUpdate = () => {
+  //   const { dispatch } = this.props
+  //   dispatch({
+  //     // force current edit row components to update
+  //     type: 'global/updateState',
+  //     payload: {
+  //       commitCount: (commitCount += 1),
+  //     },
+  //   })
+  // }
 
   initializeStateItemList = async () => {
     const { dispatch } = this.props
@@ -238,13 +238,13 @@ class DODetails extends PureComponent {
 
     this.setOption(medication, consumable, vaccination)
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   setOption = (m, c, v) => {
