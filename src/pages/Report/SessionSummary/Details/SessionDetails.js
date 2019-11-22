@@ -59,12 +59,12 @@ const SessionDetails = ({ sessionDetails, companyDetails }) => {
       </GridItem>
       <GridItem md={3} style={{ marginBottom: 16 }}>
         <NumberInput
-          label='Company'
+          label='Company Payable Amt.'
           disabled
           currency
           value={
-            companyDetails.TotalCompanyAmount ? (
-              companyDetails.TotalCompanyAmount
+            companyDetails.totalCompanyAmount ? (
+              companyDetails.totalCompanyAmount
             ) : (
                 0
               )
