@@ -39,6 +39,7 @@ class SelectEditor extends PureComponent {
 
   render () {
     const { codes } = this.props
+
     const {
       type,
       code,
@@ -47,9 +48,12 @@ class SelectEditor extends PureComponent {
       localFilter,
       row,
       editMode,
+      render,
       ...commonCfg
     } = getCommonConfig.call(this)
-
+    if (!editMode && render) {
+      return render(row)
+    }
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onBlur = this.props.onBlur

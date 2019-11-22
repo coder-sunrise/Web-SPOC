@@ -38,9 +38,16 @@ class DateEditorBase extends PureComponent {
   }
 
   render () {
-    const { currency, format, editMode, ...commonCfg } = getCommonConfig.call(
-      this,
-    )
+    const {
+      currency,
+      format,
+      editMode,
+      render,
+      ...commonCfg
+    } = getCommonConfig.call(this)
+    if (!editMode && render) {
+      return render(row)
+    }
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onBlur = (e) => {
