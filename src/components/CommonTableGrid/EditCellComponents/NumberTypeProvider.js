@@ -79,6 +79,7 @@ class NumberEditor extends PureComponent {
     return (
       <div ref={this.myRef}>
         <NumberInput
+          rightAlign
           inputProps={{
             fullWidth: true,
           }}

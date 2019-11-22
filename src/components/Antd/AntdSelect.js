@@ -372,7 +372,6 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = this.props
     let newVal = val
-
     if (
       [
         'multiple',
