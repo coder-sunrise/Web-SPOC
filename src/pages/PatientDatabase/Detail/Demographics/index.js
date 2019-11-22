@@ -233,11 +233,11 @@ class Demographic extends PureComponent {
                       <TextField
                         label='Full Name'
                         onChange={(e) => {
-                          if (
-                            !values.callingName ||
-                            e.target.value.indexOf(values.callingName) === 0
-                          )
-                            setFieldValue('callingName', e.target.value)
+                          // if (
+                          //   !values.callingName ||
+                          //   e.target.value.indexOf(values.callingName) === 0
+                          // )
+                          setFieldValue('callingName', e.target.value)
                         }}
                         {...args}
                       />
