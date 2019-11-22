@@ -114,9 +114,14 @@ const receivingDetailsSchema = Yup.object().shape({
     }
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
-      delete x.purchaseOrderMedicationItem
+      const {
+        purchaseOrderMedicationItem,
+        purchaseOrderVaccinationItem,
+        purchaseOrderConsumableItem,
+        ...restX
+      } = x
       return {
-        ...x,
+        ...restX,
         // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
         purchaseOrderItemFK: getPurchaseOrderItemFK(x),
         recevingQuantity: x.currentReceivingQty,
