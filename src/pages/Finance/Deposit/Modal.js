@@ -127,6 +127,8 @@ const style = () => ({
       type: 'deposit/updateDeposit',
       payload: {
         ...values,
+        id: undefined,
+        concurrencyToken: undefined,
         balance: balanceAfter,
         patientDepositTransaction: {
           ...restDepositTransaction,
