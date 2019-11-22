@@ -15,6 +15,7 @@ const Other = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
             render={(args) => (
               <NumberInput
                 label='Amount'
+                min={0}
                 {...args}
                 currency
                 onChange={handleAmountChange}
