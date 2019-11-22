@@ -6,6 +6,7 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
+import { getUniqueNumericId } from '@/utils/utils'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import {
   AppointmentDataColExtensions,
@@ -143,7 +144,7 @@ class AppointmentDataGrid extends React.Component {
     let defaultNewRows = []
 
     if (!data || data.length <= 0) {
-      let defaultNewRow = { isPrimaryClinician: true }
+      let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
       if (selectedSlot && selectedSlot.allDay === false) {
         defaultNewRow = {
           startTime: moment(selectedSlot.start).format('HH:mm A'),
@@ -187,12 +188,12 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
-
+    // console.log(AppointmentDataColumn, this.columnExtensions)
     return (
       <div className={classes.container}>
         <EditableTableGrid
-          disabled={disabled}
-          rows={data}
+          // disabled={disabled}
+          rows={data.length ? data : data.concat(defaultNewRows)}
           columns={AppointmentDataColumn}
           columnExtensions={this.columnExtensions}
           FuncProps={{
@@ -204,18 +205,18 @@ class AppointmentDataGrid extends React.Component {
               ],
             },
           }}
-          onRowDoubleClick={undefined}
+          // onRowDoubleClick={undefined}
           EditingProps={{
             messages: {
               deleteCommand: 'Delete appointment slot',
             },
-            editingRowIds: editingRows,
+            // editingRowIds: editingRows,
             showAddCommand: !disabled,
-            showEditCommand: !disabled,
-            showDeleteCommand: !disabled && data.length !== 1,
+            // showEditCommand: !disabled,
+            showDeleteCommand: !!data.length,
             onCommitChanges: handleCommitChanges,
-            onEditingRowIdsChange: handleEditingRowsChange,
-            defaultNewRow: defaultNewRows,
+            // onEditingRowIdsChange: handleEditingRowsChange,
+            // defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />

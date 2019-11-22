@@ -110,15 +110,17 @@ class AntdDatePicker extends PureComponent {
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     // console.log(value)
-    if (value) console.log(value.target)
+    // if (value) console.log(value.target)
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
       })
-    } else if (value && typeof value === 'string') {
-      this.setState({
-        value,
-      })
+    } else if (value) {
+      if (typeof value === 'string' || moment.isMoment(value)) {
+        this.setState({
+          value,
+        })
+      }
     } else {
       this.setState({
         value: undefined,

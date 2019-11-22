@@ -198,9 +198,12 @@ const customInputStyle = {
     },
   },
 
-  textAdornment: {
+  errorAdornment: {
     top: '2px !important',
     marginLeft: -2,
+  },
+  adornment: {
+    width: 'auto !important',
   },
 }
 
