@@ -191,24 +191,8 @@ class Modal extends PureComponent {
       this.setState({ isSessionRequired: false })
     } else {
       this.setState({ isSessionRequired: true })
-
-      // dispatch({
-      //   type: 'deposit/bizSessionList',
-      //   payload: {
-      //     sessionNoPrefix: selectedDate,
-      //     pagesize: 999999,
-      //   },
-      // }).then(() => {
-      //   const { bizSessionList } = this.props.deposit
-      //   setFieldValue(
-      //     'patientDepositTransaction.transactionBizSessionFK',
-      //     bizSessionList.length === 0 || bizSessionList === undefined
-      //       ? ''
-      //       : bizSessionList[0].value,
-      //   )
-      // })
-      this.getBizList(selectedDate)
     }
+    this.getBizList(selectedDate)
   }
 
   getBizList = (e) => {
