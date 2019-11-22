@@ -115,10 +115,12 @@ class AntdDatePicker extends PureComponent {
       this.setState({
         value: field.value === undefined ? '' : field.value,
       })
-    } else if (value && typeof value === 'string') {
-      this.setState({
-        value,
-      })
+    } else if (value) {
+      if (typeof value === 'string' || moment.isMoment(value)) {
+        this.setState({
+          value,
+        })
+      }
     } else {
       this.setState({
         value: undefined,
