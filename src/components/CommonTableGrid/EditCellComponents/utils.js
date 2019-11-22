@@ -1,3 +1,5 @@
+import React, { PureComponent } from 'react'
+
 import { object } from 'prop-types'
 import _ from 'lodash'
 
@@ -108,7 +110,6 @@ function getCommonConfig () {
     window.$tempGridRow[gridId] && gridId.indexOf('edit') === 0
       ? window.$tempGridRow[gridId][getRowId(row)] || row
       : row || {}
-  // console.log(latestRow)
   const errorObj = (latestRow._errors || [])
     .find(
       (o) =>
@@ -116,13 +117,13 @@ function getCommonConfig () {
     )
   const disabled = isDisabled(latestRow)
   const error = errorObj ? errorObj.message : ''
-
+  // console.log(columnName, latestRow[columnName], this.props.value)
   const commonCfg = {
     editMode,
     simple: true,
     showErrorIcon: true,
     error,
-    value: latestRow[columnName],
+    value: latestRow[columnName] || this.props.value,
     defaultValue: getInitialValue ? getInitialValue(row) : undefined,
     disabled,
     row: latestRow,
@@ -135,9 +136,24 @@ function getCommonConfig () {
   return commonCfg
 }
 
+function getCommonRender (cb) {
+  const { value, editMode, row } = this.props
+  const cfg = getCommonConfig.call(this)
+  const { render } = cfg
+  if (render && !editMode) {
+    return render(cfg.row)
+  }
+
+  if (typeof value === 'object') {
+    return <span>{value}</span>
+  }
+  return cb(cfg)
+}
+
 module.exports = {
   ...module.exports,
   onComponentDidMount,
   onComponentChange,
   getCommonConfig,
+  getCommonRender,
 }

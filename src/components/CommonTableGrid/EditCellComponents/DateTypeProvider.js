@@ -16,7 +16,7 @@ import {
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 class DateEditorBase extends PureComponent {
@@ -37,17 +37,7 @@ class DateEditorBase extends PureComponent {
     })
   }
 
-  render () {
-    const {
-      currency,
-      format,
-      editMode,
-      render,
-      ...commonCfg
-    } = getCommonConfig.call(this)
-    if (!editMode && render) {
-      return render(row)
-    }
+  renderComponent = ({ currency, format, editMode, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onBlur = (e) => {
@@ -70,6 +60,10 @@ class DateEditorBase extends PureComponent {
         <DatePicker timeFormat={false} {...commonCfg} />
       </div>
     )
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 

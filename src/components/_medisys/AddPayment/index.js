@@ -180,6 +180,7 @@ class AddPayment extends Component {
 
         if (bizSessionList.length > 0)
           setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
+        else setFieldValue('paymentReceivedBizSessionFK', undefined)
       }
     })
   }

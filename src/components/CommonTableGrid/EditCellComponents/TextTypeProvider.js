@@ -11,7 +11,7 @@ import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 const styles = (theme) => ({})
@@ -66,20 +66,15 @@ class TextEditorBase extends PureComponent {
   //   }
   // }
 
-  render () {
-    const {
-      type,
-      render,
-      onClick,
-      row,
-      link,
-      editMode,
-      ...commonCfg
-    } = getCommonConfig.call(this)
-    if (!editMode && render) {
-      return render(row)
-    }
-
+  renderComponent = ({
+    type,
+    render,
+    onClick,
+    row,
+    link,
+    editMode,
+    ...commonCfg
+  }) => {
     if (type === 'link') {
       return (
         <Tooltip title={commonCfg.value} enterDelay={750}>
@@ -103,9 +98,17 @@ class TextEditorBase extends PureComponent {
       commonCfg.autoFocus = true
       commonCfg.debounceDuration = 0
     }
-
+    if (commonCfg.text) {
+      commonCfg.style = {
+        display: 'inline-block',
+      }
+    }
     // console.log(commonCfg, window.$tempGridRow)
     return <TextField {...commonCfg} />
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 
