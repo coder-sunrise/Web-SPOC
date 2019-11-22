@@ -62,9 +62,16 @@ class NumberEditor extends PureComponent {
   }
 
   render () {
-    const { currency, type, editMode, ...commonCfg } = getCommonConfig.call(
-      this,
-    )
+    const {
+      currency,
+      type,
+      editMode,
+      render,
+      ...commonCfg
+    } = getCommonConfig.call(this)
+    if (!editMode && render) {
+      return render(row)
+    }
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onKeyDown = this.props.onKeyDown
@@ -74,12 +81,13 @@ class NumberEditor extends PureComponent {
       commonCfg.debounceDuration = 0
     }
 
+    if (commonCfg.text) commonCfg.rightAlign = true
+
     commonCfg.currency = currency || type === 'currency'
 
     return (
       <div ref={this.myRef}>
         <NumberInput
-          rightAlign
           inputProps={{
             fullWidth: true,
           }}

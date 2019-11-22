@@ -91,9 +91,12 @@ class DateEditorBase extends React.Component {
       row,
       format,
       editMode,
+      render,
       ...commonCfg
     } = getCommonConfig.call(this)
-
+    if (!editMode && render) {
+      return render(row)
+    }
     if (!commonCfg.timeFormat) {
       commonCfg.timeFormat = false
     }

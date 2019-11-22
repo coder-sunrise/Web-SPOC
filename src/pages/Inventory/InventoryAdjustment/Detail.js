@@ -285,13 +285,15 @@ class Detail extends PureComponent {
         ],
         onChange: (e) => {
           this.setState({ type: `inventory${e.val}` })
-          this.props.dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // this.props.dispatch(
+          //   {
+          //     // force current edit row components to update
+          //     // type: 'global/updateState',
+          //     // payload: {
+          //     //   commitCount: (commitCount += 1),
+          //     // },
+          //   },
+          // )
         },
       },
       {
@@ -733,13 +735,13 @@ class Detail extends PureComponent {
       }
     }
 
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   onCommitChanges = ({ rows, deleted }) => {

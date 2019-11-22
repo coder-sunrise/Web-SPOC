@@ -560,7 +560,7 @@ class CommonTableGrid extends PureComponent {
     const { columnExtensions = [], extraState, getRowId } = this.props
     const { classes, onClick, ...restProps } = p
     const { column, row } = restProps
-    const { cellEditingDisabled } = column
+    // const { cellEditingDisabled } = column
     // console.log(p2)
     // return null
     // console.log(restProps)
@@ -584,6 +584,7 @@ class CommonTableGrid extends PureComponent {
           // },
         }
       }
+      if (colCfg && colCfg.disabled) cfg = {}
     }
     // console.log(p, columnExtensions)
 

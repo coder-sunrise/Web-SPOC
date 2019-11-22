@@ -76,7 +76,7 @@ class TextEditorBase extends PureComponent {
       editMode,
       ...commonCfg
     } = getCommonConfig.call(this)
-    if (render) {
+    if (!editMode && render) {
       return render(row)
     }
 
