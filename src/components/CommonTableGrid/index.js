@@ -493,7 +493,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-
+    // window.$tempGridRow[this.gridId] = {}
     if (query) {
       query({
         callback: (data) => {
