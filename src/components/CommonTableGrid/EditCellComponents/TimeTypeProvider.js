@@ -49,6 +49,7 @@ class TimeEditorBase extends PureComponent {
     const { allowClear = false, editMode, ...commonCfg } = getCommonConfig.call(
       this,
     )
+    // console.log(editMode, commonCfg)
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onOpenChange = this.onOpenChange
@@ -58,7 +59,7 @@ class TimeEditorBase extends PureComponent {
           this.props.onBlur(e)
         }, 1)
       }
-      commonCfg.open = true
+      // commonCfg.open = true
       commonCfg.autoFocus = true
     }
     return <TimePicker allowClear={allowClear} {...commonCfg} />

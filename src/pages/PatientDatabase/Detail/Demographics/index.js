@@ -346,6 +346,7 @@ class Demographic extends PureComponent {
                     <Select
                       label='Occupation'
                       // code='ctOccupation'
+                      valueField='id'
                       query={this.queryOccupation}
                       {...args}
                     />
