@@ -70,34 +70,34 @@ const errorMessage = (v) => {
   },
 
   validationSchema: Yup.object().shape({
-    customLetterHeadHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayCustomLetterHead', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    standardHeaderInfoHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayStandardHeader', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    footerInfoHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayFooterInfo', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    footerDisclaimerHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayFooterInfoDisclaimer', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
+    customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfoDisclaimer', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
     customLetterHeadImage: Yup.string().when('isDisplayCustomLetterHead', {
       is: (v) => v === true,
       then: Yup.string().required('Letter Head Image is required.'),
@@ -298,6 +298,9 @@ class printoutSetting extends PureComponent {
                           label='Letter Head Height'
                           suffix='cm'
                           format='0.0'
+                          min='0'
+                          max='5'
+                          disabled={values.isDisplayCustomLetterHead === false}
                           {...args}
                         />
                       )}
@@ -314,6 +317,9 @@ class printoutSetting extends PureComponent {
                       render={(args) => {
                         return (
                           <BrowseImage
+                            disabled={
+                              values.isDisplayCustomLetterHead === false
+                            }
                             title='Letter Head Image'
                             setImageBase64={this.setImageBase64}
                             fieldName='customLetterHeadImage'
@@ -353,6 +359,9 @@ class printoutSetting extends PureComponent {
                           label='Header Info Height'
                           suffix='cm'
                           format='0.0'
+                          min='0'
+                          max='5'
+                          disabled={values.isDisplayStandardHeader === false}
                           {...args}
                         />
                       )}
@@ -379,13 +388,15 @@ class printoutSetting extends PureComponent {
               <GridContainer className={classes.indent}>
                 <GridItem direction='column' md={6}>
                   <GridItem md={6}>
-                    <FastField
+                    <Field
                       name='footerInfoHeight'
                       render={(args) => (
                         <NumberInput
                           label='Footer Info Height'
                           suffix='cm'
                           format='0.0'
+                          min='0'
+                          max='5'
                           {...args}
                         />
                       )}
@@ -421,6 +432,11 @@ class printoutSetting extends PureComponent {
                           label='Footer Disclaimer Height'
                           suffix='cm'
                           format='0.0'
+                          min='0'
+                          max='5'
+                          disabled={
+                            values.isDisplayFooterInfoDisclaimer === false
+                          }
                           {...args}
                         />
                       )}
@@ -437,6 +453,9 @@ class printoutSetting extends PureComponent {
                       name='footerDisclaimerImage'
                       render={(args) => (
                         <BrowseImage
+                          disabled={
+                            values.isDisplayFooterInfoDisclaimer === false
+                          }
                           title='Footer Disclaimer Image'
                           setImageBase64={this.setImageBase64}
                           fieldName='footerDisclaimerImage'
