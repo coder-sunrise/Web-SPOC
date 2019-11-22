@@ -23,9 +23,9 @@ const MapPaymentType = {
   [PAYMENT_MODE.DEPOSIT]: (props) => <DepositPayment {...props} />,
 }
 
-const predefinedMode = [
-  ...Object.entries(PAYMENT_MODE).values(),
-]
+const predefinedMode = Object.keys(PAYMENT_MODE).map((e) => {
+  return PAYMENT_MODE[e]
+})
 
 class PaymentCard extends Component {
   MapPaymentTypeToComponent = (payment, index) => {

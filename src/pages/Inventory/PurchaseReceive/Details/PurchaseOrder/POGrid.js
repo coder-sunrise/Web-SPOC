@@ -66,6 +66,7 @@ class Grid extends PureComponent {
           x.itemFKName,
           x.stateName,
         )
+        console.log(x.stateName, inventoryItemList)
         this.setState({
           [x.stateName]: inventoryItemList,
         })
@@ -73,13 +74,13 @@ class Grid extends PureComponent {
       return null
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -112,13 +113,13 @@ class Grid extends PureComponent {
 
     this.setState({ onClickColumn: 'type' })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   handleItemOnChange = (e, type) => {
@@ -266,7 +267,7 @@ class Grid extends PureComponent {
     const filterActiveCode = (ops) => {
       return ops.filter((o) => o.isActive === true)
     }
-
+    console.log(1)
     if (row.type === 1) {
       const filteredOptions = getUnusedItem('MedicationItemList')
       const activeOptions = filterActiveCode(filteredOptions)
@@ -311,15 +312,15 @@ class Grid extends PureComponent {
     const { rows } = values
     // console.log('banana', rows)
 
-    if (rows && rows.length > 1) {
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
-    }
+    // if (rows && rows.length > 1) {
+    //   dispatch({
+    //     // force current edit row components to update
+    //     type: 'global/updateState',
+    //     payload: {
+    //       commitCount: (commitCount += 1),
+    //     },
+    //   })
+    // }
 
     const tableParas = {
       columns: [

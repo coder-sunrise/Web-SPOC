@@ -440,7 +440,7 @@ class Medication extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={10}>
+          <GridItem xs={6}>
             <React.Fragment>
               {openPrescription ? (
                 <FastField

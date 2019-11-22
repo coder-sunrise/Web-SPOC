@@ -17,6 +17,17 @@ import Setting from './Setting'
 const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
+  const { values, codetable } = props
+  const { copayerTypeFK } = values
+
+  const getCopayerOptions = () => {
+    const { ctcopayer } = codetable
+    if (copayerTypeFK === 2) return ctcopayer
+    const options = codetable.ctcopayer.filter(
+      (copayerList) => copayerList.coPayerTypeFK === 1,
+    )
+    return options
+  }
   return (
     <CardContainer
       hideHeader
@@ -126,7 +137,6 @@ const Detail = ({ height, ...props }) => {
               }}
             />
           </GridItem>
-
           <GridItem xs={9}>
             <FastField
               name='copayerFK'
@@ -135,10 +145,7 @@ const Detail = ({ height, ...props }) => {
                   label={formatMessage({
                     id: 'finance.scheme.detail.coPayer',
                   })}
-                  // code='ctCopayer'
-                  options={props.codetable.ctcopayer.filter(
-                    (copayerList) => copayerList.coPayerTypeFK === 1,
-                  )}
+                  options={getCopayerOptions()}
                   valueField='id'
                   labelField='displayValue'
                   max={50}

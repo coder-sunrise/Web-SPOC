@@ -36,6 +36,7 @@ class SelectEditor extends PureComponent {
   _onChange = (val, option) => {
     onComponentChange.call(this, { val, option })
   }
+
   renderComponent = ({
     type,
     code,
