@@ -59,7 +59,7 @@ class TimeEditorBase extends PureComponent {
           this.props.onBlur(e)
         }, 1)
       }
-      commonCfg.open = true
+      // commonCfg.open = true
       commonCfg.autoFocus = true
     }
     return <TimePicker allowClear={allowClear} {...commonCfg} />

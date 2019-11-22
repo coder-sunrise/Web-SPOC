@@ -14,7 +14,7 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueId } from '@/utils/utils'
+import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -44,7 +44,7 @@ class EditableTableGrid extends React.Component {
       // errorRows: [],
     }
     this.gridId = `edit-${uniqueGid++}`
-    console.log(this.gridId)
+    // console.log(this.gridId)
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -252,7 +252,7 @@ class EditableTableGrid extends React.Component {
 
       newRows = added
         .map((o) => {
-          const id = getUniqueId()
+          const id = getUniqueNumericId()
           window.$tempGridRow[this.gridId][id] = {
             id,
             isNew: true,

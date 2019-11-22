@@ -10,7 +10,6 @@ import {
   SizeContainer,
   Checkbox,
   CodeSelect,
-  RadioGroup,
 } from '@/components'
 import {
   DoctorProfileSelect,
@@ -54,7 +53,7 @@ const FilterBar = ({ handleSubmit }) => {
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={6}>
+          <GridItem md={4}>
             <FastField
               name='doctorIDs'
               render={(args) => (
@@ -73,7 +72,7 @@ const FilterBar = ({ handleSubmit }) => {
               )}
             />
           </GridItem>
-          <GridItem md={6}>
+          <GridItem md={4}>
             <FastField
               name='categoryIDs'
               render={(args) => (

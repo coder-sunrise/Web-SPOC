@@ -19,7 +19,7 @@ models.forEach((model) => {
 export const dva = {
   config: {
     onError (e, ...args) {
-      e.preventDefault()
+      // e.preventDefault()
       const [
         action,
         { key, effectArgs },

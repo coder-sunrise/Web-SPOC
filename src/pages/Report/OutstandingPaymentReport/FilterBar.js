@@ -33,7 +33,41 @@ const FilterBar = ({ handleSubmit }) => {
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
-
+          <GridItem md={2}>
+            <FastField
+              name='doctorIDs'
+              render={(args) => (
+                <DoctorProfileSelect
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='companyIDS'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  // code='ctcopayer,ctsupplier'
+                  code='ctcopayer'
+                  labelField='displayValue'
+                  mode='multiple'
+                  label='Company'
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={4} />
           <GridItem md={2}>
             <FastField
               name='payerType'
@@ -79,40 +113,6 @@ const FilterBar = ({ handleSubmit }) => {
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
-          </GridItem>
-          <GridItem md={6}>
-            <FastField
-              name='doctorIDs'
-              render={(args) => (
-                <DoctorProfileSelect
-                  mode='multiple'
-                  {...args}
-                  allValue={-99}
-                  allValueOption={{
-                    id: -99,
-                    clinicianProfile: {
-                      name: 'All',
-                    },
-                  }}
-                  labelField='clinicianProfile.name'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={6}>
-            <FastField
-              name='companyIDS'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  // code='ctcopayer,ctsupplier'
-                  code='ctcopayer'
-                  labelField='displayValue'
-                  mode='multiple'
-                  label='Company'
-                />
-              )}
-            />
           </GridItem>
         </GridContainer>
       </React.Fragment>

@@ -17,8 +17,8 @@ class AllergyGrid extends PureComponent {
 
     const { type } = props
 
-    const compareDate = (a, b) =>
-      a.toLocaleString().localeCompare(b.toLocaleString())
+    // const compareDate = (a, b) =>
+    //   a.toLocaleString().localeCompare(b.toLocaleString())
 
     this.tableParas = {
       columns: [
@@ -34,7 +34,7 @@ class AllergyGrid extends PureComponent {
         {
           columnName: 'onsetDate',
           type: 'date',
-          compare: compareDate,
+          // compare: compareDate,
         },
         {
           columnName: 'allergyFK',
