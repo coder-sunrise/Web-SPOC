@@ -28,12 +28,13 @@ const FilterBar = ({ handleSubmit }) => {
               render={(args) => <DatePicker {...args} label='To' />}
             />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={2}>
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={12}>
+          <GridItem md={4} />
+          <GridItem md={4}>
             <FastField
               name='transactionTypeIDs'
               render={(args) => (
@@ -42,7 +43,6 @@ const FilterBar = ({ handleSubmit }) => {
                   label='Deposit Transaction Type'
                   mode='multiple'
                   code='LTDepositTransactionType'
-                  labelField='displayValue'
                 />
               )}
             />
