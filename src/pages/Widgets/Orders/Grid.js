@@ -286,7 +286,7 @@ export default ({
           render: (row) => {
             return (
               <React.Fragment>
-                <Tooltip title='Add'>
+                <Tooltip title='Edit'>
                   <Button
                     size='sm'
                     onClick={() => {
