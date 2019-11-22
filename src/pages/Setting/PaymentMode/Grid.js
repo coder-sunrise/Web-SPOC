@@ -10,7 +10,7 @@ class Grid extends PureComponent {
       { name: 'displayValue', title: 'Display Value' },
       { name: 'description', title: 'Description' },
       { name: 'paymentCharges', title: 'Payment Charges' },
-      { name: 'hotKey', title: 'Shoetcut Key' },
+      { name: 'hotKey', title: 'Shortcut Key' },
       { name: 'isActive', title: 'Status' },
       {
         name: 'action',
