@@ -18,15 +18,15 @@ const styles = () => ({})
 
 const Detail = ({ height, ...props }) => {
   const { values, codetable } = props
-  const { isUserMaintable } = values
+  const { copayerTypeFK } = values
 
   const getCopayerOptions = () => {
     const { ctcopayer } = codetable
-    if (isUserMaintable === false) return ctcopayer
-    const test = codetable.ctcopayer.filter(
+    if (copayerTypeFK === 2) return ctcopayer
+    const options = codetable.ctcopayer.filter(
       (copayerList) => copayerList.coPayerTypeFK === 1,
     )
-    return test
+    return options
   }
   return (
     <CardContainer
@@ -137,7 +137,6 @@ const Detail = ({ height, ...props }) => {
               }}
             />
           </GridItem>
-          {console.log(props.values)}
           <GridItem xs={9}>
             <FastField
               name='copayerFK'
