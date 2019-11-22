@@ -51,7 +51,6 @@ class UploadAttachment extends PureComponent {
           <FastField
             name='corAttachment'
             render={(args) => {
-              console.log('duck', args)
               return (
                 <Attachment
                   attachmentType='ClinicalNotes'
