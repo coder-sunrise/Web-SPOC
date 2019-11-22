@@ -151,7 +151,8 @@ const ReportViewer = ({
     <div className={classes.root}>
       <LoadingWrapper loading={exporting} text='Exporting report...'>
         {showTopDivider && <Divider className={classes.divider} />}
-        <GridContainer>
+
+        <GridContainer className={classes.reportControl}>
           <GridItem md={3}>
             <Dropdown
               disabled={!pdfData}
@@ -236,35 +237,37 @@ const ReportViewer = ({
             </Button>
           </GridItem>
         </GridContainer>
-        <div className={classes.reportContainer}>
-          {pdfData && (
-            <Document
-              // renderMode='svg'
-              file={pdfData ? `${BASE64_MARKER}${pdfData}` : ''}
-              onLoadSuccess={onDocumentLoadSuccess}
-              loading={<CircularProgress />}
-            >
-              <Page
-                className={classes.page}
-                pageNumber={pageNumber}
-                width={screenSize - 200}
-                height={screenSize - 200}
-                scale={scale}
-              />
-            </Document>
-          )}
-          {!pdfData &&
-          !showError && (
-            <React.Fragment>
-              <CircularProgress />
-              <h5>Loading report...</h5>
-            </React.Fragment>
-          )}
-          {showError && (
-            <Danger>
-              <h3 style={{ fontWeight: 500 }}>Failed to load report</h3>
-            </Danger>
-          )}
+        <div className={classes.reportContainerWrapper}>
+          <div className={classes.reportContainer}>
+            {pdfData && (
+              <Document
+                // renderMode='svg'
+                file={pdfData ? `${BASE64_MARKER}${pdfData}` : ''}
+                onLoadSuccess={onDocumentLoadSuccess}
+                loading={<CircularProgress />}
+              >
+                <Page
+                  className={classes.page}
+                  pageNumber={pageNumber}
+                  width={screenSize - 200}
+                  height={screenSize - 200}
+                  scale={scale}
+                />
+              </Document>
+            )}
+            {!pdfData &&
+            !showError && (
+              <React.Fragment>
+                <CircularProgress />
+                <h5>Loading report...</h5>
+              </React.Fragment>
+            )}
+            {showError && (
+              <Danger>
+                <h3 style={{ fontWeight: 500 }}>Failed to load report</h3>
+              </Danger>
+            )}
+          </div>
         </div>
       </LoadingWrapper>
     </div>

@@ -162,7 +162,7 @@ class Service extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
             <Field
               name='serviceFK'
               render={(args) => {
@@ -186,7 +186,7 @@ class Service extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
             <Field
               name='serviceCenterFK'
               render={(args) => {

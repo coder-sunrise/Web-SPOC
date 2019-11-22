@@ -36,6 +36,7 @@ class DateEditorBase extends PureComponent {
       value: date || '',
     })
   }
+
   renderComponent = ({ currency, format, editMode, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange

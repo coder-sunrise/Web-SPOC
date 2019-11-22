@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 // yup
 import * as Yup from 'yup'
 // formik
@@ -18,6 +18,11 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
   const onColorChange = (color) => {
     if (color) setFieldValue('tagColorHex', color.hex)
   }
+
+  useEffect(() => {
+    setFieldValue('tagColorHex', '#2B1E6B')
+  }, [])
+
   const isEdit = values.id !== undefined
   return (
     <Fragment>
@@ -93,6 +98,7 @@ export default withFormikExtend({
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
     const { dispatch, onConfirm } = props
+
     dispatch({
       type: 'settingAppointmentType/upsert',
       payload: {

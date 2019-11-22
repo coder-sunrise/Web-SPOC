@@ -68,13 +68,9 @@ const PaymentCard = ({
     // )
     _payerName = (
       <p className={classes.title}>
-        <span>{payerTypeToString[payerTypeFK]}&nbsp;</span>
-        (<CodeSelect
-          text
-          code='copaymentscheme'
-          valueField='id'
-          value={coPaymentSchemeFK}
-        />)
+        <span>
+          {payerTypeToString[payerTypeFK]} ({companyName})
+        </span>
       </p>
     )
   }

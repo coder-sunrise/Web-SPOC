@@ -230,7 +230,7 @@ class Vaccination extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
             <Field
               name='inventoryVaccinationFK'
               render={(args) => {
