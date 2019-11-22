@@ -24,10 +24,11 @@ class PatientSearch extends PureComponent {
     columnExtensions: [
       // { columnName: 'name', width: 300 },
       { columnName: 'patientAccountNo', width: 140 },
-      { columnName: 'mobileNo', width: 140 },
+      { columnName: 'mobileNo', width: 140, sortingEnabled: false },
       {
         columnName: 'gender/age',
         width: 95,
+        sortingEnabled: false,
         render: (row) =>
           `${row.gender.substring(0, 1)}/${calculateAgeFromDOB(row.dob)}`,
       },
