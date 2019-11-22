@@ -18,7 +18,7 @@ import {
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 class SelectEditor extends PureComponent {
@@ -36,19 +36,17 @@ class SelectEditor extends PureComponent {
   _onChange = (val, option) => {
     onComponentChange.call(this, { val, option })
   }
-
-  render () {
+  renderComponent = ({
+    type,
+    code,
+    columnName,
+    options,
+    localFilter,
+    row,
+    editMode,
+    ...commonCfg
+  }) => {
     const { codes } = this.props
-    const {
-      type,
-      code,
-      columnName,
-      options,
-      localFilter,
-      row,
-      editMode,
-      ...commonCfg
-    } = getCommonConfig.call(this)
 
     if (editMode) {
       commonCfg.onChange = this._onChange
@@ -90,6 +88,10 @@ class SelectEditor extends PureComponent {
       return null
     }
     return <TextField value={commonCfg.value} simple />
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 

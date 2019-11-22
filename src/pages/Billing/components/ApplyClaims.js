@@ -503,29 +503,32 @@ const ApplyClaims = ({
               (cs) =>
                 cs.find((_cs) => _cs.id === ip.copaymentSchemeFK) !== undefined,
             )
-            const schemeConfig = claimableSchemes[_claimableSchemesIndex].find(
-              (cs) => cs.id === ip.copaymentSchemeFK,
-            )
+            console.log(claimableSchemes, _claimableSchemesIndex)
+            if (claimableSchemes[_claimableSchemesIndex]) {
+              const schemeConfig = claimableSchemes[
+                _claimableSchemesIndex
+              ].find((cs) => cs.id === ip.copaymentSchemeFK)
 
-            return {
-              ...ip,
-              invoicePayerItem: ip.invoicePayerItem.map((item) => {
-                const { coverage } = getCoverageAmountAndType(
-                  schemeConfig,
-                  item,
-                )
-                const invoiceItemTypeFK =
-                  INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
-                return { ...item, coverage, invoiceItemTypeFK }
-              }),
-              schemeConfig,
-              _indexInClaimableSchemes: _claimableSchemesIndex,
+              return {
+                ...ip,
+                invoicePayerItem: ip.invoicePayerItem.map((item) => {
+                  const { coverage } = getCoverageAmountAndType(
+                    schemeConfig,
+                    item,
+                  )
+                  const invoiceItemTypeFK =
+                    INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
+                  return { ...item, coverage, invoiceItemTypeFK }
+                }),
+                schemeConfig,
+                _indexInClaimableSchemes: _claimableSchemesIndex,
 
-              _isConfirmed: true,
-              _isDeleted: false,
-              _isEditing: false,
-              _isValid: true,
-              claimableSchemes: claimableSchemes[_claimableSchemesIndex],
+                _isConfirmed: true,
+                _isDeleted: false,
+                _isEditing: false,
+                _isValid: true,
+                claimableSchemes: claimableSchemes[_claimableSchemesIndex],
+              }
             }
           }
           return {

@@ -9,7 +9,7 @@ import debounce from 'lodash/debounce'
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 // import {
@@ -111,8 +111,15 @@ class RadioEditorBase extends PureComponent {
   //     }
   //   }
   // }
-
-  render () {
+  renderComponent = ({
+    type,
+    code,
+    options,
+    row,
+    value,
+    editMode,
+    ...commonCfg
+  }) => {
     const {
       columnExtensions,
       column: { name: columnName },
@@ -125,15 +132,6 @@ class RadioEditorBase extends PureComponent {
       ) || {}
     const { checkedValue = true, uncheckedValue = false, gridId } = cfg
     if (!radioSelectedMap[gridId]) return null
-    const {
-      type,
-      code,
-      options,
-      row,
-      value,
-      editMode,
-      ...commonCfg
-    } = getCommonConfig.call(this)
     commonCfg.onChange = this._onChange
 
     let checked = row[columnName] === checkedValue
@@ -156,6 +154,10 @@ class RadioEditorBase extends PureComponent {
         {...commonCfg}
       />
     )
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 
