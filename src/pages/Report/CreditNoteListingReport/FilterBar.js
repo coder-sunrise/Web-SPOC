@@ -45,20 +45,12 @@ const FilterBar = ({ handleSubmit }) => {
               )}
             />
           </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='isGroupByDoctor'
-              render={(args) => (
-                <Checkbox {...args} label='Group By Doctor' />
-              )}
-            />
-          </GridItem>
           <GridItem md={3}>
             <Button color='primary' onClick={handleSubmit}>
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={12}>
+          <GridItem md={4}>
             <FastField
               name='doctorIDs'
               render={(args) => (
@@ -74,6 +66,14 @@ const FilterBar = ({ handleSubmit }) => {
                   }}
                   labelField='clinicianProfile.name'
                 />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <FastField
+              name='isGroupByDoctor'
+              render={(args) => (
+                <Checkbox {...args} label='Group By Doctor' />
               )}
             />
           </GridItem>

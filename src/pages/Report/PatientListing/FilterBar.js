@@ -6,17 +6,15 @@ import { formatMessage } from 'umi/locale'
 import {
   Button,
   Checkbox,
-  CodeSelect,
   DatePicker,
   GridContainer,
   GridItem,
-  Select,
   TextField,
   NumberInput,
   SizeContainer,
 } from '@/components'
 // medisys components
-import { DoctorLabel, DoctorProfileSelect } from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
 const FilterBar = ({ handleSubmit }) => {
   return (
@@ -50,12 +48,7 @@ const FilterBar = ({ handleSubmit }) => {
               render={(args) => <NumberInput {...args} label='Age To' />}
             />
           </GridItem>
-          <GridItem md={2}>
-            <Button color='primary' onClick={handleSubmit}>
-              Generate Report
-            </Button>
-          </GridItem>
-          <GridItem md={3} />
+          <GridItem md={5} />
           {/* 2nd row  */}
           <GridItem md={2}>
             <FastField
@@ -89,15 +82,31 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='doctorIDs'
               render={(args) => (
-                <DoctorProfileSelect {...args} mode='multiple' label='Doctor' />
+                <DoctorProfileSelect
+                  mode='multiple'
+                  {...args}
+                  allValue={-99}
+                  allValueOption={{
+                    id: -99,
+                    clinicianProfile: {
+                      name: 'All',
+                    },
+                  }}
+                  labelField='clinicianProfile.name'
+                />
               )}
             />
           </GridItem>
-          <GridItem>
+          <GridItem md={3}>
             <FastField
               name='isGroupByDoctor'
               render={(args) => <Checkbox {...args} label='Group By Doctor' />}
             />
+          </GridItem>
+          <GridItem md={2}>
+            <Button color='primary' onClick={handleSubmit}>
+              Generate Report
+            </Button>
           </GridItem>
         </GridContainer>
       </GridContainer>

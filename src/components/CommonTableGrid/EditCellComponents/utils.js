@@ -104,9 +104,10 @@ function getCommonConfig () {
     getInitialValue,
     ...restProps
   } = cfg
-  const latestRow = window.$tempGridRow[gridId]
-    ? window.$tempGridRow[gridId][getRowId(row)] || row
-    : row || {}
+  const latestRow =
+    window.$tempGridRow[gridId] && gridId.indexOf('edit') === 0
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
+      : row || {}
   // console.log(latestRow)
   const errorObj = (latestRow._errors || [])
     .find(

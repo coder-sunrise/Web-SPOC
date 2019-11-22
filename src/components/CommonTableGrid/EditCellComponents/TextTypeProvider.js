@@ -104,7 +104,7 @@ class TextEditorBase extends PureComponent {
       commonCfg.debounceDuration = 0
     }
 
-    // console.log(commonCfg)
+    // console.log(commonCfg, window.$tempGridRow)
     return <TextField {...commonCfg} />
   }
 }
