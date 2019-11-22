@@ -21,9 +21,10 @@ import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
 import { getBizSession } from '@/services/queue'
 
-@connect(({ clinicSettings, patient }) => ({
+@connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
   patient: patient.entity,
+  ctPaymentMode: codetable.ctpaymentmode,
 }))
 @withFormikExtend({
   notDirtyDuration: 0.5,
@@ -121,13 +122,28 @@ class AddPayment extends Component {
     const max = 123
     const { keyCode } = event
     if (keyCode < min || keyCode > max) return
-
     console.log({ keyCode })
     // TODO: add payment base on keyCode and paymentMode hotkey setting
-    switch (keyCode) {
-      default:
-        break
-    }
+
+    const keyChar = String.fromCharCode(keyCode)
+    const { ctPaymentMode } = this.props
+    const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === keyChar)
+    if (paymentModeObj) this.onPaymentTypeClick(paymentModeObj)
+
+    // let paymentModeFK
+    // switch (keyCode) {
+    //   case 112: {
+    //     paymentModeFK = PAYMENT_MODE.CREDIT_CARD
+    //     break
+    //   }
+    //   case 113: {
+    //     paymentModeFK = PAYMENT_MODE.CHEQUE
+    //     break
+    //   }
+    //   default:
+    //     paymentModeFK = 0
+    //     break
+    // }
   }
 
   fetchCurrentActiveBizSession = () => {
@@ -303,7 +319,6 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
-    console.log({ values })
     return (
       <div>
         <PayerHeader
