@@ -111,6 +111,7 @@ export const PrescriptionColumnExtensions = (
               labelField='batchNo'
               maxSelected={1}
               disableAll
+              disabled={viewOnly}
               onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
               {...args}
             />
@@ -128,6 +129,7 @@ export const PrescriptionColumnExtensions = (
           render={(args) => (
             <DatePicker
               text={viewOnly}
+              disabled={viewOnly}
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               simple
               {...args}
@@ -211,7 +213,9 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => <TextField simple text={viewOnly} {...args} />}
+          render={(args) => (
+            <TextField simple text={viewOnly} disabled={viewOnly} {...args} />
+          )}
         />
       )
     },
@@ -226,6 +230,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
             <DatePicker
               disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
               text={viewOnly}
+              disabled={viewOnly}
               simple
               {...args}
             />
