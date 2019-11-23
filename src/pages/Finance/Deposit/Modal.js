@@ -40,7 +40,7 @@ const style = () => ({
       const transactionModeFK = isDeposit ? undefined : 3
       return {
         ...deposit.entity,
-        balance: deposit.entity.banlance ? deposit.entity.banlance : 0,
+        balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
           transactionDate: moment(),
@@ -50,7 +50,7 @@ const style = () => ({
 
           amount: 0,
         },
-        balanceAfter: deposit.entity.balance ? deposit.entity.banlance : 0,
+        balanceAfter: deposit.entity.balance ? deposit.entity.balance : 0,
       }
     }
     return deposit.default
