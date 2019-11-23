@@ -34,14 +34,14 @@ const InventoryTypeListing = ({
   theme,
 }) => {
   useEffect(() => {
-    return () => {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
-      })
-    }
+    // return () => {
+    //   dispatch({
+    //     type: 'global/updateState',
+    //     payload: {
+    //       disableSave: false,
+    //     },
+    //   })
+    // }
   }, [])
 
   const {
@@ -177,13 +177,13 @@ const InventoryTypeListing = ({
       })
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   useEffect(
@@ -209,13 +209,13 @@ const InventoryTypeListing = ({
       setConsumableRows(consumablePackageItem)
       setVaccinationRows(vaccinationPackageItem)
       setServiceRows(servicePackageItem)
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
+      // dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
     },
     [
       packDetail,
@@ -229,28 +229,28 @@ const InventoryTypeListing = ({
   useEffect(
     () => {
       let total = 0
-      medicationRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
+      const calTotal = (row) => {
+        const { isDeleted, subTotal } = row
+        if (!isDeleted && subTotal) {
+          total += subTotal
         }
+        return total
+      }
+      medicationRows.forEach((row) => {
+        console.log('hi1', row)
+        calTotal(row)
       })
 
       serviceRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       consumableRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       vaccinationRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       setFieldValue('medicationPackageItem', medicationRows)
@@ -269,13 +269,13 @@ const InventoryTypeListing = ({
         totalPrice: total,
       })
 
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
+      // dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
     },
     [
       medicationRows,
@@ -398,13 +398,13 @@ const InventoryTypeListing = ({
                 o.serviceCenterId === serviceName,
             ) || {}
           if (serviceCenterService) {
+            const item = servicess.find((o) => o.value === serviceFK)
             rows[0] = {
               ...rows[0],
               isDeleted: false,
               tempServiceCenterServiceFK:
                 serviceCenterService.serviceCenter_ServiceId,
-              tempServiceName: servicess.find((o) => o.value === serviceFK)
-                .name,
+              tempServiceName: item ? item.name : undefined,
             }
           }
 
@@ -420,7 +420,7 @@ const InventoryTypeListing = ({
           return rows
       }
     } else if (changed) {
-      Object.entries(changed).map(([ key, value,
+      Object.entries(changed).map(([ key, value
       ]) => {
         const getType = (t) => {
           switch (t) {
@@ -576,13 +576,13 @@ const InventoryTypeListing = ({
     row.unitPrice = sellingPrice
     row.subTotal = undefined
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   const medicationProps = {
@@ -740,13 +740,13 @@ const InventoryTypeListing = ({
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceCenterServiceFK = e.val
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // dispatch({
+          //   // force current edit row components to update
+          //   type: 'global/updateState',
+          //   payload: {
+          //     commitCount: (commitCount += 1),
+          //   },
+          // })
         },
       },
       {
@@ -777,13 +777,13 @@ const InventoryTypeListing = ({
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceName = e.val
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // dispatch({
+          //   // force current edit row components to update
+          //   type: 'global/updateState',
+          //   payload: {
+          //     commitCount: (commitCount += 1),
+          //   },
+          // })
         },
       },
       {
@@ -845,7 +845,6 @@ const InventoryTypeListing = ({
     onAddedRowsChange: onAddedRowsChange('service'),
     onCommitChanges: onCommitChanges('servicePackageItem'),
   }
-
   return (
     <div>
       <CardContainer
