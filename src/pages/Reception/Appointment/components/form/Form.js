@@ -854,6 +854,7 @@ class Form extends React.PureComponent {
               overrideLoading
             >
               <PatientSearchModal
+                search={values.patientName}
                 handleSelectClick={this.onSelectPatientClick}
               />
             </CommonModal>

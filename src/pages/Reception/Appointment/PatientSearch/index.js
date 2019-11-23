@@ -46,10 +46,12 @@ class PatientSearch extends PureComponent {
     loading: Loading,
     render: (loaded) => {
       const Component = loaded.default
+      const { search } = this.props
       return (
         <Component
           renderActionFn={this.Cell}
           onRowDblClick={this.handleDoubleClick}
+          search={search}
           simple
           size='sm'
           disableQueryOnLoad
