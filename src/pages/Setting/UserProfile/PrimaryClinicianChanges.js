@@ -62,7 +62,6 @@ const PrimaryClinicianChanges = ({
             prefix='Primary Clinician: '
             value={selectedDoctorFK}
             onChange={handleChange}
-            autoFocus
           />
           {showError && (
             <Danger>

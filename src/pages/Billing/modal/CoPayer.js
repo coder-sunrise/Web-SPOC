@@ -155,7 +155,6 @@ class CoPayer extends Component {
               label='Corporate Copayer'
               code='ctcopayer'
               labelField='displayValue'
-              autoFocus
               // remoteFilter={{
               //   coPayerTypeFK: 1,
               // }}
