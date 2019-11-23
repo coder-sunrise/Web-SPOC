@@ -40,7 +40,7 @@ class Grid extends PureComponent {
               text
               currency
               value={
-                row.balance ? (
+                row.balance || row.balance === 0 ? (
                   currencySymbol + numeral(row.balance).format(currencyFormat)
                 ) : (
                   undefined
