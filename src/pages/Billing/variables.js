@@ -25,7 +25,10 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'invoiceItemTypeFK',
     // type: 'codeSelect',
     // code: 'ltinvoiceitemtype',
-    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFK],
+    render: (row) => {
+      if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
+      return ''
+    },
     disabled: true,
   },
   { columnName: 'itemName', disabled: true },
@@ -79,7 +82,10 @@ export const CoPayerColExtensions = [
     columnName: 'invoiceItemTypeFK',
     // type: 'codeSelect',
     // code: 'ltinvoiceitemtype',
-    render: (row) => INVOICE_ITEM_TYPE[row.invoiceItemTypeFK],
+    render: (row) => {
+      if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
+      return ''
+    },
     disabled: true,
   },
   {

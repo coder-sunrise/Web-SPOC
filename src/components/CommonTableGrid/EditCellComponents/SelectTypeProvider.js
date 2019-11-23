@@ -70,7 +70,7 @@ class SelectEditor extends PureComponent {
     // if (!commonCfg.error) commonCfg.open = true
 
     if (localFilter) commonCfg.options = commonCfg.options.filter(localFilter)
-    // console.log(commonCfg)
+    console.log({ commonCfg })
     if (columnName) {
       if (type === 'select') {
         return (
@@ -88,6 +88,7 @@ class SelectEditor extends PureComponent {
       }
       return null
     }
+
     return <TextField value={commonCfg.value} simple />
   }
 

@@ -438,6 +438,7 @@ const Grid = ({
             FuncProps={FuncConfig}
             onRowDoubleClick={onRowDoubleClick}
             onContextMenu={(row, event) => {
+              // console.log({ target: event.target.parentElement })
               event.preventDefault()
               handlePopoverOpen(event)
               setRightClickedRow(row)
