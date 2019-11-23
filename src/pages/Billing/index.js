@@ -63,6 +63,7 @@ const styles = (theme) => ({
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
+    console.log('map props to values')
     try {
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity
@@ -97,7 +98,9 @@ const styles = (theme) => ({
     const { dispatch } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
+    console.log({ payload })
 
+    router.push('/reception/queue')
     dispatch({
       type: 'billing/save',
       payload,
@@ -127,12 +130,12 @@ class Billing extends Component {
   }
 
   componentWillUnmount () {
-    // this.props.dispatch({
-    //   type: 'billing/updateState',
-    //   payload: {
-    //     entity: null,
-    //   },
-    // })
+    this.props.dispatch({
+      type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
   }
 
   toggleReport = () => {

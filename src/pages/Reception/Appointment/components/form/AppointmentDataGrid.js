@@ -213,7 +213,7 @@ class AppointmentDataGrid extends React.Component {
             // editingRowIds: editingRows,
             showAddCommand: !disabled,
             // showEditCommand: !disabled,
-            showDeleteCommand: !!data.length,
+            showDeleteCommand: data.length > 1,
             onCommitChanges: handleCommitChanges,
             // onEditingRowIdsChange: handleEditingRowsChange,
             // defaultNewRow: defaultNewRows,

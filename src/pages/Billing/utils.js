@@ -70,8 +70,9 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
 
   if (scheme.coPaymentByCategory.length > 0) {
     const itemCategory = scheme.coPaymentByCategory.find(
-      (category) => category.itemTypeFk === invoiceItem.invoiceItemTypeFk,
+      (category) => category.itemTypeFk === invoiceItem.invoiceItemTypeFK,
     )
+
     coverage = convertAmountToPercentOrCurrency(
       itemCategory.groupValueType,
       itemCategory.itemGroupValue,
@@ -136,7 +137,7 @@ export const getApplicableClaimAmount = (
     }
   } else if (coPaymentByCategory.length > 0) {
     const itemCategory = coPaymentByCategory.find(
-      (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFk,
+      (category) => category.itemTypeFk === invoicePayerItem.invoiceItemTypeFK,
     )
     const itemRemainingAmount =
       invoicePayerItem.payableBalance - (invoicePayerItem._claimedAmount || 0)
@@ -185,7 +186,7 @@ export const getApplicableClaimAmount = (
 const getItemTypeSubtotal = (list, type) =>
   list.reduce(
     (subtotal, item) =>
-      item.invoiceItemTypeFk === type ? subtotal + item.claimAmount : subtotal,
+      item.invoiceItemTypeFK === type ? subtotal + item.claimAmount : subtotal,
     0,
   )
 
