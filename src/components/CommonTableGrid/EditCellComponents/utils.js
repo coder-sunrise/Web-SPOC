@@ -143,10 +143,10 @@ function getCommonRender (cb) {
   if (render && !editMode) {
     return render(cfg.row)
   }
-  // console.log({ value })
-  // if (typeof value === 'object') {
-  //   return <span>{value}</span>
-  // }
+  console.log({ value })
+  if (typeof value === 'object' && React.isValidElement(value)) {
+    return <span>{value}</span>
+  }
   return cb(cfg)
 }
 
