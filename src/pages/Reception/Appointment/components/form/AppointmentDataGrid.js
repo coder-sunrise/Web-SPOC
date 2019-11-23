@@ -91,7 +91,6 @@ class AppointmentDataGrid extends React.Component {
           ...column,
           render: (row) => {
             const { clinicianFK } = row
-
             const { clinicianProfiles = [] } = this.props
             const clinicianProfile = clinicianProfiles.find(
               (item) => item.id === clinicianFK,

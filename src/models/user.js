@@ -98,6 +98,9 @@ export default {
       let user = JSON.parse(sessionStorage.getItem('user'))
       if (!user) {
         const response = yield call(queryCurrent)
+        if (!response) {
+          return
+        }
         const { data } = response
         if (data) {
           const accessRights = data.userClientAccessRightDto.reduce((a, b) => {

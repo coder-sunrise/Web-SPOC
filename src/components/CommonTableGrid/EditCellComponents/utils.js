@@ -137,13 +137,12 @@ function getCommonConfig () {
 }
 
 function getCommonRender (cb) {
-  const { value, editMode, row } = this.props
+  const { value, editMode } = this.props
   const cfg = getCommonConfig.call(this)
-  const { render } = cfg
-  if (render && !editMode) {
-    return render(cfg.row)
+  const { render, error, row } = cfg
+  if (render && !editMode && !error) {
+    return render(row)
   }
-  console.log({ value })
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>
   }
