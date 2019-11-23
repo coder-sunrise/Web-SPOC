@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-
+import numeral from 'numeral'
 import { Tooltip, withStyles } from '@material-ui/core'
 import { PanTool, Payment } from '@material-ui/icons'
 import Modal from './Modal'
@@ -10,7 +10,11 @@ import {
   CommonModal,
   CommonTableGrid,
   dateFormatLong,
+  CustomInput,
 } from '@/components'
+import config from '@/utils/config'
+
+const { currencyFormat, currencySymbol } = config
 
 class Grid extends PureComponent {
   state = {
@@ -28,13 +32,28 @@ class Grid extends PureComponent {
     columnExtensions: [
       {
         columnName: 'balance',
-        type: 'number',
-        currency: true,
         sortBy: 'PatientDeposit.balance',
+        align: 'right',
+        render: (row) => {
+          return (
+            <CustomInput
+              text
+              currency
+              value={
+                row.balance ? (
+                  currencySymbol + numeral(row.balance).format(currencyFormat)
+                ) : (
+                  undefined
+                )
+              }
+            />
+          )
+        },
       },
       {
         columnName: 'lastTransactionDate',
         type: 'date',
+        sortingEnabled: false,
         format: { dateFormatLong },
       },
       {
