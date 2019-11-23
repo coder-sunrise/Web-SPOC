@@ -146,6 +146,7 @@ export default createListViewModel({
             )
 
           const appointmentResources = datagrid
+            .filter((item) => item.id > 0 && !item.isDeleted)
             .map(mapDatagridToAppointmentResources(isRecurrenceChanged))
             .sort(sortDataGrid)
             .map((item, index) => ({

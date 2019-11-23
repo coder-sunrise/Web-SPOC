@@ -82,7 +82,6 @@ class Detail extends PureComponent {
                     <CodeSelect
                       code='LTDocumentTemplateType'
                       label='Document Type'
-                      autoFocus
                       {...args}
                     />
                   )
@@ -97,7 +96,7 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <TextField
                     label='Code'
-                    autoFocused
+                    autoFocus
                     {...args}
                     disabled={!!settingDocumentTemplate.entity}
                   />

@@ -15,7 +15,13 @@ const RowErrorStyles = () => ({
   },
   tooltip: {
     ...tooltip,
-    padding: '10px 5px',
+    '& > ul': {
+      marginBottom: '0px !important',
+      paddingInlineStart: '10px !important',
+    },
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingRight: 10,
     background: '#4f4f4f',
     maxWidth: 400,
     textAlign: 'left',
@@ -26,7 +32,9 @@ const RowErrorStyles = () => ({
 const ListTypeError = ({ errors }) => {
   return (
     <ul>
-      {errors.map((error, index) => <li key={`rowError-${index}`}>{error}</li>)}
+      {errors.map((error, index) => (
+        <li key={`rowError-${index}`}>{error.conflictContent}</li>
+      ))}
     </ul>
   )
 }

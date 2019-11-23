@@ -155,24 +155,9 @@ class Appointment extends React.PureComponent {
               doctorName: primaryClinician.clinicianProfile.name,
             },
           ]
-
-          // this.setState({
-          //   primaryClinicianFK: primaryClinician.clinicianProfile.id,
-          //   resources: [
-          //     {
-          //       clinicianFK: primaryClinician.clinicianProfile.id,
-          //       doctorName: primaryClinician.clinicianProfile.name,
-          //     },
-          //   ],
-          // })
         }
       }
-      console.log({
-        filterByApptType,
-        filterByDoctor,
-        primaryClinicianFK,
-        resources,
-      })
+
       this.setState((preState) => ({
         filter: {
           ...preState.filter,
@@ -183,33 +168,6 @@ class Appointment extends React.PureComponent {
         resources,
       }))
     })
-
-    // dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: { code: 'doctorprofile' },
-    // }).then((response) => {
-    //   const primaryClinician = response.find(
-    //     (item) =>
-    //       parseInt(item.id, 10) ===
-    //       parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
-    //   )
-    //   if (primaryClinician)
-    //     this.setState((preState) => ({
-    //       filter: {
-    //         ...preState.filter,
-    //         filterByDoctor: [
-    //           primaryClinician.clinicianProfile.id,
-    //         ],
-    //       },
-    //       primaryClinicianFK: primaryClinician.clinicianProfile.id,
-    //       resources: [
-    //         {
-    //           clinicianFK: primaryClinician.clinicianProfile.id,
-    //           doctorName: primaryClinician.clinicianProfile.name,
-    //         },
-    //       ],
-    //     }))
-    // })
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },

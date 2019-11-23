@@ -1,8 +1,9 @@
 import { timeFormat } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
+import ErrorPopover from './ErrorPopover'
 
 export const AppointmentDataColumn = [
-  { name: 'conflict', title: ' ' },
+  { name: 'conflicts', title: ' ' },
   { name: 'clinicianFK', title: 'Doctor' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
@@ -13,12 +14,17 @@ export const AppointmentDataColumn = [
 
 export const AppointmentDataColExtensions = [
   {
-    columnName: 'conflict',
-    type: 'error',
+    columnName: 'conflicts',
+    // type: 'error',
     editingEnabled: false,
     sortingEnabled: false,
     disabled: true,
     width: 60,
+    render: (row) => {
+      if (row.conflicts && row.conflicts.length > 0)
+        return <ErrorPopover errors={row.conflicts} />
+      return null
+    },
   },
   // {
   //   columnName: 'clinicianFK',
