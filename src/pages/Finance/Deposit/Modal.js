@@ -35,6 +35,7 @@ const style = () => ({
   authority: 'finance/deposit',
   mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
+      const { patientDepositTransaction, balance } = deposit.entity
       const transactionTypeFK = isDeposit ? 1 : 2
       const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
       const transactionModeFK = isDeposit ? undefined : 3
@@ -46,10 +47,10 @@ const style = () => ({
           transactionType,
           transactionTypeFK,
           transactionModeFK,
-
           amount: 0,
         },
-        balanceAfter: deposit.entity.balance,
+        balanceAfter: balance,
+        hasTransactionBefore: !!patientDepositTransaction,
       }
     }
     return deposit.default
@@ -106,7 +107,11 @@ const style = () => ({
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable } = props
-    const { balanceAfter, patientDepositTransaction } = values
+    const {
+      balanceAfter,
+      patientDepositTransaction,
+      hasTransactionBefore,
+    } = values
     const {
       transactionModeFK,
       creditCardTypeFK,
@@ -127,8 +132,10 @@ const style = () => ({
       type: 'deposit/updateDeposit',
       payload: {
         ...values,
-        id: undefined,
-        concurrencyToken: undefined,
+        id: hasTransactionBefore ? values.id : undefined,
+        concurrencyToken: hasTransactionBefore
+          ? values.concurrencyToken
+          : undefined,
         balance: balanceAfter,
         patientDepositTransaction: {
           ...restDepositTransaction,
@@ -461,6 +468,7 @@ class Modal extends PureComponent {
                   onChange={this.calculateBalanceAfter}
                   {...commonAmountOpts}
                   prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
+                  min={0}
                   {...args}
                 />
               )}
