@@ -57,7 +57,14 @@ const GridContextMenuButton = ({
   }
 
   const MenuItemsOverlay = (
-    <Menu onClick={handleClick} className={classes.menu}>
+    <Menu
+      id='gridContextMenuButton'
+      onClick={handleClick}
+      className={classes.menu}
+      onContextMenu={(event) => {
+        event.preventDefault()
+      }}
+    >
       {contextMenuOptions.map(
         (
           { disabled, label, Icon, id, isDivider, hidden, authority },
@@ -68,7 +75,10 @@ const GridContextMenuButton = ({
           const menu = (
             <Menu.Item
               key={id}
-              id={id}
+              id={`gridContextMenuButton-${id}`}
+              onContextMenu={(event) => {
+                event.preventDefault()
+              }}
               disabled={disabled || rights === 'disable'}
             >
               <Icon className={classes.icon} />
