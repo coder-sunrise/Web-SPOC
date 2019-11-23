@@ -103,6 +103,7 @@ const dateFormat = 'DD-MM-YYYY'
 const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
 const dateFormatLongWithTime = 'DD MMM YYYY HH:mm:ss'
 const dateFormatLongWithTimeNoSec = 'DD MMM YYYY, HH:mm A'
+const dateFormatLongWithTimeNoSec12h = 'DD MMM YYYY, hh:mm A'
 // const timeFormat = 'HH:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm A'
@@ -148,12 +149,12 @@ const TimeFormatter = ({ value, ...rest }) => {
   return value
 }
 
-const DateFormatter = ({ value, full = false }) => {
-  const format = full ? fullDateTime : dateFormatLong
+const DateFormatter = ({ value, full = false, format }) => {
+  const _format = format || (full ? fullDateTime : dateFormatLong)
   if (!value) return null
-  if (moment.isMoment(value)) return value.format(format)
+  if (moment.isMoment(value)) return value.format(_format)
 
-  return moment(value).isValid() ? moment(value).format(format) : value
+  return moment(value).isValid() ? moment(value).format(_format) : value
 
   // return moment.isMoment(value)
   //   ? value.format(format)
@@ -201,6 +202,7 @@ module.exports = {
   dateFormatWithTime,
   dateFormatLongWithTime,
   dateFormatLongWithTimeNoSec,
+  dateFormatLongWithTimeNoSec12h,
   dateFormatLong,
   fullDateTime,
   timeFormatSmallCase,
