@@ -98,7 +98,6 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'patientSearch/query',
                     payload: {
-                      keepFilter: false,
                       group: [
                         {
                           // [`${prefix}patientReferenceNo`]: search,
