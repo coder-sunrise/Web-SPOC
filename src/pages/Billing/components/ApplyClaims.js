@@ -1,7 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
-import Save from '@material-ui/icons/Save'
 import Add from '@material-ui/icons/AddCircle'
 import Reset from '@material-ui/icons/Cached'
 // common components
@@ -80,7 +79,6 @@ const ApplyClaims = ({
   classes,
   values,
   setValues,
-  setFieldValue,
   submitCount,
   handleIsEditing,
 }) => {
@@ -150,9 +148,10 @@ const ApplyClaims = ({
         schemeCoverageType, // for sending to backend
       } = getCoverageAmountAndType(scheme, item)
 
-      const invoiceItemTypeFK = item.invoiceItemTypeFk
-        ? item.invoiceItemTypeFk
-        : item.invoiceItemTypeFK
+      // const invoiceItemTypeFK = item.invoiceItemTypeFk
+      //   ? item.invoiceItemTypeFk
+      //   : item.invoiceItemTypeFK
+      const { invoiceItemTypeFK } = item
       if (existed)
         return [
           ...newList,
@@ -178,7 +177,7 @@ const ApplyClaims = ({
         },
       ]
     }, [])
-
+    console.log({ _invoiceItems })
     return [
       ..._invoiceItems,
     ]
@@ -497,35 +496,39 @@ const ApplyClaims = ({
     () => {
       if (values.invoicePayer.length > 0) {
         const newInvoicePayers = values.invoicePayer.map((ip) => {
-          // console.log({ ip })
           if (ip.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
             const _claimableSchemesIndex = claimableSchemes.findIndex(
               (cs) =>
                 cs.find((_cs) => _cs.id === ip.copaymentSchemeFK) !== undefined,
             )
-            const schemeConfig = claimableSchemes[_claimableSchemesIndex].find(
-              (cs) => cs.id === ip.copaymentSchemeFK,
-            )
 
-            return {
-              ...ip,
-              invoicePayerItem: ip.invoicePayerItem.map((item) => {
-                const { coverage } = getCoverageAmountAndType(
-                  schemeConfig,
-                  item,
-                )
-                const invoiceItemTypeFK =
-                  INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
-                return { ...item, coverage, invoiceItemTypeFK }
-              }),
-              schemeConfig,
-              _indexInClaimableSchemes: _claimableSchemesIndex,
+            if (claimableSchemes[_claimableSchemesIndex]) {
+              const schemeConfig = claimableSchemes[
+                _claimableSchemesIndex
+              ].find((cs) => cs.id === ip.copaymentSchemeFK)
 
-              _isConfirmed: true,
-              _isDeleted: false,
-              _isEditing: false,
-              _isValid: true,
-              claimableSchemes: claimableSchemes[_claimableSchemesIndex],
+              return {
+                ...ip,
+                invoicePayerItem: ip.invoicePayerItem.map((item) => {
+                  const { coverage } = getCoverageAmountAndType(
+                    schemeConfig,
+                    item,
+                  )
+                  const invoiceItemTypeFK =
+                    item.invoiceItemTypeFK === undefined && item.itemType
+                      ? INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
+                      : item.invoiceItemTypeFK
+                  return { ...item, coverage, invoiceItemTypeFK }
+                }),
+                schemeConfig,
+                _indexInClaimableSchemes: _claimableSchemesIndex,
+
+                _isConfirmed: true,
+                _isDeleted: false,
+                _isEditing: false,
+                _isValid: true,
+                claimableSchemes: claimableSchemes[_claimableSchemesIndex],
+              }
             }
           }
           return {
@@ -737,6 +740,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
+  console.log({ values })
   return (
     <React.Fragment>
       <GridItem md={2}>

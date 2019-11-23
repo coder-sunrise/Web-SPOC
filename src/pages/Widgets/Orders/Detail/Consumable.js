@@ -130,11 +130,19 @@ class Consumable extends PureComponent {
   }
 
   render () {
-    const { theme, values, footer, handleSubmit, setFieldValue, classes, disableEdit } = this.props
+    const {
+      theme,
+      values,
+      footer,
+      handleSubmit,
+      setFieldValue,
+      classes,
+      disableEdit,
+    } = this.props
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
             <FastField
               name='inventoryConsumableFK'
               render={(args) => {

@@ -48,11 +48,11 @@ export const PrescriptionColumns = [
   },
   {
     name: 'adjAmt',
-    title: 'Adj ($)',
+    title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
-    title: 'Total Price ($)',
+    name: 'totalAfterGST',
+    title: 'Total Price Incl. GST ($)',
   },
   {
     name: 'action',
@@ -68,7 +68,7 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfterItemAdjustment',
+    columnName: 'totalAfter',
     type: 'currency',
   },
   {
@@ -186,11 +186,11 @@ export const VaccinationColumn = [
   },
   {
     name: 'adjAmt',
-    title: 'Adj ($)',
+    title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
-    title: 'Total Price ($)',
+    name: 'totalAfter',
+    title: 'Total Price Incl. GST ($)',
   },
 ]
 
@@ -198,7 +198,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfterItemAdjustment',
+    columnName: 'totalAfter',
     type: 'currency',
   },
   {
@@ -251,11 +251,11 @@ export const OtherOrdersColumns = [
   },
   {
     name: 'adjAmt',
-    title: 'Adj ($)',
+    title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterItemAdjustment',
-    title: 'Total Price ($)',
+    name: 'totalAfter',
+    title: 'Total Price Incl. GST ($)',
   },
   {
     name: 'action',
@@ -295,13 +295,13 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
-    columnName: 'totalAfterItemAdjustment',
+    columnName: 'totalAfter',
     // type: 'currency',
     align: 'right',
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+      return <NumberInput text currency value={row.totalAfter} />
     },
   },
   {

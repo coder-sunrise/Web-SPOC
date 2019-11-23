@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Search, PermIdentity } from '@material-ui/icons'
+import { Search, PersonAdd } from '@material-ui/icons'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 import {
@@ -161,8 +161,8 @@ class FilterBar extends PureComponent {
                   })
                 }}
               >
-                <PermIdentity />
-                New Patient
+                <PersonAdd />
+                <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
               </Button>
             </div>
           </GridItem>

@@ -10,7 +10,7 @@ import { DateRangePicker, DateFormatter, dateFormatLong } from '@/components'
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 class DateEditorBase extends React.Component {
@@ -82,18 +82,16 @@ class DateEditorBase extends React.Component {
   //   }
   // }
 
-  render () {
-    const {
-      type,
-      code,
-      columnName,
-      options,
-      row,
-      format,
-      editMode,
-      ...commonCfg
-    } = getCommonConfig.call(this)
-
+  renderComponent = ({
+    type,
+    code,
+    columnName,
+    options,
+    row,
+    format,
+    editMode,
+    ...commonCfg
+  }) => {
     if (!commonCfg.timeFormat) {
       commonCfg.timeFormat = false
     }
@@ -117,11 +115,11 @@ class DateEditorBase extends React.Component {
       commonCfg.autoFocus = true
     }
     // console.log(commonCfg)
-    return (
-      <div ref={this.myRef}>
-        <DateRangePicker {...commonCfg} />
-      </div>
-    )
+    return <DateRangePicker {...commonCfg} />
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 

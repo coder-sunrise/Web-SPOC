@@ -273,7 +273,7 @@ class EditableTableGrid extends React.Component {
         const n = changed[getRowId(row)]
           ? {
               ...row,
-              // ...window.$tempGridRow[this.gridId][getRowId(row)],
+              ...window.$tempGridRow[this.gridId][getRowId(row)],
               ...changed[getRowId(row)],
             }
           : row

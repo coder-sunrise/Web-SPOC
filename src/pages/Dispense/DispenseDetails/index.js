@@ -71,6 +71,7 @@ const DispenseDetails = ({
   onEditOrderClick,
   onFinalizeClick,
   codetable,
+  dispense,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
@@ -183,7 +184,7 @@ const DispenseDetails = ({
             rows={invoiceItem}
             adjustments={invoiceAdjustment}
             config={{
-              isGSTInclusive: invoice.isGSTInclusive,
+              isGSTInclusive: dispense.isGSTInclusive || invoice.isGSTInclusive,
               totalField: 'totalAfterItemAdjustment',
               adjustedField: 'totalAfterOverallAdjustment',
               gstField: 'totalAfterGST',
@@ -198,6 +199,7 @@ const DispenseDetails = ({
                 outstandingBalance: v.summary.totalWithGST,
                 invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
                 invoiceAdjustment: v.adjustments,
+                isGSTInclusive: !!v.summary.isGSTInclusive,
               }
               setFieldValue('invoice', newInvoice)
               // setFieldValue('invoice.invoiceTotal', v.summary.total)
@@ -224,6 +226,7 @@ const DispenseDetails = ({
                 type: `dispense/updateState`,
                 payload: {
                   totalWithGST: v.summary.totalWithGST,
+                  isGSTInclusive: v.summary.isGSTInclusive,
                 },
               })
             }}

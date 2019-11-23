@@ -20,7 +20,7 @@ import {
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 const { currencyFormat, qtyFormat, currencySymbol } = config
@@ -45,7 +45,6 @@ class NumberEditor extends PureComponent {
 
   constructor (props) {
     super(props)
-    this.myRef = React.createRef()
   }
 
   componentDidMount () {
@@ -61,10 +60,7 @@ class NumberEditor extends PureComponent {
     })
   }
 
-  render () {
-    const { currency, type, editMode, ...commonCfg } = getCommonConfig.call(
-      this,
-    )
+  renderComponent = ({ currency, type, editMode, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onKeyDown = this.props.onKeyDown
@@ -72,21 +68,22 @@ class NumberEditor extends PureComponent {
       commonCfg.onFocus = this.props.onFocus
       commonCfg.autoFocus = true
       commonCfg.debounceDuration = 0
+      // commonCfg.inputProps={{
+      //   fullWidth: true,
+      // }}
     }
-
+    if (commonCfg.text) {
+      // commonCfg.rightAlign = true
+      commonCfg.style = {
+        display: 'inline-block',
+      }
+    }
     commonCfg.currency = currency || type === 'currency'
+    return <NumberInput {...commonCfg} />
+  }
 
-    return (
-      <div ref={this.myRef}>
-        <NumberInput
-          rightAlign
-          inputProps={{
-            fullWidth: true,
-          }}
-          {...commonCfg}
-        />
-      </div>
-    )
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 

@@ -29,6 +29,7 @@ const Deposit = ({
               <NumberInput
                 label='Amount'
                 {...args}
+                min={0}
                 currency
                 max={maxAmount}
                 onChange={handleAmountChange}

@@ -58,7 +58,7 @@ const PaymentTypeRow = ({
           <p style={{ textDecoration: 'none' }}>{mode.displayValue}</p>
         </GridItem>
         <GridItem md={4} className={classes.hotkey}>
-          <p>{mode.hotkey || '(F1)'}</p>
+          <p>{mode.hotKey ? `(${mode.hotKey})` : ''}</p>
         </GridItem>
       </GridContainer>
     </Button>

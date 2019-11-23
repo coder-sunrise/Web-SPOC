@@ -96,7 +96,13 @@ class Details extends PureComponent {
   }
 
   render () {
-    const { columns, showCollectPayment, showModal } = this.state
+    const {
+      columns,
+      showCollectPayment,
+      showModal,
+      extractRows,
+      selectedRows,
+    } = this.state
     const { classes, statement, values, theme } = this.props
     return (
       <div>
@@ -187,12 +193,13 @@ class Details extends PureComponent {
           onConfirm={this.handleClick}
           observe='statementExtract'
         >
-          <ExtractAsSingle selectedRows={this.state.extractRows} />
+          <ExtractAsSingle selectedRows={extractRows} />
         </CommonModal>
         <Button
           style={{ marginTop: 10 }}
           color='primary'
           onClick={this.handleClick}
+          disabled={selectedRows.length <= 0}
         >
           Extract As Single
         </Button>

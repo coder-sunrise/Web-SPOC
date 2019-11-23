@@ -127,6 +127,8 @@ const style = () => ({
       type: 'deposit/updateDeposit',
       payload: {
         ...values,
+        id: undefined,
+        concurrencyToken: undefined,
         balance: balanceAfter,
         patientDepositTransaction: {
           ...restDepositTransaction,
@@ -191,24 +193,8 @@ class Modal extends PureComponent {
       this.setState({ isSessionRequired: false })
     } else {
       this.setState({ isSessionRequired: true })
-
-      // dispatch({
-      //   type: 'deposit/bizSessionList',
-      //   payload: {
-      //     sessionNoPrefix: selectedDate,
-      //     pagesize: 999999,
-      //   },
-      // }).then(() => {
-      //   const { bizSessionList } = this.props.deposit
-      //   setFieldValue(
-      //     'patientDepositTransaction.transactionBizSessionFK',
-      //     bizSessionList.length === 0 || bizSessionList === undefined
-      //       ? ''
-      //       : bizSessionList[0].value,
-      //   )
-      // })
-      this.getBizList(selectedDate)
     }
+    this.getBizList(selectedDate)
   }
 
   getBizList = (e) => {
@@ -277,9 +263,9 @@ class Modal extends PureComponent {
     const { isSessionRequired, isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
-      prefixProps: {
-        style: { width: '100%' },
-      },
+      fullWidth: true,
+      rightAlign: true,
+      noUnderline: true,
     }
 
     return (
@@ -451,7 +437,7 @@ class Modal extends PureComponent {
             </GridItem>
            */}
 
-          <div style={{ width: '50%', margin: 'auto' }}>
+          <div style={{ width: '40%', margin: 'auto' }}>
             <Field
               name='balance'
               render={(args) => (
@@ -461,8 +447,6 @@ class Modal extends PureComponent {
                     marginTop: theme.spacing.unit * 2,
                   }}
                   disabled
-                  simple
-                  noUnderline
                   defaultValue='0.00'
                   prefix='Balance'
                   {...args}
@@ -473,7 +457,6 @@ class Modal extends PureComponent {
               name='patientDepositTransaction.amount'
               render={(args) => (
                 <NumberInput
-                  noUnderline
                   defaultValue='0.00'
                   onChange={this.calculateBalanceAfter}
                   {...commonAmountOpts}
@@ -482,7 +465,7 @@ class Modal extends PureComponent {
                 />
               )}
             />
-            <Divider style={{ width: '50%', float: 'right' }} />
+            <Divider style={{ width: '45%', float: 'right' }} />
             <Field
               name='balanceAfter'
               render={(args) => (
@@ -490,7 +473,6 @@ class Modal extends PureComponent {
                   style={{ top: -5 }}
                   {...commonAmountOpts}
                   disabled
-                  noUnderline
                   defaultValue='0.00'
                   prefix=' '
                   {...args}

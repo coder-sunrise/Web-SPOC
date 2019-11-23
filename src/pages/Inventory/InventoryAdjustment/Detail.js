@@ -285,13 +285,15 @@ class Detail extends PureComponent {
         ],
         onChange: (e) => {
           this.setState({ type: `inventory${e.val}` })
-          this.props.dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // this.props.dispatch(
+          //   {
+          //     // force current edit row components to update
+          //     // type: 'global/updateState',
+          //     // payload: {
+          //     //   commitCount: (commitCount += 1),
+          //     // },
+          //   },
+          // )
         },
       },
       {
@@ -388,13 +390,13 @@ class Detail extends PureComponent {
     const { dispatch, values, inventoryAdjustment, setValues } = this.props
     await this.initializeStateItemList()
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
     if (values.stockList) {
       const newStockList = values.stockList.map((o) => {
         return {
@@ -481,13 +483,13 @@ class Detail extends PureComponent {
 
     this.setOption(medication, consumable, vaccination)
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   setOption = (m, c, v) => {
@@ -652,13 +654,13 @@ class Detail extends PureComponent {
         // row.concurrencyToken = undefined
       }
     }
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   type = (v) => {
@@ -733,13 +735,13 @@ class Detail extends PureComponent {
       }
     }
 
-    this.props.dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // this.props.dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   onCommitChanges = ({ rows, deleted }) => {
