@@ -180,6 +180,9 @@ export const getTimeObject = (value) => {
 }
 
 export const compare = (start, end) => {
+  if (!start || !end) {
+    return false
+  }
   const { hour: startHour, minute: startMinute } = start
   const { hour: endHour, minute: endMinute } = end
   if (

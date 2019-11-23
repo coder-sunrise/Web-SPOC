@@ -331,8 +331,9 @@ class Form extends React.PureComponent {
       // )
       const afterDelete = datagrid.map((item) => ({
         ...item,
-        isDeleted: deleted.includes(item.id),
+        isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
+      console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
@@ -464,6 +465,13 @@ class Form extends React.PureComponent {
         type: 'calendar/submit',
         payload: submitPayload,
       }).then((response) => {
+        if (validate)
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              commitCount: 99,
+            },
+          })
         if (response) {
           onConfirm()
         }
@@ -752,6 +760,7 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
+            .filter((item) => !item.isDeleted)
             .sort(sortDataGrid)
             .map((item, index) => ({ ...item, sortOrder: index }))
             .reduce(
