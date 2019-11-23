@@ -250,7 +250,7 @@ class Detail extends PureComponent {
               <FastField
                 name='roomFK'
                 render={(args) => (
-                  <CodeSelect label='Room' autoFocus code='ctRoom' {...args} />
+                  <CodeSelect label='Room' code='ctRoom' {...args} />
                 )}
               />
             </GridItem>

@@ -130,7 +130,6 @@ const DoctorEventForm = ({
             render={(args) => (
               <DoctorProfileSelect
                 {...args}
-                autoFocus
                 valueField='clinicianProfile.userProfileFK'
               />
             )}
