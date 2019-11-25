@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
@@ -12,7 +13,7 @@ import { InputNumber } from 'antd'
 import { isNumber } from 'util'
 import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
-import { extendFunc } from '@/utils/utils'
+import { extendFunc, roundTo } from '@/utils/utils'
 import config from '@/utils/config'
 
 const { currencyFormat, percentageFormat, currencySymbol } = config
@@ -104,6 +105,7 @@ class AntdNumberInput extends React.PureComponent {
     max: PropTypes.number,
     min: PropTypes.number,
     debounceDuration: PropTypes.number,
+    precision: PropTypes.number,
   }
 
   static defaultProps = {
@@ -113,19 +115,29 @@ class AntdNumberInput extends React.PureComponent {
     max: 999999999,
     min: -999999999,
     debounceDuration: 1000,
+    precision: 1,
   }
 
   constructor (props) {
     super(props)
-    const { field = {}, defaultValue, value, debounceDuration } = props
+    const {
+      field = {},
+      defaultValue,
+      value,
+      debounceDuration,
+      precision,
+    } = props
     this.state = {
-      value:
-        field.value !== undefined && field.value !== ''
-          ? field.value
-          : defaultValue || value,
+      value: roundTo(
+        Number(
+          field.value !== undefined && field.value !== ''
+            ? field.value
+            : defaultValue || value,
+        ),
+        precision,
+      ),
       focused: false,
     }
-    // console.log(this.state.value)
 
     this.debouncedOnChange = _.debounce(
       this._onChange.bind(this),
@@ -294,7 +306,7 @@ class AntdNumberInput extends React.PureComponent {
       newV = this.props.max
     }
     if (newV === undefined || newV === null) newV = ''
-    console.log(!newV && newV !== 0 ? '' : newV)
+    // console.log(!newV && newV !== 0 ? '' : newV)
     this.setState({
       value: !newV && newV !== 0 ? '' : newV,
     })
@@ -346,20 +358,38 @@ class AntdNumberInput extends React.PureComponent {
       min,
       parser,
       field,
+      precision,
     } = this.props
     let { format } = this.props
     const extraCfg = {
+      precision,
       formatter,
       max,
       min,
     }
+
+    if (!format) {
+      if (!extraCfg.precision && currency) {
+        extraCfg.precision = 2
+      }
+      let precisionStr = '.'
+      for (let i = 0; i < extraCfg.precision; i++) {
+        precisionStr += '0'
+      }
+      if (currency) {
+        format =
+          `${currencySymbol}0,0` + (precisionStr.length > 1 ? precisionStr : '')
+      } else {
+        format = `0` + (precisionStr.length > 1 ? precisionStr : '')
+      }
+    }
+
     if (currency) {
-      if (!format) format = `${currencySymbol}${currencyFormat}`
       extraCfg.formatter = (v) => {
         if (v === '') return ''
         if (!this.state.focused) {
           const nv = numeral(v)
-          if (nv._value < 0) return nv.format(`(${format})`)
+          if (nv._value < 0) return `(${numeral(Math.abs(v)).format(format)})`
 
           return nv.format(format)
         }
@@ -409,7 +439,6 @@ class AntdNumberInput extends React.PureComponent {
           : ''
       extraCfg.parser = (v) => {
         if (v === '') return v
-
         // console.log('parser', v)
         if (v) {
           if (v.indexOf('+') >= 0) {
@@ -439,7 +468,8 @@ class AntdNumberInput extends React.PureComponent {
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
       }
-      if (dotPos.length) extraCfg.precision = dotPos.length
+      if (dotPos.length && !extraCfg.precision)
+        extraCfg.precision = dotPos.length
     }
     return extraCfg
   }
@@ -466,6 +496,7 @@ class AntdNumberInput extends React.PureComponent {
     if (this.props.text) {
       if (!this.state.value && this.state.value !== 0) return <span>-</span>
       const cfg = this.getConfig()
+      // console.log(this.state.value, cfg.formatter(this.state.value))
       return (
         <AutosizeInput
           readOnly
@@ -503,7 +534,7 @@ class AntdNumberInput extends React.PureComponent {
         value:
           field.value === undefined || Number.isNaN(Number(field.value))
             ? ''
-            : Number(field.value),
+            : roundTo(Number(field.value), nextProps.precision),
         // focused:
         //   field.value !== undefined &&
         //   field.value !== null &&
@@ -515,7 +546,7 @@ class AntdNumberInput extends React.PureComponent {
         value:
           value === undefined || Number.isNaN(Number(value))
             ? ''
-            : Number(value),
+            : roundTo(Number(value), nextProps.precision),
         // focused:
         //   value !== undefined &&
         //   value !== null &&

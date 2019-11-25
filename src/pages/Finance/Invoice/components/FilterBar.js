@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 // formik
 import { FastField } from 'formik'
 import { FormattedMessage } from 'umi/locale'
@@ -18,6 +18,18 @@ import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
 
 const FilterBar = ({ classes, dispatch, values }) => {
+  const unmount = () =>
+    dispatch({
+      type: 'invoiceList/updateState',
+      payload: {
+        filter: {},
+      },
+    })
+
+  useEffect(() => {
+    return unmount
+  }, [])
+
   const getBizSessionId = async () => {
     const bizSessionPayload = {
       IsClinicSessionClosed: false,
@@ -51,7 +63,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
     dispatch({
       type: 'invoiceList/query',
       payload: {
-        keepFilter: false,
+        // keepFilter: false,
         // combineCondition: 'and',
         lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
         lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,

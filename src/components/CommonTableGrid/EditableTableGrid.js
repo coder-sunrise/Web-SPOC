@@ -139,7 +139,7 @@ class EditableTableGrid extends React.Component {
     //   addedRows: row,
     // })
     if (row.length === 0) {
-      console.log(window.$tempGridRow, this.gridId)
+      // console.log(window.$tempGridRow, this.gridId)
       if (window.$tempGridRow[this.gridId])
         delete window.$tempGridRow[this.gridId][undefined]
     } else if (window.$tempGridRow[this.gridId]) {

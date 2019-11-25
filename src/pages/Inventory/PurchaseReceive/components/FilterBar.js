@@ -182,7 +182,6 @@ class FilterBar extends PureComponent {
                 dispatch({
                   type: 'purchaseReceiveList/query',
                   payload: {
-                    keepFilter: false,
                     lgteql_purchaseOrderDate: fromToDates(0),
                     lsteql_purchaseOrderDate: fromToDates(1),
                     purchaseOrderNo,

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { Search, Add } from '@material-ui/icons'
@@ -32,6 +32,18 @@ const styles = (theme) => ({
   },
 })
 const FilterBar = ({ classes, dispatch, history, values }) => {
+  const unmount = () =>
+    dispatch({
+      type: 'invoiceList/updateState',
+      payload: {
+        filter: {},
+      },
+    })
+
+  useEffect(() => {
+    return unmount
+  }, [])
+
   return (
     <div className={classes.filterBar}>
       <GridContainer>
@@ -109,7 +121,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 dispatch({
                   type: 'consumable/query',
                   payload: {
-                    keepFilter: false,
                     code,
                     displayValue,
                     FavouriteSupplierFkNavigation: {

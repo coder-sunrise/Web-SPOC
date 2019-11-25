@@ -134,9 +134,12 @@ class Appointment extends React.PureComponent {
       let resources = []
       let primaryClinicianFK
 
-      if (appointmentTypes) {
-        filterByApptType = appointmentTypes.map((item) => item.id)
-      }
+      // if (appointmentTypes) {
+      //   filterByApptType = [
+      //     -99,
+      //     ...appointmentTypes.map((item) => item.id),
+      //   ]
+      // }
 
       if (doctorprofile) {
         const primaryClinician = doctorprofile.find(
