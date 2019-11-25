@@ -26,6 +26,7 @@ const PatientInfoSideBanner = ({
   entity,
   loading,
   dispatch,
+  setValues,
 }) => {
   const entityNameClass = classnames({
     [classes.cardCategory]: true,
@@ -51,6 +52,8 @@ const PatientInfoSideBanner = ({
           payload: {
             id: entity.id,
           },
+        }).then((pat) => {
+          setValues(pat)
         })
 
         const {
