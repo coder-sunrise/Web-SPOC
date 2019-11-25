@@ -90,3 +90,8 @@ export const constructClinicBreakHoursData = (breakHoursList) => {
   }, [])
   return result
 }
+
+export const isSavePayloadOk = (payload) => {
+  console.log({ payload })
+  return false
+}

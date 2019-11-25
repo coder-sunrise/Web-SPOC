@@ -172,10 +172,9 @@ export const QueueColumnExtensions = [
   { columnName: 'queueNo', width: 80, compare: compareQueueNo },
   { columnName: 'patientAccountNo', compare: compareString },
 
-  { columnName: 'invoiceNo', render: (row) => row.invoiceNo || '-' },
+  { columnName: 'invoiceNo' },
   {
     columnName: 'roomNo',
-    render: (row) => row.roomNo || '-',
   },
   // {
   //   columnName: 'patientScheme',
@@ -265,18 +264,20 @@ export const QueueColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 160,
-    compare: compareTime,
-    render: (row) => {
-      if (row.appointmentTime) {
-        const appointmentDate = moment(row.appointmentTime).format(dateFormat)
-        return DateFormatter({
-          value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          full: true,
-        })
-      }
-      return '-'
-    },
+    width: 180,
+    type: 'date',
+    showTime: true,
+    // compare: compareTime,
+    // render: (row) => {
+    //   if (row.appointmentTime) {
+    //     const appointmentDate = moment(row.appointmentTime).format(dateFormat)
+    //     return DateFormatter({
+    //       value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
+    //       full: true,
+    //     })
+    //   }
+    //   return '-'
+    // },
   },
   {
     columnName: 'doctor',

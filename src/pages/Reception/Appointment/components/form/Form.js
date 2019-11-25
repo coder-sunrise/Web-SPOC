@@ -334,7 +334,7 @@ class Form extends React.PureComponent {
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
-      console.log({ deleted, datagrid, afterDelete })
+      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
@@ -371,6 +371,14 @@ class Form extends React.PureComponent {
     }
   }
 
+  checkHasError = (datagrid = []) => {
+    const hasError = datagrid.reduce(
+      (error, data) => data._errors.length > 0 || error,
+      false,
+    )
+    return hasError
+  }
+
   validateDataGrid = () => {
     const { datagrid = [], editingRows } = this.state
 
@@ -378,6 +386,8 @@ class Form extends React.PureComponent {
 
     // editing at least 1 row
     if (editingRows.length > 0) isDataGridValid = false
+
+    if (this.checkHasError(datagrid)) isDataGridValid = false
 
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
@@ -390,34 +400,6 @@ class Form extends React.PureComponent {
     )
 
     if (!hasPrimary) isDataGridValid = false
-    // const hasOneRowOnly =
-    //   datagrid.filter((item) => !item.isDeleted).length === 1
-    // let newDataGrid = [
-    //   ...datagrid,
-    // ]
-    // if (hasOneRowOnly) {
-    //   newDataGrid = datagrid.reduce(
-    //     (datas, item) => [
-    //       ...datas,
-    //       { ...item, isPrimaryClinician: !item.isDeleted },
-    //     ],
-    //     [],
-    //   )
-    // }
-    // const newDataGrid =
-    //   datagrid.length === 1
-    //     ? [
-    //         {
-    //           ...datagrid[0],
-    //           isPrimaryClinician:
-    //             datagrid[0].isPrimaryClinician === undefined
-    //               ? true
-    //               : datagrid[0].isPrimaryClinician,
-    //         },
-    //       ]
-    //     : [
-    //         ...datagrid,
-    //       ]
 
     this.setState({
       isDataGridValid,

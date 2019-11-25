@@ -173,7 +173,7 @@ class AntdTimePicker extends PureComponent {
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}
-          allowClear
+          allowClear={props.allowClear}
           placeholder=''
           format={format}
           use12Hours={use12Hours}

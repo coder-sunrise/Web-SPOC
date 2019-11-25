@@ -8,7 +8,7 @@ import { Divider } from 'antd'
 import { Button, CardContainer, GridContainer, GridItem } from '@/components'
 import Payments from './Payments'
 // utils
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import config from '@/utils/config'
 
 const { currencyFormat } = config
@@ -121,11 +121,11 @@ const InvoiceSummary = ({
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST {roundToTwoDecimals(gstValue).toFixed(2)}%</h5>
+              <h5>GST {roundTo(gstValue).toFixed(2)}%</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(roundToTwoDecimals(gstAmount))}
+                {parseToTwoDecimalString(roundTo(gstAmount))}
               </h5>
             </GridItem>
             <GridItem md={6}>
@@ -133,7 +133,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(roundToTwoDecimals(totalAftGst))}
+                {parseToTwoDecimalString(roundTo(totalAftGst))}
               </h5>
             </GridItem>
             <GridItem md={6}>

@@ -252,7 +252,7 @@ class AntdDatePicker extends PureComponent {
         format = dateFormatLong
       }
     }
-    console.log(format, restProps.showTime)
+    // console.log(format, restProps.showTime)
 
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
@@ -263,12 +263,14 @@ class AntdDatePicker extends PureComponent {
           ? _toMoment(this.state.value, local, restProps.showTime).format(
               format,
             )
-          : ''
+          : '-'
+      if (v === '-') return <span>{v}</span>
       return (
         <Tooltip title={v} enterDelay={750}>
           <AutosizeInput
             readOnly
             title=''
+            tabIndex='-1'
             inputClassName={props.className}
             value={v}
           />

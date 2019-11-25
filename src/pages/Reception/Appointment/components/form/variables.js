@@ -59,6 +59,7 @@ export const AppointmentDataColExtensions = [
     type: 'time',
     width: 140,
     format: timeFormat,
+    allowClear: false,
     // value: '00:00',
   },
   {
@@ -66,6 +67,7 @@ export const AppointmentDataColExtensions = [
     type: 'time',
     width: 140,
     format: timeFormat,
+    allowClear: false,
     // value: '00:00',
   },
   {
