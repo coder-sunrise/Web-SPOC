@@ -34,6 +34,7 @@ class PaymentCollectionList extends PureComponent {
           }),
       },
       { columnName: 'amount', type: 'currency', currency: true },
+      // { columnName: 'doctorName', type: 'text' },
     ]
     let FuncProps = {
       pager: false,
@@ -143,35 +144,32 @@ class PaymentCollectionList extends PureComponent {
       return (
         <GridItem md={12}>
           {cashData &&
-          cashData.length > 0 && (
-            <ReportDataGrid
-              height={500}
-              data={cashData}
-              columns={CashDetailsCols}
-              columnExtensions={CashColsExtension}
-              FuncProps={CashFuncProps}
-            />
-          )}
+            cashData.length > 0 && (
+              <ReportDataGrid
+                data={cashData}
+                columns={CashDetailsCols}
+                columnExtensions={CashColsExtension}
+                FuncProps={CashFuncProps}
+              />
+            )}
           {giroData &&
-          giroData.length > 0 && (
-            <ReportDataGrid
-              height={500}
-              data={giroData}
-              columns={OtherPaymentModeDetailsCols}
-              columnExtensions={PaymentCollectionDetailsExtensions}
-              FuncProps={FuncProps}
-            />
-          )}
+            giroData.length > 0 && (
+              <ReportDataGrid
+                data={giroData}
+                columns={OtherPaymentModeDetailsCols}
+                columnExtensions={PaymentCollectionDetailsExtensions}
+                FuncProps={FuncProps}
+              />
+            )}
           {otherData &&
-          otherData.length > 0 && (
-            <ReportDataGrid
-              height={500}
-              data={otherData}
-              columns={GIRODetailsCols}
-              columnExtensions={PaymentCollectionDetailsExtensions}
-              FuncProps={FuncProps}
-            />
-          )}
+            otherData.length > 0 && (
+              <ReportDataGrid
+                data={otherData}
+                columns={GIRODetailsCols}
+                columnExtensions={PaymentCollectionDetailsExtensions}
+                FuncProps={FuncProps}
+              />
+            )}
         </GridItem>
       )
     }
@@ -236,7 +234,6 @@ class PaymentCollectionList extends PureComponent {
     ]
     return (
       <ReportDataGrid
-        height={500}
         data={paymentCollectionData}
         columns={PaymentCollectionDetailsCols}
         columnExtensions={PaymentCollectionDetailsExtensions}

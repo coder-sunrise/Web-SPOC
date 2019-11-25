@@ -43,7 +43,6 @@ const SummaryOfSales = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={SummaryByDateDetailsColumns}
       columnExtensions={SummaryByDateDetailsColumnsExtensions}

@@ -110,10 +110,6 @@ const styles = (theme) => ({
             message: 'Billing completed',
           })
           router.push('/reception/queue')
-        } else {
-          notification.success({
-            message: 'Billing saved',
-          })
         }
       }
     })

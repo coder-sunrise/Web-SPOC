@@ -18,8 +18,16 @@ import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 
 const status = [
-  { value: false, name: 'Inactive', color: 'red' },
-  { value: true, name: 'Active', color: 'green' },
+  {
+    value: false,
+    name: 'Inactive',
+    render: () => <span style={{ color: 'red' }}>Inactive</span>,
+  },
+  {
+    value: true,
+    name: 'Active',
+    render: () => <span style={{ color: 'green' }}>Active</span>,
+  },
 ]
 
 const statusString = [

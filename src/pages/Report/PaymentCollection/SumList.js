@@ -24,7 +24,6 @@ class SumList extends PureComponent {
     ]
     return (
       <ReportDataGrid
-        height={500}
         data={sumData}
         columns={sumCols}
         columnExtensions={sumExtensions}

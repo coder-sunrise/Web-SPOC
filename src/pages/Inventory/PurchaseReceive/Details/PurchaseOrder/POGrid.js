@@ -267,7 +267,6 @@ class Grid extends PureComponent {
     const filterActiveCode = (ops) => {
       return ops.filter((o) => o.isActive === true)
     }
-    console.log(1)
     if (row.type === 1) {
       const filteredOptions = getUnusedItem('MedicationItemList')
       const activeOptions = filterActiveCode(filteredOptions)

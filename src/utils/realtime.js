@@ -29,14 +29,14 @@ const initStream = () => {
     } = getState()
     if (sender !== user.data.clinicianProfile.name) {
       const { notifications = [] } = header
-      notification.info({
-        // icon: WarningIcon,
-        icon: null,
-        placement: 'bottomRight',
-        message: `${sender}: ${message}`,
-        // description:
-        //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
-      })
+      // notification.info({
+      //   // icon: WarningIcon,
+      //   icon: null,
+      //   placement: 'bottomRight',
+      //   message: `${sender}: ${message}`,
+      //   // description:
+      //   //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
+      // })
 
       notifications.push(response)
       dispatch({

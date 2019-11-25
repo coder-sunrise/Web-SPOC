@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
-import { CardContainer } from '@/components'
 import { compose } from 'redux'
+import { CardContainer } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from '../Grid'
 import { status } from '@/utils/codes'
@@ -56,6 +56,7 @@ const Consumable = ({
       type: 'number',
       width: 110,
       sortingEnabled: false,
+      precision: 1,
     },
     { columnName: 'action', width: 110, align: 'center' },
     {

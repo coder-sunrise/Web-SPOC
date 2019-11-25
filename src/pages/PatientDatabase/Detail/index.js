@@ -126,8 +126,18 @@ const styles = () => ({
           if (patient.callback) patient.callback(r.id)
         })
         if (onConfirm && !r.id) {
+          dispatch({
+            type: 'patientSearch/query',
+            payload: {
+              sorting: [
+                // { columnName: 'isActive', direction: 'asc' },
+                { columnName: 'name', direction: 'asc' },
+              ],
+            },
+          })
           onConfirm()
         }
+
         resetForm({})
       }
     })
@@ -368,7 +378,7 @@ class PatientDetail extends PureComponent {
         <GridItem xs={12} sm={12} md={2}>
           <Card profile>
             <CardBody profile>
-              <PatientInfoSideBanner entity={entity} />
+              <PatientInfoSideBanner entity={entity} {...this.props} />
               <MenuList>
                 {this.widgets
                   .filter(
