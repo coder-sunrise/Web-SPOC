@@ -21,6 +21,7 @@ import {
   Field,
   ProgressButton,
 } from '@/components'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
   errorMessage: {
@@ -857,118 +858,124 @@ class Detail extends PureComponent {
     const { props } = this
     const { classes, theme, values, footer, errors } = props
     const { inventoryAdjustmentItems } = errors
+    const isEditable =
+      values.inventoryAdjustmentStatusFK === INVENTORY_ADJUSTMENT_STATUS.DRAFT
     const cfg = {}
-    if (
-      values.inventoryAdjustmentStatusFK !== INVENTORY_ADJUSTMENT_STATUS.DRAFT
-    ) {
+    if (!isEditable) {
       cfg.onRowDoubleClick = undefined
     }
+
     return (
       <React.Fragment>
-        <div style={{ margin: theme.spacing(1) }}>
-          <GridContainer>
-            <GridItem md={6}>
-              <GridItem md={12}>
-                <FastField
-                  name='adjustmentTransactionNo'
-                  render={(args) => (
-                    <TextField label='Transaction No' disabled {...args} />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={12}>
-                <Field
-                  name='adjustmentTransactionDate'
-                  render={(args) => (
-                    <DatePicker
-                      label='Transaction Date'
-                      {...args}
-                      disabled={
-                        values.inventoryAdjustmentStatusFK !==
-                        INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                      }
-                    />
-                  )}
-                />
-              </GridItem>
+        <AuthorizedContext.Provider
+          value={{
+            rights: isEditable ? 'enable' : 'disable',
+          }}
+        >
+          <div style={{ margin: theme.spacing(1) }}>
+            <GridContainer>
+              <GridItem md={6}>
+                <GridItem md={12}>
+                  <FastField
+                    name='adjustmentTransactionNo'
+                    render={(args) => (
+                      <TextField label='Transaction No' disabled {...args} />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={12}>
+                  <Field
+                    name='adjustmentTransactionDate'
+                    render={(args) => (
+                      <DatePicker
+                        label='Transaction Date'
+                        {...args}
+                        // disabled={
+                        //   values.inventoryAdjustmentStatusFK !==
+                        //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                        // }
+                      />
+                    )}
+                  />
+                </GridItem>
 
-              <GridItem md={12}>
-                <FastField
-                  name='inventoryAdjustmentStatusFK'
+                <GridItem md={12}>
+                  <FastField
+                    name='inventoryAdjustmentStatusFK'
+                    render={(args) => {
+                      return (
+                        <Select
+                          label='Status'
+                          options={inventoryAdjustmentStatus}
+                          disabled
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridItem>
+              <GridItem md={6}>
+                <Field
+                  name='remarks'
                   render={(args) => {
                     return (
-                      <Select
-                        label='Status'
-                        options={inventoryAdjustmentStatus}
-                        disabled
+                      <OutlinedTextField
+                        label='Remarks'
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        // disabled={
+                        //   values.inventoryAdjustmentStatusFK !==
+                        //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                        // }
                         {...args}
                       />
                     )
                   }}
                 />
               </GridItem>
-            </GridItem>
-            <GridItem md={6}>
-              <Field
-                name='remarks'
-                render={(args) => {
-                  return (
-                    <OutlinedTextField
-                      label='Remarks'
-                      multiline
-                      rowsMax={2}
-                      rows={2}
-                      disabled={
-                        values.inventoryAdjustmentStatusFK !==
-                        INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                      }
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-          {inventoryAdjustmentItems &&
-          !Array.isArray(inventoryAdjustmentItems) && (
-            <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
-          )}
-          <EditableTableGrid
-            style={{ marginTop: 10 }}
-            FuncProps={{
-              edit: values.inventoryAdjustmentStatusFK === 1,
-              pager: true,
-              addNewLabelName: 'New Inventory Adjustment',
-            }}
-            schema={inventoryAdjustmentSchema}
-            // onRowDoubleClick={this.onEditingRowsChange}
-            EditingProps={{
-              showAddCommand:
-                values.inventoryAdjustmentStatusFK ===
-                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-              showEditCommand:
-                values.inventoryAdjustmentStatusFK ===
-                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-              showDeleteCommand:
-                values.inventoryAdjustmentStatusFK ===
-                INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-              onCommitChanges: this.onCommitChanges,
-              onAddedRowsChange: this.onAddedRowsChange,
-              onEditingRowIdsChange: this.changeEditingRowIds,
-              editingRowIds: this.state.editingRowIds,
-            }}
-            {...cfg}
-            rows={
-              this.state.inventoryAdjustmentItems.length === 0 ? (
-                this.state.stockList
-              ) : (
-                this.state.inventoryAdjustmentItems
-              )
-            }
-            // row={values.inventoryAdjustmentItems}
-            {...this.tableParas}
-          />
-          {/* <GridContainer
+            </GridContainer>
+            {inventoryAdjustmentItems &&
+            !Array.isArray(inventoryAdjustmentItems) && (
+              <p className={classes.errorMessage}>{inventoryAdjustmentItems}</p>
+            )}
+            <EditableTableGrid
+              style={{ marginTop: 10 }}
+              FuncProps={{
+                edit: isEditable,
+                pager: true,
+                addNewLabelName: 'New Inventory Adjustment',
+              }}
+              schema={inventoryAdjustmentSchema}
+              // onRowDoubleClick={this.onEditingRowsChange}
+              EditingProps={{
+                showAddCommand:
+                  values.inventoryAdjustmentStatusFK ===
+                  INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+                // showEditCommand:
+                //   values.inventoryAdjustmentStatusFK ===
+                //   INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+                // showDeleteCommand:
+                //   values.inventoryAdjustmentStatusFK ===
+                //   INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+                onCommitChanges: this.onCommitChanges,
+                onAddedRowsChange: this.onAddedRowsChange,
+                onEditingRowIdsChange: this.changeEditingRowIds,
+                editingRowIds: this.state.editingRowIds,
+              }}
+              {...cfg}
+              rows={
+                this.state.inventoryAdjustmentItems.length === 0 ? (
+                  this.state.stockList
+                ) : (
+                  this.state.inventoryAdjustmentItems
+                )
+              }
+              // row={values.inventoryAdjustmentItems}
+              {...this.tableParas}
+            />
+            {/* <GridContainer
             direction='row'
             justify='flex-end'
             alignItems='flex-end'
@@ -990,30 +997,31 @@ class Detail extends PureComponent {
               Finalize
             </Button>
           </GridContainer> */}
-          {footer &&
-            footer({
-              onConfirm: props.handleSubmit,
-              confirmBtnText: 'Save',
-              extraButtons: (
-                <ProgressButton
-                  color='info'
-                  type='submit'
-                  onClick={this.updateStatus}
-                  disabled={
-                    values.inventoryAdjustmentStatusFK !==
-                    INVENTORY_ADJUSTMENT_STATUS.DRAFT
-                  }
-                >
-                  Finalize
-                </ProgressButton>
-              ),
-              confirmProps: {
-                disabled:
-                  values.inventoryAdjustmentStatusFK !==
-                  INVENTORY_ADJUSTMENT_STATUS.DRAFT,
-              },
-            })}
-        </div>
+            {footer &&
+              footer({
+                onConfirm: props.handleSubmit,
+                confirmBtnText: 'Save',
+                extraButtons: (
+                  <ProgressButton
+                    color='info'
+                    type='submit'
+                    onClick={this.updateStatus}
+                    // disabled={
+                    //   values.inventoryAdjustmentStatusFK !==
+                    //   INVENTORY_ADJUSTMENT_STATUS.DRAFT
+                    // }
+                  >
+                    Finalize
+                  </ProgressButton>
+                ),
+                // confirmProps: {
+                //   disabled:
+                //     values.inventoryAdjustmentStatusFK !==
+                //     INVENTORY_ADJUSTMENT_STATUS.DRAFT,
+                // },
+              })}
+          </div>
+        </AuthorizedContext.Provider>
       </React.Fragment>
     )
   }
