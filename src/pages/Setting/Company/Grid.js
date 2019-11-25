@@ -100,14 +100,18 @@ class Grid extends PureComponent {
                   rel='noopener noreferrer'
                   target='_blank'
                   href={
-                    row.contact && row.contact.contactWebsite.website !== '' ? (
+                    row.contact &&
+                    row.contact.contactWebsite &&
+                    row.contact.contactWebsite.website !== '' ? (
                       row.contact.contactWebsite.website
                     ) : (
                       '-'
                     )
                   }
                 >
-                  {row.contact && row.contact.contactWebsite.website !== '' ? (
+                  {row.contact &&
+                  row.contact.contactWebsite &&
+                  row.contact.contactWebsite.website !== '' ? (
                     row.contact.contactWebsite.website
                   ) : (
                     '-'
@@ -128,6 +132,7 @@ class Grid extends PureComponent {
             render: (row) => (
               <span>
                 {row.contact &&
+                row.contact.officeContactNumber &&
                 row.contact.officeContactNumber.number !== '' ? (
                   row.contact.officeContactNumber.number
                 ) : (
@@ -148,7 +153,9 @@ class Grid extends PureComponent {
             width: 120,
             render: (row) => (
               <span>
-                {row.contact && row.contact.faxContactNumber.number !== '' ? (
+                {row.contact &&
+                row.contact.faxContactNumber &&
+                row.contact.faxContactNumber.number !== '' ? (
                   row.contact.faxContactNumber.number
                 ) : (
                   '-'
@@ -168,6 +175,7 @@ class Grid extends PureComponent {
             render: (row) => (
               <span>
                 {row.contact &&
+                row.contact.mobileContactNumber &&
                 row.contact.mobileContactNumber.number !== '' ? (
                   row.contact.mobileContactNumber.number
                 ) : (
