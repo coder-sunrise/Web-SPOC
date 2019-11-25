@@ -63,7 +63,7 @@ export default class ReportBase extends React.Component {
       reportDatas: null,
     }))
     const params = this.formatReportParams(this.props.values)
-    const reportDatas = await getRawData(this.state.reportId, params)
+    const reportDatas = await getRawData(this.state.reportId, { ...params })
 
     if (reportDatas) {
       this.setState((state) => ({
