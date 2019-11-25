@@ -576,7 +576,6 @@ class AntdSelect extends React.PureComponent {
       maxTagPlaceholder,
       value,
       isLoading,
-      // onMouseLeave,
       ...restProps
     } = this.props
     // console.log(options)
@@ -621,13 +620,16 @@ class AntdSelect extends React.PureComponent {
         (o) => Object.byString(o, this.props.valueField) === this.state.value,
       )
       let text = ''
-      if (match) text = Object.byString(match, labelField)
-      // console.log(match, text, labelField)
+      if (match) {
+        text = Object.byString(match, labelField)
+        if (match.render) {
+          return match.render(text)
+        }
+      }
       text =
         optionLabelLength && text && text.length > optionLabelLength
           ? `${text.substring(0, optionLabelLength)}...`
           : text
-
       return (
         <Tooltip title={text} enterDelay={750}>
           <AutosizeInput

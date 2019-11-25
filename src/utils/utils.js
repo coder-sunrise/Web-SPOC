@@ -573,6 +573,7 @@ export const updateCellValue = (
     classes,
     config = {},
     row = {},
+    editMode,
   },
   element,
   val,
@@ -583,7 +584,7 @@ export const updateCellValue = (
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
   const { validationSchema, gridId, getRowId, ...restConfig } = cfg
-  // console.log({ columnName, val },getRowId,'dsad')
+  // console.log({ columnName, val, value, editMode }, row, 'dsad')
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
@@ -593,12 +594,16 @@ export const updateCellValue = (
   }
   // console.log(columnName, val)
   // console.log({ row, val })
-  window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  if (editMode) {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  } else {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = value
+  }
   // console.log(val, columnName)
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
-      if (value !== val && typeof onValueChange === 'function') {
+      if (editMode && value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
       const r = validationSchema.validateSync(
