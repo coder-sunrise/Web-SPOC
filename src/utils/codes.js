@@ -788,6 +788,9 @@ const consultationDocumentTypes = [
     value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
+    getSubject: (r) => {
+      return r.Title || ''
+    },
     downloadKey: 'documentid',
     downloadConfig: {
       id: 12,
