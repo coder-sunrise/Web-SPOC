@@ -154,7 +154,7 @@ class EmergencyContact extends PureComponent {
     const patientEmergencyContact = _.cloneDeep(values.patientEmergencyContact)
     if (
       patientEmergencyContact.find(
-        (m) => m.patientProfileFK === o.id && !m.isDeleted,
+        (m) => m.emergencyContactFK === o.id && !m.isDeleted,
       )
     ) {
       notification.warn({
@@ -175,7 +175,8 @@ class EmergencyContact extends PureComponent {
       id: newId,
       isNew: true,
       accountNo: o.patientAccountNo,
-      patientProfileFK: o.id,
+      patientProfileFK: values.id,
+      emergencyContactFK: o.id,
       salutationFK: o.salutationFK,
       accountNoTypeFK: o.patientAccountNoTypeFK,
       name: o.name,
