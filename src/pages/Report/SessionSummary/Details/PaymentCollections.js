@@ -109,7 +109,6 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={PaymentCollectionsColumns}
       columnExtensions={PaymentCollectionsColumnExtension}

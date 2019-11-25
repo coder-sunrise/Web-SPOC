@@ -94,7 +94,6 @@ class OutstandingList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={OutstandingListCols}
         columnExtensions={OutstandingListColsExtension}

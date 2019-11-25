@@ -65,7 +65,6 @@ class ExpenditureList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={incomeData}
         columns={ExpenditureGstDetailsCols}
         columnExtensions={ExpenditureGstDetailsExtensions}

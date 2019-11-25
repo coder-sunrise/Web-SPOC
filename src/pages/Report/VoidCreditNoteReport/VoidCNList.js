@@ -56,13 +56,12 @@ class VoidCNList extends PureComponent {
       },
     }
 
-    if (reportDatas.ListingDetails[0].filtertype==='Payment') {
-      listCols[2].title='Payment Date'
-      listCols[3].title='Payment No.'
+    if (reportDatas.ListingDetails[0].filtertype === 'Payment') {
+      listCols[2].title = 'Payment Date'
+      listCols[3].title = 'Payment No.'
     }
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={listCols}
         columnExtensions={listColsExtension}

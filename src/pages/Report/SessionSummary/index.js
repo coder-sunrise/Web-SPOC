@@ -135,7 +135,6 @@ const SessionSummary = () => {
     <CardContainer hideHeader>
       <h4 style={{ marginBottom: 16 }}>All Sessions</h4>
       <ReportDataGrid
-        height='auto'
         data={state.sessionData}
         columns={SessionColumns}
         columnExtensions={columnExtensions}

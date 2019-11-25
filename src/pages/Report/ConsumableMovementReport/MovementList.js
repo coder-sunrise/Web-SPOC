@@ -26,12 +26,11 @@ class MovementList extends PureComponent {
     ]
     const ConsumableStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date' },
-      { columnName: 'transactionQuantity', type: 'qty' },
+      { columnName: 'transactionQuantity', type: 'number' },
     ]
 
     return (
       <ReportDataGrid
-        height={500}
         data={incomeData}
         columns={ConsumableStockDetailsCols}
         columnExtensions={ConsumableStockDetailsExtensions}

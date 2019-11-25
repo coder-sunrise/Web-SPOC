@@ -52,7 +52,6 @@ const PaymentSummary = ({ PaymentSummaryDetails }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={PaymentDetailsColumns}
       columnExtensions={PaymentDetailsColumnsExtensions}

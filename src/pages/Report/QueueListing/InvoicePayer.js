@@ -44,7 +44,6 @@ const InvoicePayer = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={InvoicePayerTableColumn}
       columnExtensions={InvoicePayerTableColumnExtension}
