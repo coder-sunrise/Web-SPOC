@@ -219,16 +219,22 @@ const PatientInfoSideBanner = ({
                 {schemeData.validFrom && (
                   <div>
                     <p>
-                      Balance:&nbsp;
-                      {schemeData.chronicBalanceStatusCode === 'SC105' ? (
-                        'Full Balance'
-                      ) : (
-                        <NumberInput text currency value={schemeData.balance} />
-                      )}
+                      <NumberInput
+                        prefix='Full Balance:'
+                        text
+                        currency
+                        value={
+                          schemeData.chronicBalanceStatusCode === 'SC105' ? (
+                            'Full Balance'
+                          ) : (
+                            schemeData.balance
+                          )
+                        }
+                      />
                     </p>
                     <p>
-                      Validity:&nbsp;
                       <DatePicker
+                        prefix='Validity:'
                         text
                         format={dateFormatLong}
                         // value={o.validFrom}

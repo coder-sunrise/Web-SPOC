@@ -21,6 +21,7 @@ import {
   additionalShortcutFormats,
   timeFormat24HourWithSecond,
   serverDateTimeFormatFull,
+  Tooltip,
 } from '@/components'
 
 const _toMoment = (value, isLocal, showTime) => {
@@ -251,26 +252,30 @@ class AntdDatePicker extends PureComponent {
         format = dateFormatLong
       }
     }
+    console.log(format, restProps.showTime)
 
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
-    if (text)
-      return (
-        <AutosizeInput
-          readOnly
-          inputClassName={props.className}
-          value={
-            this.state.value !== undefined &&
-            _toMoment(this.state.value, local, restProps.showTime) ? (
-              _toMoment(this.state.value, local, restProps.showTime).format(
-                format,
-              )
-            ) : (
-              ''
+    if (text) {
+      const v =
+        this.state.value !== undefined &&
+        _toMoment(this.state.value, local, restProps.showTime)
+          ? _toMoment(this.state.value, local, restProps.showTime).format(
+              format,
             )
-          }
-        />
+          : ''
+      return (
+        <Tooltip title={v} enterDelay={750}>
+          <AutosizeInput
+            readOnly
+            title=''
+            inputClassName={props.className}
+            value={v}
+          />
+        </Tooltip>
       )
+    }
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <DatePicker
