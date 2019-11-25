@@ -13,19 +13,19 @@ export const AppointmentDataColumn = [
 ]
 
 export const AppointmentDataColExtensions = [
-  {
-    columnName: 'conflicts',
-    // type: 'error',
-    editingEnabled: false,
-    sortingEnabled: false,
-    disabled: true,
-    width: 60,
-    render: (row) => {
-      if (row.conflicts && row.conflicts.length > 0)
-        return <ErrorPopover errors={row.conflicts} />
-      return null
-    },
-  },
+  // {
+  //   columnName: 'conflicts',
+  //   // type: 'error',
+  //   editingEnabled: false,
+  //   sortingEnabled: false,
+  //   disabled: true,
+  //   width: 60,
+  //   render: (row) => {
+  //     if (row.conflicts && row.conflicts.length > 0)
+  //       return <ErrorPopover errors={row.conflicts} />
+  //     return null
+  //   },
+  // },
   // {
   //   columnName: 'clinicianFK',
   //   width: 200,

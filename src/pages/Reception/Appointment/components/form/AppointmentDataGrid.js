@@ -187,12 +187,30 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
+    console.log({ data })
     return (
       <div className={classes.container}>
         <EditableTableGrid
           rows={data.length ? data : data.concat(defaultNewRows)}
           columns={AppointmentDataColumn}
-          columnExtensions={this.columnExtensions}
+          columnExtensions={[
+            ...this.columnExtensions,
+            {
+              columnName: 'conflicts',
+              // type: 'error',
+              editingEnabled: false,
+              sortingEnabled: false,
+              disabled: true,
+              width: 60,
+              render: (row) => {
+                console.log({ row })
+                return null
+                // if (row.conflicts && row.conflicts.length > 0)
+                //   return <ErrorPopover errors={row.conflicts} />
+                // return null
+              },
+            },
+          ]}
           FuncProps={{
             pager: false,
             sort: true,
