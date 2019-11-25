@@ -237,7 +237,6 @@ const InventoryTypeListing = ({
         return total
       }
       medicationRows.forEach((row) => {
-        console.log('hi1', row)
         calTotal(row)
       })
 
@@ -331,7 +330,6 @@ const InventoryTypeListing = ({
   // )
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
-    console.log(rows, deleted, added, changed)
     if (deleted) {
       const tempArray = [
         ...values[type],
@@ -420,82 +418,126 @@ const InventoryTypeListing = ({
           return rows
       }
     } else if (changed) {
-      Object.entries(changed).map(([ key, value
-      ]) => {
-        const getType = (t) => {
-          switch (t) {
-            case 'medicationPackageItem': {
-              return {
-                stateRows: medicationRows,
-                setStateRow: (v) => setMedicationRows(v),
-              }
+      const getType = (t) => {
+        switch (t) {
+          case 'medicationPackageItem': {
+            return {
+              stateRows: medicationRows,
+              setStateRow: (v) => setMedicationRows(v),
             }
-            case 'consumablePackageItem': {
-              return {
-                stateRows: consumableRows,
-                setStateRow: (v) => setConsumableRows(v),
-              }
+          }
+          case 'consumablePackageItem': {
+            return {
+              stateRows: consumableRows,
+              setStateRow: (v) => setConsumableRows(v),
             }
-            case 'vaccinationPackageItem': {
-              return {
-                stateRows: vaccinationRows,
-                setStateRow: (v) => setVaccinationRows(v),
-              }
+          }
+          case 'vaccinationPackageItem': {
+            return {
+              stateRows: vaccinationRows,
+              setStateRow: (v) => setVaccinationRows(v),
             }
-            case 'servicePackageItem': {
-              return {
-                stateRows: serviceRows,
-                setStateRow: (v) => setServiceRows(v),
-              }
+          }
+          case 'servicePackageItem': {
+            return {
+              stateRows: serviceRows,
+              setStateRow: (v) => setServiceRows(v),
             }
-            default: {
-              return null
-            }
+          }
+          default: {
+            return null
           }
         }
+      }
 
-        const edittedType = getType(type)
-        const newArray = edittedType.stateRows.map((item) => {
-          if (item.id === parseInt(key, 10)) {
-            const {
-              medicationName,
-              inventoryMedication,
-              consumableName,
-              inventoryConsumable,
-              vaccinationName,
-              inventoryVaccination,
-              service,
-              ...restFields
-            } = item
+      const edittedType = getType(type)
 
-            let tempServiceCenterServiceFK
-            const tempServiceId = serviceFK || item.serviceCenterServiceFK
-            const tempServiceCenterId = serviceCenterFK || item.serviceName
-            const serviceCenterService =
-              serviceCenterServicess.find(
-                (o) =>
-                  o.serviceId === tempServiceId &&
-                  o.serviceCenterId === tempServiceCenterId,
-              ) || {}
-            if (serviceCenterService) {
-              tempServiceCenterServiceFK =
-                serviceCenterService.serviceCenter_ServiceId
-            }
-            const obj = {
-              ...restFields,
-              ...value,
-              tempServiceCenterServiceFK,
-            }
-            return obj
-          }
-          return item
-        })
+      const newRows = rows.map((item) => {
+        // const {
+        //   medicationName,
+        //   inventoryMedication,
+        //   consumableName,
+        //   inventoryConsumable,
+        //   vaccinationName,
+        //   inventoryVaccination,
+        //   service,
+        //   ...restFields
+        // } = item
 
-        setServiceCenterFK()
-        setServiceFK()
-        edittedType.setStateRow(newArray)
-        return setFieldValue(`${type}`, newArray)
+        let tempServiceCenterServiceFK
+        const tempServiceId = serviceFK || item.serviceCenterServiceFK
+        const tempServiceCenterId = serviceCenterFK || item.serviceName
+        const serviceCenterService =
+          serviceCenterServicess.find(
+            (o) =>
+              o.serviceId === tempServiceId &&
+              o.serviceCenterId === tempServiceCenterId,
+          ) || {}
+        if (serviceCenterService) {
+          tempServiceCenterServiceFK =
+            serviceCenterService.serviceCenter_ServiceId
+        }
+
+        const obj = {
+          ...item,
+          tempServiceCenterServiceFK,
+        }
+
+        return obj
       })
+
+      setServiceCenterFK()
+      setServiceFK()
+      edittedType.setStateRow(newRows)
+      return setFieldValue(`${type}`, newRows)
+
+      // Object.entries(changed).map(([ key, value,
+      // ]) => {
+
+      //   const newArray = edittedType.stateRows.map((item) => {
+      //     if (item.id === parseInt(key, 10)) {
+      //       const {
+      //         medicationName,
+      //         inventoryMedication,
+      //         consumableName,
+      //         inventoryConsumable,
+      //         vaccinationName,
+      //         inventoryVaccination,
+      //         service,
+      //         ...restFields
+      //       } = item
+
+      //       let tempServiceCenterServiceFK
+      //       const tempServiceId = serviceFK || item.serviceCenterServiceFK
+      //       const tempServiceCenterId = serviceCenterFK || item.serviceName
+      //       const serviceCenterService =
+      //         serviceCenterServicess.find(
+      //           (o) =>
+      //             o.serviceId === tempServiceId &&
+      //             o.serviceCenterId === tempServiceCenterId,
+      //         ) || {}
+      //       if (serviceCenterService) {
+      //         tempServiceCenterServiceFK =
+      //           serviceCenterService.serviceCenter_ServiceId
+      //       }
+      //       console.log('asds', restFields)
+
+      //       const obj = {
+      //         ...restFields,
+      //         // ...value,
+      //         tempServiceCenterServiceFK,
+      //       }
+      //       console.log('obj', obj)
+
+      //       return obj
+      //     }
+      //     return item
+      //   })
+      //   setServiceCenterFK()
+      //   setServiceFK()
+      //   edittedType.setStateRow(newArray)
+      //   return setFieldValue(`${type}`, newArray)
+      // })
     }
   }
 
@@ -518,9 +560,7 @@ const InventoryTypeListing = ({
   const calSubtotal = (e) => {
     const { row } = e
     const { unitPrice, quantity } = row
-    console.log(unitPrice, quantity)
     if (unitPrice && quantity) row.subTotal = unitPrice * quantity
-    console.log(row.subTotal)
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {
