@@ -656,7 +656,9 @@ class Layout extends PureComponent {
                     <Paper {...this.generateConfig(id)}>
                       {this.state.mode === 'edit' && (
                         <div className={`${classes.blockHeader} dragable`}>
-                          <div style={{ height: 25 }}>
+                          <div
+                            style={{ height: 25, backgroundColor: '#e6e6e6' }}
+                          >
                             <span className={classes.blockName}>{w.name}</span>
 
                             <React.Fragment>
