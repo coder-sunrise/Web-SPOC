@@ -71,6 +71,7 @@ const DiagnosisSelect = ({
       sorting: [
         { columnName: 'displayvalue', direction: 'asc' },
       ],
+      pagesize: 30,
     }
     if (typeof v === 'string') {
       search.displayvalue = v
