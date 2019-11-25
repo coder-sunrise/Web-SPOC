@@ -77,6 +77,7 @@ const Payments = ({
                     render={(args) => (
                       <TextField
                         label='Cancel Reason'
+                        autoFocus
                         {...args}
                         onChange={onCancelReasonChange}
                       />
