@@ -334,7 +334,7 @@ class Form extends React.PureComponent {
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
-      console.log({ deleted, datagrid, afterDelete })
+      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
