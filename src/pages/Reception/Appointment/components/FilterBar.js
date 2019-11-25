@@ -176,7 +176,7 @@ export default memo(
         primaryRegisteredDoctorFK,
       ],
       filterByApptType: [
-        ...filterByApptType,
+        -99,
       ],
     }),
   })(StyledFilterBar),
