@@ -289,7 +289,8 @@ class Index extends Component {
           IsACPUpdated: false,
           unitOfMeasurement: x.uomString,
           [itemType.prop]: {
-            [itemType.itemFKName]: x[itemType.itemFKName],
+            // [itemType.itemFKName]: x[itemType.itemFKName],
+            [itemType.itemFKName]: x.code,
             [itemType.itemCode]: x.codeString,
             [itemType.itemName]: x.nameString,
           },
@@ -533,6 +534,7 @@ class Index extends Component {
       if (isWriteOff) return false
       return true
     }
+    console.log({ values })
     return (
       // <AuthorizedContext.Provider
       //   value={{
