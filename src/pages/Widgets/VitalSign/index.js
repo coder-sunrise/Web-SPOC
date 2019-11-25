@@ -64,8 +64,8 @@ class index extends PureComponent {
           render={(arrayHelpers) => {
             this.arrayHelpers = arrayHelpers
             return (arrayHelpers.form.values.corPatientNoteVitalSign || [])
-              .filter((o) => !o.isDeleted)
               .map((v, i) => {
+                if (v.isDeleted === true) return null
                 return (
                   <div key={i}>
                     <VitalSignCard
