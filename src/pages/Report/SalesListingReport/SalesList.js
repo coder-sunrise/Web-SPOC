@@ -29,12 +29,12 @@ class SalesList extends PureComponent {
       { name: 'documentNo', title: 'Document No.' },
       { name: 'qty', title: 'QTY' },
       { name: 'unitPrice', title: 'Unit Price' },
-      { name: 'revenueAMT', title: 'Tevenue Amt.' },
+      { name: 'revenueAMT', title: 'Revenue Amt.' },
       { name: 'cnamt', title: 'CN Amt.' },
     ]
     const SalesDetailsExtensions = [
       { columnName: 'date', type: 'date' },
-      { columnName: 'qty', type: 'qty' },
+      { columnName: 'qty', type: 'number' },
       { columnName: 'unitPrice', type: 'currency', currency: true },
       { columnName: 'revenueAMT', type: 'currency', currency: true },
       { columnName: 'cnamt', type: 'currency', currency: true },
@@ -96,7 +96,6 @@ class SalesList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={SalesListCols}
         columnExtensions={SalesListColsExtension}

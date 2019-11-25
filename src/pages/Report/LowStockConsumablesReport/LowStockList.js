@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class LowStockList extends PureComponent {
-   render () {
+  render () {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas)
@@ -25,12 +25,11 @@ class LowStockList extends PureComponent {
       { name: 'supplier', title: 'Supplier' },
     ]
     const LowStockConsumablesDetailsExtensions = [
-      { columnName: 'stock', type: 'qty'},
+      { columnName: 'stock', type: 'number' },
     ]
 
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={LowStockConsumablesDetailsCols}
         columnExtensions={LowStockConsumablesDetailsExtensions}
