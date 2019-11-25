@@ -376,6 +376,7 @@ class Form extends React.PureComponent {
       if (data._errors) {
         return data._errors.length > 0 || error
       }
+      return error
     }, false)
     return hasError
   }
