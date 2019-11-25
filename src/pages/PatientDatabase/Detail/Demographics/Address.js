@@ -70,15 +70,22 @@ class Address extends Component {
             if (data.length > 0) {
               const { postalCode, blkHseNo, building, street } = data[0]
               const { contactAddress } = values.contact
-              const contactAddressArray = [
-                {
-                  ...contactAddress[addressIndex],
-                  postalCode,
-                  blockNo: blkHseNo,
-                  buildingName: building,
-                  street,
+              const newContactAddress = {
+                ...contactAddress[addressIndex],
+                postalCode,
+                blockNo: blkHseNo,
+                buildingName: building,
+                street,
+              }
+
+              let contactAddressArray = values.contact.contactAddress.map(
+                (adr, index) => {
+                  if (index === addressIndex) {
+                    return newContactAddress
+                  }
+                  return adr
                 },
-              ]
+              )
               setValues({
                 ...values,
                 contact: {
@@ -96,10 +103,12 @@ class Address extends Component {
   deleteAddress = (id) => () => {
     const contact = _.cloneDeep(this.props.values.contact)
     const { contactAddress } = contact
-    // console.log(contactAddress, id)
+
     const deleted = contactAddress.find((o, idx) => o.id === id)
-    deleted.isDeleted = true
-    this.props.setFieldValue('contact', contact)
+    if (deleted) {
+      deleted.isDeleted = true
+      this.props.setFieldValue('contact', contact)
+    }
   }
 
   render () {
