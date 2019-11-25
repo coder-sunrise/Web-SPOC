@@ -34,6 +34,7 @@ class PaymentCollectionList extends PureComponent {
           }),
       },
       { columnName: 'amount', type: 'currency', currency: true },
+      // { columnName: 'doctorName', type: 'text' },
     ]
     let FuncProps = {
       pager: false,

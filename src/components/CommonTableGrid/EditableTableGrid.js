@@ -498,13 +498,6 @@ class EditableTableGrid extends React.Component {
       gridId: this.gridId,
       columnExtensions,
       editingRowIds,
-      // onRowDoubleClick: this.onRowDoubleClick,
-      ...cfg,
-      ...props,
-    }
-    // console.log(rowChanges, addedRows)
-    // console.log({ columnExtensions })
-    const editableCfg = {
       getRowId,
       extraState: [
         <EditingState
@@ -537,29 +530,11 @@ class EditableTableGrid extends React.Component {
           showDeleteCommand={showDeleteCommand}
           commandComponent={CommandComponent}
           messages={messages}
-          // cellComponent={(cellProps) => {
-          //   const { children, ...p } = cellProps
-          //   return (
-          //     <Table.Cell {...p}>
-          //       {children.map((o) => {
-          //         if (o) {
-          //           // console.log(12311231,o.props)
-          //           return React.cloneElement(o, {
-          //             row: p.row,
-          //             disabled: p.row.disabled,
-          //             editingRowIds,
-          //             getRowId,
-          //             key: o.props.id,
-          //             schema: this.props.schema,
-          //             gridId: this.gridId,
-          //             ...o.props,
-          //           })
-          //         }
-          //         return null
-          //       })}
-          //     </Table.Cell>
-          //   )
-          // }}
+        />,
+        <TableInlineCellEditing
+          key={`TableInlineCellEditing-${uniqueGid}`}
+          startEditAction='click'
+          selectTextOnEditStart
         />,
       ],
       extraGetter: [
@@ -567,13 +542,20 @@ class EditableTableGrid extends React.Component {
         <Getter
           key={`Getter-${uniqueGid}`}
           name='tableColumns'
-          computed={({ tableColumns, isColumnEditingEnabled }) => {
+          computed={({ tableColumns, ...resetProps }) => {
+            // console.log(tableColumns, TableEditColumn, resetProps)
+            // const col = tableColumns.find(
+            //   (c) => c.type === TableEditColumn.COLUMN_TYPE,
+            // )
+            // if (col) {
+            //   col.fixed = 'right'
+            // }
             const cols = [
               ...tableColumns.filter(
                 (c) => c.type !== TableEditColumn.COLUMN_TYPE,
               ),
               {
-                key: 'editCommand',
+                key: 'Symbol(editCommand)',
                 type: TableEditColumn.COLUMN_TYPE,
                 fixed: 'right',
                 width: 75,
@@ -583,46 +565,27 @@ class EditableTableGrid extends React.Component {
             return cols
           }}
         />,
-        <TableInlineCellEditing
-          key={`TableInlineCellEditing-${uniqueGid}`}
-          // cellComponent={(p) => {
-          //   console.log(p)
-          //   const { classes, onClick, onFocus, ...restProps } = p
-          //   const { column, row } = restProps
-          //   const { name } = column
-          //   // console.log(p2)
-          //   // return null
-          //   // console.log(restProps)
-          //   // if (name === 'rowMove') return <Table.Cell {...restProps} />
-
-          //   // // return null
-          //   // // return (
-          //   // //   <Table.Cell editingEnabled={name !== 'rowMove'} {...restProps} />
-          //   // // )
-
-          //   return (
-          //     <TableInlineCellEditing.Cell
-          //       editingEnabled={name !== 'rowMove'}
-          //       onFocus={false}
-          //       {...restProps}
-          //     />
-          //   )
-          // }}
-          startEditAction='click'
-          selectTextOnEditStart
-        />,
       ],
+      // onRowDoubleClick: this.onRowDoubleClick,
+      ...cfg,
+      ...props,
     }
+    // console.log(rowChanges, addedRows)
+    // console.log({ columnExtensions })
+    // const editableCfg = {
+
+    // }
+
     // console.log('EditableTableGrid')
     // console.log(editableCfg)
     const element = (
       <Authorized.Context.Consumer>
         {(matches) => {
-          // console.log(matches)
+          console.log(matches)
           return Authorized.generalCheck(
             matches,
             this.props,
-            <CommonTableGrid {...sharedCfg} {...editableCfg} />,
+            <CommonTableGrid {...sharedCfg} />,
             <CommonTableGrid {...sharedCfg} />,
           )
         }}

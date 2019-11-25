@@ -75,9 +75,6 @@ class Grid extends PureComponent {
         pager: true,
         filter: true,
       },
-      // TableProps: {
-      //   height: 300,
-      // },
     }
   }
 
