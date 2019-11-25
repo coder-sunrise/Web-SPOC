@@ -737,7 +737,10 @@ class Layout extends PureComponent {
                           <Divider light />
                         </div>
                       )}
-                      <div className='non-dragable' layoutConfig>
+                      <div
+                        className='non-dragable'
+                        style={w.layoutConfig.style}
+                      >
                         <SizeContainer size='sm'>
                           <LoadableComponent {...widgetProps} />
                         </SizeContainer>
