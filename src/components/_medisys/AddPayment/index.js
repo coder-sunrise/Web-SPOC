@@ -16,7 +16,7 @@ import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
 import { getBizSession } from '@/services/queue'
@@ -222,7 +222,7 @@ class AddPayment extends Component {
   calculatePayment = () => {
     const { values, setFieldValue, clinicSettings } = this.props
     const { paymentList, outstandingBalance } = values
-    const totalPaid = roundToTwoDecimals(
+    const totalPaid = roundTo(
       paymentList.reduce((total, payment) => total + (payment.amt || 0), 0),
     )
 
@@ -232,15 +232,13 @@ class AddPayment extends Component {
 
     let cashReturned = 0
     if (cashPayment) {
-      const cashAfterRounding = roundToTwoDecimals(
+      const cashAfterRounding = roundTo(
         rounding(clinicSettings, cashPayment.amt),
       )
-      const collectableAmountAfterRounding = roundToTwoDecimals(
+      const collectableAmountAfterRounding = roundTo(
         rounding(clinicSettings, outstandingBalance),
       )
-      const roundingAmt = roundToTwoDecimals(
-        cashAfterRounding - cashPayment.amt,
-      )
+      const roundingAmt = roundTo(cashAfterRounding - cashPayment.amt)
       this.setState(
         {
           cashPaymentAmount: cashAfterRounding,
@@ -254,7 +252,7 @@ class AddPayment extends Component {
       setFieldValue('collectableAmount', collectableAmountAfterRounding)
 
       if (totalPaid > outstandingBalance && cashPayment) {
-        cashReturned = roundToTwoDecimals(totalPaid - outstandingBalance)
+        cashReturned = roundTo(totalPaid - outstandingBalance)
         setFieldValue('cashReturned', cashReturned)
       } else {
         setFieldValue('cashReturned', 0)
@@ -269,7 +267,7 @@ class AddPayment extends Component {
     setFieldValue('totalAmtPaid', totalPaid)
     setFieldValue(
       'outstandingAfterPayment',
-      roundToTwoDecimals(outstandingBalance - totalPaid + cashReturned),
+      roundTo(outstandingBalance - totalPaid + cashReturned),
     )
   }
 
@@ -292,7 +290,7 @@ class AddPayment extends Component {
     if (totalPaid - cashPayment.amt + _cashReceived > finalPayable)
       setFieldValue(
         'cashReturned',
-        roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
+        roundTo(_cashReceived - (cashPayment.amt + cashRounding)),
       )
     else if (totalPaid < finalPayable) {
       setFieldValue(

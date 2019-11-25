@@ -38,7 +38,7 @@ import {
   INVOICE_PAYER_TYPE,
   INVOICE_ITEM_TYPE_BY_TEXT,
 } from '@/utils/constants'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 
 const styles = (theme) => ({
   gridRow: {
@@ -186,7 +186,7 @@ const ApplyClaims = ({
   const updateOriginalInvoiceItemList = () => {
     const _resultInvoiceItems = invoice.invoiceItems.map((item) => {
       const computeInvoicePayerSubtotal = (subtotal, invoicePayer) => {
-        if (invoicePayer.isCancelled) return roundToTwoDecimals(subtotal)
+        if (invoicePayer.isCancelled) return roundTo(subtotal)
         const _invoicePayerItem = invoicePayer.invoicePayerItem.find(
           (payerItem) =>
             payerItem.invoiceItemFK
@@ -195,9 +195,9 @@ const ApplyClaims = ({
         )
 
         if (_invoicePayerItem) {
-          return roundToTwoDecimals(subtotal + _invoicePayerItem.claimAmount)
+          return roundTo(subtotal + _invoicePayerItem.claimAmount)
         }
-        return roundToTwoDecimals(subtotal)
+        return roundTo(subtotal)
       }
       const _subtotal = tempInvoicePayer.reduce(computeInvoicePayerSubtotal, 0)
       return { ...item, _claimedAmount: _subtotal }
@@ -369,15 +369,15 @@ const ApplyClaims = ({
 
   useEffect(
     () => {
-      const finalClaim = roundToTwoDecimals(
+      const finalClaim = roundTo(
         tempInvoicePayer.reduce(computeTotalForAllSavedClaim, 0),
       )
-      let finalPayable = roundToTwoDecimals(invoice.totalAftGst - finalClaim)
+      let finalPayable = roundTo(invoice.totalAftGst - finalClaim)
       const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
         if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
         return totalAmtPaid
       }, 0)
-      const newOutstandingBalance = roundToTwoDecimals(finalPayable - totalPaid)
+      const newOutstandingBalance = roundTo(finalPayable - totalPaid)
 
       const updatedInvoiceItems = updateOriginalInvoiceItemList()
       const _values = {
@@ -396,7 +396,7 @@ const ApplyClaims = ({
       // setFieldValue('finalPayable', finalPayable)
       // setFieldValue(
       //   'invoice.outstandingBalance',
-      //   roundToTwoDecimals(finalPayable - finalClaim),
+      //   roundTo(finalPayable - finalClaim),
       // )
       // setFieldValue('invoice.invoiceItems', updatedInvoiceItems)
       // setFieldValue('invoicePayer', tempInvoicePayer)
@@ -484,7 +484,7 @@ const ApplyClaims = ({
 
         return {
           ...item,
-          claimAmount: roundToTwoDecimals(claimAmount),
+          claimAmount: roundTo(claimAmount),
         }
       }),
     }
@@ -592,7 +592,7 @@ const ApplyClaims = ({
 
     const updatedRow = {
       ...tempInvoicePayer[index],
-      payerDistributedAmt: roundToTwoDecimals(
+      payerDistributedAmt: roundTo(
         newInvoiceItems.reduce(
           (subtotal, item) => subtotal + item.claimAmount,
           0,
