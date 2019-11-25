@@ -95,6 +95,7 @@ const SessionSummary = () => {
   const columnExtensions = [
     {
       columnName: 'isClinicSessionClosed',
+      sortingEnabled: false,
       render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'On going'),
     },
     {
