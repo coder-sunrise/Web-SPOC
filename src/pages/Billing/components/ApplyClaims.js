@@ -377,7 +377,9 @@ const ApplyClaims = ({
         if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
         return totalAmtPaid
       }, 0)
-      const newOutstandingBalance = roundToTwoDecimals(finalPayable - totalPaid)
+      const newOutstandingBalance = roundToTwoDecimals(
+        invoice.totalAftGst - totalPaid,
+      )
 
       const updatedInvoiceItems = updateOriginalInvoiceItemList()
       const _values = {
