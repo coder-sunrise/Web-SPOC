@@ -109,7 +109,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 dispatch({
                   type: 'vaccination/query',
                   payload: {
-                    keepFilter: false,
                     code,
                     displayValue,
                     FavouriteSupplierFkNavigation: {

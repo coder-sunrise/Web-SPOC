@@ -52,6 +52,18 @@ class SearchBar extends PureComponent {
     showReportSelection: false,
   }
 
+  componentWillUnmount () {
+    this.unmount()
+  }
+
+  unmount = () =>
+    this.props.dispatch({
+      type: 'invoiceList/updateState',
+      payload: {
+        filter: {},
+      },
+    })
+
   handleOnChange = (name, checked) => (event) => {
     this.setState({ [name]: !checked })
     // if AllDate is checked, set datetime to max range
@@ -185,7 +197,6 @@ class SearchBar extends PureComponent {
                 this.props.dispatch({
                   type: 'statement/query',
                   payload: {
-                    keepFilter: false,
                     statementNo,
                     copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
                     lgteql_statementDate: statementDateFrom,
