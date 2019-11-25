@@ -1105,7 +1105,7 @@ export const fetchAndSaveCodeTable = async (
     if (skipCache.includes(code)) return newData
 
     await db.codetable.put({
-      code,
+      code: code.toLowerCase(),
       data: newData,
       updateDate: new Date(), // refresh ? null : new Date(),
       params,
@@ -1154,7 +1154,7 @@ export const getCodes = async (payload) => {
   let _temp = false
 
   const { refresh = false } = payload
-  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'string') ctcode = payload
   if (typeof payload === 'object') {
     ctcode = payload.code
     params = payload.filter
@@ -1164,7 +1164,11 @@ export const getCodes = async (payload) => {
   }
 
   let result = []
+
   try {
+    if (!ctcode) throw Error('ctcode is undefined / null')
+
+    ctcode = ctcode.toLowerCase()
     await db.open()
     const ct = await db.codetable.get(ctcode)
 

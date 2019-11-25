@@ -29,6 +29,7 @@ import {
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
+import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
 
@@ -177,12 +178,17 @@ const styles = (theme) => ({
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
     }
-    console.log({ payload })
+
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,
     }).then((response) => {
+      console.log({ response })
       if (response) {
+        sendNotification('CodetableUpdated', {
+          message: 'User profiles updated',
+          code: 'clinicianprofile',
+        })
         sessionStorage.removeItem('user')
         if (currentUser) {
           dispatch({
@@ -393,7 +399,9 @@ class UserProfileForm extends React.PureComponent {
                           type='password'
                           inputProps={{
                             autoComplete: 'new-password',
+                            maxLength: 18,
                           }}
+                          maxLength={18}
                         />
                       )}
                     />
