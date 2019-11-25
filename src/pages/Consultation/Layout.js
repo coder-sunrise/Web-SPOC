@@ -653,7 +653,14 @@ class Layout extends PureComponent {
                     })}
                     key={id}
                   >
-                    <Paper {...this.generateConfig(id)}>
+                    <Paper
+                      {...this.generateConfig(id)}
+                      style={{
+                        borderColor: '#AAAAAA',
+                        borderStyle: 'solid',
+                        borderWidth: 'thin',
+                      }}
+                    >
                       {this.state.mode === 'edit' && (
                         <div className={`${classes.blockHeader} dragable`}>
                           <div
@@ -730,10 +737,7 @@ class Layout extends PureComponent {
                           <Divider light />
                         </div>
                       )}
-                      <div
-                        className='non-dragable'
-                        style={w.layoutConfig.style}
-                      >
+                      <div className='non-dragable' layoutConfig>
                         <SizeContainer size='sm'>
                           <LoadableComponent {...widgetProps} />
                         </SizeContainer>
