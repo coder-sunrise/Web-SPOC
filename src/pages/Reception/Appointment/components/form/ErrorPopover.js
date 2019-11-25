@@ -14,18 +14,17 @@ const RowErrorStyles = () => ({
     pointerEvents: 'none',
   },
   tooltip: {
-    ...tooltip,
+    // ...tooltip,
     '& > ul': {
       marginBottom: '0px !important',
+      listStyle: 'none',
       paddingInlineStart: '10px !important',
     },
     paddingTop: 5,
     paddingBottom: 5,
     paddingRight: 10,
-    background: '#4f4f4f',
     maxWidth: 400,
     textAlign: 'left',
-    fontSize: '0.85rem',
   },
 })
 
@@ -54,16 +53,13 @@ const ErrorPopover = ({ classes, errors = [], style = {}, className }) => {
   }
 
   const showPopup = Boolean(anchorEl)
-
   return (
     <div style={style} className={className}>
-      <SizeContainer size='lg'>
-        <Info
-          color='error'
-          onMouseEnter={handlePopoverOpen}
-          onMouseLeave={handlePopoverClose}
-        />
-      </SizeContainer>
+      <Info
+        color='error'
+        onMouseEnter={handlePopoverOpen}
+        onMouseLeave={handlePopoverClose}
+      />
       <Popover
         // id={}
         className={classes.popover}

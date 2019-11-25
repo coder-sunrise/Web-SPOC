@@ -67,36 +67,29 @@ class Address extends Component {
           })
           .then((o) => {
             const { data } = o
-            const { postalCode, blkHseNo, building, street } = data[0]
-            const { contactAddress } = values.contact
-            const contactAddressArray = [
-              {
-                ...contactAddress[addressIndex],
-                postalCode,
-                blockNo: blkHseNo,
-                buildingName: building,
-                street,
-              },
-            ]
-            // contactAddressArray[addressIndex] = [
-            //   {
-            //     ...contactAddressArray[addressIndex],
-            //     postalCode,
-            //     blockNo: blkHseNo,
-            //     buildingName: building,
-            //     street,
-            //   },
-            // ]
-            setValues({
-              ...values,
-              contact: {
-                ...values.contact,
-                contactAddress: contactAddressArray,
-              },
-            })
-            setFieldValue(`${addressIndex}blockNo`, blkHseNo)
-            setFieldValue(`${addressIndex}buildingName`, building)
-            setFieldValue(`${addressIndex}street`, street)
+            if (data.length > 0) {
+              const { postalCode, blkHseNo, building, street } = data[0]
+              const { contactAddress } = values.contact
+              const contactAddressArray = [
+                {
+                  ...contactAddress[addressIndex],
+                  postalCode,
+                  blockNo: blkHseNo,
+                  buildingName: building,
+                  street,
+                },
+              ]
+              setValues({
+                ...values,
+                contact: {
+                  ...values.contact,
+                  contactAddress: contactAddressArray,
+                },
+              })
+              setFieldValue(`${addressIndex}blockNo`, blkHseNo)
+              setFieldValue(`${addressIndex}buildingName`, building)
+              setFieldValue(`${addressIndex}street`, street)
+            }
           })
   }
 

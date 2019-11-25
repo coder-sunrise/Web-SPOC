@@ -12,9 +12,11 @@ import {
 function onComponentDidMount () {
   const {
     columnExtensions,
+    value,
     row = {},
     column: { name: columnName },
   } = this.props
+  // console.log('onComponentDidMount', columnName)
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -23,8 +25,13 @@ function onComponentDidMount () {
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
+  // console.log(latestRow[columnName], value)
+  if (latestRow[columnName] !== value) {
+    setTimeout(() => {
+      this.forceUpdate()
+    }, 300)
+  }
   const errors = updateCellValue(this.props, null, latestRow[columnName])
-
   latestRow._errors = errors
   return {
     row,
@@ -130,9 +137,9 @@ function getCommonConfig () {
     text: text || !editMode,
     ...restProps,
   }
-  if (editMode && disabled) {
-    commonCfg.onMouseLeave = this.props.onBlur
-  }
+  // if (editMode && disabled) {
+  //   commonCfg.onMouseLeave = this.props.onBlur
+  // }
   return commonCfg
 }
 
@@ -140,6 +147,7 @@ function getCommonRender (cb) {
   const { value, editMode } = this.props
   const cfg = getCommonConfig.call(this)
   const { render, error, row } = cfg
+  // console.log(row, this.props.row)
   if (render && !editMode && !error) {
     return render(row)
   }
