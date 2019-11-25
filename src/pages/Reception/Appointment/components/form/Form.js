@@ -372,10 +372,12 @@ class Form extends React.PureComponent {
   }
 
   checkHasError = (datagrid = []) => {
-    const hasError = datagrid.reduce(
-      (error, data) => data._errors.length > 0 || error,
-      false,
-    )
+    const hasError = datagrid.reduce((error, data) => {
+      if (data._errors) {
+        return data._errors.length > 0 || error
+      }
+      return error
+    }, false)
     return hasError
   }
 

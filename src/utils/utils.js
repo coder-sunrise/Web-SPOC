@@ -1,6 +1,8 @@
 import moment from 'moment'
 import React from 'react'
 import _ from 'lodash'
+import { isNumber } from 'util'
+
 import nzh from 'nzh/cn'
 import router from 'umi/router'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
@@ -76,8 +78,10 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 //   return this.clone().add(-8, 'hours')
 // }
 
-export const roundTo = (amount, precision = 2) =>
-  Math.round(amount * 10 ** precision) / 10 ** precision
+export const roundTo = (amount, precision = 2) => {
+  if (!amount && amount !== 0) return undefined
+  return Math.round(amount * 10 ** precision) / 10 ** precision
+}
 
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
@@ -573,6 +577,7 @@ export const updateCellValue = (
     classes,
     config = {},
     row = {},
+    editMode,
   },
   element,
   val,
@@ -583,7 +588,7 @@ export const updateCellValue = (
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
   const { validationSchema, gridId, getRowId, ...restConfig } = cfg
-  // console.log({ columnName, val },getRowId,'dsad')
+  // console.log({ columnName, val, value, editMode }, row, 'dsad')
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
@@ -593,12 +598,16 @@ export const updateCellValue = (
   }
   // console.log(columnName, val)
   // console.log({ row, val })
-  window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  if (editMode) {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  } else {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = value
+  }
   // console.log(val, columnName)
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
-      if (value !== val && typeof onValueChange === 'function') {
+      if (editMode && value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
       const r = validationSchema.validateSync(

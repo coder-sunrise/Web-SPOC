@@ -445,6 +445,14 @@ class EditableTableGrid extends React.Component {
   //   }
   // }
 
+  // componentDidMount () {
+  //   console.log('componentDidMount')
+  // }
+
+  // componentDidUpdate () {
+  //   console.log('componentDidUpdate', window.$tempGridRow)
+  // }
+
   render () {
     const {
       theme,

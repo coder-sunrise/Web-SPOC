@@ -184,9 +184,13 @@ class TextTypeProvider extends React.Component {
     }
   }
 
-  shouldComponentUpdate = (nextProps, nextState) =>
-    this.props.editingRowIds !== nextProps.editingRowIds ||
-    this.props.commitCount !== nextProps.commitCount
+  shouldComponentUpdate = (nextProps, nextState) => {
+    // console.log(nextProps)
+    return (
+      this.props.editingRowIds !== nextProps.editingRowIds ||
+      this.props.commitCount !== nextProps.commitCount
+    )
+  }
 
   render () {
     const { columnExtensions } = this.props

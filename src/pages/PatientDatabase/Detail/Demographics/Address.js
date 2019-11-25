@@ -67,46 +67,48 @@ class Address extends Component {
           })
           .then((o) => {
             const { data } = o
-            const { postalCode, blkHseNo, building, street } = data[0]
-            const { contactAddress } = values.contact
-            const contactAddressArray = [
-              {
+            if (data.length > 0) {
+              const { postalCode, blkHseNo, building, street } = data[0]
+              const { contactAddress } = values.contact
+              const newContactAddress = {
                 ...contactAddress[addressIndex],
                 postalCode,
                 blockNo: blkHseNo,
                 buildingName: building,
                 street,
-              },
-            ]
-            // contactAddressArray[addressIndex] = [
-            //   {
-            //     ...contactAddressArray[addressIndex],
-            //     postalCode,
-            //     blockNo: blkHseNo,
-            //     buildingName: building,
-            //     street,
-            //   },
-            // ]
-            setValues({
-              ...values,
-              contact: {
-                ...values.contact,
-                contactAddress: contactAddressArray,
-              },
-            })
-            setFieldValue(`${addressIndex}blockNo`, blkHseNo)
-            setFieldValue(`${addressIndex}buildingName`, building)
-            setFieldValue(`${addressIndex}street`, street)
+              }
+
+              let contactAddressArray = values.contact.contactAddress.map(
+                (adr, index) => {
+                  if (index === addressIndex) {
+                    return newContactAddress
+                  }
+                  return adr
+                },
+              )
+              setValues({
+                ...values,
+                contact: {
+                  ...values.contact,
+                  contactAddress: contactAddressArray,
+                },
+              })
+              setFieldValue(`${addressIndex}blockNo`, blkHseNo)
+              setFieldValue(`${addressIndex}buildingName`, building)
+              setFieldValue(`${addressIndex}street`, street)
+            }
           })
   }
 
   deleteAddress = (id) => () => {
     const contact = _.cloneDeep(this.props.values.contact)
     const { contactAddress } = contact
-    // console.log(contactAddress, id)
+
     const deleted = contactAddress.find((o, idx) => o.id === id)
-    deleted.isDeleted = true
-    this.props.setFieldValue('contact', contact)
+    if (deleted) {
+      deleted.isDeleted = true
+      this.props.setFieldValue('contact', contact)
+    }
   }
 
   render () {

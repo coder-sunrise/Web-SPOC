@@ -32,13 +32,13 @@ export default createFormViewModel({
             notification.warn({ message: 'Address Not Found' }),
             {
               data: [
-                {
-                  postalCode: '',
-                  blkHseNo: '',
-                  street: '',
-                  building: '',
-                  houseType: '',
-                },
+                // {
+                //   postalCode: '',
+                //   blkHseNo: '',
+                //   street: '',
+                //   building: '',
+                //   houseType: '',
+                // },
               ],
             }
           )
