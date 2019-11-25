@@ -16,6 +16,7 @@ import {
 } from '@/components'
 // sub components
 import AddCrNote from '../../components/modal/AddCrNote'
+import Transfer from '../../components/modal/Transfer'
 import WriteOff from '../../components/modal/WriteOff'
 import PaymentCard from './PaymentCard'
 import DeleteConfirmation from '../../components/modal/DeleteConfirmation'
@@ -77,6 +78,7 @@ class PaymentDetails extends Component {
   state = {
     showAddPayment: false,
     showAddCrNote: false,
+    showAddTransfer: false,
     showWriteOff: false,
     showDeleteConfirmation: false,
     onVoid: {},
@@ -199,6 +201,9 @@ class PaymentDetails extends Component {
   closeAddCrNoteModal = () =>
     this.setState({ showAddCrNote: false, selectedInvoicePayerFK: undefined })
 
+  closeAddTransferModal = () =>
+    this.setState({ showAddTransfer: false, selectedInvoicePayerFK: undefined })
+
   closeWriteOffModal = () => {
     this.setState({ showWriteOff: false, selectedInvoicePayerFK: undefined })
   }
@@ -221,11 +226,12 @@ class PaymentDetails extends Component {
     })
   }
 
-  onAddCrNoteClick = (invoicePayerFK) => {
+  onAddCrNoteClick = (invoicePayerFK, payerType) => {
     const { dispatch, invoiceDetail, invoicePayment } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
+        payerType,
         invoicePayerFK,
         invoiceDetail: invoiceDetail.entity || {},
         invoicePaymentDetails: invoicePayment.entity || {},
@@ -355,6 +361,21 @@ class PaymentDetails extends Component {
     }
   }
 
+  onTransferClick = (invoicePayerFK, payerType) => {
+    const { dispatch, invoiceDetail, invoicePayment } = this.props
+    dispatch({
+      type: 'invoiceCreditNote/mapCreditNote',
+      payload: {
+        payerType,
+        invoicePayerFK,
+        invoiceDetail: invoiceDetail.entity || {},
+        invoicePaymentDetails: invoicePayment.entity || {},
+      },
+    })
+
+    this.setState({ showAddTransfer: true })
+  }
+
   render () {
     // console.log('PaymentIndex', this.props)
     const { classes, values, readOnly, invoicePayment } = this.props
@@ -365,6 +386,7 @@ class PaymentDetails extends Component {
       handleWriteOff: this.onWriteOffClick,
       handleVoidClick: this.onVoidClick,
       handlePrinterClick: this.onPrinterClick,
+      handleTransferClick: this.onTransferClick,
     }
     const {
       showAddPayment,
@@ -376,6 +398,7 @@ class PaymentDetails extends Component {
       reportPayload,
       invoicePayerName,
       invoicePayerPayment,
+      showAddTransfer,
     } = this.state
 
     return (
@@ -506,6 +529,16 @@ class PaymentDetails extends Component {
             reportID={reportPayload.reportID}
             reportParameters={reportPayload.reportParameters}
           />
+        </CommonModal>
+
+        <CommonModal
+          open={showAddTransfer}
+          title='Add Transfer'
+          closeIconTooltip='Close Transfer'
+          onConfirm={this.closeAddTransferModal}
+          onClose={this.closeAddTransferModal}
+        >
+          <Transfer onRefresh={this.refresh} />
         </CommonModal>
       </div>
     )

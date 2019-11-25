@@ -84,7 +84,6 @@ class IncomeList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={incomeData}
         columns={InComeGstDetails}
         columnExtensions={InComeGstDetailsExtensions}

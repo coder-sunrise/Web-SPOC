@@ -136,7 +136,6 @@ const VisitListing = ({ reportDatas }) => {
 
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={VisitListingColumns}
       columnExtensions={VisitListingColumnExtension}
