@@ -49,6 +49,7 @@ class Demographic extends PureComponent {
       contactFK: this.props.values.contact.id,
       postcode: '',
       countryFK: undefined,
+      isDeleted: false,
     })
   }
 

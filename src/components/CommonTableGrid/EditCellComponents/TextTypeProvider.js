@@ -185,7 +185,7 @@ class TextTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    console.log(nextProps)
+    // console.log(nextProps)
     return (
       this.props.editingRowIds !== nextProps.editingRowIds ||
       this.props.commitCount !== nextProps.commitCount

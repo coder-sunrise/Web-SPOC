@@ -43,7 +43,7 @@ class DepositList extends PureComponent {
       { columnName: 'depositBalance', type: 'currency', currency: true },
       { columnName: 'txnAmount', type: 'currency', currency: true },
     ]
-   const  FuncProps = {
+    const FuncProps = {
       pager: false,
       summary: true,
       summaryConfig: {
@@ -64,7 +64,6 @@ class DepositList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={PatientDepositTransactionCols}
         columnExtensions={PatientDepositTransactionExtensions}

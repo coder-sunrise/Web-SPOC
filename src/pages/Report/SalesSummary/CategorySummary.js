@@ -25,7 +25,6 @@ const CategorySummary = ({ reportDatas }) => {
 
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={CategoryCategorySummaryColumns}
       columnExtensions={CategoryCategorySummaryColumnsExtensions}

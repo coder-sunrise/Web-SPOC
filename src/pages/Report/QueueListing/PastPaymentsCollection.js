@@ -65,7 +65,6 @@ const PastPaymentsCollection = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={PastPaymentCollectionTableColumn}
       columnExtensions={PastPaymentCollectionTableColumnExtension}

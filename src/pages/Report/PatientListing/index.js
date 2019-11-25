@@ -22,7 +22,7 @@ class PatientListing extends ReportBase {
   }
 
   renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+    return <FilterBar {...this.props} handleSubmit={handleSubmit} />
   }
 
   renderContent = (reportDatas) => {
@@ -43,6 +43,7 @@ const PatientListingWithFormik = withFormik({
     dateTo: moment(new Date()).toDate(),
     ageFrom: 0,
     ageTo: 0,
+    isAllDate: false,
   }),
 })(PatientListing)
 

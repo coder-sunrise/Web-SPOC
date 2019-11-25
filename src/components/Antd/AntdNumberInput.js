@@ -353,7 +353,7 @@ class AntdNumberInput extends React.PureComponent {
     const {
       currency,
       percentage,
-      formatter = (f) => f,
+      formatter,
       max,
       min,
       parser,
@@ -383,7 +383,6 @@ class AntdNumberInput extends React.PureComponent {
         format = `0` + (precisionStr.length > 1 ? precisionStr : '')
       }
     }
-
     if (currency) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
@@ -422,7 +421,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (format) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
-
+        // console.log(v, format)
         if (!this.state.focused) {
           return numeral(v).format(format)
         }
@@ -496,7 +495,6 @@ class AntdNumberInput extends React.PureComponent {
     if (this.props.text) {
       if (!this.state.value && this.state.value !== 0) return <span>-</span>
       const cfg = this.getConfig()
-      // console.log(this.state.value, cfg.formatter(this.state.value))
       return (
         <AutosizeInput
           readOnly

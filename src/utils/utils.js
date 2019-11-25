@@ -1,6 +1,8 @@
 import moment from 'moment'
 import React from 'react'
 import _ from 'lodash'
+import { isNumber } from 'util'
+
 import nzh from 'nzh/cn'
 import router from 'umi/router'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
@@ -76,8 +78,10 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 //   return this.clone().add(-8, 'hours')
 // }
 
-export const roundTo = (amount, precision = 2) =>
-  Math.round(amount * 10 ** precision) / 10 ** precision
+export const roundTo = (amount, precision = 2) => {
+  if (!amount && amount !== 0) return undefined
+  return Math.round(amount * 10 ** precision) / 10 ** precision
+}
 
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val

@@ -12,11 +12,12 @@ import {
   TextField,
   NumberInput,
   SizeContainer,
+  Field,
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, values }) => {
   return (
     <SizeContainer size='sm'>
       <GridContainer>
@@ -51,17 +52,17 @@ const FilterBar = ({ handleSubmit }) => {
           <GridItem md={5} />
           {/* 2nd row  */}
           <GridItem md={2}>
-            <FastField
+            <Field
               name='dateFrom'
               render={(args) => (
-                <DatePicker {...args} label='Visit Date From' />
+                <DatePicker {...args} disabled={values.isAllDate} label='Visit Date From' />
               )}
             />
           </GridItem>
           <GridItem md={2}>
-            <FastField
+            <Field
               name='dateTo'
-              render={(args) => <DatePicker {...args} label='Visit Date To' />}
+              render={(args) => <DatePicker {...args} disabled={values.isAllDate} label='Visit Date To' />}
             />
           </GridItem>
           <GridItem md={1}>

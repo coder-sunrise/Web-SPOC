@@ -5,8 +5,9 @@ import { CommonTableGrid } from '@/components'
 const ReportDataGrid = ({
   data = [],
   columns,
-  height = 400,
+  height = 300,
   loading = false,
+  TableProps,
   ...restProps
 }) => {
   return (
@@ -20,8 +21,9 @@ const ReportDataGrid = ({
           pageSize: 100,
           totalRowCount: data.length,
           loading,
+          height,
+          ...TableProps,
         }}
-        height={height}
         rows={data}
         columns={columns}
         {...restProps}

@@ -56,7 +56,6 @@ class DiagnosisTrending extends ReportBase {
     }
     return (
       <ReportDataGrid
-        height='auto'
         data={listData}
         columns={DiagnosisDetailsColumns}
         FuncProps={FuncProps}
