@@ -50,8 +50,8 @@ const style = () => ({
           transactionModeFK,
           amount: 0,
         },
-          balanceAfter: deposit.entity.balance ? deposit.entity.balance : 0,
-          hasTransactionBefore: !!patientDepositTransaction,
+        balanceAfter: deposit.entity.balance ? deposit.entity.balance : 0,
+        hasTransactionBefore: !!patientDepositTransaction,
       }
     }
     return deposit.default
@@ -380,70 +380,6 @@ class Modal extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {/* <GridContainer>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <Divider />
-            </GridItem>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <FastField
-                name='total'
-                render={(args) => {
-                  return <NumberInput prefix='Total' {...args} />
-                }}
-              />
-            </GridItem>
-          </GridContainer> */}
-
-          {/* <GridItem xs={6} justify='flex-end'>
-              <Field
-                name='balance'
-                render={(args) => (
-                  <NumberInput
-                    {...commonAmountOpts}
-                    style={{
-                      marginTop: theme.spacing.unit * 2,
-                    }}
-                    disabled
-                    simple
-                    currency
-                    prefix='Balance'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} justify='flex-end'>
-              <Field
-                name='patientDepositTransaction.amount'
-                render={(args) => (
-                  <NumberInput
-                    currency
-                    onChange={this.calculateBalanceAfter}
-                    {...commonAmountOpts}
-                    prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} justify='flex-end' direction='row'>
-              <Field
-                name='balanceAfter'
-                render={(args) => (
-                  <NumberInput
-                    {...commonAmountOpts}
-                    disabled
-                    simple
-                    currency
-                    prefix=' '
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-           */}
 
           <div style={{ width: '40%', margin: 'auto' }}>
             <Field

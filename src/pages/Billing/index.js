@@ -22,7 +22,7 @@ import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
 import { constructPayload } from './utils'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
@@ -77,7 +77,7 @@ const styles = (theme) => ({
             ),
           0,
         )
-        const finalPayable = roundToTwoDecimals(
+        const finalPayable = roundTo(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
@@ -159,9 +159,7 @@ class Billing extends Component {
       if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
-    const newOutstandingBalance = roundToTwoDecimals(
-      values.finalPayable - totalPaid,
-    )
+    const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
     await setFieldValue('invoice', {
       ...values.invoice,
       outstandingBalance: newOutstandingBalance,

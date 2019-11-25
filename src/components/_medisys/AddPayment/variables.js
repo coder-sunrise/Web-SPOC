@@ -1,6 +1,6 @@
 import * as Yup from 'yup'
 import { PAYMENT_MODE } from '@/utils/constants'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 
 export const ValidationSchema = Yup.object().shape({
   cashReturned: Yup.number(),
@@ -33,9 +33,7 @@ export const ValidationSchema = Yup.object().shape({
               .min(0, 'Amount must be greater than 0')
               .max(
                 0.01,
-                `Total amount paid cannot exceed $${roundToTwoDecimals(
-                  finalPayable,
-                )}`,
+                `Total amount paid cannot exceed $${roundTo(finalPayable)}`,
               )
               .required(),
             creditCardPayment: Yup.object().shape({
