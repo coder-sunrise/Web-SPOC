@@ -98,9 +98,7 @@ const styles = (theme) => ({
     const { dispatch } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
-    console.log({ payload })
 
-    router.push('/reception/queue')
     dispatch({
       type: 'billing/save',
       payload,
