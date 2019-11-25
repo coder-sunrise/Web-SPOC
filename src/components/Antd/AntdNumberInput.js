@@ -421,7 +421,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (format) {
       extraCfg.formatter = (v) => {
         if (v === '') return ''
-        console.log(v, format)
+        // console.log(v, format)
         if (!this.state.focused) {
           return numeral(v).format(format)
         }
