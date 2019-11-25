@@ -58,6 +58,7 @@ const Vaccination = ({
       type: 'number',
       width: 110,
       sortingEnabled: false,
+      precision: 1,
     },
     {
       columnName: 'isActive',
