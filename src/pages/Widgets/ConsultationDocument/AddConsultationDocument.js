@@ -2,8 +2,12 @@ import React, { Component, PureComponent } from 'react'
 import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { convertFromHTML } from 'draft-js'
+import numeral from 'numeral'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 import Yup from '@/utils/yup'
+
+import { qtyFormat } from '@/utils/config'
+
 import {
   withFormikExtend,
   FastField,
@@ -44,14 +48,17 @@ const loadFromCodesConfig = {
         instruction,
         corPrescriptionItemPrecaution: precaution = [],
         remarks = '',
+        quantity = 0,
+        dispenseUOMDisplayValue = '',
       } = o
-
+      const qtyFormatStr = numeral(quantity).format(qtyFormat)
       const { ctmedicationprecaution = [] } = codetable
       const subjectHtml = `<li> - ${o.subject} ${isExtPrescription
         ? ' (Ext.)'
         : ''}</li>`
       const instHtml = instruction !== '' ? `<li>${instruction}</li>` : ''
       const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+      const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${dispenseUOMDisplayValue}</li>`
       const precautionHtml = precaution
         .map((i) => {
           const codetablePrecaution = ctmedicationprecaution.find(
@@ -78,7 +85,7 @@ const loadFromCodesConfig = {
         })
         .join('')
 
-      return `<ul>${subjectHtml}<ul>${instHtml}${precautionHtml}${remarksHtml}</ul></ul>`
+      return `<ul>${subjectHtml}<ul>${instHtml}${qtyHtml}${precautionHtml}${remarksHtml}</ul></ul>`
     })
   },
   InsertMedication: (rows, codetable, patient, isExtPrescription = false) => {
@@ -114,16 +121,19 @@ const loadFromCodesConfig = {
           dosageDisplayValue: dosage = '',
           uomDisplayValue: uom = '',
           remarks = '',
+          quantity = 0,
+          uomDisplayValue = '',
         } = v
-
+        const qtyFormatStr = numeral(quantity).format(qtyFormat)
         const subjectHtml = `<li> - ${subject}</li>`
         const precautionHtml =
           usage + dosage + uom !== ''
             ? `<li>${usage} ${dosage} ${uom} </li>`
             : ''
+        const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${uomDisplayValue}</li>`
         const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
 
-        return `<ul>${subjectHtml} <ul> ${precautionHtml} ${remarksHtml}</ul></ul>`
+        return `<ul>${subjectHtml} <ul> ${precautionHtml}${qtyHtml}${remarksHtml}</ul></ul>`
       })
     if (vRows && vRows.length > 0)
       return `<ul>
