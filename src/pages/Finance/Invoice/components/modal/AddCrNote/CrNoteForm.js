@@ -13,8 +13,9 @@ import {
   Switch,
 } from '@/components'
 import styles from './styles'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
-const CrNoteForm = ({ classes }) => {
+const CrNoteForm = ({ classes, payerType }) => {
   return (
     <GridContainer className={classes.form}>
       <GridItem md={6}>
@@ -42,7 +43,13 @@ const CrNoteForm = ({ classes }) => {
             <FastField
               name='isStockIn'
               render={(args) => {
-                return <Switch prefix='Update Inventory' {...args} />
+                return (
+                  <Switch
+                    prefix='Update Inventory'
+                    disabled={payerType === INVOICE_PAYER_TYPE.COMPANY}
+                    {...args}
+                  />
+                )
               }}
             />
           </GridItem>

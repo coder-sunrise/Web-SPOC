@@ -20,6 +20,7 @@ import {
   Attachment,
 } from '@/components/_medisys'
 import FormField from './formField'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -46,6 +47,7 @@ const VisitInfoCard = ({
   attachments,
   handleUpdateAttachments,
   existingQNo,
+  visitType,
 }) => {
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
@@ -53,7 +55,6 @@ const VisitInfoCard = ({
       return 'Queue No. already existed in current queue list'
     return ''
   }
-
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -78,9 +79,17 @@ const VisitInfoCard = ({
             render={(args) => (
               <DoctorProfileSelect
                 disabled={isReadOnly}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.doctor',
-                })}
+                label={
+                  visitType === VISIT_TYPE.RETAIL ? (
+                    formatMessage({
+                      id: 'reception.queue.visitRegistration.attendantDoctor',
+                    })
+                  ) : (
+                    formatMessage({
+                      id: 'reception.queue.visitRegistration.doctor',
+                    })
+                  )
+                }
                 {...args}
               />
             )}
