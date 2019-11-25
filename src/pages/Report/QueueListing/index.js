@@ -66,8 +66,8 @@ const QueueListingWithFormik = withFormik({
     listingFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).startOf('month').toDate(),
-    listingTo: moment(new Date()).endOf('month').toDate(),
+    listingFrom: moment(new Date()).toDate(),
+    listingTo: moment(new Date()).toDate(),
   }),
 })(QueueListing)
 
