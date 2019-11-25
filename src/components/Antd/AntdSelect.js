@@ -146,7 +146,7 @@ class AntdSelect extends React.PureComponent {
           form.setFieldValue(field.name, v)
         }
       }
-    } else if (value) {
+    } else if (value !== undefined) {
       v = [
         'multiple',
         'tags',
@@ -261,7 +261,7 @@ class AntdSelect extends React.PureComponent {
         //   ? v && v.length > 0
         //   : v !== undefined,
       })
-    } else if (value) {
+    } else if (value !== undefined) {
       v = [
         'multiple',
         'tags',
@@ -630,6 +630,7 @@ class AntdSelect extends React.PureComponent {
         optionLabelLength && text && text.length > optionLabelLength
           ? `${text.substring(0, optionLabelLength)}...`
           : text
+
       return (
         <Tooltip title={text} enterDelay={750}>
           <AutosizeInput
