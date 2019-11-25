@@ -2,13 +2,9 @@ import React from 'react'
 import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
-import moment from 'moment'
 import {
   Table,
 } from '@devexpress/dx-react-grid-material-ui'
-import {
-  dateFormatLong,
-} from '@/components'
 import { ReportDataGrid } from '@/components/_medisys'
 
 
@@ -18,19 +14,33 @@ const VisitListing = ({ reportDatas }) => {
   let listData = []
   const { VisitListingDetails } = reportDatas
   if (VisitListingDetails) {
-    listData = VisitListingDetails.map(
-      (item, index) => ({
-        ...item,
-        id: `qListing-${index}-${item.visitReferenceNo}`,
-        date: moment(item.visitDate).format(dateFormatLong),
-      }),
-    )
+    let count = 0
+    for (let i = VisitListingDetails.length - 1; i >= 0; i--) {
+      const item = VisitListingDetails[i]
+      count += 1
+      if (i === 0 || VisitListingDetails[i - 1].invoiceNo !== item.invoiceNo) {
+        listData.splice(0, 0, {
+          ...item,
+          id: `qListing-${i}-${item.invoiceNo}`,
+          countNumber: 1,
+          rowspan: count,
+        })
+        count = 0
+      } else {
+        listData.splice(0, 0, {
+          ...item,
+          id: `qListing-${i}-${item.invoiceNo}`,
+          countNumber: 0,
+          rowspan: 0,
+        })
+      }
+    }
   }
 
   const VisitListingColumns = [
     { name: 'queueNo', title: 'Queue No.' },
     { name: 'patientName', title: 'Patient Name' },
-    { name: 'doctorCode', title: 'Doctor' },
+    { name: 'doctorName', title: 'Doctor' },
     { name: 'timeIn', title: 'Time In' },
     { name: 'timeOut', title: 'Time Out' },
     { name: 'invoiceNo', title: 'Invoice No' },
@@ -41,21 +51,24 @@ const VisitListing = ({ reportDatas }) => {
     { name: 'patientOS', title: 'Patient O/S Amt.' },
     { name: 'coPayerPayable', title: 'Company Payable' },
     { name: 'coPayerName', title: 'Co-Payer' },
-    { name: 'date', title: 'Visit Date' },
+    { name: 'visitDate', title: 'Visit Date' },
   ]
 
   const VisitListingColumnExtension = [
-    { columnName: 'queueNo', width: 80 },
-    { columnName: 'invoiceNo', width: 100 },
-    { columnName: 'patientName', width: 180 },
-    { columnName: 'invoiceAmt', type: 'currency', currency: true },
-    { columnName: 'gstAmt', type: 'currency', currency: true },
-    { columnName: 'patientPaid', type: 'currency', currency: true },
-    { columnName: 'patientOS', type: 'currency', currency: true },
-    { columnName: 'coPayerPayable', type: 'currency', currency: true },
-    { columnName: 'coPayerPayable', wordWrapEnabled: true },
-    { columnName: 'timeIn', width: 80, render: (row) => moment(row.timeIn).format('hh:mm A') },
-    { columnName: 'timeOut', width: 80, render: (row) => moment(row.timeOut).format('hh:mm A') },
+    { columnName: 'queueNo', width: 80, sortingEnabled: false },
+    { columnName: 'patientName', width: 180, sortingEnabled: false },
+    { columnName: 'doctorName', width: 180, sortingEnabled: false },
+    { columnName: 'timeIn', width: 80, sortingEnabled: false },
+    { columnName: 'timeOut', width: 80, sortingEnabled: false },
+    { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
+    { columnName: 'invoiceAmt', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'patientPaid', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'paymentMode', width: 100, sortingEnabled: false },
+    { columnName: 'patientOS', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'coPayerPayable', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'coPayerName', wordWrapEnabled: true, sortingEnabled: false },
+
   ]
 
   const FuncProps = {
@@ -64,7 +77,7 @@ const VisitListing = ({ reportDatas }) => {
     groupingConfig: {
       state: {
         grouping: [
-          { columnName: 'date' },
+          { columnName: 'visitDate' },
         ],
       },
     },
@@ -101,9 +114,22 @@ const VisitListing = ({ reportDatas }) => {
   const visitListingRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      return <Table.Row {...p}>{children}</Table.Row>
+      const newchildren = children.map((item, index) => (index < 9 || index > 10) ? {
+        ...children[index],
+        props: {
+          ...children[index].props,
+          rowSpan: row.rowspan,
+        },
+      } : item)
+      return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    const newchildren = [<Table.Cell colSpan="9"></Table.Cell>, children[9], children[10], <Table.Cell colSpan="3"></Table.Cell>]
+    const newchildren = [{
+      ...children[9],
+      props: {
+        ...children[9].props,
+        style: { paddingLeft: 8 },
+      },
+    }, children[10]]
     return <Table.Row {...p}>{newchildren}</Table.Row>
 
   }
