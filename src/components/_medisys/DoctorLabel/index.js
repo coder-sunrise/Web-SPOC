@@ -1,4 +1,5 @@
 import React, { memo } from 'react'
+import { Tooltip } from '@/components'
 
 const DoctorLabel = ({ doctor, hideMCR = false }) => {
   let label = ''
@@ -20,7 +21,11 @@ const DoctorLabel = ({ doctor, hideMCR = false }) => {
   } catch (error) {
     // console.log({ error })
   }
-  return <React.Fragment>{label}</React.Fragment>
+  return (
+    <Tooltip title={label}>
+      <span>{label}</span>
+    </Tooltip>
+  )
 }
 
 export default memo(DoctorLabel)

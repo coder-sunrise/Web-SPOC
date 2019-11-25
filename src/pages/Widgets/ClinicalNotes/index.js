@@ -498,6 +498,7 @@ class ClinicalNotes extends Component {
 
                   <RichEditor
                     strongLabel
+                    autoFocus
                     onBlur={this.onEditorChange('clinicianNote')}
                     label='Clinical Notes'
                     {...args}

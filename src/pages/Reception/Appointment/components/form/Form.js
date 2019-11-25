@@ -69,6 +69,7 @@ import styles from './style'
 })
 class Form extends React.PureComponent {
   state = {
+    submitCount: 0,
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
@@ -333,7 +334,7 @@ class Form extends React.PureComponent {
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
-      console.log({ deleted, datagrid, afterDelete })
+      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
@@ -465,14 +466,36 @@ class Form extends React.PureComponent {
         type: 'calendar/submit',
         payload: submitPayload,
       }).then((response) => {
-        if (validate)
-          dispatch({
-            type: 'global/updateState',
-            payload: {
-              commitCount: 99,
+        if (validate && response) {
+          const conflicts = [
+            ...response,
+          ]
+          this.setState(
+            (preState) => ({
+              submitCount: preState.submitCount + 1,
+              datagrid: preState.datagrid.reduce(
+                (data, d) => [
+                  ...data,
+                  {
+                    ...d,
+                    conflicts:
+                      conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                        ? conflicts[d.sortOrder].conflicts
+                        : undefined,
+                  },
+                ],
+                [],
+              ),
+            }),
+            () => {
+              dispatch({
+                type: 'global/updateState',
+                payload: { commitCount: this.state.submitCount + 1 },
+              })
             },
-          })
-        if (response) {
+          )
+        }
+        if (!validate && response) {
           onConfirm()
         }
       })
@@ -763,19 +786,6 @@ class Form extends React.PureComponent {
             .filter((item) => !item.isDeleted)
             .sort(sortDataGrid)
             .map((item, index) => ({ ...item, sortOrder: index }))
-            .reduce(
-              (data, d) => [
-                ...data,
-                {
-                  ...d,
-                  conflicts:
-                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                      ? conflicts[d.sortOrder].conflicts
-                      : undefined,
-                },
-              ],
-              [],
-            )
         : [
             ...datagrid,
           ]

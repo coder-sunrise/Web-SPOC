@@ -52,12 +52,12 @@ class DateEditorBase extends PureComponent {
       }
       commonCfg.autoFocus = true
     }
-    if (!editMode && !format) {
-      commonCfg.format = dateFormatLong
-    }
+    // if (!editMode && !format) {
+    //   commonCfg.format = dateFormatLong
+    // }
     return (
       <div ref={this.myRef}>
-        <DatePicker timeFormat={false} {...commonCfg} />
+        <DatePicker showTime={false} {...commonCfg} />
       </div>
     )
   }

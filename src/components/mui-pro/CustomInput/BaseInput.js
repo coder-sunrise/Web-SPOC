@@ -30,7 +30,7 @@ const _config = {
       'onChange',
       // 'onBlur',
       // 'onFocus',
-      'onMouseLeave',
+      // 'onMouseLeave',
       'autoFocus',
       'multiline',
       'rows',

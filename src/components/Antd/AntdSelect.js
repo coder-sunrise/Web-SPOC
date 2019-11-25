@@ -576,7 +576,7 @@ class AntdSelect extends React.PureComponent {
       maxTagPlaceholder,
       value,
       isLoading,
-      onMouseLeave,
+      // onMouseLeave,
       ...restProps
     } = this.props
     // console.log(options)
@@ -632,8 +632,9 @@ class AntdSelect extends React.PureComponent {
         <Tooltip title={text} enterDelay={750}>
           <AutosizeInput
             title=''
+            tabIndex='-1'
             readOnly
-            onMouseLeave={onMouseLeave}
+            // onMouseLeave={onMouseLeave}
             inputClassName={props.className}
             value={text}
           />
@@ -647,7 +648,7 @@ class AntdSelect extends React.PureComponent {
         style={{ width: '100%' }}
         {...props}
         ref={this.myRef}
-        onMouseLeave={onMouseLeave}
+        // onMouseLeave={onMouseLeave}
       >
         <Select
           className={classnames([

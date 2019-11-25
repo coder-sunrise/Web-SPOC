@@ -288,11 +288,11 @@ export default createListViewModel({
             recurrenceDto: recurrence,
           }
           if (validate) {
-            yield put({
+            return yield put({
               type: 'validate',
               payload: savePayload,
             })
-            return false
+            // return false
           }
           if (isEdit) {
             savePayload = {
@@ -321,13 +321,15 @@ export default createListViewModel({
         const { status, data } = result
 
         if (parseInt(status, 10) === 200) {
-          yield put({
-            type: 'saveConflict',
-            payload: {
-              conflicts: data.resourceConflict,
-            },
-          })
+          // yield put({
+          //   type: 'saveConflict',
+          //   payload: {
+          //     conflicts: data.resourceConflict,
+          //   },
+          // })
+          return data.resourceConflict
         }
+        return null
       },
       *refresh (_, { put }) {
         yield put({ type: 'navigateCalendar', payload: {} })
