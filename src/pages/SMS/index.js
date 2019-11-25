@@ -7,6 +7,7 @@ import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
 import New from './New'
 import { SmsOption } from './variables'
+import { ADD_ON_FEATURE } from '@/utils/constants'
 
 const styles = {
   sendBar: {
@@ -16,12 +17,16 @@ const styles = {
     opacity: 0.4,
   },
   warningContainer: {
-    position: 'absolute',
+    // position: 'absolute',
+    // width: '100%',
+    // height: '100%',
+    // top: 0,
+    // left: 0,
+    // zIndex: 9999,
+    position: 'fixed',
+    top: '50%',
+    transform: 'translate(-20%, -50%)',
     width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    zIndex: 9999,
   },
   warningContent: {
     top: '50%',
@@ -33,7 +38,7 @@ const styles = {
   },
 }
 
-const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
+const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
   const [
     selectedRows,
     setSelectedRows,
@@ -43,6 +48,11 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
     currentTab,
     setCurrentTab,
   ] = useState('0')
+
+  const [
+    showWarning,
+    setShowWarning,
+  ] = useState(false)
 
   const newMessageProps = {
     selectedRows,
@@ -61,7 +71,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
     selectedRows,
   }
 
-  const showWarning = false
   const contentClass = classnames({
     [classes.blur]: showWarning,
   })
@@ -82,6 +91,39 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
   }
 
   useEffect(() => {
+    const { addOnSubscriptions } = clinicInfo
+    const smsService = addOnSubscriptions.find(
+      (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
+    )
+
+    if (smsService) {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctAddonFeature',
+        },
+      }).then((ctAddonFeature) => {
+        const currentDate = moment().formatUTC()
+        const {
+          effectiveStartDate,
+          effectiveEndDate,
+          ctAddOnFeatureFK,
+        } = smsService
+
+        if (
+          currentDate < effectiveStartDate ||
+          currentDate > effectiveEndDate
+        ) {
+          setShowWarning(true)
+        } else {
+          const smsFeature = ctAddonFeature.find(
+            (o) => o.id === ctAddOnFeatureFK,
+          )
+          if (!smsFeature) setShowWarning(true)
+        }
+      })
+    }
+
     dispatch({
       type: 'smsAppointment/query',
       payload: {
@@ -97,7 +139,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
       },
     })
   }, [])
-
   return (
     <CardContainer hideHeader>
       {showWarning && (
@@ -105,7 +146,10 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
           <div className={classes.warningContent}>
             <CardContainer hideHeader>
               <Danger>
-                <h4>Please contact administrator to setup SMS feature.</h4>
+                <h4>
+                  To configure and use SMS feature, please contact system
+                  administrator for assistant.
+                </h4>
               </Danger>
             </CardContainer>
           </div>
@@ -127,8 +171,9 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ smsAppointment, smsPatient }) => ({
+  connect(({ smsAppointment, smsPatient, clinicInfo }) => ({
     smsAppointment,
     smsPatient,
+    clinicInfo,
   })),
 )(SMS)

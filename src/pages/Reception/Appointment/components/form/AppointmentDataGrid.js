@@ -187,7 +187,7 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
-    console.log({ data })
+    // console.log({ data })
     return (
       <div className={classes.container}>
         <EditableTableGrid
@@ -203,7 +203,7 @@ class AppointmentDataGrid extends React.Component {
               disabled: true,
               width: 60,
               render: (row) => {
-                console.log({ row })
+                // console.log({ row })
                 return null
                 // if (row.conflicts && row.conflicts.length > 0)
                 //   return <ErrorPopover errors={row.conflicts} />

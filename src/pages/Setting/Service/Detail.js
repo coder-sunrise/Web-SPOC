@@ -37,6 +37,27 @@ const itemSchema = Yup.object().shape({
   costPrice: Yup.number().required(),
   unitPrice: Yup.number().required(),
 })
+// const itemSchema = Yup.array()
+//   .compact((item) => item.isDeleted)
+//   .unique(
+//     (v) => {
+//       console.log({ v })
+//       return v.serviceCenterFK
+//     },
+//     'error',
+//     () => {
+//       // notification.error({
+//       //   message: 'The Schemes record already exists in the system',
+//       // })
+//     },
+//   )
+//   .of(
+//     Yup.object().shape({
+//       serviceCenterFK: Yup.string().required(),
+//       costPrice: Yup.number().required(),
+//       unitPrice: Yup.number().required(),
+//     }),
+//   )
 
 @withFormikExtend({
   mapPropsToValues: ({ settingClinicService }) => {
@@ -63,9 +84,9 @@ const itemSchema = Yup.object().shape({
     revenueCategoryFK: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
     serviceSettingItem: Yup.array().compact((v) => v.isDeleted).of(itemSchema),
-    ctServiceCenter_ServiceNavigation: Yup.array().required(
-      'At least one service setting is required.',
-    ),
+    ctServiceCenter_ServiceNavigation: Yup.array()
+      .compact((v) => v.isDeleted)
+      .required('At least one service setting is required.'),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
@@ -140,13 +161,13 @@ class Detail extends PureComponent {
 
         type: 'codeSelect',
         code: 'ctServiceCenter',
-        localFilter: (opt) => {
-          const selectedServiceCenter = this.state.serviceSettings
-            .filter((item) => !item.isDeleted)
-            .map((item) => item.serviceCenterFK)
+        // localFilter: (opt) => {
+        //   const selectedServiceCenter = this.state.serviceSettings
+        //     .filter((item) => !item.isDeleted)
+        //     .map((item) => item.serviceCenterFK)
 
-          return !selectedServiceCenter.includes(opt.id)
-        },
+        //   return !selectedServiceCenter.includes(opt.id)
+        // },
       },
       { columnName: 'costPrice', type: 'number', currency: true },
       { columnName: 'unitPrice', type: 'number', currency: true },
@@ -229,7 +250,13 @@ class Detail extends PureComponent {
     }))
   }
 
+  checkIsServiceCenterUnique = (row) => {
+    console.log({ row })
+  }
+
   commitChanges = ({ rows, added, changed, deleted }) => {
+    if (this.checkIsServiceCenterUnique(rows)) return rows
+
     const { setFieldValue, values } = this.props
 
     rows.forEach((val, i) => {
@@ -260,6 +287,7 @@ class Detail extends PureComponent {
         serviceSettings: rows,
       }
     })
+    return rows
   }
 
   handleAutoOrder = (e) => {

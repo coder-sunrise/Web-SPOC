@@ -114,7 +114,6 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 dispatch({
                   type: 'medication/query',
                   payload: {
-                    keepFilter: false,
                     code,
                     displayValue,
                     favouriteSupplierFK,

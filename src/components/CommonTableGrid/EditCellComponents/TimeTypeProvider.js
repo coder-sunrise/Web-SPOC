@@ -38,6 +38,7 @@ class TimeEditorBase extends PureComponent {
     this.setState({
       value,
     })
+    onComponentChange.call(this, { value })
   }
 
   onOpenChange = (open) => {

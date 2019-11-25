@@ -17,7 +17,10 @@ import {
   mapDatagridToAppointmentResources,
   compareDto,
 } from '@/pages/Reception/Appointment/components/form/formUtils'
-import { constructClinicBreakHoursData } from '@/pages/Reception/Appointment/utils'
+import {
+  constructClinicBreakHoursData,
+  isSavePayloadOk,
+} from '@/pages/Reception/Appointment/utils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {
@@ -146,14 +149,13 @@ export default createListViewModel({
             )
 
           const appointmentResources = datagrid
-            .filter((item) => item.id > 0 && !item.isDeleted)
+            // .filter((item) => item.id > 0 && !item.isDeleted)
             .map(mapDatagridToAppointmentResources(isRecurrenceChanged))
             .sort(sortDataGrid)
             .map((item, index) => ({
               ...item,
               sortOrder: index,
             }))
-
           const currentAppointment = {
             ...formikCurrentAppointment,
             isEditedAsSingleAppointment: !isEdit
@@ -177,6 +179,7 @@ export default createListViewModel({
               formikValues.isEnableRecurrence,
               isRecurrenceChanged,
             )
+            console.log({ appointments })
           } else if (calendarState.mode === 'single') {
             appointments = [
               currentAppointment,
@@ -306,7 +309,6 @@ export default createListViewModel({
               },
             }
           }
-          // console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,
