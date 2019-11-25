@@ -14,27 +14,29 @@ const styles = {
     marginTop: '10px',
   },
   blur: {
-    opacity: 0.4,
+    opacity: 1,
   },
-  warningContainer: {
-    // position: 'absolute',
-    // width: '100%',
-    // height: '100%',
-    // top: 0,
-    // left: 0,
-    // zIndex: 9999,
-    position: 'fixed',
-    top: '50%',
-    transform: 'translate(-20%, -50%)',
-    width: '100%',
-  },
+
   warningContent: {
-    top: '50%',
-    left: '45%',
-    position: 'fixed',
     '& h4': {
       fontWeight: 'bold',
     },
+    top: '50%',
+    position: 'fixed',
+    left: '35%',
+    zIndex: 9999,
+  },
+
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.87)',
+    position: 'fixed',
+    width: '100%',
+    height: '100%',
+    zIndex: 999,
+    top: '0px',
+    left: '0px',
+    opacity: 0.5 /* in FireFox */,
+    filter: 'alpha(opacity=50),' /* in IE */,
   },
 }
 
@@ -140,32 +142,35 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     })
   }, [])
   return (
-    <CardContainer hideHeader>
-      {showWarning && (
-        <div className={classes.warningContainer}>
-          <div className={classes.warningContent}>
-            <CardContainer hideHeader>
-              <Danger>
-                <h4>
-                  To configure and use SMS feature, please contact system
-                  administrator for assistant.
-                </h4>
-              </Danger>
-            </CardContainer>
+    <div>
+      <CardContainer hideHeader>
+        {showWarning && (
+          <React.Fragment>
+            <div className={classes.overlay}> </div>
+            <div className={classes.warningContent}>
+              <CardContainer hideHeader>
+                <Danger>
+                  <h4>
+                    To configure and use SMS feature, please contact system
+                    administrator for assistant.
+                  </h4>
+                </Danger>
+              </CardContainer>
+            </div>
+          </React.Fragment>
+        )}
+        <div className={contentClass}>
+          <Tabs
+            defaultActiveKey='0'
+            options={SmsOption(gridProps)}
+            onChange={(e) => setCurrentTab(e)}
+          />
+          <div className={classes.sendBar}>
+            <New {...newMessageProps} />
           </div>
         </div>
-      )}
-      <div className={contentClass}>
-        <Tabs
-          defaultActiveKey='0'
-          options={SmsOption(gridProps)}
-          onChange={(e) => setCurrentTab(e)}
-        />
-        <div className={classes.sendBar}>
-          <New {...newMessageProps} />
-        </div>
-      </div>
-    </CardContainer>
+      </CardContainer>
+    </div>
   )
 }
 export default compose(
