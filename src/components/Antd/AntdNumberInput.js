@@ -464,10 +464,12 @@ class AntdNumberInput extends React.PureComponent {
     //   cfg.value = selectValue
     // }
     if (this.props.text) {
+      if (!this.state.value && this.state.value !== 0) return <span>-</span>
       const cfg = this.getConfig()
       return (
         <AutosizeInput
           readOnly
+          tabIndex='-1'
           inputClassName={props.className}
           value={cfg.formatter(this.state.value)}
         />
