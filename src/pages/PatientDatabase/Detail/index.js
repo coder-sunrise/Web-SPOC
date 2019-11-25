@@ -126,8 +126,18 @@ const styles = () => ({
           if (patient.callback) patient.callback(r.id)
         })
         if (onConfirm && !r.id) {
+          dispatch({
+            type: 'patientSearch/query',
+            payload: {
+              sorting: [
+                // { columnName: 'isActive', direction: 'asc' },
+                { columnName: 'name', direction: 'asc' },
+              ],
+            },
+          })
           onConfirm()
         }
+
         resetForm({})
       }
     })
