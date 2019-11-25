@@ -227,7 +227,6 @@ class EmergencyContact extends PureComponent {
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log('render', values.patientEmergencyContact, this.tableParas)
 
     return (
       <div>
@@ -268,6 +267,11 @@ class EmergencyContact extends PureComponent {
             //     ...o,
             //   }))
             // },
+            onAddedRowsChange: (rows) => {
+              return rows.map((o) => {
+                return { primaryContactNo: '', ...o }
+              })
+            },
           }}
           {...this.tableParas}
         />
