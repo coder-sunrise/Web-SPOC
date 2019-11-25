@@ -965,6 +965,7 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               <TextTypeProvider {...cellComponentConfig} />
+
               <NumberTypeProvider {...cellComponentConfig} />
               <SelectTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />

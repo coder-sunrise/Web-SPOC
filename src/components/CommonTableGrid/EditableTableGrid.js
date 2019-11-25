@@ -581,7 +581,6 @@ class EditableTableGrid extends React.Component {
     const element = (
       <Authorized.Context.Consumer>
         {(matches) => {
-          console.log(matches)
           return Authorized.generalCheck(
             matches,
             this.props,

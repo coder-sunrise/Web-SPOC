@@ -184,18 +184,14 @@ class TextTypeProvider extends React.Component {
     }
     const { columnExtensions } = props
     // console.log(columnExtensions)
-    this.columns = columnExtensions.filter(
+    const cols = columnExtensions.filter(
       (o) =>
         [
           'number',
-          'currency',
           'select',
           'date',
-          'time',
           'action',
-        ].indexOf(o.type) < 0 ||
-        !o.type ||
-        o.type === 'text',
+        ].indexOf(o.type) < 0,
     )
     // .filter(
     //   (o) =>
@@ -203,17 +199,20 @@ class TextTypeProvider extends React.Component {
     //       'rowSort',
     //     ].indexOf(o.columnName) < 0,
     // )
-    // console.log(this.columns)
+    // console.log(cols)
 
-    for (let i = 0; i < this.columns.length; i++) {
-      // console.log(this.columns[i].columnName, this.columns[i].type)
-      delete this.columns[i].type
-      this.columns[i].compare = (a, b) => {
-        // console.log(a, b)
+    for (let i = 0; i < cols.length; i++) {
+      // console.log(cols[i].columnName, cols[i].type)
+      // delete cols[i].type
+      cols[i].compare = (a, b) => {
         // eslint-disable-next-line no-nested-ternary
         return (a || '').localeCompare(b || '')
       }
-      this.columns[i].index = i
+      // cols[i].index = i
+    }
+
+    this.state = {
+      for: cols,
     }
   }
 
@@ -227,13 +226,11 @@ class TextTypeProvider extends React.Component {
 
   render () {
     const { columnExtensions } = this.props
-    // console.log(this.columns)
     return (
       <DataTypeProvider
-        for={this.columns.map((o) => o.columnName)}
+        for={this.state.for.map((o) => o.columnName)}
         formatterComponent={this.TextEditor(columnExtensions, true)}
         editorComponent={this.TextEditor(columnExtensions)}
-        {...this.props}
       />
     )
   }
