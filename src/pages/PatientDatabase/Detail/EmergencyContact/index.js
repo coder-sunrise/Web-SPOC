@@ -17,6 +17,17 @@ class EmergencyContact extends PureComponent {
   state = {
     editingRowIds: [],
     showModal: false,
+    defaultColumnValues: {
+      accountNoTypeFK: undefined,
+      accountNo: '',
+      salutationFK: undefined,
+      name: '',
+      relationshipFK: undefined,
+      address: '',
+      primaryContactNo: '',
+      isPrimaryContact: false,
+      remark: '',
+    },
   }
 
   tableParas = {
@@ -223,15 +234,21 @@ class EmergencyContact extends PureComponent {
     )
   }
 
+  processRows = (rows) => {
+    let newRows = rows.map((row) => {
+      return { ...this.state.defaultColumnValues, ...row }
+    })
+    return newRows
+  }
+
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log('render', values.patientEmergencyContact, this.tableParas)
 
     return (
       <div>
         <EditableTableGrid
-          rows={values.patientEmergencyContact}
+          rows={this.processRows(values.patientEmergencyContact)}
           schema={schema}
           // showRowNumber
           // onRowDoubleClick={this.onRowDoubleClick}
