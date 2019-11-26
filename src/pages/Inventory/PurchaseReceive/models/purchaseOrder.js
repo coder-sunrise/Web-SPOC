@@ -217,9 +217,7 @@ export default createFormViewModel({
 
       upsertRow (state, { payload }) {
         const { purchaseOrder, rows } = payload
-        let tempArray = [
-          rows,
-        ]
+
         // if (rows.uid) {
         //   tempRows = tempRows.map((row) => {
         //     const n =
@@ -233,19 +231,19 @@ export default createFormViewModel({
         //   })
         // } else {
 
-        const newRows = tempArray.map((o) => {
+        const newRows = rows.map((o) => {
           const item = podoOrderType.find((x) => x.value === o.type)
           let itemFK
-          console.log('FK', rows, item)
           if (item) {
             const { itemFKName } = item
             itemFK = itemFKName
           }
           return {
-            ...rows,
-            [itemFK]: rows.code,
             uid: getUniqueId(),
-            sortOrder: rows.length + 1,
+            ...o,
+            [itemFK]: o.code,
+            itemFK: o.code,
+            sortOrder: o.length + 1,
             isDeleted: false,
           }
         })

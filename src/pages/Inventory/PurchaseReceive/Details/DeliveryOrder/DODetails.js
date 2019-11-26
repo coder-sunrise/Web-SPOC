@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
 import { formatMessage } from 'umi/locale'
-import _ from 'lodash'
-import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
   GridContainer,
@@ -20,7 +18,7 @@ import {
 } from '@/utils/codes'
 import AuthorizedContext from '@/components/Context/Authorized'
 
-let commitCount = 2201 // uniqueNumber
+// let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
@@ -287,7 +285,7 @@ class DODetails extends PureComponent {
 
   handleOnOrderTypeChanged = async (e) => {
     const { values, deliveryOrderDetails } = this.props
-    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderDetails, entity } = deliveryOrderDetails
     const { purchaseOrderOutstandingItem } = purchaseOrderDetails
     const { rows } = values
     const { row, option } = e
@@ -299,7 +297,8 @@ class DODetails extends PureComponent {
       value,
       itemFKName,
       rows,
-      purchaseOrderOutstandingItem,
+      // purchaseOrderOutstandingItem,
+      entity.rows,
     )
 
     this.setState({
@@ -322,27 +321,36 @@ class DODetails extends PureComponent {
   }
 
   handleItemOnChange = (e, type) => {
-    const { dispatch, deliveryOrderDetails } = this.props
     const { option, row } = e
-    const { sellingPrice, uom, name, value, remainingQty } = option
+    const { value, remainingQty } = option
     if (type === 'code') {
       row.name = value
     } else {
       row.code = value
     }
 
-    row.uom = option.uom
+    row.uom = value
     row.currentReceivingQty = remainingQty
-
+    row.itemFK = value
     row.maxCurrentReceivingQty = remainingQty
     row.maxCurrentReceivingBonusQty = remainingQty
+
+    const { deliveryOrderDetails } = this.props
+    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+    let osItem = purchaseOrderOutstandingItem.filter((x) => x.code === value)[0]
+
+    row.orderQuantity = osItem.orderQuantity
+    row.bonusQuantity = osItem.bonusQuantity
+    row.quantityReceived = osItem.totalReceived
+    row.totalBonusReceived = osItem.totalBonusReceived
 
     this.setState({
       selectedItem: option,
       onClickColumn: 'item',
     })
 
-    this.forceUpdate()
+    // this.forceUpdate()
 
     return { ...row }
   }
@@ -379,7 +387,7 @@ class DODetails extends PureComponent {
       const existUid = Object.keys(changed)[0]
       dispatch({
         type: 'deliveryOrderDetails/upsertRow',
-        payload: { uid: existUid, ...changed[existUid] },
+        payload: { uid: existUid, ...changed[existUid], gridRows: rows },
       })
     } else {
       dispatch({
@@ -470,9 +478,9 @@ class DODetails extends PureComponent {
 
   rowOptions = (row) => {
     if (row.type === 1) {
-      return row.uid
-        ? this.state.MedicationItemList
-        : this.state.filterMedicationItemList
+      return row.isNew
+        ? this.state.filterMedicationItemList
+        : this.state.MedicationItemList
     }
     if (row.type === 2) {
       return row.uid
@@ -524,7 +532,6 @@ class DODetails extends PureComponent {
       classes,
     } = props
     const { rows } = values
-
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
@@ -553,6 +560,7 @@ class DODetails extends PureComponent {
               this.handleOnOrderTypeChanged(e)
             }
           },
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'code',
@@ -566,6 +574,7 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'code')
             }
           },
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'name',
@@ -579,6 +588,7 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'name')
             }
           },
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'uom',
@@ -597,6 +607,7 @@ class DODetails extends PureComponent {
             }
             return []
           },
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'orderQuantity',
@@ -604,6 +615,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'bonusQuantity',
@@ -611,6 +623,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'quantityReceived',
@@ -618,6 +631,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 120,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'totalBonusReceived',
@@ -625,18 +639,21 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 150,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'currentReceivingQty',
           type: 'number',
           format: '0.0',
           width: 150,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
           format: '0.0',
           width: 180,
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'batchNo',
@@ -653,15 +670,17 @@ class DODetails extends PureComponent {
           render: (row) => {
             return <TextField text value={row.batchNo} />
           },
+          isDisabled: () => !!values.id,
         },
         {
           columnName: 'expiryDate',
           type: 'date',
-          // disabled: this.state.expiryDateAvailability,
+          isDisabled: () => !!values.id,
         },
       ],
       onRowDoubleClick: undefined,
     }
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>

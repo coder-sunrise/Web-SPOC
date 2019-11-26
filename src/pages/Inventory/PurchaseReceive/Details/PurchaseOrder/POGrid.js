@@ -153,8 +153,6 @@ class Grid extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
-    console.log('DONTASSD')
-
     let newAddedRows = addedRows
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
@@ -219,7 +217,6 @@ class Grid extends PureComponent {
   }
 
   onCommitChanges = (values) => ({ rows, added, changed, deleted }) => {
-    console.log('DONT')
     const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
@@ -228,12 +225,11 @@ class Grid extends PureComponent {
         payload: deleted[0],
       })
     } else if (added || changed) {
-      console.log('here')
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
         payload: {
           purchaseOrder: values,
-          rows: rows[0],
+          rows,
         },
       })
     }
@@ -243,16 +239,14 @@ class Grid extends PureComponent {
   }
 
   rowOptions = (row, rows = []) => {
+    const { purchaseOrderDetails } = this.props
     const getUnusedItem = (stateName) => {
       rows = rows.filter((o) => !o.isDeleted)
-
       const unusedInventoryItem = _.differenceBy(
         this.state[stateName],
-        rows,
+        purchaseOrderDetails.rows,
         'itemFK',
       )
-      // console.log('asda', unusedInventoryItem)
-
       return unusedInventoryItem
     }
 
@@ -280,7 +274,6 @@ class Grid extends PureComponent {
         'MedicationItemList',
         activeOptions,
       )
-      // console.log('banana', currentOptions, activeOptions)
       return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 2) {
@@ -304,12 +297,12 @@ class Grid extends PureComponent {
     return []
   }
 
-  calculateTotalPrice = (e) => {
-    console.log('cal')
+  calculateTotalPriceAndTotalQuantity = (e) => {
     const { row } = e
     if (row) {
       const { orderQuantity, unitPrice } = row
       row.totalPrice = orderQuantity * unitPrice
+      row.totalQuantity = orderQuantity
     }
   }
 
@@ -405,7 +398,7 @@ class Grid extends PureComponent {
           columnName: 'orderQuantity',
           type: 'number',
           precision: 1,
-          onChange: this.calculateTotalPrice,
+          onChange: this.calculateTotalPriceAndTotalQuantity,
         },
         {
           columnName: 'bonusReceived',
@@ -429,7 +422,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          onChange: this.calculateTotalPrice,
+          onChange: this.calculateTotalPriceAndTotalQuantity,
         },
         {
           columnName: 'totalPrice',
@@ -440,7 +433,6 @@ class Grid extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
