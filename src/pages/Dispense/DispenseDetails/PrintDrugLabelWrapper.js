@@ -45,10 +45,10 @@ class PrintDrugLabelWrapper extends React.Component {
           drugLableSource.reportId,
           drugLableSource.payload,
         )
-      } else if (type === 'Patient') {
-        const { patient } = this.props
-        printResult = await getPDF(27, patient.id)
       }
+    } else if (type === 'Patient') {
+      const { patient } = this.props
+      printResult = await getPDF(27, patient.id)
     }
     return printResult
   }
@@ -116,7 +116,10 @@ class PrintDrugLabelWrapper extends React.Component {
           ExpiryDate: row.expiryDate,
           UOM: data.dispenseUOM,
           Quantity: data.dispensedQuanity,
-          BatchNo: row.batchNo ? row.batchNo[0] : undefined,
+          BatchNo:
+            row.batchNo && Array.isArray(row.batchNo)
+              ? row.batchNo[0]
+              : undefined,
         },
       ]
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
@@ -146,7 +149,10 @@ class PrintDrugLabelWrapper extends React.Component {
             ExpiryDate: prescription ? prescription.expiryDate : undefined,
             UOM: o.dispenseUOM,
             Quantity: o.dispensedQuanity,
-            BatchNo: prescription ? prescription.batchNo[0] : undefined,
+            BatchNo:
+              prescription && Array.isArray(prescription.batchNo)
+                ? prescription.batchNo[0]
+                : undefined,
           }
         }),
       )
