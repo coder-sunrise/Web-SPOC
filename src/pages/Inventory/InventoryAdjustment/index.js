@@ -108,7 +108,7 @@ class InventoryAdjustment extends PureComponent {
               'Add Inventory Adjustment'
             )
           }
-          maxWidth='lg'
+          maxWidth='xl'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}

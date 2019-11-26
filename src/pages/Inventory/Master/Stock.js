@@ -149,7 +149,6 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.reorderThreshold',
                   })}
-                  format='0.00'
                   {...args}
                 />
               )
@@ -165,7 +164,6 @@ const Stock = ({
                   label={formatMessage({
                     id: 'inventory.master.stock.criticalThreshold',
                   })}
-                  format='0.00'
                   {...args}
                 />
               )
