@@ -216,40 +216,44 @@ export default createFormViewModel({
       },
 
       upsertRow (state, { payload }) {
-        let { rows } = state
-        if (payload.uid) {
-          rows = rows.map((row) => {
-            const n =
-              row.uid === payload.uid
-                ? {
-                    ...row,
-                    ...payload,
-                  }
-                : row
-            return n
-          })
-        } else {
-          // const itemFK = podoOrderType.filter(
-          //   (x) => x.value === payload.type,
-          // )[0].itemFKName
+        const { purchaseOrder, rows } = payload
+        let tempArray = [
+          rows,
+        ]
+        // if (rows.uid) {
+        //   tempRows = tempRows.map((row) => {
+        //     const n =
+        //       tempRows.uid === rows.uid
+        //         ? {
+        //             ...row,
+        //             ...rows,
+        //           }
+        //         : row
+        //     return n
+        //   })
+        // } else {
+
+        const newRows = tempArray.map((o) => {
+          const item = podoOrderType.find((x) => x.value === o.type)
           let itemFK
-          const item = podoOrderType.filter((x) => x.value === payload.type)
-          if (item.length > 0) {
-            const { itemFKName } = item[0]
+          console.log('FK', rows, item)
+          if (item) {
+            const { itemFKName } = item
             itemFK = itemFKName
           }
-          rows.push({
-            ...payload,
-            [itemFK]: payload.itemFK,
-            name: payload.itemFK,
-            uom: payload.itemFK,
+          return {
+            ...rows,
+            [itemFK]: rows.code,
             uid: getUniqueId(),
             sortOrder: rows.length + 1,
             isDeleted: false,
-          })
-        }
+          }
+        })
 
-        return { ...state, rows }
+        // }
+        const returnValue = { ...state, purchaseOrder, rows: newRows }
+
+        return { ...returnValue }
       },
 
       deleteRow (state, { payload }) {

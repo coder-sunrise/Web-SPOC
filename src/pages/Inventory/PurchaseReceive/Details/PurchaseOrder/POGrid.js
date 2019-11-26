@@ -9,7 +9,7 @@ import {
   fetchAndSaveCodeTable,
 } from '@/utils/codes'
 
-let commitCount = 2200 // uniqueNumber
+// let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
@@ -66,7 +66,6 @@ class Grid extends PureComponent {
           x.itemFKName,
           x.stateName,
         )
-        console.log(x.stateName, inventoryItemList)
         this.setState({
           [x.stateName]: inventoryItemList,
         })
@@ -101,15 +100,15 @@ class Grid extends PureComponent {
       [`filter${stateName}`]: inventoryItemList,
     })
 
-    row.code = ''
-    row.name = ''
-    row.uom = ''
-    row.orderQuantity = 0
-    row.bonusReceived = 0
-    row.totalQuantity = 0
-    row.totalReceived = 0
-    row.unitPrice = 0
-    row.totalPrice = 0
+    // row.code = ''
+    // row.name = ''
+    // row.uom = ''
+    // row.orderQuantity = 0
+    // row.bonusReceived = 0
+    // row.totalQuantity = 0
+    // row.totalReceived = 0
+    // row.unitPrice = 0
+    // row.totalPrice = 0
 
     this.setState({ onClickColumn: 'type' })
 
@@ -154,6 +153,8 @@ class Grid extends PureComponent {
   }
 
   onAddedRowsChange = (addedRows) => {
+    console.log('DONTASSD')
+
     let newAddedRows = addedRows
     if (addedRows.length > 0) {
       if (!addedRows.isFocused) {
@@ -217,7 +218,8 @@ class Grid extends PureComponent {
     return newAddedRows
   }
 
-  onCommitChanges = ({ rows, added, changed, deleted }) => {
+  onCommitChanges = (values) => ({ rows, added, changed, deleted }) => {
+    console.log('DONT')
     const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
@@ -226,9 +228,13 @@ class Grid extends PureComponent {
         payload: deleted[0],
       })
     } else if (added || changed) {
+      console.log('here')
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
-        payload: rows[0],
+        payload: {
+          purchaseOrder: values,
+          rows: rows[0],
+        },
       })
     }
 
@@ -274,6 +280,7 @@ class Grid extends PureComponent {
         'MedicationItemList',
         activeOptions,
       )
+      // console.log('banana', currentOptions, activeOptions)
       return row.uid ? currentOptions : activeOptions
     }
     if (row.type === 2) {
@@ -298,6 +305,7 @@ class Grid extends PureComponent {
   }
 
   calculateTotalPrice = (e) => {
+    console.log('cal')
     const { row } = e
     if (row) {
       const { orderQuantity, unitPrice } = row
@@ -376,27 +384,27 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'uom',
-          type: 'select',
-          labelField: 'uom',
+          // type: 'select',
+          // labelField: 'uom',
           disabled: true,
           sortingEnabled: false,
-          options: (row) => {
-            if (row.type === 1) {
-              return this.state.MedicationItemList
-            }
-            if (row.type === 2) {
-              return this.state.VaccinationItemList
-            }
-            if (row.type === 3) {
-              return this.state.ConsumableItemList
-            }
-            return []
-          },
+          // options: (row) => {
+          //   if (row.type === 1) {
+          //     return this.state.MedicationItemList
+          //   }
+          //   if (row.type === 2) {
+          //     return this.state.VaccinationItemList
+          //   }
+          //   if (row.type === 3) {
+          //     return this.state.ConsumableItemList
+          //   }
+          //   return []
+          // },
         },
         {
           columnName: 'orderQuantity',
           type: 'number',
-          format: '0.0',
+          precision: 1,
           onChange: this.calculateTotalPrice,
         },
         {
@@ -448,7 +456,7 @@ class Grid extends PureComponent {
               showAddCommand: isEditable,
               showEditCommand: isEditable,
               showDeleteCommand: isEditable,
-              onCommitChanges: this.onCommitChanges,
+              onCommitChanges: this.onCommitChanges(values.purchaseOrder),
               onAddedRowsChange: this.onAddedRowsChange,
             }}
             {...tableParas}
