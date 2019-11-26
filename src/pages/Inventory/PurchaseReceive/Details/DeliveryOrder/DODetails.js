@@ -636,7 +636,7 @@ class DODetails extends PureComponent {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
           format: '0.0',
-          width: 180,
+          width: 200,
         },
         {
           columnName: 'batchNo',
