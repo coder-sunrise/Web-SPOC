@@ -27,12 +27,13 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
 
   const {
     criticalThreshold = 0.0,
+    reOrderThreshold = 0.0,
     stock = 0.0,
     isChasAcuteClaimable,
     isChasChronicClaimable,
   } = source
 
-  const isLowStock = stock <= criticalThreshold
+  const isLowStock = stock <= criticalThreshold || stock <= reOrderThreshold
 
   return (
     <Popover
