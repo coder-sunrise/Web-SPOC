@@ -116,7 +116,7 @@ const styles = () => ({
   },
 })
 
-const temp = null
+let temp = null
 @withFormikExtend({
   notDirtyDuration: 0.5,
   mapPropsToValues: ({ scriblenotes }) => {
