@@ -233,7 +233,7 @@ class Demographic extends PureComponent {
                     return (
                       <TextField
                         label='Full Name'
-                        maxLength='200'
+                        maxLength='100'
                         onChange={(e) => {
                           // if (
                           //   !values.callingName ||
@@ -254,7 +254,7 @@ class Demographic extends PureComponent {
                     return (
                       <TextField
                         label='Calling Name'
-                        maxLength='200'
+                        maxLength='100'
                         {...args}
                       />
                     )
