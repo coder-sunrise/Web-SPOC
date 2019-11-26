@@ -23,29 +23,17 @@ class PrintDrugLabelWrapper extends React.Component {
     if (this.wsConnection) this.wsConnection.close()
   }
 
-  handleOnPrint = async (type, row = {}) => {
+  getPrintResult = async (type, row) => {
+    let printResult
     if (type === 'Medication') {
-      this.connectWebSocket()
       let drugLableSource = await this.generateDrugLablePrintSource(row)
       if (drugLableSource) {
-        let printResult = await postPDF(
+        printResult = await postPDF(
           drugLableSource.reportId,
           drugLableSource.payload,
         )
-
-        if (printResult) {
-          const base64Result = arrayBufferToBase64(printResult)
-          if (this.iswsConnect === true) {
-            this.wsConnection.send(`["${base64Result}"]`)
-          } else {
-            notification.error({
-              message: `SEMR printing tool is not running, please start it.`,
-            })
-          }
-        }
       }
     } else if (type === 'Medications') {
-      this.connectWebSocket()
       const { dispense, values } = this.props
       const { prescription } = values
       let drugLableSource = await this.generateDrugLablesPrintSource(
@@ -53,27 +41,23 @@ class PrintDrugLabelWrapper extends React.Component {
         prescription,
       )
       if (drugLableSource) {
-        let printResult = await postPDF(
+        printResult = await postPDF(
           drugLableSource.reportId,
           drugLableSource.payload,
         )
-
-        if (printResult) {
-          const base64Result = arrayBufferToBase64(printResult)
-          if (this.iswsConnect === true) {
-            this.wsConnection.send(`["${base64Result}"]`)
-          } else {
-            notification.error({
-              message: `SEMR printing tool is not running, please start it.`,
-            })
-          }
-        }
+      } else if (type === 'Patient') {
+        const { patient } = this.props
+        printResult = await getPDF(27, patient.id)
       }
-    } else if (type === 'Patient') {
+    }
+    return printResult
+  }
+
+  handleOnPrint = async (type, row = {}) => {
+    if (type === 'Medication' || type === 'Medications' || type === 'Patient') {
       this.connectWebSocket()
-      console.log('patietn', this.props)
-      const { patient } = this.props
-      let printResult = await getPDF(27, patient.id)
+
+      let printResult = await this.getPrintResult(type, row)
 
       if (printResult) {
         const base64Result = arrayBufferToBase64(printResult)
