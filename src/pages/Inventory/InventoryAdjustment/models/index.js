@@ -17,6 +17,7 @@ export default createListViewModel({
         // ],
         inventoryAdjustmentItems: [],
         inventoryAdjustmentStatusFK: 1,
+        adjustmentTransactionDate: moment(),
       },
     },
     subscriptions: ({ dispatch, history }) => {
