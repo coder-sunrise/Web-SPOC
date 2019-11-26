@@ -589,12 +589,14 @@ class CommonTableGrid extends PureComponent {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
       if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
-        cfg = {
-          tabIndex: 0,
-          onFocus: onClick,
-          // onBlur: () => {
-          //   console.log(111)
-          // },
+        if (colCfg && colCfg.type !== 'radio') {
+          cfg = {
+            tabIndex: 0,
+            onFocus: onClick,
+            // onBlur: () => {
+            //   console.log(111)
+            // },
+          }
         }
       }
       if (colCfg && colCfg.disabled) cfg = {}
