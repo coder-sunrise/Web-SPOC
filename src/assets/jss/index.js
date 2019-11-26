@@ -226,11 +226,12 @@ const primaryCardHeader = {
   ...primaryBoxShadow,
 }
 const loginCardHeader = {
-  background: `linear-gradient(0deg, ${color('#0093f1').hex()}, ${color(
-    '#0093f1',
-  )
-    .darken(0.2)
-    .hex()})`,
+  // background: `linear-gradient(0deg, ${color('#0093f1').hex()}, ${color(
+  //   '#0093f1',
+  // )
+  //   .darken(0.2)
+  //   .hex()})`,
+  background: '#0093f1',
   ...primaryBoxShadow,
 }
 const roseCardHeader = {

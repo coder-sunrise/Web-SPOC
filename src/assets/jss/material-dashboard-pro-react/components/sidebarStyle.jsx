@@ -141,6 +141,7 @@ const sidebarStyle = (theme) => ({
   },
   logoNormal: {
     ...defaultFont,
+    color: '#0093f1',
     transition: 'all 300ms linear',
     display: 'block',
     opacity: '1',
@@ -153,7 +154,7 @@ const sidebarStyle = (theme) => ({
     lineHeight: '30px',
     overflow: 'hidden',
     '&,&:hover,&:focus': {
-      color: 'inherit',
+      color: '#0093f1',
     },
   },
   logoNormalRTL: {
