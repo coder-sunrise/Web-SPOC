@@ -52,7 +52,6 @@ class SalesList extends PureComponent {
       summaryConfig: {
         state: {
           totalItems: [
-            { columnName: 'unitPrice', type: 'sum' },
             { columnName: 'revenueAMT', type: 'sum' },
             { columnName: 'cnamt', type: 'sum' },
           ],
@@ -76,8 +75,7 @@ class SalesList extends PureComponent {
           state: {
             totalItems: [],
             groupItems: [
-              { columnName: 'unitPrice', type: 'sum' },
-              { columnName: 'revenueamt', type: 'sum' },
+              { columnName: 'revenueAMT', type: 'sum' },
               { columnName: 'cnamt', type: 'sum' },
             ],
           },
