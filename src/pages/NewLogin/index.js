@@ -26,7 +26,7 @@ import {
 
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
-import logo from '@/assets/img/logo/logo_medicloud.png'
+import logo from '@/assets/img/logo/logo_white_with_text.png'
 import { container } from '@/assets/jss'
 
 const styles = (theme) => ({
