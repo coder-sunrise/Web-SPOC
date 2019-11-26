@@ -6,7 +6,6 @@ import {
 import {
   Table,
 } from '@devexpress/dx-react-grid-material-ui'
-import { DateFormatter } from '@/components'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class PatientList extends PureComponent {
@@ -39,16 +38,7 @@ class PatientList extends PureComponent {
 
     const PatientListingColumnsExtensions = [
       { columnName: 'lastVisitDate', type: 'date', sortingEnabled: false },
-      {
-        columnName: 'startDateTime',
-        sortingEnabled: false,
-        width: 180,
-        render: (row) =>
-          DateFormatter({
-            value: row.startDateTime,
-            full: true,
-          }),
-      },
+      { columnName: 'startDateTime', sortingEnabled: false, width: 180 },
       { columnName: 'patientReferenceNo', sortingEnabled: false },
       { columnName: 'patientAccountNo', sortingEnabled: false },
       { columnName: 'patientName', sortingEnabled: false },

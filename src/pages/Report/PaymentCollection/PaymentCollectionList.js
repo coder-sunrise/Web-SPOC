@@ -35,6 +35,15 @@ class PaymentCollectionList extends PureComponent {
           }),
       },
       { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'receiptNo', sortingEnabled: false },
+      { columnName: 'referenceNo', sortingEnabled: false },
+      { columnName: 'payerName', sortingEnabled: false },
+      { columnName: 'remark', sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'invoiceDate', sortingEnabled: false },
+      { columnName: 'paymentMode', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
     ]
     let FuncProps = {
       pager: false,
@@ -156,7 +165,7 @@ class PaymentCollectionList extends PureComponent {
             giroData.length > 0 && (
               <ReportDataGrid
                 data={giroData}
-                columns={OtherPaymentModeDetailsCols}
+                columns={GIRODetailsCols}
                 columnExtensions={PaymentCollectionDetailsExtensions}
                 FuncProps={FuncProps}
               />
@@ -165,7 +174,7 @@ class PaymentCollectionList extends PureComponent {
             otherData.length > 0 && (
               <ReportDataGrid
                 data={otherData}
-                columns={GIRODetailsCols}
+                columns={OtherPaymentModeDetailsCols}
                 columnExtensions={PaymentCollectionDetailsExtensions}
                 FuncProps={FuncProps}
               />
