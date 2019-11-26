@@ -146,6 +146,8 @@ class RadioEditorBase extends PureComponent {
       //   row[columnName] = checkedValue
       // }
     }
+    // commonCfg.text = false
+    // console.log(commonCfg)
     return (
       <Radio
         className={classnames({
