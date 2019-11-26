@@ -122,7 +122,7 @@ const Transfer = ({
             />
           </GridItem>
           <GridItem xs={2}>
-            <ProgressButton
+            <Button
               variant='contained'
               color='primary'
               icon={<Search />}
@@ -131,7 +131,7 @@ const Transfer = ({
               }}
             >
               Search
-            </ProgressButton>
+            </Button>
           </GridItem>
           <GridItem xs={12}>
             <Card>
