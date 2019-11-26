@@ -150,7 +150,7 @@ class Address extends Component {
                     label='Mailing Address'
                     inputLabel=' '
                     disabled={
-                      !!addresses.find((o) => o.isMailing) &&
+                      !!addresses.find((o) => o.isMailing && !o.isDeleted) &&
                       !addresses[addressIndex].isMailing
                     }
                     {...args}
@@ -166,7 +166,7 @@ class Address extends Component {
                     label='Primary Address'
                     inputLabel=' '
                     disabled={
-                      !!addresses.find((o) => o.isPrimary) &&
+                      !!addresses.find((o) => o.isPrimary && !o.isDeleted) &&
                       !addresses[addressIndex].isPrimary
                     }
                     {...args}

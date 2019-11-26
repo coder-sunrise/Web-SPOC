@@ -237,11 +237,10 @@ class AddCrNote extends Component {
 
   render () {
     const { handleSubmit, onConfirm, values } = this.props
-    const { creditNoteItem, finalCredit } = values
-
+    const { creditNoteItem, finalCredit, payerType } = values
     return (
       <div>
-        <CrNoteForm />
+        <CrNoteForm payerType={payerType} />
         <CommonTableGrid
           size='sm'
           // {...TableConfig}

@@ -107,27 +107,25 @@ class AddPayment extends Component {
     }
   }
 
-  // componentDidMount = () => {
-  //   document.addEventListener('keydown', this.handleKeyDown)
-  // }
+  componentDidMount = () => {
+    document.addEventListener('keydown', this.handleKeyDown)
+  }
 
-  // componentWillUnmount () {
-  //   // unbind keyDown listener
-  //   document.removeEventListener('keydown', this.handleKeyDown)
-  // }
+  componentWillUnmount () {
+    // unbind keyDown listener
+    document.removeEventListener('keydown', this.handleKeyDown)
+  }
 
   handleKeyDown = (event) => {
     event.preventDefault()
     const min = 112
     const max = 123
-    const { keyCode } = event
+    const { keyCode, key } = event
     if (keyCode < min || keyCode > max) return
     console.log({ keyCode })
     // TODO: add payment base on keyCode and paymentMode hotkey setting
-
-    const keyChar = String.fromCharCode(keyCode)
     const { ctPaymentMode } = this.props
-    const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === keyChar)
+    const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
     if (paymentModeObj) this.onPaymentTypeClick(paymentModeObj)
 
     // let paymentModeFK

@@ -126,7 +126,11 @@ class AntdNumberInput extends React.PureComponent {
       value,
       debounceDuration,
       precision,
+      currency,
     } = props
+
+    // TODO: find a better way to config default currency precision
+    const convertedPrecision = currency && precision === 1 ? 2 : precision
     this.state = {
       value: roundTo(
         Number(
@@ -134,8 +138,9 @@ class AntdNumberInput extends React.PureComponent {
             ? field.value
             : defaultValue || value,
         ),
-        precision,
+        convertedPrecision,
       ),
+      convertedPrecision,
       focused: false,
     }
 
@@ -358,8 +363,8 @@ class AntdNumberInput extends React.PureComponent {
       min,
       parser,
       field,
-      precision,
     } = this.props
+    const { convertedPrecision: precision } = this.state
     let { format } = this.props
     const extraCfg = {
       precision,
@@ -369,9 +374,6 @@ class AntdNumberInput extends React.PureComponent {
     }
 
     if (!format) {
-      if (!extraCfg.precision && currency) {
-        extraCfg.precision = 2
-      }
       let precisionStr = '.'
       for (let i = 0; i < extraCfg.precision; i++) {
         precisionStr += '0'
@@ -517,6 +519,7 @@ class AntdNumberInput extends React.PureComponent {
           onKeyUp={this.handleKeyUp}
           {...this.getConfig()}
           {...restProps}
+          precision={this.state.convertedPrecision}
           // formatter={this.handleFormatter}
           // parser={this.handleParser}
         />
@@ -526,13 +529,14 @@ class AntdNumberInput extends React.PureComponent {
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, min } = nextProps
+    const { convertedPrecision: precision } = this.state
 
     if (field) {
       this.setState({
         value:
           field.value === undefined || Number.isNaN(Number(field.value))
             ? ''
-            : roundTo(Number(field.value), nextProps.precision),
+            : roundTo(Number(field.value), precision),
         // focused:
         //   field.value !== undefined &&
         //   field.value !== null &&
@@ -544,7 +548,7 @@ class AntdNumberInput extends React.PureComponent {
         value:
           value === undefined || Number.isNaN(Number(value))
             ? ''
-            : roundTo(Number(value), nextProps.precision),
+            : roundTo(Number(value), precision),
         // focused:
         //   value !== undefined &&
         //   value !== null &&

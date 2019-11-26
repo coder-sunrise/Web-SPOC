@@ -182,6 +182,38 @@ class TextTypeProvider extends React.Component {
         />
       )
     }
+    const { columnExtensions } = props
+    // console.log(columnExtensions)
+    const cols = columnExtensions.filter(
+      (o) =>
+        [
+          'number',
+          'select',
+          'date',
+          'action',
+        ].indexOf(o.type) < 0,
+    )
+    // .filter(
+    //   (o) =>
+    //     [
+    //       'rowSort',
+    //     ].indexOf(o.columnName) < 0,
+    // )
+    // console.log(cols)
+
+    for (let i = 0; i < cols.length; i++) {
+      // console.log(cols[i].columnName, cols[i].type)
+      // delete cols[i].type
+      cols[i].compare = (a, b) => {
+        // eslint-disable-next-line no-nested-ternary
+        return (a || '').localeCompare(b || '')
+      }
+      // cols[i].index = i
+    }
+
+    this.state = {
+      for: cols,
+    }
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
@@ -194,30 +226,11 @@ class TextTypeProvider extends React.Component {
 
   render () {
     const { columnExtensions } = this.props
-    // console.log(this.props)
-    const columns = columnExtensions
-      .filter(
-        (o) =>
-          [
-            'number',
-            'select',
-            'date',
-            'action',
-          ].indexOf(o.type) < 0,
-      )
-      // .filter(
-      //   (o) =>
-      //     [
-      //       'rowSort',
-      //     ].indexOf(o.columnName) < 0,
-      // )
-      .map((o) => o.columnName)
     return (
       <DataTypeProvider
-        for={columns}
+        for={this.state.for.map((o) => o.columnName)}
         formatterComponent={this.TextEditor(columnExtensions, true)}
         editorComponent={this.TextEditor(columnExtensions)}
-        {...this.props}
       />
     )
   }
