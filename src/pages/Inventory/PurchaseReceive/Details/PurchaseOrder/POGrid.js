@@ -9,7 +9,7 @@ import {
   fetchAndSaveCodeTable,
 } from '@/utils/codes'
 
-let commitCount = 2200 // uniqueNumber
+// let commitCount = 2200 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
@@ -66,7 +66,6 @@ class Grid extends PureComponent {
           x.itemFKName,
           x.stateName,
         )
-        console.log(x.stateName, inventoryItemList)
         this.setState({
           [x.stateName]: inventoryItemList,
         })
@@ -101,15 +100,15 @@ class Grid extends PureComponent {
       [`filter${stateName}`]: inventoryItemList,
     })
 
-    row.code = ''
-    row.name = ''
-    row.uom = ''
-    row.orderQuantity = 0
-    row.bonusReceived = 0
-    row.totalQuantity = 0
-    row.totalReceived = 0
-    row.unitPrice = 0
-    row.totalPrice = 0
+    // row.code = ''
+    // row.name = ''
+    // row.uom = ''
+    // row.orderQuantity = 0
+    // row.bonusReceived = 0
+    // row.totalQuantity = 0
+    // row.totalReceived = 0
+    // row.unitPrice = 0
+    // row.totalPrice = 0
 
     this.setState({ onClickColumn: 'type' })
 
@@ -217,7 +216,7 @@ class Grid extends PureComponent {
     return newAddedRows
   }
 
-  onCommitChanges = ({ rows, added, changed, deleted }) => {
+  onCommitChanges = (values) => ({ rows, added, changed, deleted }) => {
     const { dispatch, calcPurchaseOrderSummary } = this.props
 
     if (deleted) {
@@ -228,7 +227,10 @@ class Grid extends PureComponent {
     } else if (added || changed) {
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
-        payload: rows[0],
+        payload: {
+          purchaseOrder: values,
+          rows,
+        },
       })
     }
 
@@ -237,16 +239,14 @@ class Grid extends PureComponent {
   }
 
   rowOptions = (row, rows = []) => {
+    const { purchaseOrderDetails } = this.props
     const getUnusedItem = (stateName) => {
       rows = rows.filter((o) => !o.isDeleted)
-
       const unusedInventoryItem = _.differenceBy(
         this.state[stateName],
-        rows,
+        purchaseOrderDetails.rows,
         'itemFK',
       )
-      // console.log('asda', unusedInventoryItem)
-
       return unusedInventoryItem
     }
 
@@ -297,11 +297,12 @@ class Grid extends PureComponent {
     return []
   }
 
-  calculateTotalPrice = (e) => {
+  calculateTotalPriceAndTotalQuantity = (e) => {
     const { row } = e
     if (row) {
       const { orderQuantity, unitPrice } = row
       row.totalPrice = orderQuantity * unitPrice
+      row.totalQuantity = orderQuantity
     }
   }
 
@@ -376,28 +377,28 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'uom',
-          type: 'select',
-          labelField: 'uom',
+          // type: 'select',
+          // labelField: 'uom',
           disabled: true,
           sortingEnabled: false,
-          options: (row) => {
-            if (row.type === 1) {
-              return this.state.MedicationItemList
-            }
-            if (row.type === 2) {
-              return this.state.VaccinationItemList
-            }
-            if (row.type === 3) {
-              return this.state.ConsumableItemList
-            }
-            return []
-          },
+          // options: (row) => {
+          //   if (row.type === 1) {
+          //     return this.state.MedicationItemList
+          //   }
+          //   if (row.type === 2) {
+          //     return this.state.VaccinationItemList
+          //   }
+          //   if (row.type === 3) {
+          //     return this.state.ConsumableItemList
+          //   }
+          //   return []
+          // },
         },
         {
           columnName: 'orderQuantity',
           type: 'number',
-          format: '0.0',
-          onChange: this.calculateTotalPrice,
+          precision: 1,
+          onChange: this.calculateTotalPriceAndTotalQuantity,
         },
         {
           columnName: 'bonusReceived',
@@ -421,7 +422,7 @@ class Grid extends PureComponent {
           columnName: 'unitPrice',
           type: 'number',
           currency: true,
-          onChange: this.calculateTotalPrice,
+          onChange: this.calculateTotalPriceAndTotalQuantity,
         },
         {
           columnName: 'totalPrice',
@@ -432,7 +433,6 @@ class Grid extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
@@ -448,7 +448,7 @@ class Grid extends PureComponent {
               showAddCommand: isEditable,
               showEditCommand: isEditable,
               showDeleteCommand: isEditable,
-              onCommitChanges: this.onCommitChanges,
+              onCommitChanges: this.onCommitChanges(values.purchaseOrder),
               onAddedRowsChange: this.onAddedRowsChange,
             }}
             {...tableParas}

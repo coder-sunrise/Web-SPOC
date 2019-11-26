@@ -20,6 +20,7 @@ const styles = {
   warningContent: {
     '& h4': {
       fontWeight: 'bold',
+      color: '#696969',
     },
     top: '50%',
     position: 'fixed',
