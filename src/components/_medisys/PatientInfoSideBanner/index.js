@@ -223,7 +223,7 @@ const PatientInfoSideBanner = ({
                   <div>
                     <p>
                       <NumberInput
-                        prefix='Full Balance:'
+                        prefix='Balance:'
                         text
                         currency
                         value={

@@ -141,19 +141,20 @@ const sidebarStyle = (theme) => ({
   },
   logoNormal: {
     ...defaultFont,
+    color: '#00c2f6',
+    fontWeight: 'bold',
     transition: 'all 300ms linear',
     display: 'block',
     opacity: '1',
     transform: 'translate3d(0px, 0, 0)',
-    textTransform: 'uppercase',
+
     padding: '5px 0px',
-    fontSize: '18px',
+    fontSize: '1.5rem',
     whiteSpace: 'nowrap',
-    fontWeight: '400',
     lineHeight: '30px',
     overflow: 'hidden',
     '&,&:hover,&:focus': {
-      color: 'inherit',
+      color: '#00c2f6',
     },
   },
   logoNormalRTL: {

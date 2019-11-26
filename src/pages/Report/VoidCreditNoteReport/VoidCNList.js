@@ -30,10 +30,14 @@ class VoidCNList extends PureComponent {
       { name: 'reason', title: 'Reason' },
     ]
     const listColsExtension = [
-      { columnName: 'invoiceDate', type: 'date' },
-      { columnName: 'generatedDate', type: 'date' },
-      { columnName: 'voidedDate', type: 'date' },
-      { columnName: 'totalAmt', type: 'currency', currency: true },
+      { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },
+      { columnName: 'generatedDate', type: 'date', sortingEnabled: false },
+      { columnName: 'voidedDate', type: 'date', sortingEnabled: false },
+      { columnName: 'totalAmt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'itemNo', sortingEnabled: false },
+      { columnName: 'voidedBy', sortingEnabled: false },
+      { columnName: 'reason', sortingEnabled: false },
     ]
 
     let FuncProps = {

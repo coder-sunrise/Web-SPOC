@@ -148,6 +148,8 @@ function getCommonRender (cb) {
   const cfg = getCommonConfig.call(this)
   const { render, error, row } = cfg
   // console.log(row, this.props.row)
+  // console.log(value, cfg)
+
   if (render && !editMode && !error) {
     return render(row)
   }

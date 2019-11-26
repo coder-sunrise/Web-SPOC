@@ -37,10 +37,16 @@ class CNList extends PureComponent {
       { name: 'totalAftGST', title: 'Total' },
     ]
     const CreditNoteListingDetailsExtensions = [
-      { columnName: 'invoiceDate', type: 'date' },
-      { columnName: 'total', type: 'currency', currency: true },
-      { columnName: 'gstAmt', type: 'currency', currency: true },
-      { columnName: 'totalAftGST', type: 'currency', currency: true },
+      { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },
+      { columnName: 'total', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'totalAftGST', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'creditNoteNo', sortingEnabled: false },
+      { columnName: 'account', sortingEnabled: false },
+      { columnName: 'name', sortingEnabled: false },
+      { columnName: 'remark', sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
     ]
 
     let FuncProps = {

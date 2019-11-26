@@ -25,9 +25,10 @@ const PaymentSummary = ({ PaymentSummaryDetails }) => {
     { name: 'subTotal', title: 'Sub Total' },
   ]
   const PaymentDetailsColumnsExtensions = [
-    { columnName: 'currentCollected', type: 'currency', currency: true },
-    { columnName: 'pastCollected', type: 'currency', currency: true },
-    { columnName: 'subTotal', type: 'currency', currency: true },
+    { columnName: 'currentCollected', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'pastCollected', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'subTotal', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'paymentMode', sortingEnabled: false },
   ]
   const FuncProps = {
     pager: false,

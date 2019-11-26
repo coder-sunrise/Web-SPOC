@@ -34,14 +34,20 @@ class DepositList extends PureComponent {
       {
         columnName: 'transactionDate',
         width: 180,
+        sortingEnabled: false,
         render: (row) =>
           DateFormatter({
             value: row.transactionDate,
             full: true,
           }),
       },
-      { columnName: 'depositBalance', type: 'currency', currency: true },
-      { columnName: 'txnAmount', type: 'currency', currency: true },
+      { columnName: 'depositBalance', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'txnAmount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'patientReferenceNo', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
+      { columnName: 'txnCodeDetails', sortingEnabled: false },
+      { columnName: 'paymentMode', sortingEnabled: false },
+      { columnName: 'remarks', sortingEnabled: false },
     ]
     const FuncProps = {
       pager: false,

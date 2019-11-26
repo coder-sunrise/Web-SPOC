@@ -47,6 +47,7 @@ import {
       payload: {
         sequence: rows.length,
         ...values,
+        subject: currentType.getSubject(values),
       },
     })
     if (onConfirm) onConfirm()

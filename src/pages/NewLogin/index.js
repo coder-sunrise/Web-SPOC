@@ -87,6 +87,9 @@ const styles = (theme) => ({
       textDecoration: 'underline',
     },
   },
+  imgHolder: {
+    padding: '15px 24px !important',
+  },
 })
 
 const cardAnimationDuration = 350
@@ -193,16 +196,13 @@ class NewLogin extends React.Component {
             <GridItem md={4}>
               <Card login className={classes[cardAnimation]}>
                 <CardHeader
-                  className={`${classes.cardHeader} ${classes.textCenter}`}
+                  className={`${classes.cardHeader} ${classes.textCenter} ${classes.imgHolder}`}
                   color='login'
                 >
-                  <h3 className={classes.cardTitle}>
-                    <FormattedMessage id='app.login.title' />
-                  </h3>
                   <img
                     src={logo}
                     alt='logo'
-                    style={{ height: '100px', width: '100px' }}
+                    style={{ width: '100%', objectFit: 'cover' }}
                   />
                 </CardHeader>
 
