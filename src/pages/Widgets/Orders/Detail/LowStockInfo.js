@@ -27,12 +27,14 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
 
   const {
     criticalThreshold = 0.0,
+    reOrderThreshold = 0.0,
     stock = 0.0,
     isChasAcuteClaimable,
     isChasChronicClaimable,
   } = source
 
   const isLowStock = stock <= criticalThreshold
+  const isReOrder = stock <= reOrderThreshold
 
   return (
     <Popover
@@ -48,7 +50,11 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
         >
           <p>
             Current Stock: {numeral(stock).format(qtyFormat)}
-            {isLowStock ? <font color='red'> (Low Stock)</font> : ''}
+            {isLowStock || isReOrder ? (
+              <font color={isLowStock ? 'red' : 'black'}> (Low Stock)</font>
+            ) : (
+              ''
+            )}
           </p>
           <p>CHAS Acute Claimable: {isChasAcuteClaimable ? 'Yes' : 'No'}</p>
           <p>CHAS Chronic Claimable: {isChasChronicClaimable ? 'Yes' : 'No'}</p>
