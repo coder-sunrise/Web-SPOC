@@ -101,6 +101,9 @@ class RichEditor extends React.PureComponent {
 
   componentDidMount () {
     window.addEventListener('resize', this.resize.bind(this))
+    if (this.props.autoFocus) {
+      if (this.editorReferece) this.editorReferece.focus()
+    }
   }
 
   // eslint-disable-next-line camelcase

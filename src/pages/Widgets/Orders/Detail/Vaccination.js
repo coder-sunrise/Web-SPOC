@@ -18,8 +18,11 @@ import LowStockInfo from './LowStockInfo'
 let i = 0
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {} }) =>
-    orders.entity || orders.defaultVaccination,
+  mapPropsToValues: ({ orders = {} }) => {
+    const newOrders = orders.entity || orders.defaultVaccination
+    return { minQuantity: 1, ...newOrders }
+  },
+
   enableReinitialize: true,
 
   validationSchema: Yup.object().shape({
@@ -79,7 +82,7 @@ class Vaccination extends PureComponent {
 
   changeVaccination = (v, op = {}) => {
     const { setFieldValue, values, disableEdit } = this.props
-    console.log(v, op)
+    // console.log(v, op)
     let defaultBatch
     if (op.vaccinationStock) {
       defaultBatch = op.vaccinationStock.find((o) => o.isDefault === true)
@@ -152,6 +155,7 @@ class Vaccination extends PureComponent {
   calculateQuantity = (vaccination) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
     // console.log(this.props)
+    const { minQuantity = 0 } = values
     let currentVaccination =
       vaccination && Object.values(vaccination).length ? vaccination : undefined
     if (!currentVaccination) currentVaccination = this.state.selectedVaccination
@@ -175,6 +179,9 @@ class Vaccination extends PureComponent {
           newTotalQuantity / prescriptionToDispenseConversion,
         )
     }
+    newTotalQuantity =
+      newTotalQuantity < minQuantity ? minQuantity : newTotalQuantity
+
     setFieldValue(`quantity`, newTotalQuantity)
     // console.log(newTotalQuantity)
     if (currentVaccination.sellingPrice) {
@@ -230,7 +237,7 @@ class Vaccination extends PureComponent {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
             <Field
               name='inventoryVaccinationFK'
               render={(args) => {
@@ -338,7 +345,7 @@ class Vaccination extends PureComponent {
                     label='Quantity'
                     formatter={(v) => `${v} Tab/s`}
                     step={1}
-                    min={1}
+                    min={values.minQuantity}
                     onChange={(e) => {
                       if (values.unitPrice) {
                         const total = e.target.value * values.unitPrice

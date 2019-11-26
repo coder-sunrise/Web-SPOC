@@ -6,11 +6,13 @@ import moment from 'moment'
 import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
+import { getUniqueNumericId } from '@/utils/utils'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import {
   AppointmentDataColExtensions,
   AppointmentDataColumn,
 } from './variables'
+import ErrorPopover from './ErrorPopover'
 
 const validationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
@@ -90,7 +92,6 @@ class AppointmentDataGrid extends React.Component {
           ...column,
           render: (row) => {
             const { clinicianFK } = row
-
             const { clinicianProfiles = [] } = this.props
             const clinicianProfile = clinicianProfiles.find(
               (item) => item.id === clinicianFK,
@@ -143,7 +144,7 @@ class AppointmentDataGrid extends React.Component {
     let defaultNewRows = []
 
     if (!data || data.length <= 0) {
-      let defaultNewRow = { isPrimaryClinician: true }
+      let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
       if (selectedSlot && selectedSlot.allDay === false) {
         defaultNewRow = {
           startTime: moment(selectedSlot.start).format('HH:mm A'),
@@ -187,14 +188,29 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
-    console.log(AppointmentDataColumn, this.columnExtensions)
     return (
       <div className={classes.container}>
         <EditableTableGrid
-          // disabled={disabled}
           rows={data.length ? data : data.concat(defaultNewRows)}
           columns={AppointmentDataColumn}
-          columnExtensions={this.columnExtensions}
+          columnExtensions={[
+            ...this.columnExtensions,
+            {
+              columnName: 'conflicts',
+              // type: 'error',
+              editingEnabled: false,
+              sortingEnabled: false,
+              disabled: true,
+              width: 60,
+              render: (row) => {
+                if (row.conflicts && row.conflicts.length > 0) {
+                  return <ErrorPopover errors={row.conflicts} />
+                }
+
+                return null
+              },
+            },
+          ]}
           FuncProps={{
             pager: false,
             sort: true,
@@ -204,18 +220,14 @@ class AppointmentDataGrid extends React.Component {
               ],
             },
           }}
-          // onRowDoubleClick={undefined}
           EditingProps={{
             messages: {
               deleteCommand: 'Delete appointment slot',
             },
-            // editingRowIds: editingRows,
             showAddCommand: !disabled,
-            // showEditCommand: !disabled,
-            showDeleteCommand: !!data.length,
+            showDeleteCommand:
+              data.filter((item) => !item.isDeleted).length > 1,
             onCommitChanges: handleCommitChanges,
-            // onEditingRowIdsChange: handleEditingRowsChange,
-            // defaultNewRow: defaultNewRows,
           }}
           schema={validationSchema}
         />

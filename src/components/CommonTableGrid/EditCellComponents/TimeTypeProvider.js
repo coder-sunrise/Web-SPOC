@@ -14,7 +14,7 @@ import {
 import {
   onComponentDidMount,
   onComponentChange,
-  getCommonConfig,
+  getCommonRender,
 } from './utils'
 
 const dateFormat = 'DD-MMM-YYYY'
@@ -38,6 +38,7 @@ class TimeEditorBase extends PureComponent {
     this.setState({
       value,
     })
+    onComponentChange.call(this, { value })
   }
 
   onOpenChange = (open) => {
@@ -45,11 +46,7 @@ class TimeEditorBase extends PureComponent {
       onComponentChange.call(this, { value: this.state.value })
   }
 
-  render () {
-    const { allowClear = false, editMode, ...commonCfg } = getCommonConfig.call(
-      this,
-    )
-    // console.log(editMode, commonCfg)
+  renderComponent = ({ editMode, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onOpenChange = this.onOpenChange
@@ -59,10 +56,14 @@ class TimeEditorBase extends PureComponent {
           this.props.onBlur(e)
         }, 1)
       }
-      commonCfg.open = true
+      // commonCfg.open = true
       commonCfg.autoFocus = true
     }
-    return <TimePicker allowClear={allowClear} {...commonCfg} />
+    return <TimePicker {...commonCfg} />
+  }
+
+  render () {
+    return getCommonRender.bind(this)(this.renderComponent)
   }
 }
 

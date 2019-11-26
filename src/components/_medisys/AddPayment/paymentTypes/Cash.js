@@ -16,6 +16,7 @@ const Cash = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
               <NumberInput
                 label='Amount'
                 {...args}
+                min={0}
                 currency
                 onChange={handleAmountChange}
               />

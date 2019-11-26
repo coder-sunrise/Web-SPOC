@@ -35,21 +35,23 @@ const style = () => ({
   authority: 'finance/deposit',
   mapPropsToValues: ({ deposit, isDeposit }) => {
     if (deposit.entity) {
+      const { patientDepositTransaction, balance } = deposit.entity
       const transactionTypeFK = isDeposit ? 1 : 2
       const transactionType = transactionTypeFK === 1 ? 'Deposit' : 'Refund'
       const transactionModeFK = isDeposit ? undefined : 3
       return {
         ...deposit.entity,
+        balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
           transactionDate: moment(),
           transactionType,
           transactionTypeFK,
           transactionModeFK,
-
           amount: 0,
         },
-        balanceAfter: deposit.entity.balance,
+        balanceAfter: deposit.entity.balance ? deposit.entity.balance : 0,
+        hasTransactionBefore: !!patientDepositTransaction,
       }
     }
     return deposit.default
@@ -106,7 +108,11 @@ const style = () => ({
   },
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, codetable } = props
-    const { balanceAfter, patientDepositTransaction } = values
+    const {
+      balanceAfter,
+      patientDepositTransaction,
+      hasTransactionBefore,
+    } = values
     const {
       transactionModeFK,
       creditCardTypeFK,
@@ -127,6 +133,10 @@ const style = () => ({
       type: 'deposit/updateDeposit',
       payload: {
         ...values,
+        id: hasTransactionBefore ? values.id : undefined,
+        concurrencyToken: hasTransactionBefore
+          ? values.concurrencyToken
+          : undefined,
         balance: balanceAfter,
         patientDepositTransaction: {
           ...restDepositTransaction,
@@ -191,24 +201,8 @@ class Modal extends PureComponent {
       this.setState({ isSessionRequired: false })
     } else {
       this.setState({ isSessionRequired: true })
-
-      // dispatch({
-      //   type: 'deposit/bizSessionList',
-      //   payload: {
-      //     sessionNoPrefix: selectedDate,
-      //     pagesize: 999999,
-      //   },
-      // }).then(() => {
-      //   const { bizSessionList } = this.props.deposit
-      //   setFieldValue(
-      //     'patientDepositTransaction.transactionBizSessionFK',
-      //     bizSessionList.length === 0 || bizSessionList === undefined
-      //       ? ''
-      //       : bizSessionList[0].value,
-      //   )
-      // })
-      this.getBizList(selectedDate)
     }
+    this.getBizList(selectedDate)
   }
 
   getBizList = (e) => {
@@ -277,9 +271,9 @@ class Modal extends PureComponent {
     const { isSessionRequired, isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
-      prefixProps: {
-        style: { width: '100%' },
-      },
+      fullWidth: true,
+      rightAlign: true,
+      noUnderline: true,
     }
 
     return (
@@ -386,72 +380,8 @@ class Modal extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          {/* <GridContainer>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <Divider />
-            </GridItem>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <FastField
-                name='total'
-                render={(args) => {
-                  return <NumberInput prefix='Total' {...args} />
-                }}
-              />
-            </GridItem>
-          </GridContainer> */}
 
-          {/* <GridItem xs={6} justify='flex-end'>
-              <Field
-                name='balance'
-                render={(args) => (
-                  <NumberInput
-                    {...commonAmountOpts}
-                    style={{
-                      marginTop: theme.spacing.unit * 2,
-                    }}
-                    disabled
-                    simple
-                    currency
-                    prefix='Balance'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} justify='flex-end'>
-              <Field
-                name='patientDepositTransaction.amount'
-                render={(args) => (
-                  <NumberInput
-                    currency
-                    onChange={this.calculateBalanceAfter}
-                    {...commonAmountOpts}
-                    prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} justify='flex-end' direction='row'>
-              <Field
-                name='balanceAfter'
-                render={(args) => (
-                  <NumberInput
-                    {...commonAmountOpts}
-                    disabled
-                    simple
-                    currency
-                    prefix=' '
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-           */}
-
-          <div style={{ width: '50%', margin: 'auto' }}>
+          <div style={{ width: '40%', margin: 'auto' }}>
             <Field
               name='balance'
               render={(args) => (
@@ -461,8 +391,6 @@ class Modal extends PureComponent {
                     marginTop: theme.spacing.unit * 2,
                   }}
                   disabled
-                  simple
-                  noUnderline
                   defaultValue='0.00'
                   prefix='Balance'
                   {...args}
@@ -473,16 +401,16 @@ class Modal extends PureComponent {
               name='patientDepositTransaction.amount'
               render={(args) => (
                 <NumberInput
-                  noUnderline
                   defaultValue='0.00'
                   onChange={this.calculateBalanceAfter}
                   {...commonAmountOpts}
                   prefix={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
+                  min={0}
                   {...args}
                 />
               )}
             />
-            <Divider style={{ width: '50%', float: 'right' }} />
+            <Divider style={{ width: '45%', float: 'right' }} />
             <Field
               name='balanceAfter'
               render={(args) => (
@@ -490,7 +418,6 @@ class Modal extends PureComponent {
                   style={{ top: -5 }}
                   {...commonAmountOpts}
                   disabled
-                  noUnderline
                   defaultValue='0.00'
                   prefix=' '
                   {...args}

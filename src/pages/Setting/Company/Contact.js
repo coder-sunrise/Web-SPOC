@@ -33,7 +33,7 @@ const Contact = (props) => {
             <FastField
               name='contact.contactAddress[0].street'
               render={(args) => (
-                <TextField label='Address' multiline autoFocused {...args} />
+                <TextField label='Address' multiline autoFocus {...args} />
               )}
             />
           </GridItem>

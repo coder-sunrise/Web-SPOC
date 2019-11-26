@@ -38,17 +38,17 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
 
   const PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: 'Invoice No.' },
-    { name: 'totalAftGST', title: 'Total Amount' },
+    { name: 'totalAftAdj', title: 'Total Amount' },
     { name: 'gstAmt', title: 'GST' },
-    { name: 'patientName', title: 'Payer Name' },
+    { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
     { name: 'totalAmtPaid', title: 'payment' },
   ]
 
   const PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 100 },
-    { columnName: 'patientName', width: 180 },
-    { columnName: 'totalAftGST', type: 'currency', currency: true },
+    { columnName: 'payerName', width: 180 },
+    { columnName: 'totalAftAdj', type: 'currency', currency: true },
     { columnName: 'gstAmt', type: 'currency', currency: true },
     { columnName: 'totalAmtPaid', type: 'currency', currency: true },
   ]
@@ -79,15 +79,15 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
     summaryConfig: {
       state: {
         totalItems: [
-          { columnName: 'totalAftGST', type: 'totalAftGST' },
+          { columnName: 'totalAftAdj', type: 'totalAftAdj' },
           { columnName: 'gstAmt', type: 'gstAmt' },
           { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
         ],
       },
       integrated: {
         calculator: (type, rows, getValue) => {
-          if (type === 'totalAftGST') {
-            return TotalDetails[0].grandTotalAftGST
+          if (type === 'totalAftAdj') {
+            return TotalDetails[0].grandTotalAftAdj
           }
           if (type === 'gstAmt') {
             return TotalDetails[0].grandGSTAmt
@@ -100,7 +100,7 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
       },
       row: {
         messages: {
-          totalAftGST: 'Total',
+          totalAftAdj: 'Total',
           gstAmt: 'Total',
           totalAmtPaid: 'Total',
         },
@@ -109,7 +109,6 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={PaymentCollectionsColumns}
       columnExtensions={PaymentCollectionsColumnExtension}

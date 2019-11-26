@@ -24,6 +24,7 @@ import { deleteFileByFileID } from '@/services/file'
 // misc utils
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -219,7 +220,7 @@ class NewVisit extends PureComponent {
       ? 'Loading visit info...'
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
-
+    const isRetail = values.visitPurposeFK === VISIT_TYPE.RETAIL
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -241,17 +242,18 @@ class NewVisit extends PureComponent {
                         existingQNo={existingQNo}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
+                        visitType={values.visitPurposeFK}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <VitalSignCard
-                        isReadOnly={isReadOnly}
+                        isReadOnly={isRetail || isReadOnly}
                         handleCalculateBMI={this.calculateBMI}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <ReferralCard
-                        isReadOnly={isReadOnly}
+                        isReadOnly={isRetail || isReadOnly}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                       />

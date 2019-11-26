@@ -104,7 +104,6 @@ class CNList extends PureComponent {
     }
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={CNListCols}
         columnExtensions={CNListColsExtension}

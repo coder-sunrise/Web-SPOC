@@ -20,6 +20,7 @@ import {
   TextField,
   WarningSnackbar,
   withFormikExtend,
+  notification,
 } from '@/components'
 import {
   ChangePassword,
@@ -29,6 +30,7 @@ import {
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
+import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
 
@@ -96,8 +98,8 @@ const styles = (theme) => ({
           userProfile: Yup.object().shape({
             userName: Yup.string()
               .matches(
-                /(^[a-zA-Z][a-zA-Z0-9.,$;]+$)/,
-                'Must have at least 2 letter, start with alphabet and do not contain whitespace',
+                /(^[a-zA-Z][a-zA-Z0-9]+$)/,
+                'Must have at least 2 letter, start with alphabet and do not contains whitespace and special characters.',
               )
               .required('Login ID is a required field'),
             password: Yup.string().required('Password is a required field'),
@@ -177,12 +179,17 @@ const styles = (theme) => ({
       effectiveEndDate: values.effectiveDates[1],
       userProfile,
     }
-    console.log({ payload })
+
     dispatch({
       type: 'settingUserProfile/upsert',
       payload,
     }).then((response) => {
+      console.log({ response })
       if (response) {
+        sendNotification('CodetableUpdated', {
+          message: 'User profiles updated',
+          code: 'clinicianprofile',
+        })
         sessionStorage.removeItem('user')
         if (currentUser) {
           dispatch({
@@ -276,15 +283,9 @@ class UserProfileForm extends React.PureComponent {
         oldRole.clinicalRoleName === 'Doctor' &&
         currentSelectedRole.clinicalRoleName !== 'Doctor'
       ) {
-        dispatch({
-          type: 'global/updateState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmText: 'Ok',
-            openConfirmContent:
-              'You are not allowed to change the role from doctor to non-doctor',
-          },
+        notification.warn({
+          message:
+            'You are not allowed to change the role from doctor to non-doctor.',
         })
         return true
       }
@@ -393,7 +394,9 @@ class UserProfileForm extends React.PureComponent {
                           type='password'
                           inputProps={{
                             autoComplete: 'new-password',
+                            maxLength: 18,
                           }}
+                          maxLength={18}
                         />
                       )}
                     />

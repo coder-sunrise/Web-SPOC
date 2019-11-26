@@ -22,7 +22,7 @@ import ApplyClaims from './components/ApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
 import { constructPayload } from './utils'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
@@ -63,6 +63,7 @@ const styles = (theme) => ({
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
+    console.log('map props to values')
     try {
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity
@@ -76,7 +77,7 @@ const styles = (theme) => ({
             ),
           0,
         )
-        const finalPayable = roundToTwoDecimals(
+        const finalPayable = roundTo(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
 
@@ -109,10 +110,6 @@ const styles = (theme) => ({
             message: 'Billing completed',
           })
           router.push('/reception/queue')
-        } else {
-          notification.success({
-            message: 'Billing saved',
-          })
         }
       }
     })
@@ -127,12 +124,12 @@ class Billing extends Component {
   }
 
   componentWillUnmount () {
-    // this.props.dispatch({
-    //   type: 'billing/updateState',
-    //   payload: {
-    //     entity: null,
-    //   },
-    // })
+    this.props.dispatch({
+      type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
   }
 
   toggleReport = () => {
@@ -158,9 +155,7 @@ class Billing extends Component {
       if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
-    const newOutstandingBalance = roundToTwoDecimals(
-      values.finalPayable - totalPaid,
-    )
+    const newOutstandingBalance = roundTo(values.finalPayable - totalPaid)
     await setFieldValue('invoice', {
       ...values.invoice,
       outstandingBalance: newOutstandingBalance,

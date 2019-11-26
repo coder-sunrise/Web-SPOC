@@ -18,17 +18,17 @@ models.forEach((model) => {
 
 export const dva = {
   config: {
-    onError (e, ...args) {
-      e.preventDefault()
-      const [
-        action,
-        { key, effectArgs },
-      ] = args
-      console.log({ e, effectArgs })
+    // onError (e, ...args) {
+    //   // e.preventDefault()
+    //   const [
+    //     action,
+    //     { key, effectArgs },
+    //   ] = args
+    //   console.log({ e, effectArgs })
 
-      const message = `Error occured in  effects: ${key}, with payload:`
-      // console.log(message, { ...effectArgs })
-    },
+    //   const message = `Error occured in  effects: ${key}, with payload:`
+    //   // console.log(message, { ...effectArgs })
+    // },
     onReducer (reducer) {
       return (state, action) => {
         const newState =

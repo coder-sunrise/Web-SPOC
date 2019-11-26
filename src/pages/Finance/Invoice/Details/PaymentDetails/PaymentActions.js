@@ -2,6 +2,7 @@ import React from 'react'
 // material ui
 import Printer from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
+import RepeatIcon from '@material-ui/icons/Repeat'
 // common components
 import { Button } from '@/components'
 // constants variables
@@ -12,6 +13,7 @@ const PaymentActions = ({
   handleAddCrNote,
   handleWriteOff,
   handlePrinterClick,
+  handleTransferClick,
   type,
   invoicePayerFK,
   companyFK,
@@ -24,7 +26,6 @@ const PaymentActions = ({
     color: 'primary',
     size: 'sm',
   }
-
   return (
     <React.Fragment>
       <Button
@@ -40,7 +41,7 @@ const PaymentActions = ({
       {type !== PayerType.GOVT_COPAYER && (
         <Button
           // onClick={() => handleAddCrNote(type)}
-          onClick={() => handleAddCrNote(invoicePayerFK)}
+          onClick={() => handleAddCrNote(invoicePayerFK, type)}
           disabled={
             hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
           }
@@ -60,6 +61,15 @@ const PaymentActions = ({
         >
           <Add />
           Write Off
+        </Button>
+      )}
+      {type === PayerType.COPAYER_REAL && (
+        <Button
+          onClick={() => handleTransferClick(invoicePayerFK, type)}
+          {...ButtonProps}
+        >
+          <RepeatIcon />
+          Transfer
         </Button>
       )}
       <Button

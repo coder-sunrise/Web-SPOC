@@ -17,7 +17,10 @@ import {
   mapDatagridToAppointmentResources,
   compareDto,
 } from '@/pages/Reception/Appointment/components/form/formUtils'
-import { constructClinicBreakHoursData } from '@/pages/Reception/Appointment/utils'
+import {
+  constructClinicBreakHoursData,
+  isSavePayloadOk,
+} from '@/pages/Reception/Appointment/utils'
 import { getTimeObject, compare } from '@/utils/yup'
 
 const ACTION_KEYS = {
@@ -146,13 +149,13 @@ export default createListViewModel({
             )
 
           const appointmentResources = datagrid
+            // .filter((item) => item.id > 0 && !item.isDeleted)
             .map(mapDatagridToAppointmentResources(isRecurrenceChanged))
             .sort(sortDataGrid)
             .map((item, index) => ({
               ...item,
               sortOrder: index,
             }))
-
           const currentAppointment = {
             ...formikCurrentAppointment,
             isEditedAsSingleAppointment: !isEdit
@@ -176,6 +179,7 @@ export default createListViewModel({
               formikValues.isEnableRecurrence,
               isRecurrenceChanged,
             )
+            console.log({ appointments })
           } else if (calendarState.mode === 'single') {
             appointments = [
               currentAppointment,
@@ -287,11 +291,11 @@ export default createListViewModel({
             recurrenceDto: recurrence,
           }
           if (validate) {
-            yield put({
+            return yield put({
               type: 'validate',
               payload: savePayload,
             })
-            return false
+            // return false
           }
           if (isEdit) {
             savePayload = {
@@ -305,7 +309,6 @@ export default createListViewModel({
               },
             }
           }
-          // console.log({ savePayload })
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -320,13 +323,15 @@ export default createListViewModel({
         const { status, data } = result
 
         if (parseInt(status, 10) === 200) {
-          yield put({
-            type: 'saveConflict',
-            payload: {
-              conflicts: data.resourceConflict,
-            },
-          })
+          // yield put({
+          //   type: 'saveConflict',
+          //   payload: {
+          //     conflicts: data.resourceConflict,
+          //   },
+          // })
+          return data.resourceConflict
         }
+        return null
       },
       *refresh (_, { put }) {
         yield put({ type: 'navigateCalendar', payload: {} })

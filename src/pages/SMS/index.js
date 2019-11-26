@@ -7,33 +7,40 @@ import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
 import New from './New'
 import { SmsOption } from './variables'
+import { ADD_ON_FEATURE } from '@/utils/constants'
 
 const styles = {
   sendBar: {
     marginTop: '10px',
   },
   blur: {
-    opacity: 0.4,
+    opacity: 1,
   },
-  warningContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    zIndex: 9999,
-  },
+
   warningContent: {
-    top: '50%',
-    left: '45%',
-    position: 'fixed',
     '& h4': {
       fontWeight: 'bold',
     },
+    top: '50%',
+    position: 'fixed',
+    left: '35%',
+    zIndex: 9999,
+  },
+
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.87)',
+    position: 'fixed',
+    width: '100%',
+    height: '100%',
+    zIndex: 999,
+    top: '0px',
+    left: '0px',
+    opacity: 0.5 /* in FireFox */,
+    filter: 'alpha(opacity=50),' /* in IE */,
   },
 }
 
-const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
+const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
   const [
     selectedRows,
     setSelectedRows,
@@ -43,6 +50,11 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
     currentTab,
     setCurrentTab,
   ] = useState('0')
+
+  const [
+    showWarning,
+    setShowWarning,
+  ] = useState(false)
 
   const newMessageProps = {
     selectedRows,
@@ -61,7 +73,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
     selectedRows,
   }
 
-  const showWarning = false
   const contentClass = classnames({
     [classes.blur]: showWarning,
   })
@@ -82,6 +93,39 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
   }
 
   useEffect(() => {
+    const { addOnSubscriptions } = clinicInfo
+    const smsService = addOnSubscriptions.find(
+      (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
+    )
+
+    if (smsService) {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctAddonFeature',
+        },
+      }).then((ctAddonFeature) => {
+        const currentDate = moment().formatUTC()
+        const {
+          effectiveStartDate,
+          effectiveEndDate,
+          ctAddOnFeatureFK,
+        } = smsService
+
+        if (
+          currentDate < effectiveStartDate ||
+          currentDate > effectiveEndDate
+        ) {
+          setShowWarning(true)
+        } else {
+          const smsFeature = ctAddonFeature.find(
+            (o) => o.id === ctAddOnFeatureFK,
+          )
+          if (!smsFeature) setShowWarning(true)
+        }
+      })
+    }
+
     dispatch({
       type: 'smsAppointment/query',
       payload: {
@@ -97,38 +141,44 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch }) => {
       },
     })
   }, [])
-
   return (
-    <CardContainer hideHeader>
-      {showWarning && (
-        <div className={classes.warningContainer}>
-          <div className={classes.warningContent}>
-            <CardContainer hideHeader>
-              <Danger>
-                <h4>Please contact administrator to setup SMS feature.</h4>
-              </Danger>
-            </CardContainer>
+    <div>
+      <CardContainer hideHeader>
+        {showWarning && (
+          <React.Fragment>
+            <div className={classes.overlay}> </div>
+            <div className={classes.warningContent}>
+              <CardContainer hideHeader>
+                <Danger>
+                  <h4>
+                    To configure and use SMS feature, please contact system
+                    administrator for assistant.
+                  </h4>
+                </Danger>
+              </CardContainer>
+            </div>
+          </React.Fragment>
+        )}
+        <div className={contentClass}>
+          <Tabs
+            defaultActiveKey='0'
+            options={SmsOption(gridProps)}
+            onChange={(e) => setCurrentTab(e)}
+          />
+          <div className={classes.sendBar}>
+            <New {...newMessageProps} />
           </div>
         </div>
-      )}
-      <div className={contentClass}>
-        <Tabs
-          defaultActiveKey='0'
-          options={SmsOption(gridProps)}
-          onChange={(e) => setCurrentTab(e)}
-        />
-        <div className={classes.sendBar}>
-          <New {...newMessageProps} />
-        </div>
-      </div>
-    </CardContainer>
+      </CardContainer>
+    </div>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ smsAppointment, smsPatient }) => ({
+  connect(({ smsAppointment, smsPatient, clinicInfo }) => ({
     smsAppointment,
     smsPatient,
+    clinicInfo,
   })),
 )(SMS)

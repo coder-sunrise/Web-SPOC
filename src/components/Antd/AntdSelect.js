@@ -146,7 +146,7 @@ class AntdSelect extends React.PureComponent {
           form.setFieldValue(field.name, v)
         }
       }
-    } else if (value) {
+    } else if (value !== undefined) {
       v = [
         'multiple',
         'tags',
@@ -261,7 +261,7 @@ class AntdSelect extends React.PureComponent {
         //   ? v && v.length > 0
         //   : v !== undefined,
       })
-    } else if (value) {
+    } else if (value !== undefined) {
       v = [
         'multiple',
         'tags',
@@ -372,7 +372,6 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = this.props
     let newVal = val
-
     if (
       [
         'multiple',
@@ -577,7 +576,6 @@ class AntdSelect extends React.PureComponent {
       maxTagPlaceholder,
       value,
       isLoading,
-      onMouseLeave,
       ...restProps
     } = this.props
     // console.log(options)
@@ -619,10 +617,15 @@ class AntdSelect extends React.PureComponent {
     // console.log(opts)
     if (this.props.text) {
       const match = source.find(
-        (o) => o[this.props.valueField] === this.state.value,
+        (o) => Object.byString(o, this.props.valueField) === this.state.value,
       )
       let text = ''
-      if (match) text = match[this.props.labelField]
+      if (match) {
+        text = Object.byString(match, labelField)
+        if (match.render) {
+          return match.render(text)
+        }
+      }
       text =
         optionLabelLength && text && text.length > optionLabelLength
           ? `${text.substring(0, optionLabelLength)}...`
@@ -632,8 +635,9 @@ class AntdSelect extends React.PureComponent {
         <Tooltip title={text} enterDelay={750}>
           <AutosizeInput
             title=''
+            tabIndex='-1'
             readOnly
-            onMouseLeave={onMouseLeave}
+            // onMouseLeave={onMouseLeave}
             inputClassName={props.className}
             value={text}
           />
@@ -647,7 +651,7 @@ class AntdSelect extends React.PureComponent {
         style={{ width: '100%' }}
         {...props}
         ref={this.myRef}
-        onMouseLeave={onMouseLeave}
+        // onMouseLeave={onMouseLeave}
       >
         <Select
           className={classnames([

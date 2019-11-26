@@ -1,13 +1,13 @@
 import React, { PureComponent } from 'react'
 // common components
-import { Accordion, CardContainer, GridContainer, GridItem, DateFormatter } from '@/components'
-import { ReportDataGrid } from '@/components/_medisys'
 import {
   Table,
 } from '@devexpress/dx-react-grid-material-ui'
+import { Accordion, CardContainer, GridContainer, GridItem, DateFormatter } from '@/components'
+import { ReportDataGrid } from '@/components/_medisys'
 
 class PatientList extends PureComponent {
-  render() {
+  render () {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas)
@@ -49,7 +49,7 @@ class PatientList extends PureComponent {
     const SummaryRow = (p) => {
       const { children } = p
       let countCol = children.find((c) => {
-        return c.props.tableColumn.column.name === 'patientReferenceNo';
+        return c.props.tableColumn.column.name === 'patientReferenceNo'
       })
       console.log({ countCol })
       if (countCol) {
@@ -89,7 +89,7 @@ class PatientList extends PureComponent {
                   }
                 }
               }
-              return patientIds.length;
+              return patientIds.length
             }
             return IntegratedSummary.defaultCalculator(type, rows, getValue)
           },
@@ -128,7 +128,7 @@ class PatientList extends PureComponent {
                     }
                   }
                 }
-                return patientIds.length;
+                return patientIds.length
               }
               return IntegratedSummary.defaultCalculator(type, rows, getValue)
             },
@@ -155,7 +155,6 @@ class PatientList extends PureComponent {
 
     return (
       <ReportDataGrid
-        height={500}
         data={listData}
         columns={PatientListingColumns}
         columnExtensions={PatientListingColumnsExtensions}

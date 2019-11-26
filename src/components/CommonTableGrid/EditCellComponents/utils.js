@@ -1,3 +1,5 @@
+import React, { PureComponent } from 'react'
+
 import { object } from 'prop-types'
 import _ from 'lodash'
 
@@ -10,9 +12,11 @@ import {
 function onComponentDidMount () {
   const {
     columnExtensions,
+    value,
     row = {},
     column: { name: columnName },
   } = this.props
+  // console.log('onComponentDidMount', columnName)
   const cfg =
     columnExtensions.find(
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -21,8 +25,13 @@ function onComponentDidMount () {
   const latestRow = window.$tempGridRow[gridId]
     ? window.$tempGridRow[gridId][getRowId(row)] || row
     : row
+  // console.log(latestRow[columnName], value)
+  if (latestRow[columnName] !== value) {
+    setTimeout(() => {
+      this.forceUpdate()
+    }, 300)
+  }
   const errors = updateCellValue(this.props, null, latestRow[columnName])
-
   latestRow._errors = errors
   return {
     row,
@@ -104,10 +113,10 @@ function getCommonConfig () {
     getInitialValue,
     ...restProps
   } = cfg
-  const latestRow = window.$tempGridRow[gridId]
-    ? window.$tempGridRow[gridId][getRowId(row)] || row
-    : row || {}
-  // console.log(latestRow)
+  const latestRow =
+    window.$tempGridRow[gridId] && gridId.indexOf('edit') === 0
+      ? window.$tempGridRow[gridId][getRowId(row)] || row
+      : row || {}
   const errorObj = (latestRow._errors || [])
     .find(
       (o) =>
@@ -115,23 +124,37 @@ function getCommonConfig () {
     )
   const disabled = isDisabled(latestRow)
   const error = errorObj ? errorObj.message : ''
-
+  // console.log(columnName, latestRow[columnName], this.props.value)
   const commonCfg = {
     editMode,
     simple: true,
     showErrorIcon: true,
     error,
-    value: latestRow[columnName],
+    value: latestRow[columnName] || this.props.value,
     defaultValue: getInitialValue ? getInitialValue(row) : undefined,
     disabled,
     row: latestRow,
     text: text || !editMode,
     ...restProps,
   }
-  if (editMode && disabled) {
-    commonCfg.onMouseLeave = this.props.onBlur
-  }
+  // if (editMode && disabled) {
+  //   commonCfg.onMouseLeave = this.props.onBlur
+  // }
   return commonCfg
+}
+
+function getCommonRender (cb) {
+  const { value, editMode } = this.props
+  const cfg = getCommonConfig.call(this)
+  const { render, error, row } = cfg
+  // console.log(row, this.props.row)
+  if (render && !editMode && !error) {
+    return render(row)
+  }
+  if (typeof value === 'object' && React.isValidElement(value)) {
+    return <span>{value}</span>
+  }
+  return cb(cfg)
 }
 
 module.exports = {
@@ -139,4 +162,5 @@ module.exports = {
   onComponentDidMount,
   onComponentChange,
   getCommonConfig,
+  getCommonRender,
 }

@@ -212,9 +212,15 @@ export default createFormViewModel({
             return n
           })
         } else {
-          const itemFK = podoOrderType.filter(
-            (x) => x.value === payload.type,
-          )[0].itemFKName
+          // const itemFK = podoOrderType.filter(
+          //   (x) => x.value === payload.type,
+          // )[0].itemFKName
+          let itemFK
+          const item = podoOrderType.filter((x) => x.value === payload.type)
+          if (item.length > 0) {
+            const { itemFKName } = item[0]
+            itemFK = itemFKName
+          }
           rows.push({
             ...payload,
             [itemFK]: payload.itemFK,

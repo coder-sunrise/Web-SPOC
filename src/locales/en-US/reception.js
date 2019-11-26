@@ -123,6 +123,7 @@ export default {
   'reception.queue.visitRegistration.visitType': 'Visit Type',
   'reception.queue.visitRegistration.queueNo': 'Queue Number',
   'reception.queue.visitRegistration.doctor': 'Doctor',
+  'reception.queue.visitRegistration.attendantDoctor': 'Attendant Doctor',
   'reception.queue.visitRegistration.visitRemarks': 'Visit Remarks',
   'reception.queue.visitRegistration.attachment': 'Attachment',
 

@@ -83,6 +83,7 @@ class AmountSummary extends PureComponent {
 
     this.setState((prevState) => {
       const newState = calculateAmount(rows, adjustments, config)
+      console.log(newState, config)
       if (prevState.summary.totalWithGST !== newState.summary.totalWithGST) {
         onValueChanged(newState)
       }
@@ -91,6 +92,7 @@ class AmountSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
+    console.log(isCheckboxClicked)
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
     config.isGSTInclusive = isCheckboxClicked
@@ -168,7 +170,7 @@ class AmountSummary extends PureComponent {
   render () {
     const {
       theme,
-      gstInclusiveConfigrable,
+      gstInclusiveConfigrable = true,
       showAdjustment,
       classes,
     } = this.props
@@ -264,6 +266,7 @@ class AmountSummary extends PureComponent {
                   placement='bottom'
                 >
                   <Checkbox
+                    style={{ top: 1 }}
                     label={formatMessage({
                       id: 'inventory.pr.detail.pod.summary.inclusiveGST',
                     })}

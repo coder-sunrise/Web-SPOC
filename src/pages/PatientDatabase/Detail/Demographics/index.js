@@ -49,6 +49,7 @@ class Demographic extends PureComponent {
       contactFK: this.props.values.contact.id,
       postcode: '',
       countryFK: undefined,
+      isDeleted: false,
     })
   }
 
@@ -205,7 +206,7 @@ class Demographic extends PureComponent {
                         label='Account No.'
                         autoFocus
                         uppercase
-                        inputProps={{ maxLength: 9 }}
+                        maxLength='20'
                         {...args}
                       />
                     )
@@ -232,12 +233,13 @@ class Demographic extends PureComponent {
                     return (
                       <TextField
                         label='Full Name'
+                        maxLength='200'
                         onChange={(e) => {
-                          if (
-                            !values.callingName ||
-                            e.target.value.indexOf(values.callingName) === 0
-                          )
-                            setFieldValue('callingName', e.target.value)
+                          // if (
+                          //   !values.callingName ||
+                          //   e.target.value.indexOf(values.callingName) === 0
+                          // )
+                          setFieldValue('callingName', e.target.value)
                         }}
                         {...args}
                       />
@@ -249,7 +251,13 @@ class Demographic extends PureComponent {
                 <FastField
                   name='callingName'
                   render={(args) => {
-                    return <TextField label='Calling Name' {...args} />
+                    return (
+                      <TextField
+                        label='Calling Name'
+                        maxLength='200'
+                        {...args}
+                      />
+                    )
                   }}
                 />
               </GridItem>
@@ -346,6 +354,7 @@ class Demographic extends PureComponent {
                     <Select
                       label='Occupation'
                       // code='ctOccupation'
+                      valueField='id'
                       query={this.queryOccupation}
                       {...args}
                     />

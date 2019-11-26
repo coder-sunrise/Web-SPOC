@@ -18,8 +18,16 @@ import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
 
 const status = [
-  { value: false, name: 'Inactive', color: 'red' },
-  { value: true, name: 'Active', color: 'green' },
+  {
+    value: false,
+    name: 'Inactive',
+    render: () => <span style={{ color: 'red' }}>Inactive</span>,
+  },
+  {
+    value: true,
+    name: 'Active',
+    render: () => <span style={{ color: 'green' }}>Active</span>,
+  },
 ]
 
 const statusString = [
@@ -780,6 +788,9 @@ const consultationDocumentTypes = [
     value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
+    getSubject: (r) => {
+      return r.Title || ''
+    },
     downloadKey: 'documentid',
     downloadConfig: {
       id: 12,
@@ -1105,7 +1116,7 @@ export const fetchAndSaveCodeTable = async (
     if (skipCache.includes(code)) return newData
 
     await db.codetable.put({
-      code,
+      code: code.toLowerCase(),
       data: newData,
       updateDate: new Date(), // refresh ? null : new Date(),
       params,
@@ -1154,7 +1165,7 @@ export const getCodes = async (payload) => {
   let _temp = false
 
   const { refresh = false } = payload
-  if (typeof payload === 'string') ctcode = payload.toLowerCase()
+  if (typeof payload === 'string') ctcode = payload
   if (typeof payload === 'object') {
     ctcode = payload.code
     params = payload.filter
@@ -1164,7 +1175,11 @@ export const getCodes = async (payload) => {
   }
 
   let result = []
+
   try {
+    if (!ctcode) throw Error('ctcode is undefined / null')
+
+    ctcode = ctcode.toLowerCase()
     await db.open()
     const ct = await db.codetable.get(ctcode)
 

@@ -170,6 +170,7 @@ class CommonTableGrid extends PureComponent {
       [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
     const TableComponent = ({ ...restProps }) => {
+      // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
     }
 
@@ -493,7 +494,7 @@ class CommonTableGrid extends PureComponent {
 
   search = (payload) => {
     const { query, dispatch, type, queryMethod = 'query' } = this.props
-
+    // window.$tempGridRow[this.gridId] = {}
     if (query) {
       query({
         callback: (data) => {
@@ -560,7 +561,7 @@ class CommonTableGrid extends PureComponent {
     const { columnExtensions = [], extraState, getRowId } = this.props
     const { classes, onClick, ...restProps } = p
     const { column, row } = restProps
-    const { cellEditingDisabled } = column
+    // const { cellEditingDisabled } = column
     // console.log(p2)
     // return null
     // console.log(restProps)
@@ -572,6 +573,9 @@ class CommonTableGrid extends PureComponent {
       const latestRow = window.$tempGridRow[this.gridId]
         ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
+      // try {
+      //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
+      // } catch (error) {}
       if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
         cfg = {
           tabIndex: 0,
@@ -581,6 +585,7 @@ class CommonTableGrid extends PureComponent {
           // },
         }
       }
+      if (colCfg && colCfg.disabled) cfg = {}
     }
     // console.log(p, columnExtensions)
 
@@ -653,7 +658,6 @@ class CommonTableGrid extends PureComponent {
       type,
       rows = [],
       TableCell = DefaultTableCell,
-      columnExtensions = [],
       filteringColExtensions = [],
       defaultSorting = [],
       height = undefined,
@@ -714,6 +718,8 @@ class CommonTableGrid extends PureComponent {
       ...FuncProps,
     }
 
+    let { columnExtensions = [] } = this.props
+
     if (containerComponent) {
       pagerConfig.containerComponent = containerComponent
     }
@@ -739,7 +745,7 @@ class CommonTableGrid extends PureComponent {
       align: 'center',
       sortingEnabled: false,
     }
-    let newColumExtensions = columnExtensions.concat([
+    columnExtensions = columnExtensions.concat([
       ...[
         {
           columnName: 'rowIndex',
@@ -776,27 +782,27 @@ class CommonTableGrid extends PureComponent {
           }
         }),
     ])
-    let actionCol = newColumExtensions.find((o) => o.columnName === 'action')
+    let actionCol = columnExtensions.find((o) => o.columnName === 'action')
     if (actionCol) {
-      newColumExtensions = newColumExtensions.filter(
+      columnExtensions = columnExtensions.filter(
         (o) => o.columnName !== 'action',
       )
-      newColumExtensions.push({
+      columnExtensions.push({
         ...actionColDefaultCfg,
         ...actionCol,
       })
     } else {
-      newColumExtensions.push(actionColDefaultCfg)
+      columnExtensions.push(actionColDefaultCfg)
     }
-    // console.log(errors, newColumExtensions)
+    // console.log(errors, columnExtensions)
 
     const tableProps = {
       ...TableProps,
-      columnExtensions: newColumExtensions,
+      columnExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
     }
-
+    // console.log('tableProps',tableProps)
     // const extraPagerConfig = {
     //   ...pagerConfig,
     // }
@@ -805,7 +811,7 @@ class CommonTableGrid extends PureComponent {
     // if (errors.length > 0) {
 
     // }
-    newColumExtensions.forEach((c) => {
+    columnExtensions.forEach((c) => {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
@@ -833,7 +839,7 @@ class CommonTableGrid extends PureComponent {
     })
     // console.log(pager, pagerConfig)
     const cellComponentConfig = {
-      columnExtensions: newColumExtensions,
+      columnExtensions,
       editingRowIds,
       commitCount: global.commitCount,
       errorCount: global.errorCount,
@@ -905,7 +911,7 @@ class CommonTableGrid extends PureComponent {
                   defaultSorting={defaultSorting}
                   onSortingChange={(sorting) => {
                     sorting.forEach((o) => {
-                      const c = newColumExtensions.find(
+                      const c = columnExtensions.find(
                         (m) => m.columnName === o.columnName,
                       )
                       o.sortBy = c.sortBy
@@ -914,7 +920,7 @@ class CommonTableGrid extends PureComponent {
                       sorting,
                     })
                   }}
-                  columnExtensions={newColumExtensions}
+                  columnExtensions={columnExtensions}
                   {...sortConfig}
                 />
               )}
@@ -944,7 +950,7 @@ class CommonTableGrid extends PureComponent {
               {/* <IntegratedFiltering /> */}
               {sort &&
               !type && (
-                <IntegratedSorting columnExtensions={newColumExtensions} />
+                <IntegratedSorting columnExtensions={columnExtensions} />
               )}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
               {pager && !this.state.entity && <IntegratedPaging />}
@@ -959,6 +965,7 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               <TextTypeProvider {...cellComponentConfig} />
+
               <NumberTypeProvider {...cellComponentConfig} />
               <SelectTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />

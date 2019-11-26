@@ -100,6 +100,7 @@ class Banner extends PureComponent {
               cmt: 3,
               pid: info.id,
             })}
+            tabIndex='-1'
           >
             <IconButton>
               <Edit color='action' />
@@ -372,6 +373,7 @@ class Banner extends PureComponent {
                       cmt: 1,
                       pid: info.id,
                     })}
+                    tabIndex='-1'
                   >
                     <Tooltip title={name} placement='bottom-start'>
                       <span style={{ whiteSpace: 'nowrap' }}>{name} </span>

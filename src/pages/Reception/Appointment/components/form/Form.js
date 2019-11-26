@@ -69,6 +69,7 @@ import styles from './style'
 })
 class Form extends React.PureComponent {
   state = {
+    submitCount: 0,
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
@@ -331,8 +332,9 @@ class Form extends React.PureComponent {
       // )
       const afterDelete = datagrid.map((item) => ({
         ...item,
-        isDeleted: deleted.includes(item.id),
+        isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
+      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
@@ -369,6 +371,16 @@ class Form extends React.PureComponent {
     }
   }
 
+  checkHasError = (datagrid = []) => {
+    const hasError = datagrid.reduce((error, data) => {
+      if (data._errors) {
+        return data._errors.length > 0 || error
+      }
+      return error
+    }, false)
+    return hasError
+  }
+
   validateDataGrid = () => {
     const { datagrid = [], editingRows } = this.state
 
@@ -376,6 +388,8 @@ class Form extends React.PureComponent {
 
     // editing at least 1 row
     if (editingRows.length > 0) isDataGridValid = false
+
+    if (this.checkHasError(datagrid)) isDataGridValid = false
 
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
@@ -388,34 +402,6 @@ class Form extends React.PureComponent {
     )
 
     if (!hasPrimary) isDataGridValid = false
-    // const hasOneRowOnly =
-    //   datagrid.filter((item) => !item.isDeleted).length === 1
-    // let newDataGrid = [
-    //   ...datagrid,
-    // ]
-    // if (hasOneRowOnly) {
-    //   newDataGrid = datagrid.reduce(
-    //     (datas, item) => [
-    //       ...datas,
-    //       { ...item, isPrimaryClinician: !item.isDeleted },
-    //     ],
-    //     [],
-    //   )
-    // }
-    // const newDataGrid =
-    //   datagrid.length === 1
-    //     ? [
-    //         {
-    //           ...datagrid[0],
-    //           isPrimaryClinician:
-    //             datagrid[0].isPrimaryClinician === undefined
-    //               ? true
-    //               : datagrid[0].isPrimaryClinician,
-    //         },
-    //       ]
-    //     : [
-    //         ...datagrid,
-    //       ]
 
     this.setState({
       isDataGridValid,
@@ -464,7 +450,36 @@ class Form extends React.PureComponent {
         type: 'calendar/submit',
         payload: submitPayload,
       }).then((response) => {
-        if (response) {
+        if (validate && response) {
+          const conflicts = [
+            ...response,
+          ]
+          this.setState(
+            (preState) => ({
+              submitCount: preState.submitCount + 1,
+              datagrid: preState.datagrid.reduce(
+                (data, d) => [
+                  ...data,
+                  {
+                    ...d,
+                    conflicts:
+                      conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                        ? conflicts[d.sortOrder].conflicts
+                        : undefined,
+                  },
+                ],
+                [],
+              ),
+            }),
+            () => {
+              dispatch({
+                type: 'global/updateState',
+                payload: { commitCount: this.state.submitCount + 1 },
+              })
+            },
+          )
+        }
+        if (!validate && response) {
           onConfirm()
         }
       })
@@ -752,21 +767,9 @@ class Form extends React.PureComponent {
     const _datagrid =
       conflicts.length > 0
         ? datagrid
+            .filter((item) => !item.isDeleted)
             .sort(sortDataGrid)
             .map((item, index) => ({ ...item, sortOrder: index }))
-            .reduce(
-              (data, d) => [
-                ...data,
-                {
-                  ...d,
-                  conflicts:
-                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                      ? conflicts[d.sortOrder].conflicts
-                      : undefined,
-                },
-              ],
-              [],
-            )
         : [
             ...datagrid,
           ]
@@ -854,6 +857,7 @@ class Form extends React.PureComponent {
               overrideLoading
             >
               <PatientSearchModal
+                search={values.patientName}
                 handleSelectClick={this.onSelectPatientClick}
               />
             </CommonModal>

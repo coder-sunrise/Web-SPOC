@@ -21,6 +21,7 @@ import {
   additionalShortcutFormats,
   timeFormat24HourWithSecond,
   serverDateTimeFormatFull,
+  Tooltip,
 } from '@/components'
 
 const _toMoment = (value, isLocal, showTime) => {
@@ -110,15 +111,17 @@ class AntdDatePicker extends PureComponent {
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value } = nextProps
     // console.log(value)
-    if (value) console.log(value.target)
+    // if (value) console.log(value.target)
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
       })
-    } else if (value && typeof value === 'string') {
-      this.setState({
-        value,
-      })
+    } else if (value) {
+      if (typeof value === 'string' || moment.isMoment(value)) {
+        this.setState({
+          value,
+        })
+      }
     } else {
       this.setState({
         value: undefined,
@@ -249,26 +252,32 @@ class AntdDatePicker extends PureComponent {
         format = dateFormatLong
       }
     }
+    // console.log(format, restProps.showTime)
 
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
-    if (text)
-      return (
-        <AutosizeInput
-          readOnly
-          inputClassName={props.className}
-          value={
-            this.state.value !== undefined &&
-            _toMoment(this.state.value, local, restProps.showTime) ? (
-              _toMoment(this.state.value, local, restProps.showTime).format(
-                format,
-              )
-            ) : (
-              ''
+    if (text) {
+      const v =
+        this.state.value !== undefined &&
+        _toMoment(this.state.value, local, restProps.showTime)
+          ? _toMoment(this.state.value, local, restProps.showTime).format(
+              format,
             )
-          }
-        />
+          : '-'
+      if (v === '-') return <span>{v}</span>
+      return (
+        <Tooltip title={v} enterDelay={750}>
+          <AutosizeInput
+            readOnly
+            title=''
+            tabIndex='-1'
+            inputClassName={props.className}
+            value={v}
+          />
+        </Tooltip>
       )
+    }
+
     return (
       <div style={{ width: '100%' }} {...props}>
         <DatePicker

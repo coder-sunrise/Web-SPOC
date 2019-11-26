@@ -37,7 +37,7 @@ const Setting = ({
     medicationDetail || vaccinationDetail
   const entityData = entity || []
   let addedItems = []
-  if (entityData && entityData.inventoryMedication_MedicationPrecaution.length > 0) {
+  if (entityData && entityData.inventoryMedication_MedicationPrecaution && entityData.inventoryMedication_MedicationPrecaution.length > 0) {
     addedItems = entityData.inventoryMedication_MedicationPrecaution.map((item) => ({
       medicationPrecautionFK: item.medicationPrecautionFK,
       value: item.medicationPrecaution.name,

@@ -63,13 +63,13 @@ const styles = () => ({
     const { dispatch, history } = props
 
     const newStatementInvoice = statementInvoice.map((o) => {
-      delete o.id
       return {
         ...o,
-        invoicePayerFK: o.copayerInvoicePayerId,
-        payableAmount: o.copayerPayableAmount,
-        outstandingAmount: o.copayerOutstanding,
-        invoiceAmt: o.copayerPayableAmount,
+        id: values.id ? o.id : undefined,
+        invoicePayerFK: o.copayerInvoicePayerId || o.invoicePayerFK,
+        payableAmount: o.copayerPayableAmount || o.payableAmount,
+        outstandingAmount: o.copayerOutstanding || o.outstandingAmount,
+        invoiceAmt: o.copayerPayableAmount || o.invoiceAmt,
       }
     })
     dispatch({

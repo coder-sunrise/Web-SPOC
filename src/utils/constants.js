@@ -161,3 +161,13 @@ export const COUNTRY_CODE = {
   5: '+66 Thailand',
   6: '+81 Japan',
 }
+
+export const ADD_ON_FEATURE = {
+  SMS: 1,
+  MIMS: 2,
+}
+
+export const VISIT_TYPE = {
+  CONS: 1,
+  RETAIL: 2,
+}

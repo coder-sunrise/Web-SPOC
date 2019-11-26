@@ -1,6 +1,8 @@
 import moment from 'moment'
 import React from 'react'
 import _ from 'lodash'
+import { isNumber } from 'util'
+
 import nzh from 'nzh/cn'
 import router from 'umi/router'
 import { formatMessage, setLocale, getLocale } from 'umi/locale'
@@ -76,7 +78,10 @@ moment.prototype.formatUTC = function (dateOnly = true) {
 //   return this.clone().add(-8, 'hours')
 // }
 
-export const roundToTwoDecimals = (amount) => Math.round(amount * 100) / 100
+export const roundTo = (amount, precision = 2) => {
+  if (!amount && amount !== 0) return undefined
+  return Math.round(amount * 10 ** precision) / 10 ** precision
+}
 
 export function fixedZero (val) {
   return val * 1 < 10 ? `0${val}` : val
@@ -572,6 +577,7 @@ export const updateCellValue = (
     classes,
     config = {},
     row = {},
+    editMode,
   },
   element,
   val,
@@ -582,7 +588,7 @@ export const updateCellValue = (
       ({ columnName: currentColumnName }) => currentColumnName === columnName,
     ) || {}
   const { validationSchema, gridId, getRowId, ...restConfig } = cfg
-  // console.log({ columnName, val },getRowId,'dsad')
+  // console.log({ columnName, val, value, editMode }, row, 'dsad')
   if (!window.$tempGridRow[gridId]) {
     window.$tempGridRow[gridId] = {}
   }
@@ -592,12 +598,16 @@ export const updateCellValue = (
   }
   // console.log(columnName, val)
   // console.log({ row, val })
-  window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  if (editMode) {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = val
+  } else {
+    window.$tempGridRow[gridId][getRowId(row)][columnName] = value
+  }
   // console.log(val, columnName)
   // console.log({ t1: window.$tempGridRow })
   if (validationSchema) {
     try {
-      if (value !== val && typeof onValueChange === 'function') {
+      if (editMode && value !== val && typeof onValueChange === 'function') {
         onValueChange(val)
       }
       const r = validationSchema.validateSync(
@@ -909,12 +919,12 @@ const calculateAmount = (
   const activeRows = rows.filter((o) => !o.isDeleted)
   const activeAdjustments = adjustments.filter((o) => !o.isDeleted)
 
-  const total = roundToTwoDecimals(
+  const total = roundTo(
     activeRows.map((o) => o[totalField]).reduce(sumReducer, 0),
   )
 
   activeRows.forEach((r) => {
-    r.weightage = roundToTwoDecimals(r[totalField] / total || 0)
+    r.weightage = roundTo(r[totalField] / total || 0)
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -928,18 +938,18 @@ const calculateAmount = (
     })
     activeRows.forEach((r) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      const adj = roundToTwoDecimals(r.weightage * fa.adjAmount)
+      const adj = roundTo(r.weightage * fa.adjAmount)
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
 
-      r[adjustedField] = roundToTwoDecimals(r[adjustedField] + adj)
+      r[adjustedField] = roundTo(r[adjustedField] + adj)
       r.subAdjustment += adj
     })
   })
   // activeRows.forEach((r) => {
-  //   r[adjustedField] = roundToTwoDecimals(r[adjustedField])
+  //   r[adjustedField] = roundTo(r[adjustedField])
   // })
 
-  const totalAfterAdj = roundToTwoDecimals(
+  const totalAfterAdj = roundTo(
     activeRows.map((o) => o[adjustedField]).reduce(sumReducer, 0),
   )
 
@@ -955,15 +965,15 @@ const calculateAmount = (
   if (isEnableGST) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
-        gst += roundToTwoDecimals(
+        gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
         )
       })
     } else {
-      gst = roundToTwoDecimals(totalAfterAdj * gSTPercentage)
+      gst = roundTo(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
-        r[gstAmtField] = roundToTwoDecimals(r[adjustedField] * gSTPercentage)
-        r[gstField] = roundToTwoDecimals(r[adjustedField] * (1 + gSTPercentage))
+        r[gstAmtField] = roundTo(r[adjustedField] * gSTPercentage)
+        r[gstField] = roundTo(r[adjustedField] * (1 + gSTPercentage))
       })
     }
   }
@@ -977,7 +987,7 @@ const calculateAmount = (
       totalAfterAdj,
       totalWithGST: isGSTInclusive
         ? totalAfterAdj
-        : roundToTwoDecimals(gst + totalAfterAdj),
+        : roundTo(gst + totalAfterAdj),
       isEnableGST,
       gSTPercentage,
       isGSTInclusive,

@@ -12,7 +12,7 @@ import {
   TextField,
   withFormik,
 } from '@/components'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 // styles
 import styles from './styles'
 
@@ -28,7 +28,7 @@ import styles from './styles'
     //   if (item.id < 0 && item.id < smallestNegativeID) return item.id
     //   return smallestNegativeID
     // }, 0)
-    const gstAmount = roundToTwoDecimals(
+    const gstAmount = roundTo(
       values.total - values.total / (1 + gstValue / 100),
     )
     const miscItem = {

@@ -5,7 +5,7 @@ import { control } from '@/components/Decorator'
 
 const IconButton = (props) => {
   // console.log(props)
-  return <MUIIconButton {...props} />
+  return <MUIIconButton tabIndex='-1' {...props} />
 }
 IconButton.displayName = 'IconButton'
 export default compose(control())(IconButton)

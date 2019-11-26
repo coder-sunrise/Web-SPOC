@@ -1,6 +1,8 @@
 import React, { Component, PureComponent, useState } from 'react'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import { connect } from 'dva'
+import { withStyles, Divider, Paper } from '@material-ui/core'
+import DeleteIcon from '@material-ui/icons/Delete'
 import Yup from '@/utils/yup'
 
 import {
@@ -29,8 +31,6 @@ import {
   NumberInput,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
 
 const styles = (theme) => ({})
 
@@ -51,13 +51,12 @@ class UploadAttachment extends PureComponent {
           <FastField
             name='corAttachment'
             render={(args) => {
-              // console.log(args)
               return (
                 <Attachment
                   attachmentType='ClinicalNotes'
                   filterTypes={[
                     'ClinicalNotes',
-                    'Visit',
+                    'VisitReferral',
                   ]}
                   handleUpdateAttachments={updateAttachments(args)}
                   attachments={args.field.value}

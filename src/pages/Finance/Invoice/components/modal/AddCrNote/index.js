@@ -20,7 +20,7 @@ import {
   SizeContainer,
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { CrNoteColumns } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
@@ -69,7 +69,7 @@ import MiscCrNote from './MiscCrNote'
       invoicePayerFK,
       isStockIn,
       remark,
-      gstAmt: roundToTwoDecimals(gstAmount),
+      gstAmt: roundTo(gstAmount),
       gstValue: invoiceDetail.gstValue,
       total: finalCredit,
       totalAftGST: finalCredit,
@@ -133,7 +133,7 @@ class AddCrNote extends Component {
         return total + item.totalAfterGST
       return total
     }, 0)
-    setFieldValue('finalCredit', roundToTwoDecimals(finalCreditTotal))
+    setFieldValue('finalCredit', roundTo(finalCreditTotal))
   }
 
   handleSelectionChange = (selection) => {
@@ -228,9 +228,7 @@ class AddCrNote extends Component {
 
     if (target && target.value && event.target.name !== '') {
       const parseValue = Number(target.value)
-      gstAmt = roundToTwoDecimals(
-        parseValue - parseValue / (1 + gstValue / 100),
-      )
+      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100))
       const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
       setFieldValue(gstFieldName, gstAmt)
       setTimeout(() => this.handleCalcCrNoteItem(), 100)
@@ -239,11 +237,10 @@ class AddCrNote extends Component {
 
   render () {
     const { handleSubmit, onConfirm, values } = this.props
-    const { creditNoteItem, finalCredit } = values
-
+    const { creditNoteItem, finalCredit, payerType } = values
     return (
       <div>
-        <CrNoteForm />
+        <CrNoteForm payerType={payerType} />
         <CommonTableGrid
           size='sm'
           // {...TableConfig}

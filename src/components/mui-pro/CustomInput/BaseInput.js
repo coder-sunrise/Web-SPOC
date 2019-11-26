@@ -30,7 +30,7 @@ const _config = {
       'onChange',
       // 'onBlur',
       // 'onFocus',
-      'onMouseLeave',
+      // 'onMouseLeave',
       'autoFocus',
       'multiline',
       'rows',
@@ -211,6 +211,7 @@ class BaseInput extends React.PureComponent {
       onKeyUp,
       onKeyDown,
       text,
+      simple,
       onBlur,
       onFocus,
     } = props
@@ -300,7 +301,24 @@ class BaseInput extends React.PureComponent {
         </InputAdornment>
       )
     }
+
     if (text) {
+      if (simple && !inputProps.inputComponent) {
+        // return (
+        //   <Input
+        //     classes={this.getClass(classes)}
+        //     inputRef={this.getRef}
+        //     {...cfg}
+        //     inputProps={inputProps}
+        //     {...resetProps}
+        //   />
+        // )
+        return (
+          <Tooltip title={inputProps.value} enterDelay={750}>
+            <span>{inputProps.value}</span>
+          </Tooltip>
+        )
+      }
       cfg.inputComponent = ({ className }) => {
         return (
           <Tooltip title={inputProps.value} enterDelay={750}>

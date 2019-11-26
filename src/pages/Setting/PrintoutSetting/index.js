@@ -70,34 +70,34 @@ const errorMessage = (v) => {
   },
 
   validationSchema: Yup.object().shape({
-    customLetterHeadHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayCustomLetterHead', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    standardHeaderInfoHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayStandardHeader', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    footerInfoHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayFooterInfo', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
-    footerDisclaimerHeight: Yup.number()
-      .min(0.1, errorMessage(0.1))
-      .max(5, errorMessage(0.1))
-      .when('isDisplayFooterInfoDisclaimer', {
-        is: (v) => v === true,
-        then: Yup.number().required(),
-      }),
+    customLetterHeadHeight: Yup.number().when('isDisplayCustomLetterHead', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    standardHeaderInfoHeight: Yup.number().when('isDisplayStandardHeader', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    footerInfoHeight: Yup.number().when('isDisplayFooterInfo', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
+    footerDisclaimerHeight: Yup.number().when('isDisplayFooterInfoDisclaimer', {
+      is: (v) => v === true,
+      then: Yup.number()
+        .required()
+        .min(0.1, errorMessage(0.1))
+        .max(5, errorMessage(0.1)),
+    }),
     customLetterHeadImage: Yup.string().when('isDisplayCustomLetterHead', {
       is: (v) => v === true,
       then: Yup.string().required('Letter Head Image is required.'),
@@ -287,46 +287,50 @@ class printoutSetting extends PureComponent {
                   />
                 </GridItem>
               </GridContainer>
-
-              <GridContainer className={classes.indent}>
-                <GridItem direction='column' md={6}>
-                  <GridItem md={6}>
-                    <Field
-                      name='customLetterHeadHeight'
-                      render={(args) => (
-                        <NumberInput
-                          label='Letter Head Height'
-                          suffix='cm'
-                          format='0.0'
-                          {...args}
-                        />
-                      )}
-                    />
-                  </GridItem>
-                  <GridItem md={6}>
-                    {letterHeadImgRequired && (
-                      <span className={classes.errorMsg}>
-                        {letterHeadImgRequired}
-                      </span>
-                    )}
-                    <Field
-                      name='customLetterHeadImage'
-                      render={(args) => {
-                        return (
-                          <BrowseImage
-                            title='Letter Head Image'
-                            setImageBase64={this.setImageBase64}
-                            fieldName='customLetterHeadImage'
-                            selected={this.state.selected}
+              {values.isDisplayCustomLetterHead === true ? (
+                <GridContainer className={classes.indent}>
+                  <GridItem direction='column' md={6}>
+                    <GridItem md={6}>
+                      <Field
+                        name='customLetterHeadHeight'
+                        render={(args) => (
+                          <NumberInput
+                            label='Letter Head Height'
+                            suffix='cm'
+                            format='0.0'
+                            min='0'
+                            max='5'
                             {...args}
                           />
-                        )
-                      }}
-                    />
+                        )}
+                      />
+                    </GridItem>
+                    <GridItem md={6}>
+                      {letterHeadImgRequired && (
+                        <span className={classes.errorMsg}>
+                          {letterHeadImgRequired}
+                        </span>
+                      )}
+                      <Field
+                        name='customLetterHeadImage'
+                        render={(args) => {
+                          return (
+                            <BrowseImage
+                              title='Letter Head Image'
+                              setImageBase64={this.setImageBase64}
+                              fieldName='customLetterHeadImage'
+                              selected={this.state.selected}
+                              {...args}
+                            />
+                          )
+                        }}
+                      />
+                    </GridItem>
                   </GridItem>
-                </GridItem>
-              </GridContainer>
-
+                </GridContainer>
+              ) : (
+                ''
+              )}
               <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={1}>
                   <h4>
@@ -342,24 +346,31 @@ class printoutSetting extends PureComponent {
                   />
                 </GridItem>
               </GridContainer>
-
-              <GridContainer className={classes.indent}>
-                <GridItem direction='column' md={6}>
-                  <GridItem md={6}>
-                    <FastField
-                      name='standardHeaderInfoHeight'
-                      render={(args) => (
-                        <NumberInput
-                          label='Header Info Height'
-                          suffix='cm'
-                          format='0.0'
-                          {...args}
-                        />
-                      )}
-                    />
+              {values.isDisplayStandardHeader === true ? (
+                <GridContainer className={classes.indent}>
+                  <GridItem direction='column' md={6}>
+                    <GridItem md={6}>
+                      <FastField
+                        name='standardHeaderInfoHeight'
+                        render={(args) => (
+                          <NumberInput
+                            label='Header Info Height'
+                            suffix='cm'
+                            format='0.0'
+                            min='0'
+                            max='5'
+                            disabled={values.isDisplayStandardHeader === false}
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
                   </GridItem>
-                </GridItem>
-              </GridContainer>
+                </GridContainer>
+              ) : (
+                ''
+              )}
+
               <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={1}>
                   <h4>
@@ -375,24 +386,29 @@ class printoutSetting extends PureComponent {
                   />
                 </GridItem>
               </GridContainer>
-
-              <GridContainer className={classes.indent}>
-                <GridItem direction='column' md={6}>
-                  <GridItem md={6}>
-                    <FastField
-                      name='footerInfoHeight'
-                      render={(args) => (
-                        <NumberInput
-                          label='Footer Info Height'
-                          suffix='cm'
-                          format='0.0'
-                          {...args}
-                        />
-                      )}
-                    />
+              {values.isDisplayFooterInfo === true ? (
+                <GridContainer className={classes.indent}>
+                  <GridItem direction='column' md={6}>
+                    <GridItem md={6}>
+                      <Field
+                        name='footerInfoHeight'
+                        render={(args) => (
+                          <NumberInput
+                            label='Footer Info Height'
+                            suffix='cm'
+                            format='0.0'
+                            min='0'
+                            max='5'
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
                   </GridItem>
-                </GridItem>
-              </GridContainer>
+                </GridContainer>
+              ) : (
+                ''
+              )}
 
               <GridContainer className={classes.verticalSpacing}>
                 <GridItem md={1}>
@@ -411,43 +427,49 @@ class printoutSetting extends PureComponent {
               </GridContainer>
 
               <GridContainer className={classes.indentDisclaimer} />
-              <GridContainer className={classes.indent}>
-                <GridItem direction='column' md={6}>
-                  <GridItem md={6}>
-                    <FastField
-                      name='footerDisclaimerHeight'
-                      render={(args) => (
-                        <NumberInput
-                          label='Footer Disclaimer Height'
-                          suffix='cm'
-                          format='0.0'
-                          {...args}
-                        />
-                      )}
-                    />
-                  </GridItem>
+              {values.isDisplayFooterInfoDisclaimer === true ? (
+                <GridContainer className={classes.indent}>
+                  <GridItem direction='column' md={6}>
+                    <GridItem md={6}>
+                      <FastField
+                        name='footerDisclaimerHeight'
+                        render={(args) => (
+                          <NumberInput
+                            label='Footer Disclaimer Height'
+                            suffix='cm'
+                            format='0.0'
+                            min='0'
+                            max='5'
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
 
-                  <GridItem md={6}>
-                    {footerDisclaimerImgRequired && (
-                      <span className={classes.errorMsg}>
-                        {footerDisclaimerImgRequired}
-                      </span>
-                    )}
-                    <Field
-                      name='footerDisclaimerImage'
-                      render={(args) => (
-                        <BrowseImage
-                          title='Footer Disclaimer Image'
-                          setImageBase64={this.setImageBase64}
-                          fieldName='footerDisclaimerImage'
-                          selected={this.state.selected}
-                          {...args}
-                        />
+                    <GridItem md={6}>
+                      {footerDisclaimerImgRequired && (
+                        <span className={classes.errorMsg}>
+                          {footerDisclaimerImgRequired}
+                        </span>
                       )}
-                    />
+                      <Field
+                        name='footerDisclaimerImage'
+                        render={(args) => (
+                          <BrowseImage
+                            title='Footer Disclaimer Image'
+                            setImageBase64={this.setImageBase64}
+                            fieldName='footerDisclaimerImage'
+                            selected={this.state.selected}
+                            {...args}
+                          />
+                        )}
+                      />
+                    </GridItem>
                   </GridItem>
-                </GridItem>
-              </GridContainer>
+                </GridContainer>
+              ) : (
+                ''
+              )}
             </GridContainer>
 
             <div

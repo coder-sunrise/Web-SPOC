@@ -1,10 +1,10 @@
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 
 export const rounding = (config, amount) => {
   if (amount === 0) return 0 // abort early
 
   let returnAmount = Math.floor(amount)
-  let cents = roundToTwoDecimals(amount % 1)
+  let cents = roundTo(amount % 1)
 
   if (cents === 0) return returnAmount + cents
 
@@ -15,7 +15,7 @@ export const rounding = (config, amount) => {
   if (currencyRounding.toLowerCase() === 'up') {
     switch (roundingPoint) {
       case 0.05: {
-        const _cents = roundToTwoDecimals(cents % 0.1)
+        const _cents = roundTo(cents % 0.1)
         const flooredCents = Math.floor(cents * 10) / 10
         cents =
           _cents > roundingPoint
@@ -41,7 +41,7 @@ export const rounding = (config, amount) => {
   } else {
     switch (roundingPoint) {
       case 0.05: {
-        const _cents = roundToTwoDecimals(cents % 0.1)
+        const _cents = roundTo(cents % 0.1)
         const flooredCents = Math.floor(cents * 10) / 10
         cents =
           _cents < roundingPoint ? flooredCents : flooredCents + roundingPoint

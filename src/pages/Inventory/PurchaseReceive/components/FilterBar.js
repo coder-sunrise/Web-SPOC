@@ -170,17 +170,20 @@ class FilterBar extends PureComponent {
                   purchaseOrderStatusFK,
                   transactionDates,
                   supplierFK,
+                  isAllDateChecked,
                 } = values
+
+                const fromToDates = (index) => {
+                  if (transactionDates && !isAllDateChecked)
+                    return transactionDates[index]
+                  return undefined
+                }
+
                 dispatch({
                   type: 'purchaseReceiveList/query',
                   payload: {
-                    keepFilter: false,
-                    lgteql_purchaseOrderDate: transactionDates
-                      ? transactionDates[0]
-                      : undefined,
-                    lsteql_purchaseOrderDate: transactionDates
-                      ? transactionDates[1]
-                      : undefined,
+                    lgteql_purchaseOrderDate: fromToDates(0),
+                    lsteql_purchaseOrderDate: fromToDates(1),
                     purchaseOrderNo,
                     invoiceStatusFK,
                     purchaseOrderStatusFK,

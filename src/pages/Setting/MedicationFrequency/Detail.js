@@ -125,7 +125,7 @@ class Detail extends PureComponent {
               <FastField
                 name='sortOrder'
                 render={(args) => (
-                  <NumberInput label='Sort Order' autoFocused {...args} />
+                  <NumberInput label='Sort Order' autoFocus {...args} />
                 )}
               />
             </GridItem>

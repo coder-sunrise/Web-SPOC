@@ -41,7 +41,7 @@ class EmergencyContact extends PureComponent {
       },
       {
         columnName: 'accountNo',
-        maxLength: 9,
+        maxLength: 20,
         isDisabled: (row) => !!row.nokPatientProfileFK,
       },
       {
@@ -154,7 +154,7 @@ class EmergencyContact extends PureComponent {
     const patientEmergencyContact = _.cloneDeep(values.patientEmergencyContact)
     if (
       patientEmergencyContact.find(
-        (m) => m.patientProfileFK === o.id && !m.isDeleted,
+        (m) => m.emergencyContactFK === o.id && !m.isDeleted,
       )
     ) {
       notification.warn({
@@ -175,7 +175,8 @@ class EmergencyContact extends PureComponent {
       id: newId,
       isNew: true,
       accountNo: o.patientAccountNo,
-      patientProfileFK: o.id,
+      patientProfileFK: values.id,
+      emergencyContactFK: o.id,
       salutationFK: o.salutationFK,
       accountNoTypeFK: o.patientAccountNoTypeFK,
       name: o.name,
@@ -226,7 +227,6 @@ class EmergencyContact extends PureComponent {
   render () {
     const { values, schema } = this.props
     const { SearchPatient = (f) => f } = this
-    console.log('render', values.patientEmergencyContact, this.tableParas)
 
     return (
       <div>
@@ -267,6 +267,11 @@ class EmergencyContact extends PureComponent {
             //     ...o,
             //   }))
             // },
+            onAddedRowsChange: (rows) => {
+              return rows.map((o) => {
+                return { primaryContactNo: '', ...o }
+              })
+            },
           }}
           {...this.tableParas}
         />

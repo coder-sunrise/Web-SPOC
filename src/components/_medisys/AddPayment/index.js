@@ -16,14 +16,15 @@ import PaymentDateAndBizSession from './PaymentDateAndBizSession'
 import styles from './styles'
 import { ValidationSchema, getLargestID } from './variables'
 import { rounding } from './utils'
-import { roundToTwoDecimals } from '@/utils/utils'
+import { roundTo } from '@/utils/utils'
 import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
 import { getBizSession } from '@/services/queue'
 
-@connect(({ clinicSettings, patient }) => ({
+@connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
   patient: patient.entity,
+  ctPaymentMode: codetable.ctpaymentmode,
 }))
 @withFormikExtend({
   notDirtyDuration: 0.5,
@@ -106,28 +107,41 @@ class AddPayment extends Component {
     }
   }
 
-  // componentDidMount = () => {
-  //   document.addEventListener('keydown', this.handleKeyDown)
-  // }
+  componentDidMount = () => {
+    document.addEventListener('keydown', this.handleKeyDown)
+  }
 
-  // componentWillUnmount () {
-  //   // unbind keyDown listener
-  //   document.removeEventListener('keydown', this.handleKeyDown)
-  // }
+  componentWillUnmount () {
+    // unbind keyDown listener
+    document.removeEventListener('keydown', this.handleKeyDown)
+  }
 
   handleKeyDown = (event) => {
     event.preventDefault()
     const min = 112
     const max = 123
-    const { keyCode } = event
+    const { keyCode, key } = event
     if (keyCode < min || keyCode > max) return
-
     console.log({ keyCode })
     // TODO: add payment base on keyCode and paymentMode hotkey setting
-    switch (keyCode) {
-      default:
-        break
-    }
+    const { ctPaymentMode } = this.props
+    const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
+    if (paymentModeObj) this.onPaymentTypeClick(paymentModeObj)
+
+    // let paymentModeFK
+    // switch (keyCode) {
+    //   case 112: {
+    //     paymentModeFK = PAYMENT_MODE.CREDIT_CARD
+    //     break
+    //   }
+    //   case 113: {
+    //     paymentModeFK = PAYMENT_MODE.CHEQUE
+    //     break
+    //   }
+    //   default:
+    //     paymentModeFK = 0
+    //     break
+    // }
   }
 
   fetchCurrentActiveBizSession = () => {
@@ -164,6 +178,7 @@ class AddPayment extends Component {
 
         if (bizSessionList.length > 0)
           setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
+        else setFieldValue('paymentReceivedBizSessionFK', undefined)
       }
     })
   }
@@ -205,7 +220,7 @@ class AddPayment extends Component {
   calculatePayment = () => {
     const { values, setFieldValue, clinicSettings } = this.props
     const { paymentList, outstandingBalance } = values
-    const totalPaid = roundToTwoDecimals(
+    const totalPaid = roundTo(
       paymentList.reduce((total, payment) => total + (payment.amt || 0), 0),
     )
 
@@ -215,15 +230,13 @@ class AddPayment extends Component {
 
     let cashReturned = 0
     if (cashPayment) {
-      const cashAfterRounding = roundToTwoDecimals(
+      const cashAfterRounding = roundTo(
         rounding(clinicSettings, cashPayment.amt),
       )
-      const collectableAmountAfterRounding = roundToTwoDecimals(
+      const collectableAmountAfterRounding = roundTo(
         rounding(clinicSettings, outstandingBalance),
       )
-      const roundingAmt = roundToTwoDecimals(
-        cashAfterRounding - cashPayment.amt,
-      )
+      const roundingAmt = roundTo(cashAfterRounding - cashPayment.amt)
       this.setState(
         {
           cashPaymentAmount: cashAfterRounding,
@@ -237,7 +250,7 @@ class AddPayment extends Component {
       setFieldValue('collectableAmount', collectableAmountAfterRounding)
 
       if (totalPaid > outstandingBalance && cashPayment) {
-        cashReturned = roundToTwoDecimals(totalPaid - outstandingBalance)
+        cashReturned = roundTo(totalPaid - outstandingBalance)
         setFieldValue('cashReturned', cashReturned)
       } else {
         setFieldValue('cashReturned', 0)
@@ -252,7 +265,7 @@ class AddPayment extends Component {
     setFieldValue('totalAmtPaid', totalPaid)
     setFieldValue(
       'outstandingAfterPayment',
-      roundToTwoDecimals(outstandingBalance - totalPaid + cashReturned),
+      roundTo(outstandingBalance - totalPaid + cashReturned),
     )
   }
 
@@ -275,7 +288,7 @@ class AddPayment extends Component {
     if (totalPaid - cashPayment.amt + _cashReceived > finalPayable)
       setFieldValue(
         'cashReturned',
-        roundToTwoDecimals(_cashReceived - (cashPayment.amt + cashRounding)),
+        roundTo(_cashReceived - (cashPayment.amt + cashRounding)),
       )
     else if (totalPaid < finalPayable) {
       setFieldValue(
@@ -303,7 +316,6 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
-    console.log({ values })
     return (
       <div>
         <PayerHeader

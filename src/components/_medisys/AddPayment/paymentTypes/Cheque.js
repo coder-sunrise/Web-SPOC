@@ -25,6 +25,7 @@ const Cheque = ({
               <NumberInput
                 label='Amount'
                 {...args}
+                min={0}
                 currency
                 onChange={handleAmountChange}
               />

@@ -95,6 +95,7 @@ const SessionSummary = () => {
   const columnExtensions = [
     {
       columnName: 'isClinicSessionClosed',
+      sortingEnabled: false,
       render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'On going'),
     },
     {
@@ -135,7 +136,6 @@ const SessionSummary = () => {
     <CardContainer hideHeader>
       <h4 style={{ marginBottom: 16 }}>All Sessions</h4>
       <ReportDataGrid
-        height='auto'
         data={state.sessionData}
         columns={SessionColumns}
         columnExtensions={columnExtensions}

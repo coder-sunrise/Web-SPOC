@@ -74,8 +74,8 @@ const applyFilter = (filter, data) => {
     if (search !== '') {
       returnData = returnData.filter(
         (eachData) =>
-          eachData.doctor ||
-          (!eachData.doctor &&
+          eachData.isDoctorBlock ||
+          (!eachData.isDoctorBlock &&
             eachData.patientName.toLowerCase().indexOf(search.toLowerCase()) !==
               -1),
       )
@@ -92,9 +92,11 @@ const applyFilter = (filter, data) => {
     }
 
     // filter by appointment type
-    if (filterByApptType.length > 0 && filterByApptType.indexOf(-99) !== 0) {
-      returnData = returnData.filter((eachData) =>
-        filterByApptType.includes(eachData.appointmentTypeFK),
+    if (filterByApptType.length > 0 && !filterByApptType.includes(-99)) {
+      returnData = returnData.filter(
+        (eachData) =>
+          eachData.isDoctorBlock ||
+          filterByApptType.includes(eachData.appointmentTypeFK),
       )
     }
   } catch (error) {
@@ -369,7 +371,7 @@ const CalendarView = ({
       eventList,
     ],
   )
-
+  console.log({ filtered, filter })
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar

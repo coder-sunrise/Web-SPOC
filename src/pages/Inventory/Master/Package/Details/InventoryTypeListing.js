@@ -34,14 +34,14 @@ const InventoryTypeListing = ({
   theme,
 }) => {
   useEffect(() => {
-    return () => {
-      dispatch({
-        type: 'global/updateState',
-        payload: {
-          disableSave: false,
-        },
-      })
-    }
+    // return () => {
+    //   dispatch({
+    //     type: 'global/updateState',
+    //     payload: {
+    //       disableSave: false,
+    //     },
+    //   })
+    // }
   }, [])
 
   const {
@@ -177,13 +177,13 @@ const InventoryTypeListing = ({
       })
     })
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   useEffect(
@@ -209,13 +209,13 @@ const InventoryTypeListing = ({
       setConsumableRows(consumablePackageItem)
       setVaccinationRows(vaccinationPackageItem)
       setServiceRows(servicePackageItem)
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
+      // dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
     },
     [
       packDetail,
@@ -229,28 +229,27 @@ const InventoryTypeListing = ({
   useEffect(
     () => {
       let total = 0
-      medicationRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
+      const calTotal = (row) => {
+        const { isDeleted, subTotal } = row
+        if (!isDeleted && subTotal) {
+          total += subTotal
         }
+        return total
+      }
+      medicationRows.forEach((row) => {
+        calTotal(row)
       })
 
       serviceRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       consumableRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       vaccinationRows.forEach((row) => {
-        if (!row.isDeleted) {
-          total += row.subTotal
-        }
+        calTotal(row)
       })
 
       setFieldValue('medicationPackageItem', medicationRows)
@@ -269,13 +268,13 @@ const InventoryTypeListing = ({
         totalPrice: total,
       })
 
-      dispatch({
-        // force current edit row components to update
-        type: 'global/updateState',
-        payload: {
-          commitCount: (commitCount += 1),
-        },
-      })
+      // dispatch({
+      //   // force current edit row components to update
+      //   type: 'global/updateState',
+      //   payload: {
+      //     commitCount: (commitCount += 1),
+      //   },
+      // })
     },
     [
       medicationRows,
@@ -331,7 +330,6 @@ const InventoryTypeListing = ({
   // )
 
   const onCommitChanges = (type) => ({ rows, deleted, added, changed }) => {
-    console.log(rows, deleted, added, changed)
     if (deleted) {
       const tempArray = [
         ...values[type],
@@ -398,13 +396,13 @@ const InventoryTypeListing = ({
                 o.serviceCenterId === serviceName,
             ) || {}
           if (serviceCenterService) {
+            const item = servicess.find((o) => o.value === serviceFK)
             rows[0] = {
               ...rows[0],
               isDeleted: false,
               tempServiceCenterServiceFK:
                 serviceCenterService.serviceCenter_ServiceId,
-              tempServiceName: servicess.find((o) => o.value === serviceFK)
-                .name,
+              tempServiceName: item ? item.name : undefined,
             }
           }
 
@@ -420,82 +418,126 @@ const InventoryTypeListing = ({
           return rows
       }
     } else if (changed) {
-      Object.entries(changed).map(([ key, value,
-      ]) => {
-        const getType = (t) => {
-          switch (t) {
-            case 'medicationPackageItem': {
-              return {
-                stateRows: medicationRows,
-                setStateRow: (v) => setMedicationRows(v),
-              }
+      const getType = (t) => {
+        switch (t) {
+          case 'medicationPackageItem': {
+            return {
+              stateRows: medicationRows,
+              setStateRow: (v) => setMedicationRows(v),
             }
-            case 'consumablePackageItem': {
-              return {
-                stateRows: consumableRows,
-                setStateRow: (v) => setConsumableRows(v),
-              }
+          }
+          case 'consumablePackageItem': {
+            return {
+              stateRows: consumableRows,
+              setStateRow: (v) => setConsumableRows(v),
             }
-            case 'vaccinationPackageItem': {
-              return {
-                stateRows: vaccinationRows,
-                setStateRow: (v) => setVaccinationRows(v),
-              }
+          }
+          case 'vaccinationPackageItem': {
+            return {
+              stateRows: vaccinationRows,
+              setStateRow: (v) => setVaccinationRows(v),
             }
-            case 'servicePackageItem': {
-              return {
-                stateRows: serviceRows,
-                setStateRow: (v) => setServiceRows(v),
-              }
+          }
+          case 'servicePackageItem': {
+            return {
+              stateRows: serviceRows,
+              setStateRow: (v) => setServiceRows(v),
             }
-            default: {
-              return null
-            }
+          }
+          default: {
+            return null
           }
         }
+      }
 
-        const edittedType = getType(type)
-        const newArray = edittedType.stateRows.map((item) => {
-          if (item.id === parseInt(key, 10)) {
-            const {
-              medicationName,
-              inventoryMedication,
-              consumableName,
-              inventoryConsumable,
-              vaccinationName,
-              inventoryVaccination,
-              service,
-              ...restFields
-            } = item
+      const edittedType = getType(type)
 
-            let tempServiceCenterServiceFK
-            const tempServiceId = serviceFK || item.serviceCenterServiceFK
-            const tempServiceCenterId = serviceCenterFK || item.serviceName
-            const serviceCenterService =
-              serviceCenterServicess.find(
-                (o) =>
-                  o.serviceId === tempServiceId &&
-                  o.serviceCenterId === tempServiceCenterId,
-              ) || {}
-            if (serviceCenterService) {
-              tempServiceCenterServiceFK =
-                serviceCenterService.serviceCenter_ServiceId
-            }
-            const obj = {
-              ...restFields,
-              ...value,
-              tempServiceCenterServiceFK,
-            }
-            return obj
-          }
-          return item
-        })
+      const newRows = rows.map((item) => {
+        // const {
+        //   medicationName,
+        //   inventoryMedication,
+        //   consumableName,
+        //   inventoryConsumable,
+        //   vaccinationName,
+        //   inventoryVaccination,
+        //   service,
+        //   ...restFields
+        // } = item
 
-        setServiceCenterFK()
-        setServiceFK()
-        edittedType.setStateRow(newArray)
-        return setFieldValue(`${type}`, newArray)
+        let tempServiceCenterServiceFK
+        const tempServiceId = serviceFK || item.serviceCenterServiceFK
+        const tempServiceCenterId = serviceCenterFK || item.serviceName
+        const serviceCenterService =
+          serviceCenterServicess.find(
+            (o) =>
+              o.serviceId === tempServiceId &&
+              o.serviceCenterId === tempServiceCenterId,
+          ) || {}
+        if (serviceCenterService) {
+          tempServiceCenterServiceFK =
+            serviceCenterService.serviceCenter_ServiceId
+        }
+
+        const obj = {
+          ...item,
+          tempServiceCenterServiceFK,
+        }
+
+        return obj
       })
+
+      setServiceCenterFK()
+      setServiceFK()
+      edittedType.setStateRow(newRows)
+      return setFieldValue(`${type}`, newRows)
+
+      // Object.entries(changed).map(([ key, value,
+      // ]) => {
+
+      //   const newArray = edittedType.stateRows.map((item) => {
+      //     if (item.id === parseInt(key, 10)) {
+      //       const {
+      //         medicationName,
+      //         inventoryMedication,
+      //         consumableName,
+      //         inventoryConsumable,
+      //         vaccinationName,
+      //         inventoryVaccination,
+      //         service,
+      //         ...restFields
+      //       } = item
+
+      //       let tempServiceCenterServiceFK
+      //       const tempServiceId = serviceFK || item.serviceCenterServiceFK
+      //       const tempServiceCenterId = serviceCenterFK || item.serviceName
+      //       const serviceCenterService =
+      //         serviceCenterServicess.find(
+      //           (o) =>
+      //             o.serviceId === tempServiceId &&
+      //             o.serviceCenterId === tempServiceCenterId,
+      //         ) || {}
+      //       if (serviceCenterService) {
+      //         tempServiceCenterServiceFK =
+      //           serviceCenterService.serviceCenter_ServiceId
+      //       }
+      //       console.log('asds', restFields)
+
+      //       const obj = {
+      //         ...restFields,
+      //         // ...value,
+      //         tempServiceCenterServiceFK,
+      //       }
+      //       console.log('obj', obj)
+
+      //       return obj
+      //     }
+      //     return item
+      //   })
+      //   setServiceCenterFK()
+      //   setServiceFK()
+      //   edittedType.setStateRow(newArray)
+      //   return setFieldValue(`${type}`, newArray)
+      // })
     }
   }
 
@@ -518,9 +560,7 @@ const InventoryTypeListing = ({
   const calSubtotal = (e) => {
     const { row } = e
     const { unitPrice, quantity } = row
-    console.log(unitPrice, quantity)
     if (unitPrice && quantity) row.subTotal = unitPrice * quantity
-    console.log(row.subTotal)
   }
 
   const onAddedRowsChange = (type) => (addedRows) => {
@@ -576,13 +616,13 @@ const InventoryTypeListing = ({
     row.unitPrice = sellingPrice
     row.subTotal = undefined
 
-    dispatch({
-      // force current edit row components to update
-      type: 'global/updateState',
-      payload: {
-        commitCount: (commitCount += 1),
-      },
-    })
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/updateState',
+    //   payload: {
+    //     commitCount: (commitCount += 1),
+    //   },
+    // })
   }
 
   const medicationProps = {
@@ -740,13 +780,13 @@ const InventoryTypeListing = ({
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceCenterServiceFK = e.val
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // dispatch({
+          //   // force current edit row components to update
+          //   type: 'global/updateState',
+          //   payload: {
+          //     commitCount: (commitCount += 1),
+          //   },
+          // })
         },
       },
       {
@@ -777,13 +817,13 @@ const InventoryTypeListing = ({
           handleItemOnChange
           getServiceCenterService(e.row)
           e.row.serviceName = e.val
-          dispatch({
-            // force current edit row components to update
-            type: 'global/updateState',
-            payload: {
-              commitCount: (commitCount += 1),
-            },
-          })
+          // dispatch({
+          //   // force current edit row components to update
+          //   type: 'global/updateState',
+          //   payload: {
+          //     commitCount: (commitCount += 1),
+          //   },
+          // })
         },
       },
       {
@@ -845,7 +885,6 @@ const InventoryTypeListing = ({
     onAddedRowsChange: onAddedRowsChange('service'),
     onCommitChanges: onCommitChanges('servicePackageItem'),
   }
-
   return (
     <div>
       <CardContainer

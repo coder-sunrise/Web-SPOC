@@ -19,23 +19,21 @@ const PastPaymentsCollection = ({ reportDatas }) => {
       (item, index) => ({
         ...item,
         id: `PastInvoicePaymentDetails-${index}-${item.invoiceNo}`,
-        date: moment(item.paymentReceivedDate).format(dateFormatLong),
       }),
     )
   }
 
   const PastPaymentCollectionTableColumn = [
     { name: 'payerName', title: 'Payer Name' },
-    { name: 'doctorCode', title: 'Doctor' },
+    { name: 'doctorName', title: 'Doctor' },
     { name: 'invoiceNo', title: 'Invoice No' },
     { name: 'invoiceDate', title: 'Invoice Date' },
     { name: 'mode', title: 'Payment Mode' },
     { name: 'amt', title: 'Invoice Amt' },
-    { name: 'date', title: 'Payment Received Date' },
+    { name: 'paymentReceivedDate', title: 'Payment Received Date' },
   ]
 
   const PastPaymentCollectionTableColumnExtension = [
-    { columnName: 'invoiceDate', type: 'date' },
     { columnName: 'amt', type: 'currency', currency: true },
   ]
 
@@ -45,7 +43,7 @@ const PastPaymentsCollection = ({ reportDatas }) => {
     groupingConfig: {
       state: {
         grouping: [
-          { columnName: 'date' },
+          { columnName: 'paymentReceivedDate' },
         ],
       },
     },
@@ -67,7 +65,6 @@ const PastPaymentsCollection = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
-      height={500}
       data={listData}
       columns={PastPaymentCollectionTableColumn}
       columnExtensions={PastPaymentCollectionTableColumnExtension}

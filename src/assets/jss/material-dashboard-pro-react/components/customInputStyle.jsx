@@ -52,6 +52,7 @@ const customInputStyle = {
     color: 'transparent',
     textShadow: `0 0 0 ${fontColor}`,
     padding: 0,
+    textOverflow: 'ellipsis',
   },
   textControl: {
     display: 'inline-block',

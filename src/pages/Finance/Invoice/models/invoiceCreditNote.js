@@ -35,7 +35,12 @@ export default createFormViewModel({
     effects: {},
     reducers: {
       mapCreditNote (state, { payload }) {
-        const { invoicePayerFK, invoiceDetail, invoicePaymentDetails } = payload
+        const {
+          invoicePayerFK,
+          invoiceDetail,
+          invoicePaymentDetails,
+          payerType,
+        } = payload
 
         const {
           invoiceTotalAftGST,
@@ -109,6 +114,7 @@ export default createFormViewModel({
         return {
           ...InitialCreditNote,
           gstValue,
+          payerType,
           invoiceGSTAmt,
           invoicePayerFK,
           invoiceTotal: invoiceTotalAftGST,
