@@ -81,8 +81,8 @@ import MiscCrNote from './MiscCrNote'
           const item = {
             ...restProps,
             isInventoryItem:
-              restProps.itemType.toLowerCase() === 'misc' ||
-              restProps.itemType.toLowerCase() === 'service',
+              restProps.itemType.toLowerCase() !== 'misc' &&
+              restProps.itemType.toLowerCase() !== 'service',
             subTotal: restProps.totalAfterGST,
             itemDescription: restProps.itemName,
           }
