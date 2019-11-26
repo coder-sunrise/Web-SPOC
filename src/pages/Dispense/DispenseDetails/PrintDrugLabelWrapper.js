@@ -4,9 +4,12 @@ import DispenseDetails from './index'
 import { notification } from '@/components'
 // utils
 import { consultationDocumentTypes } from '@/utils/codes'
-import { postPDF } from '@/services/report'
+import { postPDF, getPDF } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
-import { queryDrugLabelDetails } from '@/services/dispense'
+import {
+  queryDrugLabelDetails,
+  queryDrugLabelsDetails,
+} from '@/services/dispense'
 
 class PrintDrugLabelWrapper extends React.Component {
   constructor (props) {
@@ -20,25 +23,50 @@ class PrintDrugLabelWrapper extends React.Component {
     if (this.wsConnection) this.wsConnection.close()
   }
 
-  handleOnPrint = async (type, row) => {
+  getPrintResult = async (type, row) => {
+    let printResult
     if (type === 'Medication') {
-      this.connectWebSocket()
       let drugLableSource = await this.generateDrugLablePrintSource(row)
       if (drugLableSource) {
-        let printResult = await postPDF(
+        printResult = await postPDF(
           drugLableSource.reportId,
           drugLableSource.payload,
         )
+      }
+    } else if (type === 'Medications') {
+      const { dispense, values } = this.props
+      const { prescription } = values
+      let drugLableSource = await this.generateDrugLablesPrintSource(
+        dispense.visitID,
+        prescription,
+      )
+      if (drugLableSource) {
+        printResult = await postPDF(
+          drugLableSource.reportId,
+          drugLableSource.payload,
+        )
+      }
+    } else if (type === 'Patient') {
+      const { patient } = this.props
+      printResult = await getPDF(27, patient.id)
+    }
+    return printResult
+  }
 
-        if (printResult) {
-          const base64Result = arrayBufferToBase64(printResult)
-          if (this.iswsConnect === true) {
-            this.wsConnection.send(`["${base64Result}"]`)
-          } else {
-            notification.error({
-              message: `SEMR printing tool is not running, please start it.`,
-            })
-          }
+  handleOnPrint = async (type, row = {}) => {
+    if (type === 'Medication' || type === 'Medications' || type === 'Patient') {
+      this.connectWebSocket()
+
+      let printResult = await this.getPrintResult(type, row)
+
+      if (printResult) {
+        const base64Result = arrayBufferToBase64(printResult)
+        if (this.iswsConnect === true) {
+          this.wsConnection.send(`["${base64Result}"]`)
+        } else {
+          notification.error({
+            message: `SEMR printing tool is not running, please start it.`,
+          })
         }
       }
     } else {
@@ -88,9 +116,46 @@ class PrintDrugLabelWrapper extends React.Component {
           ExpiryDate: row.expiryDate,
           UOM: data.dispenseUOM,
           Quantity: data.dispensedQuanity,
-          BatchNo: row.batchNo,
+          BatchNo:
+            row.batchNo && Array.isArray(row.batchNo)
+              ? row.batchNo[0]
+              : undefined,
         },
       ]
+      return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
+    }
+    return null
+  }
+
+  generateDrugLablesPrintSource = async (visitID, prescriptions = []) => {
+    const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
+    const { data } = drugLabelsDetails1
+    if (data) {
+      let drugLabelDetail = []
+      drugLabelDetail = drugLabelDetail.concat(
+        data.map((o) => {
+          const prescription = prescriptions.find((p) => p.id === o.id)
+          return {
+            PatientName: o.name,
+            PatientReferenceNo: o.patientReferenceNo,
+            PatientAccountNo: o.patientAccountNo,
+            ClinicName: o.clinicName,
+            ClinicAddress: o.clinicAddress,
+            ClinicOfficeNumber: o.officeNo,
+            DrugName: o.name,
+            ConsumptionMethod: o.instruction,
+            Precaution: o.precaution,
+            IssuedDate: o.issuedDate,
+            ExpiryDate: prescription ? prescription.expiryDate : undefined,
+            UOM: o.dispenseUOM,
+            Quantity: o.dispensedQuanity,
+            BatchNo:
+              prescription && Array.isArray(prescription.batchNo)
+                ? prescription.batchNo[0]
+                : undefined,
+          }
+        }),
+      )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
     return null
