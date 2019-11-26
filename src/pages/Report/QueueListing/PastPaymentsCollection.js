@@ -2,10 +2,6 @@ import React from 'react'
 import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
-import moment from 'moment'
-import {
-  dateFormatLong,
-} from '@/components'
 import { ReportDataGrid } from '@/components/_medisys'
 
 
@@ -34,7 +30,13 @@ const PastPaymentsCollection = ({ reportDatas }) => {
   ]
 
   const PastPaymentCollectionTableColumnExtension = [
-    { columnName: 'amt', type: 'currency', currency: true },
+    { columnName: 'payerName', sortingEnabled: false },
+    { columnName: 'doctorName', sortingEnabled: false },
+    { columnName: 'invoiceNo', sortingEnabled: false },
+    { columnName: 'invoiceDate', sortingEnabled: false },
+    { columnName: 'mode', sortingEnabled: false },
+    { columnName: 'paymentReceivedDate', sortingEnabled: false },
+    { columnName: 'amt', type: 'currency', currency: true, sortingEnabled: false },
   ]
 
   const FuncProps = {

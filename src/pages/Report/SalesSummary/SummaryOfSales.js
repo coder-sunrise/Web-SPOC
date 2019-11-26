@@ -22,7 +22,8 @@ const SummaryOfSales = ({ reportDatas }) => {
     { name: 'totalAmount', title: 'Total Amount' },
   ]
   const SummaryByDateDetailsColumnsExtensions = [
-    { columnName: 'totalAmount', type: 'currency', currency: true },
+    { columnName: 'totalAmount', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'salesDate', sortingEnabled: false },
   ]
   const FuncProps = {
     pager: false,

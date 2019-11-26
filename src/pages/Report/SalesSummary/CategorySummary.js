@@ -20,7 +20,9 @@ const CategorySummary = ({ reportDatas }) => {
     { name: 'totalAmount', title: 'Total Amount' },
   ]
   const CategoryCategorySummaryColumnsExtensions = [
-    { columnName: 'totalAmount', type: 'currency', currency: true },
+    { columnName: 'categoryCode', sortingEnabled: false },
+    { columnName: 'categoryDisplayValue', sortingEnabled: false },
+    { columnName: 'totalAmount', type: 'currency', currency: true, sortingEnabled: false },
   ]
 
   return (

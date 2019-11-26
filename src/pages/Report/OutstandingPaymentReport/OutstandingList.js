@@ -32,10 +32,16 @@ class OutstandingList extends PureComponent {
       { name: 'osamt', title: 'O/S Amt.' },
     ]
     const OutstandingPaymentDetailsExtensions = [
-      { columnName: 'date', type: 'date' },
-      { columnName: 'invoiceamt', type: 'currency', currency: true },
-      { columnName: 'payableamt', type: 'currency', currency: true },
-      { columnName: 'osamt', type: 'currency', currency: true },
+      { columnName: 'date', type: 'date', sortingEnabled: false },
+      { columnName: 'invoiceamt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'payableamt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'osamt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'invoiceno', sortingEnabled: false },
+      { columnName: 'doctor', sortingEnabled: false },
+      { columnName: 'patientAccountNo', sortingEnabled: false },
+      { columnName: 'patientname', sortingEnabled: false },
+      { columnName: 'account', sortingEnabled: false },
+      { columnName: 'payername', sortingEnabled: false },
     ]
 
     let FuncProps = {
