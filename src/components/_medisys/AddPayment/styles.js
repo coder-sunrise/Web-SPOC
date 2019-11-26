@@ -21,7 +21,7 @@ export default (theme) => ({
     fontWeight: 'bold',
   },
   paymentTypeContainer: {
-    maxHeight: '50vh',
+    maxHeight: '49vh',
     overflowX: 'hidden',
     overflowY: 'auto',
   },
