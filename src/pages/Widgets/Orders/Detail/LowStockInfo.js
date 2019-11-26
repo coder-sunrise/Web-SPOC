@@ -50,7 +50,7 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
         >
           <p>
             Current Stock: {numeral(stock).format(qtyFormat)}
-            {isLowStock && isReOrder ? (
+            {isLowStock || isReOrder ? (
               <font color={isLowStock ? 'red' : 'black'}> (Low Stock)</font>
             ) : (
               ''
