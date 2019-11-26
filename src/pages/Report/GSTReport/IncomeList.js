@@ -29,10 +29,12 @@ class IncomeList extends PureComponent {
       { name: 'incomeTotal', title: 'Final Amount' },
     ]
     const InComeGstDetailsExtensions = [
-      { columnName: 'incomeDate', type: 'date' },
-      { columnName: 'incomeAmount', type: 'currency', currency: true },
-      { columnName: 'incomeGst', type: 'currency', currency: true },
-      { columnName: 'incomeTotal', type: 'currency', currency: true },
+      { columnName: 'incomeDate', type: 'date', sortingEnabled: false },
+      { columnName: 'incomeAmount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'incomeGst', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'incomeTotal', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
     ]
 
     let FuncProps = {

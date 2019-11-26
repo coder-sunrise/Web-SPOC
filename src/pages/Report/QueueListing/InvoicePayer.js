@@ -22,7 +22,8 @@ const InvoicePayer = ({ reportDatas }) => {
   ]
 
   const InvoicePayerTableColumnExtension = [
-    { columnName: 'coPayerPayable', type: 'currency', currency: true },
+    { columnName: 'coPayer', sortingEnabled: false },
+    { columnName: 'coPayerPayable', type: 'currency', currency: true, sortingEnabled: false },
   ]
 
   const FuncProps = {

@@ -15,7 +15,13 @@ const DiagnosisDetailsColumns = [
   { name: 'patientCount', title: 'Patients' },
   { name: 'visitCount', title: 'Visits' },
 ]
-
+const DiagnosisDetailsExtensions = [
+  { columnName: 'groupName', sortingEnabled: false },
+  { columnName: 'diagnosisCode', sortingEnabled: false },
+  { columnName: 'diagnosisName', sortingEnabled: false },
+  { columnName: 'patientCount', sortingEnabled: false },
+  { columnName: 'visitCount', sortingEnabled: false },
+]
 const reportId = 6
 const fileName = 'Diagnosis Trending'
 class DiagnosisTrending extends ReportBase {
@@ -58,6 +64,7 @@ class DiagnosisTrending extends ReportBase {
       <ReportDataGrid
         data={listData}
         columns={DiagnosisDetailsColumns}
+        columnExtensions={DiagnosisDetailsExtensions}
         FuncProps={FuncProps}
       />
     )

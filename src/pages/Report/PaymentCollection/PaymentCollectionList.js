@@ -24,6 +24,7 @@ class PaymentCollectionList extends PureComponent {
     const PaymentCollectionDetailsExtensions = [
       {
         columnName: 'paymentReceivedDate',
+        sortingEnabled: false,
         width: 200,
         type: 'date',
         render: (row) =>
@@ -33,8 +34,7 @@ class PaymentCollectionList extends PureComponent {
             format: dateFormatLongWithTimeNoSec12h,
           }),
       },
-      { columnName: 'amount', type: 'currency', currency: true },
-      // { columnName: 'doctorName', type: 'text' },
+      { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
     ]
     let FuncProps = {
       pager: false,
@@ -137,8 +137,8 @@ class PaymentCollectionList extends PureComponent {
       ]
       const CashColsExtension = [
         ...PaymentCollectionDetailsExtensions,
-        { columnName: 'cashRounding', type: 'currency', currency: true },
-        { columnName: 'netAmount', type: 'currency', currency: true },
+        { columnName: 'cashRounding', type: 'currency', currency: true, sortingEnabled: false },
+        { columnName: 'netAmount', type: 'currency', currency: true, sortingEnabled: false },
       ]
       console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
