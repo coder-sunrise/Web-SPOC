@@ -20,6 +20,7 @@ import {
   TextField,
   WarningSnackbar,
   withFormikExtend,
+  notification,
 } from '@/components'
 import {
   ChangePassword,
@@ -282,15 +283,9 @@ class UserProfileForm extends React.PureComponent {
         oldRole.clinicalRoleName === 'Doctor' &&
         currentSelectedRole.clinicalRoleName !== 'Doctor'
       ) {
-        dispatch({
-          type: 'global/updateState',
-          payload: {
-            openConfirm: true,
-            openConfirmTitle: '',
-            openConfirmText: 'Ok',
-            openConfirmContent:
-              'You are not allowed to change the role from doctor to non-doctor',
-          },
+        notification.warn({
+          message:
+            'You are not allowed to change the role from doctor to non-doctor.',
         })
         return true
       }

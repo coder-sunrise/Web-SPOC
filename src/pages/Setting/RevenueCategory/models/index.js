@@ -4,12 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingRevenue',
-  config: {
-    codetable: {
-      message: 'Revenue updated',
-      code: 'revenuecategory',
-    },
-  },
+  // config: {
+  //   codetable: {
+  //     message: 'Revenue updated',
+  //     code: 'revenuecategory',
+  //   },
+  // },
   param: {
     service,
     state: {

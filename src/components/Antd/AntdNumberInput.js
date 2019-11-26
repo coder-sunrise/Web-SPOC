@@ -369,7 +369,8 @@ class AntdNumberInput extends React.PureComponent {
     }
 
     if (!format) {
-      if (!extraCfg.precision && currency) {
+      if (extraCfg.precision === 1 && currency) {
+        //TODO: find a better way to config default currency precision
         extraCfg.precision = 2
       }
       let precisionStr = '.'

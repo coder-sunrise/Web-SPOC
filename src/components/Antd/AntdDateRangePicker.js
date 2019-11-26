@@ -266,9 +266,14 @@ class AntdDateRangePicker extends PureComponent {
     // date picker component dont pass formik props into wrapper
     // date picker component should handle the value change event itself
     if (text) {
+      if (!this.state.value[0] && !this.state.value[1]) return <span>-</span>
       return (
         <span>
-          <DatePicker text format={format} value={this.state.value[0]} />&nbsp;{this.state.value[0] || this.state.value[1] ? '~' : ''}&nbsp;
+          <DatePicker
+            text
+            format={format}
+            value={this.state.value[0]}
+          />&nbsp;~&nbsp;
           <DatePicker text format={format} value={this.state.value[1]} />
         </span>
       )
