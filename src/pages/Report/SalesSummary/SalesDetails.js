@@ -15,7 +15,11 @@ class SalesDetails extends PureComponent {
       { name: 'salesDate', title: 'Date' },
       { name: 'visit', title: 'Visit' },
     ]
-    let SalesSummaryDetailsExtensions = []
+    let SalesSummaryDetailsExtensions = [
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'salesDate', sortingEnabled: false },
+      { columnName: 'visit', sortingEnabled: false },
+    ]
     let listData = []
     let colInfo = []
     let groupItems = [{ columnName: 'visit', type: 'sum' }]
@@ -24,7 +28,7 @@ class SalesDetails extends PureComponent {
       for (let cur of reportDatas.SalesSummaryDetails) {
         if (categories[cur.category] === undefined) {
           categories[cur.category] = 0
-          SalesSummaryDetailsExtensions.push({ columnName: cur.category, type: 'currency', currency: true })
+          SalesSummaryDetailsExtensions.push({ columnName: cur.category, type: 'currency', currency: true, sortingEnabled: false })
           groupItems.push({ columnName: cur.category, type: 'sum' })
           colInfo.push({ name: cur.category, title: cur.category, sortOrder: cur.sortOrder })
         }

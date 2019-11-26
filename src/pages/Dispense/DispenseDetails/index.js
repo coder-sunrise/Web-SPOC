@@ -112,11 +112,23 @@ const DispenseDetails = ({
             Refresh
           </Button>
         )}
-        <Button color='primary' size='sm'>
+        <Button
+          color='primary'
+          size='sm'
+          onClick={() => {
+            onPrint('Medications')
+          }}
+        >
           <Print />
           Drug Label
         </Button>
-        <Button color='primary' size='sm'>
+        <Button
+          color='primary'
+          size='sm'
+          onClick={() => {
+            onPrint('Patient')
+          }}
+        >
           <Print />
           Patient Label
         </Button>

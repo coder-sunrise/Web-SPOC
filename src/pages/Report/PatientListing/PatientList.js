@@ -1,9 +1,12 @@
 import React, { PureComponent } from 'react'
+import {
+  IntegratedSummary,
+} from '@devexpress/dx-react-grid'
 // common components
 import {
   Table,
 } from '@devexpress/dx-react-grid-material-ui'
-import { Accordion, CardContainer, GridContainer, GridItem, DateFormatter } from '@/components'
+import { DateFormatter } from '@/components'
 import { ReportDataGrid } from '@/components/_medisys'
 
 class PatientList extends PureComponent {
@@ -35,9 +38,10 @@ class PatientList extends PureComponent {
     ]
 
     const PatientListingColumnsExtensions = [
-      { columnName: 'lastVisitDate', type: 'date' },
+      { columnName: 'lastVisitDate', type: 'date', sortingEnabled: false },
       {
         columnName: 'startDateTime',
+        sortingEnabled: false,
         width: 180,
         render: (row) =>
           DateFormatter({
@@ -45,6 +49,15 @@ class PatientList extends PureComponent {
             full: true,
           }),
       },
+      { columnName: 'patientReferenceNo', sortingEnabled: false },
+      { columnName: 'patientAccountNo', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'vC_Gender', sortingEnabled: false },
+      { columnName: 'vC_AgeInYear', sortingEnabled: false },
+      { columnName: 'vC_Nationality', sortingEnabled: false },
+      { columnName: 'vC_MobileNo', sortingEnabled: false },
+      { columnName: 'vC_EmailAddress', sortingEnabled: false },
     ]
     const SummaryRow = (p) => {
       const { children } = p

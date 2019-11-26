@@ -33,11 +33,17 @@ class SalesList extends PureComponent {
       { name: 'cnamt', title: 'CN Amt.' },
     ]
     const SalesDetailsExtensions = [
-      { columnName: 'date', type: 'date' },
-      { columnName: 'qty', type: 'number' },
-      { columnName: 'unitPrice', type: 'currency', currency: true },
-      { columnName: 'revenueAMT', type: 'currency', currency: true },
-      { columnName: 'cnamt', type: 'currency', currency: true },
+      { columnName: 'date', type: 'date', sortingEnabled: false },
+      { columnName: 'qty', type: 'number', sortingEnabled: false },
+      { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'patientID', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
+      { columnName: 'itemCategory', sortingEnabled: false },
+      { columnName: 'item', sortingEnabled: false },
+      { columnName: 'documentNo', sortingEnabled: false },
     ]
 
     let FuncProps = {
