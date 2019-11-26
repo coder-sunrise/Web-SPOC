@@ -142,17 +142,17 @@ const sidebarStyle = (theme) => ({
   logoNormal: {
     ...defaultFont,
     color: '#00c2f6',
-    fontWeight: 'bold',
+    fontWeight: 'normal',
     transition: 'all 300ms linear',
     display: 'block',
     opacity: '1',
     transform: 'translate3d(0px, 0, 0)',
-
     padding: '5px 0px',
-    fontSize: '1.5rem',
+    fontSize: '1.4rem',
     whiteSpace: 'nowrap',
     lineHeight: '30px',
     overflow: 'hidden',
+    letterSpacing: '0.1em',
     '&,&:hover,&:focus': {
       color: '#00c2f6',
     },
