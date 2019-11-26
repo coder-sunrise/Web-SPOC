@@ -97,8 +97,8 @@ class History {
           }
         }
       } else if (mainObject.id === 'move') {
-        let movingObject = JSON.stringify(mainObject.__originalState)
-        let movingJsonObject = JSON.parse(movingObject)
+        const movingObject = JSON.stringify(mainObject.__originalState)
+        const movingJsonObject = JSON.parse(movingObject)
         delete movingJsonObject.left
         delete movingJsonObject.top
         delete movingJsonObject.scaleX
@@ -109,7 +109,7 @@ class History {
         delete movingJsonObject.width
 
         for (let i = 0; i < this.saveLayerList.length; i++) {
-          let layerContent = JSON.parse(this.saveLayerList[i].layerContent)
+          const layerContent = JSON.parse(this.saveLayerList[i].layerContent)
           delete layerContent.left
           delete layerContent.top
           delete layerContent.scaleX

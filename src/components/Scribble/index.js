@@ -318,7 +318,7 @@ class Scribble extends React.Component {
     this.setState({
       canClear: now,
     })
-    this.props.setFieldValue('drawing', this._sketch.getAllLayerData())
+    this.props.setFieldValue('drawing', 'dirty')
   }
 
   _selectTool = (event) => {
