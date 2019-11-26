@@ -8,6 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import AddCircle from '@material-ui/icons/AddCircle'
 import RemoveCircle from '@material-ui/icons/RemoveCircle'
+import { Search } from '@material-ui/icons'
 
 import {
   Button,
@@ -16,6 +17,7 @@ import {
   Card,
   CardBody,
   TextField,
+  ProgressButton,
 } from '@/components'
 
 const styles = () => ({
@@ -37,12 +39,16 @@ const Transfer = ({
   fieldName,
   search,
   setSearch,
+  searchLabel,
 }) => {
   if (!items || items.length === 0) return null
 
-  const initAddList = items.filter((x) => !addedItems.find(
-    (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
-  ))
+  const initAddList = items.filter(
+    (x) =>
+      !addedItems.find(
+        (y) => x.medicationPrecautionFK === y.medicationPrecautionFK,
+      ),
+  )
 
   const [
     addedList,
@@ -62,7 +68,10 @@ const Transfer = ({
   ] = useState('')
 
   const addClick = (index) => () => {
-    const tempList = [...removedList, addedList[index]]
+    const tempList = [
+      ...removedList,
+      addedList[index],
+    ]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
@@ -103,21 +112,32 @@ const Transfer = ({
     <GridContainer>
       <GridItem xs={6} style={{ paddingLeft: 0 }}>
         <GridContainer>
-          <GridItem xs={12}>
+          <GridItem xs={10}>
             <TextField
-              label='Search'
+              label={searchLabel || 'Search'}
               value={searchField}
               onChange={(event) => {
-                setSearch(event.target.value)
                 setSearchField(event.target.value)
               }}
             />
+          </GridItem>
+          <GridItem xs={2}>
+            <ProgressButton
+              variant='contained'
+              color='primary'
+              icon={<Search />}
+              onClick={() => {
+                setSearch(searchField)
+              }}
+            >
+              Search
+            </ProgressButton>
           </GridItem>
           <GridItem xs={12}>
             <Card>
               <CardBody>
                 <List dense className={classes.list}>
-                  {addedList.map((item, index) => (
+                  {initAddList.map((item, index) => (
                     <ListItem
                       key={item.id}
                       disabled={limit && limit === removedList.length}
