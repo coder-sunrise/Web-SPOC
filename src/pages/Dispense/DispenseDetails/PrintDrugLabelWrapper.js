@@ -4,9 +4,12 @@ import DispenseDetails from './index'
 import { notification } from '@/components'
 // utils
 import { consultationDocumentTypes } from '@/utils/codes'
-import { postPDF } from '@/services/report'
+import { postPDF, getPDF } from '@/services/report'
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
-import { queryDrugLabelDetails } from '@/services/dispense'
+import {
+  queryDrugLabelDetails,
+  queryDrugLabelsDetails,
+} from '@/services/dispense'
 
 class PrintDrugLabelWrapper extends React.Component {
   constructor (props) {
@@ -20,7 +23,7 @@ class PrintDrugLabelWrapper extends React.Component {
     if (this.wsConnection) this.wsConnection.close()
   }
 
-  handleOnPrint = async (type, row) => {
+  handleOnPrint = async (type, row = {}) => {
     if (type === 'Medication') {
       this.connectWebSocket()
       let drugLableSource = await this.generateDrugLablePrintSource(row)
@@ -39,6 +42,47 @@ class PrintDrugLabelWrapper extends React.Component {
               message: `SEMR printing tool is not running, please start it.`,
             })
           }
+        }
+      }
+    } else if (type === 'Medications') {
+      this.connectWebSocket()
+      const { dispense, values } = this.props
+      const { prescription } = values
+      let drugLableSource = await this.generateDrugLablesPrintSource(
+        dispense.visitID,
+        prescription,
+      )
+      if (drugLableSource) {
+        let printResult = await postPDF(
+          drugLableSource.reportId,
+          drugLableSource.payload,
+        )
+
+        if (printResult) {
+          const base64Result = arrayBufferToBase64(printResult)
+          if (this.iswsConnect === true) {
+            this.wsConnection.send(`["${base64Result}"]`)
+          } else {
+            notification.error({
+              message: `SEMR printing tool is not running, please start it.`,
+            })
+          }
+        }
+      }
+    } else if (type === 'Patient') {
+      this.connectWebSocket()
+      console.log('patietn', this.props)
+      const { patient } = this.props
+      let printResult = await getPDF(27, patient.id)
+
+      if (printResult) {
+        const base64Result = arrayBufferToBase64(printResult)
+        if (this.iswsConnect === true) {
+          this.wsConnection.send(`["${base64Result}"]`)
+        } else {
+          notification.error({
+            message: `SEMR printing tool is not running, please start it.`,
+          })
         }
       }
     } else {
@@ -88,9 +132,40 @@ class PrintDrugLabelWrapper extends React.Component {
           ExpiryDate: row.expiryDate,
           UOM: data.dispenseUOM,
           Quantity: data.dispensedQuanity,
-          BatchNo: row.batchNo,
+          BatchNo: row.batchNo ? row.batchNo[0] : undefined,
         },
       ]
+      return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
+    }
+    return null
+  }
+
+  generateDrugLablesPrintSource = async (visitID, prescriptions = []) => {
+    const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
+    const { data } = drugLabelsDetails1
+    if (data) {
+      let drugLabelDetail = []
+      drugLabelDetail = drugLabelDetail.concat(
+        data.map((o) => {
+          const prescription = prescriptions.find((p) => p.id === o.id)
+          return {
+            PatientName: o.name,
+            PatientReferenceNo: o.patientReferenceNo,
+            PatientAccountNo: o.patientAccountNo,
+            ClinicName: o.clinicName,
+            ClinicAddress: o.clinicAddress,
+            ClinicOfficeNumber: o.officeNo,
+            DrugName: o.name,
+            ConsumptionMethod: o.instruction,
+            Precaution: o.precaution,
+            IssuedDate: o.issuedDate,
+            ExpiryDate: prescription ? prescription.expiryDate : undefined,
+            UOM: o.dispenseUOM,
+            Quantity: o.dispensedQuanity,
+            BatchNo: prescription ? prescription.batchNo[0] : undefined,
+          }
+        }),
+      )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
     return null
