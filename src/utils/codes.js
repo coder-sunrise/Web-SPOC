@@ -1482,7 +1482,6 @@ export const getInventoryItem = (
   outstandingItem = undefined,
 ) => {
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
-
   const groupByFKArray = _(newRows)
     .groupBy((x) => x[itemFKName])
     .map((v, key) => ({
@@ -1495,7 +1494,11 @@ export const getInventoryItem = (
   if (outstandingItem) {
     fullyReceivedArray = groupByFKArray.filter((o) => {
       const item = outstandingItem.find((i) => i[itemFKName] === o[itemFKName])
-      if (item.orderQuantity === o.totalCurrentReceivingQty) {
+      if (
+        item &&
+        item.orderQuantity - item.quantityReceived ===
+          o.totalCurrentReceivingQty
+      ) {
         return {
           ...o,
         }
@@ -1524,13 +1527,18 @@ export const getInventoryItem = (
 
   if (outstandingItem) {
     inventoryItemList = inventoryItemList.map((o) => {
-      const { orderQuantity } = outstandingItem.find(
+      const { orderQuantity, quantityReceived } = outstandingItem.find(
         (i) => i[itemFKName] === o[itemFKName],
       )
-      const { totalCurrentReceivingQty } = groupByFKArray.find(
-        (i) => i[itemFKName] === o[itemFKName],
-      )
-      const remainingQty = orderQuantity - totalCurrentReceivingQty
+      // const { totalCurrentReceivingQty } = groupByFKArray.find(
+      //   (i) => i[itemFKName] === o[itemFKName],
+      // )
+      const item = groupByFKArray.find((i) => i[itemFKName] === o[itemFKName])
+      let remainingQty
+      if (item) {
+        remainingQty =
+          orderQuantity - quantityReceived - item.totalCurrentReceivingQty
+      }
       return {
         ...o,
         remainingQty,

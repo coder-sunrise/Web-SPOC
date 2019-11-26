@@ -1,4 +1,5 @@
 import React from 'react'
+import { withStyles } from '@material-ui/core'
 import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
@@ -7,8 +8,14 @@ import {
 } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
-
-const VisitListing = ({ reportDatas }) => {
+const styles = (theme) => ({
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+})
+const VisitListing = ({ reportDatas, classes }) => {
   if (!reportDatas)
     return null
   let listData = []
@@ -123,15 +130,7 @@ const VisitListing = ({ reportDatas }) => {
       } : item)
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    const newchildren = [{
-      ...children[9],
-      props: {
-        ...children[9].props,
-        style: { paddingLeft: 8 },
-      },
-    }, children[10]]
-    return <Table.Row {...p}>{newchildren}</Table.Row>
-
+    return <Table.Row className={classes.subRow}>{[children[9], children[10]]} </Table.Row>
   }
 
   return (
@@ -145,4 +144,4 @@ const VisitListing = ({ reportDatas }) => {
   )
 }
 
-export default VisitListing
+export default withStyles(styles, { withTheme: true })(VisitListing)

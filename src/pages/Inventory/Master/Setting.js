@@ -37,11 +37,17 @@ const Setting = ({
     medicationDetail || vaccinationDetail
   const entityData = entity || []
   let addedItems = []
-  if (entityData && entityData.inventoryMedication_MedicationPrecaution && entityData.inventoryMedication_MedicationPrecaution.length > 0) {
-    addedItems = entityData.inventoryMedication_MedicationPrecaution.map((item) => ({
-      medicationPrecautionFK: item.medicationPrecautionFK,
-      value: item.medicationPrecaution.name,
-    }))
+  if (
+    entityData &&
+    entityData.inventoryMedication_MedicationPrecaution &&
+    entityData.inventoryMedication_MedicationPrecaution.length > 0
+  ) {
+    addedItems = entityData.inventoryMedication_MedicationPrecaution.map(
+      (item) => ({
+        medicationPrecautionFK: item.medicationPrecautionFK,
+        value: item.medicationPrecaution.name,
+      }),
+    )
   }
   const settingProps = {
     items: ctmedicationprecaution ? list : [],
@@ -56,6 +62,7 @@ const Setting = ({
     fieldName: 'inventoryMedication_MedicationPrecaution',
     setSearch,
     search,
+    searchLabel: 'Precaution Name',
   }
 
   useEffect(
@@ -117,8 +124,8 @@ const Setting = ({
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                      'ctvaccinationunitofmeasurement'
-                    )
+                    'ctvaccinationunitofmeasurement'
+                  )
                 }
                 {...args}
               />
@@ -252,8 +259,8 @@ const Setting = ({
                   showTransfer ? (
                     'ctmedicationunitofmeasurement'
                   ) : (
-                      'ctvaccinationunitofmeasurement'
-                    )
+                    'ctvaccinationunitofmeasurement'
+                  )
                 }
                 {...args}
               />

@@ -5,11 +5,17 @@ import { CommonTableGrid } from '@/components'
 const ReportDataGrid = ({
   data = [],
   columns,
-  height = 300,
+  height,
   loading = false,
   TableProps,
   ...restProps
 }) => {
+  let tableProps = TableProps
+  if (height === undefined) {
+    if (data.length > 10) {
+      tableProps = { ...TableProps, height: 400 }
+    }
+  }
   return (
     <div style={{ width: '100%' }}>
       <CommonTableGrid
@@ -21,8 +27,7 @@ const ReportDataGrid = ({
           pageSize: 100,
           totalRowCount: data.length,
           loading,
-          height,
-          ...TableProps,
+          ...tableProps,
         }}
         rows={data}
         columns={columns}
