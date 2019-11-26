@@ -266,11 +266,25 @@ class SketchField extends PureComponent {
     ])
   }
 
+  _deleteSelectedObject = () => {
+    const canvas = this._fc
+    const result = false
+    const obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set({
+        id: 'delete',
+      })
+      canvas.remove(obj)
+      result = true
+    }
+    return result
+  }
+
   /**
    * Action when an object is removed from the canvas
    */
   _onObjectRemoved = (e) => {
-    let obj = e.target
+    const obj = e.target
     let canvas = this._fc
     if (obj.id === 'delete' || obj.id === 'oldTemplate') {
       let activeObj = obj
@@ -933,10 +947,10 @@ class SketchField extends PureComponent {
       top: options.top,
       fill: color,
     })
-    iText.editable = false
+    iText.editable = true
     canvas.add(iText).setActiveObject(iText)
-    //iText.enterEditing()
-    //iText.selectAll()
+    iText.enterEditing()
+    iText.selectAll()
   }
 
   componentDidMount = () => {

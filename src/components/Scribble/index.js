@@ -32,9 +32,11 @@ import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+
 import {
   GridContainer,
   GridItem,
@@ -114,7 +116,7 @@ const styles = () => ({
   },
 })
 
-let temp = null
+const temp = null
 @withFormikExtend({
   notDirtyDuration: 0.5,
   mapPropsToValues: ({ scriblenotes }) => {
@@ -304,8 +306,8 @@ class Scribble extends React.Component {
   }
 
   _onSketchChange = () => {
-    let prev = this.state.canUndo
-    let now = this._sketch.canUndo()
+    const prev = this.state.canUndo
+    const now = this._sketch.canUndo()
 
     if (prev !== now) {
       this.setState({
@@ -351,11 +353,11 @@ class Scribble extends React.Component {
   }
 
   _onBackgroundImageDrop = (accepted) => {
-    let { indexCount } = this.state
+    const { indexCount } = this.state
 
     if (accepted && accepted.length > 0) {
-      let sketch = this._sketch
-      let reader = new FileReader()
+      const sketch = this._sketch
+      const reader = new FileReader()
       reader.addEventListener(
         'load',
         () => sketch.setBackgroundFromDataUrl(reader.result),
@@ -403,6 +405,37 @@ class Scribble extends React.Component {
     this.setState({
       textColor: false,
     })
+  }
+
+  @keydown('ctrl+z')
+  shortcutKeyUndo () {
+    if (this.state.canUndo) {
+      this._undo()
+    }
+  }
+
+  @keydown('ctrl+y')
+  shortcutKeyRedo () {
+    if (this.state.canRedo) {
+      this._redo()
+    }
+  }
+
+  @keydown('backspace')
+  shortcutKeyDelete () {
+    const result = this._sketch._deleteSelectedObject()
+    if (!result) {
+      this.setState({
+        tool: 'eraser',
+        eraserColor: true,
+        selectColor: false,
+        toolsDrawingColor: false,
+        toolsShapeColor: false,
+        selectColorColor: false,
+        imageColor: false,
+        textColor: false,
+      })
+    }
   }
 
   render () {

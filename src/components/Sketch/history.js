@@ -63,7 +63,7 @@ class History {
    */
   keep (obj) {
     try {
-      let [
+      const [
         mainObject,
       ] = obj
       // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
@@ -81,7 +81,7 @@ class History {
           // let [
           //   arrayobject,
           // ] = this.allList[i].layerContent
-          let arrayobject = this.saveLayerList[i].layerContent
+          const arrayobject = this.saveLayerList[i].layerContent
           if (arrayobject === JSON.stringify(mainObject)) {
             let temp = this.saveLayerList
             this.saveLayerList = []
@@ -89,7 +89,7 @@ class History {
               // let [
               //   tempArrayObject,
               // ] = temp[a].layerContent
-              let tempArrayObject = temp[a].layerContent
+              const tempArrayObject = temp[a].layerContent
               if (tempArrayObject !== JSON.stringify(mainObject)) {
                 this.saveLayerList.push(temp[a])
               }
@@ -99,6 +99,7 @@ class History {
       } else if (mainObject.id === 'move') {
         const movingObject = JSON.stringify(mainObject.__originalState)
         const movingJsonObject = JSON.parse(movingObject)
+
         delete movingJsonObject.left
         delete movingJsonObject.top
         delete movingJsonObject.scaleX
@@ -107,6 +108,8 @@ class History {
         delete movingJsonObject.left
         delete movingJsonObject.height
         delete movingJsonObject.width
+        delete movingJsonObject.text
+        delete movingJsonObject.angle
 
         for (let i = 0; i < this.saveLayerList.length; i++) {
           const layerContent = JSON.parse(this.saveLayerList[i].layerContent)
@@ -118,6 +121,8 @@ class History {
           delete layerContent.left
           delete layerContent.height
           delete layerContent.width
+          delete layerContent.text
+          delete layerContent.angle
 
           if (
             JSON.stringify(movingJsonObject) === JSON.stringify(layerContent)
@@ -157,13 +162,13 @@ class History {
    */
   undo () {
     try {
-      let [
+      const [
         mainObject,
       ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
 
-        let [
+        const [
           mainObject2,
         ] = this.current
 
@@ -247,7 +252,7 @@ class History {
   clear () {
     // this.undoList = []
     for (let i = 0; i < this.undoList.length; i++) {
-      let [
+      const [
         undoObj,
       ] = this.undoList[i]
 
@@ -257,7 +262,7 @@ class History {
       })
     }
 
-    let [
+    const [
       originalObj,
     ] = this.originalList[this.originalList.length - 1]
 

@@ -5,7 +5,7 @@ const { fabric } = require('fabric')
 
 class Circle extends FabricCanvasTool {
   configureCanvas (props) {
-    let canvas = this._canvas
+    const canvas = this._canvas
     canvas.isDrawingMode = false
     canvas.selection = false
     canvas.forEachObject((o) => {
@@ -18,9 +18,9 @@ class Circle extends FabricCanvasTool {
   }
 
   doMouseDown (o) {
-    let canvas = this._canvas
+    const canvas = this._canvas
     this.isDown = true
-    let pointer = canvas.getPointer(o.e)
+    const pointer = canvas.getPointer(o.e)
     ;[
       this.startX,
       this.startY,
@@ -46,8 +46,8 @@ class Circle extends FabricCanvasTool {
 
   doMouseMove (o) {
     if (!this.isDown) return
-    let canvas = this._canvas
-    let pointer = canvas.getPointer(o.e)
+    const canvas = this._canvas
+    const pointer = canvas.getPointer(o.e)
     this.circle.set({
       radius:
         linearDistance(
@@ -66,11 +66,11 @@ class Circle extends FabricCanvasTool {
   }
 
   doMouseUp () {
-    let canvas = this._canvas
+    const canvas = this._canvas
     this.isDown = false
 
     canvas.remove(this.circle)
-    let circle = new fabric.Group([
+    const circle = new fabric.Group([
       this.circle,
     ])
     circle.selectable = false
