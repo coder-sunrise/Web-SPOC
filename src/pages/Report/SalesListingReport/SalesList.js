@@ -33,17 +33,17 @@ class SalesList extends PureComponent {
       { name: 'cnamt', title: 'CN Amt.' },
     ]
     const SalesDetailsExtensions = [
-      { columnName: 'date', type: 'date', sortingEnabled: false },
-      { columnName: 'qty', type: 'number', sortingEnabled: false },
-      { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'doctorName', sortingEnabled: false },
-      { columnName: 'patientID', sortingEnabled: false },
-      { columnName: 'patientName', sortingEnabled: false },
-      { columnName: 'itemCategory', sortingEnabled: false },
-      { columnName: 'item', sortingEnabled: false },
-      { columnName: 'documentNo', sortingEnabled: false },
+      { columnName: 'date', type: 'date', sortingEnabled: false, width: 100 },
+      { columnName: 'qty', type: 'number', sortingEnabled: false, width: 80 },
+      { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
+      { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
+      { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
+      { columnName: 'doctorName', sortingEnabled: false, wordWrapEnabled: true },
+      { columnName: 'patientID', sortingEnabled: false, width: 100 },
+      { columnName: 'patientName', sortingEnabled: false, wordWrapEnabled: true },
+      { columnName: 'itemCategory', sortingEnabled: false, wordWrapEnabled: true, width: 120 },
+      { columnName: 'item', sortingEnabled: false, wordWrapEnabled: true },
+      { columnName: 'documentNo', sortingEnabled: false, wordWrapEnabled: true },
     ]
 
     let FuncProps = {
@@ -52,7 +52,6 @@ class SalesList extends PureComponent {
       summaryConfig: {
         state: {
           totalItems: [
-            { columnName: 'unitPrice', type: 'sum' },
             { columnName: 'revenueAMT', type: 'sum' },
             { columnName: 'cnamt', type: 'sum' },
           ],
@@ -76,8 +75,7 @@ class SalesList extends PureComponent {
           state: {
             totalItems: [],
             groupItems: [
-              { columnName: 'unitPrice', type: 'sum' },
-              { columnName: 'revenueamt', type: 'sum' },
+              { columnName: 'revenueAMT', type: 'sum' },
               { columnName: 'cnamt', type: 'sum' },
             ],
           },
