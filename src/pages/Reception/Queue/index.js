@@ -309,7 +309,6 @@ class Queue extends React.Component {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        keepFilter: false,
         group: [
           {
             [`${prefix}name`]: searchQuery,

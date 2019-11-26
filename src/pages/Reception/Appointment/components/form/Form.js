@@ -199,7 +199,6 @@ class Form extends React.PureComponent {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        keepFilter: false,
         group: [
           {
             [`${prefix}name`]: values.patientName,
