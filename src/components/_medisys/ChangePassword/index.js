@@ -95,6 +95,7 @@ class ChangePassword extends React.PureComponent {
                     value=''
                   />
                   <TextField
+                    autoFocus
                     {...args}
                     label='Current Password'
                     type='password'

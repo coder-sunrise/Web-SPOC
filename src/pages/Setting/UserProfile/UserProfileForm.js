@@ -392,12 +392,20 @@ class UserProfileForm extends React.PureComponent {
             </GridItem>
             <GridContainer className={classes.indent} alignItems='center'>
               <GridItem md={6}>
-                <FastField
-                  name='userProfile.userName'
-                  render={(args) => (
-                    <TextField {...args} label='Username' disabled={isEdit} />
-                  )}
-                />
+                {isEdit ? (
+                  <TextField
+                    value={values.userProfile.userName}
+                    label='Username'
+                    disabled
+                  />
+                ) : (
+                  <FastField
+                    name='userProfile.userName'
+                    render={(args) => (
+                      <TextField {...args} label='Username' autoFocus />
+                    )}
+                  />
+                )}
               </GridItem>
               {!isEdit ? (
                 <React.Fragment>
