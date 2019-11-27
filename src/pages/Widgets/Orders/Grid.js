@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 
@@ -17,6 +17,7 @@ import {
   Select,
   Checkbox,
   CodeSelect,
+  Field,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
 import { sumReducer } from '@/utils/utils'
@@ -32,7 +33,34 @@ export default ({
 }) => {
   const { rows, summary, finalAdjustments } = orders
   // console.log(orders)
-  const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
+  const {
+    total,
+    gst,
+    totalWithGST,
+    gSTPercentage,
+    isEnableGST,
+    isGstInclusive,
+  } = summary
+  const [
+    totalAmt,
+    setTotalAmt,
+  ] = useState(totalWithGST)
+
+  useEffect(
+    () => {
+      let tempTotal = total
+      if (!isGstInclusive) {
+        tempTotal += gst
+      }
+      setTotalAmt(tempTotal)
+    },
+    [
+      total,
+      gst,
+      isGstInclusive,
+    ],
+  )
+
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
     dispatch({
@@ -110,6 +138,28 @@ export default ({
       </span>
     )
   })
+
+  const handleInclusiveGST = useCallback(
+    (e) => {
+      if (e.target.value) {
+        if (isGstInclusive) {
+          setTotalAmt(totalWithGST)
+          return
+        }
+        setTotalAmt(totalWithGST - gst)
+      } else {
+        if (!isGstInclusive) {
+          setTotalAmt(totalWithGST)
+          return
+        }
+        setTotalAmt(totalWithGST + gst)
+      }
+    },
+    [
+      totalAmt,
+    ],
+  )
+
   return (
     <CommonTableGrid
       size='sm'
@@ -146,7 +196,7 @@ export default ({
               if (type === 'total') {
                 return (
                   <span style={{ float: 'right' }}>
-                    <NumberInput value={totalWithGST} text currency />
+                    <NumberInput value={totalAmt} text currency />
                   </span>
                 )
               }
@@ -193,13 +243,20 @@ export default ({
                       </Tooltip>
                     </span>
                     {c1}
-                    <Checkbox
-                      label={formatMessage({
-                        id: 'app.general.inclusiveGST',
-                      })}
-                      simple
-                      onChange={(e) => {}}
-                    />
+                    {isEnableGST && (
+                      <Field
+                        name='isGstInclusive'
+                        render={(args) => (
+                          <Checkbox
+                            label={formatMessage({
+                              id: 'app.general.inclusiveGST',
+                            })}
+                            onChange={handleInclusiveGST}
+                            {...args}
+                          />
+                        )}
+                      />
+                    )}
                     {c2}
                   </Table.Cell>
                 )
