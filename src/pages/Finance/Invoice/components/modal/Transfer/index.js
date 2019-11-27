@@ -24,6 +24,7 @@ const Transfer = ({ handleSubmit, onConfirm }) => {
                   currency
                   precision={2}
                   {...args}
+                  autoFocus
                 />
               )}
             />

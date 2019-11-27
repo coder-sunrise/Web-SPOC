@@ -19,7 +19,7 @@ export default ({ classes, current }) => {
 
   return (
     <div>
-      {current.plan !== undefined ? (
+      {current.clinicalNote !== undefined ? (
         <div
           className={classes.paragraph}
           dangerouslySetInnerHTML={{ __html: htmlData }}

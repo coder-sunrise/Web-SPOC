@@ -376,7 +376,17 @@ class Banner extends PureComponent {
                     tabIndex='-1'
                   >
                     <Tooltip title={name} placement='bottom-start'>
-                      <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
+                      <span
+                        style={{
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          width: '100%',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {name}
+                      </span>
                     </Tooltip>
                   </Link>
                 </div>
