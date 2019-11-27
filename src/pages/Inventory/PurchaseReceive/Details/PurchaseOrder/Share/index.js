@@ -125,13 +125,18 @@ class InvoiceSummary extends PureComponent {
         {settingGSTEnable ? (
           <GridContainer>
             <GridItem xs={2} md={9} />
-            <GridItem xs={4} md={2}>
-              <span> {`(${settingGSTPercentage}%) GST: `}</span>
+            <GridItem xs={4} md={2} style={{ display: 'flex' }}>
+              <span style={{ width: 100, marginTop: 10 }}>
+                {`(${settingGSTPercentage}%) GST: `}
+              </span>
+
               <Field
                 name={`${prefix}IsGSTEnabled`}
                 render={(args) => (
                   <Switch
-                    label={undefined}
+                    style={{
+                      position: 'relative',
+                    }}
                     fullWidth={false}
                     onChange={() => this.onChangeGstToggle()}
                     disabled={IsGSTInclusive}
@@ -140,7 +145,13 @@ class InvoiceSummary extends PureComponent {
                 )}
               />
             </GridItem>
-            <GridItem xs={6} md={1}>
+            <GridItem
+              xs={6}
+              md={1}
+              style={{
+                marginTop: 10,
+              }}
+            >
               <FastField
                 name={`${prefix}gstAmount`}
                 render={(args) => {

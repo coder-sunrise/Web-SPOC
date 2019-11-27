@@ -92,7 +92,7 @@ const styles = (theme) => ({
 })
 class GeneralSetting extends PureComponent {
   state = {
-    hasActiveSession: true,
+    hasActiveSession: false,
   }
 
   componentDidMount = () => {

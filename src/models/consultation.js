@@ -348,6 +348,9 @@ export default createFormViewModel({
 
         yield put({
           type: 'orders/calculateAmount',
+          payload: {
+            isGstInclusive: data.isGstInclusive,
+          },
         })
 
         yield put({
