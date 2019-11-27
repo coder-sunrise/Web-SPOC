@@ -113,10 +113,10 @@ class Orders extends PureComponent {
       visitRegistration,
       codetable,
     } = props
-
+    const { footer, ...restProps } = props // for dispense add order popup modal
     return (
       <div className={className}>
-        <Detail {...props} />
+        <Detail {...restProps} />
         <Divider light />
 
         <Grid
