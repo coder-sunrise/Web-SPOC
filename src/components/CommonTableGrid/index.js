@@ -173,23 +173,23 @@ class CommonTableGrid extends PureComponent {
       [classes.tableStriped]: oddEven,
       [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
-    const TableComponent = ({ ...restProps }) => {
+    this.TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
     }
 
-    this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
-      return height ? (
-        <VirtualTable
-          {...restProps}
-          height={height}
-          // height='auto'
-          tableComponent={TableComponent}
-        />
-      ) : (
-        <Table {...restProps} tableComponent={TableComponent} />
-      )
-    }
+    // this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
+    //   return height ? (
+    //     <VirtualTable
+    //       {...restProps}
+    //       height={height}
+    //       // height='auto'
+    //       tableComponent={TableComponent}
+    //     />
+    //   ) : (
+    //     <Table {...restProps} tableComponent={TableComponent} />
+    //   )
+    // }
 
     this.TableRow = ({ row, tableRow, ...restProps }) => {
       return (
@@ -882,7 +882,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-
+    const TableCmpt = height ? VirtualTable : Table
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -992,9 +992,15 @@ class CommonTableGrid extends PureComponent {
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
-              <TableBase
+              {/* <TableBase
                 // height={height}
                 rowComponent={this.TableRow}
+                {...tableProps}
+              /> */}
+              <TableCmpt
+                height={height}
+                rowComponent={this.TableRow}
+                tableComponent={this.TableComponent}
                 {...tableProps}
               />
               {selectable && (
