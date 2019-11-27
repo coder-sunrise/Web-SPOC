@@ -216,6 +216,23 @@ class UserProfileForm extends React.PureComponent {
     canEditDoctorMCR: false,
   }
 
+  componentDidMount () {
+    this.checkHasActiveSession()
+  }
+
+  checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await queueServices.getBizSession(bizSessionPayload)
+    const { data } = result.data
+    this.setState(() => {
+      return {
+        hasActiveSession: data.length > 0,
+      }
+    })
+  }
+
   toggleChangePasswordModal = () => {
     this.setState((preState) => ({
       showChangePassword: !preState.showChangePassword,
@@ -551,6 +568,7 @@ class UserProfileForm extends React.PureComponent {
                       {...args}
                       label='Effective Start Date'
                       label2='Effective End Date'
+                      disabled={isEdit ? this.state.hasActiveSession : false}
                     />
                   )}
                 />
