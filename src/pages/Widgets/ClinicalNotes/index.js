@@ -71,7 +71,7 @@ window.g_app.replaceModel(model)
 //     return clinicalnotes.entity || clinicalnotes.default
 //   },
 //   validationSchema: Yup.object().shape({
-//     type: Yup.string().required(),
+//     type: Yup.string().re  quired(),
 //     to: Yup.string().when('type', {
 //       is: (val) => val !== '2',
 //       then: Yup.string().required(),
@@ -343,8 +343,6 @@ class ClinicalNotes extends Component {
     })
   }
 
-  getScribbleValue = (test) => {}
-
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
     const { form, field } = args
@@ -382,23 +380,6 @@ class ClinicalNotes extends Component {
       }, [])
 
     form.setFieldValue('corAttachment', updated)
-  }
-
-  editRow = () => {
-    this.props.dispatch({
-      type: 'clinicalnotes/updateState',
-      payload: {
-        entity: {
-          subject: 'chin wai',
-        },
-      },
-    })
-    window.g_app._store.dispatch({
-      type: 'clinicalnotes/updateState',
-      payload: {
-        showScribbleModal: true,
-      },
-    })
   }
 
   onEditorChange = (type) => (v) => {
