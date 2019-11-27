@@ -533,11 +533,13 @@ class Layout extends PureComponent {
       height,
       values,
       cestemplate,
+      rights,
       onSaveLayout = (f) => f,
     } = props
     const widgetProps = {
       status: 'consultation',
       parentProps: props,
+      rights,
     }
     // console.log(state.currentLayout)
 
