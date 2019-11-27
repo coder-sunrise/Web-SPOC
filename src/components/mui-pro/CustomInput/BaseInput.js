@@ -295,6 +295,7 @@ class BaseInput extends React.PureComponent {
                 Object.byString(form.errors, field.name)
               )
             }
+            enterDelay={0}
           >
             <Error color='error' style={{ cursor: 'pointer' }} />
           </Tooltip>
@@ -303,7 +304,7 @@ class BaseInput extends React.PureComponent {
     }
 
     if (text) {
-      if (simple && !inputProps.inputComponent) {
+      if (simple && !inputProps.inputComponent && !error) {
         // return (
         //   <Input
         //     classes={this.getClass(classes)}
