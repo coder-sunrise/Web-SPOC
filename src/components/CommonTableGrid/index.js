@@ -39,7 +39,7 @@ import {
   Grid as DevGrid,
   GroupingPanel,
   PagingPanel,
-  Table,
+  Table as DevTable,
   TableGroupRow,
   TableHeaderRow,
   TableSummaryRow,
@@ -119,7 +119,7 @@ const styles = (theme) => ({
 const Root = (props) => <DevGrid.Root {...props} style={{ height: '100%' }} />
 
 const DefaultTableCell = React.memo(
-  ({ dispatch, ...props }) => <Table.Cell {...props} />,
+  ({ dispatch, ...props }) => <DevTable.Cell {...props} />,
   (prevProps, nextProps) => {
     // console.log(prevProps, nextProps)
     // console.log(prevProps === nextProps, prevProps.row === nextProps.row)
@@ -175,7 +175,7 @@ class CommonTableGrid extends PureComponent {
     })
     this.TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
-      return <Table.Table {...restProps} className={cls} />
+      return <DevTable.Table {...restProps} className={cls} />
     }
 
     // this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
@@ -193,7 +193,7 @@ class CommonTableGrid extends PureComponent {
 
     this.TableRow = ({ row, tableRow, ...restProps }) => {
       return (
-        <Table.Row
+        <DevTable.Row
           {...restProps}
           onDoubleClick={(event) => {
             onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
@@ -613,10 +613,10 @@ class CommonTableGrid extends PureComponent {
       }
 
       if (!this.props.rowMoveable || !this.props.rowMoveable(row))
-        return <Table.Cell {...restProps} />
+        return <DevTable.Cell {...restProps} />
 
       return (
-        <Table.Cell
+        <DevTable.Cell
           {...restProps}
           // {...cfg}
           editingEnabled={false}
@@ -639,10 +639,10 @@ class CommonTableGrid extends PureComponent {
               <ArrowDropDown />
             </IconButton>
           </div>
-        </Table.Cell>
+        </DevTable.Cell>
       )
     }
-    return <Table.Cell {...cfg} {...restProps} />
+    return <DevTable.Cell {...cfg} {...restProps} />
   }
 
   getChildRows = (row, rootRows) => {
@@ -675,7 +675,6 @@ class CommonTableGrid extends PureComponent {
       TableCell = DefaultTableCell,
       filteringColExtensions = [],
       defaultSorting = [],
-      height = undefined,
       rightColumns = [],
       leftColumns = [],
       showRowNumber = false,
@@ -882,7 +881,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-    const TableCmpt = height ? VirtualTable : Table
+
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -997,10 +996,15 @@ class CommonTableGrid extends PureComponent {
                 rowComponent={this.TableRow}
                 {...tableProps}
               /> */}
-              <TableCmpt
-                height={height}
-                rowComponent={this.TableRow}
+              {/* <Table
+                estimatedRowHeight={30}
+                // {...tableProps}
+                // tableComponent={this.TableComponent}
+                // rowComponent={this.TableRow}
+              /> */}
+              <VirtualTable
                 tableComponent={this.TableComponent}
+                rowComponent={this.TableRow}
                 {...tableProps}
               />
               {selectable && (
