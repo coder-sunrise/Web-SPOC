@@ -794,6 +794,7 @@ class Form extends React.PureComponent {
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                  values={values}
                 />
                 <AppointmentDateInput disabled={_disableAppointmentDate} />
               </GridItem>
