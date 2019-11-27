@@ -121,7 +121,7 @@ const InvoiceSummary = ({
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
             <GridItem md={6}>
-              <h5>GST {roundTo(gstValue).toFixed(2)}%</h5>
+              <h5>{roundTo(gstValue).toFixed(2)}% GST</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>

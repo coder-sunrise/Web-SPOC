@@ -129,7 +129,7 @@ class InvoiceSummary extends PureComponent {
           <GridContainer>
             <GridItem xs={2} md={9} />
             <GridItem xs={4} md={2}>
-              <span> {`GST (${settingGSTPercentage}%): `}</span>
+              <span> {`(${settingGSTPercentage}%) GST: `}</span>
               <Field
                 name={`${prefix}IsGSTEnabled`}
                 render={(args) => (
