@@ -38,7 +38,8 @@ const PaymentTypeRow = ({
       shouldDisable = disableCash
       break
     case PAYMENT_MODE.DEPOSIT:
-      shouldDisable = patientInfo.patientDeposit === undefined
+      shouldDisable =
+        !patientInfo.patientDeposit || patientInfo.patientDeposit.balance <= 0
       break
     default:
       shouldDisable = false
