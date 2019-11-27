@@ -1,5 +1,7 @@
-import { timeFormat, TextField } from '@/components'
+import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import { timeFormat, TextField, Select } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
+
 import ErrorPopover from './ErrorPopover'
 
 export const AppointmentDataColumn = [
@@ -8,7 +10,7 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Time To' },
-  // { name: 'appointmentDuration', title: 'Appt Duration' },
+  { name: 'appointmentDuration', title: 'Appt Duration' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
@@ -60,34 +62,51 @@ export const AppointmentDataColExtensions = [
     customEditor: true,
     render: (
       row,
-      { control, validSchema, ...restProps },
-      { onBlur, onFocus, ...props },
+      { value, control, validSchema, ...restProps },
+      { onBlur, onFocus, autoFocus, ...props },
     ) => {
       console.log(restProps, props)
       return (
-        <div>
-          <span>Test:This is custom editor control</span>
-          <TextField
-            text
-            {...restProps}
-            defaultValue={row.endTime} // test value only
-            // onChange={(e) => (row.appointmentDuration = e.target.value)}
-            onFocus={onFocus}
-            onBlur={(e) => {
-              const { commitChanges } = control
-              row.appointmentDuration = e.target.value
-              validSchema(row)
-              commitChanges({
-                changed: {
-                  [row.id]: {
-                    appointmentDuration: e.target.value,
+        <ClickAwayListener
+          onClickAway={() => {
+            if (onBlur) onBlur()
+          }}
+        >
+          <div>
+            <span>Test:This is custom editor control</span>
+            <TextField
+              text
+              autoFocus={autoFocus}
+              {...restProps}
+              defaultValue={row.endTime} // test value only
+              // onChange={(e) => (row.appointmentDuration = e.target.value)}
+              onBlur={(e) => {
+                const { commitChanges } = control
+                row.appointmentDuration = e.target.value
+                validSchema(row)
+                commitChanges({
+                  changed: {
+                    [row.id]: {
+                      appointmentDuration: e.target.value,
+                    },
                   },
-                },
-              })
-              if (onBlur) onBlur(e)
-            }}
-          />
-        </div>
+                })
+              }}
+            />
+            <Select
+              options={[
+                { value: 0, name: 'Monday' },
+                { value: 1, name: 'Tuesday' },
+                { value: 2, name: 'Wednesday' },
+                { value: 3, name: 'Thursday' },
+                { value: 4, name: 'Friday' },
+                { value: 5, name: 'Saturday' },
+                { value: 6, name: 'Sunday' },
+              ]}
+              {...restProps}
+            />
+          </div>
+        </ClickAwayListener>
       )
     },
   },
