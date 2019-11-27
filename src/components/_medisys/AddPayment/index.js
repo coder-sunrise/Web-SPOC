@@ -117,16 +117,26 @@ class AddPayment extends Component {
   }
 
   handleKeyDown = (event) => {
-    event.preventDefault()
+    const { values } = this.props
     const min = 112
     const max = 123
     const { keyCode, key } = event
     if (keyCode < min || keyCode > max) return
-    console.log({ keyCode })
+    event.preventDefault()
+
     // TODO: add payment base on keyCode and paymentMode hotkey setting
     const { ctPaymentMode } = this.props
     const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
-    if (paymentModeObj) this.onPaymentTypeClick(paymentModeObj)
+
+    if (paymentModeObj) {
+      const isCash = paymentModeObj.id === 3
+      const hasCashPaymentAlready =
+        values.paymentList.filter((item) => item.paymentModeFK === 3).length > 0
+
+      if (isCash && hasCashPaymentAlready) return
+
+      this.onPaymentTypeClick(paymentModeObj)
+    }
 
     // let paymentModeFK
     // switch (keyCode) {
@@ -316,6 +326,7 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
+    console.log({ paymentList })
     return (
       <div>
         <PayerHeader
