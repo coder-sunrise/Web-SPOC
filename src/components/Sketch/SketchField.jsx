@@ -268,8 +268,8 @@ class SketchField extends PureComponent {
 
   _deleteSelectedObject = () => {
     const canvas = this._fc
-    const result = false
-    const obj = canvas.getActiveObject()
+    let result = false
+    let obj = canvas.getActiveObject()
     if (obj) {
       obj.set({
         id: 'delete',

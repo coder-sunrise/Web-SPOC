@@ -63,7 +63,7 @@ class History {
    */
   keep (obj) {
     try {
-      const [
+      let [
         mainObject,
       ] = obj
       // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
@@ -81,7 +81,7 @@ class History {
           // let [
           //   arrayobject,
           // ] = this.allList[i].layerContent
-          const arrayobject = this.saveLayerList[i].layerContent
+          let arrayobject = this.saveLayerList[i].layerContent
           if (arrayobject === JSON.stringify(mainObject)) {
             let temp = this.saveLayerList
             this.saveLayerList = []
@@ -89,7 +89,7 @@ class History {
               // let [
               //   tempArrayObject,
               // ] = temp[a].layerContent
-              const tempArrayObject = temp[a].layerContent
+              let tempArrayObject = temp[a].layerContent
               if (tempArrayObject !== JSON.stringify(mainObject)) {
                 this.saveLayerList.push(temp[a])
               }
@@ -252,7 +252,7 @@ class History {
   clear () {
     // this.undoList = []
     for (let i = 0; i < this.undoList.length; i++) {
-      const [
+      let [
         undoObj,
       ] = this.undoList[i]
 
@@ -262,7 +262,7 @@ class History {
       })
     }
 
-    const [
+    let [
       originalObj,
     ] = this.originalList[this.originalList.length - 1]
 

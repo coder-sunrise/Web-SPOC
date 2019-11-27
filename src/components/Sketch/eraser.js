@@ -15,7 +15,7 @@ class Eraser extends FabricCanvasTool {
   doMouseDown () {
     const canvas = this._canvas
     this.isDown = true
-    const obj = canvas.getActiveObject()
+    let obj = canvas.getActiveObject()
 
     if (obj) {
       obj.set({
@@ -28,7 +28,7 @@ class Eraser extends FabricCanvasTool {
   doMouseUp () {
     const canvas = this._canvas
     this.isDown = false
-    const obj = canvas.getActiveObject()
+    let obj = canvas.getActiveObject()
     if (obj) {
       obj.set({
         id: 'delete',

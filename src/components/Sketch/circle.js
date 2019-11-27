@@ -20,7 +20,7 @@ class Circle extends FabricCanvasTool {
   doMouseDown (o) {
     const canvas = this._canvas
     this.isDown = true
-    const pointer = canvas.getPointer(o.e)
+    let pointer = canvas.getPointer(o.e)
     ;[
       this.startX,
       this.startY,
@@ -47,7 +47,7 @@ class Circle extends FabricCanvasTool {
   doMouseMove (o) {
     if (!this.isDown) return
     const canvas = this._canvas
-    const pointer = canvas.getPointer(o.e)
+    let pointer = canvas.getPointer(o.e)
     this.circle.set({
       radius:
         linearDistance(
@@ -70,7 +70,7 @@ class Circle extends FabricCanvasTool {
     this.isDown = false
 
     canvas.remove(this.circle)
-    const circle = new fabric.Group([
+    let circle = new fabric.Group([
       this.circle,
     ])
     circle.selectable = false
