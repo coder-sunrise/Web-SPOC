@@ -49,7 +49,7 @@ class Grid extends PureComponent {
             render: (row) => {
               return (
                 <React.Fragment>
-                  <Tooltip title='Add'>
+                  <Tooltip title='Download'>
                     <Button
                       size='sm'
                       onClick={() => {

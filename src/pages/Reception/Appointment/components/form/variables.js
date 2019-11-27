@@ -1,4 +1,4 @@
-import { timeFormat } from '@/components'
+import { timeFormat, TextField } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 import ErrorPopover from './ErrorPopover'
 
@@ -8,6 +8,7 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Time To' },
+  // { name: 'appointmentDuration', title: 'Appt Duration' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
@@ -53,6 +54,42 @@ export const AppointmentDataColExtensions = [
     code: 'ctappointmenttype',
     labelField: 'displayValue',
     valueField: 'id',
+  },
+  {
+    columnName: 'appointmentDuration',
+    customEditor: true,
+    render: (
+      row,
+      { control, validSchema, ...restProps },
+      { onBlur, onFocus, ...props },
+    ) => {
+      console.log(restProps, props)
+      return (
+        <div>
+          <span>Test:This is custom editor control</span>
+          <TextField
+            text
+            {...restProps}
+            defaultValue={row.endTime} // test value only
+            // onChange={(e) => (row.appointmentDuration = e.target.value)}
+            onFocus={onFocus}
+            onBlur={(e) => {
+              const { commitChanges } = control
+              row.appointmentDuration = e.target.value
+              validSchema(row)
+              commitChanges({
+                changed: {
+                  [row.id]: {
+                    appointmentDuration: e.target.value,
+                  },
+                },
+              })
+              if (onBlur) onBlur(e)
+            }}
+          />
+        </div>
+      )
+    },
   },
   {
     columnName: 'startTime',

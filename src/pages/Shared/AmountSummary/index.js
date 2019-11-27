@@ -259,24 +259,17 @@ class AmountSummary extends PureComponent {
             </GridItem>
             {gstInclusiveConfigrable && (
               <GridItem xs={12}>
-                <Tooltip
-                  title={formatMessage({
-                    id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                <Checkbox
+                  style={{ top: 1 }}
+                  label={formatMessage({
+                    id: 'app.general.inclusiveGST',
                   })}
-                  placement='bottom'
-                >
-                  <Checkbox
-                    style={{ top: 1 }}
-                    label={formatMessage({
-                      id: 'inventory.pr.detail.pod.summary.inclusiveGST',
-                    })}
-                    simple
-                    checked={isGSTInclusive}
-                    onChange={(e) => {
-                      this.onChangeGstToggle(e.target.value)
-                    }}
-                  />
-                </Tooltip>
+                  simple
+                  checked={isGSTInclusive}
+                  onChange={(e) => {
+                    this.onChangeGstToggle(e.target.value)
+                  }}
+                />
               </GridItem>
             )}
           </GridContainer>

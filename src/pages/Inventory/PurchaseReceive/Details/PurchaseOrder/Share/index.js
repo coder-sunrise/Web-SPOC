@@ -52,7 +52,7 @@ class InvoiceSummary extends PureComponent {
       if (!settingGSTEnable) {
         setFieldValue(`${prefix}IsGSTInclusive`, false)
       }
-    }else{
+    } else {
       setFieldValue(`${prefix}IsGSTInclusive`, e.target.value)
     }
 
@@ -60,10 +60,7 @@ class InvoiceSummary extends PureComponent {
   }
 
   render () {
-    const {
-      settingGSTEnable,
-      settingGSTPercentage,
-    } = this.state
+    const { settingGSTEnable, settingGSTPercentage } = this.state
     const {
       toggleInvoiceAdjustment,
       handleDeleteInvoiceAdjustment,
@@ -160,13 +157,13 @@ class InvoiceSummary extends PureComponent {
                     return (
                       <Tooltip
                         title={formatMessage({
-                          id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                          id: 'app.general.inclusiveGST',
                         })}
                         placement='bottom'
                       >
                         <Checkbox
                           label={formatMessage({
-                            id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                            id: 'app.general.inclusiveGST',
                           })}
                           onChange={(e) => this.onChangeGstToggle(true, e)}
                           {...args}

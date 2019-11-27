@@ -315,7 +315,8 @@ class Form extends React.PureComponent {
     })
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows, deleted, ...restProps }) => {
+    console.log(rows, restProps)
     if (rows) {
       this.setState(
         {
@@ -794,6 +795,7 @@ class Form extends React.PureComponent {
                   patientName={values.patientName}
                   patientProfileFK={values.patientProfileFK}
                   appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                  values={values}
                 />
                 <AppointmentDateInput disabled={_disableAppointmentDate} />
               </GridItem>

@@ -43,7 +43,7 @@ class TextField extends React.PureComponent {
       value,
       debounceDuration,
     } = props
-    // console.log(this.state, props)
+    // console.log(this.state, props, defaultValue, value)
     this.state = {
       // isDebouncing: false,
       value:
@@ -79,7 +79,7 @@ class TextField extends React.PureComponent {
 
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (this.state.focused) return
-    const { field, value } = nextProps
+    const { field, value, defaultValue } = nextProps
     if (field) {
       this.setState({
         value:
@@ -93,7 +93,7 @@ class TextField extends React.PureComponent {
       this.setState({
         value,
       })
-    } else {
+    } else if (!defaultValue) {
       this.setState({
         value: '',
       })
@@ -291,7 +291,7 @@ class TextField extends React.PureComponent {
     }
     // console.log(cfg)
     // console.log(inputProps)
-    // console.log('custominput', inputProps)
+    // console.log('custominput', resetProps, cfg)
 
     return (
       <BaseInput
