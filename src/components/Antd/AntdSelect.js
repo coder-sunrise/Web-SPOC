@@ -121,6 +121,7 @@ class AntdSelect extends React.PureComponent {
       max,
       allValue,
       value,
+      disableAll,
     } = props
     this.myRef = React.createRef()
 
@@ -140,9 +141,9 @@ class AntdSelect extends React.PureComponent {
       ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
-            allValue,
             ...options.map((o) => o[valueField]),
           ]
+          if (disableAll === false) v.unshift(allValue)
           form.setFieldValue(field.name, v)
         }
       }
@@ -166,9 +167,10 @@ class AntdSelect extends React.PureComponent {
           v.length === 1
         ) {
           v = [
-            allValue,
             ...options.map((o) => o[valueField]),
           ]
+
+          if (disableAll === false) v.unshift(allValue)
         }
       }
     }
@@ -214,10 +216,10 @@ class AntdSelect extends React.PureComponent {
       autoComplete,
       mode,
       allValue,
+      disableAll,
       maxSelected,
     } = nextProps
     let v = this.state.value
-    // console.log(field)
     if (field) {
       v = [
         'multiple',
@@ -252,15 +254,16 @@ class AntdSelect extends React.PureComponent {
           form.setFieldValue(field.name, v)
         }
       }
-      this.setState({
-        value: v,
-        // shrink: [
-        //   'multiple',
-        //   'tags',
-        // ].includes(mode)
-        //   ? v && v.length > 0
-        //   : v !== undefined,
-      })
+
+      if (disableAll === true) {
+        v = _.reject(v, (o) => o === allValue)
+      }
+
+      if (!_.isEqual(v, this.state.value)) {
+        this.setState({
+          value: v,
+        })
+      }
     } else if (value !== undefined) {
       v = [
         'multiple',
@@ -289,15 +292,12 @@ class AntdSelect extends React.PureComponent {
           v.unshift(allValue)
         }
       }
+      if (disableAll === true) {
+        v = _.reject(v, (o) => o === allValue)
+      }
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
-          // shrink: [
-          //   'multiple',
-          //   'tags',
-          // ].includes(mode)
-          //   ? v && v.length > 0
-          //   : v !== undefined,
         })
       }
     } else {
@@ -370,6 +370,7 @@ class AntdSelect extends React.PureComponent {
       query,
       valueField,
       maxSelected,
+      disableAll,
     } = this.props
     let newVal = val
     if (
@@ -392,22 +393,6 @@ class AntdSelect extends React.PureComponent {
       } else if (this.state.value.indexOf(allValue) >= 0) {
         newVal = []
       }
-      // else if (
-      //   val.length &&
-      //   val.length ===
-      //     val.filter((o) =>
-      //       options.find((m) => {
-      //         console.log({ m: Object.byString(m, valueField), o })
-      //         return Object.byString(m, valueField) === o
-      //       }),
-      //     ).length
-      // ) {
-      //   console.log('else if 1.1')
-      //   newVal = [
-      //     allValue,
-      //     ...options.map((o) => Object.byString(o, valueField)),
-      //   ]
-      // }
       if (maxSelected && newVal.length > maxSelected) {
         newVal = _.reject(newVal, (v) => v === allValue)
         newVal = newVal.slice(-maxSelected)
