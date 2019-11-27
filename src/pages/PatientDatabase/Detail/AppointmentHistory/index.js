@@ -88,6 +88,7 @@ class AppointmentHistory extends PureComponent {
     height: 100,
     previousAppt: [],
     futureAppt: [],
+    patientProfileFK: undefined,
   }
 
   previousApptTableParams = {
@@ -120,8 +121,8 @@ class AppointmentHistory extends PureComponent {
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
-    if (this.props.patient.id) {
-      this.getAppts()
+    if (this.props.patient && this.props.patient.id > 0) {
+      this.getAppts(this.props.patient.id)
     }
   }
 
@@ -129,13 +130,21 @@ class AppointmentHistory extends PureComponent {
     window.removeEventListener('resize', this.resize.bind(this))
   }
 
-  async getAppts () {
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { patient } = nextProps
+
+    if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
+      this.getAppts(patient.id)
+    }
+  }
+
+  async getAppts (patientId) {
     const commonParams = {
       combineCondition: 'and',
       sorting: [
         { columnName: 'appointmentDate', direction: 'asc' },
       ],
-      'AppointmentGroupFKNavigation.patientProfileFK': this.props.patient.id,
+      'AppointmentGroupFKNavigation.patientProfileFK': patientId,
     }
     const [
       previous,
@@ -162,6 +171,7 @@ class AppointmentHistory extends PureComponent {
       if (status === '200')
         this.setState({
           previousAppt: data.data,
+          patientProfileFK: patientId,
         })
     }
 
@@ -170,6 +180,7 @@ class AppointmentHistory extends PureComponent {
       if (status === '200')
         this.setState({
           futureAppt: data.data,
+          patientProfileFK: patientId,
         })
     }
   }
@@ -186,12 +197,13 @@ class AppointmentHistory extends PureComponent {
   render () {
     const { classes, theme } = this.props
     const { previousAppt, futureAppt } = this.state
-
+    // this.resize()
     return (
       <div>
         <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
 
         <CommonTableGrid
+          size='sm'
           rows={previousAppt}
           {...this.previousApptTableParams}
         />
@@ -202,8 +214,42 @@ class AppointmentHistory extends PureComponent {
         >
           Current & Future Appointment
         </h4>
-        <CommonTableGrid rows={futureAppt} {...this.futureApptTableParams} />
+        <CommonTableGrid
+          size='sm'
+          rows={futureAppt}
+          {...this.futureApptTableParams}
+        />
       </div>
+
+      // <GridContainer>
+      //   <GridItem xs md={12}>
+      //     <React.Fragment>
+      //       <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+
+      //       <CommonTableGrid
+      //         size='sm'
+      //         rows={previousAppt}
+      //         {...this.previousApptTableParams}
+      //       />
+      //     </React.Fragment>
+      //   </GridItem>
+      //   <GridItem xs md={12}>
+      //     <React.Fragment>
+      //       <h4
+      //         style={{
+      //           marginTop: theme.spacing(2),
+      //         }}
+      //       >
+      //         Current & Future Appointment
+      //       </h4>
+      //       <CommonTableGrid
+      //         size='sm'
+      //         rows={futureAppt}
+      //         {...this.futureApptTableParams}
+      //       />
+      //     </React.Fragment>
+      //   </GridItem>
+      // </GridContainer>
     )
   }
 }
