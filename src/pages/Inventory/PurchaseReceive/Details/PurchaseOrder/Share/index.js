@@ -127,8 +127,9 @@ class InvoiceSummary extends PureComponent {
             <GridItem xs={2} md={9} />
             <GridItem xs={4} md={2} style={{ display: 'flex' }}>
               <span style={{ width: 100, marginTop: 10 }}>
-                {`GST (${settingGSTPercentage}%): `}
+                {`(${settingGSTPercentage}%) GST: `}
               </span>
+
               <Field
                 name={`${prefix}IsGSTEnabled`}
                 render={(args) => (

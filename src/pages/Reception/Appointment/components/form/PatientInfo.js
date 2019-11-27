@@ -27,6 +27,7 @@ const PatientInfoInput = ({
   isEdit,
   disabled,
   appointmentStatusFK,
+  values,
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
@@ -38,21 +39,28 @@ const PatientInfoInput = ({
   return (
     <React.Fragment>
       <GridItem xs md={6}>
-        <FastField
-          name='patientName'
-          render={(args) => {
-            return (
-              <TextField
-                {...args}
-                // autoFocus
-                defaultValue={undefined}
-                label='Patient Name / Acc. No.'
-                disabled={isEdit}
-                loseFocusOnEnterPressed
-              />
-            )
-          }}
-        />
+        {isEdit ? (
+          <TextField
+            value={values.patientName}
+            label='Patient Name / Acc. No.'
+            disabled
+          />
+        ) : (
+          <FastField
+            name='patientName'
+            render={(args) => {
+              return (
+                <TextField
+                  {...args}
+                  autoFocus
+                  defaultValue={undefined}
+                  label='Patient Name / Acc. No.'
+                  loseFocusOnEnterPressed
+                />
+              )
+            }}
+          />
+        )}
       </GridItem>
       <GridItem xs md={6}>
         <div className={classnames(classes.buttonGroup)}>

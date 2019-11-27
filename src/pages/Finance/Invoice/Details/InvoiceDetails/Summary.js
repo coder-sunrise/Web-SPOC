@@ -20,7 +20,7 @@ const Summary = ({ classes, clinicSettings }) => {
     const { settings } = clinicSettings
     if (settings) {
       const { gSTPercentageInt } = settings
-      return `GST (${gSTPercentageInt}%)`
+      return `(${gSTPercentageInt}%) GST:`
     }
     return null
   }

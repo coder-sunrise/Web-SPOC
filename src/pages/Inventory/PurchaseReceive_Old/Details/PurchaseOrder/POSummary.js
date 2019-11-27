@@ -128,7 +128,7 @@ class POSummary extends PureComponent {
           <GridContainer>
             <GridItem xs={2} md={9} />
             <GridItem xs={4} md={2}>
-              <span> {`GST (${gSTPercentage}%): `}</span>
+              <span> {`(${gSTPercentage}%) GST: `}</span>
               <FastField
                 name={`${poPrefix}.gstEnabled`}
                 render={(args) => (
