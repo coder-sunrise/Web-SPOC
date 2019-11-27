@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 
 import { ReportDataGrid } from '@/components/_medisys'
 
@@ -9,15 +7,12 @@ class IncomeList extends PureComponent {
   render () {
     let incomeData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.IncomeGstDetails) {
-      incomeData = reportDatas.IncomeGstDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `gst-${index}-${item.invoiceNo}`,
-        }),
-      )
+      incomeData = reportDatas.IncomeGstDetails.map((item, index) => ({
+        ...item,
+        id: `gst-${index}-${item.invoiceNo}`,
+      }))
     }
 
     const InComeGstDetailsCols = [
@@ -29,10 +24,12 @@ class IncomeList extends PureComponent {
       { name: 'incomeTotal', title: 'Final Amount' },
     ]
     const InComeGstDetailsExtensions = [
-      { columnName: 'incomeDate', type: 'date' },
-      { columnName: 'incomeAmount', type: 'currency', currency: true },
-      { columnName: 'incomeGst', type: 'currency', currency: true },
-      { columnName: 'incomeTotal', type: 'currency', currency: true },
+      { columnName: 'incomeDate', type: 'date', sortingEnabled: false },
+      { columnName: 'incomeAmount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'incomeGst', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'incomeTotal', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
     ]
 
     let FuncProps = {
@@ -80,7 +77,10 @@ class IncomeList extends PureComponent {
           },
         },
       }
-      InComeGstDetails = [{ name: 'doctorName', title: 'Doctor Name' }, ...InComeGstDetailsCols]
+      InComeGstDetails = [
+        { name: 'doctorName', title: 'Doctor Name' },
+        ...InComeGstDetailsCols,
+      ]
     }
     return (
       <ReportDataGrid

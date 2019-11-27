@@ -24,6 +24,7 @@ class PaymentCollectionList extends PureComponent {
     const PaymentCollectionDetailsExtensions = [
       {
         columnName: 'paymentReceivedDate',
+        sortingEnabled: false,
         width: 200,
         type: 'date',
         render: (row) =>
@@ -33,8 +34,16 @@ class PaymentCollectionList extends PureComponent {
             format: dateFormatLongWithTimeNoSec12h,
           }),
       },
-      { columnName: 'amount', type: 'currency', currency: true },
-      // { columnName: 'doctorName', type: 'text' },
+      { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'receiptNo', sortingEnabled: false },
+      { columnName: 'referenceNo', sortingEnabled: false },
+      { columnName: 'payerName', sortingEnabled: false },
+      { columnName: 'remark', sortingEnabled: false },
+      { columnName: 'doctorName', sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false },
+      { columnName: 'invoiceDate', sortingEnabled: false },
+      { columnName: 'paymentMode', sortingEnabled: false },
+      { columnName: 'patientName', sortingEnabled: false },
     ]
     let FuncProps = {
       pager: false,
@@ -137,8 +146,8 @@ class PaymentCollectionList extends PureComponent {
       ]
       const CashColsExtension = [
         ...PaymentCollectionDetailsExtensions,
-        { columnName: 'cashRounding', type: 'currency', currency: true },
-        { columnName: 'netAmount', type: 'currency', currency: true },
+        { columnName: 'cashRounding', type: 'currency', currency: true, sortingEnabled: false },
+        { columnName: 'netAmount', type: 'currency', currency: true, sortingEnabled: false },
       ]
       console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
@@ -156,7 +165,7 @@ class PaymentCollectionList extends PureComponent {
             giroData.length > 0 && (
               <ReportDataGrid
                 data={giroData}
-                columns={OtherPaymentModeDetailsCols}
+                columns={GIRODetailsCols}
                 columnExtensions={PaymentCollectionDetailsExtensions}
                 FuncProps={FuncProps}
               />
@@ -165,7 +174,7 @@ class PaymentCollectionList extends PureComponent {
             otherData.length > 0 && (
               <ReportDataGrid
                 data={otherData}
-                columns={GIRODetailsCols}
+                columns={OtherPaymentModeDetailsCols}
                 columnExtensions={PaymentCollectionDetailsExtensions}
                 FuncProps={FuncProps}
               />

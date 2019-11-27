@@ -100,11 +100,13 @@ const SessionSummary = () => {
     },
     {
       columnName: 'sessionStartDate',
+      sortingEnabled: false,
       render: (row) =>
         moment(row.sessionStartDate).format(dateFormatLongWithTime),
     },
     {
       columnName: 'sessionCloseDate',
+      sortingEnabled: false,
       render: (row) =>
         row.sessionCloseDate
           ? moment(row.sessionCloseDate).format(dateFormatLongWithTime)

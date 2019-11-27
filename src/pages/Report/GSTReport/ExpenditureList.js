@@ -36,10 +36,12 @@ class ExpenditureList extends PureComponent {
       { name: 'expenditureTotal', title: 'Final Amount' },
     ]
     const ExpenditureGstDetailsExtensions = [
-      { columnName: 'expenditureDate', type: 'date' },
-      { columnName: 'expenditureAmount', type: 'currency', currency: true },
-      { columnName: 'expenditureGst', type: 'currency', currency: true },
-      { columnName: 'expenditureTotal', type: 'currency', currency: true },
+      { columnName: 'expenditureDate', type: 'date', sortingEnabled: false },
+      { columnName: 'expenditureAmount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'expenditureGst', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'expenditureTotal', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'expenditureDescription', sortingEnabled: false },
+      { columnName: 'expenditureName', sortingEnabled: false },
     ]
 
     let FuncProps = {

@@ -16,7 +16,8 @@ class SumList extends PureComponent {
       )
     }
     const sumExtensions = [
-      { columnName: 'sumAmount', type: 'currency', currency: true },
+      { columnName: 'sumAmount', type: 'currency', currency: true, sortingEnabled: false },
+      { columnName: 'paymentMode', sortingEnabled: false },
     ]
     const sumCols = [
       { name: 'paymentMode', title: 'Payment Mode' },

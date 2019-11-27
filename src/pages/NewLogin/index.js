@@ -26,7 +26,7 @@ import {
 
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
-import logo from '@/assets/img/logo/logo_medicloud.png'
+import logo from '@/assets/img/logo/logo_white_with_text.png'
 import { container } from '@/assets/jss'
 
 const styles = (theme) => ({
@@ -86,6 +86,9 @@ const styles = (theme) => ({
       color: color('#0093f1').darken(0.2).hex(),
       textDecoration: 'underline',
     },
+  },
+  imgHolder: {
+    padding: '15px 24px !important',
   },
 })
 
@@ -193,16 +196,13 @@ class NewLogin extends React.Component {
             <GridItem md={4}>
               <Card login className={classes[cardAnimation]}>
                 <CardHeader
-                  className={`${classes.cardHeader} ${classes.textCenter}`}
+                  className={`${classes.cardHeader} ${classes.textCenter} ${classes.imgHolder}`}
                   color='login'
                 >
-                  <h3 className={classes.cardTitle}>
-                    <FormattedMessage id='app.login.title' />
-                  </h3>
                   <img
                     src={logo}
                     alt='logo'
-                    style={{ height: '100px', width: '100px' }}
+                    style={{ width: '100%', objectFit: 'cover' }}
                   />
                 </CardHeader>
 

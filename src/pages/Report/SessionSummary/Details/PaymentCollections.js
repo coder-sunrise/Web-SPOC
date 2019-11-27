@@ -1,23 +1,34 @@
 import React from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
-import {
-  Table,
-} from '@devexpress/dx-react-grid-material-ui'
+import { withStyles } from '@material-ui/core'
+
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
+const styles = (theme) => ({
+  subRow: {
+    '& > td:first-child': {
+      paddingLeft: theme.spacing(1),
+    },
+  },
+})
 
-const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
-  if (!PaymentCollectionsDetails)
-    return null
+const PaymentCollections = ({
+  PaymentCollectionsDetails,
+  TotalDetails,
+  classes,
+}) => {
+  if (!PaymentCollectionsDetails) return null
   let listData = []
   if (PaymentCollectionsDetails) {
     let paymentCount = 0
     for (let i = PaymentCollectionsDetails.length - 1; i >= 0; i--) {
       const item = PaymentCollectionsDetails[i]
       paymentCount += 1
-      if (i === 0 || PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo) {
+      if (
+        i === 0 ||
+        PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo
+      ) {
         listData.splice(0, 0, {
           ...item,
           id: `${item.invoiceNo}-${item.receiptNo}`,
@@ -46,32 +57,31 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
   ]
 
   const PaymentCollectionsColumnExtension = [
-    { columnName: 'invoiceNo', width: 100 },
-    { columnName: 'payerName', width: 180 },
-    { columnName: 'totalAftAdj', type: 'currency', currency: true },
-    { columnName: 'gstAmt', type: 'currency', currency: true },
-    { columnName: 'totalAmtPaid', type: 'currency', currency: true },
+    { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
+    { columnName: 'payerName', width: 180, sortingEnabled: false },
+    { columnName: 'totalAftAdj', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'totalAmtPaid', type: 'currency', currency: true, sortingEnabled: false },
+    { columnName: 'receiptNo', sortingEnabled: false },
   ]
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      const newchildren = children.map((item, index) => index < 4 ? {
-        ...children[index],
-        props: {
-          ...children[index].props,
-          rowSpan: row.rowspan,
-        },
-      } : item)
+      const newchildren = children.map(
+        (item, index) =>
+          index < 4
+            ? {
+              ...item,
+              props: {
+                ...item.props,
+                rowSpan: row.rowspan,
+              },
+            }
+            : item,
+      )
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    const newchildren = [{
-      ...children[4],
-      props: {
-        ...children[4].props,
-        style: { paddingLeft: 8 },
-      },
-    }, children[5]]
-    return <Table.Row {...p}>{newchildren}</Table.Row>
+    return <Table.Row className={classes.subRow}>{[children[4], children[5]]} </Table.Row>
   }
   const FuncProps = {
     pager: false,
@@ -118,4 +128,4 @@ const PaymentCollections = ({ PaymentCollectionsDetails, TotalDetails }) => {
   )
 }
 
-export default PaymentCollections
+export default withStyles(styles, { withTheme: true })(PaymentCollections)

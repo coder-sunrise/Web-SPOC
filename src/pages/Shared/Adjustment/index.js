@@ -77,7 +77,7 @@ const styles = (theme) => ({})
       ),
       finalAmount: Yup.number()
         .min(
-          0.01,
+          0,
           formatMessage({
             id:
               'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',

@@ -200,17 +200,30 @@ export default createFormViewModel({
 
       upsertRow (state, { payload }) {
         let { rows } = state.entity
+        const { gridRows } = payload
         if (payload.uid) {
-          rows = rows.map((row) => {
-            const n =
-              row.uid === payload.uid
-                ? {
-                    ...row,
-                    ...payload,
-                  }
-                : row
-            return n
+          rows = gridRows.map((o) => {
+            let itemFK
+            const item = podoOrderType.filter((x) => x.value === o.type)
+            if (item.length > 0) {
+              const { itemFKName } = item[0]
+              itemFK = itemFKName
+            }
+            return {
+              ...o,
+              [itemFK]: o.itemFK,
+            }
           })
+          // rows = rows.map((row) => {
+          //   const n =
+          //     row.uid === payload.uid
+          //       ? {
+          //           ...row,
+          //           ...payload,
+          //         }
+          //       : row
+          //   return n
+          // })
         } else {
           // const itemFK = podoOrderType.filter(
           //   (x) => x.value === payload.type,

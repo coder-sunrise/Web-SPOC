@@ -201,6 +201,12 @@ const sharedOverrides = {
     },
   },
 
+  TableSummaryItemBase: {
+    item: {
+      fontSize: '2em',
+    },
+  },
+
   // MuiTableBody: {
   //   root: {
   //     // '& tr.moveable:last-of-type td.td-move-cell button:last-of-type': {

@@ -110,6 +110,10 @@ const styles = (theme) => ({
       width: '100%',
     },
   },
+
+  cleanFormat: {
+    fontSize: 'inherit',
+  },
 })
 
 const Root = (props) => <DevGrid.Root {...props} style={{ height: '100%' }} />
@@ -289,6 +293,10 @@ class CommonTableGrid extends PureComponent {
             height: 'auto',
             ...tableRowSharedRootConfig,
           },
+          footer: {
+            // color: 'red',
+            // fontSize: 'inherit',
+          },
         },
         TableNoDataCell: {
           cell: {
@@ -299,6 +307,9 @@ class CommonTableGrid extends PureComponent {
           root: {
             padding: '5px 0',
             fontSize: '1em',
+          },
+          footer: {
+            fontSize: 'inherit',
           },
         },
         EditCell: {
@@ -382,6 +393,7 @@ class CommonTableGrid extends PureComponent {
             fontSize: '1em',
           },
         },
+
         // PrivateRadioButtonIcon: {
         //   root: {
         //     display: 'none',
@@ -577,12 +589,14 @@ class CommonTableGrid extends PureComponent {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
       if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
-        cfg = {
-          tabIndex: 0,
-          onFocus: onClick,
-          // onBlur: () => {
-          //   console.log(111)
-          // },
+        if (colCfg && colCfg.type !== 'radio') {
+          cfg = {
+            tabIndex: 0,
+            onFocus: onClick,
+            // onBlur: () => {
+            //   console.log(111)
+            // },
+          }
         }
       }
       if (colCfg && colCfg.disabled) cfg = {}
@@ -941,7 +955,6 @@ class CommonTableGrid extends PureComponent {
               )}
               {tree && <TreeDataState />}
               {extraState.map((o) => o)}
-
               {grouping && (
                 <IntegratedGrouping
                   columnExtensions={groupingConfig.columnExtensions || []}
@@ -965,22 +978,18 @@ class CommonTableGrid extends PureComponent {
                 />
               )}
               <TextTypeProvider {...cellComponentConfig} />
-
               <NumberTypeProvider {...cellComponentConfig} />
               <SelectTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />
-
               {/* 
               
 
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
-
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
-
               <TableBase
                 // height={height}
                 rowComponent={this.TableRow}
@@ -1003,18 +1012,28 @@ class CommonTableGrid extends PureComponent {
                   {...selectConfig}
                 />
               )}
-
               {header && <HeaderRow showSortingControls />}
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
-
               {grouping && <TableGroupRow {...groupingConfig.row} />}
               {grouping && groupingConfig.showToolbar && <Toolbar />}
               {grouping &&
               groupingConfig.showToolbar && (
                 <GroupingPanel showSortingControls />
               )}
-              {summary && <TableSummaryRow {...summaryConfig.row} />}
+              {summary && (
+                <TableSummaryRow
+                  itemComponent={(p) => {
+                    return (
+                      <TableSummaryRow.Item
+                        className={classes.cleanFormat}
+                        {...p}
+                      />
+                    )
+                  }}
+                  {...summaryConfig.row}
+                />
+              )}
               {tree && <TableTreeColumn {...treeColumnConfig} />}
               {extraColumn.map((o) => o)}
               <TableFixedColumns
@@ -1032,6 +1051,20 @@ class CommonTableGrid extends PureComponent {
                 leftColumns={newLeftCols}
               />
               {extraGetter.map((o) => o)}
+              {/* <Getter
+                key='Getter-totalSummaryItems'
+                name='totalSummaryItems'
+                computed={(p) => {
+                  console.log(p)
+                  console.debug('11')
+                  return [
+                    {
+                      columnName: 'incomeAmount',
+                      type: 'sum',
+                    },
+                  ]
+                }}
+              />, */}
             </DevGrid>
           </LoadingWrapper>
         </Paper>

@@ -1,10 +1,9 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { FastField } from 'formik'
+import _ from 'lodash'
 import { withStyles, Radio } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
-import debounce from 'lodash/debounce'
 
 import {
   onComponentDidMount,
@@ -21,7 +20,7 @@ const styles = (theme) => ({
   main: {},
 })
 
-const radioSelectedMap = {}
+let _radioSelectedMap = {}
 
 class RadioEditorBase extends PureComponent {
   state = {}
@@ -33,17 +32,22 @@ class RadioEditorBase extends PureComponent {
 
   componentDidMount () {
     const { gridId, row, columnName } = onComponentDidMount.call(this)
-    if (!radioSelectedMap[gridId]) radioSelectedMap[gridId] = {}
-    if (row[columnName]) {
-      radioSelectedMap[gridId][columnName] = row.id
-      this.forceUpdate()
-    }
-    // console.log('RadioEditorBase', row, radioSelectedMap[gridId])
+    if (!_radioSelectedMap) _radioSelectedMap = {}
+    // if (row[columnName]) {
+    //   // _radioSelectedMap[columnName] = row.id
+    // }
+    this.forceUpdate()
+
+    // console.log('RadioEditorBase', row, _radioSelectedMap)
   }
 
   _onChange = (e, checked) => {
-    const { columnExtensions, column: { name: columnName }, row } = this.props
-
+    const {
+      columnExtensions,
+      column: { name: columnName },
+      row,
+      editMode,
+    } = this.props
     const cfg =
       columnExtensions.find(
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
@@ -51,66 +55,22 @@ class RadioEditorBase extends PureComponent {
     const { checkedValue = true, uncheckedValue = false, gridId } = cfg
 
     if (checked) {
-      radioSelectedMap[gridId][columnName] = row.id
+      _radioSelectedMap[columnName] = row.id
     }
 
     onComponentChange.call(this, {
       value: checked ? checkedValue : uncheckedValue,
       checked,
     })
+
+    // if (editMode) {
+    //   if (checked) {
+    //     _radioSelectedMap[columnName] = row.id
+    //   }
+    //   this.props.onBlur(e)
+    // }
   }
 
-  // componentDidMount () {
-  //   const { columnExtensions, row, column: { name: columnName } } = this.props
-  //   const cfg =
-  //     columnExtensions.find(
-  //       ({ columnName: currentColumnName }) => currentColumnName === columnName,
-  //     ) || {}
-  //   const { gridId, getRowId } = cfg
-  //   const latestRow = window.$tempGridRow[gridId]
-  //     ? window.$tempGridRow[gridId][getRowId(row)] || row
-  //     : row
-  //   updateCellValue(this.props, this.myRef.current, latestRow[columnName])
-  //   this.setState({
-  //     cfg,
-  //     row: latestRow,
-  //   })
-  // }
-
-  // _onChange = (date, moments, org) => {
-  //   const {
-  //     columnExtensions,
-  //     column: { name: columnName },
-  //     value,
-  //     onValueChange,
-  //     row,
-  //   } = this.props
-
-  //   const {
-  //     type,
-  //     code,
-  //     validationSchema,
-  //     isDisabled = () => false,
-  //     onChange,
-  //     gridId,
-  //     getRowId,
-  //     ...restProps
-  //   } = this.state.cfg
-
-  //   const errors = updateCellValue(this.props, this.myRef.current, date)
-
-  //   const latestRow = window.$tempGridRow[gridId]
-  //     ? window.$tempGridRow[gridId][getRowId(row)] || row
-  //     : row
-  //   latestRow._errors = errors
-  //   const error = errors.find((o) => o.path === this.state.cfg.columnName)
-  //   console.log(error, errors)
-  //   if (!error) {
-  //     if (onChange) {
-  //       onChange(date, moments, org, latestRow)
-  //     }
-  //   }
-  // }
   renderComponent = ({
     type,
     code,
@@ -131,20 +91,12 @@ class RadioEditorBase extends PureComponent {
         ({ columnName: currentColumnName }) => currentColumnName === columnName,
       ) || {}
     const { checkedValue = true, uncheckedValue = false, gridId } = cfg
-    if (!radioSelectedMap[gridId]) return null
+    if (!_radioSelectedMap) return null
     commonCfg.onChange = this._onChange
 
-    let checked = row[columnName] === checkedValue
-    if (checked) {
-      commonCfg.checked = radioSelectedMap[gridId][columnName] === row.id
-    }
-    if (editMode) {
-      commonCfg.onBlur = this.props.onBlur
-      commonCfg.autoFocus = true
-      // if (!commonCfg.checked) {
-      //   commonCfg.checked = true
-      //   row[columnName] = checkedValue
-      // }
+    commonCfg.checked = row[columnName] === checkedValue
+    if (_radioSelectedMap[columnName]) {
+      commonCfg.checked = _radioSelectedMap[columnName] === row.id
     }
     return (
       <Radio
@@ -193,16 +145,16 @@ class RadioEditorBase extends PureComponent {
 //       if (value !== e.target.value) onValueChange(e.target.value)
 //     }
 
-//     if (!radioSelectedMap[gridId]) radioSelectedMap[gridId] = {}
+//     if (!_radioSelectedMap) _radioSelectedMap = {}
 
 //     // console.log(
 //     //   row[columnName],
 //     //   checkedValue,
-//     //   radioSelectedMap[gridId][columnName],
+//     //   _radioSelectedMap[columnName],
 //     // )
 //     let checked = row[columnName] === checkedValue
-//     if (radioSelectedMap[gridId][columnName]) {
-//       checked = radioSelectedMap[gridId][columnName] === row.id
+//     if (_radioSelectedMap[columnName]) {
+//       checked = _radioSelectedMap[columnName] === row.id
 //     }
 
 //     const commonCfg = {
@@ -219,10 +171,10 @@ class RadioEditorBase extends PureComponent {
 //         checked={checked}
 //         onChange={(e, c) => {
 //           // console.log(e.target, c, row)
-//           if (!radioSelectedMap[gridId][columnName])
-//             radioSelectedMap[gridId][columnName] = {}
+//           if (!_radioSelectedMap[columnName])
+//             _radioSelectedMap[columnName] = {}
 //           if (c) {
-//             radioSelectedMap[gridId][columnName] = row.id
+//             _radioSelectedMap[columnName] = row.id
 //           }
 //           onRadioChange(row, e.target, c)
 //           onValueChange(c ? checkedValue : uncheckedValue)
@@ -281,7 +233,7 @@ class RadioTypeProvider extends PureComponent {
     return (
       <DataTypeProvider
         for={columns}
-        editorComponent={this.RadioEditor(columnExtensions)}
+        editorComponent={this.RadioEditor(columnExtensions, true)}
         formatterComponent={this.RadioEditor(columnExtensions, true)}
         {...this.props}
       />

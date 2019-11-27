@@ -25,7 +25,12 @@ class LowStockList extends PureComponent {
       { name: 'supplier', title: 'Supplier' },
     ]
     const LowStockMedicationDetailsExtensions = [
-      { columnName: 'stock', type: 'number' },
+      { columnName: 'stock', type: 'number', sortingEnabled: false },
+      { columnName: 'code', sortingEnabled: false },
+      { columnName: 'name', sortingEnabled: false },
+      { columnName: 'threshold', sortingEnabled: false },
+      { columnName: 'uom', sortingEnabled: false },
+      { columnName: 'supplier', sortingEnabled: false },
     ]
 
     return (
