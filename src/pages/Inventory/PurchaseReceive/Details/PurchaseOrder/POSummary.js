@@ -144,13 +144,13 @@ class POSummary extends PureComponent {
                     return (
                       <Tooltip
                         title={formatMessage({
-                          id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                          id: 'app.general.inclusiveGST',
                         })}
                         placement='bottom'
                       >
                         <Checkbox
                           label={formatMessage({
-                            id: 'inventory.pr.detail.pod.summary.inclusiveGST',
+                            id: 'app.general.inclusiveGST',
                           })}
                           onChange={() => this.onChangeGstToggle(true)}
                           {...args}

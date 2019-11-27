@@ -315,7 +315,8 @@ class Form extends React.PureComponent {
     })
   }
 
-  onCommitChanges = ({ rows, deleted }) => {
+  onCommitChanges = ({ rows, deleted, ...restProps }) => {
+    console.log(rows, restProps)
     if (rows) {
       this.setState(
         {

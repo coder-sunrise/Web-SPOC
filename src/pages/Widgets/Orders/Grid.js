@@ -1,5 +1,7 @@
 import React from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { formatMessage } from 'umi/locale'
+
 import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
@@ -13,6 +15,7 @@ import {
   Tooltip,
   NumberInput,
   Select,
+  Checkbox,
   CodeSelect,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
@@ -176,10 +179,12 @@ export default ({
             totalCellComponent: (p) => {
               const { children, column } = p
               if (column.name === 'totalAfterItemAdjustment') {
-                // console.log(p)
+                const items = children.props.children
+                const c1 = items.splice(0, items.length - 1)
+                const c2 = items.splice(items.length - 1)
                 return (
                   <Table.Cell colSpan={2}>
-                    <span style={{ color: 'initial' }}>
+                    <span>
                       Adjustment
                       <Tooltip title='Add Adjustment'>
                         <IconButton style={{ top: -1 }} onClick={addAdjustment}>
@@ -187,7 +192,15 @@ export default ({
                         </IconButton>
                       </Tooltip>
                     </span>
-                    {children}
+                    {c1}
+                    <Checkbox
+                      label={formatMessage({
+                        id: 'app.general.inclusiveGST',
+                      })}
+                      simple
+                      onChange={(e) => {}}
+                    />
+                    {c2}
                   </Table.Cell>
                 )
               }

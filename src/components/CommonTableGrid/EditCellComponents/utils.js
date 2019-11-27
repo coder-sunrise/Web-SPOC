@@ -39,7 +39,9 @@ function onComponentDidMount () {
     columnName,
   }
 }
-function onComponentChange (args) {
+function onComponentChange (args, config) {
+  if (!config) {
+  }
   const {
     columnExtensions,
     column: { name: columnName },
@@ -72,9 +74,9 @@ function onComponentChange (args) {
       o.path === cfg.columnName || o.path.indexOf(`${cfg.columnName}[`) === 0,
   )
   const error = errorObj ? errorObj.message : ''
-  this.setState({
-    row: latestRow,
-  })
+  // this.setState({
+  //   row: latestRow,
+  // })
   if (!error) {
     if (onChange) {
       onChange({
@@ -135,6 +137,17 @@ function getCommonConfig () {
     disabled,
     row: latestRow,
     text: text || !editMode,
+    validSchema: (_row) => {
+      if (validationSchema) {
+        try {
+          validationSchema.validateSync(_row, {
+            abortEarly: false,
+          })
+        } catch (er) {
+          latestRow._errors = er.inner || []
+        }
+      }
+    },
     ...restProps,
   }
   // if (editMode && disabled) {
@@ -146,12 +159,12 @@ function getCommonConfig () {
 function getCommonRender (cb) {
   const { value, editMode } = this.props
   const cfg = getCommonConfig.call(this)
-  const { render, error, row } = cfg
+  const { render, error, row, customEditor } = cfg
   // console.log(row, this.props.row)
   // console.log(value, cfg)
 
-  if (render && !editMode && !error) {
-    return render(row)
+  if (render && ((!editMode && !error) || customEditor)) {
+    return render(row, { ...cfg }, this.props)
   }
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>
