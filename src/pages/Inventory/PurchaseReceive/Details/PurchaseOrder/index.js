@@ -529,12 +529,10 @@ class Index extends Component {
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
     const isEditable = (poItem) => {
-      if (poItem && poStatus !== 1) return false
-      if (poStatus === 6) return false
+      if ((poItem && poStatus !== 1) || poStatus > 1) return false
       if (isWriteOff) return false
       return true
     }
-    console.log({ values })
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -554,13 +552,16 @@ class Index extends Component {
             setFieldValue={setFieldValue}
             {...this.props}
           />
+
+          {errors.rows && (
+            <p className={classes.errorMsgStyle}>{errors.rows}</p>
+          )}
+          <POGrid
+            calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
+            isEditable={isEditable('poItem')}
+            {...this.props}
+          />
         </AuthorizedContext.Provider>
-        {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
-        <POGrid
-          calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-          isEditable={isEditable('poItem')}
-          {...this.props}
-        />
         <AuthorizedContext.Provider
           value={{
             rights: isEditable() ? 'enable' : 'disable',
@@ -644,6 +645,7 @@ class Index extends Component {
               color='info'
               icon={null}
               onClick={this.toggleReport}
+              authority='none'
             >
               {formatMessage({
                 id: 'inventory.pr.detail.print',
