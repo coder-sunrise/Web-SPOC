@@ -125,15 +125,26 @@ class AddPayment extends Component {
     event.preventDefault()
 
     // TODO: add payment base on keyCode and paymentMode hotkey setting
-    const { ctPaymentMode } = this.props
+    const { ctPaymentMode, patient } = this.props
+    console.log('patietn', this.props)
     const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
 
     if (paymentModeObj) {
-      const isCash = paymentModeObj.id === 3
+      const isCash = paymentModeObj.id === PAYMENT_MODE.CASH
+      const isDeposit = paymentModeObj.id === PAYMENT_MODE.DEPOSIT
       const hasCashPaymentAlready =
-        values.paymentList.filter((item) => item.paymentModeFK === 3).length > 0
+        values.paymentList.filter(
+          (item) => item.paymentModeFK === PAYMENT_MODE.CASH,
+        ).length > 0
 
-      if (isCash && hasCashPaymentAlready) return
+      const hasDeposit =
+        patient.patientDeposit && patient.patientDeposit.balance > 0
+      if (
+        (isCash && hasCashPaymentAlready) ||
+        (isDeposit &&
+          (values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT || !hasDeposit))
+      )
+        return
 
       this.onPaymentTypeClick(paymentModeObj)
     }

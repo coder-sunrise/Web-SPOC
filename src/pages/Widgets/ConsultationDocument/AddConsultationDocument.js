@@ -40,6 +40,7 @@ import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const loadFromCodesConfig = {
   mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
@@ -158,6 +159,28 @@ const loadFromCodesConfig = {
     }
     return ''
   },
+  InsertPatientInfo: (codetable, patient) => {
+    let result
+    let patientGender = codetable.ctgender.find(
+      (x) => x.id === patient.genderFK,
+    )
+    let patientAllergy
+    for (let index = 0; index < patient.patientAllergy.length; index++) {
+      patientAllergy =
+        (patientAllergy ? `${patientAllergy}, ` : '') +
+        patient.patientAllergy[index].allergyName
+    }
+    result = `Patient Name: ${patient.name}`
+    result += `<br/>Patient Ref. No.: ${patient.patientReferenceNo}`
+    result += `<br/>Patient Acc. No.: ${patient.patientAccountNo}`
+    result += `<br/>Gender/Age: ${patientGender.name.substring(
+      0,
+      1,
+    )}/${calculateAgeFromDOB(patient.dob)}`
+
+    result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+    return result
+  },
   loadFromCodes: [
     {
       value: 'corDoctorNote[0].clinicianNote',
@@ -217,6 +240,13 @@ const loadFromCodesConfig = {
           patient,
           true,
         )
+      },
+    },
+    {
+      value: 'patientInfo',
+      name: 'Patient Info',
+      getter: (v, codetable, patient) => {
+        return loadFromCodesConfig.InsertPatientInfo(codetable, patient)
       },
     },
   ],

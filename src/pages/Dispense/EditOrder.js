@@ -51,17 +51,34 @@ class EditOrder extends Component {
     })
   }
 
-  cancelOrder = (e) => {
-    navigateDirtyCheck({
-      onProceed: () => {
-        this.props.dispatch({
+  cancelOrder = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmTitle: '',
+        openConfirmContent: 'Discard edit order?',
+        onConfirmSave: this.handleCancel,
+      },
+    })
+  }
+
+  handleCancel = () => {
+    const { dispatch, dispense } = this.props
+    dispatch({
+      type: 'consultation/discard',
+      payload: dispense.entity.clinicalObjectRecordFK,
+    }).then((o) => {
+      if (o) {
+        dispatch({
           type: `dispense/updateState`,
           payload: {
             editingOrder: false,
           },
         })
-      },
-    })(e)
+      }
+    })
   }
 
   signOrder = (values) => {

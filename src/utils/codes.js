@@ -1,6 +1,7 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import _ from 'lodash'
+
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
@@ -16,6 +17,7 @@ import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
   {
@@ -613,24 +615,16 @@ const currencyRoundingToTheClosestList = [
 
 const currenciesList = [
   {
-    value: 'SGD',
+    value: 'Singapore',
     name: 'S$',
   },
   {
-    value: 'USD',
+    value: 'United States',
     name: '$',
   },
   {
-    value: 'EUR',
-    name: '€',
-  },
-  {
-    value: 'BTC',
-    name: '฿',
-  },
-  {
-    value: 'JPY',
-    name: '¥',
+    value: 'Malaysia',
+    name: 'RM',
   },
 ]
 
@@ -1470,6 +1464,40 @@ const tagList = [
         )
       }
       return 'N.A.'
+    },
+  },
+  {
+    value: 'PatientInfo',
+    text: '<#PatientInfo#>',
+    url: '',
+    getter: () => {
+      const { patient, codetable } = window.g_app._store.getState()
+      let result
+      if (patient && patient.entity) {
+        let patientGender = codetable.ctgender.find(
+          (x) => x.id === patient.entity.genderFK,
+        )
+        let patientAllergy
+        for (
+          let index = 0;
+          index < patient.entity.patientAllergy.length;
+          index++
+        ) {
+          patientAllergy =
+            (patientAllergy ? `${patientAllergy}, ` : '') +
+            patient.entity.patientAllergy[index].allergyName
+        }
+        result = `Patient Name: ${patient.entity.name}`
+        result += `<br/>Patient Ref. No.: ${patient.entity.patientReferenceNo}`
+        result += `<br/>Patient Acc. No.: ${patient.entity.patientAccountNo}`
+        result += `<br/>Gender/Age: ${patientGender.name.substring(
+          0,
+          1,
+        )}/${calculateAgeFromDOB(patient.entity.dob)}`
+
+        result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+      }
+      return result || 'N.A.'
     },
   },
 ]

@@ -18,7 +18,7 @@ export default ({ classes, current }) => {
 
   return (
     <div>
-      {current.plan !== undefined ? (
+      {current.chiefComplaints !== undefined ? (
         <div
           className={classes.paragraph}
           dangerouslySetInnerHTML={{ __html: htmlData }}
