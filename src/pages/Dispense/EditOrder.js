@@ -54,11 +54,19 @@ class EditOrder extends Component {
   cancelOrder = (e) => {
     navigateDirtyCheck({
       onProceed: () => {
-        this.props.dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: false,
-          },
+        const { dispatch, dispense } = this.props
+        dispatch({
+          type: 'consultation/discard',
+          payload: dispense.entity.clinicalObjectRecordFK,
+        }).then((o) => {
+          if (o) {
+            dispatch({
+              type: `dispense/updateState`,
+              payload: {
+                editingOrder: false,
+              },
+            })
+          }
         })
       },
     })(e)
