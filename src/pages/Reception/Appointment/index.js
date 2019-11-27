@@ -112,65 +112,34 @@ class Appointment extends React.PureComponent {
         lsteql_appointmentDate: endOfMonth,
       },
     })
-    Promise.all([
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctappointmenttype',
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: { code: 'doctorprofile' },
-      }),
-    ]).then((response) => {
-      const [
-        appointmentTypes,
-        doctorprofile,
-      ] = response
 
-      let filterByApptType = []
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'doctorprofile' },
+    }).then((response) => {
+      response
+
       let filterByDoctor = []
       let resources = []
       let primaryClinicianFK
 
-      // if (appointmentTypes) {
-      //   filterByApptType = [
-      //     -99,
-      //     ...appointmentTypes.map((item) => item.id),
-      //   ]
-      // }
-
-      if (doctorprofile) {
-        const primaryClinician = doctorprofile.find(
-          (item) =>
-            parseInt(item.id, 10) ===
-            parseInt(clinicInfo.primaryRegisteredDoctorFK, 10),
-        )
-        if (primaryClinician) {
-          filterByDoctor = [
-            primaryClinician.clinicianProfile.id,
-          ]
-          primaryClinicianFK = primaryClinician.clinicianProfile.id
-          resources = [
-            {
-              clinicianFK: primaryClinician.clinicianProfile.id,
-              doctorName: primaryClinician.clinicianProfile.name,
-            },
-          ]
-        }
+      if (response) {
+        resources = response.map((clinician) => ({
+          clinicianFK: clinician.clinicianProfile.id,
+          doctorName: clinician.clinicianProfile.name,
+        }))
       }
 
       this.setState((preState) => ({
         filter: {
           ...preState.filter,
-          filterByApptType,
           filterByDoctor,
         },
         primaryClinicianFK,
         resources,
       }))
     })
+
     dispatch({
       type: 'calendar/initState',
       payload: { start: startOfMonth },

@@ -408,6 +408,9 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
+              outstandingBalance:
+                values.invoice.patientOutstandingBalance ||
+                values.invoice.outstandingBalance,
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
               // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,

@@ -177,7 +177,7 @@ const ApplyClaims = ({
         },
       ]
     }, [])
-    console.log({ _invoiceItems })
+
     return [
       ..._invoiceItems,
     ]
@@ -387,6 +387,7 @@ const ApplyClaims = ({
         invoice: {
           ...values.invoice,
           outstandingBalance: newOutstandingBalance,
+          patientOutstandingBalance: roundTo(finalPayable - totalPaid),
           invoiceItems: updatedInvoiceItems,
         },
         invoicePayer: tempInvoicePayer,

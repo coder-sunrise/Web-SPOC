@@ -173,7 +173,8 @@ export default memo(
     enableReinitialize: true,
     mapPropsToValues: ({ primaryRegisteredDoctorFK, filterByApptType }) => ({
       filterByDoctor: [
-        primaryRegisteredDoctorFK,
+        // primaryRegisteredDoctorFK,
+        -99,
       ],
       filterByApptType: [
         -99,
