@@ -36,28 +36,24 @@ class Address extends Component {
     postcode: '',
   }
 
-  handleOnChange = (e) => {
-    this.setState((prevState) => {
-      return { postcode: e.target.value }
-    })
-  }
+  // handleOnChange = (e) => {
+  //   this.setState((prevState) => {
+  //     return { postcode: e.target.value }
+  //   })
+  // }
 
   handleAddressType = (e) => {}
 
   handleGetAddress = () => {
-    const {
-      values,
-      addressIndex,
-      setFieldValue,
-      setValues,
-      handleSubmit,
-    } = this.props
-    const { postcode } = this.state
-    postcode === ''
-      ? (setFieldValue(`${addressIndex}postcode`, ''),
-        setFieldValue(`${addressIndex}blockNo`, ''),
-        setFieldValue(`${addressIndex}buildingName`, ''),
-        setFieldValue(`${addressIndex}street`, ''))
+    const { values, addressIndex, setFieldValue, setValues } = this.props
+    let prefix = this.getPrefix()
+
+    const postcode = Object.byString(values, `${prefix}postcode`)
+    !postcode
+      ? (setFieldValue(`${prefix}postcode`, ''),
+        setFieldValue(`${prefix}blockNo`, ''),
+        setFieldValue(`${prefix}buildingName`, ''),
+        setFieldValue(`${prefix}street`, ''))
       : this.props
           .dispatch({
             type: 'streetAddress/fetchAddress',
@@ -93,9 +89,9 @@ class Address extends Component {
                   contactAddress: contactAddressArray,
                 },
               })
-              setFieldValue(`${addressIndex}blockNo`, blkHseNo)
-              setFieldValue(`${addressIndex}buildingName`, building)
-              setFieldValue(`${addressIndex}street`, street)
+              setFieldValue(`${prefix}blockNo`, blkHseNo)
+              setFieldValue(`${prefix}buildingName`, building)
+              setFieldValue(`${prefix}street`, street)
             }
           })
   }
@@ -111,6 +107,17 @@ class Address extends Component {
     }
   }
 
+  getPrefix = () => {
+    const { addressIndex, classes, theme, values, style, propName } = this.props
+
+    let prefix = propName
+    if (addressIndex >= 0) {
+      prefix += `[${addressIndex}]`
+    }
+    prefix += '.'
+    return prefix
+  }
+
   render () {
     const { addressIndex, classes, theme, values, style, propName } = this.props
     // console.log(values, propName)
@@ -121,11 +128,7 @@ class Address extends Component {
     if (Array.isArray(v)) {
       isArray = true
     }
-    let prefix = propName
-    if (addressIndex >= 0) {
-      prefix += `[${addressIndex}]`
-    }
-    prefix += '.'
+    let prefix = this.getPrefix()
     if (Object.byString(values, `${prefix}isDeleted`)) return null
     const btnSearch = (
       <ProgressButton
@@ -180,7 +183,7 @@ class Address extends Component {
                 render={(args) => (
                   <TextField
                     label='Postal Code'
-                    onChange={this.handleOnChange}
+                    // onChange={this.handleOnChange}
                     inputProps={{
                       maxLength: 10,
                     }}
@@ -222,7 +225,7 @@ class Address extends Component {
             <GridItem xs={0} md={5} />
             <GridItem xs={6} md={5}>
               <FastField
-                name={`${addressIndex}postcode`}
+                name={`${prefix}postcode`}
                 render={(args) => (
                   <TextField
                     label='Postal Code'

@@ -41,6 +41,7 @@ import Footer from 'mui-pro-components/Footer'
 import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
+import { initClinicSettings } from '@/utils/config'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 import defaultSettings from '@/defaultSettings'
 
@@ -52,8 +53,6 @@ import Exception403 from '../pages/Exception/403'
 import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
-
-moment.locale('en')
 
 // setInterval(() => {
 //   console.log(document.activeElement)
@@ -114,6 +113,7 @@ const sessionTimeoutTimer = 15 * 60 * 1000
 class BasicLayout extends React.PureComponent {
   constructor (props) {
     super(props)
+    initClinicSettings()
     this.state = {
       mobileOpen: false,
       authorized: false,
@@ -321,10 +321,6 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
     this.getPageTitle = memoizeOne(this.getPageTitle)
     this.menus = menus
-    // this.forceUpdate()
-    await dispatch({
-      type: 'global/getUserSettings',
-    })
 
     this.setState({
       authorized: true,

@@ -10,7 +10,7 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Time To' },
-  { name: 'appointmentDuration', title: 'Appt Duration' },
+  // { name: 'appointmentDuration', title: 'Appt Duration' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
@@ -65,11 +65,11 @@ export const AppointmentDataColExtensions = [
       { value, control, validSchema, ...restProps },
       { onBlur, onFocus, autoFocus, ...props },
     ) => {
-      console.log(restProps, props)
+      // console.log(restProps, props)
       return (
         <ClickAwayListener
           onClickAway={() => {
-            if (onBlur) onBlur()
+            // if (onBlur) onBlur()
           }}
         >
           <div>
@@ -94,6 +94,20 @@ export const AppointmentDataColExtensions = [
               }}
             />
             <Select
+              value={row.clinicianFK}
+              onChange={(v) => {
+                const { commitChanges } = control
+
+                row.clinicianFK = v
+                validSchema(row)
+                commitChanges({
+                  changed: {
+                    [row.id]: {
+                      clinicianFK: row.clinicianFK,
+                    },
+                  },
+                })
+              }}
               options={[
                 { value: 0, name: 'Monday' },
                 { value: 1, name: 'Tuesday' },

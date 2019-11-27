@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import withStyles from '@material-ui/core/styles/withStyles'
 // ant
 import { DatePicker, LocaleProvider } from 'antd'
-import en_US from 'antd/es/locale-provider/en_US'
+// import en_US from 'antd/es/locale-provider/en_US'
 
 // assets
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
