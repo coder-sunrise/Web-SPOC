@@ -77,7 +77,7 @@ class Others extends PureComponent {
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='title'
+              name='subject'
               render={(args) => {
                 return <TextField label='Title' autoFocus {...args} />
               }}
@@ -103,7 +103,7 @@ class Others extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <FastField
-              name='subject'
+              name='title'
               render={(args) => {
                 return <TextField label='Re:' {...args} />
               }}
