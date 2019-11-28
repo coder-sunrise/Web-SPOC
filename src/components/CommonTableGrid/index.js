@@ -391,6 +391,10 @@ class CommonTableGrid extends PureComponent {
             padding: '7px 4px 7px 4px',
             fontSize: '1em',
           },
+          footer: {
+            fontSize: 'inherit',
+            lineHeight: '1em',
+          },
         },
 
         // PrivateRadioButtonIcon: {
