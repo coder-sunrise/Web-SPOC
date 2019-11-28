@@ -41,6 +41,7 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
+  mainDivHeight,
 }) => {
   const [
     anchorEl,
@@ -418,7 +419,7 @@ const Grid = ({
         {filter !== StatusIndicator.APPOINTMENT && (
           <CommonTableGrid
             size='sm'
-            TableProps={{ height: gridHeight }}
+            TableProps={{ height: mainDivHeight - 190 }}
             rows={queueListingData}
             columnExtensions={[
               ...QueueColumnExtensions,
@@ -449,7 +450,7 @@ const Grid = ({
         {filter === StatusIndicator.APPOINTMENT && (
           <CommonTableGrid
             size='sm'
-            TableProps={{ height: gridHeight }}
+            TableProps={{ height: mainDivHeight - 190 }}
             rows={queueListingData}
             columnExtensions={[
               ...ApptColumnExtensions,
@@ -495,6 +496,7 @@ const Grid = ({
 export default connect(({ queueLog, global, loading, user, codetable }) => ({
   user,
   codetable,
+  mainDivHeight: global.mainDivHeight,
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
