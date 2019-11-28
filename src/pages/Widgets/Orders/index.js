@@ -107,7 +107,6 @@ class Orders extends PureComponent {
   render () {
     const { state, props } = this
     const { theme, classes, orders, className, codetable } = props
-
     return (
       <div className={className}>
         <Detail {...props} />
