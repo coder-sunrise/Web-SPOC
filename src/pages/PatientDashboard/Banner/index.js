@@ -447,8 +447,8 @@ class Banner extends PureComponent {
               header={
                 <div>
                   <b style={{ color: 'darkblue' }}>Scheme </b>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
-                    .length > 0 && (
+                  {(entity.patientScheme || [])
+                    .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
                     <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>

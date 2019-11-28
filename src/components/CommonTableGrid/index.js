@@ -173,23 +173,22 @@ class CommonTableGrid extends PureComponent {
       [classes.tableStriped]: oddEven,
       [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
-    this.TableComponent = ({ ...restProps }) => {
+    const TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
     }
 
-    // this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
-    //   return height ? (
-    //     <VirtualTable
-    //       {...restProps}
-    //       height={height}
-    //       // height='auto'
-    //       tableComponent={TableComponent}
-    //     />
-    //   ) : (
-    //     <Table {...restProps} tableComponent={TableComponent} />
-    //   )
-    // }
+    this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
+      return height ? (
+        <VirtualTable
+          tableComponent={TableComponent}
+          {...restProps}
+          height={height}
+        />
+      ) : (
+        <Table tableComponent={TableComponent} {...restProps} />
+      )
+    }
 
     this.TableRow = ({ row, tableRow, ...restProps }) => {
       return (
@@ -310,7 +309,6 @@ class CommonTableGrid extends PureComponent {
           },
           footer: {
             fontSize: 'inherit',
-            color: 'inherit',
           },
         },
         EditCell: {
@@ -708,7 +706,6 @@ class CommonTableGrid extends PureComponent {
       global,
       loading,
       gridId,
-      extraCellConfig,
     } = this.props
 
     const {
@@ -831,7 +828,7 @@ class CommonTableGrid extends PureComponent {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
-      c.control = extraCellConfig
+
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
           c.align = 'right'
@@ -882,7 +879,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-    const TableCmpt = height ? VirtualTable : Table
+
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -992,15 +989,9 @@ class CommonTableGrid extends PureComponent {
               <RowErrorTypeProvider {...cellComponentConfig} /> */}
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
-              {/* <TableBase
+              <TableBase
                 // height={height}
                 rowComponent={this.TableRow}
-                {...tableProps}
-              /> */}
-              <TableCmpt
-                height={height}
-                rowComponent={this.TableRow}
-                tableComponent={this.TableComponent}
                 {...tableProps}
               />
               {selectable && (

@@ -65,7 +65,7 @@ module.exports = {
   },
 
   queryDrugLabelsDetails: async (visitId) => {
-    const r = await request(`${url}/DrugLabels/${visitId}`, {
+    const r = await request(`${url}/DrugLabelByVisitID/${visitId}`, {
       method: 'GET',
     })
     return r

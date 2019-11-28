@@ -54,6 +54,8 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
+initClinicSettings()
+
 // setInterval(() => {
 //   console.log(document.activeElement)
 // }, 2000)
@@ -113,7 +115,6 @@ const sessionTimeoutTimer = 15 * 60 * 1000
 class BasicLayout extends React.PureComponent {
   constructor (props) {
     super(props)
-    initClinicSettings()
     this.state = {
       mobileOpen: false,
       authorized: false,
@@ -278,36 +279,6 @@ class BasicLayout extends React.PureComponent {
     await dispatch({
       type: 'codetable/fetchAllCachedCodetable',
     })
-    const getClinicSettings = sessionStorage.getItem('clinicSettings')
-    const getClinicInfo = sessionStorage.getItem('clinicInfo')
-    if (getClinicSettings === null) {
-      await dispatch({
-        type: 'clinicSettings/query',
-      })
-    } else {
-      const parsedClinicSettings = JSON.parse(getClinicSettings)
-      dispatch({
-        type: 'clinicSettings/updateState',
-        payload: {
-          settings: parsedClinicSettings,
-        },
-      })
-    }
-
-    if (getClinicInfo == null) {
-      await dispatch({
-        type: 'clinicInfo/query',
-        payload: localStorage.getItem('clinicCode'),
-      })
-    } else {
-      const parsedClinicInfo = JSON.parse(getClinicInfo)
-      dispatch({
-        type: 'clinicInfo/updateState',
-        payload: {
-          ...parsedClinicInfo,
-        },
-      })
-    }
 
     // console.log(routes, authority)
     const menus = await dispatch({

@@ -649,7 +649,6 @@ class Main extends React.Component {
       rights,
       ...resetProps
     } = this.props
-
     const { entity } = consultation
     const { entity: vistEntity } = visitRegistration
     if (!vistEntity) return null
@@ -659,7 +658,6 @@ class Main extends React.Component {
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
-    // console.log(rights)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'
@@ -674,6 +672,7 @@ class Main extends React.Component {
         <Authorized.Context.Provider value={matches}>
           <Layout
             {...this.props}
+            rights={matches.rights}
             onSaveLayout={this.saveLayout}
             onLoadTemplate={this.loadTemplate}
             onSaveTemplate={this.saveTemplate}
