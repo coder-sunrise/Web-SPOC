@@ -20,6 +20,7 @@ class Eraser extends FabricCanvasTool {
     if (obj) {
       obj.set({
         id: 'delete',
+        removeObject: true,
       })
       canvas.remove(obj)
     }
@@ -32,6 +33,7 @@ class Eraser extends FabricCanvasTool {
     if (obj) {
       obj.set({
         id: 'delete',
+        removeObject: true,
       })
       canvas.remove(obj)
     }

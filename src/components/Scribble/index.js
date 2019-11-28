@@ -171,6 +171,7 @@ class Scribble extends React.Component {
       selectColor: false,
       eraserColor: false,
       templateList: [],
+      isScribbleNoteDataNull: true,
     }
   }
 
@@ -199,6 +200,10 @@ class Scribble extends React.Component {
     if (this.props.scribbleData !== '') {
       if (this.props.scribbleData.scribbleNoteLayers.length > 0) {
         this._sketch.initializeData(this.props.scribbleData.scribbleNoteLayers)
+        this.setState({
+          canClear: true,
+          isScribbleNoteDataNull: false,
+        })
       }
     }
   }
@@ -289,6 +294,7 @@ class Scribble extends React.Component {
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
       canClear: false,
+      isScribbleNoteDataNull: true,
     })
   }
 
@@ -305,11 +311,11 @@ class Scribble extends React.Component {
     this._sketch.downloadImage()
   }
 
-  _onSketchChange = () => {
+  _onSketchChange = (action) => {
     const prev = this.state.canUndo
     const now = this._sketch.canUndo()
 
-    if (prev !== now) {
+    if (prev !== now || action === 'deleteAction') {
       this.setState({
         canUndo: now,
         hideEnable: false,
@@ -317,9 +323,16 @@ class Scribble extends React.Component {
       this._sketch.hideDrawing(false)
     }
 
-    this.setState({
-      canClear: now,
-    })
+    if (this.state.isScribbleNoteDataNull) {
+      this.setState({
+        canClear: now,
+      })
+    } else {
+      this.setState({
+        canClear: true,
+      })
+    }
+
     this.props.setFieldValue('drawing', 'dirty')
   }
 
@@ -436,6 +449,7 @@ class Scribble extends React.Component {
         textColor: false,
       })
     }
+    this._onSketchChange('deleteAction')
   }
 
   render () {

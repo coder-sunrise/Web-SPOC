@@ -273,6 +273,7 @@ class SketchField extends PureComponent {
     if (obj) {
       obj.set({
         id: 'delete',
+        removeObject: true,
       })
       canvas.remove(obj)
       result = true
@@ -693,6 +694,7 @@ class SketchField extends PureComponent {
           canvas.bringToFront(mainObject)
         }
       }
+      history.reset()
     }, 400)
   }
 

@@ -8,6 +8,7 @@ class History {
     this.originalList = []
     this.undoList = []
     this.redoList = []
+    this.tempUndoList = []
     this.saveLayerList = []
     this.current = null
     this.debug = debug
@@ -66,29 +67,14 @@ class History {
       let [
         mainObject,
       ] = obj
-      // if (mainObject.id !== 'delete' && mainObject.id !== 'oldTemplate') {
-      //   this.redoList = []
-      //   this.allList.push({
-      //     data: obj,
-      //     type: mainObject.type,
-      //     sequence: this.count,
-      //   })
-      //   this.count = this.count + 1
-      // } else
 
       if (mainObject.id === 'delete' || mainObject.id === 'oldTemplate') {
         for (let i = 0; i < this.saveLayerList.length; i++) {
-          // let [
-          //   arrayobject,
-          // ] = this.allList[i].layerContent
           let arrayobject = this.saveLayerList[i].layerContent
           if (arrayobject === JSON.stringify(mainObject)) {
             let temp = this.saveLayerList
             this.saveLayerList = []
             for (let a = 0; a < temp.length; a++) {
-              // let [
-              //   tempArrayObject,
-              // ] = temp[a].layerContent
               let tempArrayObject = temp[a].layerContent
               if (tempArrayObject !== JSON.stringify(mainObject)) {
                 this.saveLayerList.push(temp[a])
@@ -162,27 +148,8 @@ class History {
    */
   undo () {
     try {
-      const [
-        mainObject,
-      ] = this.current
       if (this.current) {
         this.redoList.push(this.current)
-
-        const [
-          mainObject2,
-        ] = this.current
-
-        // for (let i = 0; i < this.saveLayerList.length; i++) {
-        //   if (this.saveLayerList[i].layerContent === JSON.stringify(mainObject)) {
-        //     let temp = this.saveLayerList
-        //     this.saveLayerList = []
-        //     for (let a = 0; a < temp.length; a++) {
-        //       if (temp[a].layerContent !== JSON.stringify(mainObject)) {
-        //         this.saveLayerList.push(temp[a])
-        //       }
-        //     }
-        //   }
-        // }
 
         if (this.redoList.length > this.undoLimit) {
           this.redoList.shift()
@@ -210,16 +177,7 @@ class History {
       if (this.redoList.length > 0) {
         if (this.current) this.undoList.push(this.current)
         this.current = this.redoList.pop()
-        let [
-          mainObject,
-        ] = this.current
-        // this.saveLayerList.push({
-        //   layerType: mainObject.type,
-        //   layerNumber: this.count,
-        //   layerContent: JSON.stringify(mainObject),
-        //   templateFK: null,
-        // })
-        // this.count = 0
+
         return this.current
       }
       return null
@@ -249,8 +207,31 @@ class History {
   /**
    * Clears the history maintained, can be undone
    */
+  reset () {
+    this.tempUndoList.push(this.current)
+    for (let i = 0; i < this.undoList.length; i++) {
+      this.tempUndoList.push(this.undoList[i])
+    }
+    this.undoList = []
+    this.redoList = []
+    this.current = null
+    this.count = 0
+  }
+
   clear () {
     // this.undoList = []
+    if (this.tempUndoList.length > 0) {
+      if (this.undoList > 0) {
+        for (let i = 0; i < this.undoList.length; i++) {
+          this.tempUndoList.push(this.undoList[i])
+        }
+      }
+
+      this.undoList = []
+      this.undoList = this.tempUndoList
+
+      this.tempUndoList = []
+    }
     for (let i = 0; i < this.undoList.length; i++) {
       let [
         undoObj,
@@ -272,9 +253,8 @@ class History {
     })
 
     this.current = this.originalList[this.originalList.length - 1]
-    // this.originalList = []
+
     this.redoList = []
-    // this.saveLayerList = []
     this.print()
   }
 
