@@ -187,7 +187,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientHistory',
-
+    disableDeleteWarning: true,
     layoutConfig: {
       style: {
         padding: 5,
