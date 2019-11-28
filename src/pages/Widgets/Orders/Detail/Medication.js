@@ -668,6 +668,7 @@ class Medication extends PureComponent {
                             render={(args) => {
                               return (
                                 <NumberInput
+                                  precision={0}
                                   label={formatMessage({
                                     id: 'inventory.master.setting.duration',
                                   })}
