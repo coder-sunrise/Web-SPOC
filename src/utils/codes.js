@@ -1483,9 +1483,10 @@ const tagList = [
           index < patient.entity.patientAllergy.length;
           index++
         ) {
-          patientAllergy =
-            (patientAllergy ? `${patientAllergy}, ` : '') +
-            patient.entity.patientAllergy[index].allergyName
+          if (patient.entity.patientAllergy[index].type === 'Allergy')
+            patientAllergy =
+              (patientAllergy ? `${patientAllergy}, ` : '') +
+              patient.entity.patientAllergy[index].allergyName
         }
         result = `Patient Name: ${patient.entity.name}`
         result += `<br/>Patient Ref. No.: ${patient.entity.patientReferenceNo}`
