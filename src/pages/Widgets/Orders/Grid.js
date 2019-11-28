@@ -268,18 +268,12 @@ export default ({
                     </span>
                     {c1}
                     {isEnableGST && (
-                      <Field
-                        name='isGstInclusive'
-                        render={(args) => (
-                          <Checkbox
-                            simple
-                            label={formatMessage({
-                              id: 'app.general.inclusiveGST',
-                            })}
-                            onChange={handleInclusiveGST}
-                            {...args}
-                          />
-                        )}
+                      <Checkbox
+                        simple
+                        label={formatMessage({
+                          id: 'app.general.inclusiveGST',
+                        })}
+                        onChange={handleInclusiveGST}
                       />
                     )}
                     {c2}

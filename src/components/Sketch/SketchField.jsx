@@ -150,7 +150,7 @@ class SketchField extends PureComponent {
       return
     }
     // if(e.target.type != "image"){
-    if (e.target.id !== 'SKIP' ) {
+    if (e.target.id !== 'SKIP') {
       let obj = e.target
       obj.__version = 1
       // record current object state as json and save as originalState
@@ -170,19 +170,20 @@ class SketchField extends PureComponent {
   getAllLayerData = () => {
     let canvas = this._fc
     let filterList = this._history.getSaveLayerList()
-    let objects = canvas.getObjects();
-    let exist = false;
+    let objects = canvas.getObjects()
+    let exist = false
 
-
-    for(let i = 0; i < filterList.length; i++){
-      for(let a = 0; a < objects.length; a++ ){
-  
-        if(filterList[i].layerContent === JSON.stringify(objects[a].__originalState)){
+    for (let i = 0; i < filterList.length; i++) {
+      for (let a = 0; a < objects.length; a++) {
+        if (
+          filterList[i].layerContent ===
+          JSON.stringify(objects[a].__originalState)
+        ) {
           exist = true
         }
       }
-      if(exist === false){
-        filterList.splice(i,1)
+      if (exist === false) {
+        filterList.splice(i, 1)
       }
       exist = false
     }
@@ -204,8 +205,6 @@ class SketchField extends PureComponent {
       // let decodeObject = JSON.parse(allList[i].layerContent)
 
       let obj = JSON.parse(allList[i].layerContent)
-
-
 
       initializeData.objects.push(obj)
 
@@ -267,11 +266,26 @@ class SketchField extends PureComponent {
     ])
   }
 
+  _deleteSelectedObject = () => {
+    const canvas = this._fc
+    let result = false
+    let obj = canvas.getActiveObject()
+    if (obj) {
+      obj.set({
+        id: 'delete',
+        removeObject: true,
+      })
+      canvas.remove(obj)
+      result = true
+    }
+    return result
+  }
+
   /**
    * Action when an object is removed from the canvas
    */
   _onObjectRemoved = (e) => {
-    let obj = e.target
+    const obj = e.target
     let canvas = this._fc
     if (obj.id === 'delete' || obj.id === 'oldTemplate') {
       let activeObj = obj
@@ -350,7 +364,7 @@ class SketchField extends PureComponent {
       const objects = canvas.getObjects()
       const newObj = objects[objects.length - 1]
       if (newObj && newObj.__version === 1) {
-        newObj.__originalState = newObj.toJSON()
+        //  newObj.__originalState = newObj.toJSON()
       }
     }
     if (this.props.onChange) {
@@ -481,17 +495,16 @@ class SketchField extends PureComponent {
       prevState,
     ] = history.getCurrent()
 
-
-    let objects = canvas.getObjects();
+    let objects = canvas.getObjects()
 
     history.undo()
     if (obj.__removed) {
       this.setState({ action: false }, () => {
         this._fc.add(obj)
         if (obj.zindex != null) {
-          if(obj.zindex === -100){
+          if (obj.zindex === -100) {
             canvas.sendToBack(obj)
-          }else{
+          } else {
             canvas.moveTo(obj, obj.zindex)
           }
         }
@@ -503,6 +516,14 @@ class SketchField extends PureComponent {
     } else {
       obj.__version -= 1
       obj.setOptions(JSON.parse(prevState))
+      // const initializeData = { objects: [] }
+      // initializeData.objects.push(JSON.parse(prevState))
+      // this._fc.loadFromJSON(initializeData, () => {
+      //   this._fc.renderAll()
+      //   // if (this.props.onChange) {
+      //   //   this.props.onChange()
+      //   // }
+      // })
       obj.setCoords()
       this._fc.renderAll()
     }
@@ -522,10 +543,10 @@ class SketchField extends PureComponent {
       let [
         obj,
         currState,
+        prevState,
       ] = history.redo()
-      
 
-      if(obj.removeObject === true){
+      if (obj.removeObject === true) {
         this._fc.remove(obj)
         return
       }
@@ -534,17 +555,25 @@ class SketchField extends PureComponent {
         this.setState({ action: false }, () => {
           canvas.add(obj)
           if (obj.zindex != null) {
-            if(obj.zindex === -100){
+            if (obj.zindex === -100) {
               canvas.sendToBack(obj)
-            }else{
+            } else {
               canvas.moveTo(obj, obj.zindex)
             }
           }
           obj.__version = 1
         })
-      }else  {
+      } else {
         obj.__version += 1
-        obj.setOptions(JSON.parse(currState))
+        obj.setOptions(JSON.parse(prevState))
+        // const initializeData = { objects: [] }
+        // initializeData.objects.push(JSON.parse(prevState))
+        // this._fc.loadFromJSON(initializeData, () => {
+        //   this._fc.renderAll()
+        //   // if (this.props.onChange) {
+        //   //   this.props.onChange()
+        //   // }
+        // })
       }
       obj.setCoords()
       canvas.renderAll()
@@ -665,6 +694,7 @@ class SketchField extends PureComponent {
           canvas.bringToFront(mainObject)
         }
       }
+      history.reset()
     }, 400)
   }
 
@@ -755,7 +785,7 @@ class SketchField extends PureComponent {
    */
   setBackgroundFromDataUrl = (dataUrl) => {
     let canvas = this._fc
-    let { indexCount , templateSet} = this.state
+    let { indexCount, templateSet } = this.state
     let history = this._history
     let oldIndexCount = indexCount
     let newIndexCount = indexCount + 1
@@ -778,14 +808,13 @@ class SketchField extends PureComponent {
       canvas.add(imgbase64)
       imgbase64.selectable = false
       imgbase64.evented = false
-      
 
-      if(!templateSet){
+      if (!templateSet) {
         this.setState({
           templateSet: true,
         })
         canvas.sendToBack(imgbase64)
-      }else{
+      } else {
         canvas.moveTo(imgbase64, oldIndexCount)
       }
 
@@ -818,7 +847,7 @@ class SketchField extends PureComponent {
     let allList = history.getOriginalList()
     let prevTemplate = ''
 
-    if(!templateSet){
+    if (!templateSet) {
       this.setState({
         templateSet: true,
       })
@@ -903,7 +932,6 @@ class SketchField extends PureComponent {
     //   id: 'template',
     // })
 
-
     link.click()
   }
 
@@ -921,10 +949,10 @@ class SketchField extends PureComponent {
       top: options.top,
       fill: color,
     })
-    iText.editable = false
+    iText.editable = true
     canvas.add(iText).setActiveObject(iText)
-    //iText.enterEditing()
-    //iText.selectAll()
+    iText.enterEditing()
+    iText.selectAll()
   }
 
   componentDidMount = () => {

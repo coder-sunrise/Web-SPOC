@@ -66,6 +66,9 @@ const PaymentActions = ({
       {type === PayerType.COPAYER_REAL && (
         <Button
           onClick={() => handleTransferClick(invoicePayerFK, type)}
+          disabled={
+            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
+          }
           {...ButtonProps}
         >
           <RepeatIcon />

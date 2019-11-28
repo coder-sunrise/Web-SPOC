@@ -160,7 +160,7 @@ class Details extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, orders, dispatch } = props
+    const { classes, orders, dispatch, fromDispense } = props
     const { type } = orders
 
     const cfg = {
@@ -173,6 +173,12 @@ class Details extends PureComponent {
       ...props,
     }
 
+    let orderTypeArray = orderTypes
+    if (fromDispense) {
+      orderTypeArray = orderTypes.filter(
+        (o) => o.value !== '2' && o.value !== '6',
+      )
+    }
     return (
       <div>
         <div className={classes.detail}>
@@ -180,7 +186,7 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={orderTypes.map((o) => {
+                options={orderTypeArray.map((o) => {
                   return {
                     id: o.value,
                     name: o.name,

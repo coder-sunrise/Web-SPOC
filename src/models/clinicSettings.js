@@ -10,7 +10,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      settings: JSON.parse(sessionStorage.getItem('clinicSettings') || '{}'),
+      settings: JSON.parse(localStorage.getItem('clinicSettings') || '{}'),
     },
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
@@ -52,7 +52,7 @@ export default createFormViewModel({
         })
 
         const clinicSettingsSessionData = JSON.stringify(settings)
-        sessionStorage.setItem('clinicSettings', clinicSettingsSessionData)
+        localStorage.setItem('clinicSettings', clinicSettingsSessionData)
 
         return {
           settings,
