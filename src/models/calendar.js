@@ -526,7 +526,38 @@ export default createListViewModel({
         return { ...state, currentViewDate: payload }
       },
       setViewAppointment (state, { data }) {
-        return { ...state, currentViewAppointment: { ...data } }
+        const { appointments = [] } = data
+
+        let newAppointments = appointments.map((o) => {
+          const { appointments_Resources = [] } = o
+          let newRes = appointments_Resources.map((m) => {
+            const { startTime = '', endTime = '' } = m
+            const startMoment = moment(
+              `${moment().format('YYYY MM DD')} ${startTime}`,
+            )
+            const endMoment = moment(
+              `${moment().format('YYYY MM DD')} ${endTime}`,
+            )
+
+            let difMinute = endMoment.diff(startMoment, 'minutes')
+            const difH = parseInt(difMinute / 60, 10)
+            const difM = difMinute % 60
+
+            return {
+              ...m,
+              apptDurationHour: difH,
+              apptDurationMinute: difM,
+            }
+          })
+          return {
+            ...o,
+            appointments_Resources: newRes,
+          }
+        })
+        return {
+          ...state,
+          currentViewAppointment: { ...data, appointments: newAppointments },
+        }
       },
       setCalendarView (state, { payload }) {
         return { ...state, calendarView: payload }

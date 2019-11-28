@@ -120,24 +120,6 @@ const PatientInfoInput = ({
               {...args}
               disabled={isRegisteredPatient || disabled || isEdit}
             />
-            // <NumberInput
-            //   {...args}
-            //   disabled={isRegisteredPatient || disabled || isEdit}
-            //   label='Contact No.'
-            // />
-          )}
-        />
-      </GridItem>
-      <GridItem xs md={6}>
-        <FastField
-          name='appointmentStatusFk'
-          render={(args) => (
-            <CodeSelect
-              {...args}
-              disabled
-              code='ltappointmentstatus'
-              label='Appointment Status'
-            />
           )}
         />
       </GridItem>

@@ -121,6 +121,7 @@ class AntdSelect extends React.PureComponent {
       max,
       allValue,
       value,
+      disableAll,
     } = props
     this.myRef = React.createRef()
 
@@ -140,9 +141,9 @@ class AntdSelect extends React.PureComponent {
       ) {
         if (v.indexOf(allValue) >= 0 && options.length > 1 && v.length === 1) {
           v = [
-            allValue,
             ...options.map((o) => o[valueField]),
           ]
+          if (disableAll === false) v.unshift(allValue)
           form.setFieldValue(field.name, v)
         }
       }
@@ -166,9 +167,10 @@ class AntdSelect extends React.PureComponent {
           v.length === 1
         ) {
           v = [
-            allValue,
             ...options.map((o) => o[valueField]),
           ]
+
+          if (disableAll === false) v.unshift(allValue)
         }
       }
     }
@@ -368,6 +370,7 @@ class AntdSelect extends React.PureComponent {
       query,
       valueField,
       maxSelected,
+      disableAll,
     } = this.props
     let newVal = val
     if (

@@ -481,7 +481,7 @@ class Appointment extends React.PureComponent {
           onClose={this.closeAppointmentForm}
           onConfirm={this.closeAppointmentForm}
           showFooter={false}
-          maxWidth='lg'
+          maxWidth='xl'
           overrideLoading
           observe='AppointmentForm'
         >
