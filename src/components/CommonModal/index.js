@@ -40,6 +40,7 @@ class CommonModal extends React.PureComponent {
 
   static defaultProps = {
     open: false,
+    maxWidth: 'md',
   }
 
   static propTypes = {

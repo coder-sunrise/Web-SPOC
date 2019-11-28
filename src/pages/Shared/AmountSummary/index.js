@@ -83,7 +83,7 @@ class AmountSummary extends PureComponent {
 
     this.setState((prevState) => {
       const newState = calculateAmount(rows, adjustments, config)
-      console.log(newState, config)
+
       if (prevState.summary.totalWithGST !== newState.summary.totalWithGST) {
         onValueChanged(newState)
       }
