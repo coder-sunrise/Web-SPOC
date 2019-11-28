@@ -140,10 +140,11 @@ const styles = (theme) => ({
   // handleSubmit: () => {},
   // displayName: 'PatientHistory',
 })
-@connect(({ patientHistory, clinicSettings, codetable }) => ({
+@connect(({ patientHistory, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
   codetable,
+  user,
 }))
 class PatientHistory extends Component {
   state = {
@@ -501,6 +502,8 @@ class PatientHistory extends Component {
       dispatch,
       widget,
       showEditPatient,
+      codetable,
+      user,
     } = this.props
     const { entity, selected, patientID } = patientHistory
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
@@ -552,9 +555,6 @@ class PatientHistory extends Component {
                   size='sm'
                   onClick={() => {
                     dispatch({
-                      type: 'patient/closePatientModal',
-                    })
-                    dispatch({
                       type: `consultation/edit`,
                       payload: {
                         id: selected.id,
@@ -562,12 +562,45 @@ class PatientHistory extends Component {
                       },
                     }).then((o) => {
                       if (o) {
-                        dispatch({
-                          type: 'patient/closePatientModal',
-                        })
-                        router.push(
-                          `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                        )
+                        if (o.updateByUserFK !== user.data.id) {
+                          const { clinicianprofile = [] } = codetable
+                          const version = Date.now()
+                          const editingUser = clinicianprofile.find(
+                            (m) => m.userProfileFK === o.updateByUserFK,
+                          ) || {
+                            name: 'Someone',
+                          }
+                          dispatch({
+                            type: 'global/updateAppState',
+                            payload: {
+                              openConfirm: true,
+                              openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                              onConfirmSave: () => {
+                                dispatch({
+                                  type: `consultation/overwrite`,
+                                  payload: {
+                                    id: selected.id,
+                                    version,
+                                  },
+                                }).then((c) => {
+                                  dispatch({
+                                    type: 'patient/closePatientModal',
+                                  })
+                                  router.push(
+                                    `/reception/queue/consultation?pid=${patientID}&cid=${c.id}&v=${version}`,
+                                  )
+                                })
+                              },
+                            },
+                          })
+                        } else {
+                          dispatch({
+                            type: 'patient/closePatientModal',
+                          })
+                          router.push(
+                            `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                          )
+                        }
                       }
                     })
                   }}
