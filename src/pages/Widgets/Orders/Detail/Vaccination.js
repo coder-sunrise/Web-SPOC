@@ -133,7 +133,6 @@ class Vaccination extends PureComponent {
     setFieldValue('vaccinationName', op.displayValue)
     setFieldValue('vaccinationCode', op.code)
 
-    this.calculateQuantity(op)
     if (op.sellingPrice) {
       setFieldValue('unitPrice', op.sellingPrice)
       setFieldValue('totalPrice', op.sellingPrice * values.quantity)
@@ -150,6 +149,9 @@ class Vaccination extends PureComponent {
         defaultBatch ? defaultBatch.expiryDate : undefined,
       )
     }
+    setTimeout(() => {
+      this.calculateQuantity(op)
+    }, 1)
   }
 
   calculateQuantity = (vaccination) => {

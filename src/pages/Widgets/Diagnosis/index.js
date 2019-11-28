@@ -60,7 +60,6 @@ const styles = (theme) => ({})
 // })
 @connect(({ diagnosis, components, codetable, consultation }) => ({
   diagnosis,
-  components,
   codetable,
   consultation,
 }))
@@ -113,7 +112,7 @@ class Diagnosis extends PureComponent {
   }
 
   render () {
-    const { theme, components, diagnosis } = this.props
+    const { theme, diagnosis, rights } = this.props
     return (
       <div>
         <FieldArray
@@ -129,14 +128,9 @@ class Diagnosis extends PureComponent {
             // if (values.corDiagnosis.length <= 0) {
             //   this.addDiagnosis()
             // }
-
             if (this.diagnosises.length === 0) {
               // if(!values.disabled)
-              if (
-                components &&
-                components.ConsultationPage &&
-                components.ConsultationPage.rights === 'enable'
-              ) {
+              if (rights === 'enable') {
                 this.addDiagnosis(1)
                 return null
               }

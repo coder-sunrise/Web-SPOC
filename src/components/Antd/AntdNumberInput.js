@@ -14,9 +14,6 @@ import { isNumber } from 'util'
 import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc, roundTo } from '@/utils/utils'
-import config from '@/utils/config'
-
-const { currencyFormat, percentageFormat, currencySymbol } = config
 
 const STYLES = () => {
   return {
@@ -379,8 +376,7 @@ class AntdNumberInput extends React.PureComponent {
         precisionStr += '0'
       }
       if (currency) {
-        format =
-          `${currencySymbol}0,0` + (precisionStr.length > 1 ? precisionStr : '')
+        format = `$0,0` + (precisionStr.length > 1 ? precisionStr : '')
       } else {
         format = `0` + (precisionStr.length > 1 ? precisionStr : '')
       }

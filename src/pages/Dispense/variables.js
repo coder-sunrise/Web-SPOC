@@ -79,14 +79,22 @@ export const PrescriptionColumnExtensions = (
     columnName: 'dispensedQuanity',
     type: 'number',
     render: (row) => {
-      return <p>{row.dispensedQuanity} Strips</p>
+      return (
+        <p>
+          {row.dispensedQuanity} {row.dispenseUOM}
+        </p>
+      )
     },
   },
   {
     columnName: 'orderedQuantity',
     type: 'number',
     render: (row) => {
-      return <p>{row.orderedQuantity} Strips</p>
+      return (
+        <p>
+          {row.orderedQuantity} {row.orderUOM}
+        </p>
+      )
     },
   },
   {

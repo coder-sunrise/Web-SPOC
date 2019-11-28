@@ -40,6 +40,7 @@ import MedicalCertificate from './MedicalCertificate'
 import CertificateAttendance from './CertificateAttendance'
 import Others from './Others'
 import VaccinationCertificate from './VaccinationCertificate'
+import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const loadFromCodesConfig = {
   mapPrescriptions: (rows, codetable, patient, isExtPrescription = false) => {
@@ -103,9 +104,9 @@ const loadFromCodesConfig = {
         isExtPrescription,
       )
       return `<ul>
-              <li><p><strong>${isExtPrescription
+              <li><strong>${isExtPrescription
                 ? 'External Prescription'
-                : 'Medication'}</strong></p></li>
+                : 'Medication'}</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -137,7 +138,7 @@ const loadFromCodesConfig = {
       })
     if (vRows && vRows.length > 0)
       return `<ul>
-              <li><p><strong>Vaccination</strong></p></li>
+              <li><strong>Vaccination</strong></li>
               ${vRows.join('')}
             </ul>`
     return ''
@@ -152,11 +153,61 @@ const loadFromCodesConfig = {
         patient,
       )
       return `<ul>
-              <li><p><strong>Open Prescription</strong></p></li>
+              <li><strong>Open Prescription</strong></li>
               ${rowHTMLs.join('')}
            </ul>`
     }
     return ''
+  },
+
+  InsertConsumable: (rows, codetable, patient) => {
+    const pRows = rows.filter((o) => !o.isDeleted && o.type === '4')
+    if (pRows && pRows.length > 0) {
+      const rowHTMLs = pRows.map((o) => {
+        const {
+          consumableName = '',
+          unitOfMeasurement = '',
+          quantity = 0,
+          remarks = '',
+        } = o
+
+        const qtyFormatStr = numeral(quantity).format(qtyFormat)
+        const subjectHtml = `<li> - ${consumableName}</li>`
+        const qtyHtml = `<li>Quantity: ${qtyFormatStr} ${unitOfMeasurement}</li>`
+        const remarksHtml = remarks !== '' ? `<li>${remarks}</li>` : ''
+
+        return `<ul>${subjectHtml} <ul>${qtyHtml}${remarksHtml}</ul></ul>`
+      })
+
+      return `<ul>
+              <li><strong>Consumable</strong></li>
+              ${rowHTMLs.join('')}
+           </ul>`
+    }
+    return ''
+  },
+
+  InsertPatientInfo: (codetable, patient) => {
+    let result
+    let patientGender = codetable.ctgender.find(
+      (x) => x.id === patient.genderFK,
+    )
+    let patientAllergy
+    for (let index = 0; index < patient.patientAllergy.length; index++) {
+      patientAllergy =
+        (patientAllergy ? `${patientAllergy}, ` : '') +
+        patient.patientAllergy[index].allergyName
+    }
+    result = `Patient Name: ${patient.name}`
+    result += `<br/>Patient Ref. No.: ${patient.patientReferenceNo}`
+    result += `<br/>Patient Acc. No.: ${patient.patientAccountNo}`
+    result += `<br/>Gender/Age: ${patientGender.name.substring(
+      0,
+      1,
+    )}/${calculateAgeFromDOB(patient.dob)}`
+
+    result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+    return result
   },
   loadFromCodes: [
     {
@@ -197,10 +248,13 @@ const loadFromCodesConfig = {
           loadFromCodesConfig.InsertMedication(rows, codetable, patient, false),
           loadFromCodesConfig.InsertVaccination(rows, codetable, patient),
           loadFromCodesConfig.InsertOpenPrescription(rows, codetable, patient),
+          loadFromCodesConfig.InsertConsumable(rows, codetable, patient),
           service,
         ]
 
-        return ordersHTML.join('<p/>')
+        let htmls = ordersHTML.join('')
+        console.log(htmls)
+        return htmls
       },
     },
     {
@@ -217,6 +271,13 @@ const loadFromCodesConfig = {
           patient,
           true,
         )
+      },
+    },
+    {
+      value: 'patientInfo',
+      name: 'Patient Info',
+      getter: (v, codetable, patient) => {
+        return loadFromCodesConfig.InsertPatientInfo(codetable, patient)
       },
     },
   ],
@@ -307,6 +368,7 @@ class AddConsultationDocument extends PureComponent {
       consultation,
       codetable,
       patient,
+      values,
     } = this.props
     const { documenttemplate = [] } = codetable
     // console.log({ documenttemplate })
@@ -347,13 +409,19 @@ class AddConsultationDocument extends PureComponent {
               ? option.getter(entity, codetable, patient.entity)
               : Object.byString(entity, option.value) || '-'
             const blocksFromHTML = convertFromHTML(htmlDecodeByRegExp(v))
-            const { editorState } = editor.props
-            editor.update(
-              RichEditor.insertBlock(editorState, blocksFromHTML.contentBlocks),
-            )
-            setTimeout(() => {
-              editor.focus()
-            }, 1)
+            console.log(editor)
+            if (editor && editor.props) {
+              const { editorState } = editor.props
+              editor.update(
+                RichEditor.insertBlock(
+                  editorState,
+                  blocksFromHTML.contentBlocks,
+                ),
+              )
+              setTimeout(() => {
+                editor.focus()
+              }, 1)
+            }
           }}
         >
           Load From

@@ -103,7 +103,7 @@ class PrintDrugLabelWrapper extends React.Component {
     if (data) {
       const drugLabelDetail = [
         {
-          PatientName: data.name,
+          PatientName: data.patientName,
           PatientReferenceNo: data.patientReferenceNo,
           PatientAccountNo: data.patientAccountNo,
           ClinicName: data.clinicName,
@@ -119,7 +119,7 @@ class PrintDrugLabelWrapper extends React.Component {
           BatchNo:
             row.batchNo && Array.isArray(row.batchNo)
               ? row.batchNo[0]
-              : undefined,
+              : row.batchNo,
         },
       ]
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
@@ -136,7 +136,7 @@ class PrintDrugLabelWrapper extends React.Component {
         data.map((o) => {
           const prescription = prescriptions.find((p) => p.id === o.id)
           return {
-            PatientName: o.name,
+            PatientName: o.patientName,
             PatientReferenceNo: o.patientReferenceNo,
             PatientAccountNo: o.patientAccountNo,
             ClinicName: o.clinicName,
@@ -152,7 +152,7 @@ class PrintDrugLabelWrapper extends React.Component {
             BatchNo:
               prescription && Array.isArray(prescription.batchNo)
                 ? prescription.batchNo[0]
-                : undefined,
+                : prescription.batchNo,
           }
         }),
       )

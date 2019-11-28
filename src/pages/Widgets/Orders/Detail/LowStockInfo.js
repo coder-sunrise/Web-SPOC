@@ -1,7 +1,7 @@
 import numeral from 'numeral'
 import { Info } from '@material-ui/icons'
 import { qtyFormat } from '@/utils/config'
-import { IconButton, Popover } from '@/components'
+import { IconButton, Popover, Tooltip } from '@/components'
 
 const LowStockInfo = ({ sourceType, values, codetable }) => {
   const {
@@ -61,16 +61,18 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
         </div>
       }
     >
-      <IconButton
-        style={{
-          position: 'absolute',
-          bottom: 2,
-          right: -5,
-        }}
-        size='medium'
-      >
-        <Info color={isLowStock ? 'error' : 'primary'} />
-      </IconButton>
+      <Tooltip title='Low Stock'>
+        <IconButton
+          style={{
+            position: 'absolute',
+            bottom: 2,
+            right: -5,
+          }}
+          size='medium'
+        >
+          <Info color={isLowStock ? 'error' : 'primary'} />
+        </IconButton>
+      </Tooltip>
     </Popover>
   )
 }

@@ -41,6 +41,7 @@ import Footer from 'mui-pro-components/Footer'
 import Loading from '@/components/PageLoading/index'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { initStream } from '@/utils/realtime'
+import { initClinicSettings } from '@/utils/config'
 import Authorized, { reloadAuthorized } from '@/utils/Authorized'
 import defaultSettings from '@/defaultSettings'
 
@@ -53,7 +54,7 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
-moment.locale('en')
+initClinicSettings()
 
 // setInterval(() => {
 //   console.log(document.activeElement)
@@ -321,10 +322,6 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
     this.getPageTitle = memoizeOne(this.getPageTitle)
     this.menus = menus
-    // this.forceUpdate()
-    await dispatch({
-      type: 'global/getUserSettings',
-    })
 
     this.setState({
       authorized: true,
