@@ -361,15 +361,12 @@ class PaymentDetails extends Component {
     }
   }
 
-  onTransferClick = (invoicePayerFK, payerType) => {
-    const { dispatch, invoiceDetail, invoicePayment } = this.props
+  onTransferClick = (invoicePayerFK) => {
+    const { dispatch } = this.props
     dispatch({
-      type: 'invoiceCreditNote/mapCreditNote',
+      type: 'invoicePayment/updateState',
       payload: {
-        payerType,
         invoicePayerFK,
-        invoiceDetail: invoiceDetail.entity || {},
-        invoicePaymentDetails: invoicePayment.entity || {},
       },
     })
 
@@ -400,6 +397,10 @@ class PaymentDetails extends Component {
       invoicePayerPayment,
       showAddTransfer,
     } = this.state
+
+    const transferProps = {
+      ...this.props,
+    }
 
     return (
       <div
@@ -537,8 +538,9 @@ class PaymentDetails extends Component {
           closeIconTooltip='Close Transfer'
           onConfirm={this.closeAddTransferModal}
           onClose={this.closeAddTransferModal}
+          observe='TransferDetail'
         >
-          <Transfer onRefresh={this.refresh} />
+          <Transfer onRefresh={this.refresh} {...transferProps} />
         </CommonModal>
       </div>
     )

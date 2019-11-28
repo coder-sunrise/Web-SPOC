@@ -32,9 +32,11 @@ import Visibility from '@material-ui/icons/Visibility'
 import InVisibility from '@material-ui/icons/VisibilityOff'
 import MaterialTextField from '@material-ui/core/TextField'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
+import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
+
 import {
   GridContainer,
   GridItem,
@@ -169,6 +171,7 @@ class Scribble extends React.Component {
       selectColor: false,
       eraserColor: false,
       templateList: [],
+      isScribbleNoteDataNull: true,
     }
   }
 
@@ -197,6 +200,10 @@ class Scribble extends React.Component {
     if (this.props.scribbleData !== '') {
       if (this.props.scribbleData.scribbleNoteLayers.length > 0) {
         this._sketch.initializeData(this.props.scribbleData.scribbleNoteLayers)
+        this.setState({
+          canClear: true,
+          isScribbleNoteDataNull: false,
+        })
       }
     }
   }
@@ -287,6 +294,7 @@ class Scribble extends React.Component {
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
       canClear: false,
+      isScribbleNoteDataNull: true,
     })
   }
 
@@ -303,11 +311,11 @@ class Scribble extends React.Component {
     this._sketch.downloadImage()
   }
 
-  _onSketchChange = () => {
-    let prev = this.state.canUndo
-    let now = this._sketch.canUndo()
+  _onSketchChange = (action) => {
+    const prev = this.state.canUndo
+    const now = this._sketch.canUndo()
 
-    if (prev !== now) {
+    if (prev !== now || action === 'deleteAction') {
       this.setState({
         canUndo: now,
         hideEnable: false,
@@ -315,10 +323,17 @@ class Scribble extends React.Component {
       this._sketch.hideDrawing(false)
     }
 
-    this.setState({
-      canClear: now,
-    })
-    this.props.setFieldValue('drawing', this._sketch.getAllLayerData())
+    if (this.state.isScribbleNoteDataNull) {
+      this.setState({
+        canClear: now,
+      })
+    } else {
+      this.setState({
+        canClear: true,
+      })
+    }
+
+    this.props.setFieldValue('drawing', 'dirty')
   }
 
   _selectTool = (event) => {
@@ -351,11 +366,11 @@ class Scribble extends React.Component {
   }
 
   _onBackgroundImageDrop = (accepted) => {
-    let { indexCount } = this.state
+    const { indexCount } = this.state
 
     if (accepted && accepted.length > 0) {
-      let sketch = this._sketch
-      let reader = new FileReader()
+      const sketch = this._sketch
+      const reader = new FileReader()
       reader.addEventListener(
         'load',
         () => sketch.setBackgroundFromDataUrl(reader.result),
@@ -403,6 +418,38 @@ class Scribble extends React.Component {
     this.setState({
       textColor: false,
     })
+  }
+
+  @keydown('ctrl+z')
+  shortcutKeyUndo () {
+    if (this.state.canUndo) {
+      this._undo()
+    }
+  }
+
+  @keydown('ctrl+y')
+  shortcutKeyRedo () {
+    if (this.state.canRedo) {
+      this._redo()
+    }
+  }
+
+  @keydown('backspace')
+  shortcutKeyDelete () {
+    const result = this._sketch._deleteSelectedObject()
+    if (!result) {
+      this.setState({
+        tool: 'eraser',
+        eraserColor: true,
+        selectColor: false,
+        toolsDrawingColor: false,
+        toolsShapeColor: false,
+        selectColorColor: false,
+        imageColor: false,
+        textColor: false,
+      })
+    }
+    this._onSketchChange('deleteAction')
   }
 
   render () {

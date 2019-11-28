@@ -119,37 +119,33 @@ class CollectPaymentConfirm extends PureComponent {
 
   handlePaymentAmount = (e, from) => {
     const { setFieldValue, statement, values, setValues } = this.props
+    const { statementInvoice } = statement.entity
 
     if (from === 'grid') {
-      this.setState({ totalAmount: e.target.value })
+      const { name, value } = e.target
+      const matches = name.match(/\[(.*?)\]/)
+      let edittedIndex
+      if (matches) {
+        edittedIndex = parseInt(matches[1], 10)
+      }
       const totalAmountPaid = _.sumBy(
         values.statementInvoice,
         'tempOutstandingAmount',
       )
 
+      const currentStatement = values.statementInvoice[edittedIndex]
+      const currentPayment = currentStatement.statementInvoicePayment.find(
+        (o) => !o.id,
+      )
+      const { invoicePayment } = currentPayment
+      invoicePayment.totalAmtPaid = value
+
       setFieldValue('amount', totalAmountPaid)
       return
     }
-    this.setState({ totalAmount: e.target.value })
     let tempAmount = e.target.value
-    const test = values.statementInvoice.map((o) => {
+    const newStatementInvoice = values.statementInvoice.map((o) => {
       let totalAmtPaid
-      // const newStatementInvoicePayment = o.statementInvoicePayment.map((i) => {
-      //   if (tempAmount >= i.outstandingAmount) {
-      //     totalAmtPaid = i.outstandingAmount
-      //     tempAmount -= i.outstandingAmount
-      //   } else {
-      //     totalAmtPaid = tempAmount
-      //   }
-      //   return {
-      //     ...i,
-      //     invoicePayment: {
-      //       totalAmtPaid,
-      //       receiptNo: i.invoiceNo,
-      //       invoicePayerFK: i.invoicePayerFK,
-      //     },
-      // }
-
       if (tempAmount >= o.outstandingAmount) {
         totalAmtPaid = o.outstandingAmount
         tempAmount -= o.outstandingAmount
@@ -157,31 +153,33 @@ class CollectPaymentConfirm extends PureComponent {
         totalAmtPaid = tempAmount
         tempAmount = 0
       }
-
       const newStatementInvoicePayment = {
+        statementInvoiceFK: o.id,
         invoicePayment: {
           totalAmtPaid,
           receiptNo: o.invoiceNo,
           invoicePayerFK: o.invoicePayerFK,
         },
       }
+      let statementInvoicePayment
+      const existingInvoicePayment = statementInvoice.find((i) => i.id === o.id)
+      if (existingInvoicePayment) {
+        statementInvoicePayment = [
+          ...existingInvoicePayment.statementInvoicePayment,
+          newStatementInvoicePayment,
+        ]
+      }
 
       return {
         ...o,
         tempOutstandingAmount: totalAmtPaid,
-        statementInvoicePayment: [
-          ...o.statementInvoicePayment,
-          newStatementInvoicePayment,
-        ],
-        // invoicePayment: {
-        //   totalAmtPaid,
-        // },
+        statementInvoicePayment,
       }
     })
     setValues({
       ...values,
       amount: e.target.value,
-      statementInvoice: test,
+      statementInvoice: newStatementInvoice,
     })
   }
 
