@@ -4,7 +4,6 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 
 import { Card, CardHeader, CardIcon, CardBody } from 'mui-pro-components'
-import { Assignment } from '@material-ui/icons'
 
 import SearchBar from './SearchBar/SearchBar'
 import DoctorExpenseGrid from './DoctorExpenseGrid'

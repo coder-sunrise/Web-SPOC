@@ -2,7 +2,8 @@ import React from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 import { FormattedMessage } from 'umi/locale'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 // formik
 import { withFormik, FastField } from 'formik'
 // material ui

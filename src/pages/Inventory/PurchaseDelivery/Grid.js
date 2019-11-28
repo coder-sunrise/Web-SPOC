@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Edit, Print } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
+import Print from '@material-ui/icons/Print'
+
 import { Tooltip, Button, CommonTableGrid } from '@/components'
 
 const Grid = (props) => {

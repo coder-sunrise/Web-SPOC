@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 // custom component
 import {
   Button,

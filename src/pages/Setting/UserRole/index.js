@@ -3,7 +3,8 @@ import React from 'react'
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import { FormattedMessage } from 'umi/locale'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 // devexpress react grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // common component

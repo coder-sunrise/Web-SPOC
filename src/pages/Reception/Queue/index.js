@@ -9,7 +9,9 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
-import { Refresh, Stop } from '@material-ui/icons'
+import Refresh from '@material-ui/icons/Refresh'
+import Stop from '@material-ui/icons/Stop'
+
 // custom components
 import {
   Card,

@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+
 import { amountProps } from './variables'
 import InvoiceAdjustment from './InvoiceAdjustment'
 import {

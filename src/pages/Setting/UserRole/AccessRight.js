@@ -1,7 +1,7 @@
 import React from 'react'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 // common components
 import {
   Button,

@@ -1,7 +1,10 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { Print, Edit, Delete } from '@material-ui/icons'
+import Delete from '@material-ui/icons/Delete'
+import Edit from '@material-ui/icons/Edit'
+import Print from '@material-ui/icons/Print'
+
 // custom components
 import {
   Dialog,

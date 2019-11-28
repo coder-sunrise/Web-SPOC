@@ -4,8 +4,8 @@ import classNames from 'classnames'
 // nodejs library to set properties for components
 import PropTypes from 'prop-types'
 // @material-ui/core components
-import { Assignment } from '@material-ui/icons'
 import withStyles from '@material-ui/core/styles/withStyles'
+import Assignment from '@material-ui/icons/Assignment'
 
 import Card from './Card'
 import CardHeader from './CardHeader'

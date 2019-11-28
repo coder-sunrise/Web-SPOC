@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 import { suppliers, dispUOMs } from '@/utils/codes'
 import { Tooltip, Button, CommonTableGrid } from '@/components'
 

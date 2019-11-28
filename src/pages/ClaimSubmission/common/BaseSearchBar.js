@@ -4,7 +4,8 @@ import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+
 // common components
 import {
   DatePicker,
