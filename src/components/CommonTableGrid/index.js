@@ -706,6 +706,7 @@ class CommonTableGrid extends PureComponent {
       global,
       loading,
       gridId,
+      extraCellConfig,
     } = this.props
 
     const {
@@ -828,6 +829,7 @@ class CommonTableGrid extends PureComponent {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
+      c.control = extraCellConfig
 
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
@@ -857,6 +859,7 @@ class CommonTableGrid extends PureComponent {
       commitCount: global.commitCount,
       errorCount: global.errorCount,
     }
+
     // const allowSelectRowByClick =
     //   columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
 

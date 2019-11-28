@@ -55,6 +55,7 @@ import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
+console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
