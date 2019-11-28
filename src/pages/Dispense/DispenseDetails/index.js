@@ -155,7 +155,7 @@ const DispenseDetails = ({
       otherOrder: newOtherOrder,
     })
   }
-
+  console.log({ values })
   return (
     <React.Fragment>
       <GridContainer>

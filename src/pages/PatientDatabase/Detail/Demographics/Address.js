@@ -60,7 +60,7 @@ class Address extends Component {
           .dispatch({
             type: 'streetAddress/fetchAddress',
             payload: {
-              postalCode: postcode,
+              eql_postalCode: postcode,
             },
           })
           .then((o) => {
