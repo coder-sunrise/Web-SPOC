@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
 import { Tooltip, withStyles } from '@material-ui/core'
-import { PanTool, Payment } from '@material-ui/icons'
+
 import Modal from './Modal'
 import Authorized from '@/utils/Authorized'
 import {

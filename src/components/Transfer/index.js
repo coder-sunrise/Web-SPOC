@@ -8,7 +8,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import AddCircle from '@material-ui/icons/AddCircle'
 import RemoveCircle from '@material-ui/icons/RemoveCircle'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 
 import {
   Button,

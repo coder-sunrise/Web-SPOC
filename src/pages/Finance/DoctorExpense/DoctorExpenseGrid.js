@@ -2,7 +2,10 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
-import { Remove, Apps } from '@material-ui/icons'
+
+import Remove from '@material-ui/icons/Remove'
+import Apps from '@material-ui/icons/Apps'
+
 // dev grid
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 // custom components

@@ -6,7 +6,7 @@ import numeral from 'numeral'
 import Paper from '@material-ui/core/Paper'
 import { withStyles } from '@material-ui/core/styles'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
-import { Print } from '@material-ui/icons'
+import Print from '@material-ui/icons/Print'
 import { Button, CommonModal, CommonTableGrid } from '@/components'
 
 const sumReducer = (p, n) => {

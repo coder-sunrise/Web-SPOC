@@ -18,8 +18,11 @@ import {
   ClickAwayListener,
   withStyles,
 } from '@material-ui/core'
-import { Money, CreditCard, Close } from '@material-ui/icons'
+import Money from '@material-ui/icons/Money'
+import CreditCard from '@material-ui/icons/CreditCard'
+import Close from '@material-ui/icons/Close'
 
+import { CustomInput, Button, Timeline } from 'mui-pro-components'
 import {
   RadioButtonGroup,
   FormField,
@@ -30,7 +33,6 @@ import {
   CommonModal,
   NumberInput,
 } from '@/components'
-import { CustomInput, Button, Timeline } from 'mui-pro-components'
 
 import { sleep, sumReducer, currencyFormat } from '@/utils/utils'
 import { getUniqueGUID } from '@/utils/cdrss'
