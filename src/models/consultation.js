@@ -347,6 +347,7 @@ export default createFormViewModel({
               uid: o.id,
             })),
             entity: undefined,
+            isGstInclusive: data.isGstInclusive,
           },
         })
 

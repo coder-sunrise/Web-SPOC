@@ -15,6 +15,7 @@ import {
 } from '@/services/file'
 // utils
 import { getCodes } from '@/utils/codes'
+import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 
 const styles = (theme) => ({
   noPadding: {
@@ -263,19 +264,14 @@ const Attachment = ({
       <GridItem md={10} className={classes.verticalSpacing}>
         <div>
           {fileAttachments.map((attachment) => (
-            <Chip
-              key={attachment.id}
-              size='small'
-              variant='outlined'
-              label={attachment.fileName}
-              color={attachment.id ? 'primary' : ''}
-              onClick={() => onClick(attachment)}
-              onDelete={
-                !isReadOnly ? (
-                  () => onDelete(attachment.fileIndexFK, attachment.id)
-                ) : null
-              }
-              className={classes.chip}
+            <AttachmentChipWithPopover
+              title='Delete Attachment'
+              contentText='Confirm to delete this attachment?'
+              isReadOnly={isReadOnly}
+              classes={classes}
+              attachment={attachment}
+              onConfirmDelete={onDelete}
+              onClickAttachment={onClick}
             />
           ))}
         </div>
