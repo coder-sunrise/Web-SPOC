@@ -18,7 +18,7 @@ import {
   Tooltip,
   Select,
   ButtonSelect,
-} from './node_modules/@/components'
+} from '@/components'
 import { queryList } from './node_modules/@/services/common'
 
 const styles = (theme) => ({

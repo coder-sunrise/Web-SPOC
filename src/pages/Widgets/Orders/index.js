@@ -39,6 +39,10 @@ const styles = (theme) => ({
   rightAlign: {
     textAlign: 'right',
   },
+  summaryRow: {
+    margin: '3px 0 3px 0',
+    height: 20,
+  },
 })
 // @skeleton()
 @connect(({ orders, codetable }) => ({
