@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react'
 import { FastField } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import { standardRowHeight } from 'mui-pro-jss'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 import { status } from '@/utils/codes'
 import {
   withFormikExtend,

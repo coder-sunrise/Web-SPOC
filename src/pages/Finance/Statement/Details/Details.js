@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { Refresh, Print, Payment, Delete } from '@material-ui/icons'
+import Print from '@material-ui/icons/Print'
+import Refresh from '@material-ui/icons/Refresh'
+
 import { withStyles } from '@material-ui/core'
 import {
   Button,

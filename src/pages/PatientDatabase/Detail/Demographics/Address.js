@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import _ from 'lodash'
 import axios from 'axios'
 import { connect } from 'dva'
-import { Close, Search } from '@material-ui/icons'
+import Close from '@material-ui/icons/Close'
+import Search from '@material-ui/icons/Search'
+
 import Yup from '@/utils/yup'
 import {
   Button,
@@ -58,7 +60,7 @@ class Address extends Component {
           .dispatch({
             type: 'streetAddress/fetchAddress',
             payload: {
-              postalCode: postcode,
+              eql_postalCode: postcode,
             },
           })
           .then((o) => {

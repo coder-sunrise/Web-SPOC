@@ -83,11 +83,11 @@ const countrySettings = [
 let countrySetting
 const initClinicSettings = () => {
   const clinicSettings =
-    JSON.parse(sessionStorage.getItem('clinicSettings')) || {}
+    JSON.parse(localStorage.getItem('clinicSettings')) || {}
   countrySetting =
     countrySettings.find((o) => o.value === clinicSettings.locale) || {}
   // console.log(countrySettings, clinicSettings.applicationLocale)
-
+  moment.locale('eu') // TODO should be removed in furture, solve deafult display chinese date bug
   if (countrySetting.code) {
     if (countrySetting.numberal) {
       countrySetting.numberal()

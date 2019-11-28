@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage, formatMessage } from 'umi/locale'
-import { Assignment } from '@material-ui/icons'
 import { withStyles } from '@material-ui/core/styles'
 
 import {

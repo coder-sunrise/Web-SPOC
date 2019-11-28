@@ -1,10 +1,11 @@
 import _extends from 'babel-runtime/helpers/extends'
 import * as React from 'react'
 import Notification from 'rc-notification'
-import { Close as Icon, AddAlert } from '@material-ui/icons'
+import Icon from '@material-ui/icons/Close'
+import AddAlert from '@material-ui/icons/AddAlert'
+
 import Snackbar from 'mui-pro-components/Snackbar/Snackbar'
 import IconButton from '@material-ui/core/IconButton'
-import Close from '@material-ui/icons/Close'
 import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 // @material-ui/icons

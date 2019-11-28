@@ -1,7 +1,8 @@
 import React from 'react'
 // umi locale
 import { FormattedMessage } from 'umi/locale'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 // formik
 import { FastField } from 'formik'
 // common components

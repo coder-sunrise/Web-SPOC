@@ -584,15 +584,16 @@ class CommonTableGrid extends PureComponent {
       // tabIndex: 0,
     }
     if (extraState) {
-      const colCfg = columnExtensions.find((o) => o.columnName === column.name)
+      const colCfg =
+        columnExtensions.find((o) => o.columnName === column.name) || {}
       const latestRow = window.$tempGridRow[this.gridId]
         ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
       // try {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
-      if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
-        if (colCfg && colCfg.type !== 'radio') {
+      if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
+        if (colCfg.type !== 'radio') {
           cfg = {
             tabIndex: 0,
             onFocus: onClick,
@@ -604,7 +605,6 @@ class CommonTableGrid extends PureComponent {
       }
       if (colCfg && colCfg.disabled) cfg = {}
     }
-    // console.log(p, columnExtensions)
 
     if (column && column.name === 'rowMove') {
       const cls = {

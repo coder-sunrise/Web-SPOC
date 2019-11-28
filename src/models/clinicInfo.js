@@ -10,7 +10,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      clinicInfo: JSON.parse(sessionStorage.getItem('clinicInfo') || '{}'),
+      ...JSON.parse(sessionStorage.getItem('clinicInfo') || '{}'),
     },
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {

@@ -7,7 +7,6 @@ const MobileNumberInput = ({ ...props }) => (
     {...props}
     label='Contact No.'
     max={999999999999999}
-    inputProps={{ maxLength: 15 }}
     maxLength={15}
     precision={0}
   />

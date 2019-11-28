@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Edit } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
+
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 import { Button, CommonTableGrid, Tooltip } from '@/components'

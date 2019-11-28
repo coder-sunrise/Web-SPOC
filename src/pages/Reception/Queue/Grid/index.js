@@ -13,9 +13,11 @@ import ContextMenu from './ContextMenu'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { filterData } from '../utils'
-import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import {
+  VISIT_STATUS,
+  ContextMenuOptions,
+} from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
-
 import {
   FuncConfig,
   QueueTableConfig,
@@ -23,6 +25,7 @@ import {
   AppointmentTableConfig,
   ApptColumnExtensions,
 } from './variables'
+import Authorized from '@/utils/Authorized'
 
 const gridHeight = window.innerHeight - 250
 
@@ -401,7 +404,23 @@ const Grid = ({
         id = undefined
         break
     }
-    if (id) onClick(row, id)
+
+    const contextMenuOption = id
+      ? ContextMenuOptions.find((item) => item.id === parseInt(id, 10))
+      : null
+
+    if (contextMenuOption) {
+      const authority = Authorized.check(contextMenuOption.authority)
+      if (authority.rights === 'disable' || authority.rights === 'hidden') {
+        notification.error({
+          message: 'Unauthorized Access',
+        })
+        return
+      }
+      onClick(row, id)
+    }
+
+    // if (id) onClick(row, id)
   }
 
   const isLoading = showingVisitRegistration ? false : queryingList

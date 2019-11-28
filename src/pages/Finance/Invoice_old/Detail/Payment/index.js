@@ -51,7 +51,10 @@ import {
   ErrorMessage,
 } from 'formik'
 import Button from 'mui-pro-components/CustomButtons'
-import { Print, Info, Clear } from '@material-ui/icons'
+import Print from '@material-ui/icons/Print'
+import Info from '@material-ui/icons/Info'
+import Clear from '@material-ui/icons/Clear'
+
 import SimpleTable from 'mui-pro-components/Table'
 import { sleep } from '@/utils/utils'
 import {

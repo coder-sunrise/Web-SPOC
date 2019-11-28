@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { Add, Delete } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+import Delete from '@material-ui/icons/Delete'
+
 import { formatMessage } from 'umi/locale'
 import LowStockInfo from './LowStockInfo'
 import {

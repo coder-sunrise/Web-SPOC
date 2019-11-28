@@ -35,6 +35,7 @@ const doctors = [
   mapPropsToValues: () => ({
     // start: '14:00',
     end: '13:00',
+    doctor: 'bao',
   }),
   validationSchema: Yup.object().shape({
     start: Yup.string().required(),
@@ -193,6 +194,7 @@ class Report extends React.Component {
                 <Select
                   mode='tags'
                   maxSelected={1}
+                  disableAll
                   label='Filter by Doctor (Tags)'
                   onChange={(v) => {
                     console.log(v)
