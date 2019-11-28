@@ -244,12 +244,10 @@ export default createListViewModel({
       },
 
       calculateAmount (state, { payload = {} }) {
-        let { finalAdjustments, rows } = state
-        const { isGstInclusive } = payload
+        let { finalAdjustments, rows, isGstInclusive } = state
         const amount = calculateAmount(rows, finalAdjustments, {
           isGstInclusive,
         })
-        // console.log(amount)
         return {
           ...state,
           ...amount,
