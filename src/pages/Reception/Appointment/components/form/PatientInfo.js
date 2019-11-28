@@ -38,7 +38,7 @@ const PatientInfoInput = ({
 
   return (
     <React.Fragment>
-      <GridItem xs md={6}>
+      <GridItem xs md={3}>
         {isEdit ? (
           <TextField
             value={values.patientName}
@@ -62,7 +62,7 @@ const PatientInfoInput = ({
           />
         )}
       </GridItem>
-      <GridItem xs md={6}>
+      <GridItem xs md={3}>
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
@@ -112,7 +112,8 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
-      <GridItem xs md={6}>
+      <GridItem ms md={6} />
+      <GridItem xs md={3}>
         <FastField
           name='patientContactNo'
           render={(args) => (

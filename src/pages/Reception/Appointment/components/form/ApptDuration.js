@@ -80,7 +80,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
   )
   return (
     <GridContainer>
-      <GridItem xs={6}>
+      <GridItem xs={5}>
         <Select
           value={row.apptDurationHour}
           options={hourOptions}
