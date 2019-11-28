@@ -93,54 +93,58 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     }
   }
 
+  const checkSmsConfiguration = (smsService) => {
+    if (!smsService) {
+      setShowWarning(true)
+      return false
+    }
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctAddonFeature',
+      },
+    }).then((ctAddonFeature) => {
+      const currentDate = moment().formatUTC()
+      const {
+        effectiveStartDate,
+        effectiveEndDate,
+        ctAddOnFeatureFK,
+      } = smsService
+      if (currentDate < effectiveStartDate || currentDate > effectiveEndDate) {
+        setShowWarning(true)
+        return false
+      }
+      const smsFeature = ctAddonFeature.find((o) => o.id === ctAddOnFeatureFK)
+      if (!smsFeature) {
+        setShowWarning(true)
+        return false
+      }
+      return true
+    })
+  }
+
   useEffect(() => {
     const { addOnSubscriptions } = clinicInfo
     const smsService = addOnSubscriptions.find(
       (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
     )
 
-    if (smsService) {
+    if (checkSmsConfiguration(smsService)) {
       dispatch({
-        type: 'codetable/fetchCodes',
+        type: 'smsAppointment/query',
         payload: {
-          code: 'ctAddonFeature',
+          smsType: 'Appointment',
+          ...defaultSearchQuery('Appointment'),
         },
-      }).then((ctAddonFeature) => {
-        const currentDate = moment().formatUTC()
-        const {
-          effectiveStartDate,
-          effectiveEndDate,
-          ctAddOnFeatureFK,
-        } = smsService
-
-        if (
-          currentDate < effectiveStartDate ||
-          currentDate > effectiveEndDate
-        ) {
-          setShowWarning(true)
-        } else {
-          const smsFeature = ctAddonFeature.find(
-            (o) => o.id === ctAddOnFeatureFK,
-          )
-          if (!smsFeature) setShowWarning(true)
-        }
+      })
+      dispatch({
+        type: 'smsPatient/query',
+        payload: {
+          smsType: 'Patient',
+          ...defaultSearchQuery(),
+        },
       })
     }
-
-    dispatch({
-      type: 'smsAppointment/query',
-      payload: {
-        smsType: 'Appointment',
-        ...defaultSearchQuery('Appointment'),
-      },
-    })
-    dispatch({
-      type: 'smsPatient/query',
-      payload: {
-        smsType: 'Patient',
-        ...defaultSearchQuery(),
-      },
-    })
   }, [])
   return (
     <div>
