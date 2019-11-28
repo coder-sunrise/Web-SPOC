@@ -932,18 +932,32 @@ const calculateAmount = (
   if (total === 0 && activeRows[0]) {
     activeRows[0].weightage = 1
   }
-  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa, i) => {
+    console.log(fa)
     activeRows.forEach((o) => {
       o.subAdjustment = 0
     })
-    activeRows.forEach((r) => {
+    let adjAmount = 0
+    activeRows.forEach((r, j) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      const adj = roundTo(r.weightage * fa.adjAmount)
+      let adj = 0
+      let initalRowToal = r[totalField]
+      for (let idx = 0; idx < i; idx++) {
+        initalRowToal = initalRowToal + r[`adjustmen${idx}`]
+      }
+      if (fa.adjType === 'ExactAmount') {
+        adj = roundTo(r.weightage * fa.adjValue)
+      } else if (fa.adjType === 'Percentage') {
+        adj = roundTo(r.weightage * fa.adjValue / 100 * initalRowToal)
+      }
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-
-      r[adjustedField] = roundTo(r[adjustedField] + adj)
-      r.subAdjustment += adj
+      adjAmount += adj
+      // r[adjustedField] = roundTo(r[adjustedField] + adj)
+      // r.subAdjustment += adj
+      r[`adjustmen${i}`] = adj
+      r[adjustedField] = initalRowToal + adj
     })
+    fa.adjAmount = adjAmount
   })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
