@@ -964,15 +964,12 @@ const calculateAmount = (
 
   if (isEnableGST) {
     if (isGstInclusive) {
-      console.log('apple')
       activeRows.forEach((r) => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
         )
       })
     } else {
-      console.log('banana')
-
       gst = roundTo(totalAfterAdj * gSTPercentage)
       activeRows.forEach((r) => {
         r[gstAmtField] = roundTo(r[adjustedField] * gSTPercentage)

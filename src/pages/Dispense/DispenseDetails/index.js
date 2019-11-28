@@ -62,6 +62,7 @@ const styles = (theme) => ({
 const DispenseDetails = ({
   classes,
   setFieldValue,
+  setValues,
   values,
   dispatch,
   viewOnly = false,
@@ -101,6 +102,35 @@ const DispenseDetails = ({
     } else {
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
     }
+  }
+
+  const updateGridData = (invoiceItems) => {
+    const mapFromInvoiceItem = (result, item) => {
+      const _prescriptionItem = invoiceItems.find(
+        (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
+      )
+      if (_prescriptionItem)
+        return [
+          ...result,
+          {
+            ...item,
+            totalAfterGST: _prescriptionItem.totalAfterGST,
+          },
+        ]
+      return [
+        ...result,
+      ]
+    }
+    const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
+    const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
+    const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
+
+    setValues({
+      ...values,
+      prescription: newPrescription,
+      vaccination: newVaccination,
+      otherOrder: newOtherOrder,
+    })
   }
 
   return (
@@ -213,7 +243,9 @@ const DispenseDetails = ({
                 invoiceAdjustment: v.adjustments,
                 isGSTInclusive: !!v.summary.isGSTInclusive,
               }
+              // console.log('summary', { summary: v })
               setFieldValue('invoice', newInvoice)
+              updateGridData(v.rows)
               // setFieldValue('invoice.invoiceTotal', v.summary.total)
               // setFieldValue(
               //   'invoice.invoiceTotalAftAdj',
