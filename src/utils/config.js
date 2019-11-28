@@ -1,154 +1,113 @@
-﻿const remoteValidator = ({
-  rule,
-  value,
-  callback,
-  promise,
-  setting = { message: 'This value already being used' },
-}) => {
-  if (!value) {
-    callback()
-  } else {
-    promise
-      .then((response) => {
-        const { success, data = {} } = response
-        const { entities } = data
-        if (success) {
-          if (entities.length > 0) {
-            callback([
-              new Error(setting.message),
-            ])
-          } else {
-            callback()
-          }
-        }
-        callback()
+﻿import numeral from 'numeral'
+import { formatMessage, setLocale, getLocale } from 'umi/locale'
+// import my from 'moment/locale/my'
+import moment from 'moment'
+import 'moment/locale/ms-my'
+import 'moment/locale/zh-cn'
+
+const defaultNumberalConfig = {
+  delimiters: {
+    thousands: ',',
+    decimal: '.',
+  },
+  abbreviations: {
+    thousand: 'k',
+    million: 'm',
+    billion: 'b',
+    trillion: 't',
+  },
+  ordinal (number) {
+    let b = number % 10
+    return ~~((number % 100) / 10) === 1
+      ? 'th'
+      : b === 1 ? 'st' : b === 2 ? 'nd' : b === 3 ? 'rd' : 'th'
+  },
+  currency: {
+    symbol: '$',
+  },
+}
+const countrySettings = [
+  {
+    value: 'Singapore',
+    name: 'Singapore',
+    code: 'sg',
+    numberal: () => {
+      try {
+        numeral.register('locale', 'sg', {
+          ...defaultNumberalConfig,
+          currency: {
+            symbol: '$',
+          },
+        })
+        numeral.locale('sg')
+      } catch (error) {}
+    },
+    moment: () => {
+      moment.defineLocale('sg', {
+        parentLocale: 'en',
+        longDateFormat: {
+          LT: 'hh:mm A',
+          LTS: 'hh:mm:ss A',
+          L: 'DD MM YYYY',
+          LL: 'DD MMM YYYY',
+          LLL: 'DD MMM YYYY hh:mm A',
+          LLLL: 'DD MMMM YYYY  hh:mm:ss A',
+        },
       })
-      .catch(() => {
-        callback()
-      })
+    },
+  },
+  {
+    value: 'Malaysia',
+    name: 'Malaysia',
+    code: 'ms-my',
+    numberal: () => {
+      try {
+        numeral.register('locale', 'my', {
+          ...defaultNumberalConfig,
+
+          currency: {
+            symbol: 'RM',
+          },
+        })
+        numeral.locale('my')
+      } catch (error) {}
+    },
+    moment: () => {
+      moment.locale('ms-my')
+    },
+  },
+]
+// console.log(1)
+let countrySetting
+const initClinicSettings = () => {
+  const clinicSettings =
+    JSON.parse(sessionStorage.getItem('clinicSettings')) || {}
+  countrySetting =
+    countrySettings.find((o) => o.value === clinicSettings.applicationLocale) ||
+    {}
+
+  if (countrySetting.code) {
+    if (countrySetting.numberal) {
+      countrySetting.numberal()
+    }
+    if (countrySetting.moment) countrySetting.moment()
+
+    // moment.updateLocale(countrySetting.code, {
+    //   longDateFormat: {
+    //     LT: 'HH:mm',
+    //     LTS: 'HH:mm:ss',
+    //     L: 'DD/MM/YYYY',
+    //     LL: 'D MMMM YYYY',
+    //     LLL: 'D MMMM YYYY HH:mm',
+    //     LLLL: 'DD/MM/YYYY',
+    //   },
+    // })
+    // moment.locale(countrySetting.code)
+    // console.log(2)
+    // console.log(3, moment.locale(), getLocale())
   }
 }
-const proxyPrefix = '/api/v2'
-const userSetting = JSON.parse(localStorage.getItem('userSettings')) || {}
 module.exports = {
-  name: 'CDRSS (BETA) [UAT]',
-  prefix: 'cdr',
-  proxyPrefix,
-  systemName: 'Clinical Diagnostic and Research Support System',
-  footerText: ' © 2017 - 2018 Medisys Innovation Pte Ltd. All rights reserved.',
-  logo: '/logo.png',
-  iconFontCSS: '/iconfont.css',
-  iconFontJS: '/iconfont.js',
-  baseURL: '',
-  // baseURL: 'http://localhost:8000',
-  // baseURL: 'http://isharesg.cloudapp.net:9000',
-  YQL: [
-    'http://www.zuimeitianqi.com',
-  ],
-  CORS: [
-    'http://localhost:9000',
-    'http://localhost:9002',
-  ],
-  openPages: [
-    '/login',
-    '/submission',
-    '/individualform',
-    '/register',
-    '/resources',
-    '/payment',
-    '/batch',
-  ],
-  apiPrefix: '/api/mock',
-  urlCryptoJSKey: 'medisys2018',
-  refreshTokenTimer: 300, // seconds
-  api: {
-    // userLogin: '/mock/user/login',
-    // userLogin: 'http://localhost:9000/Account/LoginAPI',
-
-    userLogin: `${proxyPrefix}/token`,
-    userLogout: `${proxyPrefix}/api/account/logout`,
-    userInfo: `${proxyPrefix}/api/account/userinfo`,
-    userRegister: `${proxyPrefix}/api/user/userregister`,
-    userActive: `${proxyPrefix}/api/user/useractive`,
-    userReset: `${proxyPrefix}/api/user/userreset`,
-    verifyPassword: `${proxyPrefix}/api/user/verifypassword`,
-    userExist: `${proxyPrefix}/api/user/userlist`,
-    users: `${proxyPrefix}/api/user/list`,
-    user: `${proxyPrefix}/api/user/:id`,
-    posts: `${proxyPrefix}/mock/posts`,
-    authInfo: `${proxyPrefix}/api/account/userinfo`,
-    dashboard: `${proxyPrefix}/api/mock/dashboard`,
-    menu: `${proxyPrefix}/api/app/menus`,
-    allMenu: `${proxyPrefix}/api/app/allmenus`,
-    upload: `${proxyPrefix}/api/app/upload`,
-    queryUpload: `${proxyPrefix}/api/app/getuploads`,
-    token: `${proxyPrefix}/api/app/token`,
-    mantain: `${proxyPrefix}/api/app/info`,
-    studies: `${proxyPrefix}/api/study/list`,
-    study: `${proxyPrefix}/api/study/one`,
-    surveys: `${proxyPrefix}/api/survey/list`,
-    survey: `${proxyPrefix}/api/survey/one`,
-    surveysImport: `${proxyPrefix}/api/survey/import`,
-    surveySharingConfigs: `${proxyPrefix}/api/surveySharingConfig/list`,
-    surveySharingConfig: `${proxyPrefix}/api/surveySharingConfig/one`,
-    subjects: `${proxyPrefix}/api/subject/list`,
-    subject: `${proxyPrefix}/api/subject/:id`,
-    codetable: `${proxyPrefix}/api/codetable/:type`,
-    studyTemplates: `${proxyPrefix}/api/study/templates`,
-    studySurveys: `${proxyPrefix}/api/study/surveys`,
-    batchFormRequests: `${proxyPrefix}/api/batchformrequest/list`,
-    batchFormRequest: `${proxyPrefix}/api/batchformrequest/one`,
-    batchFormRequestAnonymous: `${proxyPrefix}/api/batchformrequest/anonymous`,
-    templates: `${proxyPrefix}/api/template/list`,
-    template: `${proxyPrefix}/api/template/one`,
-    codetablelist: `${proxyPrefix}/api/codetable/list`,
-    codetablesetup: `${proxyPrefix}/api/codetable/tablelist`,
-    codetablerecord: `${proxyPrefix}/api/codetable`,
-    questions: `${proxyPrefix}/api/question/list`,
-    question: `${proxyPrefix}/api/question/one`,
-    questionSort: `${proxyPrefix}/api/question/sort`,
-    tqoption: `${proxyPrefix}/api/templatequestionoption/:title`,
-    rules: `${proxyPrefix}/api/rule/list`,
-    rule: `${proxyPrefix}/api/rule/one`,
-    ruleGetScore: `${proxyPrefix}/api/rule/getscore`,
-    permissions: `${proxyPrefix}/api/permission/list`,
-    permission: `${proxyPrefix}/api/permission/:id`,
-    groups: `${proxyPrefix}/api/group/list`,
-    group: `${proxyPrefix}/api/group/:id`,
-    permissiongroup: `${proxyPrefix}/api/permissiongroup/:id`,
-    demos: `${proxyPrefix}/api/demo/list`,
-    demo: `${proxyPrefix}/api/demo/:id`,
-
-    caseForms: `${proxyPrefix}/api/caseform/list`,
-    caseForm: `${proxyPrefix}/api/caseform/:id`,
-    diagnosisForms: `${proxyPrefix}/api/diagnosis/list`,
-    diagnosisResult: `${proxyPrefix}/api/diagnosis/diagnosisresult`,
-    diagnosiss: `${proxyPrefix}/api/diagnosis/list`,
-    diagnosis: `${proxyPrefix}/api/diagnosis/:id`,
-    sessions: `${proxyPrefix}/api/session/list`,
-    session: `${proxyPrefix}/api/session/:id`,
-    report: {
-      caseForm: `${proxyPrefix}/api/report/caseform`,
-    },
-
-    projectGroups: `${proxyPrefix}/api/projectGroup/list`,
-    studyMembers: `${proxyPrefix}/api/projectGroupUser/list`,
-    studyMember: `${proxyPrefix}/api/projectGroupUser/:id`,
-    getHMAC: `${proxyPrefix}/api/GetHMAC`,
-
-    // IDN
-    patients: `${proxyPrefix}/api/patient/list`,
-    patient: `${proxyPrefix}/api/patient/:id`,
-
-    diagnosisAdditionals: `${proxyPrefix}/api/diagnosisAdditional/list`,
-    diagnosisAdditional: `${proxyPrefix}/api/diagnosisAdditional/:id`,
-    getSessionList: `${proxyPrefix}/api/caseForm/getSessionList`,
-
-    emailNotification: `${proxyPrefix}/api/email/:id`,
-    getListWithoutCheckRights: `${proxyPrefix}/api/subject/getListWithoutCheckRights`,
-    getIndividualCaseForm: `${proxyPrefix}/api/caseform/getIndividualCaseForm`,
-  },
-
   filterType: {
     eql: 'eql', // 'Equals',
     neql: 'neql', // 'Not Equals',
@@ -211,11 +170,11 @@ module.exports = {
       pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
       message: 'This is not a valid email',
     },
-    remote: remoteValidator,
   },
   currencyFormat: '0,0.00',
   percentageFormat: '0.00%',
   currencySymbol: '$',
   qtyFormat: '0.0',
-  ...userSetting,
+  conuntry: countrySetting,
+  initClinicSettings,
 }

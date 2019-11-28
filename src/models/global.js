@@ -142,18 +142,18 @@ export default createFormViewModel({
       },
       *getUserSettings ({ payload }, { put, select }) {
         // localStorage.setItem('menuCollapsed', payload ? 1 : 0)
-        const mockUserConfig = {
-          currencySymbol: '$',
-        }
-        if (config.currencySymbol !== mockUserConfig.currencySymbol) {
-          localStorage.setItem('userSettings', JSON.stringify(mockUserConfig))
-        }
-        yield put({
-          type: 'updateState',
-          payload: {
-            ...mockUserConfig,
-          },
-        })
+        // const mockUserConfig = {
+        //   currencySymbol: '$',
+        // }
+        // if (config.currencySymbol !== mockUserConfig.currencySymbol) {
+        //   localStorage.setItem('userSettings', JSON.stringify(mockUserConfig))
+        // }
+        // yield put({
+        //   type: 'updateState',
+        //   payload: {
+        //     ...mockUserConfig,
+        //   },
+        // })
       },
     },
     reducers: {

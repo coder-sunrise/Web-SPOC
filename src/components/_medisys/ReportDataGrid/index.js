@@ -12,9 +12,7 @@ const ReportDataGrid = ({
 }) => {
   let tableProps = TableProps
   if (height === undefined) {
-    if (data.length > 10) {
-      tableProps = { ...TableProps, height: 400 }
-    }
+    tableProps = { ...TableProps, height: 400 }
   }
   return (
     <div style={{ width: '100%' }}>

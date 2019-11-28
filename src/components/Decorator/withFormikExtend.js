@@ -232,7 +232,6 @@ const withFormikExtend = (props) => (Component) => {
             //   },
             // })
             // _localAuthority[displayName].matches = matches
-
             const r = Authorized.generalCheck(
               matches,
               this.props,

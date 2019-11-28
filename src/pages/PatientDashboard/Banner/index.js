@@ -376,7 +376,17 @@ class Banner extends PureComponent {
                     tabIndex='-1'
                   >
                     <Tooltip title={name} placement='bottom-start'>
-                      <span style={{ whiteSpace: 'nowrap' }}>{name} </span>
+                      <span
+                        style={{
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis',
+                          display: 'inline-block',
+                          width: '100%',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {name}
+                      </span>
                     </Tooltip>
                   </Link>
                 </div>
@@ -437,8 +447,8 @@ class Banner extends PureComponent {
               header={
                 <div>
                   <b style={{ color: 'darkblue' }}>Scheme </b>
-                  {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
-                    .length > 0 && (
+                  {(entity.patientScheme || [])
+                    .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
                     <IconButton onClick={this.refreshChasBalance}>
                       <Refresh />
                     </IconButton>

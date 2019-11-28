@@ -1,6 +1,7 @@
 import Cookies from 'universal-cookie'
 import moment from 'moment'
 import _ from 'lodash'
+
 import request, { axiosRequest } from './request'
 import { convertToQuery } from '@/utils/utils'
 import db from './indexedDB'
@@ -614,24 +615,16 @@ const currencyRoundingToTheClosestList = [
 
 const currenciesList = [
   {
-    value: 'SGD',
+    value: 'Singapore',
     name: 'S$',
   },
   {
-    value: 'USD',
+    value: 'United States',
     name: '$',
   },
   {
-    value: 'EUR',
-    name: '€',
-  },
-  {
-    value: 'BTC',
-    name: '฿',
-  },
-  {
-    value: 'JPY',
-    name: '¥',
+    value: 'Malaysia',
+    name: 'RM',
   },
 ]
 

@@ -41,10 +41,7 @@ export default createFormViewModel({
         const routing = yield select((st) => st.routing)
 
         yield put({
-          type: 'global/updateState',
-          payload: {
-            showSessionTimeout: false,
-          },
+          type: 'global/reset',
         })
         localStorage.removeItem('token')
         sessionStorage.clear()
@@ -85,12 +82,12 @@ export default createFormViewModel({
         if (!isInvalidLogin) {
           const {
             access_token: accessToken,
-            currentAuthority = [
-              'tester',
-              // 'editor',
-            ],
+            // currentAuthority = [
+            //   'tester',
+            //   // 'editor',
+            // ],
           } = payload
-          setAuthority(currentAuthority)
+          // setAuthority(currentAuthority)
           localStorage.setItem('token', accessToken)
           localStorage.setItem('_lastLogin', moment().toDate())
         }

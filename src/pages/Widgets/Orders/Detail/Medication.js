@@ -285,7 +285,6 @@ class Medication extends PureComponent {
       selectedMedication: op,
     })
 
-    this.calculateQuantity(op)
     setFieldValue('corPrescriptionItemInstruction', [
       {
         sequence: 0,
@@ -392,6 +391,10 @@ class Medication extends PureComponent {
 
     setFieldValue('drugCode', op.code)
     setFieldValue('drugName', op.displayValue)
+
+    setTimeout(() => {
+      this.calculateQuantity(op)
+    }, 1)
   }
 
   updateTotalPrice = (v) => {
