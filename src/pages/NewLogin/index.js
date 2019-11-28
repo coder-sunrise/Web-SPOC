@@ -143,7 +143,7 @@ const submitKey = 'login/getToken'
 
           await dispatch({
             type: 'clinicInfo/query',
-            payload: localStorage.getItem('clinicCode'),
+            payload: { clinicCode: localStorage.getItem('clinicCode') },
           })
           localStorage.setItem('clinicCode', clinicCode)
           router.push(loginDestination)

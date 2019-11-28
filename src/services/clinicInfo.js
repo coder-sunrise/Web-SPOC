@@ -5,7 +5,8 @@ const url = '/api/clinic'
 
 module.exports = {
   query: (params) => {
-    return request(`${url}?clinicCode=${params}`, {
+    const { clinicCode } = params
+    return request(`${url}?clinicCode=${clinicCode}`, {
       method: 'GET',
     })
   },
