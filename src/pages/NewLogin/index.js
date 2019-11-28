@@ -132,16 +132,18 @@ const submitKey = 'login/getToken'
       type: 'login/getToken',
       credentialPayload: credential,
     })
-      .then((result) => {
+      .then(async (result) => {
         const { payload } = result
         const validLogin = payload.access_token !== undefined
 
         if (validLogin) {
-          dispatch({
-            type: 'global/updateState',
-            payload: {
-              showSessionTimeout: false,
-            },
+          await dispatch({
+            type: 'clinicSettings/query',
+          })
+
+          await dispatch({
+            type: 'clinicInfo/query',
+            payload: localStorage.getItem('clinicCode'),
           })
           localStorage.setItem('clinicCode', clinicCode)
           router.push(loginDestination)

@@ -54,6 +54,7 @@ const countrySettings = [
           LLLL: 'DD MMMM YYYY  hh:mm:ss A',
         },
       })
+      moment.locale('en')
     },
   },
   {
@@ -78,13 +79,14 @@ const countrySettings = [
   },
 ]
 // console.log(1)
+// console.log(moment.locale(), getLocale())
 let countrySetting
 const initClinicSettings = () => {
   const clinicSettings =
     JSON.parse(sessionStorage.getItem('clinicSettings')) || {}
   countrySetting =
-    countrySettings.find((o) => o.value === clinicSettings.applicationLocale) ||
-    {}
+    countrySettings.find((o) => o.value === clinicSettings.locale) || {}
+  // console.log(countrySettings, clinicSettings.applicationLocale)
 
   if (countrySetting.code) {
     if (countrySetting.numberal) {

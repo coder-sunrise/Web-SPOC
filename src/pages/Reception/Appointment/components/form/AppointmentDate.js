@@ -2,10 +2,16 @@ import React from 'react'
 // formik
 import { FastField } from 'formik'
 // custom component
-import { GridContainer, GridItem, DatePicker, TextField } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  DatePicker,
+  TextField,
+  CodeSelect,
+} from '@/components'
 
 const AppointmentDate = ({ disabled }) => (
-  <GridContainer item xs md={12}>
+  <React.Fragment>
     <GridItem xs md={6}>
       <FastField
         name='currentAppointment.appointmentDate'
@@ -20,13 +26,28 @@ const AppointmentDate = ({ disabled }) => (
         )}
       />
     </GridItem>
+
+    <GridItem xs md={6}>
+      <FastField
+        name='appointmentStatusFk'
+        render={(args) => (
+          <CodeSelect
+            {...args}
+            disabled
+            code='ltappointmentstatus'
+            label='Appointment Status'
+          />
+        )}
+      />
+    </GridItem>
+
     <GridItem xs md={6}>
       <FastField
         name='bookedByUser'
         render={(args) => <TextField label='Booked By' disabled {...args} />}
       />
     </GridItem>
-  </GridContainer>
+  </React.Fragment>
 )
 
 export default AppointmentDate
