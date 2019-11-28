@@ -126,7 +126,7 @@ class AddPayment extends Component {
 
     // TODO: add payment base on keyCode and paymentMode hotkey setting
     const { ctPaymentMode, patient } = this.props
-    console.log('patietn', this.props)
+
     const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
 
     if (paymentModeObj) {
@@ -337,7 +337,7 @@ class AddPayment extends Component {
     } = this.props
     const { paymentList } = values
     const { bizSessionList, paymentModes } = this.state
-    console.log({ paymentList })
+
     return (
       <div>
         <PayerHeader

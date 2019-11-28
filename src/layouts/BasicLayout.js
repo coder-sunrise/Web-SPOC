@@ -55,6 +55,7 @@ import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
+console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
@@ -110,7 +111,7 @@ const query = {
 }
 
 const sessionTimeoutTimer = 15 * 60 * 1000
-// const sessionTimeoutTimer = 5000
+// const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
   constructor (props) {

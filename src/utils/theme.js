@@ -166,6 +166,11 @@ const sharedOverrides = {
       borderRadius: 4,
     },
   },
+  MuiDialog: {
+    paper: {
+      // margin: 0,
+    },
+  },
   MuiList: {
     root: {
       color: primaryColor,

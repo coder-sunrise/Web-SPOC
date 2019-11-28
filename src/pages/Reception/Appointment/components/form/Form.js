@@ -770,6 +770,7 @@ class Form extends React.PureComponent {
       mode,
       conflicts,
       selectedSlot,
+      height,
     } = this.props
 
     const {
@@ -801,13 +802,12 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-
     return (
       <LoadingWrapper loading={show} text='Loading...'>
-        <SizeContainer>
+        <SizeContainer size='sm'>
           <React.Fragment>
             <GridContainer className={classnames(classes.formContent)}>
-              <GridItem container xs md={6}>
+              <GridItem container xs={12} md={7}>
                 <PatientInfoInput
                   disabled={disablePatientInfo}
                   isEdit={values.id}
@@ -860,7 +860,7 @@ class Form extends React.PureComponent {
                   />
                 </GridItem>
               </GridItem>
-              <GridItem xs md={6}>
+              <GridItem xs={12} md={5}>
                 <CardContainer
                   hideHeader
                   title='Appointment History'

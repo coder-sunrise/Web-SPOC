@@ -337,8 +337,8 @@ class Main extends React.Component {
       orders = {},
       visitRegistration,
     } = this.props
-    const { entity: vistEntity } = visitRegistration
-    if (!vistEntity) return null
+    const { entity: vistEntity = {} } = visitRegistration
+    // if (!vistEntity) return null
     const { visit = {} } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
@@ -650,8 +650,8 @@ class Main extends React.Component {
       ...resetProps
     } = this.props
     const { entity } = consultation
-    const { entity: vistEntity } = visitRegistration
-    if (!vistEntity) return null
+    const { entity: vistEntity = {} } = visitRegistration
+    // if (!vistEntity) return null
     const { visit = {} } = vistEntity
     // const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary

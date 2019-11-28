@@ -68,7 +68,7 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfter',
+    columnName: 'totalAfterGST',
     type: 'currency',
   },
   {
@@ -199,7 +199,7 @@ export const VaccinationColumn = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfter',
+    name: 'totalAfterGST',
     title: 'Total Price Incl. GST ($)',
   },
 ]
@@ -208,7 +208,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfter',
+    columnName: 'totalAfterGST',
     type: 'currency',
   },
   {
@@ -267,7 +267,7 @@ export const OtherOrdersColumns = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfter',
+    name: 'totalAfterGST',
     title: 'Total Price Incl. GST ($)',
   },
   {
@@ -308,13 +308,13 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
-    columnName: 'totalAfter',
+    columnName: 'totalAfterGST',
     // type: 'currency',
     align: 'right',
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfter} />
+      return <NumberInput text currency value={row.totalAfterGST} />
     },
   },
   {

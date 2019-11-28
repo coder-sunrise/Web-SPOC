@@ -1,16 +1,16 @@
-import ClickAwayListener from '@material-ui/core/ClickAwayListener'
-import { timeFormat, TextField, Select } from '@/components'
+import { timeFormat } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
 import ErrorPopover from './ErrorPopover'
+import ApptDuration from './ApptDuration'
 
 export const AppointmentDataColumn = [
   { name: 'conflicts', title: ' ' },
   { name: 'clinicianFK', title: 'Doctor' },
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
-  { name: 'endTime', title: 'Time To' },
-  // { name: 'appointmentDuration', title: 'Appt Duration' },
+  { name: 'endTime', title: 'Appt Duration' },
+  // { name: 'endTime', title: 'Time To' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
@@ -40,7 +40,7 @@ export const AppointmentDataColExtensions = [
   // },
   {
     columnName: 'clinicianFK',
-    width: 200,
+    width: 150,
     type: 'codeSelect',
     code: 'doctorprofile',
     labelField: 'clinicianProfile.name',
@@ -53,75 +53,21 @@ export const AppointmentDataColExtensions = [
   {
     columnName: 'appointmentTypeFK',
     type: 'codeSelect',
+    width: 130,
     code: 'ctappointmenttype',
     labelField: 'displayValue',
     valueField: 'id',
   },
   {
-    columnName: 'appointmentDuration',
-    customEditor: true,
-    render: (
-      row,
-      { value, control, validSchema, ...restProps },
-      { onBlur, onFocus, autoFocus, ...props },
-    ) => {
-      console.log(restProps, props)
-      return (
-        <ClickAwayListener
-          onClickAway={() => {
-            if (onBlur) onBlur()
-          }}
-        >
-          <div>
-            <span>Test:This is custom editor control</span>
-            <TextField
-              text
-              autoFocus={autoFocus}
-              {...restProps}
-              defaultValue={row.endTime} // test value only
-              // onChange={(e) => (row.appointmentDuration = e.target.value)}
-              onBlur={(e) => {
-                const { commitChanges } = control
-                row.appointmentDuration = e.target.value
-                validSchema(row)
-                commitChanges({
-                  changed: {
-                    [row.id]: {
-                      appointmentDuration: e.target.value,
-                    },
-                  },
-                })
-              }}
-            />
-            <Select
-              options={[
-                { value: 0, name: 'Monday' },
-                { value: 1, name: 'Tuesday' },
-                { value: 2, name: 'Wednesday' },
-                { value: 3, name: 'Thursday' },
-                { value: 4, name: 'Friday' },
-                { value: 5, name: 'Saturday' },
-                { value: 6, name: 'Sunday' },
-              ]}
-              {...restProps}
-            />
-          </div>
-        </ClickAwayListener>
-      )
-    },
+    columnName: 'endTime',
+    isReactComponent: true,
+    width: 220,
+    render: ApptDuration,
   },
   {
     columnName: 'startTime',
     type: 'time',
-    width: 140,
-    format: timeFormat,
-    allowClear: false,
-    // value: '00:00',
-  },
-  {
-    columnName: 'endTime',
-    type: 'time',
-    width: 140,
+    width: 110,
     format: timeFormat,
     allowClear: false,
     // value: '00:00',

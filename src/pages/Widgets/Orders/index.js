@@ -41,9 +41,8 @@ const styles = (theme) => ({
   },
 })
 // @skeleton()
-@connect(({ orders, visitRegistration, codetable }) => ({
+@connect(({ orders, codetable }) => ({
   orders,
-  visitRegistration,
   codetable,
 }))
 class Orders extends PureComponent {
@@ -55,9 +54,7 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, status, visitRegistration } = this.props
-    const { entity: vistEntity } = visitRegistration
-    const { visit = {} } = vistEntity
+    const { dispatch, status } = this.props
 
     const codeTableNameArray = []
     codeTableNameArray.push('ctMedicationUsage')

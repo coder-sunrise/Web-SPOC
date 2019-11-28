@@ -68,6 +68,7 @@ const styles = (theme) => ({
 const DispenseDetails = ({
   classes,
   setFieldValue,
+  setValues,
   values,
   dispatch,
   viewOnly = false,
@@ -115,24 +116,45 @@ const DispenseDetails = ({
   ] = useState(false)
 
   const handleOrderModal = () => {
-    setShowOrderModal(!showOrderModal)
+    const popUpStatus = !showOrderModal
+    setShowOrderModal(popUpStatus)
+    if (showOrderModal) {
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          type: '1',
+        },
+      })
+    }
   }
-
-  useEffect(
-    () => {
-      if (!showOrderModal) {
-        dispatch({
-          type: 'orders/updateState',
-          payload: {
-            type: '1',
+  const updateGridData = (invoiceItems) => {
+    const mapFromInvoiceItem = (result, item) => {
+      const _prescriptionItem = invoiceItems.find(
+        (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
+      )
+      if (_prescriptionItem)
+        return [
+          ...result,
+          {
+            ...item,
+            totalAfterGST: _prescriptionItem.totalAfterGST,
           },
-        })
-      }
-    },
-    [
-      showOrderModal,
-    ],
-  )
+        ]
+      return [
+        ...result,
+      ]
+    }
+    const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
+    const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
+    const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
+
+    setValues({
+      ...values,
+      prescription: newPrescription,
+      vaccination: newVaccination,
+      otherOrder: newOtherOrder,
+    })
+  }
 
   return (
     <React.Fragment>
@@ -228,6 +250,33 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
+        <GridItem md={12}>
+          <Paper className={classes.paper}>
+            <TableData
+              title='Prescription'
+              columns={PrescriptionColumns}
+              colExtensions={PrescriptionColumnExtensions(
+                viewOnly,
+                onPrint,
+                inventorymedication,
+                handleSelectedBatch,
+              )}
+              data={prescription}
+            />
+            <TableData
+              title='Vaccination'
+              columns={VaccinationColumn}
+              colExtensions={VaccinationColumnExtensions(viewOnly)}
+              data={vaccination}
+            />
+            <TableData
+              title='Other Orders'
+              columns={OtherOrdersColumns}
+              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
+              data={otherOrder}
+            />
+          </Paper>
+        </GridItem>
         <GridItem xs={2} md={9} />
         {!viewOnly && (
           <GridItem xs={10} md={3}>
@@ -253,7 +302,9 @@ const DispenseDetails = ({
                   invoiceAdjustment: v.adjustments,
                   isGSTInclusive: !!v.summary.isGSTInclusive,
                 }
+                // console.log('summary', { summary: v })
                 setFieldValue('invoice', newInvoice)
+                updateGridData(v.rows)
                 // setFieldValue('invoice.invoiceTotal', v.summary.total)
                 // setFieldValue(
                 //   'invoice.invoiceTotalAftAdj',
