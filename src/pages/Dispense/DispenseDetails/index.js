@@ -118,7 +118,7 @@ const DispenseDetails = ({
   const handleOrderModal = () => {
     const popUpStatus = !showOrderModal
     setShowOrderModal(popUpStatus)
-    if (showOrderModal) {
+    if (!showOrderModal) {
       dispatch({
         type: 'orders/updateState',
         payload: {
@@ -190,13 +190,13 @@ const DispenseDetails = ({
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
             <Authorized authority='queue.dispense.savedispense'>
-              <ProgressButton
+              {/* <ProgressButton
                 color='success'
                 size='sm'
                 onClick={handleOrderModal}
               >
                 Dummy Button
-              </ProgressButton>
+              </ProgressButton> */}
               <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                 Save Dispense
               </ProgressButton>
