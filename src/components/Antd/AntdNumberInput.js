@@ -14,6 +14,7 @@ import { isNumber } from 'util'
 import { CustomInput } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc, roundTo } from '@/utils/utils'
+import config from '@/utils/config'
 
 const STYLES = () => {
   return {
@@ -369,6 +370,7 @@ class AntdNumberInput extends React.PureComponent {
       max,
       min,
     }
+    const { percentageFormat } = config
 
     if (!format) {
       let precisionStr = '.'
