@@ -172,7 +172,6 @@ export const viewReport = (row, props, useID = false) => {
   }),
 
   handleSubmit: (values, { props }) => {
-    // // console.log(values)
     const { dispatch, onSave } = props
     // dispatch({
     //   type: 'consultationDocument/upsertRow',

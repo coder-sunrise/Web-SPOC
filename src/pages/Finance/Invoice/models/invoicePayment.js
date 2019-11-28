@@ -201,7 +201,7 @@ export default createFormViewModel({
         const response = yield call(service.postTransfer, payload)
         const { status } = response
 
-        if (status === '200') {
+        if (status === '201') {
           notification.success({
             message: 'Transferred',
           })
