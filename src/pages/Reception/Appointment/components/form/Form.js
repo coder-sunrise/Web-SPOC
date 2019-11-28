@@ -9,6 +9,7 @@ import { withStyles } from '@material-ui/core'
 // custom component
 import {
   CommonModal,
+  CardContainer,
   GridContainer,
   GridItem,
   SizeContainer,
@@ -19,6 +20,7 @@ import {
 import { LoadingWrapper, Recurrence } from '@/components/_medisys'
 // custom components
 import PatientProfile from '@/pages/PatientDatabase/Detail'
+import AppointmentHistory from '@/pages/PatientDatabase/Detail/AppointmentHistory'
 import PatientSearchModal from '../../PatientSearch'
 import DeleteConfirmation from './DeleteConfirmation'
 import AppointmentDataGrid from './AppointmentDataGrid'
@@ -85,6 +87,7 @@ class Form extends React.PureComponent {
   }
 
   componentDidMount () {
+    const { values } = this.props
     Promise.all([
       // this.props.dispatch({
       //   type: 'codetable/fetchCodes',
@@ -102,7 +105,27 @@ class Form extends React.PureComponent {
       }),
     ])
 
+    if (values && values.patientProfileFK) {
+      this.refreshPatient(values.patientProfileFK)
+    }
+
     this.validateDataGrid()
+  }
+
+  refreshPatient = (id) => {
+    this.props
+      .dispatch({
+        type: 'patient/query',
+        payload: {
+          id,
+        },
+      })
+      .then((pat) => {
+        this.props.dispatch({
+          type: 'patient/updateState',
+          payload: { entity: pat },
+        })
+      })
   }
 
   onRecurrencePatternChange = async (recurrencePatternFK) => {
@@ -246,6 +269,7 @@ class Form extends React.PureComponent {
       patientName: name,
       patientContactNo: mobileNo,
     })
+    this.refreshPatient(id)
     if (!autoPopulate) this.toggleSearchPatientModal()
 
     return true
@@ -798,42 +822,52 @@ class Form extends React.PureComponent {
                   values={values}
                 />
                 <AppointmentDateInput disabled={_disableAppointmentDate} />
+                <GridItem xs md={12} className={classes.verticalSpacing}>
+                  <AppointmentDataGrid
+                    disabled={disableDataGrid}
+                    appointmentDate={currentAppointment.appointmentDate}
+                    data={_datagrid}
+                    handleCommitChanges={this.onCommitChanges}
+                    handleEditingRowsChange={this.onEditingRowsChange}
+                    editingRows={editingRows}
+                    selectedSlot={selectedSlot}
+                  />
+                </GridItem>
+                <GridItem xs md={12}>
+                  <Field
+                    name='currentAppointment.appointmentRemarks'
+                    render={(args) => (
+                      <OutlinedTextField
+                        {...args}
+                        disabled={disableDataGrid}
+                        rows='4'
+                        rowsMax='10'
+                        multiline
+                        label='Appointment Remarks'
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem xs md={12}>
+                  <Recurrence
+                    size='lg'
+                    disabled={values.id !== undefined}
+                    formValues={values}
+                    recurrenceDto={values.recurrenceDto}
+                    handleRecurrencePatternChange={
+                      this.onRecurrencePatternChange
+                    }
+                  />
+                </GridItem>
               </GridItem>
-              <GridItem xs md={6} className={classnames(classes.remarksField)}>
-                <Field
-                  name='currentAppointment.appointmentRemarks'
-                  render={(args) => (
-                    <OutlinedTextField
-                      {...args}
-                      disabled={disableDataGrid}
-                      multiline
-                      rowsMax={3}
-                      rows={3}
-                      label='Appointment Remarks'
-                    />
-                  )}
-                />
-              </GridItem>
-
-              <GridItem xs md={12} className={classes.verticalSpacing}>
-                <AppointmentDataGrid
-                  disabled={disableDataGrid}
-                  appointmentDate={currentAppointment.appointmentDate}
-                  data={_datagrid}
-                  handleCommitChanges={this.onCommitChanges}
-                  handleEditingRowsChange={this.onEditingRowsChange}
-                  editingRows={editingRows}
-                  selectedSlot={selectedSlot}
-                />
-              </GridItem>
-
-              <GridItem xs md={12}>
-                <Recurrence
-                  disabled={values.id !== undefined}
-                  formValues={values}
-                  recurrenceDto={values.recurrenceDto}
-                  handleRecurrencePatternChange={this.onRecurrencePatternChange}
-                />
+              <GridItem xs md={6}>
+                <CardContainer
+                  hideHeader
+                  title='Appointment History'
+                  style={{ height: '100%' }}
+                >
+                  <AppointmentHistory />
+                </CardContainer>
               </GridItem>
             </GridContainer>
 

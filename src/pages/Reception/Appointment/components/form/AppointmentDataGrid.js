@@ -16,7 +16,7 @@ import ErrorPopover from './ErrorPopover'
 
 const validationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
-  appointmentDuration: Yup.string().required(),
+  // appointmentDuration: Yup.string().required(),
   endTime: Yup.string()
     .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
     .required(),

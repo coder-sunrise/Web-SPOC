@@ -102,6 +102,7 @@ const styles = () => ({
       },
     }).then((r) => {
       // create new patient will return patient entity, r === true
+      console.log(r)
       if (r) {
         if (r.id) {
           if (!patient.callback) {
