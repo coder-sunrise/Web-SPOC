@@ -39,11 +39,14 @@ const styles = (theme) => ({
   rightAlign: {
     textAlign: 'right',
   },
+  summaryRow: {
+    margin: '3px 0 3px 0',
+    height: 20,
+  },
 })
 // @skeleton()
-@connect(({ orders, visitRegistration, codetable }) => ({
+@connect(({ orders, codetable }) => ({
   orders,
-  visitRegistration,
   codetable,
 }))
 class Orders extends PureComponent {
@@ -55,9 +58,7 @@ class Orders extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, status, visitRegistration } = this.props
-    const { entity: vistEntity } = visitRegistration
-    const { visit = {} } = vistEntity
+    const { dispatch, status } = this.props
 
     const codeTableNameArray = []
     codeTableNameArray.push('ctMedicationUsage')
@@ -105,14 +106,7 @@ class Orders extends PureComponent {
 
   render () {
     const { state, props } = this
-    const {
-      theme,
-      classes,
-      orders,
-      className,
-      visitRegistration,
-      codetable,
-    } = props
+    const { theme, classes, orders, className, codetable } = props
 
     return (
       <div className={className}>

@@ -409,7 +409,7 @@ class ClinicalNotes extends Component {
       consultation,
       visitRegistration,
     } = this.props
-    const { visit } = visitRegistration.entity
+    const { visit = {} } = visitRegistration.entity || {}
     return (
       <div>
         <div className={classes.editor}>

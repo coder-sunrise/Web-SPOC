@@ -60,6 +60,10 @@ export default createFormViewModel({
           const visitRegistration = yield select((st) => st.visitRegistration)
           visit = visitRegistration.entity.visit
           if (!visit) return
+        } else {
+          yield put({
+            type: 'visitRegistration/reset',
+          })
         }
 
         yield put({

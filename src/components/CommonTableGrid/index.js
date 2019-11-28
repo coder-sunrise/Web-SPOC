@@ -391,6 +391,10 @@ class CommonTableGrid extends PureComponent {
             padding: '7px 4px 7px 4px',
             fontSize: '1em',
           },
+          footer: {
+            fontSize: 'inherit',
+            lineHeight: '1em',
+          },
         },
 
         // PrivateRadioButtonIcon: {
@@ -706,6 +710,7 @@ class CommonTableGrid extends PureComponent {
       global,
       loading,
       gridId,
+      extraCellConfig,
     } = this.props
 
     const {
@@ -828,6 +833,7 @@ class CommonTableGrid extends PureComponent {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
       c.getRowId = getRowId
+      c.control = extraCellConfig
 
       if (c.type === 'number' || c.type === 'currency') {
         if (!c.align) {
@@ -857,6 +863,7 @@ class CommonTableGrid extends PureComponent {
       commitCount: global.commitCount,
       errorCount: global.errorCount,
     }
+
     // const allowSelectRowByClick =
     //   columns.find((col) => col.name.toUpperCase() === 'ACTION') === undefined
 

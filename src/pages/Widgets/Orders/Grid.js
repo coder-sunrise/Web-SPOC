@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { formatMessage } from 'umi/locale'
 
 import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
@@ -7,6 +6,8 @@ import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table, TableSummaryRow } from '@devexpress/dx-react-grid-material-ui'
+
 import numeral from 'numeral'
 import {
   CommonTableGrid,
@@ -113,9 +114,14 @@ export default ({
   totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'total' })
   adjustments.forEach((adj) => {
     messages[adj.uid] = (
-      <span>
-        {adj.adjRemark}
-
+      <div
+        style={{
+          width: '50%',
+          overflow: 'hidden',
+          display: 'inline-block',
+          textOverflow: 'ellipsis',
+        }}
+      >
         <Popconfirm
           onConfirm={() =>
             dispatch({
@@ -135,7 +141,10 @@ export default ({
             </IconButton>
           </Tooltip>
         </Popconfirm>
-      </span>
+        <Tooltip title={adj.adjRemark}>
+          <span>{adj.adjRemark}</span>
+        </Tooltip>
+      </div>
     )
   })
 
@@ -226,6 +235,14 @@ export default ({
               ]
               return <Table.Row>{newChildren}</Table.Row>
             },
+            itemComponent: (p) => {
+              return (
+                <div className={classes.summaryRow}>
+                  {messages[p.type]}
+                  {p.children}
+                </div>
+              )
+            },
             totalCellComponent: (p) => {
               const { children, column } = p
               if (column.name === 'totalAfterItemAdjustment') {
@@ -233,7 +250,14 @@ export default ({
                 const c1 = items.splice(0, items.length - 1)
                 const c2 = items.splice(items.length - 1)
                 return (
-                  <Table.Cell colSpan={2}>
+                  <Table.Cell
+                    colSpan={2}
+                    style={{
+                      fontSize: 'inherit',
+                      color: 'inherit',
+                      fontWeight: 500,
+                    }}
+                  >
                     <span>
                       Adjustment
                       <Tooltip title='Add Adjustment'>
@@ -248,6 +272,7 @@ export default ({
                         name='isGstInclusive'
                         render={(args) => (
                           <Checkbox
+                            simple
                             label={formatMessage({
                               id: 'app.general.inclusiveGST',
                             })}
