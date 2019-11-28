@@ -107,6 +107,7 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/query',
       payload: {
+        pagesize: 9999,
         combineCondition: 'and',
         lgteql_appointmentDate: startOfMonth,
         lsteql_appointmentDate: endOfMonth,
