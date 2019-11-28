@@ -61,11 +61,10 @@ const styles = () => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, statementInvoice, ...restValues } = values
     const { dispatch, history } = props
-
     const newStatementInvoice = statementInvoice.map((o) => {
       return {
         ...o,
-        id: values.id ? o.id : undefined,
+        id: o.statementInvoicePayment ? o.id : undefined,
         invoicePayerFK: o.copayerInvoicePayerId || o.invoicePayerFK,
         payableAmount: o.copayerPayableAmount || o.payableAmount,
         outstandingAmount: o.copayerOutstanding || o.outstandingAmount,
@@ -176,7 +175,8 @@ class AddNewStatement extends PureComponent {
 
   handleSelectionChange = (rows) => {
     const { setValues, values } = this.props
-    const { invoiceRows, defaultSelectedRows, selectedRows } = this.state
+    const { statementInvoice } = values
+    const { invoiceRows } = this.state
 
     let statementInvoiceRows = []
     rows.forEach((o) => {
@@ -188,6 +188,10 @@ class AddNewStatement extends PureComponent {
       }
     })
     if (rows) {
+      statementInvoiceRows = [
+        ...statementInvoiceRows,
+        ...statementInvoice,
+      ]
       setValues({
         ...values,
         statementInvoice: statementInvoiceRows,
