@@ -28,12 +28,14 @@ const ActionButton = ({ row, onClick }) => {
                 case 8: // register visit
                   return {
                     ...opt,
-                    disabled: row.patientProfileFk === undefined,
+                    disabled: !row.patientProfileFk,
+                    hidden: !row.patientProfileFk,
                   }
                 case 9: // register patient
                   return {
                     ...opt,
-                    disabled: row.patientProfileFk !== undefined,
+                    disabled: !!row.patientProfileFk,
+                    hidden: !!row.patientProfileFk,
                   }
                 default:
                   return { ...opt }

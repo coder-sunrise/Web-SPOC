@@ -13,7 +13,7 @@ models.push(require('@/models/global'))
 models.push(require('@/models/user'))
 
 models.forEach((model) => {
-  initialState[model.namespace] = model.state
+  initialState[model.default.namespace] = model.default.state
 })
 
 export const dva = {

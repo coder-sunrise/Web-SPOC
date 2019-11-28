@@ -30,11 +30,6 @@ const styles = (theme) => ({
   gridContainer: {
     marginBottom: theme.spacing(1),
   },
-  formContent: {
-    minHeight: '50vh',
-    maxHeight: '85vh',
-    overflow: 'auto',
-  },
   cardContent: {
     padding: `0px ${16}px !important`,
   },
@@ -63,6 +58,14 @@ const styles = (theme) => ({
     right: 0,
   },
 })
+
+const getHeight = (propsHeight) => {
+  if (propsHeight < 0) return '100%'
+
+  const modalMargin = 64
+  const footerAndHeaderHeight = 95
+  return propsHeight - footerAndHeaderHeight - modalMargin
+}
 
 @connect(
   ({
@@ -193,10 +196,12 @@ class NewVisit extends PureComponent {
       footer,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: { visitInfo, errorState },
+      visitRegistration: { errorState },
       values,
       isSubmitting,
     } = this.props
+
+    const height = getHeight(this.props.height)
 
     const existingQNo = list.reduce(
       (queueNumbers, queue) =>
@@ -213,7 +218,7 @@ class NewVisit extends PureComponent {
     const isReadOnly =
       values.visitStatus !== VISIT_STATUS.WAITING &&
       values.visitStatus !== VISIT_STATUS.UPCOMING_APPT
-    const isEdit = Object.keys(visitInfo).length > 0
+    const isEdit = !!values.id
     const fetchingVisitInfo =
       loading.effects['visitRegistration/fetchVisitInfo']
     const fetchingInfoText = fetchingVisitInfo
@@ -232,7 +237,15 @@ class NewVisit extends PureComponent {
             <GridItem xs sm={12} md={3}>
               <PatientInfoCard />
             </GridItem>
-            <GridItem container xs md={9} className={classes.formContent}>
+            <GridItem
+              container
+              xs
+              md={9}
+              style={{
+                height,
+                overflow: 'auto',
+              }}
+            >
               <ErrorWrapper errorState={errorState} errorKey='visitInfo'>
                 <SizeContainer size='sm'>
                   <React.Fragment>
@@ -271,14 +284,16 @@ class NewVisit extends PureComponent {
             </GridItem>
           </GridContainer>
         </LoadingWrapper>
-        {footer &&
-          footer({
-            confirmBtnText: isEdit ? 'Save' : 'Register visit',
-            onConfirm: this.validatePatient,
-            confirmProps: {
-              disabled: isReadOnly,
-            },
-          })}
+        <div style={{ position: 'relative' }}>
+          {footer &&
+            footer({
+              confirmBtnText: isEdit ? 'Save' : 'Register visit',
+              onConfirm: this.validatePatient,
+              confirmProps: {
+                disabled: isReadOnly,
+              },
+            })}
+        </div>
       </React.Fragment>
     )
   }
