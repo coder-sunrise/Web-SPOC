@@ -250,33 +250,6 @@ const DispenseDetails = ({
             />
           </Paper>
         </GridItem>
-        <GridItem md={12}>
-          <Paper className={classes.paper}>
-            <TableData
-              title='Prescription'
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(
-                viewOnly,
-                onPrint,
-                inventorymedication,
-                handleSelectedBatch,
-              )}
-              data={prescription}
-            />
-            <TableData
-              title='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
-            <TableData
-              title='Other Orders'
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
-              data={otherOrder}
-            />
-          </Paper>
-        </GridItem>
         <GridItem xs={2} md={9} />
         {!viewOnly && (
           <GridItem xs={10} md={3}>
