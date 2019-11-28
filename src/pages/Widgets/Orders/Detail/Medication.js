@@ -72,7 +72,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
         dosageFK: Yup.number().required(),
         prescribeUOMFK: Yup.number().required(),
         drugFrequencyFK: Yup.number().required(),
-        duration: Yup.number().required(),
+        duration: Yup.number().min(1).required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
@@ -349,7 +349,10 @@ class Medication extends PureComponent {
       'corPrescriptionItemInstruction[0].drugFrequencyDisplayValue',
       op.medicationFrequency ? op.medicationFrequency.name : undefined,
     )
-    setFieldValue('corPrescriptionItemInstruction[0].duration', op.duration)
+    setFieldValue(
+      'corPrescriptionItemInstruction[0].duration',
+      op.duration || 1,
+    )
 
     if (
       op.inventoryMedication_MedicationPrecaution &&
@@ -672,7 +675,7 @@ class Medication extends PureComponent {
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
                                   step={1}
-                                  min={1}
+                                  min={0}
                                   {...args}
                                   onChange={() => {
                                     setTimeout(() => {
