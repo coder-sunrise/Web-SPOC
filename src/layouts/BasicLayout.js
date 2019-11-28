@@ -54,6 +54,8 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
+initClinicSettings()
+
 // setInterval(() => {
 //   console.log(document.activeElement)
 // }, 2000)
@@ -113,7 +115,6 @@ const sessionTimeoutTimer = 15 * 60 * 1000
 class BasicLayout extends React.PureComponent {
   constructor (props) {
     super(props)
-    initClinicSettings()
     this.state = {
       mobileOpen: false,
       authorized: false,
