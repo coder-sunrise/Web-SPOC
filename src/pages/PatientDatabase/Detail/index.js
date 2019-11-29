@@ -122,6 +122,14 @@ const mapEntityToValues = (entity) => {
       type: 'patient/upsert',
       payload: {
         ...values,
+        patientScheme: values.patientScheme.map((ps) => {
+          if (ps.isDeleted)
+            return {
+              ...ps,
+              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
+            }
+          return ps
+        }),
         cfg,
       },
     }).then((r) => {
