@@ -21,7 +21,7 @@ import { unstable_Box as Box } from '@material-ui/core/Box'
 import { Icon, Input, AutoComplete, Form } from 'antd'
 import Loadable from 'react-loadable'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
-import { findGetParameter , getAppendUrl } from '@/utils/utils'
+import { findGetParameter, getAppendUrl } from '@/utils/utils'
 import {
   PictureUpload,
   GridContainer,
@@ -39,11 +39,11 @@ import {
 
 import avatar from '@/assets/img/faces/marc.jpg'
 
-
 import Loading from '@/components/PageLoading/index'
 import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -184,6 +184,7 @@ class PatientDashboard extends PureComponent {
                   <ProgressButton
                     color='primary'
                     onClick={this.startConsultation}
+                    disabled={visit.visitPurposeFK === VISIT_TYPE.RETAIL}
                   >
                     Start Consultation
                   </ProgressButton>

@@ -912,7 +912,7 @@ const calculateAmount = (
     adjustedField = 'totalAfterOverallAdjustment',
     gstField = 'totalAfterGST',
     gstAmtField = 'gstAmount',
-    isGstInclusive = false,
+    isGSTInclusive = false,
   } = {},
 ) => {
   let gst = 0
@@ -925,6 +925,8 @@ const calculateAmount = (
 
   activeRows.forEach((r) => {
     r.weightage = roundTo(r[totalField] / total || 0)
+    // console.log(r[totalField], total, r.weightage)
+
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -932,18 +934,31 @@ const calculateAmount = (
   if (total === 0 && activeRows[0]) {
     activeRows[0].weightage = 1
   }
-  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa) => {
+  activeAdjustments.filter((o) => !o.isDeleted).forEach((fa, i) => {
     activeRows.forEach((o) => {
       o.subAdjustment = 0
     })
-    activeRows.forEach((r) => {
+    let adjAmount = 0
+    activeRows.forEach((r, j) => {
       // console.log(r.weightage * fa.adjAmount, r)
-      const adj = roundTo(r.weightage * fa.adjAmount)
+      let adj = 0
+      let initalRowToal = r[totalField]
+      for (let idx = 0; idx < i; idx++) {
+        initalRowToal += r[`adjustmen${idx}`]
+      }
+      if (fa.adjType === 'ExactAmount') {
+        adj = roundTo(r.weightage * fa.adjValue)
+      } else if (fa.adjType === 'Percentage') {
+        adj = roundTo(fa.adjValue / 100 * initalRowToal)
+      }
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-
-      r[adjustedField] = roundTo(r[adjustedField] + adj)
-      r.subAdjustment += adj
+      adjAmount = roundTo(adjAmount + adj)
+      // r[adjustedField] = roundTo(r[adjustedField] + adj)
+      // r.subAdjustment += adj
+      r[`adjustmen${i}`] = adj
+      r[adjustedField] = initalRowToal + adj
     })
+    fa.adjAmount = adjAmount
   })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
@@ -963,7 +978,7 @@ const calculateAmount = (
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
 
   if (isEnableGST) {
-    if (isGstInclusive) {
+    if (isGSTInclusive) {
       activeRows.forEach((r) => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
@@ -985,12 +1000,12 @@ const calculateAmount = (
       gst,
       total,
       totalAfterAdj,
-      totalWithGST: isGstInclusive
+      totalWithGST: isGSTInclusive
         ? totalAfterAdj
         : roundTo(gst + totalAfterAdj),
       isEnableGST,
       gSTPercentage,
-      isGstInclusive,
+      isGSTInclusive,
     },
   }
   // console.log({ r })

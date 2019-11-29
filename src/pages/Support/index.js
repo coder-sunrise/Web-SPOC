@@ -1,7 +1,9 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import _ from 'lodash'
-import { Print, Call } from '@material-ui/icons'
+import Call from '@material-ui/icons/Call'
+import Print from '@material-ui/icons/Print'
+
 import { withStyles } from '@material-ui/core'
 
 import { GridContainer, GridItem, CardContainer, Button } from '@/components'

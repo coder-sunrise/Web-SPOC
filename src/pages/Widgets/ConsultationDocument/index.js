@@ -7,6 +7,7 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import Print from '@material-ui/icons/Print'
+import Add from '@material-ui/icons/Add'
 import { consultationDocumentTypes } from '@/utils/codes'
 import { download } from '@/utils/request'
 import { commonDataReaderTransform } from '@/utils/utils'
@@ -27,6 +28,7 @@ import {
   Checkbox,
   TextField,
   ProgressButton,
+  AuthorizedContext,
 } from '@/components'
 import AddConsultationDocument from './AddConsultationDocument'
 
@@ -172,7 +174,6 @@ export const viewReport = (row, props, useID = false) => {
   }),
 
   handleSubmit: (values, { props }) => {
-    // // console.log(values)
     const { dispatch, onSave } = props
     // dispatch({
     //   type: 'consultationDocument/upsertRow',
@@ -340,6 +341,33 @@ class ConsultationDocument extends PureComponent {
             },
           ]}
         />
+        <AuthorizedContext>
+          {(r) => {
+            if (r && r.rights !== 'enable') return null
+
+            return (
+              <Tooltip title='Add Consultation Document'>
+                <ProgressButton
+                  color='primary'
+                  icon={<Add />}
+                  style={{ margin: theme.spacing(1) }}
+                  onClick={() => {
+                    window.g_app._store.dispatch({
+                      type: 'consultationDocument/updateState',
+                      payload: {
+                        showModal: true,
+                        type: '5',
+                        entity: undefined,
+                      },
+                    })
+                  }}
+                >
+                  Add New
+                </ProgressButton>
+              </Tooltip>
+            )
+          }}
+        </AuthorizedContext>
         {forDispense && (
           <GridContainer>
             <GridItem xs={12} md={6}>

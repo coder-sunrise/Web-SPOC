@@ -300,6 +300,7 @@ export default createFormViewModel({
           if (ps.coPaymentSchemeFK === null) {
             ps.coPaymentSchemeFK = undefined
           }
+          ps.preSchemeTypeFK = ps.schemeTypeFK
         })
         return {
           ...st,

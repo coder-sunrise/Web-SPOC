@@ -53,10 +53,12 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile, user, codetable }) => ({
+@connect(({ settingUserProfile, user, codetable, clinicInfo, queueLog }) => ({
+  clinicCode: clinicInfo.clinicCode,
   settingUserProfile,
   currentUser: user.profileDetails,
   ctRole: codetable.role,
+  hasActiveSession: queueLog.hasActiveSession,
 }))
 @withFormikExtend({
   displayName: 'UserProfile',
@@ -184,7 +186,6 @@ const styles = (theme) => ({
       type: 'settingUserProfile/upsert',
       payload,
     }).then((response) => {
-      console.log({ response })
       if (response) {
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
@@ -214,23 +215,6 @@ class UserProfileForm extends React.PureComponent {
     showChangePassword: false,
     showPrimaryClinicianChanges: false,
     canEditDoctorMCR: false,
-  }
-
-  componentDidMount () {
-    this.checkHasActiveSession()
-  }
-
-  checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await queueServices.getBizSession(bizSessionPayload)
-    const { data } = result.data
-    this.setState(() => {
-      return {
-        hasActiveSession: data.length > 0,
-      }
-    })
   }
 
   toggleChangePasswordModal = () => {
@@ -284,7 +268,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   validateBeforeSubmit = async () => {
-    const { values, handleSubmit, ctRole, dispatch } = this.props
+    const { values, handleSubmit, ctRole, clinicCode, dispatch } = this.props
     const { _oldRole, role, id } = values
 
     /* skip all the validation when add new user */
@@ -307,13 +291,12 @@ class UserProfileForm extends React.PureComponent {
         return true
       }
 
-      const clinicCode = localStorage.getItem('clinicCode')
       this.toggleValidating()
       const [
         clinicInfoResponse,
         bizSessionResponse,
       ] = await Promise.all([
-        clinicServices.query(clinicCode),
+        clinicServices.query({ clinicCode }),
         queueServices.getBizSession({
           IsClinicSessionClosed: false,
         }),
@@ -360,7 +343,13 @@ class UserProfileForm extends React.PureComponent {
   }
 
   render () {
-    const { classes, footer, values } = this.props
+    const {
+      classes,
+      footer,
+      values,
+      settingUserProfile,
+      hasActiveSession,
+    } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
@@ -370,6 +359,8 @@ class UserProfileForm extends React.PureComponent {
       isValidating,
     } = this.state
     const isEdit = values.id !== undefined
+    const isMyAccount = _.isEmpty(settingUserProfile.currentSelectedUser)
+
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
@@ -576,7 +567,7 @@ class UserProfileForm extends React.PureComponent {
                       {...args}
                       label='Effective Start Date'
                       label2='Effective End Date'
-                      disabled={isEdit ? this.state.hasActiveSession : false}
+                      disabled={isEdit ? hasActiveSession : false}
                     />
                   )}
                 />
@@ -594,6 +585,7 @@ class UserProfileForm extends React.PureComponent {
                       {...args}
                       label='Role'
                       code='role'
+                      disabled={isMyAccount}
                       onChange={this.onRoleChange}
                     />
                   )}

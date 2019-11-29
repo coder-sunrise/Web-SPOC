@@ -1,16 +1,12 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 // material ui
-import { Print, Edit, Delete } from '@material-ui/icons'
+import Delete from '@material-ui/icons/Delete'
+import Edit from '@material-ui/icons/Edit'
+import Print from '@material-ui/icons/Print'
+
 // custom components
-import {
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  withStyles,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import Authorized from '@/utils/Authorized'
 import {
   Button,
@@ -31,9 +27,6 @@ const styles = () => ({})
 class Statement extends PureComponent {
   state = {
     selectedRows: [],
-    open: false,
-    selectedStatementNo: '',
-
     columns: [
       { name: 'statementNo', title: 'Statement No.' },
       { name: 'statementDate', title: 'Statement Date' },
@@ -62,49 +55,33 @@ class Statement extends PureComponent {
     }
   }
 
-  handleClickOpen = (row) => {
-    this.setState((prevState) => {
-      return {
-        open: !prevState.open,
-        selectedStatementNo: row.statementNo,
-      }
-    })
-  }
-
-  confirmDelete = () => {
-    this.setState((prevState) => {
-      return { open: !prevState.open }
-    })
-
-    const { dispatch, statement } = this.props
-    const rowId = statement.entity.list.find(
-      (o) => o.statementNo === this.state.selectedStatementNo,
-    ).id
-
+  cancelStatement = (row) => {
+    const { dispatch } = this.props
+    const { statementNo, id } = row
     dispatch({
-      type: 'statement/removeRow',
+      type: 'global/updateAppState',
       payload: {
-        id: rowId,
-        cancelReason: 'Statement Cancelled',
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to delete record ${statementNo} ?`,
+        onConfirmDiscard: () => {
+          dispatch({
+            type: 'statement/removeRow',
+            payload: {
+              id,
+              cancelReason: 'Statement Cancelled',
+            },
+          }).then(() => {
+            this.props.dispatch({
+              type: 'statement/query',
+            })
+          })
+        },
       },
-    }).then(() => {
-      this.props.dispatch({
-        type: 'statement/query',
-      })
-    })
-  }
-
-  handleClose = (e) => {
-    this.setState((prevState) => {
-      return { open: !prevState.open }
     })
   }
 
   render () {
-    // console.log('rows', this.state.rows)
-
     const { history, dispatch } = this.props
-
     const editRow = (row, e) => {
       dispatch({
         type: 'statement/updateState',
@@ -114,7 +91,7 @@ class Statement extends PureComponent {
       })
       history.push(`/finance/statement/details/${row.id}`)
     }
-    const { rows, columns, selectedStatementNo } = this.state
+    const { rows, columns } = this.state
     return (
       <CardContainer hideHeader>
         <SearchBar
@@ -199,7 +176,7 @@ class Statement extends PureComponent {
                         <Button
                           size='sm'
                           onClick={() => {
-                            this.handleClickOpen(row)
+                            this.cancelStatement(row)
                           }}
                           justIcon
                           color='danger'
@@ -221,32 +198,6 @@ class Statement extends PureComponent {
             },
           ]}
         />
-        <Dialog
-          open={this.state.open}
-          // onClose={this.handleClose}
-          aria-labelledby='alert-dialog-title'
-          aria-describedby='alert-dialog-description'
-        >
-          <DialogTitle id='alert-dialog-title'>Are you sure?</DialogTitle>
-          <DialogContent>
-            <DialogContentText id='alert-dialog-description'>
-              Cancel this statement - <b>{selectedStatementNo}</b> ?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} value='false' color='danger'>
-              No
-            </Button>
-            <Button
-              onClick={this.confirmDelete}
-              value='true'
-              color='primary'
-              autoFocus
-            >
-              Yes
-            </Button>
-          </DialogActions>
-        </Dialog>
       </CardContainer>
     )
   }

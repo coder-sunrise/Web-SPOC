@@ -410,6 +410,7 @@ class ClinicalNotes extends Component {
       visitRegistration,
     } = this.props
     const { visit = {} } = visitRegistration.entity || {}
+    const { entity = {} } = consultation
     return (
       <div>
         <div className={classes.editor}>
@@ -567,7 +568,7 @@ class ClinicalNotes extends Component {
                 noUnderline
                 multiline
                 disabled
-                value={visit.visitRemarks}
+                value={entity.visitRemarks || ''}
               />
             </GridItem>
           </GridContainer>

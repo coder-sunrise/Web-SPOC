@@ -8,9 +8,6 @@ import numeral from 'numeral'
 import update from 'immutability-helper'
 import * as Yup from 'yup'
 import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
-import { sleep, sumReducer } from '@/utils/utils'
-import { getUniqueGUID } from '@/utils/cdrss'
-
 import {
   Grid,
   Divider,
@@ -20,7 +17,8 @@ import {
   ClickAwayListener,
   withStyles,
 } from '@material-ui/core'
-import { Money, CreditCard, Close, Check } from '@material-ui/icons'
+import { sleep, sumReducer } from '@/utils/utils'
+import { getUniqueGUID } from '@/utils/cdrss'
 
 import {
   RadioButtonGroup,

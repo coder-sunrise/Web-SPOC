@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { withStyles, Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+
 import { connect } from 'dva'
 import numeral from 'numeral'
 
@@ -92,7 +93,6 @@ class AmountSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
-    console.log(isCheckboxClicked)
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
     config.isGSTInclusive = isCheckboxClicked

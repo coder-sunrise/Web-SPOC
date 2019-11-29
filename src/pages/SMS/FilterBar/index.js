@@ -5,7 +5,7 @@ import { FormattedMessage } from 'umi/locale'
 // formik
 import { withFormik } from 'formik'
 // material ui
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components

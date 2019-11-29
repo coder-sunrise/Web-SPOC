@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { Edit } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
+
 import { Button, CommonTableGrid, Tooltip } from '@/components'
 import Authorized from '@/utils/Authorized'
 

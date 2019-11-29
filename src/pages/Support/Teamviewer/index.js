@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import { Chat, Computer } from '@material-ui/icons'
+import Computer from '@material-ui/icons/Computer'
+import Chat from '@material-ui/icons/Chat'
+
 import { downloadTeamviewer } from '../download'
 import logoPic from '@/assets/img/contacttop.jpg'
 

@@ -14,7 +14,11 @@ import {
 import cx from 'classnames'
 
 // material icons
-import { Menu, PersonAdd, Fingerprint, LockOpen } from '@material-ui/icons'
+import Menu from '@material-ui/icons/Menu'
+import LockOpen from '@material-ui/icons/LockOpen'
+import Fingerprint from '@material-ui/icons/Fingerprint'
+import PersonAdd from '@material-ui/icons/PersonAdd'
+
 import { Button } from '@/components'
 
 import authNavBarStyle from '@/assets/jss/material-dashboard-pro-react/components/authNavbarStyle'

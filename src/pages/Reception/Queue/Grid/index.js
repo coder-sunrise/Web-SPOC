@@ -13,9 +13,11 @@ import ContextMenu from './ContextMenu'
 // utils
 import { getAppendUrl } from '@/utils/utils'
 import { filterData } from '../utils'
-import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import {
+  VISIT_STATUS,
+  ContextMenuOptions,
+} from '@/pages/Reception/Queue/variables'
 import { StatusIndicator } from '../variables'
-
 import {
   FuncConfig,
   QueueTableConfig,
@@ -23,6 +25,8 @@ import {
   AppointmentTableConfig,
   ApptColumnExtensions,
 } from './variables'
+import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const gridHeight = window.innerHeight - 250
 
@@ -378,12 +382,13 @@ const Grid = ({
 
   const handleStatusTagClick = (row) => {
     let id = '5' // default as Start Consultation
-    const { visitStatus } = row
+    const { visitStatus, visitPurposeFK } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) return
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        id = '5'
+        if (visitPurposeFK === VISIT_TYPE.RETAIL) id = '1'
+        else id = '5'
         break
       case VISIT_STATUS.IN_CONS:
       case VISIT_STATUS.PAUSED:
@@ -401,7 +406,23 @@ const Grid = ({
         id = undefined
         break
     }
-    if (id) onClick(row, id)
+
+    const contextMenuOption = id
+      ? ContextMenuOptions.find((item) => item.id === parseInt(id, 10))
+      : null
+
+    if (contextMenuOption) {
+      const authority = Authorized.check(contextMenuOption.authority)
+      if (authority.rights === 'disable' || authority.rights === 'hidden') {
+        notification.error({
+          message: 'Unauthorized Access',
+        })
+        return
+      }
+      onClick(row, id)
+    }
+
+    // if (id) onClick(row, id)
   }
 
   const isLoading = showingVisitRegistration ? false : queryingList

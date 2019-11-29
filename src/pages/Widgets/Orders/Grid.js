@@ -32,33 +32,20 @@ export default ({
   handleAddAdjustment,
   codetable,
 }) => {
-  const { rows, summary, finalAdjustments } = orders
+  const { rows, summary, finalAdjustments, isGSTInclusive } = orders
   // console.log(orders)
-  const {
-    total,
-    gst,
-    totalWithGST,
-    gSTPercentage,
-    isEnableGST,
-    isGstInclusive,
-  } = summary
+  const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const [
-    totalAmt,
-    setTotalAmt,
-  ] = useState(totalWithGST)
+    checkedStatusIncldGST,
+    setCheckedStatusIncldGST,
+  ] = useState(isGSTInclusive)
 
   useEffect(
     () => {
-      let tempTotal = total
-      if (!isGstInclusive) {
-        tempTotal += gst
-      }
-      setTotalAmt(tempTotal)
+      setCheckedStatusIncldGST(orders.isGSTInclusive)
     },
     [
-      total,
-      gst,
-      isGstInclusive,
+      orders,
     ],
   )
 
@@ -77,6 +64,7 @@ export default ({
       },
     })
   }
+  console.log(total, summary)
   const addAdjustment = () => {
     dispatch({
       type: 'global/updateState',
@@ -148,27 +136,6 @@ export default ({
     )
   })
 
-  const handleInclusiveGST = useCallback(
-    (e) => {
-      if (e.target.value) {
-        if (isGstInclusive) {
-          setTotalAmt(totalWithGST)
-          return
-        }
-        setTotalAmt(totalWithGST - gst)
-      } else {
-        if (!isGstInclusive) {
-          setTotalAmt(totalWithGST)
-          return
-        }
-        setTotalAmt(totalWithGST + gst)
-      }
-    },
-    [
-      totalAmt,
-    ],
-  )
-
   return (
     <CommonTableGrid
       size='sm'
@@ -205,7 +172,7 @@ export default ({
               if (type === 'total') {
                 return (
                   <span style={{ float: 'right' }}>
-                    <NumberInput value={totalAmt} text currency />
+                    <NumberInput value={totalWithGST} text currency />
                   </span>
                 )
               }
@@ -268,18 +235,23 @@ export default ({
                     </span>
                     {c1}
                     {isEnableGST && (
-                      <Field
-                        name='isGstInclusive'
-                        render={(args) => (
-                          <Checkbox
-                            simple
-                            label={formatMessage({
-                              id: 'app.general.inclusiveGST',
-                            })}
-                            onChange={handleInclusiveGST}
-                            {...args}
-                          />
-                        )}
+                      <Checkbox
+                        simple
+                        label={formatMessage({
+                          id: 'app.general.inclusiveGST',
+                        })}
+                        checked={checkedStatusIncldGST}
+                        onChange={(e) => {
+                          dispatch({
+                            type: 'orders/updateState',
+                            payload: {
+                              isGSTInclusive: e.target.value,
+                            },
+                          })
+                          dispatch({
+                            type: 'orders/calculateAmount',
+                          })
+                        }}
                       />
                     )}
                     {c2}

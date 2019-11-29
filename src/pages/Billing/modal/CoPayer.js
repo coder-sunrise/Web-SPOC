@@ -136,11 +136,17 @@ class CoPayer extends Component {
         item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
       0,
     )
+    const getErrorRows = (row) => row._errors && row._errors.length > 0
+    const getSelectedRows = (item) => selectedRows.includes(item.id)
+    const hasError =
+      invoiceItems.filter(getSelectedRows).filter(getErrorRows).length > 0
+
     return (
       subtotalAmount <= 0 ||
       editingRowIds.length > 0 ||
       selectedRows.length === 0 ||
-      !coPayer
+      !coPayer ||
+      hasError
     )
   }
 

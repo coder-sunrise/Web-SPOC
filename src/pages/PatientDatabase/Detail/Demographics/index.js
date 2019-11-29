@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Call from '@material-ui/icons/Call'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+
 import { withStyles, Paper } from '@material-ui/core'
 import {
   Field,

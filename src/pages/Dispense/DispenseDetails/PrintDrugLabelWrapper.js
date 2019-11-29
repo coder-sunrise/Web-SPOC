@@ -163,7 +163,7 @@ class PrintDrugLabelWrapper extends React.Component {
 
   connectWebSocket () {
     if (this.iswsConnect === false) {
-      let settings = JSON.parse(sessionStorage.getItem('clinicSettings'))
+      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       if (settings.printToolSocketURL) {
         this.wsConnection = new window.WebSocket(settings.printToolSocketURL)
         this.wsConnection.onopen = () => {

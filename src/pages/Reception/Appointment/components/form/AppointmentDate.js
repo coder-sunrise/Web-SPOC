@@ -12,7 +12,7 @@ import {
 
 const AppointmentDate = ({ disabled }) => (
   <React.Fragment>
-    <GridItem xs md={6}>
+    <GridItem xs md={3}>
       <FastField
         name='currentAppointment.appointmentDate'
         // validate={this.startDateValidation}
@@ -26,8 +26,9 @@ const AppointmentDate = ({ disabled }) => (
         )}
       />
     </GridItem>
+    <GridItem xs md={6} />
 
-    <GridItem xs md={6}>
+    <GridItem xs md={3}>
       <FastField
         name='appointmentStatusFk'
         render={(args) => (
@@ -41,7 +42,7 @@ const AppointmentDate = ({ disabled }) => (
       />
     </GridItem>
 
-    <GridItem xs md={6}>
+    <GridItem xs md={3}>
       <FastField
         name='bookedByUser'
         render={(args) => <TextField label='Booked By' disabled {...args} />}

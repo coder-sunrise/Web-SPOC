@@ -23,14 +23,10 @@ import {
 import Button from 'mui-pro-components/CustomButtons'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import Paper from '@material-ui/core/Paper'
-import {
-  AccountCircle,
-  Search,
-  Replay,
-  Person,
-  Edit,
-  Delete,
-} from '@material-ui/icons'
+
+import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
+
 import Tooltip from '@material-ui/core/Tooltip'
 import {
   withFormik,
@@ -42,13 +38,6 @@ import {
 } from 'formik'
 import humps from 'humps'
 import Grid from '@material-ui/core/Grid'
-import {
-  RadioButtonGroup,
-  FormField,
-  DatePicker,
-  Select,
-  NumberInput,
-} from '@/components'
 
 import Call from '@material-ui/icons/Call'
 import Chat from '@material-ui/icons/Chat'
@@ -84,8 +73,16 @@ import NavPills from 'mui-pro-components/NavPills'
 import Badge from '@material-ui/core/Badge'
 
 import hoverCardStyle from 'mui-pro-jss/material-dashboard-pro-react/hoverCardStyle.jsx'
+import {
+  RadioButtonGroup,
+  FormField,
+  DatePicker,
+  Select,
+  NumberInput,
+} from '@/components'
 import Invoice from './Invoice'
 import Payment from './Payment'
+
 console.log(Yup)
 const drawerWidth = 400
 const styles = (theme) => ({

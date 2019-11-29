@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { FastField, withFormik } from 'formik'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import {

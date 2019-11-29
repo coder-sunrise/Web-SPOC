@@ -183,6 +183,33 @@ export default createFormViewModel({
 
         return false
       },
+
+      *getTransferData ({ payload }, { put, call }) {
+        const { id } = payload
+        const response = yield call(service.getTransfer, id)
+
+        const { data, status } = response
+        if (status === '200') {
+          yield put({
+            type: 'setTransferData',
+            payload: data,
+          })
+        }
+      },
+
+      *submitTransfer ({ payload }, { call }) {
+        const response = yield call(service.postTransfer, payload)
+        const { status } = response
+
+        if (status === '201') {
+          notification.success({
+            message: 'Transferred',
+          })
+          return true
+        }
+
+        return false
+      },
     },
     reducers: {
       queryDone (state, { payload }) {
@@ -282,6 +309,15 @@ export default createFormViewModel({
         return {
           ...state,
           currentBizSessionInfo: {
+            ...payload,
+          },
+        }
+      },
+
+      setTransferData (state, { payload }) {
+        return {
+          ...state,
+          transfer: {
             ...payload,
           },
         }

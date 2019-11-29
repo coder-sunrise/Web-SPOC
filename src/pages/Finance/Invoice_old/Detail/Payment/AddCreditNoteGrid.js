@@ -17,16 +17,12 @@ import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import { CustomInput, Button, Timeline } from 'mui-pro-components'
-import {
-  AccountCircle,
-  Search,
-  Replay,
-  Person,
-  Delete,
-  Save,
-  Edit,
-  Cancel,
-} from '@material-ui/icons'
+
+import Delete from '@material-ui/icons/Delete'
+import Save from '@material-ui/icons/Save'
+import Edit from '@material-ui/icons/Edit'
+import Cancel from '@material-ui/icons/Cancel'
+
 import { TableCell, MenuItem, Input, IconButton } from '@material-ui/core'
 import { Getter } from '@devexpress/dx-react-core'
 import {

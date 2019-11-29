@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 // formik
 import { FastField } from 'formik'
 import { FormattedMessage } from 'umi/locale'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 import moment from 'moment'
 // common components
 import {

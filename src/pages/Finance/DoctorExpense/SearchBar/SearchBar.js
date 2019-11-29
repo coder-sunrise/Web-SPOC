@@ -4,7 +4,9 @@ import moment from 'moment'
 
 import { GridContainer, GridItem, Button } from 'mui-pro-components'
 import { withStyles } from '@material-ui/core/styles'
-import { Search, Replay, AddBox } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Replay from '@material-ui/icons/Replay'
+import AddBox from '@material-ui/icons/AddBox'
 
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import { withFormik, FastField } from 'formik'
