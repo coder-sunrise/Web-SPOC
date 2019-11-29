@@ -28,6 +28,12 @@ import Block from './Block'
 import HistoryDiagnosis from './HistoryDiagnosis'
 import { control } from '@/components/Decorator'
 
+const headerStyles = {
+  color: 'darkblue',
+  fontWeight: 500,
+  // style={{ color: 'darkblue' }}
+}
+
 @control()
 @connect(({ patient, codetable }) => ({
   patient,
@@ -380,6 +386,7 @@ class Banner extends PureComponent {
                         style={{
                           whiteSpace: 'nowrap',
                           textOverflow: 'ellipsis',
+                          textDecoration: 'underline',
                           display: 'inline-block',
                           width: '100%',
                           overflow: 'hidden',
@@ -424,7 +431,7 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               header={
-                <div style={allergiesStyle()}>
+                <div style={headerStyles}>
                   {this.state.showWarning && (
                     <IconButton disabled style={{ marginBottom: 5 }}>
                       <Warining color='error' />
@@ -438,7 +445,7 @@ class Banner extends PureComponent {
           </GridItem>
           <GridItem xs={6} md={2}>
             <Block
-              header={<b style={{ color: 'darkblue' }}>Medical Problem</b>}
+              header={<b style={headerStyles}>Medical Problem</b>}
               body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
@@ -446,7 +453,7 @@ class Banner extends PureComponent {
             <Block
               header={
                 <div>
-                  <b style={{ color: 'darkblue' }}>Scheme </b>
+                  <b style={headerStyles}>Scheme </b>
                   {(entity.patientScheme || [])
                     .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
                     <IconButton onClick={this.refreshChasBalance}>

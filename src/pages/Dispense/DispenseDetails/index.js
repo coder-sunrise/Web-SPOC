@@ -143,6 +143,7 @@ const DispenseDetails = ({
         ]
       return [
         ...result,
+        { ...item },
       ]
     }
 
