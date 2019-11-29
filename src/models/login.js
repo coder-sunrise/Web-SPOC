@@ -1,11 +1,10 @@
 import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import { routerRedux } from 'dva/router'
-import { stringify } from 'qs'
-import Cookies from 'universal-cookie'
-import * as service from '../services/login'
+// services
+import * as service from '@/services/login'
+// utils
 import { reloadAuthorized } from '@/utils/Authorized'
-import { setAuthority } from '@/utils/authority'
 
 const { login, refresh } = service
 

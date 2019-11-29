@@ -386,6 +386,7 @@ class Banner extends PureComponent {
                         style={{
                           whiteSpace: 'nowrap',
                           textOverflow: 'ellipsis',
+                          textDecoration: 'underline',
                           display: 'inline-block',
                           width: '100%',
                           overflow: 'hidden',

@@ -261,8 +261,51 @@ class BasicLayout extends React.PureComponent {
     }, refreshTokenTimer)
   }
 
+  checkShouldProceedRender = async () => {
+    const { dispatch } = this.props
+    try {
+      const currentSystemVersion =
+        JSON.parse(localStorage.getItem('systemVersion')) || null
+      const latestSystemVersion = await dispatch({
+        type: 'global/getSystemVersion',
+      })
+
+      // first time open
+      if (!currentSystemVersion) return true
+
+      const currentUIVersion = currentSystemVersion['semr2-frontend']
+        .split('.')
+        .map((item) => parseInt(item, 10))
+      const latestUIVersion = latestSystemVersion['semr2-frontend']
+        .split('.')
+        .map((item) => parseInt(item, 10))
+
+      const shouldRefresh = latestUIVersion.reduce(
+        (refresh, version, index) => {
+          if (version > currentUIVersion[index]) return true
+          return refresh
+        },
+        false,
+      )
+
+      return !shouldRefresh
+    } catch (error) {
+      console.log({ error })
+      return true
+    }
+  }
+
   initUserData = async () => {
     const { dispatch, route: { routes, authority } } = this.props
+    const shouldProceed = await this.checkShouldProceedRender()
+
+    if (!shouldProceed) {
+      // system version is lower than db, should do a refresh
+      // reload(true) will reload the page from server, instead of cache
+      window.location.reload(true)
+      return
+    }
+
     await Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',

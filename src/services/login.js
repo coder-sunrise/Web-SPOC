@@ -1,6 +1,5 @@
 import { stringify } from 'qs'
 import request from '@/utils/request'
-import { string } from 'prop-types'
 
 const FORM_DATA = {
   grant_type: 'password', // refresh_token for refresh token
@@ -15,6 +14,7 @@ const REFRESH_FORM_DATA = {
 }
 
 const getTokenURL = '/connect/token'
+
 export async function login (credential) {
   const requestBody = {
     ...FORM_DATA,
