@@ -144,6 +144,11 @@ class Billing extends Component {
   }
 
   toggleAddPaymentModal = () => {
+    const { dispatch, patient } = this.props
+    dispatch({
+      type: 'patient/query',
+      payload: { id: patient.id },
+    })
     const { showAddPaymentModal } = this.state
     this.setState({ showAddPaymentModal: !showAddPaymentModal })
   }
