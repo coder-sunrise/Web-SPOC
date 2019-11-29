@@ -7,7 +7,7 @@ import * as service from '../services/login'
 import { reloadAuthorized } from '@/utils/Authorized'
 import { setAuthority } from '@/utils/authority'
 
-const { login } = service
+const { login, refresh } = service
 
 export default createFormViewModel({
   namespace: 'login',
@@ -24,18 +24,19 @@ export default createFormViewModel({
     effects: {
       *getToken ({ credentialPayload }, { call, put }) {
         const response = yield call(login, credentialPayload)
-        // const { status } = response
-        // console.log({ status })
-        // reloadAuthorized()
-
         return yield put({
           type: 'updateLoginStatus',
           payload: { ...response },
         })
-
-        // if (response.status === 200) {
-        //   yield put(router.push('reception/queue'))
-        // }
+      },
+      *refreshToken (_, { call, put }) {
+        const response = yield call(refresh)
+        if (response) {
+          yield put({
+            type: 'updateLoginStatus',
+            payload: { ...response },
+          })
+        }
       },
       *logout (_, { select, put }) {
         const routing = yield select((st) => st.routing)
@@ -82,13 +83,11 @@ export default createFormViewModel({
         if (!isInvalidLogin) {
           const {
             access_token: accessToken,
-            // currentAuthority = [
-            //   'tester',
-            //   // 'editor',
-            // ],
+            refresh_token: refreshToken,
           } = payload
-          // setAuthority(currentAuthority)
+
           localStorage.setItem('token', accessToken)
+          localStorage.setItem('refreshToken', refreshToken)
           localStorage.setItem('_lastLogin', moment().toDate())
         }
 

@@ -371,7 +371,7 @@ const CalendarView = ({
       eventList,
     ],
   )
-  console.log({ filtered, filter })
+
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar

@@ -142,6 +142,7 @@ const DispenseDetails = ({
         ]
       return [
         ...result,
+        { ...item },
       ]
     }
     const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
