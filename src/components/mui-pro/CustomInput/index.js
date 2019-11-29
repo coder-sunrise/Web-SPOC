@@ -30,6 +30,7 @@ class TextField extends React.PureComponent {
   static defaultProps = {
     autocomplete: 'nope',
     debounceDuration: 1000,
+    useLeading: true,
   }
 
   constructor (props) {
@@ -42,6 +43,7 @@ class TextField extends React.PureComponent {
       defaultValue = '',
       value,
       debounceDuration,
+      useLeading,
     } = props
     // console.log(this.state, props, defaultValue, value)
     this.state = {
@@ -61,7 +63,7 @@ class TextField extends React.PureComponent {
       this._onChange.bind(this),
       debounceDuration,
       {
-        leading: true,
+        leading: useLeading,
       },
     )
   }
@@ -325,6 +327,7 @@ TextField.propTypes = {
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
   debounceDuration: PropTypes.number,
+  useLeading: PropTypes.bool,
 }
 
 export default TextField

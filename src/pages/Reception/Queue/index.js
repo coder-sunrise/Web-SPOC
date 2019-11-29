@@ -374,6 +374,7 @@ class Queue extends React.Component {
       showEndSessionSummary,
       showPatientSearch,
       _sessionInfoID,
+      search,
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
@@ -440,6 +441,7 @@ class Queue extends React.Component {
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
                   history={history}
+                  searchQuery={search}
                 />
               </React.Fragment>
             )}
