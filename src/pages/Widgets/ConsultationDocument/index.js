@@ -89,7 +89,6 @@ export const printRow = async (row, props) => {
 }
 
 export const viewReport = (row, props, useID = false) => {
-  console.log('viewReport', { row, props, useID })
   const type = consultationDocumentTypes.find(
     (o) => o.value === row.type || o.name === row.type || o.code === row.type,
   )
@@ -279,12 +278,13 @@ class ConsultationDocument extends PureComponent {
             {
               columnName: 'subject',
               onClick: (row) => {
-                // printRow(row, this.props)
-
                 this.handleViewReport(row.uid)
               },
               type: 'link',
               linkField: 'href',
+              getLinkText: (row) => {
+                return row.type === '4' ? row.title : row.subject
+              },
             },
             {
               columnName: 'action',

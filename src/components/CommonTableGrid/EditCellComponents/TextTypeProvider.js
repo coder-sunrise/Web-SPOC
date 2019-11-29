@@ -73,6 +73,7 @@ class TextEditorBase extends PureComponent {
     row,
     link,
     editMode,
+    getLinkText,
     ...commonCfg
   }) => {
     if (type === 'link') {
@@ -85,7 +86,11 @@ class TextEditorBase extends PureComponent {
             }}
             href={link || '#'}
           >
-            {commonCfg.value}
+            {typeof getLinkText === 'function' ? (
+              getLinkText(row)
+            ) : (
+              commonCfg.value
+            )}
           </a>
         </Tooltip>
       )
