@@ -120,13 +120,13 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: !isStatusInProgress,
-              hidden: hideResumeButton,
+              hidden: hideResumeButton || isRetailVisit,
             }
           case 7: // edit consultation
             return {
               ...opt,
               disabled: !isStatusCompleted,
-              hidden: !isStatusCompleted,
+              hidden: !isStatusCompleted || isRetailVisit,
             }
           default:
             return { ...opt }
