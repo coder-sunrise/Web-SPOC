@@ -340,11 +340,13 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
-    console.log(rows, restProps)
+    console.log({ rows })
     if (rows) {
       this.setState(
         {
-          datagrid: rows,
+          datagrid: rows
+            .sort(sortDataGrid)
+            .map((item, index) => ({ ...item, sortOrder: index })),
         },
         this.validateDataGrid,
       )
@@ -354,10 +356,12 @@ class Form extends React.PureComponent {
       // const newDatagrid = datagrid.filter(
       //   (event) => !deleted.includes(event.id),
       // )
-      const afterDelete = datagrid.map((item) => ({
-        ...item,
-        isDeleted: item.isDeleted || deleted.includes(item.id),
-      }))
+      const afterDelete = datagrid
+        .map((item) => ({
+          ...item,
+          isDeleted: item.isDeleted || deleted.includes(item.id),
+        }))
+        .filter((item) => item.isNew && item.isDeleted)
       // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
@@ -402,6 +406,7 @@ class Form extends React.PureComponent {
       }
       return error
     }, false)
+    console.log({ datagrid, hasError })
     return hasError
   }
 
@@ -478,6 +483,7 @@ class Form extends React.PureComponent {
           const conflicts = [
             ...response,
           ]
+
           this.setState(
             (preState) => ({
               submitCount: preState.submitCount + 1,
@@ -802,14 +808,14 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-
-    console.log({ height: this.props.height })
+    console.log({ _datagrid })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
             <GridContainer
               className={classnames(classes.formContent)}
+              alignItems='flex-start'
               style={{ maxHeight: this.props.height - 200, overflow: 'auto' }}
             >
               <GridItem container xs={12} md={7}>
