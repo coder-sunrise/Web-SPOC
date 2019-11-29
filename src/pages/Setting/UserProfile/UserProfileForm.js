@@ -53,10 +53,11 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile, user, codetable }) => ({
+@connect(({ settingUserProfile, user, codetable, queueLog }) => ({
   settingUserProfile,
   currentUser: user.profileDetails,
   ctRole: codetable.role,
+  hasActiveSession: queueLog.hasActiveSession,
 }))
 @withFormikExtend({
   displayName: 'UserProfile',
@@ -216,23 +217,6 @@ class UserProfileForm extends React.PureComponent {
     canEditDoctorMCR: false,
   }
 
-  componentDidMount () {
-    this.checkHasActiveSession()
-  }
-
-  checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await queueServices.getBizSession(bizSessionPayload)
-    const { data } = result.data
-    this.setState(() => {
-      return {
-        hasActiveSession: data.length > 0,
-      }
-    })
-  }
-
   toggleChangePasswordModal = () => {
     this.setState((preState) => ({
       showChangePassword: !preState.showChangePassword,
@@ -360,7 +344,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   render () {
-    const { classes, footer, values } = this.props
+    const { classes, footer, values, hasActiveSession } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
@@ -576,7 +560,7 @@ class UserProfileForm extends React.PureComponent {
                       {...args}
                       label='Effective Start Date'
                       label2='Effective End Date'
-                      disabled={isEdit ? this.state.hasActiveSession : false}
+                      disabled={isEdit ? hasActiveSession : false}
                     />
                   )}
                 />
