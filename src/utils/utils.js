@@ -912,7 +912,7 @@ const calculateAmount = (
     adjustedField = 'totalAfterOverallAdjustment',
     gstField = 'totalAfterGST',
     gstAmtField = 'gstAmount',
-    isGstInclusive = false,
+    isGSTInclusive = false,
   } = {},
 ) => {
   let gst = 0
@@ -924,7 +924,9 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = roundTo(r[totalField] / total || 0)
+    r.weightage = r[totalField] / total || 0
+    // console.log(r[totalField], total, r.weightage)
+
     r[adjustedField] = r[totalField]
 
     // console.log(r)
@@ -933,7 +935,6 @@ const calculateAmount = (
     activeRows[0].weightage = 1
   }
   activeAdjustments.filter((o) => !o.isDeleted).forEach((fa, i) => {
-    console.log(fa)
     activeRows.forEach((o) => {
       o.subAdjustment = 0
     })
@@ -943,15 +944,15 @@ const calculateAmount = (
       let adj = 0
       let initalRowToal = r[totalField]
       for (let idx = 0; idx < i; idx++) {
-        initalRowToal = initalRowToal + r[`adjustmen${idx}`]
+        initalRowToal += r[`adjustmen${idx}`]
       }
       if (fa.adjType === 'ExactAmount') {
         adj = roundTo(r.weightage * fa.adjValue)
       } else if (fa.adjType === 'Percentage') {
-        adj = roundTo(r.weightage * fa.adjValue / 100 * initalRowToal)
+        adj = roundTo(fa.adjValue / 100 * initalRowToal)
       }
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-      adjAmount += adj
+      adjAmount = roundTo(adjAmount + adj)
       // r[adjustedField] = roundTo(r[adjustedField] + adj)
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
@@ -977,7 +978,7 @@ const calculateAmount = (
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
 
   if (isEnableGST) {
-    if (isGstInclusive) {
+    if (isGSTInclusive) {
       activeRows.forEach((r) => {
         gst += roundTo(
           r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
@@ -999,12 +1000,12 @@ const calculateAmount = (
       gst,
       total,
       totalAfterAdj,
-      totalWithGST: isGstInclusive
+      totalWithGST: isGSTInclusive
         ? totalAfterAdj
         : roundTo(gst + totalAfterAdj),
       isEnableGST,
       gSTPercentage,
-      isGstInclusive,
+      isGSTInclusive,
     },
   }
   // console.log({ r })

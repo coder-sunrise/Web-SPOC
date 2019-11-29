@@ -47,14 +47,14 @@ const styles = (theme) => ({})
     if (defaultValues) {
       defaultValues.isExactAmount = defaultValues.adjType !== 'Percentage'
       defaultValues.isMinus = !(defaultValues.adjValue > 0)
-      // defaultValues.finalAmount = calculateAdjustAmount(
-      //   defaultValues.isExactAmount,
-      //   defaultValues.initialAmout,
-      //   defaultValues.adjValue,
-      // ).amount
+      defaultValues.finalAmount = calculateAdjustAmount(
+        defaultValues.isExactAmount,
+        defaultValues.initialAmout,
+        defaultValues.adjValue,
+      ).amount
       defaultValues.adjustment = Math.abs(defaultValues.adjValue || 0)
     }
-    // console.log(defaultValues)
+
     return {
       initialAmout: 0,
       isExactAmount: true,
@@ -100,7 +100,7 @@ const styles = (theme) => ({})
     const newVals = {
       ...values,
       adjValue: values.adjustment,
-      // adjAmount: values.finalAmount - values.initialAmout,
+      adjAmount: values.finalAmount - values.initialAmout,
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
     }
     // console.log(newVals)
@@ -126,16 +126,16 @@ const styles = (theme) => ({})
   displayName: 'GlobalAdjustment',
 })
 class Adjustment extends PureComponent {
-  // getFinalAmount = ({ value } = {}) => {
-  //   const { values, setFieldValue } = this.props
-  //   const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
+  getFinalAmount = ({ value } = {}) => {
+    const { values, setFieldValue } = this.props
+    const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
 
-  //   setFieldValue(
-  //     'finalAmount',
-  //     calculateAdjustAmount(isExactAmount, initialAmout, value || adjustment)
-  //       .amount,
-  //   )
-  // }
+    setFieldValue(
+      'finalAmount',
+      calculateAdjustAmount(isExactAmount, initialAmout, value || adjustment)
+        .amount,
+    )
+  }
 
   onConditionChange = (v) => {
     // console.log(this.props, 'onConditionChange')
@@ -151,7 +151,7 @@ class Adjustment extends PureComponent {
     }
     v = value
 
-    // this.getFinalAmount({ value })
+    this.getFinalAmount({ value })
   }
 
   render () {
@@ -167,10 +167,10 @@ class Adjustment extends PureComponent {
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
-          {/* {errors &&
+          {errors &&
           errors.finalAmount && (
             <Snackbar variant='warning' message={errors.finalAmount} />
-          )} */}
+          )}
           <GridContainer>
             <GridItem xs={1}>
               <FastField
@@ -266,7 +266,7 @@ class Adjustment extends PureComponent {
                 />
               </GridItem>
             )}
-            {/* {showAmountPreview && (
+            {showAmountPreview && (
               <GridItem xs={12}>
                 <FastField
                   name='finalAmount'
@@ -283,7 +283,7 @@ class Adjustment extends PureComponent {
                   }}
                 />
               </GridItem>
-            )} */}
+            )}
           </GridContainer>
         </div>
         {footer &&
