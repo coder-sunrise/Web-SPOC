@@ -64,7 +64,7 @@ export default createFormViewModel({
           contact: data.contact ? data.contact : contact,
         }
 
-        sessionStorage.setItem('clinicInfo', JSON.stringify(clinicInfo))
+        localStorage.setItem('clinicInfo', JSON.stringify(clinicInfo))
 
         return {
           ...clinicInfo,
