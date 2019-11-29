@@ -26,6 +26,7 @@ import {
   ApptColumnExtensions,
 } from './variables'
 import Authorized from '@/utils/Authorized'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const gridHeight = window.innerHeight - 250
 
@@ -381,12 +382,13 @@ const Grid = ({
 
   const handleStatusTagClick = (row) => {
     let id = '5' // default as Start Consultation
-    const { visitStatus } = row
+    const { visitStatus, visitPurposeFK } = row
     if (visitStatus === VISIT_STATUS.UPCOMING_APPT) return
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        id = '5'
+        if (visitPurposeFK === VISIT_TYPE.RETAIL) id = '1'
+        else id = '5'
         break
       case VISIT_STATUS.IN_CONS:
       case VISIT_STATUS.PAUSED:

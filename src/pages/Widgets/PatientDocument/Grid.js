@@ -18,12 +18,11 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { patientAttachment, dispatch } = this.props
-    const { list } = patientAttachment
+    const { dispatch } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        rows={list !== undefined ? list : []}
+        type='patientAttachment'
         // onRowDoubleClick={this.downloadFile}
         columns={[
           { name: 'fileName', title: 'Document' },
