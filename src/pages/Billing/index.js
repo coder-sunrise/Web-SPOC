@@ -63,7 +63,6 @@ const styles = (theme) => ({
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
-    console.log('map props to values')
     try {
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity

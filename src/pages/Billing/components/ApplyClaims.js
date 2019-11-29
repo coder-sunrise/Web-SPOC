@@ -741,7 +741,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
-  console.log({ values })
+
   return (
     <React.Fragment>
       <GridItem md={2}>
