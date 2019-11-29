@@ -54,7 +54,7 @@ const styles = (theme) => ({
 })
 
 @connect(({ settingUserProfile, user, codetable, clinicInfo, queueLog }) => ({
-    clinicCode: clinicInfo.clinicCode,
+  clinicCode: clinicInfo.clinicCode,
   settingUserProfile,
   currentUser: user.profileDetails,
   ctRole: codetable.role,
@@ -343,7 +343,13 @@ class UserProfileForm extends React.PureComponent {
   }
 
   render () {
-      const { classes, footer, values, settingUserProfile, hasActiveSession } = this.props
+    const {
+      classes,
+      footer,
+      values,
+      settingUserProfile,
+      hasActiveSession,
+    } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
