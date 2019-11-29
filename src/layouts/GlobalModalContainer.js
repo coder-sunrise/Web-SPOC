@@ -85,6 +85,7 @@ class GlobalModalContainer extends PureComponent {
         openConfirm: false,
         openConfirmTitle: undefined,
         openConfirmContent: undefined,
+        onConfirmDiscard: undefined,
         openConfirmText: 'Confirm',
       },
     })
@@ -272,10 +273,10 @@ class GlobalModalContainer extends PureComponent {
               <Button
                 color='primary'
                 onClick={() => {
-                  this.closeConfirmationPrompt()
                   if (global.onConfirmDiscard) {
                     global.onConfirmDiscard()
                   }
+                  this.closeConfirmationPrompt()
                 }}
               >
                 Confirm
