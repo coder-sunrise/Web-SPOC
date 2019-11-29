@@ -82,6 +82,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
     <GridContainer>
       <GridItem xs={5}>
         <Select
+          autoFocus={autoFocus}
           value={row.apptDurationHour}
           options={hourOptions}
           {...restProps}

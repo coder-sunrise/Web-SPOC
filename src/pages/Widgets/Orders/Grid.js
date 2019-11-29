@@ -360,7 +360,7 @@ export default ({
           sortingEnabled: false,
           render: (row) => {
             return (
-              <React.Fragment>
+              <div>
                 <Tooltip title='Edit'>
                   <Button
                     size='sm'
@@ -398,7 +398,7 @@ export default ({
                     </Button>
                   </Tooltip>
                 </Popconfirm>
-              </React.Fragment>
+              </div>
             )
           },
         },

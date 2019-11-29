@@ -63,9 +63,10 @@ const STYLES = (theme) => ({
 })
 
 const keydown = (e) => {
-  // if (e.which === 9) {// Tab
-
-  // }
+  if (e.which === 9) {
+    // Tab
+    return false
+  }
   // $(el).find('.ant-select').trigger('click')
   $(e.target).trigger('click')
   // console.log(e.target, e.which)
@@ -194,6 +195,7 @@ class AntdDatePicker extends PureComponent {
   }
 
   handleBlur = (e) => {
+    debounceKeydown.cancel()
     if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
     }
