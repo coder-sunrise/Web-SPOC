@@ -99,7 +99,7 @@ export default ({ classes, current, setFieldValue }) => {
         <GridItem xs={2} md={9} />
         <GridItem xs={10} md={3} style={{ paddingTop: 15 }}>
           <AmountSummary
-            showAdjustment={false}
+            showAdjustment
             rows={invoiceItemData}
             adjustments={invoiceAdjustmentData}
             config={{

@@ -187,6 +187,7 @@ class SketchField extends PureComponent {
       }
       exist = false
     }
+
     return filterList
   }
 
@@ -264,6 +265,19 @@ class SketchField extends PureComponent {
       prevState,
       currState,
     ])
+  }
+
+  _checkActiveObject = () => {
+    const canvas = this._fc
+    const objects = canvas.getObjects()
+    let result = false
+    if (objects.length > 0) {
+      result = true
+    } else {
+      result = false
+    }
+
+    return result
   }
 
   _deleteSelectedObject = () => {
@@ -706,6 +720,7 @@ class SketchField extends PureComponent {
    * @returns {string} JSON string of the canvas just cleared
    */
   clear = (propertiesToInclude) => {
+    const canvas = this._fc
     this.setState({
       indexCount: 1,
     })

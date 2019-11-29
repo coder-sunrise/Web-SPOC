@@ -62,7 +62,7 @@ const PatientInfoInput = ({
           />
         )}
       </GridItem>
-      <GridItem xs md={3}>
+      <GridItem xs md={5}>
         <div className={classnames(classes.buttonGroup)}>
           {!isRegisteredPatient ? (
             <React.Fragment>
@@ -112,7 +112,7 @@ const PatientInfoInput = ({
           )}
         </div>
       </GridItem>
-      <GridItem ms md={6} />
+      <GridItem ms md={4} />
       <GridItem xs md={3}>
         <FastField
           name='patientContactNo'

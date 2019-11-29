@@ -54,11 +54,13 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
+moment.locale('eu') // TODO should be removed in furture, solve deafult display chinese date bug
 initClinicSettings()
 console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
+//   // $(document.activeElement).trigger($.Event('keyup', { which: 49 }))
 // }, 2000)
 const _theme = createMuiTheme({
   typography: {
@@ -111,6 +113,7 @@ const query = {
 }
 
 const sessionTimeoutTimer = 15 * 60 * 1000
+const refreshTokenTimer = 10 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
@@ -130,6 +133,8 @@ class BasicLayout extends React.PureComponent {
     initStream()
 
     let sessionTimeOutTimer = null
+    this.refreshTokenInterval = null
+
     const resetSessionTimeOut = (e) => {
       // console.log(e)
       clearTimeout(sessionTimeOutTimer)
@@ -147,6 +152,7 @@ class BasicLayout extends React.PureComponent {
     $(document).on('keydown', debouncedRST)
 
     resetSessionTimeOut()
+    this.refreshToken()
   }
 
   // componentDidMount () {
@@ -217,10 +223,7 @@ class BasicLayout extends React.PureComponent {
     //   ps.destroy()
     // }
     window.removeEventListener('resize', this.resize)
-  }
-
-  handleDrawerToggle = () => {
-    this.setState({ mobileOpen: !this.state.mobileOpen })
+    clearInterval(this.refreshTokenInterval)
   }
 
   getContext () {
@@ -251,8 +254,60 @@ class BasicLayout extends React.PureComponent {
     return routerMap
   }
 
+  refreshToken = () => {
+    clearInterval(this.refreshTokenInterval)
+    this.refreshTokenInterval = setInterval(() => {
+      this.props.dispatch({
+        type: 'login/refreshToken',
+      })
+    }, refreshTokenTimer)
+  }
+
+  checkShouldProceedRender = async () => {
+    const { dispatch } = this.props
+    try {
+      const currentSystemVersion =
+        JSON.parse(localStorage.getItem('systemVersion')) || null
+      const latestSystemVersion = await dispatch({
+        type: 'global/getSystemVersion',
+      })
+
+      // first time open
+      if (!currentSystemVersion) return true
+
+      const currentUIVersion = currentSystemVersion['semr2-frontend']
+        .split('.')
+        .map((item) => parseInt(item, 10))
+      const latestUIVersion = latestSystemVersion['semr2-frontend']
+        .split('.')
+        .map((item) => parseInt(item, 10))
+
+      const shouldRefresh = latestUIVersion.reduce(
+        (refresh, version, index) => {
+          if (version > currentUIVersion[index]) return true
+          return refresh
+        },
+        false,
+      )
+
+      return !shouldRefresh
+    } catch (error) {
+      console.log({ error })
+      return true
+    }
+  }
+
   initUserData = async () => {
     const { dispatch, route: { routes, authority } } = this.props
+    const shouldProceed = await this.checkShouldProceedRender()
+
+    if (!shouldProceed) {
+      // system version is lower than db, should do a refresh
+      // reload(true) will reload the page from server, instead of cache
+      window.location.reload(true)
+      return
+    }
+
     await Promise.all([
       dispatch({
         type: 'codetable/fetchCodes',
@@ -352,6 +407,36 @@ class BasicLayout extends React.PureComponent {
   //   }, 5000)
   // }
 
+  resize = () => {
+    if (window.innerWidth >= 960) {
+      this.setState({ mobileOpen: false })
+    }
+    if (window.mainPanel)
+      this.props.dispatch({
+        type: 'global/updateState',
+        payload: {
+          mainDivHeight: window.mainPanel.offsetHeight - 62,
+        },
+      })
+  }
+
+  sidebarMinimize = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/changeLayoutCollapsed',
+      payload: !this.props.collapsed,
+    }).then(() => {
+      // console.log('resize')
+      setTimeout(this.triggerResizeEvent, 500)
+    })
+  }
+
+  handleDrawerToggle = () => {
+    this.setState((preState) => ({
+      mobileOpen: !preState.mobileOpen,
+    }))
+  }
+
   triggerResizeEvent () {
     // eslint-disable-line
     const event = document.createEvent('HTMLEvents')
@@ -368,34 +453,6 @@ class BasicLayout extends React.PureComponent {
   //   }
   //   return <SettingDrawer />
   // };
-
-  handleDrawerToggle = () => {
-    this.setState({ mobileOpen: !this.state.mobileOpen })
-  }
-
-  sidebarMinimize = () => {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'global/changeLayoutCollapsed',
-      payload: !this.props.collapsed,
-    }).then(() => {
-      // console.log('resize')
-      setTimeout(this.triggerResizeEvent, 500)
-    })
-  }
-
-  resize = () => {
-    if (window.innerWidth >= 960) {
-      this.setState({ mobileOpen: false })
-    }
-    if (window.mainPanel)
-      this.props.dispatch({
-        type: 'global/updateState',
-        payload: {
-          mainDivHeight: window.mainPanel.offsetHeight - 62,
-        },
-      })
-  }
 
   render () {
     const { classes, loading, theme, ...props } = this.props

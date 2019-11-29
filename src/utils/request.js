@@ -138,9 +138,10 @@ export const axiosRequest = async (
 
     if (status === 401 && !localStorage.getItem('debug')) {
       /* eslint-disable no-underscore-dangle */
-      window.g_app._store.dispatch({
-        type: 'login/logout',
-      })
+      notification.error('Not Authorized')
+      // window.g_app._store.dispatch({
+      //   type: 'login/logout',
+      // })
       return false
     }
 

@@ -95,7 +95,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch } = props
+    const { dispatch, patient } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
 
@@ -110,6 +110,11 @@ const styles = (theme) => ({
             message: 'Billing completed',
           })
           router.push('/reception/queue')
+        } else {
+          dispatch({
+            type: 'patient/query',
+            payload: { id: patient.id },
+          })
         }
       }
     })
