@@ -194,9 +194,10 @@ const loadFromCodesConfig = {
     )
     let patientAllergy
     for (let index = 0; index < patient.patientAllergy.length; index++) {
-      patientAllergy =
-        (patientAllergy ? `${patientAllergy}, ` : '') +
-        patient.patientAllergy[index].allergyName
+      if (patient.patientAllergy[index].type === 'Allergy')
+        patientAllergy =
+          (patientAllergy ? `${patientAllergy}, ` : '') +
+          patient.patientAllergy[index].allergyName
     }
     result = `Patient Name: ${patient.name}`
     result += `<br/>Patient Ref. No.: ${patient.patientReferenceNo}`

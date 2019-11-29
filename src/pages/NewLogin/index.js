@@ -141,11 +141,11 @@ const submitKey = 'login/getToken'
             type: 'clinicSettings/query',
           })
 
+          localStorage.setItem('clinicCode', clinicCode)
           await dispatch({
             type: 'clinicInfo/query',
-            payload: localStorage.getItem('clinicCode'),
+            payload: { clinicCode },
           })
-          localStorage.setItem('clinicCode', clinicCode)
           router.push(loginDestination)
         }
       })

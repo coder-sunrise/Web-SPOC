@@ -16,7 +16,11 @@ const WEEKDAYS = {
   6: 'sat',
 }
 
+let calculatedOperationHour = []
+let calculatedBreakHour = []
+
 const checkIsBeforeOrAfterOperationHour = (operationHour, currentTime) => {
+  console.log('checkIsBeforeOrAfterOperationHour')
   const _currentTime = moment(currentTime).format(timeFormat)
   const _operationHourFromSuffix = 'FromOpHour'
   const _operationHourToSuffix = 'ToOpHour'
@@ -143,16 +147,21 @@ const TimeSlotComponent = ({
       item[`${currentDayOfWeek}FromOpHour`] &&
       item[`${currentDayOfWeek}ToOpHour`],
   )
+
+  // const existedOperationHour = calculatedOperationHour.includes(value)
+  // console.log({ existedOperationHour })
   const isBeforeOrAfterOperationHour = checkIsBeforeOrAfterOperationHour(
     operationHour,
     value,
   )
+
   const { isWithin, isSameAsStartBreakHour } = checkIsWithinBreakHour(
     breakHour,
     value,
   )
 
-  if (isBeforeOrAfterOperationHour)
+  if (isBeforeOrAfterOperationHour) {
+    // if (!existedOperationHour) calculatedOperationHour.push(value)
     return (
       <div
         style={{
@@ -165,6 +174,7 @@ const TimeSlotComponent = ({
         <span>Non-Operation Hour</span>
       </div>
     )
+  }
 
   if (isWithin) {
     if (isSameAsStartBreakHour)

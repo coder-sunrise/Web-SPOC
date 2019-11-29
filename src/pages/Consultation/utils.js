@@ -5,8 +5,7 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
   consultationDocumentTypes.forEach((p) => {
     values[p.prop] = rows.filter((o) => o.type === p.value)
   })
-
-  const { rows: orderRows = [], finalAdjustments = [] } = orders
+  const { rows: orderRows = [], finalAdjustments = [], isGstInclusive } = orders
   values.corOrderAdjustment = finalAdjustments
   orderTypes.forEach((p, i) => {
     if (p.prop) {
@@ -18,7 +17,10 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
       }
     }
   })
-  return values
+  return {
+    ...values,
+    isGstInclusive,
+  }
 }
 
 module.exports = {
