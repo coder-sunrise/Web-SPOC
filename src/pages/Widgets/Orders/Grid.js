@@ -198,7 +198,7 @@ export default ({
                   colSpan: 2,
                   ...restProps,
                 }),
-                <Table.Cell colSpan={1} key={2} />,
+                // <Table.Cell colSpan={1} key={2} />,
               ]
               return <Table.Row>{newChildren}</Table.Row>
             },
@@ -218,7 +218,7 @@ export default ({
                 const c2 = items.splice(items.length - 1)
                 return (
                   <Table.Cell
-                    colSpan={2}
+                    colSpan={3}
                     style={{
                       fontSize: 'inherit',
                       color: 'inherit',
