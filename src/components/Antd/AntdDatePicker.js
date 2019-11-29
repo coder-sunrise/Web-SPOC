@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import AutosizeInput from 'react-input-autosize'
 import moment from 'moment'
+import _ from 'lodash'
+import $ from 'jquery'
 import classnames from 'classnames'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -58,6 +60,19 @@ const STYLES = (theme) => ({
       lineHeight: 'inherit !important',
     },
   },
+})
+
+const keydown = (e) => {
+  // if (e.which === 9) {// Tab
+
+  // }
+  // $(el).find('.ant-select').trigger('click')
+  $(e.target).trigger('click')
+  // console.log(e.target, e.which)
+}
+const debounceKeydown = _.debounce(keydown, 1000, {
+  leading: true,
+  trailing: false,
 })
 
 @control()
@@ -288,8 +303,6 @@ class AntdDatePicker extends PureComponent {
           onChange={this.handleChange}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
-          // disabledDate={this.disabledDate}
-
           disabledDate={this.buildInRestrict}
           onOpenChange={extendFunc(
             onOpenChange,
@@ -326,7 +339,9 @@ class AntdDatePicker extends PureComponent {
         {...restProps}
         value={this.state.value}
         preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
+        // preventDefaultKeyDownEvent
+        onKeyUp={() => false}
+        onKeyDown={debounceKeydown}
       />
     )
   }

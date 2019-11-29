@@ -48,7 +48,7 @@ class PrintDrugLabelWrapper extends React.Component {
       }
     } else if (type === 'Patient') {
       const { patient } = this.props
-      printResult = await getPDF(27, patient.id)
+      printResult = await getPDF(27, { patientId: patient.id })
     }
     return printResult
   }
