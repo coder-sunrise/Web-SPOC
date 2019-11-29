@@ -12,6 +12,7 @@ import {
   filterMap,
   VISIT_STATUS,
 } from '../variables'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const ActionButton = ({ row, onClick }) => {
   const { visitStatus } = row
@@ -65,10 +66,27 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.PAUSED,
   ].includes(row.visitStatus)
 
-  const enableDispense = [
-    VISIT_STATUS.DISPENSE,
-    VISIT_STATUS.ORDER_UPDATED,
-  ].includes(row.visitStatus)
+  const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
+
+  // const enableDispense = [
+  //   VISIT_STATUS.DISPENSE,
+  //   VISIT_STATUS.ORDER_UPDATED,
+  // ].includes(row.visitStatus)
+  const enableDispense = () => {
+    const consDispense = [
+      VISIT_STATUS.DISPENSE,
+      VISIT_STATUS.ORDER_UPDATED,
+    ].includes(row.visitStatus)
+
+    const retailDispense = [
+      VISIT_STATUS.WAITING,
+      VISIT_STATUS.DISPENSE,
+      VISIT_STATUS.ORDER_UPDATED,
+    ].includes(row.visitStatus)
+
+    if (isRetailVisit && retailDispense) return true
+    return consDispense
+  }
 
   const enableBilling = [
     VISIT_STATUS.BILLING,
@@ -96,7 +114,7 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: isStatusInProgress,
-              hidden: !isStatusWaiting,
+              hidden: !isStatusWaiting || isRetailVisit,
             }
           case 6: // resume consultation
             return {
