@@ -331,8 +331,6 @@ class AddNewStatement extends PureComponent {
                     })}
                     max={999}
                     min={0}
-                    inputProps={{ maxLength: 3 }}
-                    maxLength={3}
                     {...args}
                   />
                 )}
