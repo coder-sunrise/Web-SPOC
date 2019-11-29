@@ -32,17 +32,17 @@ export default ({
   handleAddAdjustment,
   codetable,
 }) => {
-  const { rows, summary, finalAdjustments, isGstInclusive } = orders
+  const { rows, summary, finalAdjustments, isGSTInclusive } = orders
   // console.log(orders)
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const [
     checkedStatusIncldGST,
     setCheckedStatusIncldGST,
-  ] = useState(isGstInclusive)
+  ] = useState(isGSTInclusive)
 
   useEffect(
     () => {
-      setCheckedStatusIncldGST(orders.isGstInclusive)
+      setCheckedStatusIncldGST(orders.isGSTInclusive)
     },
     [
       orders,
@@ -64,6 +64,7 @@ export default ({
       },
     })
   }
+  console.log(total, summary)
   const addAdjustment = () => {
     dispatch({
       type: 'global/updateState',
@@ -244,7 +245,7 @@ export default ({
                           dispatch({
                             type: 'orders/updateState',
                             payload: {
-                              isGstInclusive: e.target.value,
+                              isGSTInclusive: e.target.value,
                             },
                           })
                           dispatch({

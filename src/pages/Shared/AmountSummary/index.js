@@ -93,7 +93,6 @@ class AmountSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
-    console.log(isCheckboxClicked)
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
     config.isGSTInclusive = isCheckboxClicked

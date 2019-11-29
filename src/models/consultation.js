@@ -347,14 +347,14 @@ export default createFormViewModel({
               uid: o.id,
             })),
             entity: undefined,
-            isGstInclusive: data.isGstInclusive,
+            isGSTInclusive: data.isGstInclusive,
           },
         })
 
         yield put({
           type: 'orders/calculateAmount',
           payload: {
-            isGstInclusive: data.isGstInclusive,
+            isGSTInclusive: data.isGstInclusive,
           },
         })
 
