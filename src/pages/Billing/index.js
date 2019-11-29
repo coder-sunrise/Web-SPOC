@@ -63,6 +63,7 @@ const styles = (theme) => ({
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
+    console.log('map props to values')
     try {
       if (billing.entity) {
         const { invoicePayer = [] } = billing.entity
@@ -306,10 +307,26 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  handleResetClick = () => {
+    const { dispatch, values } = this.props
+
+    dispatch({
+      type: 'billing/query',
+      payload: { id: values.visitId },
+    }).then((response) => {
+      if (response) {
+        this.setState((preState) => ({
+          submitCount: preState.submitCount + 1,
+        }))
+      }
+    })
+  }
+
   render () {
     const { showReport, showAddPaymentModal, submitCount } = this.state
     const {
       classes,
+      dispatch,
       values,
       dispense,
       loading,
@@ -355,7 +372,9 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleIsEditing={this.handleIsEditing}
+                onResetClick={this.handleResetClick}
                 submitCount={submitCount}
+                dispatch={dispatch}
                 {...formikBag}
               />
             </GridContainer>
