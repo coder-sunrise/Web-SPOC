@@ -77,10 +77,12 @@ const styles = (theme) => ({
 
 const ApplyClaims = ({
   classes,
+  dispatch,
   values,
   setValues,
   submitCount,
   handleIsEditing,
+  onResetClick,
 }) => {
   const { invoice, invoicePayment, claimableSchemes } = values
 
@@ -680,10 +682,24 @@ const ApplyClaims = ({
     refTempInvociePayer.current = newTempInvoicePayer
   }
 
-  const handleResetClick = () => {
+  const reset = () => {
     setTempInvoicePayer(initialState)
     refTempInvociePayer.current = initialState
     setCurEditInvoicePayerBackup(undefined)
+    onResetClick()
+  }
+
+  const handleResetClick = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          'Reset will revert all changes that had not been saved. Continue?',
+        openConfirmText: 'Continue',
+        onConfirmSave: reset,
+      },
+    })
   }
 
   const handleSelectClaimClick = (index) => () => {
@@ -741,7 +757,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
-  console.log({ values })
+
   return (
     <React.Fragment>
       <GridItem md={2}>
