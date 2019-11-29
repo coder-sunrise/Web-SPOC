@@ -281,7 +281,10 @@ export function isAntdPro () {
 export function extendFunc (...args) {
   const funcNew = function () {
     for (let i = 0; i < args.length; i++) {
-      if (args[i]) args[i].apply(this, arguments)
+      if (args[i]) {
+        const r = args[i].apply(this, arguments)
+        if (r !== false) break
+      }
     }
   }
   return funcNew
@@ -924,7 +927,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = roundTo(r[totalField] / total || 0)
+    r.weightage = r[totalField] / total || 0
     // console.log(r[totalField], total, r.weightage)
 
     r[adjustedField] = r[totalField]
@@ -986,11 +989,19 @@ const calculateAmount = (
       })
     } else {
       gst = roundTo(totalAfterAdj * gSTPercentage)
-      activeRows.forEach((r) => {
+    }
+    activeRows.forEach((r) => {
+      if (isGSTInclusive) {
+        r[gstField] = r[adjustedField]
+        r[gstAmtField] = roundTo(
+          r[adjustedField] - r[adjustedField] * 1 / (1 + gSTPercentage),
+        )
+      } else {
         r[gstAmtField] = roundTo(r[adjustedField] * gSTPercentage)
         r[gstField] = roundTo(r[adjustedField] * (1 + gSTPercentage))
-      })
-    }
+      }
+      // console.log(r[gstField], r[gstAmtField])
+    })
   }
 
   const r = {

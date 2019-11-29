@@ -59,6 +59,7 @@ console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
+//   // $(document.activeElement).trigger($.Event('keyup', { which: 49 }))
 // }, 2000)
 const _theme = createMuiTheme({
   typography: {

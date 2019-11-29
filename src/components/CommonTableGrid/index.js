@@ -357,6 +357,7 @@ class CommonTableGrid extends PureComponent {
             width: '100%',
           },
         },
+
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
@@ -378,6 +379,8 @@ class CommonTableGrid extends PureComponent {
         TableHeaderCell: cellStyle,
         Table: {
           table: {
+            // tableLayout: 'auto',
+
             borderCollapse: 'collapse',
           },
           stickyTable: {
