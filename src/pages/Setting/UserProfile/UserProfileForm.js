@@ -184,7 +184,6 @@ const styles = (theme) => ({
       type: 'settingUserProfile/upsert',
       payload,
     }).then((response) => {
-      console.log({ response })
       if (response) {
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
@@ -360,7 +359,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   render () {
-    const { classes, footer, values } = this.props
+    const { classes, footer, values, settingUserProfile } = this.props
     const {
       currentPrimaryRegisteredDoctorFK,
       showChangePassword,
@@ -370,6 +369,8 @@ class UserProfileForm extends React.PureComponent {
       isValidating,
     } = this.state
     const isEdit = values.id !== undefined
+    const isMyAccount = _.isEmpty(settingUserProfile.currentSelectedUser)
+
     return (
       <LoadingWrapper loading={isValidating}>
         <React.Fragment>
@@ -594,6 +595,7 @@ class UserProfileForm extends React.PureComponent {
                       {...args}
                       label='Role'
                       code='role'
+                      disabled={isMyAccount}
                       onChange={this.onRoleChange}
                     />
                   )}
