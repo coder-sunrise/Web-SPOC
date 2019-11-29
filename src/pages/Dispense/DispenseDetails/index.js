@@ -147,13 +147,16 @@ const DispenseDetails = ({
     const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
     const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
     const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
+    setFieldValue('prescription', newPrescription)
+    setFieldValue('vaccination', newVaccination)
+    setFieldValue('otherOrder', newOtherOrder)
 
-    setValues({
-      ...values,
-      prescription: newPrescription,
-      vaccination: newVaccination,
-      otherOrder: newOtherOrder,
-    })
+    // setValues({
+    //   ...values,
+    //   prescription: newPrescription,
+    //   vaccination: newVaccination,
+    //   otherOrder: newOtherOrder,
+    // })
   }
 
   return (
@@ -275,6 +278,7 @@ const DispenseDetails = ({
                   invoiceAdjustment: v.adjustments,
                   isGSTInclusive: !!v.summary.isGSTInclusive,
                 }
+                console.log(newInvoice, v)
                 // console.log('summary', { summary: v })
                 setFieldValue('invoice', newInvoice)
                 updateGridData(v.rows)

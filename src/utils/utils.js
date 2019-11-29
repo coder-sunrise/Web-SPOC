@@ -924,7 +924,7 @@ const calculateAmount = (
   )
 
   activeRows.forEach((r) => {
-    r.weightage = r[totalField] / total || 0
+    r.weightage = roundTo(r[totalField] / total || 0)
     // console.log(r[totalField], total, r.weightage)
 
     r[adjustedField] = r[totalField]

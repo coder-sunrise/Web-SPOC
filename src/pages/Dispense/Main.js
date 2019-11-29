@@ -181,7 +181,6 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit } = this.props
-
     return (
       <div className={classes.root}>
         <DispenseDetails
