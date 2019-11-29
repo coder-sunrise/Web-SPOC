@@ -104,7 +104,7 @@ const ActionButton = ({ row, onClick }) => {
           case 1: // dispense
             return {
               ...opt,
-              disabled: !enableDispense,
+              disabled: !enableDispense(),
             }
           case 1.1: // billing
             return { ...opt, disabled: !enableBilling }
