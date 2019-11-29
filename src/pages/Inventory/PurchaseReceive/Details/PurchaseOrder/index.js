@@ -29,6 +29,7 @@ import {
 import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
+import AmountSummary from '@/pages/Shared/AmountSummary'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -523,7 +524,7 @@ class Index extends Component {
     } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
-    const { purchaseOrder, purchaseOrderAdjustment } = values
+    const { purchaseOrder, purchaseOrderAdjustment, rows } = values
     const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
@@ -568,7 +569,7 @@ class Index extends Component {
             // rights: 'disable',
           }}
         >
-          <POSummary
+          {/* <POSummary
             toggleInvoiceAdjustment={this.showInvoiceAdjustment}
             handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
             handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
@@ -579,8 +580,40 @@ class Index extends Component {
             IsGSTInclusive={IsGSTInclusive}
             setFieldValue={setFieldValue}
             // {...this.props}
-          />
-
+          /> */}
+          <div style={{ float: 'right', marginBottom: 10 }}>
+            <AmountSummary
+              rows={rows}
+              adjustments={purchaseOrderAdjustment}
+              config={{
+                isGSTInclusive: IsGSTInclusive,
+                totalField: 'totalPrice',
+                adjustedField: 'totalAfterAdjustments',
+                gstField: 'totalAfterGst',
+                gstAmtField: 'itemLevelGST',
+              }}
+              onValueChanged={(v) => {
+                setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                setFieldValue(
+                  'purchaseOrder.IsGSTEnabled',
+                  v.summary.isEnableGST,
+                )
+                setFieldValue(
+                  'purchaseOrder.GSTValue',
+                  v.summary.gSTPercentage * 100,
+                )
+                setFieldValue(
+                  'purchaseOrder.IsGSTInclusive',
+                  v.summary.isGSTInclusive,
+                )
+                setFieldValue(
+                  'purchaseOrder.gstAmount',
+                  Math.round(v.summary.gst * 100) / 100,
+                )
+                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+              }}
+            />
+          </div>
           <GridContainer
             style={{
               marginTop: 20,
