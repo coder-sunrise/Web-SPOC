@@ -53,7 +53,8 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ settingUserProfile, user, codetable }) => ({
+@connect(({ settingUserProfile, user, codetable, clinicInfo }) => ({
+  clinicCode: clinicInfo.clinicCode,
   settingUserProfile,
   currentUser: user.profileDetails,
   ctRole: codetable.role,
@@ -283,7 +284,7 @@ class UserProfileForm extends React.PureComponent {
   }
 
   validateBeforeSubmit = async () => {
-    const { values, handleSubmit, ctRole, dispatch } = this.props
+    const { values, handleSubmit, ctRole, clinicCode, dispatch } = this.props
     const { _oldRole, role, id } = values
 
     /* skip all the validation when add new user */
@@ -306,13 +307,12 @@ class UserProfileForm extends React.PureComponent {
         return true
       }
 
-      const clinicCode = localStorage.getItem('clinicCode')
       this.toggleValidating()
       const [
         clinicInfoResponse,
         bizSessionResponse,
       ] = await Promise.all([
-        clinicServices.query(clinicCode),
+        clinicServices.query({ clinicCode }),
         queueServices.getBizSession({
           IsClinicSessionClosed: false,
         }),
