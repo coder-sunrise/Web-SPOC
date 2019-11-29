@@ -4,6 +4,7 @@ import color from 'color'
 import { withStyles } from '@material-ui/core'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = () => ({
   container: {
@@ -55,14 +56,13 @@ const styles = () => ({
 })
 
 const VisitStatusTag = ({ classes, row, onClick }) => {
-  const { visitStatus: value } = row
+  const { visitStatus: value, visitPurposeFK } = row
 
   let colorTag = 'lightGrey'
 
   const handleClick = useCallback(
     () => {
       if (value.toUpperCase() === VISIT_STATUS.UPCOMING_APPT) return
-
       onClick(row)
     },
     [
@@ -100,7 +100,9 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
 
   return (
     <div className={classnames(cssClass)} onClick={handleClick}>
-      <span>{value}</span>
+      <span>
+        {visitPurposeFK === VISIT_TYPE.RETAIL ? `${value} (RETAIL)` : value}
+      </span>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '@/pages/Setting/UserProfile/services'
+import * as serviceQueue from '../services/queue'
 
 export default createListViewModel({
   namespace: 'settingUserProfile',
@@ -21,6 +22,19 @@ export default createListViewModel({
     subscriptions: {},
     effects: {
       *fetchUserProfileByID ({ payload }, { call, put }) {
+        const resultSession = yield call(serviceQueue.getBizSession, {
+          IsClinicSessionClosed: false,
+        })
+        yield put({
+          type: 'queueLog/updateState',
+          payload: {
+            hasActiveSession:
+              resultSession.data &&
+              resultSession.data.data &&
+              resultSession.data.data.length > 0,
+          },
+        })
+
         const response = yield call(service.query, payload)
         const { data = {}, status } = response
         return yield put({

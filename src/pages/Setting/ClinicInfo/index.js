@@ -199,6 +199,12 @@ class ClinicInfo extends PureComponent {
               )}
             />
           </GridItem>
+          <GridItem md={6}>
+            <FastField
+              name='acra'
+              render={(args) => <TextField label='ACRA' {...args} />}
+            />
+          </GridItem>
         </GridContainer>
         <div
           style={{

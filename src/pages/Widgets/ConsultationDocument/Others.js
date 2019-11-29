@@ -34,7 +34,7 @@ import {
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
-    title: Yup.string().required(),
+    subject: Yup.string().required(),
     content: Yup.string().required(),
   }),
 
