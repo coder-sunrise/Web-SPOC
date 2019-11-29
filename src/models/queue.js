@@ -119,27 +119,6 @@ export default createListViewModel({
           })
         }
         return response
-        // const { status } = response
-
-        // if (status >= 204 && status < 400) {
-        //   // end session successfully, reset session info
-        //   // yield put({
-        //   //   type: 'updateSessionInfo',
-        //   //   payload: { ...InitialSessionInfo },
-        //   // })
-        //   // yield put({
-        //   //   type: 'global/sendNotification',
-        //   //   payload: {
-        //   //     type: 'QueueListing',
-        //   //     data: {
-        //   //       sender: 'End Session',
-        //   //       message: 'Session has been ended',
-        //   //     },
-        //   //   },
-        //   // })
-        // }
-
-        // return response
       },
       *getCurrentActiveSessionInfo (_, { call, put }) {
         const bizSessionPayload = {
@@ -195,6 +174,10 @@ export default createListViewModel({
 
           return true
         }
+        yield put({
+          type: 'updateSessionInfo',
+          payload: { ...InitialSessionInfo },
+        })
         return false
       },
       *getTodayAppointments ({ payload }, { call, put }) {

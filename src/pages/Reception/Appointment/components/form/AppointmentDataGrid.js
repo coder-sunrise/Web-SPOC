@@ -203,7 +203,7 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
-    console.log({ data })
+
     return (
       <div className={classes.container}>
         <EditableTableGrid

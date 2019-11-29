@@ -802,11 +802,16 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
+
+    console.log({ height: this.props.height })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
-            <GridContainer className={classnames(classes.formContent)}>
+            <GridContainer
+              className={classnames(classes.formContent)}
+              style={{ maxHeight: this.props.height - 200, overflow: 'auto' }}
+            >
               <GridItem container xs={12} md={7}>
                 <PatientInfoInput
                   disabled={disablePatientInfo}

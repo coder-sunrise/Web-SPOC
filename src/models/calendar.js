@@ -76,7 +76,7 @@ export default createListViewModel({
       currentViewAppointment: {
         appointments: [],
       },
-      calendarView: BigCalendar.Views.DAY,
+      calendarView: BigCalendar.Views.MONTH,
       publicHolidayList: [],
       clinicBreakHourList: [],
       clinicOperationHourList: [],
