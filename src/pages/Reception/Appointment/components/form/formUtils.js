@@ -87,7 +87,7 @@ const calculateDuration = (startTime, endTime) => {
 }
 
 const constructDefaultNewRow = (selectedSlot) => {
-  let defaultNewRow = { isPrimaryClinician: true, id: -1 }
+  let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
 
   const startTime = moment(selectedSlot.start)
   // const selectedEndTime = moment(selectedSlot.end)
@@ -356,4 +356,19 @@ export const sortDataGrid = (a, b) => {
   if (aLessThanB) return -1
   if (!aLessThanB) return 1
   return 0
+}
+
+export const getEndTime = (row) => {
+  const { endTime, apptDurationHour, apptDurationMinute, startTime } = row
+
+  if (!startTime) return endTime
+  const format =
+    startTime.includes('PM') || startTime.includes('AM') ? 'hh:mm A' : 'HH:mm'
+  if (apptDurationHour && apptDurationMinute && startTime)
+    return moment(startTime, format)
+      .add(apptDurationHour, 'hour')
+      .add(apptDurationMinute, 'minute')
+      .format('HH:mm')
+
+  return endTime
 }

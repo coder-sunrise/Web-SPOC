@@ -41,8 +41,10 @@ const setEndTime = (row) => {
 
   // console.log(row)
 }
+
 const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const { value, control, validSchema, ...restProps } = columnConfig
+
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
   // console.log(restProps, props)
   const [
@@ -63,6 +65,7 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
       blur,
     ],
   )
+
   return (
     <GridContainer>
       <GridItem xs={5}>
@@ -71,6 +74,9 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           value={row.apptDurationHour}
           options={hourOptions}
           {...restProps}
+          error={
+            row.apptDurationHour !== undefined ? '' : 'This is a required field'
+          }
           onChange={(e) => {
             const { commitChanges } = control
             row.apptDurationHour = e
@@ -98,6 +104,13 @@ const ApptDuration = ({ row, columnConfig, cellProps }) => {
           value={row.apptDurationMinute}
           options={minuteOptions}
           {...restProps}
+          error={
+            row.apptDurationMinute !== undefined ? (
+              ''
+            ) : (
+              'This is a required field'
+            )
+          }
           onChange={(e) => {
             const { commitChanges } = control
             row.apptDurationMinute = e

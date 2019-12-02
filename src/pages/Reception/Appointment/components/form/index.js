@@ -32,7 +32,12 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues, sortDataGrid } from './formUtils'
+import {
+  ValidationSchema,
+  mapPropsToValues,
+  sortDataGrid,
+  getEndTime,
+} from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
@@ -348,80 +353,80 @@ class Form extends React.PureComponent {
     })
   }
 
+  validateWithSchema = (datagrid = []) => {
+    const endResult = datagrid.reduce((result, data) => {
+      try {
+        if (!data.isDeleted) {
+          gridValidationSchema.validateSync(data, {
+            abortEarly: false,
+          })
+        }
+
+        return [
+          ...result,
+          { ...data, _errors: [] },
+        ]
+      } catch (error) {
+        return [
+          ...result,
+          { ...data, _errors: error.inner },
+        ]
+      }
+    }, [])
+    return endResult
+  }
+
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
     if (rows) {
+      const updatedRows = this.validateWithSchema(
+        rows.sort(sortDataGrid).map((item, index) => ({
+          ...item,
+          sortOrder: index,
+          conflicts: [],
+          endTime: getEndTime(item),
+          startTime: item.startTime
+            ? moment(item.startTime, 'hh:mm A').format('HH:mm')
+            : undefined,
+        })),
+      )
       this.setState(
         {
-          datagrid: rows.sort(sortDataGrid).map((item, index) => ({
-            ...item,
-            sortOrder: index,
-            startTime: moment(item.startTime, 'hh:mm A').format('HH:mm'),
-          })),
+          datagrid: updatedRows,
         },
         this.validateDataGrid,
       )
+      return updatedRows
     }
     if (deleted) {
       const { datagrid } = this.state
       // const newDatagrid = datagrid.filter(
       //   (event) => !deleted.includes(event.id),
       // )
-      const afterDelete = datagrid
-        .map((item) => ({
-          ...item,
-          isDeleted: item.isDeleted || deleted.includes(item.id),
-        }))
-        .filter((item) => item.isNew && item.isDeleted)
+      const afterDelete = datagrid.map((item) => ({
+        ...item,
+        isDeleted: item.isDeleted || deleted.includes(item.id),
+      }))
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
         ...afterDelete,
       ]
       if (hasOneRowOnlyAfterDelete) {
-        newDataGrid = afterDelete.reduce(
-          (datas, item) => [
-            ...datas,
-            { ...item, isPrimaryClinician: !item.isDeleted },
-          ],
-          [],
-        )
+        newDataGrid = afterDelete.map((item) => ({
+          ...item,
+          isPrimaryClinician: !item.isDeleted,
+        }))
       }
-      // const newDatagrid = datagrid.map(
-      //   (event) =>
-      //     deleted.includes(event.id)
-      //       ? { ...event, isDeleted: true }
-      //       : { ...event },
-      // )
-      // const newRows =
-      //   newDatagrid.length === 1
-      //     ? [
-      //         { ...newDatagrid[0], isPrimaryClinician: true },
-      //       ]
-      //     : newDatagrid
+
       this.setState(
         {
           datagrid: newDataGrid,
         },
         this.validateDataGrid,
       )
-      return newDataGrid
+      return datagrid
     }
-  }
-
-  checkHasError = (datagrid = []) => {
-    const hasError = datagrid.reduce((error, data) => {
-      try {
-        validationSchema.validateSync(data, {
-          abortEarly: false,
-        })
-      } catch (_error) {
-        console.log({ _error })
-        return true
-      }
-
-      return error
-    }, false)
-    return hasError
+    return rows
   }
 
   validateDataGrid = () => {
@@ -432,7 +437,12 @@ class Form extends React.PureComponent {
     // editing at least 1 row
     if (editingRows.length > 0) isDataGridValid = false
 
-    if (this.checkHasError(datagrid)) isDataGridValid = false
+    if (
+      this.validateWithSchema(datagrid).filter(
+        (item) => item._errors && item._errors.length > 0,
+      ).length > 0
+    )
+      isDataGridValid = false
 
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
@@ -445,7 +455,6 @@ class Form extends React.PureComponent {
     )
 
     if (!hasPrimary) isDataGridValid = false
-    console.log('validate data grid', { isDataGridValid, datagrid })
     this.setState({
       isDataGridValid,
       // datagrid: newDataGrid,
@@ -772,7 +781,7 @@ class Form extends React.PureComponent {
 
   shouldDisableCheckAvailabilityButtonAction = () => {
     const { isDataGridValid } = this.state
-    console.log({ isDataGridValid })
+
     if (!isDataGridValid) return true
 
     return false
@@ -845,7 +854,7 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-    console.log({ datagrid })
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
