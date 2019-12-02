@@ -3,7 +3,9 @@ import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import { DateFormatter } from '@/components'
+import {
+  dateFormatLongWithTimeNoSec12h,
+} from '@/components'
 
 class DepositList extends PureComponent {
   render () {
@@ -34,12 +36,9 @@ class DepositList extends PureComponent {
       {
         columnName: 'transactionDate',
         width: 180,
+        type: 'date',
         sortingEnabled: false,
-        render: (row) =>
-          DateFormatter({
-            value: row.transactionDate,
-            full: true,
-          }),
+        format: dateFormatLongWithTimeNoSec12h,
       },
       { columnName: 'depositBalance', type: 'currency', currency: true, sortingEnabled: false },
       { columnName: 'txnAmount', type: 'currency', currency: true, sortingEnabled: false },
