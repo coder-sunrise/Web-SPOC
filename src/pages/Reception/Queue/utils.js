@@ -8,11 +8,16 @@ export const formatAppointmentTimes = (values = []) =>
   values.map((value) => moment(value, 'HH:mm:ss').format('hh:mm A'))
 // moment(value, 'HH:mm:ss').format(dateTimeFormat)
 
-export const filterData = (filter, data = []) => {
+export const filterData = (filter, data = [], searchQuery = '') => {
   let newData = data.filter((eachRow) => {
-    return filterMap[filter].includes(eachRow.visitStatus)
-  })
+    if (searchQuery === '')
+      return filterMap[filter].includes(eachRow.visitStatus)
 
+    return (
+      filterMap[filter].includes(eachRow.visitStatus) &&
+      eachRow.patientName.toLowerCase().indexOf(searchQuery.toLowerCase()) >= 0
+    )
+  })
   return newData
 }
 

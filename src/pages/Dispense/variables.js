@@ -51,8 +51,8 @@ export const PrescriptionColumns = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
   },
   {
     name: 'action',
@@ -68,7 +68,7 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
@@ -199,8 +199,12 @@ export const VaccinationColumn = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
+  },
+  {
+    name: 'action',
+    title: 'Action',
   },
 ]
 
@@ -208,7 +212,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
   { columnName: 'unitPrice', type: 'currency' },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
     type: 'currency',
   },
   {
@@ -247,6 +251,11 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
       )
     },
   },
+  {
+    columnName: 'action',
+    width: 80,
+    render: () => <div />,
+  },
 ]
 
 export const OtherOrdersColumns = [
@@ -267,8 +276,8 @@ export const OtherOrdersColumns = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
   },
   {
     name: 'action',
@@ -308,7 +317,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
     render: (row) => {

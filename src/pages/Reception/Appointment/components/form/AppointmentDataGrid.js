@@ -13,15 +13,19 @@ import {
   AppointmentDataColumn,
 } from './variables'
 import ErrorPopover from './ErrorPopover'
+import AuthorizedContext from '@/components/Context/Authorized'
 
-const validationSchema = Yup.object().shape({
-  startTime: Yup.string().required(),
-  // appointmentDuration: Yup.string().required(),
-  endTime: Yup.string()
-    .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
-    .required(),
-  clinicianFK: Yup.string().required(),
-})
+// const validationSchema = Yup.object().shape({
+//   startTime: Yup.string().required(),
+//   endTime: Yup.string().required(),
+//   apptDurationHour: Yup.number().required(),
+//   apptDurationMinute: Yup.number().required(),
+//   // appointmentDuration: Yup.string().required(),
+//   // endTime: Yup.string()
+//   //   .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
+//   //   .required(),
+//   clinicianFK: Yup.string().required(),
+// })
 
 const styles = () => ({
   container: {
@@ -148,31 +152,30 @@ class AppointmentDataGrid extends React.Component {
       ...columnExtensions,
     ]
 
-    let defaultNewRows = []
+    // let defaultNewRows = []
 
-    if (!data || data.length <= 0) {
-      let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
-      if (selectedSlot && selectedSlot.allDay === false) {
-        const startTime = moment(selectedSlot.start)
-        const selectedEndTime = moment(selectedSlot.end)
+    // if (!data || data.length <= 0) {
+    //   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
+    //   if (selectedSlot && selectedSlot.allDay === false) {
+    //     const startTime = moment(selectedSlot.start)
+    //     const selectedEndTime = moment(selectedSlot.end)
 
-        const { hour, minute } = calculateDuration(startTime, selectedEndTime)
+    //     const { hour, minute } = calculateDuration(startTime, selectedEndTime)
 
-        defaultNewRow = {
-          startTime: startTime.format('HH:mm A'),
-
-          apptDurationHour: hour || 0,
-          apptDurationMinute: minute || 15,
-          endTime: selectedEndTime.format('HH:mm A'),
-          clinicianFK: selectedSlot.resourceId,
-          ...defaultNewRow,
-        }
-      }
-      defaultNewRows.push(defaultNewRow)
-    }
-    this.state = {
-      defaultNewRows,
-    }
+    //     defaultNewRow = {
+    //       startTime: startTime.format('HH:mm'),
+    //       apptDurationHour: hour || 0,
+    //       apptDurationMinute: minute || 15,
+    //       endTime: selectedEndTime.format('HH:mm'),
+    //       clinicianFK: selectedSlot.resourceId,
+    //       ...defaultNewRow,
+    //     }
+    //   }
+    //   defaultNewRows.push(defaultNewRow)
+    // }
+    // this.state = {
+    //   defaultNewRows,
+    // }
   }
 
   onRadioChange = ({ row, checked }) => {
@@ -197,56 +200,64 @@ class AppointmentDataGrid extends React.Component {
       data,
       handleCommitChanges,
       disabled,
+      validationSchema,
       handleEditingRowsChange,
       editingRows,
       selectedSlot,
     } = this.props
 
-    const { defaultNewRows } = this.state
-    console.log({ data })
+    // const { defaultNewRows } = this.state
+
+    const isEditable = !disabled
     return (
       <div className={classes.container}>
-        <EditableTableGrid
-          rows={data.length ? data : data.concat(defaultNewRows)}
-          columns={AppointmentDataColumn}
-          columnExtensions={[
-            ...this.columnExtensions,
-            {
-              columnName: 'conflicts',
-              // type: 'error',
-              editingEnabled: false,
-              sortingEnabled: false,
-              disabled: true,
-              width: 60,
-              render: (row) => {
-                if (row.conflicts && row.conflicts.length > 0) {
-                  return <ErrorPopover errors={row.conflicts} />
-                }
+        <AuthorizedContext.Provider
+          value={{ rights: disabled ? 'disable' : 'enable' }}
+        >
+          <EditableTableGrid
+            rows={data}
+            disabled={disabled}
+            columns={AppointmentDataColumn}
+            columnExtensions={[
+              ...this.columnExtensions,
+              {
+                columnName: 'conflicts',
+                // type: 'error',
+                editingEnabled: false,
+                sortingEnabled: false,
+                disabled: true,
+                width: 60,
+                render: (row) => {
+                  if (row.conflicts && row.conflicts.length > 0) {
+                    return <ErrorPopover errors={row.conflicts} />
+                  }
 
-                return null
+                  return null
+                },
               },
-            },
-          ]}
-          FuncProps={{
-            pager: false,
-            sort: true,
-            sortConfig: {
-              defaultSorting: [
-                { columnName: 'startTime', direction: 'asc' },
-              ],
-            },
-          }}
-          EditingProps={{
-            messages: {
-              deleteCommand: 'Delete appointment slot',
-            },
-            showAddCommand: !disabled,
-            showDeleteCommand:
-              data.filter((item) => !item.isDeleted).length > 1,
-            onCommitChanges: handleCommitChanges,
-          }}
-          schema={validationSchema}
-        />
+            ]}
+            FuncProps={{
+              edit: false,
+              pager: false,
+              sort: true,
+              sortConfig: {
+                defaultSorting: [
+                  { columnName: 'startTime', direction: 'asc' },
+                ],
+              },
+            }}
+            EditingProps={{
+              messages: {
+                deleteCommand: 'Delete appointment slot',
+              },
+              showAddCommand: !disabled,
+              showDeleteCommand:
+                data.filter((item) => !item.isDeleted).length > 1,
+              onCommitChanges: handleCommitChanges,
+            }}
+            schema={validationSchema}
+          />
+        </AuthorizedContext.Provider>
       </div>
     )
   }

@@ -169,6 +169,7 @@ class AntdTimePicker extends PureComponent {
       use12Hours = true,
       minuteStep = 1,
       text,
+      allowClear = true,
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
@@ -192,7 +193,7 @@ class AntdTimePicker extends PureComponent {
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}
-          allowClear={props.allowClear}
+          allowClear={allowClear}
           placeholder=''
           format={format}
           use12Hours={use12Hours}

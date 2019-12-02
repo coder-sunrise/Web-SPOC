@@ -4,6 +4,7 @@ import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { getTimeObject, compare } from '@/utils/yup'
+import { getUniqueNumericId } from '@/utils/utils'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -79,6 +80,38 @@ export const ValidationSchema = Yup.object().shape({
 const convertReccurenceDaysOfTheWeek = (week = '') =>
   week.split(', ').map((eachDay) => parseInt(eachDay, 10))
 
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = (endTime.diff(startTime, 'minute') / 60 - hour) * 60
+  return { hour, minute }
+}
+
+const constructDefaultNewRow = (selectedSlot) => {
+  let defaultNewRow = { isPrimaryClinician: true, id: -1 }
+
+  const startTime = moment(selectedSlot.start)
+  // const selectedEndTime = moment(selectedSlot.end)
+
+  // const { hour = 0, minute = 15 } = calculateDuration(
+  //   startTime,
+  //   selectedEndTime,
+  // )
+  // const endTime = moment(selectedSlot.start)
+  //   .add(hour, 'hour')
+  //   .add(minute, 'minute')
+  //   .format('HH:mm')
+
+  defaultNewRow = {
+    startTime: startTime.format('HH:mm'),
+    // endTime,
+    // apptDurationHour: hour,
+    // apptDurationMinute: minute,
+    clinicianFK: selectedSlot.resourceId,
+    ...defaultNewRow,
+  }
+  return defaultNewRow
+}
+
 export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
@@ -113,7 +146,9 @@ export const mapPropsToValues = ({
     bookedByUserFK: user.id,
     currentAppointment: {
       appointmentDate: moment(selectedSlot.start).formatUTC(),
-      appointments_Resources: [],
+      appointments_Resources: [
+        constructDefaultNewRow(selectedSlot),
+      ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
     recurrenceDto: { ...initDailyRecurrence },

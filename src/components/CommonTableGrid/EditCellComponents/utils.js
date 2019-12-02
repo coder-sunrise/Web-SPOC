@@ -29,7 +29,7 @@ function onComponentDidMount () {
   if (latestRow[columnName] !== value) {
     setTimeout(() => {
       this.forceUpdate()
-    }, 300)
+    }, 500)
   }
   const errors = updateCellValue(this.props, null, latestRow[columnName])
   latestRow._errors = errors

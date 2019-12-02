@@ -1,16 +1,9 @@
 import React from 'react'
 // common components
-import {
-  CardContainer,
-  GridContainer,
-  GridItem,
-  Button,
-} from '@/components'
+import { CardContainer, GridContainer, GridItem, Button } from '@/components'
 import ReportLayoutWrapper from './ReportLayout'
 // services
-import {
-  getRawData,
-} from '@/services/report'
+import { getRawData } from '@/services/report'
 
 export default class ReportBase extends React.Component {
   constructor (props) {
@@ -99,25 +92,25 @@ export default class ReportBase extends React.Component {
   }
 
   render () {
+    const { height } = this.props
+    console.log({ height })
+    const maxHeight = !height ? '100%' : height - 200
     return (
-      <CardContainer hideHeader>
-        <GridContainer>
-          <GridItem md={12}>
-            {this.renderFilterBar(this.onSubmitClick)}
-          </GridItem>
-          <GridItem md={12}>
-            <ReportLayoutWrapper
-              loading={this.state.isLoading}
-              reportID={this.state.reportId}
-              reportParameters={this.formatReportParams(this.props.values)}
-              loaded={this.state.loaded}
-              fileName={this.state.fileName}
-            >
-              {this.renderContent(this.state.reportDatas)}
-            </ReportLayoutWrapper>
-          </GridItem>
-        </GridContainer>
-      </CardContainer>
+      <GridContainer>
+        <GridItem md={12}>{this.renderFilterBar(this.onSubmitClick)}</GridItem>
+        <GridItem md={12}>
+          <ReportLayoutWrapper
+            height={height}
+            loading={this.state.isLoading}
+            reportID={this.state.reportId}
+            reportParameters={this.formatReportParams(this.props.values)}
+            loaded={this.state.loaded}
+            fileName={this.state.fileName}
+          >
+            {this.renderContent(this.state.reportDatas)}
+          </ReportLayoutWrapper>
+        </GridItem>
+      </GridContainer>
     )
   }
 }
