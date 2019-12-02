@@ -5,6 +5,8 @@ import { withFormikExtend, Tabs } from '@/components'
 import { StatementDetailOption } from './variables'
 import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
+import { PAYMENT_MODE } from '@/utils/constants'
+import { roundToPrecision } from '@/utils/codes'
 
 const styles = () => ({})
 @connect(({ statement, user }) => ({
@@ -47,6 +49,13 @@ const styles = () => ({})
     values.statementInvoice.forEach((o) => {
       o.statementInvoicePayment.forEach((i) => {
         if (!i.id) {
+          const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
+          const paymentAmt = i.invoicePayment.totalAmtPaid
+          const roundingAmt = parseFloat(
+            Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
+              2,
+            ),
+          )
           i.invoicePayment = {
             ...i.invoicePayment,
             paymentCreatedBizSessionFK,
@@ -57,6 +66,7 @@ const styles = () => ({})
                 paymentModeFK,
                 amt: i.invoicePayment.totalAmtPaid,
                 paymentMode: displayValue,
+                cashRouding: isCashPayment ? roundingAmt : 0,
               },
             ],
           }
@@ -67,7 +77,6 @@ const styles = () => ({})
     const payload = {
       ...values,
     }
-    console.log('payloaf', payload)
     dispatch({
       type: 'statement/upsert',
       payload,

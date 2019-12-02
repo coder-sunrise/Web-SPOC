@@ -1657,6 +1657,11 @@ export const shortcutKeys = [
   { value: 'F12', name: 'F12' },
 ]
 
+export const roundToPrecision = (x, precision) => {
+  const y = +x + (precision === undefined ? 0.5 : precision / 2)
+  return y - y % (precision === undefined ? 1 : +precision)
+}
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1706,5 +1711,6 @@ module.exports = {
   inventoryAdjustmentStatus,
   fetchAndSaveCodeTable,
   shortcutKeys,
+  roundToPrecision,
   ...module.exports,
 }
