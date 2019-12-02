@@ -273,7 +273,6 @@ class BaseInput extends React.PureComponent {
       cfg.onBlur = onBlur
       cfg.onFocus = onFocus
     }
-    console.log
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
       cfg.onKeyDown = onKeyDown
@@ -327,6 +326,7 @@ class BaseInput extends React.PureComponent {
             <AutosizeInput
               readOnly
               inputClassName={className}
+              tabIndex='-1'
               {...inputProps}
               title=''
             />

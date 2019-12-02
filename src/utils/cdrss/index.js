@@ -705,91 +705,6 @@ const defaultFormBehavior = (
   return returnVal
 }
 
-const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
-const commonDataReaderTransform = (data, fieldName) => {
-  // console.log(data, fieldName)
-  if (typeof data === 'object') {
-    if (Array.isArray(data)) {
-      if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
-      data.forEach((element) => {
-        commonDataReaderTransform(element)
-      })
-    } else {
-      for (let field in data) {
-        if (Object.prototype.hasOwnProperty.call(data, field)) {
-          const v = data[field]
-          if (v === null || v === undefined) {
-            delete data[field]
-            continue
-          }
-          if (Array.isArray(v)) {
-            if (fieldName)
-              data[field] = lodash.sortBy(data[field], [
-                (o) => o[fieldName],
-              ])
-            for (let subfield in v) {
-              if (Object.prototype.hasOwnProperty.call(v, subfield)) {
-                commonDataReaderTransform(data[field][subfield])
-              }
-            }
-          }
-          if (typeof v === 'object') {
-            commonDataReaderTransform(data[field])
-          } else if (
-            typeof v === 'string' &&
-            regDate.test(v) &&
-            !data[`_${field}In`]
-          ) {
-            data[`_${field}In`] = true
-            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
-              .add(8, 'hours')
-              .format('YYYY-MM-DDTHH:mm:ss')
-          }
-        }
-      }
-    }
-  }
-  return data
-}
-
-const commonDataWriterTransform = (data) => {
-  if (typeof data === 'object') {
-    if (Array.isArray(data)) {
-      data.forEach((element) => {
-        commonDataWriterTransform(element)
-      })
-    } else {
-      for (let field in data) {
-        if (Object.prototype.hasOwnProperty.call(data, field)) {
-          const v = data[field]
-
-          if (Array.isArray(v)) {
-            for (let subfield in v) {
-              if (Object.prototype.hasOwnProperty.call(v, subfield)) {
-                commonDataWriterTransform(data[field][subfield])
-              }
-            }
-          }
-          if (typeof v === 'object') {
-            commonDataWriterTransform(data[field])
-          } else if (
-            typeof v === 'string' &&
-            regDate.test(v) &&
-            !data[`_${field}Out`]
-          ) {
-            // console.log(v, moment(v).add(-8, 'hours'))
-            data[`_${field}Out`] = true
-            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
-              .add(-8, 'hours')
-              .format('YYYY-MM-DDTHH:mm:ss')
-          }
-        }
-      }
-    }
-  }
-  return data
-}
-
 const cleanFieldValue = (data) => {
   // console.log(data, fieldName)
   if (data === undefined || data === null) return data
@@ -1089,8 +1004,6 @@ module.exports = {
   deepDiffMapper,
   defaultFormBehavior,
   defaultContainerBehavior,
-  commonDataReaderTransform,
-  commonDataWriterTransform,
   cleanFieldValue,
   immutaeMerge,
   getUniqueId,
