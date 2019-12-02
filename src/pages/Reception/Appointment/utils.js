@@ -91,6 +91,116 @@ export const constructClinicBreakHoursData = (breakHoursList) => {
   return result
 }
 
+const getDay = (value) => {
+  if (value.includes('mon')) return 1
+  if (value.includes('tue')) return 2
+  if (value.includes('wed')) return 3
+  if (value.includes('thurs')) return 4
+  if (value.includes('fri')) return 5
+  if (value.includes('sat')) return 6
+  if (value.includes('sun')) return 0
+  return 0
+}
+
+const constructObj = ({ value, toSuffix = '', fromSuffix = '' }) => {
+  return {
+    0: {
+      end: value[`sun${toSuffix}`],
+      start: value[`sun${fromSuffix}`],
+    },
+    1: {
+      end: value[`mon${toSuffix}`],
+      start: value[`mon${fromSuffix}`],
+    },
+    2: {
+      end: value[`tue${toSuffix}`],
+      start: value[`tue${fromSuffix}`],
+    },
+    3: {
+      end: value[`wed${toSuffix}`],
+      start: value[`wed${fromSuffix}`],
+    },
+    4: {
+      end: value[`thurs${toSuffix}`],
+      start: value[`thurs${fromSuffix}`],
+    },
+    5: {
+      end: value[`fri${toSuffix}`],
+      start: value[`fri${fromSuffix}`],
+    },
+    6: {
+      end: value[`sat${toSuffix}`],
+      start: value[`sat${fromSuffix}`],
+    },
+  }
+}
+
+const appendResult = (result, value) => ({
+  ...result,
+  0: [
+    ...result[0],
+    value[0],
+  ],
+  1: [
+    ...result[1],
+    value[1],
+  ],
+  2: [
+    ...result[2],
+    value[2],
+  ],
+  3: [
+    ...result[3],
+    value[3],
+  ],
+  4: [
+    ...result[4],
+    value[4],
+  ],
+  5: [
+    ...result[5],
+    value[5],
+  ],
+  6: [
+    ...result[6],
+    value[6],
+  ],
+})
+
+const initialObj = {
+  0: [],
+  1: [],
+  2: [],
+  3: [],
+  4: [],
+  5: [],
+  6: [],
+}
+
+export const mapOperationHour = (operationHourList) => {
+  const result = operationHourList.reduce((_result, operationHour) => {
+    const value = constructObj({
+      value: operationHour,
+      fromSuffix: 'FromOpHour',
+      toSuffix: 'ToOpHour',
+    })
+    return appendResult(_result, value)
+  }, initialObj)
+  return result
+}
+
+export const mapBreakHour = (breakHourList) => {
+  const result = breakHourList.reduce((_result, breakHour) => {
+    const value = constructObj({
+      value: breakHour,
+      fromSuffix: 'FromBreak',
+      toSuffix: 'ToBreak',
+    })
+    return appendResult(_result, value)
+  }, initialObj)
+  return result
+}
+
 export const isSavePayloadOk = (payload) => {
   console.log({ payload })
   return false

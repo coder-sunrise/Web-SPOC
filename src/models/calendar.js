@@ -19,6 +19,8 @@ import {
 } from '@/pages/Reception/Appointment/components/form/formUtils'
 import {
   constructClinicBreakHoursData,
+  mapOperationHour,
+  mapBreakHour,
   isSavePayloadOk,
 } from '@/pages/Reception/Appointment/utils'
 import { getTimeObject, compare } from '@/utils/yup'
@@ -78,8 +80,8 @@ export default createListViewModel({
       },
       calendarView: BigCalendar.Views.DAY,
       publicHolidayList: [],
-      clinicBreakHourList: [],
-      clinicOperationHourList: [],
+      clinicBreakHourList: {},
+      clinicOperationHourList: {},
       isEditedAsSingleAppointment: false,
       mode: 'single',
     },
@@ -571,19 +573,17 @@ export default createListViewModel({
         }
       },
       saveClinicBreakHours (state, { payload }) {
+        const breakHour = mapBreakHour(payload)
         return {
           ...state,
-          clinicBreakHourList: [
-            ...payload,
-          ],
+          clinicBreakHourList: breakHour,
         }
       },
       saveClinicOperationHours (state, { payload }) {
+        const operationHour = mapOperationHour(payload)
         return {
           ...state,
-          clinicOperationHourList: [
-            ...payload,
-          ],
+          clinicOperationHourList: operationHour,
         }
       },
     },

@@ -11,7 +11,7 @@ import Authorized from '@/utils/Authorized'
 const ButtonText = {
   DELETE: 'Delete',
   CANCEL_APPOINTMENT: 'Cancel Appointment',
-  CANCEL: 'Cancel',
+  CLOSE: 'Close',
   CHECK: 'Check Availability',
   DRAFT: 'Save Draft',
   ADD: 'Save Appointment',
@@ -45,14 +45,7 @@ const FormFooter = ({
         <GridContainer>
           <GridItem xs md={12} container justify='flex-end'>
             <Button onClick={onClose} color='danger'>
-              {ButtonText.CANCEL}
-            </Button>
-            <Button
-              disabled={disabledCheckAvailability || isTurnedUp}
-              color='success'
-              onClick={handleValidateClick}
-            >
-              {ButtonText.CHECK}
+              {ButtonText.CLOSE}
             </Button>
             <Authorized authority='appointment.deletecancelappointment'>
               <Button
@@ -64,12 +57,18 @@ const FormFooter = ({
                 {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
               </Button>
             </Authorized>
-
+            <Button
+              disabled={disabledCheckAvailability || isTurnedUp}
+              color='success'
+              onClick={handleValidateClick}
+            >
+              {ButtonText.CHECK}
+            </Button>
             {(isNew || isDraft) && (
               <Button
                 disabled={disabled}
                 onClick={handleSaveDraftClick}
-                color='info'
+                color='primary'
               >
                 {ButtonText.DRAFT}
               </Button>
