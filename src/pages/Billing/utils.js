@@ -198,6 +198,8 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
 
   const {
     balance,
+    balanceStatusCode,
+    isBalanceCheckRequired,
     coverageMaxCap,
     patientMinCoPaymentAmount,
     patientMinCoPaymentAmountType,
@@ -213,11 +215,16 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
     isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
     isPackageCoverageMaxCapCheckRequired,
+    schemeCategoryFK,
   } = schemeConfig
 
   const listOfLimits = []
 
-  if (balance !== null && balance > 0) listOfLimits.push(balance)
+  // check balance
+  if (isBalanceCheckRequired) {
+    if (schemeCategoryFK && parseInt(schemeCategoryFK, 10) !== 3)
+      listOfLimits.push(balance)
+  }
 
   if (patientMinCoPaymentAmount > 0) {
     const amount =
@@ -272,8 +279,7 @@ export const validateClaimAmount = (schemeRow, totalPayable) => {
     (totalClaim, item) => totalClaim + (item.claimAmount || 0),
     0,
   )
-
-  const maximumLimit = Math.min(listOfLimits)
+  const maximumLimit = listOfLimits.length > 0 ? Math.min(...listOfLimits) : 0
 
   if (maximumLimit > 0 && totalClaimAmount > maximumLimit)
     invalidMessage.push('Total claim amount has exceed the maximum limit')
