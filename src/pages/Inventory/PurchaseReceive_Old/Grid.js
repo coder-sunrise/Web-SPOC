@@ -86,12 +86,12 @@ class Grid extends PureComponent {
           {
             columnName: 'poDate',
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'expectedDeliveryDate',
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           { columnName: 'total', type: 'number', currency: true },
           { columnName: 'outstanding', type: 'number', currency: true },

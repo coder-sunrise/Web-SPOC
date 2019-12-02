@@ -75,7 +75,7 @@ class Grid extends PureComponent {
             {
               columnName: 'doDate',
               type: 'date',
-              format: { dateFormatLong },
+              format: dateFormatLong,
             },
             {
               columnName: 'total',

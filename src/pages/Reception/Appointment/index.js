@@ -9,7 +9,7 @@ import { CardContainer, CommonModal } from '@/components'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
 import PopoverContent from './components/PopoverContent'
-import Form from './components/form/Form'
+import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings

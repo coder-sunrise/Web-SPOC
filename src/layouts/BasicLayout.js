@@ -54,9 +54,7 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
-moment.locale('eu') // TODO should be removed in furture, solve deafult display chinese date bug
 initClinicSettings()
-console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
@@ -271,9 +269,10 @@ class BasicLayout extends React.PureComponent {
       const latestSystemVersion = await dispatch({
         type: 'global/getSystemVersion',
       })
-
+      // console.log(currentSystemVersion)
       // first time open
-      if (!currentSystemVersion) return true
+      if (!currentSystemVersion || !latestSystemVersion['semr2-frontend'])
+        return true
 
       const currentUIVersion = currentSystemVersion['semr2-frontend']
         .split('.')
@@ -300,7 +299,6 @@ class BasicLayout extends React.PureComponent {
   initUserData = async () => {
     const { dispatch, route: { routes, authority } } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
-
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
       // reload(true) will reload the page from server, instead of cache

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
@@ -429,7 +429,7 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
-  publicHolidays: calendar.publicHolidayList || [],
+  publicHolidays: calendar.publicHolidayList,
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,

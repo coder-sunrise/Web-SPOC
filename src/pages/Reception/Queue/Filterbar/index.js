@@ -64,6 +64,8 @@ const Filterbar = ({
               })}
               onChange={(e) => setSearch(e.target.value)}
               bind='patientSearch/query'
+              useLeading={false}
+              debounceDuration={500}
             />
           )}
         />

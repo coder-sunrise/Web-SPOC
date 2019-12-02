@@ -950,18 +950,18 @@ const calculateAmount = (
         initalRowToal += r[`adjustmen${idx}`]
       }
       if (fa.adjType === 'ExactAmount') {
-        adj = roundTo(r.weightage * fa.adjValue)
+        adj = r.weightage * fa.adjValue
       } else if (fa.adjType === 'Percentage') {
         adj = roundTo(fa.adjValue / 100 * initalRowToal)
       }
       // console.log(r.subAdjustment + adj, r.subAdjustment, adj)
-      adjAmount = roundTo(adjAmount + adj)
+      adjAmount += adj
       // r[adjustedField] = roundTo(r[adjustedField] + adj)
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
       r[adjustedField] = initalRowToal + adj
     })
-    fa.adjAmount = adjAmount
+    fa.adjAmount = roundTo(adjAmount)
   })
   // activeRows.forEach((r) => {
   //   r[adjustedField] = roundTo(r[adjustedField])
@@ -1002,12 +1002,20 @@ const calculateAmount = (
       }
       // console.log(r[gstField], r[gstAmtField])
     })
+  } else {
+    activeRows.forEach((r) => {
+      r[gstAmtField] = 0
+      r[gstField] = r[adjustedField]
+    })
   }
-
+  // console.log(activeRows, adjustments)
   const r = {
     rows,
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
+      subTotal: roundTo(
+        rows.map((row) => row[totalField]).reduce(sumReducer, 0),
+      ),
       gst,
       total,
       totalAfterAdj,
@@ -1047,6 +1055,96 @@ const removeFields = (obj, fields = []) => {
 export const currencyFormatter = (value) =>
   numeral(value).format(`$${config.currencyFormat}`)
 
+const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
+const commonDataReaderTransform = (data, fieldName) => {
+  const { getClinic } = config
+  const { systemTimeZoneInt = 0 } = getClinic() || {}
+
+  // console.log(data, fieldName)
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
+      data.forEach((element) => {
+        commonDataReaderTransform(element)
+      })
+    } else {
+      for (let field in data) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+          const v = data[field]
+          if (v === null || v === undefined) {
+            delete data[field]
+            continue
+          }
+          if (Array.isArray(v)) {
+            if (fieldName)
+              data[field] = lodash.sortBy(data[field], [
+                (o) => o[fieldName],
+              ])
+            for (let subfield in v) {
+              if (Object.prototype.hasOwnProperty.call(v, subfield)) {
+                commonDataReaderTransform(data[field][subfield])
+              }
+            }
+          }
+          if (typeof v === 'object') {
+            commonDataReaderTransform(data[field])
+          } else if (
+            typeof v === 'string' &&
+            regDate.test(v) &&
+            !data[`_${field}In`]
+          ) {
+            data[`_${field}In`] = true
+            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
+              .add(systemTimeZoneInt, 'hours')
+              .format('YYYY-MM-DDTHH:mm:ss')
+          }
+        }
+      }
+    }
+  }
+  return data
+}
+
+const commonDataWriterTransform = (data) => {
+  const { getClinic } = config
+  const { systemTimeZoneInt = 0 } = getClinic() || {}
+  if (typeof data === 'object') {
+    if (Array.isArray(data)) {
+      data.forEach((element) => {
+        commonDataWriterTransform(element)
+      })
+    } else {
+      for (let field in data) {
+        if (Object.prototype.hasOwnProperty.call(data, field)) {
+          const v = data[field]
+
+          if (Array.isArray(v)) {
+            for (let subfield in v) {
+              if (Object.prototype.hasOwnProperty.call(v, subfield)) {
+                commonDataWriterTransform(data[field][subfield])
+              }
+            }
+          }
+          if (typeof v === 'object') {
+            commonDataWriterTransform(data[field])
+          } else if (
+            typeof v === 'string' &&
+            regDate.test(v) &&
+            !data[`_${field}Out`]
+          ) {
+            // console.log(v, moment(v).add(-8, 'hours'))
+            data[`_${field}Out`] = true
+            data[field] = moment(v, 'YYYY-MM-DDTHH:mm:ss')
+              .add(-systemTimeZoneInt, 'hours')
+              .format('YYYY-MM-DDTHH:mm:ss')
+          }
+        }
+      }
+    }
+  }
+  return data
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1074,6 +1172,8 @@ module.exports = {
   getRefreshChasBalanceStatus,
   calculateAmount,
   removeFields,
+  commonDataReaderTransform,
+  commonDataWriterTransform,
   // toUTC,
   // toLocal,
 }

@@ -5,6 +5,7 @@ import printJS from 'print-js'
 // ant design
 import { Dropdown, Menu } from 'antd'
 // material ui
+import { Divider } from '@material-ui/core'
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import Print from '@material-ui/icons/Print'
 // common components
@@ -30,6 +31,7 @@ const ReportLayoutWrapper = ({
   loaded = false,
   fileName = 'Report',
   reportParameters = {},
+  height,
   global,
 }) => {
   const [
@@ -68,10 +70,11 @@ const ReportLayoutWrapper = ({
   }
   let loadingText = `Generating ${fileName}...`
   if (isExporting) loadingText = `Exporting ${fileName}...`
+  const maxHeight = !height ? '100%' : height - 200
   return (
     <LoadingWrapper loading={loading || isExporting} text={loadingText}>
       <BodyWrapper simple={simple}>
-        <div style={{ textAlign: 'right' }}>
+        <div style={{ textAlign: 'right', marginBottom: 8 }}>
           <Dropdown
             disabled={!loaded || isExporting}
             overlay={
@@ -113,7 +116,10 @@ const ReportLayoutWrapper = ({
             <Print />
           </Button>
         </div>
-        {children}
+        <Divider style={{ marginBottom: 8 }} />
+        <div style={{ overflow: 'auto', maxHeight, padding: 8 }}>
+          {children}
+        </div>
       </BodyWrapper>
     </LoadingWrapper>
   )

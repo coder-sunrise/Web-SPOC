@@ -295,7 +295,6 @@ export class DeliveryOrderDetails extends PureComponent {
     const { footer, deliveryOrderDetails, values } = props
     const { rows } = values
 
-
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
@@ -402,7 +401,7 @@ export class DeliveryOrderDetails extends PureComponent {
         {
           columnName: 'expiryDate',
           type: 'date',
-          format: { dateFormatLong },
+          format: dateFormatLong,
         },
       ],
       onRowDoubleClick: undefined,

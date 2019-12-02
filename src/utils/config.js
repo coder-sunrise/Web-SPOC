@@ -81,9 +81,9 @@ const countrySettings = [
 // console.log(1)
 // console.log(moment.locale(), getLocale())
 let countrySetting
+let clinicSettings
 const initClinicSettings = () => {
-  const clinicSettings =
-    JSON.parse(localStorage.getItem('clinicSettings')) || {}
+  clinicSettings = JSON.parse(localStorage.getItem('clinicSettings')) || {}
   countrySetting =
     countrySettings.find((o) => o.value === clinicSettings.locale) || {}
   // console.log(countrySettings, clinicSettings.applicationLocale)
@@ -178,4 +178,5 @@ module.exports = {
   qtyFormat: '0.0',
   conuntry: countrySetting,
   initClinicSettings,
+  getClinic: () => clinicSettings,
 }

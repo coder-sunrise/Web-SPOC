@@ -36,6 +36,7 @@ const Grid = ({
   user,
   calendarEvents = [],
   filter = StatusIndicator.ALL,
+  searchQuery,
   selfOnly = false,
   queueList = [],
   queryingList = false,
@@ -130,7 +131,7 @@ const Grid = ({
         return doctorProfile ? id === doctorProfile.id : false
       })
 
-    return filterData(filter, data)
+    return filterData(filter, data, searchQuery)
   }
 
   const queueListingData = useMemo(computeQueueListingData, [
@@ -139,6 +140,7 @@ const Grid = ({
     calendarEvents,
     queueList,
     user,
+    searchQuery,
   ])
 
   const deleteQueueConfirmation = (row) => {

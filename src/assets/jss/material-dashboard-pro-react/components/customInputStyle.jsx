@@ -67,7 +67,6 @@ const customInputStyle = {
     cursor: 'initial !important',
     fontSize: 'inherit',
     '& > div': {
-      top: 0,
       '& > p': {
         minHeight: 24,
         display: 'inline-block',

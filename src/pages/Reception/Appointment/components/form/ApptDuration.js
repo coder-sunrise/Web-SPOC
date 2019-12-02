@@ -1,22 +1,7 @@
 import React, { memo, useState, useEffect } from 'react'
 import moment from 'moment'
 import _ from 'lodash'
-import ClickAwayListener from '@material-ui/core/ClickAwayListener'
-import {
-  timeFormat,
-  TextField,
-  Field,
-  FastField,
-  GridContainer,
-  GridItem,
-  CodeSelect,
-  Select,
-  Button,
-  Tabs,
-  CommonTableGrid,
-  Popconfirm,
-  Tooltip,
-} from '@/components'
+import { GridContainer, GridItem, Select } from '@/components'
 
 const hourOptions = [
   { name: '0 HR', value: 0 },
@@ -44,17 +29,17 @@ const minuteOptions = [
   { name: '55 MINS', value: 55 },
 ]
 const setEndTime = (row) => {
-  console.log('setEndTime')
+  // console.log('setEndTime')
   const { startTime, apptDurationHour = 0, apptDurationMinute = 0 } = row
   if (startTime) {
-    const startMoment = moment(startTime, 'HH:mm:ss')
+    const startMoment = moment(startTime, 'HH:mm')
     row.endTime = startMoment
       .add(apptDurationHour, 'hour')
       .add(apptDurationMinute, 'minute')
-      .format('HH:mm:ss')
+      .format('HH:mm')
   } else row.endTime = undefined
 
-  console.log(row)
+  // console.log(row)
 }
 const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const { value, control, validSchema, ...restProps } = columnConfig

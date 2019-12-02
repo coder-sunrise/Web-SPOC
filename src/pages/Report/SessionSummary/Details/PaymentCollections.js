@@ -27,7 +27,7 @@ const PaymentCollections = ({
       paymentCount += 1
       if (
         i === 0 ||
-        PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo
+        PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo || PaymentCollectionsDetails[i - 1].payerName !== item.payerName
       ) {
         listData.splice(0, 0, {
           ...item,
@@ -58,11 +58,11 @@ const PaymentCollections = ({
 
   const PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
-    { columnName: 'payerName', width: 180, sortingEnabled: false },
-    { columnName: 'totalAftAdj', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'totalAmtPaid', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'receiptNo', sortingEnabled: false },
+    { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
+    { columnName: 'totalAftAdj', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    { columnName: 'totalAmtPaid', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
