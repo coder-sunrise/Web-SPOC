@@ -29,7 +29,7 @@ const STYLES = () => {
     selectContainer: {
       width: '100%',
       boxSizing: 'content-box',
-      lineHeight: '1rem',
+      // lineHeight: '1rem',
       color: 'currentColor',
 
       '& > div': {

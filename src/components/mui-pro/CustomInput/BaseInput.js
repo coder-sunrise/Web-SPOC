@@ -406,4 +406,7 @@ BaseInput.propTypes = {
   onBlur: PropTypes.func,
 }
 
-export default withStyles(customInputStyle, { withTheme: true })(BaseInput)
+export default withStyles(customInputStyle, {
+  name: 'BaseInput',
+  withTheme: true,
+})(BaseInput)

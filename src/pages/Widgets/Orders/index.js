@@ -111,7 +111,7 @@ class Orders extends PureComponent {
     return (
       <div className={className}>
         <Detail {...restProps} />
-        <Divider light />
+        {/* <Divider light /> */}
 
         <Grid
           {...props}

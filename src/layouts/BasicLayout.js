@@ -54,9 +54,7 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
-moment.locale('eu') // TODO should be removed in furture, solve deafult display chinese date bug
 initClinicSettings()
-console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)

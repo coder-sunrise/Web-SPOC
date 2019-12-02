@@ -305,7 +305,7 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-select-selection--single .ant-select-selection-selected-value': {
           position: 'relative',
-          top: 2,
+          // top: 2,
         },
         // '& .ant-select-selection--single': {
         //   marginTop: 4,
@@ -412,6 +412,13 @@ export const defaultTheme = createMuiTheme({
         '& svg': {
           width: '0.95rem',
           height: '0.95rem',
+        },
+      },
+    },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: 0,
         },
       },
     },
@@ -580,6 +587,13 @@ export const smallTheme = createMuiTheme({
         },
       },
     },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: -3,
+        },
+      },
+    },
     Tabs: {
       main: {
         '& .ant-tabs-bar': {
@@ -739,6 +753,13 @@ export const largeTheme = createMuiTheme({
       outlined: {
         ...largetButton,
         padding: '11px 24px !important',
+      },
+    },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          marginTop: 0,
+        },
       },
     },
   },

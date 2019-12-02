@@ -111,8 +111,9 @@ class DateEditorBase extends React.Component {
       commonCfg.onFocus = () => {
         this.isFocused = true
       }
-      commonCfg.open = true
+      // commonCfg.open = true
       commonCfg.autoFocus = true
+      // commonCfg.onKeyDown = this.props.onKeyDown
     }
     // console.log(commonCfg)
     return <DateRangePicker {...commonCfg} />
