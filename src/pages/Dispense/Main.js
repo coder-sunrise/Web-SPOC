@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 // common component
-import { withFormikExtend, notification } from '@/components'
+import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
 import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
@@ -12,6 +12,8 @@ import {
   navigateDirtyCheck,
 } from '@/utils/utils'
 import Yup from '@/utils/yup'
+import { VISIT_TYPE } from '@/utils/constants'
+import AddOrder from './DispenseDetails/AddOrder'
 
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm } = props
@@ -118,6 +120,10 @@ const reloadDispense = (props, effect = 'query') => {
   displayName: 'DispensePage',
 })
 class Main extends Component {
+  state = {
+    showOrderModal: false,
+  }
+
   componentDidMount () {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
@@ -146,25 +152,29 @@ class Main extends Component {
   }
 
   _editOrder = () => {
-    const { dispatch, dispense } = this.props
-
-    dispatch({
-      type: `consultation/editOrder`,
-      payload: {
-        id: dispense.visitID,
-        version: dispense.version,
-      },
-    }).then((o) => {
-      if (o) {
-        dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: true,
-          },
-        })
-        reloadDispense(this.props)
-      }
-    })
+    const { dispatch, dispense, values } = this.props
+    const { visitPurposeFK } = values.invoice
+    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+      this.handleOrderModal()
+    } else {
+      dispatch({
+        type: `consultation/editOrder`,
+        payload: {
+          id: dispense.visitID,
+          version: dispense.version,
+        },
+      }).then((o) => {
+        if (o) {
+          dispatch({
+            type: `dispense/updateState`,
+            payload: {
+              editingOrder: true,
+            },
+          })
+          reloadDispense(this.props)
+        }
+      })
+    }
   }
 
   editOrder = (e) => {
@@ -177,6 +187,27 @@ class Main extends Component {
         this._editOrder()
       },
     })(e)
+  }
+
+  handleOrderModal = () => {
+    const { showOrderModal } = this.state
+    this.setState(
+      (prevState) => {
+        return {
+          showOrderModal: !prevState.showOrderModal,
+        }
+      },
+      () => {
+        if (!showOrderModal) {
+          this.props.dispatch({
+            type: 'orders/updateState',
+            payload: {
+              type: '1',
+            },
+          })
+        }
+      },
+    )
   }
 
   render () {
@@ -193,6 +224,15 @@ class Main extends Component {
             reloadDispense(this.props, 'refresh')
           }}
         />
+        <CommonModal
+          title='Orders'
+          open={this.state.showOrderModal}
+          onClose={this.handleOrderModal}
+          maxWidth='md'
+          observe='OrderPage'
+        >
+          <AddOrder />
+        </CommonModal>
       </div>
     )
   }

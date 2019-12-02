@@ -94,7 +94,8 @@ class Accordion extends React.Component {
               }}
             >
               <ExpansionPanelSummary
-                expandIcon={expandIcon}
+                expandIcon={prop.hideExpendIcon ? null : expandIcon}
+                onClick={prop.onClickSummary}
                 classes={{
                   root: classes.expansionPanelSummary,
                   expanded: classes.expansionPanelSummaryExpaned,
