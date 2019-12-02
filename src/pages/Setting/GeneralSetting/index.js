@@ -123,6 +123,7 @@ class GeneralSetting extends PureComponent {
       dispatch,
       theme,
       handleSubmit,
+      values,
       ...restProps
     } = this.props
     const { hasActiveSession } = this.state
@@ -141,7 +142,7 @@ class GeneralSetting extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='systemCurrency.settingValue'
+                name='locale.settingValue'
                 render={(args) => (
                   <Select
                     label='System Currency'

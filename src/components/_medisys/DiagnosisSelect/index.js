@@ -33,11 +33,11 @@ const styles = (theme) => ({
 
 const filterOptions = [
   {
-    value: 'isChasAcuteClaimable',
+    value: 'isChasChronicClaimable',
     name: 'CHAS Chronic',
   },
   {
-    value: 'isChasChronicClaimable',
+    value: 'isChasAcuteClaimable',
     name: 'CHAS Acute',
   },
   {
