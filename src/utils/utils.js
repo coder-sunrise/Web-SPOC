@@ -1013,6 +1013,9 @@ const calculateAmount = (
     rows,
     adjustments: adjustments.map((o, index) => ({ ...o, index })),
     summary: {
+      subTotal: roundTo(
+        rows.map((row) => row[totalField]).reduce(sumReducer, 0),
+      ),
       gst,
       total,
       totalAfterAdj,

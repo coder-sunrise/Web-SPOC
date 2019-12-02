@@ -359,7 +359,9 @@ class UserProfileForm extends React.PureComponent {
       isValidating,
     } = this.state
     const isEdit = values.id !== undefined
-    const isMyAccount = _.isEmpty(settingUserProfile.currentSelectedUser)
+    const isMyAccount = isEdit
+      ? _.isEmpty(settingUserProfile.currentSelectedUser)
+      : false
 
     return (
       <LoadingWrapper loading={isValidating}>
