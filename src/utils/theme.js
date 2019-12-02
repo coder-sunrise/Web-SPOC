@@ -415,6 +415,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: 0,
+        },
+      },
+    },
   },
 })
 
@@ -580,6 +587,13 @@ export const smallTheme = createMuiTheme({
         },
       },
     },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: -3,
+        },
+      },
+    },
     Tabs: {
       main: {
         '& .ant-tabs-bar': {
@@ -739,6 +753,13 @@ export const largeTheme = createMuiTheme({
       outlined: {
         ...largetButton,
         padding: '11px 24px !important',
+      },
+    },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          marginTop: 0,
+        },
       },
     },
   },
