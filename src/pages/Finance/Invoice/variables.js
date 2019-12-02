@@ -23,7 +23,7 @@ export const InvoiceGridColExtensions = [
   {
     columnName: 'invoiceDate',
     type: 'date',
-    format: { dateFormatLong },
+    format: dateFormatLong,
   },
   { columnName: 'patientAccountNo', sortingEnabled: false },
   { columnName: 'patientName', sortingEnabled: false },

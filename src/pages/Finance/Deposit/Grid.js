@@ -54,7 +54,7 @@ class Grid extends PureComponent {
         columnName: 'lastTransactionDate',
         type: 'date',
         sortingEnabled: false,
-        format: { dateFormatLong },
+        format: dateFormatLong,
       },
       {
         columnName: 'action',

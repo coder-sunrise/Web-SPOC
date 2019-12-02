@@ -80,7 +80,7 @@ class ExtractAsSingle extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        format: { dateFormatLong },
+        format: dateFormatLong,
         width: 120,
       },
       {
