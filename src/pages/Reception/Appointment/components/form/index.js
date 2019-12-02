@@ -96,7 +96,7 @@ class Form extends React.PureComponent {
         : [],
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
-    isDataGridValid: false,
+    isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
   }
 
@@ -507,46 +507,22 @@ class Form extends React.PureComponent {
             ...response,
           ]
 
-          const newDataGrid = datagrid.reduce(
-            (data, d) => [
-              ...data,
-              {
-                ...d,
-                conflicts:
-                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                    ? conflicts[d.sortOrder].conflicts
-                    : undefined,
-              },
-            ],
-            [],
-          )
-
-          // this.onCommitChanges({ rows: newDataGrid })
-
-          this.setState(
-            (preState) => ({
-              submitCount: preState.submitCount + 1,
-              datagrid: preState.datagrid.reduce(
-                (data, d) => [
-                  ...data,
-                  {
-                    ...d,
-                    conflicts:
-                      conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                        ? conflicts[d.sortOrder].conflicts
-                        : undefined,
-                  },
-                ],
-                [],
-              ),
-            }),
-            () => {
-              dispatch({
-                type: 'global/updateState',
-                payload: { commitCount: this.state.submitCount + 1 },
-              })
-            },
-          )
+          this.setState((preState) => ({
+            submitCount: preState.submitCount + 1,
+            datagrid: preState.datagrid.reduce(
+              (data, d) => [
+                ...data,
+                {
+                  ...d,
+                  conflicts:
+                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                      ? conflicts[d.sortOrder].conflicts
+                      : undefined,
+                },
+              ],
+              [],
+            ),
+          }))
         }
         if (!validate && response) {
           onConfirm()
