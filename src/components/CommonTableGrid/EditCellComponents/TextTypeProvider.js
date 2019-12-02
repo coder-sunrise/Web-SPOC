@@ -77,8 +77,10 @@ class TextEditorBase extends PureComponent {
     ...commonCfg
   }) => {
     if (type === 'link') {
+      let displayText =
+        typeof getLinkText === 'function' ? getLinkText(row) : commonCfg.value
       return (
-        <Tooltip title={commonCfg.value} enterDelay={750}>
+        <Tooltip title={displayText} enterDelay={750}>
           <a
             onClick={(e) => {
               e.preventDefault()
@@ -86,11 +88,7 @@ class TextEditorBase extends PureComponent {
             }}
             href={link || '#'}
           >
-            {typeof getLinkText === 'function' ? (
-              getLinkText(row)
-            ) : (
-              commonCfg.value
-            )}
+            {displayText}
           </a>
         </Tooltip>
       )
