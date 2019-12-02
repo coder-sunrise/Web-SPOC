@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Yup from 'yup'
 import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
@@ -35,6 +36,14 @@ import { ValidationSchema, mapPropsToValues, sortDataGrid } from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
+
+const gridValidationSchema = Yup.object().shape({
+  startTime: Yup.string().required(),
+  endTime: Yup.string().required(),
+  apptDurationHour: Yup.number().required(),
+  apptDurationMinute: Yup.number().required(),
+  clinicianFK: Yup.string().required(),
+})
 
 @connect(
   ({
@@ -401,9 +410,15 @@ class Form extends React.PureComponent {
 
   checkHasError = (datagrid = []) => {
     const hasError = datagrid.reduce((error, data) => {
-      if (data._errors) {
-        return data._errors.length > 0 || error
+      try {
+        validationSchema.validateSync(data, {
+          abortEarly: false,
+        })
+      } catch (_error) {
+        console.log({ _error })
+        return true
       }
+
       return error
     }, false)
     return hasError
@@ -430,7 +445,7 @@ class Form extends React.PureComponent {
     )
 
     if (!hasPrimary) isDataGridValid = false
-
+    console.log('validate data grid', { isDataGridValid, datagrid })
     this.setState({
       isDataGridValid,
       // datagrid: newDataGrid,
@@ -757,6 +772,7 @@ class Form extends React.PureComponent {
 
   shouldDisableCheckAvailabilityButtonAction = () => {
     const { isDataGridValid } = this.state
+    console.log({ isDataGridValid })
     if (!isDataGridValid) return true
 
     return false
@@ -829,7 +845,7 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-
+    console.log({ datagrid })
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
@@ -837,9 +853,17 @@ class Form extends React.PureComponent {
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
-              // style={{ maxHeight: this.props.height - 200, overflow: 'auto' }}
             >
-              <GridItem container xs={12} md={7}>
+              <GridItem
+                container
+                xs={12}
+                md={7}
+                style={{
+                  height: '100%',
+                  maxHeight: this.props.height - 200,
+                  overflow: 'auto',
+                }}
+              >
                 <PatientInfoInput
                   disabled={disablePatientInfo}
                   isEdit={values.id}
@@ -856,6 +880,7 @@ class Form extends React.PureComponent {
                 <AppointmentDateInput disabled={_disableAppointmentDate} />
                 <GridItem xs md={12} className={classes.verticalSpacing}>
                   <AppointmentDataGrid
+                    validationSchema={gridValidationSchema}
                     disabled={disableDataGrid}
                     appointmentDate={currentAppointment.appointmentDate}
                     data={_datagrid}

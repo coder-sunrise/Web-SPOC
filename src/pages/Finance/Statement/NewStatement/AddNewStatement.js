@@ -146,7 +146,7 @@ class AddNewStatement extends PureComponent {
       {
         columnName: 'invoiceDate',
         type: 'date',
-        format: { dateFormatLong },
+        format: dateFormatLong,
       },
     ],
     // currencyColumns: [

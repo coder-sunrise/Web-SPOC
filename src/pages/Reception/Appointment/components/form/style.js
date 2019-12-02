@@ -97,7 +97,6 @@ const styles = (theme) => ({
   },
   appointmentHistory: {
     height: '100%',
-    padding: theme.spacing(1),
     overflow: 'auto',
   },
 })

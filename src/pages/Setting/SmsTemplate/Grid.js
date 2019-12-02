@@ -83,14 +83,14 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             width: 130,
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'effectiveEndDate',
             sortingEnabled: false,
             width: 130,
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'action',

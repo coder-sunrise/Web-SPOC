@@ -151,7 +151,7 @@ class Details extends PureComponent {
             {
               columnName: 'invoiceDate',
               type: 'date',
-              format: { dateFormatLong },
+              format: dateFormatLong,
             },
           ]}
           FuncProps={{
