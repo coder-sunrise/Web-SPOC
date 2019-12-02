@@ -4,7 +4,6 @@ import {
 } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 import {
-  DateFormatter,
   dateFormatLongWithTimeNoSec12h,
 } from '@/components'
 
@@ -41,12 +40,7 @@ class VoidCNList extends PureComponent {
         sortingEnabled: false,
         width: 200,
         type: 'date',
-        render: (row) =>
-          DateFormatter({
-            value: row.voidedDate,
-            full: true,
-            format: dateFormatLongWithTimeNoSec12h,
-          }),
+        format: dateFormatLongWithTimeNoSec12h,
       },
       { columnName: 'totalAmt', type: 'currency', currency: true, sortingEnabled: false, width: 200 },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 120 },

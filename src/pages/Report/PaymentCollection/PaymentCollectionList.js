@@ -3,7 +3,6 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 import {
   GridItem,
-  DateFormatter,
   dateFormatLongWithTimeNoSec12h,
 } from '@/components'
 
@@ -27,12 +26,7 @@ class PaymentCollectionList extends PureComponent {
         sortingEnabled: false,
         width: 200,
         type: 'date',
-        render: (row) =>
-          DateFormatter({
-            value: row.paymentReceivedDate,
-            full: true,
-            format: dateFormatLongWithTimeNoSec12h,
-          }),
+        format: dateFormatLongWithTimeNoSec12h,
       },
       { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
       { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
