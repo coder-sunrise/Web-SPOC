@@ -181,7 +181,6 @@ export default createListViewModel({
               formikValues.isEnableRecurrence,
               isRecurrenceChanged,
             )
-            console.log({ appointments })
           } else if (calendarState.mode === 'single') {
             appointments = [
               currentAppointment,
