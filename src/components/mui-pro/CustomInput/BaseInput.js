@@ -273,6 +273,7 @@ class BaseInput extends React.PureComponent {
       cfg.onBlur = onBlur
       cfg.onFocus = onFocus
     }
+    console.log
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
       cfg.onKeyDown = onKeyDown

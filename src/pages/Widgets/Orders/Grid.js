@@ -64,7 +64,7 @@ export default ({
       },
     })
   }
-  console.log(total, summary)
+  // console.log(total, summary)
   const addAdjustment = () => {
     dispatch({
       type: 'global/updateState',
