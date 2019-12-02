@@ -54,11 +54,13 @@ import { notification } from '@/components'
 import SiderMenu from '@/components/SiderMenu'
 import GlobalModalContainer from './GlobalModalContainer'
 
+moment.locale('eu') // TODO should be removed in furture, solve deafult display chinese date bug
 initClinicSettings()
 console.log(moment.locale())
 
 // setInterval(() => {
 //   console.log(document.activeElement)
+//   // $(document.activeElement).trigger($.Event('keyup', { which: 49 }))
 // }, 2000)
 const _theme = createMuiTheme({
   typography: {

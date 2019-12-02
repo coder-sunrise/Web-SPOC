@@ -53,7 +53,7 @@ class BaseInput extends React.PureComponent {
   }
 
   _onKeyUp = (e) => {
-    // console.log(e.target.tagName==='TEXTAREA')
+    // console.log(e.target.tagName === 'TEXTAREA')
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
     // console.log(e, this)
@@ -273,6 +273,7 @@ class BaseInput extends React.PureComponent {
       cfg.onBlur = onBlur
       cfg.onFocus = onFocus
     }
+    console.log
     if (!preventDefaultKeyDownEvent) {
       cfg.onKeyUp = extendFunc(onKeyUp, this._onKeyUp)
       cfg.onKeyDown = onKeyDown

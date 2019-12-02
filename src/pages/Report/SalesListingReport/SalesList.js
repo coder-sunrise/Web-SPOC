@@ -34,10 +34,10 @@ class SalesList extends PureComponent {
     ]
     const SalesDetailsExtensions = [
       { columnName: 'date', type: 'date', sortingEnabled: false, width: 100 },
-      { columnName: 'qty', type: 'number', sortingEnabled: false, width: 80 },
-      { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
-      { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
-      { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false, width: 100 },
+      { columnName: 'qty', type: 'number', sortingEnabled: false, width: 100 },
+      { columnName: 'unitPrice', type: 'currency', currency: true, sortingEnabled: false, width: 140 },
+      { columnName: 'revenueAMT', type: 'currency', currency: true, sortingEnabled: false, width: 180, wordWrapEnabled: true },
+      { columnName: 'cnamt', type: 'currency', currency: true, sortingEnabled: false, width: 180, wordWrapEnabled: true },
       { columnName: 'doctorName', sortingEnabled: false, wordWrapEnabled: true },
       { columnName: 'patientID', sortingEnabled: false, width: 100 },
       { columnName: 'patientName', sortingEnabled: false, wordWrapEnabled: true },

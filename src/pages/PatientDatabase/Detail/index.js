@@ -161,22 +161,24 @@ const mapEntityToValues = (entity) => {
           resetForm(newEntity)
         })
 
-        dispatch({
-          type: 'patientSearch/query',
-          payload: {
-            sorting: [
-              // { columnName: 'isActive', direction: 'asc' },
-              { columnName: 'name', direction: 'asc' },
-            ],
-          },
-        })
-
         const shouldCloseForm = location.pathname
           ? !location.pathname.includes('patientdb')
           : false
 
         if (onConfirm && shouldCloseForm) {
           onConfirm()
+        }
+
+        if (!shouldCloseForm) {
+          dispatch({
+            type: 'patientSearch/query',
+            payload: {
+              sorting: [
+                // { columnName: 'isActive', direction: 'asc' },
+                { columnName: 'name', direction: 'asc' },
+              ],
+            },
+          })
         }
       }
     })

@@ -255,7 +255,7 @@ class AntdSelect extends React.PureComponent {
         }
       }
 
-      if (mode === 'disable' && disableAll === true) {
+      if (mode === 'multiple' && disableAll === true && Array.isArray(v)) {
         v = _.reject(v, (o) => o === allValue)
       }
 
@@ -292,7 +292,7 @@ class AntdSelect extends React.PureComponent {
           v.unshift(allValue)
         }
       }
-      if (mode === 'multiple' && disableAll === true) {
+      if (mode === 'multiple' && disableAll === true && Array.isArray(v)) {
         v = _.reject(v, (o) => o === allValue)
       }
       if (!_.isEqual(v, this.state.value)) {
