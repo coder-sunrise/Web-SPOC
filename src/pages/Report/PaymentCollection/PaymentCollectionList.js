@@ -3,7 +3,6 @@ import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 import {
   GridItem,
-  DateFormatter,
   dateFormatLongWithTimeNoSec12h,
 } from '@/components'
 
@@ -27,21 +26,16 @@ class PaymentCollectionList extends PureComponent {
         sortingEnabled: false,
         width: 200,
         type: 'date',
-        render: (row) =>
-          DateFormatter({
-            value: row.paymentReceivedDate,
-            full: true,
-            format: dateFormatLongWithTimeNoSec12h,
-          }),
+        format: dateFormatLongWithTimeNoSec12h,
       },
-      { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'receiptNo', sortingEnabled: false },
-      { columnName: 'referenceNo', sortingEnabled: false },
+      { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
+      { columnName: 'referenceNo', sortingEnabled: false, width: 100 },
       { columnName: 'payerName', sortingEnabled: false },
       { columnName: 'remark', sortingEnabled: false },
       { columnName: 'doctorName', sortingEnabled: false },
-      { columnName: 'invoiceNo', sortingEnabled: false },
-      { columnName: 'invoiceDate', sortingEnabled: false },
+      { columnName: 'invoiceNo', sortingEnabled: false, width: 100 },
+      { columnName: 'invoiceDate', sortingEnabled: false, width: 100 },
       { columnName: 'paymentMode', sortingEnabled: false },
       { columnName: 'patientName', sortingEnabled: false },
     ]
@@ -146,8 +140,8 @@ class PaymentCollectionList extends PureComponent {
       ]
       const CashColsExtension = [
         ...PaymentCollectionDetailsExtensions,
-        { columnName: 'cashRounding', type: 'currency', currency: true, sortingEnabled: false },
-        { columnName: 'netAmount', type: 'currency', currency: true, sortingEnabled: false },
+        { columnName: 'cashRounding', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+        { columnName: 'netAmount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
       ]
       console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
