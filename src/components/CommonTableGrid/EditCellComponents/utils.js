@@ -40,8 +40,8 @@ function onComponentDidMount () {
   }
 }
 function onComponentChange (args, config) {
-  if (!config) {
-  }
+  // if (!config) {
+  // }
   const {
     columnExtensions,
     column: { name: columnName },

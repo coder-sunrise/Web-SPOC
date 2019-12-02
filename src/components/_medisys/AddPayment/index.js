@@ -42,7 +42,7 @@ import { getBizSession } from '@/services/queue'
       outstandingAfterPayment: outstandingBalance,
       collectableAmount: outstandingBalance,
       paymentList: [],
-      paymentReceivedDate: moment().formatUTC(false),
+      // paymentReceivedDate: moment().formatUTC(false),
       // finalPayable: _finalPayable,
     }
   },
@@ -102,8 +102,8 @@ class AddPayment extends Component {
         })
       })
     if (this.props.showPaymentDate) {
-      this.fetchBizSessionList(moment())
       this.fetchCurrentActiveBizSession()
+      // this.fetchBizSessionList(moment())
     }
   }
 
@@ -166,6 +166,7 @@ class AddPayment extends Component {
   }
 
   fetchCurrentActiveBizSession = () => {
+    const { setFieldValue } = this.props
     const activeBizSessionPayload = {
       IsClinicSessionClosed: false,
     }
@@ -173,10 +174,19 @@ class AddPayment extends Component {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords === 1) {
         const { data: sessionData } = data
-        this.props.setFieldValue(
-          'paymentCreatedBizSessionFK',
-          sessionData[0].id,
-        )
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+        setFieldValue('paymentReceivedDate', sessionData[0].sessionStartDate)
+        const bizSessionList = sessionData.map((item) => ({
+          value: item.id,
+          name: item.sessionNo,
+        }))
+        this.setState({
+          bizSessionList,
+        })
+
+        if (bizSessionList.length > 0)
+          setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
+        else setFieldValue('paymentReceivedBizSessionFK', undefined)
       }
     })
   }

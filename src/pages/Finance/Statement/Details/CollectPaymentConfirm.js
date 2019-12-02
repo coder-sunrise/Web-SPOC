@@ -9,7 +9,6 @@ import {
   NumberInput,
   CommonTableGrid,
   TextField,
-  Button,
   dateFormatLong,
   CodeSelect,
   Field,
@@ -17,6 +16,7 @@ import {
   Select,
   ProgressButton,
 } from '@/components'
+import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 
 const styles = () => ({
   grid: {
@@ -109,7 +109,8 @@ class CollectPaymentConfirm extends PureComponent {
       paymentDate: moment(),
       amount: total,
       maxAmount: total,
-      paymentModeFK: 5, // GIRO
+      paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
+      displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
     })
     this.setState({
@@ -207,10 +208,10 @@ class CollectPaymentConfirm extends PureComponent {
     })
   }
 
-  onChangePaymentMode = (event) => {
+  onChangePaymentMode = (event, op) => {
+    const { displayValue } = op
     const { setFieldValue } = this.props
     const selectedValue = event || ''
-
     if (selectedValue === 1) {
       this.setState({ isCardPayment: true })
       setFieldValue('creditCardTypeFK', 1)
@@ -219,6 +220,7 @@ class CollectPaymentConfirm extends PureComponent {
       setFieldValue('cardNumber', '')
       setFieldValue('creditCardTypeFK', undefined)
     }
+    setFieldValue('displayValue', displayValue)
   }
 
   render () {
@@ -284,7 +286,7 @@ class CollectPaymentConfirm extends PureComponent {
                     label='Payment Mode'
                     code='ctPaymentMode'
                     labelField='displayValue'
-                    onChange={(e) => this.onChangePaymentMode(e)}
+                    onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
                   />
                 )}
               />

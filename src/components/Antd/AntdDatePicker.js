@@ -63,13 +63,13 @@ const STYLES = (theme) => ({
 })
 
 const keydown = (e) => {
+  if (e.shiftKey) return
+
   if (e.which === 9) {
     // Tab
     return false
   }
-  // $(el).find('.ant-select').trigger('click')
   $(e.target).trigger('click')
-  // console.log(e.target, e.which)
 }
 const debounceKeydown = _.debounce(keydown, 1000, {
   leading: true,
@@ -164,6 +164,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
+    console.log(date, dateString)
     // console.log({ date, dateString })
     // if (date) {
     //   date.utcOffset()

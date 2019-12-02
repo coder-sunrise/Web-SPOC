@@ -5,6 +5,8 @@ import { withFormikExtend, Tabs } from '@/components'
 import { StatementDetailOption } from './variables'
 import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
+import { PAYMENT_MODE } from '@/utils/constants'
+import { roundToPrecision } from '@/utils/codes'
 
 const styles = () => ({})
 @connect(({ statement, user }) => ({
@@ -42,15 +44,32 @@ const styles = () => ({})
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history, user } = props
-    const { paymentCreatedBizSessionFK } = values
+    const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
     const paymentReceivedByUserFK = user.data.id
     values.statementInvoice.forEach((o) => {
       o.statementInvoicePayment.forEach((i) => {
-        i.invoicePayment = {
-          ...i.invoicePayment,
-          paymentCreatedBizSessionFK,
-          paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-          paymentReceivedByUserFK,
+        if (!i.id) {
+          const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
+          const paymentAmt = i.invoicePayment.totalAmtPaid
+          const roundingAmt = parseFloat(
+            Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
+              2,
+            ),
+          )
+          i.invoicePayment = {
+            ...i.invoicePayment,
+            paymentCreatedBizSessionFK,
+            paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+            paymentReceivedByUserFK,
+            invoicePaymentMode: [
+              {
+                paymentModeFK,
+                amt: i.invoicePayment.totalAmtPaid,
+                paymentMode: displayValue,
+                cashRouding: isCashPayment ? roundingAmt : 0,
+              },
+            ],
+          }
         }
       })
     })

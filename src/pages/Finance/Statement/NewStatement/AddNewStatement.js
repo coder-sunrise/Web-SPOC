@@ -59,18 +59,40 @@ const styles = () => ({
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, statementInvoice, ...restValues } = values
+    const {
+      effectiveDates,
+      statementInvoice,
+      invoiceRows,
+      selectedRows,
+      ...restValues
+    } = values
     const { dispatch, history } = props
-    const newStatementInvoice = statementInvoice.map((o) => {
-      return {
+
+    const selectedAndExistingInvoices = invoiceRows.filter(
+      (o) => selectedRows.includes(o.id) || o.statementInvoicePayment,
+    )
+
+    const newStatementInvoice = selectedAndExistingInvoices.map((o) => {
+      const statementInvoiceObj = {
         ...o,
+        invoiceFK: o.invoiceFK || o.id,
         id: o.statementInvoicePayment ? o.id : undefined,
         invoicePayerFK: o.copayerInvoicePayerId || o.invoicePayerFK,
         payableAmount: o.copayerPayableAmount || o.payableAmount,
         outstandingAmount: o.copayerOutstanding || o.outstandingAmount,
         invoiceAmt: o.copayerPayableAmount || o.invoiceAmt,
       }
+      if (selectedRows.includes(o.id)) {
+        return {
+          ...statementInvoiceObj,
+        }
+      }
+      return {
+        ...statementInvoiceObj,
+        isDeleted: true,
+      }
     })
+
     dispatch({
       type: 'statement/upsert',
       payload: {
@@ -147,61 +169,43 @@ class AddNewStatement extends PureComponent {
       // },
     ],
     selectedRows: [],
-    defaultSelectedRows: [],
   }
 
-  // handleSelectionChange = (rows) => {
-  //   const { setValues, values } = this.props
-  //   const { invoiceRows, defaultSelectedRows, selectedRows } = this.state
-  //   const found = selectedRows.some((r) => defaultSelectedRows.indexOf(r) >= 0)
-  //   if (found) {
-  //     return
-  //   }
-  //   this.setState({ selectedRows: rows })
-  //   let statementInvoiceRows = []
-  //   rows.forEach((o) => {
-  //     const invoice = invoiceRows.find((r) => r.id === o)
-  //     if (invoice) {
-  //       invoice.invoicePayerFK = values.copayerFK
-  //       invoice.invoiceFK = o
-  //       statementInvoiceRows.push(invoice)
-  //     }
-  //   })
-  //   setValues({
-  //     ...values,
-  //     statementInvoice: statementInvoiceRows,
-  //   })
-  // }
+  componentDidMount () {
+    const { values, setValues } = this.props
+    this.setState({
+      invoiceRows: values.statementInvoice,
+    })
+    let defaultIds = []
+    values.statementInvoice.forEach((o) => {
+      if (o.statementInvoicePayment.length === 0 && !o.isDeleted) {
+        defaultIds.push(o.id)
+      }
+    })
+
+    this.setState({
+      selectedRows: defaultIds,
+    })
+    setValues({
+      ...values,
+      selectedRows: defaultIds,
+      invoiceRows: values.statementInvoice,
+    })
+  }
 
   handleSelectionChange = (rows) => {
     const { setValues, values } = this.props
-    const { statementInvoice } = values
-    const { invoiceRows } = this.state
-
-    let statementInvoiceRows = []
-    rows.forEach((o) => {
-      const invoice = invoiceRows.find((r) => r.id === o)
-      if (invoice) {
-        invoice.invoicePayerFK = values.copayerFK
-        invoice.invoiceFK = o
-        statementInvoiceRows.push(invoice)
-      }
-    })
     if (rows) {
-      statementInvoiceRows = [
-        ...statementInvoiceRows,
-        ...statementInvoice,
-      ]
       setValues({
         ...values,
-        statementInvoice: statementInvoiceRows,
+        selectedRows: rows,
       })
     }
     this.setState({ selectedRows: rows })
   }
 
   getInvoiceList = (e) => {
-    const { dispatch, values, statement } = this.props
+    const { dispatch, values, statement, setValues } = this.props
     const { InvoiceNo, effectiveDates, copayerFK } = values
 
     const payload = {
@@ -224,19 +228,26 @@ class AddNewStatement extends PureComponent {
             outstandingAmount: o.copayerOutstanding,
           }
         })
+
+        let statementInvoices = []
+        if (statement.entity) {
+          statementInvoices = [
+            ...values.statementInvoice,
+            ...newData,
+          ]
+        } else {
+          statementInvoices = data
+        }
+
         this.setState(() => {
-          if (statement.entity) {
-            const updatedInvoiceRows = [
-              ...values.statementInvoice,
-              ...newData,
-            ]
-            return {
-              invoiceRows: updatedInvoiceRows,
-            }
-          }
           return {
-            invoiceRows: data,
+            invoiceRows: statementInvoices,
           }
+        })
+
+        setValues({
+          ...values,
+          invoiceRows: statementInvoices,
         })
       }
     })
@@ -256,35 +267,11 @@ class AddNewStatement extends PureComponent {
     })
   }
 
-  componentDidMounts () {
-    this.setState({
-      invoiceRows: this.props.values.statementInvoice,
-    })
-    let defaultIds = []
-    this.props.values.statementInvoice.forEach((o) => {
-      defaultIds.push(o.id)
-    })
-    this.setState({
-      defaultSelectedRows: defaultIds,
-    })
-    this.setState({
-      selectedRows: defaultIds,
-    })
-  }
-
   render () {
-    const {
-      classes,
-      theme,
-      values,
-      history,
-      handleSubmit,
-      statement,
-    } = this.props
-    const { invoiceRows, columns, columnExtensions, selectedRows } = this.state
+    const { classes, theme, values, handleSubmit, statement } = this.props
+    const { invoiceRows, columns, columnExtensions } = this.state
     // console.log('values', values)
     // console.log('props', this.props)
-
     return (
       <React.Fragment>
         <CardContainer hideHeader>
@@ -329,10 +316,9 @@ class AddNewStatement extends PureComponent {
                     label={formatMessage({
                       id: 'finance.statement.paymentTerms',
                     })}
+                    precision={0}
                     max={999}
                     min={0}
-                    inputProps={{ maxLength: 3 }}
-                    maxLength={3}
                     {...args}
                   />
                 )}
@@ -444,7 +430,8 @@ class AddNewStatement extends PureComponent {
                 selectConfig: {
                   showSelectAll: true,
                   rowSelectionEnabled: (row) => {
-                    return !row.statementFK
+                    const { statementInvoicePayment = [] } = row
+                    return statementInvoicePayment.length <= 0
                   },
                 },
               }}
