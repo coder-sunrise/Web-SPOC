@@ -57,7 +57,7 @@ class CollectPaymentConfirm extends PureComponent {
         type: 'number',
         currency: true,
       },
-      { columnName: 'invoiceDate', type: 'date', format: { dateFormatLong } },
+      { columnName: 'invoiceDate', type: 'date', format: dateFormatLong },
       {
         columnName: 'payment',
         currency: true,

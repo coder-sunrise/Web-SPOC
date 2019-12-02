@@ -142,13 +142,13 @@ class Statement extends PureComponent {
             {
               columnName: 'statementDate',
               type: 'date',
-              format: { dateFormatLong },
+              format: dateFormatLong,
               width: 120,
             },
             {
               columnName: 'dueDate',
               type: 'date',
-              format: { dateFormatLong },
+              format: dateFormatLong,
               sortBy: 'DueDate',
               width: 120,
             },

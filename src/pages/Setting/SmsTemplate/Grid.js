@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react'
 
-import { CommonTableGrid, Button, Tooltip, dateFormatLong } from '@/components'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { status } from '@/utils/codes'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import * as service from './services'
 import htmlToText from 'html-to-text'
+import { CommonTableGrid, Button, Tooltip, dateFormatLong } from '@/components'
 import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
@@ -83,14 +83,14 @@ class Grid extends PureComponent {
             sortingEnabled: false,
             width: 130,
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'effectiveEndDate',
             sortingEnabled: false,
             width: 130,
             type: 'date',
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'action',
