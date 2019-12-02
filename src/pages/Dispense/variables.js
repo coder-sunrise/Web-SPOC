@@ -16,6 +16,8 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
+const _width = 220
+
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
   {
@@ -66,18 +68,21 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', type: 'currency' },
+  { columnName: 'unitPrice', width: _width, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
+    width: _width,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
+    width: _width,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
+    width: _width,
     render: (row) => {
       return (
         <p>
@@ -89,6 +94,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
+    width: _width,
     render: (row) => {
       return (
         <p>
@@ -210,13 +216,15 @@ export const VaccinationColumn = [
 
 export const VaccinationColumnExtensions = (viewOnly = false) => [
   { columnName: 'dispensedQuanity', type: 'number' },
-  { columnName: 'unitPrice', type: 'currency' },
+  { columnName: 'unitPrice', width: _width, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
+    width: _width,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
+    width: _width,
     type: 'currency',
   },
   {
@@ -291,6 +299,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'type',
     compare: compareString,
+    width: 160,
   },
   {
     columnName: 'description',
@@ -300,6 +309,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
+    width: _width,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -310,6 +320,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
+    width: _width,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -320,6 +331,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
+    width: _width,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
