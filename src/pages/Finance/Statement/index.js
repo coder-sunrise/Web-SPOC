@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
+import moment from 'moment'
 // material ui
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
@@ -41,10 +42,18 @@ class Statement extends PureComponent {
   }
 
   componentDidMount () {
+    const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
+    const toDate = moment().endOf('month').formatUTC(false)
     this.props.dispatch({
       type: 'statement/query',
       payload: {
         isCancelled: false,
+        lgteql_statementDate: fromDate,
+        lsteql_statementDate: toDate,
+        apiCriteria: {
+          DueDateFrom: fromDate,
+          DueDateTo: toDate,
+        },
       },
     })
   }

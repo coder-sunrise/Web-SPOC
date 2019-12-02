@@ -34,11 +34,11 @@ const styles = () => ({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
     statementDates: [
-      moment().startOf('month'),
+      moment().subtract(1, 'months').startOf('month'),
       moment().endOf('month'),
     ],
     statementDueDates: [
-      moment().startOf('month'),
+      moment().subtract(1, 'months').startOf('month'),
       moment().endOf('month'),
     ],
   }),
