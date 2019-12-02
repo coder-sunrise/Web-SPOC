@@ -283,7 +283,7 @@ export function extendFunc (...args) {
     for (let i = 0; i < args.length; i++) {
       if (args[i]) {
         const r = args[i].apply(this, arguments)
-        if (r !== false) break
+        if (r === false) break
       }
     }
   }
