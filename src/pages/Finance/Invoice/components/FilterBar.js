@@ -112,7 +112,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                     label='Invoice Date From'
                     label2='Invoice Date To'
                     allowClear={false}
-                    disabledDate={(d) => !d || d.isAfter(moment())}
+                    disabledDate={(d) => !d || d.isAfter(moment().endOf('day'))}
                     {...args}
                   />
                 )
