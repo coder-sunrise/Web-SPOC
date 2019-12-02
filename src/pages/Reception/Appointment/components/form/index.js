@@ -340,13 +340,14 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
-    console.log({ rows })
     if (rows) {
       this.setState(
         {
-          datagrid: rows
-            .sort(sortDataGrid)
-            .map((item, index) => ({ ...item, sortOrder: index })),
+          datagrid: rows.sort(sortDataGrid).map((item, index) => ({
+            ...item,
+            sortOrder: index,
+            startTime: moment(item.startTime, 'hh:mm A').format('HH:mm'),
+          })),
         },
         this.validateDataGrid,
       )
@@ -362,7 +363,6 @@ class Form extends React.PureComponent {
           isDeleted: item.isDeleted || deleted.includes(item.id),
         }))
         .filter((item) => item.isNew && item.isDeleted)
-      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
@@ -406,7 +406,6 @@ class Form extends React.PureComponent {
       }
       return error
     }, false)
-    console.log({ datagrid, hasError })
     return hasError
   }
 
@@ -483,6 +482,22 @@ class Form extends React.PureComponent {
           const conflicts = [
             ...response,
           ]
+
+          const newDataGrid = datagrid.reduce(
+            (data, d) => [
+              ...data,
+              {
+                ...d,
+                conflicts:
+                  conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                    ? conflicts[d.sortOrder].conflicts
+                    : undefined,
+              },
+            ],
+            [],
+          )
+
+          // this.onCommitChanges({ rows: newDataGrid })
 
           this.setState(
             (preState) => ({
@@ -763,8 +778,13 @@ class Form extends React.PureComponent {
 
   shouldDisableAppointmentDate = () => {
     const { values } = this.props
+    const { appointmentStatusFk } = values
     if (!values.id) return false
-    return values.isEnableRecurrence
+
+    return (
+      values.isEnableRecurrence ||
+      appointmentStatusFk === APPOINTMENT_STATUS.TURNEDUP
+    )
   }
 
   render () {
@@ -808,7 +828,7 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
-    console.log({ _datagrid })
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>

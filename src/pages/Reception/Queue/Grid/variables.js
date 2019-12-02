@@ -203,54 +203,16 @@ export const QueueColumnExtensions = [
     width: 180,
     type: 'date',
     showTime: true,
-    // compare: compareTime,
-    // render: (row) =>
-    //   DateFormatter({
-    //     value: row.timeIn,
-    //     full: true,
-    //   }),
   },
   {
     columnName: 'timeOut',
     width: 180,
     type: 'date',
-
     showTime: true,
-
-    // compare: compareTime,
-    // render: (row) => {
-    //   if (!row.timeOut) return '-'
-    //   return DateFormatter({
-    //     value: row.timeOut,
-    //     full: true,
-    //   })
-    // },
   },
   {
     columnName: 'gender/age',
     render: (row) => {
-      // if (row.visitStatus === VISIT_STATUS.UPCOMING_APPT) {
-      //   const { patientProfile } = row
-      //   const { genderFK, dob } = patientProfile
-      //   const gender = (
-      //     <CodeSelect
-      //       text
-      //       code='ctgender'
-      //       value={genderFK}
-      //       valueField='id'
-      //       labelField='code'
-      //     />
-      //   )
-
-      //   const age = calculateAgeFromDOB(dob)
-      //   return (
-      //     <Tooltip title={`${gender}/${age}`}>
-      //       <span>
-      //         {gender}/{age}
-      //       </span>
-      //     </Tooltip>
-      //   )
-      // }
       const { dob, gender = 'U' } = row
 
       const ageLabel = calculateAgeFromDOB(dob)
@@ -268,16 +230,16 @@ export const QueueColumnExtensions = [
     type: 'date',
     showTime: true,
     // compare: compareTime,
-    // render: (row) => {
-    //   if (row.appointmentTime) {
-    //     const appointmentDate = moment(row.appointmentTime).format(dateFormat)
-    //     return DateFormatter({
-    //       value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-    //       full: true,
-    //     })
-    //   }
-    //   return '-'
-    // },
+    render: (row) => {
+      if (row.appointmentTime) {
+        const appointmentDate = moment(row.appointmentTime).format(dateFormat)
+        return DateFormatter({
+          value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
+          full: true,
+        })
+      }
+      return '-'
+    },
   },
   {
     columnName: 'doctor',
