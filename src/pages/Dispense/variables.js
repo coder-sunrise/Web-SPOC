@@ -112,6 +112,7 @@ export const PrescriptionColumnExtensions = (
           name={`prescription[${row.rowIndex}]batchNo`}
           render={(args) => (
             <Select
+              simple
               options={batchNoOptions}
               mode='tags'
               // valueField='id'

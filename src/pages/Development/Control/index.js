@@ -455,6 +455,7 @@ class ControlTest extends PureComponent {
               render={(args) => (
                 <Select
                   label='Filter by Doctor (Single)'
+                  prefix='Filter by Doctor (Single)'
                   options={doctors}
                   {...args}
                 />

@@ -168,14 +168,14 @@ class Main extends Component {
   }
 
   editOrder = (e) => {
-    const { handleSubmit } = this.props
+    // const { handleSubmit } = this.props
 
     navigateDirtyCheck({
       onProceed: this._editOrder,
-      onConfirm: () => {
-        handleSubmit()
-        this._editOrder()
-      },
+      // onConfirm: () => {
+      //   handleSubmit()
+      //   this._editOrder()
+      // },
     })(e)
   }
 

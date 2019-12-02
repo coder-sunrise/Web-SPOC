@@ -31,6 +31,7 @@ import { control } from '@/components/Decorator'
 const headerStyles = {
   color: 'darkblue',
   fontWeight: 500,
+  position: 'relative',
   // style={{ color: 'darkblue' }}
 }
 
@@ -333,6 +334,7 @@ class Banner extends PureComponent {
       codetable,
       style = {
         position: 'sticky',
+        overflowY: 'auto',
         top: headerHeight,
         zIndex: 1000,
         paddingLeft: 16,
@@ -438,11 +440,18 @@ class Banner extends PureComponent {
                   }}
                 >
                   {this.state.showWarning && (
-                    <IconButton disabled style={{ marginBottom: 5 }}>
-                      <Warining color='error' />
-                    </IconButton>
+                    <Warining style={{ position: 'absolute' }} color='error' />
                   )}
-                  Allergies&nbsp;{this.getAllergyLink('link')}
+                  <span
+                    style={{
+                      marginLeft: this.state.showWarning ? 20 : 'inherit',
+                    }}
+                  >
+                    Allergies
+                  </span>
+                  <span style={{ position: 'absolute', bottom: -2 }}>
+                    {this.getAllergyLink('link')}
+                  </span>
                 </div>
               }
               body={this.getAllergyLink(' ')}
@@ -457,14 +466,16 @@ class Banner extends PureComponent {
           <GridItem xs={6} md={2}>
             <Block
               header={
-                <div>
-                  <b style={headerStyles}>Scheme </b>
-                  {(entity.patientScheme || [])
-                    .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
-                    <IconButton onClick={this.refreshChasBalance}>
-                      <Refresh />
-                    </IconButton>
-                  )}
+                <div style={headerStyles}>
+                  Scheme
+                  <span style={{ position: 'absolute', bottom: -2 }}>
+                    {(entity.patientScheme || [])
+                      .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
+                      <IconButton onClick={this.refreshChasBalance}>
+                        <Refresh />
+                      </IconButton>
+                    )}
+                  </span>
                 </div>
               }
               body={
@@ -477,32 +488,23 @@ class Banner extends PureComponent {
                       return (
                         <div>
                           {schemeData.statusDescription && (
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              <Tooltip
-                                title={
-                                  <p style={{ color: 'red', fontSize: 14 }}>
-                                    {schemeData.statusDescription}
-                                  </p>
-                                }
-                                placement='bottom-end'
-                              >
-                                <IconButton>
-                                  <Warining color='error' />
-                                </IconButton>
-                              </Tooltip>
-                            </div>
+                            <Tooltip title={schemeData.statusDescription}>
+                              <Warining
+                                color='error'
+                                style={{ position: 'absolute' }}
+                              />
+                            </Tooltip>
                           )}
                           <CodeSelect
+                            style={{
+                              marginLeft: schemeData.statusDescription
+                                ? 20
+                                : 'inherit',
+                            }}
                             text
                             code='ctSchemeType'
                             value={schemeData.schemeTypeFK}
                           />
-
                           <div
                             style={{
                               fontWeight: 500,
@@ -520,7 +522,6 @@ class Banner extends PureComponent {
                               />
                             )}
                           </div>
-
                           <SchemePopover
                             isBanner
                             isShowReplacementModal={
@@ -534,7 +535,6 @@ class Banner extends PureComponent {
                             entity={entity}
                             schemeData={schemeData}
                           />
-
                           {/* <p style={{ color: 'red' }}>
                             {schemeData.statusDescription}
                           </p> */}

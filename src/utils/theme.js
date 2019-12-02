@@ -305,7 +305,7 @@ export const defaultTheme = createMuiTheme({
         },
         '& .ant-select-selection--single .ant-select-selection-selected-value': {
           position: 'relative',
-          top: 2,
+          // top: 2,
         },
         // '& .ant-select-selection--single': {
         //   marginTop: 4,
