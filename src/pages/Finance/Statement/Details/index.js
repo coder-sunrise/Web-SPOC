@@ -42,15 +42,24 @@ const styles = () => ({})
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history, user } = props
-    const { paymentCreatedBizSessionFK } = values
+    const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
     const paymentReceivedByUserFK = user.data.id
     values.statementInvoice.forEach((o) => {
       o.statementInvoicePayment.forEach((i) => {
-        i.invoicePayment = {
-          ...i.invoicePayment,
-          paymentCreatedBizSessionFK,
-          paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-          paymentReceivedByUserFK,
+        if (!i.id) {
+          i.invoicePayment = {
+            ...i.invoicePayment,
+            paymentCreatedBizSessionFK,
+            paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+            paymentReceivedByUserFK,
+            invoicePaymentMode: [
+              {
+                paymentModeFK,
+                amt: i.invoicePayment.totalAmtPaid,
+                paymentMode: displayValue,
+              },
+            ],
+          }
         }
       })
     })
@@ -58,6 +67,7 @@ const styles = () => ({})
     const payload = {
       ...values,
     }
+    console.log('payloaf', payload)
     dispatch({
       type: 'statement/upsert',
       payload,

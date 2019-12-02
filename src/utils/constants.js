@@ -171,3 +171,8 @@ export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
 }
+
+export const DEFAULT_PAYMENT_MODE_GIRO = {
+  PAYMENT_FK: 5,
+  DISPLAY_VALUE: 'GIRO',
+}
