@@ -32,17 +32,17 @@ export default ({
   handleAddAdjustment,
   codetable,
 }) => {
-  const { rows, summary, finalAdjustments, isGstInclusive } = orders
+  const { rows, summary, finalAdjustments, isGSTInclusive } = orders
   // console.log(orders)
   const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
   const [
     checkedStatusIncldGST,
     setCheckedStatusIncldGST,
-  ] = useState(isGstInclusive)
+  ] = useState(isGSTInclusive)
 
   useEffect(
     () => {
-      setCheckedStatusIncldGST(orders.isGstInclusive)
+      setCheckedStatusIncldGST(orders.isGSTInclusive)
     },
     [
       orders,
@@ -64,6 +64,7 @@ export default ({
       },
     })
   }
+  console.log(total, summary)
   const addAdjustment = () => {
     dispatch({
       type: 'global/updateState',
@@ -103,7 +104,7 @@ export default ({
     messages[adj.uid] = (
       <div
         style={{
-          width: '50%',
+          width: '60%',
           overflow: 'hidden',
           display: 'inline-block',
           textOverflow: 'ellipsis',
@@ -119,13 +120,15 @@ export default ({
             })}
         >
           <Tooltip title='Delete Adjustment'>
-            <IconButton
+            <Button
+              justIcon
+              color='danger'
               style={{
                 top: -1,
               }}
             >
               <Delete />
-            </IconButton>
+            </Button>
           </Tooltip>
         </Popconfirm>
         <Tooltip title={adj.adjRemark}>
@@ -197,7 +200,6 @@ export default ({
                   colSpan: 2,
                   ...restProps,
                 }),
-                <Table.Cell colSpan={1} key={2} />,
               ]
               return <Table.Row>{newChildren}</Table.Row>
             },
@@ -217,19 +219,25 @@ export default ({
                 const c2 = items.splice(items.length - 1)
                 return (
                   <Table.Cell
-                    colSpan={2}
+                    colSpan={3}
                     style={{
                       fontSize: 'inherit',
                       color: 'inherit',
                       fontWeight: 500,
+                      border: 'transparent',
                     }}
                   >
                     <span>
-                      Adjustment
+                      Invoice Adjustment:&nbsp;
                       <Tooltip title='Add Adjustment'>
-                        <IconButton style={{ top: -1 }} onClick={addAdjustment}>
+                        <Button
+                          justIcon
+                          color='primary'
+                          style={{ top: -1 }}
+                          onClick={addAdjustment}
+                        >
                           <Add />
-                        </IconButton>
+                        </Button>
                       </Tooltip>
                     </span>
                     {c1}
@@ -244,7 +252,7 @@ export default ({
                           dispatch({
                             type: 'orders/updateState',
                             payload: {
-                              isGstInclusive: e.target.value,
+                              isGSTInclusive: e.target.value,
                             },
                           })
                           dispatch({
@@ -325,13 +333,13 @@ export default ({
         {
           columnName: 'adjAmount',
           type: 'currency',
-          width: 100,
+          width: 90,
         },
         {
           columnName: 'totalAfterItemAdjustment',
           // align: 'right',
           type: 'currency',
-          // width: 130,
+          width: 100,
           // render: (r) => {
           //   if (!r.totalAfterItemAdjustment) return ''
           //   return (
@@ -347,11 +355,12 @@ export default ({
         },
         {
           columnName: 'actions',
+          width: 70,
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
             return (
-              <React.Fragment>
+              <div>
                 <Tooltip title='Edit'>
                   <Button
                     size='sm'
@@ -389,7 +398,7 @@ export default ({
                     </Button>
                   </Tooltip>
                 </Popconfirm>
-              </React.Fragment>
+              </div>
             )
           },
         },

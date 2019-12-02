@@ -122,6 +122,14 @@ const mapEntityToValues = (entity) => {
       type: 'patient/upsert',
       payload: {
         ...values,
+        patientScheme: values.patientScheme.map((ps) => {
+          if (ps.isDeleted)
+            return {
+              ...ps,
+              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
+            }
+          return ps
+        }),
         cfg,
       },
     }).then((r) => {
@@ -153,22 +161,24 @@ const mapEntityToValues = (entity) => {
           resetForm(newEntity)
         })
 
-        dispatch({
-          type: 'patientSearch/query',
-          payload: {
-            sorting: [
-              // { columnName: 'isActive', direction: 'asc' },
-              { columnName: 'name', direction: 'asc' },
-            ],
-          },
-        })
-
         const shouldCloseForm = location.pathname
           ? !location.pathname.includes('patientdb')
           : false
 
         if (onConfirm && shouldCloseForm) {
           onConfirm()
+        }
+
+        if (!shouldCloseForm) {
+          dispatch({
+            type: 'patientSearch/query',
+            payload: {
+              sorting: [
+                // { columnName: 'isActive', direction: 'asc' },
+                { columnName: 'name', direction: 'asc' },
+              ],
+            },
+          })
         }
       }
     })

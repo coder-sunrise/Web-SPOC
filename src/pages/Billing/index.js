@@ -95,7 +95,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch } = props
+    const { dispatch, patient } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
 
@@ -110,6 +110,11 @@ const styles = (theme) => ({
             message: 'Billing completed',
           })
           router.push('/reception/queue')
+        } else {
+          dispatch({
+            type: 'patient/query',
+            payload: { id: patient.id },
+          })
         }
       }
     })
@@ -307,10 +312,26 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  handleResetClick = () => {
+    const { dispatch, values } = this.props
+
+    dispatch({
+      type: 'billing/query',
+      payload: { id: values.visitId },
+    }).then((response) => {
+      if (response) {
+        this.setState((preState) => ({
+          submitCount: preState.submitCount + 1,
+        }))
+      }
+    })
+  }
+
   render () {
     const { showReport, showAddPaymentModal, submitCount } = this.state
     const {
       classes,
+      dispatch,
       values,
       dispense,
       loading,
@@ -356,7 +377,9 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleIsEditing={this.handleIsEditing}
+                onResetClick={this.handleResetClick}
                 submitCount={submitCount}
+                dispatch={dispatch}
                 {...formikBag}
               />
             </GridContainer>

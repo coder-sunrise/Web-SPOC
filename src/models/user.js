@@ -1,5 +1,6 @@
 import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
+import * as serviceQueue from '../services/queue'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
@@ -128,6 +129,18 @@ export default {
       return user
     },
     *fetchProfileDetails ({ id }, { call, put }) {
+      const resultSession = yield call(serviceQueue.getBizSession, {
+        IsClinicSessionClosed: false,
+      })
+      yield put({
+        type: 'queueLog/updateState',
+        payload: {
+          hasActiveSession:
+            resultSession.data &&
+            resultSession.data.data &&
+            resultSession.data.data.length > 0,
+        },
+      })
       const result = yield call(fetchUserProfileByID, id)
       const { status, data } = result
       if (parseInt(status, 10) === 200)

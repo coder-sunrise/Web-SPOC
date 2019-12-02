@@ -127,35 +127,53 @@ const DispenseDetails = ({
       })
     }
   }
-  const updateGridData = (invoiceItems) => {
+  const updateGridData = (v) => {
+    const { rows } = v
     const mapFromInvoiceItem = (result, item) => {
-      const _prescriptionItem = invoiceItems.find(
+      const _item = rows.find(
         (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
       )
-      if (_prescriptionItem)
+      if (_item)
         return [
           ...result,
           {
             ...item,
-            totalAfterGST: _prescriptionItem.totalAfterGST,
+            totalAfterGST: _item.totalAfterGST,
           },
         ]
       return [
         ...result,
+        { ...item },
       ]
     }
+
+    const newInvoice = {
+      ...values.invoice,
+      invoiceTotal: v.summary.total,
+      invoiceTotalAftAdj: v.summary.totalAfterAdj,
+      invoiceTotalAftGST: v.summary.totalWithGST,
+      outstandingBalance: v.summary.totalWithGST,
+      invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceAdjustment: v.adjustments,
+      isGSTInclusive: !!v.summary.isGSTInclusive,
+    }
+
     const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
     const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
     const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
-
+    setFieldValue('prescription', newPrescription)
+    setFieldValue('vaccination', newVaccination)
+    setFieldValue('otherOrder', newOtherOrder)
+    // console.log(1, newPrescription)
     setValues({
       ...values,
+      invoice: newInvoice,
       prescription: newPrescription,
       vaccination: newVaccination,
       otherOrder: newOtherOrder,
     })
   }
-
+  // console.log(values)
   return (
     <React.Fragment>
       <GridContainer>
@@ -265,19 +283,10 @@ const DispenseDetails = ({
                 gstAmtField: 'gstAmount',
               }}
               onValueChanged={(v) => {
-                const newInvoice = {
-                  ...values.invoice,
-                  invoiceTotal: v.summary.total,
-                  invoiceTotalAftAdj: v.summary.totalAfterAdj,
-                  invoiceTotalAftGST: v.summary.totalWithGST,
-                  outstandingBalance: v.summary.totalWithGST,
-                  invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
-                  invoiceAdjustment: v.adjustments,
-                  isGSTInclusive: !!v.summary.isGSTInclusive,
-                }
+                // console.log(newInvoice, v)
                 // console.log('summary', { summary: v })
-                setFieldValue('invoice', newInvoice)
-                updateGridData(v.rows)
+                updateGridData(v)
+
                 // setFieldValue('invoice.invoiceTotal', v.summary.total)
                 // setFieldValue(
                 //   'invoice.invoiceTotalAftAdj',

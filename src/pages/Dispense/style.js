@@ -1,6 +1,7 @@
 const DispenseIndexStyle = (theme) => ({
   root: {
     position: 'relative',
+    marginBottom: theme.spacing(2),
   },
   content: {
     marginTop: theme.spacing(1),

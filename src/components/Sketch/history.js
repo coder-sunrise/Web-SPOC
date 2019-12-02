@@ -14,6 +14,7 @@ class History {
     this.debug = debug
     this.count = 0
     this.templateId = ''
+    this.undoNotAllowIndex = ''
   }
 
   /**
@@ -118,6 +119,7 @@ class History {
         }
       } else if (mainObject.id !== 'pan' || mainObject.id === null) {
         // this.redoList = []
+
         this.originalList.push(obj)
         this.saveLayerList.push({
           layerType: mainObject.type,
@@ -201,37 +203,26 @@ class History {
    * @returns {boolean}
    */
   canUndo () {
-    return this.undoList.length > 0 || this.current !== null
+    let result = ''
+    if (this.undoList.length === this.undoNotAllowIndex) {
+      result = false
+    }
+    return result === ''
+      ? this.undoList.length > 0 || this.current !== null
+      : result
   }
 
   /**
    * Clears the history maintained, can be undone
    */
   reset () {
-    this.tempUndoList.push(this.current)
-    for (let i = 0; i < this.undoList.length; i++) {
-      this.tempUndoList.push(this.undoList[i])
-    }
-    this.undoList = []
+    this.undoNotAllowIndex = this.undoList.length
     this.redoList = []
-    this.current = null
     this.count = 0
   }
 
   clear () {
-    // this.undoList = []
-    if (this.tempUndoList.length > 0) {
-      if (this.undoList > 0) {
-        for (let i = 0; i < this.undoList.length; i++) {
-          this.tempUndoList.push(this.undoList[i])
-        }
-      }
-
-      this.undoList = []
-      this.undoList = this.tempUndoList
-
-      this.tempUndoList = []
-    }
+    this.undoNotAllowIndex = ''
     for (let i = 0; i < this.undoList.length; i++) {
       let [
         undoObj,

@@ -2,9 +2,8 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import * as Yup from 'yup'
-import valid from 'card-validator'
 import { formatMessage } from 'umi/locale'
-import { withStyles, Grid, Divider } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 import {
   GridContainer,
   GridItem,
@@ -24,6 +23,12 @@ const style = () => ({
   },
   summaryLabel: {
     paddingTop: 0,
+  },
+  label: {
+    textAlign: 'right',
+    fontSize: '1rem',
+    lineHeight: 1.5,
+    fontWeight: 400,
   },
 })
 
@@ -265,14 +270,14 @@ class Modal extends PureComponent {
   }
 
   render () {
-    const { state, props } = this
-    const { theme, footer, onConfirm, values, isDeposit, deposit } = props
-    const { bizSessionList, entity } = deposit
-    const { isSessionRequired, isCardPayment, paymentMode } = this.state
+    const { props } = this
+    const { classes, footer, isDeposit, deposit } = props
+    const { bizSessionList } = deposit
+    const { isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
       fullWidth: true,
-      rightAlign: true,
+      // rightAlign: true,
       noUnderline: true,
     }
 
@@ -381,7 +386,70 @@ class Modal extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <div style={{ width: '40%', margin: 'auto' }}>
+          <GridContainer alignItems='center' justify='center'>
+            <GridItem md={3} />
+            <GridItem md={3} className={classes.label}>
+              <span>Balance</span>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='balance'
+                render={(args) => (
+                  <NumberInput
+                    defaultValue='0.00'
+                    disabled
+                    {...commonAmountOpts}
+                    // label='Balance'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
+            <GridItem md={3} />
+            <GridItem md={3} className={classes.label}>
+              <span>Deposit Amount</span>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='patientDepositTransaction.amount'
+                render={(args) => (
+                  <NumberInput
+                    defaultValue='0.00'
+                    onChange={this.calculateBalanceAfter}
+                    {...commonAmountOpts}
+                    // label={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
+                    min={0}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
+            <GridItem md={3} />
+            <GridItem md={6}>
+              <Divider />
+            </GridItem>
+            <GridItem md={3} />
+
+            <GridItem md={3} />
+
+            <GridItem md={3}>
+              <Field
+                name='balanceAfter'
+                render={(args) => (
+                  <NumberInput
+                    style={{ top: -5 }}
+                    {...commonAmountOpts}
+                    disabled
+                    defaultValue='0.00'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          {/* <div style={{ width: '40%', margin: 'auto' }}>
             <Field
               name='balance'
               render={(args) => (
@@ -424,7 +492,7 @@ class Modal extends PureComponent {
                 />
               )}
             />
-          </div>
+          </div> */}
         </div>
 
         {footer &&

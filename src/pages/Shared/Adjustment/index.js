@@ -69,21 +69,21 @@ const styles = (theme) => ({})
       extraCfg.adjRemark = Yup.string().required()
     }
     return Yup.object().shape({
-      adjustment: Yup.number().required().min(
-        0.01,
-        formatMessage({
-          id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
-        }),
-      ),
-      finalAmount: Yup.number()
-        .min(
-          0,
-          formatMessage({
-            id:
-              'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
-          }),
-        )
-        .required(),
+      // adjustment: Yup.number().required().min(
+      //   0.01,
+      //   formatMessage({
+      //     id: 'inventory.pr.detail.pod.summary.adjustment.minAdjustment',
+      //   }),
+      // ),
+      // finalAmount: Yup.number()
+      //   .min(
+      //     0,
+      //     formatMessage({
+      //       id:
+      //         'inventory.pr.detail.pod.summary.adjustment.largerThanTotalAmount',
+      //     }),
+      //   )
+      //   .required(),
       ...extraCfg,
       // remarks: Yup.string().required(),
     })

@@ -637,7 +637,7 @@ class PatientHistory extends Component {
                 const Widget = o.component
                 return (
                   <div>
-                    <h5>{o.name}</h5>
+                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
                     <Widget
                       current={entity || {}}
                       {...this.props}

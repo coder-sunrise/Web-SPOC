@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import { queryNotices } from '@/services/api'
+import { getSystemVersion } from '@/services/system'
 import { notification } from '@/components'
 
 import config from '@/utils/config'
@@ -155,8 +156,27 @@ export default createFormViewModel({
         //   },
         // })
       },
+      *getSystemVersion (_, { call, put }) {
+        const response = yield call(getSystemVersion)
+        if (response && response.data) {
+          const { data } = response
+          const parsedData = data.reduce((result, d) => {
+            return { ...result, [d.item]: d.itemVersion }
+          }, {})
+          yield put({
+            type: 'saveVersion',
+            payload: parsedData,
+          })
+          return parsedData
+        }
+        return {}
+      },
     },
     reducers: {
+      saveVersion (state, { payload }) {
+        localStorage.setItem('systemVersion', JSON.stringify(payload))
+        return { ...state, systemVersion: { ...payload } }
+      },
       saveNotices (state, { payload }) {
         return {
           ...state,

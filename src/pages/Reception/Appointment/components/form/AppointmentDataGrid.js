@@ -48,6 +48,12 @@ const styles = () => ({
   },
 })
 
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = (endTime.diff(startTime, 'minute') / 60 - hour) * 60
+  return { hour, minute }
+}
+
 @connect(({ codetable }) => ({
   appointmentTypes: codetable.ctappointmenttype,
   clinicianProfiles: codetable.clinicianprofile,
@@ -147,9 +153,17 @@ class AppointmentDataGrid extends React.Component {
     if (!data || data.length <= 0) {
       let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
       if (selectedSlot && selectedSlot.allDay === false) {
+        const startTime = moment(selectedSlot.start)
+        const selectedEndTime = moment(selectedSlot.end)
+
+        const { hour, minute } = calculateDuration(startTime, selectedEndTime)
+
         defaultNewRow = {
-          startTime: moment(selectedSlot.start).format('HH:mm A'),
-          endTime: moment(selectedSlot.end).format('HH:mm A'),
+          startTime: startTime.format('HH:mm A'),
+
+          apptDurationHour: hour || 0,
+          apptDurationMinute: minute || 15,
+          endTime: selectedEndTime.format('HH:mm A'),
           clinicianFK: selectedSlot.resourceId,
           ...defaultNewRow,
         }
@@ -189,6 +203,7 @@ class AppointmentDataGrid extends React.Component {
     } = this.props
 
     const { defaultNewRows } = this.state
+    console.log({ data })
     return (
       <div className={classes.container}>
         <EditableTableGrid
