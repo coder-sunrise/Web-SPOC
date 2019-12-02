@@ -56,7 +56,7 @@ const FilterBar = ({
               <TextField
                 {...args}
                 label={formatMessage({
-                  id: 'reception.appt.searchByPatientName',
+                  id: 'reception.queue.patientSearchPlaceholder',
                 })}
               />
             )}
