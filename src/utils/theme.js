@@ -259,6 +259,11 @@ export const defaultTheme = createMuiTheme({
         paddingTop: 0,
       },
     },
+    MuiFormLabel: {
+      root: {
+        lineHeight: '19px',
+      },
+    },
     MuiInputBase: {
       root: {
         alignItems: 'start',
@@ -295,7 +300,7 @@ export const defaultTheme = createMuiTheme({
           top: 12,
         },
         '& .ant-calendar-picker-clear': {
-          right: 11,
+          right: 12,
           top: '52%',
         },
         '& .ant-select-selection--single .ant-select-selection-selected-value': {
@@ -306,7 +311,8 @@ export const defaultTheme = createMuiTheme({
         //   marginTop: 4,
         // },
         '& .ant-select-selection--single .ant-select-selection__clear': {
-          top: 5,
+          top: 7,
+          right: 15,
         },
         // '& .ant-select-selection--multiple .ant-select-selection__rendered': {
         //   height: '28px !important',

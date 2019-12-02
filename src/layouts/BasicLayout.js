@@ -271,9 +271,10 @@ class BasicLayout extends React.PureComponent {
       const latestSystemVersion = await dispatch({
         type: 'global/getSystemVersion',
       })
-
+      // console.log(currentSystemVersion)
       // first time open
-      if (!currentSystemVersion) return true
+      if (!currentSystemVersion || !latestSystemVersion['semr2-frontend'])
+        return true
 
       const currentUIVersion = currentSystemVersion['semr2-frontend']
         .split('.')
@@ -300,7 +301,6 @@ class BasicLayout extends React.PureComponent {
   initUserData = async () => {
     const { dispatch, route: { routes, authority } } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
-
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
       // reload(true) will reload the page from server, instead of cache
