@@ -17,10 +17,12 @@ import AuthorizedContext from '@/components/Context/Authorized'
 
 const validationSchema = Yup.object().shape({
   startTime: Yup.string().required(),
+  apptDurationHour: Yup.number().required(),
+  apptDurationMinute: Yup.number().required(),
   // appointmentDuration: Yup.string().required(),
-  endTime: Yup.string()
-    .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
-    .required(),
+  // endTime: Yup.string()
+  //   .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
+  //   .required(),
   clinicianFK: Yup.string().required(),
 })
 

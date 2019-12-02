@@ -42,46 +42,42 @@ const FormFooter = ({
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
-        <GridContainer>
-          <GridItem xs md={12} container justify='flex-end'>
-            <Button onClick={onClose} color='danger'>
-              {ButtonText.CLOSE}
-            </Button>
-            <Authorized authority='appointment.deletecancelappointment'>
-              <Button
-                color='danger'
-                className={classnames(hideCancelAppointmentClass)}
-                onClick={handleCancelOrDeleteClick}
-                disabled={disabled || isTurnedUp}
-              >
-                {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
-              </Button>
-            </Authorized>
-            <Button
-              disabled={disabledCheckAvailability || isTurnedUp}
-              color='success'
-              onClick={handleValidateClick}
-            >
-              {ButtonText.CHECK}
-            </Button>
-            {(isNew || isDraft) && (
-              <Button
-                disabled={disabled}
-                onClick={handleSaveDraftClick}
-                color='primary'
-              >
-                {ButtonText.DRAFT}
-              </Button>
-            )}
-            <Button
-              disabled={disabled || isTurnedUp}
-              onClick={handleConfirmClick}
-              color='primary'
-            >
-              {confirmBtnText}
-            </Button>
-          </GridItem>
-        </GridContainer>
+        <Button onClick={onClose} color='danger'>
+          {ButtonText.CLOSE}
+        </Button>
+        <Authorized authority='appointment.deletecancelappointment'>
+          <Button
+            color='danger'
+            className={classnames(hideCancelAppointmentClass)}
+            onClick={handleCancelOrDeleteClick}
+            disabled={disabled || isTurnedUp}
+          >
+            {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
+          </Button>
+        </Authorized>
+        <Button
+          disabled={disabledCheckAvailability || isTurnedUp}
+          color='success'
+          onClick={handleValidateClick}
+        >
+          {ButtonText.CHECK}
+        </Button>
+        {(isNew || isDraft) && (
+          <Button
+            disabled={disabled}
+            onClick={handleSaveDraftClick}
+            color='primary'
+          >
+            {ButtonText.DRAFT}
+          </Button>
+        )}
+        <Button
+          disabled={disabled || isTurnedUp}
+          onClick={handleConfirmClick}
+          color='primary'
+        >
+          {confirmBtnText}
+        </Button>
       </div>
     </SizeContainer>
   )

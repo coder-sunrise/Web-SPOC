@@ -790,6 +790,7 @@ class Form extends React.PureComponent {
   render () {
     const {
       classes,
+      theme,
       onClose,
       loading,
       values,
@@ -836,7 +837,7 @@ class Form extends React.PureComponent {
             <GridContainer
               className={classnames(classes.formContent)}
               alignItems='flex-start'
-              style={{ maxHeight: this.props.height - 200, overflow: 'auto' }}
+              // style={{ maxHeight: this.props.height - 200, overflow: 'auto' }}
             >
               <GridItem container xs={12} md={7}>
                 <PatientInfoInput
@@ -890,29 +891,34 @@ class Form extends React.PureComponent {
                     }
                   />
                 </GridItem>
+                <GridItem xs md={12} className={classes.footerGrid}>
+                  <FormFooter
+                    // isNew={slotInfo.type === 'add'}
+                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                    onClose={onClose}
+                    disabled={disableFooterButton}
+                    disabledCheckAvailability={
+                      disableCheckAvailabilityFooterButton
+                    }
+                    handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
+                    handleSaveDraftClick={this.onSaveDraftClick}
+                    handleConfirmClick={this.onConfirmClick}
+                    handleValidateClick={this.onValidateClick}
+                  />
+                </GridItem>
               </GridItem>
               <GridItem xs={12} md={5}>
                 <CardContainer
                   hideHeader
-                  title='Appointment History'
-                  style={{ height: '100%' }}
+                  className={classes.appointmentHistory}
+                  style={{ maxHeight: this.props.height - 200 }}
                 >
+                  <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
                   <AppointmentHistory />
                 </CardContainer>
               </GridItem>
             </GridContainer>
 
-            <FormFooter
-              // isNew={slotInfo.type === 'add'}
-              appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={onClose}
-              disabled={disableFooterButton}
-              disabledCheckAvailability={disableCheckAvailabilityFooterButton}
-              handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
-              handleSaveDraftClick={this.onSaveDraftClick}
-              handleConfirmClick={this.onConfirmClick}
-              handleValidateClick={this.onValidateClick}
-            />
             <CommonModal
               open={showSearchPatientModal}
               title='Search Patient'
@@ -976,6 +982,8 @@ class Form extends React.PureComponent {
   }
 }
 
-const FormComponent = withStyles(styles, { name: 'ApptForm' })(Form)
+const FormComponent = withStyles(styles, { name: 'ApptForm', withTheme: true })(
+  Form,
+)
 
 export default FormComponent
