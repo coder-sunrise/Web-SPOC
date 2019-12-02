@@ -34,7 +34,7 @@ import {
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),
     issuedByUserFK: Yup.number().required(),
-    subject: Yup.string().required(),
+    title: Yup.string().required(),
     content: Yup.string().required(),
   }),
 
@@ -47,7 +47,6 @@ import {
       payload: {
         sequence: rows.length,
         ...values,
-        subject: currentType.getSubject(values),
       },
     })
     if (onConfirm) onConfirm()
@@ -77,7 +76,7 @@ class Others extends PureComponent {
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='subject'
+              name='title'
               render={(args) => {
                 return <TextField label='Title' autoFocus {...args} />
               }}
@@ -103,7 +102,7 @@ class Others extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <FastField
-              name='title'
+              name='subject'
               render={(args) => {
                 return <TextField label='Re:' {...args} />
               }}
