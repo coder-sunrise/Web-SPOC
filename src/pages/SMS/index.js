@@ -93,12 +93,12 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     }
   }
 
-  const checkSmsConfiguration = (smsService) => {
+  const checkSmsConfiguration = async (smsService) => {
     if (!smsService) {
       setShowWarning(true)
       return false
     }
-    dispatch({
+    await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctAddonFeature',
