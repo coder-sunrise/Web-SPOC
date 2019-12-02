@@ -580,7 +580,7 @@ class Scribble extends React.Component {
                           <Slider
                             // ValueLabelComponent={ValueLabelComponent}
                             step={1}
-                            min={0}
+                            min={1}
                             max={50}
                             aria-labelledby='slider'
                             value={this.state.lineWidth}
@@ -676,7 +676,7 @@ class Scribble extends React.Component {
                           <Slider
                             // ValueLabelComponent={ValueLabelComponent}
                             step={1}
-                            min={0}
+                            min={1}
                             max={50}
                             aria-labelledby='slider'
                             value={this.state.lineWidth}

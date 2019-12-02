@@ -80,13 +80,13 @@ export default class Grid extends PureComponent {
             columnName: 'startDate',
             type: 'date',
             sortingEnabled: false,
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
           {
             columnName: 'endDate',
             type: 'date',
             sortingEnabled: false,
-            format: { dateFormatLong },
+            format: dateFormatLong,
           },
         ]}
       />

@@ -3,6 +3,9 @@ import {
   IntegratedSummary,
 } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
+import {
+  dateFormatLongWithTimeNoSec12h,
+} from '@/components'
 
 class VoidCNList extends PureComponent {
   render () {
@@ -30,12 +33,18 @@ class VoidCNList extends PureComponent {
       { name: 'reason', title: 'Reason' },
     ]
     const listColsExtension = [
-      { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },
-      { columnName: 'generatedDate', type: 'date', sortingEnabled: false },
-      { columnName: 'voidedDate', type: 'date', sortingEnabled: false },
-      { columnName: 'totalAmt', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'invoiceNo', sortingEnabled: false },
-      { columnName: 'itemNo', sortingEnabled: false },
+      { columnName: 'invoiceDate', type: 'date', sortingEnabled: false, width: 120 },
+      { columnName: 'generatedDate', type: 'date', sortingEnabled: false, width: 120 },
+      {
+        columnName: 'voidedDate',
+        sortingEnabled: false,
+        width: 200,
+        type: 'date',
+        format: dateFormatLongWithTimeNoSec12h,
+      },
+      { columnName: 'totalAmt', type: 'currency', currency: true, sortingEnabled: false, width: 200 },
+      { columnName: 'invoiceNo', sortingEnabled: false, width: 120 },
+      { columnName: 'itemNo', sortingEnabled: false, width: 120 },
       { columnName: 'voidedBy', sortingEnabled: false },
       { columnName: 'reason', sortingEnabled: false },
     ]
