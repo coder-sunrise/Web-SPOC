@@ -31,52 +31,25 @@ const styles = (theme) => ({
 const commonExt = [
   {
     columnName: 'appointmentStatusFk',
-    render: (rows) => (
-      <CodeSelect
-        code='ltappointmentstatus'
-        text
-        value={parseInt(rows.appointmentStatusFk, 10)}
-      />
-    ),
+    type: 'codeSelect',
+    code: 'ltappointmentstatus',
   },
   {
     columnName: 'appointmentDate',
-    render: (rows) => moment(rows.appointmentDate).format(dateFormatLong),
+    format: dateFormatLong,
+    type: 'date',
   },
   {
     columnName: 'startTime',
-    render: (rows) => {
-      const firstAppointment = rows.appointment_Resources.find(
-        (item) => item.sortOrder === 0,
-      )
-      if (firstAppointment) {
-        return moment(firstAppointment.startTime, 'HH:mm:ss').format('hh:mm A')
-      }
-      return ''
-    },
+    type: 'time',
+    sortingEnabled: false,
   },
   {
     columnName: 'doctor',
-    render: (rows) => {
-      const firstAppointment = rows.appointment_Resources.find(
-        (item) => item.sortOrder === 0,
-      )
-      if (firstAppointment) {
-        return (
-          <div>
-            Dr <span />
-            <CodeSelect
-              text
-              code='clinicianprofile'
-              value={firstAppointment.clinicianFK}
-              labelField='name'
-              valueField='id'
-            />
-          </div>
-        )
-      }
-      return ''
-    },
+    type: 'codeSelect',
+    code: 'clinicianprofile',
+    valueField: 'id',
+    labelField: 'name',
   },
 ]
 
@@ -170,7 +143,7 @@ class AppointmentHistory extends PureComponent {
       const { status, data } = previous
       if (status === '200')
         this.setState({
-          previousAppt: data.data,
+          previousAppt: this.reBuildApptDatas(data.data),
           patientProfileFK: patientId,
         })
     }
@@ -179,7 +152,7 @@ class AppointmentHistory extends PureComponent {
       const { status, data } = future
       if (status === '200')
         this.setState({
-          futureAppt: data.data,
+          futureAppt: this.reBuildApptDatas(data.data),
           patientProfileFK: patientId,
         })
     }
@@ -192,6 +165,37 @@ class AppointmentHistory extends PureComponent {
         this.setState({ height: height > 0 ? height / 2 - 144 : 300 })
       }
     }
+  }
+
+  reBuildApptDatas (data) {
+    return data.map((o) => {
+      const firstAppointment = o.appointment_Resources.find(
+        (item) => item.sortOrder === 0,
+      )
+      let startTime = ''
+      let doctor = 0
+      let { appointmentDate } = o
+
+      if (firstAppointment) {
+        startTime = moment(firstAppointment.startTime, 'HH:mm:ss').format(
+          'hh:mm A',
+        )
+        doctor = firstAppointment.clinicianFK
+        appointmentDate = `${moment(o.appointmentDate).format(
+          'YYYY-MM-DD',
+        )} ${moment(firstAppointment.startTime, 'HH:mm:ss').format('HH:mm:ss')}`
+      }
+
+      const newRow = {
+        ...o,
+        appointmentDate,
+        startTime,
+        doctor,
+        appointmentStatusFk: parseInt(o.appointmentStatusFk, 10),
+        appointmentRemarks: o.appointmentRemarks || '',
+      }
+      return newRow
+    })
   }
 
   render () {
