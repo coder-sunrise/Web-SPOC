@@ -127,26 +127,7 @@ const DispenseDetails = ({
       })
     }
   }
-  const updateGridData = (v) => {
-    const { rows } = v
-    const mapFromInvoiceItem = (result, item) => {
-      const _item = rows.find(
-        (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
-      )
-      if (_item)
-        return [
-          ...result,
-          {
-            ...item,
-            totalAfterGST: _item.totalAfterGST,
-          },
-        ]
-      return [
-        ...result,
-        { ...item },
-      ]
-    }
-
+  const updateInvoiceData = (v) => {
     const newInvoice = {
       ...values.invoice,
       invoiceTotal: v.summary.total,
@@ -157,23 +138,19 @@ const DispenseDetails = ({
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
-
-    const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
-    const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
-    const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
-    setFieldValue('prescription', newPrescription)
-    setFieldValue('vaccination', newVaccination)
-    setFieldValue('otherOrder', newOtherOrder)
-    // console.log(1, newPrescription)
     setValues({
       ...values,
       invoice: newInvoice,
-      prescription: newPrescription,
-      vaccination: newVaccination,
-      otherOrder: newOtherOrder,
+    })
+    dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        totalWithGST: v.summary.totalWithGST,
+        isGSTInclusive: v.summary.isGSTInclusive,
+      },
     })
   }
-
+  console.log({ values })
   return (
     <React.Fragment>
       <GridContainer>
@@ -282,39 +259,7 @@ const DispenseDetails = ({
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
               }}
-              onValueChanged={(v) => {
-                // console.log(newInvoice, v)
-                // console.log('summary', { summary: v })
-                updateGridData(v)
-
-                // setFieldValue('invoice.invoiceTotal', v.summary.total)
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftAdj',
-                //   v.summary.totalAfterAdj,
-                // )
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftGST',
-                //   v.summary.totalWithGST,
-                // )
-                // setFieldValue(
-                //   'invoice.outstandingBalance',
-                //   v.summary.totalWithGST,
-                // )
-                // // console.log({ v })
-
-                // setFieldValue(
-                //   'invoice.invoiceGSTAmt',
-                //   Math.round(v.summary.gst * 100) / 100,
-                // )
-                // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
-                dispatch({
-                  type: `dispense/updateState`,
-                  payload: {
-                    totalWithGST: v.summary.totalWithGST,
-                    isGSTInclusive: v.summary.isGSTInclusive,
-                  },
-                })
-              }}
+              onValueChanged={updateInvoiceData}
             />
           </GridItem>
         )}
