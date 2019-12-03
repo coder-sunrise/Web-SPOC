@@ -4,13 +4,14 @@ import { connect } from 'dva'
 import { withFormik } from 'formik'
 // common components
 import { CardContainer } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 import InvoiceBanner from './InvoiceBanner'
 import InvoiceContent from './Content'
 
-@connect(({ invoiceDetail, invoicePayment, clinicSettings }) => ({
+@connect(({ invoiceDetail, invoicePayment, loading }) => ({
   invoiceDetail,
   invoicePayment,
-  clinicSettings,
+  loading: loading.models.invoiceDetail || loading.models.invoicePayment,
 }))
 @withFormik({
   name: 'invoiceDetail',
@@ -20,8 +21,18 @@ import InvoiceContent from './Content'
   },
 })
 class InvoiceDetails extends Component {
-  componentDidMount () {
+  componentWillMount () {
     this.refresh()
+  }
+
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'invoiceDetail/reset',
+    })
+    dispatch({
+      type: 'invoicePayment/reset',
+    })
   }
 
   refresh = () => {
@@ -43,12 +54,22 @@ class InvoiceDetails extends Component {
   }
 
   render () {
-    const { ...restProps } = this.props
+    const { values, invoiceDetail, invoicePayment, loading } = this.props
+    const invoiceContentProps = {
+      values,
+      invoiceDetail,
+      invoicePayment,
+    }
+    const bannerProps = {
+      values,
+    }
     return (
-      <CardContainer hideHeader>
-        <InvoiceBanner {...restProps} />
-        <InvoiceContent {...restProps} />
-      </CardContainer>
+      <LoadingWrapper loading={loading} text='Getting invoice details...'>
+        <CardContainer hideHeader>
+          <InvoiceBanner {...bannerProps} />
+          <InvoiceContent {...invoiceContentProps} />
+        </CardContainer>
+      </LoadingWrapper>
     )
   }
 }
