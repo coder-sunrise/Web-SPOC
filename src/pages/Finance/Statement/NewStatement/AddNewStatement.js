@@ -431,7 +431,9 @@ class AddNewStatement extends PureComponent {
                   showSelectAll: true,
                   rowSelectionEnabled: (row) => {
                     const { statementInvoicePayment = [] } = row
-                    return statementInvoicePayment.length <= 0
+                    return !statementInvoicePayment.find(
+                      (o) => o.invoicePayment.isCancelled === false,
+                    )
                   },
                 },
               }}
