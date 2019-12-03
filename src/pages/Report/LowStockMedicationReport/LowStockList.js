@@ -28,7 +28,7 @@ class LowStockList extends PureComponent {
       { columnName: 'stock', type: 'number', sortingEnabled: false },
       { columnName: 'code', sortingEnabled: false },
       { columnName: 'name', sortingEnabled: false },
-      { columnName: 'threshold', sortingEnabled: false },
+      { columnName: 'threshold', type: 'number', sortingEnabled: false },
       { columnName: 'uom', sortingEnabled: false },
       { columnName: 'supplier', sortingEnabled: false },
     ]
