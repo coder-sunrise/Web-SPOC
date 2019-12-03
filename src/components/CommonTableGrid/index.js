@@ -932,15 +932,25 @@ class CommonTableGrid extends PureComponent {
                 <SortingState
                   sorting={this.state.pagination.sorting}
                   defaultSorting={defaultSorting}
-                  onSortingChange={(sorting) => {
-                    sorting.forEach((o) => {
+                  onSortingChange={(_cmptSortings) => {
+                    // console.log(_cmptSortings, this.state.entity.pagination)
+                    _cmptSortings.forEach((o, i) => {
                       const c = columnExtensions.find(
                         (m) => m.columnName === o.columnName,
                       )
+                      if (this.state.entity) {
+                        const { sorting = [] } = this.state.entity.pagination
+                        if (
+                          sorting[i] &&
+                          o.columnName !== sorting[i].columnName
+                        )
+                          o.direction = o.direction === 'asc' ? 'desc' : 'asc'
+                      }
+
                       o.sortBy = c.sortBy
                     })
                     this.search({
-                      sorting,
+                      sorting: _cmptSortings,
                     })
                   }}
                   columnExtensions={columnExtensions}

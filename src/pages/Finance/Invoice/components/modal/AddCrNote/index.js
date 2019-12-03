@@ -63,15 +63,15 @@ import MiscCrNote from './MiscCrNote'
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
       0,
     )
-
+    const gstAmt = roundTo(gstAmount)
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
       isStockIn,
       remark,
-      gstAmt: roundTo(gstAmount),
+      gstAmt,
       gstValue: invoiceDetail.gstValue,
-      total: finalCredit,
+      total: finalCredit - gstAmt,
       totalAftGST: finalCredit,
       creditNoteItem: creditNoteItem
         .filter((x) => x.isSelected)
