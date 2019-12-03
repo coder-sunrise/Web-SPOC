@@ -9,7 +9,7 @@ import {
   GridItem,
   SizeContainer,
   Checkbox,
-  CodeSelect,
+  Select,
 } from '@/components'
 import {
   DoctorProfileSelect,
@@ -36,11 +36,13 @@ const FilterBar = ({ handleSubmit }) => {
             <FastField
               name='filterType'
               render={(args) => (
-                <CodeSelect
+                <Select
                   {...args}
                   label='Payer Type'
-                  code='ltinvoicepayertype'
-                  valueField='code'
+                  options={[
+                    { name: 'Patient', value: 'Patient' },
+                    { name: 'Co-payer', value: 'Co-payer' },
+                  ]}
                 />
               )}
             />
