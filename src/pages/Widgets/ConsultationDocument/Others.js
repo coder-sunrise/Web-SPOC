@@ -39,13 +39,13 @@ import {
   }),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, consultationDocument, currentType } = props
-    const { rows } = consultationDocument
+    const { dispatch, onConfirm, getNextSequence } = props
+    const nextSequence = getNextSequence()
 
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
-        sequence: rows.length,
+        sequence: nextSequence,
         ...values,
       },
     })

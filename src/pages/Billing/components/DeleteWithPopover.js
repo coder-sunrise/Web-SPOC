@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { withStyles } from '@material-ui/core'
 import Delete from '@material-ui/icons/Delete'
 // common components
-import { Button, Popover, Tooltip } from '@/components'
+import { Button, Popover, SizeContainer, Tooltip } from '@/components'
 
 const styles = (theme) => ({
   popoverContainer: {
@@ -48,18 +48,20 @@ const DeleteWithPopover = ({
       trigger='click'
       anchorOrigin={{
         vertical: 'top',
-        horizontal: 'right',
+        horizontal: 'left',
       }}
       transformOrigin={{
         vertical: 'bottom',
-        horizontal: 'left',
+        horizontal: 'right',
       }}
       visible={show}
       onVisibleChange={toggleVisibleChange}
       content={
         <div className={classes.popoverContainer}>
           <p className={classes.popoverMessage}>{contentText}</p>
-          <div>{extraCmd}</div>
+          <SizeContainer size='sm'>
+            {show && <div style={{ marginRight: 8 }}>{extraCmd}</div>}
+          </SizeContainer>
           <Button size='sm' color='danger' onClick={handleCancelClick}>
             Cancel
           </Button>

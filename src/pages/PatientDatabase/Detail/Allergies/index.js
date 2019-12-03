@@ -2,10 +2,9 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import {
   Checkbox,
-  Select,
+  CodeSelect,
   GridContainer,
   GridItem,
-  FastField,
   Field,
 } from '@/components'
 
@@ -31,10 +30,6 @@ class Allergies extends PureComponent {
     this.props.setFieldValue('patientAllergy', vals)
     if (this.isDisableAllergy()) {
       this.props.setFieldValue('patientAllergyMetaData[0].noAllergies', false)
-      this.props.setFieldValue(
-        'patientAllergyMetaData[0].isG6PDConfirmed',
-        undefined,
-      )
     }
   }
 
@@ -66,18 +61,14 @@ class Allergies extends PureComponent {
           </GridItem>
           <GridItem xs={2} md={2}>
             <Field
-              name='patientAllergyMetaData[0].isG6PDConfirmed'
+              name='patientAllergyMetaData[0].g6PDFK'
               render={(args) => {
                 return (
-                  <Select
+                  <CodeSelect
+                    code='ctg6pd'
                     style={{ top: -25 }}
                     {...args}
-                    options={[
-                      { name: 'Yes', value: true },
-                      { name: 'No', value: false },
-                    ]}
                     label='G6PD Deficiency:'
-                    // disabled={allergyDisabled}
                   />
                 )
               }}
