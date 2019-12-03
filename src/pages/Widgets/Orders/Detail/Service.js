@@ -27,10 +27,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType } = props
+    const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
     const data = {
-      sequence: rows.length,
+      sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,

@@ -176,8 +176,8 @@ const schemaAllergies = {
   patientAllergyMetaData: Yup.array().compact((v) => v.isDeleted).of(
     Yup.object().shape({
       noAllergies: Yup.boolean(),
-      isG6PDConfirmed: Yup.boolean(),
-      // g6PDFK: Yup.number(),
+      // isG6PDConfirmed: Yup.boolean(),
+      g6PDFK: Yup.number(),
     }),
   ),
   patientAllergy: Yup.array().compact((v) => v.isDeleted).of(

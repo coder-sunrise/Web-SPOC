@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
+import _ from 'lodash'
 import { orderTypes } from '@/utils/codes'
 
 import {
@@ -156,6 +157,18 @@ class Details extends PureComponent {
     })
   }
 
+  getNextSequence = () => {
+    const { orders: { rows } } = this.props
+
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence } = _.maxBy(allDocs, 'sequence')
+      nextSequence = sequence + 1
+    }
+    return nextSequence
+  }
+
   render () {
     const { props } = this
     const { classes, orders, dispatch, fromDispense } = props
@@ -168,6 +181,7 @@ class Details extends PureComponent {
       currentType: orderTypes.find((o) => o.value === type),
       type,
       orderTypes,
+      getNextSequence: this.getNextSequence,
       ...props,
     }
 
