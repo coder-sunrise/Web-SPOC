@@ -63,9 +63,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
   }),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, consultationDocument, currentType } = props
-    const { rows } = consultationDocument
-
+    const { dispatch, onConfirm, currentType, getNextSequence } = props
     const fullFormatAttendanceEndTime = `${moment().format(
       'YYYY-MM-DD',
     )}T${values.attendanceEndTime}`
@@ -82,11 +80,11 @@ const isSameOrAfterTime = (startTime, endTime) =>
         'YYYY-MM-DDTHH:mm:ss',
       ),
     }
-
+    const nextSequence = getNextSequence()
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
-        sequence: rows.length,
+        sequence: nextSequence,
         ...newValues,
         subject: currentType.getSubject(values),
       },

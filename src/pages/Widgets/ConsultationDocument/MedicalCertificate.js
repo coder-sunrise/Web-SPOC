@@ -33,11 +33,11 @@ import * as service from '@/services/common'
   }),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, consultationDocument, currentType } = props
+    const { dispatch, onConfirm, currentType, getNextSequence } = props
     const { mcStartEndDate } = values
-    const { rows } = consultationDocument
+    const nextSequence = getNextSequence()
     const data = {
-      sequence: rows.length,
+      sequence: nextSequence,
       ...values,
       mcStartDate: mcStartEndDate[0],
       mcEndDate: mcStartEndDate[1],
