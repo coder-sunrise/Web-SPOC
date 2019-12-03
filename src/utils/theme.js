@@ -268,6 +268,9 @@ export const defaultTheme = createMuiTheme({
       root: {
         alignItems: 'start',
         fontSize: defaultFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
@@ -324,10 +327,10 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           top: -2,
         },
-        '& .Mui-disabled': {
+        '&.Mui-disabled': {
           cursor: 'not-allowed',
         },
-        '& .Mui-disabled .anticon': {
+        '&.Mui-disabled .anticon': {
           display: 'none',
         },
         '& .checkbox-container': {
@@ -464,6 +467,9 @@ export const smallTheme = createMuiTheme({
       root: {
         alignItems: 'start',
         fontSize: smallFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
@@ -643,6 +649,9 @@ export const largeTheme = createMuiTheme({
       root: {
         alignItems: 'start',
         fontSize: largeFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
