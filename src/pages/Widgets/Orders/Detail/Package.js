@@ -33,7 +33,7 @@ const { qtyFormat } = config
     inventorypackageFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, codetable } = props
+    const { dispatch, orders, codetable, getNextSequence } = props
     const { rows } = orders
     const {
       ctmedicationusage,
@@ -308,21 +308,21 @@ const { qtyFormat } = config
       return item
     }
 
-    let { length } = rows
     const { packageItems, packageCode } = values
     let datas = []
+    let nextSequence = getNextSequence()
     for (let index = 0; index < packageItems.length; index++) {
       const newOrder = getOrderFromPackage(packageCode, packageItems[index])
       if (newOrder) {
         const data = {
-          sequence: length,
+          sequence: nextSequence,
           ...newOrder,
           subject: packageItems[index].name,
           isDeleted: false,
           type: packageItems[index].type,
         }
         datas.push(data)
-        length += 1
+        nextSequence += 1
       }
     }
     dispatch({

@@ -66,8 +66,7 @@ const styles = (theme) => ({
     console.log('map props to values')
     try {
       if (billing.entity) {
-        const { invoicePayer = [] } = billing.entity
-
+        const { invoicePayer = [], visitPurposeFK } = billing.entity
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -87,6 +86,7 @@ const styles = (theme) => ({
           finalClaim,
           finalPayable,
           visitId: billing.visitID,
+          visitPurposeFK,
         }
       }
     } catch (error) {

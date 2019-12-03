@@ -15,15 +15,9 @@ const amountProps = {
   normalText: true,
 }
 
-const Summary = ({ classes, clinicSettings }) => {
-  const getGST = () => {
-    const { settings } = clinicSettings
-    if (settings) {
-      const { gSTPercentageInt } = settings
-      return `(${gSTPercentageInt}%) GST:`
-    }
-    return null
-  }
+const Summary = ({ classes, values }) => {
+  const getGST = (gstValue = 0) => `(${gstValue.toFixed(2)}%) GST:`
+
   return (
     <GridContainer
       direction='column'
@@ -54,12 +48,20 @@ const Summary = ({ classes, clinicSettings }) => {
       </GridItem>
 
       <GridItem xs={6} md={6}>
-        <FastField
-          name='invoiceGSTAmt'
-          render={(args) => {
-            return <NumberInput prefix={getGST()} {...amountProps} {...args} />
-          }}
-        />
+        {values.gstValue && (
+          <FastField
+            name='invoiceGSTAmt'
+            render={(args) => {
+              return (
+                <NumberInput
+                  prefix={getGST(values.gstValue)}
+                  {...amountProps}
+                  {...args}
+                />
+              )
+            }}
+          />
+        )}
       </GridItem>
       <GridItem md={3} className={classes.divider}>
         <Divider />

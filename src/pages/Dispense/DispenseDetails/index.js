@@ -6,6 +6,7 @@ import { Paper, withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
@@ -28,7 +29,7 @@ import {
 } from '../variables'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
-import AddOrder from './AddOrder'
+import { VISIT_TYPE } from '@/utils/constants'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -83,7 +84,7 @@ const DispenseDetails = ({
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [] } = invoice
+  const { invoiceItem = [], invoiceAdjustment = [], visitPurposeFK } = invoice
 
   const { inventorymedication } = codetable
 
@@ -110,23 +111,6 @@ const DispenseDetails = ({
     }
   }
 
-  const [
-    showOrderModal,
-    setShowOrderModal,
-  ] = useState(false)
-
-  const handleOrderModal = () => {
-    const popUpStatus = !showOrderModal
-    setShowOrderModal(popUpStatus)
-    if (!showOrderModal) {
-      dispatch({
-        type: 'orders/updateState',
-        payload: {
-          type: '1',
-        },
-      })
-    }
-  }
   const updateGridData = (v) => {
     const { rows } = v
     const mapFromInvoiceItem = (result, item) => {
@@ -173,12 +157,13 @@ const DispenseDetails = ({
       otherOrder: newOtherOrder,
     })
   }
-  // console.log({ values })
+  const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
-          {!viewOnly && (
+          {!viewOnly &&
+          !isRetailVisit && (
             <Button color='info' size='sm' onClick={onReloadClick}>
               <Refresh />
               Refresh
@@ -207,14 +192,17 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            <Authorized authority='queue.dispense.savedispense'>
-              {/* <ProgressButton
-                color='success'
+            {isRetailVisit && (
+              <ProgressButton
+                color='danger'
                 size='sm'
-                onClick={handleOrderModal}
+                icon={<Delete />}
+                // onClick={handleOrderModal}
               >
-                Dummy Button
-              </ProgressButton> */}
+                Discard
+              </ProgressButton>
+            )}
+            <Authorized authority='queue.dispense.savedispense'>
               <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                 Save Dispense
               </ProgressButton>
@@ -226,7 +214,7 @@ const DispenseDetails = ({
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                Edit Order
+                {isRetailVisit ? 'Add Order' : 'Edit Order'}
               </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
@@ -254,12 +242,15 @@ const DispenseDetails = ({
               )}
               data={prescription}
             />
-            <TableData
-              title='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
+            {!isRetailVisit && (
+              <TableData
+                title='Vaccination'
+                columns={VaccinationColumn}
+                colExtensions={VaccinationColumnExtensions(viewOnly)}
+                data={vaccination}
+              />
+            )}
+
             <TableData
               title='Other Orders'
               columns={OtherOrdersColumns}
@@ -319,16 +310,6 @@ const DispenseDetails = ({
           </GridItem>
         )}
       </GridContainer>
-
-      <CommonModal
-        title='Orders'
-        open={showOrderModal}
-        onClose={handleOrderModal}
-        maxWidth='md'
-        observe='OrderPage'
-      >
-        <AddOrder />
-      </CommonModal>
     </React.Fragment>
   )
 }

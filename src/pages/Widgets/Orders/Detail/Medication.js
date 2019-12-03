@@ -82,7 +82,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType } = props
+    const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
 
     const getInstruction = (instructions) => {
@@ -110,7 +110,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
 
     const data = {
-      sequence: rows.length,
+      sequence: getNextSequence(),
       ...values,
       instruction,
       subject: currentType.getSubject(values),
