@@ -162,12 +162,12 @@ export default compose(
         .max(999999.9, 'Max Discount must between 0 and 999,999.9'),
 
       reOrderThreshold: Yup.number()
-        .min(0, errMsg('Re-Order Threshold'))
-        .max(999999.99, errMsg('Re-Order Threshold')),
+        .min(0, 'Re-Order Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Re-Order Threshold must between 0 and 999,999.9'),
 
       criticalThreshold: Yup.number()
-        .min(0, errMsg('Critical Threshold'))
-        .max(999999.99, errMsg('Critical Threshold')),
+        .min(0, 'Critical Threshold must between 0 and 999,999.9')
+        .max(999999.9, 'Critical Threshold must between 0 and 999,999.9'),
     }),
 
     handleSubmit: (values, { props, resetForm }) => {

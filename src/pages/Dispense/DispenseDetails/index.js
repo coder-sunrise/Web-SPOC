@@ -6,6 +6,7 @@ import { Paper, withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
@@ -28,7 +29,7 @@ import {
 } from '../variables'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
-import AddOrder from './AddOrder'
+import { VISIT_TYPE } from '@/utils/constants'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -83,7 +84,7 @@ const DispenseDetails = ({
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [] } = invoice
+  const { invoiceItem = [], invoiceAdjustment = [], visitPurposeFK } = invoice
 
   const { inventorymedication } = codetable
 
@@ -127,26 +128,7 @@ const DispenseDetails = ({
       })
     }
   }
-  const updateGridData = (v) => {
-    const { rows } = v
-    const mapFromInvoiceItem = (result, item) => {
-      const _item = rows.find(
-        (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
-      )
-      if (_item)
-        return [
-          ...result,
-          {
-            ...item,
-            totalAfterGST: _item.totalAfterGST,
-          },
-        ]
-      return [
-        ...result,
-        { ...item },
-      ]
-    }
-
+  const updateInvoiceData = (v) => {
     const newInvoice = {
       ...values.invoice,
       invoiceTotal: v.summary.total,
@@ -157,28 +139,25 @@ const DispenseDetails = ({
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
     }
-
-    const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
-    const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
-    const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
-    setFieldValue('prescription', newPrescription)
-    setFieldValue('vaccination', newVaccination)
-    setFieldValue('otherOrder', newOtherOrder)
-    // console.log(1, newPrescription)
     setValues({
       ...values,
       invoice: newInvoice,
-      prescription: newPrescription,
-      vaccination: newVaccination,
-      otherOrder: newOtherOrder,
+    })
+    dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        totalWithGST: v.summary.totalWithGST,
+        isGSTInclusive: v.summary.isGSTInclusive,
+      },
     })
   }
-  // console.log({ values })
+  const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
-          {!viewOnly && (
+          {!viewOnly &&
+          !isRetailVisit && (
             <Button color='info' size='sm' onClick={onReloadClick}>
               <Refresh />
               Refresh
@@ -207,14 +186,17 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            <Authorized authority='queue.dispense.savedispense'>
-              {/* <ProgressButton
-                color='success'
+            {isRetailVisit && (
+              <ProgressButton
+                color='danger'
                 size='sm'
-                onClick={handleOrderModal}
+                icon={<Delete />}
+                // onClick={handleOrderModal}
               >
-                Dummy Button
-              </ProgressButton> */}
+                Discard
+              </ProgressButton>
+            )}
+            <Authorized authority='queue.dispense.savedispense'>
               <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                 Save Dispense
               </ProgressButton>
@@ -226,7 +208,7 @@ const DispenseDetails = ({
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                Edit Order
+                {isRetailVisit ? 'Add Order' : 'Edit Order'}
               </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
@@ -254,12 +236,15 @@ const DispenseDetails = ({
               )}
               data={prescription}
             />
-            <TableData
-              title='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
+            {!isRetailVisit && (
+              <TableData
+                title='Vaccination'
+                columns={VaccinationColumn}
+                colExtensions={VaccinationColumnExtensions(viewOnly)}
+                data={vaccination}
+              />
+            )}
+
             <TableData
               title='Other Orders'
               columns={OtherOrdersColumns}
@@ -282,53 +267,11 @@ const DispenseDetails = ({
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
               }}
-              onValueChanged={(v) => {
-                // console.log(newInvoice, v)
-                // console.log('summary', { summary: v })
-                updateGridData(v)
-
-                // setFieldValue('invoice.invoiceTotal', v.summary.total)
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftAdj',
-                //   v.summary.totalAfterAdj,
-                // )
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftGST',
-                //   v.summary.totalWithGST,
-                // )
-                // setFieldValue(
-                //   'invoice.outstandingBalance',
-                //   v.summary.totalWithGST,
-                // )
-                // // console.log({ v })
-
-                // setFieldValue(
-                //   'invoice.invoiceGSTAmt',
-                //   Math.round(v.summary.gst * 100) / 100,
-                // )
-                // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
-                dispatch({
-                  type: `dispense/updateState`,
-                  payload: {
-                    totalWithGST: v.summary.totalWithGST,
-                    isGSTInclusive: v.summary.isGSTInclusive,
-                  },
-                })
-              }}
+              onValueChanged={updateInvoiceData}
             />
           </GridItem>
         )}
       </GridContainer>
-
-      <CommonModal
-        title='Orders'
-        open={showOrderModal}
-        onClose={handleOrderModal}
-        maxWidth='md'
-        observe='OrderPage'
-      >
-        <AddOrder />
-      </CommonModal>
     </React.Fragment>
   )
 }

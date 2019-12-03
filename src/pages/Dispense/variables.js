@@ -16,7 +16,8 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
-const _width = 220
+const columnwidth = '10%'
+const columnWidth = '10%'
 
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
@@ -68,21 +69,21 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', width: _width, type: 'currency' },
+  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
-    width: _width,
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: _width,
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
-    width: _width,
+    width: columnWidth,
     render: (row) => {
       return (
         <p>
@@ -94,7 +95,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
-    width: _width,
+    width: columnWidth,
     render: (row) => {
       return (
         <p>
@@ -105,6 +106,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'batchNo',
+
     render: (row) => {
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
@@ -137,6 +139,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'expiryDate',
+
     render: (row) => {
       return (
         <FastField
@@ -216,20 +219,21 @@ export const VaccinationColumn = [
 ]
 
 export const VaccinationColumnExtensions = (viewOnly = false) => [
-  { columnName: 'dispensedQuanity', type: 'number' },
-  { columnName: 'unitPrice', width: _width, type: 'currency' },
+  { columnName: 'dispensedQuanity', width: columnWidth, type: 'number' },
+  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
-    width: _width,
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
-    width: _width,
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'batchNo',
+
     render: (row) => {
       return (
         <FastField
@@ -243,6 +247,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   },
   {
     columnName: 'expiryDate',
+
     render: (row) => {
       return (
         <FastField
@@ -310,7 +315,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
-    width: _width,
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -321,7 +326,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
-    width: _width,
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -332,11 +337,11 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
-    width: _width,
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfterGST} />
+      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
     },
   },
   {

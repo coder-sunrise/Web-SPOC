@@ -30,6 +30,10 @@ class Invoice extends React.Component {
   componentDidMount () {
     this.props.dispatch({
       type: 'invoiceList/query',
+      payload: {
+        lgteql_invoiceDate: moment().add(-1, 'month').formatUTC(),
+        lsteql_invoiceDate: moment().formatUTC(false),
+      },
     })
   }
 

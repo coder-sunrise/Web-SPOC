@@ -558,6 +558,7 @@ class Layout extends PureComponent {
         2,
         2,
       ],
+      isDraggable: !this.state.fullScreenWidget,
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
       isResizable: this.state.mode === 'edit',

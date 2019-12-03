@@ -37,6 +37,7 @@ import {
 import {
   INVOICE_PAYER_TYPE,
   INVOICE_ITEM_TYPE_BY_TEXT,
+  VISIT_TYPE,
 } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
 
@@ -726,6 +727,7 @@ const ApplyClaims = ({
   }
 
   const shouldDisableAddApplicableClaim = () => {
+    if (values.visitPurposeFK === VISIT_TYPE.RETAIL) return true
     const isEditing = hasEditing()
     const hasUnappliedScheme =
       tempInvoicePayer.filter(
@@ -782,7 +784,13 @@ const ApplyClaims = ({
           <Add />
           Co-Payer
         </Button>
-        <Button color='danger' size='sm' onClick={handleResetClick}>
+
+        <Button
+          color='danger'
+          size='sm'
+          disabled={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+          onClick={handleResetClick}
+        >
           <Reset />
           Reset
         </Button>

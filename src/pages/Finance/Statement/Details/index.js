@@ -46,36 +46,75 @@ const styles = () => ({})
     const { dispatch, onConfirm, history, user } = props
     const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
     const paymentReceivedByUserFK = user.data.id
-    values.statementInvoice.forEach((o) => {
-      o.statementInvoicePayment.forEach((i) => {
-        if (!i.id) {
-          const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
-          const paymentAmt = i.invoicePayment.totalAmtPaid
-          const roundingAmt = parseFloat(
-            Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
-              2,
-            ),
-          )
-          i.invoicePayment = {
-            ...i.invoicePayment,
-            paymentCreatedBizSessionFK,
-            paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-            paymentReceivedByUserFK,
-            invoicePaymentMode: [
-              {
-                paymentModeFK,
-                amt: i.invoicePayment.totalAmtPaid,
-                paymentMode: displayValue,
-                cashRouding: isCashPayment ? roundingAmt : 0,
-              },
-            ],
-          }
-        }
-      })
+    let newPaymentStatementInvoice = values.statementInvoice.filter((o) =>
+      o.statementInvoicePayment.find((i) => !i.id),
+    )
+
+    newPaymentStatementInvoice = newPaymentStatementInvoice.map((o) => {
+      let newInvoicePayment = o.statementInvoicePayment.find((i) => !i.id)
+      const existingInvoicePayment = o.statementInvoicePayment.filter(
+        (i) => i.id,
+      )
+      const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
+      const paymentAmt = newInvoicePayment.totalAmtPaid
+      const roundingAmt = parseFloat(
+        Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(2),
+      )
+      const { invoicePayment, statementInvoiceFK } = newInvoicePayment
+      newInvoicePayment = {
+        ...invoicePayment,
+        paymentCreatedBizSessionFK,
+        paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+        paymentReceivedByUserFK,
+        invoicePaymentMode: [
+          {
+            paymentModeFK,
+            amt: invoicePayment.totalAmtPaid,
+            paymentMode: displayValue,
+            cashRouding: isCashPayment ? roundingAmt : 0,
+          },
+        ],
+      }
+      return {
+        ...o,
+        statementInvoicePayment: [
+          ...existingInvoicePayment,
+          { invoicePayment: { ...newInvoicePayment }, statementInvoiceFK },
+        ],
+      }
     })
+
+    // values.statementInvoice.forEach((o) => {
+    //   o.statementInvoicePayment.forEach((i) => {
+    //     if (!i.id) {
+    //       const isCashPayment = paymentModeFK === PAYMENT_MODE.CASH
+    //       const paymentAmt = i.invoicePayment.totalAmtPaid
+    //       const roundingAmt = parseFloat(
+    //         Math.abs(paymentAmt - roundToPrecision(paymentAmt, 0.05)).toFixed(
+    //           2,
+    //         ),
+    //       )
+    //       i.invoicePayment = {
+    //         ...i.invoicePayment,
+    //         paymentCreatedBizSessionFK,
+    //         paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+    //         paymentReceivedByUserFK,
+    //         invoicePaymentMode: [
+    //           {
+    //             paymentModeFK,
+    //             amt: i.invoicePayment.totalAmtPaid,
+    //             paymentMode: displayValue,
+    //             cashRouding: isCashPayment ? roundingAmt : 0,
+    //           },
+    //         ],
+    //       }
+    //     }
+    //   })
+    // })
 
     const payload = {
       ...values,
+      statementInvoice: newPaymentStatementInvoice,
     }
     dispatch({
       type: 'statement/upsert',

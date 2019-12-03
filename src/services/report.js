@@ -27,7 +27,7 @@ export const getPDF = async (reportID, payload) => {
     },
     body: stringify({
       reportFormat: 'Pdf',
-      reportParameters: JSON.stringify({ ...payload }),
+      reportParameters: JSON.stringify({ ...commonDataWriterTransform(payload) }),
     }),
   })
 }
@@ -55,7 +55,7 @@ export const getExcel = async (reportID, payload) => {
     },
     body: stringify({
       reportFormat: 'Excel',
-      reportParameters: JSON.stringify({ ...payload }),
+      reportParameters: JSON.stringify({ ...commonDataWriterTransform(payload) }),
     }),
   })
 }
@@ -76,7 +76,7 @@ export const exportExcelReport = async (reportID, payload) => {
   const baseURL = '/api/reports'
   return download(
     `${baseURL}/${reportID}?reportFormat=Excel&ReportParameters=${JSON.stringify(
-      payload,
+      commonDataWriterTransform(payload),
     )}`,
     { subject: REPORT_TYPE[reportID] || 'Report', type: 'xls' },
   )
@@ -87,7 +87,7 @@ export const getPatientListingReport = async (payload) => {
   const url = '/api/reports/2'
   return request(url, {
     method: 'GET',
-    body: convertToQuery({ reportParameters: payload }, [
+    body: convertToQuery({ reportParameters: commonDataWriterTransform(payload) }, [
       'reportParameters',
     ]),
   })
