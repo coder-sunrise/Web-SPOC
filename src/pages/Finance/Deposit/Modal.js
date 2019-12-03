@@ -127,9 +127,9 @@ const style = () => ({
     const { ctpaymentmode, ctcreditcardtype } = codetable
     let transactionMode
     let creditCardType
+    transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+      .displayValue
     if (transactionModeFK === 1) {
-      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
-        .displayValue
       creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
         .name
     }
