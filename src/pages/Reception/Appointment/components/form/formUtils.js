@@ -87,25 +87,12 @@ const calculateDuration = (startTime, endTime) => {
 }
 
 const constructDefaultNewRow = (selectedSlot) => {
-  let defaultNewRow = { isPrimaryClinician: true, id: -1 }
+  let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
 
-  const startTime = moment(selectedSlot.start)
-  // const selectedEndTime = moment(selectedSlot.end)
-
-  // const { hour = 0, minute = 15 } = calculateDuration(
-  //   startTime,
-  //   selectedEndTime,
-  // )
-  // const endTime = moment(selectedSlot.start)
-  //   .add(hour, 'hour')
-  //   .add(minute, 'minute')
-  //   .format('HH:mm')
+  const startTime = moment(selectedSlot.start).format('HH:mm')
 
   defaultNewRow = {
-    startTime: startTime.format('HH:mm'),
-    // endTime,
-    // apptDurationHour: hour,
-    // apptDurationMinute: minute,
+    startTime,
     clinicianFK: selectedSlot.resourceId,
     ...defaultNewRow,
   }
@@ -211,6 +198,20 @@ export const mapPropsToValues = ({
 
         currentAppointment: {
           ...appointment,
+          appointments_Resources: appointment.appointments_Resources.map(
+            (item) => {
+              const startTime = moment(item.startTime, 'HH:mm:ss')
+              const endTime = moment(item.endTime, 'HH:mm:ss')
+              const { hour, minute } = calculateDuration(startTime, endTime)
+              return {
+                ...item,
+                startTime: startTime.format('HH:mm'),
+                endTime: endTime.format('HH:mm'),
+                apptDurationHour: hour,
+                apptDurationMinute: minute,
+              }
+            },
+          ),
           appointmentDate: moment(appointment.appointmentDate).formatUTC(),
           // appointmentDate,
         },
@@ -356,4 +357,19 @@ export const sortDataGrid = (a, b) => {
   if (aLessThanB) return -1
   if (!aLessThanB) return 1
   return 0
+}
+
+export const getEndTime = (row) => {
+  const { endTime, apptDurationHour, apptDurationMinute, startTime } = row
+
+  if (!startTime) return endTime
+  const format =
+    startTime.includes('PM') || startTime.includes('AM') ? 'hh:mm A' : 'HH:mm'
+  if (apptDurationHour && apptDurationMinute && startTime)
+    return moment(startTime, format)
+      .add(apptDurationHour, 'hour')
+      .add(apptDurationMinute, 'minute')
+      .format('HH:mm')
+
+  return endTime
 }

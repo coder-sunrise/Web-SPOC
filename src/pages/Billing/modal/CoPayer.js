@@ -43,26 +43,6 @@ class CoPayer extends Component {
     selectedRows: [],
     coPayer: undefined,
     invoiceItems: this.props.invoiceItems,
-    // .reduce((invoiceItems, item) => {
-    //   const existed = invoiceItems.find((_item) => _item.id === item.id)
-    //   if (existed)
-    //     return [
-    //       ...invoiceItems.filter((_item) => _item.id !== existed.id),
-    //       {
-    //         ...item,
-    //         ...existed,
-    //         payableBalance: existed.payableBalance - existed.claimAmount,
-    //       },
-    //     ]
-    //   return [
-    //     ...invoiceItems,
-    //     {
-    //       ...item,
-    //       payableBalance: item.payableBalance - item.claimAmount,
-    //     },
-    //   ]
-    // }, [])
-    // .map((item) => ({ ...item, claimAmount: 0 })) || [],
   }
 
   populateClaimAmount = (selected) => {

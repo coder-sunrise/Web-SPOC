@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import moment from 'moment'
 import AutosizeInput from 'react-input-autosize'
 import classnames from 'classnames'
+import $ from 'jquery'
+import _ from 'lodash'
 // material ui
 import withStyles from '@material-ui/core/styles/withStyles'
 // wrapper
@@ -67,7 +69,19 @@ const STYLES = (theme) => ({
     },
   },
 })
-
+const keydown = (e) => {
+  if (e.shiftKey) return
+  // console.log(e.target)
+  if (e.which === 9) {
+    // Tab
+    return false
+  }
+  $(e.target).find('input').trigger('click')
+}
+const debounceKeydown = _.debounce(keydown, 1000, {
+  leading: true,
+  trailing: false,
+})
 @control()
 class AntdDateRangePicker extends PureComponent {
   static defaultProps = {
@@ -204,8 +218,8 @@ class AntdDateRangePicker extends PureComponent {
   }
 
   handleBlur = (e) => {
-    // console.log('blur', e, e.target, e.target.value)
-    if (this.state.value === undefined || this.state.value.length === 0) {
+    debounceKeydown.cancel()
+    if (this.state.value === undefined || this.state.value === '') {
       this.setState({ shrink: false })
     }
   }
@@ -326,9 +340,11 @@ class AntdDateRangePicker extends PureComponent {
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
-        preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
         {...restProps}
+        preventDefaultChangeEvent
+        // preventDefaultKeyDownEvent
+        onKeyUp={() => false}
+        onKeyDown={debounceKeydown}
       />
     )
   }

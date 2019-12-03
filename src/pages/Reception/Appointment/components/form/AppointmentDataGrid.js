@@ -145,37 +145,21 @@ class AppointmentDataGrid extends React.Component {
           },
         }
       }
+
+      if (column.columnName === 'startTime') {
+        return {
+          ...column,
+          onChange: (row) => {
+            console.log({ row })
+          },
+        }
+      }
       return { ...column }
     })
 
     this.columnExtensions = [
       ...columnExtensions,
     ]
-
-    // let defaultNewRows = []
-
-    // if (!data || data.length <= 0) {
-    //   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
-    //   if (selectedSlot && selectedSlot.allDay === false) {
-    //     const startTime = moment(selectedSlot.start)
-    //     const selectedEndTime = moment(selectedSlot.end)
-
-    //     const { hour, minute } = calculateDuration(startTime, selectedEndTime)
-
-    //     defaultNewRow = {
-    //       startTime: startTime.format('HH:mm'),
-    //       apptDurationHour: hour || 0,
-    //       apptDurationMinute: minute || 15,
-    //       endTime: selectedEndTime.format('HH:mm'),
-    //       clinicianFK: selectedSlot.resourceId,
-    //       ...defaultNewRow,
-    //     }
-    //   }
-    //   defaultNewRows.push(defaultNewRow)
-    // }
-    // this.state = {
-    //   defaultNewRows,
-    // }
   }
 
   onRadioChange = ({ row, checked }) => {
@@ -206,9 +190,6 @@ class AppointmentDataGrid extends React.Component {
       selectedSlot,
     } = this.props
 
-    // const { defaultNewRows } = this.state
-
-    const isEditable = !disabled
     return (
       <div className={classes.container}>
         <AuthorizedContext.Provider
@@ -254,6 +235,10 @@ class AppointmentDataGrid extends React.Component {
               showDeleteCommand:
                 data.filter((item) => !item.isDeleted).length > 1,
               onCommitChanges: handleCommitChanges,
+              onAddedRowsChange: (rows) => {
+                console.log({ rows })
+                return rows
+              },
             }}
             schema={validationSchema}
           />

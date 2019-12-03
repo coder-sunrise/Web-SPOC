@@ -26,6 +26,7 @@ const amountProps = {
   currency: true,
   rightAlign: true,
   text: true,
+  fullWidth: true,
 }
 
 const styles = (theme) => ({
@@ -196,7 +197,7 @@ class AmountSummary extends PureComponent {
     } = this.props
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
-    console.log({ props: this.props, summary })
+    // console.log({ props: this.props, summary })
     return (
       <div className={classes.cls01}>
         <GridContainer style={{ marginBottom: 4 }}>

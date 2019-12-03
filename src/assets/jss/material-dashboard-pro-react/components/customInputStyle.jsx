@@ -49,8 +49,10 @@ const customInputStyle = {
     },
   },
   text: {
-    color: 'transparent',
-    textShadow: `0 0 0 ${fontColor}`,
+    // color: 'transparent',
+    color: 'inherit',
+
+    // textShadow: `0 0 0 ${fontColor}`,
     padding: 0,
     textOverflow: 'ellipsis',
   },
