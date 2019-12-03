@@ -790,6 +790,16 @@ const calculateAdjustAmount = (
   }
 }
 
+const calculateBMI = (heightCM, weightKG) => {
+  if (heightCM && weightKG) {
+    const heightM = heightCM / 100
+    const bmi = weightKG / heightM ** 2
+    const bmiInTwoDecimal = Math.round(bmi * 100) / 100
+    return bmiInTwoDecimal
+  }
+  return null
+}
+
 const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
 const calculateItemLevelAdjustment = (
   adjType = 'ExactAmount',
@@ -1174,6 +1184,7 @@ module.exports = {
   removeFields,
   commonDataReaderTransform,
   commonDataWriterTransform,
+  calculateBMI,
   // toUTC,
   // toLocal,
 }
