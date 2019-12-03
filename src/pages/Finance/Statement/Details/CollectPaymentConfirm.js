@@ -103,10 +103,11 @@ class CollectPaymentConfirm extends PureComponent {
         ],
       }
     })
-    this.getBizList(moment().formatUTC('YYMMDD'))
+
+    this.fetchRecentBizSessions()
     setValues({
       ...values,
-      paymentDate: moment(),
+      // paymentDate: moment(),
       amount: total,
       maxAmount: total,
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
@@ -187,6 +188,19 @@ class CollectPaymentConfirm extends PureComponent {
   onChangeDate = (event) => {
     const selectedDate = moment(event).format('YYMMDD')
     this.getBizList(selectedDate)
+  }
+
+  fetchRecentBizSessions = () => {
+    const { setFieldValue, dispatch } = this.props
+    dispatch({
+      type: 'statement/queryRecentBizSessions',
+    }).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200) {
+        setFieldValue('paymentDate', data[0].sessionStartDate)
+        setFieldValue('paymentCreatedBizSessionFK', data[0].id)
+      }
+    })
   }
 
   getBizList = (e) => {
