@@ -68,6 +68,7 @@ const styles = () => ({
     } = values
     const { dispatch, history } = props
 
+    // filter out unselected new invoice
     const selectedAndExistingInvoices = invoiceRows.filter(
       (o) => selectedRows.includes(o.id) || o.statementInvoicePayment,
     )
@@ -82,7 +83,14 @@ const styles = () => ({
         outstandingAmount: o.copayerOutstanding || o.outstandingAmount,
         invoiceAmt: o.copayerPayableAmount || o.invoiceAmt,
       }
-      if (selectedRows.includes(o.id)) {
+
+      // check if the invoice is selected && is the invoice has existing payment
+      if (
+        selectedRows.includes(o.id) ||
+        o.statementInvoicePayment.find(
+          (i) => i.invoicePayment.isCancelled === false,
+        )
+      ) {
         return {
           ...statementInvoiceObj,
         }
@@ -178,7 +186,12 @@ class AddNewStatement extends PureComponent {
     })
     let defaultIds = []
     values.statementInvoice.forEach((o) => {
-      if (o.statementInvoicePayment.length === 0 && !o.isDeleted) {
+      if (
+        (o.statementInvoicePayment.length === 0 && !o.isDeleted) ||
+        o.statementInvoicePayment.find(
+          (i) => i.invoicePayment.isCancelled === true,
+        )
+      ) {
         defaultIds.push(o.id)
       }
     })
