@@ -341,7 +341,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfterGST} />
+      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
     },
   },
   {
