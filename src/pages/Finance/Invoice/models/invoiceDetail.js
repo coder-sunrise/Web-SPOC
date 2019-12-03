@@ -3,14 +3,18 @@ import moment from 'moment'
 import * as service from '../services'
 import { fakeInvoiceDetailData } from '../sampleData'
 
+const initialState = {
+  currentId: undefined,
+  entity: undefined,
+  default: {},
+}
+
 export default createFormViewModel({
   namespace: 'invoiceDetail',
   config: {},
   param: {
     service,
-    state: {
-      default: {},
-    },
+    state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
@@ -40,6 +44,10 @@ export default createFormViewModel({
         }
       },
     },
-    reducers: {},
+    reducers: {
+      reset () {
+        return { ...initialState }
+      },
+    },
   },
 })

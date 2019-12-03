@@ -12,7 +12,8 @@ import PaymentDetails from './PaymentDetails'
 // styling
 import styles from './styles'
 
-const Content = ({ classes, ...restProps }) => {
+const Content = ({ classes, clinicSettings, values, ...restProps }) => {
+  console.log({ restProps })
   const { invoiceDetail, invoicePayment } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail
@@ -35,44 +36,26 @@ const Content = ({ classes, ...restProps }) => {
         !currentBizSessionInfo.isClinicSessionClosed
 
       return isSameBizSessionAndIsSessionClosed
-      // if (
-      //   parseInt(bizSessionFK, 10) === parseInt(invoiceBizSessionFK, 10) &&
-      //   !currentBizSessionInfo.isClinicSessionClosed
-      // ) {
-      //   return true
-      // }
-      // return false
     }
 
     return false
   }
 
-  const addContent = (type) => {
-    switch (type) {
-      case 1:
-        return <InvoiceDetails {...restProps} />
-      case 2:
-        return (
-          <PaymentDetails
-            invoiceDetail={restProps.values}
-            readOnly={!currentBizSessionInfo.id}
-          />
-        )
-      default:
-        return <InvoiceDetails {...restProps} />
-    }
-  }
-
-  const InvoicePaymentTabOption = () => [
+  const InvoicePaymentTabOption = [
     {
       id: 1,
       name: 'Invoice',
-      content: addContent(1),
+      content: <InvoiceDetails values={values} />,
     },
     {
       id: 2,
       name: 'Payment Details',
-      content: addContent(2),
+      content: (
+        <PaymentDetails
+          invoiceDetail={values}
+          readOnly={!currentBizSessionInfo.id}
+        />
+      ),
       disabled: isInvoiceCurrentBizSession(),
     },
   ]
@@ -84,7 +67,7 @@ const Content = ({ classes, ...restProps }) => {
         activeKey={active}
         defaultActivekey='1'
         onChange={(e) => setActive(e)}
-        options={InvoicePaymentTabOption()}
+        options={InvoicePaymentTabOption}
       />
     </React.Fragment>
   )
