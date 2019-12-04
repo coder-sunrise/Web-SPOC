@@ -997,6 +997,13 @@ const ApplyClaims = ({
       >
         <CoPayer
           onAddCoPayerClick={handleAddCoPayer}
+          copayers={tempInvoicePayer
+            .filter(
+              (payer) =>
+                !payer.isCancelled &&
+                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+            )
+            .map((i) => i.companyFK)}
           invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
             itemName: invoiceItem.itemDescription,
