@@ -48,7 +48,7 @@ class Grid extends PureComponent {
       {
         columnName: 'transactionDate',
         type: 'date',
-        format: { dateFormatLong },
+        format: dateFormatLong,
         sortBy: 'adjustmentTransactionDate',
       },
       {
