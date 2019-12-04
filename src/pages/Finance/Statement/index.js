@@ -147,6 +147,7 @@ class Statement extends PureComponent {
               type: 'number',
               currency: true,
               width: 130,
+              sortingEnabled: false,
             },
             {
               columnName: 'statementDate',
@@ -160,6 +161,7 @@ class Statement extends PureComponent {
               format: dateFormatLong,
               sortBy: 'DueDate',
               width: 120,
+              sortingEnabled: false,
             },
             {
               columnName: 'action',

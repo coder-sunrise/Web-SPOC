@@ -138,11 +138,20 @@ class AddNewStatement extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
         columnName: this.props.statement.entity
           ? 'payableAmount'
           : 'copayerPayableAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: this.props.statement.entity
@@ -150,11 +159,13 @@ class AddNewStatement extends PureComponent {
           : 'copayerOutstanding',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'invoiceDate',
         type: 'date',
         format: dateFormatLong,
+        sortingEnabled: false,
       },
     ],
     // currencyColumns: [
