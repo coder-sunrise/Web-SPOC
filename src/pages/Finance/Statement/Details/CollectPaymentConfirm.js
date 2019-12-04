@@ -289,6 +289,7 @@ class CollectPaymentConfirm extends PureComponent {
                     currency
                     label='Amount'
                     autoFocus
+                    min={0}
                     onChange={this.handlePaymentAmount}
                   />
                 )}
@@ -374,7 +375,11 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
 
             <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
-              <ProgressButton color='primary' onClick={handleSubmit}>
+              <ProgressButton
+                color='primary'
+                onClick={handleSubmit}
+                disabled={values.amount <= 0}
+              >
                 Confirm Payment
               </ProgressButton>
             </GridItem>
