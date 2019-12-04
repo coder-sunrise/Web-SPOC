@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import * as Yup from 'yup'
-import valid from 'card-validator'
 import { formatMessage } from 'umi/locale'
-import { withStyles, Grid, Divider } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
+import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,
@@ -25,6 +25,12 @@ const style = () => ({
   summaryLabel: {
     paddingTop: 0,
   },
+  label: {
+    textAlign: 'right',
+    fontSize: '1rem',
+    lineHeight: 1.5,
+    fontWeight: 400,
+  },
 })
 
 @connect(({ deposit, codetable }) => ({
@@ -44,7 +50,7 @@ const style = () => ({
         balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
-          transactionDate: moment(),
+          // transactionDate: moment(),
           transactionType,
           transactionTypeFK,
           transactionModeFK,
@@ -122,9 +128,9 @@ const style = () => ({
     const { ctpaymentmode, ctcreditcardtype } = codetable
     let transactionMode
     let creditCardType
+    transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
+      .displayValue
     if (transactionModeFK === 1) {
-      transactionMode = ctpaymentmode.find((o) => o.id === transactionModeFK)
-        .displayValue
       creditCardType = ctcreditcardtype.find((o) => o.id === creditCardTypeFK)
         .name
     }
@@ -177,8 +183,7 @@ class Modal extends PureComponent {
   componentDidMount () {
     const { dispatch, isDeposit } = this.props
 
-    this.getBizList(moment().format('YYMMDD'))
-
+    this.fetchLatestBizSessions()
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -193,6 +198,38 @@ class Modal extends PureComponent {
     })
   }
 
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        setFieldValue(
+          'patientDepositTransaction.transactionDate',
+          sessionData[0].sessionStartDate,
+        )
+        setFieldValue(
+          'patientDepositTransaction.transactionBizSessionFK',
+          sessionData[0].id,
+        )
+
+        this.getBizList(sessionData[0].sessionStartDate)
+      } else {
+        setFieldValue('patientDepositTransaction.transactionDate', null)
+        setFieldValue(
+          'patientDepositTransaction.transactionBizSessionFK',
+          undefined,
+        )
+      }
+    })
+  }
+
   onChangeDate = (event) => {
     const { isDeposit } = this.props
     const selectedDate = moment(event).format('YYMMDD')
@@ -202,16 +239,34 @@ class Modal extends PureComponent {
     } else {
       this.setState({ isSessionRequired: true })
     }
-    this.getBizList(selectedDate)
+    this.getBizList(event)
   }
 
-  getBizList = (e) => {
+  getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     dispatch({
       type: 'deposit/bizSessionList',
       payload: {
-        sessionNoPrefix: e,
         pagesize: 999,
+        lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
       },
     }).then(() => {
       const { bizSessionList } = this.props.deposit
@@ -265,14 +320,14 @@ class Modal extends PureComponent {
   }
 
   render () {
-    const { state, props } = this
-    const { theme, footer, onConfirm, values, isDeposit, deposit } = props
-    const { bizSessionList, entity } = deposit
-    const { isSessionRequired, isCardPayment, paymentMode } = this.state
+    const { props } = this
+    const { classes, footer, isDeposit, deposit } = props
+    const { bizSessionList } = deposit
+    const { isCardPayment, paymentMode } = this.state
     const commonAmountOpts = {
       currency: true,
       fullWidth: true,
-      rightAlign: true,
+      // rightAlign: true,
       noUnderline: true,
     }
 
@@ -381,7 +436,70 @@ class Modal extends PureComponent {
             </GridItem>
           </GridContainer>
 
-          <div style={{ width: '40%', margin: 'auto' }}>
+          <GridContainer alignItems='center' justify='center'>
+            <GridItem md={3} />
+            <GridItem md={3} className={classes.label}>
+              <span>Balance</span>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='balance'
+                render={(args) => (
+                  <NumberInput
+                    defaultValue='0.00'
+                    disabled
+                    {...commonAmountOpts}
+                    // label='Balance'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
+            <GridItem md={3} />
+            <GridItem md={3} className={classes.label}>
+              <span>Deposit Amount</span>
+            </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='patientDepositTransaction.amount'
+                render={(args) => (
+                  <NumberInput
+                    defaultValue='0.00'
+                    onChange={this.calculateBalanceAfter}
+                    {...commonAmountOpts}
+                    // label={isDeposit ? 'Deposit Amount' : 'Refund Amount'}
+                    min={0}
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={3} />
+            <GridItem md={3} />
+            <GridItem md={6}>
+              <Divider />
+            </GridItem>
+            <GridItem md={3} />
+
+            <GridItem md={3} />
+
+            <GridItem md={3}>
+              <Field
+                name='balanceAfter'
+                render={(args) => (
+                  <NumberInput
+                    style={{ top: -5 }}
+                    {...commonAmountOpts}
+                    disabled
+                    defaultValue='0.00'
+                    {...args}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          {/* <div style={{ width: '40%', margin: 'auto' }}>
             <Field
               name='balance'
               render={(args) => (
@@ -424,7 +542,7 @@ class Modal extends PureComponent {
                 />
               )}
             />
-          </div>
+          </div> */}
         </div>
 
         {footer &&

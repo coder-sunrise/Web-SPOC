@@ -42,7 +42,7 @@ import { getBizSession } from '@/services/queue'
       outstandingAfterPayment: outstandingBalance,
       collectableAmount: outstandingBalance,
       paymentList: [],
-      paymentReceivedDate: moment().formatUTC(false),
+      // paymentReceivedDate: moment().formatUTC(false),
       // finalPayable: _finalPayable,
     }
   },
@@ -60,7 +60,6 @@ import { getBizSession } from '@/services/queue'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
     } = values
-
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
         ...payment,
@@ -80,7 +79,8 @@ import { getBizSession } from '@/services/queue'
       paymentCreatedBizSessionFK,
     }
 
-    handleSubmit(returnValue)
+    console.log({ returnValue })
+    // handleSubmit(returnValue)
   },
 })
 class AddPayment extends Component {
@@ -102,8 +102,7 @@ class AddPayment extends Component {
         })
       })
     if (this.props.showPaymentDate) {
-      this.fetchBizSessionList(moment())
-      this.fetchCurrentActiveBizSession()
+      this.fetchLatestBizSessions()
     }
   }
 
@@ -165,27 +164,52 @@ class AddPayment extends Component {
     // }
   }
 
-  fetchCurrentActiveBizSession = () => {
-    const activeBizSessionPayload = {
-      IsClinicSessionClosed: false,
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
     }
-    getBizSession(activeBizSessionPayload).then((response) => {
+    getBizSession(payload).then((response) => {
       const { status, data } = response
-      if (parseInt(status, 10) === 200 && data.totalRecords === 1) {
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
-        this.props.setFieldValue(
-          'paymentCreatedBizSessionFK',
-          sessionData[0].id,
-        )
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+        setFieldValue('paymentReceivedDate', sessionData[0].sessionStartDate)
+
+        this.fetchBizSessionList(sessionData[0].sessionStartDate)
+      } else {
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+        setFieldValue('paymentReceivedDate', null)
       }
     })
   }
 
   fetchBizSessionList = (date) => {
     const { setFieldValue } = this.props
+    const momentDate = moment(date)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     getBizSession({
       pagesize: 999,
-      sessionNoPrefix: moment(date).format('YYMMDD'),
+      lsteql_SessionStartDate: endDateTime,
+      group: [
+        {
+          isClinicSessionClosed: false,
+          lgteql_SessionCloseDate: startDateTime,
+          combineCondition: 'or',
+        },
+      ],
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
     }).then((response) => {
       const { status, data } = response
       if (parseInt(status, 10) === 200) {
@@ -359,11 +383,8 @@ class AddPayment extends Component {
             <GridItem md={3} className={classes.noPaddingLeft}>
               <PaymentType
                 paymentModes={paymentModes}
-                disableCash={values.paymentList.reduce(
-                  (noCashPaymentMode, payment) =>
-                    payment.paymentModeFK === PAYMENT_MODE.CASH ||
-                    noCashPaymentMode,
-                  false,
+                currentPayments={values.paymentList.map(
+                  (payment) => payment.paymentModeFK,
                 )}
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}

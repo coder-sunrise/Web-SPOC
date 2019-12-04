@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { withStyles, Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+
 import { connect } from 'dva'
 import numeral from 'numeral'
 
@@ -25,6 +26,7 @@ const amountProps = {
   currency: true,
   rightAlign: true,
   text: true,
+  fullWidth: true,
 }
 
 const styles = (theme) => ({
@@ -92,7 +94,6 @@ class AmountSummary extends PureComponent {
   }
 
   onChangeGstToggle = (isCheckboxClicked = false) => {
-    console.log(isCheckboxClicked)
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
     config.isGSTInclusive = isCheckboxClicked
@@ -177,6 +178,7 @@ class AmountSummary extends PureComponent {
     const { summary, adjustments } = this.state
     if (!summary) return null
     const {
+      subTotal,
       totalWithGST,
       isEnableGST,
       gSTPercentage,
@@ -195,8 +197,28 @@ class AmountSummary extends PureComponent {
     } = this.props
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
+    // console.log({ props: this.props, summary })
     return (
       <div className={classes.cls01}>
+        <GridContainer style={{ marginBottom: 4 }}>
+          <GridItem xs={6}>
+            <span>Sub Total:</span>
+            {/* <FastField
+          name={`${poPrefix}.IsGSTEnabled`}
+          render={(args) => (
+            <Switch
+              label={undefined}
+              fullWidth={false}
+              onChange={() => this.onChangeGstToggle()}
+              {...args}
+            />
+          )}
+        /> */}
+          </GridItem>
+          <GridItem xs={6}>
+            <NumberInput {...amountProps} value={subTotal} />
+          </GridItem>
+        </GridContainer>
         <GridContainer style={{ marginBottom: 4 }}>
           {showAdjustment === false ? (
             ''

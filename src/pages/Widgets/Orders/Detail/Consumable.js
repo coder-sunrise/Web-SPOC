@@ -29,10 +29,10 @@ import LowStockInfo from './LowStockInfo'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType } = props
-    const { rows } = orders
+    const { dispatch, currentType, getNextSequence } = props
+
     const data = {
-      sequence: rows.length,
+      sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,

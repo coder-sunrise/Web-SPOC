@@ -1,38 +1,38 @@
-import React, { Component } from 'react';
-import { connect } from 'dva';
-import { formatMessage, FormattedMessage } from 'umi/locale';
-import Link from 'umi/link';
-import router from 'umi/router';
-import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd';
-import styles from './Register.less';
+import React, { Component } from 'react'
+import { connect } from 'dva'
+import { formatMessage, FormattedMessage } from 'umi/locale'
+import Link from 'umi/link'
+import router from 'umi/router'
+import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd'
+import styles from './Register.less'
 
-const FormItem = Form.Item;
-const { Option } = Select;
-const InputGroup = Input.Group;
+const FormItem = Form.Item
+const { Option } = Select
+const InputGroup = Input.Group
 
 const passwordStatusMap = {
   ok: (
     <div className={styles.success}>
-      <FormattedMessage id="validation.password.strength.strong" />
+      <FormattedMessage id='validation.password.strength.strong' />
     </div>
   ),
   pass: (
     <div className={styles.warning}>
-      <FormattedMessage id="validation.password.strength.medium" />
+      <FormattedMessage id='validation.password.strength.medium' />
     </div>
   ),
   poor: (
     <div className={styles.error}>
-      <FormattedMessage id="validation.password.strength.short" />
+      <FormattedMessage id='validation.password.strength.short' />
     </div>
   ),
-};
+}
 
 const passwordProgressMap = {
   ok: 'success',
   pass: 'normal',
   poor: 'exception',
-};
+}
 
 @connect(({ register, loading }) => ({
   register,
@@ -46,120 +46,125 @@ class Register extends Component {
     visible: false,
     help: '',
     prefix: '86',
-  };
+  }
 
-  componentDidUpdate() {
-    const { form, register } = this.props;
-    const account = form.getFieldValue('mail');
+  componentDidUpdate () {
+    const { form, register } = this.props
+    const account = form.getFieldValue('mail')
     if (register.status === 'ok') {
       router.push({
         pathname: '/user/register-result',
         state: {
           account,
         },
-      });
+      })
     }
   }
 
-  componentWillUnmount() {
-    clearInterval(this.interval);
+  componentWillUnmount () {
+    clearInterval(this.interval)
   }
 
   onGetCaptcha = () => {
-    let count = 59;
-    this.setState({ count });
+    let count = 59
+    this.setState({ count })
     this.interval = setInterval(() => {
-      count -= 1;
-      this.setState({ count });
+      count -= 1
+      this.setState({ count })
       if (count === 0) {
-        clearInterval(this.interval);
+        clearInterval(this.interval)
       }
-    }, 1000);
-  };
+    }, 1000)
+  }
 
   getPasswordStatus = () => {
-    const { form } = this.props;
-    const value = form.getFieldValue('password');
+    const { form } = this.props
+    const value = form.getFieldValue('password')
     if (value && value.length > 9) {
-      return 'ok';
+      return 'ok'
     }
     if (value && value.length > 5) {
-      return 'pass';
+      return 'pass'
     }
-    return 'poor';
-  };
+    return 'poor'
+  }
 
-  handleSubmit = e => {
-    e.preventDefault();
-    const { form, dispatch } = this.props;
+  handleSubmit = (e) => {
+    e.preventDefault()
+    const { form, dispatch } = this.props
     form.validateFields({ force: true }, (err, values) => {
       if (!err) {
-        const { prefix } = this.state;
+        const { prefix } = this.state
         dispatch({
           type: 'register/submit',
           payload: {
             ...values,
             prefix,
           },
-        });
+        })
       }
-    });
-  };
+    })
+  }
 
-  handleConfirmBlur = e => {
-    const { value } = e.target;
-    const { confirmDirty } = this.state;
-    this.setState({ confirmDirty: confirmDirty || !!value });
-  };
+  handleConfirmBlur = (e) => {
+    const { value } = e.target
+    const { confirmDirty } = this.state
+    this.setState({ confirmDirty: confirmDirty || !!value })
+  }
 
   checkConfirm = (rule, value, callback) => {
-    const { form } = this.props;
+    const { form } = this.props
     if (value && value !== form.getFieldValue('password')) {
-      callback(formatMessage({ id: 'validation.password.twice' }));
+      callback(formatMessage({ id: 'validation.password.twice' }))
     } else {
-      callback();
+      callback()
     }
-  };
+  }
 
   checkPassword = (rule, value, callback) => {
-    const { visible, confirmDirty } = this.state;
+    const { visible, confirmDirty } = this.state
     if (!value) {
       this.setState({
         help: formatMessage({ id: 'validation.password.required' }),
         visible: !!value,
-      });
-      callback('error');
+      })
+      callback('error')
     } else {
       this.setState({
         help: '',
-      });
+      })
       if (!visible) {
         this.setState({
           visible: !!value,
-        });
+        })
       }
       if (value.length < 6) {
-        callback('error');
+        callback('error')
       } else {
-        const { form } = this.props;
+        const { form } = this.props
         if (value && confirmDirty) {
-          form.validateFields(['confirm'], { force: true });
+          form.validateFields(
+            [
+              'confirm',
+            ],
+            { force: true },
+          )
         }
-        callback();
+        callback()
       }
     }
-  };
+  }
 
-  changePrefix = value => {
+  changePrefix = (value) => {
     this.setState({
       prefix: value,
-    });
-  };
+    })
+  }
 
   renderPasswordProgress = () => {
-    const { form } = this.props;
-    const value = form.getFieldValue('password');
-    const passwordStatus = this.getPasswordStatus();
+    const { form } = this.props
+    const value = form.getFieldValue('password')
+    const passwordStatus = this.getPasswordStatus()
     return value && value.length ? (
       <div className={styles[`progress-${passwordStatus}`]}>
         <Progress
@@ -170,17 +175,17 @@ class Register extends Component {
           showInfo={false}
         />
       </div>
-    ) : null;
-  };
+    ) : null
+  }
 
-  render() {
-    const { form, submitting } = this.props;
-    const { getFieldDecorator } = form;
-    const { count, prefix, help, visible } = this.state;
+  render () {
+    const { form, submitting } = this.props
+    const { getFieldDecorator } = form
+    const { count, prefix, help, visible } = this.state
     return (
       <div className={styles.main}>
         <h3>
-          <FormattedMessage id="app.register.register" />
+          <FormattedMessage id='app.register.register' />
         </h3>
         <Form onSubmit={this.handleSubmit}>
           <FormItem>
@@ -192,27 +197,32 @@ class Register extends Component {
                 },
                 {
                   type: 'email',
-                  message: formatMessage({ id: 'validation.email.wrong-format' }),
+                  message: formatMessage({
+                    id: 'validation.email.wrong-format',
+                  }),
                 },
               ],
             })(
-              <Input size="large" placeholder={formatMessage({ id: 'form.email.placeholder' })} />
+              <Input
+                size='large'
+                placeholder={formatMessage({ id: 'form.email.placeholder' })}
+              />,
             )}
           </FormItem>
           <FormItem help={help}>
             <Popover
-              getPopupContainer={node => node.parentNode}
+              getPopupContainer={(node) => node.parentNode}
               content={
                 <div style={{ padding: '4px 0' }}>
                   {passwordStatusMap[this.getPasswordStatus()]}
                   {this.renderPasswordProgress()}
                   <div style={{ marginTop: 10 }}>
-                    <FormattedMessage id="validation.password.strength.msg" />
+                    <FormattedMessage id='validation.password.strength.msg' />
                   </div>
                 </div>
               }
               overlayStyle={{ width: 240 }}
-              placement="right"
+              placement='right'
               visible={visible}
             >
               {getFieldDecorator('password', {
@@ -223,10 +233,12 @@ class Register extends Component {
                 ],
               })(
                 <Input
-                  size="large"
-                  type="password"
-                  placeholder={formatMessage({ id: 'form.password.placeholder' })}
-                />
+                  size='large'
+                  type='password'
+                  placeholder={formatMessage({
+                    id: 'form.password.placeholder',
+                  })}
+                />,
               )}
             </Popover>
           </FormItem>
@@ -235,7 +247,9 @@ class Register extends Component {
               rules: [
                 {
                   required: true,
-                  message: formatMessage({ id: 'validation.confirm-password.required' }),
+                  message: formatMessage({
+                    id: 'validation.confirm-password.required',
+                  }),
                 },
                 {
                   validator: this.checkConfirm,
@@ -243,40 +257,48 @@ class Register extends Component {
               ],
             })(
               <Input
-                size="large"
-                type="password"
-                placeholder={formatMessage({ id: 'form.confirm-password.placeholder' })}
-              />
+                size='large'
+                type='password'
+                placeholder={formatMessage({
+                  id: 'form.confirm-password.placeholder',
+                })}
+              />,
             )}
           </FormItem>
           <FormItem>
             <InputGroup compact>
               <Select
-                size="large"
+                size='large'
                 value={prefix}
                 onChange={this.changePrefix}
                 style={{ width: '20%' }}
               >
-                <Option value="86">+86</Option>
-                <Option value="87">+87</Option>
+                <Option value='86'>+86</Option>
+                <Option value='87'>+87</Option>
               </Select>
               {getFieldDecorator('mobile', {
                 rules: [
                   {
                     required: true,
-                    message: formatMessage({ id: 'validation.phone-number.required' }),
+                    message: formatMessage({
+                      id: 'validation.phone-number.required',
+                    }),
                   },
                   {
                     pattern: /^\d{11}$/,
-                    message: formatMessage({ id: 'validation.phone-number.wrong-format' }),
+                    message: formatMessage({
+                      id: 'validation.phone-number.wrong-format',
+                    }),
                   },
                 ],
               })(
                 <Input
-                  size="large"
+                  size='large'
                   style={{ width: '80%' }}
-                  placeholder={formatMessage({ id: 'form.phone-number.placeholder' })}
-                />
+                  placeholder={formatMessage({
+                    id: 'form.phone-number.placeholder',
+                  })}
+                />,
               )}
             </InputGroup>
           </FormItem>
@@ -287,48 +309,54 @@ class Register extends Component {
                   rules: [
                     {
                       required: true,
-                      message: formatMessage({ id: 'validation.verification-code.required' }),
+                      message: formatMessage({
+                        id: 'validation.verification-code.required',
+                      }),
                     },
                   ],
                 })(
                   <Input
-                    size="large"
-                    placeholder={formatMessage({ id: 'form.verification-code.placeholder' })}
-                  />
+                    size='large'
+                    placeholder={formatMessage({
+                      id: 'form.verification-code.placeholder',
+                    })}
+                  />,
                 )}
               </Col>
               <Col span={8}>
                 <Button
-                  size="large"
+                  size='large'
                   disabled={count}
                   className={styles.getCaptcha}
                   onClick={this.onGetCaptcha}
                 >
-                  {count
-                    ? `${count} s`
-                    : formatMessage({ id: 'app.register.get-verification-code' })}
+                  {count ? (
+                    `${count} s`
+                  ) : (
+                    formatMessage({ id: 'app.register.get-verification-code' })
+                  )}
                 </Button>
               </Col>
             </Row>
           </FormItem>
           <FormItem>
             <Button
-              size="large"
+              size='large'
               loading={submitting}
               className={styles.submit}
-              type="primary"
-              htmlType="submit"
+              type='primary'
+              htmlType='submit'
             >
-              <FormattedMessage id="app.register.register" />
+              <FormattedMessage id='app.register.register' />
             </Button>
-            <Link className={styles.login} to="/User/Login">
-              <FormattedMessage id="app.register.sign-in" />
+            <Link className={styles.login} to='/User/Login'>
+              <FormattedMessage id='app.register.sign-in' />
             </Link>
           </FormItem>
         </Form>
       </div>
-    );
+    )
   }
 }
 
-export default Register;
+export default Register

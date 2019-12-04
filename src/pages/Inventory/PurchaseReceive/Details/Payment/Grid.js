@@ -131,7 +131,7 @@ const Grid = ({
       {
         columnName: 'paymentDate',
         type: 'date',
-        format: { dateFormatLong },
+        format: dateFormatLong,
         value: moment(),
         disabled: true,
         compare: compareString,

@@ -9,7 +9,7 @@ import { CardContainer, CommonModal } from '@/components'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
 import PopoverContent from './components/PopoverContent'
-import Form from './components/form/Form'
+import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
 // settings
@@ -125,10 +125,13 @@ class Appointment extends React.PureComponent {
       let primaryClinicianFK
 
       if (response) {
-        resources = response.map((clinician) => ({
-          clinicianFK: clinician.clinicianProfile.id,
-          doctorName: clinician.clinicianProfile.name,
-        }))
+        resources = response
+          .filter((_, index) => index < 5)
+          .map((clinician) => ({
+            clinicianFK: clinician.clinicianProfile.id,
+            doctorName: clinician.clinicianProfile.name,
+          }))
+        filterByDoctor = resources.map((res) => res.clinicianFK)
       }
 
       this.setState((preState) => ({
@@ -454,7 +457,7 @@ class Appointment extends React.PureComponent {
 
         <FilterBar
           loading={calendarLoading}
-          primaryRegisteredDoctorFK={primaryClinicianFK}
+          filterByDoctor={filter.filterByDoctor}
           filterByApptType={filter.filterByApptType}
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}

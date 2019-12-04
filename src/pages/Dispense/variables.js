@@ -16,6 +16,9 @@ export const tableConfig = {
   FuncProps: { pager: false },
 }
 
+const columnwidth = '10%'
+const columnWidth = '10%'
+
 export const PrescriptionColumns = [
   // { name: 'id', title: 'id' },
   {
@@ -51,8 +54,8 @@ export const PrescriptionColumns = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
   },
   {
     name: 'action',
@@ -66,18 +69,21 @@ export const PrescriptionColumnExtensions = (
   inventorymedication = [],
   handleSelectedBatch,
 ) => [
-  { columnName: 'unitPrice', type: 'currency' },
+  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'dispensedQuanity',
     type: 'number',
+    width: columnWidth,
     render: (row) => {
       return (
         <p>
@@ -89,6 +95,7 @@ export const PrescriptionColumnExtensions = (
   {
     columnName: 'orderedQuantity',
     type: 'number',
+    width: columnWidth,
     render: (row) => {
       return (
         <p>
@@ -99,6 +106,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'batchNo',
+
     render: (row) => {
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
@@ -112,6 +120,7 @@ export const PrescriptionColumnExtensions = (
           name={`prescription[${row.rowIndex}]batchNo`}
           render={(args) => (
             <Select
+              simple
               options={batchNoOptions}
               mode='tags'
               // valueField='id'
@@ -130,6 +139,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'expiryDate',
+
     render: (row) => {
       return (
         <FastField
@@ -199,24 +209,31 @@ export const VaccinationColumn = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
+  },
+  {
+    name: 'action',
+    title: 'Action',
   },
 ]
 
 export const VaccinationColumnExtensions = (viewOnly = false) => [
-  { columnName: 'dispensedQuanity', type: 'number' },
-  { columnName: 'unitPrice', type: 'currency' },
+  { columnName: 'dispensedQuanity', width: columnWidth, type: 'number' },
+  { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'adjAmt',
+    width: columnWidth,
     type: 'currency',
   },
   {
     columnName: 'batchNo',
+
     render: (row) => {
       return (
         <FastField
@@ -230,6 +247,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   },
   {
     columnName: 'expiryDate',
+
     render: (row) => {
       return (
         <FastField
@@ -246,6 +264,11 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
         />
       )
     },
+  },
+  {
+    columnName: 'action',
+    width: 80,
+    render: () => <div />,
   },
 ]
 
@@ -267,8 +290,8 @@ export const OtherOrdersColumns = [
     title: 'Item Adj ($)',
   },
   {
-    name: 'totalAfterGST',
-    title: 'Total Price Incl. GST ($)',
+    name: 'totalAfterItemAdjustment',
+    title: 'Total ($)',
   },
   {
     name: 'action',
@@ -282,6 +305,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
   {
     columnName: 'type',
     compare: compareString,
+    width: 160,
   },
   {
     columnName: 'description',
@@ -291,6 +315,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'unitPrice',
     // type: 'currency',
     align: 'right',
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -301,6 +326,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'adjAmt',
     // type: 'currency',
     align: 'right',
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
@@ -308,13 +334,14 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     },
   },
   {
-    columnName: 'totalAfterGST',
+    columnName: 'totalAfterItemAdjustment',
     // type: 'currency',
     align: 'right',
+    width: columnWidth,
     render: (row) => {
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable') return 'N/A'
-      return <NumberInput text currency value={row.totalAfterGST} />
+      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
     },
   },
   {

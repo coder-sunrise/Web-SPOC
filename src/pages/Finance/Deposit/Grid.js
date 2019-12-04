@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
 import { Tooltip, withStyles } from '@material-ui/core'
-import { PanTool, Payment } from '@material-ui/icons'
+
 import Modal from './Modal'
 import Authorized from '@/utils/Authorized'
 import {
@@ -54,7 +54,7 @@ class Grid extends PureComponent {
         columnName: 'lastTransactionDate',
         type: 'date',
         sortingEnabled: false,
-        format: { dateFormatLong },
+        format: dateFormatLong,
       },
       {
         columnName: 'action',
@@ -108,7 +108,7 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0}
+                    disabled={row.balance <= 0 || !row.balance}
                     onClick={() => {
                       this.editRow(row, false)
                     }}

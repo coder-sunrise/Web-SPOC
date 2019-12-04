@@ -259,10 +259,18 @@ export const defaultTheme = createMuiTheme({
         paddingTop: 0,
       },
     },
+    MuiFormLabel: {
+      root: {
+        lineHeight: '19px',
+      },
+    },
     MuiInputBase: {
       root: {
         alignItems: 'start',
         fontSize: defaultFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
@@ -295,18 +303,19 @@ export const defaultTheme = createMuiTheme({
           top: 12,
         },
         '& .ant-calendar-picker-clear': {
-          right: 11,
+          right: 12,
           top: '52%',
         },
         '& .ant-select-selection--single .ant-select-selection-selected-value': {
           position: 'relative',
-          top: 2,
+          // top: 2,
         },
         // '& .ant-select-selection--single': {
         //   marginTop: 4,
         // },
         '& .ant-select-selection--single .ant-select-selection__clear': {
-          top: 5,
+          top: 7,
+          right: 15,
         },
         // '& .ant-select-selection--multiple .ant-select-selection__rendered': {
         //   height: '28px !important',
@@ -318,10 +327,10 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           top: -2,
         },
-        '& .Mui-disabled': {
+        '&.Mui-disabled': {
           cursor: 'not-allowed',
         },
-        '& .Mui-disabled .anticon': {
+        '&.Mui-disabled .anticon': {
           display: 'none',
         },
         '& .checkbox-container': {
@@ -409,6 +418,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: 0,
+        },
+      },
+    },
   },
 })
 
@@ -451,6 +467,9 @@ export const smallTheme = createMuiTheme({
       root: {
         alignItems: 'start',
         fontSize: smallFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
@@ -574,6 +593,13 @@ export const smallTheme = createMuiTheme({
         },
       },
     },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          top: -3,
+        },
+      },
+    },
     Tabs: {
       main: {
         '& .ant-tabs-bar': {
@@ -623,6 +649,9 @@ export const largeTheme = createMuiTheme({
       root: {
         alignItems: 'start',
         fontSize: largeFontSize,
+        '&.Mui-disabled': {
+          color: 'inherit',
+        },
         '& .ant-input': {
           height: '1em',
         },
@@ -733,6 +762,13 @@ export const largeTheme = createMuiTheme({
       outlined: {
         ...largetButton,
         padding: '11px 24px !important',
+      },
+    },
+    BaseInput: {
+      textInput: {
+        '& > div': {
+          marginTop: 0,
+        },
       },
     },
   },

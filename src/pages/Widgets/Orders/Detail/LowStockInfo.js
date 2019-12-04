@@ -1,5 +1,6 @@
 import numeral from 'numeral'
-import { Info } from '@material-ui/icons'
+import Info from '@material-ui/icons/Info'
+
 import { qtyFormat } from '@/utils/config'
 import { IconButton, Popover, Tooltip } from '@/components'
 

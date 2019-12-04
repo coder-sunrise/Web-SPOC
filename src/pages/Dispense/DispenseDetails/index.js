@@ -6,6 +6,7 @@ import { Paper, withStyles } from '@material-ui/core'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
@@ -28,7 +29,7 @@ import {
 } from '../variables'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
-import AddOrder from './AddOrder'
+import { VISIT_TYPE } from '@/utils/constants'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -83,7 +84,7 @@ const DispenseDetails = ({
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [] } = invoice
+  const { invoiceItem = [], invoiceAdjustment = [], visitPurposeFK } = invoice
 
   const { inventorymedication } = codetable
 
@@ -127,40 +128,36 @@ const DispenseDetails = ({
       })
     }
   }
-  const updateGridData = (invoiceItems) => {
-    const mapFromInvoiceItem = (result, item) => {
-      const _prescriptionItem = invoiceItems.find(
-        (_invoiceItem) => item.invoiceItemFK === _invoiceItem.id,
-      )
-      if (_prescriptionItem)
-        return [
-          ...result,
-          {
-            ...item,
-            totalAfterGST: _prescriptionItem.totalAfterGST,
-          },
-        ]
-      return [
-        ...result,
-      ]
+  const updateInvoiceData = (v) => {
+    const newInvoice = {
+      ...values.invoice,
+      invoiceTotal: v.summary.total,
+      invoiceTotalAftAdj: v.summary.totalAfterAdj,
+      invoiceTotalAftGST: v.summary.totalWithGST,
+      outstandingBalance: v.summary.totalWithGST,
+      invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
+      invoiceAdjustment: v.adjustments,
+      isGSTInclusive: !!v.summary.isGSTInclusive,
     }
-    const newPrescription = prescription.reduce(mapFromInvoiceItem, [])
-    const newVaccination = vaccination.reduce(mapFromInvoiceItem, [])
-    const newOtherOrder = otherOrder.reduce(mapFromInvoiceItem, [])
-
     setValues({
       ...values,
-      prescription: newPrescription,
-      vaccination: newVaccination,
-      otherOrder: newOtherOrder,
+      invoice: newInvoice,
+    })
+    dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        totalWithGST: v.summary.totalWithGST,
+        isGSTInclusive: v.summary.isGSTInclusive,
+      },
     })
   }
-
+  const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
-          {!viewOnly && (
+          {!viewOnly &&
+          !isRetailVisit && (
             <Button color='info' size='sm' onClick={onReloadClick}>
               <Refresh />
               Refresh
@@ -189,14 +186,17 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            <Authorized authority='queue.dispense.savedispense'>
-              {/* <ProgressButton
-                color='success'
+            {isRetailVisit && (
+              <ProgressButton
+                color='danger'
                 size='sm'
-                onClick={handleOrderModal}
+                icon={<Delete />}
+                // onClick={handleOrderModal}
               >
-                Dummy Button
-              </ProgressButton> */}
+                Discard
+              </ProgressButton>
+            )}
+            <Authorized authority='queue.dispense.savedispense'>
               <ProgressButton color='success' size='sm' onClick={onSaveClick}>
                 Save Dispense
               </ProgressButton>
@@ -208,7 +208,7 @@ const DispenseDetails = ({
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                Edit Order
+                {isRetailVisit ? 'Add Order' : 'Edit Order'}
               </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
@@ -236,39 +236,15 @@ const DispenseDetails = ({
               )}
               data={prescription}
             />
-            <TableData
-              title='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
-            <TableData
-              title='Other Orders'
-              columns={OtherOrdersColumns}
-              colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
-              data={otherOrder}
-            />
-          </Paper>
-        </GridItem>
-        <GridItem md={12}>
-          <Paper className={classes.paper}>
-            <TableData
-              title='Prescription'
-              columns={PrescriptionColumns}
-              colExtensions={PrescriptionColumnExtensions(
-                viewOnly,
-                onPrint,
-                inventorymedication,
-                handleSelectedBatch,
-              )}
-              data={prescription}
-            />
-            <TableData
-              title='Vaccination'
-              columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
-              data={vaccination}
-            />
+            {!isRetailVisit && (
+              <TableData
+                title='Vaccination'
+                columns={VaccinationColumn}
+                colExtensions={VaccinationColumnExtensions(viewOnly)}
+                data={vaccination}
+              />
+            )}
+
             <TableData
               title='Other Orders'
               columns={OtherOrdersColumns}
@@ -291,62 +267,11 @@ const DispenseDetails = ({
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
               }}
-              onValueChanged={(v) => {
-                const newInvoice = {
-                  ...values.invoice,
-                  invoiceTotal: v.summary.total,
-                  invoiceTotalAftAdj: v.summary.totalAfterAdj,
-                  invoiceTotalAftGST: v.summary.totalWithGST,
-                  outstandingBalance: v.summary.totalWithGST,
-                  invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
-                  invoiceAdjustment: v.adjustments,
-                  isGSTInclusive: !!v.summary.isGSTInclusive,
-                }
-                // console.log('summary', { summary: v })
-                setFieldValue('invoice', newInvoice)
-                updateGridData(v.rows)
-                // setFieldValue('invoice.invoiceTotal', v.summary.total)
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftAdj',
-                //   v.summary.totalAfterAdj,
-                // )
-                // setFieldValue(
-                //   'invoice.invoiceTotalAftGST',
-                //   v.summary.totalWithGST,
-                // )
-                // setFieldValue(
-                //   'invoice.outstandingBalance',
-                //   v.summary.totalWithGST,
-                // )
-                // // console.log({ v })
-
-                // setFieldValue(
-                //   'invoice.invoiceGSTAmt',
-                //   Math.round(v.summary.gst * 100) / 100,
-                // )
-                // setFieldValue('invoice.invoiceAdjustment', v.adjustments)
-                dispatch({
-                  type: `dispense/updateState`,
-                  payload: {
-                    totalWithGST: v.summary.totalWithGST,
-                    isGSTInclusive: v.summary.isGSTInclusive,
-                  },
-                })
-              }}
+              onValueChanged={updateInvoiceData}
             />
           </GridItem>
         )}
       </GridContainer>
-
-      <CommonModal
-        title='Orders'
-        open={showOrderModal}
-        onClose={handleOrderModal}
-        maxWidth='md'
-        observe='OrderPage'
-      >
-        <AddOrder />
-      </CommonModal>
     </React.Fragment>
   )
 }

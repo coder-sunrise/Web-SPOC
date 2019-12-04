@@ -54,7 +54,7 @@ import ResultHistory from './ResultHistory'
 import Invoice from './Invoice'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
-
+import { VISIT_TYPE_NAME } from '@/utils/constants'
 // import ChiefComplaints from './ChiefComplaints'
 // import ChiefComplaints from './ChiefComplaints'
 
@@ -431,13 +431,17 @@ class PatientHistory extends Component {
 
   getTitle = (row) => {
     const { coHistory } = row
+    let { visitPurposeName } = row
     const latest = coHistory[coHistory.length] || {}
+    if (visitPurposeName === VISIT_TYPE_NAME.RETAIL)
+      visitPurposeName += ' Visit'
+
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
           <GridItem sm={10}>
             <p>
-              <span>Consultation Visit</span>
+              <span>{visitPurposeName}</span>
               <span style={{ position: 'relative' }}>
                 &nbsp; (<DatePicker text value={row.visitDate} />)
               </span>
@@ -512,6 +516,8 @@ class PatientHistory extends Component {
     const { location } = window
 
     const fromConsultation = location.pathname.includes('consultation')
+
+    const isRetailVisit = selected.visitPurposeName === VISIT_TYPE_NAME.RETAIL
     return (
       <CardContainer
         hideHeader
@@ -522,104 +528,106 @@ class PatientHistory extends Component {
         })}
         // style={{ marginLeft: theme.spacing.unit * 2 }}
       >
-        <GridContainer gutter={0} alignItems='center'>
-          <GridItem md={2}>
-            <Select
-              // simple
-              value={this.state.selectedItems}
-              allValue='0'
-              // prefix='Filter By'
-              mode='multiple'
-              // maxTagCount={4}
-              options={[
-                { name: 'Clinical Notes', value: '1' },
-                { name: 'Chief Complaints', value: '2' },
-                { name: 'Plan', value: '3' },
-                { name: 'Diagnosis', value: '4' },
-                { name: 'Orders', value: '5' },
-                { name: 'Consultation Document', value: '6' },
-                // { name: 'Result History', value: '6' },
-                { name: 'Invoice', value: '7' },
-              ]}
-              style={{ marginBottom: theme.spacing(1) }}
-              onChange={this.onSelectChange}
-              maxTagCount={maxItemTagCount}
-            />
-          </GridItem>
-          <Authorized authority='patientdashboard.editconsultation'>
-            <GridItem md={3}>
-              {!fromConsultation && (
-                <ProgressButton
-                  color='primary'
-                  style={{ marginLeft: theme.spacing(2) }}
-                  size='sm'
-                  onClick={() => {
-                    dispatch({
-                      type: `consultation/edit`,
-                      payload: {
-                        id: selected.id,
-                        version: patientHistory.version,
-                      },
-                    }).then((o) => {
-                      if (o) {
-                        if (o.updateByUserFK !== user.data.id) {
-                          const { clinicianprofile = [] } = codetable
-                          const version = Date.now()
-                          const editingUser = clinicianprofile.find(
-                            (m) => m.userProfileFK === o.updateByUserFK,
-                          ) || {
-                            name: 'Someone',
-                          }
-                          dispatch({
-                            type: 'global/updateAppState',
-                            payload: {
-                              openConfirm: true,
-                              openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
-                              onConfirmSave: () => {
-                                dispatch({
-                                  type: `consultation/overwrite`,
-                                  payload: {
-                                    id: selected.id,
-                                    version,
-                                  },
-                                }).then((c) => {
+        {!isRetailVisit && (
+          <GridContainer gutter={0} alignItems='center'>
+            <GridItem md={2}>
+              <Select
+                // simple
+                value={this.state.selectedItems}
+                allValue='0'
+                // prefix='Filter By'
+                mode='multiple'
+                // maxTagCount={4}
+                options={[
+                  { name: 'Clinical Notes', value: '1' },
+                  { name: 'Chief Complaints', value: '2' },
+                  { name: 'Plan', value: '3' },
+                  { name: 'Diagnosis', value: '4' },
+                  { name: 'Orders', value: '5' },
+                  { name: 'Consultation Document', value: '6' },
+                  // { name: 'Result History', value: '6' },
+                  { name: 'Invoice', value: '7' },
+                ]}
+                style={{ marginBottom: theme.spacing(1) }}
+                onChange={this.onSelectChange}
+                maxTagCount={maxItemTagCount}
+              />
+            </GridItem>
+            <Authorized authority='patientdashboard.editconsultation'>
+              <GridItem md={3}>
+                {!fromConsultation && (
+                  <ProgressButton
+                    color='primary'
+                    style={{ marginLeft: theme.spacing(2) }}
+                    size='sm'
+                    onClick={() => {
+                      dispatch({
+                        type: `consultation/edit`,
+                        payload: {
+                          id: selected.id,
+                          version: patientHistory.version,
+                        },
+                      }).then((o) => {
+                        if (o) {
+                          if (o.updateByUserFK !== user.data.id) {
+                            const { clinicianprofile = [] } = codetable
+                            const version = Date.now()
+                            const editingUser = clinicianprofile.find(
+                              (m) => m.userProfileFK === o.updateByUserFK,
+                            ) || {
+                              name: 'Someone',
+                            }
+                            dispatch({
+                              type: 'global/updateAppState',
+                              payload: {
+                                openConfirm: true,
+                                openConfirmContent: `${editingUser.name} is currently editing the patient note, do you want to overwrite?`,
+                                onConfirmSave: () => {
                                   dispatch({
-                                    type: 'patient/closePatientModal',
+                                    type: `consultation/overwrite`,
+                                    payload: {
+                                      id: selected.id,
+                                      version,
+                                    },
+                                  }).then((c) => {
+                                    dispatch({
+                                      type: 'patient/closePatientModal',
+                                    })
+                                    router.push(
+                                      `/reception/queue/consultation?pid=${patientID}&cid=${c.id}&v=${version}`,
+                                    )
                                   })
-                                  router.push(
-                                    `/reception/queue/consultation?pid=${patientID}&cid=${c.id}&v=${version}`,
-                                  )
-                                })
+                                },
                               },
-                            },
-                          })
-                        } else {
-                          dispatch({
-                            type: 'patient/closePatientModal',
-                          })
-                          router.push(
-                            `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
-                          )
+                            })
+                          } else {
+                            dispatch({
+                              type: 'patient/closePatientModal',
+                            })
+                            router.push(
+                              `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                            )
+                          }
                         }
-                      }
-                    })
-                  }}
-                >
-                  Edit Consultation
-                </ProgressButton>
+                      })
+                    }}
+                  >
+                    Edit Consultation
+                  </ProgressButton>
+                )}
+              </GridItem>
+            </Authorized>
+            <GridItem md={7} style={{ textAlign: 'right' }}>
+              Updated Date:&nbsp;
+              {patientHistory.selectedSubRow.signOffDate && (
+                <DatePicker
+                  text
+                  value={patientHistory.selectedSubRow.signOffDate}
+                />
               )}
             </GridItem>
-          </Authorized>
-          <GridItem md={7} style={{ textAlign: 'right' }}>
-            Updated Date:&nbsp;
-            {patientHistory.selectedSubRow.signOffDate && (
-              <DatePicker
-                text
-                value={patientHistory.selectedSubRow.signOffDate}
-              />
-            )}
-          </GridItem>
-        </GridContainer>
+          </GridContainer>
+        )}
 
         <AuthorizedContext.Provider
           value={{
@@ -637,7 +645,7 @@ class PatientHistory extends Component {
                 const Widget = o.component
                 return (
                   <div>
-                    <h5>{o.name}</h5>
+                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
                     <Widget
                       current={entity || {}}
                       {...this.props}
@@ -665,7 +673,6 @@ class PatientHistory extends Component {
     } = this.props
     const { settings = [] } = clinicSettings
     const { entity, visitInfo, selected } = patientHistory
-
     const cfg = {}
 
     if (!clinicSettings) return null
@@ -679,8 +686,31 @@ class PatientHistory extends Component {
     let sortedPatientHistory = ''
 
     sortedPatientHistory = patientHistory.list
-      ? patientHistory.list.filter((o) => o.coHistory.length >= 1)
+      ? patientHistory.list.filter(
+          (o) =>
+            o.coHistory.length >= 1 ||
+            o.visitPurposeName === VISIT_TYPE_NAME.RETAIL,
+        )
       : ''
+
+    const handleRetailVisitHistory = (v) => {
+      this.props
+        .dispatch({
+          type: 'patientHistory/queryOne',
+          payload: v.id,
+        })
+        .then((r) => {
+          if (r) {
+            this.props.dispatch({
+              type: 'patientHistory/updateState',
+              payload: {
+                selected: v,
+                selectedSubRow: v,
+              },
+            })
+          }
+        })
+    }
 
     return (
       <div {...cfg}>
@@ -700,10 +730,24 @@ class PatientHistory extends Component {
           ) : (
             <Accordion
               defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => ({
-                title: this.getTitle(o),
-                content: this.getContent(o),
-              }))}
+              collapses={sortedPatientHistory.map((o) => {
+                const isRetailVisit =
+                  o.visitPurposeName === VISIT_TYPE_NAME.RETAIL
+                const returnValue = {
+                  title: this.getTitle(o),
+                  content: this.getContent(o),
+                  hideExpendIcon: isRetailVisit,
+                }
+                if (isRetailVisit) {
+                  return {
+                    ...returnValue,
+                    onClickSummary: () => handleRetailVisitHistory(o),
+                  }
+                }
+                return {
+                  ...returnValue,
+                }
+              })}
             />
           ) : (
             <p>No Visit Record Found</p>

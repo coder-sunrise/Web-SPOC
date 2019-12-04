@@ -7,9 +7,10 @@ import { Button, CardContainer, Tooltip } from '@/components'
 
 const styles = (theme) => ({
   paymentItemHeader: {
-    display: 'inline',
+    display: 'inline-block',
     textDecoration: 'underline',
     fontWeight: 'bold',
+    paddingRight: theme.spacing(2),
   },
   deleteButton: {
     position: 'absolute',
@@ -18,11 +19,18 @@ const styles = (theme) => ({
   },
 })
 
-const PaymentBase = ({ classes, payment, children, handleDeletePayment }) => {
+const PaymentBase = ({
+  classes,
+  payment,
+  children,
+  handleDeletePayment,
+  extraLabel = null,
+}) => {
   const onClick = () => handleDeletePayment(payment.id)
   return (
     <CardContainer hideHeader>
       <h5 className={classes.paymentItemHeader}>{payment.displayValue}</h5>
+      {extraLabel}
       <Tooltip title='Delete payment' placement='top'>
         <Button
           className={classes.deleteButton}

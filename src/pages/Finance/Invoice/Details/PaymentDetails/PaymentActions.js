@@ -30,9 +30,7 @@ const PaymentActions = ({
     <React.Fragment>
       <Button
         onClick={() => handleAddPayment(invoicePayerFK)}
-        disabled={
-          hasActiveSession ? !handleAddPayment || readOnly : !hasActiveSession
-        }
+        disabled={!handleAddPayment || readOnly}
         {...ButtonProps}
       >
         <Add />
@@ -42,9 +40,7 @@ const PaymentActions = ({
         <Button
           // onClick={() => handleAddCrNote(type)}
           onClick={() => handleAddCrNote(invoicePayerFK, type)}
-          disabled={
-            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
-          }
+          disabled={!handleAddCrNote || readOnly}
           {...ButtonProps}
         >
           <Add />
@@ -54,9 +50,7 @@ const PaymentActions = ({
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleWriteOff(invoicePayerFK)}
-          disabled={
-            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
-          }
+          disabled={!handleAddCrNote || readOnly}
           {...ButtonProps}
         >
           <Add />
@@ -66,9 +60,7 @@ const PaymentActions = ({
       {type === PayerType.COPAYER_REAL && (
         <Button
           onClick={() => handleTransferClick(invoicePayerFK, type)}
-          disabled={
-            hasActiveSession ? !handleAddCrNote || readOnly : !hasActiveSession
-          }
+          disabled={!handleAddCrNote || readOnly}
           {...ButtonProps}
         >
           <RepeatIcon />

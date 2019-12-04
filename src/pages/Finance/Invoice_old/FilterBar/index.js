@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { FastField, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
-import { AccountCircle, Search, Replay, Person, Apps } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Replay from '@material-ui/icons/Replay'
 
 import { withStyles, Tooltip } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'

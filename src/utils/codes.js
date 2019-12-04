@@ -782,9 +782,6 @@ const consultationDocumentTypes = [
     value: '4',
     name: 'Others',
     prop: 'corOtherDocuments',
-    getSubject: (r) => {
-      return r.subject || ''
-    },
     downloadKey: 'documentid',
     downloadConfig: {
       id: 12,
@@ -1483,9 +1480,10 @@ const tagList = [
           index < patient.entity.patientAllergy.length;
           index++
         ) {
-          patientAllergy =
-            (patientAllergy ? `${patientAllergy}, ` : '') +
-            patient.entity.patientAllergy[index].allergyName
+          if (patient.entity.patientAllergy[index].type === 'Allergy')
+            patientAllergy =
+              (patientAllergy ? `${patientAllergy}, ` : '') +
+              patient.entity.patientAllergy[index].allergyName
         }
         result = `Patient Name: ${patient.entity.name}`
         result += `<br/>Patient Ref. No.: ${patient.entity.patientReferenceNo}`
@@ -1656,6 +1654,11 @@ export const shortcutKeys = [
   { value: 'F12', name: 'F12' },
 ]
 
+export const roundToPrecision = (x, precision) => {
+  const y = +x + (precision === undefined ? 0.5 : precision / 2)
+  return y - y % (precision === undefined ? 1 : +precision)
+}
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1705,5 +1708,6 @@ module.exports = {
   inventoryAdjustmentStatus,
   fetchAndSaveCodeTable,
   shortcutKeys,
+  roundToPrecision,
   ...module.exports,
 }

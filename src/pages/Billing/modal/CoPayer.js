@@ -43,26 +43,6 @@ class CoPayer extends Component {
     selectedRows: [],
     coPayer: undefined,
     invoiceItems: this.props.invoiceItems,
-    // .reduce((invoiceItems, item) => {
-    //   const existed = invoiceItems.find((_item) => _item.id === item.id)
-    //   if (existed)
-    //     return [
-    //       ...invoiceItems.filter((_item) => _item.id !== existed.id),
-    //       {
-    //         ...item,
-    //         ...existed,
-    //         payableBalance: existed.payableBalance - existed.claimAmount,
-    //       },
-    //     ]
-    //   return [
-    //     ...invoiceItems,
-    //     {
-    //       ...item,
-    //       payableBalance: item.payableBalance - item.claimAmount,
-    //     },
-    //   ]
-    // }, [])
-    // .map((item) => ({ ...item, claimAmount: 0 })) || [],
   }
 
   populateClaimAmount = (selected) => {
@@ -136,16 +116,22 @@ class CoPayer extends Component {
         item.claimAmount === undefined ? subtotal : subtotal + item.claimAmount,
       0,
     )
+    const getErrorRows = (row) => row._errors && row._errors.length > 0
+    const getSelectedRows = (item) => selectedRows.includes(item.id)
+    const hasError =
+      invoiceItems.filter(getSelectedRows).filter(getErrorRows).length > 0
+
     return (
       subtotalAmount <= 0 ||
       editingRowIds.length > 0 ||
       selectedRows.length === 0 ||
-      !coPayer
+      !coPayer ||
+      hasError
     )
   }
 
   render () {
-    const { classes, onClose } = this.props
+    const { classes, onClose, copayers = [] } = this.props
     const { selectedRows, invoiceItems, coPayer } = this.state
     return (
       <div className={classes.container}>
@@ -158,7 +144,8 @@ class CoPayer extends Component {
               // remoteFilter={{
               //   coPayerTypeFK: 1,
               // }}
-              localFilter={(item) => item.coPayerTypeFK === 1}
+              localFilter={(item) =>
+                item.coPayerTypeFK === 1 && !copayers.includes(item.id)}
               value={coPayer}
               onChange={this.handleCopayerChange}
             />

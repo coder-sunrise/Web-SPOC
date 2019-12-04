@@ -9,7 +9,6 @@ import {
   NumberInput,
   CommonTableGrid,
   TextField,
-  Button,
   dateFormatLong,
   CodeSelect,
   Field,
@@ -17,6 +16,8 @@ import {
   Select,
   ProgressButton,
 } from '@/components'
+import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   grid: {
@@ -57,7 +58,7 @@ class CollectPaymentConfirm extends PureComponent {
         type: 'number',
         currency: true,
       },
-      { columnName: 'invoiceDate', type: 'date', format: { dateFormatLong } },
+      { columnName: 'invoiceDate', type: 'date', format: dateFormatLong },
       {
         columnName: 'payment',
         currency: true,
@@ -103,13 +104,14 @@ class CollectPaymentConfirm extends PureComponent {
         ],
       }
     })
-    this.getBizList(moment().formatUTC('YYMMDD'))
+    this.fetchLatestBizSessions()
     setValues({
       ...values,
-      paymentDate: moment(),
+      // paymentDate: moment(),
       amount: total,
       maxAmount: total,
-      paymentModeFK: 5, // GIRO
+      paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
+      displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
     })
     this.setState({
@@ -184,17 +186,58 @@ class CollectPaymentConfirm extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    const selectedDate = moment(event).format('YYMMDD')
-    this.getBizList(selectedDate)
+    // const selectedDate = moment(event).format('YYMMDD')
+    this.getBizList(event)
   }
 
-  getBizList = (e) => {
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        setFieldValue('paymentDate', sessionData[0].sessionStartDate)
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+
+        this.getBizList(sessionData[0].sessionStartDate)
+      } else {
+        setFieldValue('paymentDate', null)
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+      }
+    })
+  }
+
+  getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     dispatch({
       type: 'statement/bizSessionList',
       payload: {
-        sessionNoPrefix: e,
         pagesize: 999,
+        lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
       },
     }).then(() => {
       const { bizSessionList } = this.props.statement
@@ -207,10 +250,10 @@ class CollectPaymentConfirm extends PureComponent {
     })
   }
 
-  onChangePaymentMode = (event) => {
+  onChangePaymentMode = (event, op) => {
+    const { displayValue } = op
     const { setFieldValue } = this.props
     const selectedValue = event || ''
-
     if (selectedValue === 1) {
       this.setState({ isCardPayment: true })
       setFieldValue('creditCardTypeFK', 1)
@@ -219,6 +262,7 @@ class CollectPaymentConfirm extends PureComponent {
       setFieldValue('cardNumber', '')
       setFieldValue('creditCardTypeFK', undefined)
     }
+    setFieldValue('displayValue', displayValue)
   }
 
   render () {
@@ -284,7 +328,7 @@ class CollectPaymentConfirm extends PureComponent {
                     label='Payment Mode'
                     code='ctPaymentMode'
                     labelField='displayValue'
-                    onChange={(e) => this.onChangePaymentMode(e)}
+                    onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
                   />
                 )}
               />

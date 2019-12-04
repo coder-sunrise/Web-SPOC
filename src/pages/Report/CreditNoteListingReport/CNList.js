@@ -14,7 +14,7 @@ class CNList extends PureComponent {
     const { reportDatas } = this.props
     if (!reportDatas)
       return null
-    if (reportDatas && reportDatas.CreditNoteListingDetails) {
+    if (reportDatas.CreditNoteListingDetails) {
       listData = reportDatas.CreditNoteListingDetails.map(
         (item, index) => ({
           ...item,
@@ -24,7 +24,7 @@ class CNList extends PureComponent {
       )
     }
 
-    const CreditNoteListingDetailsCols = [
+    let CreditNoteListingDetailsCols = [
       { name: 'creditNoteNo', title: 'CR No.' },
       { name: 'account', title: 'Account' },
       { name: 'name', title: 'Name' },
@@ -33,13 +33,10 @@ class CNList extends PureComponent {
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'total', title: 'CN Amt.' },
-      { name: 'gstAmt', title: 'GST' },
-      { name: 'totalAftGST', title: 'Total' },
     ]
-    const CreditNoteListingDetailsExtensions = [
+    let CreditNoteListingDetailsExtensions = [
       { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },
       { columnName: 'total', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
       { columnName: 'totalAftGST', type: 'currency', currency: true, sortingEnabled: false },
       { columnName: 'creditNoteNo', sortingEnabled: false },
       { columnName: 'account', sortingEnabled: false },
@@ -48,6 +45,12 @@ class CNList extends PureComponent {
       { columnName: 'doctorName', sortingEnabled: false },
       { columnName: 'invoiceNo', sortingEnabled: false },
     ]
+    if (reportDatas.ListingDetails[0].isDisplayGST) {
+      CreditNoteListingDetailsCols.push({ name: 'gstAmt', title: 'GST' })
+      CreditNoteListingDetailsExtensions.push({ columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false })
+    }
+    CreditNoteListingDetailsCols.push({ name: 'totalAftGST', title: 'Total' })
+
 
     let FuncProps = {
       pager: false,
@@ -67,8 +70,12 @@ class CNList extends PureComponent {
         },
         integrated: {
           calculator: (type, rows, getValue) => {
-            if (type === 'grandTotal')
-              return IntegratedSummary.defaultCalculator('sum', rows, getValue)
+            if (type === 'grandTotal' || type === 'sum') {
+              return rows.reduce((pre, cur) => {
+                const v = getValue(cur)
+                return pre + (v || 0)
+              }, 0)
+            }
             return IntegratedSummary.defaultCalculator(type, rows, getValue)
           },
         },

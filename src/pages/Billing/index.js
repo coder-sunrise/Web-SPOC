@@ -11,8 +11,11 @@ import {
   Button,
   CommonModal,
   GridContainer,
+  GridItem,
   withFormikExtend,
   notification,
+  FastField,
+  OutlinedTextField,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
@@ -66,8 +69,7 @@ const styles = (theme) => ({
     console.log('map props to values')
     try {
       if (billing.entity) {
-        const { invoicePayer = [] } = billing.entity
-
+        const { invoicePayer = [], visitPurposeFK } = billing.entity
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -87,6 +89,7 @@ const styles = (theme) => ({
           finalClaim,
           finalPayable,
           visitId: billing.visitID,
+          visitPurposeFK,
         }
       }
     } catch (error) {
@@ -95,7 +98,7 @@ const styles = (theme) => ({
     return { ...billing.default, visitId: billing.visitID }
   },
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch } = props
+    const { dispatch, patient } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
 
@@ -110,6 +113,11 @@ const styles = (theme) => ({
             message: 'Billing completed',
           })
           router.push('/reception/queue')
+        } else {
+          dispatch({
+            type: 'patient/query',
+            payload: { id: patient.id },
+          })
         }
       }
     })
@@ -307,10 +315,26 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  handleResetClick = () => {
+    const { dispatch, values } = this.props
+
+    dispatch({
+      type: 'billing/query',
+      payload: { id: values.visitId },
+    }).then((response) => {
+      if (response) {
+        this.setState((preState) => ({
+          submitCount: preState.submitCount + 1,
+        }))
+      }
+    })
+  }
+
   render () {
     const { showReport, showAddPaymentModal, submitCount } = this.state
     const {
       classes,
+      dispatch,
       values,
       dispense,
       loading,
@@ -356,7 +380,9 @@ class Billing extends Component {
             <GridContainer item md={8}>
               <ApplyClaims
                 handleIsEditing={this.handleIsEditing}
+                onResetClick={this.handleResetClick}
                 submitCount={submitCount}
+                dispatch={dispatch}
                 {...formikBag}
               />
             </GridContainer>
@@ -372,29 +398,46 @@ class Billing extends Component {
             </GridContainer>
           </GridContainer>
         </Paper>
-        <div className={classes.paymentButton}>
-          <Button
-            color='info'
-            onClick={this.backToDispense}
-            disabled={this.state.isEditing}
-          >
-            <ArrowBack />Dispense
-          </Button>
-          {/* <Button
-            color='primary'
-            disabled={this.state.isEditing || values.id === undefined}
-            onClick={this.onSavePaymentClick}
-          >
-            Save
-          </Button> */}
-          <Button
-            color='success'
-            disabled={this.state.isEditing || values.id === undefined}
-            onClick={this.onCompletePaymentClick}
-          >
-            Complete Payment
-          </Button>
-        </div>
+        <GridContainer>
+          <GridItem md={8}>
+            <FastField
+              name='invoice.invoiceRemark'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Invoice Remarks'
+                    multiline
+                    maxLength={2000}
+                    rowsMax={2}
+                    rows={2}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <React.Fragment>
+              <div className={classes.paymentButton}>
+                <Button
+                  color='info'
+                  onClick={this.backToDispense}
+                  disabled={this.state.isEditing}
+                >
+                  <ArrowBack />Dispense
+                </Button>
+                <Button
+                  color='success'
+                  disabled={this.state.isEditing || values.id === undefined}
+                  onClick={this.onCompletePaymentClick}
+                >
+                  Complete Payment
+                </Button>
+              </div>
+            </React.Fragment>
+          </GridItem>
+        </GridContainer>
+
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'

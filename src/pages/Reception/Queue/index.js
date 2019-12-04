@@ -9,7 +9,9 @@ import { withFormik } from 'formik'
 import classNames from 'classnames'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
-import { Refresh, Stop } from '@material-ui/icons'
+import Refresh from '@material-ui/icons/Refresh'
+import Stop from '@material-ui/icons/Stop'
+
 // custom components
 import {
   Card,
@@ -372,6 +374,7 @@ class Queue extends React.Component {
       showEndSessionSummary,
       showPatientSearch,
       _sessionInfoID,
+      search,
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
@@ -438,6 +441,7 @@ class Queue extends React.Component {
                   handleEditVisitClick={this.showVisitRegistration}
                   handleActualizeAppointment={this.handleActualizeAppointment}
                   history={history}
+                  searchQuery={search}
                 />
               </React.Fragment>
             )}

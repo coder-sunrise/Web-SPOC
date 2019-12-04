@@ -558,6 +558,7 @@ class Layout extends PureComponent {
         2,
         2,
       ],
+      isDraggable: !this.state.fullScreenWidget,
       draggableCancel: '.non-dragable',
       draggableHandle: '.dragable',
       isResizable: this.state.mode === 'edit',
@@ -640,7 +641,7 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                console.log(cfg, w)
+                // console.log(cfg, w)
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
                 return (
@@ -707,12 +708,25 @@ class Layout extends PureComponent {
                                     </Dropdown>
                                   </Tooltip>
 
-                                  <Popconfirm
-                                    title='Removing widget will remove all underlying data. Remove this widget?'
-                                    onConfirm={() => this.removeWidget(id)}
-                                  >
+                                  {!w.disableDeleteWarning ? (
+                                    <Popconfirm
+                                      title='Removing widget will remove all underlying data. Remove this widget?'
+                                      onConfirm={() => this.removeWidget(id)}
+                                    >
+                                      <Tooltip title='Delete'>
+                                        <IconButton
+                                          aria-label='Delete'
+                                          size='small'
+                                          disabled={w.persist}
+                                        >
+                                          <Clear />
+                                        </IconButton>
+                                      </Tooltip>
+                                    </Popconfirm>
+                                  ) : (
                                     <Tooltip title='Delete'>
                                       <IconButton
+                                        onClick={() => this.removeWidget(id)}
                                         aria-label='Delete'
                                         size='small'
                                         disabled={w.persist}
@@ -720,7 +734,7 @@ class Layout extends PureComponent {
                                         <Clear />
                                       </IconButton>
                                     </Tooltip>
-                                  </Popconfirm>
+                                  )}
                                 </React.Fragment>
                               )}
                               {state.fullScreenWidget === id && (

@@ -23,6 +23,7 @@ import {
 } from '@/components'
 // component
 import { ReportViewer } from '@/components/_medisys'
+import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 
 const doctors = [
   { value: 'bao', name: 'Bao' },
@@ -35,6 +36,7 @@ const doctors = [
   mapPropsToValues: () => ({
     // start: '14:00',
     end: '13:00',
+    doctor: 'bao',
   }),
   validationSchema: Yup.object().shape({
     start: Yup.string().required(),
@@ -81,8 +83,14 @@ class Report extends React.Component {
     this.props.validateForm()
   }
 
+  showReport = () => {
+    this.setState((preState) => ({
+      showEndSessionSummary: !preState.showEndSessionSummary,
+    }))
+  }
+
   render () {
-    const { showReport } = this.state
+    const { showReport, showEndSessionSummary } = this.state
     // return (
     //   <CardContainer hideHeader size='sm'>
     //     <Button color='primary&#39;' onClick={this.viewReport}>
@@ -106,137 +114,18 @@ class Report extends React.Component {
     // )
     return (
       <CardContainer hideHeader size='sm'>
-        {/* <Button color='primary&#39;' onClick={this.toggleReport}>
-          View Report
-        </Button>
-        <Button color='primary&#39;' onClick={this.getCodeTable}>
-          Get Codetable
-        </Button>
-        <Button color='primary&#39;' onClick={this.testWatch}>
-          Test Watch
-        </Button>
-        <CommonModal
-          bodyNoPadding
-          open={showReport}
-          onClose={this.toggleReport}
-          title='Report'
-          maxWidth='lg'
-          // fullScreen
-        >
-          <ReportViewer />
-        </CommonModal>
-        <CodeSelect code='clinicianprofile' /> */}
-        <Button onClick={this.validate} color='primary'>
+        <Button onClick={this.showReport} color='primary'>
           Submit
         </Button>
-        <GridContainer>
-          <GridItem md={3}>
-            <FastField
-              name='copaymentschemename'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='Copayment Scheme name'
-                  code='coPaymentScheme'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='copaymentschemename'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='Copayment Scheme name'
-                  code='coPaymentScheme'
-                  localFilter={(opt) => opt.schemeCategoryName === 'Corporate'}
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='ctMedicationDosage'
-              render={(args) => (
-                <CodeSelect
-                  {...args}
-                  label='Medication dosage'
-                  labelField='displayValue'
-                  code='ctMedicationDosage'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='inventoryMedicationFK'
-              render={(args) => {
-                return (
-                  <CodeSelect
-                    label='Name'
-                    code='inventorymedication'
-                    labelField='displayValue'
-                    temp
-                    // onChange={this.changeMedication}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
-
-          <GridItem sm={3}>
-            <FastField
-              name='doctor'
-              render={(args) => (
-                <Select
-                  mode='tags'
-                  maxSelected={1}
-                  label='Filter by Doctor (Tags)'
-                  onChange={(v) => {
-                    console.log(v)
-                  }}
-                  options={doctors}
-                  {...args}
-                />
-              )}
-            />
-          </GridItem>
-
-          {/* <GridItem md={3}>
-            <FastField
-              name='ctMedicationDosage'
-              render={(args) => <DoctorProfileSelect />}
-            />
-          </GridItem> */}
-          <GridItem md={3}>
-            <FastField
-              name='effectiveDates'
-              render={(args) => (
-                <DateRangePicker
-                  {...args}
-                  label='Effective Start Date'
-                  label2='Effective End Date'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem xs md={3}>
-            <FastField
-              name='dateTo'
-              render={(args) => <DatePicker {...args} label='Date from' />}
-            />
-          </GridItem>
-          <GridItem md={3}>
-            <FastField
-              name='end'
-              render={(args) => (
-                <TimePicker {...args} label='End' format='hh:mm A' />
-              )}
-            />
-          </GridItem>
-        </GridContainer>
+        <CommonModal
+          open={showEndSessionSummary}
+          title='Session Summary'
+          onClose={this.showReport}
+          onConfirm={this.showReport}
+          disableBackdropClick
+        >
+          <EndSessionSummary sessionID={14} />
+        </CommonModal>
       </CardContainer>
     )
   }

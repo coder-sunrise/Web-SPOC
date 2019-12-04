@@ -53,7 +53,7 @@ class BaseInput extends React.PureComponent {
   }
 
   _onKeyUp = (e) => {
-    // console.log(e.target.tagName==='TEXTAREA')
+    // console.log(e.target.tagName === 'TEXTAREA')
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
     // console.log(e, this)
@@ -326,6 +326,7 @@ class BaseInput extends React.PureComponent {
             <AutosizeInput
               readOnly
               inputClassName={className}
+              tabIndex='-1'
               {...inputProps}
               title=''
             />
@@ -405,4 +406,7 @@ BaseInput.propTypes = {
   onBlur: PropTypes.func,
 }
 
-export default withStyles(customInputStyle, { withTheme: true })(BaseInput)
+export default withStyles(customInputStyle, {
+  name: 'BaseInput',
+  withTheme: true,
+})(BaseInput)

@@ -72,13 +72,29 @@ const applyFilter = (filter, data) => {
   try {
     // filter by patient name and ignore doctorblock
     if (search !== '') {
-      returnData = returnData.filter(
-        (eachData) =>
-          eachData.isDoctorBlock ||
-          (!eachData.isDoctorBlock &&
-            eachData.patientName.toLowerCase().indexOf(search.toLowerCase()) !==
-              -1),
-      )
+      const _searchStr = search.toLowerCase()
+      returnData = returnData.filter((eachData) => {
+        if (eachData.isDoctorBlock) return true
+        const { patientProfile, patientName, patientContactNo } = eachData
+        if (patientProfile) {
+          const { contactNumbers = [] } = patientProfile
+          const mobile = contactNumbers.find(
+            (item) => item.numberTypeFK === 1,
+          ) || { number: '' }
+
+          return (
+            patientProfile.name.toLowerCase().indexOf(_searchStr) >= 0 ||
+            patientProfile.patientAccountNo.toLowerCase().indexOf(_searchStr) >=
+              0 ||
+            mobile.number.toLowerCase().indexOf(_searchStr) >= 0
+          )
+        }
+
+        return (
+          patientName.toLowerCase().indexOf(_searchStr) >= 0 ||
+          patientContactNo.toLowerCase().indexOf(_searchStr) >= 0
+        )
+      })
     }
 
     // filter by doctor
@@ -371,7 +387,7 @@ const CalendarView = ({
       eventList,
     ],
   )
-  console.log({ filtered, filter })
+
   return (
     <LoadingWrapper loading={loading} text='Loading appointments...'>
       <DragAndDropCalendar
@@ -429,10 +445,8 @@ export default connect(({ calendar, codetable, loading, doctorBlock }) => ({
   displayDate: calendar.currentViewDate,
   calendarView: calendar.calendarView,
   calendarEvents: calendar.list || [],
-  publicHolidays: calendar.publicHolidayList || [],
+  publicHolidays: calendar.publicHolidayList,
   doctorBlocks: doctorBlock.list || [],
   appointmentTypes: codetable.ctappointmenttype || [],
   loading: loading.models.calendar,
-  // loading.effects['calendar/getCalendarList'] ||
-  // loading.effects['calendar/getAppointmentDetails'],
 }))(CalendarView)

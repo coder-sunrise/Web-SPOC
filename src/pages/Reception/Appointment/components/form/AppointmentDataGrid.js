@@ -13,15 +13,19 @@ import {
   AppointmentDataColumn,
 } from './variables'
 import ErrorPopover from './ErrorPopover'
+import AuthorizedContext from '@/components/Context/Authorized'
 
-const validationSchema = Yup.object().shape({
-  startTime: Yup.string().required(),
-  // appointmentDuration: Yup.string().required(),
-  endTime: Yup.string()
-    .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
-    .required(),
-  clinicianFK: Yup.string().required(),
-})
+// const validationSchema = Yup.object().shape({
+//   startTime: Yup.string().required(),
+//   endTime: Yup.string().required(),
+//   apptDurationHour: Yup.number().required(),
+//   apptDurationMinute: Yup.number().required(),
+//   // appointmentDuration: Yup.string().required(),
+//   // endTime: Yup.string()
+//   //   .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
+//   //   .required(),
+//   clinicianFK: Yup.string().required(),
+// })
 
 const styles = () => ({
   container: {
@@ -47,6 +51,12 @@ const styles = () => ({
     marginRight: 10,
   },
 })
+
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = (endTime.diff(startTime, 'minute') / 60 - hour) * 60
+  return { hour, minute }
+}
 
 @connect(({ codetable }) => ({
   appointmentTypes: codetable.ctappointmenttype,
@@ -135,30 +145,21 @@ class AppointmentDataGrid extends React.Component {
           },
         }
       }
+
+      if (column.columnName === 'startTime') {
+        return {
+          ...column,
+          onChange: (row) => {
+            console.log({ row })
+          },
+        }
+      }
       return { ...column }
     })
 
     this.columnExtensions = [
       ...columnExtensions,
     ]
-
-    let defaultNewRows = []
-
-    if (!data || data.length <= 0) {
-      let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
-      if (selectedSlot && selectedSlot.allDay === false) {
-        defaultNewRow = {
-          startTime: moment(selectedSlot.start).format('HH:mm A'),
-          endTime: moment(selectedSlot.end).format('HH:mm A'),
-          clinicianFK: selectedSlot.resourceId,
-          ...defaultNewRow,
-        }
-      }
-      defaultNewRows.push(defaultNewRow)
-    }
-    this.state = {
-      defaultNewRows,
-    }
   }
 
   onRadioChange = ({ row, checked }) => {
@@ -183,55 +184,65 @@ class AppointmentDataGrid extends React.Component {
       data,
       handleCommitChanges,
       disabled,
+      validationSchema,
       handleEditingRowsChange,
       editingRows,
       selectedSlot,
     } = this.props
 
-    const { defaultNewRows } = this.state
     return (
       <div className={classes.container}>
-        <EditableTableGrid
-          rows={data.length ? data : data.concat(defaultNewRows)}
-          columns={AppointmentDataColumn}
-          columnExtensions={[
-            ...this.columnExtensions,
-            {
-              columnName: 'conflicts',
-              // type: 'error',
-              editingEnabled: false,
-              sortingEnabled: false,
-              disabled: true,
-              width: 60,
-              render: (row) => {
-                if (row.conflicts && row.conflicts.length > 0) {
-                  return <ErrorPopover errors={row.conflicts} />
-                }
+        <AuthorizedContext.Provider
+          value={{ rights: disabled ? 'disable' : 'enable' }}
+        >
+          <EditableTableGrid
+            rows={data}
+            disabled={disabled}
+            columns={AppointmentDataColumn}
+            columnExtensions={[
+              ...this.columnExtensions,
+              {
+                columnName: 'conflicts',
+                // type: 'error',
+                editingEnabled: false,
+                sortingEnabled: false,
+                disabled: true,
+                width: 60,
+                render: (row) => {
+                  if (row.conflicts && row.conflicts.length > 0) {
+                    return <ErrorPopover errors={row.conflicts} />
+                  }
 
-                return null
+                  return null
+                },
               },
-            },
-          ]}
-          FuncProps={{
-            pager: false,
-            sort: true,
-            sortConfig: {
-              defaultSorting: [
-                { columnName: 'startTime', direction: 'asc' },
-              ],
-            },
-          }}
-          EditingProps={{
-            messages: {
-              deleteCommand: 'Delete appointment slot',
-            },
-            showAddCommand: !disabled,
-            showDeleteCommand:
-              data.filter((item) => !item.isDeleted).length > 1,
-            onCommitChanges: handleCommitChanges,
-          }}
-          schema={validationSchema}
-        />
+            ]}
+            FuncProps={{
+              edit: false,
+              pager: false,
+              sort: true,
+              sortConfig: {
+                defaultSorting: [
+                  { columnName: 'startTime', direction: 'asc' },
+                ],
+              },
+            }}
+            EditingProps={{
+              messages: {
+                deleteCommand: 'Delete appointment slot',
+              },
+              showAddCommand: !disabled,
+              showDeleteCommand:
+                data.filter((item) => !item.isDeleted).length > 1,
+              onCommitChanges: handleCommitChanges,
+              onAddedRowsChange: (rows) => {
+                console.log({ rows })
+                return rows
+              },
+            }}
+            schema={validationSchema}
+          />
+        </AuthorizedContext.Provider>
       </div>
     )
   }

@@ -4,6 +4,7 @@ import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { getTimeObject, compare } from '@/utils/yup'
+import { getUniqueNumericId } from '@/utils/utils'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -79,6 +80,38 @@ export const ValidationSchema = Yup.object().shape({
 const convertReccurenceDaysOfTheWeek = (week = '') =>
   week.split(', ').map((eachDay) => parseInt(eachDay, 10))
 
+const calculateDuration = (startTime, endTime) => {
+  const hour = endTime.diff(startTime, 'hour')
+  const minute = (endTime.diff(startTime, 'minute') / 60 - hour) * 60
+  return { hour, minute }
+}
+
+const constructDefaultNewRow = (selectedSlot) => {
+  let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
+
+  const startTime = moment(selectedSlot.start)
+  const selectedEndTime = moment(selectedSlot.end)
+
+  const { hour = 0, minute = 15 } = calculateDuration(
+    startTime,
+    selectedEndTime,
+  )
+  const endTime = moment(selectedSlot.start)
+    .add(hour, 'hour')
+    .add(minute, 'minute')
+    .format('HH:mm')
+  defaultNewRow = {
+    startTime: startTime.format('HH:mm'),
+    clinicianFK: selectedSlot.resourceId,
+    endTime,
+    apptDurationHour: hour,
+    apptDurationMinute: minute,
+    sortOrder: 0,
+    ...defaultNewRow,
+  }
+  return defaultNewRow
+}
+
 export const mapPropsToValues = ({
   viewingAppointment,
   selectedAppointmentID,
@@ -113,7 +146,9 @@ export const mapPropsToValues = ({
     bookedByUserFK: user.id,
     currentAppointment: {
       appointmentDate: moment(selectedSlot.start).formatUTC(),
-      appointments_Resources: [],
+      appointments_Resources: [
+        constructDefaultNewRow(selectedSlot),
+      ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
     recurrenceDto: { ...initDailyRecurrence },
@@ -176,6 +211,20 @@ export const mapPropsToValues = ({
 
         currentAppointment: {
           ...appointment,
+          appointments_Resources: appointment.appointments_Resources.map(
+            (item) => {
+              const startTime = moment(item.startTime, 'HH:mm:ss')
+              const endTime = moment(item.endTime, 'HH:mm:ss')
+              const { hour, minute } = calculateDuration(startTime, endTime)
+              return {
+                ...item,
+                startTime: startTime.format('HH:mm'),
+                endTime: endTime.format('HH:mm'),
+                apptDurationHour: hour,
+                apptDurationMinute: minute,
+              }
+            },
+          ),
           appointmentDate: moment(appointment.appointmentDate).formatUTC(),
           // appointmentDate,
         },
@@ -321,4 +370,19 @@ export const sortDataGrid = (a, b) => {
   if (aLessThanB) return -1
   if (!aLessThanB) return 1
   return 0
+}
+
+export const getEndTime = (row) => {
+  const { endTime, apptDurationHour, apptDurationMinute, startTime } = row
+
+  if (!startTime) return endTime
+  const format =
+    startTime.includes('PM') || startTime.includes('AM') ? 'hh:mm A' : 'HH:mm'
+  if (apptDurationHour && apptDurationMinute && startTime)
+    return moment(startTime, format)
+      .add(apptDurationHour, 'hour')
+      .add(apptDurationMinute, 'minute')
+      .format('HH:mm')
+
+  return endTime
 }

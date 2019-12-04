@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Divider } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
 import { amountProps } from '../../variables'
 import POAdjustment from './POAdjustment'
 import {

@@ -1,5 +1,7 @@
 import React, { PureComponent } from 'react'
-import { Edit, Delete } from '@material-ui/icons'
+import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
+
 import { CommonTableGrid, Button, dateFormatLong } from '@/components'
 
 class Grid extends PureComponent {

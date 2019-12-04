@@ -2,7 +2,8 @@ import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import { FastField, Field, withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
-import { Search, Add } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
+import Add from '@material-ui/icons/Add'
 import moment from 'moment'
 import {
   GridContainer,
@@ -33,11 +34,11 @@ const styles = () => ({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
     statementDates: [
-      moment().startOf('month'),
+      moment().subtract(1, 'months').startOf('month'),
       moment().endOf('month'),
     ],
     statementDueDates: [
-      moment().startOf('month'),
+      moment().subtract(1, 'months').startOf('month'),
       moment().endOf('month'),
     ],
   }),

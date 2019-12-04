@@ -3,9 +3,9 @@ import { connect } from 'dva'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { convertFromHTML } from 'draft-js'
 import numeral from 'numeral'
+import _ from 'lodash'
 import { htmlEncodeByRegExp, htmlDecodeByRegExp } from '@/utils/utils'
 import Yup from '@/utils/yup'
-
 import { qtyFormat } from '@/utils/config'
 
 import {
@@ -194,9 +194,10 @@ const loadFromCodesConfig = {
     )
     let patientAllergy
     for (let index = 0; index < patient.patientAllergy.length; index++) {
-      patientAllergy =
-        (patientAllergy ? `${patientAllergy}, ` : '') +
-        patient.patientAllergy[index].allergyName
+      if (patient.patientAllergy[index].type === 'Allergy')
+        patientAllergy =
+          (patientAllergy ? `${patientAllergy}, ` : '') +
+          patient.patientAllergy[index].allergyName
     }
     result = `Patient Name: ${patient.name}`
     result += `<br/>Patient Ref. No.: ${patient.patientReferenceNo}`
@@ -361,6 +362,17 @@ class AddConsultationDocument extends PureComponent {
     })
   }
 
+  getNextSequence = () => {
+    const { consultationDocument: { rows, type } } = this.props
+    const allDocs = rows.filter((s) => !s.isDeleted)
+    let nextSequence = 1
+    if (allDocs && allDocs.length > 0) {
+      const { sequence } = _.maxBy(allDocs, 'sequence')
+      nextSequence = sequence + 1
+    }
+    return nextSequence
+  }
+
   getLoader = (editor, setFieldValue, currentType) => {
     const {
       classes,
@@ -450,6 +462,7 @@ class AddConsultationDocument extends PureComponent {
       loadFromCodes,
       currentType: types.find((o) => o.value === type),
       templateLoader: this.getLoader,
+      getNextSequence: this.getNextSequence,
     }
 
     return (

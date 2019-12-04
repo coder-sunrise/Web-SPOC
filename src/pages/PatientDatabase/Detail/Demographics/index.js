@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Call from '@material-ui/icons/Call'
-import { Add } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+
 import { withStyles, Paper } from '@material-ui/core'
 import {
   Field,
@@ -114,53 +115,6 @@ class Demographic extends PureComponent {
         {...args}
       />
     )
-  }
-
-  queryOccupation = (value) => {
-    const search = {}
-    if (typeof value === 'number') {
-      search.id = value
-    } else {
-      search.displayValue = value
-    }
-
-    return fetchAndSaveCodeTable('ctoccupation', {
-      ...search,
-      pagesize: 25,
-      sorting: [
-        { columnName: 'displayValue', direction: 'asc' },
-      ],
-      temp: true,
-    })
-  }
-
-  queryCountry = (value) => {
-    return fetchAndSaveCodeTable('ctcountry', {
-      displayValue: value,
-      pagesize: 25,
-      sorting: [
-        { columnName: 'displayValue', direction: 'asc' },
-      ],
-      temp: true,
-    })
-  }
-
-  queryNationality = (value) => {
-    const search = {}
-    if (typeof value === 'number') {
-      search.id = value
-    } else {
-      search.displayValue = value
-    }
-
-    return fetchAndSaveCodeTable('ctnationality', {
-      ...search,
-      pagesize: 25,
-      sorting: [
-        { columnName: 'displayValue', direction: 'asc' },
-      ],
-      temp: true,
-    })
   }
 
   onReferredByChange = (event) => {
@@ -310,7 +264,7 @@ class Demographic extends PureComponent {
                     <CodeSelect
                       label='Nationality'
                       code='ctNationality'
-                      query={this.queryNationality}
+                      autoComplete
                       max={5}
                       {...args}
                     />
@@ -351,11 +305,11 @@ class Demographic extends PureComponent {
                 <FastField
                   name='occupationFK'
                   render={(args) => (
-                    <Select
+                    <CodeSelect
                       label='Occupation'
-                      // code='ctOccupation'
+                      code='ctoccupation'
                       valueField='id'
-                      query={this.queryOccupation}
+                      autoComplete
                       {...args}
                     />
                   )}

@@ -49,8 +49,10 @@ const customInputStyle = {
     },
   },
   text: {
-    color: 'transparent',
-    textShadow: `0 0 0 ${fontColor}`,
+    // color: 'transparent',
+    color: 'inherit',
+
+    // textShadow: `0 0 0 ${fontColor}`,
     padding: 0,
     textOverflow: 'ellipsis',
   },
@@ -67,7 +69,6 @@ const customInputStyle = {
     cursor: 'initial !important',
     fontSize: 'inherit',
     '& > div': {
-      top: 0,
       '& > p': {
         minHeight: 24,
         display: 'inline-block',
@@ -129,6 +130,7 @@ const customInputStyle = {
       fontWeight: 500,
       fontSize: '1.2rem',
       color: 'rgba(0, 0, 0, 0.8)',
+      lineHeight: '1.3em',
     },
   },
   labelRootError: {

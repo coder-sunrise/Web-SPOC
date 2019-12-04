@@ -36,10 +36,14 @@ import {
 
   handleSubmit: (values, { props }) => {
     // console.log(values)
-    const { dispatch, onConfirm } = props
+    const { dispatch, onConfirm, getNextSequence } = props
+    const nextSequence = getNextSequence()
     dispatch({
       type: 'consultationDocument/upsertRow',
-      payload: values,
+      payload: {
+        sequence: nextSequence,
+        ...values,
+      },
     })
     if (onConfirm) onConfirm()
   },

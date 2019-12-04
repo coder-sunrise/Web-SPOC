@@ -171,7 +171,6 @@ class Scribble extends React.Component {
       selectColor: false,
       eraserColor: false,
       templateList: [],
-      isScribbleNoteDataNull: true,
     }
   }
 
@@ -202,7 +201,7 @@ class Scribble extends React.Component {
         this._sketch.initializeData(this.props.scribbleData.scribbleNoteLayers)
         this.setState({
           canClear: true,
-          isScribbleNoteDataNull: false,
+          // canUndo: true,
         })
       }
     }
@@ -260,6 +259,7 @@ class Scribble extends React.Component {
     this.setState({
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
+      canClear: this._sketch._checkActiveObject(),
     })
   }
 
@@ -279,7 +279,7 @@ class Scribble extends React.Component {
       this.setState({
         canUndo: this._sketch.canUndo(),
         canRedo: this._sketch.canRedo(),
-        canClear: true,
+        canClear: this._sketch._checkActiveObject(),
         hideEnable: !hideEnable,
       })
     }
@@ -294,7 +294,6 @@ class Scribble extends React.Component {
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
       canClear: false,
-      isScribbleNoteDataNull: true,
     })
   }
 
@@ -314,7 +313,6 @@ class Scribble extends React.Component {
   _onSketchChange = (action) => {
     const prev = this.state.canUndo
     const now = this._sketch.canUndo()
-
     if (prev !== now || action === 'deleteAction') {
       this.setState({
         canUndo: now,
@@ -323,15 +321,17 @@ class Scribble extends React.Component {
       this._sketch.hideDrawing(false)
     }
 
-    if (this.state.isScribbleNoteDataNull) {
-      this.setState({
-        canClear: now,
-      })
-    } else {
-      this.setState({
-        canClear: true,
-      })
-    }
+    setTimeout(() => {
+      if (now && this._sketch._checkActiveObject()) {
+        this.setState({
+          canClear: true,
+        })
+      } else {
+        this.setState({
+          canClear: this._sketch._checkActiveObject(),
+        })
+      }
+    }, 100)
 
     this.props.setFieldValue('drawing', 'dirty')
   }
@@ -580,7 +580,7 @@ class Scribble extends React.Component {
                           <Slider
                             // ValueLabelComponent={ValueLabelComponent}
                             step={1}
-                            min={0}
+                            min={1}
                             max={50}
                             aria-labelledby='slider'
                             value={this.state.lineWidth}
@@ -676,7 +676,7 @@ class Scribble extends React.Component {
                           <Slider
                             // ValueLabelComponent={ValueLabelComponent}
                             step={1}
-                            min={0}
+                            min={1}
                             max={50}
                             aria-labelledby='slider'
                             value={this.state.lineWidth}

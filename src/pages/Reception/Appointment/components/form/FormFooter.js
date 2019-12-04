@@ -3,7 +3,7 @@ import classnames from 'classnames'
 // material ui
 import { withStyles } from '@material-ui/core'
 // custom component
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, SizeContainer } from '@/components'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import style from './style'
 import Authorized from '@/utils/Authorized'
@@ -11,7 +11,7 @@ import Authorized from '@/utils/Authorized'
 const ButtonText = {
   DELETE: 'Delete',
   CANCEL_APPOINTMENT: 'Cancel Appointment',
-  CANCEL: 'Cancel',
+  CLOSE: 'Close',
   CHECK: 'Check Availability',
   DRAFT: 'Save Draft',
   ADD: 'Save Appointment',
@@ -40,49 +40,46 @@ const FormFooter = ({
   const confirmBtnText = isNew || isDraft ? ButtonText.ADD : ButtonText.EDIT
 
   return (
-    <div className={classnames(classes.footer)}>
-      <GridContainer>
-        <GridItem xs md={12} container justify='flex-end'>
-          <Button onClick={onClose} color='danger'>
-            {ButtonText.CANCEL}
-          </Button>
+    <SizeContainer size='md'>
+      <div className={classnames(classes.footer)}>
+        <Button onClick={onClose} color='danger'>
+          {ButtonText.CLOSE}
+        </Button>
+        <Authorized authority='appointment.deletecancelappointment'>
           <Button
-            disabled={disabledCheckAvailability || isTurnedUp}
-            color='success'
-            onClick={handleValidateClick}
-          >
-            {ButtonText.CHECK}
-          </Button>
-          <Authorized authority='appointment.deletecancelappointment'>
-            <Button
-              color='danger'
-              className={classnames(hideCancelAppointmentClass)}
-              onClick={handleCancelOrDeleteClick}
-              disabled={disabled || isTurnedUp}
-            >
-              {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
-            </Button>
-          </Authorized>
-
-          {(isNew || isDraft) && (
-            <Button
-              disabled={disabled}
-              onClick={handleSaveDraftClick}
-              color='info'
-            >
-              {ButtonText.DRAFT}
-            </Button>
-          )}
-          <Button
+            color='danger'
+            className={classnames(hideCancelAppointmentClass)}
+            onClick={handleCancelOrDeleteClick}
             disabled={disabled || isTurnedUp}
-            onClick={handleConfirmClick}
+          >
+            {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
+          </Button>
+        </Authorized>
+        <Button
+          disabled={disabledCheckAvailability || isTurnedUp}
+          color='success'
+          onClick={handleValidateClick}
+        >
+          {ButtonText.CHECK}
+        </Button>
+        {(isNew || isDraft) && (
+          <Button
+            disabled={disabled}
+            onClick={handleSaveDraftClick}
             color='primary'
           >
-            {confirmBtnText}
+            {ButtonText.DRAFT}
           </Button>
-        </GridItem>
-      </GridContainer>
-    </div>
+        )}
+        <Button
+          disabled={disabled || isTurnedUp}
+          onClick={handleConfirmClick}
+          color='primary'
+        >
+          {confirmBtnText}
+        </Button>
+      </div>
+    </SizeContainer>
   )
 }
 

@@ -25,15 +25,17 @@ const InitialSessionInfo = {
   sessionCloseDate: '',
 }
 
+const initialState = {
+  default: {},
+  currentBizSessionInfo: { ...InitialSessionInfo },
+}
+
 export default createFormViewModel({
   namespace: 'invoicePayment',
   config: {},
   param: {
     service,
-    state: {
-      default: {},
-      currentBizSessionInfo: { ...InitialSessionInfo },
-    },
+    state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {
         const { pathname, search, query = {} } = loct
@@ -201,7 +203,7 @@ export default createFormViewModel({
         const response = yield call(service.postTransfer, payload)
         const { status } = response
 
-        if (status === '200') {
+        if (status === '201') {
           notification.success({
             message: 'Transferred',
           })
@@ -212,6 +214,9 @@ export default createFormViewModel({
       },
     },
     reducers: {
+      reset () {
+        return { ...initialState }
+      },
       queryDone (state, { payload }) {
         const { data } = payload
         let paymentResult

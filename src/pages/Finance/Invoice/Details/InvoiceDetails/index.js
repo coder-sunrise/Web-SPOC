@@ -48,17 +48,6 @@ class InvoiceDetails extends Component {
             <Printer />Print Invoice
           </Button>
         </div>
-        <CommonModal
-          open={this.state.showReport}
-          onClose={this.toggleReport}
-          title='Invoice'
-          maxWidth='lg'
-        >
-          <ReportViewer
-            reportID={15}
-            reportParameters={{ InvoiceID: values ? values.id : '' }}
-          />
-        </CommonModal>
         <CommonTableGrid
           size='sm'
           height={300}
@@ -67,7 +56,7 @@ class InvoiceDetails extends Component {
           columnExtensions={DataGridColExtensions}
           {...TableConfig}
         />
-        <Summary clinicSettings={clinicSettings} />
+        <Summary values={values} />
         <GridContainer className={classes.summaryContainer}>
           <GridItem md={6}>
             <FastField
@@ -87,6 +76,17 @@ class InvoiceDetails extends Component {
             />
           </GridItem>
         </GridContainer>
+        <CommonModal
+          open={this.state.showReport}
+          onClose={this.toggleReport}
+          title='Invoice'
+          maxWidth='lg'
+        >
+          <ReportViewer
+            reportID={15}
+            reportParameters={{ InvoiceID: values ? values.id : '' }}
+          />
+        </CommonModal>
       </div>
     )
   }

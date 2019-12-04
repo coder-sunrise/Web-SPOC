@@ -34,7 +34,7 @@ import {
 
 import AmountSummary from '@/pages/Shared/AmountSummary'
 
-export default ({ classes, current, setFieldValue }) => {
+export default ({ classes, current, theme, setFieldValue }) => {
   const amountProps = {
     text: true,
     currency: true,
@@ -95,11 +95,16 @@ export default ({ classes, current, setFieldValue }) => {
           },
         ]}
       />
-      <GridContainer direction='column' justify='center' alignItems='flex-end'>
-        <GridItem xs={2} md={9} />
-        <GridItem xs={10} md={3} style={{ paddingTop: 15 }}>
+      <GridContainer
+        // direction='column'
+        // justify='center'
+        // alignItems='flex-end'
+        style={{ paddingTop: theme.spacing(2) }}
+      >
+        <GridItem xs={4} md={7} />
+        <GridItem xs={8} md={5}>
           <AmountSummary
-            showAdjustment={false}
+            showAdjustment
             rows={invoiceItemData}
             adjustments={invoiceAdjustmentData}
             config={{

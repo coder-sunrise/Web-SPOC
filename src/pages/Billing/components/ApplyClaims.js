@@ -37,6 +37,7 @@ import {
 import {
   INVOICE_PAYER_TYPE,
   INVOICE_ITEM_TYPE_BY_TEXT,
+  VISIT_TYPE,
 } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
 
@@ -77,10 +78,12 @@ const styles = (theme) => ({
 
 const ApplyClaims = ({
   classes,
+  dispatch,
   values,
   setValues,
   submitCount,
   handleIsEditing,
+  onResetClick,
 }) => {
   const { invoice, invoicePayment, claimableSchemes } = values
 
@@ -680,10 +683,24 @@ const ApplyClaims = ({
     refTempInvociePayer.current = newTempInvoicePayer
   }
 
-  const handleResetClick = () => {
+  const reset = () => {
     setTempInvoicePayer(initialState)
     refTempInvociePayer.current = initialState
     setCurEditInvoicePayerBackup(undefined)
+    onResetClick()
+  }
+
+  const handleResetClick = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          'Reset will revert all changes that had not been saved. Continue?',
+        openConfirmText: 'Continue',
+        onConfirmSave: reset,
+      },
+    })
   }
 
   const handleSelectClaimClick = (index) => () => {
@@ -710,6 +727,7 @@ const ApplyClaims = ({
   }
 
   const shouldDisableAddApplicableClaim = () => {
+    if (values.visitPurposeFK === VISIT_TYPE.RETAIL) return true
     const isEditing = hasEditing()
     const hasUnappliedScheme =
       tempInvoicePayer.filter(
@@ -741,7 +759,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
-  console.log({ values })
+
   return (
     <React.Fragment>
       <GridItem md={2}>
@@ -766,7 +784,13 @@ const ApplyClaims = ({
           <Add />
           Co-Payer
         </Button>
-        <Button color='danger' size='sm' onClick={handleResetClick}>
+
+        <Button
+          color='danger'
+          size='sm'
+          disabled={values.visitPurposeFK === VISIT_TYPE.RETAIL}
+          onClick={handleResetClick}
+        >
           <Reset />
           Reset
         </Button>
@@ -973,6 +997,13 @@ const ApplyClaims = ({
       >
         <CoPayer
           onAddCoPayerClick={handleAddCoPayer}
+          copayers={tempInvoicePayer
+            .filter(
+              (payer) =>
+                !payer.isCancelled &&
+                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+            )
+            .map((i) => i.companyFK)}
           invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
             itemName: invoiceItem.itemDescription,

@@ -39,15 +39,14 @@ import {
   }),
 
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, consultationDocument, currentType } = props
-    const { rows } = consultationDocument
+    const { dispatch, onConfirm, getNextSequence } = props
+    const nextSequence = getNextSequence()
 
     dispatch({
       type: 'consultationDocument/upsertRow',
       payload: {
-        sequence: rows.length,
+        sequence: nextSequence,
         ...values,
-        subject: currentType.getSubject(values),
       },
     })
     if (onConfirm) onConfirm()
@@ -77,7 +76,7 @@ class Others extends PureComponent {
         <GridContainer>
           <GridItem xs={12}>
             <FastField
-              name='subject'
+              name='title'
               render={(args) => {
                 return <TextField label='Title' autoFocus {...args} />
               }}
@@ -103,7 +102,7 @@ class Others extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <FastField
-              name='title'
+              name='subject'
               render={(args) => {
                 return <TextField label='Re:' {...args} />
               }}

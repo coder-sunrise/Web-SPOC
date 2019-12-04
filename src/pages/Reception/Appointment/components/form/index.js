@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Yup from 'yup'
 import { connect } from 'dva'
 import moment from 'moment'
 import classnames from 'classnames'
@@ -31,10 +32,23 @@ import FormFooter from './FormFooter'
 import SeriesUpdateConfirmation from '../../SeriesUpdateConfirmation'
 import RescheduleForm from './RescheduleForm'
 // utils
-import { ValidationSchema, mapPropsToValues, sortDataGrid } from './formUtils'
+import {
+  ValidationSchema,
+  mapPropsToValues,
+  sortDataGrid,
+  getEndTime,
+} from './formUtils'
 import { getAppendUrl } from '@/utils/utils'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import styles from './style'
+
+const gridValidationSchema = Yup.object().shape({
+  startTime: Yup.string().required(),
+  endTime: Yup.string().required(),
+  apptDurationHour: Yup.number().required(),
+  apptDurationMinute: Yup.number().required(),
+  clinicianFK: Yup.string().required(),
+})
 
 @connect(
   ({
@@ -45,9 +59,11 @@ import styles from './style'
     codetable,
     patient,
     patientSearch,
+    global,
   }) => ({
     loginSEMR,
     loading,
+    commitCount: global.commitCount || 1,
     patientProfile: patient.entity,
     patientProfileDefaultValue: patient.default,
     user: user.data,
@@ -65,13 +81,13 @@ import styles from './style'
 @withFormikExtend({
   // notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
-  enableReinitialize: true,
+  // enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
   state = {
-    submitCount: 0,
+    submitCount: this.props.commitCount,
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
@@ -82,7 +98,7 @@ class Form extends React.PureComponent {
         : [],
     showSeriesUpdateConfirmation: false,
     tempNewAppointmentStatusFK: -1,
-    isDataGridValid: false,
+    isDataGridValid: this.props.values.id !== undefined,
     editingRows: [],
   }
 
@@ -339,15 +355,49 @@ class Form extends React.PureComponent {
     })
   }
 
+  validateWithSchema = (datagrid = []) => {
+    const endResult = datagrid.reduce((result, data) => {
+      try {
+        if (!data.isDeleted) {
+          gridValidationSchema.validateSync(data, {
+            abortEarly: false,
+          })
+        }
+
+        return [
+          ...result,
+          { ...data, _errors: [] },
+        ]
+      } catch (error) {
+        return [
+          ...result,
+          { ...data, _errors: error.inner },
+        ]
+      }
+    }, [])
+    return endResult
+  }
+
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
-    console.log(rows, restProps)
     if (rows) {
+      const updatedRows = this.validateWithSchema(
+        rows.sort(sortDataGrid).map((item, index) => ({
+          ...item,
+          sortOrder: index,
+          conflicts: [],
+          endTime: getEndTime(item),
+          startTime: item.startTime
+            ? moment(item.startTime, 'hh:mm A').format('HH:mm')
+            : undefined,
+        })),
+      )
       this.setState(
         {
-          datagrid: rows,
+          datagrid: updatedRows,
         },
         this.validateDataGrid,
       )
+      return updatedRows
     }
     if (deleted) {
       const { datagrid } = this.state
@@ -358,51 +408,27 @@ class Form extends React.PureComponent {
         ...item,
         isDeleted: item.isDeleted || deleted.includes(item.id),
       }))
-      // console.log({ deleted, datagrid, afterDelete })
       const hasOneRowOnlyAfterDelete =
         afterDelete.filter((item) => !item.isDeleted).length === 1
       let newDataGrid = [
         ...afterDelete,
       ]
       if (hasOneRowOnlyAfterDelete) {
-        newDataGrid = afterDelete.reduce(
-          (datas, item) => [
-            ...datas,
-            { ...item, isPrimaryClinician: !item.isDeleted },
-          ],
-          [],
-        )
+        newDataGrid = afterDelete.map((item) => ({
+          ...item,
+          isPrimaryClinician: !item.isDeleted,
+        }))
       }
-      // const newDatagrid = datagrid.map(
-      //   (event) =>
-      //     deleted.includes(event.id)
-      //       ? { ...event, isDeleted: true }
-      //       : { ...event },
-      // )
-      // const newRows =
-      //   newDatagrid.length === 1
-      //     ? [
-      //         { ...newDatagrid[0], isPrimaryClinician: true },
-      //       ]
-      //     : newDatagrid
+
       this.setState(
         {
           datagrid: newDataGrid,
         },
         this.validateDataGrid,
       )
-      return newDataGrid
+      return datagrid
     }
-  }
-
-  checkHasError = (datagrid = []) => {
-    const hasError = datagrid.reduce((error, data) => {
-      if (data._errors) {
-        return data._errors.length > 0 || error
-      }
-      return error
-    }, false)
-    return hasError
+    return rows
   }
 
   validateDataGrid = () => {
@@ -413,7 +439,12 @@ class Form extends React.PureComponent {
     // editing at least 1 row
     if (editingRows.length > 0) isDataGridValid = false
 
-    if (this.checkHasError(datagrid)) isDataGridValid = false
+    if (
+      this.validateWithSchema(datagrid).filter(
+        (item) => item._errors && item._errors.length > 0,
+      ).length > 0
+    )
+      isDataGridValid = false
 
     // has at least 1 row of appointment_resources
     if (datagrid.length === 0) isDataGridValid = false
@@ -426,7 +457,6 @@ class Form extends React.PureComponent {
     )
 
     if (!hasPrimary) isDataGridValid = false
-
     this.setState({
       isDataGridValid,
       // datagrid: newDataGrid,
@@ -478,6 +508,7 @@ class Form extends React.PureComponent {
           const conflicts = [
             ...response,
           ]
+
           this.setState(
             (preState) => ({
               submitCount: preState.submitCount + 1,
@@ -496,9 +527,11 @@ class Form extends React.PureComponent {
               ),
             }),
             () => {
-              dispatch({
+              this.props.dispatch({
                 type: 'global/updateState',
-                payload: { commitCount: this.state.submitCount + 1 },
+                payload: {
+                  commitCount: this.state.submitCount + 1,
+                },
               })
             },
           )
@@ -736,6 +769,7 @@ class Form extends React.PureComponent {
 
   shouldDisableCheckAvailabilityButtonAction = () => {
     const { isDataGridValid } = this.state
+
     if (!isDataGridValid) return true
 
     return false
@@ -757,13 +791,19 @@ class Form extends React.PureComponent {
 
   shouldDisableAppointmentDate = () => {
     const { values } = this.props
+    const { appointmentStatusFk } = values
     if (!values.id) return false
-    return values.isEnableRecurrence
+
+    return (
+      values.isEnableRecurrence ||
+      appointmentStatusFk === APPOINTMENT_STATUS.TURNEDUP
+    )
   }
 
   render () {
     const {
       classes,
+      theme,
       onClose,
       loading,
       values,
@@ -802,12 +842,25 @@ class Form extends React.PureComponent {
     const show =
       loading.effects['patientSearch/query'] || loading.models.calendar
     const _disableAppointmentDate = this.shouldDisableAppointmentDate()
+
     return (
       <LoadingWrapper loading={show} text='Loading...'>
         <SizeContainer size='sm'>
           <React.Fragment>
-            <GridContainer className={classnames(classes.formContent)}>
-              <GridItem container xs={12} md={7}>
+            <GridContainer
+              className={classnames(classes.formContent)}
+              alignItems='flex-start'
+            >
+              <GridItem
+                container
+                xs={12}
+                md={7}
+                style={{
+                  height: '100%',
+                  maxHeight: this.props.height - 200,
+                  overflow: 'auto',
+                }}
+              >
                 <PatientInfoInput
                   disabled={disablePatientInfo}
                   isEdit={values.id}
@@ -824,6 +877,7 @@ class Form extends React.PureComponent {
                 <AppointmentDateInput disabled={_disableAppointmentDate} />
                 <GridItem xs md={12} className={classes.verticalSpacing}>
                   <AppointmentDataGrid
+                    validationSchema={gridValidationSchema}
                     disabled={disableDataGrid}
                     appointmentDate={currentAppointment.appointmentDate}
                     data={_datagrid}
@@ -859,29 +913,34 @@ class Form extends React.PureComponent {
                     }
                   />
                 </GridItem>
+                <GridItem xs md={12} className={classes.footerGrid}>
+                  <FormFooter
+                    // isNew={slotInfo.type === 'add'}
+                    appointmentStatusFK={currentAppointment.appointmentStatusFk}
+                    onClose={onClose}
+                    disabled={disableFooterButton}
+                    disabledCheckAvailability={
+                      disableCheckAvailabilityFooterButton
+                    }
+                    handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
+                    handleSaveDraftClick={this.onSaveDraftClick}
+                    handleConfirmClick={this.onConfirmClick}
+                    handleValidateClick={this.onValidateClick}
+                  />
+                </GridItem>
               </GridItem>
               <GridItem xs={12} md={5}>
                 <CardContainer
                   hideHeader
-                  title='Appointment History'
-                  style={{ height: '100%' }}
+                  className={classes.appointmentHistory}
+                  style={{ maxHeight: this.props.height - 200 }}
                 >
+                  <h4 style={{ fontWeight: 500 }}>Appointment History</h4>
                   <AppointmentHistory />
                 </CardContainer>
               </GridItem>
             </GridContainer>
 
-            <FormFooter
-              // isNew={slotInfo.type === 'add'}
-              appointmentStatusFK={currentAppointment.appointmentStatusFk}
-              onClose={onClose}
-              disabled={disableFooterButton}
-              disabledCheckAvailability={disableCheckAvailabilityFooterButton}
-              handleCancelOrDeleteClick={this.onCancelOrDeleteClick}
-              handleSaveDraftClick={this.onSaveDraftClick}
-              handleConfirmClick={this.onConfirmClick}
-              handleValidateClick={this.onValidateClick}
-            />
             <CommonModal
               open={showSearchPatientModal}
               title='Search Patient'
@@ -945,6 +1004,8 @@ class Form extends React.PureComponent {
   }
 }
 
-const FormComponent = withStyles(styles, { name: 'ApptForm' })(Form)
+const FormComponent = withStyles(styles, { name: 'ApptForm', withTheme: true })(
+  Form,
+)
 
 export default FormComponent

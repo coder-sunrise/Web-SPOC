@@ -10,7 +10,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      settings: JSON.parse(sessionStorage.getItem('clinicSettings') || '{}'),
+      settings: JSON.parse(localStorage.getItem('clinicSettings') || '{}'),
     },
     subscriptions: ({ dispatch, history, searchField }) => {
       history.listen((loct) => {
@@ -36,7 +36,8 @@ export default createFormViewModel({
               settings[key] = booleanValue
               break
             }
-            case 'Decimal': {
+            case 'Decimal':
+            case 'Double': {
               const decimalValue = parseFloat(value / 100)
               const decimalIntValue = parseInt(value, 10)
               settings[key] = decimalValue
@@ -52,7 +53,7 @@ export default createFormViewModel({
         })
 
         const clinicSettingsSessionData = JSON.stringify(settings)
-        sessionStorage.setItem('clinicSettings', clinicSettingsSessionData)
+        localStorage.setItem('clinicSettings', clinicSettingsSessionData)
 
         return {
           settings,

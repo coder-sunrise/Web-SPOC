@@ -4,17 +4,21 @@ import { withStyles } from '@material-ui/core'
 // common components
 import { CardContainer } from '@/components'
 import PaymentTypeRow from './PaymentTypeRow'
+// utils
+import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // styling
 import styles from './styles'
 
 const PayerHeader = ({
   classes,
   paymentModes,
-  disableCash,
   hideDeposit,
   handlePaymentTypeClick,
   patientInfo,
+  currentPayments = [],
 }) => {
+  const disableCash = currentPayments.includes(PAYMENT_MODE.CASH)
+  const disableDeposit = currentPayments.includes(PAYMENT_MODE.DEPOSIT)
   return (
     <CardContainer className={classes.paymentModeContainer} hideHeader>
       {paymentModes.map((mode) => (
@@ -23,75 +27,11 @@ const PayerHeader = ({
           hideDeposit={hideDeposit}
           patientInfo={patientInfo}
           disableCash={disableCash}
+          disableDeposit={disableDeposit}
           onPaymentModeClick={handlePaymentTypeClick}
         />
       ))}
     </CardContainer>
-    // <GridContainer alignItems='flex-start' className={classes.paymentTypeRow}>
-    //   <GridItem md={12}>
-
-    //   </GridItem>
-    //    <GridItem>
-    //     <Button
-    //       color='primary'
-    //       size='sm'
-    //       disabled={disableCash}
-    //       id={PAYMENT_MODE.CASH}
-    //       onClick={handlePaymentTypeClick}
-    //     >
-    //       <Add />
-    //       Cash
-    //     </Button>
-    //     <Button
-    //       color='primary'
-    //       size='sm'
-    //       id={PAYMENT_MODE.NETS}
-    //       onClick={handlePaymentTypeClick}
-    //     >
-    //       <Add />
-    //       Nets
-    //     </Button>
-    //     <Button
-    //       color='primary'
-    //       size='sm'
-    //       id={PAYMENT_MODE.CREDIT_CARD}
-    //       onClick={handlePaymentTypeClick}
-    //     >
-    //       <Add />
-    //       Credit Card
-    //     </Button>
-    //     <Button
-    //       color='primary'
-    //       size='sm'
-    //       id={PAYMENT_MODE.CHEQUE}
-    //       onClick={handlePaymentTypeClick}
-    //     >
-    //       <Add />
-    //       Cheque
-    //     </Button>
-    //     <Button
-    //       color='primary'
-    //       size='sm'
-    //       id={PAYMENT_MODE.GIRO}
-    //       onClick={handlePaymentTypeClick}
-    //     >
-    //       <Add />
-    //       GIRO
-    //     </Button>
-    //     {!hideDeposit && (
-    //       <Button
-    //         color='primary'
-    //         size='sm'
-    //         id={PAYMENT_MODE.DEPOSIT}
-    //         onClick={handlePaymentTypeClick}
-    //         disabled={patientInfo.patientDeposit === undefined}
-    //       >
-    //         <Add />
-    //         Deposit
-    //       </Button>
-    //     )}
-    //   </GridItem>
-    // </GridContainer>
   )
 }
 

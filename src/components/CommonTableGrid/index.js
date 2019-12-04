@@ -357,6 +357,7 @@ class CommonTableGrid extends PureComponent {
             width: '100%',
           },
         },
+
         TableFixedCell: {
           fixedCell: {
             zIndex: 1,
@@ -378,6 +379,8 @@ class CommonTableGrid extends PureComponent {
         TableHeaderCell: cellStyle,
         Table: {
           table: {
+            // tableLayout: 'auto',
+
             borderCollapse: 'collapse',
           },
           stickyTable: {
@@ -584,15 +587,16 @@ class CommonTableGrid extends PureComponent {
       // tabIndex: 0,
     }
     if (extraState) {
-      const colCfg = columnExtensions.find((o) => o.columnName === column.name)
+      const colCfg =
+        columnExtensions.find((o) => o.columnName === column.name) || {}
       const latestRow = window.$tempGridRow[this.gridId]
         ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
       // try {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
-      if (!colCfg || !colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
-        if (colCfg && colCfg.type !== 'radio') {
+      if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
+        if (colCfg.type !== 'radio') {
           cfg = {
             tabIndex: 0,
             onFocus: onClick,
@@ -604,7 +608,6 @@ class CommonTableGrid extends PureComponent {
       }
       if (colCfg && colCfg.disabled) cfg = {}
     }
-    // console.log(p, columnExtensions)
 
     if (column && column.name === 'rowMove') {
       const cls = {
@@ -929,15 +932,25 @@ class CommonTableGrid extends PureComponent {
                 <SortingState
                   sorting={this.state.pagination.sorting}
                   defaultSorting={defaultSorting}
-                  onSortingChange={(sorting) => {
-                    sorting.forEach((o) => {
+                  onSortingChange={(_cmptSortings) => {
+                    // console.log(_cmptSortings, this.state.entity.pagination)
+                    _cmptSortings.forEach((o, i) => {
                       const c = columnExtensions.find(
                         (m) => m.columnName === o.columnName,
                       )
+                      if (this.state.entity) {
+                        const { sorting = [] } = this.state.entity.pagination
+                        if (
+                          sorting[i] &&
+                          o.columnName !== sorting[i].columnName
+                        )
+                          o.direction = o.direction === 'asc' ? 'desc' : 'asc'
+                      }
+
                       o.sortBy = c.sortBy
                     })
                     this.search({
-                      sorting,
+                      sorting: _cmptSortings,
                     })
                   }}
                   columnExtensions={columnExtensions}

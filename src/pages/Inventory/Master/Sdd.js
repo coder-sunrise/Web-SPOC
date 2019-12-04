@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { FormattedMessage } from 'umi/locale'
-import { Search } from '@material-ui/icons'
+import Search from '@material-ui/icons/Search'
 import { compose } from 'redux'
 import { connect } from 'dva'
 import {

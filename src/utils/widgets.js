@@ -146,34 +146,34 @@ const widgets = [
       })
     },
 
-    toolbarAddon: (
-      <AuthorizedContext>
-        {(r) => {
-          if (r && r.rights !== 'enable') return null
+    // toolbarAddon: (
+    //   <AuthorizedContext>
+    //     {(r) => {
+    //       if (r && r.rights !== 'enable') return null
 
-          return (
-            <Tooltip title='Add Consultation Document'>
-              <IconButton
-                style={{ float: 'left' }}
-                className='non-dragable'
-                onClick={() => {
-                  window.g_app._store.dispatch({
-                    type: 'consultationDocument/updateState',
-                    payload: {
-                      showModal: true,
-                      type: '5',
-                      entity: undefined,
-                    },
-                  })
-                }}
-              >
-                <Add />
-              </IconButton>
-            </Tooltip>
-          )
-        }}
-      </AuthorizedContext>
-    ),
+    //       return (
+    //         <Tooltip title='Add Consultation Document'>
+    //           <IconButton
+    //             style={{ float: 'left' }}
+    //             className='non-dragable'
+    //             onClick={() => {
+    //               window.g_app._store.dispatch({
+    //                 type: 'consultationDocument/updateState',
+    //                 payload: {
+    //                   showModal: true,
+    //                   type: '5',
+    //                   entity: undefined,
+    //                 },
+    //               })
+    //             }}
+    //           >
+    //             <Add />
+    //           </IconButton>
+    //         </Tooltip>
+    //       )
+    //     }}
+    //   </AuthorizedContext>
+    // ),
   },
   {
     id: '4',
@@ -187,7 +187,7 @@ const widgets = [
       loading: Loading,
     }),
     model: 'patientHistory',
-
+    disableDeleteWarning: true,
     layoutConfig: {
       style: {
         padding: 5,

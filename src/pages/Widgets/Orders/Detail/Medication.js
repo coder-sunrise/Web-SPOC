@@ -1,6 +1,8 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import { Add, Delete } from '@material-ui/icons'
+import Add from '@material-ui/icons/Add'
+import Delete from '@material-ui/icons/Delete'
+
 import { formatMessage } from 'umi/locale'
 import LowStockInfo from './LowStockInfo'
 import {
@@ -80,7 +82,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
   }),
 
   handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, orders, currentType } = props
+    const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
 
     const getInstruction = (instructions) => {
@@ -108,7 +110,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
 
     const data = {
-      sequence: rows.length,
+      sequence: getNextSequence(),
       ...values,
       instruction,
       subject: currentType.getSubject(values),

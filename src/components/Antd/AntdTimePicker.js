@@ -56,6 +56,21 @@ const STYLES = (theme) => ({
     },
   },
 })
+
+const keydown = (e) => {
+  if (e.shiftKey) return
+
+  if (e.which === 9) {
+    // Tab
+    return false
+  }
+  $(e.target).trigger('click')
+}
+const debounceKeydown = _.debounce(keydown, 1000, {
+  leading: true,
+  trailing: false,
+})
+
 @control()
 class AntdTimePicker extends PureComponent {
   static defaultProps = {
@@ -140,6 +155,10 @@ class AntdTimePicker extends PureComponent {
     // }, 1)
   }
 
+  handleBlur = (e) => {
+    debounceKeydown.cancel()
+  }
+
   getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
@@ -150,6 +169,7 @@ class AntdTimePicker extends PureComponent {
       use12Hours = true,
       minuteStep = 1,
       text,
+      allowClear = true,
       ...restProps
     } = this.props
     const { format, form, field, value } = restProps
@@ -173,7 +193,7 @@ class AntdTimePicker extends PureComponent {
           className={classnames(classes.timePickerContainer)}
           // dropdownClassName={classnames(classes.dropdownMenu)}
           popupStyle={{ zIndex: 1400 }}
-          allowClear={props.allowClear}
+          allowClear={allowClear}
           placeholder=''
           format={format}
           use12Hours={use12Hours}
@@ -194,13 +214,20 @@ class AntdTimePicker extends PureComponent {
     const labelProps = {
       shrink: !!selectValue || this.state.shrink,
     }
+    const cfg = {
+      onKeyUp: () => false,
+      onKeyDown: extendFunc(keydown, debounceKeydown),
+    }
+
     return (
       <CustomInput
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
+        // preventDefaultKeyDownEvent
         {...restProps}
+        {...cfg}
+
         // value={this.state.selectValue}
       />
     )

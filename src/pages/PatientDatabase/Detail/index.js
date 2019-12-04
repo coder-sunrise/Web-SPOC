@@ -57,6 +57,28 @@ const styles = () => ({
   },
 })
 
+const mapEntityToValues = (entity) => {
+  const mappedValues = {
+    ...entity,
+    pdpaConsent: entity.patientPdpaConsent.reduce(
+      (consents, item) =>
+        item.isConsent
+          ? [
+              ...consents,
+              item.pdpaConsentTypeFK,
+            ]
+          : [
+              ...consents,
+            ],
+      [],
+    ),
+  }
+  return {
+    ...mappedValues,
+    nationalityFK: entity ? entity.nationalityFK : 173,
+  }
+}
+
 @connect(({ patient, global }) => ({
   patient,
   global,
@@ -65,32 +87,34 @@ const styles = () => ({
   authority: 'patientdatabase.patientprofiledetails',
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
-    const mappedValues = {
-      ...(patient.entity || patient.default),
-      pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
-        .reduce(
-          (consents, item) =>
-            item.isConsent
-              ? [
-                  ...consents,
-                  item.pdpaConsentTypeFK,
-                ]
-              : [
-                  ...consents,
-                ],
-          [],
-        ),
-    }
-    return {
-      ...mappedValues,
-      nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
-    }
+    // const mappedValues = {
+    //   ...(patient.entity || patient.default),
+    //   pdpaConsent: (patient.entity || patient.default).patientPdpaConsent
+    //     .reduce(
+    //       (consents, item) =>
+    //         item.isConsent
+    //           ? [
+    //               ...consents,
+    //               item.pdpaConsentTypeFK,
+    //             ]
+    //           : [
+    //               ...consents,
+    //             ],
+    //       [],
+    //     ),
+    // }
+    // return {
+    //   ...mappedValues,
+    //   nationalityFK: patient.entity ? patient.entity.nationalityFK : 173,
+    // }
+    return mapEntityToValues(patient.entity || patient.default)
   },
   validationSchema: schema,
 
   handleSubmit: (values, component) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
+    const { location } = history
     const cfg = {
       message: 'Patient profile saved.',
     }
@@ -98,12 +122,20 @@ const styles = () => ({
       type: 'patient/upsert',
       payload: {
         ...values,
+        patientScheme: values.patientScheme.map((ps) => {
+          if (ps.isDeleted)
+            return {
+              ...ps,
+              schemeTypeFK: ps.schemeTypeFK || ps.preSchemeTypeFK,
+            }
+          return ps
+        }),
         cfg,
       },
     }).then((r) => {
-      // create new patient will return patient entity, r === true
-      console.log(r)
       if (r) {
+        // POST request -> r.id === true
+        // PUT request -> r.id === false
         if (r.id) {
           if (!patient.callback) {
             history.push(
@@ -123,10 +155,21 @@ const styles = () => ({
           payload: {
             id: r.id || values.id,
           },
-        }).then(() => {
+        }).then((response) => {
           if (patient.callback) patient.callback(r.id)
+          const newEntity = mapEntityToValues(response)
+          resetForm(newEntity)
         })
-        if (onConfirm && !r.id) {
+
+        const shouldCloseForm = location.pathname
+          ? !location.pathname.includes('patientdb')
+          : false
+
+        if (onConfirm && shouldCloseForm) {
+          onConfirm()
+        }
+
+        if (!shouldCloseForm) {
           dispatch({
             type: 'patientSearch/query',
             payload: {
@@ -136,10 +179,7 @@ const styles = () => ({
               ],
             },
           })
-          onConfirm()
         }
-
-        resetForm({})
       }
     })
   },
@@ -149,9 +189,7 @@ class PatientDetail extends PureComponent {
   state = {}
 
   constructor (props) {
-    // console.log('PatientDetail constructor')
     super(props)
-    console.log('PatientDetail')
     this.widgets = [
       {
         id: '1',
@@ -362,11 +400,6 @@ class PatientDetail extends PureComponent {
     const isCreatingPatient = entity
       ? Object.prototype.hasOwnProperty.call(entity, 'id')
       : false
-
-    // console.log(this.props)
-    console.log('patient', this.props)
-    // // console.log('xx', resetProps)
-    // console.log(this.props.values)
 
     const currentMenu =
       this.widgets.find(

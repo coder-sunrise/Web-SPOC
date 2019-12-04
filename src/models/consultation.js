@@ -314,29 +314,27 @@ export default createFormViewModel({
           orderTypes.forEach((p) => {
             const datas =
               (p.filter ? data[p.prop].filter(p.filter) : data[p.prop]) || []
+
+            let maxSeq = 0
+            if (datas && datas.length > 0)
+              maxSeq = _.maxBy(datas, 'sequence').sequence
+
             oRows = oRows.concat(
               datas.map((o) => {
+                if (!o.sequence) maxSeq += 1
                 const d = {
                   uid: getUniqueId(),
                   type: p.value,
                   subject: p.getSubject ? p.getSubject(o) : '',
                   ...o,
+                  sequence: o.sequence || maxSeq,
                 }
                 return p.convert ? p.convert(d) : d
               }),
             )
           })
         }
-        // let orderList = []
-        // if (
-        //   oRows.length === 0 &&
-        //   visitStatus === 'IN CONS' &&
-        //   status !== 'PAUSED'
-        // ) {
-        //   orderList = yield put.resolve({
-        //     type: 'addAutoOrder',
-        //   })
-        // }
+
         yield put({
           type: 'orders/updateState',
           payload: {
@@ -347,13 +345,14 @@ export default createFormViewModel({
               uid: o.id,
             })),
             entity: undefined,
+            isGSTInclusive: data.isGstInclusive,
           },
         })
 
         yield put({
           type: 'orders/calculateAmount',
           payload: {
-            isGstInclusive: data.isGstInclusive,
+            isGSTInclusive: data.isGstInclusive,
           },
         })
 
