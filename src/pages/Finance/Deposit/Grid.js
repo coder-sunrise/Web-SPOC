@@ -108,7 +108,7 @@ class Grid extends PureComponent {
                 <Tooltip title='Refund' placement='bottom'>
                   <Button
                     size='sm'
-                    disabled={row.balance <= 0}
+                    disabled={row.balance <= 0 || !row.balance}
                     onClick={() => {
                       this.editRow(row, false)
                     }}
