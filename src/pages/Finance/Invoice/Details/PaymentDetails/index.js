@@ -412,7 +412,7 @@ class PaymentDetails extends Component {
             <WarningSnackbar
               variant='warning'
               className={classes.margin}
-              message='All action is not allowed due to no active session was found.'
+              message='Action(s) is not allowed due to no active session was found.'
             />
           </div>
         ) : (
@@ -435,7 +435,7 @@ class PaymentDetails extends Component {
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
-                  readOnly={readOnly}
+                  readOnly={false}
                   hasActiveSession={hasActiveSession}
                 />
               )
