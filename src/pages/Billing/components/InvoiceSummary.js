@@ -120,14 +120,18 @@ const InvoiceSummary = ({
       <GridItem md={10}>
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
-            <GridItem md={6}>
-              <h5>{roundTo(gstValue).toFixed(2)}% GST</h5>
-            </GridItem>
-            <GridItem md={6} className={classes.rightAlign}>
-              <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(roundTo(gstAmount))}
-              </h5>
-            </GridItem>
+            {gstValue && (
+              <React.Fragment>
+                <GridItem md={6}>
+                  <h5>{roundTo(gstValue).toFixed(2)}% GST</h5>
+                </GridItem>
+                <GridItem md={6} className={classes.rightAlign}>
+                  <h5 className={classes.currencyValue}>
+                    {parseToTwoDecimalString(roundTo(gstAmount))}
+                  </h5>
+                </GridItem>
+              </React.Fragment>
+            )}
             <GridItem md={6}>
               <h5>Final Bill</h5>
             </GridItem>

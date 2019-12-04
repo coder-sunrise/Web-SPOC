@@ -96,7 +96,7 @@ const SessionSummary = () => {
     {
       columnName: 'isClinicSessionClosed',
       sortingEnabled: false,
-      render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'On going'),
+      render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'Ongoing'),
     },
     {
       columnName: 'sessionStartDate',
