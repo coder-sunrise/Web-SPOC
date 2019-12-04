@@ -94,7 +94,23 @@ const Setting = ({
       <h4 style={{ fontWeight: 400 }}>
         <b>Prescribing</b>
       </h4>
-
+      <GridContainer>
+        <GridItem xs={6}>
+          <FastField
+            name={showTransfer ? 'medicationUsageFK' : 'vaccinationUsageFK'}
+            render={(args) => (
+              <CodeSelect
+                label={formatMessage({
+                  id: 'inventory.master.setting.usage',
+                })}
+                labelField='name'
+                code={showTransfer ? 'ctMedicationUsage' : 'ctvaccinationusage'}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+      </GridContainer>
       <GridContainer>
         <GridItem xs={3}>
           <FastField
@@ -171,23 +187,7 @@ const Setting = ({
       <h4 style={{ fontWeight: 400, marginTop: 25 }}>
         <b>Dispensing</b>
       </h4>
-      <GridContainer>
-        <GridItem xs={6}>
-          <FastField
-            name={showTransfer ? 'medicationUsageFK' : 'vaccinationUsageFK'}
-            render={(args) => (
-              <CodeSelect
-                label={formatMessage({
-                  id: 'inventory.master.setting.usage',
-                })}
-                labelField='name'
-                code={showTransfer ? 'ctMedicationUsage' : 'ctvaccinationusage'}
-                {...args}
-              />
-            )}
-          />
-        </GridItem>
-      </GridContainer>
+
       <GridContainer>
         <GridItem xs={3}>
           <FastField
