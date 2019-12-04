@@ -80,6 +80,7 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense,
+  history,
 }) => {
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
@@ -111,22 +112,27 @@ const DispenseDetails = ({
     }
   }
 
-  const [
-    showOrderModal,
-    setShowOrderModal,
-  ] = useState(false)
-
-  const handleOrderModal = () => {
-    const popUpStatus = !showOrderModal
-    setShowOrderModal(popUpStatus)
-    if (!showOrderModal) {
-      dispatch({
-        type: 'orders/updateState',
-        payload: {
-          type: '1',
+  const discardAddOrderDetails = () => {
+    const { id } = invoice
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to discard the dispense ?`,
+        onConfirmDiscard: () => {
+          dispatch({
+            type: 'dispense/removeAddOrderDetails',
+            payload: {
+              id,
+            },
+          }).then((r) => {
+            if (r) {
+              history.push('/reception/queue')
+            }
+          })
         },
-      })
-    }
+      },
+    })
   }
   const updateInvoiceData = (v) => {
     const newInvoice = {
@@ -191,7 +197,7 @@ const DispenseDetails = ({
                 color='danger'
                 size='sm'
                 icon={<Delete />}
-                // onClick={handleOrderModal}
+                onClick={discardAddOrderDetails}
               >
                 Discard
               </ProgressButton>

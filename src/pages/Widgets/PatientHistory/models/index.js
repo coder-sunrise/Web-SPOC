@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
+import { VISIT_TYPE } from '@/utils/constants'
 
 export default createListViewModel({
   namespace: 'patientHistory',
@@ -72,12 +73,31 @@ export default createListViewModel({
           const st = yield select((st) => st.patientHistory)
 
           const { list = [] } = st
-          const filteredList = list.filter((o) => o.coHistory.length >= 1)
+          const filteredList = list.filter(
+            (o) =>
+              o.coHistory.length >= 1 || o.visitPurposeFK === VISIT_TYPE.RETAIL,
+          )
+
           if (filteredList.length > 0) {
-            yield put({
-              type: 'queryOne',
-              payload: filteredList[0].coHistory[0].id,
-            })
+            if (filteredList[0].visitPurposeFK === VISIT_TYPE.RETAIL) {
+              yield put({
+                type: 'updateState',
+                payload: {
+                  defaultItem: filteredList[0],
+                },
+              })
+              yield put({
+                type: 'queryRetailHistory',
+                payload: {
+                  id: filteredList[0].invoiceFK,
+                },
+              })
+            } else {
+              yield put({
+                type: 'queryOne',
+                payload: filteredList[0].coHistory[0].id,
+              })
+            }
           }
         }
 
@@ -88,6 +108,19 @@ export default createListViewModel({
             patientID,
           },
         })
+      },
+
+      *queryRetailHistory ({ payload }, { call, put }) {
+        const response = yield call(service.queryRetailHistory, payload)
+
+        if (response.status === '200') {
+          yield put({
+            type: 'getRetailHistory',
+            payload: response,
+          })
+          return response
+        }
+        return false
       },
     },
     reducers: {
@@ -106,6 +139,16 @@ export default createListViewModel({
             sortedPatientHistory.length > 0
               ? sortedPatientHistory[0].coHistory[0]
               : '',
+        }
+      },
+      getRetailHistory (st, { payload }) {
+        const { data } = payload
+        const { defaultItem } = st
+        return {
+          ...st,
+          entity: data,
+          selected: defaultItem,
+          selectedSubRow: defaultItem,
         }
       },
     },

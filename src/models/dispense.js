@@ -6,6 +6,7 @@ import * as service from '../services/dispense'
 import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
+import { notification } from '@/components'
 
 export default createFormViewModel({
   namespace: 'dispense',
@@ -181,6 +182,40 @@ export default createFormViewModel({
           router.push('/reception/queue')
         }
       },
+
+      *queryAddOrderDetails ({ payload }, { call, put }) {
+        const response = yield call(
+          service.queryAddOrderDetails,
+          payload.invoiceId,
+        )
+
+        if (response.status === '200') {
+          yield put({
+            type: 'getAddOrderDetails',
+            payload: response,
+          })
+          return response.data
+        }
+        return false
+      },
+
+      *saveAddOrderDetails ({ payload }, { call, put }) {
+        const response = yield call(service.saveAddOrderDetails, payload)
+        if (response === 204) {
+          notification.success({ message: 'Saved' })
+          return true
+        }
+        return false
+      },
+
+      *removeAddOrderDetails ({ payload }, { call, put }) {
+        const response = yield call(service.removeAddOrderDetails, payload)
+        if (response === 204) {
+          notification.success({ message: 'Deleted' })
+          return true
+        }
+        return false
+      },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)
       //   const { data } = payload
@@ -260,6 +295,14 @@ export default createFormViewModel({
       //   return payload
       // },
     },
-    reducers: {},
+    reducers: {
+      getAddOrderDetails (state, { payload }) {
+        const { data } = payload
+        return {
+          ...state,
+          addOrderDetails: data,
+        }
+      },
+    },
   },
 })
