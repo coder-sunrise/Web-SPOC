@@ -100,6 +100,7 @@ class ExtractAsSingle extends PureComponent {
                 <CodeSelect
                   code='ctCopayer'
                   labelField='displayValue'
+                  localFilter={(item) => item.coPayerTypeFK === 1}
                   {...args}
                 />
               )}
