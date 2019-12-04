@@ -110,7 +110,8 @@ const styles = () => ({
     }).then((r) => {
       if (r) {
         resetForm()
-        history.push('/finance/statement')
+        // history.push('/finance/statement')
+        history.goBack()
       }
     })
   },
