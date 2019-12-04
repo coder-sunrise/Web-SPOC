@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { Edit, Delete } from '@material-ui/icons'
-import { CommonTableGrid, Button } from '@/components'
+import { CommonTableGrid, Button, dateFormatLong } from '@/components'
 
 class Grid extends PureComponent {
   configs = {
@@ -46,7 +46,7 @@ class Grid extends PureComponent {
       {
         columnName: 'transactionDate',
         type: 'date',
-        format: 'd/M/YYYY',
+        format: { dateFormatLong },
         sortBy: 'adjustmentTransactionDate',
       },
       {
