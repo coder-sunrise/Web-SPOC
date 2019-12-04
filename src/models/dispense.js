@@ -211,7 +211,7 @@ export default createFormViewModel({
       *removeAddOrderDetails ({ payload }, { call, put }) {
         const response = yield call(service.removeAddOrderDetails, payload)
         if (response === 204) {
-          notification.success({ message: 'Deleted' })
+          notification.success({ message: 'Retail visit discarded' })
           return true
         }
         return false
