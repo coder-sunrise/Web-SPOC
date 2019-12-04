@@ -19,7 +19,7 @@ import { rounding } from './utils'
 import { roundTo } from '@/utils/utils'
 import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
-import { getBizSession } from '@/services/queue'
+import { getBizSession, queryRecentBizSessions } from '@/services/queue'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -102,7 +102,7 @@ class AddPayment extends Component {
         })
       })
     if (this.props.showPaymentDate) {
-      this.fetchCurrentActiveBizSession()
+      this.fetchRecentBizSessions()
       // this.fetchBizSessionList(moment())
     }
   }
@@ -165,18 +165,14 @@ class AddPayment extends Component {
     // }
   }
 
-  fetchCurrentActiveBizSession = () => {
+  fetchRecentBizSessions = () => {
     const { setFieldValue } = this.props
-    const activeBizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    getBizSession(activeBizSessionPayload).then((response) => {
+    queryRecentBizSessions().then((response) => {
       const { status, data } = response
-      if (parseInt(status, 10) === 200 && data.totalRecords === 1) {
-        const { data: sessionData } = data
-        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
-        setFieldValue('paymentReceivedDate', sessionData[0].sessionStartDate)
-        const bizSessionList = sessionData.map((item) => ({
+      if (parseInt(status, 10) === 200) {
+        setFieldValue('paymentCreatedBizSessionFK', data[0].id)
+        setFieldValue('paymentReceivedDate', data[0].sessionStartDate)
+        const bizSessionList = data.map((item) => ({
           value: item.id,
           name: item.sessionNo,
         }))

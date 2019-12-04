@@ -49,7 +49,7 @@ const style = () => ({
         balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
-          transactionDate: moment(),
+          // transactionDate: moment(),
           transactionType,
           transactionTypeFK,
           transactionModeFK,
@@ -182,8 +182,7 @@ class Modal extends PureComponent {
   componentDidMount () {
     const { dispatch, isDeposit } = this.props
 
-    this.getBizList(moment().format('YYMMDD'))
-
+    this.fetchRecentBizSessions()
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -195,6 +194,25 @@ class Modal extends PureComponent {
         paymentMode = v.filter((o) => o.code !== 'DEPOSIT')
       }
       this.setState({ paymentMode })
+    })
+  }
+
+  fetchRecentBizSessions = () => {
+    const { setFieldValue, dispatch } = this.props
+    dispatch({
+      type: 'deposit/queryRecentBizSessions',
+    }).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200) {
+        setFieldValue(
+          'patientDepositTransaction.transactionDate',
+          data[0].sessionStartDate,
+        )
+        setFieldValue(
+          'patientDepositTransaction.transactionBizSessionFK',
+          data[0].id,
+        )
+      }
     })
   }
 

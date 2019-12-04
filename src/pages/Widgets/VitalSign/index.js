@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 import VisitValidationSchema from './validationScheme'
 import model from './models'
 import VitalSignCard from './VitalSignCard'
+import { calculateBMI } from '@/utils/utils'
 
 window.g_app.replaceModel(model)
 
@@ -47,9 +48,7 @@ class index extends PureComponent {
     const { setFieldValue, setFieldTouched } = form
     // console.log(heightCM, weightKG, form.values.corPatientNoteVitalSign[i])
     if (heightCM && weightKG) {
-      const heightM = heightCM / 100
-      const bmi = weightKG / heightM ** 2
-      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
+      const bmiInTwoDecimal = calculateBMI(heightCM, weightKG)
       setFieldValue(`corPatientNoteVitalSign[${i}].bmi`, bmiInTwoDecimal)
       setFieldTouched(`corPatientNoteVitalSign[${i}].bmi`, true)
     }
