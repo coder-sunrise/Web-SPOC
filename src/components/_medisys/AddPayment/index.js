@@ -383,11 +383,8 @@ class AddPayment extends Component {
             <GridItem md={3} className={classes.noPaddingLeft}>
               <PaymentType
                 paymentModes={paymentModes}
-                disableCash={values.paymentList.reduce(
-                  (noCashPaymentMode, payment) =>
-                    payment.paymentModeFK === PAYMENT_MODE.CASH ||
-                    noCashPaymentMode,
-                  false,
+                currentPayments={values.paymentList.map(
+                  (payment) => payment.paymentModeFK,
                 )}
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}
