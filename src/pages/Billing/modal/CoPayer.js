@@ -131,7 +131,7 @@ class CoPayer extends Component {
   }
 
   render () {
-    const { classes, onClose } = this.props
+    const { classes, onClose, copayers = [] } = this.props
     const { selectedRows, invoiceItems, coPayer } = this.state
     return (
       <div className={classes.container}>
@@ -144,7 +144,8 @@ class CoPayer extends Component {
               // remoteFilter={{
               //   coPayerTypeFK: 1,
               // }}
-              localFilter={(item) => item.coPayerTypeFK === 1}
+              localFilter={(item) =>
+                item.coPayerTypeFK === 1 && !copayers.includes(item.id)}
               value={coPayer}
               onChange={this.handleCopayerChange}
             />

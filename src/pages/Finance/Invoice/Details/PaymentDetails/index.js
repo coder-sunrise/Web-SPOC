@@ -106,17 +106,21 @@ class PaymentDetails extends Component {
   }
 
   checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-
-    this.setState(() => {
-      return {
-        hasActiveSession: data.length > 0,
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
       }
-    })
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   refresh = () => {
