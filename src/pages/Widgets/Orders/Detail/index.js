@@ -3,7 +3,7 @@ import classnames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import { orderTypes } from '@/utils/codes'
-
+import { VISIT_TYPE } from '@/utils/constants'
 import {
   Button,
   GridContainer,
@@ -51,7 +51,8 @@ class Details extends PureComponent {
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
-    const { entity } = orders
+    const { entity, visitPurposeFK } = orders
+    const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
     return (
       <React.Fragment>
         <Divider />
@@ -102,7 +103,7 @@ class Details extends PureComponent {
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>
-            Save
+            {isRetailVisit ? 'Add' : 'Save'}
           </Button>
         </div>
       </React.Fragment>

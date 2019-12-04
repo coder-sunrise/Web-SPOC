@@ -137,7 +137,12 @@ class Main extends Component {
       },
     })
 
-    if (otherOrder.length === 0 && prescription.length === 0) {
+    if (
+      otherOrder &&
+      prescription &&
+      otherOrder.length === 0 &&
+      prescription.length === 0
+    ) {
       this.setState(
         (prevState) => {
           return {
@@ -211,6 +216,14 @@ class Main extends Component {
         type: 'orders/updateState',
         payload: {
           type: '1',
+          visitPurposeFK: 2,
+        },
+      })
+    } else {
+      this.props.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          visitPurposeFK: undefined,
         },
       })
     }
@@ -250,7 +263,11 @@ class Main extends Component {
           maxWidth='md'
           observe='OrderPage'
         >
-          <AddOrder />
+          <AddOrder
+            onReloadClick={() => {
+              reloadDispense(this.props)
+            }}
+          />
         </CommonModal>
       </div>
     )

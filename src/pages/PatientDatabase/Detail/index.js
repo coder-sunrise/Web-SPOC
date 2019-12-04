@@ -75,7 +75,7 @@ const mapEntityToValues = (entity) => {
   }
   return {
     ...mappedValues,
-    nationalityFK: entity ? entity.nationalityFK : 173,
+    nationalityFK: entity.id ? entity.nationalityFK : 173,
   }
 }
 
