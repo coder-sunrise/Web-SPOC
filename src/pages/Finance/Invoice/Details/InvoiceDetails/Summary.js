@@ -16,7 +16,7 @@ const amountProps = {
 }
 
 const Summary = ({ classes, values }) => {
-  const getGST = (gstValue = 0) => `(${gstValue.toFixed(2)}%) GST:`
+  const getGST = (gstValue = 0) => `${gstValue.toFixed(2)}% GST:`
 
   return (
     <GridContainer
