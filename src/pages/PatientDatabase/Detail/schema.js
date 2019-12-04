@@ -126,7 +126,7 @@ const schemaDemographic = {
   patientAccountNoTypeFK: Yup.number().required(),
   patientAccountNo: Yup.string().NRIC().required(),
   genderFK: Yup.number().required(),
-
+  nationalityFK: Yup.number().required(),
   referredBy: Yup.string(),
   // referralRemarks: Yup.string().when('referredBy', {
   //   is: 'Company',
