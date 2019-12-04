@@ -53,7 +53,8 @@ const New = ({
                 onChange={(e, op = {}) => {
                   const { templateMessage } = op
                   if (templateMessage) {
-                    setFieldValue('content', values.content + templateMessage)
+                    const prevContent = values.content || ''
+                    setFieldValue('content', prevContent + templateMessage)
                   } else {
                     setFieldValue('content', undefined)
                   }
