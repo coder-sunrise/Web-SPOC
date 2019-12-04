@@ -73,7 +73,7 @@ class CNList extends PureComponent {
             if (type === 'grandTotal' || type === 'sum') {
               return rows.reduce((pre, cur) => {
                 const v = getValue(cur)
-                return pre + v ? v : 0
+                return pre + (v || 0)
               }, 0)
             }
             return IntegratedSummary.defaultCalculator(type, rows, getValue)

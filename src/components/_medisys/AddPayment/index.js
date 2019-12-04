@@ -102,8 +102,7 @@ class AddPayment extends Component {
         })
       })
     if (this.props.showPaymentDate) {
-      this.fetchCurrentActiveBizSession()
-      // this.fetchBizSessionList(moment())
+      this.fetchLatestBizSessions()
     }
   }
 
@@ -165,37 +164,52 @@ class AddPayment extends Component {
     // }
   }
 
-  fetchCurrentActiveBizSession = () => {
+  fetchLatestBizSessions = () => {
     const { setFieldValue } = this.props
-    const activeBizSessionPayload = {
-      IsClinicSessionClosed: false,
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
     }
-    getBizSession(activeBizSessionPayload).then((response) => {
+    getBizSession(payload).then((response) => {
       const { status, data } = response
-      if (parseInt(status, 10) === 200 && data.totalRecords === 1) {
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
         setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
         setFieldValue('paymentReceivedDate', sessionData[0].sessionStartDate)
-        const bizSessionList = sessionData.map((item) => ({
-          value: item.id,
-          name: item.sessionNo,
-        }))
-        this.setState({
-          bizSessionList,
-        })
 
-        if (bizSessionList.length > 0)
-          setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
-        else setFieldValue('paymentReceivedBizSessionFK', undefined)
+        this.fetchBizSessionList(sessionData[0].sessionStartDate)
+      } else {
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+        setFieldValue('paymentReceivedDate', null)
       }
     })
   }
 
   fetchBizSessionList = (date) => {
     const { setFieldValue } = this.props
+    const momentDate = moment(date)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     getBizSession({
       pagesize: 999,
-      sessionNoPrefix: moment(date).format('YYMMDD'),
+      lsteql_SessionStartDate: endDateTime,
+      group: [
+        {
+          isClinicSessionClosed: false,
+          lgteql_SessionCloseDate: startDateTime,
+          combineCondition: 'or',
+        },
+      ],
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
     }).then((response) => {
       const { status, data } = response
       if (parseInt(status, 10) === 200) {
