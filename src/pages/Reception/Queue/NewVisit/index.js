@@ -25,7 +25,6 @@ import { deleteFileByFileID } from '@/services/file'
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 import { VISIT_TYPE } from '@/utils/constants'
-import { calculateBMI } from '@/utils/utils'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -114,11 +113,13 @@ class NewVisit extends PureComponent {
     }
   }
 
-  handleCalculateBMI = () => {
+  calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
     const { setFieldValue, setFieldTouched } = this.props
     if (heightCM && weightKG) {
-      const bmiInTwoDecimal = calculateBMI(heightCM, weightKG)
+      const heightM = heightCM / 100
+      const bmi = weightKG / heightM ** 2
+      const bmiInTwoDecimal = Math.round(bmi * 100) / 100
       setFieldValue(FormFieldName['vitalsign.bmi'], bmiInTwoDecimal)
     } else {
       setFieldValue(FormFieldName['vitalsign.bmi'], null)
@@ -260,7 +261,7 @@ class NewVisit extends PureComponent {
                     <GridItem xs md={12} className={classes.row}>
                       <VitalSignCard
                         isReadOnly={isRetail || isReadOnly}
-                        handleCalculateBMI={this.handleCalculateBMI}
+                        handleCalculateBMI={this.calculateBMI}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>

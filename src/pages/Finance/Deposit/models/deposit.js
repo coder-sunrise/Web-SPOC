@@ -1,7 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
-import { queryRecentBizSessions } from '@/services/queue'
 
 export default createListViewModel({
   namespace: 'deposit',
@@ -32,15 +31,6 @@ export default createListViewModel({
           type: 'updateBizSessionList',
           payload: response.status === '200' ? response.data : {},
         })
-      },
-      *queryRecentBizSessions ({ payload }, { call, put }) {
-        const response = yield call(queryRecentBizSessions, payload)
-        const { data } = response
-        yield put({
-          type: 'updateBizSessionList',
-          payload: { data },
-        })
-        return response
       },
 
       *updateDeposit ({ payload }, { call, put }) {

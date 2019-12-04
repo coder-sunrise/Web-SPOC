@@ -3,7 +3,6 @@ import request, { axiosRequest } from '@/utils/request'
 
 const queueAPIUrl = '/api/queue'
 const bizSessionAPIURL = '/api/bizsession'
-const queryRecentBizSessionsUrl = '/api/bizSession/recent'
 const appointmentAPIURL = '/api/Appointment/PatientAppointmentListing'
 
 export const startSession = async () => {
@@ -20,9 +19,6 @@ export const endSession = async (sessionID) => {
 
 export const getBizSession = (params) =>
   commonServices.queryList(bizSessionAPIURL, params)
-
-export const queryRecentBizSessions = (params) =>
-  commonServices.queryList(queryRecentBizSessionsUrl, params)
 
 export const query = (params) => commonServices.query(bizSessionAPIURL, params)
 

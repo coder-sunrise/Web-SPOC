@@ -2,7 +2,6 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import { notification } from '@/components'
 import * as service from '../services'
-import { queryRecentBizSessions } from '@/services/queue'
 
 export default createListViewModel({
   namespace: 'statement',
@@ -65,15 +64,6 @@ export default createListViewModel({
           type: 'updateBizSessionList',
           payload: response.status === '200' ? response.data : {},
         })
-      },
-      *queryRecentBizSessions ({ payload }, { call, put }) {
-        const response = yield call(queryRecentBizSessions, payload)
-        const { data } = response
-        yield put({
-          type: 'updateBizSessionList',
-          payload: { data },
-        })
-        return response
       },
 
       *removeRow ({ payload }, { call, put }) {
