@@ -433,7 +433,7 @@ const ApplyClaims = ({
       patientMinCoPaymentAmountType = 'ExactAmount',
       id,
     } = schemeConfig
-
+    console.log({ schemeConfig })
     const _patientMinPayment =
       patientMinCoPaymentAmountType === 'ExactAmount'
         ? patientMinCoPaymentAmount
@@ -461,6 +461,7 @@ const ApplyClaims = ({
       schemeConfig,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
+      companyFK: copayerFK,
       isModified: true,
       invoicePayerItem: newInvoiceItems.map((item) => {
         let claimAmount = item.payableBalance
@@ -759,7 +760,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
-
+  console.log({ tempInvoicePayer })
   return (
     <React.Fragment>
       <GridItem md={2}>

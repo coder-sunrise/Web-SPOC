@@ -79,8 +79,8 @@ import { getBizSession } from '@/services/queue'
       paymentCreatedBizSessionFK,
     }
 
-    console.log({ returnValue })
-    // handleSubmit(returnValue)
+    // console.log({ returnValue })
+    handleSubmit(returnValue)
   },
 })
 class AddPayment extends Component {
