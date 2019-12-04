@@ -12,6 +12,7 @@ const PaymentDateAndBizSession = ({ handleDateChange, bizSessionList }) => {
           render={(args) => (
             <DatePicker
               {...args}
+              allowClear={false}
               disabledDate={(d) => !d || d.isAfter(moment())}
               label='Payment Date'
               onChange={handleDateChange}

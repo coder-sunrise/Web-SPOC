@@ -60,7 +60,6 @@ import { getBizSession } from '@/services/queue'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
     } = values
-
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
         ...payment,
@@ -80,7 +79,8 @@ import { getBizSession } from '@/services/queue'
       paymentCreatedBizSessionFK,
     }
 
-    handleSubmit(returnValue)
+    console.log({ returnValue })
+    // handleSubmit(returnValue)
   },
 })
 class AddPayment extends Component {
