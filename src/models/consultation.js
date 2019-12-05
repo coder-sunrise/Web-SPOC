@@ -346,6 +346,7 @@ export default createFormViewModel({
             })),
             entity: undefined,
             isGSTInclusive: data.isGstInclusive,
+            gstValue: data.gstValue,
           },
         })
 
@@ -353,6 +354,7 @@ export default createFormViewModel({
           type: 'orders/calculateAmount',
           payload: {
             isGSTInclusive: data.isGstInclusive,
+            gstValue: data.gstValue,
           },
         })
 

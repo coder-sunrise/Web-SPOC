@@ -74,6 +74,7 @@ const Contact = (props) => {
                   maxLength='15'
                   min='0'
                   max='999999999999999'
+                  precision={0}
                   {...args}
                 />
               )}
@@ -91,6 +92,7 @@ const Contact = (props) => {
                     maxLength='15'
                     min='0'
                     max='999999999999999'
+                    precision={0}
                     {...args}
                   />
                 )}
@@ -110,6 +112,7 @@ const Contact = (props) => {
                     maxLength='15'
                     min='0'
                     max='999999999999999'
+                    precision={0}
                     {...args}
                   />
                 )}

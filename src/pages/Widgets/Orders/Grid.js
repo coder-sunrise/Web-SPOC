@@ -32,9 +32,9 @@ export default ({
   handleAddAdjustment,
   codetable,
 }) => {
-  const { rows, summary, finalAdjustments, isGSTInclusive } = orders
+  const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   // console.log(orders)
-  const { total, gst, totalWithGST, gSTPercentage, isEnableGST } = summary
+  const { total, gst, totalWithGST } = summary
   const [
     checkedStatusIncldGST,
     setCheckedStatusIncldGST,
@@ -94,8 +94,8 @@ export default ({
   const messages = {
     total: 'Total',
   }
-  if (isEnableGST) {
-    messages.gst = `${numeral(gSTPercentage * 100).format('0.00')}% GST`
+  if (gstValue) {
+    messages.gst = `${numeral(gstValue).format('0.00')}% GST`
     messages.total = 'Total '
     totalItems.push({ columnName: 'totalAfterItemAdjustment', type: 'gst' })
   }
@@ -241,7 +241,7 @@ export default ({
                       </Tooltip>
                     </span>
                     {c1}
-                    {isEnableGST && (
+                    {gstValue && (
                       <Checkbox
                         simple
                         label={formatMessage({
