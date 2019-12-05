@@ -128,14 +128,14 @@ class Main extends Component {
     const { dispatch, values } = this.props
     const { otherOrder, prescription } = values
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'inventorymedication',
+    //     force: true,
+    //     temp: true,
+    //   },
+    // })
 
     if (
       otherOrder &&

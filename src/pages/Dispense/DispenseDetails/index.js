@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
@@ -11,13 +11,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
 // common component
-import {
-  Button,
-  ProgressButton,
-  GridItem,
-  GridContainer,
-  CommonModal,
-} from '@/components'
+import { Button, ProgressButton, GridItem, GridContainer } from '@/components'
 // variables
 import {
   PrescriptionColumns,
@@ -82,6 +76,16 @@ const DispenseDetails = ({
   dispense,
   history,
 }) => {
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
+  }, [])
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -158,6 +162,7 @@ const DispenseDetails = ({
     })
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+
   return (
     <React.Fragment>
       <GridContainer>
