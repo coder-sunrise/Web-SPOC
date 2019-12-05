@@ -544,7 +544,7 @@ class Index extends Component {
       //     // rights: 'disable',
       //   }}
       // >
-      <div>
+      <React.Fragment>
         <AuthorizedContext.Provider
           value={{
             rights: isEditable() ? 'enable' : 'disable',
@@ -584,36 +584,39 @@ class Index extends Component {
             setFieldValue={setFieldValue}
             // {...this.props}
           /> */}
-          <div style={{ float: 'right', marginBottom: 10 }}>
-            <AmountSummary
-              rows={rows}
-              adjustments={purchaseOrderAdjustment}
-              config={{
-                isGSTInclusive: IsGSTInclusive,
-                totalField: 'totalPrice',
-                adjustedField: 'totalAfterAdjustments',
-                gstField: 'totalAfterGst',
-                gstAmtField: 'itemLevelGST',
-                gstValue: currentGstValue,
-              }}
-              onValueChanged={(v) => {
-                setFieldValue('purchaseOrderAdjustment', v.adjustments)
-                // setFieldValue(
-                //  'purchaseOrder.IsGSTEnabled',
-                //  v.summary.isEnableGST,
-                // )
-                setFieldValue(
-                  'purchaseOrder.IsGSTInclusive',
-                  v.summary.isGSTInclusive,
-                )
-                setFieldValue(
-                  'purchaseOrder.gstAmount',
-                  Math.round(v.summary.gst * 100) / 100,
-                )
-                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-              }}
-            />
-          </div>
+          <GridContainer>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={10} md={3}>
+              <AmountSummary
+                rows={rows}
+                adjustments={purchaseOrderAdjustment}
+                config={{
+                  isGSTInclusive: IsGSTInclusive,
+                  totalField: 'totalPrice',
+                  adjustedField: 'totalAfterAdjustments',
+                  gstField: 'totalAfterGst',
+                  gstAmtField: 'itemLevelGST',
+                  gstValue: currentGstValue,
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                  // setFieldValue(
+                  //  'purchaseOrder.IsGSTEnabled',
+                  //  v.summary.isEnableGST,
+                  // )
+                  setFieldValue(
+                    'purchaseOrder.IsGSTInclusive',
+                    v.summary.isGSTInclusive,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.gstAmount',
+                    Math.round(v.summary.gst * 100) / 100,
+                  )
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                }}
+              />
+            </GridItem>
+          </GridContainer>
           <GridContainer
             style={{
               marginTop: 20,
@@ -700,7 +703,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </div>
+      </React.Fragment>
       // </AuthorizedContext.Provider>
     )
   }
