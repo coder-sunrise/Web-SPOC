@@ -34,6 +34,7 @@ export default createListViewModel({
         adminCharge: 0,
         adminChargeType: 'Percentage',
         coPayerTypeFK: 1,
+        isGSTEnabled: false,
         contact: {
           contactAddress: [
             {

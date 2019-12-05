@@ -73,15 +73,10 @@ class AmountSummary extends PureComponent {
     })
   }
 
-  onChangeGstToggle = (isCheckboxClicked = false, fromGstInclusive) => {
+  onChangeGstToggle = (isCheckboxClicked = false) => {
     const { adjustments, rows, summary } = this.state
     const { config, onValueChanged } = this.props
-    if (!fromGstInclusive) {
-      config.isGSTEnabled = isCheckboxClicked
-      config.isGSTInclusive = false
-    } else {
-      config.isGSTInclusive = isCheckboxClicked
-    }
+    config.isGSTInclusive = isCheckboxClicked
     this.setState(
       {
         ...calculateAmount(rows, adjustments, config),
@@ -172,11 +167,6 @@ class AmountSummary extends PureComponent {
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
     // console.log({ props: this.props, summary })
-    const showGSTInclusive = () => {
-      if (fromPO && isEnableGST) return true
-      if (!fromPO && gstInclusiveConfigrable) return true
-      return false
-    }
     return (
       <div className={classes.cls01}>
         <GridContainer style={{ marginBottom: 4 }}>

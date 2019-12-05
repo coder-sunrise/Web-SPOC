@@ -94,6 +94,11 @@ const appointmentStatus = [
     value: 5,
   },
 ]
+
+const gstEnabled = [
+  { value: false, name: 'No' },
+  { value: true, name: 'Yes' },
+]
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1714,5 +1719,6 @@ module.exports = {
   fetchAndSaveCodeTable,
   shortcutKeys,
   roundToPrecision,
+  gstEnabled,
   ...module.exports,
 }

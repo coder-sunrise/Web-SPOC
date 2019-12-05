@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
-import { status } from '@/utils/codes'
+import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
 class Grid extends PureComponent {
@@ -83,6 +83,7 @@ class Grid extends PureComponent {
               { name: 'officeNum', title: 'Office Number' },
 
               { name: 'faxNo', title: 'Fax Number' },
+              { name: 'isGSTEnabled', title: 'GST Enable' },
               { name: 'isActive', title: 'Status' },
               { name: 'action', title: 'Action' },
             ]
@@ -191,6 +192,13 @@ class Grid extends PureComponent {
             options: status,
             align: 'center',
             width: 120,
+          },
+          {
+            columnName: 'isGSTEnabled',
+            type: 'select',
+            options: gstEnabled,
+            width: 120,
+            sortBy: 'isGSTEnabled',
           },
           {
             columnName: 'action',
