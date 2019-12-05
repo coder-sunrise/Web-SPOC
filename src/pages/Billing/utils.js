@@ -340,7 +340,7 @@ export const constructPayload = (values) => {
         invoicePayerItem: payer.invoicePayerItem
           .filter((item) => item.claimAmount > 0)
           .map((item) => {
-            if (item.invoiceItemFK) {
+            if (typeof item.id !== 'string') {
               return { ...item }
             }
             const {
@@ -360,7 +360,7 @@ export const constructPayload = (values) => {
 
             const _invoicePayerItem = {
               ...restItem,
-              invoiceItemFK: id,
+              invoiceItemFK,
               payableBalance,
               invoiceItemTypeFK,
               itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
@@ -371,7 +371,7 @@ export const constructPayload = (values) => {
       }
       return _payer
     })
-  console.log('construct payload', { invoicePayer, _invoicePayer })
+
   const payload = {
     mode,
     concurrencyToken,

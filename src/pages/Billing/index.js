@@ -99,12 +99,12 @@ const styles = (theme) => ({
     }
     return { ...billing.default, visitId: billing.visitID }
   },
-  handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, patient } = props
-    const { visitStatus } = values
-    const payload = constructPayload(values)
-    console.log({ payload })
-  },
+  // handleSubmit: (values, { props, resetForm }) => {
+  //   const { dispatch, patient } = props
+  //   const { visitStatus } = values
+  //   const payload = constructPayload(values)
+  //   console.log({ payload })
+  // },
 })
 class Billing extends Component {
   state = {
@@ -361,7 +361,7 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
-    console.log({ values, initialValues: this.props.initialValues })
+
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />
@@ -391,14 +391,16 @@ class Billing extends Component {
         <Paper className={classes.paperContent}>
           <GridContainer justify='center' alignItems='flex-start'>
             <GridContainer item md={8}>
-              <ApplyClaims
-                handleIsEditing={this.handleIsEditing}
-                onResetClick={this.handleResetClick}
-                submitCount={submitCount}
-                dispatch={dispatch}
-                commitCount={commitCount}
-                {...formikBag}
-              />
+              {values.id && (
+                <ApplyClaims
+                  handleIsEditing={this.handleIsEditing}
+                  onResetClick={this.handleResetClick}
+                  submitCount={submitCount}
+                  dispatch={dispatch}
+                  commitCount={commitCount}
+                  {...formikBag}
+                />
+              )}
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
@@ -439,6 +441,13 @@ class Billing extends Component {
                   disabled={this.state.isEditing}
                 >
                   <ArrowBack />Dispense
+                </Button>
+                <Button
+                  color='info'
+                  onClick={this.upsertBilling}
+                  disabled={this.state.isEditing}
+                >
+                  Save Billing
                 </Button>
                 <Button
                   color='success'

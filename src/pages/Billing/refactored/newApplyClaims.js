@@ -98,6 +98,13 @@ const ApplyClaims = ({
     setTempInvoicePayer,
   ] = useState([])
 
+  const [
+    updatedInvoiceItems,
+    setUpdatedInvoiceItems,
+  ] = useState([
+    ...invoice.invoiceItems,
+  ])
+
   const hasOtherEditing = tempInvoicePayer.reduce(
     (editing, payer) => payer._isEditing || editing,
     false,
@@ -124,14 +131,14 @@ const ApplyClaims = ({
       (payer, index) => (updatedIndex === index ? updatedPayer : payer),
     )
     const newInvoicePayer = updateInvoicePayerPayableBalance(
-      invoice.invoiceItems,
+      updatedInvoiceItems,
       invoicePayerWithUpdatedPayer,
       updatedIndex,
     )
     setTempInvoicePayer(newInvoicePayer)
   }
 
-  const handleSchemeChange = (value, index, invoicePayerList) => {
+  const handleSchemeChange = (value, index, invoicePayerList, invoiceItems) => {
     const flattenSchemes = claimableSchemes.reduce(
       (schemes, cs) => [
         ...schemes,
@@ -147,10 +154,10 @@ const ApplyClaims = ({
 
     const payerInvoiceItems = getInvoiceItemsWithClaimAmount(
       { ...schemeConfig, claimType: payer.claimType },
-      invoice.invoiceItems,
+      invoiceItems || updatedInvoiceItems,
       payer.invoicePayerItem,
+      payer.id === undefined,
     )
-
     const updatedPayer = {
       ...payer,
       schemeConfig,
@@ -233,9 +240,14 @@ const ApplyClaims = ({
       setInitialState([
         _invoicePayer,
       ])
-      handleSchemeChange(_invoicePayer.claimableSchemes[0].id, 0, [
-        _invoicePayer,
-      ])
+      handleSchemeChange(
+        _invoicePayer.claimableSchemes[0].id,
+        0,
+        [
+          _invoicePayer,
+        ],
+        invoice.invoiceItems,
+      )
     } else {
       setInitialState([])
       setTempInvoicePayer([])
@@ -254,10 +266,11 @@ const ApplyClaims = ({
       return totalAmtPaid
     }, 0)
     const newOutstandingBalance = roundTo(invoice.totalAftGst - totalPaid)
-    const updatedInvoiceItems = updateOriginalInvoiceItemList(
+    const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
       invoice.invoiceItems,
       tempInvoicePayer,
     )
+    setUpdatedInvoiceItems(newInvoiceItemsCopy)
 
     const _values = {
       ...values,
@@ -267,7 +280,7 @@ const ApplyClaims = ({
         ...values.invoice,
         outstandingBalance: newOutstandingBalance,
         patientOutstandingBalance: roundTo(finalPayable - totalPaid),
-        invoiceItems: updatedInvoiceItems,
+        // invoiceItems: updatedInvoiceItems,
       },
       invoicePayer: tempInvoicePayer,
     }
@@ -348,10 +361,8 @@ const ApplyClaims = ({
         // setCommitCount(commitCount + 1)
         return false
       }
-      const invalidMessages = validateClaimAmount(
-        updatedPayer,
-        values.finalPayable,
-      )
+      const invalidMessages = validateClaimAmount(updatedPayer)
+
       if (invalidMessages.length <= 0) {
         setCurEditInvoicePayerBackup(undefined)
         updateTempInvoicePayer(updatedPayer, index)
@@ -385,71 +396,115 @@ const ApplyClaims = ({
 
   const handleCommitChanges = useCallback(
     ({ rows, changed }) => {
-      const id = !_.isEmpty(changed)
-        ? parseInt(Object.keys(changed)[0], 10)
-        : -99
+      const id = Object.keys(changed)[0]
+      // const id = !_.isEmpty(changed)
+      //   ? parseInt(Object.keys(changed)[0], 10)
+      //   : -99
 
       if (id === -99) return
       const index = tempInvoicePayer.findIndex((item) => item._isEditing)
       const payer = { ...tempInvoicePayer[index] }
-      const flattenInvoiceItemList = tempInvoicePayer.reduce(
-        flattenInvoicePayersInvoiceItemList,
-        [],
-      )
-      const totalPayableBalance = flattenInvoiceItemList
-        .filter(
-          (item) =>
-            item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
-        )
-        .reduce(
-          (largestPayable, item) =>
-            item.payableBalance > largestPayable
-              ? item.payableBalance
-              : largestPayable,
-          0,
-        )
-      const currentItemClaimedAmount = flattenInvoiceItemList.reduce(
-        (remainingClaimable, item) => {
-          if (
-            item.invoiceItemFK &&
-            parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
-          )
-            return remainingClaimable + item.claimAmount
-          if (parseInt(item.id, 10) === parseInt(id, 10)) {
-            return remainingClaimable + item.claimAmount
-          }
-          return remainingClaimable
-        },
-        0,
+
+      const changedItem = rows.find((i) => i.id === id)
+      const originalItem = updatedInvoiceItems.find(
+        (i) => i.id === changedItem.invoiceItemFK,
       )
 
+      let eligibleAmount =
+        originalItem.totalAfterGst - originalItem._claimedAmount
+      if (eligibleAmount === 0) {
+        const currentEditItemClaimedAmount = tempInvoicePayer
+          .filter((_rest, i) => i !== index)
+          .reduce(flattenInvoicePayersInvoiceItemList, [])
+          .reduce((remainingClaimable, item) => {
+            if (item.invoiceItemFK === changedItem.invoiceItemFK)
+              return remainingClaimable + item.claimAmount
+
+            // if (
+            //   item.invoiceItemFK &&
+            //   parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
+            // )
+            //   return remainingClaimable + item.claimAmount
+            // if (parseInt(item.id, 10) === parseInt(id, 10)) {
+            //   return remainingClaimable + item.claimAmount
+            // }
+            return remainingClaimable
+          }, 0)
+
+        eligibleAmount =
+          originalItem.totalAfterGst - currentEditItemClaimedAmount
+      }
+
+      let hasError = false
+      const newRows = rows.map((item) => {
+        const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
+        if (item.id === id) {
+          const currentChangesClaimAmount = changed[id].claimAmount
+          if (
+            // eligibleAmount === 0 ||
+            currentChangesClaimAmount <= eligibleAmount
+            // Number.isNaN(eligibleAmount)
+          ) {
+            return { ...item, error: undefined }
+          }
+          hasError = true
+          return {
+            ...item,
+            error: `Cannot claim more than $${eligibleAmount.toFixed(2)}`,
+          }
+        }
+
+        return { ...item, error: undefined }
+      })
       const newInvoicePayer = {
         ...payer,
-        invoicePayerItem: rows.map((item) => {
-          const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
-          if (parseInt(_id, 10) === id) {
-            const { claimAmount: currentChangesClaimAmount } = item
-            const eligibleAmount =
-              totalPayableBalance - currentItemClaimedAmount
-
-            if (
-              eligibleAmount === 0 ||
-              currentChangesClaimAmount <= eligibleAmount ||
-              Number.isNaN(eligibleAmount)
-            ) {
-              return { ...item, error: undefined }
-            }
-            return { ...item, error: 'INVALID' }
-          }
-          return { ...item, error: undefined }
-        }),
-        _hasError: rows.reduce(
-          (error, row) => (row._errors && row._errors.length > 0) || error,
-          false,
-        ),
+        invoicePayerItem: newRows,
+        _hasError:
+          rows.reduce(
+            (error, row) => (row._errors && row._errors.length > 0) || error,
+            false,
+          ) || hasError,
+        // _hasError: hasError,
       }
+
+      // console.log({ flattenInvoiceItemList })
+      // const totalPayableBalance = flattenInvoiceItemList
+      //   .filter(
+      //     (item) =>
+      //       item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
+      //   )
+      //   .reduce(
+      //     (largestPayable, item) =>
+      //       item.payableBalance > largestPayable
+      //         ? item.payableBalance
+      //         : largestPayable,
+      //     0,
+      //   )
+      // const currentItemClaimedAmount = flattenInvoiceItemList.reduce(
+      //   (remainingClaimable, item) => {
+      //     if (
+      //       item.invoiceItemFK &&
+      //       parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
+      //     )
+      //       return remainingClaimable + item.claimAmount
+      //     if (parseInt(item.id, 10) === parseInt(id, 10)) {
+      //       return remainingClaimable + item.claimAmount
+      //     }
+      //     return remainingClaimable
+      //   },
+      //   0,
+      // )
+      // console.log({
+      //   changed,
+      //   id,
+      //   totalPayableBalance,
+      //   currentItemClaimedAmount,
+      // })
+      // let error = payer._hasError
+
       updateTempInvoicePayer(newInvoicePayer, index)
       incrementCommitCount()
+      return newRows
     },
     [
       tempInvoicePayer,
@@ -626,7 +681,7 @@ const ApplyClaims = ({
                 payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
             )
             .map((i) => i.companyFK)}
-          invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
+          invoiceItems={updatedInvoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
             itemName: invoiceItem.itemDescription,
             schemeCoverage: 100,

@@ -102,6 +102,7 @@ const InvoiceSummary = ({
         !payment.isCancelled ? total + payment.totalAmtPaid : total,
       0,
     )
+    console.log({ totalPaid, finalPayable: values.finalPayable })
     return values.finalPayable <= totalPaid
   }
 
@@ -218,7 +219,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.addPaymentButton}
                 onClick={handleAddPaymentClick}
-                disabled={shouldDisableAddPayment()}
+                disabled={disabled}
               >
                 Add Payment
               </Button>

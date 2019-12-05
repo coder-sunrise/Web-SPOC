@@ -14,6 +14,7 @@ import {
 // data table variable
 import { CoPayerColumns, CoPayerColExtensions } from '../variables'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { getUniqueId } from '@/utils/utils'
 
 const styles = (theme) => ({
   container: {
@@ -72,9 +73,9 @@ class CoPayer extends Component {
   onConfirmClick = () => {
     const { codetable } = this.props
     const { coPayer, selectedRows, invoiceItems } = this.state
-    const invoicePayerItem = invoiceItems.filter((item) =>
-      selectedRows.includes(item.id),
-    )
+    const invoicePayerItem = invoiceItems
+      .filter((item) => selectedRows.includes(item.id))
+      .map((item) => ({ ...item, id: getUniqueId(), invoiceItemFK: item.id }))
     const copayer = codetable.ctcopayer.find((item) => item.id === coPayer)
 
     const returnValue = {
