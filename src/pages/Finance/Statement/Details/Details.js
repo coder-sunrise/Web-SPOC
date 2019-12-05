@@ -81,17 +81,21 @@ class Details extends PureComponent {
   handleClick = () => {
     const { statement } = this.props
     let rows = []
+    let selectedInvoiceNos = []
     this.state.selectedRows.forEach((o) => {
       const invoice = statement.entity.statementInvoice.find(
         (r) => r.invoiceNo === o,
       )
       if (!invoice) {
-        rows = []
         return
       }
       rows.push(invoice)
+      selectedInvoiceNos.push(invoice.invoiceNo)
     })
-    this.setState({ extractRows: rows })
+    this.setState({
+      extractRows: rows,
+      selectedRows: selectedInvoiceNos,
+    })
     this.setState((prevState) => {
       return { showModal: !prevState.showModal }
     })
@@ -105,7 +109,7 @@ class Details extends PureComponent {
       extractRows,
       selectedRows,
     } = this.state
-    const { classes, statement, values, theme } = this.props
+    const { classes, statement, values, theme, history } = this.props
     return (
       <div>
         <GridContainer classes={{ grid: classes.gridContainer }}>
@@ -222,6 +226,15 @@ class Details extends PureComponent {
           disabled={selectedRows.length <= 0}
         >
           Extract As Single
+        </Button>
+        <Button
+          style={{ marginTop: 10 }}
+          color='primary'
+          onClick={() => {
+            history.push(`/finance/statement/editstatement`)
+          }}
+        >
+          Edit Statement
         </Button>
       </div>
     )

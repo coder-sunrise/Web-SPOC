@@ -162,19 +162,6 @@ class DetailsHeader extends PureComponent {
               )}
             />
           </GridItem>
-          <GridItem md={12} xs={12} style={{ textAlign: 'right' }}>
-            <a
-              // style={{
-              // position: 'absolute',
-              // bottom: 0,
-              // right: 0,
-              // margin: 10,
-              // }}
-              onClick={() => history.push(`/finance/statement/editstatement`)}
-            >
-              Edit statement
-            </a>
-          </GridItem>
         </GridContainer>
       </CardContainer>
     )

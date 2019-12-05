@@ -130,7 +130,7 @@ class Grid extends PureComponent {
     }
     row.codeString = option.code
     row.nameString = option.name
-    row.uomString = option.uom
+    row.unitOfMeasurement = option.uom
     row.unitPrice = option.sellingPrice
     row.uom = option.value
     row.orderQuantity = 0
@@ -326,7 +326,7 @@ class Grid extends PureComponent {
         { name: 'type', title: 'Type' },
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
-        { name: 'uom', title: 'UOM' },
+        { name: 'unitOfMeasurement', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
         { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
@@ -432,6 +432,7 @@ class Grid extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
+    console.log(rows)
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
