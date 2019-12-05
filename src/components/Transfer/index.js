@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 import { withStyles } from '@material-ui/core/styles'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -37,8 +38,6 @@ const Transfer = ({
   limit,
   setFieldValue,
   fieldName,
-  search,
-  setSearch,
   searchLabel,
 }) => {
   if (!items || items.length === 0) return null
@@ -55,8 +54,6 @@ const Transfer = ({
     setAddedList,
   ] = useState(initAddList || [])
 
-  console.log({ initAddList, addedList })
-
   const [
     removedList,
     setRemovedList,
@@ -67,33 +64,63 @@ const Transfer = ({
     setSearchField,
   ] = useState('')
 
+  const [
+    search,
+    setSearch,
+  ] = useState('')
+
+  const getUnusedItem = () => {
+    const unusedItem = _.differenceWith(items, removedList, _.isEqual)
+    return unusedItem
+  }
+
+  useEffect(
+    () => {
+      if (search !== '') {
+        const filteredList = addedList.filter((o) => {
+          return o.value.toLowerCase().indexOf(search) >= 0
+        })
+        setAddedList(filteredList)
+      } else {
+        setAddedList(getUnusedItem())
+      }
+    },
+    [
+      search,
+    ],
+  )
+
   const addClick = (index) => () => {
     const tempList = [
       ...removedList,
-      addedList[index],
+      items[index],
     ]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
     }
-    setAddedList([
-      ...addedList.slice(0, index),
-      ...addedList.slice(index + 1, addedList.length),
-    ])
+
+    setAddedList(addedList.filter((o) => o.sequence !== index))
+
+    // setAddedList([
+    //   ...addedList.slice(0, index),
+    //   ...addedList.slice(index + 1, addedList.length),
+    // ])
   }
 
   const removeClick = (index) => () => {
     setAddedList([
       ...addedList,
-      removedList[index],
+      items[index],
     ])
-    const tempList = [
-      ...removedList.slice(0, index),
-      ...removedList.slice(index + 1, removedList.length),
-    ]
-    setRemovedList(tempList)
+    // const tempList = [
+    //   ...removedList.slice(0, index),
+    //   ...removedList.slice(index + 1, removedList.length),
+    // ]
+    const currentRemovedList = removedList.filter((o) => o.sequence !== index)
+    setRemovedList(currentRemovedList)
     if (setFieldValue && fieldName) {
-      setFieldValue(fieldName, tempList)
+      setFieldValue(fieldName, currentRemovedList)
     }
   }
 
@@ -107,7 +134,6 @@ const Transfer = ({
       ...removedList,
     ])
   }
-
   return (
     <GridContainer>
       <GridItem xs={6} style={{ paddingLeft: 0 }}>
@@ -137,28 +163,30 @@ const Transfer = ({
             <Card>
               <CardBody>
                 <List dense className={classes.list}>
-                  {initAddList.map((item, index) => (
-                    <ListItem
-                      key={item.id}
-                      disabled={limit && limit === removedList.length}
-                      button
-                      onClick={addClick(index)}
-                    >
-                      <ListItemText primary={`${item.value}`} />
-                      <ListItemSecondaryAction>
-                        <Button
-                          size='sm'
-                          onClick={addClick(index)}
-                          justIcon
-                          round
-                          disabled={limit && limit === removedList.length}
-                          color='primary'
-                        >
-                          <AddCircle />
-                        </Button>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
+                  {addedList.map((item) => {
+                    return (
+                      <ListItem
+                        key={item.sequence}
+                        disabled={limit && limit === removedList.length}
+                        button
+                        onClick={addClick(item.sequence)}
+                      >
+                        <ListItemText primary={`${item.value}`} />
+                        <ListItemSecondaryAction>
+                          <Button
+                            size='sm'
+                            onClick={addClick(item.sequence)}
+                            justIcon
+                            round
+                            disabled={limit && limit === removedList.length}
+                            color='primary'
+                          >
+                            <AddCircle />
+                          </Button>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    )
+                  })}
                 </List>
               </CardBody>
             </Card>
@@ -196,9 +224,9 @@ const Transfer = ({
                   <List dense className={classes.list}>
                     {removedList.map((item, index) => (
                       <ListItem
-                        key={item.id}
+                        key={item.sequence}
                         button
-                        onClick={removeClick(index)}
+                        onClick={removeClick(item.sequence)}
                       >
                         {label && (
                           <ListItemIcon style={{ paddingRight: '20px' }}>
@@ -209,7 +237,7 @@ const Transfer = ({
                         <ListItemSecondaryAction>
                           <Button
                             size='sm'
-                            onClick={removeClick(index)}
+                            onClick={removeClick(item.sequence)}
                             justIcon
                             round
                             color='primary'
