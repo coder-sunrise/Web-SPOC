@@ -105,8 +105,8 @@ const loadFromCodesConfig = {
       )
       return `<ul>
               <li><strong>${isExtPrescription
-                ? 'External Prescription'
-                : 'Medication'}</strong></li>
+          ? 'External Prescription'
+          : 'Medication'}</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -199,15 +199,15 @@ const loadFromCodesConfig = {
           (patientAllergy ? `${patientAllergy}, ` : '') +
           patient.patientAllergy[index].allergyName
     }
-    result = `Patient Name: ${patient.name}`
-    result += `<br/>Patient Ref. No.: ${patient.patientReferenceNo}`
-    result += `<br/>Patient Acc. No.: ${patient.patientAccountNo}`
-    result += `<br/>Gender/Age: ${patientGender.name.substring(
+    result = `<p>Patient Name: ${patient.name}</p>`
+    result += `<p>Patient Ref. No.: ${patient.patientReferenceNo}</p>`
+    result += `<p>Patient Acc. No.: ${patient.patientAccountNo}</p>`
+    result += `<p>Gender/Age: ${patientGender.name.substring(
       0,
       1,
-    )}/${calculateAgeFromDOB(patient.dob)}`
+    )}/${calculateAgeFromDOB(patient.dob)}</p>`
 
-    result += `<br/>Drug Allergy: ${patientAllergy || 'NA'}`
+    result += `<p>Drug Allergy: ${patientAllergy || 'NA'}</p>`
     return result
   },
   loadFromCodes: [

@@ -114,7 +114,7 @@ const style = () => ({
     })
   },
   handleSubmit: (values, { props }) => {
-    const { dispatch, onConfirm, codetable } = props
+    const { dispatch, onConfirm, codetable, isDeposit } = props
     const {
       balanceAfter,
       patientDepositTransaction,
@@ -124,6 +124,7 @@ const style = () => ({
       transactionModeFK,
       creditCardTypeFK,
       transactionBizSessionFK,
+      remarks,
       ...restDepositTransaction
     } = patientDepositTransaction
     const { ctpaymentmode, ctcreditcardtype } = codetable
@@ -153,6 +154,7 @@ const style = () => ({
           creditCardTypeFK,
           createdByBizSessionFK: transactionBizSessionFK,
           transactionBizSessionFK,
+          remarks: remarks || (isDeposit ? 'Deposit for treatments' : 'Refund from patient deposit account'),
         },
       },
     }).then((r) => {
