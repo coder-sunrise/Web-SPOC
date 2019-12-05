@@ -184,12 +184,12 @@ export const fakeQueryDoneData = {
   purchaseOrder: {
     poNo: 'PO/000999',
     poDate: moment(),
-    //status: 'Draft',
+    // status: 'Draft',
     status: 'Finalized',
     shippingAddress:
       '24 Raffles Place, Clifford Centre, #07-02A, Singapore 048621',
-    IsGSTEnabled: true,
-    IsGSTInclusive: true,
+    isGSTEnabled: true,
+    isGstInclusive: true,
     invoiceGST: 10.7,
     invoiceTotal: 163.6,
   },

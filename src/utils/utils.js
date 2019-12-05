@@ -796,7 +796,6 @@ const calculateItemLevelAdjustment = (
   adjValue = 0,
   tempSubTotal = 0,
   tempInvoiceTotal = 0,
-  isClinicGSTEnabled = false,
   gstPercentage = 0,
   gstEnabled = false,
   gstIncluded = false,
@@ -813,16 +812,12 @@ const calculateItemLevelAdjustment = (
     tempSubTotal += itemLevelAdjustmentAmount
   }
 
-  if (isClinicGSTEnabled) {
-    if (!gstEnabled) {
-      itemLevelGSTAmount = 0
-    } else if (gstIncluded) {
-      itemLevelGSTAmount = tempSubTotal * (gstPercentage / 107)
-    } else {
-      itemLevelGSTAmount = tempSubTotal * (gstPercentage / 100)
-    }
-  } else {
+  if (!gstEnabled) {
     itemLevelGSTAmount = 0
+  } else if (gstIncluded) {
+    itemLevelGSTAmount = tempSubTotal * (gstPercentage / 107)
+  } else {
+    itemLevelGSTAmount = tempSubTotal * (gstPercentage / 100)
   }
 
   return {

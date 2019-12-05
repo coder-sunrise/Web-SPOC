@@ -24,13 +24,22 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
     let address
 
     if (opts) {
-      const { contactPerson, contact } = opts
+      const { contactPerson, contact, isGSTEnabled, gstValue } = opts
       const { faxContactNumber, mobileContactNumber, contactAddress } = contact
       const { street } = contactAddress[0]
       conPerson = contactPerson
       faxNo = faxContactNumber.number
       contactNo = mobileContactNumber.number
       address = street
+
+      setFieldValue(`${prefix}.isGSTEnabled`, isGSTEnabled)
+      if (isGSTEnabled) {
+        setFieldValue(`${prefix}.gstValue`, gstValue)
+      }
+      if (!isGSTEnabled) {
+        setFieldValue(`${prefix}.gstValue`, undefined)
+        setFieldValue(`${prefix}.isGstInclusive`, false)
+      }
     }
 
     setFieldValue(`${prefix}.contactPerson`, conPerson)
