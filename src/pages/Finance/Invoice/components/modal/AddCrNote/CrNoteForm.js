@@ -46,7 +46,7 @@ const CrNoteForm = ({ classes, payerType }) => {
                 return (
                   <Switch
                     prefix='Update Inventory'
-                    disabled={payerType === INVOICE_PAYER_TYPE.COMPANY}
+                    disabled={payerType > INVOICE_PAYER_TYPE.PATIENT}
                     {...args}
                   />
                 )
