@@ -45,7 +45,7 @@ const appointmentColumnsExtensions = [
   {
     columnName: 'upcomingAppointmentDate',
     width: 190,
-    sortBy: 'AppointmentDate',
+    sortingEnabled: false,
     render: (row) => {
       const { upcomingAppointmentDate, upcomingAppointmentStartTime } = row
       return `${moment(upcomingAppointmentDate).format(
@@ -55,6 +55,10 @@ const appointmentColumnsExtensions = [
         timeFormat24HourWithSecond,
       ).format(timeFormatSmallCase)} `
     },
+  },
+  {
+    columnName: 'appointmentRemarks',
+    sortingEnabled: false,
   },
   {
     columnName: 'doctor',

@@ -17,7 +17,6 @@ export default createListViewModel({
     effects: {
       *querySMSHistory ({ payload, smsType }, { call, put }) {
         const response = yield call(service.querySMSHistory, payload, smsType)
-        return response
         if (response) {
           yield put({
             type: 'getSMSHistory',
