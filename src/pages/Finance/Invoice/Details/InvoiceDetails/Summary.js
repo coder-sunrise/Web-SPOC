@@ -16,7 +16,8 @@ const amountProps = {
 }
 
 const Summary = ({ classes, values }) => {
-  const getGST = (gstValue = 0) => `(${gstValue.toFixed(2)}%) GST:`
+  const getGST = (gstValue = 0, isGstInclusive = false) =>
+    `${gstValue.toFixed(2)}% GST${isGstInclusive ? ' inclusive' : ''}:`
 
   return (
     <GridContainer
@@ -54,7 +55,7 @@ const Summary = ({ classes, values }) => {
             render={(args) => {
               return (
                 <NumberInput
-                  prefix={getGST(values.gstValue)}
+                  prefix={getGST(values.gstValue, values.isGSTInclusive)}
                   {...amountProps}
                   {...args}
                 />

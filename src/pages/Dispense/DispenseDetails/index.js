@@ -261,11 +261,13 @@ const DispenseDetails = ({
               adjustments={invoiceAdjustment}
               config={{
                 isGSTInclusive:
-                  dispense.isGSTInclusive || invoice.isGSTInclusive,
+                  dispense.entity.invoice.isGSTInclusive ||
+                  invoice.isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',
                 adjustedField: 'totalAfterOverallAdjustment',
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
+                gstValue: dispense.entity.invoice.gstValue || invoice.gstValue,
               }}
               onValueChanged={updateInvoiceData}
             />
