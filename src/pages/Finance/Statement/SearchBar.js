@@ -128,6 +128,7 @@ class SearchBar extends PureComponent {
                     label='Company'
                     code='ctCopayer'
                     labelField='displayValue'
+                    localFilter={(item) => item.coPayerTypeFK === 1}
                   />
                 )
               }}
