@@ -41,7 +41,7 @@ class index extends PureComponent {
     })
   }
 
-  handleCalculateBMI = (i) => () => {
+  handleCalculateBMI = (i) => {
     const { form } = this.arrayHelpers
     const { heightCM, weightKG } = form.values.corPatientNoteVitalSign[i]
     const { setFieldValue, setFieldTouched } = form

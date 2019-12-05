@@ -103,7 +103,11 @@ class VitalSignCard extends PureComponent {
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.weight.suffix',
                   })}
-                  onChange={handleCalculateBMI}
+                  onChange={() => {
+                    setTimeout(() => {
+                      handleCalculateBMI()
+                    }, 1)
+                  }}
                 />
               )}
             />
@@ -122,7 +126,11 @@ class VitalSignCard extends PureComponent {
                     id: 'reception.queue.visitRegistration.height.suffix',
                   })}
                   // formatter={(value) => Math.floor(value)}
-                  onChange={handleCalculateBMI}
+                  onChange={() => {
+                    setTimeout(() => {
+                      handleCalculateBMI()
+                    }, 1)
+                  }}
                 />
               )}
             />

@@ -577,7 +577,7 @@ class AntdNumberInput extends React.PureComponent {
         labelProps={labelProps}
         inputComponent={this.getComponent}
         preventDefaultChangeEvent
-        preventDefaultKeyDownEvent
+        // preventDefaultKeyDownEvent
         maxLength='12'
         muiType='numberinput'
         {...restProps}

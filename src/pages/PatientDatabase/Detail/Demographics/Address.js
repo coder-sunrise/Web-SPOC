@@ -20,6 +20,7 @@ import {
   withFormikExtend,
   ProgressButton,
 } from '@/components'
+import { getUniqueId } from '@/utils/utils'
 
 // TODO: To update api to our server api
 // const API =
@@ -121,6 +122,7 @@ class Address extends Component {
   }
 
   render () {
+    const searchBtnUid = getUniqueId()
     const { addressIndex, classes, theme, values, style, propName } = this.props
     // console.log(values, propName)
     const v = Object.byString(values, propName)
@@ -137,6 +139,8 @@ class Address extends Component {
         color='primary'
         icon={null}
         onClick={this.handleGetAddress}
+        uid={searchBtnUid}
+        defaultbinding='none'
       >
         <Search />
         Get Address
@@ -188,6 +192,7 @@ class Address extends Component {
                     // onChange={this.handleOnChange}
                     inputProps={{
                       maxLength: 10,
+                      enterkey: `[uid=${searchBtnUid}]`,
                     }}
                     maxLength={10}
                     {...args}
@@ -231,6 +236,7 @@ class Address extends Component {
                 render={(args) => (
                   <TextField
                     label='Postal Code'
+                    for=''
                     onChange={this.handleOnChange}
                     {...args}
                   />

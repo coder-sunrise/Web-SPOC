@@ -64,7 +64,7 @@ const receivingDetailsSchema = Yup.object().shape({
   enableReinitialize: true,
   displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
-    deliveryOrderNo: Yup.string().required(),
+    // deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().required('At least one item is required.'),
     // rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
@@ -185,20 +185,8 @@ class DODetails extends PureComponent {
     await this.initializeStateItemList()
   }
 
-  // forceUpdate = () => {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     // force current edit row components to update
-  //     type: 'global/updateState',
-  //     payload: {
-  //       commitCount: (commitCount += 1),
-  //     },
-  //   })
-  // }
-
   initializeStateItemList = async () => {
     const { dispatch } = this.props
-    const result = []
 
     await podoOrderType.map((x) => {
       dispatch({
@@ -211,30 +199,15 @@ class DODetails extends PureComponent {
           list,
           x.itemFKName,
           x.stateName,
+          x.stockName,
         )
         this.setState({
           [x.stateName]: inventoryItemList,
         })
       })
 
-      result.push(
-        dispatch({
-          type: 'deliveryOrderDetails/getStockDetails',
-          payload: {
-            id: x.value,
-          },
-        }),
-      )
       return null
     })
-
-    let [
-      medication,
-      consumable,
-      vaccination,
-    ] = await Promise.all(result)
-
-    this.setOption(medication, consumable, vaccination)
 
     // dispatch({
     //   // force current edit row components to update
@@ -483,14 +456,14 @@ class DODetails extends PureComponent {
         : this.state.MedicationItemList
     }
     if (row.type === 2) {
-      return row.uid
-        ? this.state.VaccinationItemList
-        : this.state.filterVaccinationItemList
+      return row.isNew
+        ? this.state.filterVaccinationItemList
+        : this.state.VaccinationItemList
     }
     if (row.type === 3) {
-      return row.uid
-        ? this.state.ConsumableItemList
-        : this.state.filterConsumableItemList
+      return row.isNew
+        ? this.state.filterConsumableItemList
+        : this.state.ConsumableItemList
     }
     return []
   }
@@ -660,9 +633,25 @@ class DODetails extends PureComponent {
           type: 'select',
           mode: 'tags',
           maxSelected: 1,
+          labelField: 'batchNo',
           disableAll: true,
           options: (row) => {
-            return this.stockOptions(row)
+            if (row.type === 1) {
+              return this.state.MedicationItemList.find(
+                (o) => o.itemFK === row.code,
+              ).stock
+            }
+            if (row.type === 2) {
+              return this.state.VaccinationItemList.find(
+                (o) => o.itemFK === row.code,
+              ).stock
+            }
+            if (row.type === 3) {
+              return this.state.ConsumableItemList.find(
+                (o) => o.itemFK === row.code,
+              ).stock
+            }
+            return []
           },
           onChange: (e) => {
             // this.handleSelectedBatch(e)
@@ -769,6 +758,7 @@ class DODetails extends PureComponent {
             <EditableTableGrid
               getRowId={(r) => r.uid}
               rows={rows}
+              // schema={values.id ? {} : receivingDetailsSchema}
               schema={receivingDetailsSchema}
               FuncProps={{
                 // edit: isEditable,

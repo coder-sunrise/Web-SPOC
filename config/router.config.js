@@ -908,6 +908,12 @@ const routes = [
             mini: 'RS',
             component: './Development/Report',
           },
+          {
+            path: '/development/dentalchart',
+            name: 'Dental Chart',
+            mini: 'DC',
+            component: './Development/DentalChart',
+          },
         ],
       },
       {

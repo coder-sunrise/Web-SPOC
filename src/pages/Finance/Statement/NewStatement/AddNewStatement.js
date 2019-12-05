@@ -147,6 +147,10 @@ class AddNewStatement extends PureComponent {
         sortingEnabled: false,
       },
       {
+        columnName: 'remark',
+        sortingEnabled: false,
+      },
+      {
         columnName: this.props.statement.entity
           ? 'payableAmount'
           : 'copayerPayableAmount',
@@ -487,6 +491,7 @@ class AddNewStatement extends PureComponent {
             </Button>
             <ProgressButton
               color='primary'
+              disabled={this.state.selectedRows.length <= 0}
               onClick={() => {
                 this.setState({ selectedRows: [] })
                 handleSubmit()
