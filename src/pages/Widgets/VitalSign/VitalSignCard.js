@@ -106,7 +106,11 @@ export default ({
                 suffix={formatMessage({
                   id: 'reception.queue.visitRegistration.weight.suffix',
                 })}
-                onChange={handleCalculateBMI(index)}
+                onChange={(e) => {
+                  setTimeout(() => {
+                    handleCalculateBMI(index)
+                  }, 1)
+                }}
               />
             )}
           />
@@ -124,7 +128,11 @@ export default ({
                   id: 'reception.queue.visitRegistration.height.suffix',
                 })}
                 // formatter={(value) => Math.floor(value)}
-                onChange={handleCalculateBMI(index)}
+                onChange={(e) => {
+                  setTimeout(() => {
+                    handleCalculateBMI(index)
+                  }, 1)
+                }}
               />
             )}
           />

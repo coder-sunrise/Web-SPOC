@@ -64,7 +64,7 @@ const receivingDetailsSchema = Yup.object().shape({
   enableReinitialize: true,
   displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
-    deliveryOrderNo: Yup.string().required(),
+    // deliveryOrderNo: Yup.string().required(),
     deliveryOrderDate: Yup.string().required(),
     rows: Yup.array().required('At least one item is required.'),
     // rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
