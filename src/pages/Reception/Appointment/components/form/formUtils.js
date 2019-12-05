@@ -89,11 +89,24 @@ const calculateDuration = (startTime, endTime) => {
 const constructDefaultNewRow = (selectedSlot) => {
   let defaultNewRow = { isPrimaryClinician: true, id: getUniqueNumericId() }
 
-  const startTime = moment(selectedSlot.start).format('HH:mm')
+  const startTime = moment(selectedSlot.start)
+  const selectedEndTime = moment(selectedSlot.end)
 
-  defaultNewRow = {
+  const { hour = 0, minute = 15 } = calculateDuration(
     startTime,
+    selectedEndTime,
+  )
+  const endTime = moment(selectedSlot.start)
+    .add(hour, 'hour')
+    .add(minute, 'minute')
+    .format('HH:mm')
+  defaultNewRow = {
+    startTime: startTime.format('HH:mm'),
     clinicianFK: selectedSlot.resourceId,
+    endTime,
+    apptDurationHour: hour,
+    apptDurationMinute: minute,
+    sortOrder: 0,
     ...defaultNewRow,
   }
   return defaultNewRow

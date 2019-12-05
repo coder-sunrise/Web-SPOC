@@ -110,7 +110,8 @@ const styles = () => ({
     }).then((r) => {
       if (r) {
         resetForm()
-        history.push('/finance/statement')
+        // history.push('/finance/statement')
+        history.goBack()
       }
     })
   },
@@ -138,11 +139,20 @@ class AddNewStatement extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
         columnName: this.props.statement.entity
           ? 'payableAmount'
           : 'copayerPayableAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: this.props.statement.entity
@@ -150,11 +160,13 @@ class AddNewStatement extends PureComponent {
           : 'copayerOutstanding',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'invoiceDate',
         type: 'date',
         format: dateFormatLong,
+        sortingEnabled: false,
       },
     ],
     // currencyColumns: [
@@ -272,7 +284,11 @@ class AddNewStatement extends PureComponent {
     history.goBack()
   }
 
-  clearInvoiceList = () => {
+  clearInvoiceList = (e, op) => {
+    const { setFieldValue } = this.props
+    const { adminCharge, adminChargeType } = op
+    setFieldValue('adminChargeValue', adminCharge)
+    setFieldValue('adminChargeValueType', adminChargeType)
     this.setState(() => {
       return {
         invoiceRows: [],
@@ -301,7 +317,7 @@ class AddNewStatement extends PureComponent {
                         labelField='displayValue'
                         localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
-                        onChange={this.clearInvoiceList}
+                        onChange={(e, op = {}) => this.clearInvoiceList(e, op)}
                         {...args}
                       />
                     )

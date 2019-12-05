@@ -54,7 +54,7 @@ import ResultHistory from './ResultHistory'
 import Invoice from './Invoice'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE_NAME } from '@/utils/constants'
+import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
 // import ChiefComplaints from './ChiefComplaints'
 // import ChiefComplaints from './ChiefComplaints'
 
@@ -345,7 +345,7 @@ class PatientHistory extends Component {
         disablePadding
       >
         {newArray.map((o) => {
-          const _title = o.doctorTitle ? `${o.doctorTitle} ` : ''
+          const _title = o.userTitle ? `${o.userTitle} ` : ''
           return (
             <React.Fragment>
               <ListItem
@@ -411,7 +411,7 @@ class PatientHistory extends Component {
                         <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${_title}${o.doctorName}`}
+                            value={`V${o.versionNumber}, ${_title}${o.userName}`}
                           />
                         </GridItem>
                       </GridContainer>
@@ -446,7 +446,7 @@ class PatientHistory extends Component {
                 &nbsp; (<DatePicker text value={row.visitDate} />)
               </span>
               <div className={this.props.classes.note}>
-                {row.doctorTitle} {row.doctorName}
+                {row.userTitle} {row.userName}
               </div>
             </p>
           </GridItem>
@@ -510,6 +510,7 @@ class PatientHistory extends Component {
       user,
     } = this.props
     const { entity, selected, patientID } = patientHistory
+    const { visitPurposeFK } = entity.invoice
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
 
@@ -634,7 +635,21 @@ class PatientHistory extends Component {
             rights: 'disable',
           }}
         >
-          {entity &&
+          {visitPurposeFK === VISIT_TYPE.RETAIL ? (
+            this.widgets.filter((o) => o.id === '7').map((o) => {
+              const Widget = o.component
+              return (
+                <div>
+                  <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
+                  <Widget
+                    current={entity || {}}
+                    {...this.props}
+                    setFieldValue={this.props.setFieldValue}
+                  />
+                </div>
+              )
+            })
+          ) : (
             this.widgets
               .filter(
                 (o) =>
@@ -653,7 +668,28 @@ class PatientHistory extends Component {
                     />
                   </div>
                 )
-              })}
+              })
+          )}
+          {/* {entity &&
+            this.widgets
+              .filter(
+                (o) =>
+                  this.state.selectedItems.indexOf('0') >= 0 ||
+                  this.state.selectedItems.indexOf(o.id) >= 0,
+              )
+              .map((o) => {
+                const Widget = o.component
+                return (
+                  <div>
+                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
+                    <Widget
+                      current={entity || {}}
+                      {...this.props}
+                      setFieldValue={this.props.setFieldValue}
+                    />
+                  </div>
+                )
+              })} */}
         </AuthorizedContext.Provider>
       </CardContainer>
     )
@@ -696,8 +732,10 @@ class PatientHistory extends Component {
     const handleRetailVisitHistory = (v) => {
       this.props
         .dispatch({
-          type: 'patientHistory/queryOne',
-          payload: v.id,
+          type: 'patientHistory/queryRetailHistory',
+          payload: {
+            id: v.invoiceFK,
+          },
         })
         .then((r) => {
           if (r) {

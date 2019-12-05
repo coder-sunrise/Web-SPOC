@@ -126,14 +126,35 @@ class Main extends Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
+    const { dispatch, values } = this.props
+    const { otherOrder, prescription } = values
+
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'inventorymedication',
+    //     force: true,
+    //     temp: true,
+    //   },
+    // })
+
+    if (
+      otherOrder &&
+      prescription &&
+      otherOrder.length === 0 &&
+      prescription.length === 0
+    ) {
+      this.setState(
+        (prevState) => {
+          return {
+            showOrderModal: !prevState.showOrderModal,
+          }
+        },
+        () => {
+          this.openFirstTabAddOrder()
+        },
+      )
+    }
   }
 
   makePayment = () => {
@@ -190,8 +211,26 @@ class Main extends Component {
     })(e)
   }
 
+  openFirstTabAddOrder = () => {
+    if (this.state.showOrderModal) {
+      this.props.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          type: '1',
+          visitPurposeFK: 2,
+        },
+      })
+    } else {
+      this.props.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          visitPurposeFK: undefined,
+        },
+      })
+    }
+  }
+
   handleOrderModal = () => {
-    const { showOrderModal } = this.state
     this.setState(
       (prevState) => {
         return {
@@ -199,14 +238,7 @@ class Main extends Component {
         }
       },
       () => {
-        if (!showOrderModal) {
-          this.props.dispatch({
-            type: 'orders/updateState',
-            payload: {
-              type: '1',
-            },
-          })
-        }
+        this.openFirstTabAddOrder()
       },
     )
   }
@@ -232,7 +264,11 @@ class Main extends Component {
           maxWidth='md'
           observe='OrderPage'
         >
-          <AddOrder />
+          <AddOrder
+            onReloadClick={() => {
+              reloadDispense(this.props)
+            }}
+          />
         </CommonModal>
       </div>
     )

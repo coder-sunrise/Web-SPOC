@@ -4,6 +4,7 @@ import moment from 'moment'
 import * as Yup from 'yup'
 import { formatMessage } from 'umi/locale'
 import { withStyles, Divider } from '@material-ui/core'
+import { getBizSession } from '@/services/queue'
 import {
   GridContainer,
   GridItem,
@@ -49,7 +50,7 @@ const style = () => ({
         balance: deposit.entity.balance ? deposit.entity.balance : 0,
         patientDepositTransaction: {
           patientDepositFK: deposit.entity.patientDepositFK,
-          transactionDate: moment(),
+          // transactionDate: moment(),
           transactionType,
           transactionTypeFK,
           transactionModeFK,
@@ -182,8 +183,7 @@ class Modal extends PureComponent {
   componentDidMount () {
     const { dispatch, isDeposit } = this.props
 
-    this.getBizList(moment().format('YYMMDD'))
-
+    this.fetchLatestBizSessions()
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -198,6 +198,38 @@ class Modal extends PureComponent {
     })
   }
 
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        setFieldValue(
+          'patientDepositTransaction.transactionDate',
+          sessionData[0].sessionStartDate,
+        )
+        setFieldValue(
+          'patientDepositTransaction.transactionBizSessionFK',
+          sessionData[0].id,
+        )
+
+        this.getBizList(sessionData[0].sessionStartDate)
+      } else {
+        setFieldValue('patientDepositTransaction.transactionDate', null)
+        setFieldValue(
+          'patientDepositTransaction.transactionBizSessionFK',
+          undefined,
+        )
+      }
+    })
+  }
+
   onChangeDate = (event) => {
     const { isDeposit } = this.props
     const selectedDate = moment(event).format('YYMMDD')
@@ -207,16 +239,34 @@ class Modal extends PureComponent {
     } else {
       this.setState({ isSessionRequired: true })
     }
-    this.getBizList(selectedDate)
+    this.getBizList(event)
   }
 
-  getBizList = (e) => {
+  getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     dispatch({
       type: 'deposit/bizSessionList',
       payload: {
-        sessionNoPrefix: e,
         pagesize: 999,
+        lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
       },
     }).then(() => {
       const { bizSessionList } = this.props.deposit

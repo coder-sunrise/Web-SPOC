@@ -2,6 +2,7 @@ import * as Yup from 'yup'
 import { PAYMENT_MODE } from '@/utils/constants'
 import { roundTo } from '@/utils/utils'
 
+const requiredMsg = 'This is a required field'
 export const ValidationSchema = Yup.object().shape({
   cashReturned: Yup.number(),
   totalAmtPaid: Yup.number(),
@@ -12,11 +13,11 @@ export const ValidationSchema = Yup.object().shape({
   showPaymentDate: Yup.boolean(),
   paymentReceivedDate: Yup.string().when('showPaymentDate', {
     is: (val) => val,
-    then: Yup.string().required(),
+    then: Yup.string().required(requiredMsg),
   }),
   paymentReceivedBizSessionFK: Yup.string().when('showPaymentDate', {
     is: (val) => val,
-    then: Yup.string().required(),
+    then: Yup.string().required(requiredMsg),
   }),
   paymentList: Yup.array().when(
     [
@@ -30,7 +31,7 @@ export const ValidationSchema = Yup.object().shape({
             id: Yup.number(),
             paymentModeFK: Yup.number().required(),
             amt: Yup.number()
-              .min(0, 'Amount must be greater than 0')
+              .min(0.01, 'Amount must be greater than $0.00')
               .max(
                 0.01,
                 `Total amount paid cannot exceed $${roundTo(finalPayable)}`,
@@ -57,7 +58,7 @@ export const ValidationSchema = Yup.object().shape({
           id: Yup.number(),
           paymentModeFK: Yup.number().required(),
           amt: Yup.number()
-            .min(0)
+            .min(0.01, 'Amount must be greater than $0.00')
             .max(
               finalPayable,
               `Total amount paid cannot exceed $${finalPayable}`,
@@ -104,7 +105,7 @@ export const ValidationSchema = Yup.object().shape({
           minAmount,
           `Cash Received must be at least $${minAmount.toFixed(2)}`,
         )
-        .required()
+        .required(requiredMsg)
     }
 
     return Yup.number()

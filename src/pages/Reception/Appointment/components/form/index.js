@@ -59,9 +59,11 @@ const gridValidationSchema = Yup.object().shape({
     codetable,
     patient,
     patientSearch,
+    global,
   }) => ({
     loginSEMR,
     loading,
+    commitCount: global.commitCount || 1,
     patientProfile: patient.entity,
     patientProfileDefaultValue: patient.default,
     user: user.data,
@@ -79,13 +81,13 @@ const gridValidationSchema = Yup.object().shape({
 @withFormikExtend({
   // notDirtyDuration: 0.5,
   displayName: 'AppointmentForm',
-  enableReinitialize: true,
+  // enableReinitialize: true,
   validationSchema: ValidationSchema,
   mapPropsToValues,
 })
 class Form extends React.PureComponent {
   state = {
-    submitCount: 0,
+    submitCount: this.props.commitCount,
     showPatientProfile: false,
     showSearchPatientModal: false,
     showDeleteConfirmationModal: false,
@@ -507,22 +509,32 @@ class Form extends React.PureComponent {
             ...response,
           ]
 
-          this.setState((preState) => ({
-            submitCount: preState.submitCount + 1,
-            datagrid: preState.datagrid.reduce(
-              (data, d) => [
-                ...data,
-                {
-                  ...d,
-                  conflicts:
-                    conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
-                      ? conflicts[d.sortOrder].conflicts
-                      : undefined,
+          this.setState(
+            (preState) => ({
+              submitCount: preState.submitCount + 1,
+              datagrid: preState.datagrid.reduce(
+                (data, d) => [
+                  ...data,
+                  {
+                    ...d,
+                    conflicts:
+                      conflicts[d.sortOrder] && conflicts[d.sortOrder].conflicts
+                        ? conflicts[d.sortOrder].conflicts
+                        : undefined,
+                  },
+                ],
+                [],
+              ),
+            }),
+            () => {
+              this.props.dispatch({
+                type: 'global/updateState',
+                payload: {
+                  commitCount: this.state.submitCount + 1,
                 },
-              ],
-              [],
-            ),
-          }))
+              })
+            },
+          )
         }
         if (!validate && response) {
           onConfirm()

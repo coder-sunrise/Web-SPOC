@@ -27,6 +27,7 @@ const PaymentTypeRow = ({
   hideDeposit = false,
   patientInfo,
   disableCash,
+  disableDeposit,
   onPaymentModeClick,
 }) => {
   const handleClick = () => onPaymentModeClick(mode)
@@ -39,7 +40,9 @@ const PaymentTypeRow = ({
       break
     case PAYMENT_MODE.DEPOSIT:
       shouldDisable =
-        !patientInfo.patientDeposit || patientInfo.patientDeposit.balance <= 0
+        disableDeposit ||
+        !patientInfo.patientDeposit ||
+        patientInfo.patientDeposit.balance <= 0
       break
     default:
       shouldDisable = false
