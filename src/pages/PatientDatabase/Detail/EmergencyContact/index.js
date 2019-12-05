@@ -37,12 +37,12 @@ class EmergencyContact extends PureComponent {
     columnExtensions: [
       {
         columnName: 'name',
-        isDisabled: (row) => !!row.nokPatientProfileFK,
+        isDisabled: (row) => !!row.emergencyContactFK,
       },
       {
         columnName: 'accountNo',
         maxLength: 20,
-        isDisabled: (row) => !!row.nokPatientProfileFK,
+        isDisabled: (row) => !!row.emergencyContactFK,
       },
       {
         columnName: 'relationshipFK',
@@ -56,12 +56,14 @@ class EmergencyContact extends PureComponent {
         columnName: 'accountNoTypeFK',
         type: 'codeSelect',
         code: 'ctPatientAccountNoType',
-        isDisabled: (row) => !!row.nokPatientProfileFK,
+        isDisabled: (row) => {
+          return !!row.emergencyContactFK
+        },
         dropdownMatchSelectWidth: false,
       },
       {
         columnName: 'address',
-        isDisabled: (row) => !!row.nokPatientProfileFK,
+        isDisabled: (row) => !!row.emergencyContactFK,
       },
       {
         columnName: 'salutationFK',
@@ -69,7 +71,7 @@ class EmergencyContact extends PureComponent {
         type: 'codeSelect',
         code: 'ctSalutation',
         // sortingEnabled: false,
-        isDisabled: (row) => !!row.nokPatientProfileFK,
+        isDisabled: (row) => !!row.emergencyContactFK,
       },
       {
         columnName: 'isPrimaryContact',
@@ -182,7 +184,6 @@ class EmergencyContact extends PureComponent {
       name: o.name,
       relationshipFK: undefined,
       isPrimaryContact: false,
-      nokPatientProfileFK: o.id,
       address: `${primaryAddress.blockNo || ''} ${primaryAddress.buildingName ||
         ''} ${primaryAddress.unitNo || ''} ${primaryAddress.street || ''}`,
       primaryContactNo: o.contact.mobileContactNumber.number,

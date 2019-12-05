@@ -1067,6 +1067,7 @@ export const currencyFormatter = (value) =>
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
 const commonDataReaderTransform = (data, fieldName) => {
+  // console.log(commonDataReaderTransform)
   const { getClinic } = config
   const { systemTimeZoneInt = 0 } = getClinic() || {}
 

@@ -164,7 +164,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   handleChange = (date, dateString) => {
-    console.log(date, dateString)
+    // console.log(date, dateString)
     // console.log({ date, dateString })
     // if (date) {
     //   date.utcOffset()
@@ -342,7 +342,7 @@ class AntdDatePicker extends PureComponent {
         {...restProps}
         value={this.state.value}
         preventDefaultChangeEvent
-        // preventDefaultKeyDownEvent
+        preventDefaultKeyDownEvent
         onKeyUp={() => false}
         onKeyDown={debounceKeydown}
       />
