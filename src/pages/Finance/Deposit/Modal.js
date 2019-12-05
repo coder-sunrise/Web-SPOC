@@ -16,6 +16,7 @@ import {
   Field,
   withFormikExtend,
   notification,
+  serverDateFormat,
 } from '@/components'
 
 const style = () => ({
@@ -210,16 +211,20 @@ class Modal extends PureComponent {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
         setFieldValue(
           'patientDepositTransaction.transactionDate',
-          sessionData[0].sessionStartDate,
+          paymentDate.format(serverDateFormat),
         )
         setFieldValue(
           'patientDepositTransaction.transactionBizSessionFK',
           sessionData[0].id,
         )
 
-        this.getBizList(sessionData[0].sessionStartDate)
+        this.getBizList(paymentDate.format(serverDateFormat))
       } else {
         setFieldValue('patientDepositTransaction.transactionDate', null)
         setFieldValue(
@@ -244,7 +249,8 @@ class Modal extends PureComponent {
 
   getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
-    const momentDate = moment(date)
+    const momentDate = moment(date, serverDateFormat)
+
     const startDateTime = moment(
       momentDate.set({ hour: 0, minute: 0, second: 0 }),
     ).formatUTC(false)
@@ -256,11 +262,11 @@ class Modal extends PureComponent {
       type: 'deposit/bizSessionList',
       payload: {
         pagesize: 999,
-        lsteql_SessionStartDate: endDateTime,
+        lgteql_SessionStartDate: startDateTime,
         group: [
           {
             isClinicSessionClosed: false,
-            lgteql_SessionCloseDate: startDateTime,
+            lsteql_SessionStartDate: endDateTime,
             combineCondition: 'or',
           },
         ],
