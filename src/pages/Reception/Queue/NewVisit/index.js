@@ -115,6 +115,7 @@ class NewVisit extends PureComponent {
 
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
+    console.log(heightCM, weightKG)
     const { setFieldValue, setFieldTouched } = this.props
     if (heightCM && weightKG) {
       const heightM = heightCM / 100

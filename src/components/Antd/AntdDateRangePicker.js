@@ -342,7 +342,7 @@ class AntdDateRangePicker extends PureComponent {
         inputComponent={this.getComponent}
         {...restProps}
         preventDefaultChangeEvent
-        // preventDefaultKeyDownEvent
+        preventDefaultKeyDownEvent
         onKeyUp={() => false}
         onKeyDown={debounceKeydown}
       />

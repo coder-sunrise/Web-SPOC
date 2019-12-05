@@ -45,24 +45,41 @@ class CollectPaymentConfirm extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
         columnName: 'adminCharge',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'payableAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
-      { columnName: 'invoiceDate', type: 'date', format: dateFormatLong },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: dateFormatLong,
+        sortingEnabled: false,
+      },
       {
         columnName: 'payment',
         currency: true,
+        sortingEnabled: false,
         render: (row) => {
           return (
             <GridItem xs={8}>
@@ -141,12 +158,12 @@ class CollectPaymentConfirm extends PureComponent {
         (o) => !o.id,
       )
       const { invoicePayment } = currentPayment
-      invoicePayment.totalAmtPaid = value
+      invoicePayment.totalAmtPaid = value === '' ? 0 : value
 
       setFieldValue('amount', totalAmountPaid)
       return
     }
-    let tempAmount = e.target.value
+    let tempAmount = e.target.value === '' ? 0 : e.target.value
     const newStatementInvoice = values.statementInvoice.map((o) => {
       let totalAmtPaid
       if (tempAmount >= o.outstandingAmount) {
@@ -181,7 +198,7 @@ class CollectPaymentConfirm extends PureComponent {
     })
     setValues({
       ...values,
-      amount: e.target.value,
+      amount: e.target.value === '' ? 0 : e.target.value,
       statementInvoice: newStatementInvoice,
     })
   }

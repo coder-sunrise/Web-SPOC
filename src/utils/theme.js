@@ -270,6 +270,7 @@ export const defaultTheme = createMuiTheme({
         fontSize: defaultFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
+          cursor: 'not-allowed',
         },
         '& .ant-input': {
           height: '1em',
@@ -327,9 +328,7 @@ export const defaultTheme = createMuiTheme({
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
           top: -2,
         },
-        '&.Mui-disabled': {
-          cursor: 'not-allowed',
-        },
+
         '&.Mui-disabled .anticon': {
           display: 'none',
         },
@@ -469,6 +468,7 @@ export const smallTheme = createMuiTheme({
         fontSize: smallFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
+          cursor: 'not-allowed',
         },
         '& .ant-input': {
           height: '1em',
@@ -651,6 +651,7 @@ export const largeTheme = createMuiTheme({
         fontSize: largeFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
+          cursor: 'not-allowed',
         },
         '& .ant-input': {
           height: '1em',

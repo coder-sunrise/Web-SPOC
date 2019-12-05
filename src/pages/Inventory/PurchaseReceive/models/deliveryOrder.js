@@ -103,16 +103,13 @@ export default createFormViewModel({
 
       *addNewDeliveryOrder ({ payload }, { call, put }) {
         // Call API to query DeliveryOrder#
-        const runningNumberResponse = yield call(service.queryRunningNumber, {
-          prefix: 'DO',
-        })
-        const { data: doRunningNumber } = runningNumberResponse
+        // const runningNumberResponse = yield call(service.queryRunningNumber, {
+        //   prefix: 'DO',
+        // })
+        // const { data: doRunningNumber } = runningNumberResponse
 
         return yield put({
           type: 'setAddNewDeliveryOrder',
-          payload: {
-            deliveryOrderNo: doRunningNumber,
-          },
         })
       },
 
@@ -125,7 +122,7 @@ export default createFormViewModel({
 
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
-        const { deliveryOrderNo } = payload
+        // const { deliveryOrderNo } = payload
         const { purchaseOrderDetails } = state
         const {
           purchaseOrder,
@@ -135,7 +132,7 @@ export default createFormViewModel({
           ...state,
           entity: {
             purchaseOrderFK: purchaseOrder.id,
-            deliveryOrderNo,
+            // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
             rows: purchaseOrderOutstandingItem,

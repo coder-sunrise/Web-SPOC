@@ -282,6 +282,7 @@ class Index extends Component {
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         return {
+          isDeleted: x.isDeleted || false,
           inventoryItemTypeFK: itemType.value,
           orderQuantity: x.orderQuantity,
           bonusQuantity: x.bonusQuantity,
@@ -292,7 +293,7 @@ class Index extends Component {
           unitPrice: x.unitPrice,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
-          unitOfMeasurement: x.uomString,
+          unitOfMeasurement: x.unitOfMeasurement,
           [itemType.prop]: {
             // [itemType.itemFKName]: x[itemType.itemFKName],
             [itemType.itemFKName]: x.code,
@@ -324,7 +325,7 @@ class Index extends Component {
           totalAfterGst: x.totalAfterGst,
           sortOrder: x.sortOrder,
           IsACPUpdated: false,
-          unitOfMeasurement: x.uomString,
+          unitOfMeasurement: x.unitOfMeasurement,
           [itemType.prop]: {
             [itemType.itemFKName]: x[itemType.itemFKName],
             [itemType.itemCode]: x.codeString,
@@ -346,6 +347,7 @@ class Index extends Component {
         let result = {}
         if (x.isNew) {
           result = {
+            isDeleted: x.isDeleted || false,
             inventoryItemTypeFK: itemType.value,
             orderQuantity: x.orderQuantity,
             bonusQuantity: x.bonusQuantity,
@@ -355,7 +357,7 @@ class Index extends Component {
             totalAfterGst: x.totalAfterGst,
             sortOrder: x.sortOrder,
             IsACPUpdated: false,
-            unitOfMeasurement: x.uomString,
+            unitOfMeasurement: x.unitOfMeasurement,
             [itemType.prop]: {
               [itemType.itemFKName]: x[itemType.itemFKName],
               [itemType.itemCode]: x.codeString,

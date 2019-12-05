@@ -53,7 +53,7 @@ class BaseInput extends React.PureComponent {
   }
 
   _onKeyUp = (e) => {
-    // console.log(e.target.tagName === 'TEXTAREA')
+    // console.log(e.target)
     if (this.props.preventDefaultKeyDownEvent) return
     if (e.target.tagName === 'TEXTAREA') return
     // console.log(e, this)
@@ -66,30 +66,39 @@ class BaseInput extends React.PureComponent {
       }
       let loop = 0
       let target = $(e.target)
-      while (loop < 100) {
-        const newTarget = $(target.parents('div,tr')[0])
+      if (target.attr('enterkey')) {
+        const btn = $(`button${target.attr('enterkey')}`)
+        setTimeout(() => {
+          btn.trigger('click')
+        }, 200)
+      } else {
+        while (loop < 100) {
+          const newTarget = $(target.parents('div,tr')[0])
+          if (newTarget.length === 0) break
+          const btn = newTarget.find(
+            "button[data-button-type='progress'][defaultbinding!='none']",
+          )
 
-        if (newTarget.length === 0) break
-        const btn = newTarget.find("button[data-button-type='progress']")
-        if (btn.length > 0) {
-          if (this.props.onCommit) {
-            this.props.onCommit({
-              target: {
-                value: e.target.value,
-              },
-            })
-            setTimeout(() => {
-              btn.trigger('click')
-            }, 200)
-          } else {
-            setTimeout(() => {
-              btn.trigger('click')
-            }, 200)
+          if (btn.length > 0) {
+            if (this.props.onCommit) {
+              this.props.onCommit({
+                target: {
+                  value: e.target.value,
+                },
+              })
+              setTimeout(() => {
+                btn.trigger('click')
+              }, 200)
+            } else {
+              setTimeout(() => {
+                btn.trigger('click')
+              }, 200)
+            }
+            break
           }
-          break
+          target = newTarget
+          loop += 1
         }
-        target = newTarget
-        loop += 1
       }
     }
   }
