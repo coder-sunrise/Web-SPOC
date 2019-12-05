@@ -15,8 +15,10 @@ import {
   DatePicker,
   Select,
   ProgressButton,
+  serverDateFormat,
 } from '@/components'
 import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   grid: {
@@ -43,24 +45,41 @@ class CollectPaymentConfirm extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
         columnName: 'adminCharge',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'payableAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
-      { columnName: 'invoiceDate', type: 'date', format: dateFormatLong },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: dateFormatLong,
+        sortingEnabled: false,
+      },
       {
         columnName: 'payment',
         currency: true,
+        sortingEnabled: false,
         render: (row) => {
           return (
             <GridItem xs={8}>
@@ -103,8 +122,7 @@ class CollectPaymentConfirm extends PureComponent {
         ],
       }
     })
-
-    this.fetchRecentBizSessions()
+    this.fetchLatestBizSessions()
     setValues({
       ...values,
       // paymentDate: moment(),
@@ -140,12 +158,12 @@ class CollectPaymentConfirm extends PureComponent {
         (o) => !o.id,
       )
       const { invoicePayment } = currentPayment
-      invoicePayment.totalAmtPaid = value
+      invoicePayment.totalAmtPaid = value === '' ? 0 : value
 
       setFieldValue('amount', totalAmountPaid)
       return
     }
-    let tempAmount = e.target.value
+    let tempAmount = e.target.value === '' ? 0 : e.target.value
     const newStatementInvoice = values.statementInvoice.map((o) => {
       let totalAmtPaid
       if (tempAmount >= o.outstandingAmount) {
@@ -180,36 +198,69 @@ class CollectPaymentConfirm extends PureComponent {
     })
     setValues({
       ...values,
-      amount: e.target.value,
+      amount: e.target.value === '' ? 0 : e.target.value,
       statementInvoice: newStatementInvoice,
     })
   }
 
   onChangeDate = (event) => {
-    const selectedDate = moment(event).format('YYMMDD')
-    this.getBizList(selectedDate)
+    // const selectedDate = moment(event).format('YYMMDD')
+    this.getBizList(event)
   }
 
-  fetchRecentBizSessions = () => {
-    const { setFieldValue, dispatch } = this.props
-    dispatch({
-      type: 'statement/queryRecentBizSessions',
-    }).then((response) => {
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
       const { status, data } = response
-      if (parseInt(status, 10) === 200) {
-        setFieldValue('paymentDate', data[0].sessionStartDate)
-        setFieldValue('paymentCreatedBizSessionFK', data[0].id)
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+        setFieldValue('paymentDate', paymentDate.format(serverDateFormat))
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+
+        this.getBizList(paymentDate.format(serverDateFormat))
+      } else {
+        setFieldValue('paymentDate', null)
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
       }
     })
   }
 
-  getBizList = (e) => {
+  getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date, serverDateFormat)
+
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     dispatch({
       type: 'statement/bizSessionList',
       payload: {
-        sessionNoPrefix: e,
         pagesize: 999,
+        lgteql_SessionStartDate: startDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lsteql_SessionStartDate: endDateTime,
+            combineCondition: 'or',
+          },
+        ],
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
       },
     }).then(() => {
       const { bizSessionList } = this.props.statement
@@ -261,6 +312,7 @@ class CollectPaymentConfirm extends PureComponent {
                     currency
                     label='Amount'
                     autoFocus
+                    min={0}
                     onChange={this.handlePaymentAmount}
                   />
                 )}
@@ -346,7 +398,11 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
 
             <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
-              <ProgressButton color='primary' onClick={handleSubmit}>
+              <ProgressButton
+                color='primary'
+                onClick={handleSubmit}
+                disabled={values.amount <= 0}
+              >
                 Confirm Payment
               </ProgressButton>
             </GridItem>

@@ -70,4 +70,20 @@ module.exports = {
     })
     return r
   },
+
+  queryAddOrderDetails: async (invoiceId) => {
+    const r = await request(`${url}/retailOrder/${invoiceId}`, {
+      method: 'GET',
+    })
+    return r
+  },
+  saveAddOrderDetails: async (params) => {
+    const r = await request(`${url}/retailOrder/${params.id}`, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
+  removeAddOrderDetails: (params) =>
+    service.remove(`${url}/retailOrder`, params),
 }

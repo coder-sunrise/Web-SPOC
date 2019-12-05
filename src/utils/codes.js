@@ -1327,6 +1327,7 @@ export const podoOrderType = [
     stateName: 'MedicationItemList',
     itemCode: 'inventoryMedicationCode',
     itemName: 'inventoryMedicationName',
+    stockName: 'medicationStock',
   },
   {
     value: 2,
@@ -1337,6 +1338,7 @@ export const podoOrderType = [
     stateName: 'VaccinationItemList',
     itemCode: 'inventoryVaccinationCode',
     itemName: 'inventoryVaccinationName',
+    stockName: 'vaccinationStock',
   },
   {
     value: 3,
@@ -1347,6 +1349,7 @@ export const podoOrderType = [
     stateName: 'ConsumableItemList',
     itemCode: 'inventoryConsumableCode',
     itemName: 'inventoryConsumableName',
+    stockName: 'consumableStock',
   },
 ]
 
@@ -1581,6 +1584,7 @@ export const getInventoryItemList = (
   list,
   itemFKName = undefined,
   stateName = undefined,
+  stockName = undefined,
 ) => {
   let inventoryItemList = list.map((x) => {
     return {
@@ -1588,6 +1592,7 @@ export const getInventoryItemList = (
       name: x.displayValue,
       code: x.code,
       // uom: prescribingUOM.id,
+      stock: x[stockName],
       uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,

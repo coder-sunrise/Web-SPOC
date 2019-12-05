@@ -130,9 +130,9 @@ class Grid extends PureComponent {
     }
     row.codeString = option.code
     row.nameString = option.name
-    row.uomString = option.uom
+    row.unitOfMeasurement = option.uom
     row.unitPrice = option.sellingPrice
-    row.uom = option.uom
+    row.uom = option.value
     row.orderQuantity = 0
     row.bonusReceived = 0
     row.totalQuantity = 0
@@ -238,13 +238,12 @@ class Grid extends PureComponent {
     return rows
   }
 
-  rowOptions = (row, rows = []) => {
+  rowOptions = (row) => {
     const { purchaseOrderDetails } = this.props
     const getUnusedItem = (stateName) => {
-      rows = rows.filter((o) => !o.isDeleted)
       const unusedInventoryItem = _.differenceBy(
         this.state[stateName],
-        purchaseOrderDetails.rows,
+        purchaseOrderDetails.rows.filter((o) => !o.isDeleted),
         'itemFK',
       )
       return unusedInventoryItem
@@ -327,7 +326,7 @@ class Grid extends PureComponent {
         { name: 'type', title: 'Type' },
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
-        { name: 'uom', title: 'UOM' },
+        { name: 'unitOfMeasurement', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
         { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
@@ -353,7 +352,7 @@ class Grid extends PureComponent {
           labelField: 'code',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row, rows)
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -367,7 +366,7 @@ class Grid extends PureComponent {
           labelField: 'name',
           sortingEnabled: false,
           options: (row) => {
-            return this.rowOptions(row, values.rows)
+            return this.rowOptions(row)
           },
           onChange: (e) => {
             if (e.option) {
@@ -377,22 +376,22 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'uom',
-          // type: 'select',
-          // labelField: 'uom',
+          type: 'select',
+          labelField: 'uom',
           disabled: true,
           sortingEnabled: false,
-          // options: (row) => {
-          //   if (row.type === 1) {
-          //     return this.state.MedicationItemList
-          //   }
-          //   if (row.type === 2) {
-          //     return this.state.VaccinationItemList
-          //   }
-          //   if (row.type === 3) {
-          //     return this.state.ConsumableItemList
-          //   }
-          //   return []
-          // },
+          options: (row) => {
+            if (row.type === 1) {
+              return this.state.MedicationItemList
+            }
+            if (row.type === 2) {
+              return this.state.VaccinationItemList
+            }
+            if (row.type === 3) {
+              return this.state.ConsumableItemList
+            }
+            return []
+          },
         },
         {
           columnName: 'orderQuantity',
@@ -433,6 +432,7 @@ class Grid extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
+    console.log(rows)
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>

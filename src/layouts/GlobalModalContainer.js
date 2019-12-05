@@ -83,10 +83,10 @@ class GlobalModalContainer extends PureComponent {
       type: 'global/updateAppState',
       payload: {
         openConfirm: false,
-        openConfirmTitle: undefined,
-        openConfirmContent: undefined,
-        onConfirmDiscard: undefined,
-        onConfirm: undefined,
+        openConfirmTitle: null,
+        openConfirmContent: null,
+        onConfirmDiscard: null,
+        // onConfirm: null,
         openConfirmText: 'Confirm',
       },
     })
@@ -285,8 +285,8 @@ class GlobalModalContainer extends PureComponent {
             ) : null,
             onConfirm: global.onConfirmSave
               ? () => {
-                  this.closeConfirmationPrompt()
                   global.onConfirmSave()
+                  this.closeConfirmationPrompt()
                 }
               : undefined,
           }}

@@ -790,16 +790,6 @@ const calculateAdjustAmount = (
   }
 }
 
-const calculateBMI = (heightCM, weightKG) => {
-  if (heightCM && weightKG) {
-    const heightM = heightCM / 100
-    const bmi = weightKG / heightM ** 2
-    const bmiInTwoDecimal = Math.round(bmi * 100) / 100
-    return bmiInTwoDecimal
-  }
-  return null
-}
-
 const errMsgForOutOfRange = (field) => `${field} must between 0 and 999,999.99`
 const calculateItemLevelAdjustment = (
   adjType = 'ExactAmount',
@@ -926,6 +916,7 @@ const calculateAmount = (
     gstField = 'totalAfterGST',
     gstAmtField = 'gstAmount',
     isGSTInclusive = false,
+    gstValue = undefined,
   } = {},
 ) => {
   let gst = 0
@@ -988,27 +979,26 @@ const calculateAmount = (
     // })
     return
   }
-  const { isEnableGST, gSTPercentage } = clinicSettings.settings
 
-  if (isEnableGST) {
+  if (gstValue) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
         gst += roundTo(
-          r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
+          r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       })
     } else {
-      gst = roundTo(totalAfterAdj * gSTPercentage)
+      gst = roundTo(totalAfterAdj * gstValue / 100)
     }
     activeRows.forEach((r) => {
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
-          r[adjustedField] - r[adjustedField] * 1 / (1 + gSTPercentage),
+          r[adjustedField] - r[adjustedField] * 1 / (1 + gstValue / 100),
         )
       } else {
-        r[gstAmtField] = roundTo(r[adjustedField] * gSTPercentage)
-        r[gstField] = roundTo(r[adjustedField] * (1 + gSTPercentage))
+        r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
+        r[gstField] = roundTo(r[adjustedField] * (1 + gstValue / 100))
       }
       // console.log(r[gstField], r[gstAmtField])
     })
@@ -1032,8 +1022,7 @@ const calculateAmount = (
       totalWithGST: isGSTInclusive
         ? totalAfterAdj
         : roundTo(gst + totalAfterAdj),
-      isEnableGST,
-      gSTPercentage,
+      gstValue,
       isGSTInclusive,
     },
   }
@@ -1185,7 +1174,6 @@ module.exports = {
   removeFields,
   commonDataReaderTransform,
   commonDataWriterTransform,
-  calculateBMI,
   // toUTC,
   // toLocal,
 }

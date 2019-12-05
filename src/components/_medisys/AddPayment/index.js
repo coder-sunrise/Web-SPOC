@@ -4,7 +4,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, serverDateFormat } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import PayerHeader from './PayerHeader'
@@ -19,7 +19,7 @@ import { rounding } from './utils'
 import { roundTo } from '@/utils/utils'
 import { PAYMENT_MODE, INVOICE_PAYER_TYPE } from '@/utils/constants'
 // services
-import { getBizSession, queryRecentBizSessions } from '@/services/queue'
+import { getBizSession } from '@/services/queue'
 
 @connect(({ clinicSettings, patient, codetable }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -60,7 +60,6 @@ import { getBizSession, queryRecentBizSessions } from '@/services/queue'
       paymentReceivedBizSessionFK,
       paymentCreatedBizSessionFK,
     } = values
-
     const returnValue = {
       invoicePaymentMode: paymentList.map((payment, index) => ({
         ...payment,
@@ -80,6 +79,7 @@ import { getBizSession, queryRecentBizSessions } from '@/services/queue'
       paymentCreatedBizSessionFK,
     }
 
+    // console.log({ returnValue })
     handleSubmit(returnValue)
   },
 })
@@ -102,8 +102,7 @@ class AddPayment extends Component {
         })
       })
     if (this.props.showPaymentDate) {
-      this.fetchRecentBizSessions()
-      // this.fetchBizSessionList(moment())
+      this.fetchLatestBizSessions()
     }
   }
 
@@ -165,33 +164,57 @@ class AddPayment extends Component {
     // }
   }
 
-  fetchRecentBizSessions = () => {
+  fetchLatestBizSessions = () => {
     const { setFieldValue } = this.props
-    queryRecentBizSessions().then((response) => {
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
       const { status, data } = response
-      if (parseInt(status, 10) === 200) {
-        setFieldValue('paymentCreatedBizSessionFK', data[0].id)
-        setFieldValue('paymentReceivedDate', data[0].sessionStartDate)
-        const bizSessionList = data.map((item) => ({
-          value: item.id,
-          name: item.sessionNo,
-        }))
-        this.setState({
-          bizSessionList,
-        })
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+        const formateDate = paymentDate.format(serverDateFormat)
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+        setFieldValue('paymentReceivedDate', formateDate)
 
-        if (bizSessionList.length > 0)
-          setFieldValue('paymentReceivedBizSessionFK', bizSessionList[0].value)
-        else setFieldValue('paymentReceivedBizSessionFK', undefined)
+        this.fetchBizSessionList(formateDate)
+      } else {
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+        setFieldValue('paymentReceivedDate', null)
       }
     })
   }
 
   fetchBizSessionList = (date) => {
     const { setFieldValue } = this.props
+    const momentDate = moment(date, serverDateFormat)
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     getBizSession({
       pagesize: 999,
-      sessionNoPrefix: moment(date).format('YYMMDD'),
+      lgteql_SessionStartDate: startDateTime,
+      group: [
+        {
+          isClinicSessionClosed: false,
+          lsteql_SessionStartDate: endDateTime,
+          combineCondition: 'or',
+        },
+      ],
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
     }).then((response) => {
       const { status, data } = response
       if (parseInt(status, 10) === 200) {
@@ -365,11 +388,8 @@ class AddPayment extends Component {
             <GridItem md={3} className={classes.noPaddingLeft}>
               <PaymentType
                 paymentModes={paymentModes}
-                disableCash={values.paymentList.reduce(
-                  (noCashPaymentMode, payment) =>
-                    payment.paymentModeFK === PAYMENT_MODE.CASH ||
-                    noCashPaymentMode,
-                  false,
+                currentPayments={values.paymentList.map(
+                  (payment) => payment.paymentModeFK,
                 )}
                 hideDeposit={values.payerTypeFK !== INVOICE_PAYER_TYPE.PATIENT}
                 patientInfo={patient}

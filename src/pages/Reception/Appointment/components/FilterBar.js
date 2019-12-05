@@ -69,13 +69,14 @@ const FilterBar = ({
               <CodeSelect
                 {...args}
                 // allLabel='All Doctors'
-                allValue={-99}
-                allValueOption={{
-                  clinicianProfile: {
-                    name: 'All',
-                    id: -99,
-                  },
-                }}
+                disableAll
+                // allValue={-99}
+                // allValueOption={{
+                //   clinicianProfile: {
+                //     name: 'All',
+                //     id: -99,
+                //   },
+                // }}
                 allowClear={false}
                 label='Filter by Doctor'
                 mode='multiple'
@@ -89,6 +90,7 @@ const FilterBar = ({
                 labelField='clinicianProfile.name'
                 valueField='clinicianProfile.id'
                 maxTagCount={maxDoctorTagCount}
+                maxSelected={5}
                 maxTagPlaceholder='doctors'
                 renderDropdown={renderDropdown}
               />
@@ -171,10 +173,9 @@ const StyledFilterBar = withStyles(styles, { name: 'CalendarFilterBar' })(
 export default memo(
   withFormik({
     enableReinitialize: true,
-    mapPropsToValues: ({ primaryRegisteredDoctorFK, filterByApptType }) => ({
+    mapPropsToValues: ({ filterByDoctor }) => ({
       filterByDoctor: [
-        // primaryRegisteredDoctorFK,
-        -99,
+        ...filterByDoctor,
       ],
       filterByApptType: [
         -99,

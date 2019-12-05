@@ -19,8 +19,17 @@ const Deposit = ({
     patientInfo && patientInfo.patientDeposit
       ? patientInfo.patientDeposit.balance
       : undefined
+
   return (
-    <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
+    <PaymentBase
+      payment={payment}
+      handleDeletePayment={handleDeletePayment}
+      extraLabel={
+        <h5 style={{ display: 'inline-block' }}>
+          (<NumberInput prefix='Balance: ' text currency value={maxAmount} />)
+        </h5>
+      }
+    >
       <GridContainer>
         <GridItem md={6}>
           <FastField

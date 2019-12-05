@@ -118,21 +118,24 @@ export const PrescriptionColumnExtensions = (
       return (
         <FastField
           name={`prescription[${row.rowIndex}]batchNo`}
-          render={(args) => (
-            <Select
-              simple
-              options={batchNoOptions}
-              mode='tags'
-              // valueField='id'
-              valueField='batchNo'
-              labelField='batchNo'
-              maxSelected={1}
-              disableAll
-              disabled={viewOnly}
-              onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
-              {...args}
-            />
-          )}
+          render={(args) => {
+            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+            return (
+              <Select
+                simple
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
+                disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+                {...restProps}
+              />
+            )
+          }}
         />
       )
     },
@@ -144,15 +147,19 @@ export const PrescriptionColumnExtensions = (
       return (
         <FastField
           name={`prescription[${row.rowIndex}]expiryDate`}
-          render={(args) => (
-            <DatePicker
-              text={viewOnly}
-              disabled={viewOnly}
-              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
-              simple
-              {...args}
-            />
-          )}
+          render={(args) => {
+            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+
+            return (
+              <DatePicker
+                text={viewOnly}
+                disabled={viewOnly}
+                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                simple
+                {...restProps}
+              />
+            )
+          }}
         />
       )
     },
@@ -238,9 +245,17 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
-          render={(args) => (
-            <TextField simple text={viewOnly} disabled={viewOnly} {...args} />
-          )}
+          render={(args) => {
+            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+            return (
+              <TextField
+                simple
+                text={viewOnly}
+                disabled={viewOnly}
+                {...restProps}
+              />
+            )
+          }}
         />
       )
     },

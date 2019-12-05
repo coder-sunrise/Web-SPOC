@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
@@ -11,13 +11,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 // sub components
 import TableData from './TableData'
 // common component
-import {
-  Button,
-  ProgressButton,
-  GridItem,
-  GridContainer,
-  CommonModal,
-} from '@/components'
+import { Button, ProgressButton, GridItem, GridContainer } from '@/components'
 // variables
 import {
   PrescriptionColumns,
@@ -80,7 +74,18 @@ const DispenseDetails = ({
   onFinalizeClick,
   codetable,
   dispense,
+  history,
 }) => {
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
+  }, [])
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
@@ -111,22 +116,27 @@ const DispenseDetails = ({
     }
   }
 
-  const [
-    showOrderModal,
-    setShowOrderModal,
-  ] = useState(false)
-
-  const handleOrderModal = () => {
-    const popUpStatus = !showOrderModal
-    setShowOrderModal(popUpStatus)
-    if (!showOrderModal) {
-      dispatch({
-        type: 'orders/updateState',
-        payload: {
-          type: '1',
+  const discardAddOrderDetails = () => {
+    const { id } = invoice
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to discard the dispense ?`,
+        onConfirmDiscard: () => {
+          dispatch({
+            type: 'dispense/removeAddOrderDetails',
+            payload: {
+              id,
+            },
+          }).then((r) => {
+            if (r) {
+              history.push('/reception/queue')
+            }
+          })
         },
-      })
-    }
+      },
+    })
   }
   const updateInvoiceData = (v) => {
     const newInvoice = {
@@ -152,6 +162,7 @@ const DispenseDetails = ({
     })
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+
   return (
     <React.Fragment>
       <GridContainer>
@@ -191,7 +202,7 @@ const DispenseDetails = ({
                 color='danger'
                 size='sm'
                 icon={<Delete />}
-                // onClick={handleOrderModal}
+                onClick={discardAddOrderDetails}
               >
                 Discard
               </ProgressButton>
@@ -261,11 +272,13 @@ const DispenseDetails = ({
               adjustments={invoiceAdjustment}
               config={{
                 isGSTInclusive:
-                  dispense.isGSTInclusive || invoice.isGSTInclusive,
+                  dispense.entity.invoice.isGSTInclusive ||
+                  invoice.isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',
                 adjustedField: 'totalAfterOverallAdjustment',
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
+                gstValue: dispense.entity.invoice.gstValue || invoice.gstValue,
               }}
               onValueChanged={updateInvoiceData}
             />

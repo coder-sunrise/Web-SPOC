@@ -128,6 +128,7 @@ class SearchBar extends PureComponent {
                     label='Company'
                     code='ctCopayer'
                     labelField='displayValue'
+                    localFilter={(item) => item.coPayerTypeFK === 1}
                   />
                 )
               }}
@@ -194,12 +195,12 @@ class SearchBar extends PureComponent {
                   statementDueDateFrom = from
                   statementDueDateTo = to
                 }
-
                 this.props.dispatch({
                   type: 'statement/query',
                   payload: {
                     statementNo,
-                    copayerFK: Number.isNaN(copayerFK) ? copayerFK : undefined,
+                    copayerFK:
+                      typeof copayerFK === 'number' ? copayerFK : undefined,
                     lgteql_statementDate: statementDateFrom,
                     lsteql_statementDate: statementDateTo,
                     isCancelled: false,

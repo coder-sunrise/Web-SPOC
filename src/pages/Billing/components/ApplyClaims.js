@@ -433,7 +433,7 @@ const ApplyClaims = ({
       patientMinCoPaymentAmountType = 'ExactAmount',
       id,
     } = schemeConfig
-
+    console.log({ schemeConfig })
     const _patientMinPayment =
       patientMinCoPaymentAmountType === 'ExactAmount'
         ? patientMinCoPaymentAmount
@@ -461,6 +461,7 @@ const ApplyClaims = ({
       schemeConfig,
       name: coPaymentSchemeName,
       copaymentSchemeFK: id,
+      companyFK: copayerFK,
       isModified: true,
       invoicePayerItem: newInvoiceItems.map((item) => {
         let claimAmount = item.payableBalance
@@ -997,6 +998,13 @@ const ApplyClaims = ({
       >
         <CoPayer
           onAddCoPayerClick={handleAddCoPayer}
+          copayers={tempInvoicePayer
+            .filter(
+              (payer) =>
+                !payer.isCancelled &&
+                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+            )
+            .map((i) => i.companyFK)}
           invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
             ...invoiceItem,
             itemName: invoiceItem.itemDescription,

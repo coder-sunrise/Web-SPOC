@@ -110,7 +110,8 @@ const styles = () => ({
     }).then((r) => {
       if (r) {
         resetForm()
-        history.push('/finance/statement')
+        // history.push('/finance/statement')
+        history.goBack()
       }
     })
   },
@@ -143,6 +144,10 @@ class AddNewStatement extends PureComponent {
       },
       {
         columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'remark',
         sortingEnabled: false,
       },
       {
@@ -283,7 +288,11 @@ class AddNewStatement extends PureComponent {
     history.goBack()
   }
 
-  clearInvoiceList = () => {
+  clearInvoiceList = (e, op) => {
+    const { setFieldValue } = this.props
+    const { adminCharge, adminChargeType } = op
+    setFieldValue('adminChargeValue', adminCharge)
+    setFieldValue('adminChargeValueType', adminChargeType)
     this.setState(() => {
       return {
         invoiceRows: [],
@@ -312,7 +321,7 @@ class AddNewStatement extends PureComponent {
                         labelField='displayValue'
                         localFilter={(item) => item.coPayerTypeFK === 1}
                         disabled={statement.entity}
-                        onChange={this.clearInvoiceList}
+                        onChange={(e, op = {}) => this.clearInvoiceList(e, op)}
                         {...args}
                       />
                     )
@@ -482,6 +491,7 @@ class AddNewStatement extends PureComponent {
             </Button>
             <ProgressButton
               color='primary'
+              disabled={this.state.selectedRows.length <= 0}
               onClick={() => {
                 this.setState({ selectedRows: [] })
                 handleSubmit()

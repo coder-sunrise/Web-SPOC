@@ -45,6 +45,7 @@ const reloadDispense = (props, effect = 'query') => {
         adjustedField: 'totalAfterOverallAdjustment',
         gstField: 'totalAfterGST',
         gstAmtField: 'gstAmount',
+        gstValue: obj.invoice.gstValue,
       },
     )
     let invoiceSummary = {}
@@ -128,16 +129,21 @@ class Main extends Component {
     const { dispatch, values } = this.props
     const { otherOrder, prescription } = values
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'inventorymedication',
+    //     force: true,
+    //     temp: true,
+    //   },
+    // })
 
-    if (otherOrder.length === 0 && prescription.length === 0) {
+    if (
+      otherOrder &&
+      prescription &&
+      otherOrder.length === 0 &&
+      prescription.length === 0
+    ) {
       this.setState(
         (prevState) => {
           return {
@@ -211,6 +217,14 @@ class Main extends Component {
         type: 'orders/updateState',
         payload: {
           type: '1',
+          visitPurposeFK: 2,
+        },
+      })
+    } else {
+      this.props.dispatch({
+        type: 'orders/updateState',
+        payload: {
+          visitPurposeFK: undefined,
         },
       })
     }
@@ -250,7 +264,11 @@ class Main extends Component {
           maxWidth='md'
           observe='OrderPage'
         >
-          <AddOrder />
+          <AddOrder
+            onReloadClick={() => {
+              reloadDispense(this.props)
+            }}
+          />
         </CommonModal>
       </div>
     )

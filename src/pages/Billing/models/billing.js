@@ -103,7 +103,6 @@ export default createFormViewModel({
       },
       *save ({ payload }, { call, put, take }) {
         const response = yield call(service.save, payload)
-        console.log({ response })
         if (response) {
           yield put({
             type: 'query',
@@ -112,11 +111,6 @@ export default createFormViewModel({
             },
           })
           yield take('billing/query/@@end')
-          // yield put({
-          //   type: 'formik/clean',
-          //   payload: 'BillingForm',
-          // })
-
           return response
         }
         return false

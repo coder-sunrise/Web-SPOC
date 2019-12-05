@@ -7,6 +7,7 @@ import {
   CodeSelect,
   NumberInput,
 } from '@/components'
+import { MobileNumberInput } from '@/components/_medisys'
 
 const Contact = (props) => {
   const { theme, type } = props
@@ -69,13 +70,15 @@ const Contact = (props) => {
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
-                <NumberInput
-                  label='Contact Number'
-                  maxLength='15'
-                  min='0'
-                  max='999999999999999'
-                  {...args}
-                />
+                // <NumberInput
+                //   label='Contact Number'
+                //   maxLength='15'
+                //   min='0'
+                //   max='999999999999999'
+                //   precision={0}
+                //   {...args}
+                // />
+                <MobileNumberInput {...args} label='Contact Number' />
               )}
             />
           </GridItem>
@@ -86,13 +89,15 @@ const Contact = (props) => {
               <FastField
                 name='contact.officeContactNumber.number'
                 render={(args) => (
-                  <NumberInput
-                    label='Office Number'
-                    maxLength='15'
-                    min='0'
-                    max='999999999999999'
-                    {...args}
-                  />
+                  // <NumberInput
+                  //   label='Office Number'
+                  //   maxLength='15'
+                  //   min='0'
+                  //   max='999999999999999'
+                  //   precision={0}
+                  //   {...args}
+                  // />
+                  <MobileNumberInput {...args} label='Office Number' />
                 )}
               />
             )}
@@ -105,13 +110,15 @@ const Contact = (props) => {
               <FastField
                 name='contact.faxContactNumber.number'
                 render={(args) => (
-                  <NumberInput
-                    label='Fax Number'
-                    maxLength='15'
-                    min='0'
-                    max='999999999999999'
-                    {...args}
-                  />
+                  // <NumberInput
+                  //   label='Fax Number'
+                  //   maxLength='15'
+                  //   min='0'
+                  //   max='999999999999999'
+                  //   precision={0}
+                  //   {...args}
+                  // />
+                  <MobileNumberInput {...args} label='Fax Number' />
                 )}
               />
             )}

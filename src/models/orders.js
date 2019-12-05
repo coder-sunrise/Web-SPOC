@@ -244,9 +244,10 @@ export default createListViewModel({
       },
 
       calculateAmount (state, { payload = {} }) {
-        let { finalAdjustments, rows, isGSTInclusive } = state
+        let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
         const amount = calculateAmount(rows, finalAdjustments, {
           isGSTInclusive,
+          gstValue,
         })
         return {
           ...state,

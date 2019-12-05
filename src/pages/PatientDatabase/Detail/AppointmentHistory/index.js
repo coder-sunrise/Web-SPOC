@@ -139,23 +139,22 @@ class AppointmentHistory extends PureComponent {
         ...commonParams,
       }),
     ])
+    let previousAppt = []
+    let futureAppt = []
     if (previous) {
       const { status, data } = previous
-      if (status === '200')
-        this.setState({
-          previousAppt: this.reBuildApptDatas(data.data),
-          patientProfileFK: patientId,
-        })
+      if (status === '200') previousAppt = this.reBuildApptDatas(data.data)
     }
 
     if (future) {
       const { status, data } = future
-      if (status === '200')
-        this.setState({
-          futureAppt: this.reBuildApptDatas(data.data),
-          patientProfileFK: patientId,
-        })
+      if (status === '200') futureAppt = this.reBuildApptDatas(data.data)
     }
+    this.setState({
+      futureAppt,
+      previousAppt,
+      patientProfileFK: patientId,
+    })
   }
 
   resize () {

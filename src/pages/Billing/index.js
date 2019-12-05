@@ -11,14 +11,18 @@ import {
   Button,
   CommonModal,
   GridContainer,
+  GridItem,
   withFormikExtend,
   notification,
+  FastField,
+  OutlinedTextField,
 } from '@/components'
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
-import ApplyClaims from './components/ApplyClaims'
+// import ApplyClaims from './components/ApplyClaims'
+import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 // utils
 import { constructPayload } from './utils'
@@ -50,20 +54,21 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ queueLog, billing, user, dispense, loading, patient }) => ({
+@connect(({ global, queueLog, billing, user, dispense, loading, patient }) => ({
   billing,
   dispense,
   loading,
   patient: patient.entity || patient.default,
   user: user.data,
   sessionInfo: queueLog.sessionInfo,
+  commitCount: global.commitCount,
 }))
 @withFormikExtend({
   notDirtyDuration: 3,
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
-    console.log('map props to values')
+    // console.log('map props to values')
     try {
       if (billing.entity) {
         const { invoicePayer = [], visitPurposeFK } = billing.entity
@@ -98,26 +103,7 @@ const styles = (theme) => ({
     const { dispatch, patient } = props
     const { visitStatus } = values
     const payload = constructPayload(values)
-
-    dispatch({
-      type: 'billing/save',
-      payload,
-    }).then((response) => {
-      if (response) {
-        resetForm()
-        if (visitStatus === 'COMPLETED') {
-          notification.success({
-            message: 'Billing completed',
-          })
-          router.push('/reception/queue')
-        } else {
-          dispatch({
-            type: 'patient/query',
-            payload: { id: patient.id },
-          })
-        }
-      }
-    })
+    console.log({ payload })
   },
 })
 class Billing extends Component {
@@ -129,11 +115,47 @@ class Billing extends Component {
   }
 
   componentWillUnmount () {
-    this.props.dispatch({
-      type: 'billing/updateState',
-      payload: {
-        entity: null,
-      },
+    // this.props.dispatch({
+    //   type: 'billing/updateState',
+    //   payload: {
+    //     entity: null,
+    //   },
+    // })
+  }
+
+  handleSubmit = (callback = undefined) => {
+    const { dispatch, values, resetForm, patient } = this.props
+    const { visitStatus } = values
+    const payload = constructPayload(values)
+    const defaultCallback = () => {
+      if (visitStatus === 'COMPLETED') {
+        notification.success({
+          message: 'Billing completed',
+        })
+        router.push('/reception/queue')
+      } else {
+        dispatch({
+          type: 'patient/query',
+          payload: { id: patient.id },
+        })
+        this.setState((preState) => ({
+          submitCount: preState.submitCount + 1,
+        }))
+      }
+      resetForm()
+    }
+
+    dispatch({
+      type: 'billing/save',
+      payload,
+    }).then((response) => {
+      if (response) {
+        if (callback) {
+          callback()
+          return
+        }
+        defaultCallback()
+      }
     })
   }
 
@@ -181,8 +203,8 @@ class Billing extends Component {
   }
 
   upsertBilling = () => {
-    this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
-    this.props.handleSubmit()
+    // this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+    this.handleSubmit()
   }
 
   shouldDisableSaveAndCompleteButton = () => {
@@ -236,21 +258,13 @@ class Billing extends Component {
           openConfirmText: 'Confirm',
           openConfirmContent: `Save changes and print invoice?`,
           onConfirmSave: () => {
-            const payload = constructPayload({
-              ...values,
-              visitStatus: 'BILLING',
-            })
-            dispatch({
-              type: 'billing/save',
-              payload,
-            }).then((response) => {
-              if (response) {
-                this.setState((preState) => ({
-                  submitCount: preState.submitCount + 1,
-                }))
-                this.toggleReport()
-              }
-            })
+            const callback = () => {
+              this.setState((preState) => ({
+                submitCount: preState.submitCount + 1,
+              }))
+              this.toggleReport()
+            }
+            this.handleSubmit(callback)
           },
         },
       })
@@ -340,12 +354,14 @@ class Billing extends Component {
       patient,
       sessionInfo,
       user,
+      commitCount,
     } = this.props
     const formikBag = {
       values,
       setFieldValue,
       setValues,
     }
+    console.log({ values, initialValues: this.props.initialValues })
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />
@@ -380,6 +396,7 @@ class Billing extends Component {
                 onResetClick={this.handleResetClick}
                 submitCount={submitCount}
                 dispatch={dispatch}
+                commitCount={commitCount}
                 {...formikBag}
               />
             </GridContainer>
@@ -395,29 +412,46 @@ class Billing extends Component {
             </GridContainer>
           </GridContainer>
         </Paper>
-        <div className={classes.paymentButton}>
-          <Button
-            color='info'
-            onClick={this.backToDispense}
-            disabled={this.state.isEditing}
-          >
-            <ArrowBack />Dispense
-          </Button>
-          {/* <Button
-            color='primary'
-            disabled={this.state.isEditing || values.id === undefined}
-            onClick={this.onSavePaymentClick}
-          >
-            Save
-          </Button> */}
-          <Button
-            color='success'
-            disabled={this.state.isEditing || values.id === undefined}
-            onClick={this.onCompletePaymentClick}
-          >
-            Complete Payment
-          </Button>
-        </div>
+        <GridContainer>
+          <GridItem md={8}>
+            <FastField
+              name='invoice.invoiceRemark'
+              render={(args) => {
+                return (
+                  <OutlinedTextField
+                    label='Invoice Remarks'
+                    multiline
+                    maxLength={2000}
+                    rowsMax={2}
+                    rows={2}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <React.Fragment>
+              <div className={classes.paymentButton}>
+                <Button
+                  color='info'
+                  onClick={this.backToDispense}
+                  disabled={this.state.isEditing}
+                >
+                  <ArrowBack />Dispense
+                </Button>
+                <Button
+                  color='success'
+                  disabled={this.state.isEditing || values.id === undefined}
+                  onClick={this.onCompletePaymentClick}
+                >
+                  Complete Payment
+                </Button>
+              </div>
+            </React.Fragment>
+          </GridItem>
+        </GridContainer>
+
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'

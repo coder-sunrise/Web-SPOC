@@ -21,17 +21,8 @@ const Setting = ({
   dispatch,
   ...props
 }) => {
-  const [
-    search,
-    setSearch,
-  ] = useState('')
-
   const { medicationDetail, vaccinationDetail, theme, values } = props
   const optionLabelLength = 40
-  const [
-    list,
-    setList,
-  ] = useState([])
 
   const { ctmedicationprecaution, entity, config = {} } =
     medicationDetail || vaccinationDetail
@@ -44,13 +35,14 @@ const Setting = ({
   ) {
     addedItems = entityData.inventoryMedication_MedicationPrecaution.map(
       (item) => ({
+        sequence: item.sequence,
         medicationPrecautionFK: item.medicationPrecautionFK,
         value: item.medicationPrecaution.name,
       }),
     )
   }
   const settingProps = {
-    items: ctmedicationprecaution ? list : [],
+    items: ctmedicationprecaution || [],
     addedItems,
     classes,
     label: 'Precaution',
@@ -60,24 +52,8 @@ const Setting = ({
     limit: 3,
     setFieldValue,
     fieldName: 'inventoryMedication_MedicationPrecaution',
-    setSearch,
-    search,
     searchLabel: 'Precaution Name',
   }
-
-  useEffect(
-    () => {
-      if (ctmedicationprecaution) {
-        const filteredList = ctmedicationprecaution.filter((o) => {
-          return o.value.toLowerCase().indexOf(search) >= 0
-        })
-        setList(filteredList)
-      }
-    },
-    [
-      search,
-    ],
-  )
 
   return (
     <CardContainer
