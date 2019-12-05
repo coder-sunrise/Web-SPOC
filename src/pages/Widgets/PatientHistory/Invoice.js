@@ -113,6 +113,7 @@ export default ({ classes, current, theme, setFieldValue }) => {
                 : '',
               totalField: 'totalAfterItemAdjustment',
               adjustedField: 'totalAfterOverallAdjustment',
+              gstValue: current.invoice.gstValue,
             }}
             onValueChanged={(v) => {
               // console.log('onValueChanged', v)

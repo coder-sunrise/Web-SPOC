@@ -64,8 +64,13 @@ const InvoiceSummary = ({
   ] = useState(false)
 
   const { invoicePayment, invoice } = values
-  const { gstValue, gstAmount, totalAftGst, invoiceNo } = invoice
-
+  const {
+    gstValue,
+    gstAmount,
+    totalAftGst,
+    invoiceNo,
+    isGstInclusive,
+  } = invoice
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
@@ -123,7 +128,9 @@ const InvoiceSummary = ({
             {gstValue && (
               <React.Fragment>
                 <GridItem md={6}>
-                  <h5>{roundTo(gstValue).toFixed(2)}% GST</h5>
+                  <h5>
+                    {roundTo(gstValue).toFixed(2)}% GST{isGstInclusive ? ' inclusive' : ''}
+                  </h5>
                 </GridItem>
                 <GridItem md={6} className={classes.rightAlign}>
                   <h5 className={classes.currencyValue}>

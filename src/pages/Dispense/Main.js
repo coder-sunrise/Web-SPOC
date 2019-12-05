@@ -45,6 +45,7 @@ const reloadDispense = (props, effect = 'query') => {
         adjustedField: 'totalAfterOverallAdjustment',
         gstField: 'totalAfterGST',
         gstAmtField: 'gstAmount',
+        gstValue: obj.invoice.gstValue,
       },
     )
     let invoiceSummary = {}
