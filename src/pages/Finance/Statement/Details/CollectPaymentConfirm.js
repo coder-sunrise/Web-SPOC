@@ -45,24 +45,41 @@ class CollectPaymentConfirm extends PureComponent {
     ],
     columnExtensions: [
       {
+        columnName: 'invoiceNo',
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'patientName',
+        sortingEnabled: false,
+      },
+      {
         columnName: 'adminCharge',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'payableAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
       {
         columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
+        sortingEnabled: false,
       },
-      { columnName: 'invoiceDate', type: 'date', format: dateFormatLong },
+      {
+        columnName: 'invoiceDate',
+        type: 'date',
+        format: dateFormatLong,
+        sortingEnabled: false,
+      },
       {
         columnName: 'payment',
         currency: true,
+        sortingEnabled: false,
         render: (row) => {
           return (
             <GridItem xs={8}>
