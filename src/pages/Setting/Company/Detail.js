@@ -12,11 +12,11 @@ import {
   Field,
   NumberInput,
   dateFormatLong,
+  Checkbox,
+  CustomInput,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
 import Contact from './Contact'
-
-const styles = (theme) => ({})
 
 @withFormikExtend({
   mapPropsToValues: ({ settingCompany }) =>
@@ -108,10 +108,10 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, theme, footer, values, settingCompany, route } = props
+    const { theme, footer, values, settingCompany, route } = props
     const { name } = route
     const type = 'copayer'
-    const { isUserMaintainable } = values
+    const { isUserMaintainable, isGSTEnabled } = values
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
@@ -161,27 +161,26 @@ class Detail extends PureComponent {
                 />
               </GridItem>
 
-              <GridContainer>
-                <GridItem md={6}>
-                  {name === type ? (
-                    <FastField
-                      name='coPayerTypeFK'
-                      render={(args) => (
-                        <CodeSelect
-                          label='Co-Payer Type'
-                          code='ctCopayerType'
-                          disabled
-                          {...args}
-                        />
-                      )}
-                    />
-                  ) : (
-                    []
-                  )}
-                </GridItem>
-              </GridContainer>
-
               <GridItem md={6}>
+                {name === type ? (
+                  <FastField
+                    name='coPayerTypeFK'
+                    render={(args) => (
+                      <CodeSelect
+                        label='Co-Payer Type'
+                        code='ctCopayerType'
+                        disabled
+                        {...args}
+                      />
+                    )}
+                  />
+                ) : (
+                  []
+                )}
+              </GridItem>
+              <GridItem md={6} />
+
+              <GridItem md={4}>
                 <Field
                   name='adminCharge'
                   render={(args) => {
@@ -191,6 +190,7 @@ class Detail extends PureComponent {
                           currency
                           label='Admin Fee'
                           defaultValue='0.00'
+                          precision={2}
                           {...args}
                         />
                       )
@@ -200,13 +200,14 @@ class Detail extends PureComponent {
                         percentage
                         label='Admin Fee'
                         defaultValue='0.00'
+                        precision={2}
                         {...args}
                       />
                     )
                   }}
                 />
               </GridItem>
-              <GridItem md={6}>
+              <GridItem md={2}>
                 <Field
                   name='adminChargeType'
                   render={(args) => (
@@ -220,6 +221,52 @@ class Detail extends PureComponent {
                     />
                   )}
                 />
+              </GridItem>
+
+              <GridItem md={2}>
+                {name !== type ? (
+                  <div style={{ position: 'relative' }}>
+                    <CustomInput label='' disabled style={{ width: 0 }} />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                      }}
+                    >
+                      <Field
+                        name='isGSTEnabled'
+                        render={(args) => (
+                          <Checkbox
+                            label='Enable GST'
+                            onChange={this.handleOnChange}
+                            {...args}
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  []
+                )}
+              </GridItem>
+              <GridItem md={4}>
+                {name !== type ? (
+                  <Field
+                    name='gstValue'
+                    render={(args) => (
+                      <NumberInput
+                        label='GST Value'
+                        {...args}
+                        disabled={!isGSTEnabled}
+                        suffix='%'
+                        format='0.00'
+                        precision={2}
+                      />
+                    )}
+                  />
+                ) : (
+                  []
+                )}
               </GridItem>
             </GridContainer>
 

@@ -15,12 +15,9 @@ import {
 import { ReportViewer } from '@/components/_medisys'
 import POForm from './POForm'
 import POGrid from './POGrid'
-// import POSummary from './POSummary'
-import POSummary from './Share/index'
 import { calculateItemLevelAdjustment } from '@/utils/utils'
 import {
   isPOStatusDraft,
-  isPOStatusFinalized,
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
@@ -47,9 +44,8 @@ const styles = (theme) => ({
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
-  mapPropsToValues: ({ purchaseOrderDetails, clinicSettings }) => {
+  mapPropsToValues: ({ purchaseOrderDetails }) => {
     const newPurchaseOrderDetails = purchaseOrderDetails
-    const { settings } = clinicSettings
     if (newPurchaseOrderDetails) {
       if (
         newPurchaseOrderDetails.type &&
@@ -64,19 +60,6 @@ const styles = (theme) => ({
       } else if (newPurchaseOrderDetails.type === 'new') {
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
         newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
-        newPurchaseOrderDetails.purchaseOrder.gstValue =
-          settings.gSTPercentageInt
-        newPurchaseOrderDetails.purchaseOrder.isGSTEnabled =
-          settings.isEnableGST
-      }
-
-      if (newPurchaseOrderDetails.purchaseOrder) {
-        const {
-          isGSTEnabled,
-          isGstInclusive,
-        } = newPurchaseOrderDetails.purchaseOrder
-        newPurchaseOrderDetails.purchaseOrder.IsGSTEnabled = isGSTEnabled
-        newPurchaseOrderDetails.purchaseOrder.IsGSTInclusive = isGstInclusive
       }
     }
     return {
@@ -90,32 +73,11 @@ const styles = (theme) => ({
     }),
     rows: Yup.array().required('At least one item is required.'),
   }),
-  handleSubmit: (values, { props }) => {},
+  handleSubmit: () => {},
 })
 class Index extends Component {
   state = {
-    settingGSTEnable: false,
-    settingGSTPercentage: 0,
     showReport: false,
-    inclusiveGSTChecked: false,
-  }
-
-  static getDerivedStateFromProps (props, state) {
-    const { clinicSettings } = props
-    const { settings } = clinicSettings
-
-    if (settings) {
-      if (
-        settings.isEnableGST !== state.settingGSTEnable &&
-        settings.gSTPercentageInt !== state.settingGSTPercentage
-      )
-        return {
-          ...state,
-          settingGSTEnable: settings.isEnableGST,
-          settingGSTPercentage: settings.gSTPercentageInt,
-        }
-    }
-    return null
   }
 
   componentDidMount () {
@@ -393,10 +355,9 @@ class Index extends Component {
   }
 
   calcPurchaseOrderSummary = () => {
-    const { settingGSTEnable } = this.state
     const { values, setFieldValue } = this.props
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
-    const { IsGSTEnabled, IsGSTInclusive, gstValue } = purchaseOrder || false
+    const { isGSTEnabled, isGstInclusive, gstValue } = purchaseOrder || false
     let tempInvoiceTotal = 0
     let totalAmount = 0
     let gstAmount = 0
@@ -433,10 +394,9 @@ class Index extends Component {
               adj.adjValue,
               item.tempSubTotal,
               tempInvoiceTotal,
-              settingGSTEnable,
               gstValue,
-              IsGSTEnabled,
-              IsGSTInclusive,
+              isGSTEnabled,
+              isGstInclusive,
               filteredPurchaseOrderItem.length,
             )
 
@@ -455,7 +415,7 @@ class Index extends Component {
             // Sum up all itemLevelGST & invoiceTotal at last iteration
             if (Object.is(adjArr.length - 1, adjKey)) {
               // Calculate item level totalAfterAdjustments & totalAfterGst
-              if (IsGSTInclusive) {
+              if (isGstInclusive) {
                 item.totalAfterGst = item.tempSubTotal
                 totalAmount += item.tempSubTotal
               } else {
@@ -473,16 +433,12 @@ class Index extends Component {
       })
     } else {
       filteredPurchaseOrderItem.map((item) => {
-        if (settingGSTEnable) {
-          if (!IsGSTEnabled) {
-            item.itemLevelGST = 0
-          } else if (IsGSTInclusive) {
-            item.itemLevelGST = item.tempSubTotal * (gstValue / 107)
-          } else {
-            item.itemLevelGST = item.tempSubTotal * (gstValue / 100)
-          }
-        } else {
+        if (!isGSTEnabled) {
           item.itemLevelGST = 0
+        } else if (isGstInclusive) {
+          item.itemLevelGST = item.tempSubTotal * (gstValue / 107)
+        } else {
+          item.itemLevelGST = item.tempSubTotal * (gstValue / 100)
         }
 
         // Calculate item level totalAfterAdjustments & totalAfterGst
@@ -514,10 +470,6 @@ class Index extends Component {
     }))
   }
 
-  setInclusiveGSTChecked = () => {
-    this.setState({ inclusiveGSTChecked: true })
-  }
-
   render () {
     const {
       purchaseOrderDetails,
@@ -529,7 +481,7 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment, rows } = values
-    const { IsGSTEnabled, IsGSTInclusive, gstValue } = purchaseOrder || false
+    const { isGSTEnabled, isGstInclusive, gstValue } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -538,7 +490,7 @@ class Index extends Component {
       if (isWriteOff) return false
       return true
     }
-    const currentGstValue = IsGSTEnabled ? gstValue : undefined
+    const currentGstValue = isGSTEnabled ? gstValue : undefined
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -574,18 +526,6 @@ class Index extends Component {
             // rights: 'disable',
           }}
         >
-          {/* <POSummary
-            toggleInvoiceAdjustment={this.showInvoiceAdjustment}
-            handleCalcInvoiceSummary={this.calcPurchaseOrderSummary}
-            handleDeleteInvoiceAdjustment={this.handleDeleteInvoiceAdjustment}
-            prefix='purchaseOrder.'
-            adjustmentListName='purchaseOrderAdjustment'
-            adjustmentList={purchaseOrderAdjustment}
-            IsGSTEnabled={IsGSTEnabled}
-            IsGSTInclusive={IsGSTInclusive}
-            setFieldValue={setFieldValue}
-            // {...this.props}
-          /> */}
           <GridContainer>
             <GridItem xs={2} md={9} />
             <GridItem xs={10} md={3}>
@@ -593,7 +533,7 @@ class Index extends Component {
                 rows={rows}
                 adjustments={purchaseOrderAdjustment}
                 config={{
-                  isGSTInclusive: IsGSTInclusive,
+                  isGSTInclusive: isGstInclusive,
                   totalField: 'totalPrice',
                   adjustedField: 'totalAfterAdjustments',
                   gstField: 'totalAfterGst',
@@ -602,12 +542,8 @@ class Index extends Component {
                 }}
                 onValueChanged={(v) => {
                   setFieldValue('purchaseOrderAdjustment', v.adjustments)
-                  // setFieldValue(
-                  //  'purchaseOrder.IsGSTEnabled',
-                  //  v.summary.isEnableGST,
-                  // )
                   setFieldValue(
-                    'purchaseOrder.IsGSTInclusive',
+                    'purchaseOrder.isGstInclusive',
                     v.summary.isGSTInclusive,
                   )
                   setFieldValue(
