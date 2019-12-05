@@ -793,10 +793,13 @@ class Form extends React.PureComponent {
     const { values } = this.props
     const { appointmentStatusFk } = values
     if (!values.id) return false
-
+    const disablingList = [
+      APPOINTMENT_STATUS.TURNEDUP,
+      APPOINTMENT_STATUS.SCHEDULED,
+      APPOINTMENT_STATUS.RESCHEDULED,
+    ]
     return (
-      values.isEnableRecurrence ||
-      appointmentStatusFk === APPOINTMENT_STATUS.TURNEDUP
+      values.isEnableRecurrence || disablingList.includes(appointmentStatusFk)
     )
   }
 

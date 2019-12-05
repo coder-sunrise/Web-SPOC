@@ -443,7 +443,7 @@ class Billing extends Component {
                   <ArrowBack />Dispense
                 </Button>
                 <Button
-                  color='info'
+                  color='primary'
                   onClick={this.upsertBilling}
                   disabled={this.state.isEditing}
                 >
