@@ -315,7 +315,63 @@ export const constructPayload = (values) => {
   } = values
 
   const { invoiceItems, ...restInvoice } = invoice
+  const _invoicePayer = invoicePayer
+    .map((item, index) => ({ ...item, sequence: index }))
+    .filter((payer) => {
+      if (payer.id === undefined && payer.isCancelled) return false
+      return true
+    })
+    .filter((payer) => (payer.id ? payer.isModified : true))
+    .map((payer) => {
+      const {
+        schemeConfig,
+        _indexInClaimableSchemes,
+        _isConfirmed,
+        claimableSchemes,
+        _isDeleted,
+        _isEditing,
+        _isValid,
+        isModified,
+        ...restPayer
+      } = payer
+      const _payer = {
+        ...restPayer,
+        isModified: restPayer.id ? isModified : false,
+        invoicePayerItem: payer.invoicePayerItem
+          .filter((item) => item.claimAmount > 0)
+          .map((item) => {
+            if (item.invoiceItemFK) {
+              return { ...item }
+            }
+            const {
+              invoiceItemFK,
+              _claimedAmount,
+              disabled,
+              itemCode,
+              rowIndex,
+              notClaimableBySchemeIds,
+              invoiceItemTypeFK,
+              itemDescription,
+              coverage,
+              payableBalance,
+              id,
+              ...restItem
+            } = item
 
+            const _invoicePayerItem = {
+              ...restItem,
+              invoiceItemFK: id,
+              payableBalance,
+              invoiceItemTypeFK,
+              itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
+              itemName: itemDescription,
+            }
+            return _invoicePayerItem
+          }),
+      }
+      return _payer
+    })
+  console.log('construct payload', { invoicePayer, _invoicePayer })
   const payload = {
     mode,
     concurrencyToken,
@@ -332,62 +388,7 @@ export const constructPayload = (values) => {
         invoicePayerFK: undefined,
       })),
     invoice: restInvoice,
-    invoicePayer: invoicePayer
-      .map((item, index) => ({ ...item, sequence: index }))
-      .filter((payer) => {
-        if (payer.id === undefined && payer.isCancelled) return false
-        return true
-      })
-      .filter((payer) => (payer.id ? payer.isModified : true))
-      .map((payer) => {
-        const {
-          schemeConfig,
-          _indexInClaimableSchemes,
-          _isConfirmed,
-          claimableSchemes,
-          _isDeleted,
-          _isEditing,
-          _isValid,
-          isModified,
-          ...restPayer
-        } = payer
-        const _payer = {
-          ...restPayer,
-          isModified: restPayer.id ? isModified : false,
-          invoicePayerItem: payer.invoicePayerItem
-            .filter((item) => item.claimAmount > 0)
-            .map((item) => {
-              if (item.invoiceItemFK) {
-                return { ...item }
-              }
-              const {
-                invoiceItemFK,
-                _claimedAmount,
-                disabled,
-                itemCode,
-                rowIndex,
-                notClaimableBySchemeIds,
-                invoiceItemTypeFK,
-                itemDescription,
-                coverage,
-                payableBalance,
-                id,
-                ...restItem
-              } = item
-
-              const _invoicePayerItem = {
-                ...restItem,
-                invoiceItemFK: id,
-                payableBalance,
-                invoiceItemTypeFK,
-                itemType: INVOICE_ITEM_TYPE[invoiceItemTypeFK],
-                itemName: itemDescription,
-              }
-              return _invoicePayerItem
-            }),
-        }
-        return _payer
-      }),
+    invoicePayer: _invoicePayer,
   }
   return payload
 }

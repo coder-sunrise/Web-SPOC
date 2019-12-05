@@ -79,7 +79,7 @@ const gridValidationSchema = Yup.object().shape({
   }),
 )
 @withFormikExtend({
-  // notDirtyDuration: 0.5,
+  notDirtyDuration: 1,
   displayName: 'AppointmentForm',
   // enableReinitialize: true,
   validationSchema: ValidationSchema,
