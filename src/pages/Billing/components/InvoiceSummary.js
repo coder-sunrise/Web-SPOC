@@ -206,6 +206,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.invoiceButton}
                 onClick={handlePrintInvoiceClick}
+                disabled={disabled}
               >
                 Print Invoice
               </Button>

@@ -1,0 +1,662 @@
+import React, { Fragment, useState, useEffect, useCallback } from 'react'
+import _ from 'lodash'
+// material ui
+import { withStyles } from '@material-ui/core'
+import Add from '@material-ui/icons/AddCircle'
+import Reset from '@material-ui/icons/Cached'
+// common components
+import { CommonModal, Button, GridItem } from '@/components'
+// import MedisaveSchemes from './MedisaveSchemes'
+import Scheme from './newScheme'
+import CoPayer from '../modal/CoPayer'
+import ApplicableClaims from '../modal/ApplicableClaims'
+// styles
+import styles from './styles'
+// utils
+import {
+  getInvoiceItemsWithClaimAmount,
+  getCoverageAmountAndType,
+  computeTotalForAllSavedClaim,
+  updateOriginalInvoiceItemList,
+  flattenInvoicePayersInvoiceItemList,
+  validateInvoicePayerItems,
+  validateClaimAmount,
+  updateInvoicePayerPayableBalance,
+  sortItemByID,
+} from './applyClaimUtils'
+import { roundTo } from '@/utils/utils'
+import {
+  INVOICE_PAYER_TYPE,
+  INVOICE_ITEM_TYPE_BY_TEXT,
+} from '@/utils/constants'
+
+const defaultInvoicePayer = {
+  _indexInClaimableSchemes: 0,
+  _isConfirmed: false,
+  _isDeleted: false,
+  _isEditing: true,
+  _isValid: true,
+  isDeleted: false,
+  isCancelled: false,
+  copaymentSchemeFK: undefined,
+  name: '',
+  payerDistributedAmt: 0,
+  // claimableSchemes: claimableSchemes[0],
+  invoicePayerItem: [],
+  sequence: 0,
+  // payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
+}
+
+const ApplyClaims = ({
+  dispatch,
+  classes,
+  values,
+  setValues,
+  submitCount,
+  commitCount = 1,
+  handleIsEditing,
+}) => {
+  const {
+    invoice,
+    invoicePayment,
+    invoicePayer: payerList,
+    claimableSchemes,
+  } = values
+
+  const [
+    showErrorPrompt,
+    setShowErrorPrompt,
+  ] = useState(false)
+
+  const [
+    errorMessage,
+    setErrorMessage,
+  ] = useState([])
+
+  const [
+    showClaimableSchemesSelection,
+    setShowClaimableSchemesSelection,
+  ] = useState(false)
+
+  const [
+    showCoPaymentModal,
+    setShowCoPaymentModal,
+  ] = useState(false)
+
+  const [
+    initialState,
+    setInitialState,
+  ] = useState([])
+
+  const [
+    curEditInvoicePayerBackup,
+    setCurEditInvoicePayerBackup,
+  ] = useState(undefined)
+
+  const [
+    tempInvoicePayer,
+    setTempInvoicePayer,
+  ] = useState([])
+
+  const hasOtherEditing = tempInvoicePayer.reduce(
+    (editing, payer) => payer._isEditing || editing,
+    false,
+  )
+  const shouldDisableAddClaim =
+    tempInvoicePayer.filter(
+      (invoicePayer) => invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME,
+    ).length < invoice.claimableSchemes || hasOtherEditing
+
+  const incrementCommitCount = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: { commitCount: commitCount + 1 },
+    })
+  }
+
+  const updateTempInvoicePayer = (
+    updatedPayer,
+    updatedIndex,
+    invoicePayerList,
+  ) => {
+    const _list = invoicePayerList || tempInvoicePayer
+    const invoicePayerWithUpdatedPayer = _list.map(
+      (payer, index) => (updatedIndex === index ? updatedPayer : payer),
+    )
+    const newInvoicePayer = updateInvoicePayerPayableBalance(
+      invoice.invoiceItems,
+      invoicePayerWithUpdatedPayer,
+      updatedIndex,
+    )
+    setTempInvoicePayer(newInvoicePayer)
+  }
+
+  const handleSchemeChange = (value, index, invoicePayerList) => {
+    const flattenSchemes = claimableSchemes.reduce(
+      (schemes, cs) => [
+        ...schemes,
+        ...cs.map((item) => ({ ...item })),
+      ],
+      [],
+    )
+    const schemeConfig = flattenSchemes.find((item) => item.id === value)
+
+    const payer = invoicePayerList
+      ? invoicePayerList[index]
+      : tempInvoicePayer[index]
+
+    const payerInvoiceItems = getInvoiceItemsWithClaimAmount(
+      { ...schemeConfig, claimType: payer.claimType },
+      invoice.invoiceItems,
+      payer.invoicePayerItem,
+    )
+
+    const updatedPayer = {
+      ...payer,
+      schemeConfig,
+      name: schemeConfig.coPaymentSchemeName,
+      companyFK: schemeConfig.copayerFK,
+      copaymentSchemeFK: schemeConfig.id,
+      isModified: true,
+      invoicePayerItem: payerInvoiceItems,
+    }
+
+    updateTempInvoicePayer(updatedPayer, index, invoicePayerList || null)
+  }
+
+  const toggleCopayerModal = () => setShowCoPaymentModal(!showCoPaymentModal)
+
+  const toggleErrorPrompt = () => {
+    if (showErrorPrompt) setErrorMessage([])
+    setShowErrorPrompt(!showErrorPrompt)
+  }
+
+  const syncWithQueried = () => {
+    const hasAddedPayer = payerList.length > 0
+    if (hasAddedPayer) {
+      const newInvoicePayer = payerList.map((_payer, index) => {
+        if (_payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
+          const _claimableSchemesIndex = claimableSchemes.findIndex(
+            (cs) =>
+              cs.find((_cs) => _cs.id === _payer.copaymentSchemeFK) !==
+              undefined,
+          )
+          if (claimableSchemes[_claimableSchemesIndex]) {
+            const schemeConfig = claimableSchemes[_claimableSchemesIndex].find(
+              (cs) => cs.id === _payer.copaymentSchemeFK,
+            )
+
+            return {
+              ..._payer,
+              invoicePayerItem: _payer.invoicePayerItem
+                .map((item) => {
+                  const { coverage } = getCoverageAmountAndType(
+                    schemeConfig,
+                    item,
+                  )
+                  const invoiceItemTypeFK =
+                    item.invoiceItemTypeFK === undefined && item.itemType
+                      ? INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
+                      : item.invoiceItemTypeFK
+                  return { ...item, coverage, invoiceItemTypeFK }
+                })
+                .sort(sortItemByID),
+              schemeConfig,
+              _indexInClaimableSchemes: _claimableSchemesIndex,
+              _isConfirmed: true,
+              _isDeleted: false,
+              _isEditing: false,
+              _isValid: true,
+              claimableSchemes: claimableSchemes[_claimableSchemesIndex],
+            }
+          }
+        }
+        const existing = tempInvoicePayer[index]
+        return {
+          ...existing,
+          ..._payer,
+          _isConfirmed: true,
+          _isDeleted: false,
+          _isEditing: false,
+          _isValid: true,
+        }
+      })
+      setTempInvoicePayer(newInvoicePayer)
+      setInitialState(newInvoicePayer)
+    } else if (claimableSchemes.length > 0 && invoicePayment.length === 0) {
+      const _invoicePayer = {
+        ...defaultInvoicePayer,
+        claimableSchemes: claimableSchemes[0],
+        payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
+      }
+      setCurEditInvoicePayerBackup(_invoicePayer)
+      setInitialState([
+        _invoicePayer,
+      ])
+      handleSchemeChange(_invoicePayer.claimableSchemes[0].id, 0, [
+        _invoicePayer,
+      ])
+    } else {
+      setInitialState([])
+      setTempInvoicePayer([])
+      setCurEditInvoicePayerBackup(undefined)
+      // refTempInvociePayer.current = []
+    }
+  }
+
+  const updateValues = () => {
+    const finalClaim = roundTo(
+      tempInvoicePayer.reduce(computeTotalForAllSavedClaim, 0),
+    )
+    let finalPayable = roundTo(invoice.totalAftGst - finalClaim)
+    const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
+      if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+      return totalAmtPaid
+    }, 0)
+    const newOutstandingBalance = roundTo(invoice.totalAftGst - totalPaid)
+    const updatedInvoiceItems = updateOriginalInvoiceItemList(
+      invoice.invoiceItems,
+      tempInvoicePayer,
+    )
+
+    const _values = {
+      ...values,
+      finalClaim,
+      finalPayable,
+      invoice: {
+        ...values.invoice,
+        outstandingBalance: newOutstandingBalance,
+        patientOutstandingBalance: roundTo(finalPayable - totalPaid),
+        invoiceItems: updatedInvoiceItems,
+      },
+      invoicePayer: tempInvoicePayer,
+    }
+    handleIsEditing(hasOtherEditing)
+    setValues(_values)
+  }
+
+  const handleResetClick = useCallback(
+    () => {
+      setTempInvoicePayer(initialState)
+      setCurEditInvoicePayerBackup(undefined)
+    },
+    [
+      initialState,
+    ],
+  )
+
+  const handleCancelClick = useCallback(
+    (index) => {
+      const updatedPayer = {
+        ...tempInvoicePayer[index],
+        ...curEditInvoicePayerBackup,
+        _isConfirmed: true,
+        _isEditing: false,
+        _isDeleted: false,
+        isCancelled: false,
+      }
+      setCurEditInvoicePayerBackup(updatedPayer)
+      updateTempInvoicePayer(updatedPayer, index)
+    },
+    [
+      tempInvoicePayer,
+    ],
+  )
+
+  const handleEditClick = useCallback(
+    (index) => {
+      const updatedPayer = {
+        ...tempInvoicePayer[index],
+        _isConfirmed: false,
+        _isEditing: true,
+        _isDeleted: false,
+      }
+      setCurEditInvoicePayerBackup(updatedPayer)
+      updateTempInvoicePayer(updatedPayer, index)
+    },
+    [
+      tempInvoicePayer,
+    ],
+  )
+  const handleApplyClick = useCallback(
+    (index) => {
+      const invoiceItems = validateInvoicePayerItems(
+        tempInvoicePayer[index].invoicePayerItem,
+      )
+      const hasInvalidRow = invoiceItems.reduce(
+        (hasError, item) => (item.error ? true : hasError),
+        false,
+      )
+      const updatedPayer = {
+        ...tempInvoicePayer[index],
+        payerDistributedAmt: roundTo(
+          invoiceItems.reduce(
+            (subtotal, item) => subtotal + item.claimAmount,
+            0,
+          ),
+        ),
+        isModified: true,
+        invoicePayerItem: invoiceItems,
+        _isConfirmed: !hasInvalidRow,
+        _isEditing: hasInvalidRow,
+        _isDeleted: false,
+      }
+
+      if (hasInvalidRow) {
+        updateTempInvoicePayer(updatedPayer, index)
+        incrementCommitCount()
+        // setCommitCount(commitCount + 1)
+        return false
+      }
+      const invalidMessages = validateClaimAmount(
+        updatedPayer,
+        values.finalPayable,
+      )
+      if (invalidMessages.length <= 0) {
+        setCurEditInvoicePayerBackup(undefined)
+        updateTempInvoicePayer(updatedPayer, index)
+      } else {
+        setErrorMessage(invalidMessages)
+        toggleErrorPrompt()
+      }
+      return true
+    },
+    [
+      tempInvoicePayer,
+    ],
+  )
+
+  const handleDeleteClick = useCallback(
+    (index) => {
+      const updatedPayer = {
+        ...tempInvoicePayer[index],
+        isModified: true,
+        _isConfirmed: true,
+        _isEditing: false,
+        _isDeleted: true,
+        isCancelled: true,
+      }
+      updateTempInvoicePayer(updatedPayer, index)
+    },
+    [
+      tempInvoicePayer,
+    ],
+  )
+
+  const handleCommitChanges = useCallback(
+    ({ rows, changed }) => {
+      const id = !_.isEmpty(changed)
+        ? parseInt(Object.keys(changed)[0], 10)
+        : -99
+
+      if (id === -99) return
+      const index = tempInvoicePayer.findIndex((item) => item._isEditing)
+      const payer = { ...tempInvoicePayer[index] }
+      const flattenInvoiceItemList = tempInvoicePayer.reduce(
+        flattenInvoicePayersInvoiceItemList,
+        [],
+      )
+      const totalPayableBalance = flattenInvoiceItemList
+        .filter(
+          (item) =>
+            item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
+        )
+        .reduce(
+          (largestPayable, item) =>
+            item.payableBalance > largestPayable
+              ? item.payableBalance
+              : largestPayable,
+          0,
+        )
+      const currentItemClaimedAmount = flattenInvoiceItemList.reduce(
+        (remainingClaimable, item) => {
+          if (
+            item.invoiceItemFK &&
+            parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
+          )
+            return remainingClaimable + item.claimAmount
+          if (parseInt(item.id, 10) === parseInt(id, 10)) {
+            return remainingClaimable + item.claimAmount
+          }
+          return remainingClaimable
+        },
+        0,
+      )
+
+      const newInvoicePayer = {
+        ...payer,
+        invoicePayerItem: rows.map((item) => {
+          const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
+          if (parseInt(_id, 10) === id) {
+            const { claimAmount: currentChangesClaimAmount } = item
+            const eligibleAmount =
+              totalPayableBalance - currentItemClaimedAmount
+
+            if (
+              eligibleAmount === 0 ||
+              currentChangesClaimAmount <= eligibleAmount ||
+              Number.isNaN(eligibleAmount)
+            ) {
+              return { ...item, error: undefined }
+            }
+            return { ...item, error: 'INVALID' }
+          }
+          return { ...item, error: undefined }
+        }),
+        _hasError: rows.reduce(
+          (error, row) => (row._errors && row._errors.length > 0) || error,
+          false,
+        ),
+      }
+      updateTempInvoicePayer(newInvoicePayer, index)
+      incrementCommitCount()
+    },
+    [
+      tempInvoicePayer,
+    ],
+  )
+
+  const handleAddCoPayer = (invoicePayer) => {
+    toggleCopayerModal()
+    const newTempInvoicePayer = [
+      ...tempInvoicePayer,
+      invoicePayer,
+    ]
+    setTempInvoicePayer(newTempInvoicePayer)
+  }
+
+  const handleSelectClaimClick = (
+    claimableSchemesIndex,
+    nestedIndex,
+    schemePayerFK,
+  ) => {
+    const invoicePayer = {
+      ...defaultInvoicePayer,
+      _indexInClaimableSchemes: claimableSchemesIndex,
+      claimableSchemes: claimableSchemes[claimableSchemesIndex],
+      payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
+      schemePayerFK,
+    }
+    setCurEditInvoicePayerBackup(invoicePayer)
+    setShowClaimableSchemesSelection(false)
+    const newTempInvoicePayer = [
+      ...tempInvoicePayer,
+      invoicePayer,
+    ]
+    if (
+      claimableSchemes[claimableSchemesIndex].length === 1 ||
+      nestedIndex !== undefined
+    ) {
+      return handleSchemeChange(
+        invoicePayer.claimableSchemes[nestedIndex].id,
+        newTempInvoicePayer.length - 1,
+        newTempInvoicePayer,
+      )
+    }
+    return setTempInvoicePayer(newTempInvoicePayer)
+  }
+
+  const handleAddClaimClick = () => {
+    setShowClaimableSchemesSelection(true)
+  }
+
+  const handleClaimTypeChange = (value, index) => {
+    const claimType = value.toLowerCase()
+    const updatedPayer = {
+      ...tempInvoicePayer[index],
+      claimType,
+      invoicePayerItem: tempInvoicePayer[
+        index
+      ].invoicePayerItem.filter((item) => {
+        if (claimType === 'vaccination' && item.invoiceItemTypeFK !== 3)
+          return false
+        if (claimType === 'cdmp' && item.invoiceItemTypeFK === 3) return false
+
+        return true
+      }),
+    }
+
+    updateTempInvoicePayer(updatedPayer, index)
+  }
+
+  useEffect(syncWithQueried, [
+    values.id,
+    submitCount,
+  ])
+
+  useEffect(updateValues, [
+    tempInvoicePayer,
+  ])
+
+  return (
+    <Fragment>
+      <GridItem md={2}>
+        <h5 style={{ paddingLeft: 8 }}>Apply Claims</h5>
+      </GridItem>
+      <GridItem md={10} container justify='flex-end'>
+        <Button
+          color='primary'
+          size='sm'
+          disabled={shouldDisableAddClaim}
+          onClick={handleAddClaimClick}
+        >
+          <Add />
+          Claimable Schemes
+        </Button>
+        <Button
+          color='primary'
+          size='sm'
+          onClick={toggleCopayerModal}
+          disabled={hasOtherEditing}
+        >
+          <Add />
+          Co-Payer
+        </Button>
+        <Button color='danger' size='sm' onClick={handleResetClick}>
+          <Reset />
+          Reset
+        </Button>
+      </GridItem>
+      <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+        {tempInvoicePayer.map((invoicePayer, index) => {
+          if (invoicePayer.isCancelled) return null
+          // if (
+          //   invoicePayer.schemeConfig &&
+          //   [
+          //     12,
+          //     13,
+          //     14,
+          //   ].includes(invoicePayer.schemeConfig.id)
+          // )
+          //   return (
+          //     <MedisaveSchemes
+          //       key={`invoicePayer-${index}`}
+          //       _key={`invoicePayer-${index}`}
+          //       invoicePayer={invoicePayer}
+          //       index={index}
+          //       onSchemeChange={handleSchemeChange}
+          //       onCommitChanges={handleCommitChanges}
+          //       onCancelClick={handleCancelClick}
+          //       onEditClick={handleEditClick}
+          //       onApplyClick={handleApplyClick}
+          //       onDeleteClick={handleDeleteClick}
+          //       hasOtherEditing={hasOtherEditing}
+          //       onClaimTypeChange={handleClaimTypeChange}
+          //     />
+          //   )
+
+          return (
+            <Scheme
+              key={`invoicePayer-${index}`}
+              _key={`invoicePayer-${index}`}
+              invoicePayer={invoicePayer}
+              index={index}
+              onSchemeChange={handleSchemeChange}
+              onCommitChanges={handleCommitChanges}
+              onCancelClick={handleCancelClick}
+              onEditClick={handleEditClick}
+              onApplyClick={handleApplyClick}
+              onDeleteClick={handleDeleteClick}
+              hasOtherEditing={hasOtherEditing}
+            />
+          )
+        })}
+      </GridItem>
+      <CommonModal
+        title='Cannot save scheme'
+        open={showErrorPrompt}
+        onClose={toggleErrorPrompt}
+        maxWidth='sm'
+      >
+        <div className={classes.errorPromptContainer}>
+          {errorMessage.map((message) => <p>{message}</p>)}
+        </div>
+      </CommonModal>
+      <CommonModal
+        title='Add Copayer'
+        open={showCoPaymentModal}
+        onClose={toggleCopayerModal}
+      >
+        <CoPayer
+          onAddCoPayerClick={handleAddCoPayer}
+          copayers={tempInvoicePayer
+            .filter(
+              (payer) =>
+                !payer.isCancelled &&
+                payer.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+            )
+            .map((i) => i.companyFK)}
+          invoiceItems={invoice.invoiceItems.map((invoiceItem) => ({
+            ...invoiceItem,
+            itemName: invoiceItem.itemDescription,
+            schemeCoverage: 100,
+            schemeCoverageType: 'Percentage',
+            payableBalance:
+              invoiceItem.totalAfterGst - (invoiceItem._claimedAmount || 0),
+          }))}
+        />
+      </CommonModal>
+      <CommonModal
+        open={showClaimableSchemesSelection}
+        title='Claimable Schemes'
+        onClose={() =>
+          setShowClaimableSchemesSelection(!showClaimableSchemesSelection)}
+        maxWidth='sm'
+      >
+        <ApplicableClaims
+          currentClaims={tempInvoicePayer
+            .filter(
+              (invoicePayer) =>
+                !invoicePayer.isCancelled &&
+                invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME,
+            )
+            .map((i) => i.schemeConfig.id)}
+          claimableSchemes={claimableSchemes}
+          handleSelectClick={handleSelectClaimClick}
+        />
+      </CommonModal>
+    </Fragment>
+  )
+}
+
+export default withStyles(styles, { name: 'NewApplyClaims' })(ApplyClaims)

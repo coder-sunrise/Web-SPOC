@@ -96,6 +96,10 @@ class EmergencyContact extends PureComponent {
           }
         },
       },
+      {
+        columnName: 'remark',
+        maxLength: 100,
+      },
     ],
   }
 

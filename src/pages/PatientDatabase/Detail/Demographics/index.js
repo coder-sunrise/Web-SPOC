@@ -358,19 +358,23 @@ class Demographic extends PureComponent {
               <GridItem xs={3}>
                 <FastField
                   name='contact.homeContactNumber.number'
-                  render={(args) => <TextField label='Home' {...args} />}
+                  render={(args) => (
+                    <MobileNumberInput label='Home' {...args} />
+                  )}
                 />
               </GridItem>
               <GridItem xs={3}>
                 <FastField
                   name='contact.officeContactNumber.number'
-                  render={(args) => <TextField label='Office' {...args} />}
+                  render={(args) => (
+                    <MobileNumberInput label='Office' {...args} />
+                  )}
                 />
               </GridItem>
               <GridItem xs={6}>
                 <FastField
                   name='contact.faxContactNumber.number'
-                  render={(args) => <TextField label='Fax' {...args} />}
+                  render={(args) => <MobileNumberInput label='Fax' {...args} />}
                 />
               </GridItem>
               <GridItem xs={6}>
