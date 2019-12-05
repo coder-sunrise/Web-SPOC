@@ -132,9 +132,10 @@ class Detail extends PureComponent {
                 render={(args) => (
                   <NumberInput
                     label='Multiplier'
-                    maxLength={11}
+                    maxLength={9}
                     max={999999.99}
                     format='0.00'
+                    precision={2}
                     {...args}
                   />
                 )}

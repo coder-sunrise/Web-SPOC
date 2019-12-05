@@ -760,7 +760,7 @@ const ApplyClaims = ({
       refTempInvociePayer.current,
     ],
   )
-  console.log({ tempInvoicePayer })
+
   return (
     <React.Fragment>
       <GridItem md={2}>

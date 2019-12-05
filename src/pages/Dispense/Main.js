@@ -45,6 +45,7 @@ const reloadDispense = (props, effect = 'query') => {
         adjustedField: 'totalAfterOverallAdjustment',
         gstField: 'totalAfterGST',
         gstAmtField: 'gstAmount',
+        gstValue: obj.invoice.gstValue,
       },
     )
     let invoiceSummary = {}
@@ -128,14 +129,14 @@ class Main extends Component {
     const { dispatch, values } = this.props
     const { otherOrder, prescription } = values
 
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
+    // dispatch({
+    //   type: 'codetable/fetchCodes',
+    //   payload: {
+    //     code: 'inventorymedication',
+    //     force: true,
+    //     temp: true,
+    //   },
+    // })
 
     if (
       otherOrder &&

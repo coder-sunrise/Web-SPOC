@@ -47,8 +47,6 @@ class AmountSummary extends PureComponent {
     const { rows = [], adjustments = [], config, onValueChanged } = this.props
     // console.log(rows, adjustments)
     this.state = {
-      settingGSTEnable: true,
-      settingGSTPercentage: 0,
       adjustments: [],
       rows: [],
       ...calculateAmount(rows, adjustments, config),
@@ -57,24 +55,6 @@ class AmountSummary extends PureComponent {
       onValueChanged(this.state)
     }
   }
-
-  // static getDerivedStateFromProps (props, state) {
-  //   const { clinicSettings } = props
-  //   const { settings } = clinicSettings
-
-  //   if (settings) {
-  //     if (
-  //       settings.isEnableGST !== state.settingGSTEnable &&
-  //       settings.GSTPercentageInt !== state.settingGSTPercentage
-  //     )
-  //       return {
-  //         ...state,
-  //         settingGSTEnable: settings.isEnableGST,
-  //         settingGSTPercentage: settings.GSTPercentageInt,
-  //       }
-  //   }
-  //   return null
-  // }
 
   componentDidMount () {}
 
@@ -174,23 +154,10 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const {
-      theme,
-      gstInclusiveConfigrable = true,
-      showAdjustment,
-      classes,
-      fromPO,
-    } = this.props
+    const { theme, showAdjustment, classes, config } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
-    const {
-      subTotal,
-      totalWithGST,
-      isEnableGST,
-      gSTPercentage,
-      gst,
-      isGSTInclusive,
-    } = summary
+    const { subTotal, totalWithGST, gst, isGSTInclusive } = summary
     const {
       settings = {
         totalField: 'totalAfterItemAdjustment',
@@ -201,6 +168,7 @@ class AmountSummary extends PureComponent {
       // calcPurchaseOrderSummary,
       toggleInvoiceAdjustment,
     } = this.props
+    const { gstValue } = config
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
     // console.log({ props: this.props, summary })
@@ -269,40 +237,39 @@ class AmountSummary extends PureComponent {
           return null
         })}
 
-        {isEnableGST ? (
+        {gstValue ? (
           <GridContainer>
-            <GridItem xs={6} style={{ display: 'flex' }}>
-              <span style={fromPO && { width: 150, marginTop: 6 }}>
-                {`${numeral(gSTPercentage * 100).format('0.00')}`}% GST:
-              </span>
-              {fromPO && (
-                <Switch
-                  style={{ position: 'relative', marginTop: 0 }}
-                  label={undefined}
-                  value={isEnableGST}
-                  fullWidth={false}
-                  onChange={(e) => this.onChangeGstToggle(e)}
-                />
-              )}
+            <GridItem xs={6}>
+              <span>{`${numeral(gstValue).format('0.00')}`}% GST:</span>
+              {/* <FastField
+                name={`${poPrefix}.IsGSTEnabled`}
+                render={(args) => (
+                  <Switch
+                    label={undefined}
+                    fullWidth={false}
+                    onChange={() => this.onChangeGstToggle()}
+                    {...args}
+                  />
+                )}
+              /> */}
             </GridItem>
             <GridItem xs={6}>
               <NumberInput {...amountProps} value={gst} />
             </GridItem>
-            {showGSTInclusive() && (
-              <GridItem xs={12}>
-                <Checkbox
-                  style={{ top: 1 }}
-                  label={formatMessage({
-                    id: 'app.general.inclusiveGST',
-                  })}
-                  simple
-                  checked={isGSTInclusive}
-                  onChange={(e) => {
-                    this.onChangeGstToggle(e.target.value, 'checkbox')
-                  }}
-                />
-              </GridItem>
-            )}
+
+            <GridItem xs={12}>
+              <Checkbox
+                style={{ top: 1 }}
+                label={formatMessage({
+                  id: 'app.general.inclusiveGST',
+                })}
+                simple
+                checked={isGSTInclusive}
+                onChange={(e) => {
+                  this.onChangeGstToggle(e.target.value)
+                }}
+              />
+            </GridItem>
           </GridContainer>
         ) : (
           []

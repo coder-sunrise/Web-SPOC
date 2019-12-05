@@ -4,7 +4,7 @@ import { connect } from 'dva'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, GridContainer, GridItem } from '@/components'
+import { Button, GridContainer, GridItem, serverDateFormat } from '@/components'
 import withFormikExtend from '@/components/Decorator/withFormikExtend'
 // sub component
 import PayerHeader from './PayerHeader'
@@ -176,10 +176,15 @@ class AddPayment extends Component {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+        const formateDate = paymentDate.format(serverDateFormat)
         setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
-        setFieldValue('paymentReceivedDate', sessionData[0].sessionStartDate)
+        setFieldValue('paymentReceivedDate', formateDate)
 
-        this.fetchBizSessionList(sessionData[0].sessionStartDate)
+        this.fetchBizSessionList(formateDate)
       } else {
         setFieldValue('paymentCreatedBizSessionFK', undefined)
         setFieldValue('paymentReceivedDate', null)
@@ -189,7 +194,7 @@ class AddPayment extends Component {
 
   fetchBizSessionList = (date) => {
     const { setFieldValue } = this.props
-    const momentDate = moment(date)
+    const momentDate = moment(date, serverDateFormat)
     const startDateTime = moment(
       momentDate.set({ hour: 0, minute: 0, second: 0 }),
     ).formatUTC(false)
@@ -199,11 +204,11 @@ class AddPayment extends Component {
 
     getBizSession({
       pagesize: 999,
-      lsteql_SessionStartDate: endDateTime,
+      lgteql_SessionStartDate: startDateTime,
       group: [
         {
           isClinicSessionClosed: false,
-          lgteql_SessionCloseDate: startDateTime,
+          lsteql_SessionStartDate: endDateTime,
           combineCondition: 'or',
         },
       ],

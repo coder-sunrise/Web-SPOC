@@ -916,7 +916,7 @@ const calculateAmount = (
     gstField = 'totalAfterGST',
     gstAmtField = 'gstAmount',
     isGSTInclusive = false,
-    isGSTEnabled,
+    gstValue = undefined,
   } = {},
 ) => {
   let gst = 0
@@ -979,28 +979,26 @@ const calculateAmount = (
     // })
     return
   }
-  const { isEnableGST, gSTPercentage } = clinicSettings.settings
-  if (isGSTEnabled === undefined) isGSTEnabled = isEnableGST
 
-  if (isGSTEnabled) {
+  if (gstValue) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
         gst += roundTo(
-          r[adjustedField] - r[adjustedField] / (1 + gSTPercentage),
+          r[adjustedField] - r[adjustedField] / (1 + gstValue / 100),
         )
       })
     } else {
-      gst = roundTo(totalAfterAdj * gSTPercentage)
+      gst = roundTo(totalAfterAdj * gstValue / 100)
     }
     activeRows.forEach((r) => {
       if (isGSTInclusive) {
         r[gstField] = r[adjustedField]
         r[gstAmtField] = roundTo(
-          r[adjustedField] - r[adjustedField] * 1 / (1 + gSTPercentage),
+          r[adjustedField] - r[adjustedField] * 1 / (1 + gstValue / 100),
         )
       } else {
-        r[gstAmtField] = roundTo(r[adjustedField] * gSTPercentage)
-        r[gstField] = roundTo(r[adjustedField] * (1 + gSTPercentage))
+        r[gstAmtField] = roundTo(r[adjustedField] * gstValue / 100)
+        r[gstField] = roundTo(r[adjustedField] * (1 + gstValue / 100))
       }
       // console.log(r[gstField], r[gstAmtField])
     })
@@ -1024,8 +1022,7 @@ const calculateAmount = (
       totalWithGST: isGSTInclusive
         ? totalAfterAdj
         : roundTo(gst + totalAfterAdj),
-      isEnableGST: isGSTEnabled,
-      gSTPercentage,
+      gstValue,
       isGSTInclusive,
     },
   }

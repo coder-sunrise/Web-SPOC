@@ -43,7 +43,6 @@ class Dispense extends PureComponent {
   //   this.connectWebSocket()
   //   this.setHandleClickPrint()
   // }
-
   componentWillUnmount () {
     // if (this.wsConnection) this.wsConnection.close()
     this.props.dispatch({
