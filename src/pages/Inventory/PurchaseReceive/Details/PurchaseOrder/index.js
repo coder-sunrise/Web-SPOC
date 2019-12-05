@@ -581,11 +581,13 @@ class Index extends Component {
             setFieldValue={setFieldValue}
             // {...this.props}
           /> */}
-          <div style={{ float: 'right', marginBottom: 10 }}>
+          <div style={{ float: 'right', marginBottom: 10, width: '28%' }}>
             <AmountSummary
+              fromPO
               rows={rows}
               adjustments={purchaseOrderAdjustment}
               config={{
+                isGSTEnabled: IsGSTEnabled,
                 isGSTInclusive: IsGSTInclusive,
                 totalField: 'totalPrice',
                 adjustedField: 'totalAfterAdjustments',

@@ -916,6 +916,7 @@ const calculateAmount = (
     gstField = 'totalAfterGST',
     gstAmtField = 'gstAmount',
     isGSTInclusive = false,
+    isGSTEnabled,
   } = {},
 ) => {
   let gst = 0
@@ -979,8 +980,9 @@ const calculateAmount = (
     return
   }
   const { isEnableGST, gSTPercentage } = clinicSettings.settings
+  if (isGSTEnabled === undefined) isGSTEnabled = isEnableGST
 
-  if (isEnableGST) {
+  if (isGSTEnabled) {
     if (isGSTInclusive) {
       activeRows.forEach((r) => {
         gst += roundTo(
@@ -1022,7 +1024,7 @@ const calculateAmount = (
       totalWithGST: isGSTInclusive
         ? totalAfterAdj
         : roundTo(gst + totalAfterAdj),
-      isEnableGST,
+      isEnableGST: isGSTEnabled,
       gSTPercentage,
       isGSTInclusive,
     },
