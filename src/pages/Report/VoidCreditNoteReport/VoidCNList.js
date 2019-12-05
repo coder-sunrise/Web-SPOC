@@ -41,6 +41,7 @@ class VoidCNList extends PureComponent {
         width: 200,
         type: 'date',
         format: dateFormatLongWithTimeNoSec12h,
+        showTime: true,
       },
       { columnName: 'totalAmt', type: 'currency', currency: true, sortingEnabled: false, width: 200 },
       { columnName: 'invoiceNo', sortingEnabled: false, width: 120 },

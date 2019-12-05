@@ -27,6 +27,7 @@ class PaymentCollectionList extends PureComponent {
         width: 200,
         type: 'date',
         format: dateFormatLongWithTimeNoSec12h,
+        showTime: true,
       },
       { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
       { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
