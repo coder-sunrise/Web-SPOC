@@ -487,6 +487,7 @@ class AddNewStatement extends PureComponent {
             </Button>
             <ProgressButton
               color='primary'
+              disabled={this.state.selectedRows.length <= 0}
               onClick={() => {
                 this.setState({ selectedRows: [] })
                 handleSubmit()
