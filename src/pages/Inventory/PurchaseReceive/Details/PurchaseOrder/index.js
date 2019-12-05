@@ -47,9 +47,9 @@ const styles = (theme) => ({
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
-  mapPropsToValues: ({ purchaseOrderDetails }) => {
+  mapPropsToValues: ({ purchaseOrderDetails, clinicSettings }) => {
     const newPurchaseOrderDetails = purchaseOrderDetails
-
+    const { settings } = clinicSettings
     if (newPurchaseOrderDetails) {
       if (
         newPurchaseOrderDetails.type &&
@@ -64,6 +64,10 @@ const styles = (theme) => ({
       } else if (newPurchaseOrderDetails.type === 'new') {
         newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
         newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
+        newPurchaseOrderDetails.purchaseOrder.gstValue =
+          settings.gSTPercentageInt
+        newPurchaseOrderDetails.purchaseOrder.isGSTEnabled =
+          settings.isEnableGST
       }
 
       if (newPurchaseOrderDetails.purchaseOrder) {
@@ -387,15 +391,14 @@ class Index extends Component {
   }
 
   calcPurchaseOrderSummary = () => {
-    const { settingGSTEnable, settingGSTPercentage } = this.state
+    const { settingGSTEnable } = this.state
     const { values, setFieldValue } = this.props
     const { rows, purchaseOrderAdjustment, purchaseOrder } = values
-    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
+    const { IsGSTEnabled, IsGSTInclusive, gstValue } = purchaseOrder || false
     let tempInvoiceTotal = 0
     let totalAmount = 0
     let gstAmount = 0
     let totalAdjustmentAmount = 0
-    let gstValue = IsGSTEnabled ? settingGSTPercentage : 0
 
     const filteredPurchaseOrderAdjustment = purchaseOrderAdjustment.filter(
       (x) => !x.isDeleted,
@@ -429,7 +432,7 @@ class Index extends Component {
               item.tempSubTotal,
               tempInvoiceTotal,
               settingGSTEnable,
-              settingGSTPercentage,
+              gstValue,
               IsGSTEnabled,
               IsGSTInclusive,
               filteredPurchaseOrderItem.length,
@@ -472,9 +475,9 @@ class Index extends Component {
           if (!IsGSTEnabled) {
             item.itemLevelGST = 0
           } else if (IsGSTInclusive) {
-            item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 107)
+            item.itemLevelGST = item.tempSubTotal * (gstValue / 107)
           } else {
-            item.itemLevelGST = item.tempSubTotal * (settingGSTPercentage / 100)
+            item.itemLevelGST = item.tempSubTotal * (gstValue / 100)
           }
         } else {
           item.itemLevelGST = 0
@@ -495,7 +498,6 @@ class Index extends Component {
       setFieldValue('purchaseOrder.gstAmount', gstAmount)
       setFieldValue('purchaseOrder.totalAmount', totalAmount)
       setFieldValue('purchaseOrder.AdjustmentAmount', totalAdjustmentAmount)
-      setFieldValue('purchaseOrder.GSTValue', gstValue)
     }, 1)
   }
 
@@ -525,7 +527,7 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment, rows } = values
-    const { IsGSTEnabled, IsGSTInclusive } = purchaseOrder || false
+    const { IsGSTEnabled, IsGSTInclusive, gstValue } = purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -534,6 +536,7 @@ class Index extends Component {
       if (isWriteOff) return false
       return true
     }
+    const currentGstValue = IsGSTEnabled ? gstValue : undefined
     return (
       // <AuthorizedContext.Provider
       //   value={{
@@ -541,7 +544,7 @@ class Index extends Component {
       //     // rights: 'disable',
       //   }}
       // >
-      <div>
+      <React.Fragment>
         <AuthorizedContext.Provider
           value={{
             rights: isEditable() ? 'enable' : 'disable',
@@ -581,39 +584,39 @@ class Index extends Component {
             setFieldValue={setFieldValue}
             // {...this.props}
           /> */}
-          <div style={{ float: 'right', marginBottom: 10 }}>
-            <AmountSummary
-              rows={rows}
-              adjustments={purchaseOrderAdjustment}
-              config={{
-                isGSTInclusive: IsGSTInclusive,
-                totalField: 'totalPrice',
-                adjustedField: 'totalAfterAdjustments',
-                gstField: 'totalAfterGst',
-                gstAmtField: 'itemLevelGST',
-              }}
-              onValueChanged={(v) => {
-                setFieldValue('purchaseOrderAdjustment', v.adjustments)
-                setFieldValue(
-                  'purchaseOrder.IsGSTEnabled',
-                  v.summary.isEnableGST,
-                )
-                setFieldValue(
-                  'purchaseOrder.GSTValue',
-                  v.summary.gSTPercentage * 100,
-                )
-                setFieldValue(
-                  'purchaseOrder.IsGSTInclusive',
-                  v.summary.isGSTInclusive,
-                )
-                setFieldValue(
-                  'purchaseOrder.gstAmount',
-                  Math.round(v.summary.gst * 100) / 100,
-                )
-                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-              }}
-            />
-          </div>
+          <GridContainer>
+            <GridItem xs={2} md={9} />
+            <GridItem xs={10} md={3}>
+              <AmountSummary
+                rows={rows}
+                adjustments={purchaseOrderAdjustment}
+                config={{
+                  isGSTInclusive: IsGSTInclusive,
+                  totalField: 'totalPrice',
+                  adjustedField: 'totalAfterAdjustments',
+                  gstField: 'totalAfterGst',
+                  gstAmtField: 'itemLevelGST',
+                  gstValue: currentGstValue,
+                }}
+                onValueChanged={(v) => {
+                  setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                  // setFieldValue(
+                  //  'purchaseOrder.IsGSTEnabled',
+                  //  v.summary.isEnableGST,
+                  // )
+                  setFieldValue(
+                    'purchaseOrder.IsGSTInclusive',
+                    v.summary.isGSTInclusive,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.gstAmount',
+                    Math.round(v.summary.gst * 100) / 100,
+                  )
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                }}
+              />
+            </GridItem>
+          </GridContainer>
           <GridContainer
             style={{
               marginTop: 20,
@@ -700,7 +703,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </div>
+      </React.Fragment>
       // </AuthorizedContext.Provider>
     )
   }

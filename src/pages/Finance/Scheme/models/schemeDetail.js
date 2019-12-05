@@ -140,8 +140,9 @@ export default createFormViewModel({
               data.effectiveStartDate,
               data.effectiveEndDate,
             ],
-            itemGroupMaxCapacityDtoRdoValue:
-              data.coverageMaxCap !== null ? 'all' : 'sub',
+            itemGroupMaxCapacityDtoRdoValue: !data.coverageMaxCap
+              ? 'sub'
+              : 'all',
             itemGroupValueDtoRdoValue: !data.itemGroupValueDto ? 'all' : 'sub',
             rows: itemRows,
           },

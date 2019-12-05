@@ -90,7 +90,6 @@ class CoPayer extends Component {
       _isConfirmed: true,
       _isEditing: false,
       _isDeleted: false,
-      schemeConfig: {},
     }
     this.props.onAddCoPayerClick(returnValue)
   }

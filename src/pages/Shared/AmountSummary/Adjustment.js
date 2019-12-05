@@ -7,6 +7,7 @@ import {
   NumberInput,
   Popconfirm,
   Field,
+  Tooltip,
 } from '@/components'
 
 const Adjustment = ({
@@ -21,22 +22,35 @@ const Adjustment = ({
   // console.log('Adjustment', amountProps)
   return (
     <GridContainer style={{ margin: '4px 0' }}>
-      <GridItem xs={6}>
-        <GridItem>
+      <GridItem xs={9}>
+        <div
+          style={{
+            width: '90%',
+            overflow: 'hidden',
+            display: 'inline-block',
+            textOverflow: 'ellipsis',
+            wordBreak: 'keep-all',
+            whiteSpace: 'nowrap',
+          }}
+        >
           <Popconfirm
             title='Do you want to remove this adjustment?'
             onConfirm={() => {
               onDelete(index)
             }}
           >
-            <Button color='danger' size='sm' aria-label='Delete' justIcon>
-              <Delete />
-            </Button>
+            <Tooltip title='Delete Adjustment'>
+              <Button color='danger' size='sm' aria-label='Delete' justIcon>
+                <Delete />
+              </Button>
+            </Tooltip>
           </Popconfirm>
-          {adjRemark}
-        </GridItem>
+          <Tooltip title={adjRemark}>
+            <span>{adjRemark}</span>
+          </Tooltip>
+        </div>
       </GridItem>
-      <GridItem xs={6}>
+      <GridItem xs={3}>
         <NumberInput value={adjAmount} {...amountProps} />
       </GridItem>
     </GridContainer>

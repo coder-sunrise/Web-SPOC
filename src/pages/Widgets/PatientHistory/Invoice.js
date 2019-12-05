@@ -101,8 +101,8 @@ export default ({ classes, current, theme, setFieldValue }) => {
         // alignItems='flex-end'
         style={{ paddingTop: theme.spacing(2) }}
       >
-        <GridItem xs={4} md={7} />
-        <GridItem xs={8} md={5}>
+        <GridItem xs={2} md={9} />
+        <GridItem xs={10} md={3}>
           <AmountSummary
             showAdjustment
             rows={invoiceItemData}
@@ -113,6 +113,7 @@ export default ({ classes, current, theme, setFieldValue }) => {
                 : '',
               totalField: 'totalAfterItemAdjustment',
               adjustedField: 'totalAfterOverallAdjustment',
+              gstValue: current.invoice.gstValue,
             }}
             onValueChanged={(v) => {
               // console.log('onValueChanged', v)

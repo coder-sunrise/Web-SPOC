@@ -39,6 +39,7 @@ class DepositList extends PureComponent {
         type: 'date',
         sortingEnabled: false,
         format: dateFormatLongWithTimeNoSec12h,
+        showTime: true,
       },
       { columnName: 'depositBalance', type: 'currency', currency: true, sortingEnabled: false },
       { columnName: 'txnAmount', type: 'currency', currency: true, sortingEnabled: false },

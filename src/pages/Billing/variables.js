@@ -56,9 +56,7 @@ export const ApplyClaimsColumnExtension = [
         return (
           <Tooltip title={row.error} placement='top'>
             <div>
-              <SizeContainer size='lg'>
-                <Info color='error' />
-              </SizeContainer>
+              <Info color='error' />
             </div>
           </Tooltip>
         )
