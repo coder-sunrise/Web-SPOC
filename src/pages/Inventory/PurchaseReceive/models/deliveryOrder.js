@@ -125,6 +125,7 @@ export default createFormViewModel({
 
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
+        console.log('sadasd', payload)
         const { deliveryOrderNo } = payload
         const { purchaseOrderDetails } = state
         const {

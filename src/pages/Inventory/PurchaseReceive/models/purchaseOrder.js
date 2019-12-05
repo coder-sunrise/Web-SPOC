@@ -244,7 +244,6 @@ export default createFormViewModel({
             [itemFK]: o.code,
             itemFK: o.code,
             sortOrder: o.length + 1,
-            isDeleted: false,
           }
         })
 

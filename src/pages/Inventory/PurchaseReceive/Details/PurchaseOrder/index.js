@@ -282,6 +282,7 @@ class Index extends Component {
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         return {
+          isDeleted: x.isDeleted || false,
           inventoryItemTypeFK: itemType.value,
           orderQuantity: x.orderQuantity,
           bonusQuantity: x.bonusQuantity,
@@ -346,6 +347,7 @@ class Index extends Component {
         let result = {}
         if (x.isNew) {
           result = {
+            isDeleted: x.isDeleted || false,
             inventoryItemTypeFK: itemType.value,
             orderQuantity: x.orderQuantity,
             bonusQuantity: x.bonusQuantity,
