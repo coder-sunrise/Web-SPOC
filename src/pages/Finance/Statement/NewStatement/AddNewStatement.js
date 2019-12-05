@@ -147,6 +147,10 @@ class AddNewStatement extends PureComponent {
         sortingEnabled: false,
       },
       {
+        columnName: 'remark',
+        sortingEnabled: false,
+      },
+      {
         columnName: this.props.statement.entity
           ? 'payableAmount'
           : 'copayerPayableAmount',
