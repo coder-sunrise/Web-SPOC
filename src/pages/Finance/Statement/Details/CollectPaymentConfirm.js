@@ -15,6 +15,7 @@ import {
   DatePicker,
   Select,
   ProgressButton,
+  serverDateFormat,
 } from '@/components'
 import { DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { getBizSession } from '@/services/queue'
@@ -202,10 +203,14 @@ class CollectPaymentConfirm extends PureComponent {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
-        setFieldValue('paymentDate', sessionData[0].sessionStartDate)
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+        setFieldValue('paymentDate', paymentDate.format(serverDateFormat))
         setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
 
-        this.getBizList(sessionData[0].sessionStartDate)
+        this.getBizList(paymentDate.format(serverDateFormat))
       } else {
         setFieldValue('paymentDate', null)
         setFieldValue('paymentCreatedBizSessionFK', undefined)
@@ -215,7 +220,8 @@ class CollectPaymentConfirm extends PureComponent {
 
   getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
-    const momentDate = moment(date)
+    const momentDate = moment(date, serverDateFormat)
+
     const startDateTime = moment(
       momentDate.set({ hour: 0, minute: 0, second: 0 }),
     ).formatUTC(false)
@@ -227,11 +233,11 @@ class CollectPaymentConfirm extends PureComponent {
       type: 'statement/bizSessionList',
       payload: {
         pagesize: 999,
-        lsteql_SessionStartDate: endDateTime,
+        lgteql_SessionStartDate: startDateTime,
         group: [
           {
             isClinicSessionClosed: false,
-            lgteql_SessionCloseDate: startDateTime,
+            lsteql_SessionStartDate: endDateTime,
             combineCondition: 'or',
           },
         ],
