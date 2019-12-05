@@ -141,12 +141,12 @@ class CollectPaymentConfirm extends PureComponent {
         (o) => !o.id,
       )
       const { invoicePayment } = currentPayment
-      invoicePayment.totalAmtPaid = value
+      invoicePayment.totalAmtPaid = value === '' ? 0 : value
 
       setFieldValue('amount', totalAmountPaid)
       return
     }
-    let tempAmount = e.target.value
+    let tempAmount = e.target.value === '' ? 0 : e.target.value
     const newStatementInvoice = values.statementInvoice.map((o) => {
       let totalAmtPaid
       if (tempAmount >= o.outstandingAmount) {
@@ -181,7 +181,7 @@ class CollectPaymentConfirm extends PureComponent {
     })
     setValues({
       ...values,
-      amount: e.target.value,
+      amount: e.target.value === '' ? 0 : e.target.value,
       statementInvoice: newStatementInvoice,
     })
   }
