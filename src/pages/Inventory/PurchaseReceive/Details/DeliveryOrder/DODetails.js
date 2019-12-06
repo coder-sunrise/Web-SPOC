@@ -278,7 +278,7 @@ class DODetails extends PureComponent {
       [`filter${stateName}`]: inventoryItemList,
     })
 
-    this.forceUpdate()
+    // this.forceUpdate()
 
     row.code = ''
     row.name = ''
@@ -449,21 +449,35 @@ class DODetails extends PureComponent {
     return newAddedRows
   }
 
+  getItemOptions = (row, filteredStateName, stateName) => {
+    const { code, isNew } = row
+    if (code !== '') {
+      return this.state[stateName].filter((o) => o.value === code)
+    }
+    return isNew ? this.state[filteredStateName] : this.state[stateName]
+  }
+
   rowOptions = (row) => {
     if (row.type === 1) {
-      return row.isNew
-        ? this.state.filterMedicationItemList
-        : this.state.MedicationItemList
+      return this.getItemOptions(
+        row,
+        'filterMedicationItemList',
+        'MedicationItemList',
+      )
     }
     if (row.type === 2) {
-      return row.isNew
-        ? this.state.filterVaccinationItemList
-        : this.state.VaccinationItemList
+      return this.getItemOptions(
+        row,
+        'filterVaccinationItemList',
+        'VaccinationItemList',
+      )
     }
     if (row.type === 3) {
-      return row.isNew
-        ? this.state.filterConsumableItemList
-        : this.state.ConsumableItemList
+      return this.getItemOptions(
+        row,
+        'filterConsumableItemList',
+        'ConsumableItemList',
+      )
     }
     return []
   }
