@@ -352,14 +352,13 @@ class Detail extends PureComponent {
         columnName: 'stock',
         type: 'number',
         format: '0.0',
-        isDisabled: (row) => this.isDisabled(row),
+        disabled: true,
         qty: true,
       },
       {
         columnName: 'adjustmentQty',
         type: 'number',
         format: '0.0',
-        isDisabled: (row) => !this.isDisabled(row),
         qty: true,
       },
     ],
@@ -640,6 +639,7 @@ class Detail extends PureComponent {
           row.stock = stock
           row.stockFK = id
           row.stockId = id
+          row.isManuallyCreated = true
           row.concurrencyToken = concurrencyToken
         } else {
           row.stockFK = undefined
