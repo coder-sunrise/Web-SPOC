@@ -89,7 +89,12 @@ const DispenseDetails = ({
   const { prescription, vaccination, otherOrder, invoice } = values || {
     invoice: { invoiceItem: [] },
   }
-  const { invoiceItem = [], invoiceAdjustment = [], visitPurposeFK } = invoice
+  const {
+    invoiceItem = [],
+    invoiceAdjustment = [],
+    visitPurposeFK,
+    totalPayment,
+  } = invoice
 
   const { inventorymedication } = codetable
 
@@ -203,6 +208,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Delete />}
                 onClick={discardAddOrderDetails}
+                disabled={totalPayment > 0}
               >
                 Discard
               </ProgressButton>
