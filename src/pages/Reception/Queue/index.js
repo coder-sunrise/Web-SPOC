@@ -79,6 +79,7 @@ const styles = (theme) => ({
   loading,
   user: user.data,
   patient: patient.entity,
+  DefaultPatientProfile: patient.default,
 }))
 class Queue extends React.Component {
   constructor (props) {
@@ -203,11 +204,19 @@ class Queue extends React.Component {
 
   toggleRegisterNewPatient = (shouldRedirect = true, row = undefined) => {
     if (row) {
+      const { DefaultPatientProfile } = this.props
       this.props.dispatch({
         type: 'patient/updateDefaultEntity',
         payload: {
           name: row.patientName,
           callingName: row.patientName,
+          contact: {
+            ...DefaultPatientProfile.contact,
+            mobileContactNumber: {
+              ...DefaultPatientProfile.contact.mobileContactNumber,
+              number: row.patientContactNo,
+            },
+          },
         },
       })
     }
