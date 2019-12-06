@@ -18,8 +18,10 @@ const Adjustment = ({
   adjRemark,
   onDelete,
   amountProps,
+  type,
 }) => {
   // console.log('Adjustment', amountProps)
+  const isExactAmount = type === 'ExactAmount'
   return (
     <GridContainer style={{ margin: '4px 0' }}>
       <GridItem xs={9}>
@@ -51,7 +53,12 @@ const Adjustment = ({
         </div>
       </GridItem>
       <GridItem xs={3}>
-        <NumberInput value={adjAmount} {...amountProps} />
+        <NumberInput
+          value={adjAmount}
+          currency={isExactAmount}
+          percentage={!isExactAmount}
+          {...amountProps}
+        />
       </GridItem>
     </GridContainer>
   )

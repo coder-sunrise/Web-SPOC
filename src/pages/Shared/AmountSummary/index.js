@@ -23,7 +23,7 @@ import { calculateAmount } from '@/utils/utils'
 
 const amountProps = {
   noUnderline: true,
-  currency: true,
+  // currency: true,
   rightAlign: true,
   text: true,
   fullWidth: true,
@@ -216,6 +216,7 @@ class AmountSummary extends PureComponent {
               <Adjustment
                 key={v.id || i}
                 index={i}
+                type={v.adjType}
                 dispatch={dispatch}
                 onDelete={this.deleteAdjustment}
                 amountProps={amountProps}

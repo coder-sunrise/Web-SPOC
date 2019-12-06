@@ -38,9 +38,9 @@ const receivingDetailsSchema = Yup.object().shape({
   currentReceivingQty: Yup.number()
     .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
     .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
-      return `Current Receiving Quantity must be less than or equal to ${e.max.toFixed(
-        1,
-      )}`
+      return `Current Receiving Quantity must be less than or equal to ${e.max
+        ? e.max.toFixed(1)
+        : e.max}`
     })
     .required(),
   // currentReceivingBonusQty: Yup.number()
@@ -768,12 +768,11 @@ class DODetails extends PureComponent {
             {errors.rows && (
               <p className={classes.errorMsgStyle}>{errors.rows}</p>
             )}
-
             <EditableTableGrid
               getRowId={(r) => r.uid}
               rows={rows}
-              // schema={values.id ? {} : receivingDetailsSchema}
-              schema={receivingDetailsSchema}
+              schema={values.id ? {} : receivingDetailsSchema}
+              // schema={receivingDetailsSchema}
               FuncProps={{
                 // edit: isEditable,
                 pager: false,
