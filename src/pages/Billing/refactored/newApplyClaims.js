@@ -136,6 +136,7 @@ const ApplyClaims = ({
       updatedIndex,
     )
     setTempInvoicePayer(newInvoicePayer)
+    incrementCommitCount()
   }
 
   const handleSchemeChange = (value, index, invoicePayerList, invoiceItems) => {
@@ -181,7 +182,7 @@ const ApplyClaims = ({
   const syncWithQueried = () => {
     const hasAddedPayer = payerList.length > 0
     if (hasAddedPayer) {
-      const newInvoicePayer = payerList.map((_payer, index) => {
+      const mapResponseToInvoicePayers = (_payer) => {
         if (_payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME) {
           const _claimableSchemesIndex = claimableSchemes.findIndex(
             (cs) =>
@@ -226,7 +227,8 @@ const ApplyClaims = ({
           _isEditing: false,
           _isValid: true,
         }
-      })
+      }
+      const newInvoicePayer = payerList.map(mapResponseToInvoicePayers)
       setTempInvoicePayer(newInvoicePayer)
       setInitialState(newInvoicePayer)
     } else if (claimableSchemes.length > 0 && invoicePayment.length === 0) {
@@ -288,7 +290,7 @@ const ApplyClaims = ({
     setValues(_values)
   }
 
-  const handleResetClick = useCallback(
+  const resetClaims = useCallback(
     () => {
       setTempInvoicePayer(initialState)
       setCurEditInvoicePayerBackup(undefined)
@@ -298,13 +300,27 @@ const ApplyClaims = ({
     ],
   )
 
+  const handleResetClick = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          'Reset will revert all changes that had not been saved. Continue?',
+        openConfirmText: 'Continue',
+        onConfirmSave: resetClaims,
+      },
+    })
+  }
+
   const handleCancelClick = useCallback(
     (index) => {
+      const isEditing = tempInvoicePayer[index].id === undefined
       const updatedPayer = {
         ...tempInvoicePayer[index],
         ...curEditInvoicePayerBackup,
-        _isConfirmed: true,
-        _isEditing: false,
+        _isConfirmed: !isEditing,
+        _isEditing: isEditing,
         _isDeleted: false,
         isCancelled: false,
       }
@@ -454,7 +470,6 @@ const ApplyClaims = ({
       }
       updateTempInvoicePayer(newInvoicePayer, index)
       incrementCommitCount()
-      return newRows
     },
     [
       tempInvoicePayer,
