@@ -162,7 +162,7 @@ const DispenseDetails = ({
     })
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-
+  // console.log({ values })
   return (
     <React.Fragment>
       <GridContainer>
@@ -271,14 +271,12 @@ const DispenseDetails = ({
               rows={invoiceItem}
               adjustments={invoiceAdjustment}
               config={{
-                isGSTInclusive:
-                  dispense.entity.invoice.isGSTInclusive ||
-                  invoice.isGSTInclusive,
+                isGSTInclusive: invoice.isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',
                 adjustedField: 'totalAfterOverallAdjustment',
                 gstField: 'totalAfterGST',
                 gstAmtField: 'gstAmount',
-                gstValue: dispense.entity.invoice.gstValue || invoice.gstValue,
+                gstValue: invoice.gstValue,
               }}
               onValueChanged={updateInvoiceData}
             />

@@ -137,25 +137,27 @@ const Scheme = ({
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='center'>
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
-          {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
-            <Select
-              size='sm'
-              allowClear={false}
-              simple
-              valueField='id'
-              onChange={handleSchemeChange}
-              value={copaymentSchemeFK}
-              disabled={_isConfirmed}
-              options={[
-                ...claimableSchemes.map((item) => ({
-                  id: item.id,
-                  name: item.coPaymentSchemeName,
-                })),
-              ]}
-            />
-          ) : (
-            <span>{name}</span>
-          )}
+          <p style={{ color: 'darkblue', fontWeight: 500, fontSize: '1rem' }}>
+            {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
+              <Select
+                size='sm'
+                allowClear={false}
+                simple
+                valueField='id'
+                onChange={handleSchemeChange}
+                value={copaymentSchemeFK}
+                disabled={_isConfirmed}
+                options={[
+                  ...claimableSchemes.map((item) => ({
+                    id: item.id,
+                    name: item.coPaymentSchemeName,
+                  })),
+                ]}
+              />
+            ) : (
+              <span>{name}</span>
+            )}
+          </p>
         </GridItem>
         {schemeConfig &&
         schemeConfig.copayerFK === 1 && (
