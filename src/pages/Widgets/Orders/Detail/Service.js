@@ -96,7 +96,10 @@ class Service extends PureComponent {
       nextProps.dispatch({
         type: 'orders/updateState',
         payload: {
-          entity: nextProps.values,
+          entity: {
+            ...nextProps.values,
+            totalPrice: nextProps.values.total,
+          },
           shouldPushToState: false,
         },
       })
