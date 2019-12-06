@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Delete from '@material-ui/icons/Delete'
 import {
   Field,
@@ -47,6 +47,7 @@ const ItemList = ({
 
   useEffect(
     () => {
+      console.log('set item list')
       setItemList(values.rows)
     },
     [
@@ -129,6 +130,24 @@ const ItemList = ({
     )
   }
 
+  const onDeleteClick = useCallback(
+    (row) => {
+      const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
+      console.log({ deletedRow, itemList, rows: values.rows, row })
+      // if (deletedRow) {
+      //   deletedRow.isDeleted = true
+      // }
+      // const newRows = itemList.filter(
+      //   (o) => o.isDeleted === false || o.isDeleted === undefined,
+      // )
+      // setItemList(newRows)
+    },
+    [
+      itemList,
+      values.rows,
+    ],
+  )
+
   const options = () => [
     {
       id: 1,
@@ -166,130 +185,118 @@ const ItemList = ({
       { name: 'cpAmount', title: 'Co-Pay Amount' },
       { name: 'action', title: 'Actions' },
     ],
-    columnExtensions: [
-      {
-        columnName: 'type',
-        type: 'select',
-        options: InventoryTypes,
-      },
-      {
-        columnName: 'itemFK',
-        render: (row) => {
-          const inventory = InventoryTypes.filter(
-            (x) => x.value === row.type,
-          )[0]
-          const { ctName, itemFKName } = inventory
-          return row.name ? row.name : ''
-          // return (
-          //   <FastField
-          //     name={`rows[${row.rowIndex}].${itemFKName}`}
-          //     render={(args) => {
-          //       // console.log(args)
-          //       return (
-          //         <CodeSelect
-          //           text
-          //           labelField='displayValue'
-          //           valueField={
-          //             row.type === 'ctservice' ? (
-          //               'serviceCenter_ServiceId'
-          //             ) : (
-          //               'id'
-          //             )
-          //           }
-          //           code={ctName}
-          //           {...args}
-          //         />
-          //       )
-          //     }}
-          //   />
-          // )
-        },
-      },
-      {
-        columnName: 'unitPrice',
-        type: 'currency',
-      },
-      {
-        columnName: 'cpAmount',
-        render: (row) => {
-          return (
-            <GridContainer>
-              <GridItem xs={8}>
-                {/* <Field
-                name={`packageValueDto[${row.rowIndex }].itemValue`}
-                render={(args) => <NumberInput {...args} />}
-              /> */}
-                <Field
-                  name={`rows[${row.rowIndex}].itemValue`}
-                  render={CPNumber(
-                    undefined,
-                    row.itemValueType === 'ExactAmount'
-                      ? 'ExactAmount'
-                      : 'Percentage',
-                    // Array.isArray(values.rows) && values.rows.length >= 1
-                    //   ? values.rows[row.rowIndex].itemValueType
-                    //   : 'ExactAmount',
-                  )}
-                />
-              </GridItem>
-              <GridItem xs={4}>
-                <Field
-                  name={`rows[${row.rowIndex}].itemValueType`}
-                  render={CPSwitch(undefined)}
-                />
-              </GridItem>
-            </GridContainer>
-          )
-        },
-      },
-      {
-        columnName: 'action',
-        align: 'center',
-        render: (row) => {
-          return (
-            <Popconfirm
-              onConfirm={() => {
-                const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
-                if (deletedRow) {
-                  deletedRow.isDeleted = true
-                }
-                const newRows = itemList.filter(
-                  (o) => o.isDeleted === false || o.isDeleted === undefined,
-                )
-                setItemList(newRows)
-
-                // dispatch({
-                //   type: 'schemeDetail/deleteRow',
-                //   payload: {
-                //     id: row.uid,
-                //   },
-                // })
-              }}
-              // onConfirm={() => onClickDelete(row)}
-            >
-              <Tooltip title='Delete'>
-                <Button size='sm' color='danger' justIcon>
-                  <Delete />
-                </Button>
-              </Tooltip>
-            </Popconfirm>
-          )
-        },
-      },
-    ],
-    FuncProps: {
-      pager: false,
-      // tree: true,
-      // treeColumnConfig: {
-      //   for: 'cpAmount',
-      // },
-    },
+    // columnExtensions: ,
   }
+
+  const renderDeleteButton = useCallback(
+    (row) => {
+      console.log({ row })
+      return (
+        <Popconfirm
+          onConfirm={() => {
+            const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
+            // console.log({ itemList })
+            // onDeleteClick(row)
+            if (deletedRow) {
+              deletedRow.isDeleted = true
+            }
+            const newRows = itemList.filter(
+              (o) => o.isDeleted === false || o.isDeleted === undefined,
+            )
+            setItemList(newRows)
+            // dispatch({
+            //   type: 'schemeDetail/deleteRow',
+            //   payload: {
+            //     id: row.uid,
+            //   },
+            // })
+          }}
+        >
+          <Tooltip title='Delete'>
+            <Button size='sm' color='danger' justIcon>
+              <Delete />
+            </Button>
+          </Tooltip>
+        </Popconfirm>
+      )
+    },
+    [
+      itemList,
+      values.rows,
+    ],
+  )
+
   return (
     <div style={{ marginTop: theme.spacing(1) }}>
       <Tabs defaultActiveKey='1' options={options()} onChange={callback} />
 
-      <CommonTableGrid rows={itemList} {...tableConfigs} />
+      <CommonTableGrid
+        rows={itemList}
+        // {...tableConfigs}
+        getRowId={(r) => r.uid}
+        columns={[
+          { name: 'type', title: 'Type' },
+          { name: 'itemFK', title: 'Item' },
+          { name: 'unitPrice', title: 'Unit Price' },
+          { name: 'cpAmount', title: 'Co-Pay Amount' },
+          { name: 'action', title: 'Actions' },
+        ]}
+        columnExtensions={[
+          {
+            columnName: 'type',
+            type: 'select',
+            options: InventoryTypes,
+          },
+          {
+            columnName: 'itemFK',
+            render: (row) => {
+              const inventory = InventoryTypes.filter(
+                (x) => x.value === row.type,
+              )[0]
+              const { ctName, itemFKName } = inventory
+              return row.name ? row.name : ''
+            },
+          },
+          {
+            columnName: 'unitPrice',
+            type: 'currency',
+          },
+          {
+            columnName: 'cpAmount',
+            render: (row) => {
+              return (
+                <GridContainer>
+                  <GridItem xs={8}>
+                    <Field
+                      name={`rows[${row.rowIndex}].itemValue`}
+                      render={CPNumber(
+                        undefined,
+                        row.itemValueType === 'ExactAmount'
+                          ? 'ExactAmount'
+                          : 'Percentage',
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem xs={4}>
+                    <Field
+                      name={`rows[${row.rowIndex}].itemValueType`}
+                      render={CPSwitch(undefined)}
+                    />
+                  </GridItem>
+                </GridContainer>
+              )
+            },
+          },
+          {
+            columnName: 'action',
+            align: 'center',
+            render: renderDeleteButton,
+          },
+        ]}
+        FuncProps={{
+          pager: false,
+        }}
+      />
     </div>
   )
 }
