@@ -65,6 +65,7 @@ export default createListViewModel({
               },
             ],
             version,
+            'neql_VisitStatusFKNavigation.Status': 'WAITING',
           },
         })
         yield take('query/@@end')

@@ -1561,18 +1561,19 @@ export const getInventoryItem = (
 
   if (outstandingItem) {
     inventoryItemList = inventoryItemList.map((o) => {
-      const { orderQuantity, quantityReceived } = outstandingItem.find(
+      const findSpecificOutstandingItem = outstandingItem.find(
         (i) => i[itemFKName] === o[itemFKName],
       )
-      // const { totalCurrentReceivingQty } = groupByFKArray.find(
-      //   (i) => i[itemFKName] === o[itemFKName],
-      // )
-      const item = groupByFKArray.find((i) => i[itemFKName] === o[itemFKName])
       let remainingQty
-      if (item) {
-        remainingQty =
-          orderQuantity - quantityReceived - item.totalCurrentReceivingQty
+      if (findSpecificOutstandingItem) {
+        const { orderQuantity, quantityReceived } = findSpecificOutstandingItem
+        const item = groupByFKArray.find((i) => i[itemFKName] === o[itemFKName])
+        if (item) {
+          remainingQty =
+            orderQuantity - quantityReceived - item.totalCurrentReceivingQty
+        }
       }
+
       return {
         ...o,
         remainingQty,

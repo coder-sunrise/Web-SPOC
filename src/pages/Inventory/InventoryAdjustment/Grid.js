@@ -95,7 +95,7 @@ class Grid extends PureComponent {
       payload: {
         openConfirm: true,
         openConfirmContent: `Are you sure want to delete record - ${row.transactionNo} ?`,
-        onConfirmDiscard: () => {
+        onConfirmSave: () => {
           this.props
             .dispatch({
               type: 'inventoryAdjustment/removeRow',

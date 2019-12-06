@@ -180,7 +180,7 @@ class Index extends Component {
           payload: {
             openConfirm: true,
             openConfirmContent: content,
-            onConfirmDiscard: async () => {
+            onConfirmSave: async () => {
               processedPayload = this.processSubmitPayload(false, statusCode)
               await submit()
               if (statusCode === 4) {

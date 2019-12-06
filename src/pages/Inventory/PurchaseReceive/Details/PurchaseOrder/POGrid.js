@@ -432,7 +432,6 @@ class Grid extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
-    console.log(rows)
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>

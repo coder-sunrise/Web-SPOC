@@ -44,6 +44,7 @@ class Statement extends PureComponent {
   componentDidMount () {
     const fromDate = moment().subtract(1, 'months').startOf('month').formatUTC()
     const toDate = moment().endOf('month').formatUTC(false)
+    const dueToDate = moment().add(3, 'months').endOf('month').formatUTC(false)
     this.props.dispatch({
       type: 'statement/query',
       payload: {
@@ -52,7 +53,7 @@ class Statement extends PureComponent {
         lsteql_statementDate: toDate,
         apiCriteria: {
           DueDateFrom: fromDate,
-          DueDateTo: toDate,
+          DueDateTo: dueToDate,
         },
       },
     })

@@ -57,6 +57,7 @@ class UploadAttachment extends PureComponent {
                   filterTypes={[
                     'ClinicalNotes',
                     'VisitReferral',
+                    'Visit',
                   ]}
                   handleUpdateAttachments={updateAttachments(args)}
                   attachments={args.field.value}

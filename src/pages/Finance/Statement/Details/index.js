@@ -5,7 +5,7 @@ import { withFormikExtend, Tabs } from '@/components'
 import { StatementDetailOption } from './variables'
 import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
-import { PAYMENT_MODE } from '@/utils/constants'
+import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
 
 const styles = () => ({})
@@ -17,11 +17,22 @@ const styles = () => ({})
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
-
+    let newStatementInvoice = []
+    let total = 0
     let adminChargeValue = 0
     if (returnValue.statementInvoice) {
-      returnValue.statementInvoice.forEach((o) => {
-        adminChargeValue += o.adminCharge
+      newStatementInvoice = returnValue.statementInvoice.map((o) => {
+        const { statementInvoicePayment, adminCharge, outstandingAmount } = o
+        total += outstandingAmount
+        adminChargeValue += adminCharge
+
+        return {
+          ...o,
+          tempOutstandingAmount: o.outstandingAmount,
+          statementInvoicePayment: [
+            ...statementInvoicePayment,
+          ],
+        }
       })
     }
 
@@ -32,6 +43,11 @@ const styles = () => ({})
       ...returnValue,
       outstandingBalance,
       adminChargeValue,
+      amount: total,
+      maxAmount: total,
+      paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
+      displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
+      statementInvoice: newStatementInvoice,
     }
   },
   validationSchema: Yup.object().shape({
@@ -46,10 +62,11 @@ const styles = () => ({})
     const { dispatch, onConfirm, history, user } = props
     const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
     const paymentReceivedByUserFK = user.data.id
-    let newPaymentStatementInvoice = values.statementInvoice.filter((o) =>
-      o.statementInvoicePayment.find((i) => !i.id),
+    let newPaymentStatementInvoice = values.statementInvoice.filter(
+      (o) =>
+        o.statementInvoicePayment.find((i) => !i.id) &&
+        o.tempOutstandingAmount > 0,
     )
-
     newPaymentStatementInvoice = newPaymentStatementInvoice.map((o) => {
       let newInvoicePayment = o.statementInvoicePayment.find((i) => !i.id)
       const existingInvoicePayment = o.statementInvoicePayment.filter(

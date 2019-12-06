@@ -206,7 +206,8 @@ class AddNewStatement extends PureComponent {
         (o.statementInvoicePayment.length === 0 && !o.isDeleted) ||
         o.statementInvoicePayment.find(
           (i) => i.invoicePayment.isCancelled === true,
-        )
+        ) ||
+        o.payableAmount === o.outstandingAmount
       ) {
         defaultIds.push(o.id)
       }
@@ -463,9 +464,15 @@ class AddNewStatement extends PureComponent {
                 selectConfig: {
                   showSelectAll: true,
                   rowSelectionEnabled: (row) => {
-                    const { statementInvoicePayment = [] } = row
-                    return !statementInvoicePayment.find(
-                      (o) => o.invoicePayment.isCancelled === false,
+                    const {
+                      statementInvoicePayment = [],
+                      payableAmount,
+                      outstandingAmount,
+                    } = row
+                    return (
+                      !statementInvoicePayment.find(
+                        (o) => o.invoicePayment.isCancelled === false,
+                      ) && payableAmount === outstandingAmount
                     )
                   },
                 },
