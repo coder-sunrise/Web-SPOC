@@ -37,7 +37,7 @@ class PrintDrugLabelWrapper extends React.Component {
       const { dispense, values } = this.props
       const { prescription } = values
       let drugLableSource = await this.generateDrugLablesPrintSource(
-        dispense.visitID,
+        dispense ? dispense.visitID : values.id,
         prescription,
       )
       if (drugLableSource) {
@@ -47,8 +47,10 @@ class PrintDrugLabelWrapper extends React.Component {
         )
       }
     } else if (type === 'Patient') {
-      const { patient } = this.props
-      printResult = await getPDF(27, { patientId: patient.id })
+      const { patient, values } = this.props
+      printResult = await getPDF(27, {
+        patientId: patient ? patient.id : values.patientProfileFK,
+      })
     }
     return printResult
   }
