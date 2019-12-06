@@ -167,6 +167,7 @@ const DispenseDetails = ({
     })
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
   // console.log({ values })
   return (
     <React.Fragment>
@@ -176,7 +177,7 @@ const DispenseDetails = ({
           !isRetailVisit && (
             <Button color='info' size='sm' onClick={onReloadClick}>
               <Refresh />
-              Refresh
+              Refresh Order
             </Button>
           )}
           <Button
@@ -213,11 +214,13 @@ const DispenseDetails = ({
                 Discard
               </ProgressButton>
             )}
-            <Authorized authority='queue.dispense.savedispense'>
-              <ProgressButton color='success' size='sm' onClick={onSaveClick}>
-                Save Dispense
-              </ProgressButton>
-            </Authorized>
+            {!isBillFirstVisit && (
+              <Authorized authority='queue.dispense.savedispense'>
+                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                  Save Dispense
+                </ProgressButton>
+              </Authorized>
+            )}
             <Authorized authority='queue.dispense.editorder'>
               <ProgressButton
                 color='primary'
@@ -225,7 +228,7 @@ const DispenseDetails = ({
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                {isRetailVisit ? 'Add Order' : 'Edit Order'}
+                {isRetailVisit || isBillFirstVisit ? 'Add Order' : 'Edit Order'}
               </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
@@ -276,6 +279,7 @@ const DispenseDetails = ({
             <AmountSummary
               rows={invoiceItem}
               adjustments={invoiceAdjustment}
+              showAddAdjustment={!isBillFirstVisit}
               config={{
                 isGSTInclusive: invoice.isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',
