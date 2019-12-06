@@ -306,6 +306,7 @@ export const validateClaimAmount = (schemeRow) => {
 
   const {
     balance,
+    isBalanceCheckRequired,
     coverageMaxCap,
     patientMinCoPaymentAmount,
     patientMinCoPaymentAmountType,
@@ -325,7 +326,7 @@ export const validateClaimAmount = (schemeRow) => {
 
   const listOfLimits = []
 
-  if (balance !== null && balance > 0)
+  if (isBalanceCheckRequired)
     listOfLimits.push({ type: 'Balance', value: balance })
 
   const totalClaimAmount = invoicePayerItem.reduce(
@@ -448,7 +449,12 @@ export const updateInvoicePayerPayableBalance = (
             const original = originalInvoiceItems.find(
               (oriInvoiceItem) => oriInvoiceItem.id === item.invoiceItemFK,
             )
-            return { ...item, payableBalance: original.totalAfterGst }
+            return {
+              ...item,
+              payableBalance: original
+                ? original.totalAfterGst
+                : item.payableBalance,
+            }
           }),
         },
       ]
