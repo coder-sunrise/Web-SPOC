@@ -101,7 +101,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
             ? item.prescribeUOMDisplayValue
             : ''} ${item.drugFrequencyDisplayValue
             ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration ? item.duration : ''} day(s)`
+            : ''} For ${item.duration ? item.duration : ''} day(s) ${index <
+          instructions.length - 1
+            ? `${item.stepdose} `
+            : ''}`
         }
       }
       return instruction
@@ -279,7 +282,6 @@ class Medication extends PureComponent {
   }
 
   setInstruction = (index = 0) => {
-    console.log('setInstruction', index)
     const { setFieldValue } = this.props
     const op = this.state.selectedMedication
 
@@ -530,7 +532,8 @@ class Medication extends PureComponent {
                         {i > 0 && (
                           <GridItem xs={2}>
                             <FastField
-                              name={`corPrescriptionItemInstruction[${i}].stepdose`}
+                              name={`corPrescriptionItemInstruction[${i -
+                                1}].stepdose`}
                               render={(args) => {
                                 return (
                                   <Select
