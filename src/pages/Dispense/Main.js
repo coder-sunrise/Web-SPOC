@@ -15,6 +15,41 @@ import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import AddOrder from './DispenseDetails/AddOrder'
 
+const calculateInvoiceAmounts = (entity) => {
+  const obj = { ...entity }
+  const output = calculateAmount(
+    obj.invoice.invoiceItem,
+    obj.invoice.invoiceAdjustment,
+    {
+      isGSTInclusive: obj.invoice.isGSTInclusive,
+      totalField: 'totalAfterItemAdjustment',
+      adjustedField: 'totalAfterOverallAdjustment',
+      gstField: 'totalAfterGST',
+      gstAmtField: 'gstAmount',
+      gstValue: obj.invoice.gstValue,
+    },
+  )
+  let invoiceSummary = {}
+  if (output && output.summary) {
+    const { summary } = output
+    invoiceSummary = {
+      invoiceTotal: summary.total,
+      invoiceTotalAftAdj: summary.totalAfterAdj,
+      invoiceTotalAftGST: summary.totalWithGST,
+      outstandingBalance: summary.totalWithGST,
+      invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
+    }
+  }
+
+  return {
+    ...obj,
+    invoice: {
+      ...obj.invoice,
+      ...invoiceSummary,
+    },
+  }
+}
+
 const reloadDispense = (props, effect = 'query') => {
   const { dispatch, dispense, resetForm } = props
 
@@ -22,12 +57,11 @@ const reloadDispense = (props, effect = 'query') => {
     type: `dispense/${effect}`,
     // payload: visitRegistration.entity.visit.id,
     payload: dispense.visitID,
-  }).then((o) => {
-    resetForm(o)
-    // dispatch({
-    //   type: `formik/clean`,
-    //   payload: 'DispensePage',
-    // })
+  }).then((response) => {
+    if (response) {
+      const result = calculateInvoiceAmounts(response)
+      resetForm(result)
+    }
   })
 }
 @withFormikExtend({
@@ -36,42 +70,8 @@ const reloadDispense = (props, effect = 'query') => {
   notDirtyDuration: 3,
   mapPropsToValues: ({ dispense = {} }) => {
     const obj = dispense.entity || dispense.default
-    const output = calculateAmount(
-      obj.invoice.invoiceItem,
-      obj.invoice.invoiceAdjustment,
-      {
-        isGSTInclusive: obj.invoice.isGSTInclusive,
-        totalField: 'totalAfterItemAdjustment',
-        adjustedField: 'totalAfterOverallAdjustment',
-        gstField: 'totalAfterGST',
-        gstAmtField: 'gstAmount',
-        gstValue: obj.invoice.gstValue,
-      },
-    )
-    let invoiceSummary = {}
-    if (output && output.summary) {
-      const { summary } = output
-      invoiceSummary = {
-        invoiceTotal: summary.total,
-        invoiceTotalAftAdj: summary.totalAfterAdj,
-        invoiceTotalAftGST: summary.totalWithGST,
-        outstandingBalance: summary.totalWithGST,
-        invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
-      }
-    }
-    const _values = {
-      ...obj,
-      invoice: {
-        ...obj.invoice,
-        ...invoiceSummary,
-        // invoiceTotal,
-        // invoiceTotalAftAdj: invoiceTotal,
-        // invoiceGSTAmt,
-        // invoiceTotalAftGST,
-        // outstandingBalance,
-      },
-    }
-    return _values
+    const result = calculateInvoiceAmounts(obj)
+    return result
   },
   validationSchema: Yup.object().shape({
     prescription: Yup.array().of(
@@ -246,7 +246,7 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit } = this.props
-
+    console.log({ values: this.props.values })
     return (
       <div className={classes.root}>
         <DispenseDetails
