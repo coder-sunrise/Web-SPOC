@@ -116,10 +116,10 @@ export const ApptColumnExtensions = [
     columnName: 'appointmentTime',
     width: 200,
     render: (row) => {
-      const appointmentDate = moment(row.appointmentDate).format(dateFormat)
+      const appointmentDate = moment(row.appointmentDate).format('MM DD YYYY')
       return DateFormatter({
         value: `${appointmentDate} ${row.startTime}`,
-        format: 'DD MMM YYYY hh:mm:ss A',
+        format: 'DD MMM YYYY hh:mm A',
       })
       // if (row.appointmentTime) {
       //   return DateFormatter({
@@ -232,10 +232,10 @@ export const QueueColumnExtensions = [
     // compare: compareTime,
     render: (row) => {
       if (row.appointmentTime) {
-        const appointmentDate = moment(row.appointmentTime).format(dateFormat)
+        const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         return DateFormatter({
           value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: 'DD MM YYYY hh:mm:ss A',
+          format: 'DD MM YYYY hh:mm A',
         })
       }
       return '-'
