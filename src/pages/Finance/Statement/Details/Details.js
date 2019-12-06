@@ -179,8 +179,10 @@ class Details extends PureComponent {
             selectConfig: {
               showSelectAll: true,
               rowSelectionEnabled: (row) => {
-                return !row.statementInvoicePayment.find(
-                  (o) => o.invoicePayment.isCancelled === false,
+                return (
+                  !row.statementInvoicePayment.find(
+                    (o) => o.invoicePayment.isCancelled === false,
+                  ) && row.payableAmount === row.outstandingAmount
                 )
               },
             },
