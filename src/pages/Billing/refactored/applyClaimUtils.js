@@ -292,7 +292,9 @@ const calculateTotalPaybable = (total, item) => {
   let coverageAmount = item.schemeCoverage
   if (item.schemeCoverageType === 'Percentage')
     coverageAmount = item.payableBalance * item.schemeCoverage / 100
-
+  else {
+    coverageAmount = Math.min(item.schemeCoverage, item.payableBalance)
+  }
   return total + coverageAmount
 }
 

@@ -397,9 +397,6 @@ const ApplyClaims = ({
   const handleCommitChanges = useCallback(
     ({ rows, changed }) => {
       const id = Object.keys(changed)[0]
-      // const id = !_.isEmpty(changed)
-      //   ? parseInt(Object.keys(changed)[0], 10)
-      //   : -99
 
       if (id === -99) return
       const index = tempInvoicePayer.findIndex((item) => item._isEditing)
@@ -420,14 +417,6 @@ const ApplyClaims = ({
             if (item.invoiceItemFK === changedItem.invoiceItemFK)
               return remainingClaimable + item.claimAmount
 
-            // if (
-            //   item.invoiceItemFK &&
-            //   parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
-            // )
-            //   return remainingClaimable + item.claimAmount
-            // if (parseInt(item.id, 10) === parseInt(id, 10)) {
-            //   return remainingClaimable + item.claimAmount
-            // }
             return remainingClaimable
           }, 0)
 
@@ -436,17 +425,13 @@ const ApplyClaims = ({
       }
 
       let hasError = false
-      const newRows = rows.map((item) => {
-        const _id = item.invoiceItemFK ? item.invoiceItemFK : item.id
+      const mapAndCompareCurrentChangesAmount = (item) => {
         if (item.id === id) {
           const currentChangesClaimAmount = changed[id].claimAmount
-          if (
-            // eligibleAmount === 0 ||
-            currentChangesClaimAmount <= eligibleAmount
-            // Number.isNaN(eligibleAmount)
-          ) {
+          if (currentChangesClaimAmount <= eligibleAmount) {
             return { ...item, error: undefined }
           }
+
           hasError = true
           return {
             ...item,
@@ -455,7 +440,8 @@ const ApplyClaims = ({
         }
 
         return { ...item, error: undefined }
-      })
+      }
+      const newRows = rows.map(mapAndCompareCurrentChangesAmount)
       const newInvoicePayer = {
         ...payer,
         invoicePayerItem: newRows,
@@ -466,42 +452,6 @@ const ApplyClaims = ({
           ) || hasError,
         // _hasError: hasError,
       }
-
-      // console.log({ flattenInvoiceItemList })
-      // const totalPayableBalance = flattenInvoiceItemList
-      //   .filter(
-      //     (item) =>
-      //       item.invoiceItemFK ? item.invoiceItemFK === id : item.id === id,
-      //   )
-      //   .reduce(
-      //     (largestPayable, item) =>
-      //       item.payableBalance > largestPayable
-      //         ? item.payableBalance
-      //         : largestPayable,
-      //     0,
-      //   )
-      // const currentItemClaimedAmount = flattenInvoiceItemList.reduce(
-      //   (remainingClaimable, item) => {
-      //     if (
-      //       item.invoiceItemFK &&
-      //       parseInt(item.invoiceItemFK, 10) === parseInt(id, 10)
-      //     )
-      //       return remainingClaimable + item.claimAmount
-      //     if (parseInt(item.id, 10) === parseInt(id, 10)) {
-      //       return remainingClaimable + item.claimAmount
-      //     }
-      //     return remainingClaimable
-      //   },
-      //   0,
-      // )
-      // console.log({
-      //   changed,
-      //   id,
-      //   totalPayableBalance,
-      //   currentItemClaimedAmount,
-      // })
-      // let error = payer._hasError
-
       updateTempInvoicePayer(newInvoicePayer, index)
       incrementCommitCount()
       return newRows
@@ -582,7 +532,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-
+  // console.log({ tempInvoicePayer })
   return (
     <Fragment>
       <GridItem md={2}>
@@ -703,7 +653,8 @@ const ApplyClaims = ({
             .filter(
               (invoicePayer) =>
                 !invoicePayer.isCancelled &&
-                invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME,
+                invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+                !_.isEmpty(invoicePayer.schemeConfig),
             )
             .map((i) => i.schemeConfig.id)}
           claimableSchemes={claimableSchemes}
