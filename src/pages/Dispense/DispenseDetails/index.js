@@ -128,7 +128,7 @@ const DispenseDetails = ({
       payload: {
         openConfirm: true,
         openConfirmContent: `Are you sure want to discard the dispense ?`,
-        onConfirmDiscard: () => {
+        onConfirmSave: () => {
           dispatch({
             type: 'dispense/removeAddOrderDetails',
             payload: {

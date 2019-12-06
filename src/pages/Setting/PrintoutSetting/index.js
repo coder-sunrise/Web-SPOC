@@ -171,14 +171,14 @@ class printoutSetting extends PureComponent {
         payload: {
           openConfirm: true,
           openConfirmContent: 'Are you sure want to discard the changes?',
-          onConfirmDiscard: () => {
+          onConfirmSave: () => {
             this.getSelectedReportSetting(e)
           },
           onConfirmClose: () => {
             setFieldValue('reportFK', this.state.prevSelectedIndex)
           },
 
-          openConfirmText: 'Discard Changes',
+          // openConfirmText: 'Discard Changes',
         },
       })
     } else {
