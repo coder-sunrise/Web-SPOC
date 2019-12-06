@@ -46,10 +46,11 @@ const styles = () => ({})
     const { dispatch, onConfirm, history, user } = props
     const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
     const paymentReceivedByUserFK = user.data.id
-    let newPaymentStatementInvoice = values.statementInvoice.filter((o) =>
-      o.statementInvoicePayment.find((i) => !i.id),
+    let newPaymentStatementInvoice = values.statementInvoice.filter(
+      (o) =>
+        o.statementInvoicePayment.find((i) => !i.id) &&
+        o.tempOutstandingAmount > 0,
     )
-
     newPaymentStatementInvoice = newPaymentStatementInvoice.map((o) => {
       let newInvoicePayment = o.statementInvoicePayment.find((i) => !i.id)
       const existingInvoicePayment = o.statementInvoicePayment.filter(
