@@ -298,6 +298,37 @@ export default ({
           columnName: 'description',
           width: 300,
           render: (row) => {
+            const _renderHTML = (textList) => {
+              return (
+                <Tooltip
+                  title={
+                    <React.Fragment>
+                      <div>
+                        {textList.map((t) => {
+                          return <p>{t}</p>
+                        })}
+                      </div>
+                    </React.Fragment>
+                  }
+                >
+                  <div>
+                    {textList.map((item) => {
+                      return (
+                        <p
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {item}
+                        </p>
+                      )
+                    })}
+                  </div>
+                </Tooltip>
+              )
+            }
             let text = ''
             if (row.usageMethodFK && row.dosageFK && row.uomfk) {
               text = `${row.usageMethodDisplayValue
@@ -307,27 +338,28 @@ export default ({
                 : ''} ${row.uomDisplayValue ? row.uomDisplayValue : ''} `
             }
 
-            return (
-              <div>
-                {row.corPrescriptionItemInstruction ? (
-                  row.corPrescriptionItemInstruction.map((item) => {
-                    text = `${item.usageMethodDisplayValue
-                      ? item.usageMethodDisplayValue
-                      : ''} ${item.dosageDisplayValue
-                      ? item.dosageDisplayValue
-                      : ''} ${item.prescribeUOMDisplayValue
-                      ? item.prescribeUOMDisplayValue
-                      : ''} ${item.drugFrequencyDisplayValue
-                      ? item.drugFrequencyDisplayValue
-                      : ''} For ${item.duration ? item.duration : ''} day(s)`
-
-                    return <p>{text}</p>
-                  })
-                ) : (
-                  text
-                )}
-              </div>
-            )
+            if (row.corPrescriptionItemInstruction) {
+              const textArray = row.corPrescriptionItemInstruction.map(
+                (item, i) => {
+                  return `${item.usageMethodDisplayValue
+                    ? item.usageMethodDisplayValue
+                    : ''} ${item.dosageDisplayValue
+                    ? item.dosageDisplayValue
+                    : ''} ${item.prescribeUOMDisplayValue
+                    ? item.prescribeUOMDisplayValue
+                    : ''} ${item.drugFrequencyDisplayValue
+                    ? item.drugFrequencyDisplayValue
+                    : ''} For ${item.duration ? item.duration : ''} day(s) ${i <
+                  row.corPrescriptionItemInstruction.length - 1
+                    ? `${item.stepdose} `
+                    : ''}`
+                },
+              )
+              return _renderHTML(textArray)
+            }
+            return _renderHTML([
+              text,
+            ])
           },
         },
         {

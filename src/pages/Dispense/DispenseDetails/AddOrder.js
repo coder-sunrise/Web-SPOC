@@ -4,12 +4,11 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
 import { withFormikExtend } from '@/components'
-import { inventoryTypeName } from '@/utils/codes'
 
 const styles = () => ({})
 
-const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
-  const displayExistingOrders = async (id) => {
+const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
+  const displayExistingOrders = async (id, servicesList) => {
     await dispatch({
       type: 'dispense/queryAddOrderDetails',
       payload: {
@@ -21,18 +20,19 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
         const newRows = retailInvoiceItem.map((o) => {
           let obj
           switch (o.invoiceItemTypeFK) {
-            case '1':
-            case '5': {
+            case 1:
+            case 5: {
+              const {
+                retailPrescriptionItemInstruction,
+                retailPrescriptionItemPrecaution,
+                ...restValues
+              } = o.retailVisitInvoiceDrug.retailPrescriptionItem
               obj = {
                 ...o.retailVisitInvoiceDrug,
                 innerLayerId: o.retailVisitInvoiceDrug.id,
                 innerLayerConcurrencyToken:
                   o.retailVisitInvoiceDrug.concurrencyToken,
-                ...o.retailVisitInvoiceDrug.retailPrescriptionItem,
-                type: o.invoiceItemTypeFK.toString(),
-                subject: o.itemName,
-                isActive: true,
-                uid: o.id,
+                ...restValues,
                 corPrescriptionItemInstruction:
                   o.retailVisitInvoiceDrug.retailPrescriptionItem
                     .retailPrescriptionItemInstruction,
@@ -43,21 +43,30 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
               break
             }
 
-            case '3': {
+            case 4: {
+              const { serviceId, serviceCenterId } = servicesList.find(
+                (s) =>
+                  s.serviceCenter_ServiceId ===
+                  o.retailVisitInvoiceService.serviceCenterServiceFK,
+              )
               obj = {
+                serviceFK: serviceId,
+                serviceCenterFK: serviceCenterId,
                 innerLayerId: o.retailVisitInvoiceService.id,
                 innerLayerConcurrencyToken:
                   o.retailVisitInvoiceService.concurrencyToken,
+                ...o.retailVisitInvoiceService,
                 ...o.retailVisitInvoiceService.retailService,
               }
               break
             }
 
-            case '4': {
+            case 2: {
               obj = {
                 innerLayerId: o.retailVisitInvoiceConsumable.id,
                 innerLayerConcurrencyToken:
                   o.retailVisitInvoiceConsumable.concurrencyToken,
+                ...o.retailVisitInvoiceConsumable,
                 ...o.retailVisitInvoiceConsumable.retailConsumable,
               }
               break
@@ -70,6 +79,10 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
           return {
             outerLayerId: o.id,
             outerLayerConcurrencyToken: o.concurrencyToken,
+            type: o.invoiceItemTypeFK.toString(),
+            subject: o.itemName,
+            isActive: true,
+            uid: o.id,
             ...obj,
           }
         })
@@ -87,7 +100,20 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
   useEffect(() => {
     const { entity } = dispense
     const { invoice } = entity
-    displayExistingOrders(invoice.id)
+
+    let servicesList = ctservice
+    if (!ctservice) {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+        },
+      }).then((services) => {
+        displayExistingOrders(invoice.id, services)
+      })
+    } else {
+      displayExistingOrders(invoice.id, servicesList)
+    }
   }, [])
 
   return (
@@ -106,13 +132,22 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense }) => {
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders }) => ({
+  connect(({ dispense, orders, codetable }) => ({
     dispense,
     orders,
+    ctservice: codetable.ctservice,
+    inventoryConsumable: codetable.inventoryconsumable,
   })),
   withFormikExtend({
     handleSubmit: (values, { props, resetForm }) => {
-      const { dispatch, orders, onClose, dispense, onReloadClick } = props
+      const {
+        dispatch,
+        orders,
+        onClose,
+        dispense,
+        onReloadClick,
+        inventoryConsumable,
+      } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
 
@@ -124,19 +159,40 @@ export default compose(
             const {
               corPrescriptionItemInstruction,
               corPrescriptionItemPrecaution,
+              retailPrescriptionItem = {},
               ...restO
             } = o
+            const {
+              retailPrescriptionItemInstruction = [],
+              retailPrescriptionItemPrecaution = [],
+            } = retailPrescriptionItem
+            const deletedRetailPrescriptionItemInstruction = retailPrescriptionItemInstruction.map(
+              (ins) => {
+                return {
+                  ...ins,
+                  isDeleted: true,
+                }
+              },
+            )
+            const deletedRetailPrescriptionItemPrecaution = retailPrescriptionItemPrecaution.map(
+              (ins) => {
+                return {
+                  ...ins,
+                  isDeleted: true,
+                }
+              },
+            )
             obj = {
               itemCode: o.drugCode,
               itemName: o.drugName,
+              invoiceItemTypeFK: 1,
+
               // "costPrice": 0,
               unitPrice: o.unitPrice,
               quantity: o.quantity,
               subTotal: o.totalPrice,
               // "adjType": "string",
               // "adjValue": 0,
-              id: o.outerLayerId,
-              concurrencyToken: o.outerLayerConcurrencyToken,
               retailVisitInvoiceDrug: {
                 id: o.innerLayerId,
                 concurrencyToken: o.innerLayerConcurrencyToken,
@@ -146,11 +202,18 @@ export default compose(
                 dispensedQuanity: o.dispensedQuanity,
                 retailPrescriptionItem: {
                   ...restO,
-                  retailPrescriptionItemInstruction: corPrescriptionItemInstruction,
-                  retailPrescriptionItemPrecaution: corPrescriptionItemPrecaution,
+                  retailPrescriptionItemInstruction: [
+                    ...corPrescriptionItemInstruction,
+                    ...deletedRetailPrescriptionItemInstruction,
+                  ],
+                  retailPrescriptionItemPrecaution: [
+                    ...corPrescriptionItemPrecaution,
+                    ...deletedRetailPrescriptionItemPrecaution,
+                  ],
                 },
               },
             }
+
             break
           }
           case '3': {
@@ -158,8 +221,10 @@ export default compose(
               itemCode: o.serviceCode,
               itemName: o.serviceName,
               subTotal: o.total,
-
+              invoiceItemTypeFK: 4,
               retailVisitInvoiceService: {
+                id: o.innerLayerId,
+                concurrencyToken: o.innerLayerConcurrencyToken,
                 serviceCenterServiceFK: o.serviceCenterServiceFK,
                 retailService: {
                   ...o,
@@ -169,16 +234,23 @@ export default compose(
             break
           }
           case '4': {
+            const { uom } = inventoryConsumable.find(
+              (c) => c.id === o.inventoryConsumableFK,
+            )
             obj = {
+              invoiceItemTypeFK: 2,
               itemCode: o.consumableCode,
               itemName: o.consumableName,
               subTotal: o.totalPrice,
-
               retailVisitInvoiceConsumable: {
+                id: o.innerLayerId,
+                concurrencyToken: o.innerLayerConcurrencyToken,
                 inventoryConsumableFK: o.inventoryConsumableFK,
                 expiryDate: o.expiryDate,
                 batchNo: o.batchNo,
                 retailConsumable: {
+                  unitOfMeasurement: uom.name,
+                  unitofMeasurementFK: uom.id,
                   ...o,
                 },
               },
@@ -190,6 +262,9 @@ export default compose(
           }
         }
         return {
+          id: o.outerLayerId,
+          concurrencyToken: o.outerLayerConcurrencyToken,
+
           invoiceItemTypeFK: parseInt(o.type, 10),
           description: o.subject,
           adjAmt: o.adjAmount,
@@ -207,6 +282,7 @@ export default compose(
         retailInvoiceItem,
         retailInvoiceAdjustment: finalAdjustments,
       }
+
       dispatch({
         type: 'dispense/saveAddOrderDetails',
         payload,

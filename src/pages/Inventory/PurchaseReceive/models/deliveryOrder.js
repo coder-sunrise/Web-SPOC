@@ -58,9 +58,6 @@ export default createFormViewModel({
           if (data.deliveryOrderItem) {
             data.deliveryOrderItem = data.deliveryOrderItem.map((x) => ({
               ...x,
-              maxCurrentReceivingQty: x.orderQty - x.totalQtyReceived,
-              maxCurrentReceivingBonusQty:
-                x.bonusQuantity - x.totalBonusReceived,
             }))
           }
           return yield put({
@@ -157,6 +154,8 @@ export default createFormViewModel({
             bonusQuantity: x.bonusQty,
             currentReceivingQty: x.recevingQuantity,
             currentReceivingBonusQty: x.bonusQuantity,
+            maxCurrentReceivingQty: x.recevingQuantity,
+            maxCurrentReceivingBonusQty: x.bonusQuantity,
             // expiryDate: null,
           }
         })
