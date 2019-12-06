@@ -44,6 +44,7 @@ import {
   sharedCfg,
   fontCfg,
   groupCfg,
+  cellPrefix,
 } from './variables'
 
 const { fabric } = require('fabric')
@@ -83,52 +84,39 @@ class Tooth extends React.PureComponent {
     const { action = {} } = dentalChartComponent
     const { icon, type, hoverColor: hc, render, clear } = action
     if (clear) clear(this.canvas, props)
-    this.canvas.getObjects('group').map((o) => {
-      if (o.name === 'cell') {
-        if (icon && type !== 'cell') {
-          // item.set('hoverCursor', `url(${icon}),pointer`)
-          this.hoverOpacity = 0
-        } else {
-          // item.set('hoverCursor', `auto`)
-          this.hoverOpacity = 1
-        }
-        if (hc) {
-          this.hoverColor = hc
-        } else {
-          this.hoverColor = '#ffffff'
-        }
-      }
-    })
+
     if (render) render(this.canvas, props)
 
-    this.canvas.off('mouse:over')
-    this.canvas.on('mouse:over', (e) => {
-      // console.log(e, e.target)
-      if (e.target && e.target.item) {
-        const item = e.target.item(0)
-        if (item) {
-          item.set('fill', this.hoverColor)
-          this.canvas.getObjects('group').map((o) => {
-            if (o.name === 'cell') o.set('opacity', this.hoverOpacity)
-          })
-          this.canvas.renderAll()
-        }
-      }
-    })
-    this.canvas.off('mouse:out')
-    this.canvas.on('mouse:out', (e) => {
-      if (e.target && e.target.item) {
-        const item = e.target.item(0)
-        if (item) {
-          item.set('fill', 'white')
-          this.canvas.getObjects('group').map((o) => {
-            if (o.name === 'cell') o.set('opacity', 1)
-          })
+    // this.canvas.off('mouse:over')
+    // this.canvas.on('mouse:over', (e) => {
+    //   // console.log(e, e.target)
+    //   if (e.target && e.target.item) {
+    //     const item = e.target.item(0)
+    //     if (item) {
+    //       item.set('fill', this.hoverColor)
+    //       this.canvas.getObjects('group').map((o) => {
+    //         // if (o.name === 'cell') o.set('opacity', this.hoverOpacity)
+    //         if (o.name === 'cell') this.canvas.sendToBack(o)
+    //       })
+    //       this.canvas.renderAll()
+    //     }
+    //   }
+    // })
+    // this.canvas.off('mouse:out')
+    // this.canvas.on('mouse:out', (e) => {
+    //   if (e.target && e.target.item) {
+    //     const item = e.target.item(0)
+    //     if (item) {
+    //       item.set('fill', 'white')
+    //       this.canvas.getObjects('group').map((o) => {
+    //         // if (o.name === 'cell') o.set('opacity', 1)
+    //         if (o.name === 'cell') this.canvas.bringToFront(o)
+    //       })
 
-          this.canvas.renderAll()
-        }
-      }
-    })
+    //       this.canvas.renderAll()
+    //     }
+    //   }
+    // })
 
     // if (icon) {
     //   fabric.Image.fromURL(icon, (img) => {
@@ -270,7 +258,10 @@ class Tooth extends React.PureComponent {
           polygon,
           polygonText,
         ],
-        groupCfg,
+        {
+          ...groupCfg,
+          name: `${cellPrefix}left`,
+        },
       ),
     )
     canvas.add(
@@ -279,7 +270,10 @@ class Tooth extends React.PureComponent {
           polygon2,
           polygon2Text,
         ],
-        groupCfg,
+        {
+          ...groupCfg,
+          name: `${cellPrefix}bottom`,
+        },
       ),
     )
     canvas.add(
@@ -288,7 +282,10 @@ class Tooth extends React.PureComponent {
           polygon3,
           polygon3Text,
         ],
-        groupCfg,
+        {
+          ...groupCfg,
+          name: `${cellPrefix}right`,
+        },
       ),
     )
     canvas.add(
@@ -297,7 +294,10 @@ class Tooth extends React.PureComponent {
           polygon4,
           polygon4Text,
         ],
-        groupCfg,
+        {
+          ...groupCfg,
+          name: `${cellPrefix}top`,
+        },
       ),
     )
     if (text[5]) {
@@ -349,7 +349,10 @@ class Tooth extends React.PureComponent {
             polygon5,
             polygon5Text,
           ],
-          groupCfg,
+          {
+            ...groupCfg,
+            name: `${cellPrefix}centerLeft`,
+          },
         ),
       )
       canvas.add(
@@ -358,7 +361,10 @@ class Tooth extends React.PureComponent {
             polygon6,
             polygon6Text,
           ],
-          groupCfg,
+          {
+            ...groupCfg,
+            name: `${cellPrefix}centerRight`,
+          },
         ),
       )
     } else {
@@ -389,29 +395,32 @@ class Tooth extends React.PureComponent {
             polygon7,
             polygon7Text,
           ],
-          groupCfg,
+          {
+            ...groupCfg,
+            name: `${cellPrefix}centerfull`,
+          },
         ),
       )
     }
 
-    const polygon12 = new fabric.Polygon( // outside top
-      [
-        { x: 0, y: baseHeight },
+    // const polygon12 = new fabric.Polygon( // outside top
+    //   [
+    //     { x: 0, y: baseHeight },
 
-        { x: baseWidth * 1, y: 0 },
+    //     { x: baseWidth * 1, y: 0 },
 
-        { x: baseWidth * 3, y: 0 },
-        { x: baseWidth * 4, y: baseHeight },
-      ],
-      {
-        ...cfg,
-        fill: 'brown',
-        top: baseHeight * 5,
-      },
-    )
-    polygon12.rotate(180)
+    //     { x: baseWidth * 3, y: 0 },
+    //     { x: baseWidth * 4, y: baseHeight },
+    //   ],
+    //   {
+    //     ...cfg,
+    //     fill: 'brown',
+    //     top: baseHeight * 5,
+    //   },
+    // )
+    // polygon12.rotate(180)
 
-    canvas.add(polygon12)
+    // canvas.add(polygon12)
 
     // canvas.on('mouse:over', (e) => {
     //   // console.log(e, e.target)

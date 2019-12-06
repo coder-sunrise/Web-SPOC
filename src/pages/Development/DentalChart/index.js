@@ -64,6 +64,7 @@ const text2 = [
 class DentalChart extends React.Component {
   constructor (props) {
     super(props)
+    this._canvas = React.createRef()
 
     this.divContainer = React.createRef()
 
@@ -72,44 +73,44 @@ class DentalChart extends React.Component {
         index: 18,
         text: text1,
       },
-      {
-        index: 17,
-        text: text1,
-      },
-      {
-        index: 16,
-        text: text1,
-      },
-      {
-        index: 15,
-        text: text1,
-      },
-      {
-        index: 14,
-        text: text2,
-      },
-      {
-        index: 13,
-        text: text2,
-      },
-      {
-        index: 12,
-        text: text2,
-      },
-      {
-        index: 11,
-        text: text2,
-      },
-      {
-        index: 0,
-        text: [
-          '',
-          '',
-          '',
-          '',
-          '',
-        ],
-      },
+      // {
+      //   index: 17,
+      //   text: text1,
+      // },
+      // {
+      //   index: 16,
+      //   text: text1,
+      // },
+      // {
+      //   index: 15,
+      //   text: text1,
+      // },
+      // {
+      //   index: 14,
+      //   text: text2,
+      // },
+      // {
+      //   index: 13,
+      //   text: text2,
+      // },
+      // {
+      //   index: 12,
+      //   text: text2,
+      // },
+      // {
+      //   index: 11,
+      //   text: text2,
+      // },
+      // {
+      //   index: 0,
+      //   text: [
+      //     '',
+      //     '',
+      //     '',
+      //     '',
+      //     '',
+      //   ],
+      // },
     ]
   }
 
@@ -139,13 +140,20 @@ class DentalChart extends React.Component {
       <div className={className} ref={this.divContainer}>
         <GridContainer>
           <GridItem md={8}>
-            {this.configs.map((o) => (
-              <Tooth
-                {...o}
-                values={data.filter((m) => m.toothIndex === o.index)}
-                {...this.props}
-              />
-            ))}
+            {/* <canvas id={this.id} ref={this._canvas}>
+              Sorry, Canvas HTML5 element is not supported by your browser :(
+            </canvas> */}
+            {this.configs.map((o) => {
+              console.log(data.filter((m) => m.toothIndex === o.index))
+              return (
+                <Tooth
+                  {...o}
+                  ca
+                  values={data.filter((m) => m.toothIndex === o.index)}
+                  {...this.props}
+                />
+              )
+            })}
           </GridItem>
           <GridItem md={4}>test</GridItem>
         </GridContainer>
