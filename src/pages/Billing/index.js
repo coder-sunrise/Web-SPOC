@@ -123,7 +123,7 @@ class Billing extends Component {
     // })
   }
 
-  upsertBilling = (callback = undefined) => {
+  upsertBilling = (callback = null) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus } = values
     const payload = constructPayload(values)
@@ -267,7 +267,7 @@ class Billing extends Component {
               }))
               this.toggleReport()
             }
-            this.handleSubmit(callback)
+            this.upsertBilling(callback)
           },
         },
       })
@@ -342,6 +342,10 @@ class Billing extends Component {
         }))
       }
     })
+  }
+
+  handleSaveBillingClick = () => {
+    this.upsertBilling()
   }
 
   render () {
@@ -447,7 +451,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='primary'
-                  onClick={this.upsertBilling}
+                  onClick={this.handleSaveBillingClick}
                   disabled={this.state.isEditing}
                 >
                   Save Billing

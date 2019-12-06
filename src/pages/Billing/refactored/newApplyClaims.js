@@ -283,7 +283,7 @@ const ApplyClaims = ({
       },
       invoicePayer: tempInvoicePayer,
     }
-    console.log({ _values })
+
     handleIsEditing(hasOtherEditing)
     setValues(_values)
   }
@@ -532,7 +532,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-  console.log({ tempInvoicePayer })
+
   return (
     <Fragment>
       <GridItem md={2}>

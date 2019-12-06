@@ -78,7 +78,7 @@ const InvoiceSummary = ({
     isGstInclusive,
     patientOutstandingBalance,
   } = invoice
-  console.log({ invoice })
+
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
