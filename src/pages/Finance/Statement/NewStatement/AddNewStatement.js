@@ -299,6 +299,9 @@ class AddNewStatement extends PureComponent {
   render () {
     const { classes, theme, values, handleSubmit, statement } = this.props
     const { invoiceRows, columns, columnExtensions } = this.state
+    const { entity } = statement
+    const mode = entity && entity.id > 0 ? 'Edit' : 'Add'
+
     // console.log('values', values)
     // console.log('props', this.props)
     return (
@@ -487,7 +490,7 @@ class AddNewStatement extends PureComponent {
             </Button>
             <ProgressButton
               color='primary'
-              disabled={this.state.selectedRows.length <= 0}
+              disabled={mode === 'Add' && this.state.selectedRows.length <= 0}
               onClick={() => {
                 this.setState({ selectedRows: [] })
                 handleSubmit()
