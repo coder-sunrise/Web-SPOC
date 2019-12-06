@@ -39,7 +39,7 @@ const styles = () => ({
     ],
     statementDueDates: [
       moment().subtract(1, 'months').startOf('month'),
-      moment().endOf('month'),
+      moment().add(3, 'months').endOf('month'),
     ],
   }),
   handleSubmit: (values, { setSubmitting, props }) => {
