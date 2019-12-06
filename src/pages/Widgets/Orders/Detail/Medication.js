@@ -184,6 +184,14 @@ class Medication extends PureComponent {
             color='info'
             onClick={() => {
               arrayHelpers.push(defaultValue)
+              if (prop === 'corPrescriptionItemInstruction') {
+                this.setInstruction(
+                  values.corPrescriptionItemInstruction.length,
+                )
+                setTimeout(() => {
+                  this.calculateQuantity()
+                }, 1)
+              }
             }}
           >
             <Tooltip title={tooltip}>
@@ -270,6 +278,66 @@ class Medication extends PureComponent {
     }
   }
 
+  setInstruction = (index = 0) => {
+    console.log('setInstruction', index)
+    const { setFieldValue } = this.props
+    const op = this.state.selectedMedication
+
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].usageMethodFK`,
+      op.medicationUsage ? op.medicationUsage.id : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].usageMethodCode`,
+      op.medicationUsage ? op.medicationUsage.code : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].usageMethodDisplayValue`,
+      op.medicationUsage ? op.medicationUsage.name : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].dosageFK`,
+      op.prescribingDosage ? op.prescribingDosage.id : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].dosageCode`,
+      op.prescribingDosage ? op.prescribingDosage.code : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].dosageDisplayValue`,
+      op.prescribingDosage ? op.prescribingDosage.name : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].prescribeUOMFK`,
+      op.prescribingUOM ? op.prescribingUOM.id : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].prescribeUOMCode`,
+      op.prescribingUOM ? op.prescribingUOM.code : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].prescribeUOMDisplayValue`,
+      op.prescribingUOM ? op.prescribingUOM.name : undefined,
+    )
+
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].drugFrequencyFK`,
+      op.medicationFrequency ? op.medicationFrequency.id : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].drugFrequencyCode`,
+      op.medicationFrequency ? op.medicationFrequency.code : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].drugFrequencyDisplayValue`,
+      op.medicationFrequency ? op.medicationFrequency.name : undefined,
+    )
+    setFieldValue(
+      `corPrescriptionItemInstruction[${index}].duration`,
+      op.duration || 1,
+    )
+  }
+
   changeMedication = (v, op = {}) => {
     const { setFieldValue, disableEdit } = this.props
 
@@ -282,10 +350,6 @@ class Medication extends PureComponent {
           expiryDate: defaultBatch.expiryDate,
         })
     }
-
-    this.setState({
-      selectedMedication: op,
-    })
 
     setFieldValue('corPrescriptionItemInstruction', [
       {
@@ -301,59 +365,14 @@ class Medication extends PureComponent {
       )
     }
     setFieldValue('isActive', op.isActive)
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].usageMethodFK',
-      op.medicationUsage ? op.medicationUsage.id : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].usageMethodCode',
-      op.medicationUsage ? op.medicationUsage.code : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].usageMethodDisplayValue',
-      op.medicationUsage ? op.medicationUsage.name : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].dosageFK',
-      op.prescribingDosage ? op.prescribingDosage.id : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].dosageCode',
-      op.prescribingDosage ? op.prescribingDosage.code : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].dosageDisplayValue',
-      op.prescribingDosage ? op.prescribingDosage.name : undefined,
-    )
 
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].prescribeUOMFK',
-      op.prescribingUOM ? op.prescribingUOM.id : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].prescribeUOMCode',
-      op.prescribingUOM ? op.prescribingUOM.code : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].prescribeUOMDisplayValue',
-      op.prescribingUOM ? op.prescribingUOM.name : undefined,
-    )
-
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].drugFrequencyFK',
-      op.medicationFrequency ? op.medicationFrequency.id : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].drugFrequencyCode',
-      op.medicationFrequency ? op.medicationFrequency.code : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].drugFrequencyDisplayValue',
-      op.medicationFrequency ? op.medicationFrequency.name : undefined,
-    )
-    setFieldValue(
-      'corPrescriptionItemInstruction[0].duration',
-      op.duration || 1,
+    this.setState(
+      {
+        selectedMedication: op,
+      },
+      () => {
+        this.setInstruction()
+      },
     )
 
     if (
