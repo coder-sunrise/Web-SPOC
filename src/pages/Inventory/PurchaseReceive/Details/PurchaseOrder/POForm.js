@@ -13,6 +13,7 @@ import {
   NumberInput,
   Field,
 } from '@/components'
+import { MobileNumberInput } from '@/components/_medisys'
 
 const prefix = 'purchaseOrder'
 
@@ -295,41 +296,27 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.contactNo`}
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      min='0'
-                      maxLength='15'
-                      max='999999999999999'
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.contactNo',
-                      })}
-                      precision={0}
-                      // disabled={!isReadOnly}
-                      {...args}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <MobileNumberInput
+                    {...args}
+                    label={formatMessage({
+                      id: 'inventory.pr.detail.pod.contactNo',
+                    })}
+                  />
+                )}
               />
             </GridItem>
             <GridItem xs={12}>
               <FastField
                 name={`${prefix}.faxNo`}
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      min='0'
-                      maxLength='15'
-                      max='999999999999999'
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.faxNo',
-                      })}
-                      precision={0}
-                      // disabled={!isReadOnly}
-                      {...args}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <MobileNumberInput
+                    {...args}
+                    label={formatMessage({
+                      id: 'inventory.pr.detail.pod.faxNo',
+                    })}
+                  />
+                )}
               />
             </GridItem>
           </GridContainer>
