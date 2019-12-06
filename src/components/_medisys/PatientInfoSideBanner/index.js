@@ -14,6 +14,7 @@ import {
   dateFormatLong,
   DatePicker,
   IconButton,
+  TextField,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // assets
@@ -188,6 +189,7 @@ const PatientInfoSideBanner = ({
       >
         {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
           const schemeData = getSchemeDetails(o)
+          console.log({ schemeData })
           return (
             <LoadingWrapper loading={loading}>
               <div style={{ marginBottom: theme.spacing(1) }}>
@@ -222,18 +224,20 @@ const PatientInfoSideBanner = ({
                 {schemeData.validFrom && (
                   <div>
                     <p>
-                      <NumberInput
-                        prefix='Balance:'
-                        text
-                        currency
-                        value={
-                          schemeData.chronicBalanceStatusCode === 'SC105' ? (
-                            'Full Balance'
-                          ) : (
-                            schemeData.balance
-                          )
-                        }
-                      />
+                      {schemeData.chronicBalanceStatusCode !== 'SC105' ? (
+                        <NumberInput
+                          prefix='Balance:'
+                          text
+                          currency
+                          value={schemeData.balance}
+                        />
+                      ) : (
+                        <TextField
+                          text
+                          prefix='Balance:'
+                          value='Full Balance'
+                        />
+                      )}
                     </p>
                     <p>
                       <DatePicker
