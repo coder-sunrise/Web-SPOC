@@ -154,7 +154,11 @@ const style = () => ({
           creditCardTypeFK,
           createdByBizSessionFK: transactionBizSessionFK,
           transactionBizSessionFK,
-          remarks: remarks || (isDeposit ? 'Deposit for treatments' : 'Refund from patient deposit account'),
+          remarks:
+            remarks ||
+            (isDeposit
+              ? 'Deposit for treatments'
+              : 'Refund from patient deposit account'),
         },
       },
     }).then((r) => {
@@ -265,13 +269,8 @@ class Modal extends PureComponent {
       payload: {
         pagesize: 999,
         lgteql_SessionStartDate: startDateTime,
-        group: [
-          {
-            isClinicSessionClosed: false,
-            lsteql_SessionStartDate: endDateTime,
-            combineCondition: 'or',
-          },
-        ],
+        isClinicSessionClosed: true,
+        lsteql_SessionCloseDate: endDateTime,
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],
