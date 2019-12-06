@@ -4,6 +4,7 @@ import { createFormViewModel } from 'medisys-model'
 import { notification } from '@/components'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '../services'
+import { unlock } from '@/services/dispense'
 import { query as queryPatient } from '@/services/patient'
 
 export default createFormViewModel({
@@ -137,7 +138,7 @@ export default createFormViewModel({
           payload: { id: payload.visitID },
         })
       },
-      *backToDispense ({ payload }, { put, select, take }) {
+      *backToDispense ({ payload }, { call, put, select, take }) {
         const billingState = yield select((state) => state.billing)
 
         const parameters = {
@@ -150,15 +151,15 @@ export default createFormViewModel({
           parameters,
           '/reception/queue/dispense',
         )
+        // const response = yield put({
+        //   type: 'dispense/unlock',
+        //   payload: {
+        //     id: billingState.visitID,
+        //   },
+        // })
+        // yield take('dispense/unlock/@@end')
 
-        const response = yield put({
-          type: 'dispense/unlock',
-          payload: {
-            id: billingState.visitID,
-          },
-        })
-        yield take('dispense/unlock/@@end')
-
+        const response = yield call(unlock, { id: billingState.visitID })
         if (response) {
           yield put({
             type: 'updateState',

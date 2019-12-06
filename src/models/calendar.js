@@ -169,8 +169,7 @@ export default createListViewModel({
             rescheduledByFK,
           }
 
-          const shouldGenerateRecurrence =
-            !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
+          const shouldGenerateRecurrence = !isEdit
 
           let appointments = []
 
@@ -310,6 +309,7 @@ export default createListViewModel({
               },
             }
           }
+
           return yield put({
             type: actionKey,
             payload: savePayload,
@@ -360,6 +360,7 @@ export default createListViewModel({
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, {
           ...payload,
+          isCancelled: false,
         })
         const { status, data } = result
         if (status === '200' && data.data) {

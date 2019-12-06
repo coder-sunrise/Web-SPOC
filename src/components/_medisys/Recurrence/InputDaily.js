@@ -20,6 +20,7 @@ const InputDaily = ({ classes, labelSize, disabled, inputSize }) => {
             <NumberInput
               {...args}
               min={1}
+              precision={0}
               disabled={disabled}
               suffix='day(s)'
             />

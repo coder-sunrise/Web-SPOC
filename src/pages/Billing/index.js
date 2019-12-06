@@ -123,17 +123,20 @@ class Billing extends Component {
     // })
   }
 
-  handleSubmit = (callback = undefined) => {
+  upsertBilling = (callback = null) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus } = values
     const payload = constructPayload(values)
     const defaultCallback = () => {
       if (visitStatus === 'COMPLETED') {
         notification.success({
-          message: 'Billing completed',
+          message: 'Billing Completed',
         })
         router.push('/reception/queue')
       } else {
+        notification.success({
+          message: 'Billing Saved',
+        })
         dispatch({
           type: 'patient/query',
           payload: { id: patient.id },
@@ -202,10 +205,10 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  upsertBilling = () => {
-    // this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
-    this.handleSubmit()
-  }
+  // upsertBilling = () => {
+  //   this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
+  //   this.handleSubmit()
+  // }
 
   shouldDisableSaveAndCompleteButton = () => {
     const { values } = this.props
@@ -264,7 +267,7 @@ class Billing extends Component {
               }))
               this.toggleReport()
             }
-            this.handleSubmit(callback)
+            this.upsertBilling(callback)
           },
         },
       })
@@ -339,6 +342,10 @@ class Billing extends Component {
         }))
       }
     })
+  }
+
+  handleSaveBillingClick = () => {
+    this.upsertBilling()
   }
 
   render () {
@@ -444,7 +451,7 @@ class Billing extends Component {
                 </Button>
                 <Button
                   color='primary'
-                  onClick={this.upsertBilling}
+                  onClick={this.handleSaveBillingClick}
                   disabled={this.state.isEditing}
                 >
                   Save Billing
