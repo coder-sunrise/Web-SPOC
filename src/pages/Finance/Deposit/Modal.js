@@ -269,7 +269,6 @@ class Modal extends PureComponent {
       payload: {
         pagesize: 999,
         lgteql_SessionStartDate: startDateTime,
-        isClinicSessionClosed: true,
         lsteql_SessionCloseDate: endDateTime,
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
