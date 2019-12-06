@@ -33,6 +33,7 @@ const InputWeekly = ({
             <NumberInput
               disabled={disabled}
               min={1}
+              precision={0}
               suffix='week(s)'
               {...args}
             />

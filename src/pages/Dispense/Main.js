@@ -166,6 +166,7 @@ class Main extends Component {
         values,
       },
     }).then((response) => {
+      console.log({ response })
       if (response) {
         const parameters = {}
         router.push(getAppendUrl(parameters, '/reception/queue/billing'))

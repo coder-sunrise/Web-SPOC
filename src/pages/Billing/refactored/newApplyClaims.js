@@ -218,9 +218,8 @@ const ApplyClaims = ({
             }
           }
         }
-        const existing = tempInvoicePayer[index]
+
         return {
-          ...existing,
           ..._payer,
           _isConfirmed: true,
           _isDeleted: false,
@@ -284,6 +283,7 @@ const ApplyClaims = ({
       },
       invoicePayer: tempInvoicePayer,
     }
+    console.log({ _values })
     handleIsEditing(hasOtherEditing)
     setValues(_values)
   }
@@ -532,7 +532,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-  // console.log({ tempInvoicePayer })
+  console.log({ tempInvoicePayer })
   return (
     <Fragment>
       <GridItem md={2}>

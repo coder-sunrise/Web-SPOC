@@ -169,8 +169,7 @@ export default createListViewModel({
             rescheduledByFK,
           }
 
-          const shouldGenerateRecurrence =
-            !isEdit || (isRecurrenceChanged && formikValues.isEnableRecurrence)
+          const shouldGenerateRecurrence = !isEdit
 
           let appointments = []
 
@@ -310,6 +309,7 @@ export default createListViewModel({
               },
             }
           }
+
           return yield put({
             type: actionKey,
             payload: savePayload,

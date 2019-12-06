@@ -5,7 +5,13 @@ import { withStyles } from '@material-ui/core'
 // ant design
 import { Divider } from 'antd'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  NumberInput,
+} from '@/components'
 import Payments from './Payments'
 // utils
 import { roundTo } from '@/utils/utils'
@@ -70,7 +76,9 @@ const InvoiceSummary = ({
     totalAftGst,
     invoiceNo,
     isGstInclusive,
+    patientOutstandingBalance,
   } = invoice
+  console.log({ invoice })
   const handleConfirmDelete = useCallback(
     (id, toggleVisibleCallback) => {
       const payment = invoicePayment.find(
@@ -102,8 +110,9 @@ const InvoiceSummary = ({
         !payment.isCancelled ? total + payment.totalAmtPaid : total,
       0,
     )
-    console.log({ totalPaid, finalPayable: values.finalPayable })
-    return values.finalPayable <= totalPaid
+    return (
+      patientOutstandingBalance !== undefined && patientOutstandingBalance === 0
+    )
   }
 
   const handleCancelClick = useCallback(
@@ -135,17 +144,17 @@ const InvoiceSummary = ({
                 </GridItem>
                 <GridItem md={6} className={classes.rightAlign}>
                   <h5 className={classes.currencyValue}>
-                    {parseToTwoDecimalString(roundTo(gstAmount))}
+                    <NumberInput value={gstAmount} text currency />
                   </h5>
                 </GridItem>
               </React.Fragment>
             )}
             <GridItem md={6}>
-              <h5>Final Bill</h5>
+              <h5 style={{ fontWeight: 500 }}>Final Bill</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(roundTo(totalAftGst))}
+                <NumberInput value={totalAftGst} text currency />
               </h5>
             </GridItem>
             <GridItem md={6}>
@@ -153,7 +162,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(values.finalClaim)}
+                <NumberInput value={values.finalClaim} text currency />
               </h5>
             </GridItem>
             <GridItem md={12}>
@@ -166,11 +175,11 @@ const InvoiceSummary = ({
               />
             </GridItem>
             <GridItem md={6}>
-              <h5 style={{ fontWeight: 500 }}>Final Payable</h5>
+              <h5 style={{ fontWeight: 500 }}>Outstanding</h5>
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                {parseToTwoDecimalString(values.finalPayable)}
+                <NumberInput value={patientOutstandingBalance} text currency />
               </h5>
             </GridItem>
           </GridContainer>
@@ -219,7 +228,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.addPaymentButton}
                 onClick={handleAddPaymentClick}
-                disabled={disabled}
+                disabled={shouldDisableAddPayment()}
               >
                 Add Payment
               </Button>

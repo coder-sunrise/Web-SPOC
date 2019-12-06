@@ -157,6 +157,7 @@ const Recurrence = ({
                         {...args}
                         min={1}
                         max={99}
+                        precision={0}
                         disabled={disabled}
                         suffix='occurences'
                       />
