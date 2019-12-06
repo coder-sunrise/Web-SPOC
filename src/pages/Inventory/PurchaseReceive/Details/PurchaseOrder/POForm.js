@@ -304,6 +304,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.contactNo',
                       })}
+                      precision={0}
                       // disabled={!isReadOnly}
                       {...args}
                     />
@@ -323,6 +324,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.faxNo',
                       })}
+                      precision={0}
                       // disabled={!isReadOnly}
                       {...args}
                     />
