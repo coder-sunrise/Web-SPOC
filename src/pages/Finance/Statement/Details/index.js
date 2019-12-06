@@ -5,7 +5,7 @@ import { withFormikExtend, Tabs } from '@/components'
 import { StatementDetailOption } from './variables'
 import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
-import { PAYMENT_MODE } from '@/utils/constants'
+import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
 
 const styles = () => ({})
@@ -17,11 +17,22 @@ const styles = () => ({})
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
     const returnValue = statement.entity || statement.default
-
+    let newStatementInvoice = []
+    let total = 0
     let adminChargeValue = 0
     if (returnValue.statementInvoice) {
-      returnValue.statementInvoice.forEach((o) => {
-        adminChargeValue += o.adminCharge
+      newStatementInvoice = returnValue.statementInvoice.map((o) => {
+        const { statementInvoicePayment, adminCharge, outstandingAmount } = o
+        total += outstandingAmount
+        adminChargeValue += adminCharge
+
+        return {
+          ...o,
+          tempOutstandingAmount: o.outstandingAmount,
+          statementInvoicePayment: [
+            ...statementInvoicePayment,
+          ],
+        }
       })
     }
 
@@ -32,6 +43,11 @@ const styles = () => ({})
       ...returnValue,
       outstandingBalance,
       adminChargeValue,
+      amount: total,
+      maxAmount: total,
+      paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
+      displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
+      statementInvoice: newStatementInvoice,
     }
   },
   validationSchema: Yup.object().shape({

@@ -101,42 +101,6 @@ class CollectPaymentConfirm extends PureComponent {
     ],
   }
 
-  componentDidMount () {
-    const { statement, setValues, values } = this.props
-    const { statementInvoice } = statement.entity
-    let total = 0
-
-    const newStatementInvoice = statementInvoice.map((o) => {
-      const { statementInvoicePayment, ...restStatementValues } = o
-      total += o.outstandingAmount
-      const invoicePayment = {
-        totalAmtPaid: o.outstandingAmount,
-        receiptNo: o.invoiceNo,
-        invoicePayerFK: o.invoicePayerFK,
-      }
-      return {
-        ...o,
-        tempOutstandingAmount: o.outstandingAmount,
-        statementInvoicePayment: [
-          ...statementInvoicePayment,
-        ],
-      }
-    })
-    this.fetchLatestBizSessions()
-    setValues({
-      ...values,
-      // paymentDate: moment(),
-      amount: total,
-      maxAmount: total,
-      paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
-      displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
-      statementInvoice: newStatementInvoice,
-    })
-    this.setState({
-      rows: newStatementInvoice,
-    })
-  }
-
   handlePaymentAmount = (e, from) => {
     const { setFieldValue, statement, values, setValues } = this.props
     const { statementInvoice } = statement.entity
@@ -157,8 +121,10 @@ class CollectPaymentConfirm extends PureComponent {
       const currentPayment = currentStatement.statementInvoicePayment.find(
         (o) => !o.id,
       )
-      const { invoicePayment } = currentPayment
-      invoicePayment.totalAmtPaid = value === '' ? 0 : value
+      if (currentPayment) {
+        const { invoicePayment } = currentPayment
+        invoicePayment.totalAmtPaid = value === '' ? 0 : value
+      }
 
       setFieldValue('amount', totalAmountPaid)
       return
@@ -208,33 +174,6 @@ class CollectPaymentConfirm extends PureComponent {
     this.getBizList(event)
   }
 
-  fetchLatestBizSessions = () => {
-    const { setFieldValue } = this.props
-    const payload = {
-      pagesize: 1,
-      sorting: [
-        { columnName: 'sessionStartDate', direction: 'desc' },
-      ],
-    }
-    getBizSession(payload).then((response) => {
-      const { status, data } = response
-      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
-        const { data: sessionData } = data
-        let paymentDate = moment(
-          sessionData[0].sessionStartDate,
-          serverDateFormat,
-        )
-        setFieldValue('paymentDate', paymentDate.format(serverDateFormat))
-        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
-
-        this.getBizList(paymentDate.format(serverDateFormat))
-      } else {
-        setFieldValue('paymentDate', null)
-        setFieldValue('paymentCreatedBizSessionFK', undefined)
-      }
-    })
-  }
-
   getBizList = (date) => {
     const { dispatch, setFieldValue } = this.props
     const momentDate = moment(date, serverDateFormat)
@@ -251,13 +190,8 @@ class CollectPaymentConfirm extends PureComponent {
       payload: {
         pagesize: 999,
         lgteql_SessionStartDate: startDateTime,
-        group: [
-          {
-            isClinicSessionClosed: false,
-            lsteql_SessionStartDate: endDateTime,
-            combineCondition: 'or',
-          },
-        ],
+        isClinicSessionClosed: true,
+        lsteql_SessionCloseDate: endDateTime,
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],
@@ -295,7 +229,7 @@ class CollectPaymentConfirm extends PureComponent {
     return (
       <React.Fragment>
         <CommonTableGrid
-          rows={rows}
+          rows={values.statementInvoice}
           columns={columns}
           columnExtensions={columnExtensions}
           FuncProps={{ pager: false }}

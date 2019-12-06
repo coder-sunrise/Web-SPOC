@@ -15,10 +15,12 @@ import {
   dateFormatLong,
   dateFormatLongWithTime,
   ProgressButton,
+  serverDateFormat,
 } from '@/components'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   gridContainer: {
@@ -53,6 +55,72 @@ class Details extends PureComponent {
     showCollectPayment: false,
   }
 
+  componentDidMount () {
+    this.fetchLatestBizSessions()
+  }
+
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (status === '200' && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+        setFieldValue('paymentDate', paymentDate.format(serverDateFormat))
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+
+        this.getBizList(paymentDate.format(serverDateFormat))
+      } else {
+        setFieldValue('paymentDate', null)
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+      }
+    })
+  }
+
+  getBizList = (date) => {
+    const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date, serverDateFormat)
+
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
+    dispatch({
+      type: 'statement/bizSessionList',
+      payload: {
+        pagesize: 999,
+        lgteql_SessionStartDate: startDateTime,
+        isClinicSessionClosed: true,
+        lsteql_SessionCloseDate: endDateTime,
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
+      },
+    }).then(() => {
+      const { bizSessionList } = this.props.statement
+      if (bizSessionList) {
+        setFieldValue(
+          'paymentCreatedBizSessionFK',
+          bizSessionList.length === 0 || bizSessionList === undefined
+            ? undefined
+            : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
+        )
+      }
+    })
+  }
+
   handleRefresh = () => {
     const { dispatch, values, resetForm } = this.props
     dispatch({
@@ -62,6 +130,8 @@ class Details extends PureComponent {
       },
     }).then(() => {
       resetForm()
+
+      this.fetchLatestBizSessions()
     })
   }
 
