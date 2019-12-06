@@ -127,7 +127,7 @@ class Main extends Component {
 
   componentDidMount () {
     const { dispatch, values } = this.props
-    const { otherOrder, prescription } = values
+    const { otherOrder, prescription, visitPurposeFK } = values
 
     // dispatch({
     //   type: 'codetable/fetchCodes',
@@ -139,6 +139,7 @@ class Main extends Component {
     // })
 
     if (
+      visitPurposeFK === VISIT_TYPE.RETAIL &&
       otherOrder &&
       prescription &&
       otherOrder.length === 0 &&

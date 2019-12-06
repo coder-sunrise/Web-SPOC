@@ -28,6 +28,7 @@ const Detail = ({ height, ...props }) => {
     )
     return options
   }
+  console.log({ values })
   return (
     <CardContainer
       hideHeader

@@ -67,11 +67,8 @@ const ActionButton = ({ row, onClick }) => {
   ].includes(row.visitStatus)
 
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BILL_FIRST
 
-  // const enableDispense = [
-  //   VISIT_STATUS.DISPENSE,
-  //   VISIT_STATUS.ORDER_UPDATED,
-  // ].includes(row.visitStatus)
   const enableDispense = () => {
     const consDispense = [
       VISIT_STATUS.DISPENSE,
@@ -84,7 +81,17 @@ const ActionButton = ({ row, onClick }) => {
       VISIT_STATUS.ORDER_UPDATED,
     ].includes(row.visitStatus)
 
-    if (isRetailVisit && retailDispense) return true
+    const billFirstDispense = [
+      VISIT_STATUS.WAITING,
+      VISIT_STATUS.DISPENSE,
+    ].includes(row.visitStatus)
+
+    if (
+      (isRetailVisit && retailDispense) ||
+      (isBillFirstVisit && billFirstDispense)
+    )
+      return true
+
     return consDispense
   }
 
@@ -114,19 +121,19 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: isStatusInProgress,
-              hidden: !isStatusWaiting || isRetailVisit,
+              hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
             }
           case 6: // resume consultation
             return {
               ...opt,
               disabled: !isStatusInProgress,
-              hidden: hideResumeButton || isRetailVisit,
+              hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
             }
           case 7: // edit consultation
             return {
               ...opt,
               disabled: !isStatusCompleted,
-              hidden: !isStatusCompleted || isRetailVisit,
+              hidden: !isStatusCompleted || isRetailVisit || isBillFirstVisit,
             }
           default:
             return { ...opt }
