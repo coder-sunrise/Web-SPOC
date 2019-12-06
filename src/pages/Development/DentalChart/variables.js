@@ -77,9 +77,8 @@ const renderBackgroud = () => {
 }
 let currentPointer
 const renderOutsideTopCell = (
-  canvas,
   { addonShapeHandler, customizeHover = false, hoverOpacity = 0.1, ...config },
-  { dispatch, values = [] },
+  { canvas, group, dispatch, values = [] },
 ) => {
   console.log(config, values)
 
@@ -260,7 +259,7 @@ const renderOutsideTopCell = (
   })
   if (shape) {
     shape.set('name', name)
-    canvas.add(shape)
+    group.add(shape)
     if (selected.length === 0) canvas.sendToBack(shape)
   }
 }
@@ -269,8 +268,9 @@ const sharedButtonConfig = {
     // console.log(currentSelectedGroup)
     // console.log(values)
     canvas
-      .getObjects()
+      .getObjects('group')
       .filter((o) => {
+        console.log('group', o, values)
         if (!o.name || o.name.indexOf(modifierNamePrefix) < 0) return false
         if (
           values.find(
@@ -357,9 +357,8 @@ export const buttonConfigs = [
     icon: temporarydressing,
     text: 'Temporary Dressing',
     type: 'cell',
-    render: (canvas, props) => {
+    render: (props) => {
       renderOutsideTopCell(
-        canvas,
         {
           fill: '#9c9c98',
           value: 'temporarydressing',
@@ -379,9 +378,8 @@ export const buttonConfigs = [
     text: 'Onlay/Veneer',
     ...sharedButtonConfig,
 
-    render: (canvas, props) => {
+    render: (props) => {
       renderOutsideTopCell(
-        canvas,
         {
           icon: onlayveneer,
           value: 'onlayveneer',
@@ -396,11 +394,11 @@ export const buttonConfigs = [
             })
             const onlayveneerInner2 = new fabric.Triangle({
               // top: 300,
-              left: baseWidth / 2 + 15,
+              // left: baseWidth / 2 + 15,
               width: baseWidth * 2,
               height: baseHeight * 2 - 10,
               fill: '#ffffff',
-              top: baseHeight * 3 + 5,
+              // top: baseHeight * 3 + 5,
               ...sharedCfg,
             })
             onlayveneerInner1.rotate(180)
@@ -429,9 +427,8 @@ export const buttonConfigs = [
     text: 'Top',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (canvas, props) => {
+    render: (props) => {
       renderOutsideTopCell(
-        canvas,
         {
           fill: 'brown',
           value: 'topcell',
@@ -447,7 +444,8 @@ export const buttonConfigs = [
               ],
               {
                 ...sharedCfg,
-                top: baseHeight,
+                top: 0,
+                left: 0,
                 opacity: selected.length ? 1 : 0.1,
                 ...config,
               },
@@ -467,9 +465,8 @@ export const buttonConfigs = [
     text: 'Bottom',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (canvas, props) => {
+    render: (props) => {
       renderOutsideTopCell(
-        canvas,
         {
           fill: 'brown',
           value: 'bottomcell',

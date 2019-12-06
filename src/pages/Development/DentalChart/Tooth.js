@@ -87,48 +87,7 @@ class Tooth extends React.PureComponent {
 
     if (render) render(this.canvas, props)
 
-    // this.canvas.off('mouse:over')
-    // this.canvas.on('mouse:over', (e) => {
-    //   // console.log(e, e.target)
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
-    //     if (item) {
-    //       item.set('fill', this.hoverColor)
-    //       this.canvas.getObjects('group').map((o) => {
-    //         // if (o.name === 'cell') o.set('opacity', this.hoverOpacity)
-    //         if (o.name === 'cell') this.canvas.sendToBack(o)
-    //       })
-    //       this.canvas.renderAll()
-    //     }
-    //   }
-    // })
-    // this.canvas.off('mouse:out')
-    // this.canvas.on('mouse:out', (e) => {
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
-    //     if (item) {
-    //       item.set('fill', 'white')
-    //       this.canvas.getObjects('group').map((o) => {
-    //         // if (o.name === 'cell') o.set('opacity', 1)
-    //         if (o.name === 'cell') this.canvas.bringToFront(o)
-    //       })
-
-    //       this.canvas.renderAll()
-    //     }
-    //   }
-    // })
-
-    // if (icon) {
-    //   fabric.Image.fromURL(icon, (img) => {
-    //     console.log(img)
-    //     if (this.backgroudImage) {
-    //       this.canvas.remove(this.backgroudImage)
-    //     }
-    //     this.backgroudImage = img.set({ left: 0, top: 0 }).scale(1)
-    //     this.canvas.add(this.backgroudImage)
-    //   })
-    // }
-    this.canvas.renderAll()
+    props.canvas.renderAll()
 
     // fabric.Image.fromURL('../assets/pug.jpg', function(img) {
     //   var oImg = img.set({ left: 0, top: 0}).scale(0.25);
@@ -137,271 +96,13 @@ class Tooth extends React.PureComponent {
   }
 
   initCanvas = () => {
-    const { index, text, dentalChartComponent } = this.props
+    const { index, text, dentalChartComponent, canvas } = this.props
     const { action = {} } = dentalChartComponent
     const { icon } = action
 
     // console.log(action)
-    const canvas = new fabric.Canvas(this._canvas.current, {
-      // preserveObjectStacking: true,
-      width: (baseWidth * 4 + strokeWidth) * zoom,
-      height: (baseHeight * 6 + strokeWidth) * zoom,
-      // renderOnAddRemove: false,
-      // skipTargetFind: true
-      name: index,
-    })
-    fabric.Object.prototype.transparentCorners = false
-    fabric.Object.prototype.noScaleCache = false
-    // console.log(logo, index, text)
-    canvas.hoverCursor = 'default'
+
     // console.log(canvas.hoverCursor)
-
-    const cfg = {
-      fill: '#ffffff',
-      ...sharedCfg,
-      top: baseHeight * 2,
-      // strokeUniform: true,
-    }
-
-    // console.log(groupCfg, logo)
-    const polygon = new fabric.Polygon( // left
-      [
-        { x: 0, y: 0 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: baseWidth, y: baseHeight },
-      ],
-      {
-        // fill: 'purple',
-        ...cfg,
-      },
-    )
-
-    const polygon2 = new fabric.Polygon( // bottom
-      [
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        // fill: 'red',
-        ...cfg,
-        top: baseHeight * 4,
-      },
-    )
-
-    const polygon3 = new fabric.Polygon( // right
-      [
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        // fill: 'green',
-        ...cfg,
-      },
-    )
-
-    const polygon4 = new fabric.Polygon( // top
-      [
-        { x: 0, y: 0 },
-
-        { x: baseWidth, y: baseHeight },
-
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-      ],
-      {
-        // fill: 'gray',
-        ...cfg,
-      },
-    )
-
-    const headerText = new fabric.IText(`${index}`, {
-      left: baseWidth * 2 - `${index}`.length * 9,
-      top: 8,
-      fontSize: 26,
-      ...fontCfg,
-    })
-    const polygonText = new fabric.IText(text[0], {
-      left: baseWidth / 2 - innerFontSize / 4,
-      top: baseHeight * 3.5 - innerFontSize / 2,
-      fontSize: innerFontSize,
-      ...fontCfg,
-    })
-    const polygon2Text = new fabric.IText(text[1], {
-      left: baseWidth * 2 - innerFontSize / 4,
-      top: baseHeight * 5 - innerFontSize * 1.5,
-      fontSize: innerFontSize,
-      ...fontCfg,
-    })
-
-    const polygon3Text = new fabric.IText(text[2], {
-      left: baseWidth * 4 - innerFontSize * 1.5,
-      top: baseHeight * 3.5 - innerFontSize / 2,
-      fontSize: innerFontSize,
-      ...fontCfg,
-    })
-    const polygon4Text = new fabric.IText(text[3], {
-      left: baseWidth * 2 - innerFontSize / 4,
-      top: baseHeight * 2 + innerFontSize / 2,
-      fontSize: innerFontSize,
-      ...fontCfg,
-    })
-    canvas.add(headerText)
-
-    canvas.add(
-      new fabric.Group(
-        [
-          polygon,
-          polygonText,
-        ],
-        {
-          ...groupCfg,
-          name: `${cellPrefix}left`,
-        },
-      ),
-    )
-    canvas.add(
-      new fabric.Group(
-        [
-          polygon2,
-          polygon2Text,
-        ],
-        {
-          ...groupCfg,
-          name: `${cellPrefix}bottom`,
-        },
-      ),
-    )
-    canvas.add(
-      new fabric.Group(
-        [
-          polygon3,
-          polygon3Text,
-        ],
-        {
-          ...groupCfg,
-          name: `${cellPrefix}right`,
-        },
-      ),
-    )
-    canvas.add(
-      new fabric.Group(
-        [
-          polygon4,
-          polygon4Text,
-        ],
-        {
-          ...groupCfg,
-          name: `${cellPrefix}top`,
-        },
-      ),
-    )
-    if (text[5]) {
-      const polygon5 = new fabric.Polygon( // center left
-        [
-          { x: baseWidth, y: baseHeight },
-
-          { x: baseWidth, y: baseHeight * 2 },
-
-          { x: baseWidth * 2, y: baseHeight * 2 },
-          { x: baseWidth * 2, y: baseHeight },
-        ],
-        {
-          // fill: 'blue',
-          ...cfg,
-          top: baseHeight * 3,
-        },
-      )
-      const polygon6 = new fabric.Polygon( // center right
-        [
-          { x: baseWidth * 2, y: baseHeight },
-
-          { x: baseWidth * 2, y: baseHeight * 2 },
-
-          { x: baseWidth * 3, y: baseHeight * 2 },
-          { x: baseWidth * 3, y: baseHeight },
-        ],
-        {
-          // fill: 'brown',
-          ...cfg,
-          top: baseHeight * 3,
-        },
-      )
-      const polygon5Text = new fabric.IText(text[4], {
-        left: baseWidth / 2 + baseWidth - innerFontSize / 4,
-        top: baseHeight * 3.5 - innerFontSize / 2,
-        fontSize: innerFontSize,
-        ...fontCfg,
-      })
-      const polygon6Text = new fabric.IText(text[5], {
-        left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
-        top: baseHeight * 3.5 - innerFontSize / 2,
-        fontSize: innerFontSize,
-        ...fontCfg,
-      })
-      canvas.add(
-        new fabric.Group(
-          [
-            polygon5,
-            polygon5Text,
-          ],
-          {
-            ...groupCfg,
-            name: `${cellPrefix}centerLeft`,
-          },
-        ),
-      )
-      canvas.add(
-        new fabric.Group(
-          [
-            polygon6,
-            polygon6Text,
-          ],
-          {
-            ...groupCfg,
-            name: `${cellPrefix}centerRight`,
-          },
-        ),
-      )
-    } else {
-      const polygon7 = new fabric.Polygon( // center
-        [
-          { x: baseWidth, y: baseHeight },
-
-          { x: baseWidth, y: baseHeight * 2 },
-
-          { x: baseWidth * 3, y: baseHeight * 2 },
-          { x: baseWidth * 3, y: baseHeight },
-        ],
-        {
-          // fill: 'blue',
-          ...cfg,
-          top: baseHeight * 3,
-        },
-      )
-      const polygon7Text = new fabric.IText(text[4], {
-        left: baseWidth * 2 - innerFontSize / 4,
-        top: baseHeight * 3.5 - innerFontSize / 2,
-        fontSize: innerFontSize,
-        ...fontCfg,
-      })
-      canvas.add(
-        new fabric.Group(
-          [
-            polygon7,
-            polygon7Text,
-          ],
-          {
-            ...groupCfg,
-            name: `${cellPrefix}centerfull`,
-          },
-        ),
-      )
-    }
 
     // const polygon12 = new fabric.Polygon( // outside top
     //   [
@@ -449,8 +150,10 @@ class Tooth extends React.PureComponent {
     //     }
     //   }
     // })
-    canvas.setZoom(zoom)
-    this.canvas = canvas
+    // canvas.setZoom(zoom)
+    // this.canvas = canvas
+    // this.props.container.add(this.canvas)
+    // console.log(this.canvas, this.props.container)
   }
 
   render () {
@@ -468,14 +171,10 @@ class Tooth extends React.PureComponent {
       onChange,
       mode,
       onDataSouceChange,
+      container,
       ...props
     } = this.props
-    // console.log(this.canvas)
-    return (
-      <canvas id={this.id} ref={this._canvas}>
-        Sorry, Canvas HTML5 element is not supported by your browser :(
-      </canvas>
-    )
+    return <div />
   }
 }
 
