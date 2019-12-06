@@ -242,6 +242,7 @@ class Form extends React.PureComponent {
           {
             [`${prefix}name`]: values.patientName,
             [`${prefix}patientAccountNo`]: values.patientName,
+            [`${prefix}patientReferenceNo`]: values.patientName,
             [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
               ''}`,
             combineCondition: 'or',

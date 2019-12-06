@@ -360,6 +360,7 @@ export default createListViewModel({
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, {
           ...payload,
+          isCancelled: false,
         })
         const { status, data } = result
         if (status === '200' && data.data) {
