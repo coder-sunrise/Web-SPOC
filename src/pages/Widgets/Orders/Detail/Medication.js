@@ -87,12 +87,20 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
     const getInstruction = (instructions) => {
       let instruction = ''
+      let nextStepdose = ''
       if (instructions) {
         for (let index = 0; index < instructions.length; index++) {
           let item = instructions[index]
           if (instruction !== '') {
             instruction += ' - '
           }
+
+          if (index < instructions.length - 1) {
+            nextStepdose = ` ${instructions[index + 1].stepdose}`
+          } else {
+            nextStepdose = ''
+          }
+
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
@@ -101,10 +109,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
             ? item.prescribeUOMDisplayValue
             : ''} ${item.drugFrequencyDisplayValue
             ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration ? item.duration : ''} day(s) ${index <
-          instructions.length - 1
-            ? `${item.stepdose} `
-            : ''}`
+            : ''} For ${item.duration
+            ? item.duration
+            : ''} day(s)${nextStepdose}`
         }
       }
       return instruction
@@ -532,8 +539,7 @@ class Medication extends PureComponent {
                         {i > 0 && (
                           <GridItem xs={2}>
                             <FastField
-                              name={`corPrescriptionItemInstruction[${i -
-                                1}].stepdose`}
+                              name={`corPrescriptionItemInstruction[${i}].stepdose`}
                               render={(args) => {
                                 return (
                                   <Select
