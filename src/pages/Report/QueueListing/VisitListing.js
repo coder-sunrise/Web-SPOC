@@ -19,7 +19,7 @@ const VisitListing = ({ reportDatas, classes }) => {
   if (!reportDatas)
     return null
   let listData = []
-  const { VisitListingDetails } = reportDatas
+  const { VisitListingDetails, ListingDetails } = reportDatas
   if (VisitListingDetails) {
     let count = 0
     for (let i = VisitListingDetails.length - 1; i >= 0; i--) {
@@ -44,7 +44,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     }
   }
 
-  const VisitListingColumns = [
+  let VisitListingColumns = [
     { name: 'queueNo', title: 'Queue No.' },
     { name: 'patientName', title: 'Patient Name' },
     { name: 'doctorName', title: 'Doctor' },
@@ -61,7 +61,7 @@ const VisitListing = ({ reportDatas, classes }) => {
     { name: 'visitDate', title: 'Visit Date' },
   ]
 
-  const VisitListingColumnExtension = [
+  let VisitListingColumnExtension = [
     { columnName: 'queueNo', width: 80, sortingEnabled: false },
     { columnName: 'patientName', width: 180, sortingEnabled: false },
     { columnName: 'doctorName', width: 180, sortingEnabled: false },
@@ -78,6 +78,10 @@ const VisitListing = ({ reportDatas, classes }) => {
 
   ]
 
+  if (!ListingDetails[0].isDisplayGST) {
+    VisitListingColumns.splice(7, 1)
+    VisitListingColumnExtension.splice(7, 1)
+  }
   const FuncProps = {
     pager: false,
     grouping: true,
