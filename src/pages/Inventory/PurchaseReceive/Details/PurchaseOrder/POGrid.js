@@ -228,8 +228,9 @@ class Grid extends PureComponent {
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
         payload: {
-          purchaseOrder: values,
+          purchaseOrder: values.purchaseOrder,
           rows,
+          purchaseOrderAdjustment: values.purchaseOrderAdjustment,
         },
       })
     }
@@ -447,7 +448,7 @@ class Grid extends PureComponent {
               showAddCommand: isEditable,
               showEditCommand: isEditable,
               showDeleteCommand: isEditable,
-              onCommitChanges: this.onCommitChanges(values.purchaseOrder),
+              onCommitChanges: this.onCommitChanges(values),
               onAddedRowsChange: this.onAddedRowsChange,
             }}
             {...tableParas}

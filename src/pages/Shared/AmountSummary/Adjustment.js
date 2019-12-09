@@ -25,7 +25,7 @@ const Adjustment = ({
   const isExactAmount = type === 'ExactAmount'
   return (
     <GridContainer style={{ margin: '4px 0' }}>
-      <GridItem xs={9}>
+      <GridItem xs={7}>
         <div
           style={{
             width: '90%',
@@ -56,7 +56,7 @@ const Adjustment = ({
           </Tooltip>
         </div>
       </GridItem>
-      <GridItem xs={3}>
+      <GridItem xs={5}>
         <NumberInput
           value={adjAmount}
           {...amountProps}
