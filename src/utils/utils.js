@@ -1009,21 +1009,11 @@ const calculateAmount = (
     })
   }
   // console.log({ activeRows, adjustments })
-  const mapInvoiceItemAdjustment = (adjustment, isNew) => (invoiceItem) => {
-    const row = activeRows.find((i) => i.id === invoiceItem[itemFkField])
-    if (row && isNew)
-      return {
-        ...invoiceItem,
-        [itemFkField]: invoiceItem.id,
-        [itemAdjustmentFkField]: adjustment.id,
-        adjAmount: invoiceItem[adjAmountField],
-        isDeleted: !!adjustment.isDeleted,
-      }
+  const mapInvoiceItemAdjustment = (adjustment) => (invoiceItem) => {
     return {
-      ...(isNew ? {} : invoiceItem),
       [itemFkField]: invoiceItem.id,
       [itemAdjustmentFkField]: adjustment.id,
-      adjAmount: isNew ? invoiceItem[adjAmountField] : invoiceItem.adjAmount,
+      adjAmount: invoiceItem[adjAmountField],
       isDeleted: !!adjustment.isDeleted,
     }
   }
@@ -1033,13 +1023,7 @@ const calculateAmount = (
     adjustments: adjustments.map((o, index) => ({
       ...o,
       index,
-      [invoiceItemAdjustmentField]:
-        o[invoiceItemAdjustmentField] &&
-        o[invoiceItemAdjustmentField].length > 0
-          ? o[invoiceItemAdjustmentField].map(
-              mapInvoiceItemAdjustment(o, false),
-            )
-          : activeRows.map(mapInvoiceItemAdjustment(o, true)),
+      [invoiceItemAdjustmentField]: activeRows.map(mapInvoiceItemAdjustment(o)),
     })),
     summary: {
       subTotal: roundTo(
