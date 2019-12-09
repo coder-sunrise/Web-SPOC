@@ -122,10 +122,17 @@ class CollectPaymentConfirm extends PureComponent {
       if (matches) {
         edittedIndex = parseInt(matches[1], 10)
       }
-      const totalAmountPaid = _.sumBy(
-        values.statementInvoice,
-        'tempOutstandingAmount',
-      )
+
+      let totalAmountPaid = 0
+      for (let index = 0; index < values.statementInvoice.length; index++) {
+        if (index === edittedIndex) {
+          totalAmountPaid = (totalAmountPaid || 0) + (value === '' ? 0 : value)
+        } else {
+          totalAmountPaid =
+            (totalAmountPaid || 0) +
+            (values.statementInvoice[index].tempOutstandingAmount || 0)
+        }
+      }
 
       const currentStatement = values.statementInvoice[edittedIndex]
       const currentPayment = currentStatement.statementInvoicePayment.find(
