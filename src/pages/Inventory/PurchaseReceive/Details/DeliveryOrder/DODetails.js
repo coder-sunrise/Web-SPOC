@@ -508,7 +508,6 @@ class DODetails extends PureComponent {
   }
 
   render () {
-    const isEditable = true
     const { props } = this
     const {
       footer,
@@ -519,6 +518,7 @@ class DODetails extends PureComponent {
       classes,
     } = props
     const { rows } = values
+    const isEditable = !values.id
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
@@ -706,6 +706,7 @@ class DODetails extends PureComponent {
                             label={formatMessage({
                               id: 'inventory.pr.detail.dod.deliveryOrderNo',
                             })}
+                            disabled
                             {...args}
                           />
                         )
@@ -779,8 +780,7 @@ class DODetails extends PureComponent {
               }}
               EditingProps={{
                 showAddCommand: isEditable,
-                showEditCommand: !values.id,
-                showDeleteCommand: isEditable,
+                showEditCommand: isEditable,
                 onCommitChanges: this.onCommitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
               }}

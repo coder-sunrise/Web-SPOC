@@ -555,78 +555,78 @@ class Index extends Component {
               />
             </GridItem>
           </GridContainer>
-          <GridContainer
-            style={{
-              marginTop: 20,
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            {isPOStatusDraft(poStatus) && type === 'edit' ? (
-              <ProgressButton
-                color='danger'
-                icon={null}
-                onClick={() =>
-                  this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-              >
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.cancelpo',
-                })}
-              </ProgressButton>
-            ) : (
-              ''
-            )}
-            <ProgressButton
-              color='primary'
-              icon={null}
-              onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.save',
-              })}
-            </ProgressButton>
-            {!isPOStatusDraft(poStatus) ? (
-              <ProgressButton
-                color='success'
-                icon={null}
-                onClick={() =>
-                  this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
-                disabled={!isPOStatusFulfilled(poStatus)}
-              >
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.complete',
-                })}
-              </ProgressButton>
-            ) : (
-              ''
-            )}
-            {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
-              <ProgressButton
-                color='success'
-                icon={null}
-                onClick={() =>
-                  this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-              >
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.finalize',
-                })}
-              </ProgressButton>
-            ) : (
-              ''
-            )}
-
-            <ProgressButton
-              color='info'
-              icon={null}
-              onClick={this.toggleReport}
-              authority='none'
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.print',
-              })}
-            </ProgressButton>
-          </GridContainer>
         </AuthorizedContext.Provider>
+
+        <GridContainer
+          style={{
+            marginTop: 20,
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          {isPOStatusDraft(poStatus) && type === 'edit' ? (
+            <ProgressButton
+              color='danger'
+              icon={null}
+              onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.cancelpo',
+              })}
+            </ProgressButton>
+          ) : (
+            ''
+          )}
+          <ProgressButton
+            color='primary'
+            icon={null}
+            onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.pod.save',
+            })}
+          </ProgressButton>
+          {!isPOStatusDraft(poStatus) ? (
+            <ProgressButton
+              color='success'
+              icon={null}
+              onClick={() =>
+                this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+              disabled={!isPOStatusFulfilled(poStatus)}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.complete',
+              })}
+            </ProgressButton>
+          ) : (
+            ''
+          )}
+          {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+            <ProgressButton
+              color='success'
+              icon={null}
+              onClick={() =>
+                this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+            >
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.finalize',
+              })}
+            </ProgressButton>
+          ) : (
+            ''
+          )}
+
+          <ProgressButton
+            color='info'
+            icon={null}
+            onClick={this.toggleReport}
+            authority='none'
+          >
+            {formatMessage({
+              id: 'inventory.pr.detail.print',
+            })}
+          </ProgressButton>
+        </GridContainer>
 
         <CommonModal
           open={this.state.showReport}
