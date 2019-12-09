@@ -1091,9 +1091,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
+      { ...criteriaForTenantCodes, ...params },
+      convertExcludeFields,
+    )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -1336,17 +1336,6 @@ export const podoOrderType = [
   },
   {
     value: 2,
-    name: 'Vaccination',
-    prop: 'purchaseOrderVaccinationItem',
-    itemFKName: 'inventoryVaccinationFK',
-    ctName: 'inventoryvaccination',
-    stateName: 'VaccinationItemList',
-    itemCode: 'inventoryVaccinationCode',
-    itemName: 'inventoryVaccinationName',
-    stockName: 'vaccinationStock',
-  },
-  {
-    value: 3,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
@@ -1355,6 +1344,17 @@ export const podoOrderType = [
     itemCode: 'inventoryConsumableCode',
     itemName: 'inventoryConsumableName',
     stockName: 'consumableStock',
+  },
+  {
+    value: 3,
+    name: 'Vaccination',
+    prop: 'purchaseOrderVaccinationItem',
+    itemFKName: 'inventoryVaccinationFK',
+    ctName: 'inventoryvaccination',
+    stateName: 'VaccinationItemList',
+    itemCode: 'inventoryVaccinationCode',
+    itemName: 'inventoryVaccinationName',
+    stockName: 'vaccinationStock',
   },
 ]
 
@@ -1515,6 +1515,7 @@ export const getInventoryItem = (
   rows = [],
   outstandingItem = undefined,
 ) => {
+  console.log({ rows })
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
   const groupByFKArray = _(newRows)
     .groupBy((x) => x[itemFKName])
@@ -1531,7 +1532,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-          o.totalCurrentReceivingQty
+        o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
