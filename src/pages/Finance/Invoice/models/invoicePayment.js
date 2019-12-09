@@ -201,15 +201,13 @@ export default createFormViewModel({
 
       *submitTransfer ({ payload }, { call }) {
         const response = yield call(service.postTransfer, payload)
-        const { status } = response
 
-        if (status === '201') {
+        if (response) {
           notification.success({
             message: 'Transferred',
           })
           return true
         }
-
         return false
       },
     },
