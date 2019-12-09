@@ -21,14 +21,14 @@ const Detail = ({ height, ...props }) => {
   const { copayerTypeFK } = values
 
   const getCopayerOptions = () => {
-    const { ctcopayer } = codetable
+    const { ctcopayer = [] } = codetable
     if (copayerTypeFK === 2) return ctcopayer
-    const options = codetable.ctcopayer.filter(
+    const options = ctcopayer.filter(
       (copayerList) => copayerList.coPayerTypeFK === 1,
     )
     return options
   }
-  console.log({ values })
+
   return (
     <CardContainer
       hideHeader

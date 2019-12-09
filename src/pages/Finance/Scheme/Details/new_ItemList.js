@@ -11,17 +11,12 @@ import {
   CommonTableGrid,
   Popconfirm,
   Tooltip,
+  notification,
 } from '@/components'
 import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
 class ItemList extends React.Component {
-  state = {
-    itemList: [
-      ...this.props.values.rows,
-    ],
-  }
-
   addItemToRows = (obj) => {
     const { setFieldValue, values } = this.props
     const newRows = values.rows
@@ -35,7 +30,17 @@ class ItemList extends React.Component {
   }
 
   onClickAdd = (type) => {
-    const { setFieldValue, values } = this.props
+    const { values } = this.props
+
+    const isExisted = values.rows
+      .filter((row) => !row.isDeleted)
+      .map((row) => row.itemFK)
+      .includes(values.tempSelectedItemFK)
+
+    if (isExisted) {
+      notification.error({ message: 'Item is already in the list' })
+      return
+    }
 
     const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
     let newItemRow = {
@@ -48,12 +53,12 @@ class ItemList extends React.Component {
       itemValueType: 'ExactAmount',
       itemValue: 0,
     }
-    console.log({})
+
     this.addItemToRows(newItemRow)
   }
 
   onItemSelect = (e, option, type) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue } = this.props
 
     setFieldValue('tempSelectedItemName', option.displayValue)
     if (e && type !== 'ctservice') {
@@ -114,22 +119,17 @@ class ItemList extends React.Component {
   }
 
   onDeleteClick = (row) => {
-    const { itemList } = this.state
-    const { values } = this.props
-    const deletedRow = itemList.find((o) => o.itemFK === row.itemFK)
-    console.log({ deletedRow, itemList, rows: values.rows, row })
-    // if (deletedRow) {
-    //   deletedRow.isDeleted = true
-    // }
-    // const newRows = itemList.filter(
-    //   (o) => o.isDeleted === false || o.isDeleted === undefined,
-    // )
-    // setItemList(newRows)
+    const { values, setFieldValue } = this.props
+    const newRows = values.rows.map(
+      (item) =>
+        item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
+    )
+    setFieldValue('rows', newRows)
   }
 
   render () {
-    const { theme, CPSwitch, CPNumber } = this.props
-    const { itemList } = this.state
+    const { theme, CPSwitch, CPNumber, values } = this.props
+
     return (
       <div style={{ marginTop: theme.spacing(1) }}>
         <Tabs
@@ -162,9 +162,8 @@ class ItemList extends React.Component {
             },
           ]}
         />
-
         <CommonTableGrid
-          rows={itemList}
+          rows={values.rows}
           // {...tableConfigs}
           getRowId={(r) => r.uid}
           columns={[
@@ -197,6 +196,11 @@ class ItemList extends React.Component {
             {
               columnName: 'cpAmount',
               render: (row) => {
+                console.log({ row })
+                // const index = values.rows
+                //   .map((i) => i.itemFK)
+                //   .indexOf(row.itemFK)
+                // console.log({ row, index, rows: values.rows })
                 return (
                   <GridContainer>
                     <GridItem xs={8}>
@@ -224,30 +228,9 @@ class ItemList extends React.Component {
               columnName: 'action',
               align: 'center',
               render: (row) => {
-                console.log({ row })
+                const onConfirm = () => this.onDeleteClick(row)
                 return (
-                  <Popconfirm
-                    onConfirm={() => {
-                      const deletedRow = itemList.find(
-                        (o) => o.itemFK === row.itemFK,
-                      )
-                      console.log({ itemList })
-                      this.onDeleteClick(row)
-                      // if (deletedRow) {
-                      //   deletedRow.isDeleted = true
-                      // }
-                      // const newRows = itemList.filter(
-                      //   (o) => o.isDeleted === false || o.isDeleted === undefined,
-                      // )
-                      // setItemList(newRows)
-                      // dispatch({
-                      //   type: 'schemeDetail/deleteRow',
-                      //   payload: {
-                      //     id: row.uid,
-                      //   },
-                      // })
-                    }}
-                  >
+                  <Popconfirm onConfirm={onConfirm}>
                     <Tooltip title='Delete'>
                       <Button size='sm' color='danger' justIcon>
                         <Delete />
@@ -266,3 +249,5 @@ class ItemList extends React.Component {
     )
   }
 }
+
+export default ItemList

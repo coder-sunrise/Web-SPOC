@@ -47,10 +47,18 @@ const Detail = (props) => {
 
   useEffect(
     () => {
-      const { entity } = props.schemeDetail
+      const { dispatch, schemeDetail } = props
+      const { entity } = schemeDetail
       if (entity) {
         setEditable(entity.isUserMaintainable)
       } else setEditable(props.schemeDetail.default.isUserMaintainable)
+
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctcopayer',
+        },
+      })
     },
     [
       data,
