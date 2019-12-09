@@ -205,7 +205,7 @@ class AddPayment extends Component {
     getBizSession({
       pagesize: 999,
       lgteql_SessionStartDate: startDateTime,
-      lsteql_SessionCloseDate: endDateTime,
+      lsteql_SessionStartDate: endDateTime,
       sorting: [
         { columnName: 'sessionStartDate', direction: 'desc' },
       ],
