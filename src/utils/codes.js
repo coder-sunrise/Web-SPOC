@@ -1515,7 +1515,6 @@ export const getInventoryItem = (
   rows = [],
   outstandingItem = undefined,
 ) => {
-  console.log({ rows })
   let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
   const groupByFKArray = _(newRows)
     .groupBy((x) => x[itemFKName])
