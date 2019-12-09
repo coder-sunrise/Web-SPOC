@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
@@ -151,6 +152,123 @@ export default compose(
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
 
+      const medicationPrecautionsArray = (
+        corPrescriptionItemPrecaution,
+        retailPrescriptionItemPrecaution,
+      ) => {
+        const combinedOldNewPrecautions = _.intersectionBy(
+          corPrescriptionItemPrecaution,
+          retailPrescriptionItemPrecaution,
+          'medicationPrecautionFK',
+        )
+
+        const newAddedPrecautions = _.differenceBy(
+          corPrescriptionItemPrecaution,
+          combinedOldNewPrecautions,
+          'medicationPrecautionFK',
+        )
+
+        const unwantedItem = _.differenceBy(
+          retailPrescriptionItemPrecaution,
+          combinedOldNewPrecautions,
+          'medicationPrecautionFK',
+        )
+
+        const formatNewAddedPrecautions = newAddedPrecautions.map((o) => {
+          delete o.id
+          delete o.concurrencyToken
+          return {
+            ...o,
+          }
+        })
+
+        let deleteUnwantedItem = []
+        if (combinedOldNewPrecautions.length <= 0) {
+          deleteUnwantedItem = retailPrescriptionItemPrecaution.map((o) => {
+            return {
+              ...o,
+              isDeleted: true,
+            }
+          })
+        } else {
+          deleteUnwantedItem = unwantedItem.map((o) => {
+            return {
+              ...o,
+              isDeleted: true,
+            }
+          })
+        }
+
+        return [
+          ...combinedOldNewPrecautions,
+          ...formatNewAddedPrecautions,
+          ...deleteUnwantedItem,
+        ]
+      }
+
+      const medicationIntructionsArray = (
+        corPrescriptionItemInstruction,
+        retailPrescriptionItemInstruction,
+      ) => {
+        const compareCriteria = [
+          'dosageFK',
+          'drugFrequencyFK',
+          'duration',
+          'prescribeUOMFK',
+          'stepdose',
+          'usageMethodFK',
+        ]
+
+        const combinedOldNewInstructions = _.intersectionBy(
+          corPrescriptionItemInstruction,
+          retailPrescriptionItemInstruction,
+          compareCriteria,
+        )
+
+        const newAddedIntructions = _.differenceBy(
+          corPrescriptionItemInstruction,
+          combinedOldNewInstructions,
+          compareCriteria,
+        )
+
+        const unwantedItem = _.differenceBy(
+          retailPrescriptionItemInstruction,
+          combinedOldNewInstructions,
+          compareCriteria,
+        )
+
+        const formatNewAddedInstructions = newAddedIntructions.map((o) => {
+          delete o.id
+          delete o.concurrencyToken
+          return {
+            ...o,
+          }
+        })
+
+        let deleteUnwantedItem = []
+        if (combinedOldNewInstructions.length <= 0) {
+          deleteUnwantedItem = retailPrescriptionItemInstruction.map((o) => {
+            return {
+              ...o,
+              isDeleted: true,
+            }
+          })
+        } else {
+          deleteUnwantedItem = unwantedItem.map((o) => {
+            return {
+              ...o,
+              isDeleted: true,
+            }
+          })
+        }
+
+        return [
+          ...combinedOldNewInstructions,
+          ...formatNewAddedInstructions,
+          ...deleteUnwantedItem,
+        ]
+      }
+
       const retailInvoiceItem = rows.map((o) => {
         let obj
         switch (o.type) {
@@ -166,22 +284,7 @@ export default compose(
               retailPrescriptionItemInstruction = [],
               retailPrescriptionItemPrecaution = [],
             } = retailPrescriptionItem
-            const deletedRetailPrescriptionItemInstruction = retailPrescriptionItemInstruction.map(
-              (ins) => {
-                return {
-                  ...ins,
-                  isDeleted: true,
-                }
-              },
-            )
-            const deletedRetailPrescriptionItemPrecaution = retailPrescriptionItemPrecaution.map(
-              (ins) => {
-                return {
-                  ...ins,
-                  isDeleted: true,
-                }
-              },
-            )
+
             obj = {
               itemCode: o.drugCode,
               itemName: o.drugName,
@@ -202,14 +305,14 @@ export default compose(
                 dispensedQuanity: o.dispensedQuanity,
                 retailPrescriptionItem: {
                   ...restO,
-                  retailPrescriptionItemInstruction: [
-                    ...corPrescriptionItemInstruction,
-                    ...deletedRetailPrescriptionItemInstruction,
-                  ],
-                  retailPrescriptionItemPrecaution: [
-                    ...corPrescriptionItemPrecaution,
-                    ...deletedRetailPrescriptionItemPrecaution,
-                  ],
+                  retailPrescriptionItemInstruction: medicationIntructionsArray(
+                    corPrescriptionItemInstruction,
+                    retailPrescriptionItemInstruction,
+                  ),
+                  retailPrescriptionItemPrecaution: medicationPrecautionsArray(
+                    corPrescriptionItemPrecaution,
+                    retailPrescriptionItemPrecaution,
+                  ),
                 },
               },
             }
@@ -282,7 +385,6 @@ export default compose(
         retailInvoiceItem,
         retailInvoiceAdjustment: finalAdjustments,
       }
-
       dispatch({
         type: 'dispense/saveAddOrderDetails',
         payload,
