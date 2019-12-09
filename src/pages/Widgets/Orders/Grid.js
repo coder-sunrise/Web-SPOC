@@ -339,9 +339,17 @@ export default ({
             }
 
             if (row.corPrescriptionItemInstruction) {
+              let nextStepdose = ''
               const textArray = row.corPrescriptionItemInstruction.map(
                 (item, i) => {
-                  return `${item.usageMethodDisplayValue
+                  if (i < row.corPrescriptionItemInstruction.length - 1) {
+                    nextStepdose = ` ${row.corPrescriptionItemInstruction[i + 1]
+                      .stepdose}`
+                  } else {
+                    nextStepdose = ''
+                  }
+
+                  let txt = `${item.usageMethodDisplayValue
                     ? item.usageMethodDisplayValue
                     : ''} ${item.dosageDisplayValue
                     ? item.dosageDisplayValue
@@ -349,10 +357,11 @@ export default ({
                     ? item.prescribeUOMDisplayValue
                     : ''} ${item.drugFrequencyDisplayValue
                     ? item.drugFrequencyDisplayValue
-                    : ''} For ${item.duration ? item.duration : ''} day(s) ${i <
-                  row.corPrescriptionItemInstruction.length - 1
-                    ? `${item.stepdose} `
-                    : ''}`
+                    : ''} For ${item.duration
+                    ? item.duration
+                    : ''} day(s)${nextStepdose}`
+
+                  return txt
                 },
               )
               return _renderHTML(textArray)

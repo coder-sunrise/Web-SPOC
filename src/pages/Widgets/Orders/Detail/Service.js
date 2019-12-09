@@ -89,18 +89,23 @@ class Service extends PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    if (
-      (!this.props.global.openAdjustment && nextProps.global.openAdjustment) ||
-      nextProps.orders.shouldPushToState
-    ) {
-      nextProps.dispatch({
-        type: 'orders/updateState',
-        payload: {
-          entity: nextProps.values,
-          shouldPushToState: false,
-        },
-      })
-    }
+    if (nextProps.orders.type === nextProps.values.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: {
+              ...nextProps.values,
+              totalPrice: nextProps.values.total,
+            },
+            shouldPushToState: false,
+          },
+        })
+      }
   }
 
   getServiceCenterService = () => {
