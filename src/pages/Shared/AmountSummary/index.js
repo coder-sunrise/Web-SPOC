@@ -23,7 +23,7 @@ import { calculateAmount } from '@/utils/utils'
 
 const amountProps = {
   noUnderline: true,
-  // currency: true,
+  currency: true,
   rightAlign: true,
   text: true,
   fullWidth: true,
