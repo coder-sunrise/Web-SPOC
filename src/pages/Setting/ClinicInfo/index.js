@@ -17,6 +17,7 @@ import {
 } from '@/components'
 import Address from '@/pages/PatientDatabase/Detail/Demographics/Address'
 import { navigateDirtyCheck } from '@/utils/utils'
+import { MobileNumberInput } from '@/components/_medisys'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -203,6 +204,13 @@ class ClinicInfo extends PureComponent {
             <FastField
               name='acra'
               render={(args) => <TextField label='ACRA' disabled {...args} />}
+            />
+          </GridItem>
+
+          <GridItem md={3}>
+            <FastField
+              name='contact.mobileContactNumber.number'
+              render={(args) => <MobileNumberInput {...args} />}
             />
           </GridItem>
         </GridContainer>
