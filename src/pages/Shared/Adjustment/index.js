@@ -102,6 +102,7 @@ const styles = (theme) => ({})
       adjValue: values.adjustment,
       adjAmount: values.finalAmount - values.initialAmout,
       adjType: values.isExactAmount ? 'ExactAmount' : 'Percentage',
+      invoiceItemAdjustment: [],
     }
     // console.log(newVals)
     dispatch({

@@ -906,6 +906,10 @@ const calculateAmount = (
   rows,
   adjustments,
   {
+    itemFkField = 'invoiceItemFK',
+    itemAdjustmentFkField = 'invoiceAdjustmentFK',
+    invoiceItemAdjustmentField = 'invoiceItemAdjustment',
+    adjAmountField = 'adjAmt',
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
     gstField = 'totalAfterGST',
@@ -955,6 +959,7 @@ const calculateAmount = (
       // r[adjustedField] = roundTo(r[adjustedField] + adj)
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
+      r[adjAmountField] = adj
       r[adjustedField] = initalRowToal + adj
     })
     fa.adjAmount = roundTo(adjAmount)
@@ -1003,10 +1008,39 @@ const calculateAmount = (
       r[gstField] = r[adjustedField]
     })
   }
-  // console.log(activeRows, adjustments)
+  // console.log({ activeRows, adjustments })
+  const mapInvoiceItemAdjustment = (adjustment, isNew) => (invoiceItem) => {
+    const row = activeRows.find((i) => i.id === invoiceItem[itemFkField])
+    if (row && isNew)
+      return {
+        ...invoiceItem,
+        [itemFkField]: invoiceItem.id,
+        [itemAdjustmentFkField]: adjustment.id,
+        adjAmount: invoiceItem[adjAmountField],
+        isDeleted: !!adjustment.isDeleted,
+      }
+    return {
+      ...(isNew ? {} : invoiceItem),
+      [itemFkField]: invoiceItem.id,
+      [itemAdjustmentFkField]: adjustment.id,
+      adjAmount: isNew ? invoiceItem[adjAmountField] : invoiceItem.adjAmount,
+      isDeleted: !!adjustment.isDeleted,
+    }
+  }
+
   const r = {
     rows,
-    adjustments: adjustments.map((o, index) => ({ ...o, index })),
+    adjustments: adjustments.map((o, index) => ({
+      ...o,
+      index,
+      [invoiceItemAdjustmentField]:
+        o[invoiceItemAdjustmentField] &&
+        o[invoiceItemAdjustmentField].length > 0
+          ? o[invoiceItemAdjustmentField].map(
+              mapInvoiceItemAdjustment(o, false),
+            )
+          : activeRows.map(mapInvoiceItemAdjustment(o, true)),
+    })),
     summary: {
       subTotal: roundTo(
         rows.map((row) => row[totalField]).reduce(sumReducer, 0),

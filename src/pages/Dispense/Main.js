@@ -32,11 +32,12 @@ const calculateInvoiceAmounts = (entity) => {
   let invoiceSummary = {}
   if (output && output.summary) {
     const { summary } = output
+
     invoiceSummary = {
       invoiceTotal: summary.total,
       invoiceTotalAftAdj: summary.totalAfterAdj,
       invoiceTotalAftGST: summary.totalWithGST,
-      outstandingBalance: summary.totalWithGST,
+      outstandingBalance: summary.totalWithGST - obj.invoice.totalPayment,
       invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
     }
   }
@@ -268,7 +269,7 @@ class Main extends Component {
 
   render () {
     const { classes, handleSubmit, values } = this.props
-    console.log('main', { values })
+
     return (
       <div className={classes.root}>
         <DispenseDetails

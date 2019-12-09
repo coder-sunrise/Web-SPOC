@@ -176,7 +176,7 @@ const DispenseDetails = ({
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance: v.summary.totalWithGST,
+      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
