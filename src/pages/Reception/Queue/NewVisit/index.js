@@ -236,7 +236,7 @@ class NewVisit extends PureComponent {
           {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
           <GridContainer className={classes.gridContainer}>
             <GridItem xs sm={12} md={3}>
-              <PatientInfoCard />
+              <PatientInfoCard {...this.props} autoRefreshChas={!isEdit} />
             </GridItem>
             <GridItem
               container

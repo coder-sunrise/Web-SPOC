@@ -75,8 +75,6 @@ class Details extends PureComponent {
           sessionData[0].sessionStartDate,
           serverDateFormat,
         )
-        setFieldValue('paymentDate', paymentDate.format(serverDateFormat))
-        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
 
         this.getBizList(paymentDate.format(serverDateFormat))
       } else {
@@ -102,7 +100,7 @@ class Details extends PureComponent {
       payload: {
         pagesize: 999,
         lgteql_SessionStartDate: startDateTime,
-        lsteql_SessionCloseDate: endDateTime,
+        lsteql_SessionStartDate: endDateTime,
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],
@@ -110,11 +108,12 @@ class Details extends PureComponent {
     }).then(() => {
       const { bizSessionList } = this.props.statement
       if (bizSessionList) {
+        setFieldValue('paymentDate', startDateTime)
         setFieldValue(
           'paymentCreatedBizSessionFK',
-          bizSessionList.length === 0 || bizSessionList === undefined
+          !bizSessionList || bizSessionList.length === 0
             ? undefined
-            : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
+            : bizSessionList[0].value,
         )
       }
     })

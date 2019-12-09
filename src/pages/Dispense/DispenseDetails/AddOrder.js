@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
@@ -38,6 +39,7 @@ const AddOrder = ({
                 retailPrescriptionItemPrecaution,
                 ...restValues
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
+
               obj = {
                 ...o.retailVisitInvoiceDrug,
                 innerLayerId: o.retailVisitInvoiceDrug.id,
@@ -97,12 +99,23 @@ const AddOrder = ({
             ...obj,
           }
         })
+
+        const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map((o) => {
+          return {
+            ...o,
+            uid: o.id,
+          }
+        })
         dispatch({
           type: 'orders/updateState',
           payload: {
             rows: newRows,
-            finalAdjustments: retailInvoiceAdjustment,
+            finalAdjustments: newRetailInvoiceAdjustment,
           },
+        })
+
+        dispatch({
+          type: 'orders/calculateAmount',
         })
       }
     })
@@ -166,8 +179,129 @@ export default compose(
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
-
       if (visitType === VISIT_TYPE.RETAIL) {
+        const medicationPrecautionsArray = (
+          corPrescriptionItemPrecaution,
+          retailPrescriptionItemPrecaution,
+        ) => {
+          const combinedOldNewPrecautions = _.intersectionBy(
+            corPrescriptionItemPrecaution,
+            retailPrescriptionItemPrecaution,
+            'medicationPrecautionFK',
+          )
+
+          const newAddedPrecautions = _.differenceBy(
+            corPrescriptionItemPrecaution,
+            combinedOldNewPrecautions,
+            'medicationPrecautionFK',
+          )
+
+          // const unwantedItem = _.differenceBy(
+          //   retailPrescriptionItemPrecaution,
+          //   combinedOldNewPrecautions,
+          //   'medicationPrecautionFK',
+          // )
+
+          const unwantedItem = _.xor(
+            retailPrescriptionItemPrecaution,
+            combinedOldNewPrecautions,
+          )
+
+          const formatNewAddedPrecautions = newAddedPrecautions.map((o) => {
+            return {
+              ...o,
+              id: undefined,
+              concurrencyToken: undefined,
+            }
+          })
+
+          let deleteUnwantedItem = []
+          if (combinedOldNewPrecautions.length <= 0) {
+            deleteUnwantedItem = retailPrescriptionItemPrecaution.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          } else {
+            deleteUnwantedItem = unwantedItem.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          }
+
+          return [
+            ...combinedOldNewPrecautions,
+            ...formatNewAddedPrecautions,
+            ...deleteUnwantedItem,
+          ]
+        }
+
+        const medicationIntructionsArray = (
+          corPrescriptionItemInstruction,
+          retailPrescriptionItemInstruction,
+        ) => {
+          // const compareCriteria = [
+          //   'dosageFK',
+          //   'drugFrequencyFK',
+          //   'duration',
+          //   'prescribeUOMFK',
+          //   'stepdose',
+          //   'usageMethodFK',
+          // ]
+          const compareCriteria =
+            'dosageFK drugFrequencyFK duration prescribeUOMFK stepdose usageMethodFK'
+
+          const combinedOldNewInstructions = _.intersectionBy(
+            corPrescriptionItemInstruction,
+            retailPrescriptionItemInstruction,
+            compareCriteria,
+          )
+
+          const newAddedIntructions = _.differenceBy(
+            corPrescriptionItemInstruction,
+            combinedOldNewInstructions,
+            compareCriteria,
+          )
+
+          const unwantedItem = _.xor(
+            retailPrescriptionItemInstruction,
+            combinedOldNewInstructions,
+          )
+
+          const formatNewAddedInstructions = newAddedIntructions.map((o) => {
+            return {
+              ...o,
+              id: undefined,
+              concurrencyToken: undefined,
+            }
+          })
+
+          let deleteUnwantedItem = []
+          if (combinedOldNewInstructions.length <= 0) {
+            deleteUnwantedItem = retailPrescriptionItemInstruction.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          } else {
+            deleteUnwantedItem = unwantedItem.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          }
+
+          return [
+            ...combinedOldNewInstructions,
+            ...formatNewAddedInstructions,
+            ...deleteUnwantedItem,
+          ]
+        }
         const retailInvoiceItem = rows.map((o) => {
           let obj
           switch (o.type) {
@@ -183,22 +317,6 @@ export default compose(
                 retailPrescriptionItemInstruction = [],
                 retailPrescriptionItemPrecaution = [],
               } = retailPrescriptionItem
-              const deletedRetailPrescriptionItemInstruction = retailPrescriptionItemInstruction.map(
-                (ins) => {
-                  return {
-                    ...ins,
-                    isDeleted: true,
-                  }
-                },
-              )
-              const deletedRetailPrescriptionItemPrecaution = retailPrescriptionItemPrecaution.map(
-                (ins) => {
-                  return {
-                    ...ins,
-                    isDeleted: true,
-                  }
-                },
-              )
               obj = {
                 itemCode: o.drugCode,
                 itemName: o.drugName,
@@ -219,14 +337,14 @@ export default compose(
                   dispensedQuanity: o.dispensedQuanity,
                   retailPrescriptionItem: {
                     ...restO,
-                    retailPrescriptionItemInstruction: [
-                      ...corPrescriptionItemInstruction,
-                      ...deletedRetailPrescriptionItemInstruction,
-                    ],
-                    retailPrescriptionItemPrecaution: [
-                      ...corPrescriptionItemPrecaution,
-                      ...deletedRetailPrescriptionItemPrecaution,
-                    ],
+                    retailPrescriptionItemInstruction: medicationIntructionsArray(
+                      corPrescriptionItemInstruction,
+                      retailPrescriptionItemInstruction,
+                    ),
+                    retailPrescriptionItemPrecaution: medicationPrecautionsArray(
+                      corPrescriptionItemPrecaution,
+                      retailPrescriptionItemPrecaution,
+                    ),
                   },
                 },
               }

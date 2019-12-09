@@ -134,7 +134,7 @@ class Details extends PureComponent {
           // showRemark: true,
           defaultValues: {
             ...this.props.orders.entity,
-            initialAmout: this.props.orders.entity.total, // for item level need inital amount
+            initialAmout: this.props.orders.entity.totalPrice, // for item level need inital amount
           },
         },
       },
