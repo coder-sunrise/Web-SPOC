@@ -276,7 +276,7 @@ class Grid extends PureComponent {
       )
       return row.uid ? currentOptions : activeOptions
     }
-    if (row.type === 2) {
+    if (row.type === 3) {
       const filteredOptions = getUnusedItem('VaccinationItemList')
       const activeOptions = filterActiveCode(filteredOptions)
       const currentOptions = getCurrentOptions(
@@ -285,7 +285,7 @@ class Grid extends PureComponent {
       )
       return row.uid ? currentOptions : activeOptions
     }
-    if (row.type === 3) {
+    if (row.type === 2) {
       const filteredOptions = getUnusedItem('ConsumableItemList')
       const activeOptions = filterActiveCode(filteredOptions)
       const currentOptions = getCurrentOptions(
