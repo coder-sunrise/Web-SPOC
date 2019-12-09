@@ -42,7 +42,6 @@ const DiagnosisSelect = ({
   onDataSouceChange,
   ...props
 }) => {
-  console.log({ props })
   let selectProps = props
   const initMaxTagCount =
     props.field &&
