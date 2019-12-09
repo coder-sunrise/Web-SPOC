@@ -50,7 +50,8 @@ const Adjustment = ({
           </Popconfirm>
           <Tooltip title={adjRemark}>
             <span>
-              {adjRemark} {!isExactAmount && `(${Math.abs(adjValue)}%)`}
+              {adjRemark}
+              {/* {adjRemark} {!isExactAmount && `(${Math.abs(adjValue)}%)`} */}
             </span>
           </Tooltip>
         </div>
