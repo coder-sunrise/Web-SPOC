@@ -103,27 +103,12 @@ class PrintDrugLabelWrapper extends React.Component {
     const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
     const { data } = drugLabelDetails1
     if (data) {
-      const drugLabelDetail = [
-        {
-          PatientName: data.patientName,
-          PatientReferenceNo: data.patientReferenceNo,
-          PatientAccountNo: data.patientAccountNo,
-          ClinicName: data.clinicName,
-          ClinicAddress: data.clinicAddress,
-          ClinicOfficeNumber: data.officeNo,
-          DrugName: data.name,
-          ConsumptionMethod: data.instruction,
-          Precaution: data.precaution,
-          IssuedDate: data.issueDate,
-          ExpiryDate: row.expiryDate,
-          UOM: data.dispenseUOM,
-          Quantity: data.dispensedQuanity,
-          BatchNo:
-            row.batchNo && Array.isArray(row.batchNo)
-              ? row.batchNo[0]
-              : row.batchNo,
-        },
-      ]
+      let drugLabelDetail = []
+      drugLabelDetail = drugLabelDetail.concat(
+        data.map((o) => {
+          return this.getDrugLabelDetails(o, row)
+        }),
+      )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
     return null
@@ -136,31 +121,38 @@ class PrintDrugLabelWrapper extends React.Component {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
         data.map((o) => {
-          const prescription = prescriptions.find((p) => p.id === o.id)
-          return {
-            PatientName: o.patientName,
-            PatientReferenceNo: o.patientReferenceNo,
-            PatientAccountNo: o.patientAccountNo,
-            ClinicName: o.clinicName,
-            ClinicAddress: o.clinicAddress,
-            ClinicOfficeNumber: o.officeNo,
-            DrugName: o.name,
-            ConsumptionMethod: o.instruction,
-            Precaution: o.precaution,
-            IssuedDate: o.issueDate,
-            ExpiryDate: prescription ? prescription.expiryDate : undefined,
-            UOM: o.dispenseUOM,
-            Quantity: o.dispensedQuanity,
-            BatchNo:
-              prescription && Array.isArray(prescription.batchNo)
-                ? prescription.batchNo[0]
-                : prescription.batchNo,
-          }
+          const prescriptionItem = prescriptions.find((p) => p.id === o.id)
+          return this.getDrugLabelDetails(o, prescriptionItem)
         }),
       )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
     return null
+  }
+
+  getDrugLabelDetails = (drugLabel, prescripationItem) => {
+    const expiryDate = prescripationItem
+      ? prescripationItem.expiryDate
+      : undefined
+    const batchNo =
+      prescripationItem && Array.isArray(prescripationItem.batchNo)
+        ? prescripationItem.batchNo[0]
+        : prescripationItem.batchNo
+    return {
+      PatientName: drugLabel.patientName,
+      PatientReferenceNo: drugLabel.patientReferenceNo,
+      PatientAccountNo: drugLabel.patientAccountNo,
+      DrugName: drugLabel.name,
+      ConsumptionMethod: drugLabel.instruction,
+      Precaution: drugLabel.precaution,
+      IssuedDate: drugLabel.issueDate,
+      ExpiryDate: expiryDate,
+      UOM: drugLabel.dispenseUOM,
+      Quantity: drugLabel.dispensedQuanity,
+      BatchNo: batchNo,
+      CurrentPage: drugLabel.currentPage,
+      TotalPage: drugLabel.totalPage,
+    }
   }
 
   connectWebSocket () {

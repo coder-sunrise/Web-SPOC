@@ -28,6 +28,7 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
                 retailPrescriptionItemPrecaution,
                 ...restValues
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
+
               obj = {
                 ...o.retailVisitInvoiceDrug,
                 innerLayerId: o.retailVisitInvoiceDrug.id,
@@ -168,17 +169,22 @@ export default compose(
           'medicationPrecautionFK',
         )
 
-        const unwantedItem = _.differenceBy(
+        // const unwantedItem = _.differenceBy(
+        //   retailPrescriptionItemPrecaution,
+        //   combinedOldNewPrecautions,
+        //   'medicationPrecautionFK',
+        // )
+
+        const unwantedItem = _.xor(
           retailPrescriptionItemPrecaution,
           combinedOldNewPrecautions,
-          'medicationPrecautionFK',
         )
 
         const formatNewAddedPrecautions = newAddedPrecautions.map((o) => {
-          delete o.id
-          delete o.concurrencyToken
           return {
             ...o,
+            id: undefined,
+            concurrencyToken: undefined,
           }
         })
 
@@ -210,14 +216,16 @@ export default compose(
         corPrescriptionItemInstruction,
         retailPrescriptionItemInstruction,
       ) => {
-        const compareCriteria = [
-          'dosageFK',
-          'drugFrequencyFK',
-          'duration',
-          'prescribeUOMFK',
-          'stepdose',
-          'usageMethodFK',
-        ]
+        // const compareCriteria = [
+        //   'dosageFK',
+        //   'drugFrequencyFK',
+        //   'duration',
+        //   'prescribeUOMFK',
+        //   'stepdose',
+        //   'usageMethodFK',
+        // ]
+        const compareCriteria =
+          'dosageFK drugFrequencyFK duration prescribeUOMFK stepdose usageMethodFK'
 
         const combinedOldNewInstructions = _.intersectionBy(
           corPrescriptionItemInstruction,
@@ -231,17 +239,16 @@ export default compose(
           compareCriteria,
         )
 
-        const unwantedItem = _.differenceBy(
+        const unwantedItem = _.xor(
           retailPrescriptionItemInstruction,
           combinedOldNewInstructions,
-          compareCriteria,
         )
 
         const formatNewAddedInstructions = newAddedIntructions.map((o) => {
-          delete o.id
-          delete o.concurrencyToken
           return {
             ...o,
+            id: undefined,
+            concurrencyToken: undefined,
           }
         })
 
@@ -268,7 +275,6 @@ export default compose(
           ...deleteUnwantedItem,
         ]
       }
-
       const retailInvoiceItem = rows.map((o) => {
         let obj
         switch (o.type) {
@@ -284,7 +290,6 @@ export default compose(
               retailPrescriptionItemInstruction = [],
               retailPrescriptionItemPrecaution = [],
             } = retailPrescriptionItem
-
             obj = {
               itemCode: o.drugCode,
               itemName: o.drugName,
