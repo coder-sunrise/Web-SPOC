@@ -104,7 +104,7 @@ const Grid = ({
     }).then((response) => {
       if (response === 204)
         notification.success({
-          message: 'Visit deleted',
+          message: 'Visit Deleted',
         })
     })
   }
@@ -379,7 +379,11 @@ const Grid = ({
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        if (visitPurposeFK === VISIT_TYPE.RETAIL) id = '1'
+        if (
+          visitPurposeFK === VISIT_TYPE.RETAIL ||
+          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+        )
+          id = '1'
         else id = '5'
         break
       case VISIT_STATUS.IN_CONS:

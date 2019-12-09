@@ -89,9 +89,15 @@ class EditOrder extends Component {
       dispense,
       visitRegistration,
     } = this.props
+    console.log('before', { values: { ...values } })
+    const payload = convertToConsultation(values, {
+      consultationDocument,
+      orders,
+    })
+    console.log({ payload })
     dispatch({
       type: `consultation/signOrder`,
-      payload: convertToConsultation(values, { consultationDocument, orders }),
+      payload,
     }).then((o) => {
       if (o) {
         dispatch({
@@ -123,7 +129,7 @@ class EditOrder extends Component {
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
-    // console.log('edit order', { values: this.props.values })
+    console.log('edit order', { values: this.props.values })
     return (
       <div className={classes.root}>
         <GridContainer>

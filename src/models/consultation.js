@@ -263,6 +263,10 @@ export default createFormViewModel({
         const response = yield call(service.signOrder, payload)
         return response
       },
+      *completeBillFirstOrder ({ payload }, { call, put }) {
+        const response = yield call(service.completeOrder, payload)
+        return response
+      },
       *closeModal ({ payload = { history: {} } }, { call, put, take }) {
         const { history = {} } = payload
         yield put({

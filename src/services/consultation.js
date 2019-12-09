@@ -3,6 +3,7 @@ import { getUniqueGUID, convertToQuery } from '@/utils/utils'
 import * as service from '@/services/common'
 
 const url = '/api/consultation'
+const billingUrl = '/api/billing'
 
 module.exports = {
   remove: (params) => service.remove(url, params),
@@ -58,6 +59,13 @@ module.exports = {
   },
   signOrder: async (params) => {
     const r = await request(`${url}/signorder/${params.id}`, {
+      method: 'PUT',
+      body: params,
+    })
+    return r
+  },
+  completeOrder: async (params) => {
+    const r = await request(`${billingUrl}/complete/${params.id}`, {
       method: 'PUT',
       body: params,
     })

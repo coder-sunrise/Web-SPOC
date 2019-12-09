@@ -86,4 +86,6 @@ module.exports = {
   },
   removeAddOrderDetails: (params) =>
     service.remove(`${url}/retailOrder`, params),
+  removeBillFirstVisit: (params) =>
+    service.remove(`${url}/billFirstOrder`, params),
 }

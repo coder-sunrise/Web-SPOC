@@ -8,10 +8,17 @@ import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
+import AddAlert from '@material-ui/icons/AddAlert'
 // sub components
 import TableData from './TableData'
 // common component
-import { Button, ProgressButton, GridItem, GridContainer } from '@/components'
+import {
+  Button,
+  ProgressButton,
+  GridItem,
+  GridContainer,
+  SizeContainer,
+} from '@/components'
 // variables
 import {
   PrescriptionColumns,
@@ -24,6 +31,7 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -52,8 +60,10 @@ const styles = (theme) => ({
     },
   },
   rightActionButtons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     marginTop: theme.spacing(2),
-    textAlign: 'right',
     '& > button:last-child': {
       marginRight: '0px !important',
     },
@@ -86,15 +96,16 @@ const DispenseDetails = ({
       },
     })
   }, [])
-  const { prescription, vaccination, otherOrder, invoice } = values || {
+  const {
+    prescription,
+    vaccination,
+    otherOrder,
+    invoice,
+    visitPurposeFK,
+  } = values || {
     invoice: { invoiceItem: [] },
   }
-  const {
-    invoiceItem = [],
-    invoiceAdjustment = [],
-    visitPurposeFK,
-    totalPayment,
-  } = invoice
+  const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
 
   const { inventorymedication } = codetable
 
@@ -121,28 +132,44 @@ const DispenseDetails = ({
     }
   }
 
+  const discardCallback = (r) => {
+    if (r) {
+      history.push('/reception/queue')
+    }
+  }
+
   const discardAddOrderDetails = () => {
     const { id } = invoice
+    dispatch({
+      type: 'dispense/removeAddOrderDetails',
+      payload: {
+        id,
+      },
+    }).then(discardCallback)
+  }
+
+  const discardBillOrder = () => {
+    const { id } = invoice
+    dispatch({
+      type: 'dispense/discardBillOrder',
+      payload: { id },
+    }).then(discardCallback)
+  }
+
+  const discardDispense = () => {
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmContent: `Are you sure want to discard the dispense ?`,
-        onConfirmSave: () => {
-          dispatch({
-            type: 'dispense/removeAddOrderDetails',
-            payload: {
-              id,
-            },
-          }).then((r) => {
-            if (r) {
-              history.push('/reception/queue')
-            }
-          })
-        },
+        onConfirmSave:
+          visitPurposeFK === VISIT_TYPE.RETAIL
+            ? discardAddOrderDetails
+            : discardBillOrder,
       },
     })
   }
+
   const updateInvoiceData = (v) => {
     const newInvoice = {
       ...values.invoice,
@@ -203,12 +230,26 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            {isRetailVisit && (
+            {isBillFirstVisit && (
+              <div
+                style={{
+                  marginRight: 8,
+                  marginTop: 8,
+                  display: 'inline-block',
+                  color: dangerColor,
+                }}
+              >
+                <SizeContainer size='lg'>
+                  <AddAlert />
+                </SizeContainer>
+              </div>
+            )}
+            {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
                 size='sm'
                 icon={<Delete />}
-                onClick={discardAddOrderDetails}
+                onClick={discardDispense}
                 disabled={totalPayment > 0}
               >
                 Discard

@@ -53,6 +53,7 @@ class Details extends PureComponent {
     // console.log(this.props)
     const { entity, visitPurposeFK } = orders
     const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
     return (
       <React.Fragment>
         <Divider />
@@ -103,7 +104,7 @@ class Details extends PureComponent {
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>
-            {isRetailVisit ? 'Add' : 'Save'}
+            {(isRetailVisit || isBillFirstVisit) && !entity ? 'Add' : 'Save'}
           </Button>
         </div>
       </React.Fragment>

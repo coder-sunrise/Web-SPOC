@@ -216,6 +216,14 @@ export default createFormViewModel({
         }
         return false
       },
+      *discardBillOrder ({ payload }, { call, put }) {
+        const response = yield call(service.removeBillFirstVisit, payload)
+        if (response === 204) {
+          notification.success({ message: 'Bill-First visit discarded' })
+          return true
+        }
+        return false
+      },
       // *queryDone ({ payload }, { call, put, select }) {
       //   // console.log('queryDone', payload)
       //   const { data } = payload
