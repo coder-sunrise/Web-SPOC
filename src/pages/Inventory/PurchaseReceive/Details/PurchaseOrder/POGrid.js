@@ -327,7 +327,7 @@ class Grid extends PureComponent {
         { name: 'type', title: 'Type' },
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
-        { name: 'unitOfMeasurement', title: 'UOM' },
+        { name: 'uom', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
         { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc

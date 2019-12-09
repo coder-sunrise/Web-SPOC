@@ -88,12 +88,23 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
             ...obj,
           }
         })
+
+        const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map((o) => {
+          return {
+            ...o,
+            uid: o.id,
+          }
+        })
         dispatch({
           type: 'orders/updateState',
           payload: {
             rows: newRows,
-            finalAdjustments: retailInvoiceAdjustment,
+            finalAdjustments: newRetailInvoiceAdjustment,
           },
+        })
+
+        dispatch({
+          type: 'orders/calculateAmount',
         })
       }
     })
