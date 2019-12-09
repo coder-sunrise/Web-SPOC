@@ -339,19 +339,69 @@ class Main extends React.Component {
     })
   }
 
+  signOffAndCompleteBilling = () => {
+    const { visitRegistration, dispatch, values } = this.props
+    const { entity: vistEntity = {} } = visitRegistration
+    const { visit = {} } = vistEntity
+    const { id: visitId } = visit
+    const successCallback = () => {
+      dispatch({
+        type: 'consultation/completeBillFirstOrder',
+        payload: {
+          id: visitId,
+        },
+      })
+    }
+    saveConsultation({
+      props: {
+        values,
+        ...this.props,
+      },
+      successMessage: 'Consultation signed',
+      shouldPromptConfirm: false,
+      action: 'sign',
+      successCallback,
+    })
+  }
+
+  signOffOnly = () => {
+    const { values } = this.props
+    saveConsultation({
+      props: {
+        values,
+        ...this.props,
+      },
+      successMessage: 'Consultation signed',
+      shouldPromptConfirm: false,
+      action: 'sign',
+    })
+  }
+
   handleSignOffClick = () => {
-    const { visitRegistration, dispatch, handleSubmit, values } = this.props
+    const {
+      visitRegistration,
+      orders,
+      dispatch,
+      handleSubmit,
+      values,
+    } = this.props
+    const { rows, _originalRows } = orders
     const { entity: vistEntity = {} } = visitRegistration
     const { visit = {} } = vistEntity
     const {
       visitPurposeFK = VISIT_TYPE.CONS,
-      id: visitId,
       visitStatus = VISIT_STATUS.DISPENSE,
     } = visit
 
+    const isModifiedOrder = _.isEqual(
+      rows.filter((i) => i.id && !i.isDeleted),
+      _originalRows,
+    )
+
     if (
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
-      visitStatus === VISIT_STATUS.BILLING
+      visitStatus === VISIT_STATUS.BILLING &&
+      isModifiedOrder
     ) {
       dispatch({
         type: 'global/updateState',
@@ -371,41 +421,12 @@ class Main extends React.Component {
               {
                 text: 'No',
                 color: 'danger',
-                onClick: () => {
-                  saveConsultation({
-                    props: {
-                      values,
-                      ...this.props,
-                    },
-                    successMessage: 'Consultation signed',
-                    shouldPromptConfirm: false,
-                    action: 'sign',
-                  })
-                },
+                onClick: this.signOffOnly,
               },
               {
                 text: 'Yes',
                 color: 'primary',
-                onClick: () => {
-                  const successCallback = () => {
-                    dispatch({
-                      type: 'consultation/completeBillFirstOrder',
-                      payload: {
-                        id: visitId,
-                      },
-                    })
-                  }
-                  saveConsultation({
-                    props: {
-                      values,
-                      ...this.props,
-                    },
-                    successMessage: 'Consultation signed',
-                    shouldPromptConfirm: false,
-                    action: 'sign',
-                    successCallback,
-                  })
-                },
+                onClick: this.signOffAndCompleteBilling,
               },
             ],
           },

@@ -344,6 +344,7 @@ export default createFormViewModel({
           payload: {
             type: '1',
             rows: _.sortBy(oRows, 'sequence'),
+            _originalRows: _.sortBy(oRows, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,

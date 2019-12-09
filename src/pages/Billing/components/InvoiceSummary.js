@@ -154,7 +154,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                <NumberInput value={totalAftGst} text currency />
+                <NumberInput value={totalAftGst} showZero text currency />
               </h5>
             </GridItem>
             <GridItem md={6}>
@@ -162,7 +162,7 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                <NumberInput value={values.finalClaim} text currency />
+                <NumberInput value={values.finalClaim} showZero text currency />
               </h5>
             </GridItem>
             <GridItem md={12}>
@@ -179,7 +179,12 @@ const InvoiceSummary = ({
             </GridItem>
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
-                <NumberInput value={patientOutstandingBalance} text currency />
+                <NumberInput
+                  value={patientOutstandingBalance}
+                  showZero
+                  text
+                  currency
+                />
               </h5>
             </GridItem>
           </GridContainer>
