@@ -380,6 +380,40 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
+    if (deleted) {
+      const { datagrid } = this.state
+      // const newDatagrid = datagrid.filter(
+      //   (event) => !deleted.includes(event.id),
+      // )
+      const afterDelete = datagrid.map((item) => ({
+        ...item,
+        isDeleted: item.isDeleted || deleted.includes(item.id),
+      }))
+      const primayDoctor = afterDelete.find(
+        (item) => !item.isDeleted && item.isPrimaryClinician,
+      )
+      const firstUnDelete = afterDelete.filter((item) => !item.isDeleted)[0]
+      let newDataGrid = [
+        ...afterDelete,
+      ]
+      if (primayDoctor) {
+        newDataGrid = afterDelete
+      } else {
+        newDataGrid = afterDelete.map((item) => ({
+          ...item,
+          isPrimaryClinician: firstUnDelete.id === item.id,
+        }))
+      }
+
+      this.setState(
+        {
+          datagrid: newDataGrid,
+        },
+        this.validateDataGrid,
+      )
+      return newDataGrid
+    }
+
     if (rows) {
       const updatedRows = this.validateWithSchema(
         rows.sort(sortDataGrid).map((item, index) => ({
@@ -399,35 +433,6 @@ class Form extends React.PureComponent {
         this.validateDataGrid,
       )
       return updatedRows
-    }
-    if (deleted) {
-      const { datagrid } = this.state
-      // const newDatagrid = datagrid.filter(
-      //   (event) => !deleted.includes(event.id),
-      // )
-      const afterDelete = datagrid.map((item) => ({
-        ...item,
-        isDeleted: item.isDeleted || deleted.includes(item.id),
-      }))
-      const hasOneRowOnlyAfterDelete =
-        afterDelete.filter((item) => !item.isDeleted).length === 1
-      let newDataGrid = [
-        ...afterDelete,
-      ]
-      if (hasOneRowOnlyAfterDelete) {
-        newDataGrid = afterDelete.map((item) => ({
-          ...item,
-          isPrimaryClinician: !item.isDeleted,
-        }))
-      }
-
-      this.setState(
-        {
-          datagrid: newDataGrid,
-        },
-        this.validateDataGrid,
-      )
-      return datagrid
     }
     return rows
   }
