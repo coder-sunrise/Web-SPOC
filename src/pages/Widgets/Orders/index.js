@@ -57,7 +57,7 @@ class Orders extends PureComponent {
     adjustments: [],
   }
 
-  componentDidMount () {
+  componentWillMount () {
     const { dispatch, status } = this.props
 
     const codeTableNameArray = [
@@ -68,14 +68,11 @@ class Orders extends PureComponent {
       'ctVaccinationUsage',
       'ctVaccinationUnitOfMeasurement',
     ]
-
-    codeTableNameArray.forEach((o) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: o,
-        },
-      })
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
     })
   }
 

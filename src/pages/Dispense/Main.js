@@ -127,25 +127,12 @@ class Main extends Component {
   }
 
   componentDidMount () {
-    const { dispatch, values } = this.props
-    const { otherOrder, prescription, visitPurposeFK } = values
+    const { values } = this.props
+    const { otherOrder = [], prescription = [], visitPurposeFK } = values
 
-    // dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: {
-    //     code: 'inventorymedication',
-    //     force: true,
-    //     temp: true,
-    //   },
-    // })
+    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
 
-    if (
-      visitPurposeFK === VISIT_TYPE.RETAIL &&
-      otherOrder &&
-      prescription &&
-      otherOrder.length === 0 &&
-      prescription.length === 0
-    ) {
+    if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
         (prevState) => {
           return {
@@ -156,6 +143,10 @@ class Main extends Component {
           this.openFirstTabAddOrder()
         },
       )
+    }
+
+    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST && isEmptyDispense) {
+      this.editOrder()
     }
   }
 
@@ -168,7 +159,6 @@ class Main extends Component {
         values,
       },
     }).then((response) => {
-      console.log({ response })
       if (response) {
         const parameters = {}
         router.push(getAppendUrl(parameters, '/reception/queue/billing'))
@@ -193,7 +183,7 @@ class Main extends Component {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
-          id: dispense.visitID,
+          id: values.id,
           version: dispense.version,
         },
       }).then((o) => {
@@ -251,6 +241,10 @@ class Main extends Component {
   }
 
   handleOrderModal = () => {
+    this.props.dispatch({
+      type: 'orders/reset',
+    })
+
     this.setState(
       (prevState) => {
         return {
@@ -265,6 +259,22 @@ class Main extends Component {
 
   handleReloadClick = () => {
     reloadDispense(this.props, 'refresh')
+  }
+
+  handleCloseAddOrder = () => {
+    const { dispatch, consultation, values } = this.props
+    const { visitPurposeFK } = values
+
+    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+      dispatch({
+        type: 'consultation/discard',
+        payload: {
+          id: consultation.entity.id,
+        },
+      }).then((response) => {
+        if (response) this.handleOrderModal()
+      })
+    }
   }
 
   render () {
@@ -282,7 +292,8 @@ class Main extends Component {
         <CommonModal
           title='Orders'
           open={this.state.showOrderModal}
-          onClose={this.handleOrderModal}
+          onClose={this.handleCloseAddOrder}
+          onConfirm={this.handleOrderModal}
           maxWidth='md'
           observe='OrderPage'
         >

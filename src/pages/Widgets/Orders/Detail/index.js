@@ -51,9 +51,7 @@ class Details extends PureComponent {
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
-    const { entity, visitPurposeFK } = orders
-    const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-    const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
+    const { entity } = orders
     return (
       <React.Fragment>
         <Divider />
@@ -104,7 +102,7 @@ class Details extends PureComponent {
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>
-            {(isRetailVisit || isBillFirstVisit) && !entity ? 'Add' : 'Save'}
+            {!entity ? 'Add' : 'Save'}
           </Button>
         </div>
       </React.Fragment>

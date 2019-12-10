@@ -172,6 +172,7 @@ export default compose(
         consultation,
         orders,
         onClose,
+        onConfirm,
         dispense,
         onReloadClick,
         inventoryConsumable,
@@ -423,13 +424,7 @@ export default compose(
           payload,
         }).then((r) => {
           if (r) {
-            onClose()
-            dispatch({
-              type: 'orders/updateState',
-              payload: {
-                rows: [],
-              },
-            })
+            if (onConfirm) onConfirm()
             onReloadClick()
           }
         })
@@ -451,11 +446,7 @@ export default compose(
               type: `dispense/refresh`,
               payload: dispense.visitID,
             })
-            dispatch({
-              type: 'orders/updateState',
-              payload: { rows: [] },
-            })
-            onClose()
+            if (onConfirm) onConfirm()
             onReloadClick()
           }
         })
