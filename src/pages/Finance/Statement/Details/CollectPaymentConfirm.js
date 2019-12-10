@@ -188,39 +188,7 @@ class CollectPaymentConfirm extends PureComponent {
 
   onChangeDate = (event) => {
     // const selectedDate = moment(event).format('YYMMDD')
-    this.getBizList(event)
-  }
-
-  getBizList = (date) => {
-    const { dispatch, setFieldValue } = this.props
-    const momentDate = moment(date, serverDateFormat)
-
-    const startDateTime = moment(
-      momentDate.set({ hour: 0, minute: 0, second: 0 }),
-    ).formatUTC(false)
-    const endDateTime = moment(
-      momentDate.set({ hour: 23, minute: 59, second: 59 }),
-    ).formatUTC(false)
-
-    dispatch({
-      type: 'statement/bizSessionList',
-      payload: {
-        pagesize: 999,
-        lgteql_SessionStartDate: startDateTime,
-        lsteql_SessionStartDate: endDateTime,
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
-      },
-    }).then(() => {
-      const { bizSessionList } = this.props.statement
-      setFieldValue(
-        'paymentCreatedBizSessionFK',
-        bizSessionList.length === 0 || bizSessionList === undefined
-          ? undefined
-          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
-      )
-    })
+    this.props.getBizList(event)
   }
 
   onChangePaymentMode = (event, op) => {
