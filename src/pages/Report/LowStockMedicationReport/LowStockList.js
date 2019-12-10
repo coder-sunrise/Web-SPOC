@@ -21,7 +21,7 @@ class LowStockList extends PureComponent {
       { name: 'name', title: 'Name' },
       { name: 'stock', title: 'Stock' },
       { name: 'threshold', title: 'Threshold' },
-      { name: 'uom', title: 'UOM' },
+      { name: 'uom', title: 'Uom' },
       { name: 'supplier', title: 'Supplier' },
     ]
     const LowStockMedicationDetailsExtensions = [

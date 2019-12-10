@@ -27,7 +27,7 @@ class SalesList extends PureComponent {
       { name: 'itemCategory', title: 'Category' },
       { name: 'item', title: 'Item' },
       { name: 'documentNo', title: 'Document No.' },
-      { name: 'qty', title: 'QTY' },
+      { name: 'qty', title: 'Qty' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'revenueAMT', title: 'Revenue Amt.' },
       { name: 'cnamt', title: 'CN Amt.' },
