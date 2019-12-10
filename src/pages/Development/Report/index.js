@@ -62,15 +62,27 @@ class Report extends React.Component {
       'ctVaccinationUsage',
       'ctVaccinationUnitOfMeasurement',
     ]
-
-    codeTableNameArray.forEach((o) => {
-      this.props.dispatch({
-        type: 'codetable/fetchCodes',
+    console.time('test')
+    this.props
+      .dispatch({
+        type: 'codetable/batchFetch',
         payload: {
-          code: o,
+          codes: codeTableNameArray,
         },
       })
-    })
+      .then((r) => {
+        console.log({ r })
+        console.timeEnd('test')
+      })
+    // codeTableNameArray.forEach((o) => {
+    //   console.log('fetch codes')
+    //   this.props.dispatch({
+    //     type: 'codetable/fetchCodes',
+    //     payload: {
+    //       code: o,
+    //     },
+    //   })
+    // })
   }
 
   // componentDidMount () {

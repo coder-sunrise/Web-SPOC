@@ -36,34 +36,12 @@ export default createListViewModel({
     },
     effects: {
       *fetchAllCachedCodetable (_, { call, put }) {
-        console.time('fetchAllCachedCodetable')
         const response = yield call(getAllCodes)
-        // console.log(response)
-        // if (response) {
-        //   const ct = response.reduce((allCodetable, codetable) => {
-        //     // skip snomeddiagnosis codetable in development mode
-        //     // if (
-        //     //   codetable.code === 'codetable/ctsnomeddiagnosis' &&
-        //     //   process.env.NODE_ENV === 'development'
-        //     // ) {
-        //     //   return {
-        //     //     ...allCodetable,
-        //     //     // [codetable.code.toLowerCase()]: codetable.data,
-        //     //   }
-        //     // }
-
-        //     return {
-        //       ...allCodetable,
-        //       [codetable.code.toLowerCase()]: codetable.data,
-        //     }
-        //   }, {})
         yield put({
           type: 'updateState',
           payload: response,
         })
-        console.timeEnd('fetchAllCachedCodetable')
       },
-
       *refreshCodes ({ payload }, { call, put }) {
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
@@ -105,6 +83,15 @@ export default createListViewModel({
         }
 
         return []
+      },
+      *batchFetch ({ payload }, { all, call, put }) {
+        const { codes } = payload
+        console.time('batch fetch')
+        const responses = yield all(
+          codes.map((code) => put({ type: 'fetchCodes', payload: { code } })),
+        )
+        console.timeEnd('batch fetch')
+        return responses
       },
     },
     reducers: {

@@ -337,21 +337,19 @@ class Package extends PureComponent {
   constructor (props) {
     super(props)
     const { dispatch } = props
-    const codeTableNameArray = []
-    codeTableNameArray.push('ctmedicationusage')
-    codeTableNameArray.push('ctmedicationunitofmeasurement')
-    codeTableNameArray.push('ctmedicationfrequency')
-    codeTableNameArray.push('ctmedicationdosage')
-    codeTableNameArray.push('ctvaccinationunitofmeasurement')
-    codeTableNameArray.push('ctvaccinationusage')
-
-    codeTableNameArray.forEach((o) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: o,
-        },
-      })
+    const codeTableNameArray = [
+      'ctmedicationusage',
+      'ctmedicationunitofmeasurement',
+      'ctmedicationfrequency',
+      'ctmedicationdosage',
+      'ctvaccinationunitofmeasurement',
+      'ctvaccinationusage',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
     })
 
     this.tableProps = {
