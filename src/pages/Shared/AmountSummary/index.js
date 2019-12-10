@@ -149,9 +149,10 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const { theme, showAdjustment, classes, config } = this.props
+    const { theme, showAdjustment, classes, config = {} } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
+    // console.log(summary, config)
     const { subTotal, totalWithGST, gst, isGSTInclusive } = summary
     const {
       settings = {
