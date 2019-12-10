@@ -54,6 +54,7 @@ const PaymentCollections = ({
       }
       listData.splice(0, 0, item)
     }
+    console.log({ listData })
   }
 
   let PaymentCollectionsColumns = [
