@@ -125,7 +125,7 @@ class ReferralLetter extends PureComponent {
               render={(args) => {
                 const cfg = {}
                 if (height && height > 495) {
-                  cfg.height = height - 381
+                  cfg.height = height - 545
                 }
                 return (
                   <RichEditor
