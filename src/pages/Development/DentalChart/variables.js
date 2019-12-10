@@ -14,13 +14,13 @@ const { fabric } = require('fabric')
 const modifierNamePrefix = 'selected_'
 export const cellPrefix = 'cell_'
 
-fabric.Object.prototype.set({
-  cornerSize: 0,
-  hasBorders: false,
-  lockMovementX: true,
-  lockMovementY: true,
-  lockRotation: true,
-})
+// fabric.Object.prototype.set({
+//   cornerSize: 0,
+//   hasBorders: false,
+//   lockMovementX: true,
+//   lockMovementY: true,
+//   lockRotation: true,
+// })
 fabric.Group.prototype.getLastAddedObject = function () {
   return this._objects[this._objects.length - 1]
 }
@@ -42,6 +42,13 @@ export const baseHeight = 40
 export const zoom = 1
 export const fontColor = '#000000'
 export const innerFontSize = 16
+export const lockConfig = {
+  cornerSize: 0,
+  hasBorders: false,
+  lockMovementX: true,
+  lockMovementY: true,
+  lockRotation: true,
+}
 export const groupCfg = {
   selectable: false,
 }
@@ -467,15 +474,6 @@ export const buttonConfigs = [
     value: 'clear',
     icon: clear,
     text: 'Clear',
-    type: 'cell',
-    onClick: ({ dispatch, group }) => {
-      dispatch({
-        type: 'dentalChartComponent/clean',
-        payload: {
-          toothIndex: Number(group.name),
-        },
-      })
-    },
   },
   {
     value: 'missing',
