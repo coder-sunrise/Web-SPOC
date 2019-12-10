@@ -168,7 +168,6 @@ const ApplyClaims = ({
       isModified: true,
       invoicePayerItem: payerInvoiceItems,
     }
-
     updateTempInvoicePayer(updatedPayer, index, invoicePayerList || null)
   }
 
@@ -231,7 +230,11 @@ const ApplyClaims = ({
       const newInvoicePayer = payerList.map(mapResponseToInvoicePayers)
       setTempInvoicePayer(newInvoicePayer)
       setInitialState(newInvoicePayer)
-    } else if (claimableSchemes.length > 0 && invoicePayment.length === 0) {
+    } else if (
+      !invoice.isBillingSaved &&
+      claimableSchemes.length > 0 &&
+      invoicePayment.length === 0
+    ) {
       const _invoicePayer = {
         ...defaultInvoicePayer,
         claimableSchemes: claimableSchemes[0],
