@@ -37,6 +37,7 @@ import {
   cellPrefix,
   buttonConfigs,
   overlayShapeTypes,
+  lockConfig,
 } from './variables'
 
 import Tooth from './Tooth'
@@ -85,8 +86,9 @@ const debouncedAction = _.debounce(
   },
 )
 
-@connect(({ dentalChartComponent }) => ({
+@connect(({ dentalChartComponent, global }) => ({
   dentalChartComponent,
+  global,
 }))
 class DentalChart extends React.Component {
   state = {
@@ -108,30 +110,30 @@ class DentalChart extends React.Component {
         index: 17,
         text: text1,
       },
-      // {
-      //   index: 16,
-      //   text: text1,
-      // },
-      // {
-      //   index: 15,
-      //   text: text1,
-      // },
-      // {
-      //   index: 14,
-      //   text: text2,
-      // },
-      // {
-      //   index: 13,
-      //   text: text2,
-      // },
-      // {
-      //   index: 12,
-      //   text: text2,
-      // },
-      // {
-      //   index: 11,
-      //   text: text2,
-      // },
+      {
+        index: 16,
+        text: text1,
+      },
+      {
+        index: 15,
+        text: text1,
+      },
+      {
+        index: 14,
+        text: text2,
+      },
+      {
+        index: 13,
+        text: text2,
+      },
+      {
+        index: 12,
+        text: text2,
+      },
+      {
+        index: 11,
+        text: text2,
+      },
       // {
       //   index: 0,
       //   text: [
@@ -146,10 +148,17 @@ class DentalChart extends React.Component {
   }
 
   componentDidMount () {
+    console.log(this.divContainer.current)
+    console.log(this.divContainer.current.offsetWidth)
+    console.log(
+      this.divContainer.current.offsetHeight,
+      this.props.global.mainDivHeight,
+    )
+
     const canvas = new fabric.Canvas(this._canvasContainer.current, {
       // preserveObjectStacking: true,
-      width: 900,
-      height: 500,
+      width: this.divContainer.current.offsetWidth,
+      height: this.props.global.mainDivHeight - 50,
       // renderOnAddRemove: false,
       // skipTargetFind: true
       name: 'container',
@@ -173,23 +182,29 @@ class DentalChart extends React.Component {
     })
     this.renderCanvas(this.props)
 
-    this.canvas.on('mouse:down', (e) => {
-      console.log('mouse:down', e)
-    })
-    this.canvas.on('mouse:move', (e) => {
-      // console.log('mouse:move', e)
-    })
-    console.log('selection:created')
-    this.canvas.on('selection:created', ({ selected, e }) => {
-      // this.canvas.setActiveObject(selected[0], e)
-      this.toggleMultiSelect(
-        selected.map((g) => ({
-          group: g,
-          select: true,
-        })),
-      )
+    // this.canvas.on('mouse:down', (e) => {
+    //   console.log('mouse:down', e)
+    // })
+    // this.canvas.on('mouse:move', (e) => {
+    //   // console.log('mouse:move', e)
+    // })
+    this.canvas.on('selection:created', ({ selected, e, target }) => {
+      if (!target) return
+      target.set(lockConfig)
 
-      console.log('selection:created', e)
+      if (!this.props.dentalChartComponent.action) return
+      console.log('selection:created')
+      if (this.props.dentalChartComponent.action.type !== 'cell') {
+        this.canvas.setActiveObject(selected[0], e)
+        this.toggleMultiSelect(
+          selected.map((g) => ({
+            group: g,
+            select: true,
+          })),
+        )
+      }
+
+      // console.log('selection:created', rest)
     })
   }
 
@@ -352,6 +367,61 @@ class DentalChart extends React.Component {
         top: baseHeight * 2,
       },
     )
+
+    const g11 = new fabric.Group(
+      [
+        new fabric.Polygon(
+          [
+            // outside top
+            { x: 0, y: baseHeight * 3 },
+
+            { x: baseWidth * 1, y: baseHeight * 4 },
+
+            { x: baseWidth * 3, y: baseHeight * 4 },
+            { x: baseWidth * 4, y: baseHeight * 3 },
+          ],
+          {
+            ...cfg,
+          },
+        ),
+      ],
+      {
+        ...groupCfg,
+        // opacity: 0.1,
+        name: `${cellPrefix}outsidetop`,
+
+        top: baseHeight,
+      },
+    )
+    g11.rotate(180)
+
+    const g12 = new fabric.Group(
+      [
+        new fabric.Polygon(
+          [
+            // outside bottom
+            { x: 0, y: baseHeight * 3 },
+
+            { x: baseWidth * 1, y: baseHeight * 4 },
+
+            { x: baseWidth * 3, y: baseHeight * 4 },
+            { x: baseWidth * 4, y: baseHeight * 3 },
+          ],
+          {
+            ...cfg,
+          },
+        ),
+      ],
+      {
+        ...groupCfg,
+        name: `${cellPrefix}outsidebottom`,
+
+        // opacity: 0.1,
+
+        top: baseHeight * 5,
+      },
+    )
+
     let g5
     let g6
     let g7
@@ -458,6 +528,8 @@ class DentalChart extends React.Component {
       g2,
       g3,
       g4,
+      g11,
+      g12,
       // groupt,
     ]
     if (g7) {
@@ -468,6 +540,8 @@ class DentalChart extends React.Component {
     }
     const group = new fabric.Group(fixedItems, {
       ...groupCfg,
+      ...lockConfig,
+
       width: groupWidth,
       height: groupHeight,
       // padding: 300,
@@ -478,7 +552,7 @@ class DentalChart extends React.Component {
       // originY: 'center',
       subTargetCheck: true,
       selectable: true,
-      selectionBackgroundColor: 'red',
+      selectionBackgroundColor: '#cccccc',
 
       // transparentCorners: true,
       // cornerColor: 'white',
@@ -514,7 +588,7 @@ class DentalChart extends React.Component {
         group.off('mouseup')
         group.on('mouseup', (e) => {
           console.log('gesture', e)
-          console.log(action, dentalChartComponent)
+          // console.log(action, dentalChartComponent)
           if (action.onClick) {
             action.onClick({ group, dispatch })
           } else if (action && overlayShapeTypes.includes(action.value)) {
@@ -527,7 +601,7 @@ class DentalChart extends React.Component {
           item.off('mouseup')
           item.on('mouseup', (e) => {
             console.log('cell gesture', e)
-            if (action && !overlayShapeTypes.includes(action.value))
+            if (action && action.type === 'cell')
               this.toggleSelect({ item, group })
             // if (e.target) {
             //   const item = group.object(value)
@@ -647,10 +721,12 @@ class DentalChart extends React.Component {
     } = this.props
     const { data = {} } = dentalChartComponent
     return (
-      <div className={className} ref={this.divContainer}>
+      <div className={className}>
         <GridContainer>
           <GridItem md={8}>
-            <canvas id={this.id} ref={this._canvasContainer} />
+            <div ref={this.divContainer}>
+              <canvas id={this.id} ref={this._canvasContainer} />
+            </div>
             {/* {this.state.container &&
               this.configs.map((o) => {
                 console.log(data.filter((m) => m.toothIndex === o.index))

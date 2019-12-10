@@ -5,27 +5,24 @@ import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
 
 const updateData = (data, payload) => {
+  const { toothIndex, value, target, forceSelect } = payload
   const exist = data.find(
     (o) =>
-      o.toothIndex === payload.toothIndex &&
-      o.value === payload.value &&
-      payload.target === o.target,
+      o.toothIndex === toothIndex && o.value === value && target === o.target,
   )
-  if (exist && !payload.forceSelect) {
+  if (value === 'clear')
+    return _.reject(data, (o) => o.toothIndex === toothIndex)
+  if (exist && !forceSelect) {
     data = _.reject(
       data,
       (o) =>
-        o.toothIndex === payload.toothIndex &&
-        o.value === payload.value &&
-        payload.target === o.target,
+        o.toothIndex === toothIndex && o.value === value && target === o.target,
     )
   } else {
     data = _.reject(
       data,
       (o) =>
-        o.value !== payload.value &&
-        o.toothIndex === payload.toothIndex &&
-        payload.target === o.target,
+        o.value !== value && o.toothIndex === toothIndex && target === o.target,
     )
     data.push({
       ...payload,
