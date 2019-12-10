@@ -35,6 +35,8 @@ import {
   fontCfg,
   groupCfg,
   cellPrefix,
+  buttonConfigs,
+  overlayShapeTypes,
 } from './variables'
 
 import Tooth from './Tooth'
@@ -72,6 +74,16 @@ const text2 = [
   'b',
   'i',
 ]
+const debouncedAction = _.debounce(
+  (cb) => {
+    cb()
+  },
+  100,
+  {
+    leading: true,
+    trailing: false,
+  },
+)
 
 @connect(({ dentalChartComponent }) => ({
   dentalChartComponent,
@@ -137,7 +149,7 @@ class DentalChart extends React.Component {
     const canvas = new fabric.Canvas(this._canvasContainer.current, {
       // preserveObjectStacking: true,
       width: 900,
-      height: 800,
+      height: 500,
       // renderOnAddRemove: false,
       // skipTargetFind: true
       name: 'container',
@@ -156,7 +168,28 @@ class DentalChart extends React.Component {
         ...o,
         order,
         values: data.filter((m) => m.toothIndex === o.index),
+        ...this.props,
       })
+    })
+    this.renderCanvas(this.props)
+
+    this.canvas.on('mouse:down', (e) => {
+      console.log('mouse:down', e)
+    })
+    this.canvas.on('mouse:move', (e) => {
+      // console.log('mouse:move', e)
+    })
+    console.log('selection:created')
+    this.canvas.on('selection:created', ({ selected, e }) => {
+      // this.canvas.setActiveObject(selected[0], e)
+      this.toggleMultiSelect(
+        selected.map((g) => ({
+          group: g,
+          select: true,
+        })),
+      )
+
+      console.log('selection:created', e)
     })
   }
 
@@ -170,7 +203,7 @@ class DentalChart extends React.Component {
     }
   }
 
-  addGroup = ({ text, index, order }) => {
+  addGroup = ({ text, index, order, values, dentalChartComponent }) => {
     const groupWidth = baseWidth * 4 // + strokeWidth
     const groupHeight = baseHeight * 6 // + strokeWidth
 
@@ -238,10 +271,9 @@ class DentalChart extends React.Component {
     )
 
     const headerText = new fabric.IText(`${index}`, {
-      // left: baseWidth * 2 - `${index}`.length * 9,
-      // top: 8,
-      left: 0,
-      top: -groupHeight / 2 + 8,
+      left: -`${index}`.length * 9,
+      top: -groupHeight / 2 - 12,
+      // top: -groupHeight / 2 + 8,
       // originX: 'center',
       // originY: 'center',
       fontSize: 26,
@@ -281,6 +313,10 @@ class DentalChart extends React.Component {
       {
         ...groupCfg,
         name: `${cellPrefix}left`,
+        top: baseHeight * 2,
+        // left: 0 - groupWidth / 2,
+        // originX: 'center',
+        // originY: 'center',
       },
     )
     const g2 = new fabric.Group(
@@ -291,6 +327,7 @@ class DentalChart extends React.Component {
       {
         ...groupCfg,
         name: `${cellPrefix}bottom`,
+        top: baseHeight * 4,
       },
     )
     const g3 = new fabric.Group(
@@ -301,6 +338,7 @@ class DentalChart extends React.Component {
       {
         ...groupCfg,
         name: `${cellPrefix}right`,
+        top: baseHeight * 2,
       },
     )
     const g4 = new fabric.Group(
@@ -311,6 +349,7 @@ class DentalChart extends React.Component {
       {
         ...groupCfg,
         name: `${cellPrefix}top`,
+        top: baseHeight * 2,
       },
     )
     let g5
@@ -415,53 +454,128 @@ class DentalChart extends React.Component {
 
     const fixedItems = [
       // headerText,
-      // g1,
-      // g2,
-      // g3,
-      // g4,
+      g1,
+      g2,
+      g3,
+      g4,
+      // groupt,
     ]
-    const group = new fabric.Group(
-      g7
-        ? [
-            ...fixedItems,
-            // g7,
-          ]
-        : [
-            ...fixedItems,
-            // g5,
-            // g6,
-          ],
-      {
-        ...groupCfg,
-        width: groupWidth,
-        height: groupHeight,
-        left: order * groupWidth + 1,
-        top: 0,
-        selectable: true,
-        name: `${index}`,
-      },
-    )
+    if (g7) {
+      fixedItems.push(g7)
+    } else {
+      fixedItems.push(g5)
+      fixedItems.push(g6)
+    }
+    const group = new fabric.Group(fixedItems, {
+      ...groupCfg,
+      width: groupWidth,
+      height: groupHeight,
+      // padding: 300,
+      left: order * groupWidth + 1,
+      // top: 150,
+      // originX: 'left',
+
+      // originY: 'center',
+      subTargetCheck: true,
+      selectable: true,
+      selectionBackgroundColor: 'red',
+
+      // transparentCorners: true,
+      // cornerColor: 'white',
+
+      // padding: 20,
+      // cornerStrokeColor: 'black',
+      // cornerStyle: 'circle',
+      name: `${index}`,
+    })
+
     group.add(headerText)
+
+    // group.addWithUpdate(g1)
+    // group.addWithUpdate(g2)
+
     this.canvas.add(group)
   }
 
   renderCanvas = (props) => {
-    console.log('renderCanvas', props.values)
-    const { dentalChartComponent } = props
-    const { action = {} } = dentalChartComponent
+    console.log('renderCanvas', props.dentalChartComponent.data)
+    const { dentalChartComponent, dispatch } = props
+    const { action = {}, data } = dentalChartComponent
     const { icon, type, hoverColor: hc, render, clear } = action
-    if (clear) clear(this.canvas, props)
 
     this.canvas
       .getObjects('group')
       .filter((n) => Number(n.name) > 0)
       .map((group) => {
-        if (render)
-          render({
-            ...props,
-            canvas: this.canvas,
-            group,
+        group.filter((n) => !n.isDefaultCell()).map((o) => group.remove(o))
+        group
+          .filter((n) => n.isValidCell())
+          .map((o) => o.item(0).set('fill', 'white'))
+        group.off('mouseup')
+        group.on('mouseup', (e) => {
+          console.log('gesture', e)
+          console.log(action, dentalChartComponent)
+          if (action.onClick) {
+            action.onClick({ group, dispatch })
+          } else if (action && overlayShapeTypes.includes(action.value)) {
+            this.toggleSelect({ group })
+          } else if (e.subTargets[0] && !e.subTargets[0].isValidCell()) {
+            this.toggleSelect({ group })
+          }
+        })
+        group.filter((n) => n.isValidCell()).map((item) => {
+          item.off('mouseup')
+          item.on('mouseup', (e) => {
+            console.log('cell gesture', e)
+            if (action && !overlayShapeTypes.includes(action.value))
+              this.toggleSelect({ item, group })
+            // if (e.target) {
+            //   const item = group.object(value)
+
+            //   if (
+            //     item // &&
+            //     // e.target.canvas // &&
+            //     // checkIsValidElement(item, name, config.isValidElement)
+            //   ) {
+            //     toggleSelect({ item, selected, config, values, dispatch, group })
+            //   }
+            // }
           })
+        })
+
+        data.filter((m) => m.toothIndex === Number(group.name)).map((o) => {
+          const target = buttonConfigs.find((m) => m.value === o.value)
+          if (target) {
+            if (target.getShape) {
+              let newShape = target.getShape()
+              let existed = group.filter((x) => x.name === o.value)[0]
+              if (!existed) {
+                newShape.set('name', o.value)
+                group.add(newShape)
+                existed = newShape
+              }
+
+              existed.bringToFront()
+            } else if (target.type === 'cell') {
+              const cell = group
+                .filter((n) => n.isValidCell())
+                .find((t) => t.name === o.target)
+              if (cell) cell.item(0).set('fill', target.fill)
+            }
+          }
+        })
+        // console.log(group)
+        // const cfg = {
+        //   ...props,
+        //   values: props.dentalChartComponent.data.filter(
+        //     (m) => m.toothIndex === Number(group.name),
+        //   ),
+        //   canvas: this.canvas,
+        //   group,
+        // }
+        // if (clear) clear(cfg)
+
+        // if (render) render(cfg)
       })
 
     this.canvas.renderAll()
@@ -470,6 +584,46 @@ class DentalChart extends React.Component {
     //   var oImg = img.set({ left: 0, top: 0}).scale(0.25);
     //   canvas.add(oImg);
     // });
+  }
+
+  toggleSelect = ({ item = {}, group, select }) => {
+    const { dentalChartComponent } = this.props
+    const { action } = dentalChartComponent
+    if (action && action.value) {
+      debouncedAction(() => {
+        this.props.dispatch({
+          type: 'dentalChartComponent/toggleSelect',
+          payload: {
+            toothIndex: Number(group.name),
+            value: action.value,
+            target: item.name,
+            forceSelect: select,
+            prevColor:
+              item.isValidCell && item.isValidCell() ? item.item(0).fill : '',
+          },
+        })
+      })
+    }
+  }
+
+  toggleMultiSelect = (ary) => {
+    const { dentalChartComponent } = this.props
+    const { action } = dentalChartComponent
+    if (action && action.value) {
+      debouncedAction(() => {
+        this.props.dispatch({
+          type: 'dentalChartComponent/toggleMultiSelect',
+          payload: ary.map(({ group, item = {}, select }) => ({
+            toothIndex: Number(group.name),
+            value: action.value,
+            target: item.name,
+            forceSelect: select,
+            prevColor:
+              item.isValidCell && item.isValidCell() ? item.item(0).fill : '',
+          })),
+        })
+      })
+    }
   }
 
   render () {

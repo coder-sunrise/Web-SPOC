@@ -228,6 +228,7 @@ class NewLogin extends React.Component {
                     render={(args) => (
                       <TextField
                         {...args}
+                        autoFocus
                         label={formatMessage({ id: 'app.login.username' })}
                       />
                     )}

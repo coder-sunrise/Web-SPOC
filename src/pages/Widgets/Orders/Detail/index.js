@@ -179,7 +179,6 @@ class Details extends PureComponent {
       setDisable: this.setDisable,
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
-      type,
       orderTypes,
       getNextSequence: this.getNextSequence,
       ...props,
@@ -202,7 +201,10 @@ class Details extends PureComponent {
                   return {
                     id: o.value,
                     name: o.name,
-                    content: o.component(cfg),
+                    content: o.component({
+                      ...cfg,
+                      type: o.value,
+                    }),
                   }
                 })}
                 tabStyle={{}}
