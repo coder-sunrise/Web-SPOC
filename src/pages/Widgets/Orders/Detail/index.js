@@ -51,8 +51,7 @@ class Details extends PureComponent {
   footerBtns = ({ onSave, onReset, showAdjustment = true }) => {
     const { classes, orders } = this.props
     // console.log(this.props)
-    const { entity, visitPurposeFK } = orders
-    const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
+    const { entity } = orders
     return (
       <React.Fragment>
         <Divider />
@@ -103,7 +102,7 @@ class Details extends PureComponent {
             Discard
           </Button>
           <Button color='primary' onClick={onSave}>
-            {isRetailVisit ? 'Add' : 'Save'}
+            {!entity ? 'Add' : 'Save'}
           </Button>
         </div>
       </React.Fragment>
@@ -133,7 +132,7 @@ class Details extends PureComponent {
           // showRemark: true,
           defaultValues: {
             ...this.props.orders.entity,
-            initialAmout: this.props.orders.entity.total, // for item level need inital amount
+            initialAmout: this.props.orders.entity.totalPrice, // for item level need inital amount
           },
         },
       },

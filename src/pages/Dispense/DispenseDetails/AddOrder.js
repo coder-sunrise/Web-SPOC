@@ -1,13 +1,25 @@
 import React, { useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core/styles'
+import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
 import { withFormikExtend } from '@/components'
+import { convertToConsultation } from '@/pages/Consultation/utils'
+import { VISIT_TYPE } from '@/utils/constants'
 
 const styles = () => ({})
 
-const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
+const AddOrder = ({
+  footer,
+  orders,
+  handleSubmit,
+  dispatch,
+  dispense,
+  ctservice,
+  values,
+  visitType,
+}) => {
   const displayExistingOrders = async (id, servicesList) => {
     await dispatch({
       type: 'dispense/queryAddOrderDetails',
@@ -27,6 +39,7 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
                 retailPrescriptionItemPrecaution,
                 ...restValues
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
+
               obj = {
                 ...o.retailVisitInvoiceDrug,
                 innerLayerId: o.retailVisitInvoiceDrug.id,
@@ -86,12 +99,23 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
             ...obj,
           }
         })
+
+        const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map((o) => {
+          return {
+            ...o,
+            uid: o.id,
+          }
+        })
         dispatch({
           type: 'orders/updateState',
           payload: {
             rows: newRows,
-            finalAdjustments: retailInvoiceAdjustment,
+            finalAdjustments: newRetailInvoiceAdjustment,
           },
+        })
+
+        dispatch({
+          type: 'orders/calculateAmount',
         })
       }
     })
@@ -102,6 +126,7 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
     const { invoice } = entity
 
     let servicesList = ctservice
+
     if (!ctservice) {
       dispatch({
         type: 'codetable/fetchCodes',
@@ -109,16 +134,17 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
           code: 'ctservice',
         },
       }).then((services) => {
-        displayExistingOrders(invoice.id, services)
+        if (visitType === VISIT_TYPE.RETAIL)
+          displayExistingOrders(invoice.id, services)
       })
-    } else {
+    } else if (visitType === VISIT_TYPE.RETAIL) {
       displayExistingOrders(invoice.id, servicesList)
     }
   }, [])
 
   return (
     <React.Fragment>
-      <Order fromDispense='dispense' />
+      <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
       {footer &&
         footer({
           onConfirm: handleSubmit,
@@ -132,9 +158,10 @@ const AddOrder = ({ footer, handleSubmit, dispatch, dispense, ctservice }) => {
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders, codetable }) => ({
+  connect(({ dispense, orders, codetable, consultation }) => ({
     dispense,
     orders,
+    consultation,
     ctservice: codetable.ctservice,
     inventoryConsumable: codetable.inventoryconsumable,
   })),
@@ -142,162 +169,288 @@ export default compose(
     handleSubmit: (values, { props, resetForm }) => {
       const {
         dispatch,
+        consultation,
         orders,
         onClose,
+        onConfirm,
         dispense,
         onReloadClick,
         inventoryConsumable,
+        visitType,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
+      if (visitType === VISIT_TYPE.RETAIL) {
+        const medicationPrecautionsArray = (
+          corPrescriptionItemPrecaution,
+          retailPrescriptionItemPrecaution,
+        ) => {
+          const combinedOldNewPrecautions = _.intersectionBy(
+            corPrescriptionItemPrecaution,
+            retailPrescriptionItemPrecaution,
+            'medicationPrecautionFK',
+          )
 
-      const retailInvoiceItem = rows.map((o) => {
-        let obj
-        switch (o.type) {
-          case '1':
-          case '5': {
-            const {
-              corPrescriptionItemInstruction,
-              corPrescriptionItemPrecaution,
-              retailPrescriptionItem = {},
-              ...restO
-            } = o
-            const {
-              retailPrescriptionItemInstruction = [],
-              retailPrescriptionItemPrecaution = [],
-            } = retailPrescriptionItem
-            const deletedRetailPrescriptionItemInstruction = retailPrescriptionItemInstruction.map(
-              (ins) => {
-                return {
-                  ...ins,
-                  isDeleted: true,
-                }
-              },
-            )
-            const deletedRetailPrescriptionItemPrecaution = retailPrescriptionItemPrecaution.map(
-              (ins) => {
-                return {
-                  ...ins,
-                  isDeleted: true,
-                }
-              },
-            )
-            obj = {
-              itemCode: o.drugCode,
-              itemName: o.drugName,
-              invoiceItemTypeFK: 1,
+          const newAddedPrecautions = _.differenceBy(
+            corPrescriptionItemPrecaution,
+            combinedOldNewPrecautions,
+            'medicationPrecautionFK',
+          )
 
-              // "costPrice": 0,
-              unitPrice: o.unitPrice,
-              quantity: o.quantity,
-              subTotal: o.totalPrice,
-              // "adjType": "string",
-              // "adjValue": 0,
-              retailVisitInvoiceDrug: {
-                id: o.innerLayerId,
-                concurrencyToken: o.innerLayerConcurrencyToken,
-                inventoryMedicationFK: o.inventoryMedicationFK,
-                expiryDate: o.expiryDate,
-                batchNo: o.batchNo,
-                dispensedQuanity: o.dispensedQuanity,
-                retailPrescriptionItem: {
-                  ...restO,
-                  retailPrescriptionItemInstruction: [
-                    ...corPrescriptionItemInstruction,
-                    ...deletedRetailPrescriptionItemInstruction,
-                  ],
-                  retailPrescriptionItemPrecaution: [
-                    ...corPrescriptionItemPrecaution,
-                    ...deletedRetailPrescriptionItemPrecaution,
-                  ],
-                },
-              },
+          // const unwantedItem = _.differenceBy(
+          //   retailPrescriptionItemPrecaution,
+          //   combinedOldNewPrecautions,
+          //   'medicationPrecautionFK',
+          // )
+
+          const unwantedItem = _.xor(
+            retailPrescriptionItemPrecaution,
+            combinedOldNewPrecautions,
+          )
+
+          const formatNewAddedPrecautions = newAddedPrecautions.map((o) => {
+            return {
+              ...o,
+              id: undefined,
+              concurrencyToken: undefined,
             }
-
-            break
-          }
-          case '3': {
-            obj = {
-              itemCode: o.serviceCode,
-              itemName: o.serviceName,
-              subTotal: o.total,
-              invoiceItemTypeFK: 4,
-              retailVisitInvoiceService: {
-                id: o.innerLayerId,
-                concurrencyToken: o.innerLayerConcurrencyToken,
-                serviceCenterServiceFK: o.serviceCenterServiceFK,
-                retailService: {
-                  ...o,
-                },
-              },
-            }
-            break
-          }
-          case '4': {
-            const { uom } = inventoryConsumable.find(
-              (c) => c.id === o.inventoryConsumableFK,
-            )
-            obj = {
-              invoiceItemTypeFK: 2,
-              itemCode: o.consumableCode,
-              itemName: o.consumableName,
-              subTotal: o.totalPrice,
-              retailVisitInvoiceConsumable: {
-                id: o.innerLayerId,
-                concurrencyToken: o.innerLayerConcurrencyToken,
-                inventoryConsumableFK: o.inventoryConsumableFK,
-                expiryDate: o.expiryDate,
-                batchNo: o.batchNo,
-                retailConsumable: {
-                  unitOfMeasurement: uom.name,
-                  unitofMeasurementFK: uom.id,
-                  ...o,
-                },
-              },
-            }
-            break
-          }
-          default: {
-            break
-          }
-        }
-        return {
-          id: o.outerLayerId,
-          concurrencyToken: o.outerLayerConcurrencyToken,
-
-          invoiceItemTypeFK: parseInt(o.type, 10),
-          description: o.subject,
-          adjAmt: o.adjAmount,
-          totalAfterItemAdjustment: o.totalAfterItemAdjustment,
-          totalAfterOverallAdjustment: o.totalAfterOverallAdjustment,
-          totalAfterGST: o.totalAfterGST,
-          gstAmount: o.gstAmount,
-          ...obj,
-        }
-      })
-
-      const payload = {
-        ...addOrderDetails,
-        ...summary,
-        retailInvoiceItem,
-        retailInvoiceAdjustment: finalAdjustments,
-      }
-
-      dispatch({
-        type: 'dispense/saveAddOrderDetails',
-        payload,
-      }).then((r) => {
-        if (r) {
-          onClose()
-          dispatch({
-            type: 'orders/updateState',
-            payload: {
-              rows: [],
-            },
           })
-          onReloadClick()
+
+          let deleteUnwantedItem = []
+          if (combinedOldNewPrecautions.length <= 0) {
+            deleteUnwantedItem = retailPrescriptionItemPrecaution.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          } else {
+            deleteUnwantedItem = unwantedItem.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          }
+
+          return [
+            ...combinedOldNewPrecautions,
+            ...formatNewAddedPrecautions,
+            ...deleteUnwantedItem,
+          ]
         }
-      })
+
+        const medicationIntructionsArray = (
+          corPrescriptionItemInstruction,
+          retailPrescriptionItemInstruction,
+        ) => {
+          // const compareCriteria = [
+          //   'dosageFK',
+          //   'drugFrequencyFK',
+          //   'duration',
+          //   'prescribeUOMFK',
+          //   'stepdose',
+          //   'usageMethodFK',
+          // ]
+          const compareCriteria =
+            'dosageFK drugFrequencyFK duration prescribeUOMFK stepdose usageMethodFK'
+
+          const combinedOldNewInstructions = _.intersectionBy(
+            corPrescriptionItemInstruction,
+            retailPrescriptionItemInstruction,
+            compareCriteria,
+          )
+
+          const newAddedIntructions = _.differenceBy(
+            corPrescriptionItemInstruction,
+            combinedOldNewInstructions,
+            compareCriteria,
+          )
+
+          const unwantedItem = _.xor(
+            retailPrescriptionItemInstruction,
+            combinedOldNewInstructions,
+          )
+
+          const formatNewAddedInstructions = newAddedIntructions.map((o) => {
+            return {
+              ...o,
+              id: undefined,
+              concurrencyToken: undefined,
+            }
+          })
+
+          let deleteUnwantedItem = []
+          if (combinedOldNewInstructions.length <= 0) {
+            deleteUnwantedItem = retailPrescriptionItemInstruction.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          } else {
+            deleteUnwantedItem = unwantedItem.map((o) => {
+              return {
+                ...o,
+                isDeleted: true,
+              }
+            })
+          }
+
+          return [
+            ...combinedOldNewInstructions,
+            ...formatNewAddedInstructions,
+            ...deleteUnwantedItem,
+          ]
+        }
+        const retailInvoiceItem = rows.map((o) => {
+          let obj
+          switch (o.type) {
+            case '1':
+            case '5': {
+              const {
+                corPrescriptionItemInstruction,
+                corPrescriptionItemPrecaution,
+                retailPrescriptionItem = {},
+                ...restO
+              } = o
+              const {
+                retailPrescriptionItemInstruction = [],
+                retailPrescriptionItemPrecaution = [],
+              } = retailPrescriptionItem
+              obj = {
+                itemCode: o.drugCode,
+                itemName: o.drugName,
+                invoiceItemTypeFK: 1,
+
+                // "costPrice": 0,
+                unitPrice: o.unitPrice,
+                quantity: o.quantity,
+                subTotal: o.totalPrice,
+                // "adjType": "string",
+                // "adjValue": 0,
+                retailVisitInvoiceDrug: {
+                  id: o.innerLayerId,
+                  concurrencyToken: o.innerLayerConcurrencyToken,
+                  inventoryMedicationFK: o.inventoryMedicationFK,
+                  expiryDate: o.expiryDate,
+                  batchNo: o.batchNo,
+                  dispensedQuanity: o.dispensedQuanity,
+                  retailPrescriptionItem: {
+                    ...restO,
+                    retailPrescriptionItemInstruction: medicationIntructionsArray(
+                      corPrescriptionItemInstruction,
+                      retailPrescriptionItemInstruction,
+                    ),
+                    retailPrescriptionItemPrecaution: medicationPrecautionsArray(
+                      corPrescriptionItemPrecaution,
+                      retailPrescriptionItemPrecaution,
+                    ),
+                  },
+                },
+              }
+
+              break
+            }
+            case '3': {
+              obj = {
+                itemCode: o.serviceCode,
+                itemName: o.serviceName,
+                subTotal: o.total,
+                invoiceItemTypeFK: 4,
+                retailVisitInvoiceService: {
+                  id: o.innerLayerId,
+                  concurrencyToken: o.innerLayerConcurrencyToken,
+                  serviceCenterServiceFK: o.serviceCenterServiceFK,
+                  retailService: {
+                    ...o,
+                  },
+                },
+              }
+              break
+            }
+            case '4': {
+              const { uom } = inventoryConsumable.find(
+                (c) => c.id === o.inventoryConsumableFK,
+              )
+              obj = {
+                invoiceItemTypeFK: 2,
+                itemCode: o.consumableCode,
+                itemName: o.consumableName,
+                subTotal: o.totalPrice,
+                retailVisitInvoiceConsumable: {
+                  id: o.innerLayerId,
+                  concurrencyToken: o.innerLayerConcurrencyToken,
+                  inventoryConsumableFK: o.inventoryConsumableFK,
+                  expiryDate: o.expiryDate,
+                  batchNo: o.batchNo,
+                  retailConsumable: {
+                    unitOfMeasurement: uom.name,
+                    unitofMeasurementFK: uom.id,
+                    ...o,
+                  },
+                },
+              }
+              break
+            }
+            default: {
+              break
+            }
+          }
+          return {
+            id: o.outerLayerId,
+            concurrencyToken: o.outerLayerConcurrencyToken,
+
+            invoiceItemTypeFK: parseInt(o.type, 10),
+            description: o.subject,
+            adjAmt: o.adjAmount,
+            totalAfterItemAdjustment: o.totalAfterItemAdjustment,
+            totalAfterOverallAdjustment: o.totalAfterOverallAdjustment,
+            totalAfterGST: o.totalAfterGST,
+            gstAmount: o.gstAmount,
+            ...obj,
+          }
+        })
+
+        const payload = {
+          ...addOrderDetails,
+          ...summary,
+          retailInvoiceItem,
+          retailInvoiceAdjustment: finalAdjustments,
+        }
+
+        dispatch({
+          type: 'dispense/saveAddOrderDetails',
+          payload,
+        }).then((r) => {
+          if (r) {
+            if (onConfirm) onConfirm()
+            onReloadClick()
+          }
+        })
+      } else if (visitType === VISIT_TYPE.BILL_FIRST) {
+        const billFirstPayload = convertToConsultation(consultation.entity, {
+          consultationDocument: { rows: [] },
+          orders,
+        })
+        console.log({ billFirstPayload })
+        dispatch({
+          type: `consultation/signOrder`,
+          payload: {
+            ...billFirstPayload,
+            id: consultation.entity.id,
+          },
+        }).then((response) => {
+          if (response) {
+            dispatch({
+              type: `dispense/refresh`,
+              payload: dispense.visitID,
+            })
+            if (onConfirm) onConfirm()
+            onReloadClick()
+          }
+        })
+      }
     },
     displayName: 'AddOrder',
   }),

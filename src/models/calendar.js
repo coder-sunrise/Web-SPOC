@@ -164,7 +164,12 @@ export default createListViewModel({
               ? false
               : calendarState.mode === 'single',
             appointmentStatusFk: newAppointmentStatusFK,
-            appointments_Resources: appointmentResources,
+            appointments_Resources: appointmentResources.map((o) => {
+              return {
+                ...o,
+                clinicianFK: o.isDeleted ? o.preClinicianFK : o.clinicianFK,
+              }
+            }),
             rescheduleReason,
             rescheduledByFK,
           }
@@ -549,6 +554,7 @@ export default createListViewModel({
               ...m,
               apptDurationHour: difH,
               apptDurationMinute: difM,
+              preClinicianFK: m.clinicianFK,
             }
           })
           return {

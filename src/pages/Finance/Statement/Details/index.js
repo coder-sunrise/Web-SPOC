@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react'
 import { withStyles, Paper } from '@material-ui/core'
 import { connect } from 'dva'
-import { withFormikExtend, Tabs } from '@/components'
+import moment from 'moment'
+import { withFormikExtend, Tabs, serverDateFormat } from '@/components'
 import { StatementDetailOption } from './variables'
 import DetailsHeader from './DetailsHeader'
 import Yup from '@/utils/yup'
 import { PAYMENT_MODE, DEFAULT_PAYMENT_MODE_GIRO } from '@/utils/constants'
 import { roundToPrecision } from '@/utils/codes'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({})
 @connect(({ statement, user }) => ({
@@ -145,10 +147,6 @@ const styles = () => ({})
   },
 })
 class StatementDetails extends PureComponent {
-  state = {
-    type: '',
-  }
-
   componentDidMount = () => {
     const { statement, dispatch, history } = this.props
     if (statement.currentId) {
@@ -158,11 +156,73 @@ class StatementDetails extends PureComponent {
           id: statement.currentId,
         },
       }).then((v) => {
-        if (v) this.setState({ type: v.adminChargeValueType })
+        if (v) {
+          this.fetchLatestBizSessions()
+        }
       })
     } else {
       history.push('/finance/statement/')
     }
+  }
+
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (status === '200' && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        let paymentDate = moment(
+          sessionData[0].sessionStartDate,
+          serverDateFormat,
+        )
+
+        this.getBizList(paymentDate.format(serverDateFormat))
+      } else {
+        setFieldValue('paymentDate', null)
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+      }
+    })
+  }
+
+  getBizList = (date) => {
+    const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date, serverDateFormat)
+
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
+    dispatch({
+      type: 'statement/bizSessionList',
+      payload: {
+        pagesize: 999,
+        lgteql_SessionStartDate: startDateTime,
+        lsteql_SessionStartDate: endDateTime,
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
+      },
+    }).then(() => {
+      const { bizSessionList } = this.props.statement
+      if (bizSessionList) {
+        setFieldValue('paymentDate', startDateTime)
+        setFieldValue(
+          'paymentCreatedBizSessionFK',
+          !bizSessionList || bizSessionList.length === 0
+            ? undefined
+            : bizSessionList[0].value,
+        )
+      }
+    })
   }
 
   render () {
@@ -175,7 +235,11 @@ class StatementDetails extends PureComponent {
           <Tabs
             style={{ marginTop: 20 }}
             defaultActiveKey='0'
-            options={StatementDetailOption(this.props, this.state.type)}
+            options={StatementDetailOption(
+              this.props,
+              this.fetchLatestBizSessions,
+              this.getBizList,
+            )}
           />
         </Paper>
       </React.Fragment>

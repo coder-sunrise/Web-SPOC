@@ -228,8 +228,9 @@ class Grid extends PureComponent {
       dispatch({
         type: 'purchaseOrderDetails/upsertRow',
         payload: {
-          purchaseOrder: values,
+          purchaseOrder: values.purchaseOrder,
           rows,
+          purchaseOrderAdjustment: values.purchaseOrderAdjustment,
         },
       })
     }
@@ -275,7 +276,7 @@ class Grid extends PureComponent {
       )
       return row.uid ? currentOptions : activeOptions
     }
-    if (row.type === 2) {
+    if (row.type === 3) {
       const filteredOptions = getUnusedItem('VaccinationItemList')
       const activeOptions = filterActiveCode(filteredOptions)
       const currentOptions = getCurrentOptions(
@@ -284,7 +285,7 @@ class Grid extends PureComponent {
       )
       return row.uid ? currentOptions : activeOptions
     }
-    if (row.type === 3) {
+    if (row.type === 2) {
       const filteredOptions = getUnusedItem('ConsumableItemList')
       const activeOptions = filterActiveCode(filteredOptions)
       const currentOptions = getCurrentOptions(
@@ -326,7 +327,7 @@ class Grid extends PureComponent {
         { name: 'type', title: 'Type' },
         { name: 'code', title: 'Code' },
         { name: 'name', title: 'Name' },
-        { name: 'unitOfMeasurement', title: 'UOM' },
+        { name: 'uom', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
         { name: 'bonusReceived', title: 'Bonus Qty' },
         { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
@@ -447,7 +448,7 @@ class Grid extends PureComponent {
               showAddCommand: isEditable,
               showEditCommand: isEditable,
               showDeleteCommand: isEditable,
-              onCommitChanges: this.onCommitChanges(values.purchaseOrder),
+              onCommitChanges: this.onCommitChanges(values),
               onAddedRowsChange: this.onAddedRowsChange,
             }}
             {...tableParas}

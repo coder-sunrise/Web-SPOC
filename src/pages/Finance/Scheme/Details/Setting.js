@@ -1,7 +1,8 @@
 import React from 'react'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
-import ItemList from './ItemList'
+// import ItemList from './ItemList'
+import ItemList from './new_ItemList'
 
 import {
   Field,
@@ -18,6 +19,7 @@ const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
+
   return (
     <Switch
       checkedChildren='$'

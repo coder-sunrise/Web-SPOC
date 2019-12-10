@@ -23,7 +23,7 @@ import { calculateAmount } from '@/utils/utils'
 
 const amountProps = {
   noUnderline: true,
-  // currency: true,
+  currency: true,
   rightAlign: true,
   text: true,
   fullWidth: true,
@@ -149,7 +149,7 @@ class AmountSummary extends PureComponent {
   }
 
   render () {
-    const { theme, showAdjustment, classes, config = {} } = this.props
+    const { theme, showAddAdjustment = true, classes, config = {} } = this.props
     const { summary, adjustments } = this.state
     if (!summary) return null
     // console.log(summary, config)
@@ -164,7 +164,7 @@ class AmountSummary extends PureComponent {
       // calcPurchaseOrderSummary,
       toggleInvoiceAdjustment,
     } = this.props
-    const { gstValue } = config
+    const { gstValue, visitPurposeFK } = config
     // const { purchaseOrder } = values
     // const { IsGSTEnabled } = purchaseOrder || false
     // console.log({ props: this.props, summary })
@@ -189,16 +189,15 @@ class AmountSummary extends PureComponent {
             <NumberInput {...amountProps} value={subTotal} />
           </GridItem>
         </GridContainer>
+
         <GridContainer style={{ marginBottom: 4 }}>
-          {showAdjustment === false ? (
-            ''
-          ) : (
-            <GridItem xs={12}>
-              <span>
-                {formatMessage({
-                  id: 'inventory.pr.detail.pod.summary.adjustment',
-                })}
-              </span>
+          <GridItem xs={12}>
+            <span>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.summary.adjustment',
+              })}
+            </span>
+            {showAddAdjustment && (
               <Button
                 color='primary'
                 size='sm'
@@ -208,9 +207,10 @@ class AmountSummary extends PureComponent {
               >
                 <Add />
               </Button>
-            </GridItem>
-          )}
+            )}
+          </GridItem>
         </GridContainer>
+
         {adjustments.map((v, i) => {
           if (!v.isDeleted) {
             return (

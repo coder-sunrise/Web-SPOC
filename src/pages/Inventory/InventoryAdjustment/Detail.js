@@ -149,7 +149,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         if (o.isManuallyCreated) {
           return {
             ...shareProperty,
-            stock: o.stock,
+            stock: o.stock + o.adjustmentQty,
           }
         }
         if (values.inventoryAdjustmentStatusFK === 1) return undefined
@@ -159,7 +159,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         }
         return {
           ...shareProperty,
-          stock: o.stock,
+          stock: o.stock + o.adjustmentQty,
         }
       }
 
@@ -192,7 +192,10 @@ const inventoryAdjustmentSchema = Yup.object().shape({
               o.codeString || o[getType.typeName][getType.codeName],
             [getType.nameName]:
               o.displayValueString || o[getType.typeName][getType.nameName],
-            [getType.stock]: getStockObject(),
+            [getType.stock]:
+              values.inventoryAdjustmentStatusFK === 1
+                ? undefined
+                : getStockObject(),
           },
         }
       }
@@ -215,7 +218,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       //   },
       // }
     })
-    // console.log('submit123', newInventoryAdjustmentItem)
     dispatch({
       type: 'inventoryAdjustment/upsert',
       payload: {
@@ -639,7 +641,7 @@ class Detail extends PureComponent {
           row.stock = stock
           row.stockFK = id
           row.stockId = id
-          row.isManuallyCreated = true
+          row.isManuallyCreated = false
           row.concurrencyToken = concurrencyToken
         } else {
           row.stockFK = undefined

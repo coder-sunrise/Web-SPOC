@@ -13,6 +13,7 @@ import {
   NumberInput,
   CommonTableGrid,
   EditableTableGrid,
+  TextField,
 } from '@/components'
 // sub components
 import MaxCapInfo from '../components/MaxCapInfo'
@@ -21,7 +22,7 @@ import {
   SchemeInvoicePayerColumn,
   CompanyInvoicePayerColumn,
   ApplyClaimsColumnExtension,
-  ApplyClaimsCopayerColumnExtension,
+  // ApplyClaimsCopayerColumnExtension,
 } from '../variables'
 
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
@@ -120,19 +121,8 @@ const Scheme = ({
     },
   ]
 
-  // console.log({
-  //   _key,
-  //   _isConfirmed,
-  //   _isEditing,
-  //   name,
-  //   columnExtensions,
-  //   grid: window.$tempGridRow,
-  //   // invoicePayer,
-  //   // columnExtensions,
-  //   // data: invoicePayer.invoicePayerItem,
-  //   // _hasError,
-  // })
   const showGrid = companyFK || !_.isEmpty(schemeConfig)
+
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='center'>
@@ -163,12 +153,15 @@ const Scheme = ({
         schemeConfig.copayerFK === 1 && (
           <GridItem md={2}>
             <div>
-              {!schemeConfig.balance ? (
-                <span className={classes.dangerText}>Insufficient balance</span>
+              {schemeConfig.balanceStatusCode.toUpperCase() === 'SC105' ? (
+                <TextField text prefix='Balance:' value='Full Balance' />
               ) : (
-                <span className={classes.currencyText}>
-                  Balance: ${schemeConfig.balance}
-                </span>
+                <NumberInput
+                  currency
+                  text
+                  prefix='Balance:'
+                  value={schemeConfig.balance}
+                />
               )}
             </div>
           </GridItem>

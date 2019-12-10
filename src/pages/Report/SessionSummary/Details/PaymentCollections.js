@@ -22,32 +22,41 @@ const PaymentCollections = ({
   let listData = []
   if (PaymentCollectionsDetails) {
     let paymentCount = 0
+    let payerCount = 0
     for (let i = PaymentCollectionsDetails.length - 1; i >= 0; i--) {
-      const item = PaymentCollectionsDetails[i]
+      let item = PaymentCollectionsDetails[i]
+      item.id = `${item.invoiceNo}-${item.receiptNo}`
       paymentCount += 1
-      if (
-        i === 0 ||
-        PaymentCollectionsDetails[i - 1].invoiceNo !== item.invoiceNo || PaymentCollectionsDetails[i - 1].payerName !== item.payerName
-      ) {
-        listData.splice(0, 0, {
-          ...item,
-          id: `${item.invoiceNo}-${item.receiptNo}`,
-          countNumber: 1,
-          rowspan: paymentCount,
-        })
-        paymentCount = 0
+      payerCount += 1
+      if (i === 0) {
+        item.countNumber = 1
+        item.rowspan = paymentCount
+        item.payerCountNumber = 1
+        item.payerRowspan = payerCount
+      } else if (PaymentCollectionsDetails[i - 1].invoiceNo === item.invoiceNo) {
+        item.countNumber = 0
+        item.rowspan = 0
+        if (PaymentCollectionsDetails[i - 1].payerName !== item.payerName) {
+          item.payerCountNumber = 1
+          item.payerRowspan = payerCount
+          payerCount = 0
+        } else {
+          item.payerCountNumber = 0
+          item.payerRowspan = 0
+        }
       } else {
-        listData.splice(0, 0, {
-          ...item,
-          id: `${item.invoiceNo}-${item.receiptNo}`,
-          countNumber: 0,
-          rowspan: 0,
-        })
+        item.countNumber = 1
+        item.rowspan = paymentCount
+        item.payerCountNumber = 1
+        item.payerRowspan = payerCount
+        payerCount = 0
+        paymentCount = 0
       }
+      listData.splice(0, 0, item)
     }
   }
 
-  const PaymentCollectionsColumns = [
+  let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: 'Invoice No.' },
     { name: 'totalAftAdj', title: 'Total Amount' },
     { name: 'gstAmt', title: 'GST' },
@@ -56,43 +65,58 @@ const PaymentCollections = ({
     { name: 'totalAmtPaid', title: 'payment' },
   ]
 
-  const PaymentCollectionsColumnExtension = [
+  let PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
-    { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
     { columnName: 'totalAftAdj', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
     { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
     { columnName: 'totalAmtPaid', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]
+  let totalItems = [
+    { columnName: 'totalAftAdj', type: 'totalAftAdj' },
+    { columnName: 'gstAmt', type: 'gstAmt' },
+    { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
+  ]
+  if (!TotalDetails[0].isDisplayGST) {
+    PaymentCollectionsColumns.splice(2, 1)
+    PaymentCollectionsColumnExtension.splice(2, 1)
+    totalItems.splice(1, 1)
+  }
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
+    let newchildren = []
     if (row.countNumber === 1) {
-      const newchildren = children.map(
-        (item, index) =>
-          index < 4
-            ? {
-              ...item,
-              props: {
-                ...item.props,
-                rowSpan: row.rowspan,
-              },
-            }
-            : item,
-      )
-      return <Table.Row {...p}>{newchildren}</Table.Row>
+      newchildren.push(children.filter((value, index) => index < 3).map(
+        (item) => ({
+          ...item,
+          props: {
+            ...item.props,
+            rowSpan: row.rowspan,
+          },
+        })
+      ))
     }
-    return <Table.Row className={classes.subRow}>{[children[4], children[5]]} </Table.Row>
+    if (row.payerCountNumber === 1) {
+      newchildren.push(children.filter((value, index) => index === 3).map(
+        (item) => ({
+          ...item,
+          props: {
+            ...item.props,
+            rowSpan: row.payerRowspan,
+          },
+        })
+      ))
+    }
+    newchildren.push([children[4], children[5]])
+    return <Table.Row className={classes.subRow}>{newchildren}</Table.Row>
   }
   const FuncProps = {
     pager: false,
     summary: true,
     summaryConfig: {
       state: {
-        totalItems: [
-          { columnName: 'totalAftAdj', type: 'totalAftAdj' },
-          { columnName: 'gstAmt', type: 'gstAmt' },
-          { columnName: 'totalAmtPaid', type: 'totalAmtPaid' },
-        ],
+        totalItems,
       },
       integrated: {
         calculator: (type, rows, getValue) => {

@@ -626,7 +626,7 @@ export const updateCellValue = (
       return []
       // row._$error = false
     } catch (er) {
-      console.log(er)
+      // console.log(er)
       // window.g_app._store.dispatch({
       //   type: 'global/updateState',
       //   payload: {
@@ -906,6 +906,10 @@ const calculateAmount = (
   rows,
   adjustments,
   {
+    itemFkField = 'invoiceItemFK',
+    itemAdjustmentFkField = 'invoiceAdjustmentFK',
+    invoiceItemAdjustmentField = 'invoiceItemAdjustment',
+    adjAmountField = 'adjAmt',
     totalField = 'totalAfterItemAdjustment',
     adjustedField = 'totalAfterOverallAdjustment',
     gstField = 'totalAfterGST',
@@ -1003,10 +1007,23 @@ const calculateAmount = (
       r[gstField] = r[adjustedField]
     })
   }
-  // console.log(activeRows, adjustments)
+  // console.log({ activeRows, adjustments })
+  const mapInvoiceItemAdjustment = (adjustment) => (invoiceItem) => {
+    return {
+      [itemFkField]: invoiceItem.id,
+      [itemAdjustmentFkField]: adjustment.id,
+      adjAmount: invoiceItem[adjAmountField],
+      isDeleted: !!adjustment.isDeleted,
+    }
+  }
+
   const r = {
     rows,
-    adjustments: adjustments.map((o, index) => ({ ...o, index })),
+    adjustments: adjustments.map((o, index) => ({
+      ...o,
+      index,
+      [invoiceItemAdjustmentField]: activeRows.map(mapInvoiceItemAdjustment(o)),
+    })),
     summary: {
       subTotal: roundTo(
         rows.map((row) => row[totalField]).reduce(sumReducer, 0),

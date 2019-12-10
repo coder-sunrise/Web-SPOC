@@ -57,24 +57,22 @@ class Orders extends PureComponent {
     adjustments: [],
   }
 
-  componentDidMount () {
+  componentWillMount () {
     const { dispatch, status } = this.props
 
-    const codeTableNameArray = []
-    codeTableNameArray.push('ctMedicationUsage')
-    codeTableNameArray.push('ctMedicationDosage')
-    codeTableNameArray.push('ctMedicationUnitOfMeasurement')
-    codeTableNameArray.push('ctMedicationFrequency')
-    codeTableNameArray.push('ctVaccinationUsage')
-    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
-
-    codeTableNameArray.forEach((o) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: o,
-        },
-      })
+    const codeTableNameArray = [
+      'ctMedicationUsage',
+      'ctMedicationDosage',
+      'ctMedicationUnitOfMeasurement',
+      'ctMedicationFrequency',
+      'ctVaccinationUsage',
+      'ctVaccinationUnitOfMeasurement',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
     })
   }
 

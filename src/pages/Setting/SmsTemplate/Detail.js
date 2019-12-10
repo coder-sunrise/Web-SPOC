@@ -59,7 +59,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, settingSmsTemplate } = props
+    const { theme, footer, settingSmsTemplate, height } = props
 
     return (
       <React.Fragment>
@@ -102,13 +102,17 @@ class Detail extends PureComponent {
               <Field
                 name='templateMessage'
                 render={(args) => {
+                  const cfg = {}
+                  if (height && height > 538) {
+                    cfg.height = height - 330
+                  }
                   return (
                     <RichEditor
                       toolbarHidden={() => true}
                       // handlePastedText={() => false}
                       label='Template Message'
                       tagList={tagList}
-                      height={450}
+                      {...cfg}
                       onBlur={(html, text) => {
                         this.props.setFieldValue('templateMessage', text)
                       }}

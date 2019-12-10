@@ -621,15 +621,15 @@ const currencyRoundingToTheClosestList = [
 const currenciesList = [
   {
     value: 'Singapore',
-    name: 'S$',
+    name: 'Singapore (S$)',
   },
   {
     value: 'United States',
-    name: '$',
+    name: 'US Dollar ($)',
   },
   {
     value: 'Malaysia',
-    name: 'RM',
+    name: 'Malaysia Ringgit (MYR)',
   },
 ]
 
@@ -1336,17 +1336,6 @@ export const podoOrderType = [
   },
   {
     value: 2,
-    name: 'Vaccination',
-    prop: 'purchaseOrderVaccinationItem',
-    itemFKName: 'inventoryVaccinationFK',
-    ctName: 'inventoryvaccination',
-    stateName: 'VaccinationItemList',
-    itemCode: 'inventoryVaccinationCode',
-    itemName: 'inventoryVaccinationName',
-    stockName: 'vaccinationStock',
-  },
-  {
-    value: 3,
     name: 'Consumable',
     prop: 'purchaseOrderConsumableItem',
     itemFKName: 'inventoryConsumableFK',
@@ -1355,6 +1344,17 @@ export const podoOrderType = [
     itemCode: 'inventoryConsumableCode',
     itemName: 'inventoryConsumableName',
     stockName: 'consumableStock',
+  },
+  {
+    value: 3,
+    name: 'Vaccination',
+    prop: 'purchaseOrderVaccinationItem',
+    itemFKName: 'inventoryVaccinationFK',
+    ctName: 'inventoryvaccination',
+    stateName: 'VaccinationItemList',
+    itemCode: 'inventoryVaccinationCode',
+    itemName: 'inventoryVaccinationName',
+    stockName: 'vaccinationStock',
   },
 ]
 

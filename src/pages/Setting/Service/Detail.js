@@ -14,6 +14,7 @@ import {
   EditableTableGrid,
   CodeSelect,
   withFormikExtend,
+  notification,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -154,20 +155,19 @@ class Detail extends PureComponent {
     columnExtensions: [
       {
         columnName: 'serviceCenterFK',
-        // type: 'select',
-        // labelField: 'name',
-        // valueField: 'id',
-        // options: ctservicecenter,
-
         type: 'codeSelect',
         code: 'ctServiceCenter',
-        // localFilter: (opt) => {
-        //   const selectedServiceCenter = this.state.serviceSettings
-        //     .filter((item) => !item.isDeleted)
-        //     .map((item) => item.serviceCenterFK)
-
-        //   return !selectedServiceCenter.includes(opt.id)
-        // },
+        onChange: ({ val, row }) => {
+          const { serviceSettings } = this.state
+          const rs = serviceSettings.filter(
+            (o) => !o.isDeleted && o.serviceCenterFK === val && o.id !== row.id,
+          )
+          if (rs.length > 0) {
+            notification.error({
+              message: 'The service center already exist in the list',
+            })
+          }
+        },
       },
       { columnName: 'costPrice', type: 'number', currency: true },
       { columnName: 'unitPrice', type: 'number', currency: true },
@@ -204,14 +204,6 @@ class Detail extends PureComponent {
 
   componentDidMount () {
     this.checkHasActiveSession()
-    // let commitCount = 1000 // uniqueNumber
-    // this.props.dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   checkHasActiveSession = async () => {
@@ -250,44 +242,57 @@ class Detail extends PureComponent {
     }))
   }
 
-  checkIsServiceCenterUnique = (row) => {
-    console.log({ row })
+  checkIsServiceCenterUnique = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const obj = changed[key]
+    if (obj.serviceCenterFK !== undefined) {
+      const hasDuplicate = rows.filter(
+        (i) => !i.isDeleted && i.serviceCenterFK === obj.serviceCenterFK,
+      )
+      if (hasDuplicate.length >= 2) {
+        return rows.map(
+          (row) =>
+            row.id === parseInt(key, 10)
+              ? { ...row, serviceCenterFK: undefined }
+              : row,
+        )
+      }
+    }
+    return rows
   }
 
-  commitChanges = ({ rows, added, changed, deleted }) => {
-    if (this.checkIsServiceCenterUnique(rows)) return rows
-
+  commitChanges = ({ rows, changed }) => {
+    const _rows = this.checkIsServiceCenterUnique({ rows, changed })
     const { setFieldValue, values } = this.props
 
-    rows.forEach((val, i) => {
+    _rows.forEach((val, i) => {
       val.serviceFK = values.id
       val.serviceCenterFKNavigation = null
     })
 
-    const isDefaultExists = rows.find(
+    const isDefaultExists = _rows.find(
       (o) =>
         (o.isDefault === true && o.isDeleted === undefined) ||
         (o.isDeleted === false && o.isDefault === true),
     )
-    // console.log({ isDefaultExists })
     if (!isDefaultExists) {
-      const getRow = rows.find(
+      const getRow = _rows.find(
         (o) =>
           (o.isDeleted === undefined || o.isDeleted === false) && !o.isDefault,
       )
-      // console.log({ getRow })
       if (getRow) {
         getRow.isDefault = true
       }
     }
 
-    setFieldValue('ctServiceCenter_ServiceNavigation', rows)
+    setFieldValue('ctServiceCenter_ServiceNavigation', _rows)
     this.setState(() => {
       return {
-        serviceSettings: rows,
+        serviceSettings: _rows,
       }
     })
-    return rows
+    return _rows
   }
 
   handleAutoOrder = (e) => {
@@ -296,7 +301,6 @@ class Detail extends PureComponent {
       const checkDefaultExist = serviceSettings.find(
         (o) => o.isDefault === true,
       )
-      // console.log({ checkDefaultExist })
       if (!checkDefaultExist && serviceSettings.length > 0) {
         serviceSettings[0].isDefault = true
       }
@@ -351,11 +355,11 @@ class Detail extends PureComponent {
       classes,
       theme,
       footer,
-      values,
+
       settingClinicService,
       errors,
     } = props
-    const { hasActiveSession } = this.state
+    const { serviceSettings } = this.state
     const medisaveSettingValue = {
       MedisaveHealthScreeningValue: [
         { value: 1, name: 'Mammogram' },
@@ -367,6 +371,9 @@ class Detail extends PureComponent {
       ],
     }
     const serviceSettingsErrMsg = errors.ctServiceCenter_ServiceNavigation
+    const shoudDisableSaveButton =
+      serviceSettings.filter((row) => !row.isDeleted).length === 0
+
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -590,7 +597,7 @@ class Detail extends PureComponent {
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
-              disabled: false,
+              disabled: shoudDisableSaveButton,
             },
           })}
       </React.Fragment>

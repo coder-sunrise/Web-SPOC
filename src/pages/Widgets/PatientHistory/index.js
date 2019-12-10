@@ -1,62 +1,30 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
-import moment from 'moment'
-import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
 import router from 'umi/router'
 import Loadable from 'react-loadable'
 import classnames from 'classnames'
+// material ui
+import { withStyles, List, ListItem, ListItemText } from '@material-ui/core'
+// common components
 import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-} from '@material-ui/core'
-import { standardRowHeight, border } from 'assets/jss'
-import DeleteIcon from '@material-ui/icons/Delete'
-import {
-  Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
   TextField,
-  notification,
   Select,
-  CodeSelect,
   DatePicker,
-  RadioGroup,
   ProgressButton,
   CardContainer,
-  confirm,
   Accordion,
   withFormikExtend,
   Skeleton,
 } from '@/components'
 import Loading from '@/components/PageLoading/index'
-import Yup from '@/utils/yup'
-import { findGetParameter } from '@/utils/utils'
-
-import Orders from './Orders'
-import ConsultationDocument from './ConsultationDocument'
-import ResultHistory from './ResultHistory'
-import Invoice from './Invoice'
 import AuthorizedContext from '@/components/Context/Authorized'
+// utils
+import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
-// import ChiefComplaints from './ChiefComplaints'
-// import ChiefComplaints from './ChiefComplaints'
 
 import model from './models'
 
@@ -266,31 +234,22 @@ class PatientHistory extends Component {
     ]
   }
 
-  componentDidMount () {
+  componentWillMount () {
     const { dispatch, mode } = this.props
-    // dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: {
-    //     code: 'ctComplication',
-    //   },
-    // })
-
-    const codeTableNameArray = []
-    codeTableNameArray.push('ctComplication')
-    codeTableNameArray.push('ctMedicationUsage')
-    codeTableNameArray.push('ctMedicationDosage')
-    codeTableNameArray.push('ctMedicationUnitOfMeasurement')
-    codeTableNameArray.push('ctMedicationFrequency')
-    codeTableNameArray.push('ctVaccinationUsage')
-    codeTableNameArray.push('ctVaccinationUnitOfMeasurement')
-
-    codeTableNameArray.forEach((o) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: o,
-        },
-      })
+    const codeTableNameArray = [
+      'ctComplication',
+      'ctMedicationUsage',
+      'ctMedicationDosage',
+      'ctMedicationUnitOfMeasurement',
+      'ctMedicationFrequency',
+      'ctVaccinationUsage',
+      'ctVaccinationUnitOfMeasurement',
+    ]
+    dispatch({
+      type: 'codetable/batchFetch',
+      payload: {
+        codes: codeTableNameArray,
+      },
     })
 
     dispatch({
@@ -510,6 +469,7 @@ class PatientHistory extends Component {
       user,
     } = this.props
     const { entity, selected, patientID } = patientHistory
+    const { id: visitId } = selected
     const { visitPurposeFK } = selected
     const maxItemTagCount = this.state.selectedItems.length <= 1 ? 1 : 0
     // console.log({ maxItemTagCount, selected: this.state.selectedItems })
@@ -595,7 +555,7 @@ class PatientHistory extends Component {
                                       type: 'patient/closePatientModal',
                                     })
                                     router.push(
-                                      `/reception/queue/consultation?pid=${patientID}&cid=${c.id}&v=${version}`,
+                                      `/reception/queue/consultation?qid=${visitId}&pid=${patientID}&cid=${c.id}&v=${version}`,
                                     )
                                   })
                                 },
@@ -606,7 +566,7 @@ class PatientHistory extends Component {
                               type: 'patient/closePatientModal',
                             })
                             router.push(
-                              `/reception/queue/consultation?pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
+                              `/reception/queue/consultation?qid=${visitId}&pid=${patientID}&cid=${o.id}&v=${patientHistory.version}`,
                             )
                           }
                         }

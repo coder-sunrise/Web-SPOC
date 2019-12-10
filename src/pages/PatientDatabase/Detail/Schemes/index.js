@@ -21,7 +21,7 @@ class Schemes extends PureComponent {
       theme,
       ...restProps
     } = this.props
-    console.log({ schema: schema.patientScheme })
+
     return (
       <div>
         <h4>Schemes</h4>

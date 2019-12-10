@@ -1,21 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
+import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
-import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import FilterList from '@material-ui/icons/FilterList'
-import moment from 'moment'
 import {
-  Button,
-  GridContainer,
-  GridItem,
-  TextField,
-  CodeSelect,
-  DatePicker,
-  Checkbox,
-  Popover,
-  Tooltip,
   Select,
   ButtonSelect,
 } from '@/components'
@@ -54,6 +42,27 @@ const DiagnosisSelect = ({
   onDataSouceChange,
   ...props
 }) => {
+  let selectProps = props
+  const initMaxTagCount =
+    props.field &&
+      props.field.value &&
+      props.field.value.length === 1
+      ? 1
+      : 0
+  const [
+    maxTagCount,
+    setMaxTagCount,
+  ] = useState(props.maxTagCount !== undefined
+    ? props.maxTagCount
+    : initMaxTagCount)
+  if (
+    props.maxTagCount === undefined &&
+    props.mode &&
+    props.mode === 'multiple'
+  ) {
+    selectProps = { ...props, maxTagCount }
+  }
+
   const [
     ctDiagnosis,
     setCtDiagnosis,
@@ -100,6 +109,7 @@ const DiagnosisSelect = ({
 
     return response
   }
+
   return (
     <div style={{ position: 'relative' }}>
       <Select
@@ -129,7 +139,19 @@ const DiagnosisSelect = ({
           setCtDiagnosis(data)
           if (onDataSouceChange) onDataSouceChange(data)
         }}
-        {...props}
+        onChange={(values, opts) => {
+          if (
+            props.maxTagCount === undefined &&
+            props.mode &&
+            props.mode === 'multiple'
+          ) {
+            setMaxTagCount(values && values.length === 1 ? 1 : 0)
+          }
+          if (props.onChange) {
+            props.onChange(values, opts)
+          }
+        }}
+        {...selectProps}
       />
 
       <ButtonSelect

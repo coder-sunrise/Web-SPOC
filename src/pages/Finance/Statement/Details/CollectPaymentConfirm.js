@@ -6,6 +6,7 @@ import { withStyles } from '@material-ui/core'
 import {
   GridContainer,
   GridItem,
+  CardContainer,
   NumberInput,
   CommonTableGrid,
   TextField,
@@ -101,6 +102,15 @@ class CollectPaymentConfirm extends PureComponent {
     ],
   }
 
+  componentDidMount () {
+    this.resize()
+    window.addEventListener('resize', this.resize.bind(this))
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.resize.bind(this))
+  }
+
   handlePaymentAmount = (e, from) => {
     const { setFieldValue, statement, values, setValues } = this.props
     const { statementInvoice } = statement.entity
@@ -112,10 +122,17 @@ class CollectPaymentConfirm extends PureComponent {
       if (matches) {
         edittedIndex = parseInt(matches[1], 10)
       }
-      const totalAmountPaid = _.sumBy(
-        values.statementInvoice,
-        'tempOutstandingAmount',
-      )
+
+      let totalAmountPaid = 0
+      for (let index = 0; index < values.statementInvoice.length; index++) {
+        if (index === edittedIndex) {
+          totalAmountPaid = (totalAmountPaid || 0) + (value === '' ? 0 : value)
+        } else {
+          totalAmountPaid =
+            (totalAmountPaid || 0) +
+            (values.statementInvoice[index].tempOutstandingAmount || 0)
+        }
+      }
 
       const currentStatement = values.statementInvoice[edittedIndex]
       const currentPayment = currentStatement.statementInvoicePayment.find(
@@ -171,39 +188,7 @@ class CollectPaymentConfirm extends PureComponent {
 
   onChangeDate = (event) => {
     // const selectedDate = moment(event).format('YYMMDD')
-    this.getBizList(event)
-  }
-
-  getBizList = (date) => {
-    const { dispatch, setFieldValue } = this.props
-    const momentDate = moment(date, serverDateFormat)
-
-    const startDateTime = moment(
-      momentDate.set({ hour: 0, minute: 0, second: 0 }),
-    ).formatUTC(false)
-    const endDateTime = moment(
-      momentDate.set({ hour: 23, minute: 59, second: 59 }),
-    ).formatUTC(false)
-
-    dispatch({
-      type: 'statement/bizSessionList',
-      payload: {
-        pagesize: 999,
-        lgteql_SessionStartDate: startDateTime,
-        lsteql_SessionCloseDate: endDateTime,
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
-      },
-    }).then(() => {
-      const { bizSessionList } = this.props.statement
-      setFieldValue(
-        'paymentCreatedBizSessionFK',
-        bizSessionList.length === 0 || bizSessionList === undefined
-          ? undefined
-          : bizSessionList[0].value, // bizSessionList.slice(-1)[0].value,
-      )
-    })
+    this.props.getBizList(event)
   }
 
   onChangePaymentMode = (event, op) => {
@@ -221,127 +206,152 @@ class CollectPaymentConfirm extends PureComponent {
     setFieldValue('displayValue', displayValue)
   }
 
+  resize () {
+    if (this._container) {
+      const containerHeight = window.document.body.clientHeight - 300
+      this.setState({ containerHeight })
+    }
+  }
+
   render () {
     const { rows, columns, columnExtensions, isCardPayment } = this.state
     const { values, statement, handleSubmit } = this.props
     const { bizSessionList } = statement
     return (
-      <React.Fragment>
-        <CommonTableGrid
-          rows={values.statementInvoice}
-          columns={columns}
-          columnExtensions={columnExtensions}
-          FuncProps={{ pager: false }}
-        />
-
-        <GridContainer style={{ marginTop: 20 }} justify='flex-end'>
-          <GridItem direction='column' justify='flex-end' md={3}>
+      <GridContainer>
+        <GridItem md={9}>
+          <CardContainer hideHeader justify='flex-end'>
             <GridItem>
-              <FastField
-                name='amount'
-                render={(args) => (
-                  <NumberInput
-                    {...args}
-                    currency
-                    label='Amount'
-                    autoFocus
-                    min={0}
-                    onChange={this.handlePaymentAmount}
-                  />
-                )}
-              />
-            </GridItem>
-
-            <GridItem>
-              <Field
-                name='paymentDate'
-                render={(args) => (
-                  <DatePicker
-                    timeFomat={false}
-                    onChange={this.onChangeDate}
-                    disabledDate={(d) => !d || d.isAfter(moment())}
-                    label='Date'
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-
-            <GridItem>
-              <Field
-                name='paymentCreatedBizSessionFK'
-                render={(args) => (
-                  <Select label='Session' options={bizSessionList} {...args} />
-                )}
-              />
-            </GridItem>
-
-            <GridItem>
-              <Field
-                name='paymentModeFK'
-                render={(args) => (
-                  <CodeSelect
-                    {...args}
-                    label='Payment Mode'
-                    code='ctPaymentMode'
-                    labelField='displayValue'
-                    onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
-                  />
-                )}
-              />
-            </GridItem>
-
-            {isCardPayment && (
-              <React.Fragment>
-                <GridItem>
-                  <Field
-                    name='creditCardTypeFK'
-                    render={(args) => (
-                      <CodeSelect
-                        label='Card Type'
-                        code='ctCreditCardType'
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-                <GridItem>
-                  <Field
-                    name='cardNumber'
-                    render={(args) => (
-                      <NumberInput
-                        label='Card Number'
-                        inputProps={{ maxLength: 4 }}
-                        maxLength={4}
-                        {...args}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </React.Fragment>
-            )}
-
-            <GridItem>
-              <FastField
-                name='remarks'
-                render={(args) => (
-                  <TextField {...args} multiline label='Remarks' />
-                )}
-              />
-            </GridItem>
-
-            <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
-              <ProgressButton
-                color='primary'
-                onClick={handleSubmit}
-                disabled={values.amount <= 0}
+              <div
+                style={{ height: this.state.containerHeight, overflow: 'auto' }}
+                ref={(c) => {
+                  this._container = c
+                }}
               >
-                Confirm Payment
-              </ProgressButton>
+                <CommonTableGrid
+                  rows={values.statementInvoice}
+                  columns={columns}
+                  columnExtensions={columnExtensions}
+                  FuncProps={{ pager: false }}
+                />
+              </div>
             </GridItem>
-          </GridItem>
-        </GridContainer>
-      </React.Fragment>
+          </CardContainer>
+        </GridItem>
+        <GridItem md={3}>
+          <CardContainer hideHeader>
+            <GridItem>
+              <GridItem>
+                <FastField
+                  name='amount'
+                  render={(args) => (
+                    <NumberInput
+                      {...args}
+                      currency
+                      label='Amount'
+                      autoFocus
+                      min={0}
+                      onChange={this.handlePaymentAmount}
+                    />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem>
+                <Field
+                  name='paymentDate'
+                  render={(args) => (
+                    <DatePicker
+                      timeFomat={false}
+                      onChange={this.onChangeDate}
+                      disabledDate={(d) => !d || d.isAfter(moment())}
+                      label='Date'
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem>
+                <Field
+                  name='paymentCreatedBizSessionFK'
+                  render={(args) => (
+                    <Select
+                      label='Session'
+                      options={bizSessionList}
+                      {...args}
+                    />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem>
+                <Field
+                  name='paymentModeFK'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      label='Payment Mode'
+                      code='ctPaymentMode'
+                      labelField='displayValue'
+                      onChange={(e, op = {}) => this.onChangePaymentMode(e, op)}
+                    />
+                  )}
+                />
+              </GridItem>
+
+              {isCardPayment && (
+                <React.Fragment>
+                  <GridItem>
+                    <Field
+                      name='creditCardTypeFK'
+                      render={(args) => (
+                        <CodeSelect
+                          label='Card Type'
+                          code='ctCreditCardType'
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                  <GridItem>
+                    <Field
+                      name='cardNumber'
+                      render={(args) => (
+                        <NumberInput
+                          label='Card Number'
+                          inputProps={{ maxLength: 4 }}
+                          maxLength={4}
+                          {...args}
+                        />
+                      )}
+                    />
+                  </GridItem>
+                </React.Fragment>
+              )}
+
+              <GridItem>
+                <FastField
+                  name='remarks'
+                  render={(args) => (
+                    <TextField {...args} multiline label='Remarks' />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem style={{ float: 'right', padding: 0, marginTop: 10 }}>
+                <ProgressButton
+                  color='primary'
+                  onClick={handleSubmit}
+                  disabled={values.amount <= 0}
+                >
+                  Confirm Payment
+                </ProgressButton>
+              </GridItem>
+            </GridItem>
+          </CardContainer>
+        </GridItem>
+      </GridContainer>
     )
   }
 }

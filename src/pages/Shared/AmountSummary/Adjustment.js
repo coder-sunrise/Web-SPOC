@@ -15,6 +15,7 @@ const Adjustment = ({
   adjustments,
   dispatch,
   adjAmount,
+  adjValue,
   adjRemark,
   onDelete,
   amountProps,
@@ -24,7 +25,7 @@ const Adjustment = ({
   const isExactAmount = type === 'ExactAmount'
   return (
     <GridContainer style={{ margin: '4px 0' }}>
-      <GridItem xs={9}>
+      <GridItem xs={7}>
         <div
           style={{
             width: '90%',
@@ -48,16 +49,19 @@ const Adjustment = ({
             </Tooltip>
           </Popconfirm>
           <Tooltip title={adjRemark}>
-            <span>{adjRemark}</span>
+            <span>
+              {adjRemark}
+              {/* {adjRemark} {!isExactAmount && `(${Math.abs(adjValue)}%)`} */}
+            </span>
           </Tooltip>
         </div>
       </GridItem>
-      <GridItem xs={3}>
+      <GridItem xs={5}>
         <NumberInput
           value={adjAmount}
-          currency={isExactAmount}
-          percentage={!isExactAmount}
           {...amountProps}
+          // currency={isExactAmount}
+          // percentage={!isExactAmount}
         />
       </GridItem>
     </GridContainer>

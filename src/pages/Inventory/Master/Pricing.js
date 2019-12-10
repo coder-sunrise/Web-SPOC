@@ -139,6 +139,7 @@ const Pricing = ({
                     })}
                     onChange={(e) => setAcp(e.target.value)}
                     currency
+                    precision={4}
                     {...args}
                   />
                 )}

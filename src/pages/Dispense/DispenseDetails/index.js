@@ -8,10 +8,17 @@ import Refresh from '@material-ui/icons/Refresh'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
+import AddAlert from '@material-ui/icons/AddAlert'
 // sub components
 import TableData from './TableData'
 // common component
-import { Button, ProgressButton, GridItem, GridContainer } from '@/components'
+import {
+  Button,
+  ProgressButton,
+  GridItem,
+  GridContainer,
+  SizeContainer,
+} from '@/components'
 // variables
 import {
   PrescriptionColumns,
@@ -24,6 +31,7 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import { dangerColor } from '@/assets/jss'
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -52,8 +60,10 @@ const styles = (theme) => ({
     },
   },
   rightActionButtons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     marginTop: theme.spacing(2),
-    textAlign: 'right',
     '& > button:last-child': {
       marginRight: '0px !important',
     },
@@ -86,15 +96,16 @@ const DispenseDetails = ({
       },
     })
   }, [])
-  const { prescription, vaccination, otherOrder, invoice } = values || {
+  const {
+    prescription,
+    vaccination,
+    otherOrder,
+    invoice,
+    visitPurposeFK,
+  } = values || {
     invoice: { invoiceItem: [] },
   }
-  const {
-    invoiceItem = [],
-    invoiceAdjustment = [],
-    visitPurposeFK,
-    totalPayment,
-  } = invoice
+  const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
 
   const { inventorymedication } = codetable
 
@@ -121,35 +132,51 @@ const DispenseDetails = ({
     }
   }
 
+  const discardCallback = (r) => {
+    if (r) {
+      history.push('/reception/queue')
+    }
+  }
+
   const discardAddOrderDetails = () => {
     const { id } = invoice
+    dispatch({
+      type: 'dispense/removeAddOrderDetails',
+      payload: {
+        id,
+      },
+    }).then(discardCallback)
+  }
+
+  const discardBillOrder = () => {
+    const { id } = invoice
+    dispatch({
+      type: 'dispense/discardBillOrder',
+      payload: { id },
+    }).then(discardCallback)
+  }
+
+  const discardDispense = () => {
     dispatch({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
         openConfirmContent: `Are you sure want to discard the dispense ?`,
-        onConfirmSave: () => {
-          dispatch({
-            type: 'dispense/removeAddOrderDetails',
-            payload: {
-              id,
-            },
-          }).then((r) => {
-            if (r) {
-              history.push('/reception/queue')
-            }
-          })
-        },
+        onConfirmSave:
+          visitPurposeFK === VISIT_TYPE.RETAIL
+            ? discardAddOrderDetails
+            : discardBillOrder,
       },
     })
   }
+
   const updateInvoiceData = (v) => {
     const newInvoice = {
       ...values.invoice,
       invoiceTotal: v.summary.total,
       invoiceTotalAftAdj: v.summary.totalAfterAdj,
       invoiceTotalAftGST: v.summary.totalWithGST,
-      outstandingBalance: v.summary.totalWithGST,
+      outstandingBalance: v.summary.totalWithGST - values.invoice.totalPayment,
       invoiceGSTAmt: Math.round(v.summary.gst * 100) / 100,
       invoiceAdjustment: v.adjustments,
       isGSTInclusive: !!v.summary.isGSTInclusive,
@@ -167,16 +194,23 @@ const DispenseDetails = ({
     })
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
-  // console.log({ values })
+  const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
+  const disableRefreshOrder = isBillFirstVisit && !values.clinicalObjectRecordFK
+
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
           !isRetailVisit && (
-            <Button color='info' size='sm' onClick={onReloadClick}>
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
               <Refresh />
-              Refresh
+              Refresh Order
             </Button>
           )}
           <Button
@@ -202,22 +236,38 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            {isRetailVisit && (
+            {/* isBillFirstVisit && (
+              <div
+                style={{
+                  marginRight: 8,
+                  marginTop: 8,
+                  display: 'inline-block',
+                  color: dangerColor,
+                }}
+              >
+                <SizeContainer size='lg'>
+                  <AddAlert />
+                </SizeContainer>
+              </div>
+            ) */}
+            {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'
                 size='sm'
                 icon={<Delete />}
-                onClick={discardAddOrderDetails}
+                onClick={discardDispense}
                 disabled={totalPayment > 0}
               >
                 Discard
               </ProgressButton>
             )}
-            <Authorized authority='queue.dispense.savedispense'>
-              <ProgressButton color='success' size='sm' onClick={onSaveClick}>
-                Save Dispense
-              </ProgressButton>
-            </Authorized>
+            {!isBillFirstVisit && (
+              <Authorized authority='queue.dispense.savedispense'>
+                <ProgressButton color='success' size='sm' onClick={onSaveClick}>
+                  Save Dispense
+                </ProgressButton>
+              </Authorized>
+            )}
             <Authorized authority='queue.dispense.editorder'>
               <ProgressButton
                 color='primary'
@@ -225,7 +275,7 @@ const DispenseDetails = ({
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                {isRetailVisit ? 'Add Order' : 'Edit Order'}
+                {isRetailVisit || isBillFirstVisit ? 'Add Order' : 'Edit Order'}
               </ProgressButton>
             </Authorized>
             <Authorized authority='queue.dispense.makepayment'>
@@ -276,6 +326,7 @@ const DispenseDetails = ({
             <AmountSummary
               rows={invoiceItem}
               adjustments={invoiceAdjustment}
+              showAddAdjustment={!isBillFirstVisit}
               config={{
                 isGSTInclusive: invoice.isGSTInclusive,
                 totalField: 'totalAfterItemAdjustment',

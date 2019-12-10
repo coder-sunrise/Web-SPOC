@@ -62,16 +62,14 @@ const FilterBar = ({ classes, handleSubmit }) => {
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={8}>
+          <GridItem md={4} />
+          <GridItem md={4}>
             <FastField
               name='diagnosisIds'
               render={(args) => (
                 <DiagnosisSelect
                   {...args}
                   mode='multiple'
-                  onChange={(v, op) => {
-                    console.log(v, op)
-                  }}
                 />
               )}
             />

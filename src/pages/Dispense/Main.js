@@ -32,11 +32,12 @@ const calculateInvoiceAmounts = (entity) => {
   let invoiceSummary = {}
   if (output && output.summary) {
     const { summary } = output
+
     invoiceSummary = {
       invoiceTotal: summary.total,
       invoiceTotalAftAdj: summary.totalAfterAdj,
       invoiceTotalAftGST: summary.totalWithGST,
-      outstandingBalance: summary.totalWithGST,
+      outstandingBalance: summary.totalWithGST - obj.invoice.totalPayment,
       invoiceGSTAmt: Math.round(summary.gst * 100) / 100,
     }
   }
@@ -126,24 +127,12 @@ class Main extends Component {
   }
 
   componentDidMount () {
-    const { dispatch, values } = this.props
-    const { otherOrder, prescription } = values
+    const { values } = this.props
+    const { otherOrder = [], prescription = [], visitPurposeFK } = values
 
-    // dispatch({
-    //   type: 'codetable/fetchCodes',
-    //   payload: {
-    //     code: 'inventorymedication',
-    //     force: true,
-    //     temp: true,
-    //   },
-    // })
+    const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
 
-    if (
-      otherOrder &&
-      prescription &&
-      otherOrder.length === 0 &&
-      prescription.length === 0
-    ) {
+    if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
         (prevState) => {
           return {
@@ -154,6 +143,10 @@ class Main extends Component {
           this.openFirstTabAddOrder()
         },
       )
+    }
+
+    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST && isEmptyDispense) {
+      this.editOrder()
     }
   }
 
@@ -166,7 +159,6 @@ class Main extends Component {
         values,
       },
     }).then((response) => {
-      console.log({ response })
       if (response) {
         const parameters = {}
         router.push(getAppendUrl(parameters, '/reception/queue/billing'))
@@ -176,14 +168,22 @@ class Main extends Component {
 
   _editOrder = () => {
     const { dispatch, dispense, values } = this.props
-    const { visitPurposeFK } = values.invoice
-    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+    const { visitPurposeFK } = values
+    const addOrderList = [
+      VISIT_TYPE.RETAIL,
+      VISIT_TYPE.BILL_FIRST,
+    ]
+    const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
+
+    if (shouldShowAddOrderModal) {
       this.handleOrderModal()
-    } else {
+    }
+
+    if (visitPurposeFK !== VISIT_TYPE.RETAIL) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
-          id: dispense.visitID,
+          id: values.id,
           version: dispense.version,
         },
       }).then((o) => {
@@ -191,7 +191,7 @@ class Main extends Component {
           dispatch({
             type: `dispense/updateState`,
             payload: {
-              editingOrder: true,
+              editingOrder: !shouldShowAddOrderModal,
             },
           })
           reloadDispense(this.props)
@@ -201,37 +201,50 @@ class Main extends Component {
   }
 
   editOrder = (e) => {
-    // const { handleSubmit } = this.props
+    const { values } = this.props
+    const { visitPurposeFK } = values
 
-    navigateDirtyCheck({
-      onProceed: this._editOrder,
-      // onConfirm: () => {
-      //   handleSubmit()
-      //   this._editOrder()
-      // },
-    })(e)
+    if (
+      visitPurposeFK === VISIT_TYPE.RETAIL ||
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST
+    ) {
+      this._editOrder()
+    } else {
+      navigateDirtyCheck({
+        onProceed: this._editOrder,
+        // onConfirm: () => {
+        //   handleSubmit()
+        //   this._editOrder()
+        // },
+      })(e)
+    }
   }
 
   openFirstTabAddOrder = () => {
+    const { dispatch, values } = this.props
     if (this.state.showOrderModal) {
-      this.props.dispatch({
+      dispatch({
         type: 'orders/updateState',
         payload: {
           type: '1',
-          visitPurposeFK: 2,
+          visitPurposeFK: values.visitPurposeFK,
         },
       })
     } else {
-      this.props.dispatch({
+      dispatch({
         type: 'orders/updateState',
         payload: {
-          visitPurposeFK: undefined,
+          visitPurposeFK: values.visitPurposeFK,
         },
       })
     }
   }
 
   handleOrderModal = () => {
+    this.props.dispatch({
+      type: 'orders/reset',
+    })
+
     this.setState(
       (prevState) => {
         return {
@@ -244,9 +257,36 @@ class Main extends Component {
     )
   }
 
+  handleReloadClick = () => {
+    reloadDispense(this.props, 'refresh')
+  }
+
+  handleCloseAddOrder = () => {
+    const { dispatch, consultation, values } = this.props
+    const { visitPurposeFK } = values
+
+    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+      dispatch({
+        type: 'consultation/discard',
+        payload: {
+          id: consultation.entity.id,
+        },
+      }).then((response) => {
+        dispatch({
+          type: 'dispense/query',
+          payload: {
+            id: values.id,
+            version: Date.now(),
+          },
+        })
+        if (response) this.handleOrderModal()
+      })
+    }
+  }
+
   render () {
-    const { classes, handleSubmit } = this.props
-    console.log({ values: this.props.values })
+    const { classes, handleSubmit, values } = this.props
+
     return (
       <div className={classes.root}>
         <DispenseDetails
@@ -254,18 +294,18 @@ class Main extends Component {
           onSaveClick={handleSubmit}
           onEditOrderClick={this.editOrder}
           onFinalizeClick={this.makePayment}
-          onReloadClick={() => {
-            reloadDispense(this.props, 'refresh')
-          }}
+          onReloadClick={this.handleReloadClick}
         />
         <CommonModal
           title='Orders'
           open={this.state.showOrderModal}
-          onClose={this.handleOrderModal}
+          onClose={this.handleCloseAddOrder}
+          onConfirm={this.handleOrderModal}
           maxWidth='md'
           observe='OrderPage'
         >
           <AddOrder
+            visitType={values.visitPurposeFK}
             onReloadClick={() => {
               reloadDispense(this.props)
             }}

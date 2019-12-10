@@ -57,7 +57,21 @@ class SchemesGrid extends PureComponent {
           columnName: 'schemeTypeFK',
           type: 'codeSelect',
           code: 'ctSchemeType',
-
+          options: (row) => {
+            const ctSchemeTypes = this.props.codetable[
+              ctSchemeType.toLowerCase()
+            ]
+            return ctSchemeTypes.map((o) => {
+              return [
+                'MEDI500VISIT',
+                'OPSCAN',
+                'MEDI500VACCINATION',
+              ].indexOf(o.code) >= 0
+                ? []
+                : o
+            })
+            // return this.medisaveCheck(row) ? [] : row
+          },
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
@@ -245,9 +259,10 @@ class SchemesGrid extends PureComponent {
     if (!r) return false
     return (
       [
-        'MEDI500VISUT',
+        'MEDI500VISIT',
         'FLEXIMEDI',
         'OPSCAN',
+        'MEDI500VACCINATION',
       ].indexOf(r.code) >= 0 || r.code.startsWith('PHPC')
     )
   }
@@ -261,8 +276,9 @@ class SchemesGrid extends PureComponent {
     if (!r) return false
     return (
       [
-        'MEDI500VISUT',
+        'MEDI500VISIT',
         'OPSCAN',
+        'MEDI500VACCINATION',
       ].indexOf(r.code) >= 0
     )
   }
@@ -309,7 +325,7 @@ class SchemesGrid extends PureComponent {
 
       onCommitChanges: this.commitChanges,
     }
-    // console.log({ props: this.props })
+    console.log({ rows: this.getSortedRows(rows) })
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}
