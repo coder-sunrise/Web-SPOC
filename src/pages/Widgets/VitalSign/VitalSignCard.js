@@ -121,6 +121,7 @@ export default ({
             render={(args) => (
               <NumberInput
                 {...args}
+                precision={0}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.height',
                 })}
