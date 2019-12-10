@@ -61,7 +61,7 @@ class Details extends PureComponent {
         <div className={classnames(classes.footer)}>
           {showAdjustment && (
             <Button
-              link
+              color='primary'
               style={{ float: 'left' }}
               disabled={this.state.disableEdit}
               onClick={this.showAdjustment}
