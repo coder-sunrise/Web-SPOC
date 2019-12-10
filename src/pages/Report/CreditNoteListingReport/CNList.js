@@ -25,14 +25,14 @@ class CNList extends PureComponent {
     }
 
     let CreditNoteListingDetailsCols = [
-      { name: 'creditNoteNo', title: 'CR No.' },
+      { name: 'creditNoteNo', title: 'Cn No.' },
       { name: 'account', title: 'Account' },
       { name: 'name', title: 'Name' },
       { name: 'remark', title: 'Remarks' },
       { name: 'doctorName', title: 'Doctor Name' },
       { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'invoiceDate', title: 'Invoice Date' },
-      { name: 'total', title: 'CN Amt.' },
+      { name: 'total', title: 'Cn Amt.' },
     ]
     let CreditNoteListingDetailsExtensions = [
       { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },

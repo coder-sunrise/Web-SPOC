@@ -17,10 +17,10 @@ class IncomeList extends PureComponent {
 
     const InComeGstDetailsCols = [
       { name: 'incomeDate', title: 'Date' },
-      { name: 'invoiceNo', title: 'Invoice No' },
+      { name: 'invoiceNo', title: 'Invoice No.' },
       { name: 'patientName', title: 'Patient Name' },
       { name: 'incomeAmount', title: 'Invoice Amount' },
-      { name: 'incomeGst', title: 'GST' },
+      { name: 'incomeGst', title: 'Gst' },
       { name: 'incomeTotal', title: 'Final Amount' },
     ]
     const InComeGstDetailsExtensions = [
