@@ -621,15 +621,15 @@ const currencyRoundingToTheClosestList = [
 const currenciesList = [
   {
     value: 'Singapore',
-    name: 'S$',
+    name: 'Singapore (S$)',
   },
   {
     value: 'United States',
-    name: '$',
+    name: 'US Dollar ($)',
   },
   {
     value: 'Malaysia',
-    name: 'RM',
+    name: 'Malaysia Ringgit (MYR)',
   },
 ]
 
@@ -1091,9 +1091,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -1531,7 +1531,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-        o.totalCurrentReceivingQty
+          o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
