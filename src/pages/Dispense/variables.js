@@ -148,7 +148,7 @@ export const PrescriptionColumnExtensions = (
         <FastField
           name={`prescription[${row.rowIndex}]expiryDate`}
           render={(args) => {
-            const restProps = viewOnly ? { value: row.batchNo } : { ...args }
+            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
 
             return (
               <DatePicker
@@ -267,15 +267,18 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]expiryDate`}
-          render={(args) => (
-            <DatePicker
-              disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
-              text={viewOnly}
-              disabled={viewOnly}
-              simple
-              {...args}
-            />
-          )}
+          render={(args) => {
+            const restProps = viewOnly ? { value: row.expiryDate } : { ...args }
+            return (
+              <DatePicker
+                disabledDate={(d) => !d || d.isBefore(moment().add('days', -1))}
+                text={viewOnly}
+                disabled={viewOnly}
+                simple
+                {...restProps}
+              />
+            )
+          }}
         />
       )
     },

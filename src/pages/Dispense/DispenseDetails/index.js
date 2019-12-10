@@ -294,6 +294,7 @@ const DispenseDetails = ({
           <Paper className={classes.paper}>
             <TableData
               title='Prescription'
+              idPrefix='prescription'
               columns={PrescriptionColumns}
               colExtensions={PrescriptionColumnExtensions(
                 viewOnly,
@@ -306,6 +307,7 @@ const DispenseDetails = ({
             {!isRetailVisit && (
               <TableData
                 title='Vaccination'
+                idPrefix='vaccination'
                 columns={VaccinationColumn}
                 colExtensions={VaccinationColumnExtensions(viewOnly)}
                 data={vaccination}
@@ -314,6 +316,7 @@ const DispenseDetails = ({
 
             <TableData
               title='Other Orders'
+              idPrefix='otherOrders'
               columns={OtherOrdersColumns}
               colExtensions={OtherOrdersColumnExtensions(viewOnly, onPrint)}
               data={otherOrder}

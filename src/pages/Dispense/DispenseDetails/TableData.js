@@ -16,6 +16,7 @@ const styles = (theme) => ({
 
 const TableData = ({
   classes,
+  idPrefix,
   title,
   height,
   columns,
@@ -23,12 +24,19 @@ const TableData = ({
   data,
   ...props
 }) => {
+  const getRowId = (r) => {
+    if (idPrefix === 'otherOrders') {
+      return `${idPrefix}-${r.id}-${r.sourceFK}`
+    }
+    return `${idPrefix}-${r.id}`
+  }
   return (
     <div className={classes.tableContainer}>
       <h5>{title}</h5>
       <CommonTableGrid
         size='sm'
         // height={height}
+        getRowId={getRowId}
         columns={columns}
         columnExtensions={colExtensions}
         rows={data}
