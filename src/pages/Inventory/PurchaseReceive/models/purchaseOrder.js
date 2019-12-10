@@ -93,7 +93,7 @@ export default createFormViewModel({
           purchaseOrderDate: moment(),
           // status: 'Draft',
           purchaseOrderStatusFK: 1,
-          shippingAddress: clinicAddress,
+          shippingAddress: clinicAddress.substring(0, 500),
           isGSTEnabled: false,
           isGstInclusive: false,
           gstAmount: 0,

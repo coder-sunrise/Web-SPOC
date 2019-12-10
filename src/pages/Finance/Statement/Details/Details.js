@@ -55,70 +55,6 @@ class Details extends PureComponent {
     showCollectPayment: false,
   }
 
-  componentDidMount () {
-    this.fetchLatestBizSessions()
-  }
-
-  fetchLatestBizSessions = () => {
-    const { setFieldValue } = this.props
-    const payload = {
-      pagesize: 1,
-      sorting: [
-        { columnName: 'sessionStartDate', direction: 'desc' },
-      ],
-    }
-    getBizSession(payload).then((response) => {
-      const { status, data } = response
-      if (status === '200' && data.totalRecords > 0) {
-        const { data: sessionData } = data
-        let paymentDate = moment(
-          sessionData[0].sessionStartDate,
-          serverDateFormat,
-        )
-
-        this.getBizList(paymentDate.format(serverDateFormat))
-      } else {
-        setFieldValue('paymentDate', null)
-        setFieldValue('paymentCreatedBizSessionFK', undefined)
-      }
-    })
-  }
-
-  getBizList = (date) => {
-    const { dispatch, setFieldValue } = this.props
-    const momentDate = moment(date, serverDateFormat)
-
-    const startDateTime = moment(
-      momentDate.set({ hour: 0, minute: 0, second: 0 }),
-    ).formatUTC(false)
-    const endDateTime = moment(
-      momentDate.set({ hour: 23, minute: 59, second: 59 }),
-    ).formatUTC(false)
-
-    dispatch({
-      type: 'statement/bizSessionList',
-      payload: {
-        pagesize: 999,
-        lgteql_SessionStartDate: startDateTime,
-        lsteql_SessionStartDate: endDateTime,
-        sorting: [
-          { columnName: 'sessionStartDate', direction: 'desc' },
-        ],
-      },
-    }).then(() => {
-      const { bizSessionList } = this.props.statement
-      if (bizSessionList) {
-        setFieldValue('paymentDate', startDateTime)
-        setFieldValue(
-          'paymentCreatedBizSessionFK',
-          !bizSessionList || bizSessionList.length === 0
-            ? undefined
-            : bizSessionList[0].value,
-        )
-      }
-    })
-  }
-
   handleRefresh = () => {
     const { dispatch, values, resetForm } = this.props
     dispatch({
@@ -129,7 +65,7 @@ class Details extends PureComponent {
     }).then(() => {
       resetForm()
 
-      this.fetchLatestBizSessions()
+      this.props.fetchLatestBizSessions()
     })
   }
 
