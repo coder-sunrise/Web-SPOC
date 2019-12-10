@@ -129,7 +129,7 @@ class Detail extends PureComponent {
                 render={(args) => {
                   const cfg = {}
                   if (height && height > 538) {
-                    cfg.height = height - 338
+                    cfg.height = height - 440
                   }
                   return (
                     <RichEditor
