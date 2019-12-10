@@ -1,16 +1,20 @@
 import Details from './Details'
 import CollectPaymentConfirm from './CollectPaymentConfirm'
 
-const addContent = (tabNo, props, type) => {
+const addContent = (tabNo, props, func) => {
   switch (tabNo) {
     case 1:
-      return <Details {...props} type={type} />
+      return <Details {...props} fetchLatestBizSessions={func} />
     default:
-      return <CollectPaymentConfirm {...props} disabled />
+      return <CollectPaymentConfirm {...props} disabled getBizList={func} />
   }
 }
 
-export const StatementDetailOption = (detailsProps, type) => {
+export const StatementDetailOption = (
+  detailsProps,
+  fetchLatestBizSessions,
+  getBizList,
+) => {
   const { statementInvoice } = detailsProps.values
   const disabledPayment = !statementInvoice || statementInvoice.length <= 0
 
@@ -18,12 +22,12 @@ export const StatementDetailOption = (detailsProps, type) => {
     {
       id: 0,
       name: 'Statement Details',
-      content: addContent(1, detailsProps, type),
+      content: addContent(1, detailsProps, fetchLatestBizSessions),
     },
     {
       id: 1,
       name: 'Payment',
-      content: addContent(2, detailsProps),
+      content: addContent(2, detailsProps, getBizList),
       disabled: disabledPayment,
     },
   ]
