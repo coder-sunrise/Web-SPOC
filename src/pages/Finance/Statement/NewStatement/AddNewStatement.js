@@ -297,6 +297,7 @@ class AddNewStatement extends PureComponent {
     this.setState(() => {
       return {
         invoiceRows: [],
+        selectedRows: [],
       }
     })
   }
