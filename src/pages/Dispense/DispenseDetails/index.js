@@ -195,14 +195,21 @@ const DispenseDetails = ({
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
-  // console.log({ values })
+  const disableRefreshOrder =
+    isBillFirstVisit && !!values.clinicalObjectRecordFK
+
   return (
     <React.Fragment>
       <GridContainer>
         <GridItem justify='flex-start' md={6} className={classes.actionButtons}>
           {!viewOnly &&
           !isRetailVisit && (
-            <Button color='info' size='sm' onClick={onReloadClick}>
+            <Button
+              color='info'
+              size='sm'
+              onClick={onReloadClick}
+              disabled={disableRefreshOrder}
+            >
               <Refresh />
               Refresh Order
             </Button>
@@ -230,7 +237,7 @@ const DispenseDetails = ({
         </GridItem>
         {!viewOnly && (
           <GridItem className={classes.rightActionButtons} md={6}>
-            {isBillFirstVisit && (
+            {/* isBillFirstVisit && (
               <div
                 style={{
                   marginRight: 8,
@@ -243,7 +250,7 @@ const DispenseDetails = ({
                   <AddAlert />
                 </SizeContainer>
               </div>
-            )}
+            ) */}
             {(isRetailVisit || isBillFirstVisit) && (
               <ProgressButton
                 color='danger'

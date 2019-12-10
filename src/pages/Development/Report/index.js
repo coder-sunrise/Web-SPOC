@@ -53,6 +53,26 @@ class Report extends React.Component {
     showReport: false,
   }
 
+  componentDidMount () {
+    const codeTableNameArray = [
+      'ctMedicationUsage',
+      'ctMedicationDosage',
+      'ctMedicationUnitOfMeasurement',
+      'ctMedicationFrequency',
+      'ctVaccinationUsage',
+      'ctVaccinationUnitOfMeasurement',
+    ]
+
+    codeTableNameArray.forEach((o) => {
+      this.props.dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: o,
+        },
+      })
+    })
+  }
+
   // componentDidMount () {
   //   const { dispatch } = this.props
   //   dispatch({

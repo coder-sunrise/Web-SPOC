@@ -6,9 +6,9 @@ import { IconButton, Popover, Tooltip } from '@/components'
 
 const LowStockInfo = ({ sourceType, values, codetable }) => {
   const {
-    inventorymedication,
-    inventoryconsumable,
-    inventoryvaccination,
+    inventorymedication = [],
+    inventoryconsumable = [],
+    inventoryvaccination = [],
   } = codetable
   let source = {}
 

@@ -26,6 +26,53 @@ const sharedMedicationValue = {
     },
   ],
 }
+const initialState = {
+  rows: [],
+  finalAdjustments: [],
+  summary: {},
+  defaultMedication: {
+    ...sharedMedicationValue,
+  },
+  defaultService: {
+    unitPrice: 0,
+  },
+  defaultVaccination: {
+    vaccinationGivenDate: moment(),
+    quantity: 1,
+    unitPrice: 0,
+  },
+  defaultConsumable: { quantity: 1 },
+  defaultPackage: {
+    packageItems: [],
+  },
+  // default: {
+  //   corPrescriptionItemPrecaution: [
+  //     {
+  //       action: '1',
+  //       count: 1,
+  //       unit: '1',
+  //       frequency: '1',
+  //       day: 1,
+  //       // precaution: '1',
+  //       operator: '1',
+  //     },
+  //   ],
+  //   descriptions: [
+  //     {
+  //       action: '1',
+  //       count: 1,
+  //       unit: '1',
+  //       frequency: '1',
+  //       day: 1,
+  //       precaution: '1',
+  //       operator: '1',
+  //     },
+  //   ],
+  //   quantity: 1,
+  //   total: 20,
+  //   totalAfterAdj: 18,
+  // },
+}
 export default createListViewModel({
   namespace: 'orders',
   config: {
@@ -33,53 +80,7 @@ export default createListViewModel({
   },
   param: {
     service: {},
-    state: {
-      rows: [],
-      finalAdjustments: [],
-      summary: {},
-      defaultMedication: {
-        ...sharedMedicationValue,
-      },
-      defaultService: {
-        unitPrice: 0,
-      },
-      defaultVaccination: {
-        vaccinationGivenDate: moment(),
-        quantity: 1,
-        unitPrice: 0,
-      },
-      defaultConsumable: { quantity: 1 },
-      defaultPackage: {
-        packageItems: [],
-      },
-      // default: {
-      //   corPrescriptionItemPrecaution: [
-      //     {
-      //       action: '1',
-      //       count: 1,
-      //       unit: '1',
-      //       frequency: '1',
-      //       day: 1,
-      //       // precaution: '1',
-      //       operator: '1',
-      //     },
-      //   ],
-      //   descriptions: [
-      //     {
-      //       action: '1',
-      //       count: 1,
-      //       unit: '1',
-      //       frequency: '1',
-      //       day: 1,
-      //       precaution: '1',
-      //       operator: '1',
-      //     },
-      //   ],
-      //   quantity: 1,
-      //   total: 20,
-      //   totalAfterAdj: 18,
-      // },
-    },
+    state: { ...initialState },
     subscriptions: ({ dispatch, history }) => {
       // history.listen(async (loct, method) => {
       //   const { pathname, search, query = {} } = loct
@@ -151,6 +152,10 @@ export default createListViewModel({
     },
 
     reducers: {
+      reset () {
+        console.log('order reset')
+        return { ...initialState }
+      },
       upsertRowState (state, { payload }) {
         let newRow
         let { rows, type } = state
