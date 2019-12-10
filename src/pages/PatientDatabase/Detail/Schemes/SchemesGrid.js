@@ -309,7 +309,7 @@ class SchemesGrid extends PureComponent {
 
       onCommitChanges: this.commitChanges,
     }
-    // console.log({ props: this.props })
+    console.log({ rows: this.getSortedRows(rows) })
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}

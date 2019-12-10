@@ -7,12 +7,11 @@ import { withStyles } from '@material-ui/core'
 // common components
 import {
   CodeSelect,
-  GridContainer,
-  GridItem,
   CommonTableGrid,
+  Tooltip,
   dateFormatLong,
 } from '@/components'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { APPOINTMENT_STATUS, CANCELLATION_REASON_TYPE } from '@/utils/constants'
 // services
 import { queryList as queryAppointments } from '@/services/calendar'
 
@@ -51,6 +50,35 @@ const commonExt = [
     valueField: 'id',
     labelField: 'name',
   },
+  {
+    columnName: 'cancellationReason',
+    render: (row) => {
+      const {
+        appointmentStatusFk,
+        cancellationReasonTypeFK,
+        cancellationReason,
+      } = row
+      const appointmentStatus = parseInt(appointmentStatusFk, 10)
+      const title = cancellationReason || ''
+      if (appointmentStatus === APPOINTMENT_STATUS.CANCELLED) {
+        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.NOSHOW)
+          return (
+            <CodeSelect
+              code='ltcancelreasontype'
+              value={cancellationReasonTypeFK}
+              text
+            />
+          )
+        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.OTHERS)
+          return (
+            <Tooltip title={title}>
+              <span>{title}</span>
+            </Tooltip>
+          )
+      }
+      return ''
+    },
+  },
 ]
 
 @connect(({ patient }) => ({
@@ -70,7 +98,10 @@ class AppointmentHistory extends PureComponent {
       { name: 'startTime', title: 'Time' },
       { name: 'doctor', title: 'Doctor' },
       { name: 'appointmentStatusFk', title: 'Status' },
-      { name: 'cancellationReason', title: 'Reason' },
+      {
+        name: 'cancellationReason',
+        title: 'Reason',
+      },
       { name: 'appointmentRemarks', title: 'Remarks' },
     ],
     columnExtensions: [
@@ -101,14 +132,6 @@ class AppointmentHistory extends PureComponent {
 
   componentWillUnmount () {
     window.removeEventListener('resize', this.resize.bind(this))
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { patient } = nextProps
-
-    if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
-      this.getAppts(patient.id)
-    }
   }
 
   async getAppts (patientId) {
@@ -155,6 +178,14 @@ class AppointmentHistory extends PureComponent {
       previousAppt,
       patientProfileFK: patientId,
     })
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { patient } = nextProps
+
+    if (this.state.patientProfileFK !== patient.id && patient.id > 0) {
+      this.getAppts(patient.id)
+    }
   }
 
   resize () {
