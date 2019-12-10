@@ -118,6 +118,7 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
+                  precision={0}
                   disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.height',

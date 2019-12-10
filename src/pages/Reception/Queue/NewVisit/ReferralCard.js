@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 // formik
 import { Field } from 'formik'
 // custom components
@@ -37,6 +38,7 @@ class ReferralCard extends PureComponent {
               render={(args) => (
                 <DatePicker
                   {...args}
+                  disabledDate={(d) => !d || d.isAfter(moment())}
                   disabled={isReadOnly}
                   label='Referral Date'
                 />
