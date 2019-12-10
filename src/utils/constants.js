@@ -11,6 +11,11 @@ export const APPOINTMENT_STATUS = {
   NOSHOW: 6,
 }
 
+export const CANCELLATION_REASON_TYPE = {
+  NOSHOW: 1,
+  OTHERS: 2,
+}
+
 export const RESCHEDULE_BY = {
   BYCLINIC: 1,
   BYPATIENT: 2,
