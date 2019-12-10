@@ -85,7 +85,7 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-
+const fixedHeight = 50
 @connect(({ dentalChartComponent, global }) => ({
   dentalChartComponent,
   global,
@@ -154,11 +154,11 @@ class DentalChart extends React.Component {
       this.divContainer.current.offsetHeight,
       this.props.global.mainDivHeight,
     )
-
+    window.addEventListener('resize', this.resize.bind(this))
     const canvas = new fabric.Canvas(this._canvasContainer.current, {
       // preserveObjectStacking: true,
       width: this.divContainer.current.offsetWidth,
-      height: this.props.global.mainDivHeight - 50,
+      height: this.props.global.mainDivHeight - fixedHeight,
       // renderOnAddRemove: false,
       // skipTargetFind: true
       name: 'container',
@@ -209,12 +209,21 @@ class DentalChart extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent } = nextProps
+    const { dentalChartComponent, global } = nextProps
     // console.log(
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
     // )
     if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
       this.renderCanvas(nextProps)
+    }
+    if (global.mainDivHeight !== this.props.global.mainDivHeight) {
+      const width = this.divContainer.current.offsetWidth
+      const height = global.mainDivHeight - fixedHeight
+      this.canvas.setDimensions({
+        width,
+        height,
+      })
+      this.canvas.setZoom(width / 1200)
     }
   }
 
@@ -696,6 +705,19 @@ class DentalChart extends React.Component {
               item.isValidCell && item.isValidCell() ? item.item(0).fill : '',
           })),
         })
+      })
+    }
+  }
+
+  resize () {
+    if (this.divContainer.current) {
+      console.log({
+        width: this.divContainer.current.offsetWidth,
+        height: this.props.global.mainDivHeight - 50,
+      })
+      this.canvas.setDimensions({
+        width: this.divContainer.current.offsetWidth,
+        height: this.props.global.mainDivHeight - 50,
       })
     }
   }

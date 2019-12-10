@@ -3,6 +3,7 @@ import NProgress from 'nprogress'
 import $ from 'jquery'
 import _ from 'lodash'
 import moment from 'moment'
+import { headerHeight } from 'mui-pro-jss'
 
 // import { renderWhenReady} from '@sencha/ext-react'
 // import { Panel } from '@sencha/ext-modern'
@@ -409,13 +410,14 @@ class BasicLayout extends React.PureComponent {
     if (window.innerWidth >= 960) {
       this.setState({ mobileOpen: false })
     }
-    if (window.mainPanel)
+    if (window.mainPanel) {
       this.props.dispatch({
         type: 'global/updateState',
         payload: {
-          mainDivHeight: window.mainPanel.offsetHeight - 62,
+          mainDivHeight: window.mainPanel.offsetHeight - headerHeight,
         },
       })
+    }
   }
 
   sidebarMinimize = () => {
