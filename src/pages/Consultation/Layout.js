@@ -684,29 +684,30 @@ class Layout extends PureComponent {
                                       <Fullscreen />
                                     </IconButton>
                                   </Tooltip>
-                                  <Tooltip title='Replace'>
-                                    <Dropdown
-                                      overlay={this.widgetMenu}
-                                      trigger={[
-                                        'click',
-                                      ]}
-                                      currentWidgetId={id}
-                                      disabled={cfg.static}
-                                      onVisibleChange={(visible) => {
-                                        if (visible)
-                                          this.setState({
-                                            replaceWidget: id,
-                                          })
-                                      }}
-                                    >
+
+                                  <Dropdown
+                                    overlay={this.widgetMenu}
+                                    trigger={[
+                                      'click',
+                                    ]}
+                                    currentWidgetId={id}
+                                    disabled={cfg.static}
+                                    onVisibleChange={(visible) => {
+                                      if (visible)
+                                        this.setState({
+                                          replaceWidget: id,
+                                        })
+                                    }}
+                                  >
+                                    <Tooltip title='Switch widget'>
                                       <IconButton
                                         aria-label='Replace'
                                         size='small'
                                       >
                                         <CompareArrows />
                                       </IconButton>
-                                    </Dropdown>
-                                  </Tooltip>
+                                    </Tooltip>
+                                  </Dropdown>
 
                                   {!w.disableDeleteWarning ? (
                                     <Popconfirm

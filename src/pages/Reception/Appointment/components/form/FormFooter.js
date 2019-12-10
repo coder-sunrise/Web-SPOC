@@ -42,9 +42,6 @@ const FormFooter = ({
   return (
     <SizeContainer size='md'>
       <div className={classnames(classes.footer)}>
-        <Button onClick={onClose} color='danger'>
-          {ButtonText.CLOSE}
-        </Button>
         <Authorized authority='appointment.deletecancelappointment'>
           <Button
             color='danger'
