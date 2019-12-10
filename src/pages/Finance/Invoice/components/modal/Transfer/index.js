@@ -10,6 +10,7 @@ import {
   NumberInput,
   withFormikExtend,
   CommonTableGrid,
+  Field,
 } from '@/components'
 
 @withFormikExtend({
@@ -82,13 +83,20 @@ class Transfer extends PureComponent {
         render: (row) => {
           return (
             <GridItem xs={8}>
-              <FastField
+              <Field
                 name={`invoicePayerInfo[${row.rowIndex}].transferAmount`}
                 render={(args) => (
                   <NumberInput
                     currency
                     min={0}
-                    onChange={(e) => this.handleTransferAmount(e, 'grid')}
+                    onChange={async (e) => {
+                      await this.props.setFieldValue(
+                        `invoicePayerInfo[${row.rowIndex}].transferAmount`,
+                        e.target.value,
+                      )
+
+                      this.handleTransferAmount(e, 'grid')
+                    }}
                     {...args}
                   />
                 )}
@@ -118,8 +126,8 @@ class Transfer extends PureComponent {
         values.invoicePayerInfo,
         'transferAmount',
       )
-
       setFieldValue('transferAmount', totalTransferAmt)
+
       return
     }
 
@@ -143,6 +151,7 @@ class Transfer extends PureComponent {
 
     setValues({
       ...values,
+      transferAmount: e.target.value,
       invoicePayerInfo: distributedTransferAmtArray,
     })
   }
@@ -164,7 +173,7 @@ class Transfer extends PureComponent {
         <GridContainer>
           <GridItem direction='column' md={12}>
             <GridItem md={3}>
-              <FastField
+              <Field
                 name='transferAmount'
                 render={(args) => (
                   <NumberInput
