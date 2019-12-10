@@ -959,7 +959,6 @@ const calculateAmount = (
       // r[adjustedField] = roundTo(r[adjustedField] + adj)
       // r.subAdjustment += adj
       r[`adjustmen${i}`] = adj
-      r[adjAmountField] = adj
       r[adjustedField] = initalRowToal + adj
     })
     fa.adjAmount = roundTo(adjAmount)
