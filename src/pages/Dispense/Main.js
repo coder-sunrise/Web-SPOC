@@ -281,6 +281,8 @@ class Main extends Component {
         })
         if (response) this.handleOrderModal()
       })
+    } else {
+      this.handleOrderModal()
     }
   }
 

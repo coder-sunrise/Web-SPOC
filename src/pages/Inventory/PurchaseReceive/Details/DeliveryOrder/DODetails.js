@@ -355,8 +355,7 @@ class DODetails extends PureComponent {
 
   onCommitChanges = ({ rows, deleted, changed }) => {
     // console.log({ rows, changed })
-    const { dispatch } = this.props
-
+    const { dispatch, values } = this.props
     if (deleted) {
       dispatch({
         type: 'deliveryOrderDetails/deleteRow',
@@ -366,12 +365,20 @@ class DODetails extends PureComponent {
       const existUid = Object.keys(changed)[0]
       dispatch({
         type: 'deliveryOrderDetails/upsertRow',
-        payload: { uid: existUid, ...changed[existUid], gridRows: rows },
+        payload: {
+          uid: existUid,
+          ...changed[existUid],
+          gridRows: rows,
+          remark: values.remark,
+        },
       })
     } else {
       dispatch({
         type: 'deliveryOrderDetails/upsertRow',
-        payload: rows[0],
+        payload: {
+          gridRow: rows[0],
+          remark: values.remark,
+        },
       })
     }
 
