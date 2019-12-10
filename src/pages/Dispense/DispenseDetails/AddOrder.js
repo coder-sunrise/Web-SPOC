@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
-import { withFormikExtend } from '@/components'
+import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 import { VISIT_TYPE } from '@/utils/constants'
 
@@ -144,7 +144,9 @@ const AddOrder = ({
 
   return (
     <React.Fragment>
-      <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+      <SizeContainer size='sm'>
+        <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+      </SizeContainer>
       {footer &&
         footer({
           onConfirm: handleSubmit,
