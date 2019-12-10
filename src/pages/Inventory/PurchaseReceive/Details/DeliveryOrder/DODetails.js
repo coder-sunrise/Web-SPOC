@@ -204,6 +204,12 @@ class DODetails extends PureComponent {
         this.setState({
           [x.stateName]: inventoryItemList,
         })
+        dispatch({
+          type: 'deliveryOrderDetails/updateState',
+          payload: {
+            [x.stateName]: inventoryItemList,
+          },
+        })
       })
 
       return null
@@ -516,9 +522,22 @@ class DODetails extends PureComponent {
       refreshDeliveryOrder,
       errors,
       classes,
+      deliveryOrderDetails,
     } = props
+    const {
+      MedicationItemList = [],
+      ConsumableItemList = [],
+      VaccinationItemList = [],
+    } = deliveryOrderDetails
     const { rows } = values
     const isEditable = !values.id
+
+    const getOptions = (stateItemList, storeItemList, row) => {
+      const stateArray = stateItemList
+      const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
+      return selectedArray.find((o) => o.itemFK === row.code).stock
+    }
+
     const tableParas = {
       columns: [
         { name: 'type', title: 'Type' },
@@ -651,19 +670,26 @@ class DODetails extends PureComponent {
           disableAll: true,
           options: (row) => {
             if (row.type === 1) {
-              return this.state.MedicationItemList.find(
-                (o) => o.itemFK === row.code,
-              ).stock
+              return getOptions(
+                this.state.MedicationItemList,
+                MedicationItemList,
+                row,
+              )
             }
+
             if (row.type === 2) {
-              return this.state.VaccinationItemList.find(
-                (o) => o.itemFK === row.code,
-              ).stock
+              return getOptions(
+                this.state.VaccinationItemList,
+                VaccinationItemList,
+                row,
+              )
             }
             if (row.type === 3) {
-              return this.state.ConsumableItemList.find(
-                (o) => o.itemFK === row.code,
-              ).stock
+              return getOptions(
+                this.state.ConsumableItemList,
+                ConsumableItemList,
+                row,
+              )
             }
             return []
           },
@@ -772,7 +798,7 @@ class DODetails extends PureComponent {
             <EditableTableGrid
               getRowId={(r) => r.uid}
               rows={rows}
-              schema={values.id ? {} : receivingDetailsSchema}
+              schema={receivingDetailsSchema}
               // schema={receivingDetailsSchema}
               FuncProps={{
                 // edit: isEditable,

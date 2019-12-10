@@ -111,15 +111,8 @@ class Service extends PureComponent {
   getServiceCenterService = () => {
     const { values, setValues } = this.props
     const { serviceFK, serviceCenterFK } = values
-
-    if (!serviceCenterFK || !serviceFK) return
-    const serviceCenterService =
-      this.state.serviceCenterServices.find(
-        (o) =>
-          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
-      ) || {}
-    if (serviceCenterService) {
-      setValues({
+    const obj = (serviceCenterService) => {
+      return {
         ...values,
         isActive: serviceCenterService.isActive,
         serviceCenterServiceFK: serviceCenterService.serviceCenter_ServiceId,
@@ -130,6 +123,32 @@ class Service extends PureComponent {
         unitPrice: serviceCenterService.unitPrice,
         total: serviceCenterService.unitPrice,
         quantity: 1,
+      }
+    }
+    if (serviceFK && !serviceCenterFK) {
+      const serviceCenterService =
+        this.state.serviceCenterServices.find(
+          (o) => o.serviceId === serviceFK && o.isDefault,
+        ) || {}
+      if (serviceCenterService) {
+        setValues({
+          ...obj(serviceCenterService),
+          serviceCenterFK: serviceCenterService.serviceCenterId,
+        })
+        this.updateTotalPrice(serviceCenterService.unitPrice)
+      }
+      return
+    }
+    if (!serviceCenterFK || !serviceFK) return
+
+    const serviceCenterService =
+      this.state.serviceCenterServices.find(
+        (o) =>
+          o.serviceId === serviceFK && o.serviceCenterId === serviceCenterFK,
+      ) || {}
+    if (serviceCenterService) {
+      setValues({
+        ...obj(serviceCenterService),
       })
       this.updateTotalPrice(serviceCenterService.unitPrice)
     }
