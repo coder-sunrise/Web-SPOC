@@ -138,7 +138,7 @@ class VaccinationCertificate extends PureComponent {
               render={(args) => {
                 const cfg = {}
                 if (height && height > 450) {
-                  cfg.height = height - 336
+                  cfg.height = height - 400
                 }
                 return (
                   <RichEditor

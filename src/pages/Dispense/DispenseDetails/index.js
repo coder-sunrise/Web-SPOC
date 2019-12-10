@@ -195,8 +195,7 @@ const DispenseDetails = ({
   }
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
-  const disableRefreshOrder =
-    isBillFirstVisit && !!values.clinicalObjectRecordFK
+  const disableRefreshOrder = isBillFirstVisit && !values.clinicalObjectRecordFK
 
   return (
     <React.Fragment>

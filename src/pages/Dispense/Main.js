@@ -272,6 +272,13 @@ class Main extends Component {
           id: consultation.entity.id,
         },
       }).then((response) => {
+        dispatch({
+          type: 'dispense/query',
+          payload: {
+            id: values.id,
+            version: Date.now(),
+          },
+        })
         if (response) this.handleOrderModal()
       })
     }

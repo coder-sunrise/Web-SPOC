@@ -129,7 +129,6 @@ class ItemList extends React.Component {
 
   render () {
     const { theme, CPSwitch, CPNumber, values } = this.props
-
     return (
       <div style={{ marginTop: theme.spacing(1) }}>
         <Tabs
@@ -196,7 +195,6 @@ class ItemList extends React.Component {
             {
               columnName: 'cpAmount',
               render: (row) => {
-                console.log({ row })
                 // const index = values.rows
                 //   .map((i) => i.itemFK)
                 //   .indexOf(row.itemFK)

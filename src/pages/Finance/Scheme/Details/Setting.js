@@ -19,7 +19,7 @@ const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
     args.field.value = 'ExactAmount'
   }
-  console.log({ label, args })
+
   return (
     <Switch
       checkedChildren='$'
