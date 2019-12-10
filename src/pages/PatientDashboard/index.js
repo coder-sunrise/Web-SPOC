@@ -173,6 +173,7 @@ class PatientDashboard extends PureComponent {
     const { entity } = visitRegistration
     if (!entity) return null
     const { visit = {} } = entity
+    const { visitPurposeFK = VISIT_TYPE.CONS } = visit
 
     return (
       <div className={classes.root}>
@@ -184,7 +185,10 @@ class PatientDashboard extends PureComponent {
                   <ProgressButton
                     color='primary'
                     onClick={this.startConsultation}
-                    disabled={visit.visitPurposeFK === VISIT_TYPE.RETAIL}
+                    disabled={
+                      visitPurposeFK === VISIT_TYPE.RETAIL ||
+                      visitPurposeFK === VISIT_TYPE.BILL_FIRST
+                    }
                   >
                     Start Consultation
                   </ProgressButton>

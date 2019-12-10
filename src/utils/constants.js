@@ -170,6 +170,7 @@ export const ADD_ON_FEATURE = {
 export const VISIT_TYPE = {
   CONS: 1,
   RETAIL: 2,
+  BILL_FIRST: 3,
 }
 
 export const VISIT_TYPE_NAME = {

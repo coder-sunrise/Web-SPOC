@@ -93,7 +93,7 @@ export default createFormViewModel({
           purchaseOrderDate: moment(),
           // status: 'Draft',
           purchaseOrderStatusFK: 1,
-          shippingAddress: clinicAddress,
+          shippingAddress: clinicAddress.substring(0, 500),
           isGSTEnabled: false,
           isGstInclusive: false,
           gstAmount: 0,
@@ -213,7 +213,7 @@ export default createFormViewModel({
       },
 
       upsertRow (state, { payload }) {
-        const { purchaseOrder, rows } = payload
+        const { purchaseOrder, rows, purchaseOrderAdjustment } = payload
 
         // if (rows.uid) {
         //   tempRows = tempRows.map((row) => {
@@ -245,7 +245,12 @@ export default createFormViewModel({
         })
 
         // }
-        const returnValue = { ...state, purchaseOrder, rows: newRows }
+        const returnValue = {
+          ...state,
+          purchaseOrder,
+          rows: newRows,
+          purchaseOrderAdjustment,
+        }
 
         return { ...returnValue }
       },

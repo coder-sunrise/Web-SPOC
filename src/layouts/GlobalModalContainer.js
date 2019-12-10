@@ -1,7 +1,11 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
-import { ChangePassword, SessionTimeout } from 'medisys-components'
+import {
+  ChangePassword,
+  SessionTimeout,
+  CustomConfirm,
+} from '@/components/_medisys'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
 import VisitRegistration from '@/pages/Reception/Queue/NewVisit'
@@ -333,6 +337,7 @@ class GlobalModalContainer extends PureComponent {
           <Adjustment />
         </CommonModal>
         {report.reportTypeID && <ReportModal />}
+        <CustomConfirm />
       </div>
     )
   }

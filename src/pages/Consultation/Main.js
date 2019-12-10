@@ -60,6 +60,8 @@ import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
+import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 // import PatientSearch from '@/pages/PatientDatabase/Search'
 // import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -78,6 +80,8 @@ const saveConsultation = ({
   action,
   confirmMessage,
   successMessage,
+  shouldPromptConfirm = true,
+  successCallback = undefined,
 }) => {
   const {
     dispatch,
@@ -86,51 +90,59 @@ const saveConsultation = ({
     consultationDocument = {},
     orders = {},
   } = props
-  dispatch({
-    type: 'global/updateAppState',
-    payload: {
-      openConfirm: true,
-      openConfirmContent: confirmMessage,
-      openConfirmText: 'Confirm',
-      onConfirmSave: () => {
-        const newValues = convertToConsultation(
-          {
-            ...values,
-            corDiagnosis: [
-              ...values.corDiagnosis.filter(
-                (diagnosis) => diagnosis.diagnosisFK !== undefined,
-              ),
-            ],
-          },
-          {
-            orders,
-            consultationDocument,
-          },
-        )
-        newValues.duration = Math.floor(
-          Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
-        )
-        if (!newValues.visitConsultationTemplate) {
-          newValues.visitConsultationTemplate = {}
-        }
-        newValues.visitConsultationTemplate.consultationTemplate =
-          localStorage.getItem('consultationLayout') || ''
-        dispatch({
-          type: `consultation/${action}`,
-          payload: newValues,
-        }).then((r) => {
-          if (r) {
-            if (successMessage) {
-              notification.success({
-                message: successMessage,
-              })
-            }
-            sessionStorage.removeItem(`${values.id}_consultationTimer`)
-          }
-        })
+  const onConfirmSave = () => {
+    const newValues = convertToConsultation(
+      {
+        ...values,
+        corDiagnosis: [
+          ...values.corDiagnosis.filter(
+            (diagnosis) => diagnosis.diagnosisFK !== undefined,
+          ),
+        ],
       },
-    },
-  })
+      {
+        orders,
+        consultationDocument,
+      },
+    )
+    newValues.duration = Math.floor(
+      Number(sessionStorage.getItem(`${values.id}_consultationTimer`)) || 0,
+    )
+    if (!newValues.visitConsultationTemplate) {
+      newValues.visitConsultationTemplate = {}
+    }
+    newValues.visitConsultationTemplate.consultationTemplate =
+      localStorage.getItem('consultationLayout') || ''
+    dispatch({
+      type: `consultation/${action}`,
+      payload: newValues,
+    }).then((r) => {
+      if (r) {
+        if (successMessage) {
+          notification.success({
+            message: successMessage,
+          })
+        }
+        sessionStorage.removeItem(`${values.id}_consultationTimer`)
+        if (successCallback) {
+          successCallback()
+        }
+      }
+    })
+  }
+  if (shouldPromptConfirm)
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: confirmMessage,
+        openConfirmText: 'Confirm',
+        onConfirmSave,
+      },
+    })
+  else {
+    onConfirmSave()
+  }
 }
 
 const discardConsultation = ({
@@ -327,6 +339,104 @@ class Main extends React.Component {
     })
   }
 
+  signOffAndCompleteBilling = () => {
+    const { visitRegistration, dispatch, values } = this.props
+    const { entity: vistEntity = {} } = visitRegistration
+    const { visit = {} } = vistEntity
+    const { id: visitId } = visit
+    const successCallback = () => {
+      dispatch({
+        type: 'consultation/completeBillFirstOrder',
+        payload: {
+          id: visitId,
+        },
+      })
+    }
+    saveConsultation({
+      props: {
+        values,
+        ...this.props,
+      },
+      successMessage: 'Consultation signed',
+      shouldPromptConfirm: false,
+      action: 'sign',
+      successCallback,
+    })
+  }
+
+  signOffOnly = () => {
+    const { values } = this.props
+    saveConsultation({
+      props: {
+        values,
+        ...this.props,
+      },
+      successMessage: 'Consultation signed',
+      shouldPromptConfirm: false,
+      action: 'sign',
+    })
+  }
+
+  handleSignOffClick = () => {
+    const {
+      visitRegistration,
+      orders,
+      dispatch,
+      handleSubmit,
+      values,
+    } = this.props
+    const { rows, _originalRows } = orders
+    const { entity: vistEntity = {} } = visitRegistration
+    const { visit = {} } = vistEntity
+    const {
+      visitPurposeFK = VISIT_TYPE.CONS,
+      visitStatus = VISIT_STATUS.DISPENSE,
+    } = visit
+
+    const isModifiedOrder = _.isEqual(
+      rows.filter((i) => i.id && !i.isDeleted),
+      _originalRows,
+    )
+
+    if (
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
+      visitStatus === VISIT_STATUS.BILLING &&
+      isModifiedOrder
+    ) {
+      dispatch({
+        type: 'global/updateState',
+        payload: {
+          showCustomConfirm: true,
+          customConfirmCfg: {
+            title: 'Confirm',
+            content: 'Do you want to complete the visit?',
+            actions: [
+              {
+                text: 'Cancel',
+                color: 'danger',
+                onClick: () => {
+                  // do nothing
+                },
+              },
+              {
+                text: 'No',
+                color: 'danger',
+                onClick: this.signOffOnly,
+              },
+              {
+                text: 'Yes',
+                color: 'primary',
+                onClick: this.signOffAndCompleteBilling,
+              },
+            ],
+          },
+        },
+      })
+    } else {
+      handleSubmit()
+    }
+  }
+
   // discardConsultation =
 
   getExtraComponent = () => {
@@ -510,7 +620,7 @@ class Main extends React.Component {
 
               <ProgressButton
                 color='primary'
-                onClick={this.props.handleSubmit}
+                onClick={this.handleSignOffClick}
                 icon={null}
               >
                 Sign Off

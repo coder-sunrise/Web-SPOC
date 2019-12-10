@@ -31,8 +31,16 @@ import {
   DatePicker,
   NumberInput,
 } from '@/components'
-
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import { VISIT_TYPE } from '@/utils/constants'
+
+const baseColumns = [
+  { name: 'itemType', title: 'Type' },
+  { name: 'itemName', title: 'Name' },
+  { name: 'quantity', title: 'Quantity' },
+  { name: 'adjAmt', title: 'Adj' },
+  { name: 'totalAfterItemAdjustment', title: 'Total' },
+]
 
 export default ({ classes, current, theme, setFieldValue }) => {
   const amountProps = {
@@ -43,11 +51,29 @@ export default ({ classes, current, theme, setFieldValue }) => {
 
   let invoiceItemData = []
   let invoiceAdjustmentData = []
-
+  let columns = baseColumns
   if (current.invoice) {
-    const { invoiceItem = [], invoiceAdjustment = [] } = current.invoice
+    const {
+      invoiceItem = [],
+      invoiceAdjustment = [],
+      visitPurposeFK = VISIT_TYPE.CONS,
+    } = current.invoice
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
+
+    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+      columns = [
+        { name: 'itemType', title: 'Type' },
+        { name: 'itemName', title: 'Name' },
+        {
+          name: 'description',
+          title: 'Description',
+        },
+        { name: 'quantity', title: 'Quantity' },
+        { name: 'adjAmt', title: 'Adj' },
+        { name: 'totalAfterItemAdjustment', title: 'Total' },
+      ]
+    }
   }
 
   return (
@@ -78,20 +104,18 @@ export default ({ classes, current, theme, setFieldValue }) => {
       <CommonTableGrid
         size='sm'
         rows={current.invoice ? current.invoice.invoiceItem : []}
-        columns={[
-          { name: 'itemType', title: 'Type' },
-          { name: 'itemName', title: 'Name' },
-          { name: 'quantity', title: 'Quantity' },
-          { name: 'adjAmt', title: 'Adj' },
-          { name: 'totalAfterItemAdjustment', title: 'Total' },
-        ]}
+        columns={columns}
         FuncProps={{ pager: false }}
         columnExtensions={[
-          { columnName: 'adjAmt', type: 'number', currency: true },
+          { columnName: 'itemType', width: 150 },
+          { columnName: 'description', width: 'auto' },
+          { columnName: 'quantity', width: 90 },
+          { columnName: 'adjAmt', type: 'number', currency: true, width: 120 },
           {
             columnName: 'totalAfterItemAdjustment',
             type: 'number',
             currency: true,
+            width: 120,
           },
         ]}
       />

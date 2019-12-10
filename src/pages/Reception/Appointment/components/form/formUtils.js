@@ -245,11 +245,11 @@ export const mapPropsToValues = ({
 export const mapDatagridToAppointmentResources = (shouldDumpID) => (event) => {
   const { id, startTime: timeFrom, endTime: timeTo, ...restEvent } = event
   const startTime =
-    timeFrom.includes('AM') || timeFrom.includes('PM')
+    timeFrom && (timeFrom.includes('AM') || timeFrom.includes('PM'))
       ? moment(timeFrom, timeFormat).format(timeFormat24Hour)
       : timeFrom
   const endTime =
-    timeTo.includes('AM') || timeTo.includes('PM')
+    timeTo && (timeTo.includes('AM') || timeTo.includes('PM'))
       ? moment(timeTo, timeFormat).format(timeFormat24Hour)
       : timeTo
 

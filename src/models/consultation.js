@@ -263,6 +263,10 @@ export default createFormViewModel({
         const response = yield call(service.signOrder, payload)
         return response
       },
+      *completeBillFirstOrder ({ payload }, { call, put }) {
+        const response = yield call(service.completeOrder, payload)
+        return response
+      },
       *closeModal ({ payload = { history: {} } }, { call, put, take }) {
         const { history = {} } = payload
         yield put({
@@ -340,6 +344,7 @@ export default createFormViewModel({
           payload: {
             type: '1',
             rows: _.sortBy(oRows, 'sequence'),
+            _originalRows: _.sortBy(oRows, 'sequence'),
             finalAdjustments: data.corOrderAdjustment.map((o) => ({
               ...o,
               uid: o.id,

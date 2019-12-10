@@ -104,7 +104,7 @@ const Grid = ({
     }).then((response) => {
       if (response === 204)
         notification.success({
-          message: 'Visit deleted',
+          message: 'Visit Deleted',
         })
     })
   }
@@ -169,13 +169,6 @@ const Grid = ({
           break
         case '1': {
           // dispense
-          // const parameters = {
-          //   vis: row.id,
-          //   pid: row.patientProfileFK,
-          //   md2: 'disp',
-          // }
-          // // history.push(getAppendUrl(parameters, '/reception/queue/dispense'))
-          // router.push(getAppendUrl(parameters, '/reception/queue'))
           const version = Date.now()
           dispatch({
             type: `dispense/start`,
@@ -185,9 +178,6 @@ const Grid = ({
             },
           }).then((o) => {
             if (o)
-              // router.push(
-              //   `/reception/queue/patientdashboard?qid=${row.id}&vid=${row.visitFK}&v=${version}&md2=dsps`,
-              // )
               router.push(
                 `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
@@ -389,7 +379,11 @@ const Grid = ({
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
-        if (visitPurposeFK === VISIT_TYPE.RETAIL) id = '1'
+        if (
+          visitPurposeFK === VISIT_TYPE.RETAIL ||
+          visitPurposeFK === VISIT_TYPE.BILL_FIRST
+        )
+          id = '1'
         else id = '5'
         break
       case VISIT_STATUS.IN_CONS:
