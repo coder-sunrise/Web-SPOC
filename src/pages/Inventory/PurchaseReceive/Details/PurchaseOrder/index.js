@@ -577,9 +577,11 @@ class Index extends Component {
           ) : (
             ''
           )}
+
           <ProgressButton
             color='primary'
             icon={null}
+            disabled={!isPOStatusDraft(poStatus)}
             onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
           >
             {formatMessage({
