@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core'
 
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { bool } from 'prop-types'
 import { ReportDataGrid } from '@/components/_medisys'
 
 const styles = (theme) => ({
