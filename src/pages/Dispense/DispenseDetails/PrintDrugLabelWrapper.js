@@ -102,7 +102,7 @@ class PrintDrugLabelWrapper extends React.Component {
   generateDrugLablePrintSource = async (row) => {
     const drugLabelDetails1 = await queryDrugLabelDetails(row.id)
     const { data } = drugLabelDetails1
-    if (data) {
+    if (data && data.length > 0) {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
         data.map((o) => {
@@ -111,13 +111,16 @@ class PrintDrugLabelWrapper extends React.Component {
       )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
+    notification.warn({
+      message: `No prescription found. Add prescription to print drug label.`,
+    })
     return null
   }
 
   generateDrugLablesPrintSource = async (visitID, prescriptions = []) => {
     const drugLabelsDetails1 = await queryDrugLabelsDetails(visitID)
     const { data } = drugLabelsDetails1
-    if (data) {
+    if (data && data.length > 0) {
       let drugLabelDetail = []
       drugLabelDetail = drugLabelDetail.concat(
         data.map((o) => {
@@ -127,6 +130,9 @@ class PrintDrugLabelWrapper extends React.Component {
       )
       return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
     }
+    notification.warn({
+      message: `No prescription found. Add prescription to print drug label.`,
+    })
     return null
   }
 

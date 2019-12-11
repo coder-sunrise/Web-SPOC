@@ -32,6 +32,40 @@ const status = [
   },
 ]
 
+const approvedStatus = [
+  {
+    value:'AP',
+    name:'Approved',
+    render:() => <span>Approved</span>,
+  },
+  {
+    value:'EP',
+    name:'Extracted to Payment Process',
+    render:() => <span>Extracted to Payment Process</span>,
+  },
+  {
+    value:'PD',
+    name:'Paid',
+    render:() => <span>Paid</span>,
+  },
+  {
+    value:'RV',
+    name:'Recovery Pending',
+    render:() => <span>Recovery Pending</span>,
+  },
+  {
+    value:'RV2',
+    name:'Recovery Extracted',
+    render:() => <span>Recovery Extracted</span>,
+  },
+  {
+    value:'RV3',
+    name:'Recovered',
+    render:() => <span>Recovered</span>,
+  },
+]
+
+
 const statusString = [
   { value: 'Inactive', name: 'Inactive', color: 'red' },
   { value: 'Active', name: 'Active', color: 'green' },
@@ -1699,6 +1733,7 @@ module.exports = {
   appointmentStatus,
   recurrenceTypes,
   status,
+  approvedStatus,
   statusString,
   isAutoOrder,
   addressTypes,

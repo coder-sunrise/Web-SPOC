@@ -73,6 +73,7 @@ const Consumable = ({
       currency: true,
       width: 120,
       format: '0.0000',
+      precision: 4,
     },
     { columnName: 'sellingPrice', type: 'number', currency: true, width: 200 },
   ])

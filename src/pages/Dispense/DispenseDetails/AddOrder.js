@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
@@ -6,18 +6,21 @@ import { compose } from 'redux'
 import Order from '../../Widgets/Orders'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
-import { VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE,
+  INVOICE_ITEM_TYPE_BY_NAME,
+  ORDER_TYPE_TAB,
+} from '@/utils/constants'
+import { roundTo } from '@/utils/utils'
 
 const styles = () => ({})
 
 const AddOrder = ({
   footer,
-  orders,
   handleSubmit,
   dispatch,
   dispense,
   ctservice,
-  values,
   visitType,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
@@ -32,8 +35,7 @@ const AddOrder = ({
         const newRows = retailInvoiceItem.map((o) => {
           let obj
           switch (o.invoiceItemTypeFK) {
-            case 1:
-            case 5: {
+            case INVOICE_ITEM_TYPE_BY_NAME.MEDICATION: {
               const {
                 retailPrescriptionItemInstruction,
                 retailPrescriptionItemPrecaution,
@@ -41,6 +43,7 @@ const AddOrder = ({
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
               obj = {
+                type: o.invoiceItemTypeFK.toString(),
                 ...o.retailVisitInvoiceDrug,
                 innerLayerId: o.retailVisitInvoiceDrug.id,
                 innerLayerConcurrencyToken:
@@ -56,13 +59,14 @@ const AddOrder = ({
               break
             }
 
-            case 4: {
+            case INVOICE_ITEM_TYPE_BY_NAME.SERVICE: {
               const { serviceId, serviceCenterId } = servicesList.find(
                 (s) =>
                   s.serviceCenter_ServiceId ===
                   o.retailVisitInvoiceService.serviceCenterServiceFK,
               )
               obj = {
+                type: ORDER_TYPE_TAB.SERVICE,
                 serviceFK: serviceId,
                 serviceCenterFK: serviceCenterId,
                 innerLayerId: o.retailVisitInvoiceService.id,
@@ -74,8 +78,9 @@ const AddOrder = ({
               break
             }
 
-            case 2: {
+            case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
               obj = {
+                type: ORDER_TYPE_TAB.CONSUMABLE,
                 innerLayerId: o.retailVisitInvoiceConsumable.id,
                 innerLayerConcurrencyToken:
                   o.retailVisitInvoiceConsumable.concurrencyToken,
@@ -92,7 +97,6 @@ const AddOrder = ({
           return {
             outerLayerId: o.id,
             outerLayerConcurrencyToken: o.concurrencyToken,
-            type: o.invoiceItemTypeFK.toString(),
             subject: o.itemName,
             isActive: true,
             uid: o.id,
@@ -168,12 +172,11 @@ export default compose(
     inventoryConsumable: codetable.inventoryconsumable,
   })),
   withFormikExtend({
-    handleSubmit: (values, { props, resetForm }) => {
+    handleSubmit: (values, { props }) => {
       const {
         dispatch,
         consultation,
         orders,
-        onClose,
         onConfirm,
         dispense,
         onReloadClick,
@@ -308,8 +311,8 @@ export default compose(
         const retailInvoiceItem = rows.map((o) => {
           let obj
           switch (o.type) {
-            case '1':
-            case '5': {
+            case ORDER_TYPE_TAB.MEDICATION:
+            case ORDER_TYPE_TAB.OPENPRECRIPTION: {
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
@@ -323,12 +326,11 @@ export default compose(
               obj = {
                 itemCode: o.drugCode,
                 itemName: o.drugName,
-                invoiceItemTypeFK: 1,
-
+                invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
                 // "costPrice": 0,
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
-                subTotal: o.totalPrice,
+                subTotal: roundTo(o.totalPrice),
                 // "adjType": "string",
                 // "adjValue": 0,
                 retailVisitInvoiceDrug: {
@@ -354,12 +356,12 @@ export default compose(
 
               break
             }
-            case '3': {
+            case ORDER_TYPE_TAB.SERVICE: {
               obj = {
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
-                subTotal: o.total,
-                invoiceItemTypeFK: 4,
+                subTotal: roundTo(o.total),
+                invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -371,15 +373,15 @@ export default compose(
               }
               break
             }
-            case '4': {
+            case ORDER_TYPE_TAB.CONSUMABLE: {
               const { uom } = inventoryConsumable.find(
                 (c) => c.id === o.inventoryConsumableFK,
               )
               obj = {
-                invoiceItemTypeFK: 2,
+                invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
-                subTotal: o.totalPrice,
+                subTotal: roundTo(o.totalPrice),
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -402,13 +404,11 @@ export default compose(
           return {
             id: o.outerLayerId,
             concurrencyToken: o.outerLayerConcurrencyToken,
-
-            invoiceItemTypeFK: parseInt(o.type, 10),
             description: o.subject,
             adjAmt: o.adjAmount,
-            totalAfterItemAdjustment: o.totalAfterItemAdjustment,
-            totalAfterOverallAdjustment: o.totalAfterOverallAdjustment,
-            totalAfterGST: o.totalAfterGST,
+            totalAfterItemAdjustment: roundTo(o.totalAfterItemAdjustment),
+            totalAfterOverallAdjustment: roundTo(o.totalAfterOverallAdjustment),
+            totalAfterGST: roundTo(o.totalAfterGST),
             gstAmount: o.gstAmount,
             ...obj,
           }
@@ -430,7 +430,8 @@ export default compose(
             onReloadClick()
           }
         })
-      } else if (visitType === VISIT_TYPE.BILL_FIRST) {
+      }
+      if (visitType === VISIT_TYPE.BILL_FIRST) {
         const billFirstPayload = convertToConsultation(consultation.entity, {
           consultationDocument: { rows: [] },
           orders,

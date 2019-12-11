@@ -66,8 +66,8 @@ export const RejectedCHASColumnExtensions = [
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'rejectionDate', type: 'date', width: 130 },
   { columnName: 'submissionDate', type: 'date', width: 140 },
-  { columnName: 'rejectionReason', width: 400 },
+  { columnName: 'rejectionReason', width: 400, sortBy: 'ChasClaimStatusDescription' },
   { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+  { columnName: 'invoiceAmount', type: 'currency', currency: true, sortBy:'invoiceAmt' },
+  { columnName: 'claimAmount', type: 'currency', currency: true, sortBy:'claimAmt' },
 ]

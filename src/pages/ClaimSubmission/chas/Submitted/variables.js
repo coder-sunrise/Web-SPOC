@@ -24,7 +24,7 @@ export const SubmittedCHASColumns = [
     title: 'Diagnosis',
   },
   {
-    name: 'schemeType',
+    name: 'schemeTypeDisplayValue',
     title: 'Scheme Type',
   },
   {
@@ -58,6 +58,6 @@ export const SubmittedCHASColumnExtensions = [
   { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+  { columnName: 'invoiceAmount', type: 'currency', currency: true, sortBy:'invoiceAmt' },
+  { columnName: 'claimAmount', type: 'currency', currency: true, sortBy:'claimAmt' },
 ]
