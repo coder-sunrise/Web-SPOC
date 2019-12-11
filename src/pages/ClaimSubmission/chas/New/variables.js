@@ -56,8 +56,8 @@ export const NewCHASColumns = [
 export const NewCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'rejectionReason', width: 400 },
+  { columnName: 'rejectionReason', width: 400, sortBy: 'ResponseStatusDescription' },
   { columnName: 'schemeCategoryDisplayValue', width: 145 , sortBy:'schemeCategory'},
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+  { columnName: 'invoiceAmount', type: 'currency', currency: true, sortBy:'invoiceAmt' },
+  { columnName: 'claimAmount', type: 'currency', currency: true , sortBy:'claimAmt'},
 ]
