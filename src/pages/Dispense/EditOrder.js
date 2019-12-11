@@ -131,7 +131,7 @@ class EditOrder extends Component {
     const ConsultationDocument = cdWidget.component
     console.log('edit order', { values: this.props.values })
     return (
-      <div className={classes.root}>
+      <div className={classes.content}>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>

@@ -126,18 +126,22 @@ class index extends Component {
                 mode={mode}
               />
             </CommonModal>
-            <Button
-              // disabled={isPOStatusFulfilled(poStatus)}
-              onClick={this.onAddDeliveryOrderClicked}
-              // hideIfNoEditRights
-              color='info'
-              link
-            >
-              <Add />
-              {formatMessage({
-                id: 'inventory.pr.detail.dod.addDeliveryOrder',
-              })}
-            </Button>
+            {!isPOStatusFulfilled(poStatus) ? (
+              <Button
+                // disabled={isPOStatusFulfilled(poStatus)}
+                onClick={this.onAddDeliveryOrderClicked}
+                // hideIfNoEditRights
+                color='info'
+                link
+              >
+                <Add />
+                {formatMessage({
+                  id: 'inventory.pr.detail.dod.addDeliveryOrder',
+                })}
+              </Button>
+            ) : (
+              ''
+            )}
           </GridContainer>
         </div>
       </AuthorizedContext.Provider>

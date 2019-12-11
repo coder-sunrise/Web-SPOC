@@ -40,13 +40,13 @@ const FilterBar = ({ handleSubmit, values }) => {
           <GridItem md={1}>
             <FastField
               name='ageFrom'
-              render={(args) => <NumberInput {...args} label='Age From' />}
+              render={(args) => <NumberInput {...args} label='Age From' max={200} precision={0} />}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='ageTo'
-              render={(args) => <NumberInput {...args} label='Age To' />}
+              render={(args) => <NumberInput {...args} label='Age To' max={200} precision={0} />}
             />
           </GridItem>
           <GridItem md={5} />

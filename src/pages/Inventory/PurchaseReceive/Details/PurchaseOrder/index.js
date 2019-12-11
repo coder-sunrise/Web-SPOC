@@ -605,9 +605,11 @@ class Index extends Component {
               ) : (
                 ''
               )}
+
               <ProgressButton
                 color='primary'
                 icon={null}
+                disabled={!isPOStatusDraft(poStatus)}
                 onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
               >
                 {formatMessage({
@@ -645,6 +647,7 @@ class Index extends Component {
               )}
             </div>
           )}
+
           <ProgressButton
             color='info'
             icon={null}
