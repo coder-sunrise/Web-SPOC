@@ -40,7 +40,7 @@ const countrySettings = [
           },
         })
         numeral.locale('sg')
-      } catch (error) {}
+      } catch (error) { }
     },
     moment: () => {
       moment.defineLocale('sg', {
@@ -71,7 +71,7 @@ const countrySettings = [
           },
         })
         numeral.locale('my')
-      } catch (error) {}
+      } catch (error) { }
     },
     moment: () => {
       moment.locale('ms-my')
@@ -176,6 +176,7 @@ module.exports = {
   percentageFormat: '0.00%',
   currencySymbol: '$',
   qtyFormat: '0.0',
+  numberFormat: '0,0',
   conuntry: countrySetting,
   initClinicSettings,
   getClinic: () => clinicSettings,
