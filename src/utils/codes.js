@@ -1599,7 +1599,7 @@ export const getInventoryItemList = (
       code: x.code,
       // uom: prescribingUOM.id,
       stock: x[stockName],
-      uom: x.prescribingUOM ? x.prescribingUOM.name : x.uom.name,
+      uom: x.dispensingUOM ? x.dispensingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
       [itemFKName]: x.id,
       stateName,
