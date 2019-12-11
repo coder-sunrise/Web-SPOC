@@ -1,13 +1,9 @@
 import React, { PureComponent } from 'react'
-import { connect } from 'dva'
 import { statusString } from '@/utils/codes'
 import { CommonTableGrid } from '@/components'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 import Authorized from '@/utils/Authorized'
 
-@connect(({ global }) => ({
-  mainDivHeight: global.mainDivHeight,
-}))
 class Grid extends PureComponent {
   state = {}
 
@@ -78,24 +74,34 @@ class Grid extends PureComponent {
       FuncProps: {
         pager: true,
         filter: true,
+        grouping: true,
+        groupingConfig: {
+          showToolbar: false,
+          state: {
+            grouping: [
+              { columnName: 'nationality' },
+            ],
+            // defaultExpandedGroups: [
+            //   'Patient',
+            //   'Company',
+            // ],
+          },
+          // row: {
+          //   contentComponent: GroupCellContent,
+          // },
+        },
       },
     }
   }
 
   render () {
-    const {
-      patientSearch,
-      onRowDblClick,
-      overrideTableParas = {},
-      mainDivHeight,
-      simple,
-    } = this.props
+    const { patientSearch, onRowDblClick, overrideTableParas = {} } = this.props
+
     return (
       <React.Fragment>
         <CommonTableGrid
           type='patientSearch'
           entity={patientSearch}
-          TableProps={{ height: simple ? mainDivHeight - 450 : undefined }}
           onRowDoubleClick={onRowDblClick}
           {...this.tableParas}
           {...overrideTableParas}

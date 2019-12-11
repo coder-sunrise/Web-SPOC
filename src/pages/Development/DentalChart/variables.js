@@ -583,7 +583,13 @@ export const buttonConfigs = [
       )
     },
   },
-
+  {
+    value: 'bridge',
+    // icon: filling,
+    text: 'Bridge',
+    type: 'connect',
+    // fill: '#737372',
+  },
   {
     value: 'topcell',
     // icon: onlayveneer,

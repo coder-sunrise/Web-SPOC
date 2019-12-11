@@ -92,7 +92,6 @@ class PatientSearch extends PureComponent {
       <React.Fragment>
         <FilterBar {...restProps} simple={simple} />
         <Grid
-          simple={simple}
           renderActionFn={renderActionFn}
           onRowDblClick={onRowDblClick}
           {...restProps}
