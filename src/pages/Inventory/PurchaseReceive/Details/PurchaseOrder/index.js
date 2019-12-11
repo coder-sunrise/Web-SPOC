@@ -262,6 +262,7 @@ class Index extends Component {
             [itemType.itemCode]: x.codeString,
             [itemType.itemName]: x.nameString,
           },
+          purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
       })
     } else if (type === 'dup') {
@@ -293,6 +294,7 @@ class Index extends Component {
             [itemType.itemCode]: x.codeString,
             [itemType.itemName]: x.nameString,
           },
+          purchaseOrderItemAdjustment: poAdjustment.purchaseOrderItemAdjustment,
         }
       })
     } else {
@@ -325,6 +327,8 @@ class Index extends Component {
               [itemType.itemCode]: x.codeString,
               [itemType.itemName]: x.nameString,
             },
+            purchaseOrderItemAdjustment:
+              poAdjustment.purchaseOrderItemAdjustment,
           }
         } else {
           result = {
@@ -334,7 +338,6 @@ class Index extends Component {
         return result
       })
     }
-
     return {
       ...purchaseOrder,
       purchaseOrderStatusFK: newPurchaseOrderStatusFK,
@@ -534,6 +537,9 @@ class Index extends Component {
                 adjustments={purchaseOrderAdjustment}
                 config={{
                   isGSTInclusive: isGstInclusive,
+                  itemFkField: 'purchaseOrderItemFK',
+                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
                   totalField: 'totalPrice',
                   adjustedField: 'totalAfterAdjustments',
                   gstField: 'totalAfterGst',
@@ -541,16 +547,35 @@ class Index extends Component {
                   gstValue: currentGstValue,
                 }}
                 onValueChanged={(v) => {
-                  setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                  // const newInvoice = {
+                  //   ...values.invoice,
+
+                  //   isGSTInclusive: !!v.summary.isGSTInclusive,
+                  // }
+                  // setValues({
+                  //   ...values,
+                  //   invoice: newInvoice,
+                  // })
+
+                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
                   setFieldValue(
-                    'purchaseOrder.isGstInclusive',
-                    v.summary.isGSTInclusive,
+                    'purchaseOrder.totalAfterAdj',
+                    v.summary.totalAfterAdj,
+                  )
+                  setFieldValue(
+                    'purchaseOrder.totalAfterGst',
+                    v.summary.totalWithGST,
                   )
                   setFieldValue(
                     'purchaseOrder.gstAmount',
                     Math.round(v.summary.gst * 100) / 100,
                   )
-                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+
+                  setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                  setFieldValue(
+                    'purchaseOrder.isGstInclusive',
+                    v.summary.isGSTInclusive,
+                  )
                 }}
               />
             </GridItem>
@@ -564,58 +589,63 @@ class Index extends Component {
             justifyContent: 'flex-end',
           }}
         >
-          {isPOStatusDraft(poStatus) && type === 'edit' ? (
-            <ProgressButton
-              color='danger'
-              icon={null}
-              onClick={() => this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.cancelpo',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
-          )}
+          {poStatus !== 6 && (
+            <div>
+              {isPOStatusDraft(poStatus) && type === 'edit' ? (
+                <ProgressButton
+                  color='danger'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.CANCEL)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.cancelpo',
+                  })}
+                </ProgressButton>
+              ) : (
+                ''
+              )}
 
-          <ProgressButton
-            color='primary'
-            icon={null}
-            disabled={!isPOStatusDraft(poStatus)}
-            onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
-          >
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.save',
-            })}
-          </ProgressButton>
-          {!isPOStatusDraft(poStatus) ? (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() =>
-                this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
-              disabled={!isPOStatusFulfilled(poStatus)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.complete',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
-          )}
-          {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
-            <ProgressButton
-              color='success'
-              icon={null}
-              onClick={() =>
-                this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
-            >
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.finalize',
-              })}
-            </ProgressButton>
-          ) : (
-            ''
+              <ProgressButton
+                color='primary'
+                icon={null}
+                disabled={!isPOStatusDraft(poStatus)}
+                onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
+              >
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.save',
+                })}
+              </ProgressButton>
+              {!isPOStatusDraft(poStatus) ? (
+                <ProgressButton
+                  color='success'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.COMPLETE)}
+                  disabled={!isPOStatusFulfilled(poStatus)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.complete',
+                  })}
+                </ProgressButton>
+              ) : (
+                ''
+              )}
+              {isPOStatusDraft(poStatus) && type !== 'new' && type !== 'dup' ? (
+                <ProgressButton
+                  color='success'
+                  icon={null}
+                  onClick={() =>
+                    this.onSubmitButtonClicked(poSubmitAction.FINALIZE)}
+                >
+                  {formatMessage({
+                    id: 'inventory.pr.detail.pod.finalize',
+                  })}
+                </ProgressButton>
+              ) : (
+                ''
+              )}
+            </div>
           )}
 
           <ProgressButton
