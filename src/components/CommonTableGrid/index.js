@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react'
+import color from 'color'
 
 import { isNumber } from 'util'
 import PropTypes from 'prop-types'
@@ -78,17 +79,20 @@ const styles = (theme) => ({
   },
 
   tableStriped: {
-    '& > tbody > tr:nth-of-type(odd), & > thead > tr': {
+    '& > tbody > tr:nth-of-type(odd):not(.group), & > thead > tr:not(.group)': {
       // backgroundColor: colorManipulator.fade(
       //   theme.palette.secondary.main,
       //   0.01,
       // ),
       backgroundColor: '#ffffff',
     },
-    '& > tbody > tr:nth-of-type(even)': {
+    '& > tbody > tr:nth-of-type(even):not(.group)': {
       backgroundColor: tableEvenRowColor,
     },
-    '& > tbody > tr:hover': {
+    // '& > tbody > tr.group': {
+    //   backgroundColor: color(tableEvenRowColor).lighten(0.5).hex(),
+    // },
+    '& > tbody > tr:not(.group):hover': {
       // backgroundColor: colorManipulator.fade(
       //   theme.palette.secondary.main,
       //   0.05,
@@ -1034,7 +1038,14 @@ class CommonTableGrid extends PureComponent {
               {header && <HeaderRow showSortingControls />}
               {extraRow.map((o) => o)}
               {pager && <PagingPanel pageSizes={pageSizes} {...pagerConfig} />}
-              {grouping && <TableGroupRow {...groupingConfig.row} />}
+              {grouping && (
+                <TableGroupRow
+                  rowComponent={(p) => {
+                    return <TableGroupRow.Row className='group' {...p} />
+                  }}
+                  {...groupingConfig.row}
+                />
+              )}
               {grouping && groupingConfig.showToolbar && <Toolbar />}
               {grouping &&
               groupingConfig.showToolbar && (

@@ -93,7 +93,7 @@ export default class ReportBase extends React.Component {
 
   render () {
     const { height } = this.props
-    console.log({ height })
+    // console.log({ height })
     const maxHeight = !height ? '100%' : height - 200
     return (
       <GridContainer>
