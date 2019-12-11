@@ -155,8 +155,8 @@ export default {
   'menu.support.contactus': 'Contact Us',
   'menu.support.druglabel': 'Drug Label',
 
-  'menu.wardoverview': 'Ward Overview',
-  'menu.wardoverview.wardmanagement': 'Ward Management',
+  'menu.wardoverview': 'Ward Management',
+  'menu.wardoverview.wardmanagement': 'Ward Occupancy',
 
   'menu.labmanagement': 'Lab Management',
 }
