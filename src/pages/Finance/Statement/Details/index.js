@@ -18,7 +18,7 @@ const styles = () => ({})
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
-    const returnValue = statement.entity || statement.default
+    const returnValue = statement.entity || statement
     let newStatementInvoice = []
     let total = 0
     let adminChargeValue = 0
