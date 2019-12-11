@@ -95,6 +95,14 @@ const DispenseDetails = ({
         temp: true,
       },
     })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+        force: true,
+        temp: true,
+      },
+    })
   }, [])
 
   const {

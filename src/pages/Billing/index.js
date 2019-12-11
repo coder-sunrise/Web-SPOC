@@ -68,10 +68,17 @@ const styles = (theme) => ({
   displayName: 'BillingForm',
   enableReinitialize: true,
   mapPropsToValues: ({ billing }) => {
-    // console.log('map props to values')
     try {
       if (billing.entity) {
-        const { invoicePayer = [], visitPurposeFK } = billing.entity
+        const {
+          invoicePayer = [],
+          invoicePayment = [],
+          visitPurposeFK,
+        } = billing.entity
+        const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
+          if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
+          return totalAmtPaid
+        }, 0)
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -84,27 +91,26 @@ const styles = (theme) => ({
         const finalPayable = roundTo(
           billing.entity.invoice.totalAftGst - finalClaim,
         )
-
-        return {
+        const values = {
           ...billing.default,
           ...billing.entity,
+          invoice: {
+            ...billing.entity.invoice,
+            patientOutstandingBalance: roundTo(finalPayable - totalPaid),
+          },
           finalClaim,
           finalPayable,
           visitId: billing.visitID,
           visitPurposeFK,
         }
+
+        return values
       }
     } catch (error) {
       console.log({ error })
     }
     return { ...billing.default, visitId: billing.visitID }
   },
-  // handleSubmit: (values, { props, resetForm }) => {
-  //   const { dispatch, patient } = props
-  //   const { visitStatus } = values
-  //   const payload = constructPayload(values)
-  //   console.log({ payload })
-  // },
 })
 class Billing extends Component {
   state = {
@@ -123,7 +129,7 @@ class Billing extends Component {
     // })
   }
 
-  upsertBilling = (callback = null) => {
+  upsertBilling = async (callback = null) => {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus } = values
     const payload = constructPayload(values)
@@ -148,18 +154,18 @@ class Billing extends Component {
       resetForm()
     }
 
-    dispatch({
+    const saveResponse = await dispatch({
       type: 'billing/save',
       payload,
-    }).then((response) => {
-      if (response) {
-        if (callback) {
-          callback()
-          return
-        }
-        defaultCallback()
-      }
     })
+
+    if (saveResponse) {
+      if (callback) {
+        callback()
+        return
+      }
+      defaultCallback()
+    }
   }
 
   toggleReport = () => {
@@ -205,11 +211,6 @@ class Billing extends Component {
     this.setState({ isEditing: editing })
   }
 
-  // upsertBilling = () => {
-  //   this.setState((preState) => ({ submitCount: preState.submitCount + 1 }))
-  //   this.handleSubmit()
-  // }
-
   shouldDisableSaveAndCompleteButton = () => {
     const { values } = this.props
     const { invoicePayer = [], invoice } = values
@@ -217,13 +218,6 @@ class Billing extends Component {
     if (invoicePayer.length === 0) return false
 
     return false
-  }
-
-  onSavePaymentClick = async () => {
-    const { setFieldValue } = this.props
-    await setFieldValue('mode', 'save')
-    await setFieldValue('visitStatus', 'BILLING')
-    this.upsertBilling()
   }
 
   onCompletePaymentClick = async () => {
@@ -368,7 +362,6 @@ class Billing extends Component {
       setFieldValue,
       setValues,
     }
-
     return (
       <LoadingWrapper loading={loading.global} text='Getting billing info...'>
         <PatientBanner />
