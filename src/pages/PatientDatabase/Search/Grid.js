@@ -88,13 +88,14 @@ class Grid extends PureComponent {
       onRowDblClick,
       overrideTableParas = {},
       mainDivHeight,
+      simple,
     } = this.props
     return (
       <React.Fragment>
         <CommonTableGrid
           type='patientSearch'
           entity={patientSearch}
-          TableProps={{ height: mainDivHeight - 450 }}
+          TableProps={{ height: simple ? mainDivHeight - 450 : undefined }}
           onRowDoubleClick={onRowDblClick}
           {...this.tableParas}
           {...overrideTableParas}
