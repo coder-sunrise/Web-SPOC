@@ -33,7 +33,8 @@ const FilterBar = ({ handleSubmit }) => {
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={12}>
+          <GridItem md={5} />
+          <GridItem md={4}>
             <FastField
               name='consumableIDs'
               render={(args) => (
