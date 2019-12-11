@@ -236,12 +236,28 @@ class Queue extends React.Component {
 
   togglePatientSearch = (override) => {
     const { showPatientSearch } = this.state
+    const target = !showPatientSearch
     this.setState({
-      showPatientSearch: override === undefined ? !showPatientSearch : override,
+      showPatientSearch: override === undefined ? target : override,
     })
-
-    if (showPatientSearch) {
+    // closing patient search
+    if (!target) {
       this.resetPatientSearchResult()
+    }
+
+    // opening patient search
+    if (target) {
+      this.props.dispatch({
+        type: 'patient/updateState',
+        payload: {
+          callback: () => {
+            this.props.dispatch({
+              type: 'patient/closePatientModal',
+            })
+            this.redirectToVisitRegistration()
+          },
+        },
+      })
     }
     this.props.history.push(
       getRemovedUrl([
@@ -343,7 +359,7 @@ class Queue extends React.Component {
         patientID: patientSearchResult[0].id,
       })
     if (totalRecords > 1) {
-      return this.setState({ showPatientSearch: true })
+      return this.togglePatientSearch()
     }
     return this.toggleRegisterNewPatient()
   }

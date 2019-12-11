@@ -4,6 +4,34 @@ import _ from 'lodash'
 import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
 
+const updateData = (data, payload) => {
+  const { toothIndex, value, target, forceSelect } = payload
+  const exist = data.find(
+    (o) =>
+      o.toothIndex === toothIndex && o.value === value && target === o.target,
+  )
+  if (value === 'clear')
+    return _.reject(data, (o) => o.toothIndex === toothIndex)
+  if (exist && !forceSelect) {
+    data = _.reject(
+      data,
+      (o) =>
+        o.toothIndex === toothIndex && o.value === value && target === o.target,
+    )
+  } else {
+    data = _.reject(
+      data,
+      (o) =>
+        o.value !== value && o.toothIndex === toothIndex && target === o.target,
+    )
+    data.push({
+      ...payload,
+      // id: getUniqueId(),
+    })
+  }
+
+  return data
+}
 export default createFormViewModel({
   namespace: 'dentalChartComponent',
   config: {
@@ -18,26 +46,40 @@ export default createFormViewModel({
           toothIndex: 11,
           value: 'topcell',
         },
+        {
+          value: 'onlayveneer',
+          toothIndex: 17,
+          id: 'sys-gen--231',
+        },
       ],
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
     reducers: {
-      toggleSelect (state, { payload }) {
+      clean (state, { payload }) {
         let data = _.cloneDeep(state.data)
-        console.log(payload)
-        if (payload.id) {
-          data = _.reject(data, (o) => o.id === payload.id)
-        } else {
-          data.push({
-            ...payload,
-            id: getUniqueId(),
-          })
+
+        return {
+          ...state,
+          data: _.reject(data, (o) => o.toothIndex === payload.toothIndex),
         }
+      },
+
+      toggleMultiSelect (state, { payload = [] }) {
+        let data = _.cloneDeep(state.data)
+        payload.map((o) => {
+          data = updateData(data, o)
+        })
 
         return {
           ...state,
           data,
+        }
+      },
+      toggleSelect (state, { payload }) {
+        return {
+          ...state,
+          data: updateData(_.cloneDeep(state.data), payload),
         }
       },
     },

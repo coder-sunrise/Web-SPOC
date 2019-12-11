@@ -32,7 +32,7 @@ class ExpenditureList extends PureComponent {
       { name: 'expenditureDescription', title: 'Description' },
       { name: 'expenditureName', title: 'Name' },
       { name: 'expenditureAmount', title: 'Amount' },
-      { name: 'expenditureGst', title: 'GST' },
+      { name: 'expenditureGst', title: 'Gst' },
       { name: 'expenditureTotal', title: 'Final Amount' },
     ]
     const ExpenditureGstDetailsExtensions = [

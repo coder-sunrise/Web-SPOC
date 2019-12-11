@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core'
 
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
+import { bool } from 'prop-types'
 import { ReportDataGrid } from '@/components/_medisys'
 
 const styles = (theme) => ({
@@ -59,10 +60,10 @@ const PaymentCollections = ({
   let PaymentCollectionsColumns = [
     { name: 'invoiceNo', title: 'Invoice No.' },
     { name: 'totalAftAdj', title: 'Total Amount' },
-    { name: 'gstAmt', title: 'GST' },
+    { name: 'gstAmt', title: 'Gst' },
     { name: 'payerName', title: 'Payer Name' },
     { name: 'receiptNo', title: 'Receipt No.' },
-    { name: 'totalAmtPaid', title: 'payment' },
+    { name: 'totalAmtPaid', title: 'Payment' },
   ]
 
   let PaymentCollectionsColumnExtension = [
@@ -109,7 +110,10 @@ const PaymentCollections = ({
       ))
     }
     newchildren.push([children[4], children[5]])
-    return <Table.Row className={classes.subRow}>{newchildren}</Table.Row>
+    if (row.countNumber === 1) {
+      return <Table.Row {...p}>{newchildren}</Table.Row>
+    }
+    return <Table.Row {...p} className={classes.subRow}>{newchildren}</Table.Row>
   }
   const FuncProps = {
     pager: false,

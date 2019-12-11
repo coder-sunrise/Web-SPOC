@@ -199,7 +199,7 @@ export default createFormViewModel({
 
       upsertRow (state, { payload }) {
         let { rows } = state.entity
-        const { gridRows } = payload
+        const { gridRows, gridRow, remark } = payload
         if (payload.uid) {
           rows = gridRows.map((o) => {
             let itemFK
@@ -223,21 +223,21 @@ export default createFormViewModel({
           //       : row
           //   return n
           // })
-        } else {
+        } else if (gridRow) {
           // const itemFK = podoOrderType.filter(
           //   (x) => x.value === payload.type,
           // )[0].itemFKName
           let itemFK
-          const item = podoOrderType.filter((x) => x.value === payload.type)
+          const item = podoOrderType.filter((x) => x.value === gridRow.type)
           if (item.length > 0) {
             const { itemFKName } = item[0]
             itemFK = itemFKName
           }
           rows.push({
-            ...payload,
-            [itemFK]: payload.itemFK,
-            name: payload.itemFK,
-            uom: payload.itemFK,
+            ...gridRow,
+            [itemFK]: gridRow.itemFK,
+            name: gridRow.itemFK,
+            uom: gridRow.itemFK,
             uid: getUniqueId(),
             isDeleted: false,
           })
@@ -248,6 +248,7 @@ export default createFormViewModel({
           entity: {
             ...state.entity,
             rows,
+            remark,
           },
         }
       },

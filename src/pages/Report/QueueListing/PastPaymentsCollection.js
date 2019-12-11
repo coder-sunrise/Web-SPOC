@@ -22,10 +22,10 @@ const PastPaymentsCollection = ({ reportDatas }) => {
   const PastPaymentCollectionTableColumn = [
     { name: 'payerName', title: 'Payer Name' },
     { name: 'doctorName', title: 'Doctor' },
-    { name: 'invoiceNo', title: 'Invoice No' },
+    { name: 'invoiceNo', title: 'Invoice No.' },
     { name: 'invoiceDate', title: 'Invoice Date' },
     { name: 'mode', title: 'Payment Mode' },
-    { name: 'amt', title: 'Invoice Amt' },
+    { name: 'amt', title: 'Invoice Amt.' },
     { name: 'paymentReceivedDate', title: 'Payment Received Date' },
   ]
 

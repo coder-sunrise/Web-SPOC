@@ -20,6 +20,7 @@ let i = 0
 @withFormikExtend({
   mapPropsToValues: ({ orders = {} }) => {
     const newOrders = orders.entity || orders.defaultVaccination
+
     return { minQuantity: 1, ...newOrders }
   },
 
@@ -66,7 +67,7 @@ class Vaccination extends PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === nextProps.values.type)
+    if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
           nextProps.global.openAdjustment) ||
@@ -237,7 +238,6 @@ class Vaccination extends PureComponent {
       disableEdit,
       ...reset
     } = this.props
-    // console.log(values, reset)
     return (
       <div>
         <GridContainer>

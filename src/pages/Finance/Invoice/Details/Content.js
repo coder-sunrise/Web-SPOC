@@ -13,7 +13,6 @@ import PaymentDetails from './PaymentDetails'
 import styles from './styles'
 
 const Content = ({ classes, clinicSettings, values, ...restProps }) => {
-  console.log({ restProps })
   const { invoiceDetail, invoicePayment } = restProps
   const { currentBizSessionInfo } = invoicePayment
   const { entity } = invoiceDetail

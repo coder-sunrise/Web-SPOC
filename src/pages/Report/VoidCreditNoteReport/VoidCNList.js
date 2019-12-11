@@ -25,8 +25,8 @@ class VoidCNList extends PureComponent {
     const listCols = [
       { name: 'invoiceDate', title: 'Invoice Date' },
       { name: 'invoiceNo', title: 'Invoice No.' },
-      { name: 'generatedDate', title: 'CN Date' },
-      { name: 'itemNo', title: 'CN No.' },
+      { name: 'generatedDate', title: 'Cn Date' },
+      { name: 'itemNo', title: 'Cn No.' },
       { name: 'totalAmt', title: 'Amount' },
       { name: 'voidedBy', title: 'Voided By' },
       { name: 'voidedDate', title: 'Voided Date' },

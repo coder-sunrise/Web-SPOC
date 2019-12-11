@@ -219,20 +219,24 @@ class CollectPaymentConfirm extends PureComponent {
     const { bizSessionList } = statement
     return (
       <GridContainer>
-        <GridItem md={9} style={{ marginTop: 20 }} justify='flex-end'>
-          <div
-            style={{ height: this.state.containerHeight, overflow: 'auto' }}
-            ref={(c) => {
-              this._container = c
-            }}
-          >
-            <CommonTableGrid
-              rows={values.statementInvoice}
-              columns={columns}
-              columnExtensions={columnExtensions}
-              FuncProps={{ pager: false }}
-            />
-          </div>
+        <GridItem md={9}>
+          <CardContainer hideHeader justify='flex-end'>
+            <GridItem>
+              <div
+                style={{ height: this.state.containerHeight, overflow: 'auto' }}
+                ref={(c) => {
+                  this._container = c
+                }}
+              >
+                <CommonTableGrid
+                  rows={values.statementInvoice}
+                  columns={columns}
+                  columnExtensions={columnExtensions}
+                  FuncProps={{ pager: false }}
+                />
+              </div>
+            </GridItem>
+          </CardContainer>
         </GridItem>
         <GridItem md={3}>
           <CardContainer hideHeader>

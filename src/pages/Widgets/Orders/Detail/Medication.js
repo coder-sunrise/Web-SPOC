@@ -44,6 +44,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
         {},
       ]
     }
+    console.log(v)
     return v
   },
   enableReinitialize: true,
@@ -214,7 +215,7 @@ class Medication extends PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === nextProps.values.type)
+    if (nextProps.orders.type === this.props.type)
       if (
         (!this.props.global.openAdjustment &&
           nextProps.global.openAdjustment) ||

@@ -23,7 +23,6 @@ const isSameOrAfterTime = (startTime, endTime) =>
   mapPropsToValues: ({ consultationDocument, visitEntity }) => {
     const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
     const currentTime = moment().format('HH:mm')
-
     if (consultationDocument.entity === undefined) {
       return {
         ...(consultationDocument.entity ||
@@ -111,7 +110,7 @@ class CertificateAttendance extends PureComponent {
 
   render () {
     const { footer, handleSubmit, classes, values } = this.props
-
+    console.log({ values })
     return (
       <div>
         {values.referenceNo && (

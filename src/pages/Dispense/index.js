@@ -38,13 +38,6 @@ class Dispense extends PureComponent {
   componentWillUnmount () {
     const { dispatch } = this.props
     dispatch({
-      type: 'dispense/updateState',
-      payload: {
-        editingOrder: false,
-        entity: null,
-      },
-    })
-    dispatch({
       type: 'orders/reset',
     })
   }

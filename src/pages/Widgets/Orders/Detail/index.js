@@ -59,7 +59,7 @@ class Details extends PureComponent {
         <div className={classnames(classes.footer)}>
           {showAdjustment && (
             <Button
-              link
+              color='primary'
               style={{ float: 'left' }}
               disabled={this.state.disableEdit}
               onClick={this.showAdjustment}
@@ -179,7 +179,6 @@ class Details extends PureComponent {
       setDisable: this.setDisable,
       footer: this.footerBtns,
       currentType: orderTypes.find((o) => o.value === type),
-      type,
       orderTypes,
       getNextSequence: this.getNextSequence,
       ...props,
@@ -202,7 +201,10 @@ class Details extends PureComponent {
                   return {
                     id: o.value,
                     name: o.name,
-                    content: o.component(cfg),
+                    content: o.component({
+                      ...cfg,
+                      type: o.value,
+                    }),
                   }
                 })}
                 tabStyle={{}}
