@@ -652,6 +652,18 @@ const routes = [
           },
         ],
       },
+      //
+      // Ward Demo
+      // {
+      //   path: '/wardmanagement',
+      //   icon: 'hotel',
+      //   name: 'wardmanagement',
+      //   hideChildrenInMenu: true,
+      //   authority: [
+      //     'wardmanagement',
+      //   ],
+      //   component: './WardManagement/Search',
+      // },
       // Claim Submission
       //
       // Settings
@@ -846,7 +858,7 @@ const routes = [
       // Support
       {
         path: '/support',
-        icon: 'library_books',
+        icon: 'local_phone',
         name: 'support',
         hideChildrenInMenu: true,
         routes: [

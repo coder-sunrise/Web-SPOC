@@ -1,6 +1,5 @@
 import React from 'react'
-// common components
-import { CardContainer, GridContainer, GridItem, Button } from '@/components'
+import { GridContainer, GridItem, Button } from '@/components'
 import ReportLayoutWrapper from './ReportLayout'
 // services
 import { getRawData } from '@/services/report'
@@ -79,7 +78,7 @@ export default class ReportBase extends React.Component {
     return (
       <GridContainer size='sm'>
         <GridItem md={3}>
-          <Button color='primary' onClick={handleSubmit}>
+          <Button color='primary' onClick={handleSubmit} style={{ marginTop: 6 }}>
             Generate Report
           </Button>
         </GridItem>
@@ -93,7 +92,7 @@ export default class ReportBase extends React.Component {
 
   render () {
     const { height } = this.props
-    console.log({ height })
+    // console.log({ height })
     const maxHeight = !height ? '100%' : height - 200
     return (
       <GridContainer>

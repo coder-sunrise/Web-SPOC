@@ -45,6 +45,7 @@ const styles = (theme) => ({
 class index extends Component {
   state = {
     showDeliveryOrderDetails: false,
+    mode: '',
   }
 
   componentDidMount () {
@@ -52,7 +53,6 @@ class index extends Component {
   }
 
   refreshDeliveryOrder = () => {
-    console.log('refreshDeliveryOrder')
     this.props.dispatch({
       type: 'deliveryOrderDetails/getOutstandingPOItem',
       payload: this.props.purchaseOrderDetails,
@@ -61,22 +61,23 @@ class index extends Component {
 
   onAddDeliveryOrderClicked = () => {
     const { dispatch } = this.props
-    this.setState({ showDeliveryOrderDetails: true })
-    dispatch({
-      type: 'deliveryOrderDetails/addNewDeliveryOrder',
-    })
+    this.setState({ showDeliveryOrderDetails: true, mode: 'Add' })
+    // dispatch({
+    //   type: 'deliveryOrderDetails/addNewDeliveryOrder',
+    // })
   }
 
   onEditDeliveryOrderClicked = (row) => {
     const { dispatch } = this.props
-    this.setState({ showDeliveryOrderDetails: true })
+    this.setState({ showDeliveryOrderDetails: true, mode: 'Edit' })
     dispatch({
       type: 'deliveryOrderDetails/queryDeliveryOrder',
       payload: { id: row.id },
     })
   }
 
-  closeDODetailsModal = () => this.setState({ showDeliveryOrderDetails: false })
+  closeDODetailsModal = () =>
+    this.setState({ showDeliveryOrderDetails: false, mode: '' })
 
   render () {
     const { purchaseOrderDetails, theme } = this.props
@@ -85,7 +86,7 @@ class index extends Component {
     const isWriteOff = purchaseOrder
       ? purchaseOrder.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const { showDeliveryOrderDetails } = this.state
+    const { showDeliveryOrderDetails, mode } = this.state
     const isEditable = () => {
       if (poStatus === 6) return false
       if (isWriteOff) return false
@@ -122,20 +123,25 @@ class index extends Component {
               <DODetails
                 refreshDeliveryOrder={this.refreshDeliveryOrder}
                 {...this.props}
+                mode={mode}
               />
             </CommonModal>
-            <Button
-              // disabled={isPOStatusFulfilled(poStatus)}
-              onClick={this.onAddDeliveryOrderClicked}
-              // hideIfNoEditRights
-              color='info'
-              link
-            >
-              <Add />
-              {formatMessage({
-                id: 'inventory.pr.detail.dod.addDeliveryOrder',
-              })}
-            </Button>
+            {!isPOStatusFulfilled(poStatus) ? (
+              <Button
+                // disabled={isPOStatusFulfilled(poStatus)}
+                onClick={this.onAddDeliveryOrderClicked}
+                // hideIfNoEditRights
+                color='info'
+                link
+              >
+                <Add />
+                {formatMessage({
+                  id: 'inventory.pr.detail.dod.addDeliveryOrder',
+                })}
+              </Button>
+            ) : (
+              ''
+            )}
           </GridContainer>
         </div>
       </AuthorizedContext.Provider>
