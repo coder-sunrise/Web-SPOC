@@ -45,8 +45,8 @@ const styles = () => ({})
       ...returnValue,
       outstandingBalance,
       adminChargeValue,
-      amount: total,
-      maxAmount: total,
+      amount: Number(total).toFixed(2),
+      maxAmount: Number(total).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
       displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
