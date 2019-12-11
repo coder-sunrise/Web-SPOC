@@ -226,7 +226,18 @@ export const VaccinationColumn = [
 ]
 
 export const VaccinationColumnExtensions = (viewOnly = false) => [
-  { columnName: 'dispensedQuanity', width: columnWidth, type: 'number' },
+  {
+    columnName: 'dispensedQuanity',
+    type: 'number',
+    width: columnWidth,
+    render: (row) => {
+      return (
+        <p>
+          {row.dispensedQuanity} {row.dispenseUOM}
+        </p>
+      )
+    },
+  },
   { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
     columnName: 'totalAfterItemAdjustment',
