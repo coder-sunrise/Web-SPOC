@@ -10,4 +10,7 @@ export default {
   'claimsubmission.invoiceClaim.ResubmitClaim.tooltips': 'Re-Submit Claim',
   'claimsubmission.invoiceClaim.CollectPayment': 'Collect Payment',
   'claimsubmission.invoiceClaim.GetStatus': 'Get Status',
+  'claimsubmission.invoiceClaim.filter.invoicedatedfrom':'Invoice Date From',
+  'claimsubmission.invoiceClaim.filter.invoicedateto':'Invoice Date To',
+  'claimsubmission.invoiceClaim.claimStatus':'Claim Status',
 }

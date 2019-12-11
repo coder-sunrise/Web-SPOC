@@ -70,7 +70,7 @@ export const ApprovedCHASColumnExtensions = [
   { columnName: 'invoiceDate', type: 'date' },
   { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
   { columnName: 'submissionDate', type: 'date', width: 140 },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true },
-  { columnName: 'claimAmount', type: 'currency', currency: true },
+  { columnName: 'invoiceAmount', type: 'currency', currency: true, sortBy:'invoiceAmt' },
+  { columnName: 'claimAmount', type: 'currency', currency: true, sortBy:'claimAmt' },
   { columnName: 'collectedAmount', type: 'currency', currency: true },
 ]

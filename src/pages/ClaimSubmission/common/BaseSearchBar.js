@@ -3,7 +3,7 @@ import React from 'react'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import { FormattedMessage } from 'umi/locale'
+import { formatMessage,FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 
 // common components
@@ -11,6 +11,7 @@ import {
   DatePicker,
   GridContainer,
   GridItem,
+  DateRangePicker,
   TextField,
   ProgressButton,
 } from '@/components'
@@ -55,8 +56,20 @@ const BaseSearchBar = ({
           <GridItem md={6}>
             {!hideInvoiceDate && (
               <FastField
-                name='invoiceDate'
-                render={(args) => <DatePicker {...args} label='Invoice Date' />}
+                name='invoiceDates'
+                render={(args) => {
+                  return (
+                    <DateRangePicker
+                      label={formatMessage({
+                        id:'claimsubmission.invoiceClaim.filter.invoicedatedfrom',
+                      })}
+                      label2={formatMessage({
+                        id:'claimsubmission.invoiceClaim.filter.invoicedateto',
+                      })}
+                      {...args}
+                    />)
+                }
+                  }
               />
             )}
           </GridItem>
@@ -65,43 +78,30 @@ const BaseSearchBar = ({
               color='primary'
               icon={<Search />}
               onClick={() => {
-                const { patientName, patientAccountNo, invoiceNo } = values
+                const { patientName,
+                  patientAccountNo,
+                  invoiceNo,
+                  invoiceDates,
+                  chasClaimStatusCode } = values
+
+                const fromToDates = (index) => {
+                  if (invoiceDates)
+                    return invoiceDates[index]
+                  return undefined
+                }
+
                 dispatch({
                   type: `${modelsName}/query`,
                   payload: {
-                    group: [
-                      {
-                        patientName,
-                        patientAccountNo,
-                        invoiceNo,
-                        combineCondition: 'or',
-                      },
-                    ],
+                    lgteql_invoiceDate: fromToDates(0),
+                    lsteql_invoiceDate: fromToDates(1),
+                    patientName,
+                    patientAccountNo,
+                    invoiceNo,
+                    chasClaimStatusCode,
                   },
                 })
               }}
-              // onClick={() => {
-              //   const {
-              //     codeDisplayValue,
-              //     isActive,
-              //     serviceCenterFK,
-              //   } = this.props.values
-              //   this.props.dispatch({
-              //     type: 'settingClinicService/query',
-              //     payload: {
-              //       //[`${prefix}name`]: this.props.values.search
-              //       isActive,
-              //       group: [
-              //         {
-              //           code: codeDisplayValue,
-              //           displayValue: codeDisplayValue,
-              //           serviceCenterFK: serviceCenterFK,
-              //           combineCondition: 'or',
-              //         },
-              //       ],
-              //     },
-              //   })
-              // }}
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
