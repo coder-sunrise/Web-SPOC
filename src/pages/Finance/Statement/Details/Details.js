@@ -13,7 +13,7 @@ import {
   CommonTableGrid,
   CommonModal,
   dateFormatLong,
-  dateFormatLongWithTime,
+  dateFormatLongWithTimeNoSec12h,
   ProgressButton,
   serverDateFormat,
 } from '@/components'
@@ -198,7 +198,9 @@ class Details extends PureComponent {
 
         <p style={{ margin: theme.spacing(1) }}>
           {`Last Refreshed On ${values.lastRefreshTime
-            ? moment(values.lastRefreshTime).format(dateFormatLongWithTime)
+            ? moment(values.lastRefreshTime).format(
+                dateFormatLongWithTimeNoSec12h,
+              )
             : '-'}`}
         </p>
 

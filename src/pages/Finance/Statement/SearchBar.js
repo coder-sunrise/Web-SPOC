@@ -220,6 +220,9 @@ class SearchBar extends PureComponent {
               color='primary'
               onClick={() => {
                 dispatch({
+                  type: 'statement/reset',
+                })
+                dispatch({
                   type: 'statement/updateState',
                   payload: {
                     entity: undefined,

@@ -44,7 +44,7 @@ const styles = () => ({
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
-    const returnValue = statement.entity || statement.default
+    const returnValue = statement.entity || statement
     const adminChargeValueType =
       returnValue.adminChargeValueType || 'Percentage'
     return {
@@ -196,22 +196,25 @@ class AddNewStatement extends PureComponent {
   }
 
   componentDidMount () {
-    const { values, setValues } = this.props
+    const { values, setValues, dispatch } = this.props
+
     this.setState({
       invoiceRows: values.statementInvoice,
     })
     let defaultIds = []
-    values.statementInvoice.forEach((o) => {
-      if (
-        (o.statementInvoicePayment.length === 0 && !o.isDeleted) ||
-        o.statementInvoicePayment.find(
-          (i) => i.invoicePayment.isCancelled === true,
-        ) ||
-        o.payableAmount === o.outstandingAmount
-      ) {
-        defaultIds.push(o.id)
-      }
-    })
+    if (values.statementInvoice) {
+      values.statementInvoice.forEach((o) => {
+        if (
+          (o.statementInvoicePayment.length === 0 && !o.isDeleted) ||
+          o.statementInvoicePayment.find(
+            (i) => i.invoicePayment.isCancelled === true,
+          ) ||
+          o.payableAmount === o.outstandingAmount
+        ) {
+          defaultIds.push(o.id)
+        }
+      })
+    }
 
     this.setState({
       selectedRows: defaultIds,
@@ -220,6 +223,12 @@ class AddNewStatement extends PureComponent {
       ...values,
       selectedRows: defaultIds,
       invoiceRows: values.statementInvoice,
+    })
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'statement/reset',
     })
   }
 
@@ -304,7 +313,7 @@ class AddNewStatement extends PureComponent {
 
   render () {
     const { classes, theme, values, handleSubmit, statement } = this.props
-    const { invoiceRows, columns, columnExtensions } = this.state
+    const { invoiceRows = [], columns, columnExtensions } = this.state
     const { entity } = statement
     const mode = entity && entity.id > 0 ? 'Edit' : 'Add'
 
@@ -457,6 +466,8 @@ class AddNewStatement extends PureComponent {
               </GridItem>
             </GridItem>
             <CommonTableGrid
+              type='statement'
+              queryMethod='queryInvoiceList'
               style={{ margin: theme.spacing(2) }}
               rows={
                 invoiceRows.length > 0 ? invoiceRows : values.statementInvoice
@@ -465,6 +476,8 @@ class AddNewStatement extends PureComponent {
               columnExtensions={columnExtensions}
               FuncProps={{
                 selectable: true,
+                pager: true,
+                filter: true,
                 selectConfig: {
                   showSelectAll: true,
                   rowSelectionEnabled: (row) => {
