@@ -1012,7 +1012,7 @@ const calculateAmount = (
     return {
       [itemFkField]: invoiceItem.id,
       [itemAdjustmentFkField]: adjustment.id,
-      adjAmount: invoiceItem[`adjustmen${index}`],
+      adjAmount: roundTo(invoiceItem[`adjustmen${index}`]),
       isDeleted: !!adjustment.isDeleted,
     }
   }
