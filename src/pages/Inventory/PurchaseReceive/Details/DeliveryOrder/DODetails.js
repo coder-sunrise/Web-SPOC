@@ -65,7 +65,7 @@ const receivingDetailsSchema = Yup.object().shape({
   displayName: 'deliveryOrderDetails',
   validationSchema: Yup.object().shape({
     // deliveryOrderNo: Yup.string().required(),
-    deliveryOrderDate: Yup.string().required(),
+    deliveryOrderDate: Yup.date().required(),
     rows: Yup.array().required('At least one item is required.'),
     // rows: Yup.array().compact((v) => v.isDeleted).of(receivingDetailsSchema),
     remark: Yup.string().max(500),
@@ -181,8 +181,15 @@ class DODetails extends PureComponent {
   }
 
   componentDidMount = async () => {
-    await this.props.refreshDeliveryOrder()
+    const { mode, dispatch } = this.props
     await this.initializeStateItemList()
+    await this.props.refreshDeliveryOrder()
+
+    if (mode === 'Add') {
+      dispatch({
+        type: 'deliveryOrderDetails/addNewDeliveryOrder',
+      })
+    }
   }
 
   initializeStateItemList = async () => {
@@ -210,6 +217,7 @@ class DODetails extends PureComponent {
             [x.stateName]: inventoryItemList,
           },
         })
+        console.log('deliveryOrderDetails/updateState')
       })
 
       return null
@@ -721,74 +729,68 @@ class DODetails extends PureComponent {
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
           <GridContainer>
-            <AuthorizedContext.Provider
-              value={{
-                rights: values.id ? 'disable' : 'enable',
-                // rights: 'disable',
-              }}
-            >
-              <GridItem xs={12} md={5}>
-                <GridContainer>
-                  <GridItem xs={12}>
-                    <FastField
-                      name='deliveryOrderNo'
-                      render={(args) => {
-                        return (
-                          <TextField
-                            autoFocus
-                            label={formatMessage({
-                              id: 'inventory.pr.detail.dod.deliveryOrderNo',
-                            })}
-                            disabled
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </GridItem>
-                  <GridItem xs={12}>
-                    <FastField
-                      name='deliveryOrderDate'
-                      render={(args) => {
-                        return (
-                          <DatePicker
-                            label={formatMessage({
-                              id: 'inventory.pr.detail.dod.deliveryOrderDate',
-                            })}
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </GridItem>
-                </GridContainer>
-              </GridItem>
+            <GridItem xs={12} md={5}>
+              <GridContainer>
+                <GridItem xs={12}>
+                  <FastField
+                    name='deliveryOrderNo'
+                    render={(args) => {
+                      return (
+                        <TextField
+                          autoFocus
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.deliveryOrderNo',
+                          })}
+                          disabled
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+                <GridItem xs={12}>
+                  <FastField
+                    name='deliveryOrderDate'
+                    render={(args) => {
+                      return (
+                        <DatePicker
+                          disabled={values.id}
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.deliveryOrderDate',
+                          })}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>
+            </GridItem>
 
-              <GridItem xs={12} md={1} />
+            <GridItem xs={12} md={1} />
 
-              <GridItem xs={12} md={5}>
-                <GridContainer>
-                  <GridItem xs={12}>
-                    <FastField
-                      name='remark'
-                      render={(args) => {
-                        return (
-                          <OutlinedTextField
-                            label={formatMessage({
-                              id: 'inventory.pr.detail.dod.remarks',
-                            })}
-                            multiline
-                            rowsMax={2}
-                            rows={2}
-                            {...args}
-                          />
-                        )
-                      }}
-                    />
-                  </GridItem>
-                </GridContainer>
-              </GridItem>
-            </AuthorizedContext.Provider>
+            <GridItem xs={12} md={5}>
+              <GridContainer>
+                <GridItem xs={12}>
+                  <FastField
+                    name='remark'
+                    render={(args) => {
+                      return (
+                        <OutlinedTextField
+                          label={formatMessage({
+                            id: 'inventory.pr.detail.dod.remarks',
+                          })}
+                          multiline
+                          rowsMax={2}
+                          rows={2}
+                          {...args}
+                        />
+                      )
+                    }}
+                  />
+                </GridItem>
+              </GridContainer>
+            </GridItem>
           </GridContainer>
 
           <GridItem xs={12} md={11}>

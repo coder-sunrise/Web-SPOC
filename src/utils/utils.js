@@ -1008,11 +1008,11 @@ const calculateAmount = (
     })
   }
   // console.log({ activeRows, adjustments })
-  const mapInvoiceItemAdjustment = (adjustment) => (invoiceItem) => {
+  const mapInvoiceItemAdjustment = (adjustment, index) => (invoiceItem) => {
     return {
       [itemFkField]: invoiceItem.id,
       [itemAdjustmentFkField]: adjustment.id,
-      adjAmount: invoiceItem[adjAmountField],
+      adjAmount: invoiceItem[`adjustmen${index}`],
       isDeleted: !!adjustment.isDeleted,
     }
   }
@@ -1022,7 +1022,9 @@ const calculateAmount = (
     adjustments: adjustments.map((o, index) => ({
       ...o,
       index,
-      [invoiceItemAdjustmentField]: activeRows.map(mapInvoiceItemAdjustment(o)),
+      [invoiceItemAdjustmentField]: activeRows.map(
+        mapInvoiceItemAdjustment(o, index),
+      ),
     })),
     summary: {
       subTotal: roundTo(

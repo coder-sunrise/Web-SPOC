@@ -120,11 +120,64 @@ export default createFormViewModel({
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
         // const { deliveryOrderNo } = payload
-        const { purchaseOrderDetails } = state
+        const {
+          purchaseOrderDetails,
+          MedicationItemList = [],
+          ConsumableItemList = [],
+          VaccinationItemList = [],
+        } = state
         const {
           purchaseOrder,
           purchaseOrderOutstandingItem,
         } = purchaseOrderDetails
+
+        const newOSItem = purchaseOrderOutstandingItem.map((o) => {
+          if (MedicationItemList.length > 0 && o.type === 1) {
+            const m = MedicationItemList.find(
+              (f) =>
+                f.inventoryMedicationFK === o.inventoryMedicationFK &&
+                f.stock &&
+                f.stock.length > 0,
+            )
+            const defaultStock = m.stock.find((s) => s.isDefault === true)
+            const batchNo = defaultStock.batchNo || o.batchNo
+            return {
+              ...o,
+              batchNo,
+            }
+          }
+          if (MedicationItemList.length > 0 && o.type === 2) {
+            const m = ConsumableItemList.find(
+              (f) =>
+                f.inventoryConsumableFK === o.inventoryConsumableFK &&
+                f.stock &&
+                f.stock.length > 0,
+            )
+            const defaultStock = m.stock.find((s) => s.isDefault === true)
+            const batchNo = defaultStock.batchNo || o.batchNo
+            return {
+              ...o,
+              batchNo,
+            }
+          }
+          if (MedicationItemList.length > 0 && o.type === 3) {
+            const m = VaccinationItemList.find(
+              (f) =>
+                f.inventoryVaccinationFK === o.inventoryVaccinationFK &&
+                f.stock &&
+                f.stock.length > 0,
+            )
+            const defaultStock = m.stock.find((s) => s.isDefault === true)
+            const batchNo = defaultStock.batchNo || o.batchNo
+            return {
+              ...o,
+              batchNo,
+            }
+          }
+
+          return o
+        })
+
         return {
           ...state,
           entity: {
@@ -132,7 +185,7 @@ export default createFormViewModel({
             // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
-            rows: purchaseOrderOutstandingItem,
+            rows: newOSItem,
           },
         }
       },
@@ -156,6 +209,9 @@ export default createFormViewModel({
             currentReceivingBonusQty: x.bonusQuantity,
             maxCurrentReceivingQty: x.recevingQuantity,
             maxCurrentReceivingBonusQty: x.bonusQuantity,
+            batchNo: [
+              x.batchNo,
+            ],
             // expiryDate: null,
           }
         })
