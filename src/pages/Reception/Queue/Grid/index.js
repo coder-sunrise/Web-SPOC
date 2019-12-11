@@ -374,8 +374,13 @@ const Grid = ({
 
   const handleStatusTagClick = (row) => {
     let id = '5' // default as Start Consultation
-    const { visitStatus, visitPurposeFK } = row
-    if (visitStatus === VISIT_STATUS.UPCOMING_APPT) return
+    const { visitStatus, visitPurposeFK, patientProfileFk } = row
+    if (visitStatus === VISIT_STATUS.UPCOMING_APPT) {
+      id = patientProfileFk ? '8' : '9'
+
+      onClick(row, id)
+      return
+    }
 
     switch (visitStatus) {
       case VISIT_STATUS.WAITING:
@@ -471,7 +476,13 @@ const Grid = ({
             rows={queueListingData}
             columnExtensions={[
               ...ApptColumnExtensions,
-
+              {
+                columnName: 'visitStatus',
+                width: 180,
+                render: (row) => (
+                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
+                ),
+              },
               {
                 columnName: 'action',
                 align: 'center',

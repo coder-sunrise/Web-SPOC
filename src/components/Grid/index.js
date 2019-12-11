@@ -150,7 +150,6 @@ const TimeFormatter = ({ value, ...rest }) => {
 }
 
 const DateFormatter = ({ value, full = false, format }) => {
-  console.log({ value, format })
   const _format = format || (full ? fullDateTime : dateFormatLong)
   if (!value) return null
   if (moment.isMoment(value)) return value.format(_format)

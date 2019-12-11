@@ -85,6 +85,7 @@ const routes = [
           {
             path: '/reception/queue/dispense',
             name: 'dispense',
+            observe: 'EditOrder',
             hideInMenu: true,
             exact: true,
             component: './Dispense',

@@ -1,10 +1,7 @@
 import _ from 'lodash'
 import numeral from 'numeral'
 import { roundTo, getUniqueId } from '@/utils/utils'
-import {
-  INVOICE_PAYER_TYPE,
-  INVOICE_ITEM_TYPE_BY_TEXT,
-} from '@/utils/constants'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 export const convertAmountToPercentOrCurrency = (type, amount) =>
   type.toLowerCase() === 'percentage' ? `${amount}%` : `$${amount.toFixed(2)}`

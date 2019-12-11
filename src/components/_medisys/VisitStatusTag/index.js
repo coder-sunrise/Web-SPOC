@@ -50,7 +50,7 @@ const styles = () => ({
   lightGrey: {
     backgroundColor: '#999',
     '&:hover': {
-      cursor: 'default',
+      backgroundColor: color('#999').darken(0.2).hex(),
     },
   },
 })
@@ -62,7 +62,7 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
 
   const handleClick = useCallback(
     () => {
-      if (value.toUpperCase() === VISIT_STATUS.UPCOMING_APPT) return
+      // if (value.toUpperCase() === VISIT_STATUS.UPCOMING_APPT) return
       onClick(row)
     },
     [

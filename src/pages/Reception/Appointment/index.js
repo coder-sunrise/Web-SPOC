@@ -109,6 +109,7 @@ class Appointment extends React.PureComponent {
       payload: {
         pagesize: 9999,
         combineCondition: 'and',
+        isCancelled: false,
         lgteql_appointmentDate: startOfMonth,
         lsteql_appointmentDate: endOfMonth,
       },

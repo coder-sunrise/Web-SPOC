@@ -25,10 +25,7 @@ import {
   sortItemByID,
 } from './applyClaimUtils'
 import { roundTo } from '@/utils/utils'
-import {
-  INVOICE_PAYER_TYPE,
-  INVOICE_ITEM_TYPE_BY_TEXT,
-} from '@/utils/constants'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -201,11 +198,8 @@ const ApplyClaims = ({
                     schemeConfig,
                     item,
                   )
-                  const invoiceItemTypeFK =
-                    item.invoiceItemTypeFK === undefined && item.itemType
-                      ? INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
-                      : item.invoiceItemTypeFK
-                  return { ...item, coverage, invoiceItemTypeFK }
+                  // const invoiceItemTypeFK = item.invoiceItemTypeFK
+                  return { ...item, coverage }
                 })
                 .sort(sortItemByID),
               schemeConfig,
