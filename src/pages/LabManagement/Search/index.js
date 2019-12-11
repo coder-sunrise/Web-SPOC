@@ -4,9 +4,11 @@ import { withStyles } from '@material-ui/core'
 import AccountCircle from '@material-ui/icons/AccountCircle'
 import { getAppendUrl } from '@/utils/utils'
 import { compare } from '@/layouts'
-import { CardContainer, Button, Tooltip } from '@/components'
+import { CardContainer, Button, Tooltip, Tabs } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
+import FilterBar2 from './FilterBar2'
+import Grid2 from './Grid2'
 
 const styles = () => ({})
 
@@ -89,14 +91,31 @@ class WardSearch extends PureComponent {
       ...restProps
     } = props
     const newChildren = (
-      <React.Fragment>
-        <FilterBar {...restProps} simple={simple} />
-        <Grid
-          renderActionFn={renderActionFn}
-          onRowDblClick={onRowDblClick}
-          {...restProps}
-        />
-      </React.Fragment>
+      <Tabs
+        options={[
+          {
+            id: 1,
+            name: 'Order',
+            content: (
+              <React.Fragment>
+                <FilterBar {...restProps} />
+                <Grid {...restProps} />
+              </React.Fragment>
+            ),
+          },
+          {
+            id: 2,
+            name: 'Result',
+            content: (
+              <React.Fragment>
+                <FilterBar2 {...restProps} />
+                <Grid2 {...restProps} />
+              </React.Fragment>
+            ),
+          },
+        ]}
+        tabStyle={{}}
+      />
     )
     return simple ? (
       <div>{newChildren}</div>

@@ -653,16 +653,40 @@ const routes = [
       },
       //
       // Ward Demo
-      // {
-      //   path: '/wardmanagement',
-      //   icon: 'hotel',
-      //   name: 'wardmanagement',
-      //   hideChildrenInMenu: true,
-      //   authority: [
-      //     'wardmanagement',
-      //   ],
-      //   component: './WardManagement/Search',
-      // },
+      {
+        path: '/wardoverview',
+        icon: 'hotel',
+        name: 'wardoverview',
+        // authority: [
+        //   'demorights',
+        // ],
+        // component: './WardManagement/Dashboard',
+        hideChildrenInMenu: true,
+
+        routes: [
+          {
+            path: '/wardoverview',
+            name: 'wardoverview',
+            component: './WardManagement/Dashboard',
+          },
+          {
+            path: '/wardoverview/list',
+            name: 'wardmanagement',
+            component: './WardManagement/Search',
+
+            // hideInMenu: true,
+          },
+        ],
+      },
+      {
+        path: '/labmanagement',
+        icon: 'label',
+        name: 'labmanagement',
+        // authority: [
+        //   'demorights',
+        // ],
+        component: './LabManagement/search',
+      },
       // Claim Submission
       //
       // Settings

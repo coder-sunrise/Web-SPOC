@@ -12,7 +12,10 @@ import {
   GridItem,
   Button,
   TextField,
+  Select,
+  ClinicianSelect,
   ProgressButton,
+  DateRangePicker,
 } from '@/components'
 
 const styles = (theme) => ({
@@ -48,40 +51,59 @@ class FilterBar extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem md={12} lg={3} style={{ position: 'relative' }}>
+          <GridItem md={4}>
             <FastField
-              name='search'
+              name='search1'
               render={(args) => {
-                return (
-                  <TextField
-                    autoFocus={!simple}
-                    label={formatMessage({
-                      id: 'reception.queue.patientSearchPlaceholder',
-                    })}
-                    {...args}
-                  />
-                )
+                return <Select label='Service Centre' {...args} />
               }}
             />
-            {/* <div className={classes.tansactionCheck}>
-              <FastField
-                name='isExactSearch'
-                render={(args) => {
-                  return (
-                    <Tooltip
-                      title={formatMessage({
-                        id: 'patient.search.exact',
-                      })}
-                      placement='bottom'
-                    >
-                      <Checkbox simple {...args} />
-                    </Tooltip>
-                  )
-                }}
-              />
-            </div> */}
           </GridItem>
-          <GridItem md={12} lg={5}>
+          <GridItem md={4}>
+            <FastField
+              name='search3'
+              render={(args) => {
+                return <TextField label='Patient Acct No.' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <ClinicianSelect label='Doctor' />
+          </GridItem>
+          <GridItem md={4}>
+            <FastField
+              name='search4'
+              render={(args) => {
+                return <Select label='Service Category' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <FastField
+              name='search7'
+              render={(args) => {
+                return <TextField label='Patient Name' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={4} />
+          <GridItem md={4}>
+            <FastField
+              name='search5'
+              render={(args) => {
+                return <Select label='Status' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
+            <FastField
+              name='search6'
+              render={(args) => {
+                return <DateRangePicker label='Order Date' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={4}>
             <div className={classes.filterBtn}>
               <ProgressButton
                 variant='contained'
