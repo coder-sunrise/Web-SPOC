@@ -40,6 +40,13 @@ class Dispense extends PureComponent {
     dispatch({
       type: 'orders/reset',
     })
+    // reset dispense screen load count
+    dispatch({
+      type: 'dispense/updateState',
+      payload: {
+        loadCount: 0,
+      },
+    })
   }
 
   getExtraComponent = () => {

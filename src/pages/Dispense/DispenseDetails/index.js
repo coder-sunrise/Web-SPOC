@@ -96,6 +96,7 @@ const DispenseDetails = ({
       },
     })
   }, [])
+
   const {
     prescription,
     vaccination,
@@ -268,16 +269,28 @@ const DispenseDetails = ({
                 </ProgressButton>
               </Authorized>
             )}
-            <Authorized authority='queue.dispense.editorder'>
+            {isRetailVisit && (
               <ProgressButton
                 color='primary'
                 size='sm'
                 icon={<Edit />}
                 onClick={onEditOrderClick}
               >
-                {isRetailVisit || isBillFirstVisit ? 'Add Order' : 'Edit Order'}
+                Add Order
               </ProgressButton>
-            </Authorized>
+            )}
+            {!isRetailVisit && (
+              <Authorized authority='queue.dispense.editorder'>
+                <ProgressButton
+                  color='primary'
+                  size='sm'
+                  icon={<Edit />}
+                  onClick={onEditOrderClick}
+                >
+                  Edit Order
+                </ProgressButton>
+              </Authorized>
+            )}
             <Authorized authority='queue.dispense.makepayment'>
               <ProgressButton
                 color='primary'

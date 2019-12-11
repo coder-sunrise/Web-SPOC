@@ -708,6 +708,7 @@ const navigateDirtyCheck = ({
   // )
   if (window.beforeReloadHandlerAdded) {
     let f = {}
+    console.log({ window, dirtyForms: window.dirtyForms, displayName })
     if (displayName) {
       f = window.dirtyForms[displayName]
 
@@ -717,6 +718,7 @@ const navigateDirtyCheck = ({
         return
       }
     }
+    console.log({ f })
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {

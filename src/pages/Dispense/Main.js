@@ -133,10 +133,13 @@ class Main extends Component {
   }
 
   componentDidMount () {
-    const { values } = this.props
+    const { dispatch, values, dispense } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
-
+    dispatch({
+      type: 'dispense/incrementLoadCount',
+    })
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
@@ -151,7 +154,12 @@ class Main extends Component {
       )
     }
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST && isEmptyDispense) {
+    if (
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
+      isEmptyDispense &&
+      noClinicalObjectRecord &&
+      dispense.loadCount === 0
+    ) {
       this.editOrder()
     }
   }
@@ -186,7 +194,6 @@ class Main extends Component {
     const { visitPurposeFK } = values
     const addOrderList = [
       VISIT_TYPE.RETAIL,
-      VISIT_TYPE.BILL_FIRST,
     ]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
 
@@ -219,10 +226,7 @@ class Main extends Component {
     const { values } = this.props
     const { visitPurposeFK } = values
 
-    if (
-      visitPurposeFK === VISIT_TYPE.RETAIL ||
-      visitPurposeFK === VISIT_TYPE.BILL_FIRST
-    ) {
+    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
       this._editOrder()
     } else {
       navigateDirtyCheck({
