@@ -282,7 +282,6 @@ const ApplyClaims = ({
       },
       invoicePayer: tempInvoicePayer,
     }
-    console.log({ _values })
 
     handleIsEditing(hasOtherEditing)
     setValues(_values)

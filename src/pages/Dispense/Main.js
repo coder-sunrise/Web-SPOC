@@ -164,29 +164,27 @@ class Main extends Component {
     }
   }
 
-  makePayment = () => {
+  makePayment = async () => {
     const { dispatch, dispense, values } = this.props
     const _values = constructPayload(values)
     // console.log({ _values })
-    dispatch({
+    const finalizeResponse = await dispatch({
       type: 'dispense/finalize',
       payload: {
         id: dispense.visitID,
         values: _values,
       },
-    }).then((response) => {
-      if (response) {
-        const parameters = {}
-        dispatch({
-          type: 'dispense/query',
-          payload: {
-            id: dispense.visitID,
-            version: Date.now(),
-          },
-        })
-        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
-      }
     })
+    if (finalizeResponse) {
+      await dispatch({
+        type: 'dispense/query',
+        payload: {
+          id: dispense.visitID,
+          version: Date.now(),
+        },
+      })
+      router.push(getAppendUrl({}, '/reception/queue/billing'))
+    }
   }
 
   _editOrder = () => {

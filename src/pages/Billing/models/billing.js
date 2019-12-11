@@ -83,9 +83,8 @@ export default createFormViewModel({
       },
       *showDispenseDetails ({ payload }, { select, put }) {
         const routing = yield select((st) => st.routing)
-        const dispense = yield select((st) => st.dispense)
 
-        yield put({
+        return yield put({
           type: 'dispense/query',
           payload: {
             id: routing.location.query.vid,

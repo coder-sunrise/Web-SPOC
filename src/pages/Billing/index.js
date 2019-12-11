@@ -118,6 +118,7 @@ class Billing extends Component {
     showAddPaymentModal: false,
     isEditing: false,
     submitCount: 0,
+    dispenseLoaded: false,
   }
 
   componentWillUnmount () {
@@ -200,6 +201,8 @@ class Billing extends Component {
 
   onExpandDispenseDetails = () => {
     const { dispense } = this.props
+    const { dispenseLoaded } = this.state
+
     if (!dispense.entity) {
       this.props.dispatch({
         type: 'billing/showDispenseDetails',
