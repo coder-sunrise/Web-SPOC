@@ -17,6 +17,9 @@ export default createListViewModel({
         statementInvoice: [],
         statementDate: moment(),
         adminChargeValue: 0.0,
+        pagination: {
+          sorting: [],
+        },
       },
       invoiceList: [],
     },
@@ -26,8 +29,37 @@ export default createListViewModel({
       })
     },
     effects: {
-      *queryInvoiceList ({ payload }, { call, put }) {
-        const response = yield call(service.queryInvoiceList, payload)
+      *queryInvoiceList ({ payload }, { call, put, select }) {
+        let { filter = {}, fixedFilter = {}, pagination } = yield select(
+          (st) => st.statement,
+        )
+        if (typeof payload === 'object') {
+          const { sorting = [], pagesize = 10 } = pagination || {}
+          const current = !payload.current ? 1 : payload.current
+
+          filter = {
+            sorting,
+            pagesize,
+            ...fixedFilter,
+            ...filter,
+            ...payload,
+            current,
+          }
+        } else {
+          filter = payload
+        }
+
+        const response = yield call(service.queryInvoiceList, filter)
+        const { data } = response
+        yield put({
+          type: 'querySuccess',
+          payload: {
+            data,
+            filter,
+            keepFilter: true,
+            version: filter.version,
+          },
+        })
         return response
         // yield put({
         //   type: 'queryInvoiceDone',
