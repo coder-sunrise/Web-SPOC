@@ -11,10 +11,7 @@ import {
   CodeSelect,
 } from '@/components'
 
-import { DoctorLabel } from '@/components/_medisys'
-
 const FilterBar = ({ handleSubmit }) => {
-  const renderDropdown = (option) => <DoctorLabel doctor={option} />
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -36,7 +33,8 @@ const FilterBar = ({ handleSubmit }) => {
               Generate Report
             </Button>
           </GridItem>
-          <GridItem md={12}>
+          <GridItem md={5} />
+          <GridItem md={4}>
             <FastField
               name='medicationIDs'
               render={(args) => (

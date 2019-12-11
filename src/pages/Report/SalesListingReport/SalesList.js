@@ -26,7 +26,7 @@ class SalesList extends PureComponent {
       { name: 'patientName', title: 'Patient Name' },
       { name: 'itemCategory', title: 'Category' },
       { name: 'item', title: 'Item' },
-      { name: 'documentNo', title: 'Document No.' },
+      { name: 'documentNo', title: 'Invoice No.' },
       { name: 'qty', title: 'Qty' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'revenueAMT', title: 'Revenue Amt.' },
