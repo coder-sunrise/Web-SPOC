@@ -44,11 +44,13 @@ export const query = (payload) => {
   return request(`${url}${urlPrefix}/${payload.id}`, { method: 'GET' })
 }
 
-export const queryList = (params) =>
-  commonService.queryList(url, {
+export const queryList = (params) => {
+  console.log({ params })
+  return commonService.queryList(url, {
     pagesize: 9999,
     ...params,
   })
+}
 
 export const deleteDraft = (payload) => commonService.remove(url, payload)
 

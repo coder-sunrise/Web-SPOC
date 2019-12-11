@@ -65,6 +65,27 @@ const reloadDispense = (props, effect = 'query') => {
     }
   })
 }
+
+const constructPayload = (values) => {
+  const _values = {
+    ...values,
+    prescription: values.prescription.map((o) => {
+      const item = { ...o }
+      if (item.batchNo instanceof Array) {
+        if (item.batchNo && item.batchNo.length > 0) {
+          const [
+            firstIndex,
+          ] = item.batchNo
+          item.batchNo = firstIndex
+        }
+      }
+      return item
+    }),
+  }
+  // values.prescription.forEach()
+  return _values
+}
+
 @withFormikExtend({
   authority: 'queue.dispense',
   enableReinitialize: true,
@@ -85,27 +106,12 @@ const reloadDispense = (props, effect = 'query') => {
   handleSubmit: (values, { props, ...restProps }) => {
     const { dispatch, dispense } = props
     const vid = dispense.visitID
-    // const prescription = values.prescription.map((o) => {
-    //   return {
-    //     ...o,
-    //     batchNo: o.batchNo ? o.batchNo[0] : undefined,
-    //   }
-    // })
-    values.prescription.forEach((o) => {
-      if (o.batchNo instanceof Array) {
-        if (o.batchNo && o.batchNo.length > 0) {
-          const [
-            firstIndex,
-          ] = o.batchNo
-          o.batchNo = firstIndex
-        }
-      }
-    })
+    const _values = constructPayload(values)
     dispatch({
       type: `dispense/save`,
       payload: {
         id: vid,
-        values,
+        values: _values,
       },
     }).then((o) => {
       if (o) {
@@ -127,10 +133,13 @@ class Main extends Component {
   }
 
   componentDidMount () {
-    const { values } = this.props
+    const { dispatch, values, dispense } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
-
+    dispatch({
+      type: 'dispense/incrementLoadCount',
+    })
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
+    const noClinicalObjectRecord = !values.clinicalObjectRecordFK
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
@@ -145,25 +154,37 @@ class Main extends Component {
       )
     }
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST && isEmptyDispense) {
+    if (
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
+      isEmptyDispense &&
+      noClinicalObjectRecord &&
+      dispense.loadCount === 0
+    ) {
       this.editOrder()
     }
   }
 
-  makePayment = () => {
+  makePayment = async () => {
     const { dispatch, dispense, values } = this.props
-    dispatch({
+    const _values = constructPayload(values)
+    // console.log({ _values })
+    const finalizeResponse = await dispatch({
       type: 'dispense/finalize',
       payload: {
         id: dispense.visitID,
-        values,
+        values: _values,
       },
-    }).then((response) => {
-      if (response) {
-        const parameters = {}
-        router.push(getAppendUrl(parameters, '/reception/queue/billing'))
-      }
     })
+    if (finalizeResponse) {
+      await dispatch({
+        type: 'dispense/query',
+        payload: {
+          id: dispense.visitID,
+          version: Date.now(),
+        },
+      })
+      router.push(getAppendUrl({}, '/reception/queue/billing'))
+    }
   }
 
   _editOrder = () => {
@@ -171,7 +192,6 @@ class Main extends Component {
     const { visitPurposeFK } = values
     const addOrderList = [
       VISIT_TYPE.RETAIL,
-      VISIT_TYPE.BILL_FIRST,
     ]
     const shouldShowAddOrderModal = addOrderList.includes(visitPurposeFK)
 
@@ -204,10 +224,7 @@ class Main extends Component {
     const { values } = this.props
     const { visitPurposeFK } = values
 
-    if (
-      visitPurposeFK === VISIT_TYPE.RETAIL ||
-      visitPurposeFK === VISIT_TYPE.BILL_FIRST
-    ) {
+    if (visitPurposeFK === VISIT_TYPE.RETAIL) {
       this._editOrder()
     } else {
       navigateDirtyCheck({

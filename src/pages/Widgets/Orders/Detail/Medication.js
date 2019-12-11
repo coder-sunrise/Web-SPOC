@@ -44,7 +44,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
         {},
       ]
     }
-    console.log(v)
+
     return v
   },
   enableReinitialize: true,

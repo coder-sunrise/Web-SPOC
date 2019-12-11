@@ -32,6 +32,7 @@ const FormFooter = ({
   const isNew = appointmentStatusFK === undefined
   const isDraft = appointmentStatusFK === 2
   const isTurnedUp = appointmentStatusFK === APPOINTMENT_STATUS.TURNEDUP
+  const isCancelled = appointmentStatusFK === APPOINTMENT_STATUS.CANCELLED
 
   const hideCancelAppointmentClass = {
     [classes.hideCancelAppointmentBtn]: isNew,
@@ -47,7 +48,7 @@ const FormFooter = ({
             color='danger'
             className={classnames(hideCancelAppointmentClass)}
             onClick={handleCancelOrDeleteClick}
-            disabled={disabled || isTurnedUp}
+            disabled={disabled || isTurnedUp || isCancelled}
           >
             {isDraft ? ButtonText.DELETE : ButtonText.CANCEL_APPOINTMENT}
           </Button>

@@ -14,6 +14,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      loadCount: 0,
       totalWithGST: 0,
       visitID: undefined,
       default: {
@@ -304,6 +305,9 @@ export default createFormViewModel({
       // },
     },
     reducers: {
+      incrementLoadCount (state) {
+        return { ...state, loadCount: state.loadCount + 1 }
+      },
       getAddOrderDetails (state, { payload }) {
         const { data } = payload
         return {
