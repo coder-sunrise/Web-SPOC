@@ -623,6 +623,7 @@ class Index extends Component {
             icon={null}
             onClick={this.toggleReport}
             authority='none'
+            disabled={!values.id}
           >
             {formatMessage({
               id: 'inventory.pr.detail.print',
