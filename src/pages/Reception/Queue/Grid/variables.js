@@ -114,24 +114,13 @@ export const ApptColumnExtensions = [
   },
   {
     columnName: 'appointmentTime',
-    width: 200,
+    width: 180,
     render: (row) => {
-      const appointmentDate = moment(row.appointmentDate).format(
-        'DD MM YYYY hh:mm A',
-      )
+      const appointmentDate = moment(row.appointmentDate).format('DD MMM YYYY')
       return DateFormatter({
         value: `${appointmentDate} ${row.startTime}`,
         format: 'DD MMM YYYY hh:mm A',
       })
-      // if (row.appointmentTime) {
-      //   return DateFormatter({
-      //     value: row.appointmentTime,
-      //     full: true,
-      //   })
-      // }
-
-      // if (row.startTime) return formatAppointmentTimes(row.startTime).join(', ')
-      // return '-'
     },
   },
 ]
@@ -235,11 +224,11 @@ export const QueueColumnExtensions = [
     render: (row) => {
       if (row.appointmentTime) {
         const appointmentDate = moment(row.appointmentTime).format(
-          'DD MM YYYY hh:mm A',
+          'DD MMM YYYY',
         )
         return DateFormatter({
           value: `${appointmentDate} ${row.appointmentResourceStartTime}`,
-          format: 'DD MM YYYY hh:mm A',
+          format: 'DD MMM YYYY hh:mm A',
         })
       }
       return '-'
