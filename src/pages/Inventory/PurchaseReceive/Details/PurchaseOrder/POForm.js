@@ -14,10 +14,11 @@ import {
   Field,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
+import AuthorizedContext from '@/components/Context/Authorized'
 
 const prefix = 'purchaseOrder'
 
-const POForm = ({ setFieldValue, isReadOnly = false }) => {
+const POForm = ({ setFieldValue, isReadOnly = false, isFinalize }) => {
   const setSupplierDetails = (opts) => {
     let conPerson
     let faxNo
@@ -95,17 +96,17 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.exceptedDeliveryDate`}
                 render={(args) => {
                   return (
                     <DatePicker
+                      disabled={isReadOnly}
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.expectedDeliveryDate',
                       })}
                       disabledDate={(d) =>
                         !d || d.isBefore(moment().add('days', -1))}
-                      // disabled={!isReadOnly}
                       {...args}
                     />
                   )
@@ -121,7 +122,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceDate',
                       })}
-                      disabled={isReadOnly}
+                      disabled={!isFinalize}
                       {...args}
                     />
                   )
@@ -129,7 +130,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.remark`}
                 render={(args) => {
                   return (
@@ -139,7 +140,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       })}
                       multiline
                       rowsMax={4}
-                      // disabled={isReadOnly}
+                      disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -171,6 +172,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                           )
                         }
                       }}
+                      disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -178,7 +180,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
               />
             </GridItem>
             <GridItem xs={12}>
-              <FastField
+              <Field
                 name={`${prefix}.shippingAddress`}
                 render={(args) => {
                   return (
@@ -193,7 +195,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                         maxLength: 500,
                       }}
                       maxLength={500}
-                      // disabled={!isReadOnly}
+                      disabled={isReadOnly}
                       {...args}
                     />
                   )
@@ -209,7 +211,7 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.invoiceNo',
                       })}
-                      disabled={isReadOnly}
+                      disabled={!isFinalize}
                       {...args}
                     />
                   )
@@ -219,108 +221,111 @@ const POForm = ({ setFieldValue, isReadOnly = false }) => {
           </GridContainer>
         </GridItem>
 
-        <GridItem xs={12} md={11}>
-          <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
-            {formatMessage({
-              id: 'inventory.pr.detail.pod.supplierInfo',
-            })}
-          </h4>
-          <Divider />
-        </GridItem>
+        <AuthorizedContext.Provider
+          value={{
+            rights: isReadOnly ? 'disable' : 'enable',
+          }}
+        >
+          <GridItem xs={12} md={11}>
+            <h4 style={{ marginTop: 20, fontWeight: 'bold' }}>
+              {formatMessage({
+                id: 'inventory.pr.detail.pod.supplierInfo',
+              })}
+            </h4>
+            <Divider />
+          </GridItem>
 
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={12}>
-              <FastField
-                name={`${prefix}.supplierFK`}
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      label={formatMessage({
-                        id: 'inventory.pr.supplier',
-                      })}
-                      code='ctSupplier'
-                      labelField='displayValue'
-                      onChange={(v, opts) => {
-                        setSupplierDetails(opts)
-                      }}
-                      // disabled={!isReadOnly}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name={`${prefix}.contactPerson`}
-                render={(args) => {
-                  return (
-                    <TextField
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.contactPerson',
-                      })}
-                      // disabled={!isReadOnly}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name={`${prefix}.supplierAddress`}
-                render={(args) => {
-                  return (
-                    <OutlinedTextField
-                      label={formatMessage({
-                        id: 'inventory.pr.detail.pod.supplierAdd',
-                      })}
-                      multiline
-                      rowsMax={2}
-                      rows={2}
-                      // disabled={!isReadOnly}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-        </GridItem>
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name={`${prefix}.supplierFK`}
+                  render={(args) => {
+                    return (
+                      <CodeSelect
+                        label={formatMessage({
+                          id: 'inventory.pr.supplier',
+                        })}
+                        code='ctSupplier'
+                        labelField='displayValue'
+                        onChange={(v, opts) => {
+                          setSupplierDetails(opts)
+                        }}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name={`${prefix}.contactPerson`}
+                  render={(args) => {
+                    return (
+                      <TextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.pod.contactPerson',
+                        })}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name={`${prefix}.supplierAddress`}
+                  render={(args) => {
+                    return (
+                      <OutlinedTextField
+                        label={formatMessage({
+                          id: 'inventory.pr.detail.pod.supplierAdd',
+                        })}
+                        multiline
+                        rowsMax={2}
+                        rows={2}
+                        {...args}
+                      />
+                    )
+                  }}
+                />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
 
-        <GridItem xs={12} md={1} />
+          <GridItem xs={12} md={1} />
 
-        <GridItem xs={12} md={5}>
-          <GridContainer>
-            <GridItem xs={12}>
-              <FastField
-                name={`${prefix}.contactNo`}
-                render={(args) => (
-                  <MobileNumberInput
-                    {...args}
-                    label={formatMessage({
-                      id: 'inventory.pr.detail.pod.contactNo',
-                    })}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={12}>
-              <FastField
-                name={`${prefix}.faxNo`}
-                render={(args) => (
-                  <MobileNumberInput
-                    {...args}
-                    label={formatMessage({
-                      id: 'inventory.pr.detail.pod.faxNo',
-                    })}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-        </GridItem>
+          <GridItem xs={12} md={5}>
+            <GridContainer>
+              <GridItem xs={12}>
+                <FastField
+                  name={`${prefix}.contactNo`}
+                  render={(args) => (
+                    <MobileNumberInput
+                      {...args}
+                      label={formatMessage({
+                        id: 'inventory.pr.detail.pod.contactNo',
+                      })}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem xs={12}>
+                <FastField
+                  name={`${prefix}.faxNo`}
+                  render={(args) => (
+                    <MobileNumberInput
+                      {...args}
+                      label={formatMessage({
+                        id: 'inventory.pr.detail.pod.faxNo',
+                      })}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          </GridItem>
+        </AuthorizedContext.Provider>
       </GridContainer>
     </div>
   )
