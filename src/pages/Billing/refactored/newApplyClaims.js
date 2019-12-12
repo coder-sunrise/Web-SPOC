@@ -8,6 +8,7 @@ import Reset from '@material-ui/icons/Cached'
 import { CommonModal, Button, GridItem } from '@/components'
 // import MedisaveSchemes from './MedisaveSchemes'
 import Scheme from './newScheme'
+import ResetButton from './ResetButton'
 import CoPayer from '../modal/CoPayer'
 import ApplicableClaims from '../modal/ApplicableClaims'
 // styles
@@ -29,6 +30,7 @@ import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
+  _isAppliedOnce: false,
   _isConfirmed: false,
   _isDeleted: false,
   _isEditing: true,
@@ -204,6 +206,7 @@ const ApplyClaims = ({
                 .sort(sortItemByID),
               schemeConfig,
               _indexInClaimableSchemes: _claimableSchemesIndex,
+
               _isConfirmed: true,
               _isDeleted: false,
               _isEditing: false,
@@ -297,6 +300,34 @@ const ApplyClaims = ({
     ],
   )
 
+  const clearClaims = useCallback(
+    () => {
+      if (claimableSchemes.length > 0) {
+        const _invoicePayer = {
+          ...defaultInvoicePayer,
+          claimableSchemes: claimableSchemes[0],
+          payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
+        }
+        setCurEditInvoicePayerBackup(_invoicePayer)
+        setInitialState([
+          _invoicePayer,
+        ])
+        handleSchemeChange(
+          _invoicePayer.claimableSchemes[0].id,
+          0,
+          [
+            _invoicePayer,
+          ],
+          invoice.invoiceItems,
+        )
+      }
+    },
+    [
+      claimableSchemes,
+      invoice.invoiceItems,
+    ],
+  )
+
   const handleResetClick = () => {
     dispatch({
       type: 'global/updateState',
@@ -310,9 +341,24 @@ const ApplyClaims = ({
     })
   }
 
+  const handleClearClick = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          'Reset will revert all changes that had not been saved. Continue?',
+        openConfirmText: 'Continue',
+        onConfirmSave: clearClaims,
+      },
+    })
+  }
+
   const handleCancelClick = useCallback(
     (index) => {
-      const isEditing = tempInvoicePayer[index].id === undefined
+      // const isEditing = tempInvoicePayer[index].id === undefined
+      const { _isAppliedOnce } = tempInvoicePayer[index]
+      const isEditing = !_isAppliedOnce
       const updatedPayer = {
         ...tempInvoicePayer[index],
         ...curEditInvoicePayerBackup,
@@ -334,6 +380,7 @@ const ApplyClaims = ({
       const updatedPayer = {
         ...tempInvoicePayer[index],
         _isConfirmed: false,
+        _isAppliedOnce: true,
         _isEditing: true,
         _isDeleted: false,
       }
@@ -547,6 +594,7 @@ const ApplyClaims = ({
     tempInvoicePayer,
   ])
 
+  console.log({ tempInvoicePayer })
   return (
     <Fragment>
       <GridItem md={2}>
@@ -571,10 +619,14 @@ const ApplyClaims = ({
           <Add />
           Co-Payer
         </Button>
-        <Button color='danger' size='sm' onClick={handleResetClick}>
+        {/* <Button color='danger' size='sm' onClick={handleResetClick}>
           <Reset />
           Reset
-        </Button>
+        </Button> */}
+        <ResetButton
+          handleResetClick={handleResetClick}
+          handleClearClick={handleClearClick}
+        />
       </GridItem>
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         {tempInvoicePayer.map((invoicePayer, index) => {

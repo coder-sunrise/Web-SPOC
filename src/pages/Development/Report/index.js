@@ -25,12 +25,17 @@ import {
 import { ReportViewer } from '@/components/_medisys'
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 
+import { rounding } from '@/components/_medisys/AddPayment/utils'
+
 const doctors = [
   { value: 'bao', name: 'Bao' },
   { value: 'cheah', name: 'Cheah' },
 ]
 
-@connect(({ codetable }) => ({ codetable }))
+@connect(({ codetable, clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+  codetable,
+}))
 @withFormik({
   enableReinitialize: true,
   mapPropsToValues: () => ({
@@ -51,6 +56,7 @@ const doctors = [
 class Report extends React.Component {
   state = {
     showReport: false,
+    amount: 0.05,
   }
 
   componentDidMount () {
@@ -121,6 +127,18 @@ class Report extends React.Component {
     }))
   }
 
+  onAmountChange = (event) => {
+    const { target } = event
+    this.setState({
+      amount: target.value,
+    })
+    const { clinicSettings } = this.props
+    const rounded = rounding(clinicSettings, target.value)
+    this.setState({
+      rounded: rounded,
+    })
+  }
+
   render () {
     const { showReport, showEndSessionSummary } = this.state
     // return (
@@ -158,6 +176,24 @@ class Report extends React.Component {
         >
           <EndSessionSummary sessionID={14} />
         </CommonModal>
+        <GridContainer>
+          <GridItem md={3}>
+            <NumberInput
+              currency
+              label='Amount'
+              value={this.state.amount}
+              onChange={this.onAmountChange}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <NumberInput
+              currency
+              disabled
+              label='Amount After Rounding'
+              value={this.state.rounded}
+            />
+          </GridItem>
+        </GridContainer>
       </CardContainer>
     )
   }
