@@ -131,6 +131,11 @@ export default compose(
       } = props
       let payload = []
       const createPayload = (patientProfFK, o) => {
+        const {
+          smsPatient: smsPat,
+          smsAppointment: smsAppt,
+          ...restValues
+        } = values
         let patientProfileFK = patientProfFK
         let appointmentFK = o
         if (!patientProfileFK) {
@@ -138,7 +143,7 @@ export default compose(
           appointmentFK = undefined
         }
         const tempObject = {
-          ...values,
+          ...restValues,
           patientOutgoingSMS: {
             patientProfileFK,
             appointmentReminderDto: {
@@ -147,17 +152,21 @@ export default compose(
           },
           selectedRows: undefined,
         }
+
+        if (!appointmentFK) {
+          delete tempObject.patientOutgoingSMS.appointmentReminderDto
+        }
+
         payload.push(tempObject)
       }
-
       if (recipient) {
         const { id, patientProfileFK } = recipient
         createPayload(patientProfileFK, id)
       } else {
-        let currentList = smsAppointment.list
-        if (currentTab === '1') currentList = smsPatient.list
         selectedRows.forEach((o) => {
-          const { patientProfileFK } = currentList.find((r) => r.id === o)
+          const { patientProfileFK } =
+            smsAppointment.list.find((r) => r.id === o) ||
+            smsPatient.list.find((r) => r.id === o)
           createPayload(patientProfileFK, o)
         })
       }
