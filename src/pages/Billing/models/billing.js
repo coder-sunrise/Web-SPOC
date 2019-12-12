@@ -68,12 +68,6 @@ export default createFormViewModel({
         }
 
         yield put({
-          type: 'query',
-          payload: {
-            id: payload.visitID,
-          },
-        })
-        yield put({
           type: 'updateState',
           payload: {
             visitID: payload.visitID,
