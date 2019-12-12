@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -468,9 +468,17 @@ class AddNewStatement extends PureComponent {
                 selectConfig: {
                   showSelectAll: true,
                   rowSelectionEnabled: (row) => {
-                    const { statementInvoicePayment = [] } = row
-                    return !statementInvoicePayment.find(
-                      (o) => o.invoicePayment.isCancelled === false,
+                    const {
+                      statementInvoicePayment = [],
+                      payableAmount,
+                      outstandingAmount,
+                      adminCharge,
+                    } = row
+                    return (
+                      !statementInvoicePayment.find(
+                        (o) => o.invoicePayment.isCancelled === false,
+                      ) &&
+                      payableAmount === roundTo(outstandingAmount + adminCharge)
                     )
                   },
                 },

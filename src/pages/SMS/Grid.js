@@ -138,6 +138,7 @@ const Grid = ({
   const filterBarProps = {
     type,
     dispatch,
+    setSelectedRows,
   }
 
   return (

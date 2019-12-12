@@ -2,8 +2,9 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
-
 import { formatMessage } from 'umi/locale'
+import { VISIT_TYPE } from '@/utils/constants'
+
 import LowStockInfo from './LowStockInfo'
 import {
   Button,
@@ -32,6 +33,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     const v = {
       ...(orders.entity || orders.defaultMedication),
       type,
+      visitPurposeFK: orders.visitPurposeFK,
     }
     if (type === '5') {
       v.drugCode = 'MISC'
@@ -984,44 +986,54 @@ class Medication extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem xs={12}>
-            <FastField
-              name='isExternalPrescription'
-              render={(args) => {
-                if (args.field.value) {
-                  setDisable(true)
-                } else {
-                  setDisable(false)
-                }
-                return (
-                  <Checkbox
-                    label='External Prescription'
-                    labelPlacement='start'
-                    {...args}
-                    onChange={(e) => {
-                      if (e.target.value) {
-                        this.props.setFieldValue('adjAmount', 0)
-                        this.props.setFieldValue('totalAfterItemAdjustment', 0)
-                        this.props.setFieldValue('totalPrice', 0)
-                        this.props.setFieldValue('expiryDate', undefined)
-                        this.props.setFieldValue('batchNo', undefined)
-                      } else {
-                        this.props.setFieldValue(
-                          'expiryDate',
-                          this.state.expiryDate,
-                        )
-                        this.props.setFieldValue('batchNo', this.state.batchNo)
-                        setTimeout(() => {
-                          this.calculateQuantity()
-                        }, 1)
-                      }
-                      setDisable(e.target.value)
-                    }}
-                  />
-                )
-              }}
-            />
-          </GridItem>
+          {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
+            <GridItem xs={12}>
+              <FastField
+                name='isExternalPrescription'
+                render={(args) => {
+                  if (args.field.value) {
+                    setDisable(true)
+                  } else {
+                    setDisable(false)
+                  }
+                  return (
+                    <Checkbox
+                      label='External Prescription'
+                      labelPlacement='start'
+                      {...args}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          this.props.setFieldValue('adjAmount', 0)
+                          this.props.setFieldValue(
+                            'totalAfterItemAdjustment',
+                            0,
+                          )
+                          this.props.setFieldValue('totalPrice', 0)
+                          this.props.setFieldValue('expiryDate', undefined)
+                          this.props.setFieldValue('batchNo', undefined)
+                        } else {
+                          this.props.setFieldValue(
+                            'expiryDate',
+                            this.state.expiryDate,
+                          )
+                          this.props.setFieldValue(
+                            'batchNo',
+                            this.state.batchNo,
+                          )
+                          setTimeout(() => {
+                            this.calculateQuantity()
+                          }, 1)
+                        }
+                        setDisable(e.target.value)
+                      }}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+          ) : (
+            ''
+          )}
         </GridContainer>
         {footer({
           onSave: handleSubmit,

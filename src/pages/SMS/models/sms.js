@@ -22,7 +22,9 @@ export default createListViewModel({
             type: 'getSMSHistory',
             payload: response.data,
           })
+          return response
         }
+        return false
       },
     },
     reducers: {

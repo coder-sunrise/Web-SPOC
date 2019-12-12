@@ -563,7 +563,7 @@ class Index extends Component {
                     v.summary.totalAfterAdj,
                   )
                   setFieldValue(
-                    'purchaseOrder.totalAfterGst',
+                    'purchaseOrder.totalAftGst',
                     v.summary.totalWithGST,
                   )
                   setFieldValue(

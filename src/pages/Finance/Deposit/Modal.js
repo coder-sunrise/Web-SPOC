@@ -268,8 +268,14 @@ class Modal extends PureComponent {
       type: 'deposit/bizSessionList',
       payload: {
         pagesize: 999,
-        lgteql_SessionStartDate: startDateTime,
         lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],

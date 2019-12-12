@@ -14,13 +14,6 @@ import { CustomInput, Tooltip } from '@/components'
 import { control } from '@/components/Decorator'
 import { extendFunc } from '@/utils/utils'
 
-const focus = (el) => {
-  $(el).find('.ant-select').trigger('click')
-}
-const debounceFocus = _.debounce(focus, 100, {
-  leading: true,
-  trailing: false,
-})
 const STYLES = () => {
   return {
     // dropdownMenu: {
@@ -194,6 +187,14 @@ class AntdSelect extends React.PureComponent {
 
     this.lastFetchId = 0
     this.fetchData = _.debounce(props.onFetchData || this.fetchData, 800)
+
+    const focus = (el) => {
+      if (!this.mouseover) $(el).find('.ant-select').trigger('click')
+    }
+    this.debounceFocus = _.debounce(focus, 100, {
+      leading: true,
+      trailing: false,
+    })
   }
 
   componentDidMount () {
@@ -339,9 +340,10 @@ class AntdSelect extends React.PureComponent {
     return match
   }
 
-  handleFocus = () => {
+  handleFocus = (e) => {
+    console.log(e)
     this.setState({ shrink: true, focus: true })
-    debounceFocus(this.myRef.current)
+    this.debounceFocus(this.myRef.current)
   }
 
   handleBlur = () => {
@@ -647,6 +649,12 @@ class AntdSelect extends React.PureComponent {
           showSearch
           // defaultOpen
           onChange={this.handleValueChange}
+          onMouseEnter={(e) => {
+            this.mouseover = true
+          }}
+          onMouseLeave={(e) => {
+            this.mouseover = false
+          }}
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           onSearch={this.fetchData}
