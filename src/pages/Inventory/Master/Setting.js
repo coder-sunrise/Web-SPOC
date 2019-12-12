@@ -153,6 +153,7 @@ const Setting = ({
                     id: 'inventory.master.setting.duration',
                   })}
                   {...args}
+                  precision={0}
                 />
               )
             }}

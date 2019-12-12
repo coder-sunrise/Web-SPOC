@@ -115,7 +115,7 @@ const VisitInfoCard = ({
             )}
           />
         </GridItem>
-        <GridItem xs md={12}>
+        <GridItem xs md={8}>
           <Field
             name={FormField['visit.visitRemarks']}
             render={(args) => (
@@ -127,6 +127,21 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitRemarks',
                 })}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.roomFK']}
+            render={(args) => (
+              <CodeSelect
+                disabled={isReadOnly}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.room',
+                })}
+                code='ctRoom'
+                {...args}
               />
             )}
           />

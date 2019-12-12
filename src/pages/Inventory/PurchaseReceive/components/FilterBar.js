@@ -27,19 +27,6 @@ import Authorized from '@/utils/Authorized'
   displayName: 'PurchaseReceiveFilter',
 })
 class FilterBar extends PureComponent {
-  onChangeAllDate = (e) => {
-    const { setFieldValue } = this.props
-    const { target } = e
-    if (target.value) {
-      // setFieldValue('transactionDates', [])
-    } else {
-      setFieldValue('transactionDates', [
-        moment().format('YYYY-MM-01'),
-        moment(),
-      ])
-    }
-  }
-
   render () {
     const {
       classes,
@@ -100,7 +87,6 @@ class FilterBar extends PureComponent {
                       id: 'form.date.placeholder.allDate',
                     })}
                     inputLabel=' '
-                    onChange={(e) => this.onChangeAllDate(e)}
                     {...args}
                   />
                 </Tooltip>
@@ -179,6 +165,8 @@ class FilterBar extends PureComponent {
                     return transactionDates[index]
                   return undefined
                 }
+
+                console.log(transactionDates)
 
                 dispatch({
                   type: 'purchaseReceiveList/query',
