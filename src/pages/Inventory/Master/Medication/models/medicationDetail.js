@@ -74,13 +74,10 @@ export default createFormViewModel({
     reducers: {
       getMedicPrecautionList (state, { payload }) {
         const { data } = payload
-        let counter = -1
         return {
           ...state,
           ctmedicationprecaution: data.map((x) => {
-            counter += 1
             return {
-              sequence: counter,
               medicationPrecautionFK: x.id,
               value: x.displayValue,
             }
