@@ -409,7 +409,8 @@ const ApplyClaims = ({
 
   const handleCommitChanges = useCallback(
     ({ rows, changed }) => {
-      const id = Object.keys(changed)[0]
+      const _id = Object.keys(changed)[0]
+      let id = _id.includes('sys-gen') ? _id : parseInt(_id, 10)
 
       if (id === -99) return
       const index = tempInvoicePayer.findIndex((item) => item._isEditing)
@@ -470,6 +471,7 @@ const ApplyClaims = ({
     },
     [
       tempInvoicePayer,
+      updatedInvoiceItems,
     ],
   )
 

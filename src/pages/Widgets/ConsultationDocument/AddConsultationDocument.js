@@ -105,8 +105,8 @@ const loadFromCodesConfig = {
       )
       return `<ul>
               <li><strong>${isExtPrescription
-          ? 'External Prescription'
-          : 'Medication'}</strong></li>
+                ? 'External Prescription'
+                : 'Medication'}</strong></li>
                ${rowHTMLs.join('')}
             </ul>`
     }
@@ -144,8 +144,18 @@ const loadFromCodesConfig = {
     return ''
   },
 
-  InsertOpenPrescription: (rows, codetable, patient) => {
-    const pRows = rows.filter((o) => !o.isDeleted && o.type === '5')
+  InsertOpenPrescription: (
+    rows,
+    codetable,
+    patient,
+    isExtPrescription = false,
+  ) => {
+    const pRows = rows.filter(
+      (o) =>
+        !o.isDeleted &&
+        o.type === '5' &&
+        (o.isExternalPrescription || false) === isExtPrescription,
+    )
     if (pRows && pRows.length > 0) {
       const rowHTMLs = loadFromCodesConfig.mapPrescriptions(
         pRows,
@@ -254,7 +264,7 @@ const loadFromCodesConfig = {
         ]
 
         let htmls = ordersHTML.join('')
-        console.log(htmls)
+        // console.log(htmls)
         return htmls
       },
     },
@@ -266,12 +276,19 @@ const loadFromCodesConfig = {
         if (!orders) return '-'
         const { rows = [] } = orders
 
-        return loadFromCodesConfig.InsertMedication(
-          rows,
-          codetable,
-          patient,
-          true,
-        )
+        const ordersHTML = [
+          loadFromCodesConfig.InsertMedication(rows, codetable, patient, true),
+          loadFromCodesConfig.InsertOpenPrescription(
+            rows,
+            codetable,
+            patient,
+            true,
+          ),
+        ]
+
+        let htmls = ordersHTML.join('')
+        console.log(htmls)
+        return htmls
       },
     },
     {

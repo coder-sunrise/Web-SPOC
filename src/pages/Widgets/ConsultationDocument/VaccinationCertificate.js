@@ -69,8 +69,13 @@ class VaccinationCertificate extends PureComponent {
     })
   }
 
+  state = {
+    editorReferece: {},
+  }
+
   setEditorReference = (ref) => {
-    this.editorReferece = ref
+    this.setState({ editorReferece: ref })
+    // this.editorReferece = ref
   }
 
   render () {
@@ -131,7 +136,11 @@ class VaccinationCertificate extends PureComponent {
             />
           </GridItem>
           <GridItem xs={12} className={classes.editor}>
-            {templateLoader(this.editorReferece, setFieldValue, currentType)}
+            {templateLoader(
+              this.state.editorReferece,
+              setFieldValue,
+              currentType,
+            )}
 
             <FastField
               name='content'

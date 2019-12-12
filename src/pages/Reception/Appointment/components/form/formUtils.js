@@ -4,7 +4,7 @@ import { serverDateFormat, timeFormat, timeFormat24Hour } from '@/components'
 import { computeRRule } from '@/components/_medisys'
 import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { getTimeObject, compare } from '@/utils/yup'
-import { getUniqueNumericId } from '@/utils/utils'
+import { getUniqueNumericId, roundTo } from '@/utils/utils'
 
 const initDailyRecurrence = {
   recurrencePatternFK: 1,
@@ -82,7 +82,8 @@ const convertReccurenceDaysOfTheWeek = (week = '') =>
 
 const calculateDuration = (startTime, endTime) => {
   const hour = endTime.diff(startTime, 'hour')
-  const minute = (endTime.diff(startTime, 'minute') / 60 - hour) * 60
+  const minute = roundTo((endTime.diff(startTime, 'minute') / 60 - hour) * 60)
+
   return { hour, minute }
 }
 
