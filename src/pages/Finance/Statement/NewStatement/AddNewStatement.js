@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import {
   Button,
   DatePicker,
@@ -292,8 +292,8 @@ class AddNewStatement extends PureComponent {
   clearInvoiceList = (e, op) => {
     const { setFieldValue } = this.props
     const { adminCharge, adminChargeType } = op
-    setFieldValue('adminChargeValue', adminCharge)
-    setFieldValue('adminChargeValueType', adminChargeType)
+    setFieldValue('adminChargeValue', adminCharge || 0)
+    setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
     this.setState(() => {
       return {
         invoiceRows: [],
@@ -472,11 +472,13 @@ class AddNewStatement extends PureComponent {
                       statementInvoicePayment = [],
                       payableAmount,
                       outstandingAmount,
+                      adminCharge,
                     } = row
                     return (
                       !statementInvoicePayment.find(
                         (o) => o.invoicePayment.isCancelled === false,
-                      ) && payableAmount === outstandingAmount
+                      ) &&
+                      payableAmount === roundTo(outstandingAmount + adminCharge)
                     )
                   },
                 },

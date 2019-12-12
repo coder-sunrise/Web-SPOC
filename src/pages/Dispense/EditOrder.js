@@ -1,22 +1,60 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
-// material ui
-import Refresh from '@material-ui/icons/Refresh'
-import Print from '@material-ui/icons/Print'
 // common component
-import { Button, GridContainer, GridItem, notification } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  notification,
+  withFormikExtend,
+} from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 // utils
-import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
+import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
-// import model from '@/pages/Widgets/Orders/models'
 
-// window.g_app.replaceModel(model)
+const discardConsultation = async ({ dispatch, dispense }) => {
+  const consultationResult = await dispatch({
+    type: 'consultation/discard',
+    payload: dispense.entity.clinicalObjectRecordFK,
+  })
+  if (consultationResult) {
+    await dispatch({
+      type: 'dispense/query',
+      payload: {
+        id: dispense.visitID,
+        version: Date.now(),
+      },
+    })
+    dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        editingOrder: false,
+      },
+    })
+  }
+}
 
-// model
-@Authorized.Secured('queue.dispense.editorder')
+// @Authorized.Secured('queue.dispense.editorder')
+@withFormikExtend({
+  authority: [
+    'queue.dispense.editorder',
+  ],
+  notDirtyDuration: 0, // this page should alwasy show warning message when leave
+  mapPropsToValues: () => ({ dummyField: '' }),
+  dirtyCheckMessage: 'Discard edit order?',
+  onDirtyDiscard: discardConsultation,
+  enableReinitialize: false,
+  displayName: 'EditOrder',
+})
 class EditOrder extends Component {
+  componentDidMount () {
+    const { setFieldValue } = this.props
+    setTimeout(() => {
+      setFieldValue('fakeField', 'setdirty')
+    }, 500)
+  }
+
   makePayment = () => {
     const { dispatch, dispense } = this.props
     const { patientInfo } = dispense
@@ -28,7 +66,6 @@ class EditOrder extends Component {
       vid: dispense.visitID,
     }
     router.push(getAppendUrl(parameters, '/reception/queue/billing'))
-    // this.props.history.push(`${location.pathname}/billing`)
   }
 
   editOrder = () => {
@@ -64,63 +101,37 @@ class EditOrder extends Component {
     })
   }
 
-  handleCancel = () => {
-    const { dispatch, dispense } = this.props
-    dispatch({
-      type: 'consultation/discard',
-      payload: dispense.entity.clinicalObjectRecordFK,
-    }).then((o) => {
-      if (o) {
-        dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: false,
-          },
-        })
-      }
-    })
+  handleCancel = async () => {
+    discardConsultation(this.props)
   }
 
-  signOrder = (values) => {
-    const {
-      consultationDocument,
-      orders,
-      dispatch,
-      dispense,
-      visitRegistration,
-    } = this.props
-    console.log('before', { values: { ...values } })
+  signOrder = async (values) => {
+    const { consultationDocument, orders, dispatch, dispense } = this.props
     const payload = convertToConsultation(values, {
       consultationDocument,
       orders,
     })
-    console.log({ payload })
-    dispatch({
+
+    const signResult = await dispatch({
       type: `consultation/signOrder`,
       payload,
-    }).then((o) => {
-      if (o) {
-        dispatch({
-          type: `dispense/updateState`,
-          payload: {
-            editingOrder: false,
-          },
-        })
-
-        dispatch({
-          type: `dispense/refresh`,
-          payload: dispense.visitID,
-        })
-        notification.success({
-          message: 'Order signed',
-        })
-
-        // dispatch({
-        //   type: `formik/clean`,
-        //   payload: 'OrderPage',
-        // })
-      }
     })
+    if (signResult) {
+      notification.success({
+        message: 'Order signed',
+      })
+
+      await dispatch({
+        type: `dispense/refresh`,
+        payload: dispense.visitID,
+      })
+      dispatch({
+        type: `dispense/updateState`,
+        payload: {
+          editingOrder: false,
+        },
+      })
+    }
   }
 
   render () {
@@ -129,9 +140,9 @@ class EditOrder extends Component {
     const cdWidget = widgets.find((o) => o.id === '3')
     const Order = orderWidget.component
     const ConsultationDocument = cdWidget.component
-    console.log('edit order', { values: this.props.values })
+
     return (
-      <div className={classes.root}>
+      <div className={classes.content}>
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>

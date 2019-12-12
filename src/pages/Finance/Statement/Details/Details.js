@@ -4,7 +4,6 @@ import moment from 'moment'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
-
 import { withStyles } from '@material-ui/core'
 import {
   Button,
@@ -21,6 +20,7 @@ import CollectPaymentConfirm from './CollectPaymentConfirm'
 import ExtractAsSingle from './ExtractAsSingle'
 import PrintStatementReport from '../PrintStatementReport'
 import { getBizSession } from '@/services/queue'
+import { roundTo } from '@/utils/utils'
 
 const styles = () => ({
   gridContainer: {
@@ -186,7 +186,9 @@ class Details extends PureComponent {
                 return (
                   !row.statementInvoicePayment.find(
                     (o) => o.invoicePayment.isCancelled === false,
-                  ) && row.payableAmount === row.outstandingAmount
+                  ) &&
+                  row.payableAmount ===
+                    roundTo(row.outstandingAmount + row.adminCharge)
                 )
               },
             },

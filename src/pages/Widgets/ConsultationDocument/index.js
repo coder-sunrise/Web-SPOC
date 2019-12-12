@@ -156,8 +156,16 @@ export const viewReport = (row, props, useID = false) => {
   consultation,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ consultation }) => {
-    return consultation.entity || consultation.default
+  mapPropsToValues: ({ consultation, forDispense }) => {
+    const _values = forDispense
+      ? {
+          ...(consultation.entity || consultation.default),
+          dispenseAcknowledgement: {
+            editDispenseReasonFK: 1,
+          },
+        }
+      : consultation.entity || consultation.default
+    return _values
   },
   validationSchema: Yup.object().shape({
     dispenseAcknowledgement: Yup.object().shape({

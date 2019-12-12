@@ -128,7 +128,8 @@ const Scheme = ({
       <GridContainer style={{ marginBottom: 16 }} alignItems='center'>
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
           <p style={{ color: 'darkblue', fontWeight: 500, fontSize: '1rem' }}>
-            {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME ? (
+            {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+            _isEditing && (
               <Select
                 size='sm'
                 allowClear={false}
@@ -144,9 +145,8 @@ const Scheme = ({
                   })),
                 ]}
               />
-            ) : (
-              <span>{name}</span>
             )}
+            {_isConfirmed && <span>{name}</span>}
           </p>
         </GridItem>
         {schemeConfig &&
@@ -167,7 +167,9 @@ const Scheme = ({
           </GridItem>
         )}
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
-          {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && (
+          {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+          schemeConfig &&
+          schemeConfig.isCoverageMaxCapCheckRequired ? (
             <NumberInput
               currency
               text
@@ -178,8 +180,16 @@ const Scheme = ({
                   copaymentSchemeFK={copaymentSchemeFK}
                 />
               }
-              value={schemeConfig ? schemeConfig.coverageMaxCap : 0}
+              value={schemeConfig.coverageMaxCap}
             />
+          ) : (
+            <div style={{ display: 'flex' }}>
+              <span style={{ marginRight: 8 }}>Max. Cap:</span>
+              <MaxCapInfo
+                claimableSchemes={claimableSchemes}
+                copaymentSchemeFK={copaymentSchemeFK}
+              />
+            </div>
           )}
         </GridItem>
         <GridItem

@@ -63,11 +63,13 @@ class NumberEditor extends PureComponent {
   renderComponent = ({ currency, type, editMode, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange
-      commonCfg.onKeyDown = this.props.onKeyDown
       commonCfg.onBlur = this.props.onBlur
       commonCfg.onFocus = this.props.onFocus
+      commonCfg.onKeyDown = this.props.onKeyDown
+
       commonCfg.autoFocus = true
       commonCfg.debounceDuration = 0
+      commonCfg.preventDefaultKeyDownEvent = true
       // commonCfg.inputProps={{
       //   fullWidth: true,
       // }}

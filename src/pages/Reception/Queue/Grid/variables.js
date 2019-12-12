@@ -65,11 +65,11 @@ export const AppointmentTableConfig = {
 }
 
 export const ApptColumnExtensions = [
-  {
-    columnName: 'visitStatus',
-    width: 180,
-    render: (row) => <VisitStatusTag row={row} />,
-  },
+  // {
+  //   columnName: 'visitStatus',
+  //   width: 180,
+  //   render: (row) => <VisitStatusTag row={row} />,
+  // },
   { columnName: 'patientAccountNo', compare: compareString },
   {
     columnName: 'patientName',
@@ -116,6 +116,7 @@ export const ApptColumnExtensions = [
     columnName: 'appointmentTime',
     width: 180,
     render: (row) => {
+      // const appointmentDate = moment(row.appointmentDate).format('MM DD YYYY')
       const appointmentDate = moment(row.appointmentDate).format('DD MMM YYYY')
       return DateFormatter({
         value: `${appointmentDate} ${row.startTime}`,
@@ -223,6 +224,7 @@ export const QueueColumnExtensions = [
     // compare: compareTime,
     render: (row) => {
       if (row.appointmentTime) {
+        // const appointmentDate = moment(row.appointmentTime).format('MM DD YYYY')
         const appointmentDate = moment(row.appointmentTime).format(
           'DD MMM YYYY',
         )

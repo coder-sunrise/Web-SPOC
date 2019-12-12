@@ -45,8 +45,8 @@ const styles = () => ({})
       ...returnValue,
       outstandingBalance,
       adminChargeValue,
-      amount: total,
-      maxAmount: total,
+      amount: Number(total).toFixed(2),
+      maxAmount: Number(total).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
       displayValue: DEFAULT_PAYMENT_MODE_GIRO.DISPLAY_VALUE,
       statementInvoice: newStatementInvoice,
@@ -62,7 +62,12 @@ const styles = () => ({})
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history, user } = props
-    const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
+    const {
+      paymentCreatedBizSessionFK,
+      paymentModeFK,
+      displayValue,
+      paymentDate,
+    } = values
     const paymentReceivedByUserFK = user.data.id
     let newPaymentStatementInvoice = values.statementInvoice.filter(
       (o) =>
@@ -85,6 +90,9 @@ const styles = () => ({})
         paymentCreatedBizSessionFK,
         paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
         paymentReceivedByUserFK,
+        paymentReceivedDate: moment(paymentDate, serverDateFormat).formatUTC(
+          false,
+        ),
         invoicePaymentMode: [
           {
             paymentModeFK,

@@ -13,7 +13,7 @@ const { fabric } = require('fabric')
 
 const modifierNamePrefix = 'selected_'
 export const cellPrefix = 'cell_'
-
+export const selectablePrefix = 'selectable_'
 // fabric.Object.prototype.set({
 //   cornerSize: 0,
 //   hasBorders: false,
@@ -74,6 +74,9 @@ export const fontCfg = {
 }
 export const overlayShapeTypes = [
   'onlayveneer',
+  'clear',
+  'fractured',
+  'bridge',
 ]
 const checkIsValidElement = (item, name, checker) => {
   if (checker) return checker(item, name)
@@ -99,7 +102,27 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-
+const makeLine = (coords, cfg) => {
+  return new fabric.Line(coords, {
+    fill: 'red',
+    stroke: 'red',
+    strokeWidth: 6,
+    selectable: false,
+    evented: false,
+    ...cfg,
+  })
+}
+const makeCircle = (cfg) => {
+  return new fabric.Circle({
+    left: -8,
+    top: -8,
+    strokeWidth: 2,
+    radius: 8,
+    fill: '#fff',
+    stroke: '#666',
+    ...cfg,
+  })
+}
 let currentSelectedStyle = null
 let currentSelectedGroup = null
 const renderBackgroud = () => {
@@ -469,6 +492,16 @@ const sharedButtonConfig = {
     //   })
   },
 }
+
+let img1
+
+fabric.Image.fromURL(fractured, (img) => {
+  img1 = img.set({ left: 0, top: 0 }).scale(1)
+
+  // canvas.add(oImg)
+  // group.bringToFront()
+})
+
 export const buttonConfigs = [
   {
     value: 'clear',
@@ -505,6 +538,23 @@ export const buttonConfigs = [
     value: 'fractured',
     icon: fractured,
     text: 'Fractured',
+    getShape: ({ canvas, group, config }) => {
+      console.log(fractured)
+      // const group = new fabric.Group([], {
+      //   ...addonGroupCfg,
+      // })
+      // fabric.Image.fromURL(fractured, (img) => {
+      //   let oImg = img.set({ left: 0, top: 0 }).scale(1)
+      //   group.add(oImg)
+      //   console.log(img, oImg, config)
+      //   oImg.set('name', config.value)
+      //   canvas.renderAll()
+      //   // canvas.add(oImg)
+      //   // group.bringToFront()
+      // })
+      // console.log(i)
+      return img1
+    },
   },
   {
     value: 'filling',
@@ -519,20 +569,6 @@ export const buttonConfigs = [
     text: 'Temporary Dressing',
     type: 'cell',
     fill: '#9c9c98',
-    // render: (props) => {
-    //   renderOutsideTopCell(
-    //     {
-    //       fill: '#9c9c98',
-    //       value: 'temporarydressing',
-    //       unselectedOpactiy: 1,
-    //       isValidElement: (item, name) => {
-    //         console.log(item.name.indexOf(cellPrefix), name)
-    //         return item.name.indexOf(cellPrefix) === 0
-    //       },
-    //     },
-    //     props,
-    //   )
-    // },
   },
   {
     value: 'onlayveneer',
@@ -572,60 +608,194 @@ export const buttonConfigs = [
       )
       return group
     },
-    render: (props) => {
-      renderOutsideTopCell(
+  },
+  {
+    value: 'bridge',
+    // icon: filling,
+    text: 'Bridge',
+    type: 'connect',
+    // fill: '#737372',
+    getShape: () => {
+      let line = makeLine([
+        0,
+        -3,
+        baseWidth * 2 + strokeWidth / 2,
+        -3,
+      ])
+      let line2 = makeLine([
+        0,
+        -3,
+        -baseWidth * 2 - strokeWidth / 2,
+        -3,
+      ])
+
+      let c = makeCircle({
+        left: -8,
+        top: -8,
+      })
+      // c.hasControls = c.hasBorders = false
+
+      c.line1 = line
+      c.line2 = line2
+
+      const groupConnect = new fabric.Group(
+        [
+          line,
+          line2,
+          c,
+        ],
         {
-          icon: onlayveneer,
-          value: 'onlayveneer',
-          unselectedOpactiy: 0,
+          ...groupCfg,
+          name: `bridge`,
+          disableAutoReplace: true,
         },
-        props,
       )
+      return groupConnect
+    },
+
+    onSelect: ({ canvas }) => {
+      // let startTarget
+      // let endTarget
+      // let started = false
+      // let line = null
+      // let selected = []
+      // canvas.set('selection', false)
+      // canvas.getObjects('group').map((o) => {
+      //   o.set('selectable', false)
+      //   // o.set('selectable', false)
+      //   const _anchor = makeCircle({
+      //     left: 0,
+      //     top: 0,
+      //     selectable: true,
+      //     name: `${selectablePrefix}_${o.name}_anchor`,
+      //     ...lockConfig,
+      //     lockMovementX: false,
+      //   })
+      //   console.log('add anchor', _anchor)
+      //   o.add(_anchor)
+      //   // canvas.setActiveObject(_anchor, e)
+      //   // canvas.bringToFront(_anchor)
+      //   console.log(o)
+      //   canvas.renderAll()
+      //   // canvas.sendToBack(o)
+      // })
+      // canvas.off('mouse:down')
+      // canvas.on('mouse:down', (e) => {
+      //   started = true
+      //   startTarget = e.target
+      //   console.log(e)
+      //   // const anchor = canvas._objects.find(
+      //   //   (o) => o.name === `${selectablePrefix}anchor`,
+      //   // )
+      //   // if (anchor) {
+      //   //   // canvas.setActiveObject(anchor, e)
+      //   //   anchor.set('left', e.pointer.x)
+      //   //   anchor.setCoords()
+      //   //   canvas.renderAll()
+      //   // }
+      //   if (!line && e.target) {
+      //     // line = makeLine(
+      //     //   [
+      //     //     e.pointer.x,
+      //     //     e.pointer.y,
+      //     //     e.pointer.x,
+      //     //     e.pointer.y,
+      //     //   ],
+      //     //   {
+      //     //     lockMovementX: true,
+      //     //   },
+      //     // )
+      //     // canvas.add(line)
+      //   }
+      // })
+      // canvas.off('mouse:up')
+      // canvas.on('mouse:up', (e) => {
+      //   started = false
+      //   endTarget = e.target
+      //   console.log(e)
+      //   console.log(startTarget, endTarget)
+      // })
+      // canvas.off('object:moving')
+      // canvas.on('object:moving', (e) => {
+      //   console.log('object:moving', e)
+      //   const anchor = canvas._objects.find(
+      //     (o) => o.name === `${selectablePrefix}anchor`,
+      //   )
+      //   if (anchor) {
+      //     if (!selected.find((o) => o === e.target.name)) {
+      //       // selected.
+      //     }
+      //     // canvas.setActiveObject(anchor, e)
+      //     anchor.set('left', e.pointer.x)
+      //     anchor.setCoords()
+      //     canvas.renderAll()
+      //   }
+      // })
+      // canvas.off('mouse:move')
+      // canvas.on('mouse:move', (e) => {
+      //   if (started) {
+      //     const anchor = canvas._objects.find(
+      //       (o) => o.name === `${selectablePrefix}anchor`,
+      //     )
+      //     if (anchor) {
+      //       console.log('mouse:move', e)
+      //       // canvas.setActiveObject(anchor, e)
+      //       anchor.set('left', e.pointer.x)
+      //       anchor.setCoords()
+      //       canvas.renderAll()
+      //     }
+      //   }
+      // })
+      // canvas.off('mouse:over')
+      // canvas.on('mouse:over', (e) => {
+      //   if (e.target) {
+      //     const anchor = canvas._objects.find(
+      //       (o) => o.name === `${selectablePrefix}anchor`,
+      //     )
+      //     if (anchor && !started) {
+      //       // console.log(11)
+      //       // anchor.set({
+      //       //   left: e.target.left + e.target.width / 2 - 8,
+      //       //   top: e.target.top + e.target.height / 2 - 8,
+      //       // })
+      //       // // canvas.setActiveObject(anchor, e)
+      //       // canvas.bringToFront(anchor)
+      //       // canvas.renderAll()
+      //     } else if (
+      //       !canvas._objects.find((o) => o.name === `${selectablePrefix}anchor`)
+      //     ) {
+      //       console.log(22)
+      //       // const _anchor = makeCircle({
+      //       //   left: e.target.left + e.target.width / 2 - 8,
+      //       //   top: e.target.top + e.target.height / 2 - 8,
+      //       //   selectable: true,
+      //       //   name: `${selectablePrefix}anchor`,
+      //       //   ...lockConfig,
+      //       //   lockMovementX: false,
+      //       // })
+      //       // console.log('add anchor', _anchor)
+      //       // canvas.add(_anchor)
+      //       // // canvas.setActiveObject(_anchor, e)
+      //       // canvas.bringToFront(_anchor)
+      //       // canvas.renderAll()
+      //     }
+      //   }
+      // })
+    },
+    onDeselect: ({ canvas }) => {
+      canvas.set('selection', true)
+
+      canvas.getObjects('group').map((o) => {
+        o.set('selectable', true)
+      })
     },
   },
-
   {
     value: 'topcell',
     // icon: onlayveneer,
     text: 'Top',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (props) => {
-      renderOutsideTopCell(
-        {
-          fill: 'brown',
-          value: 'topcell',
-          unselectedOpactiy: 0.1,
-          addonShapeHandler: ({ selected, config }) => {
-            const shape = new fabric.Polygon( // outside top
-              [
-                { x: 0, y: 0 },
-
-                { x: baseWidth * 1, y: baseHeight },
-
-                { x: baseWidth * 3, y: baseHeight },
-                { x: baseWidth * 4, y: 0 },
-              ],
-              {
-                ...config,
-              },
-            )
-            shape.rotate(180)
-            const group = new fabric.Group(
-              [
-                shape,
-              ],
-              {
-                ...addonGroupCfg,
-                top: -baseHeight * 2.5 - strokeWidth / 2,
-              },
-            )
-            return group
-          },
-        },
-        props,
-      )
-    },
   },
 
   {
@@ -634,42 +804,5 @@ export const buttonConfigs = [
     text: 'Bottom',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (props) => {
-      renderOutsideTopCell(
-        {
-          fill: 'brown',
-          value: 'bottomcell',
-          unselectedOpactiy: 0.1,
-
-          addonShapeHandler: ({ selected, config }) => {
-            const shape = new fabric.Polygon( // outside top
-              [
-                { x: 0, y: baseHeight },
-
-                { x: baseWidth * 1, y: 0 },
-
-                { x: baseWidth * 3, y: 0 },
-                { x: baseWidth * 4, y: baseHeight },
-              ],
-              {
-                ...config,
-              },
-            )
-            shape.rotate(180)
-            const group = new fabric.Group(
-              [
-                shape,
-              ],
-              {
-                ...addonGroupCfg,
-                top: baseHeight * 1.5 + strokeWidth / 2,
-              },
-            )
-            return group
-          },
-        },
-        props,
-      )
-    },
   },
 ]

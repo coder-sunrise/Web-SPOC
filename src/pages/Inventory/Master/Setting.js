@@ -35,7 +35,6 @@ const Setting = ({
   ) {
     addedItems = entityData.inventoryMedication_MedicationPrecaution.map(
       (item) => ({
-        sequence: item.sequence,
         medicationPrecautionFK: item.medicationPrecautionFK,
         value: item.medicationPrecaution.name,
       }),

@@ -183,6 +183,10 @@ export default createFormViewModel({
           notices: payload,
         }
       },
+      incrementCommitCount (state) {
+        const _commitCount = state.commitCount ? state.commitCount + 1 : 1
+        return { ...state, commitCount: _commitCount }
+      },
       saveClearedNotices (state, { payload }) {
         return {
           ...state,

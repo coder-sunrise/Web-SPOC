@@ -76,13 +76,14 @@ const Transfer = ({
 
   useEffect(
     () => {
+      const getUnusedItemList = getUnusedItem()
       if (search !== '') {
-        const filteredList = addedList.filter((o) => {
+        const filteredList = getUnusedItemList.filter((o) => {
           return o.value.toLowerCase().indexOf(search) >= 0
         })
         setAddedList(filteredList)
       } else {
-        setAddedList(getUnusedItem())
+        setAddedList(getUnusedItemList)
       }
     },
     [
@@ -90,17 +91,17 @@ const Transfer = ({
     ],
   )
 
-  const addClick = (index) => () => {
+  const addClick = (fk) => () => {
+    const removedItem = items.find((o) => o.medicationPrecautionFK === fk)
     const tempList = [
       ...removedList,
-      items[index],
+      removedItem,
     ]
     setRemovedList(tempList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, tempList)
     }
-
-    setAddedList(addedList.filter((o) => o.sequence !== index))
+    setAddedList(addedList.filter((o) => o.medicationPrecautionFK !== fk))
 
     // setAddedList([
     //   ...addedList.slice(0, index),
@@ -108,16 +109,20 @@ const Transfer = ({
     // ])
   }
 
-  const removeClick = (index) => () => {
+  const removeClick = (fk) => () => {
+    const addedItem = items.find((o) => o.medicationPrecautionFK === fk)
+
     setAddedList([
       ...addedList,
-      items[index],
+      addedItem,
     ])
     // const tempList = [
     //   ...removedList.slice(0, index),
     //   ...removedList.slice(index + 1, removedList.length),
     // ]
-    const currentRemovedList = removedList.filter((o) => o.sequence !== index)
+    const currentRemovedList = removedList.filter(
+      (o) => o.medicationPrecautionFK !== fk,
+    )
     setRemovedList(currentRemovedList)
     if (setFieldValue && fieldName) {
       setFieldValue(fieldName, currentRemovedList)
@@ -166,16 +171,16 @@ const Transfer = ({
                   {addedList.map((item) => {
                     return (
                       <ListItem
-                        key={item.sequence}
+                        key={item.medicationPrecautionFK}
                         disabled={limit && limit === removedList.length}
                         button
-                        onClick={addClick(item.sequence)}
+                        onClick={addClick(item.medicationPrecautionFK)}
                       >
                         <ListItemText primary={`${item.value}`} />
                         <ListItemSecondaryAction>
                           <Button
                             size='sm'
-                            onClick={addClick(item.sequence)}
+                            onClick={addClick(item.medicationPrecautionFK)}
                             justIcon
                             round
                             disabled={limit && limit === removedList.length}
@@ -224,9 +229,9 @@ const Transfer = ({
                   <List dense className={classes.list}>
                     {removedList.map((item, index) => (
                       <ListItem
-                        key={item.sequence}
+                        key={item.medicationPrecautionFK}
                         button
-                        onClick={removeClick(item.sequence)}
+                        onClick={removeClick(item.medicationPrecautionFK)}
                       >
                         {label && (
                           <ListItemIcon style={{ paddingRight: '20px' }}>
@@ -237,7 +242,7 @@ const Transfer = ({
                         <ListItemSecondaryAction>
                           <Button
                             size='sm'
-                            onClick={removeClick(item.sequence)}
+                            onClick={removeClick(item.medicationPrecautionFK)}
                             justIcon
                             round
                             color='primary'

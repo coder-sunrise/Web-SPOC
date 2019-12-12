@@ -92,6 +92,15 @@ export const INVOICE_ITEM_TYPE_BY_TEXT = {
   Package: 4,
 }
 
+export const INVOICE_ITEM_TYPE_BY_NAME = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+  SERVICE: 4,
+  PACKAGE: 5,
+  MISC: 6,
+}
+
 export const INVENTORY_TYPE = {
   MEDICATION: 1,
   CONSUMABLE: 2,
@@ -186,4 +195,13 @@ export const VISIT_TYPE_NAME = {
 export const DEFAULT_PAYMENT_MODE_GIRO = {
   PAYMENT_FK: 5,
   DISPLAY_VALUE: 'GIRO',
+}
+
+export const ORDER_TYPE_TAB = {
+  MEDICATION: '1',
+  VACCINATION: '2',
+  SERVICE: '3',
+  CONSUMABLE: '4',
+  OPENPRECRIPTION: '5',
+  PACKAGE: '6',
 }

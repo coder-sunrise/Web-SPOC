@@ -120,7 +120,7 @@ const InvoiceBanner = ({ classes, ...restProps }) => {
           <GridItem md={5}>
             <h5 className={classes.boldText}>O/S Balance: </h5>
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <FastField
               name='outstandingBalance'
               render={(args) => <NumberInput {...amountProps} {...args} />}

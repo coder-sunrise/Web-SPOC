@@ -3,6 +3,11 @@ const DispenseIndexStyle = (theme) => ({
     position: 'relative',
     marginBottom: theme.spacing(2),
   },
+  editOrderRoot: {
+    '& h5': {
+      marginTop: theme.spacing(2),
+    },
+  },
   content: {
     marginTop: theme.spacing(1),
   },

@@ -59,6 +59,16 @@ String.prototype.replaceAll = function (search, replacement) {
   return target.replace(new RegExp(search, 'g'), replacement)
 }
 
+Number.prototype.currencyString = function () {
+  if (this === undefined || this === null)
+    return '-'
+  return `${config.currencySymbol}${numeral(Math.abs(this)).format(config.currencyFormat)}`
+}
+Number.prototype.formatString = function () {
+  if (this === undefined || this === null)
+    return '-'
+  return `${numeral(Math.abs(this)).format(config.numberFormat)}`
+}
 // function toLocal (m) {
 //   // console.log(m, m.formatUTC(), moment(m.formatUTC()).add(8, 'hours'))
 //   return m.add(8, 'hours')
@@ -663,19 +673,19 @@ export const watchForElementChange = (e) => {
   let r =
     undefined === i
       ? {
-          childList: true,
-          characterData: true,
-          subtree: true,
-          attributes: true,
-        }
+        childList: true,
+        characterData: true,
+        subtree: true,
+        attributes: true,
+      }
       : i
-  ;(observers[t] = new MutationObserver((e1) => {
-    e1.forEach((e2) => {
-      a(e2)
-    }),
-      n || observers[t].disconnect()
-  })),
-    observers[t].observe(e.container || document, r)
+    ; (observers[t] = new MutationObserver((e1) => {
+      e1.forEach((e2) => {
+        a(e2)
+      }),
+        n || observers[t].disconnect()
+    })),
+      observers[t].observe(e.container || document, r)
 }
 
 const confirmBeforeReload = (e) => {
@@ -708,6 +718,7 @@ const navigateDirtyCheck = ({
   // )
   if (window.beforeReloadHandlerAdded) {
     let f = {}
+
     if (displayName) {
       f = window.dirtyForms[displayName]
 
@@ -717,6 +728,7 @@ const navigateDirtyCheck = ({
         return
       }
     }
+
     window.g_app._store.dispatch({
       type: 'global/updateAppState',
       payload: {
@@ -1008,11 +1020,11 @@ const calculateAmount = (
     })
   }
   // console.log({ activeRows, adjustments })
-  const mapInvoiceItemAdjustment = (adjustment) => (invoiceItem) => {
+  const mapInvoiceItemAdjustment = (adjustment, index) => (invoiceItem) => {
     return {
       [itemFkField]: invoiceItem.id,
       [itemAdjustmentFkField]: adjustment.id,
-      adjAmount: invoiceItem[adjAmountField],
+      adjAmount: roundTo(invoiceItem[`adjustmen${index}`]),
       isDeleted: !!adjustment.isDeleted,
     }
   }
@@ -1022,7 +1034,9 @@ const calculateAmount = (
     adjustments: adjustments.map((o, index) => ({
       ...o,
       index,
-      [invoiceItemAdjustmentField]: activeRows.map(mapInvoiceItemAdjustment(o)),
+      [invoiceItemAdjustmentField]: activeRows.map(
+        mapInvoiceItemAdjustment(o, index),
+      ),
     })),
     summary: {
       subTotal: roundTo(

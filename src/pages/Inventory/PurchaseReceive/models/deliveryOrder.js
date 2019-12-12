@@ -209,6 +209,9 @@ export default createFormViewModel({
             currentReceivingBonusQty: x.bonusQuantity,
             maxCurrentReceivingQty: x.recevingQuantity,
             maxCurrentReceivingBonusQty: x.bonusQuantity,
+            batchNo: [
+              x.batchNo,
+            ],
             // expiryDate: null,
           }
         })

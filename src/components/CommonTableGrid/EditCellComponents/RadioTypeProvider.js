@@ -32,6 +32,7 @@ class RadioEditorBase extends PureComponent {
 
   componentDidMount () {
     const { gridId, row, columnName } = onComponentDidMount.call(this)
+
     if (!_radioSelectedMap) _radioSelectedMap = {}
     // if (row[columnName]) {
     //   // _radioSelectedMap[columnName] = row.id
@@ -39,6 +40,10 @@ class RadioEditorBase extends PureComponent {
     this.forceUpdate()
 
     // console.log('RadioEditorBase', row, _radioSelectedMap)
+  }
+
+  componentWillUnmount () {
+    _radioSelectedMap = {}
   }
 
   _onChange = (e, checked) => {
@@ -98,6 +103,7 @@ class RadioEditorBase extends PureComponent {
     if (_radioSelectedMap[columnName]) {
       commonCfg.checked = _radioSelectedMap[columnName] === row.id
     }
+
     return (
       <Radio
         className={classnames({

@@ -482,6 +482,7 @@ class AntdNumberInput extends React.PureComponent {
       defaultValue,
       renderDropdown,
       onChange,
+      onKeyDown,
       onFocus,
       onBlur,
       currency,
@@ -518,7 +519,7 @@ class AntdNumberInput extends React.PureComponent {
           onFocus={extendFunc(onFocus, this.handleFocus)}
           onBlur={extendFunc(onBlur, this.handleBlur)}
           value={this.state.value}
-          onKeyDown={this.handleKeyDown}
+          onKeyDown={extendFunc(onKeyDown, this.handleKeyDown)}
           onKeyUp={this.handleKeyUp}
           {...this.getConfig()}
           {...restProps}

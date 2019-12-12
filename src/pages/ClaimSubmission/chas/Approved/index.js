@@ -23,6 +23,7 @@ import TableGrid from '../../common/TableGrid'
 import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
+import { approvedStatus } from '@/utils/codes'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -154,7 +155,6 @@ class ApprovedCHAS extends React.Component {
     const { list } = claimSubmissionApproved || []
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
-
     return (
       <CardContainer
         hideHeader
@@ -170,10 +170,18 @@ class ApprovedCHAS extends React.Component {
         >
           <GridItem md={12}>
             <FastField
-              name='claimStatus'
-              render={(args) => (
-                <Select {...args} label='Claim Status' options={[]} />
+              name='chasClaimStatusCode'
+              render={(args) => {
+                return (
+                  <Select
+                    label={formatMessage({
+                      id:'claimsubmission.invoiceClaim.claimStatus',
+                    })}
+                    options={approvedStatus}
+                    {...args}
+                  />
               )}
+              }
             />
           </GridItem>
         </BaseSearchBar>{' '}

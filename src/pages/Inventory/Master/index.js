@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 // import { getAppendUrl } from '@/utils/utils'
 import { compose } from 'redux'
-import { NavPills, Tabs } from '@/components'
+import { Tabs } from '@/components'
 // import Consumable from './Consumable'
 // import Medication from './Medication'
 // import Vaccination from './Vaccination'
@@ -16,7 +16,12 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
   const [
     activeTab,
     setActiveTab,
-  ] = useState('0')
+  ] = useState('-1')
+
+  const [
+    mounted,
+    setMounted,
+  ] = useState(false)
 
   const componentProps = {
     dispatch,
@@ -24,48 +29,44 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
     setActiveTab,
   }
 
-  useEffect(() => {
+  const didMount = async () => {
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctSupplier',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctmedicationunitofmeasurement',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctConsumableUnitOfMeasurement',
+        },
+      }),
+    ])
+    setMounted(true)
     let tabIndex = inventoryMaster.currentTab
     if (!tabIndex) {
       tabIndex = '0'
     }
     setActiveTab(tabIndex)
+  }
+
+  useEffect(() => {
+    didMount()
   }, [])
+
   return (
-    // <NavPills
-    //   color='primary'
-    //   onChange={(event, active) => {
-    //     history.push(
-    //       getAppendUrl({
-    //         t: active,
-    //       }),
-    //     )
-    //   }}
-    //   index={inventoryMaster.currentTab}
-    //   contentStyle={{ margin: '0 -5px' }}
-    //   tabs={[
-    //     {
-    //       tabButton: 'Medication',
-    //       tabContent: <Medication {...componentProps} />,
-    //     },
-    //     {
-    //       tabButton: 'Consumable',
-    //       tabContent: <Consumable {...componentProps} />,
-    //     },
-    //     {
-    //       tabButton: 'Vaccination',
-    //       tabContent: <Vaccination {...componentProps} />,
-    //     },
-    //     {
-    //       tabButton: 'Package',
-    //       tabContent: <Package {...componentProps} />,
-    //     },
-    //   ]}
-    // />
     <Tabs
       style={{ marginTop: 20 }}
-      activeKey={activeTab}
-      defaultActivekey='0'
+      activeKey={mounted ? activeTab : '-1'}
+      // defaultActivekey='0'
       onChange={(e) => setActiveTab(e)}
       options={InventoryMasterOption(componentProps)}
     />

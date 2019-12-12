@@ -25,10 +25,7 @@ import {
   sortItemByID,
 } from './applyClaimUtils'
 import { roundTo } from '@/utils/utils'
-import {
-  INVOICE_PAYER_TYPE,
-  INVOICE_ITEM_TYPE_BY_TEXT,
-} from '@/utils/constants'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -201,11 +198,8 @@ const ApplyClaims = ({
                     schemeConfig,
                     item,
                   )
-                  const invoiceItemTypeFK =
-                    item.invoiceItemTypeFK === undefined && item.itemType
-                      ? INVOICE_ITEM_TYPE_BY_TEXT[item.itemType]
-                      : item.invoiceItemTypeFK
-                  return { ...item, coverage, invoiceItemTypeFK }
+                  // const invoiceItemTypeFK = item.invoiceItemTypeFK
+                  return { ...item, coverage }
                 })
                 .sort(sortItemByID),
               schemeConfig,
@@ -415,7 +409,8 @@ const ApplyClaims = ({
 
   const handleCommitChanges = useCallback(
     ({ rows, changed }) => {
-      const id = Object.keys(changed)[0]
+      const _id = Object.keys(changed)[0]
+      let id = _id.includes('sys-gen') ? _id : parseInt(_id, 10)
 
       if (id === -99) return
       const index = tempInvoicePayer.findIndex((item) => item._isEditing)
@@ -476,6 +471,7 @@ const ApplyClaims = ({
     },
     [
       tempInvoicePayer,
+      updatedInvoiceItems,
     ],
   )
 
