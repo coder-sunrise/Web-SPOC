@@ -46,7 +46,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
         {},
       ]
     }
-    console.log(v)
     return v
   },
   enableReinitialize: true,
@@ -235,7 +234,6 @@ class Medication extends PureComponent {
 
   calculateQuantity = (medication) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
-    // console.log(this.props)
     let currentMedicaiton = medication
     if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
     const { form } = this.descriptionArrayHelpers
@@ -478,7 +476,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log('openPrescription', openPrescription, values.type)
     return (
       <div>
         <GridContainer>
