@@ -374,7 +374,11 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <div className={classes.dispenseContainer}>
-                      <DispenseDetails viewOnly values={dispense.entity} />
+                      <DispenseDetails
+                        viewOnly
+                        values={dispense.entity}
+                        dispatch={this.props.dispatch}
+                      />
                     </div>
                   ),
                 },
