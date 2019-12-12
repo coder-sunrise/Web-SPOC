@@ -292,8 +292,8 @@ class AddNewStatement extends PureComponent {
   clearInvoiceList = (e, op) => {
     const { setFieldValue } = this.props
     const { adminCharge, adminChargeType } = op
-    setFieldValue('adminChargeValue', adminCharge)
-    setFieldValue('adminChargeValueType', adminChargeType)
+    setFieldValue('adminChargeValue', adminCharge || 0)
+    setFieldValue('adminChargeValueType', adminChargeType || 'Percentage')
     this.setState(() => {
       return {
         invoiceRows: [],

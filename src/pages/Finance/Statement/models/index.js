@@ -14,6 +14,7 @@ export default createListViewModel({
       default: {
         paymentTerms: 0,
         adminChargeValueType: 'Percentage',
+        isAdminChargeIncludeGST: false,
         statementInvoice: [],
         statementDate: moment(),
         adminChargeValue: 0.0,
