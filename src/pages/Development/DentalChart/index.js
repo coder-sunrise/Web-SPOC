@@ -154,7 +154,7 @@ class DentalChart extends React.Component {
       this.divContainer.current.offsetHeight,
       this.props.global.mainDivHeight,
     )
-    window.addEventListener('resize', this.resize.bind(this))
+    // window.addEventListener('resize', this.resize.bind(this))
     const canvas = new fabric.Canvas(this._canvasContainer.current, {
       // preserveObjectStacking: true,
       width: this.divContainer.current.offsetWidth,
@@ -189,7 +189,7 @@ class DentalChart extends React.Component {
     //   // console.log('mouse:move', e)
     // })
     this.canvas.on('selection:created', ({ selected, e, target }) => {
-      if (!target) return
+      if (!target || !Number(target.name)) return
       target.set(lockConfig)
 
       if (!this.props.dentalChartComponent.action) return
@@ -214,6 +214,7 @@ class DentalChart extends React.Component {
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
     // )
     if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
+      this.unbindCanvas(this.props)
       this.renderCanvas(nextProps)
     }
     if (global.mainDivHeight !== this.props.global.mainDivHeight) {
@@ -547,6 +548,7 @@ class DentalChart extends React.Component {
       fixedItems.push(g5)
       fixedItems.push(g6)
     }
+    console.log(fixedItems)
     const group = new fabric.Group(fixedItems, {
       ...groupCfg,
       ...lockConfig,
@@ -580,12 +582,23 @@ class DentalChart extends React.Component {
     this.canvas.add(group)
   }
 
+  unbindCanvas = (props) => {
+    const { dentalChartComponent, dispatch } = props
+    const { action = {}, data } = dentalChartComponent
+    const { icon, type, hoverColor: hc, onDeselect, clear } = action
+    if (onDeselect) {
+      onDeselect({ canvas: this.canvas })
+    }
+  }
+
   renderCanvas = (props) => {
     console.log('renderCanvas', props.dentalChartComponent.data)
     const { dentalChartComponent, dispatch } = props
     const { action = {}, data } = dentalChartComponent
-    const { icon, type, hoverColor: hc, render, clear } = action
-
+    const { icon, type, hoverColor: hc, onSelect, clear } = action
+    if (onSelect) {
+      onSelect({ canvas: this.canvas })
+    }
     this.canvas
       .getObjects('group')
       .filter((n) => Number(n.name) > 0)
@@ -595,6 +608,7 @@ class DentalChart extends React.Component {
           .filter((n) => n.isValidCell())
           .map((o) => o.item(0).set('fill', 'white'))
         group.off('mouseup')
+
         group.on('mouseup', (e) => {
           console.log('gesture', e)
           // console.log(action, dentalChartComponent)
@@ -645,8 +659,12 @@ class DentalChart extends React.Component {
                 .find((t) => t.name === o.target)
               if (cell) cell.item(0).set('fill', target.fill)
             }
+            if (target.render) {
+              target.render({ group, canvas: this.canvas })
+            }
           }
         })
+
         // console.log(group)
         // const cfg = {
         //   ...props,

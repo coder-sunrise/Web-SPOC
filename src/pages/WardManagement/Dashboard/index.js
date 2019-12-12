@@ -117,7 +117,7 @@ class Dashboard extends Component {
               color='primary'
               style={{ marginBottom: 8 }}
               onClick={() => {
-                router.push('/wardoverview/list')
+                router.push('/wardmanagement/wardoccupancy')
               }}
             >
               View

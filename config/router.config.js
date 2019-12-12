@@ -654,9 +654,9 @@ const routes = [
       //
       // Ward Demo
       {
-        path: '/wardoverview',
+        path: '/wardmanagement',
         icon: 'hotel',
-        name: 'wardoverview',
+        name: 'wardmanagement',
         // authority: [
         //   'demorights',
         // ],
@@ -665,13 +665,13 @@ const routes = [
 
         routes: [
           {
-            path: '/wardoverview',
-            name: 'wardoverview',
+            path: '/wardmanagement',
+            name: 'wardmanagement',
             component: './WardManagement/Dashboard',
           },
           {
-            path: '/wardoverview/list',
-            name: 'wardmanagement',
+            path: '/wardmanagement/wardoccupancy',
+            name: 'wardoccupancy',
             component: './WardManagement/Search',
 
             // hideInMenu: true,

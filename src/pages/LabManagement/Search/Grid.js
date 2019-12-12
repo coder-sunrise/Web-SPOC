@@ -124,6 +124,10 @@ class Grid extends PureComponent {
           type: 'date',
         },
         {
+          columnName: 'serviceCentre',
+          width: 180,
+        },
+        {
           columnName: 'action',
           align: 'center',
           sortingEnabled: false,

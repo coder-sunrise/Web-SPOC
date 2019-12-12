@@ -74,6 +74,8 @@ export const fontCfg = {
 }
 export const overlayShapeTypes = [
   'onlayveneer',
+  'clear',
+  // 'bridge',
 ]
 const checkIsValidElement = (item, name, checker) => {
   if (checker) return checker(item, name)
@@ -99,7 +101,27 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-
+const makeLine = (coords, cfg) => {
+  return new fabric.Line(coords, {
+    fill: 'red',
+    stroke: 'red',
+    strokeWidth: 6,
+    selectable: false,
+    evented: false,
+    ...cfg,
+  })
+}
+const makeCircle = (cfg) => {
+  return new fabric.Circle({
+    left: -8,
+    top: -8,
+    strokeWidth: 2,
+    radius: 8,
+    fill: '#fff',
+    stroke: '#666',
+    ...cfg,
+  })
+}
 let currentSelectedStyle = null
 let currentSelectedGroup = null
 const renderBackgroud = () => {
@@ -572,16 +594,6 @@ export const buttonConfigs = [
       )
       return group
     },
-    render: (props) => {
-      renderOutsideTopCell(
-        {
-          icon: onlayveneer,
-          value: 'onlayveneer',
-          unselectedOpactiy: 0,
-        },
-        props,
-      )
-    },
   },
   {
     value: 'bridge',
@@ -589,6 +601,134 @@ export const buttonConfigs = [
     text: 'Bridge',
     type: 'connect',
     // fill: '#737372',
+    getShape: () => {
+      let line = makeLine([
+        0,
+        -3,
+        baseWidth * 2 + strokeWidth / 2,
+        -3,
+      ])
+      let line2 = makeLine([
+        0,
+        -3,
+        -baseWidth * 2 - strokeWidth / 2,
+        -3,
+      ])
+
+      let c = makeCircle({
+        left: -8,
+        top: -8,
+      })
+      c.hasControls = c.hasBorders = false
+
+      c.line1 = line
+      c.line2 = line2
+
+      const groupConnect = new fabric.Group(
+        [
+          line,
+          line2,
+          c,
+        ],
+        {
+          ...groupCfg,
+          name: `bridge`,
+        },
+      )
+      return groupConnect
+    },
+
+    onSelect: ({ canvas }) => {
+      let startTarget
+      let endTarget
+      let started = false
+      let line = null
+      canvas.set('selection', true)
+      canvas.getObjects('group').map((o) => {
+        o.set('selectable', false)
+        // o.set('selectable', false)
+        canvas.sendToBack(o)
+      })
+      canvas.off('mouse:down')
+      canvas.on('mouse:down', (e) => {
+        started = true
+        startTarget = e.target
+        console.log(e)
+        if (!line && e.target) {
+          // line = makeLine(
+          //   [
+          //     e.pointer.x,
+          //     e.pointer.y,
+          //     e.pointer.x,
+          //     e.pointer.y,
+          //   ],
+          //   {
+          //     lockMovementX: true,
+          //   },
+          // )
+          // canvas.add(line)
+        }
+      })
+      canvas.off('mouse:up')
+
+      canvas.on('mouse:up', (e) => {
+        started = false
+        endTarget = e.target
+        console.log(e)
+        console.log(startTarget, endTarget)
+      })
+
+      canvas.off('mouse:move')
+
+      canvas.on('object:move', (e) => {
+        // if (started && e.target) console.log(e.target.name)
+        // if (line) {
+        //   line.set({
+        //     x2: e.pointer.x,
+        //     y2: e.pointer.y,
+        //   })
+        //   canvas.renderAll()
+        // }
+      })
+      canvas.off('mouse:over')
+      canvas.on('mouse:over', (e) => {
+        if (e.target) {
+          const anchor = canvas._objects.find((o) => o.name === 'anchor')
+          if (anchor && !started) {
+            console.log(11)
+            anchor.set({
+              left: e.target.left + e.target.width / 2 - 8,
+              top: e.target.top + e.target.height / 2 - 8,
+            })
+            // canvas.setActiveObject(anchor, e)
+            canvas.renderAll()
+          } else if (!canvas._objects.find((o) => o.name === 'anchor')) {
+            console.log(22)
+
+            const _anchor = makeCircle({
+              left: e.target.left + e.target.width / 2 - 8,
+              top: e.target.top + e.target.height / 2 - 8,
+              selectable: true,
+              name: 'anchor',
+              ...lockConfig,
+              lockMovementX: false,
+            })
+            console.log('add anchor', _anchor)
+            canvas.add(_anchor)
+            // canvas.setActiveObject(_anchor, e)
+            // canvas.bringToFront(_anchor)
+            canvas.renderAll()
+          }
+        }
+      })
+    },
+    onDeselect: ({ canvas }) => {
+      canvas.set('selection', true)
+
+      canvas.getObjects('group').map((o) => {
+        o.set('selectable', true)
+      })
+    },
   },
   {
     value: 'topcell',
@@ -596,42 +736,6 @@ export const buttonConfigs = [
     text: 'Top',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (props) => {
-      renderOutsideTopCell(
-        {
-          fill: 'brown',
-          value: 'topcell',
-          unselectedOpactiy: 0.1,
-          addonShapeHandler: ({ selected, config }) => {
-            const shape = new fabric.Polygon( // outside top
-              [
-                { x: 0, y: 0 },
-
-                { x: baseWidth * 1, y: baseHeight },
-
-                { x: baseWidth * 3, y: baseHeight },
-                { x: baseWidth * 4, y: 0 },
-              ],
-              {
-                ...config,
-              },
-            )
-            shape.rotate(180)
-            const group = new fabric.Group(
-              [
-                shape,
-              ],
-              {
-                ...addonGroupCfg,
-                top: -baseHeight * 2.5 - strokeWidth / 2,
-              },
-            )
-            return group
-          },
-        },
-        props,
-      )
-    },
   },
 
   {
@@ -640,42 +744,5 @@ export const buttonConfigs = [
     text: 'Bottom',
     color: 'brown',
     ...sharedButtonConfig,
-    render: (props) => {
-      renderOutsideTopCell(
-        {
-          fill: 'brown',
-          value: 'bottomcell',
-          unselectedOpactiy: 0.1,
-
-          addonShapeHandler: ({ selected, config }) => {
-            const shape = new fabric.Polygon( // outside top
-              [
-                { x: 0, y: baseHeight },
-
-                { x: baseWidth * 1, y: 0 },
-
-                { x: baseWidth * 3, y: 0 },
-                { x: baseWidth * 4, y: baseHeight },
-              ],
-              {
-                ...config,
-              },
-            )
-            shape.rotate(180)
-            const group = new fabric.Group(
-              [
-                shape,
-              ],
-              {
-                ...addonGroupCfg,
-                top: baseHeight * 1.5 + strokeWidth / 2,
-              },
-            )
-            return group
-          },
-        },
-        props,
-      )
-    },
   },
 ]
