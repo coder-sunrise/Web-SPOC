@@ -18,7 +18,7 @@ const styles = () => ({})
 @withFormikExtend({
   enableReinitialize: true,
   mapPropsToValues: ({ statement }) => {
-    const returnValue = statement.entity || statement.default
+    const returnValue = statement.entity || statement
     let newStatementInvoice = []
     let total = 0
     let adminChargeValue = 0
@@ -62,7 +62,12 @@ const styles = () => ({})
   }),
   handleSubmit: (values, { props }) => {
     const { dispatch, onConfirm, history, user } = props
-    const { paymentCreatedBizSessionFK, paymentModeFK, displayValue } = values
+    const {
+      paymentCreatedBizSessionFK,
+      paymentModeFK,
+      displayValue,
+      paymentDate,
+    } = values
     const paymentReceivedByUserFK = user.data.id
     let newPaymentStatementInvoice = values.statementInvoice.filter(
       (o) =>
@@ -85,6 +90,9 @@ const styles = () => ({})
         paymentCreatedBizSessionFK,
         paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
         paymentReceivedByUserFK,
+        paymentReceivedDate: moment(paymentDate, serverDateFormat).formatUTC(
+          false,
+        ),
         invoicePaymentMode: [
           {
             paymentModeFK,

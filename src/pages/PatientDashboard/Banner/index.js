@@ -361,6 +361,7 @@ class Banner extends PureComponent {
         fontWeight: 500,
       }
     }
+    const year = Math.floor(moment.duration(moment().diff(info.dob)).asYears())
     return (
       // <Affix target={() => window.mainPanel} offset={headerHeight + 1}>
       <Paper style={style}>
@@ -412,9 +413,7 @@ class Banner extends PureComponent {
                     />
                   </div>
                   <div>
-                    {Math.floor(
-                      moment.duration(moment().diff(info.dob)).asYears(),
-                    )},&nbsp;
+                    {year > 1 ? `${year} yrs` : `${year} yr`},&nbsp;
                     {
                       <CodeSelect
                         code='ctGender'
