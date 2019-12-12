@@ -39,6 +39,34 @@ const PaymentRow = ({
   if (type === 'Payment') tooltipMsg = 'Print Receipt'
   else if (type === 'Credit Note') tooltipMsg = 'Print Credit Note'
 
+  const getIconByType = () => {
+    if (type === 'Payment' || type === 'Credit Note') {
+      return (
+        <Tooltip title={tooltipMsg}>
+          <IconButton
+            // payerID='N/A'
+            id={itemID}
+            className={classes.printButton}
+            disabled={isCancelled}
+            onClick={() => handlePrinterClick(type, id)}
+          >
+            <Printer />
+          </IconButton>
+        </Tooltip>
+      )
+    }
+    if (type === 'Admin Charge') {
+      return ''
+    }
+    return (
+      <Tooltip title={reason}>
+        <IconButton className={classes.infoButton}>
+          <Info />
+        </IconButton>
+      </Tooltip>
+    )
+  }
+
   return (
     <React.Fragment>
       <GridContainer
@@ -48,25 +76,7 @@ const PaymentRow = ({
         style={isCancelled ? { textDecorationLine: 'line-through' } : {}}
       >
         <GridItem md={2}>
-          {type === 'Payment' || type === 'Credit Note' ? (
-            <Tooltip title={tooltipMsg}>
-              <IconButton
-                // payerID='N/A'
-                id={itemID}
-                className={classes.printButton}
-                disabled={isCancelled}
-                onClick={() => handlePrinterClick(type, id)}
-              >
-                <Printer />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <Tooltip title={reason}>
-              <IconButton className={classes.infoButton}>
-                <Info />
-              </IconButton>
-            </Tooltip>
-          )}
+          {getIconByType()}
           <span>{type}</span>
         </GridItem>
         <GridItem md={2}>
