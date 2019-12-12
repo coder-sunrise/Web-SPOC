@@ -213,8 +213,14 @@ class StatementDetails extends PureComponent {
       type: 'statement/bizSessionList',
       payload: {
         pagesize: 999,
-        lgteql_SessionStartDate: startDateTime,
         lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],

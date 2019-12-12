@@ -58,7 +58,7 @@ export const formikMapPropsToValues = ({
       qNo = parseFloat(largestQNo + 1).toFixed(1)
     }
 
-    const { visitInfo } = visitRegistration
+    const { visitInfo, roomFK } = visitRegistration
 
     if (Object.keys(visitInfo).length > 0) {
       qNo = visitInfo.queueNo
@@ -85,6 +85,7 @@ export const formikMapPropsToValues = ({
     return {
       queueNo: qNo,
       visitPurposeFK: 1,
+      roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,

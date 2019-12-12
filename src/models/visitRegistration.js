@@ -55,9 +55,10 @@ export default createFormViewModel({
             })
           }
           if (query.pdroomid) {
+            const pdroomidInt = parseInt(query.pdroomid, 10)
             dispatch({
               type: 'updateState',
-              payload: { roomFK: query.pdroomid },
+              payload: { roomFK: pdroomidInt || undefined },
             })
           }
           dispatch(openModal)

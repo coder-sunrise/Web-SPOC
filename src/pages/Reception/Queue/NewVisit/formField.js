@@ -3,6 +3,7 @@ export default {
   'visit.visitType': 'visitPurposeFK',
   'visit.doctorProfileFk': 'doctorProfileFK',
   'visit.visitRemarks': 'visitRemarks',
+  'visit.roomFK': 'roomFK',
 
   'vitalsign.temperatureC': 'temperatureC',
   'vitalsign.bpSysMMHG': 'bpSysMMHG',
