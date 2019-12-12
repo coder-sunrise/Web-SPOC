@@ -571,7 +571,15 @@ class Index extends Component {
                     Math.round(v.summary.gst * 100) / 100,
                   )
 
-                  setFieldValue('purchaseOrderAdjustment', v.adjustments)
+                  setFieldValue(
+                    'purchaseOrderAdjustment',
+                    v.adjustments.map((a) => {
+                      return {
+                        sequence: a.index + 1,
+                        ...a,
+                      }
+                    }),
+                  )
                   setFieldValue(
                     'purchaseOrder.isGstInclusive',
                     v.summary.isGSTInclusive,
