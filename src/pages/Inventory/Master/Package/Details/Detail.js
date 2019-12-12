@@ -106,7 +106,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                 }}
               />
             </GridItem>
-            <GridItem xs={12}>
+            {/* <GridItem xs={12}>
               <FastField
                 name='isOrderable'
                 render={(args) => {
@@ -120,7 +120,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                   )
                 }}
               />
-            </GridItem>
+            </GridItem> */}
           </GridContainer>
         </GridItem>
         <GridItem xs={12} md={2} />
