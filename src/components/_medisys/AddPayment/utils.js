@@ -1,6 +1,12 @@
 import _ from 'lodash'
 import { roundTo } from '@/utils/utils'
 
+const getCentsSecondDecimal = (cents) =>
+  // 0.5 or above % 0.1 will give 0.1, set to 0
+  roundTo(cents % 0.1) === 0 || roundTo(cents % 0.1) === 0.1
+    ? 0
+    : roundTo(cents % 0.1)
+
 export const rounding = (config, amount) => {
   // abort early
   if (amount === 0) return 0
@@ -45,10 +51,13 @@ export const rounding = (config, amount) => {
     } else {
       switch (roundingPoint) {
         case 0.05: {
-          const _cents = roundTo(cents % 0.1)
+          const centsSecondDecimal = getCentsSecondDecimal(cents)
           const flooredCents = Math.floor(cents * 10) / 10
           cents =
-            _cents < roundingPoint ? flooredCents : flooredCents + roundingPoint
+            centsSecondDecimal < roundingPoint
+              ? flooredCents
+              : flooredCents + roundingPoint
+
           break
         }
         case 0.1:

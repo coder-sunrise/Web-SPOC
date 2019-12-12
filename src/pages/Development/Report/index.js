@@ -59,63 +59,8 @@ class Report extends React.Component {
     amount: 0.05,
   }
 
-  componentDidMount () {
-    const codeTableNameArray = [
-      'ctMedicationUsage',
-      'ctMedicationDosage',
-      'ctMedicationUnitOfMeasurement',
-      'ctMedicationFrequency',
-      'ctVaccinationUsage',
-      'ctVaccinationUnitOfMeasurement',
-    ]
-    console.time('test')
-    this.props
-      .dispatch({
-        type: 'codetable/batchFetch',
-        payload: {
-          codes: codeTableNameArray,
-        },
-      })
-      .then((r) => {
-        console.log({ r })
-        console.timeEnd('test')
-      })
-    // codeTableNameArray.forEach((o) => {
-    //   console.log('fetch codes')
-    //   this.props.dispatch({
-    //     type: 'codetable/fetchCodes',
-    //     payload: {
-    //       code: o,
-    //     },
-    //   })
-    // })
-  }
-
-  // componentDidMount () {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/watchFetchCodes',
-  //   })
-  // }
-
   toggleReport = () =>
     this.setState((preState) => ({ showReport: !preState.showReport }))
-
-  // getCodeTable = () => {
-  //   const code = 'ctnationality'
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/fetchCodes',
-  //     code,
-  //   })
-  // }
-
-  // testWatch = () => {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/TEST',
-  //   })
-  // }
 
   validate = () => {
     this.props.validateForm()
@@ -141,27 +86,6 @@ class Report extends React.Component {
 
   render () {
     const { showReport, showEndSessionSummary } = this.state
-    // return (
-    //   <CardContainer hideHeader size='sm'>
-    //     <Button color='primary&#39;' onClick={this.viewReport}>
-    //       View Report
-    //     </Button>
-    //     <Button color='primary&#39;' onClick={this.getCodeTable}>
-    //       Get Codetable
-    //     </Button>
-    //     <Button color='primary&#39;' onClick={this.testWatch}>
-    //       Test Watch
-    //     </Button>
-    //     <CommonModal
-    //       open={showReport}
-    //       onClose={this.closeModal}
-    //       title='Report'
-    //       maxWidth='lg'
-    //     >
-    //       <ReportViewer />
-    //     </CommonModal>
-    //   </CardContainer>
-    // )
     return (
       <CardContainer hideHeader size='sm'>
         <Button onClick={this.showReport} color='primary'>
