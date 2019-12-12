@@ -121,9 +121,8 @@ class AddPayment extends Component {
     const max = 123
     const { keyCode, key } = event
     if (keyCode < min || keyCode > max) return
-    event.preventDefault()
 
-    // TODO: add payment base on keyCode and paymentMode hotkey setting
+    event.preventDefault()
     const { ctPaymentMode, patient } = this.props
 
     const paymentModeObj = ctPaymentMode.find((o) => o.hotKey === key)
@@ -147,21 +146,6 @@ class AddPayment extends Component {
 
       this.onPaymentTypeClick(paymentModeObj)
     }
-
-    // let paymentModeFK
-    // switch (keyCode) {
-    //   case 112: {
-    //     paymentModeFK = PAYMENT_MODE.CREDIT_CARD
-    //     break
-    //   }
-    //   case 113: {
-    //     paymentModeFK = PAYMENT_MODE.CHEQUE
-    //     break
-    //   }
-    //   default:
-    //     paymentModeFK = 0
-    //     break
-    // }
   }
 
   fetchLatestBizSessions = () => {
@@ -284,7 +268,7 @@ class AddPayment extends Component {
         rounding(clinicSettings, cashPayment.amt),
       )
       const collectableAmountAfterRounding = roundTo(
-        rounding(clinicSettings, outstandingBalance),
+        rounding(clinicSettings, totalPaid),
       )
       const roundingAmt = roundTo(cashAfterRounding - cashPayment.amt)
       this.setState(
@@ -306,7 +290,7 @@ class AddPayment extends Component {
         setFieldValue('cashReturned', 0)
       }
     } else {
-      setFieldValue('collectableAmount', outstandingBalance)
+      setFieldValue('collectableAmount', totalPaid)
       setFieldValue('cashReceived', 0)
       setFieldValue('cashReturned', 0)
       setFieldValue('cashRounding', 0)
