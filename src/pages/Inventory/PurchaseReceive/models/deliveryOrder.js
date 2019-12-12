@@ -109,12 +109,6 @@ export default createFormViewModel({
           type: 'setAddNewDeliveryOrder',
         })
       },
-
-      *getStockDetails ({ payload }, { call }) {
-        const result = yield call(service.queryStockDetails, payload)
-        return result
-        // yield put({ type: 'saveStockDetails', payload: result })
-      },
     },
 
     reducers: {
@@ -130,7 +124,6 @@ export default createFormViewModel({
           purchaseOrder,
           purchaseOrderOutstandingItem,
         } = purchaseOrderDetails
-
         const newOSItem = purchaseOrderOutstandingItem.map((o) => {
           if (MedicationItemList.length > 0 && o.type === 1) {
             const m = MedicationItemList.find(
@@ -143,6 +136,7 @@ export default createFormViewModel({
             const batchNo = defaultStock.batchNo || o.batchNo
             return {
               ...o,
+              id: undefined,
               batchNo,
             }
           }
@@ -157,6 +151,7 @@ export default createFormViewModel({
             const batchNo = defaultStock.batchNo || o.batchNo
             return {
               ...o,
+              id: undefined,
               batchNo,
             }
           }
@@ -171,6 +166,7 @@ export default createFormViewModel({
             const batchNo = defaultStock.batchNo || o.batchNo
             return {
               ...o,
+              id: undefined,
               batchNo,
             }
           }
@@ -195,9 +191,14 @@ export default createFormViewModel({
         const { deliveryOrderItem } = data
 
         const itemRows = deliveryOrderItem.map((x) => {
+          const inventoryType = podoOrderType.find(
+            (o) => o.value === x.inventoryTypeFK,
+          )
           return {
             ...x,
             uid: getUniqueId(),
+            [inventoryType.itemFKName]: x.inventoryItemFK,
+            itemFK: x.inventoryItemFK,
             type: x.inventoryTypeFK,
             code: x.inventoryItemFK,
             name: x.inventoryItemFK,
@@ -263,6 +264,7 @@ export default createFormViewModel({
             }
             return {
               ...o,
+              // [itemFK]: o.inventoryItemFK,
               [itemFK]: o.itemFK,
             }
           })
@@ -295,7 +297,6 @@ export default createFormViewModel({
             isDeleted: false,
           })
         }
-
         return {
           ...state,
           entity: {

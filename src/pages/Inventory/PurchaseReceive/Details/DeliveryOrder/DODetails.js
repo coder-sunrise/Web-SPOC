@@ -10,10 +10,12 @@ import {
   DatePicker,
   OutlinedTextField,
   EditableTableGrid,
+  Field,
 } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
+  getInventoryItemV2,
   getInventoryItemList,
 } from '@/utils/codes'
 import AuthorizedContext from '@/components/Context/Authorized'
@@ -80,10 +82,10 @@ const receivingDetailsSchema = Yup.object().shape({
       dispatch,
       onConfirm,
     } = props
-    const { list } = deliveryOrderDetails
-
+    const { list, purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderItem } = purchaseOrderDetails
     const getPurchaseOrderItemFK = (v) => {
-      if (v.id <= 0) {
+      if (!v.id || v.id <= 0) {
         let itemFKName = ''
         switch (v.type) {
           case 1: {
@@ -91,24 +93,27 @@ const receivingDetailsSchema = Yup.object().shape({
             break
           }
           case 2: {
-            itemFKName = 'inventoryVaccinationFK'
+            itemFKName = 'inventoryConsumableFK'
             break
           }
           case 3: {
-            itemFKName = 'inventoryConsumableFK'
+            itemFKName = 'inventoryVaccinationFK'
             break
           }
           default: {
             break
           }
         }
-        const { id } = rows.find((o) => o[itemFKName] === v[itemFKName])
+        const { id } = purchaseOrderItem.find(
+          (o) => o[itemFKName] === v[itemFKName],
+        )
         return id
       }
+
       if (values.id) {
         return v.purchaseOrderItemFK
       }
-      return v.id
+      return undefined
     }
     let deliveryOrderItem = rows.map((x, index) => {
       // const itemType = podoOrderType.find((y) => y.value === x.type)
@@ -125,7 +130,7 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        batchNo: x.batchNo ? x.batchNo[0] : undefined,
+        batchNo: Array.isArray(x.batchNo) ? x.batchNo[0] : x.batchNo,
         expiryDate: x.expiryDate,
         sortOrder: index + 1,
         id: values.id ? x.id : undefined,
@@ -184,11 +189,14 @@ class DODetails extends PureComponent {
     const { mode, dispatch } = this.props
     await this.initializeStateItemList()
     await this.props.refreshDeliveryOrder()
-
     if (mode === 'Add') {
-      dispatch({
-        type: 'deliveryOrderDetails/addNewDeliveryOrder',
+      await dispatch({
+        type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
       })
+      this.props.setFieldValue(
+        'deliveryOrderDate',
+        this.props.values.deliveryOrderDate,
+      )
     }
   }
 
@@ -217,7 +225,6 @@ class DODetails extends PureComponent {
             [x.stateName]: inventoryItemList,
           },
         })
-        console.log('deliveryOrderDetails/updateState')
       })
 
       return null
@@ -232,60 +239,22 @@ class DODetails extends PureComponent {
     // })
   }
 
-  setOption = (m, c, v) => {
-    if (!m.data || !c.data || !v.data) {
-      return
-    }
-    const mOptions = m.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.batchNo,
-        // value: o.id,
-      }
-    })
-    const vOptions = v.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.batchNo,
-        // value: o.id,
-      }
-    })
-
-    const cOptions = c.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.batchNo,
-        // value: o.id,
-      }
-    })
-
-    this.setState({ stockMedication: mOptions })
-    this.setState({ stockVaccination: vOptions })
-    this.setState({ stockConsumable: cOptions })
-    this.setState({ filterStockMedication: mOptions })
-    this.setState({ filterStockVaccination: vOptions })
-    this.setState({ filterStockConsumable: cOptions })
-  }
-
   handleOnOrderTypeChanged = async (e) => {
-    const { values, deliveryOrderDetails } = this.props
-    const { purchaseOrderDetails, entity } = deliveryOrderDetails
-    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+    const { values, deliveryOrderDetails, purchaseOrderDetails } = this.props
+    const { entity } = deliveryOrderDetails
+    // const { purchaseOrderOutstandingItem } = purchaseOrderDetails
     const { rows } = values
     const { row, option } = e
     const { value, itemFKName, stateName } = option
     const originItemList = this.state[stateName]
 
-    const { inventoryItemList } = getInventoryItem(
+    const { inventoryItemList } = getInventoryItemV2(
       originItemList,
       value,
       itemFKName,
       rows,
       // purchaseOrderOutstandingItem,
-      entity.rows,
+      purchaseOrderDetails.rows,
     )
 
     this.setState({
@@ -324,13 +293,17 @@ class DODetails extends PureComponent {
 
     const { deliveryOrderDetails } = this.props
     const { purchaseOrderDetails } = deliveryOrderDetails
-    const { purchaseOrderOutstandingItem } = purchaseOrderDetails
-    let osItem = purchaseOrderOutstandingItem.filter((x) => x.code === value)[0]
+    const { purchaseOrderItem } = purchaseOrderDetails
+    const osItem = purchaseOrderItem.find(
+      (x) => x.code === value && x.inventoryItemTypeFK === row.type,
+    )
 
-    row.orderQuantity = osItem.orderQuantity
-    row.bonusQuantity = osItem.bonusQuantity
-    row.quantityReceived = osItem.totalReceived
-    row.totalBonusReceived = osItem.totalBonusReceived
+    if (osItem) {
+      row.orderQuantity = osItem.orderQuantity
+      row.bonusQuantity = osItem.bonusQuantity
+      row.quantityReceived = osItem.quantityReceived
+      row.totalBonusReceived = osItem.bonusReceived
+    }
 
     this.setState({
       selectedItem: option,
@@ -420,10 +393,10 @@ class DODetails extends PureComponent {
           return addedRows.map((row) => ({
             ...row,
             itemFK: selectedItem.value,
-            orderQuantity: osItem.orderQuantity,
-            bonusQuantity: osItem.bonusQuantity,
-            quantityReceived: osItem.quantityReceived,
-            totalBonusReceived: osItem.totalBonusReceived,
+            // orderQuantity: osItem.orderQuantity,
+            // bonusQuantity: osItem.bonusQuantity,
+            // quantityReceived: osItem.quantityReceived,
+            // totalBonusReceived: osItem.totalBonusReceived,
             // currentReceivingQty: osItem.orderQuantity - osItem.quantityReceived,
             // currentReceivingBonusQty:
             //   osItem.bonusQuantity - osItem.bonusReceived,
@@ -489,41 +462,16 @@ class DODetails extends PureComponent {
     if (row.type === 2) {
       return this.getItemOptions(
         row,
-        'filterVaccinationItemList',
-        'VaccinationItemList',
+        'filterConsumableItemList',
+        'ConsumableItemList',
       )
     }
     if (row.type === 3) {
       return this.getItemOptions(
         row,
-        'filterConsumableItemList',
-        'ConsumableItemList',
+        'filterVaccinationItemList',
+        'VaccinationItemList',
       )
-    }
-    return []
-  }
-
-  stockOptions = (row) => {
-    if (row.inventoryItemTypeFK === 1) {
-      let array = [
-        ...this.state.filterStockMedication,
-      ]
-      let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return x
-    }
-    if (row.inventoryItemTypeFK === 2) {
-      let array = [
-        ...this.state.filterStockVaccination,
-      ]
-      let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return x
-    }
-    if (row.inventoryItemTypeFK === 3) {
-      let array = [
-        ...this.state.filterStockConsumable,
-      ]
-      let x = array.filter((o) => o.inventoryItemFK === row.code)
-      return x
     }
     return []
   }
@@ -534,7 +482,6 @@ class DODetails extends PureComponent {
       footer,
       values,
       theme,
-      refreshDeliveryOrder,
       errors,
       classes,
       deliveryOrderDetails,
@@ -545,7 +492,6 @@ class DODetails extends PureComponent {
       VaccinationItemList = [],
     } = deliveryOrderDetails
     const { rows } = values
-    const isEditable = !values.id
 
     const getOptions = (stateItemList, storeItemList, row) => {
       const stateArray = stateItemList
@@ -581,7 +527,7 @@ class DODetails extends PureComponent {
               this.handleOnOrderTypeChanged(e)
             }
           },
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'code',
@@ -595,7 +541,7 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'code')
             }
           },
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'name',
@@ -609,7 +555,7 @@ class DODetails extends PureComponent {
               this.handleItemOnChange(e, 'name')
             }
           },
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'uom',
@@ -621,14 +567,14 @@ class DODetails extends PureComponent {
               return this.state.MedicationItemList
             }
             if (row.type === 2) {
-              return this.state.VaccinationItemList
+              return this.state.ConsumableItemList
             }
             if (row.type === 3) {
-              return this.state.ConsumableItemList
+              return this.state.VaccinationItemList
             }
             return []
           },
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'orderQuantity',
@@ -636,7 +582,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'bonusQuantity',
@@ -644,7 +590,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 90,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'quantityReceived',
@@ -652,7 +598,7 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 120,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'totalBonusReceived',
@@ -660,21 +606,21 @@ class DODetails extends PureComponent {
           format: '0.0',
           disabled: true,
           width: 150,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'currentReceivingQty',
           type: 'number',
           format: '0.0',
           width: 150,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'currentReceivingBonusQty',
           type: 'number',
           format: '0.0',
           width: 200,
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'batchNo',
@@ -694,15 +640,15 @@ class DODetails extends PureComponent {
 
             if (row.type === 2) {
               return getOptions(
-                this.state.VaccinationItemList,
-                VaccinationItemList,
+                this.state.ConsumableItemList,
+                ConsumableItemList,
                 row,
               )
             }
             if (row.type === 3) {
               return getOptions(
-                this.state.ConsumableItemList,
-                ConsumableItemList,
+                this.state.VaccinationItemList,
+                VaccinationItemList,
                 row,
               )
             }
@@ -714,17 +660,16 @@ class DODetails extends PureComponent {
           render: (row) => {
             return <TextField text value={row.batchNo} />
           },
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
         {
           columnName: 'expiryDate',
           type: 'date',
-          isDisabled: () => !!values.id,
+          isDisabled: (row) => row.id >= 0,
         },
       ],
       onRowDoubleClick: undefined,
     }
-
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(2) }}>
@@ -749,7 +694,7 @@ class DODetails extends PureComponent {
                   />
                 </GridItem>
                 <GridItem xs={12}>
-                  <FastField
+                  <Field
                     name='deliveryOrderDate'
                     render={(args) => {
                       return (
@@ -814,8 +759,7 @@ class DODetails extends PureComponent {
                 pager: false,
               }}
               EditingProps={{
-                showAddCommand: isEditable,
-                showEditCommand: isEditable,
+                showAddCommand: true,
                 onCommitChanges: this.onCommitChanges,
                 onAddedRowsChange: this.onAddedRowsChange,
               }}
