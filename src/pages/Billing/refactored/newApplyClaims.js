@@ -266,7 +266,7 @@ const ApplyClaims = ({
       if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
       return totalAmtPaid
     }, 0)
-    const newOutstandingBalance = roundTo(invoice.totalAftGst - totalPaid)
+    const newOutstandingBalance = roundTo(finalPayable - totalPaid)
     const newInvoiceItemsCopy = updateOriginalInvoiceItemList(
       invoice.invoiceItems,
       tempInvoicePayer,
@@ -280,8 +280,6 @@ const ApplyClaims = ({
       invoice: {
         ...values.invoice,
         outstandingBalance: newOutstandingBalance,
-        patientOutstandingBalance: roundTo(finalPayable - totalPaid),
-        // invoiceItems: updatedInvoiceItems,
       },
       invoicePayer: tempInvoicePayer,
     }
@@ -594,7 +592,6 @@ const ApplyClaims = ({
     tempInvoicePayer,
   ])
 
-  console.log({ tempInvoicePayer })
   return (
     <Fragment>
       <GridItem md={2}>
