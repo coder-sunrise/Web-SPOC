@@ -1,5 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
+import _ from 'lodash'
 import * as service from '../services'
 import { notification } from '@/components'
 import { podoOrderType } from '@/utils/codes'
@@ -177,7 +178,7 @@ export default createFormViewModel({
       },
 
       setPurchaseOrder (state, { payload }) {
-        const { purchaseOrderAdjustment, purchaseOrderItem } = payload
+        const { purchaseOrderAdjustment = [], purchaseOrderItem } = payload
         const itemRows = purchaseOrderItem.map((x) => {
           const itemType = podoOrderType.find(
             (y) => y.value === x.inventoryItemTypeFK,
@@ -207,7 +208,9 @@ export default createFormViewModel({
               payload.purchaseOrderStatus,
             ).id,
           },
-          purchaseOrderAdjustment: purchaseOrderAdjustment || [],
+          purchaseOrderAdjustment: _.sortBy(purchaseOrderAdjustment, (s) => {
+            return s.sequence || 0
+          }),
           rows: itemRows || [],
         }
       },
