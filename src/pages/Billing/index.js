@@ -70,15 +70,8 @@ const styles = (theme) => ({
   mapPropsToValues: ({ billing }) => {
     try {
       if (billing.entity) {
-        const {
-          invoicePayer = [],
-          invoicePayment = [],
-          visitPurposeFK,
-        } = billing.entity
-        const totalPaid = invoicePayment.reduce((totalAmtPaid, payment) => {
-          if (!payment.isCancelled) return totalAmtPaid + payment.totalAmtPaid
-          return totalAmtPaid
-        }, 0)
+        const { invoicePayer = [], visitPurposeFK } = billing.entity
+
         const finalClaim = invoicePayer.reduce(
           (totalClaim, payer) =>
             totalClaim +
@@ -96,7 +89,6 @@ const styles = (theme) => ({
           ...billing.entity,
           invoice: {
             ...billing.entity.invoice,
-            patientOutstandingBalance: roundTo(finalPayable - totalPaid),
           },
           finalClaim,
           finalPayable,
@@ -382,7 +374,11 @@ class Billing extends Component {
                   title: <h5 style={{ paddingLeft: 8 }}>Dispensing Details</h5>,
                   content: (
                     <div className={classes.dispenseContainer}>
-                      <DispenseDetails viewOnly values={dispense.entity} />
+                      <DispenseDetails
+                        viewOnly
+                        values={dispense.entity}
+                        dispatch={this.props.dispatch}
+                      />
                     </div>
                   ),
                 },
@@ -477,9 +473,7 @@ class Billing extends Component {
             invoicePayment={values.invoicePayment}
             invoice={{
               ...values.invoice,
-              outstandingBalance:
-                values.invoice.patientOutstandingBalance ||
-                values.invoice.outstandingBalance,
+              outstandingBalance: values.invoice.outstandingBalance,
               payerTypeFK: INVOICE_PAYER_TYPE.PATIENT,
               // paymentReceivedDate: moment().formatUTC(false),
               paymentReceivedByUserFK: user.id,

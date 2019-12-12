@@ -47,11 +47,6 @@ const styles = () => ({
   },
 })
 
-const parseToTwoDecimalString = (value = 0.0) => {
-  // value.toFixed(2)
-  return numeral(value).format(`$${currencyFormat}`)
-}
-
 const InvoiceSummary = ({
   classes,
   handleAddPaymentClick,
@@ -76,7 +71,7 @@ const InvoiceSummary = ({
     totalAftGst,
     invoiceNo,
     isGstInclusive,
-    patientOutstandingBalance,
+    outstandingBalance,
   } = invoice
 
   const handleConfirmDelete = useCallback(
@@ -102,18 +97,8 @@ const InvoiceSummary = ({
       setShowError(false)
   }
 
-  const shouldDisableAddPayment = () => {
-    if (disabled) return disabled
-
-    const totalPaid = values.invoicePayment.reduce(
-      (total, payment) =>
-        !payment.isCancelled ? total + payment.totalAmtPaid : total,
-      0,
-    )
-    return (
-      patientOutstandingBalance !== undefined && patientOutstandingBalance === 0
-    )
-  }
+  const shouldDisableAddPayment =
+    disabled || (outstandingBalance !== undefined && outstandingBalance <= 0)
 
   const handleCancelClick = useCallback(
     (id) => {
@@ -180,7 +165,7 @@ const InvoiceSummary = ({
             <GridItem md={6} className={classes.rightAlign}>
               <h5 className={classes.currencyValue}>
                 <NumberInput
-                  value={patientOutstandingBalance}
+                  value={outstandingBalance}
                   showZero
                   text
                   currency
@@ -233,7 +218,7 @@ const InvoiceSummary = ({
                 size='sm'
                 className={classes.addPaymentButton}
                 onClick={handleAddPaymentClick}
-                disabled={shouldDisableAddPayment()}
+                disabled={shouldDisableAddPayment}
               >
                 Add Payment
               </Button>

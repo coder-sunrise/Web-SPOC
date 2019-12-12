@@ -61,16 +61,16 @@ class SchemesGrid extends PureComponent {
             const ctSchemeTypes = this.props.codetable[
               ctSchemeType.toLowerCase()
             ]
-            return ctSchemeTypes.map((o) => {
-              return [
-                'MEDI500VISIT',
-                'OPSCAN',
-                'MEDI500VACCINATION',
-              ].indexOf(o.code) >= 0
-                ? []
-                : o
+
+            return ctSchemeTypes.filter((o) => {
+              const isMedisave =
+                [
+                  'MEDI500VISIT',
+                  'OPSCAN',
+                  'MEDI500VACCINATION',
+                ].indexOf(o.code) >= 0
+              return !isMedisave
             })
-            // return this.medisaveCheck(row) ? [] : row
           },
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
@@ -205,6 +205,7 @@ class SchemesGrid extends PureComponent {
     this.commitChanges = ({ rows, added, changed, deleted }) => {
       const { setFieldValue } = this.props
       const newRows = this.getSortedRows(rows)
+
       newRows.forEach((r, i) => {
         if (r.validRange && !this.isMedisaveOrPHPC(r)) {
           r.validFrom = r.validRange[0]
@@ -217,8 +218,40 @@ class SchemesGrid extends PureComponent {
         r.sequence = this.isCorporate(r) ? i : 0
       })
 
-      setFieldValue('patientScheme', newRows)
+      const _newRows = this.isDuplicate({ rows: newRows, changed })
+
+      setFieldValue('patientScheme', _newRows)
+      return _newRows
     }
+  }
+
+  isDuplicate = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const { schemeTypeFK } = changed[key]
+
+    // not changing scheme type or scheme type is Corporate, skip all the checking
+    if (!schemeTypeFK || schemeTypeFK === 15) return rows
+
+    const hasDuplicate = key
+      ? rows.filter((r) => !r.isDeleted && r.schemeTypeFK === schemeTypeFK)
+          .length >= 2
+      : []
+    const chasSchemes = rows.filter((r) => this.isCHAS(r.schemeTypeFK))
+    const isCurrentSelectedCHAS = this.isCHAS(schemeTypeFK)
+
+    let _newRows = [
+      ...rows,
+    ]
+
+    if (hasDuplicate || (chasSchemes.length >= 2 && isCurrentSelectedCHAS)) {
+      _newRows = _newRows.map(
+        (r) =>
+          r.id === parseInt(key, 10) ? { ...r, schemeTypeFK: undefined } : r,
+      )
+    }
+
+    return _newRows
   }
 
   isPHPC = (row) => {

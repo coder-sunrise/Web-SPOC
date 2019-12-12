@@ -25,12 +25,17 @@ import {
 import { ReportViewer } from '@/components/_medisys'
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 
+import { rounding } from '@/components/_medisys/AddPayment/utils'
+
 const doctors = [
   { value: 'bao', name: 'Bao' },
   { value: 'cheah', name: 'Cheah' },
 ]
 
-@connect(({ codetable }) => ({ codetable }))
+@connect(({ codetable, clinicSettings }) => ({
+  clinicSettings: clinicSettings.settings || clinicSettings.default,
+  codetable,
+}))
 @withFormik({
   enableReinitialize: true,
   mapPropsToValues: () => ({
@@ -51,65 +56,11 @@ const doctors = [
 class Report extends React.Component {
   state = {
     showReport: false,
+    amount: 0.05,
   }
-
-  componentDidMount () {
-    const codeTableNameArray = [
-      'ctMedicationUsage',
-      'ctMedicationDosage',
-      'ctMedicationUnitOfMeasurement',
-      'ctMedicationFrequency',
-      'ctVaccinationUsage',
-      'ctVaccinationUnitOfMeasurement',
-    ]
-    console.time('test')
-    this.props
-      .dispatch({
-        type: 'codetable/batchFetch',
-        payload: {
-          codes: codeTableNameArray,
-        },
-      })
-      .then((r) => {
-        console.log({ r })
-        console.timeEnd('test')
-      })
-    // codeTableNameArray.forEach((o) => {
-    //   console.log('fetch codes')
-    //   this.props.dispatch({
-    //     type: 'codetable/fetchCodes',
-    //     payload: {
-    //       code: o,
-    //     },
-    //   })
-    // })
-  }
-
-  // componentDidMount () {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/watchFetchCodes',
-  //   })
-  // }
 
   toggleReport = () =>
     this.setState((preState) => ({ showReport: !preState.showReport }))
-
-  // getCodeTable = () => {
-  //   const code = 'ctnationality'
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/fetchCodes',
-  //     code,
-  //   })
-  // }
-
-  // testWatch = () => {
-  //   const { dispatch } = this.props
-  //   dispatch({
-  //     type: 'codetable/TEST',
-  //   })
-  // }
 
   validate = () => {
     this.props.validateForm()
@@ -121,29 +72,20 @@ class Report extends React.Component {
     }))
   }
 
+  onAmountChange = (event) => {
+    const { target } = event
+    this.setState({
+      amount: target.value,
+    })
+    const { clinicSettings } = this.props
+    const rounded = rounding(clinicSettings, target.value)
+    this.setState({
+      rounded: rounded,
+    })
+  }
+
   render () {
     const { showReport, showEndSessionSummary } = this.state
-    // return (
-    //   <CardContainer hideHeader size='sm'>
-    //     <Button color='primary&#39;' onClick={this.viewReport}>
-    //       View Report
-    //     </Button>
-    //     <Button color='primary&#39;' onClick={this.getCodeTable}>
-    //       Get Codetable
-    //     </Button>
-    //     <Button color='primary&#39;' onClick={this.testWatch}>
-    //       Test Watch
-    //     </Button>
-    //     <CommonModal
-    //       open={showReport}
-    //       onClose={this.closeModal}
-    //       title='Report'
-    //       maxWidth='lg'
-    //     >
-    //       <ReportViewer />
-    //     </CommonModal>
-    //   </CardContainer>
-    // )
     return (
       <CardContainer hideHeader size='sm'>
         <Button onClick={this.showReport} color='primary'>
@@ -158,6 +100,24 @@ class Report extends React.Component {
         >
           <EndSessionSummary sessionID={14} />
         </CommonModal>
+        <GridContainer>
+          <GridItem md={3}>
+            <NumberInput
+              currency
+              label='Amount'
+              value={this.state.amount}
+              onChange={this.onAmountChange}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <NumberInput
+              currency
+              disabled
+              label='Amount After Rounding'
+              value={this.state.rounded}
+            />
+          </GridItem>
+        </GridContainer>
       </CardContainer>
     )
   }
