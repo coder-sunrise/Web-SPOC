@@ -98,7 +98,7 @@ export default compose(
         doctor = [],
         appointmentType = [],
       } = values
-      const { dispatch, type } = props
+      const { dispatch, type, setSelectedRows } = props
       let stringDoctors = Number(doctor)
       let doctorProperty = 'Appointment_Resources.ClinicianFK'
       if (doctor.length > 1) {
@@ -161,6 +161,8 @@ export default compose(
           ...payload,
           smsType: type,
         },
+      }).then((r) => {
+        if (r) setSelectedRows([])
       })
     },
   }),
