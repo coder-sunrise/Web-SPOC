@@ -21,7 +21,7 @@ import {
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
-  isInvoiceReadOnly,
+  isPOStatusFinalized,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS } from '@/utils/constants'
@@ -502,18 +502,18 @@ class Index extends Component {
       //   }}
       // >
       <React.Fragment>
+        <POForm
+          isReadOnly={!isEditable()}
+          isFinalize={isPOStatusFinalized(poStatus)}
+          setFieldValue={setFieldValue}
+          {...this.props}
+        />
         <AuthorizedContext.Provider
           value={{
             rights: isEditable() ? 'enable' : 'disable',
             // rights: 'disable',
           }}
         >
-          <POForm
-            isReadOnly={isInvoiceReadOnly(poStatus)}
-            setFieldValue={setFieldValue}
-            {...this.props}
-          />
-
           {errors.rows && (
             <p className={classes.errorMsgStyle}>{errors.rows}</p>
           )}
