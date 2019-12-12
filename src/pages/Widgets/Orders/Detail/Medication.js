@@ -478,6 +478,7 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+    console.log('openPrescription', openPrescription, values.type)
     return (
       <div>
         <GridContainer>
@@ -869,7 +870,8 @@ class Medication extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
-                    label=''
+                    disabled={!openPrescription}
+                    label='UOM'
                     allowClear={false}
                     code='ctMedicationUnitOfMeasurement'
                     onChange={(v, op = {}) => {
