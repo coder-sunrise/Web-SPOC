@@ -8,9 +8,9 @@ import {
   ClickAwayListener,
   MenuItem,
 } from '@material-ui/core'
-import { Button } from '@/components'
+import { Button, Tooltip } from '@/components'
 
-const ResetButton = ({ handleResetClick, handleClearClick }) => {
+const ResetButton = ({ handleResetClick, handleRestoreClick }) => {
   const [
     anchorEl,
     setAnchorEl,
@@ -29,15 +29,15 @@ const ResetButton = ({ handleResetClick, handleClearClick }) => {
     handleClickAway()
   }
 
-  const onClearClick = () => {
-    handleClearClick()
+  const onRestoreClick = () => {
+    handleRestoreClick()
     handleClickAway()
   }
 
   const open = Boolean(anchorEl)
   return (
     <React.Fragment>
-      <Button color='default' size='sm' onClick={onClick}>
+      <Button color='primary' size='sm' onClick={onClick}>
         <More />
         More
       </Button>
@@ -56,8 +56,15 @@ const ResetButton = ({ handleResetClick, handleClearClick }) => {
         <Paper>
           <ClickAwayListener onClickAway={handleClickAway}>
             <MenuList role='menu'>
-              <MenuItem onClick={onResetClick}>Reset</MenuItem>
-              <MenuItem onClick={onClearClick}>Clear</MenuItem>
+              <Tooltip title='Reset all applied scheme(s)' placement='right'>
+                <MenuItem onClick={onResetClick}>Reset</MenuItem>
+              </Tooltip>
+              <Tooltip
+                title='Restore to last saved scheme(s)'
+                placement='right'
+              >
+                <MenuItem onClick={onRestoreClick}>Restore</MenuItem>
+              </Tooltip>
             </MenuList>
           </ClickAwayListener>
         </Paper>

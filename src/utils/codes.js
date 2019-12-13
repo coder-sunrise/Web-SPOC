@@ -34,37 +34,36 @@ const status = [
 
 const approvedStatus = [
   {
-    value:'AP',
-    name:'Approved',
-    render:() => <span>Approved</span>,
+    value: 'AP',
+    name: 'Approved',
+    render: () => <span>Approved</span>,
   },
   {
-    value:'EP',
-    name:'Extracted to Payment Process',
-    render:() => <span>Extracted to Payment Process</span>,
+    value: 'EP',
+    name: 'Extracted to Payment Process',
+    render: () => <span>Extracted to Payment Process</span>,
   },
   {
-    value:'PD',
-    name:'Paid',
-    render:() => <span>Paid</span>,
+    value: 'PD',
+    name: 'Paid',
+    render: () => <span>Paid</span>,
   },
   {
-    value:'RV',
-    name:'Recovery Pending',
-    render:() => <span>Recovery Pending</span>,
+    value: 'RV',
+    name: 'Recovery Pending',
+    render: () => <span>Recovery Pending</span>,
   },
   {
-    value:'RV2',
-    name:'Recovery Extracted',
-    render:() => <span>Recovery Extracted</span>,
+    value: 'RV2',
+    name: 'Recovery Extracted',
+    render: () => <span>Recovery Extracted</span>,
   },
   {
-    value:'RV3',
-    name:'Recovered',
-    render:() => <span>Recovered</span>,
+    value: 'RV3',
+    name: 'Recovered',
+    render: () => <span>Recovered</span>,
   },
 ]
-
 
 const statusString = [
   { value: 'Inactive', name: 'Inactive', color: 'red' },
@@ -1615,6 +1614,113 @@ export const getInventoryItem = (
     })
   }
 
+  return {
+    inventoryItemList,
+  }
+}
+
+export const getInventoryItemV2 = (
+  list,
+  value,
+  itemFKName,
+  rows = [],
+  outstandingItem = undefined,
+) => {
+  const groupByFKFunc = (array) => {
+    return _(array)
+      .groupBy((x) => x[itemFKName])
+      .map((v, key) => ({
+        [itemFKName]: parseInt(key, 10),
+        totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
+      }))
+      .value()
+  }
+
+  let newRows = rows.filter((x) => x.type === value && x.isDeleted === false)
+  // console.log({ newRows })
+
+  const rowsGroupByFK = groupByFKFunc(newRows)
+
+  // console.log({ rowsGroupByFK })
+  const newOutstandingItem = outstandingItem.map((o) => {
+    const { quantityReceived, orderQuantity } = o
+
+    const activeItem = rowsGroupByFK.find(
+      (i) => i[itemFKName] === o[itemFKName],
+    )
+    let currentReceivedQty = quantityReceived
+
+    if (activeItem) {
+      if (currentReceivedQty === activeItem.totalCurrentReceivingQty) {
+        currentReceivedQty = 0
+      } else {
+        currentReceivedQty -= activeItem.totalCurrentReceivingQty
+      }
+    } else {
+      currentReceivedQty = orderQuantity
+    }
+    return {
+      ...o,
+      remainingQuantity: currentReceivedQty,
+    }
+  })
+
+  let fullyReceivedArray = []
+  // console.log({ newOutstandingItem })
+
+  fullyReceivedArray = rowsGroupByFK.filter((o) => {
+    const item = newOutstandingItem.find((i) => i[itemFKName] === o[itemFKName])
+    if (item && item.remainingQuantity <= 0) {
+      return {
+        ...o,
+      }
+    }
+    return null
+  })
+  // console.log({ fullyReceivedArray })
+
+  // get the fully received item
+  newRows = newRows.filter((o) =>
+    fullyReceivedArray.find((i) => i[itemFKName] === o[itemFKName]),
+  )
+
+  // get all the not fully received item based on the inventory item and current rows
+  let inventoryItemList = _.differenceBy(list, newRows, itemFKName)
+  // console.log({ inventoryItemList })
+
+  // get current inventory item outstanding item
+  const filterOutstandingItem = newOutstandingItem.filter(
+    (x) => x.type === value,
+  )
+  // console.log({ filterOutstandingItem })
+
+  // get the all the not fully received item based on outstanding item
+  inventoryItemList = _.intersectionBy(
+    inventoryItemList,
+    filterOutstandingItem,
+    itemFKName,
+  )
+  // console.log({ inventoryItemList })
+
+  inventoryItemList = inventoryItemList.map((o) => {
+    const findSpecificOutstandingItem = newOutstandingItem.find(
+      (i) => i[itemFKName] === o[itemFKName],
+    )
+
+    // console.log({ findSpecificOutstandingItem })
+    let remainingQty
+    if (findSpecificOutstandingItem) {
+      const { remainingQuantity } = findSpecificOutstandingItem
+
+      remainingQty = remainingQuantity
+    }
+
+    return {
+      ...o,
+      remainingQty,
+    }
+  })
+  // console.log({ inventoryItemList })
   return {
     inventoryItemList,
   }

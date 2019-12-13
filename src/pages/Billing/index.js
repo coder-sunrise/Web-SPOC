@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import moment from 'moment'
 import router from 'umi/router'
 import { connect } from 'dva'
 // material ui
@@ -24,6 +25,7 @@ import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrap
 // import ApplyClaims from './components/ApplyClaims'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
+import SchemeValidationPrompt from './components/SchemeValidationPrompt'
 // utils
 import { constructPayload } from './utils'
 import { roundTo } from '@/utils/utils'
@@ -54,15 +56,29 @@ const styles = (theme) => ({
   },
 })
 
-@connect(({ global, queueLog, billing, user, dispense, loading, patient }) => ({
-  billing,
-  dispense,
-  loading,
-  patient: patient.entity || patient.default,
-  user: user.data,
-  sessionInfo: queueLog.sessionInfo,
-  commitCount: global.commitCount,
-}))
+@connect(
+  ({
+    global,
+    codetable,
+    queueLog,
+    billing,
+    user,
+    dispense,
+    loading,
+    patient,
+  }) => ({
+    billing,
+    dispense,
+    loading: loading.models.billing,
+    dispenseLoading: loading.models.dispense,
+    patient: patient.entity || patient.default,
+    user: user.data,
+    sessionInfo: queueLog.sessionInfo,
+    ctcopaymentscheme: codetable.copaymentscheme || [],
+    ctschemetype: codetable.ctschemetype || [],
+    commitCount: global.commitCount,
+  }),
+)
 @withFormikExtend({
   notDirtyDuration: 3,
   displayName: 'BillingForm',
@@ -108,9 +124,38 @@ class Billing extends Component {
   state = {
     showReport: false,
     showAddPaymentModal: false,
+    showSchemeValidationPrompt: false,
     isEditing: false,
     submitCount: 0,
     dispenseLoaded: false,
+    schemeValidations: {
+      patient: [],
+      billing: [],
+    },
+  }
+
+  componentWillMount () {
+    const { history, dispatch } = this.props
+    const { query } = history.location
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctschemetype',
+      },
+    })
+    if (query.vid)
+      dispatch({
+        type: 'billing/query',
+        payload: {
+          id: query.vid,
+        },
+      })
   }
 
   componentWillUnmount () {
@@ -122,42 +167,117 @@ class Billing extends Component {
     // })
   }
 
-  upsertBilling = async (callback = null) => {
-    const { dispatch, values, resetForm, patient } = this.props
-    const { visitStatus } = values
-    const payload = constructPayload(values)
-    const defaultCallback = () => {
-      if (visitStatus === 'COMPLETED') {
-        notification.success({
-          message: 'Billing Completed',
+  validateSchemesWithPatientProfile = (invoicePayers = []) => {
+    const { patient, ctcopaymentscheme, ctschemetype } = this.props
+    try {
+      const _appliedSchemes = invoicePayers.filter(
+        (payer) =>
+          payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && !payer.isCancelled,
+      )
+      const schemePayers = _appliedSchemes.map((item) => item.copaymentSchemeFK)
+      const patientSchemes = patient.patientScheme
+        .filter((ps) => {
+          const isExpired = moment().isAfter(moment(ps.validTo))
+          return !isExpired
         })
-        router.push('/reception/queue')
-      } else {
-        notification.success({
-          message: 'Billing Saved',
-        })
-        dispatch({
-          type: 'patient/query',
-          payload: { id: patient.id },
-        })
-        this.setState((preState) => ({
-          submitCount: preState.submitCount + 1,
-        }))
+        .map((item) => item.coPaymentSchemeFK)
+
+      const checkIfPatientSchemesIncludesAppliedScheme = (result, schemeFK) => {
+        if (!patientSchemes.includes(schemeFK)) return true
+        return result
       }
-      resetForm()
+      const doesNotMatch = schemePayers.reduce(
+        checkIfPatientSchemesIncludesAppliedScheme,
+        false,
+      )
+
+      let schemeValidations = { patient: [], billing: [] }
+
+      if (doesNotMatch) {
+        const mapPatientSchemeForValidation = (ps) => {
+          const isExpired = moment().isAfter(moment(ps.validTo))
+          if (ps.schemeTypeFK === 15) {
+            const _scheme = ctcopaymentscheme.find(
+              (scheme) => scheme.id === ps.coPaymentSchemeFK,
+            )
+            return { name: _scheme.name, isExpired }
+          }
+
+          const _scheme = ctschemetype.find(
+            (scheme) => scheme.id === ps.schemeTypeFK,
+          )
+          return { name: _scheme.name, isExpired }
+        }
+        schemeValidations = {
+          patient: patient.patientScheme.map(mapPatientSchemeForValidation),
+          billing: _appliedSchemes.map((ps) => ps.name),
+        }
+      }
+
+      this.setState({
+        schemeValidations,
+        showSchemeValidationPrompt: doesNotMatch,
+      })
+      return !doesNotMatch
+    } catch (error) {
+      notification.error({
+        message: 'Failed to validate schemes',
+      })
+      throw error
     }
+  }
 
-    const saveResponse = await dispatch({
-      type: 'billing/save',
-      payload,
-    })
+  upsertByPassValidation = () => {
+    this.upsertBilling(null, true)
+    this.toggleSchemeValidationPrompt()
+  }
 
-    if (saveResponse) {
-      if (callback) {
-        callback()
-        return
+  upsertBilling = async (callback = null, noValidation = false) => {
+    const { dispatch, values, resetForm, patient } = this.props
+    const { visitStatus, invoicePayer = [] } = values
+    try {
+      const canSave = noValidation
+        ? true
+        : this.validateSchemesWithPatientProfile(invoicePayer)
+
+      if (canSave) {
+        const payload = constructPayload(values)
+        const defaultCallback = () => {
+          if (visitStatus === 'COMPLETED') {
+            notification.success({
+              message: 'Billing Completed',
+            })
+            router.push('/reception/queue')
+          } else {
+            notification.success({
+              message: 'Billing Saved',
+            })
+            dispatch({
+              type: 'patient/query',
+              payload: { id: patient.id },
+            })
+            this.setState((preState) => ({
+              submitCount: preState.submitCount + 1,
+            }))
+          }
+          resetForm()
+        }
+
+        const saveResponse = await dispatch({
+          type: 'billing/save',
+          payload,
+        })
+
+        if (saveResponse) {
+          if (callback) {
+            callback()
+            return
+          }
+          defaultCallback()
+        }
       }
-      defaultCallback()
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -337,14 +457,27 @@ class Billing extends Component {
     this.upsertBilling()
   }
 
+  toggleSchemeValidationPrompt = () => {
+    this.setState((preState) => ({
+      showSchemeValidationPrompt: !preState.showSchemeValidationPrompt,
+    }))
+  }
+
   render () {
-    const { showReport, showAddPaymentModal, submitCount } = this.state
+    const {
+      showReport,
+      showAddPaymentModal,
+      showSchemeValidationPrompt,
+      schemeValidations,
+      submitCount,
+    } = this.state
     const {
       classes,
       dispatch,
       values,
       dispense,
       loading,
+      dispenseLoading,
       setFieldValue,
       setValues,
       patient,
@@ -358,13 +491,10 @@ class Billing extends Component {
       setValues,
     }
     return (
-      <LoadingWrapper loading={loading.global} text='Getting billing info...'>
+      <LoadingWrapper loading={loading} text='Getting billing info...'>
         <PatientBanner />
         <div className={classes.accordionContainer}>
-          <LoadingWrapper
-            linear
-            loading={loading.effects['dispense/initState']}
-          >
+          <LoadingWrapper linear loading={dispenseLoading}>
             <Accordion
               leftIcon
               expandIcon={<SolidExpandMore fontSize='large' />}
@@ -459,7 +589,15 @@ class Billing extends Component {
             </React.Fragment>
           </GridItem>
         </GridContainer>
-
+        <CommonModal
+          open={showSchemeValidationPrompt}
+          title='Scheme Check'
+          onClose={this.toggleSchemeValidationPrompt}
+          onConfirm={this.upsertByPassValidation}
+          cancelText='Cancel'
+        >
+          <SchemeValidationPrompt validation={schemeValidations} />
+        </CommonModal>
         <CommonModal
           open={showAddPaymentModal}
           title='Add Payment'
