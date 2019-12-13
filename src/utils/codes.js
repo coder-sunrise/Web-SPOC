@@ -131,8 +131,16 @@ const chasSchemeTypes = [
   { code: 'PHPCMFEC', displayValue: 'PHPC MFEC' },
 ]
 const statusString = [
-  { value: 'Inactive', name: 'Inactive', color: 'red' },
-  { value: 'Active', name: 'Active', color: 'green' },
+  {
+    value: 'Inactive',
+    name: 'Inactive',
+    render: () => <span style={{ color: 'red' }}>Inactive</span>,
+  },
+  {
+    value: 'Active',
+    name: 'Active',
+    render: () => <span style={{ color: 'green' }}>Active</span>,
+  },
 ]
 
 const isAutoOrder = [
@@ -1189,9 +1197,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-      { ...criteriaForTenantCodes, ...params },
-      convertExcludeFields,
-    )
+        { ...criteriaForTenantCodes, ...params },
+        convertExcludeFields,
+      )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -1629,7 +1637,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-        o.totalCurrentReceivingQty
+          o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
