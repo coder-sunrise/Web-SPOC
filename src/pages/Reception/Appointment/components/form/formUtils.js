@@ -152,8 +152,10 @@ export const mapPropsToValues = ({
       ],
     },
     appointmentStatusFk: APPOINTMENT_STATUS.DRAFT,
+
     recurrenceDto: { ...initDailyRecurrence },
     _appointmentDateIn: true,
+    countryCodeFK: 1,
   }
 
   try {

@@ -52,7 +52,7 @@ const PatientInfoInput = ({
               return (
                 <TextField
                   {...args}
-                  autoFocus
+                  // autoFocus
                   defaultValue={undefined}
                   label='Patient Name / Acc. No.'
                   loseFocusOnEnterPressed
@@ -113,6 +113,20 @@ const PatientInfoInput = ({
         </div>
       </GridItem>
       <GridItem ms md={4} />
+      <GridItem xs md={3}>
+        <FastField
+          name='countryCodeFK'
+          render={(args) => (
+            <CodeSelect
+              allowClear={false}
+              label='Country Code'
+              code='ctcountrycode'
+              disabled={isRegisteredPatient || disabled || isEdit}
+              {...args}
+            />
+          )}
+        />
+      </GridItem>
       <GridItem xs md={3}>
         <FastField
           name='patientContactNo'
