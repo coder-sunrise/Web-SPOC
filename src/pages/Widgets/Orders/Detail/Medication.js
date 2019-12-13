@@ -362,7 +362,7 @@ class Medication extends PureComponent {
           expiryDate: defaultBatch.expiryDate,
         })
     }
-
+    setFieldValue('costPrice', op.averageCostPrice || 0)
     setFieldValue('corPrescriptionItemInstruction', [
       {
         sequence: 0,
