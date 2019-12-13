@@ -671,7 +671,7 @@ const ApplyClaims = ({
         })}
       </GridItem>
       <CommonModal
-        title='Cannot save scheme'
+        title='Claim Amount Check'
         open={showErrorPrompt}
         onClose={toggleErrorPrompt}
         maxWidth='sm'

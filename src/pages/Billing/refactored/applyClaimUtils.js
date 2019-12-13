@@ -74,7 +74,7 @@ export const getApplicableClaimAmount = (
   const payableBalance =
     invoicePayerItem.totalAfterGst - (invoicePayerItem._claimedAmount || 0)
 
-  if (payableBalance <= 0) return returnClaimAmount
+  if (payableBalance <= 0 || !scheme) return returnClaimAmount
 
   const isSpecificDefined = coPaymentByItem.find(
     (_coPaymentItem) => _coPaymentItem.itemCode === invoicePayerItem.itemCode,
@@ -300,7 +300,7 @@ export const validateClaimAmount = (schemeRow) => {
   let invalidMessage = []
 
   const { schemeConfig, invoicePayerItem, payerTypeFK } = schemeRow
-  if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY) return []
+  if (payerTypeFK === INVOICE_PAYER_TYPE.COMPANY || !schemeConfig) return []
 
   const {
     balance,
