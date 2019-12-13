@@ -11,11 +11,9 @@ import {
   Checkbox,
   CodeSelect,
 } from '@/components'
-import {
-  DoctorProfileSelect,
-} from '@/components/_medisys'
+import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -35,21 +33,21 @@ const FilterBar = ({ handleSubmit }) => {
           <GridItem md={2}>
             <FastField
               name='groupByDoctor'
-              render={(args) => (
-                <Checkbox {...args} label='Group By Doctor' />
-              )}
+              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='asAt'
-              render={(args) => (
-                <Checkbox {...args} label='As At' />
-              )}
+              render={(args) => <Checkbox {...args} label='As At' />}
             />
           </GridItem>
           <GridItem md={2}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

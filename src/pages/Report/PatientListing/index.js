@@ -21,14 +21,13 @@ class PatientListing extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
+  renderFilterBar = (handleSubmit, isSubmitting) => {
     return <FilterBar {...this.props} handleSubmit={handleSubmit} />
   }
 
   renderContent = (reportDatas) => {
     return <PatientList reportDatas={reportDatas} />
   }
-
 }
 
 const PatientListingWithFormik = withFormik({

@@ -248,6 +248,7 @@ class Billing extends Component {
           billing: _appliedSchemes.map((ps) => ({
             name: ps.name,
             isExpired: false,
+            isDeleted: !patientSchemes.includes(ps.copaymentSchemeFK),
           })),
         }
       }

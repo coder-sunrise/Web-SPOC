@@ -12,7 +12,7 @@ import {
 } from '@/components'
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -32,13 +32,15 @@ const FilterBar = ({ handleSubmit }) => {
           <GridItem md={2}>
             <FastField
               name='isGroupByDoctor'
-              render={(args) => (
-                <Checkbox {...args} label='Group By Doctor' />
-              )}
+              render={(args) => <Checkbox {...args} label='Group By Doctor' />}
             />
           </GridItem>
           <GridItem md={3}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

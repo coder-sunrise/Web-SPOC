@@ -40,13 +40,22 @@ const FilterBar = ({ handleSubmit, values }) => {
           <GridItem md={1}>
             <FastField
               name='ageFrom'
-              render={(args) => <NumberInput {...args} label='Age From' max={200} precision={0} />}
+              render={(args) => (
+                <NumberInput
+                  {...args}
+                  label='Age From'
+                  max={200}
+                  precision={0}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={1}>
             <FastField
               name='ageTo'
-              render={(args) => <NumberInput {...args} label='Age To' max={200} precision={0} />}
+              render={(args) => (
+                <NumberInput {...args} label='Age To' max={200} precision={0} />
+              )}
             />
           </GridItem>
           <GridItem md={5} />
@@ -55,14 +64,24 @@ const FilterBar = ({ handleSubmit, values }) => {
             <Field
               name='dateFrom'
               render={(args) => (
-                <DatePicker {...args} disabled={values.isAllDate} label='Visit Date From' />
+                <DatePicker
+                  {...args}
+                  disabled={values.isAllDate}
+                  label='Visit Date From'
+                />
               )}
             />
           </GridItem>
           <GridItem md={2}>
             <Field
               name='dateTo'
-              render={(args) => <DatePicker {...args} disabled={values.isAllDate} label='Visit Date To' />}
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  disabled={values.isAllDate}
+                  label='Visit Date To'
+                />
+              )}
             />
           </GridItem>
           <GridItem md={1}>
@@ -105,7 +124,11 @@ const FilterBar = ({ handleSubmit, values }) => {
             />
           </GridItem>
           <GridItem md={2}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

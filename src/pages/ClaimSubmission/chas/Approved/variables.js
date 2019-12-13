@@ -68,9 +68,24 @@ export const ApprovedCHASColumns = [
 export const ApprovedCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
+  {
+    columnName: 'schemeCategoryDisplayValue',
+    width: 145,
+    sortBy: 'schemeCategory',
+  },
   { columnName: 'submissionDate', type: 'date', width: 140 },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true, sortBy:'invoiceAmt' },
-  { columnName: 'claimAmount', type: 'currency', currency: true, sortBy:'claimAmt' },
-  { columnName: 'collectedAmount', type: 'currency', currency: true },
+  {
+    columnName: 'invoiceAmount',
+    type: 'currency',
+    currency: true,
+    sortBy: 'invoiceAmt',
+  },
+  {
+    columnName: 'claimAmount',
+    type: 'currency',
+    currency: true,
+    sortBy: 'claimAmt',
+  },
+  { columnName: 'collectedPayment', type: 'currency', currency: true },
+  { columnName: 'approvedAmount', type: 'currency', currency: true },
 ]

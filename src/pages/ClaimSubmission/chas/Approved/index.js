@@ -155,6 +155,7 @@ class ApprovedCHAS extends React.Component {
     const { list } = claimSubmissionApproved || []
     const { showCollectPayment } = this.state
     const { selectedRows } = this.state
+
     return (
       <CardContainer
         hideHeader
@@ -175,13 +176,13 @@ class ApprovedCHAS extends React.Component {
                 return (
                   <Select
                     label={formatMessage({
-                      id:'claimsubmission.invoiceClaim.claimStatus',
+                      id: 'claimsubmission.invoiceClaim.claimStatus',
                     })}
                     options={approvedStatus}
                     {...args}
                   />
-              )}
-              }
+                )
+              }}
             />
           </GridItem>
         </BaseSearchBar>{' '}
@@ -197,7 +198,15 @@ class ApprovedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => row.approvedAmount,
+                    rowSelectionEnabled: (row) => {
+                      if (
+                        row.status.toLowerCase() === 'paid' &&
+                        row.approvedAmount === row.collectedAmount
+                      )
+                        return false
+
+                      return true
+                    },
                   },
                 }}
                 selection={this.state.selectedRows}

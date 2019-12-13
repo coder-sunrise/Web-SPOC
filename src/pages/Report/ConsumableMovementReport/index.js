@@ -12,7 +12,6 @@ import ReportBase from '../ReportBase'
 const reportId = 21
 const fileName = 'Consumable Movement Report'
 
-
 class ConsumableMovementReport extends ReportBase {
   constructor (props) {
     super(props)
@@ -23,14 +22,13 @@ class ConsumableMovementReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
   renderContent = (reportDatas) => {
     return <MovementList reportDatas={reportDatas} />
   }
-
 }
 
 const ConsumableMovementReportWithFormik = withFormik({

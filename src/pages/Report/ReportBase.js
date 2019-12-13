@@ -11,6 +11,7 @@ export default class ReportBase extends React.Component {
       default: {
         loaded: false,
         isLoading: false,
+        isSubmitting: false,
         activePanel: -1,
         reportDatas: null,
         reportId: 0,
@@ -52,6 +53,7 @@ export default class ReportBase extends React.Component {
       ...state,
       loaded: false,
       isLoading: true,
+      isSubmitting: true,
       reportDatas: null,
     }))
     const params = this.formatReportParams(this.props.values)
@@ -62,6 +64,7 @@ export default class ReportBase extends React.Component {
         ...state,
         activePanel: 0,
         loaded: true,
+        isSubmitting: false,
         isLoading: false,
         reportDatas,
       }))
@@ -69,16 +72,22 @@ export default class ReportBase extends React.Component {
       this.setState(() => ({
         loaded: false,
         isLoading: false,
+        isSubmitting: false,
         reportDatas: null,
       }))
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
+  renderFilterBar = (handleSubmit, isSubmitting) => {
     return (
       <GridContainer size='sm'>
         <GridItem md={3}>
-          <Button color='primary' onClick={handleSubmit} style={{ marginTop: 6 }}>
+          <Button
+            color='primary'
+            onClick={handleSubmit}
+            style={{ marginTop: 6 }}
+            disabled={this.state.isSubmitting}
+          >
             Generate Report
           </Button>
         </GridItem>
@@ -96,7 +105,9 @@ export default class ReportBase extends React.Component {
     const maxHeight = !height ? '100%' : height - 200
     return (
       <GridContainer>
-        <GridItem md={12}>{this.renderFilterBar(this.onSubmitClick)}</GridItem>
+        <GridItem md={12}>
+          {this.renderFilterBar(this.onSubmitClick, this.state.isSubmitting)}
+        </GridItem>
         <GridItem md={12}>
           <ReportLayoutWrapper
             height={height}

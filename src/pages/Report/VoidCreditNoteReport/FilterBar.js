@@ -11,7 +11,7 @@ import {
   RadioGroup,
 } from '@/components'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -50,7 +50,11 @@ const FilterBar = ({ handleSubmit }) => {
             />
           </GridItem>
           <GridItem md={3}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>
