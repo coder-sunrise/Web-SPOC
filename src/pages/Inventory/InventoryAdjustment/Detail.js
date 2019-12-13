@@ -337,11 +337,13 @@ class Detail extends PureComponent {
         maxSelected: 1,
         disableAll: true,
         options: (row) => {
-          return row.stockList
-          // return this.stockOptions(row)
+          const item = this.state.MedicationItemList.find(
+            (o) => o.itemFK === row.code,
+          )
+          return item.stock
         },
-        onChange: (e, op = {}) => {
-          this.handleSelectedBatch(e, op)
+        onChange: (e) => {
+          this.handleSelectedBatch(e)
         },
         render: (row) => {
           return <TextField text value={row.batchNo} />
@@ -473,70 +475,6 @@ class Detail extends PureComponent {
         })
       })
     })
-
-    const result = []
-    for (let i = 1; i < 4; i++) {
-      result.push(
-        dispatch({
-          type: 'inventoryAdjustment/getStockDetails',
-          payload: {
-            id: i,
-          },
-        }),
-      )
-    }
-
-    let [
-      medication,
-      consumable,
-      vaccination,
-    ] = await Promise.all(result)
-
-    this.setOption(medication, consumable, vaccination)
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
-  }
-
-  setOption = (m, c, v) => {
-    if (!m.data || !c.data || !v.data) {
-      return
-    }
-    const mOptions = m.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.id,
-      }
-    })
-
-    const cOptions = c.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.id,
-      }
-    })
-
-    const vOptions = v.data.map((o) => {
-      return {
-        ...o,
-        name: o.batchNo,
-        value: o.id,
-      }
-    })
-
-    this.setState({ stockMedication: mOptions })
-    this.setState({ stockConsumable: cOptions })
-    this.setState({ stockVaccination: vOptions })
-    this.setState({ filterStockMedication: mOptions })
-    this.setState({ filterStockConsumable: cOptions })
-    this.setState({ filterStockVaccination: vOptions })
   }
 
   rowOptions = (row) => {
@@ -669,9 +607,8 @@ class Detail extends PureComponent {
     }
   }
 
-  handleSelectedBatch = (e, op) => {
+  handleSelectedBatch = (e) => {
     const { option, row, val } = e
-    console.log({ e, op })
     if (option) {
       this.setState({ selectedItem: undefined })
       if (val && val.length > 0) {
@@ -769,10 +706,11 @@ class Detail extends PureComponent {
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
-        const getState = this.type(row.inventoryTypeFK)
-        const defaultStock = this.state[getState.filterStateName].find(
-          (j) => j.inventoryItemFK === row.code && j.isDefault,
+        const currentType = this.type(row.inventoryTypeFK)
+        const defaultStock = stock.find(
+          (j) => j[currentType.itemFK] === row.code && j.isDefault,
         )
+
         if (defaultStock) {
           row.batchNo = [
             defaultStock.batchNo,
@@ -784,14 +722,6 @@ class Detail extends PureComponent {
         }
       }
     }
-
-    // this.props.dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   onCommitChanges = ({ rows, deleted }) => {
