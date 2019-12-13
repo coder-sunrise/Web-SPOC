@@ -21,7 +21,6 @@ class OutstandingPaymentReport extends ReportBase {
     }
   }
 
-
   formatReportParams = (params) => {
     return {
       ...params,
@@ -32,14 +31,13 @@ class OutstandingPaymentReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
   renderContent = (reportDatas) => {
     return <OutstandingList reportDatas={reportDatas} />
   }
-
 }
 
 const OutstandingPaymentReportWithFormik = withFormik({

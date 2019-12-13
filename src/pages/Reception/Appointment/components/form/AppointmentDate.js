@@ -26,7 +26,7 @@ const AppointmentDate = ({ disabled }) => (
         )}
       />
     </GridItem>
-    <GridItem xs md={6} />
+    <GridItem xs md={3} />
 
     <GridItem xs md={3}>
       <FastField

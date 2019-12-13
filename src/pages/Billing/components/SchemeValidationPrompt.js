@@ -60,7 +60,14 @@ const SchemeValidationPrompt = ({
               render: (row) => {
                 const _row = row.billing
                 if (_row) {
-                  return <span>{_row.name}</span>
+                  return (
+                    <div>
+                      <span>{_row.name}</span>
+                      {_row.isDeleted && (
+                        <span style={{ color: 'red' }}>&nbsp;(Deleted)</span>
+                      )}
+                    </div>
+                  )
                 }
                 return null
               },

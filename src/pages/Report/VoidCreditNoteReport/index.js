@@ -22,14 +22,13 @@ class VoidCreditNoteReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
   renderContent = (reportDatas) => {
     return <VoidCNList reportDatas={reportDatas} />
   }
-
 }
 
 const VoidCreditNoteReportWithFormik = withFormik({

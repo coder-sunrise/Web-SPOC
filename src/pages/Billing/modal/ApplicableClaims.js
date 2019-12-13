@@ -123,70 +123,27 @@ const ApplicableClaims = ({
       scheme.schemePayerFK,
     )
   }
+
   return (
     <GridContainer>
-      {schemesList.map((scheme, index) => {
-        const nameLabel = constructLabel(scheme)
-        const onClick = () => _handleSelectClick(scheme)
-        return (
-          <React.Fragment>
-            <GridItem md={2}>
-              <span>{index + 1}</span>
-            </GridItem>
-            <GridItem md={7}>
-              <span>{nameLabel}</span>
-            </GridItem>
-            <GridItem md={3} className={classes.row}>
-              <Button
-                color='primary'
-                size='sm'
-                disabled={scheme.disabled}
-                onClick={onClick}
-              >
-                Add
-              </Button>
-            </GridItem>
-          </React.Fragment>
-        )
-      })}
-      {/* claimableSchemes && claimableSchemes.length > 0 ? (
-        claimableSchemes.map((schemes, index) => {
-          const isCHAS = schemes[0].coPaymentSchemeName.startsWith('CHAS')
-
-          let shouldDisable = false
-          if (selectedClaims.includes(index)) {
-            shouldDisable = true
-          } else if (isCHAS && currentClaims.length > 0) {
-            shouldDisable =
-              invoicePayersName[index] &&
-              invoicePayersName[index].startsWith('CHAS')
-          } else {
-            const { notClaimableWithSchemeIds } = schemes[0]
-            shouldDisable = notClaimableWithSchemeIds.reduce(
-              (notCompatible, id) =>
-                selectedSchemeIDs.includes(id) ? true : notCompatible,
-              false,
-            )
-          }
-
+      {schemesList.length > 0 ? (
+        schemesList.map((scheme, index) => {
+          const nameLabel = constructLabel(scheme)
+          const onClick = () => _handleSelectClick(scheme)
           return (
             <React.Fragment>
               <GridItem md={2}>
                 <span>{index + 1}</span>
               </GridItem>
               <GridItem md={7}>
-                <span>
-                  {schemes
-                    .map((scheme) => scheme.coPaymentSchemeName)
-                    .join(', ')}
-                </span>
+                <span>{nameLabel}</span>
               </GridItem>
               <GridItem md={3} className={classes.row}>
                 <Button
                   color='primary'
                   size='sm'
-                  disabled={shouldDisable}
-                  onClick={handleSelectClick(index)}
+                  disabled={scheme.disabled}
+                  onClick={onClick}
                 >
                   Add
                 </Button>
@@ -195,12 +152,10 @@ const ApplicableClaims = ({
           )
         })
       ) : (
-        <React.Fragment>
-          <GridItem style={{ textAlign: 'center' }} md={12}>
-            <div>No scheme to apply.</div>
-          </GridItem>
-        </React.Fragment>
-      ) */}
+        <GridItem style={{ textAlign: 'center' }} md={12}>
+          <h4>No scheme to apply.</h4>
+        </GridItem>
+      )}
     </GridContainer>
   )
 }

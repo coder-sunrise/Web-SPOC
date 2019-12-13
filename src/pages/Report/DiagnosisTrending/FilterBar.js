@@ -58,7 +58,11 @@ const FilterBar = ({ classes, handleSubmit }) => {
             />
           </GridItem>
           <GridItem md={2} className={classes.generateBtn}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>
@@ -66,12 +70,7 @@ const FilterBar = ({ classes, handleSubmit }) => {
           <GridItem md={4}>
             <FastField
               name='diagnosisIds'
-              render={(args) => (
-                <DiagnosisSelect
-                  {...args}
-                  mode='multiple'
-                />
-              )}
+              render={(args) => <DiagnosisSelect {...args} mode='multiple' />}
             />
           </GridItem>
         </GridContainer>

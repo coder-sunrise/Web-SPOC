@@ -11,6 +11,13 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   let schemeCoverageType = 'percentage'
   let schemeCoverage = 0
 
+  if (_.isEmpty(scheme))
+    return {
+      coverage: invoiceItem.coverage,
+      schemeCoverage: invoiceItem.schemeCoverage,
+      schemeCoverageType: invoiceItem.schemeCoverageType,
+    }
+
   // 1. first priority: coPaymentByItem
   // 2. second priority: coPaymentByCategory
   // 3. third priority: overall value

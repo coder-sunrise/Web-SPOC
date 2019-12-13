@@ -380,6 +380,8 @@ class Form extends React.PureComponent {
   }
 
   onCommitChanges = ({ rows, deleted, ...restProps }) => {
+    const { setFieldValue } = this.props
+    setFieldValue('_fakeField', 'fakeValue')
     if (deleted) {
       const { datagrid } = this.state
       // const newDatagrid = datagrid.filter(
@@ -434,6 +436,7 @@ class Form extends React.PureComponent {
       )
       return updatedRows
     }
+
     return rows
   }
 

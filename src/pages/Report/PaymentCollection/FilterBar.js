@@ -14,7 +14,7 @@ import {
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <GridContainer>
@@ -123,7 +123,11 @@ const FilterBar = ({ handleSubmit }) => {
             />
           </GridItem>
           <GridItem md={2}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

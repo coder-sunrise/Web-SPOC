@@ -20,14 +20,13 @@ class MedicationMovementReport extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
   renderContent = (reportDatas) => {
     return <MovementList reportDatas={reportDatas} />
   }
-
 }
 
 const MedicationMovementReportWithFormik = withFormik({

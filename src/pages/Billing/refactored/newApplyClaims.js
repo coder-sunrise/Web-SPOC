@@ -308,6 +308,10 @@ const ApplyClaims = ({
           ],
           invoice.invoiceItems,
         )
+      } else {
+        setCurEditInvoicePayerBackup(undefined)
+        setInitialState([])
+        setTempInvoicePayer([])
       }
     },
     [

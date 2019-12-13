@@ -14,7 +14,7 @@ import {
 } from '@/components'
 import { claimStatus, chasSchemeTypes } from '@/utils/codes'
 
-const FilterBar = ({ handleSubmit }) => {
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -46,8 +46,7 @@ const FilterBar = ({ handleSubmit }) => {
                     {...args}
                   />
                 )
-              }
-              }
+              }}
             />
           </GridItem>
           <GridItem md={4} />
@@ -65,8 +64,7 @@ const FilterBar = ({ handleSubmit }) => {
                     {...args}
                   />
                 )
-              }
-              }
+              }}
             />
           </GridItem>
           <GridItem md={2}>
@@ -78,7 +76,11 @@ const FilterBar = ({ handleSubmit }) => {
             />
           </GridItem>
           <GridItem md={2}>
-            <Button color='primary' onClick={handleSubmit}>
+            <Button
+              color='primary'
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
               Generate Report
             </Button>
           </GridItem>

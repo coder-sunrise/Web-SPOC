@@ -43,7 +43,7 @@ const styles = (theme) => ({
 }))
 @withFormikExtend({
   enableReinitialize: true,
-  mapPropsToValues: ({ claimSubmission }) => {
+  mapPropsToValues: ({ claimSubmission, allowEdit }) => {
     const returnValue = claimSubmission.entity || {}
     const { diagnosis } = returnValue
     let diagnosisOptions = []
@@ -53,7 +53,7 @@ const styles = (theme) => ({
       })
     }
 
-    if (diagnosis.length === diagnosisOptions.length) {
+    if (diagnosis.length === diagnosisOptions.length && allowEdit) {
       diagnosisOptions.push(-99)
     }
 
@@ -287,7 +287,8 @@ class ClaimDetails extends Component {
                         options={diagnosis}
                         labelField='diagnosisDescription'
                         valueField='id'
-                        maxTagCount={diagnosis.length > 0 ? 0 : 0}
+                        // maxTagCount={diagnosis.length > 0 ? 0 : 0}
+                        maxTagCount={allowEdit ? 0 : undefined}
                         maxTagPlaceholder='diagnosis'
                         {...args}
                       />
