@@ -8,6 +8,7 @@ import fractured from '@/assets/img/dentalChart/fractured.png'
 import filling from '@/assets/img/dentalChart/filling.png'
 import temporarydressing from '@/assets/img/dentalChart/temporarydressing.png'
 import onlayveneer from '@/assets/img/dentalChart/onlayveneer.png'
+import test from '@/assets/img/dentalChart/test2.png'
 
 const { fabric } = require('fabric')
 
@@ -41,13 +42,14 @@ export const baseWidth = 30
 export const baseHeight = 40
 export const zoom = 1
 export const fontColor = '#000000'
-export const innerFontSize = 16
+export const innerFontSize = 22
 export const lockConfig = {
   cornerSize: 0,
   hasBorders: false,
   lockMovementX: true,
   lockMovementY: true,
   lockRotation: true,
+  // selectable: false,
 }
 export const groupCfg = {
   selectable: false,
@@ -64,6 +66,7 @@ export const sharedCfg = {
   objectCaching: true,
   strokeLineJoin: 'round',
   hoverCursor: 'pointer',
+  fill: '#ffffff',
 }
 
 export const fontCfg = {
@@ -77,6 +80,7 @@ export const overlayShapeTypes = [
   'clear',
   'fractured',
   'bridge',
+  'missing',
 ]
 const checkIsValidElement = (item, name, checker) => {
   if (checker) return checker(item, name)
@@ -495,11 +499,29 @@ const sharedButtonConfig = {
 
 let img1
 
-fabric.Image.fromURL(fractured, (img) => {
-  img1 = img.set({ left: 0, top: 0 }).scale(1)
+fabric.Image.fromURL(test, (img) => {
+  // console.log(
+  //   (img.height - strokeWidth * 2) / (baseHeight * 3),
+  //   baseHeight * 3 / img.height,
+  //   img.height,
+  //   baseHeight * 3,
+  // )
+  const img2 = img
+    .set({ left: 0, top: 0 })
+    .scale((baseHeight * 3 + strokeWidth * 2) / img.height)
+  const group = new fabric.Group(
+    [
+      img2,
+    ],
+    {
+      ...addonGroupCfg,
+    },
+  )
+  // img2.set('scaleX', 1)
+  // img2.set('scaleY', 1)
 
-  // canvas.add(oImg)
-  // group.bringToFront()
+  // group.setZoom(0.5)
+  img1 = group
 })
 
 export const buttonConfigs = [
@@ -512,6 +534,17 @@ export const buttonConfigs = [
     value: 'missing',
     icon: missing,
     text: 'Missing',
+    getShape: ({ canvas, group, config }) => {
+      const g = new fabric.Group(
+        [
+          renderBackgroud(),
+        ],
+        {
+          ...addonGroupCfg,
+        },
+      )
+      return g
+    },
   },
   {
     value: 'caries',
@@ -536,24 +569,10 @@ export const buttonConfigs = [
   },
   {
     value: 'fractured',
-    icon: fractured,
+    icon: test,
     text: 'Fractured',
     getShape: ({ canvas, group, config }) => {
-      console.log(fractured)
-      // const group = new fabric.Group([], {
-      //   ...addonGroupCfg,
-      // })
-      // fabric.Image.fromURL(fractured, (img) => {
-      //   let oImg = img.set({ left: 0, top: 0 }).scale(1)
-      //   group.add(oImg)
-      //   console.log(img, oImg, config)
-      //   oImg.set('name', config.value)
-      //   canvas.renderAll()
-      //   // canvas.add(oImg)
-      //   // group.bringToFront()
-      // })
-      // console.log(i)
-      return img1
+      return fabric.util.object.clone(img1)
     },
   },
   {
@@ -795,7 +814,9 @@ export const buttonConfigs = [
     // icon: onlayveneer,
     text: 'Top',
     color: 'brown',
+    type: 'special',
     ...sharedButtonConfig,
+    onSelect: ({ canvas }) => {},
   },
 
   {
@@ -803,6 +824,8 @@ export const buttonConfigs = [
     // icon: onlayveneer,
     text: 'Bottom',
     color: 'brown',
+    type: 'special',
+
     ...sharedButtonConfig,
   },
 ]

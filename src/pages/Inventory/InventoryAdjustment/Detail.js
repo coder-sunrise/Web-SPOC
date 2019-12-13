@@ -7,6 +7,7 @@ import {
   inventoryAdjustmentStatus,
   podoOrderType,
   getInventoryItemList,
+  fetchAndSaveCodeTable,
 } from '@/utils/codes'
 import {
   withFormikExtend,
@@ -331,14 +332,16 @@ class Detail extends PureComponent {
         columnName: 'batchNo',
         type: 'select',
         mode: 'tags',
-        valueField: 'name',
+        labelField: 'batchNo',
+        valueField: 'batchNo',
         maxSelected: 1,
         disableAll: true,
         options: (row) => {
-          return this.stockOptions(row)
+          return row.stockList
+          // return this.stockOptions(row)
         },
-        onChange: (e) => {
-          this.handleSelectedBatch(e)
+        onChange: (e, op = {}) => {
+          this.handleSelectedBatch(e, op)
         },
         render: (row) => {
           return <TextField text value={row.batchNo} />
@@ -447,17 +450,23 @@ class Detail extends PureComponent {
   initializeStateItemList = async () => {
     const { dispatch } = this.props
 
+    const excludeInactiveCodes = () => {
+      const { values } = this.props
+      if (!Number.isNaN(values.id)) {
+        return undefined
+      }
+      return true
+    }
+
     await podoOrderType.forEach((x) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: x.ctName,
-        },
+      fetchAndSaveCodeTable(x.ctName, {
+        isActive: excludeInactiveCodes(),
       }).then((list) => {
         const { inventoryItemList } = getInventoryItemList(
           list,
           x.itemFKName,
           x.stateName,
+          x.stockName,
         )
         this.setState({
           [x.stateName]: inventoryItemList,
@@ -531,14 +540,49 @@ class Detail extends PureComponent {
   }
 
   rowOptions = (row) => {
+    const getCurrentOptions = (stateName, filteredOptions) => {
+      const selectedItem = this.state[stateName].find(
+        (o) => o.itemFK === row.itemFK,
+      )
+      let currentOptions = filteredOptions
+      if (selectedItem) {
+        currentOptions = [
+          ...filteredOptions,
+          selectedItem,
+        ]
+        currentOptions = _.uniqBy(currentOptions, 'itemFK')
+      }
+
+      return currentOptions
+    }
+    const filterActiveCode = (ops) => {
+      return ops.filter((o) => o.isActive === true)
+    }
+
     if (row.inventoryTypeFK === INVENTORY_TYPE.MEDICATION) {
-      return this.state.MedicationItemList
+      const activeOptions = filterActiveCode(this.state.MedicationItemList)
+      const currentOptions = getCurrentOptions(
+        'MedicationItemList',
+        activeOptions,
+      )
+
+      return row.id ? currentOptions : activeOptions
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.VACCINATION) {
-      return this.state.VaccinationItemList
+      const activeOptions = filterActiveCode(this.state.VaccinationItemList)
+      const currentOptions = getCurrentOptions(
+        'VaccinationItemList',
+        activeOptions,
+      )
+      return row.id ? currentOptions : activeOptions
     }
     if (row.inventoryTypeFK === INVENTORY_TYPE.CONSUMABLE) {
-      return this.state.ConsumableItemList
+      const activeOptions = filterActiveCode(this.state.ConsumableItemList)
+      const currentOptions = getCurrentOptions(
+        'ConsumableItemList',
+        activeOptions,
+      )
+      return row.id ? currentOptions : activeOptions
     }
     return []
   }
@@ -625,8 +669,9 @@ class Detail extends PureComponent {
     }
   }
 
-  handleSelectedBatch = (e) => {
+  handleSelectedBatch = (e, op) => {
     const { option, row, val } = e
+    console.log({ e, op })
     if (option) {
       this.setState({ selectedItem: undefined })
       if (val && val.length > 0) {
@@ -709,7 +754,7 @@ class Detail extends PureComponent {
   handleSelectedItem = (e) => {
     const { option, row } = e
     if (option) {
-      const { uom, value, code, name } = option
+      const { uom, value, code, name, stock } = option
       row.code = value
       row.displayValue = value
       row.uomDisplayValue = uom
@@ -719,6 +764,8 @@ class Detail extends PureComponent {
       row.batchNoString = undefined
       row.expiryDate = undefined
       row.stock = undefined
+      row.stockList = stock
+      row.itemFK = value
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
@@ -866,7 +913,6 @@ class Detail extends PureComponent {
     if (!isEditable) {
       cfg.onRowDoubleClick = undefined
     }
-
     return (
       <React.Fragment>
         <AuthorizedContext.Provider

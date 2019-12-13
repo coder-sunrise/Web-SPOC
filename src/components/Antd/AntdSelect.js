@@ -408,7 +408,7 @@ class AntdSelect extends React.PureComponent {
           (o) => o[valueField] === newVal,
         )
         proceed = onChange(newVal, option) !== false
-      } else {
+      } else if (mode === 'multiple') {
         const opts = (autoComplete || query
           ? this.state.data
           : options).filter((o) =>
@@ -419,7 +419,12 @@ class AntdSelect extends React.PureComponent {
                 : m === o[valueField],
           ),
         )
-        newVal = mode === 'tags' && newVal.length === 0 ? '' : newVal
+        proceed = onChange(newVal, opts) !== false
+      } else if (mode === 'tags') {
+        const opts = (autoComplete || query
+          ? this.state.data
+          : options).filter((o) => newVal.find((m) => m === o[valueField]))
+        newVal = newVal.length === 0 ? '' : newVal
         proceed = onChange(newVal, opts) !== false
       }
     }

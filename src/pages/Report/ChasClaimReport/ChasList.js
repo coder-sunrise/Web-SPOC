@@ -66,7 +66,7 @@ class ChasList extends PureComponent {
     }
     let ChasListCols = SalesDetailsCols
     let ChasListColsExtension = SalesDetailsExtensions
-    if (reportDatas.ListingDetails[0].groupByDoctor) {
+    if (reportDatas.ListingDetails[0].isGroup) {
       FuncProps = {
         ...FuncProps,
         summaryConfig: {
