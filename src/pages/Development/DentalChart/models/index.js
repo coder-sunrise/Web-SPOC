@@ -40,6 +40,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
+      showPedo: false,
       data: [
         {
           id: 'system-id-1',
