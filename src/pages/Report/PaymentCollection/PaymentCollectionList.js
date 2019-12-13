@@ -1,10 +1,7 @@
 import React, { PureComponent } from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import {
-  GridItem,
-  dateFormatLongWithTimeNoSec12h,
-} from '@/components'
+import { GridItem, dateFormatLongWithTimeNoSec12h } from '@/components'
 
 class PaymentCollectionList extends PureComponent {
   render () {
@@ -29,7 +26,13 @@ class PaymentCollectionList extends PureComponent {
         format: dateFormatLongWithTimeNoSec12h,
         showTime: true,
       },
-      { columnName: 'amount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+      {
+        columnName: 'amount',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+        width: 180,
+      },
       { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
       { columnName: 'referenceNo', sortingEnabled: false, width: 100 },
       { columnName: 'payerName', sortingEnabled: false },
@@ -44,7 +47,7 @@ class PaymentCollectionList extends PureComponent {
       pager: false,
       summary: true,
     }
-    console.log({ reportDatas })
+
     if (reportDatas.PaymentCollectionInfo[0].groupByPaymentMode) {
       let cashData = []
       let giroData = []
@@ -141,39 +144,51 @@ class PaymentCollectionList extends PureComponent {
       ]
       const CashColsExtension = [
         ...PaymentCollectionDetailsExtensions,
-        { columnName: 'cashRounding', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
-        { columnName: 'netAmount', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+        {
+          columnName: 'cashRounding',
+          type: 'currency',
+          currency: true,
+          sortingEnabled: false,
+          width: 180,
+        },
+        {
+          columnName: 'netAmount',
+          type: 'currency',
+          currency: true,
+          sortingEnabled: false,
+          width: 180,
+        },
       ]
       console.log({ CashDetailsCols, CashColsExtension, CashFuncProps })
       return (
         <GridItem md={12}>
           {cashData &&
-            cashData.length > 0 && (
-              <ReportDataGrid
-                data={cashData}
-                columns={CashDetailsCols}
-                columnExtensions={CashColsExtension}
-                FuncProps={CashFuncProps}
-              />
-            )}
+          cashData.length > 0 && (
+            <ReportDataGrid
+              data={cashData}
+              columns={CashDetailsCols}
+              columnExtensions={CashColsExtension}
+              FuncProps={CashFuncProps}
+            />
+          )}
           {giroData &&
-            giroData.length > 0 && (
-              <ReportDataGrid
-                data={giroData}
-                columns={GIRODetailsCols}
-                columnExtensions={PaymentCollectionDetailsExtensions}
-                FuncProps={FuncProps}
-              />
-            )}
+          giroData.length > 0 && (
+            <ReportDataGrid
+              data={giroData}
+              columns={GIRODetailsCols}
+              columnExtensions={PaymentCollectionDetailsExtensions}
+              FuncProps={FuncProps}
+            />
+          )}
           {otherData &&
-            otherData.length > 0 && (
-              <ReportDataGrid
-                data={otherData}
-                columns={OtherPaymentModeDetailsCols}
-                columnExtensions={PaymentCollectionDetailsExtensions}
-                FuncProps={FuncProps}
-              />
-            )}
+          otherData.length > 0 && (
+            <ReportDataGrid
+              data={otherData}
+              columns={OtherPaymentModeDetailsCols}
+              columnExtensions={PaymentCollectionDetailsExtensions}
+              FuncProps={FuncProps}
+            />
+          )}
         </GridItem>
       )
     }
@@ -236,6 +251,7 @@ class PaymentCollectionList extends PureComponent {
       { name: 'amount', title: 'Amount' },
       { name: 'paymentMode', title: 'Payment Mode' },
     ]
+
     return (
       <ReportDataGrid
         data={paymentCollectionData}

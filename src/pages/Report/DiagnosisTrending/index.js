@@ -40,15 +40,12 @@ class DiagnosisTrending extends ReportBase {
 
   renderContent = (reportDatas) => {
     let listData = []
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas.DiagnosisDetails) {
-      listData = reportDatas.DiagnosisDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `DiagnosisDetails-${index}-${item.diagnosisCode}`,
-        }),
-      )
+      listData = reportDatas.DiagnosisDetails.map((item, index) => ({
+        ...item,
+        id: `DiagnosisDetails-${index}-${item.diagnosisCode}`,
+      }))
     }
     const FuncProps = {
       grouping: true,
@@ -69,7 +66,6 @@ class DiagnosisTrending extends ReportBase {
       />
     )
   }
-
 }
 
 const DiagnosisTrendingWithFormik = withFormik({

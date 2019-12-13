@@ -1,13 +1,9 @@
 import React from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 
-
 const SummaryOfSales = ({ reportDatas }) => {
-  if (!reportDatas)
-    return null
+  if (!reportDatas) return null
   let listData = []
   const { SummaryByDateDetails } = reportDatas
   if (SummaryByDateDetails) {
@@ -22,7 +18,12 @@ const SummaryOfSales = ({ reportDatas }) => {
     { name: 'totalAmount', title: 'Total Amount' },
   ]
   const SummaryByDateDetailsColumnsExtensions = [
-    { columnName: 'totalAmount', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'totalAmount',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
     { columnName: 'salesDate', sortingEnabled: false },
   ]
   const FuncProps = {
@@ -30,7 +31,9 @@ const SummaryOfSales = ({ reportDatas }) => {
     summary: true,
     summaryConfig: {
       state: {
-        totalItems: [{ columnName: 'totalAmount', type: 'sum' }],
+        totalItems: [
+          { columnName: 'totalAmount', type: 'sum' },
+        ],
       },
       integrated: {
         calculator: IntegratedSummary.defaultCalculator,
@@ -44,6 +47,7 @@ const SummaryOfSales = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
+      height='40vh'
       data={listData}
       columns={SummaryByDateDetailsColumns}
       columnExtensions={SummaryByDateDetailsColumnsExtensions}
