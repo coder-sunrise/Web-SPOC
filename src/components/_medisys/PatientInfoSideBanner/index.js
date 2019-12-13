@@ -8,6 +8,7 @@ import { withStyles, Divider } from '@material-ui/core'
 // common components
 import Refresh from '@material-ui/icons/Sync'
 import { SchemePopover } from 'medisys-components'
+import { locationQueryParameters } from '@/utils/utils'
 import {
   NumberInput,
   CodeSelect,
@@ -49,7 +50,8 @@ class PatientInfoSideBanner extends PureComponent {
       },
     }).then((result) => {
       if (result) {
-        if (window.location.pathname === '/patientdb') {
+        const params = locationQueryParameters()
+        if (params.md !== 'visreg') {
           dispatch({
             type: 'patient/query',
             payload: {

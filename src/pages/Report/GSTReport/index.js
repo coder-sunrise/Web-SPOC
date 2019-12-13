@@ -34,34 +34,35 @@ class GSTReport extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
-    return <Accordion
-      active={this.state.activePanel}
-      onChange={this.handleActivePanelChange}
-      leftIcon
-      expandIcon={<SolidExpandMore fontSize='large' />}
-      collapses={[
-        {
-          title: <AccordionTitle title='Income' />,
-          content: (
-            <IncomeList reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Expenditure' />,
-          content: (
-            <ExpenditureList reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Summary' />,
-          content: (
-            <Summary reportDatas={reportDatas} />
-          ),
-        },
-      ]}
-    />
+    return (
+      <Accordion
+        // active={this.state.activePanel}
+        // onChange={this.handleActivePanelChange}
+        defaultActive={[
+          0,
+          1,
+          2,
+        ]}
+        mode='multiple'
+        leftIcon
+        expandIcon={<SolidExpandMore fontSize='large' />}
+        collapses={[
+          {
+            title: <AccordionTitle title='Income' />,
+            content: <IncomeList reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Expenditure' />,
+            content: <ExpenditureList reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary' />,
+            content: <Summary reportDatas={reportDatas} />,
+          },
+        ]}
+      />
+    )
   }
-
 }
 const GSTReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({

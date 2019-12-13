@@ -6,9 +6,7 @@ import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import {
-  Accordion,
-} from '@/components'
+import { Accordion } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
 import InvoicePayer from './InvoicePayer'
@@ -32,32 +30,34 @@ class QueueListing extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
-    return <Accordion
-      active={this.state.activePanel}
-      onChange={this.handleActivePanelChange}
-      leftIcon
-      expandIcon={<SolidExpandMore fontSize='large' />}
-      collapses={[
-        {
-          title: <AccordionTitle title='Visit Listing' />,
-          content: (
-            <VisitListing reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Past Payments Collection' />,
-          content: (
-            <PastPaymentsCollection reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Invoice Payer' />,
-          content: (
-            <InvoicePayer reportDatas={reportDatas} />
-          ),
-        },
-      ]}
-    />
+    return (
+      <Accordion
+        // active={this.state.activePanel}
+        // onChange={this.handleActivePanelChange}
+        defaultActive={[
+          0,
+          1,
+          2,
+        ]}
+        mode='multiple'
+        leftIcon
+        expandIcon={<SolidExpandMore fontSize='large' />}
+        collapses={[
+          {
+            title: <AccordionTitle title='Visit Listing' />,
+            content: <VisitListing reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Past Payments Collection' />,
+            content: <PastPaymentsCollection reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Invoice Payer' />,
+            content: <InvoicePayer reportDatas={reportDatas} />,
+          },
+        ]}
+      />
+    )
   }
 }
 

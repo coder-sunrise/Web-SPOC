@@ -26,7 +26,11 @@ class MovementList extends PureComponent {
     ]
     const ConsumableStockDetailsExtensions = [
       { columnName: 'transactionDate', type: 'date', sortingEnabled: false },
-      { columnName: 'transactionQuantity', type: 'number', sortingEnabled: false },
+      {
+        columnName: 'transactionQuantity',
+        type: 'number',
+        sortingEnabled: false,
+      },
       { columnName: 'consumableCode', sortingEnabled: false },
       { columnName: 'consumableName', sortingEnabled: false },
       { columnName: 'transactionCategory', sortingEnabled: false },

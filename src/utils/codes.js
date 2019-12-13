@@ -1625,6 +1625,7 @@ export const getInventoryItemV2 = (
   itemFKName,
   rows = [],
   outstandingItem = undefined,
+  existingData = false,
 ) => {
   const groupByFKFunc = (array) => {
     return _(array)
@@ -1648,21 +1649,60 @@ export const getInventoryItemV2 = (
     const activeItem = rowsGroupByFK.find(
       (i) => i[itemFKName] === o[itemFKName],
     )
-    let currentReceivedQty = quantityReceived
+    // console.log({ activeItem })
+    let remainingQuantity = orderQuantity - quantityReceived
+    let currentQtyReceived = quantityReceived
 
     if (activeItem) {
-      if (currentReceivedQty === activeItem.totalCurrentReceivingQty) {
-        currentReceivedQty = 0
+      if (activeItem.totalCurrentReceivingQty === currentQtyReceived) {
+        // console.log('a')
+      } else if (activeItem.totalCurrentReceivingQty > currentQtyReceived) {
+        let tempActiveItemTotalQtyReceived = 0
+        tempActiveItemTotalQtyReceived =
+          activeItem.totalCurrentReceivingQty - currentQtyReceived
+        currentQtyReceived += tempActiveItemTotalQtyReceived
+        remainingQuantity = orderQuantity - currentQtyReceived
+      } else if (
+        existingData &&
+        activeItem.totalCurrentReceivingQty < currentQtyReceived
+      ) {
+        let tempActiveItemTotalQtyReceived = 0
+        tempActiveItemTotalQtyReceived =
+          currentQtyReceived - activeItem.totalCurrentReceivingQty
+        remainingQuantity += tempActiveItemTotalQtyReceived
       } else {
-        currentReceivedQty -= activeItem.totalCurrentReceivingQty
+        remainingQuantity -= activeItem.totalCurrentReceivingQty
       }
-    } else {
-      currentReceivedQty = orderQuantity
+
+      if (remainingQuantity === 0) {
+        return {
+          ...o,
+          remainingQuantity,
+        }
+      }
+    } else if (existingData && !activeItem) {
+      remainingQuantity = orderQuantity
     }
+
     return {
       ...o,
-      remainingQuantity: currentReceivedQty,
+      remainingQuantity,
     }
+
+    // if (activeItem) {
+    //   if (remainingQuantity === activeItem.totalCurrentReceivingQty) {
+    //     remainingQuantity = activeItem.totalCurrentReceivingQty
+    //   } else {
+    //     remainingQuantity = activeItem.totalCurrentReceivingQty
+    //     // remainingQuantity -= activeItem.totalCurrentReceivingQty
+    //   }
+    // } else {
+    //   remainingQuantity = orderQuantity
+    // }
+    // return {
+    //   ...o,
+    //   remainingQuantity,
+    // }
   })
 
   let fullyReceivedArray = []

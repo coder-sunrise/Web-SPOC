@@ -1,21 +1,16 @@
 import React from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 
-
 const PaymentSummary = ({ PaymentSummaryDetails }) => {
-  if (!PaymentSummaryDetails)
-    return null
+  if (!PaymentSummaryDetails) return null
   let listData = []
   if (PaymentSummaryDetails) {
     listData = PaymentSummaryDetails.map((item) => ({
       ...item,
       id: `paymentDetails-${item.paymentMode}`,
       subTotal: item.currentCollected + item.pastCollected,
-    })
-    )
+    }))
   }
 
   const PaymentDetailsColumns = [
@@ -25,9 +20,24 @@ const PaymentSummary = ({ PaymentSummaryDetails }) => {
     { name: 'subTotal', title: 'Sub Total' },
   ]
   const PaymentDetailsColumnsExtensions = [
-    { columnName: 'currentCollected', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'pastCollected', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'subTotal', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'currentCollected',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'pastCollected',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'subTotal',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
     { columnName: 'paymentMode', sortingEnabled: false },
   ]
   const FuncProps = {

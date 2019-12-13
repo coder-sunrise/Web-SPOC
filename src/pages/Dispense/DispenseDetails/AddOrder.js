@@ -327,7 +327,6 @@ export default compose(
                 itemCode: o.drugCode,
                 itemName: o.drugName,
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.MEDICATION,
-                // "costPrice": 0,
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
@@ -342,6 +341,7 @@ export default compose(
                   dispensedQuanity: o.dispensedQuanity,
                   retailPrescriptionItem: {
                     ...restO,
+                    unitPrice: roundTo(o.totalPrice / o.quantity),
                     retailPrescriptionItemInstruction: medicationIntructionsArray(
                       corPrescriptionItemInstruction,
                       retailPrescriptionItemInstruction,
@@ -367,6 +367,7 @@ export default compose(
                   concurrencyToken: o.innerLayerConcurrencyToken,
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
                   retailService: {
+                    unitPrice: o.total,
                     ...o,
                   },
                 },
@@ -391,6 +392,7 @@ export default compose(
                   retailConsumable: {
                     unitOfMeasurement: uom.name,
                     unitofMeasurementFK: uom.id,
+                    unitPrice: roundTo(o.totalPrice / o.quantity),
                     ...o,
                   },
                 },
