@@ -351,7 +351,7 @@ class PatientHistory extends Component {
                       }}
                     >
                       <GridContainer>
-                        <GridItem sm={10}>
+                        <GridItem sm={12} style={{ fontWeight: 500 }}>
                           <TextField text value={row.visitPurposeName} />
                           {row.visitDate && (
                             <span style={{ position: 'relative' }}>
@@ -370,7 +370,13 @@ class PatientHistory extends Component {
                         <GridItem sm={7}>
                           <TextField
                             text
-                            value={`V${o.versionNumber}, ${_title}${o.userName}`}
+                            value={
+                              settings.showConsultationVersioning ? (
+                                `V${o.versionNumber}, ${_title}${o.userName}`
+                              ) : (
+                                `${_title}${o.userName}`
+                              )
+                            }
                           />
                         </GridItem>
                       </GridContainer>
@@ -398,7 +404,7 @@ class PatientHistory extends Component {
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
-          <GridItem sm={10}>
+          <GridItem sm={12}>
             <p>
               <span>{visitPurposeName}</span>
               <span style={{ position: 'relative' }}>
