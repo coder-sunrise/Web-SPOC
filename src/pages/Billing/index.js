@@ -167,6 +167,41 @@ class Billing extends Component {
     // })
   }
 
+  getPatientCorporateScheme = () => {
+    const { patient } = this.props
+    const today = moment()
+    return patient.patientScheme
+      .filter((ps) => {
+        const isExpired = today.isAfter(moment(ps.validTo))
+        return !isExpired && ps.schemeTypeFK === 15
+      })
+      .map((item) => {
+        return item.coPaymentSchemeFK
+      })
+  }
+
+  getPatientGovernmentScheme = () => {
+    const { patient, ctcopaymentscheme, ctschemetype } = this.props
+    const today = moment()
+    return patient.patientScheme.reduce((result, ps) => {
+      const isExpired = today.isAfter(moment(ps.validTo))
+      if (ps.schemeTypeFK !== 15 && !isExpired) {
+        const schemeType = ctschemetype.find((st) => st.id === ps.schemeTypeFK)
+        const copaymentschemes = ctcopaymentscheme.filter(
+          (cs) => cs.schemeTypeName === schemeType.name,
+        )
+
+        return [
+          ...result,
+          ...copaymentschemes.map((i) => i.id),
+        ]
+      }
+      return [
+        ...result,
+      ]
+    }, [])
+  }
+
   validateSchemesWithPatientProfile = (invoicePayers = []) => {
     const { patient, ctcopaymentscheme, ctschemetype } = this.props
     try {
@@ -175,12 +210,12 @@ class Billing extends Component {
           payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && !payer.isCancelled,
       )
       const schemePayers = _appliedSchemes.map((item) => item.copaymentSchemeFK)
-      const patientSchemes = patient.patientScheme
-        .filter((ps) => {
-          const isExpired = moment().isAfter(moment(ps.validTo))
-          return !isExpired
-        })
-        .map((item) => item.coPaymentSchemeFK)
+      const patientCorporateSchemes = this.getPatientCorporateScheme()
+      const patientGovernmentSchemes = this.getPatientGovernmentScheme()
+      const patientSchemes = [
+        ...patientCorporateSchemes,
+        ...patientGovernmentSchemes,
+      ]
 
       const checkIfPatientSchemesIncludesAppliedScheme = (result, schemeFK) => {
         if (!patientSchemes.includes(schemeFK)) return true
@@ -210,7 +245,10 @@ class Billing extends Component {
         }
         schemeValidations = {
           patient: patient.patientScheme.map(mapPatientSchemeForValidation),
-          billing: _appliedSchemes.map((ps) => ps.name),
+          billing: _appliedSchemes.map((ps) => ({
+            name: ps.name,
+            isExpired: false,
+          })),
         }
       }
 
@@ -533,7 +571,7 @@ class Billing extends Component {
             </GridContainer>
             <GridContainer item md={4} justify='center' alignItems='flex-start'>
               <InvoiceSummary
-                disabled={this.state.isEditing}
+                disabled={this.state.isEditing || values.id === undefined}
                 handleAddPaymentClick={this.toggleAddPaymentModal}
                 handleDeletePaymentClick={this.handleDeletePayment}
                 handlePrintInvoiceClick={this.onPrintInvoiceClick}
@@ -567,14 +605,14 @@ class Billing extends Component {
                 <Button
                   color='info'
                   onClick={this.backToDispense}
-                  disabled={this.state.isEditing}
+                  disabled={this.state.isEditing || values.id === undefined}
                 >
                   <ArrowBack />Dispense
                 </Button>
                 <Button
                   color='primary'
                   onClick={this.handleSaveBillingClick}
-                  disabled={this.state.isEditing}
+                  disabled={this.state.isEditing || values.id === undefined}
                 >
                   Save Billing
                 </Button>

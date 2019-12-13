@@ -21,7 +21,7 @@ const SchemeValidationPrompt = ({
   footer,
 }) => {
   const { patient, billing } = validation
-  const largerList = patient.length > billing.length ? 'patient' : 'billing'
+  const largerList = patient.length >= billing.length ? 'patient' : 'billing'
   const shorterList = patient.length < billing.length ? 'patient' : 'billing'
   const rows = validation[largerList].map((item, index) => ({
     [largerList]: item,
@@ -42,15 +42,27 @@ const SchemeValidationPrompt = ({
               columnName: 'patient',
               render: (row) => {
                 const _row = row.patient
-
-                return (
-                  <div>
-                    <span>{_row.name}</span>
-                    {_row.isExpired && (
-                      <span style={{ color: 'red' }}>&nbsp;(Expired)</span>
-                    )}
-                  </div>
-                )
+                if (_row) {
+                  return (
+                    <div>
+                      <span>{_row.name}</span>
+                      {_row.isExpired && (
+                        <span style={{ color: 'red' }}>&nbsp;(Expired)</span>
+                      )}
+                    </div>
+                  )
+                }
+                return null
+              },
+            },
+            {
+              columnName: 'billing',
+              render: (row) => {
+                const _row = row.billing
+                if (_row) {
+                  return <span>{_row.name}</span>
+                }
+                return null
               },
             },
           ]}

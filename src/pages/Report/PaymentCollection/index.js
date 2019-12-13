@@ -5,7 +5,7 @@ import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { Accordion } from '@/components'
+import { Accordion, GridContainer, GridItem } from '@/components'
 import { AccordionTitle } from '@/components/_medisys'
 // sub components
 import FilterBar from './FilterBar'
@@ -41,28 +41,57 @@ class PaymentCollection extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
-    return <Accordion
-      active={this.state.activePanel}
-      onChange={this.handleActivePanelChange}
-      leftIcon
-      expandIcon={<SolidExpandMore fontSize='large' />}
-      collapses={[
-        {
-          title: <AccordionTitle title='Payment Collection Details' />,
-          content: <PaymentCollectionList reportDatas={reportDatas} />,
-        },
-        {
-          title: <AccordionTitle title='Summary' />,
-          content: <Summary reportDatas={reportDatas} />,
-        },
-        {
-          title: <AccordionTitle title='Summary By Payment Model' />,
-          content: <SumList reportDatas={reportDatas} />,
-        },
-      ]}
-    />
+    return (
+      <Accordion
+        // active={this.state.activePanel}
+        // onChange={this.handleActivePanelChange}
+        defaultActive={[
+          0,
+          1,
+          2,
+        ]}
+        mode='multiple'
+        leftIcon
+        expandIcon={<SolidExpandMore fontSize='large' />}
+        collapses={[
+          {
+            title: <AccordionTitle title='Payment Collection Details' />,
+            content: <PaymentCollectionList reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary' />,
+            content: <Summary reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary By Payment Model' />,
+            content: <SumList reportDatas={reportDatas} />,
+          },
+        ]}
+      />
+    )
+    // return (
+    //   <GridContainer>
+    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+    //       <h4>Payment Collection Details</h4>
+    //     </GridItem>
+    //     <GridItem md={12}>
+    //       <PaymentCollectionList reportDatas={reportDatas} />
+    //     </GridItem>
+    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+    //       <h4>Summary</h4>
+    //     </GridItem>
+    //     <GridItem md={12}>
+    //       <Summary reportDatas={reportDatas} />
+    //     </GridItem>
+    //     <GridItem md={12} style={{ marginBottom: 8, marginTop: 8 }}>
+    //       <h4>Summary By Payment Mode</h4>
+    //     </GridItem>
+    //     <GridItem md={12}>
+    //       <SumList reportDatas={reportDatas} />
+    //     </GridItem>
+    //   </GridContainer>
+    // )
   }
-
 }
 
 const PaymentCollectionWithFormik = withFormik({

@@ -1,64 +1,73 @@
 import React from 'react'
 // common components
-import {
-  NumberInput,
-  GridContainer,
-  GridItem,
-} from '@/components'
+import { ReportDataGrid } from '@/components/_medisys'
 
 const Summary = ({ reportDatas }) => {
-  if (!reportDatas)
-    return null
+  if (!reportDatas) return null
 
-  const { SumExpenditureGstDetails: [SumExpenditureGstDetail], SumIncomeGstDetails: [SumIncomeGstDetail], GstDetails: [GstDetail] } = reportDatas
+  const {
+    SumExpenditureGstDetails: [
+      SumExpenditureGstDetail,
+    ],
+    SumIncomeGstDetails: [
+      SumIncomeGstDetail,
+    ],
+    GstDetails: [
+      GstDetail,
+    ],
+  } = reportDatas
+  const sumData = [
+    {
+      id: '0',
+      name: 'Total Income:',
+      value: SumIncomeGstDetail.sumIncomeAmount,
+    },
+    {
+      id: '1',
+      name: 'Total Output Tax:',
+      value: SumIncomeGstDetail.sumIncomeGst,
+    },
+    {
+      id: '2',
+      name: 'Total Expenditure:',
+      value: SumExpenditureGstDetail.sumExpenditureAmount,
+    },
+    {
+      id: '3',
+      name: 'Total Input Tax:',
+      value: SumExpenditureGstDetail.sumExpenditureAmount,
+    },
+    {
+      id: '4',
+      name: 'Total Output Tax - Total Input Tax:',
+      value: GstDetail.totalTax,
+    },
+  ]
+
+  const sumExtensions = [
+    { columnName: 'name', sortingEnabled: false, width: 300 },
+    {
+      columnName: 'value',
+      sortingEnabled: false,
+      width: 200,
+      align: 'right',
+      type: 'currency',
+    },
+  ]
+  const sumCols = [
+    { name: 'name', title: 'Name' },
+    { name: 'value', title: 'Value' },
+  ]
   return (
-    <GridContainer md={6}>
-      <GridItem md={12}>
-        <NumberInput
-          currency
-          prefix='Total Income: '
-          disabled
-          value={SumIncomeGstDetail.sumIncomeAmount}
-          rightAlign
-        />
-      </GridItem>
-      <GridItem md={12}>
-        <NumberInput
-          prefix='Total Output Tax: '
-          disabled
-          currency
-          rightAlign
-          value={SumIncomeGstDetail.sumIncomeGst}
-        />
-      </GridItem>
-      <GridItem md={12}>
-        <NumberInput
-          prefix='Total Expenditure: '
-          disabled
-          currency
-          rightAlign
-          value={SumExpenditureGstDetail.sumExpenditureAmount}
-        />
-      </GridItem>
-      <GridItem md={12}>
-        <NumberInput
-          prefix='Total Input Tax: '
-          disabled
-          currency
-          rightAlign
-          value={SumExpenditureGstDetail.sumExpenditureGst}
-        />
-      </GridItem>
-      <GridItem md={12}>
-        <NumberInput
-          prefix='Total Output Tax - Total Input Tax: '
-          disabled
-          currency
-          rightAlign
-          value={GstDetail.totalTax}
-        />
-      </GridItem>
-    </GridContainer>
+    <ReportDataGrid
+      style={{ width: 500, marginTop: 6 }}
+      noHeight
+      header={false}
+      data={sumData}
+      columns={sumCols}
+      columnExtensions={sumExtensions}
+      flexible
+    />
   )
 }
 
