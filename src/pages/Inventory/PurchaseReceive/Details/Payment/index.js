@@ -50,36 +50,33 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
     const { purchaseOrderPayment, currentBizSessionInfo } = values
 
-    let paymentData = purchaseOrderPayment
-      .filter((item) => !item.isDeleted)
-      .map((x, index) => {
-        x.isCancelled = x.isDeleted
-        delete x.isDeleted
+    let paymentData = purchaseOrderPayment.map((x, index) => {
+      x.isCancelled = x.isDeleted
 
-        if (_.has(x, 'isNew')) {
-          return {
-            purchaseOrderFK: values.id,
-            sequence: index + 1,
-            clinicPaymentDto: {
-              ...x,
-              id: x.cpId,
-              concurrencyToken: x.cpConcurrencyToken,
-              createdOnBizSessionFK: currentBizSessionInfo.id,
-              clinicPaymentTypeFK: 1,
-              transactionOnBizSessionFK: currentBizSessionInfo.id,
-              // isCancelled: x.isCancelled,
-            },
-          }
-        }
-
+      if (_.has(x, 'isNew')) {
         return {
-          ...x,
+          purchaseOrderFK: values.id,
+          sequence: index + 1,
           clinicPaymentDto: {
-            ...x.clinicPaymentDto,
-            // isCancelled: x.isCancelled,
+            ...x,
+            id: x.cpId,
+            concurrencyToken: x.cpConcurrencyToken,
+            createdOnBizSessionFK: currentBizSessionInfo.id,
+            clinicPaymentTypeFK: 1,
+            transactionOnBizSessionFK: currentBizSessionInfo.id,
+            isCancelled: x.isCancelled,
           },
         }
-      })
+      }
+
+      return {
+        ...x,
+        clinicPaymentDto: {
+          ...x.clinicPaymentDto,
+          isCancelled: x.isCancelled,
+        },
+      }
+    })
 
     paymentData.forEach((o) => {
       o.clinicPaymentDto.paymentModeFK =
