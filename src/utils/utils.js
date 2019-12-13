@@ -60,13 +60,13 @@ String.prototype.replaceAll = function (search, replacement) {
 }
 
 Number.prototype.currencyString = function () {
-  if (this === undefined || this === null)
-    return '-'
-  return `${config.currencySymbol}${numeral(Math.abs(this)).format(config.currencyFormat)}`
+  if (this === undefined || this === null) return '-'
+  return `${config.currencySymbol}${numeral(Math.abs(this)).format(
+    config.currencyFormat,
+  )}`
 }
 Number.prototype.formatString = function () {
-  if (this === undefined || this === null)
-    return '-'
+  if (this === undefined || this === null) return '-'
   return `${numeral(Math.abs(this)).format(config.numberFormat)}`
 }
 // function toLocal (m) {
@@ -673,19 +673,19 @@ export const watchForElementChange = (e) => {
   let r =
     undefined === i
       ? {
-        childList: true,
-        characterData: true,
-        subtree: true,
-        attributes: true,
-      }
+          childList: true,
+          characterData: true,
+          subtree: true,
+          attributes: true,
+        }
       : i
-    ; (observers[t] = new MutationObserver((e1) => {
-      e1.forEach((e2) => {
-        a(e2)
-      }),
-        n || observers[t].disconnect()
-    })),
-      observers[t].observe(e.container || document, r)
+  ;(observers[t] = new MutationObserver((e1) => {
+    e1.forEach((e2) => {
+      a(e2)
+    }),
+      n || observers[t].disconnect()
+  })),
+    observers[t].observe(e.container || document, r)
 }
 
 const confirmBeforeReload = (e) => {
@@ -1021,11 +1021,18 @@ const calculateAmount = (
   }
   // console.log({ activeRows, adjustments })
   const mapInvoiceItemAdjustment = (adjustment, index) => (invoiceItem) => {
+    let itemAdj
+    if (adjustment.invoiceItemAdjustment)
+      itemAdj = adjustment.invoiceItemAdjustment.find(
+        (ss) => ss.invoiceItemFK === invoiceItem.id,
+      )
     return {
       [itemFkField]: invoiceItem.id,
       [itemAdjustmentFkField]: adjustment.id,
       adjAmount: roundTo(invoiceItem[`adjustmen${index}`]),
       isDeleted: !!adjustment.isDeleted,
+      id: itemAdj ? itemAdj.id : 0,
+      concurrencyToken: itemAdj ? itemAdj.concurrencyToken : undefined,
     }
   }
 
@@ -1170,6 +1177,17 @@ const commonDataWriterTransform = (data) => {
   }
   return data
 }
+const locationQueryParameters = () => {
+  let searchParams = window.location.search.split('&')
+  const params = searchParams.reduce((pre, cur) => {
+    let kv = (cur.startsWith('?') ? cur.substring(1) : cur).split('=')
+    return {
+      ...pre,
+      [`${kv[0]}`]: kv[1],
+    }
+  }, {})
+  return params
+}
 
 module.exports = {
   ...cdrssUtil,
@@ -1200,6 +1218,7 @@ module.exports = {
   removeFields,
   commonDataReaderTransform,
   commonDataWriterTransform,
+  locationQueryParameters,
   // toUTC,
   // toLocal,
 }

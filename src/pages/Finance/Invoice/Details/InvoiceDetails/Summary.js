@@ -44,15 +44,19 @@ const Summary = ({ classes, values }) => {
           </GridItem>
 
           <GridItem md={6} xs={6}>
-            <span>
-              {formatMessage({
-                id: 'inventory.pr.detail.pod.summary.adjustment',
-              })}
-            </span>
+            {invoiceAdjustment.length > 0 && (
+              <span>
+                {formatMessage({
+                  id: 'inventory.pr.detail.pod.summary.adjustment',
+                })}
+              </span>
+            )}
           </GridItem>
 
           <GridItem md={6} xs={6}>
-            <NumberInput {...amountProps} disabled />
+            {invoiceAdjustment.length > 0 && (
+              <NumberInput {...amountProps} disabled />
+            )}
           </GridItem>
 
           <GridContainer md={12} xs={12}>

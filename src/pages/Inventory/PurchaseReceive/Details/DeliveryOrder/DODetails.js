@@ -240,9 +240,9 @@ class DODetails extends PureComponent {
   }
 
   handleOnOrderTypeChanged = async (e) => {
-    const { values, deliveryOrderDetails, purchaseOrderDetails } = this.props
-    const { entity } = deliveryOrderDetails
-    // const { purchaseOrderOutstandingItem } = purchaseOrderDetails
+    const { values, deliveryOrderDetails } = this.props
+    const { purchaseOrderDetails } = deliveryOrderDetails
+    const { purchaseOrderItem } = purchaseOrderDetails
     const { rows } = values
     const { row, option } = e
     const { value, itemFKName, stateName } = option
@@ -253,15 +253,13 @@ class DODetails extends PureComponent {
       value,
       itemFKName,
       rows,
-      // purchaseOrderOutstandingItem,
-      purchaseOrderDetails.rows,
+      purchaseOrderItem,
+      values.id,
     )
 
     this.setState({
       [`filter${stateName}`]: inventoryItemList,
     })
-
-    // this.forceUpdate()
 
     row.code = ''
     row.name = ''
@@ -392,7 +390,7 @@ class DODetails extends PureComponent {
           this.setState({ onClickColumn: undefined })
           return addedRows.map((row) => ({
             ...row,
-            itemFK: selectedItem.value,
+            // itemFK: selectedItem.value,
             // orderQuantity: osItem.orderQuantity,
             // bonusQuantity: osItem.bonusQuantity,
             // quantityReceived: osItem.quantityReceived,
@@ -417,11 +415,12 @@ class DODetails extends PureComponent {
 
         newAddedRows = addedRows.map((row) => ({
           ...row,
-          orderQuantity: tempOrderQty,
-          bonusQuantity: tempBonusQty,
-          quantityReceived: tempQuantityReceived,
-          totalBonusReceived: tempTotalBonusReceived,
-          itemFK: selectedItem.value,
+          // orderQuantity: tempOrderQty,
+          // bonusQuantity: tempBonusQty,
+          // quantityReceived: tempQuantityReceived,
+          // totalBonusReceived: tempTotalBonusReceived,
+          // itemFK: selectedItem.value,
+
           // currentReceivingQty: tempCurrentReceivingQty,
           // currentReceivingBonusQty: tempCurrentReceivingBonusQty,
         }))
@@ -430,12 +429,12 @@ class DODetails extends PureComponent {
         this.setState({ onClickColumn: undefined })
         newAddedRows = addedRows.map((row) => ({
           ...row,
-          orderQuantity: 0,
-          bonusQuantity: 0,
-          quantityReceived: 0,
-          totalBonusReceived: 0,
-          currentReceivingQty: 0,
-          currentReceivingBonusQty: 0,
+          // orderQuantity: 0,
+          // bonusQuantity: 0,
+          // quantityReceived: 0,
+          // totalBonusReceived: 0,
+          // currentReceivingQty: 0,
+          // currentReceivingBonusQty: 0,
           isFocused: true,
         }))
       }

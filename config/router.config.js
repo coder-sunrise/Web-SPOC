@@ -560,6 +560,11 @@ const routes = [
             component: './Report/LowStockMedicationReport',
           },
           {
+            path: '/report/chasclaimreport',
+            name: 'viewreport',
+            component: './Report/ChasClaimReport',
+          },
+          {
             path: '/report/creditnotelistingreport',
             name: 'creditNoteListingReport',
             component: './Report/CreditNoteListingReport',
