@@ -64,7 +64,72 @@ const approvedStatus = [
     render: () => <span>Recovered</span>,
   },
 ]
-
+const claimStatus = [
+  {
+    value: 'SU',
+    name: 'Submitted',
+    render: () => <span>Submitted</span>,
+  },
+  ...approvedStatus,
+  {
+    value: 'RJ',
+    name: 'Rejected',
+    render: () => <span>Rejected</span>,
+  },
+  {
+    value: 'AE',
+    name: 'Appealed',
+    render: () => <span>Rejected</span>,
+  },
+  {
+    value: 'PR',
+    name: 'Pending for Screening Report',
+    render: () => <span>Pending for Screening Report</span>,
+  },
+  {
+    value: 'PBA',
+    name: 'Pending Batch Approval',
+    render: () => <span>Pending Batch Approval</span>,
+  },
+  {
+    value: 'DF',
+    name: 'Draft',
+    render: () => <span>Draft</span>,
+  },
+  {
+    value: 'OH',
+    name: 'OnHold',
+    render: () => <span>On-Hold</span>,
+  },
+  {
+    value: 'CA',
+    name: 'Cancellation Submitted',
+    render: () => <span>Cancellation Submitted</span>,
+  },
+  {
+    value: 'CA2',
+    name: 'Cancellation Extracted',
+    render: () => <span>Cancellation Extracted</span>,
+  },
+  {
+    value: 'CA3',
+    name: 'Cancelled',
+    render: () => <span>Cancelled</span>,
+  },
+]
+const chasSchemeTypes = [
+  { code: 'CHASGREEN', displayValue: 'CHAS Green' },
+  { code: 'CHASBLUE', displayValue: 'CHAS Blue' },
+  { code: 'CHASORANGE', displayValue: 'CHAS Orange' },
+  { code: 'CHASMG', displayValue: 'CHAS MG (Merdeka Generation)' },
+  { code: 'CHASPG', displayValue: 'CHAS PG (Pioneer Generation)' },
+  { code: 'CHASPA', displayValue: 'CHAS PA (Public Assistance)' },
+  { code: 'PHPCCHILD', displayValue: 'PHPC Child' },
+  { code: 'PGPCADULT', displayValue: 'PHPC Adult' },
+  { code: 'PHPCSELF', displayValue: 'PHPC Self' },
+  { code: 'PHPCMFAC', displayValue: 'PHPC MFAC' },
+  { code: 'PHPCMFEC', displayValue: 'PHPC MFEC' },
+]
 const statusString = [
   { value: 'Inactive', name: 'Inactive', color: 'red' },
   { value: 'Active', name: 'Active', color: 'green' },
@@ -1124,9 +1189,9 @@ export const fetchAndSaveCodeTable = async (
   const body = useGeneral
     ? convertToQuery({ ...newParams }, convertExcludeFields)
     : convertToQuery(
-        { ...criteriaForTenantCodes, ...params },
-        convertExcludeFields,
-      )
+      { ...criteriaForTenantCodes, ...params },
+      convertExcludeFields,
+    )
 
   const response = await request(`${url}${code}`, {
     method: 'GET',
@@ -1564,7 +1629,7 @@ export const getInventoryItem = (
       if (
         item &&
         item.orderQuantity - item.quantityReceived ===
-          o.totalCurrentReceivingQty
+        o.totalCurrentReceivingQty
       ) {
         return {
           ...o,
@@ -1625,6 +1690,7 @@ export const getInventoryItemV2 = (
   itemFKName,
   rows = [],
   outstandingItem = undefined,
+  existingData = false,
 ) => {
   const groupByFKFunc = (array) => {
     return _(array)
@@ -1648,21 +1714,60 @@ export const getInventoryItemV2 = (
     const activeItem = rowsGroupByFK.find(
       (i) => i[itemFKName] === o[itemFKName],
     )
-    let currentReceivedQty = quantityReceived
+    // console.log({ activeItem })
+    let remainingQuantity = orderQuantity - quantityReceived
+    let currentQtyReceived = quantityReceived
 
     if (activeItem) {
-      if (currentReceivedQty === activeItem.totalCurrentReceivingQty) {
-        currentReceivedQty = 0
+      if (activeItem.totalCurrentReceivingQty === currentQtyReceived) {
+        // console.log('a')
+      } else if (activeItem.totalCurrentReceivingQty > currentQtyReceived) {
+        let tempActiveItemTotalQtyReceived = 0
+        tempActiveItemTotalQtyReceived =
+          activeItem.totalCurrentReceivingQty - currentQtyReceived
+        currentQtyReceived += tempActiveItemTotalQtyReceived
+        remainingQuantity = orderQuantity - currentQtyReceived
+      } else if (
+        existingData &&
+        activeItem.totalCurrentReceivingQty < currentQtyReceived
+      ) {
+        let tempActiveItemTotalQtyReceived = 0
+        tempActiveItemTotalQtyReceived =
+          currentQtyReceived - activeItem.totalCurrentReceivingQty
+        remainingQuantity += tempActiveItemTotalQtyReceived
       } else {
-        currentReceivedQty -= activeItem.totalCurrentReceivingQty
+        remainingQuantity -= activeItem.totalCurrentReceivingQty
       }
-    } else {
-      currentReceivedQty = orderQuantity
+
+      if (remainingQuantity === 0) {
+        return {
+          ...o,
+          remainingQuantity,
+        }
+      }
+    } else if (existingData && !activeItem) {
+      remainingQuantity = orderQuantity
     }
+
     return {
       ...o,
-      remainingQuantity: currentReceivedQty,
+      remainingQuantity,
     }
+
+    // if (activeItem) {
+    //   if (remainingQuantity === activeItem.totalCurrentReceivingQty) {
+    //     remainingQuantity = activeItem.totalCurrentReceivingQty
+    //   } else {
+    //     remainingQuantity = activeItem.totalCurrentReceivingQty
+    //     // remainingQuantity -= activeItem.totalCurrentReceivingQty
+    //   }
+    // } else {
+    //   remainingQuantity = orderQuantity
+    // }
+    // return {
+    //   ...o,
+    //   remainingQuantity,
+    // }
   })
 
   let fullyReceivedArray = []
@@ -1840,6 +1945,8 @@ module.exports = {
   recurrenceTypes,
   status,
   approvedStatus,
+  chasSchemeTypes,
+  claimStatus,
   statusString,
   isAutoOrder,
   addressTypes,

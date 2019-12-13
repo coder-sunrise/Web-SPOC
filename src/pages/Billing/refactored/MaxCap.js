@@ -1,5 +1,5 @@
 import React from 'react'
-import { NumberInput } from '@/components'
+import { NumberInput, TextField } from '@/components'
 import MaxCapInfo from '../components/MaxCapInfo'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
@@ -26,13 +26,16 @@ const MaxCap = ({
         />
       )
     return (
-      <div style={{ display: 'flex' }}>
-        <span style={{ marginRight: 8 }}>Max. Cap:</span>
-        <MaxCapInfo
-          claimableSchemes={claimableSchemes}
-          copaymentSchemeFK={copaymentSchemeFK}
-        />
-      </div>
+      <TextField
+        suffix={
+          <MaxCapInfo
+            claimableSchemes={claimableSchemes}
+            copaymentSchemeFK={copaymentSchemeFK}
+          />
+        }
+        prefix='Max. Cap: '
+        text
+      />
     )
   }
   return null

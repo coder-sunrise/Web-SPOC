@@ -334,7 +334,7 @@ class UserProfileForm extends React.PureComponent {
         handleSubmit()
       }
     } catch (error) {
-      console.log({ error })
+      console.error({ error })
     }
     this.setState({
       isValidating: false,

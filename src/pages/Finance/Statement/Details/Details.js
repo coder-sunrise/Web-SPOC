@@ -144,6 +144,7 @@ class Details extends PureComponent {
             {
               columnName: 'invoiceNo',
               sortingEnabled: false,
+              width: 100,
             },
             {
               columnName: 'patientName',
@@ -158,37 +159,38 @@ class Details extends PureComponent {
               type: 'number',
               currency: true,
               sortingEnabled: false,
+              width: 150,
             },
             {
               columnName: 'payableAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
+              width: 150,
             },
             {
               columnName: 'outstandingAmount',
               type: 'number',
               currency: true,
               sortingEnabled: false,
+              width: 150,
             },
             {
               columnName: 'invoiceDate',
               type: 'date',
               format: dateFormatLong,
               sortingEnabled: false,
+              width: 100,
             },
           ]}
           FuncProps={{
+            pager: false,
             selectable: true,
             selectConfig: {
               showSelectAll: true,
               rowSelectionEnabled: (row) => {
-                return (
-                  !row.statementInvoicePayment.find(
-                    (o) => o.invoicePayment.isCancelled === false,
-                  ) &&
-                  row.payableAmount ===
-                    roundTo(row.outstandingAmount + row.adminCharge)
+                return !row.statementInvoicePayment.find(
+                  (o) => o.invoicePayment.isCancelled === false,
                 )
               },
             },

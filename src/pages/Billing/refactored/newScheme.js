@@ -9,13 +9,12 @@ import {
   GridContainer,
   GridItem,
   Select,
-  NumberInput,
   CommonTableGrid,
   EditableTableGrid,
-  TextField,
 } from '@/components'
 // sub components
 import MaxCap from './MaxCap'
+import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
 import {
   SchemeInvoicePayerColumn,
@@ -99,7 +98,7 @@ const Scheme = ({
     _isConfirmed,
     _isEditing,
     _isAppliedOnce,
-    claimableSchemes,
+    claimableSchemes = [],
     invoicePayerItem,
     _hasError = false,
   } = invoicePayer
@@ -125,7 +124,7 @@ const Scheme = ({
 
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
-      <GridContainer style={{ marginBottom: 16 }} alignItems='center'>
+      <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
           <p style={{ color: 'darkblue', fontWeight: 500, fontSize: '1rem' }}>
             {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
@@ -151,20 +150,8 @@ const Scheme = ({
         </GridItem>
         {schemeConfig &&
         schemeConfig.copayerFK === 1 && (
-          <GridItem md={2}>
-            <div>
-              {(schemeConfig.balanceStatusCode || '').toUpperCase() ===
-              'SC105' ? (
-                <TextField text prefix='Balance:' value='Full Balance' />
-              ) : (
-                <NumberInput
-                  currency
-                  text
-                  prefix='Balance:'
-                  value={schemeConfig.balance}
-                />
-              )}
-            </div>
+          <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
+            <BalanceLabel schemeConfig={schemeConfig} />
           </GridItem>
         )}
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>

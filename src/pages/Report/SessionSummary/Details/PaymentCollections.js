@@ -33,7 +33,9 @@ const PaymentCollections = ({
         item.rowspan = paymentCount
         item.payerCountNumber = 1
         item.payerRowspan = payerCount
-      } else if (PaymentCollectionsDetails[i - 1].invoiceNo === item.invoiceNo) {
+      } else if (
+        PaymentCollectionsDetails[i - 1].invoiceNo === item.invoiceNo
+      ) {
         item.countNumber = 0
         item.rowspan = 0
         if (PaymentCollectionsDetails[i - 1].payerName !== item.payerName) {
@@ -67,10 +69,28 @@ const PaymentCollections = ({
 
   let PaymentCollectionsColumnExtension = [
     { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
-    { columnName: 'totalAftAdj', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
-    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    {
+      columnName: 'totalAftAdj',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+      width: 180,
+    },
+    {
+      columnName: 'gstAmt',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+      width: 180,
+    },
     { columnName: 'payerName', sortingEnabled: false, wordWrapEnabled: true },
-    { columnName: 'totalAmtPaid', type: 'currency', currency: true, sortingEnabled: false, width: 180 },
+    {
+      columnName: 'totalAmtPaid',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+      width: 180,
+    },
     { columnName: 'receiptNo', sortingEnabled: false, width: 100 },
   ]
   let totalItems = [
@@ -86,33 +106,38 @@ const PaymentCollections = ({
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     let newchildren = []
+    const invoiceColumnCount = TotalDetails[0].isDisplayGST ? 3 : 2
     if (row.countNumber === 1) {
-      newchildren.push(children.filter((value, index) => index < 3).map(
+      newchildren.push(children.filter((value, index) => index < invoiceColumnCount).map(
         (item) => ({
           ...item,
           props: {
             ...item.props,
             rowSpan: row.rowspan,
           },
-        })
-      ))
+        })),
+      )
     }
     if (row.payerCountNumber === 1) {
-      newchildren.push(children.filter((value, index) => index === 3).map(
-        (item) => ({
+      newchildren.push(
+        children.filter((value, index) => index === 3).map((item) => ({
           ...item,
           props: {
             ...item.props,
             rowSpan: row.payerRowspan,
           },
-        })
-      ))
+        })),
+      )
     }
-    newchildren.push([children[4], children[5]])
+    newchildren.push([children[children.length - 2], children[children.length - 1]])
     if (row.countNumber === 1) {
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    return <Table.Row {...p} className={classes.subRow}>{newchildren}</Table.Row>
+    return (
+      <Table.Row {...p} className={classes.subRow}>
+        {newchildren}
+      </Table.Row>
+    )
   }
   const FuncProps = {
     pager: false,

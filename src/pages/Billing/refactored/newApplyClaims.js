@@ -290,16 +290,6 @@ const ApplyClaims = ({
 
   const resetClaims = useCallback(
     () => {
-      setTempInvoicePayer(initialState)
-      setCurEditInvoicePayerBackup(undefined)
-    },
-    [
-      initialState,
-    ],
-  )
-
-  const clearClaims = useCallback(
-    () => {
       if (claimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
@@ -326,6 +316,29 @@ const ApplyClaims = ({
     ],
   )
 
+  const restoreClaims = useCallback(
+    () => {
+      setTempInvoicePayer(initialState)
+      setCurEditInvoicePayerBackup(undefined)
+    },
+    [
+      initialState,
+    ],
+  )
+
+  const handleRestoreClick = () => {
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent:
+          'Reset will revert all changes that had not been saved. Continue?',
+        openConfirmText: 'Continue',
+        onConfirmSave: restoreClaims,
+      },
+    })
+  }
+
   const handleResetClick = () => {
     dispatch({
       type: 'global/updateState',
@@ -335,19 +348,6 @@ const ApplyClaims = ({
           'Reset will revert all changes that had not been saved. Continue?',
         openConfirmText: 'Continue',
         onConfirmSave: resetClaims,
-      },
-    })
-  }
-
-  const handleClearClick = () => {
-    dispatch({
-      type: 'global/updateState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent:
-          'Reset will revert all changes that had not been saved. Continue?',
-        openConfirmText: 'Continue',
-        onConfirmSave: clearClaims,
       },
     })
   }
@@ -622,7 +622,7 @@ const ApplyClaims = ({
         </Button> */}
         <ResetButton
           handleResetClick={handleResetClick}
-          handleClearClick={handleClearClick}
+          handleRestoreClick={handleRestoreClick}
         />
       </GridItem>
       <GridItem md={12} style={{ maxHeight: '60vh', overflowY: 'auto' }}>
@@ -671,7 +671,7 @@ const ApplyClaims = ({
         })}
       </GridItem>
       <CommonModal
-        title='Cannot save scheme'
+        title='Claim Amount Check'
         open={showErrorPrompt}
         onClose={toggleErrorPrompt}
         maxWidth='sm'
