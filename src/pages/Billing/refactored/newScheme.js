@@ -153,7 +153,8 @@ const Scheme = ({
         schemeConfig.copayerFK === 1 && (
           <GridItem md={2}>
             <div>
-              {schemeConfig.balanceStatusCode.toUpperCase() === 'SC105' ? (
+              {(schemeConfig.balanceStatusCode || '').toUpperCase() ===
+              'SC105' ? (
                 <TextField text prefix='Balance:' value='Full Balance' />
               ) : (
                 <NumberInput
