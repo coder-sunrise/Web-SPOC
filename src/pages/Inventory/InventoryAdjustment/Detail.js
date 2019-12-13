@@ -333,7 +333,7 @@ class Detail extends PureComponent {
         type: 'select',
         mode: 'tags',
         labelField: 'batchNo',
-        valueField: 'id',
+        valueField: 'batchNo',
         maxSelected: 1,
         disableAll: true,
         options: (row) => {

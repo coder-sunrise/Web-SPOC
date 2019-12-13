@@ -49,7 +49,7 @@ export const lockConfig = {
   lockMovementX: true,
   lockMovementY: true,
   lockRotation: true,
-  selectable: false,
+  // selectable: false,
 }
 export const groupCfg = {
   selectable: false,
@@ -66,6 +66,7 @@ export const sharedCfg = {
   objectCaching: true,
   strokeLineJoin: 'round',
   hoverCursor: 'pointer',
+  fill: '#ffffff',
 }
 
 export const fontCfg = {
@@ -813,7 +814,9 @@ export const buttonConfigs = [
     // icon: onlayveneer,
     text: 'Top',
     color: 'brown',
+    type: 'special',
     ...sharedButtonConfig,
+    onSelect: ({ canvas }) => {},
   },
 
   {
@@ -821,6 +824,8 @@ export const buttonConfigs = [
     // icon: onlayveneer,
     text: 'Bottom',
     color: 'brown',
+    type: 'special',
+
     ...sharedButtonConfig,
   },
 ]

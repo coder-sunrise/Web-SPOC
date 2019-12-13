@@ -59,7 +59,6 @@ class SelectEditor extends PureComponent {
       typeof options === 'function'
         ? options(row)
         : options || codes[`${columnName}Option`] || []
-
     // commonCfg.onFocus = () => {
     //   setTimeout(() => {
     //     // console.log($(this.myRef.current).find('.ant-select'))
