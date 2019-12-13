@@ -20,12 +20,12 @@ class ChasClaimReport extends ReportBase {
     this.state = {
       ...super.state,
       reportId: 30,
-      fileName: 'Sales Listing Report',
+      fileName: 'CHAS Claim Report',
     }
   }
 
-  renderFilterBar = (handleSubmit) => {
-    return <FilterBar handleSubmit={handleSubmit} />
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
   renderContent = (reportDatas) => {
