@@ -48,6 +48,7 @@ class CollectPaymentConfirm extends PureComponent {
       {
         columnName: 'invoiceNo',
         sortingEnabled: false,
+        width: 100,
       },
       {
         columnName: 'patientName',
@@ -58,24 +59,28 @@ class CollectPaymentConfirm extends PureComponent {
         type: 'number',
         currency: true,
         sortingEnabled: false,
+        width: 150,
       },
       {
         columnName: 'payableAmount',
         type: 'number',
         currency: true,
         sortingEnabled: false,
+        width: 150,
       },
       {
         columnName: 'outstandingAmount',
         type: 'number',
         currency: true,
         sortingEnabled: false,
+        width: 150,
       },
       {
         columnName: 'invoiceDate',
         type: 'date',
         format: dateFormatLong,
         sortingEnabled: false,
+        width: 100,
       },
       {
         columnName: 'payment',
@@ -83,7 +88,7 @@ class CollectPaymentConfirm extends PureComponent {
         sortingEnabled: false,
         render: (row) => {
           return (
-            <GridItem xs={8}>
+            <GridItem xs={12}>
               <FastField
                 name={`statementInvoice[${row.rowIndex}].tempOutstandingAmount`}
                 render={(args) => (
@@ -98,6 +103,7 @@ class CollectPaymentConfirm extends PureComponent {
             </GridItem>
           )
         },
+        width: 150,
       },
     ],
   }
@@ -126,7 +132,9 @@ class CollectPaymentConfirm extends PureComponent {
       let totalAmountPaid = 0
       for (let index = 0; index < values.statementInvoice.length; index++) {
         if (index === edittedIndex) {
-          totalAmountPaid = (totalAmountPaid || 0) + (value === '' ? 0 : value)
+          totalAmountPaid =
+            (totalAmountPaid || 0) +
+            (value === undefined || value === '' ? 0 : value)
         } else {
           totalAmountPaid =
             (totalAmountPaid || 0) +
@@ -140,13 +148,15 @@ class CollectPaymentConfirm extends PureComponent {
       )
       if (currentPayment) {
         const { invoicePayment } = currentPayment
-        invoicePayment.totalAmtPaid = value === '' ? 0 : value
+        invoicePayment.totalAmtPaid =
+          value === undefined || value === '' ? 0 : value
       }
 
       setFieldValue('amount', totalAmountPaid)
       return
     }
-    let tempAmount = e.target.value === '' ? 0 : e.target.value
+    let tempAmount =
+      e.target.value === undefined || e.target.value === '' ? 0 : e.target.value
     const newStatementInvoice = values.statementInvoice.map((o) => {
       let totalAmtPaid
       if (tempAmount >= o.outstandingAmount) {
@@ -181,7 +191,10 @@ class CollectPaymentConfirm extends PureComponent {
     })
     setValues({
       ...values,
-      amount: e.target.value === '' ? 0 : e.target.value,
+      amount:
+        e.target.value === undefined || e.target.value === ''
+          ? 0
+          : e.target.value,
       statementInvoice: newStatementInvoice,
     })
   }
