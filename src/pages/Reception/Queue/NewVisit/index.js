@@ -25,6 +25,7 @@ import { deleteFileByFileID } from '@/services/file'
 import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 import { VISIT_TYPE } from '@/utils/constants'
+import { locationQueryParameters } from '@/utils/utils'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -227,6 +228,10 @@ class NewVisit extends PureComponent {
       : undefined
     const loadingText = isEdit ? 'Saving visit...' : 'Registering visit...'
     const isRetail = values.visitPurposeFK === VISIT_TYPE.RETAIL
+    const params = locationQueryParameters()
+    const vis = parseInt(params.vis, 10)
+    const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
+
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -236,7 +241,10 @@ class NewVisit extends PureComponent {
           {/* <Chip label='Read Only' className={classes.readOnlyChip} /> */}
           <GridContainer className={classes.gridContainer}>
             <GridItem xs sm={12} md={3}>
-              <PatientInfoCard {...this.props} autoRefreshChas={!isEdit} />
+              <PatientInfoCard
+                {...this.props}
+                autoRefreshChas={autoRefreshChas}
+              />
             </GridItem>
             <GridItem
               container

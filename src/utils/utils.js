@@ -1177,6 +1177,17 @@ const commonDataWriterTransform = (data) => {
   }
   return data
 }
+const locationQueryParameters = () => {
+  let searchParams = window.location.search.split('&')
+  const params = searchParams.reduce((pre, cur) => {
+    let kv = (cur.startsWith('?') ? cur.substring(1) : cur).split('=')
+    return {
+      ...pre,
+      [`${kv[0]}`]: kv[1],
+    }
+  }, {})
+  return params
+}
 
 module.exports = {
   ...cdrssUtil,
@@ -1207,6 +1218,7 @@ module.exports = {
   removeFields,
   commonDataReaderTransform,
   commonDataWriterTransform,
+  locationQueryParameters,
   // toUTC,
   // toLocal,
 }
