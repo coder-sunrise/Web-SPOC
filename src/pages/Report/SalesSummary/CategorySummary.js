@@ -1,10 +1,8 @@
 import React from 'react'
 import { ReportDataGrid } from '@/components/_medisys'
 
-
 const CategorySummary = ({ reportDatas }) => {
-  if (!reportDatas)
-    return null
+  if (!reportDatas) return null
   let listData = []
   const { CategoryDetails } = reportDatas
   if (CategoryDetails) {
@@ -22,11 +20,17 @@ const CategorySummary = ({ reportDatas }) => {
   const CategoryCategorySummaryColumnsExtensions = [
     { columnName: 'categoryCode', sortingEnabled: false },
     { columnName: 'categoryDisplayValue', sortingEnabled: false },
-    { columnName: 'totalAmount', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'totalAmount',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
   ]
 
   return (
     <ReportDataGrid
+      noHeight
       data={listData}
       columns={CategoryCategorySummaryColumns}
       columnExtensions={CategoryCategorySummaryColumnsExtensions}

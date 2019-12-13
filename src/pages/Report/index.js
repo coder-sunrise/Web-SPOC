@@ -90,7 +90,7 @@ const menuData = [
   {
     title: 'Finance',
     text: 'CHAS Claim Report',
-    url: '',
+    url: '/report/chasclaimreport',
   },
   {
     title: 'Inventory',
@@ -154,7 +154,7 @@ class Report extends React.Component {
               .filter((m) => {
                 return (
                   m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                    0 || !this.state.searchText
+                  0 || !this.state.searchText
                 )
               })
               .map((item) => {

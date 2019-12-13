@@ -8,8 +8,7 @@ import {
 } from '@/components'
 
 const SessionDetails = ({ sessionDetails, companyDetails }) => {
-  if (!sessionDetails)
-    return null
+  if (!sessionDetails) return null
   return (
     <GridContainer>
       <GridItem md={3}>
@@ -24,6 +23,7 @@ const SessionDetails = ({ sessionDetails, companyDetails }) => {
           label='Total Visits'
           disabled
           value={sessionDetails.totalVisit}
+          precision={0}
         />
       </GridItem>
 
@@ -66,8 +66,8 @@ const SessionDetails = ({ sessionDetails, companyDetails }) => {
             companyDetails.totalCompanyAmount ? (
               companyDetails.totalCompanyAmount
             ) : (
-                0
-              )
+              0
+            )
           }
         />
       </GridItem>

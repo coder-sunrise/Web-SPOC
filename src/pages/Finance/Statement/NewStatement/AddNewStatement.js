@@ -141,6 +141,7 @@ class AddNewStatement extends PureComponent {
       {
         columnName: 'invoiceNo',
         sortingEnabled: false,
+        width: 100,
       },
       {
         columnName: 'patientName',
@@ -157,6 +158,7 @@ class AddNewStatement extends PureComponent {
         type: 'number',
         currency: true,
         sortingEnabled: false,
+        width: 150,
       },
       {
         columnName: this.props.statement.entity
@@ -165,12 +167,14 @@ class AddNewStatement extends PureComponent {
         type: 'number',
         currency: true,
         sortingEnabled: false,
+        width: 150,
       },
       {
         columnName: 'invoiceDate',
         type: 'date',
         format: dateFormatLong,
         sortingEnabled: false,
+        width: 100,
       },
     ],
     // currencyColumns: [
@@ -243,6 +247,7 @@ class AddNewStatement extends PureComponent {
       invoiceNo: InvoiceNo,
       lgteql_invoiceDate: effectiveDates ? effectiveDates[0] : undefined,
       lsteql_invoiceDate: effectiveDates ? effectiveDates[1] : undefined,
+      pagesize: 9999,
     }
 
     dispatch({
@@ -464,6 +469,7 @@ class AddNewStatement extends PureComponent {
               columns={columns}
               columnExtensions={columnExtensions}
               FuncProps={{
+                pager: false,
                 selectable: true,
                 selectConfig: {
                   showSelectAll: true,
@@ -474,11 +480,8 @@ class AddNewStatement extends PureComponent {
                       outstandingAmount,
                       adminCharge,
                     } = row
-                    return (
-                      !statementInvoicePayment.find(
-                        (o) => o.invoicePayment.isCancelled === false,
-                      ) &&
-                      payableAmount === roundTo(outstandingAmount + adminCharge)
+                    return !statementInvoicePayment.find(
+                      (o) => o.invoicePayment.isCancelled === false,
                     )
                   },
                 },

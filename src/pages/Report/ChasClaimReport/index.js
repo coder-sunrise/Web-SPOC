@@ -5,23 +5,22 @@ import moment from 'moment'
 import { withFormik } from 'formik'
 // material ui
 import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
-// common components
-import { Accordion } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
-import InvoicePayer from './InvoicePayer'
-import PastPaymentsCollection from './PastPaymentsCollection'
+import ChasList from './ChasList'
+import ChasStatusList from './ChasStatusList'
 import ReportBase from '../ReportBase'
-import VisitListing from './VisitListing'
+// common components
+import { Accordion } from '@/components'
 import { AccordionTitle } from '@/components/_medisys'
 
-class QueueListing extends ReportBase {
+class ChasClaimReport extends ReportBase {
   constructor (props) {
     super(props)
     this.state = {
       ...super.state,
-      reportId: 1,
-      fileName: 'Queue Listing Report',
+      reportId: 30,
+      fileName: 'Sales Listing Report',
     }
   }
 
@@ -44,16 +43,12 @@ class QueueListing extends ReportBase {
         expandIcon={<SolidExpandMore fontSize='large' />}
         collapses={[
           {
-            title: <AccordionTitle title='Visit Listing' />,
-            content: <VisitListing reportDatas={reportDatas} />,
+            title: <AccordionTitle title='Claim Details' />,
+            content: <ChasList reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Past Payments Collection' />,
-            content: <PastPaymentsCollection reportDatas={reportDatas} />,
-          },
-          {
-            title: <AccordionTitle title='Invoice Payer' />,
-            content: <InvoicePayer reportDatas={reportDatas} />,
+            title: <AccordionTitle title='Claim Summary' />,
+            content: <ChasStatusList reportDatas={reportDatas} />,
           },
         ]}
       />
@@ -61,14 +56,14 @@ class QueueListing extends ReportBase {
   }
 }
 
-const QueueListingWithFormik = withFormik({
+const ChasClaimReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
-    listingFrom: Yup.date().required(),
+    dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).toDate(),
-    listingTo: moment(new Date()).toDate(),
+    dateFrom: moment(new Date()).startOf('month').toDate(),
+    dateTo: moment(new Date()).endOf('month').toDate(),
   }),
-})(QueueListing)
+})(ChasClaimReport)
 
-export default QueueListingWithFormik
+export default ChasClaimReportWithFormik
