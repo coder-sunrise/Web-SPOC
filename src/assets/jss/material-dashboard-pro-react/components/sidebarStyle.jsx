@@ -131,7 +131,7 @@ const sidebarStyle = (theme) => ({
     maxHeight: '30px',
     marginLeft: '22px',
     marginRight: '18px',
-    marginTop: '7px',
+    marginTop: 0,
     color: 'inherit',
   },
   logoMiniRTL: {
@@ -141,7 +141,7 @@ const sidebarStyle = (theme) => ({
   },
   logoNormal: {
     ...defaultFont,
-    color: '#00c2f6',
+    color: '#58b05b',
     fontWeight: 'normal',
     transition: 'all 300ms linear',
     display: 'block',
@@ -154,7 +154,7 @@ const sidebarStyle = (theme) => ({
     overflow: 'hidden',
     letterSpacing: '0.1em',
     '&,&:hover,&:focus': {
-      color: '#00c2f6',
+      color: '#58b05b',
     },
   },
   logoNormalRTL: {

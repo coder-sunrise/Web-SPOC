@@ -17,5 +17,5 @@ module.exports = {
   collapse: true,
   ui: 'mui',
   pwa: false,
-  appTitle: 'Medicloud',
+  appTitle: 'HMI Group',
 }
