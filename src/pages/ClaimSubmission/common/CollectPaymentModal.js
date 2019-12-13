@@ -54,12 +54,13 @@ const paymentListSchema = Yup.object().shape({
       paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
       paymentReceivedByUserFK,
     }
-    dispatch({
-      type: 'claimSubmissionApproved/submitInvoicePayment',
-      payload,
-    }).then((r) => {
-      closeModal()
-    })
+    console.log({ payload })
+    // dispatch({
+    //   type: 'claimSubmissionApproved/submitInvoicePayment',
+    //   payload,
+    // }).then((r) => {
+    //   if (r) closeModal()
+    // })
   },
 })
 class CollectPaymentModal extends PureComponent {

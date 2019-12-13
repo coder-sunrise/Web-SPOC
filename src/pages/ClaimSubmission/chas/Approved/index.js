@@ -59,10 +59,9 @@ class ApprovedCHAS extends React.Component {
     this.setState({ isLoading: visibility })
 
   handleSelectionChange = (selection) => {
+    // const _selection = selection.pop()
     this.setState({
-      selectedRows: [
-        selection.pop(),
-      ],
+      selectedRows: selection,
     })
   }
 
@@ -97,17 +96,20 @@ class ApprovedCHAS extends React.Component {
     const { dispatch, claimSubmissionApproved } = this.props
     const { selectedRows } = this.state
     const { list } = claimSubmissionApproved || []
-    const rows = []
-    selectedRows.map((selected) => {
-      const row = list.find((x) => x.id === selected)
+    // const rows = []
+    const rows = list.filter((i) => selectedRows.includes(i.id))
 
-      // Dev: CollectPaymentModal purpose (Pls delete after complete) -Start
-      row.approvedAmount = Math.floor(Math.random() * 100 + 1)
-      row.collectedPayment = Math.floor(Math.random() * row.approvedAmount + 1)
-      // Dev: CollectPaymentModal purpose (Pls delete after complete) -End
+    console.log({ rows, selectedRows, list })
+    // selectedRows.map((selected) => {
+    //   const row = list.find((x) => x.id === selected)
 
-      return rows.push(row)
-    })
+    //   // Dev: CollectPaymentModal purpose (Pls delete after complete) -Start
+    //   row.approvedAmount = Math.floor(Math.random() * 100 + 1)
+    //   row.collectedPayment = Math.floor(Math.random() * row.approvedAmount + 1)
+    //   // Dev: CollectPaymentModal purpose (Pls delete after complete) -End
+
+    //   return rows.push(row)
+    // })
 
     let outstandingPayment = []
 
