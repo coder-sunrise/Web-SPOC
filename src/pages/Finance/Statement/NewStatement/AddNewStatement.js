@@ -480,11 +480,8 @@ class AddNewStatement extends PureComponent {
                       outstandingAmount,
                       adminCharge,
                     } = row
-                    return (
-                      !statementInvoicePayment.find(
-                        (o) => o.invoicePayment.isCancelled === false,
-                      ) &&
-                      payableAmount === roundTo(outstandingAmount + adminCharge)
+                    return !statementInvoicePayment.find(
+                      (o) => o.invoicePayment.isCancelled === false,
                     )
                   },
                 },

@@ -1,11 +1,7 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
-import {
-  Table,
-} from '@devexpress/dx-react-grid-material-ui'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
 
 const styles = (theme) => ({
@@ -16,8 +12,7 @@ const styles = (theme) => ({
   },
 })
 const VisitListing = ({ reportDatas, classes }) => {
-  if (!reportDatas)
-    return null
+  if (!reportDatas) return null
   let listData = []
   const { VisitListingDetails, ListingDetails } = reportDatas
   if (VisitListingDetails) {
@@ -68,14 +63,38 @@ const VisitListing = ({ reportDatas, classes }) => {
     { columnName: 'timeIn', width: 80, sortingEnabled: false },
     { columnName: 'timeOut', width: 80, sortingEnabled: false },
     { columnName: 'invoiceNo', width: 100, sortingEnabled: false },
-    { columnName: 'invoiceAmt', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'patientPaid', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'invoiceAmt',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'gstAmt',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'patientPaid',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
     { columnName: 'paymentMode', width: 100, sortingEnabled: false },
-    { columnName: 'patientOS', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'coPayerPayable', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'patientOS',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'coPayerPayable',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
     { columnName: 'coPayerName', wordWrapEnabled: true, sortingEnabled: false },
-
   ]
 
   if (!ListingDetails[0].isDisplayGST) {
@@ -125,16 +144,28 @@ const VisitListing = ({ reportDatas, classes }) => {
   const visitListingRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      const newchildren = children.map((item, index) => (index < 9 || index > 10) ? {
-        ...children[index],
-        props: {
-          ...children[index].props,
-          rowSpan: row.rowspan,
-        },
-      } : item)
+      const newchildren = children.map(
+        (item, index) =>
+          index < 9 || index > 10
+            ? {
+                ...children[index],
+                props: {
+                  ...children[index].props,
+                  rowSpan: row.rowspan,
+                },
+              }
+            : item,
+      )
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    return <Table.Row className={classes.subRow}>{[children[9], children[10]]} </Table.Row>
+    return (
+      <Table.Row className={classes.subRow}>
+        {[
+          children[9],
+          children[10],
+        ]}{' '}
+      </Table.Row>
+    )
   }
 
   return (

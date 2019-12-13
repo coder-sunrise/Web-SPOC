@@ -34,40 +34,40 @@ class SalesSummary extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
-    return <Accordion
-      active={this.state.activePanel}
-      onChange={this.handleActivePanelChange}
-      leftIcon
-      expandIcon={<SolidExpandMore fontSize='large' />}
-      collapses={[
-        {
-          title: <AccordionTitle title='Sales Details' />,
-          content: (
-            <SalesDetails reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Summary' />,
-          content: (
-            <Summary reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Summary Of Category' />,
-          content: (
-            <CategorySummary reportDatas={reportDatas} />
-          ),
-        },
-        {
-          title: <AccordionTitle title='Summary Of Sales' />,
-          content: (
-            <SummaryOfSales reportDatas={reportDatas} />
-          ),
-        },
-      ]}
-    />
+    return (
+      <Accordion
+        // active={this.state.activePanel}
+        // onChange={this.handleActivePanelChange}
+        defaultActive={[
+          0,
+          1,
+          2,
+          3,
+        ]}
+        mode='multiple'
+        leftIcon
+        expandIcon={<SolidExpandMore fontSize='large' />}
+        collapses={[
+          {
+            title: <AccordionTitle title='Sales Details' />,
+            content: <SalesDetails reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary' />,
+            content: <Summary reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary Of Category' />,
+            content: <CategorySummary reportDatas={reportDatas} />,
+          },
+          {
+            title: <AccordionTitle title='Summary Of Sales' />,
+            content: <SummaryOfSales reportDatas={reportDatas} />,
+          },
+        ]}
+      />
+    )
   }
-
 }
 const SalesSummaryWithFormik = withFormik({
   validationSchema: Yup.object().shape(
