@@ -125,7 +125,7 @@ const VisitListing = ({ reportDatas, classes }) => {
   const visitListingRow = (p) => {
     const { row, children } = p
     if (row.countNumber === 1) {
-      const newchildren = children.map((item, index) => (index < 9 || index > 10) ? {
+      const newchildren = children.map((item, index) => (index < children.length - 5 || index > children.length - 4) ? {
         ...children[index],
         props: {
           ...children[index].props,
@@ -134,7 +134,7 @@ const VisitListing = ({ reportDatas, classes }) => {
       } : item)
       return <Table.Row {...p}>{newchildren}</Table.Row>
     }
-    return <Table.Row className={classes.subRow}>{[children[9], children[10]]} </Table.Row>
+    return <Table.Row className={classes.subRow}>{[children[children.length - 5], children[children.length - 4]]} </Table.Row>
   }
 
   return (
