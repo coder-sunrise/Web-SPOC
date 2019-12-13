@@ -67,7 +67,7 @@ class PrintDrugLabelWrapper extends React.Component {
           this.wsConnection.send(`["${base64Result}"]`)
         } else {
           notification.error({
-            message: `SEMR printing tool is not running, please start it.`,
+            message: `Medicloud printing tool is not running, please start it.`,
           })
         }
       }
