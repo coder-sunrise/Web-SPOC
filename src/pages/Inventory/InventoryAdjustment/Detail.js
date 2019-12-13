@@ -333,7 +333,7 @@ class Detail extends PureComponent {
         type: 'select',
         mode: 'tags',
         labelField: 'batchNo',
-        valueField: 'name',
+        valueField: 'id',
         maxSelected: 1,
         disableAll: true,
         options: (row) => {
@@ -542,7 +542,7 @@ class Detail extends PureComponent {
   rowOptions = (row) => {
     const getCurrentOptions = (stateName, filteredOptions) => {
       const selectedItem = this.state[stateName].find(
-        (o) => o.itemFK === row.code,
+        (o) => o.itemFK === row.itemFK,
       )
       let currentOptions = filteredOptions
       if (selectedItem) {
@@ -550,7 +550,9 @@ class Detail extends PureComponent {
           ...filteredOptions,
           selectedItem,
         ]
+        currentOptions = _.uniqBy(currentOptions, 'itemFK')
       }
+
       return currentOptions
     }
     const filterActiveCode = (ops) => {
@@ -763,6 +765,7 @@ class Detail extends PureComponent {
       row.expiryDate = undefined
       row.stock = undefined
       row.stockList = stock
+      row.itemFK = value
       this.setState({ selectedItem: e })
       this.setState({ selectedBatch: undefined })
       if (row.inventoryTypeFK && row.code && !row.batchNo) {
@@ -910,7 +913,6 @@ class Detail extends PureComponent {
     if (!isEditable) {
       cfg.onRowDoubleClick = undefined
     }
-
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
