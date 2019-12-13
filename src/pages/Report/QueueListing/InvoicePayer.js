@@ -1,19 +1,16 @@
 import React from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
 
-
 const InvoicePayer = ({ reportDatas }) => {
-  if (!reportDatas)
-    return null
+  if (!reportDatas) return null
   let listData = []
   const { InvoicePayerDetail } = reportDatas
   if (InvoicePayerDetail) {
-    listData = InvoicePayerDetail.map(
-      (item, index) => ({ ...item, id: `${item.coPayer}-${index}` }),
-    )
+    listData = InvoicePayerDetail.map((item, index) => ({
+      ...item,
+      id: `${item.coPayer}-${index}`,
+    }))
   }
 
   const InvoicePayerTableColumn = [
@@ -23,7 +20,12 @@ const InvoicePayer = ({ reportDatas }) => {
 
   const InvoicePayerTableColumnExtension = [
     { columnName: 'coPayer', sortingEnabled: false },
-    { columnName: 'coPayerPayable', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'coPayerPayable',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
   ]
 
   const FuncProps = {
@@ -31,7 +33,9 @@ const InvoicePayer = ({ reportDatas }) => {
     summary: true,
     summaryConfig: {
       state: {
-        totalItems: [{ columnName: 'coPayerPayable', type: 'sum' }],
+        totalItems: [
+          { columnName: 'coPayerPayable', type: 'sum' },
+        ],
       },
       integrated: {
         calculator: IntegratedSummary.defaultCalculator,
@@ -45,6 +49,7 @@ const InvoicePayer = ({ reportDatas }) => {
   }
   return (
     <ReportDataGrid
+      noHeight
       data={listData}
       columns={InvoicePayerTableColumn}
       columnExtensions={InvoicePayerTableColumnExtension}

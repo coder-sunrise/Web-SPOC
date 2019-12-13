@@ -1,25 +1,18 @@
 import React, { PureComponent } from 'react'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import {
-  dateFormatLongWithTimeNoSec12h,
-} from '@/components'
+import { dateFormatLongWithTimeNoSec12h } from '@/components'
 
 class DepositList extends PureComponent {
   render () {
     let listData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.PatientDepositTransaction) {
-      listData = reportDatas.PatientDepositTransaction.map(
-        (item, index) => ({
-          ...item,
-          id: `depositlist-${index}-${item.patientName}`,
-        }),
-      )
+      listData = reportDatas.PatientDepositTransaction.map((item, index) => ({
+        ...item,
+        id: `depositlist-${index}-${item.patientName}`,
+      }))
     }
 
     const PatientDepositTransactionCols = [
@@ -41,8 +34,20 @@ class DepositList extends PureComponent {
         format: dateFormatLongWithTimeNoSec12h,
         showTime: true,
       },
-      { columnName: 'depositBalance', width: 180, type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'txnAmount', width: 180, type: 'currency', currency: true, sortingEnabled: false },
+      {
+        columnName: 'depositBalance',
+        width: 180,
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'txnAmount',
+        width: 180,
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+      },
       { columnName: 'patientReferenceNo', width: 100, sortingEnabled: false },
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'txnCodeDetails', width: 200, sortingEnabled: false },

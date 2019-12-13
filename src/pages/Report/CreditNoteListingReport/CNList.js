@@ -1,27 +1,20 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import {
-  dateFormatLong,
-} from '@/components'
+import { dateFormatLong } from '@/components'
 
 class CNList extends PureComponent {
   render () {
     let listData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas.CreditNoteListingDetails) {
-      listData = reportDatas.CreditNoteListingDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `cnList-${index}-${item.creditNoteNo}`,
-          date: moment(item.generatedDate).format(dateFormatLong),
-        }),
-      )
+      listData = reportDatas.CreditNoteListingDetails.map((item, index) => ({
+        ...item,
+        id: `cnList-${index}-${item.creditNoteNo}`,
+        date: moment(item.generatedDate).format(dateFormatLong),
+      }))
     }
 
     let CreditNoteListingDetailsCols = [
@@ -36,8 +29,18 @@ class CNList extends PureComponent {
     ]
     let CreditNoteListingDetailsExtensions = [
       { columnName: 'invoiceDate', type: 'date', sortingEnabled: false },
-      { columnName: 'total', type: 'currency', currency: true, sortingEnabled: false },
-      { columnName: 'totalAftGST', type: 'currency', currency: true, sortingEnabled: false },
+      {
+        columnName: 'total',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+      },
+      {
+        columnName: 'totalAftGST',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+      },
       { columnName: 'creditNoteNo', sortingEnabled: false },
       { columnName: 'account', sortingEnabled: false },
       { columnName: 'name', sortingEnabled: false },
@@ -47,10 +50,14 @@ class CNList extends PureComponent {
     ]
     if (reportDatas.ListingDetails[0].isDisplayGST) {
       CreditNoteListingDetailsCols.push({ name: 'gstAmt', title: 'GST' })
-      CreditNoteListingDetailsExtensions.push({ columnName: 'gstAmt', type: 'currency', currency: true, sortingEnabled: false })
+      CreditNoteListingDetailsExtensions.push({
+        columnName: 'gstAmt',
+        type: 'currency',
+        currency: true,
+        sortingEnabled: false,
+      })
     }
     CreditNoteListingDetailsCols.push({ name: 'totalAftGST', title: 'Total' })
-
 
     let FuncProps = {
       pager: false,
@@ -102,7 +109,10 @@ class CNList extends PureComponent {
         },
       }
     } else {
-      CNListCols = [{ name: 'date', title: 'Date' }, ...CreditNoteListingDetailsCols]
+      CNListCols = [
+        { name: 'date', title: 'Date' },
+        ...CreditNoteListingDetailsCols,
+      ]
       FuncProps = {
         ...FuncProps,
         grouping: true,
