@@ -14,7 +14,6 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
   // 1. first priority: coPaymentByItem
   // 2. second priority: coPaymentByCategory
   // 3. third priority: overall value
-
   const isSpecificDefined = scheme.coPaymentByItem.find(
     (_coPaymentItem) => _coPaymentItem.itemCode === invoiceItem.itemCode,
   )
@@ -265,12 +264,14 @@ export const flattenInvoicePayersInvoiceItemList = (
 export const validateInvoicePayerItems = (invoicePayerItem) => {
   const returnData = invoicePayerItem.map((item) => {
     let maxAmount
+    let type = 'Total Payable'
     if (item.schemeCoverageType.toLowerCase() === 'percentage') {
       maxAmount = item.payableBalance * item.schemeCoverage / 100
+      type = 'Coverage Amount'
     } else maxAmount = item.payableBalance
 
     if (item.claimAmount > maxAmount) {
-      return { ...item, error: 'Claim Amount cannot exceed Total Payable' }
+      return { ...item, error: `Claim Amount cannot exceed ${type}` }
     }
 
     return { ...item, error: undefined }

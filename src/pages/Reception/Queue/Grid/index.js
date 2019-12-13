@@ -333,10 +333,14 @@ const Grid = ({
 
   const onRowDoubleClick = useCallback(
     (row) => {
-      const isWaiting = row.visitStatus === VISIT_STATUS.WAITING
+      const { visitStatus, visitPurposeFK = VISIT_TYPE.CONS } = row
+      const isWaiting = visitStatus === VISIT_STATUS.WAITING
       const { clinicianProfile: { doctorProfile } } = user.data
-
-      if (!doctorProfile) return false
+      const retailVisits = [
+        VISIT_TYPE.RETAIL,
+        VISIT_TYPE.BILL_FIRST,
+      ]
+      if (!doctorProfile || retailVisits.includes(visitPurposeFK)) return false
 
       if (isWaiting) onClick(row, '5') // start consultation context menu id = 5
 

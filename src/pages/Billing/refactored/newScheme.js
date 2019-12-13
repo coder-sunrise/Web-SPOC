@@ -1,9 +1,8 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 import * as Yup from 'yup'
 import _ from 'lodash'
 // material ui
 import { Paper, withStyles } from '@material-ui/core'
-import { TableInlineCellEditing } from '@devexpress/dx-react-grid-material-ui'
 // common components
 import {
   Button,
@@ -16,7 +15,7 @@ import {
   TextField,
 } from '@/components'
 // sub components
-import MaxCapInfo from '../components/MaxCapInfo'
+import MaxCap from './MaxCap'
 import DeleteWithPopover from '../components/DeleteWithPopover'
 import {
   SchemeInvoicePayerColumn,
@@ -99,6 +98,7 @@ const Scheme = ({
     copaymentSchemeFK,
     _isConfirmed,
     _isEditing,
+    _isAppliedOnce,
     claimableSchemes,
     invoicePayerItem,
     _hasError = false,
@@ -167,30 +167,12 @@ const Scheme = ({
           </GridItem>
         )}
         <GridItem md={2} style={{ marginTop: 8, marginBottom: 8 }}>
-          {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
-          schemeConfig &&
-          schemeConfig.isCoverageMaxCapCheckRequired ? (
-            <NumberInput
-              currency
-              text
-              prefix='Max. Cap:'
-              suffix={
-                <MaxCapInfo
-                  claimableSchemes={claimableSchemes}
-                  copaymentSchemeFK={copaymentSchemeFK}
-                />
-              }
-              value={schemeConfig.coverageMaxCap}
-            />
-          ) : (
-            <div style={{ display: 'flex' }}>
-              <span style={{ marginRight: 8 }}>Max. Cap:</span>
-              <MaxCapInfo
-                claimableSchemes={claimableSchemes}
-                copaymentSchemeFK={copaymentSchemeFK}
-              />
-            </div>
-          )}
+          <MaxCap
+            payerTypeFK={payerTypeFK}
+            claimableSchemes={claimableSchemes}
+            copaymentSchemeFK={copaymentSchemeFK}
+            schemeConfig={schemeConfig}
+          />
         </GridItem>
         <GridItem
           md={schemeConfig && schemeConfig.copayerFK === 1 ? 5 : 7}
@@ -258,17 +240,19 @@ const Scheme = ({
         <GridItem md={4} className={classes.gridActionBtn}>
           {_isEditing && (
             <React.Fragment>
-              <Button
-                size='sm'
-                color='danger'
-                onClick={handleCancelClick}
-                disabled={
-                  payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
-                  copaymentSchemeFK === undefined
-                }
-              >
-                Cancel
-              </Button>
+              {_isAppliedOnce && (
+                <Button
+                  size='sm'
+                  color='danger'
+                  onClick={handleCancelClick}
+                  disabled={
+                    payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+                    copaymentSchemeFK === undefined
+                  }
+                >
+                  Cancel
+                </Button>
+              )}
               <Button
                 size='sm'
                 color='primary'

@@ -430,7 +430,7 @@ class AddNewStatement extends PureComponent {
                 />
               </GridItem>
 
-              <GridItem md={6}>
+              <GridItem md={3}>
                 <FastField
                   name='effectiveDates'
                   render={(args) => {
