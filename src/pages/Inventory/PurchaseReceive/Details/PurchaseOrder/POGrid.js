@@ -386,10 +386,10 @@ class Grid extends PureComponent {
               return this.state.MedicationItemList
             }
             if (row.type === 2) {
-              return this.state.VaccinationItemList
+              return this.state.ConsumableItemList
             }
             if (row.type === 3) {
-              return this.state.ConsumableItemList
+              return this.state.VaccinationItemList
             }
             return []
           },
