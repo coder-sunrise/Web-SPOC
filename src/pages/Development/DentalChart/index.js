@@ -653,6 +653,7 @@ class DentalChart extends React.Component {
               ...groupCfg,
               // opacity: 0.1,
               name: `${cellPrefix}${group.name}outsidetop`,
+              index: Number(group.name),
               // opacity: top ? 1 : 0,
               top: group.translateY - baseHeight * 2.5,
               left: group.translateX - baseWidth * 2,
@@ -689,6 +690,7 @@ class DentalChart extends React.Component {
               ...groupCfg,
               // opacity: 0.1,
               name: `${cellPrefix}${group.name}outsidebottom`,
+              index: Number(group.name),
               // opacity: top ? 1 : 0,
               selectable: true,
               top: group.translateY + baseHeight * 1.5,
@@ -708,11 +710,15 @@ class DentalChart extends React.Component {
           if (mouseMoved) return
           const { action } = this.props.dentalChartComponent
           console.log('gesture', e, data, action)
-          const config = this.configs.find(
+          const cfg = this.configs.find(
             (o) => o.index === Number(e.target.name),
           )
-          if (!config) return
-          if (!config.top && e.subTargets[0].name.indexOf('outsidetop') >= 0)
+          if (!cfg) return
+          if (
+            !cfg.top &&
+            (!e.subTargets[0] ||
+              e.subTargets[0].name.indexOf('outsidetop') >= 0)
+          )
             return
           if (action) {
             // console.log(action, dentalChartComponent)
@@ -742,7 +748,7 @@ class DentalChart extends React.Component {
       startPointer = e.pointer
       console.log('canvas,mouse:down', e)
       this.canvas._objects.map((g) => {
-        g.set('selectable', true)
+        if (g.opacity) g.set('selectable', true)
       })
     })
     // this.canvas.on('mouse:move', (e) => {
@@ -766,7 +772,7 @@ class DentalChart extends React.Component {
       // console.log('canvas,mouse:up', e)
 
       this.canvas._objects.map((g) => {
-        g.set('selectable', false)
+        if (g.opacity) g.set('selectable', false)
       })
     })
     this.canvas.on('selection:created', ({ selected, e, target }) => {
@@ -1167,7 +1173,7 @@ class DentalChart extends React.Component {
       fixedItems.push(g5)
       fixedItems.push(g6)
     }
-    console.log(fixedItems)
+    // console.log(fixedItems)
     const group = new fabric.Group(fixedItems.filter((o) => !width && !!o), {
       ...groupCfg,
       ...lockConfig,
@@ -1205,7 +1211,7 @@ class DentalChart extends React.Component {
 
     //     })
 
-    console.log(group)
+    // console.log(group)
 
     this.canvas.add(group)
   }
@@ -1228,17 +1234,49 @@ class DentalChart extends React.Component {
     this.canvas
       .getObjects('group')
       .filter((n) => n.name && n.name.indexOf('outside') > 0)
-      .map((o) => o.item(0).set('fill', 'white'))
+      .map((o) => {
+        o.item(0).set('fill', 'white')
+
+        if (o.index > 30 && o.index < 50) {
+          if (pedoChart) {
+            o.set('top', baseHeight * 9 - strokeWidth / 2)
+
+            // o.set('top', (o.orgY || o.top) - baseHeight * 9)
+          } else {
+            o.set('top', baseHeight * 17 - strokeWidth / 2)
+            // console.log(o.top)
+            // o.set('orgY', o.top)
+          }
+        }
+      })
 
     this.canvas
       .getObjects('group')
       .filter((n) => Number(n.name) > 0)
       .map((group) => {
         const index = Number(group.name)
-        if (pedoChart && index >= 55) {
-          group.remove()
+        if (pedoChart && index >= 50) {
+          group.set('opacity', 0)
+          // group.set('evented', false)
+          // group.sendToBack()
+
+          // this.canvas.remove(group)
+
           return false
         }
+        group.set('opacity', 1)
+        // group.set('evented', true)
+        // group.bringToFront()
+
+        if (index > 30 && index < 50) {
+          if (pedoChart) {
+            group.set('top', baseHeight * 6)
+          } else {
+            group.set('top', baseHeight * 14)
+          }
+          group.setCoords()
+        }
+
         group.filter((n) => !n.isDefaultCell()).map((o) => group.remove(o))
         group
           .filter((n) => n.isValidCell())
@@ -1416,7 +1454,8 @@ class DentalChart extends React.Component {
       dispatch,
       ...props
     } = this.props
-    const { data = {} } = dentalChartComponent
+    const { data = {}, pedoChart, showChar } = dentalChartComponent
+    console.log(pedoChart, showChar)
     return (
       <div className={className}>
         <GridContainer>
@@ -1440,11 +1479,24 @@ class DentalChart extends React.Component {
           <GridItem md={3}>
             <Checkbox
               label='Pedo Chart'
+              checked={pedoChart}
               onChange={(v) => {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
                   payload: {
                     pedoChart: v.target.value,
+                  },
+                })
+              }}
+            />
+            <Checkbox
+              label='Show Number'
+              checked={showChar}
+              onChange={(v) => {
+                dispatch({
+                  type: 'dentalChartComponent/updateState',
+                  payload: {
+                    showChar: v.target.value,
                   },
                 })
               }}
