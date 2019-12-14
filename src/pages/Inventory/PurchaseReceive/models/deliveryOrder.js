@@ -114,7 +114,6 @@ export default createFormViewModel({
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
         // const { deliveryOrderNo } = payload
-        console.log(state, payload)
         const {
           purchaseOrderDetails,
           MedicationItemList = [],
@@ -124,7 +123,6 @@ export default createFormViewModel({
         const {
           purchaseOrder,
           purchaseOrderOutstandingItem,
-          purchaseOrderItem,
         } = purchaseOrderDetails
 
         const newOSItem = purchaseOrderOutstandingItem.map((o) => {
@@ -177,29 +175,8 @@ export default createFormViewModel({
           return o
         })
 
-        const itemRowsGroupByItemFK = groupByFKFunc(newOSItem)
-        console.log()
-        const newPurchaseOrderItem = purchaseOrderItem.map((o) => {
-          const currentItem = itemRowsGroupByItemFK.find(
-            (i) => i.itemFK === o.itemFK,
-          )
-          let quantityReceivedFromOtherDOs = 0
-          if (currentItem) {
-            quantityReceivedFromOtherDOs =
-              o.quantityReceived - currentItem.totalCurrentReceivingQty
-          }
-          return {
-            ...o,
-            quantityReceivedFromOtherDOs,
-          }
-        })
-
         return {
           ...state,
-          purchaseOrderDetails: {
-            ...purchaseOrderDetails,
-            purchaseOrderItem: newPurchaseOrderItem,
-          },
           entity: {
             purchaseOrderFK: purchaseOrder.id,
             // deliveryOrderNo,
