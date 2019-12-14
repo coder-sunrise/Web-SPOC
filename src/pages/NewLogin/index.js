@@ -137,6 +137,12 @@ const submitKey = 'login/getToken'
         const validLogin = payload.access_token !== undefined
 
         if (validLogin) {
+          dispatch({
+            type: 'global/updateState',
+            payload: {
+              showSessionTimeout: false,
+            },
+          })
           await dispatch({
             type: 'clinicSettings/query',
           })
