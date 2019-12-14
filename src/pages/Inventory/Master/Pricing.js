@@ -68,9 +68,7 @@ const Pricing = ({
   }
   useEffect(
     () => {
-      if (acp && markupMargin) {
-        calculateSuggestSellingPrice()
-      }
+      calculateSuggestSellingPrice()
       setFieldValue('averageCostPrice', acp)
       setFieldValue('markupMargin', markupMargin)
     },
@@ -137,7 +135,10 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}
-                    onChange={(e) => setAcp(e.target.value)}
+                    onChange={(e) => {
+                      const inputValue = e.target.value || 0
+                      setAcp(inputValue)
+                    }}
                     currency
                     precision={4}
                     maxLength={11}
@@ -159,7 +160,10 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.profitMarginPercentage',
                     })}
-                    onChange={(e) => setMarkupMargin(e.target.value)}
+                    onChange={(e) => {
+                      const inputValue = e.target.value || 0
+                      setMarkupMargin(inputValue)
+                    }}
                     defaultValue='0.0'
                     format='0.0'
                     {...args}
