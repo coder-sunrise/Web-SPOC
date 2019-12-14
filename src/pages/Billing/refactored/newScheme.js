@@ -101,6 +101,7 @@ const Scheme = ({
     _isAppliedOnce,
     claimableSchemes = [],
     invoicePayerItem,
+    id,
     _hasError = false,
   } = invoicePayer
 
@@ -123,8 +124,9 @@ const Scheme = ({
 
   const showGrid = companyFK || !_.isEmpty(schemeConfig)
   const disableEdit =
-    hasOtherEditing ||
-    (payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && _.isEmpty(schemeConfig))
+    payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+    id !== undefined &&
+    _.isEmpty(schemeConfig)
   const titleColor = disableEdit ? 'grey' : 'darkblue'
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
@@ -132,6 +134,7 @@ const Scheme = ({
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
           <div
             style={{
+              width: '100%',
               display: 'flex',
               fontWeight: 500,
               fontSize: '1rem',
@@ -142,6 +145,7 @@ const Scheme = ({
             {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
             _isEditing && (
               <Select
+                style={{ width: '100%' }}
                 size='sm'
                 allowClear={false}
                 simple

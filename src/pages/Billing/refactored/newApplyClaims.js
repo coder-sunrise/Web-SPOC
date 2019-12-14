@@ -605,7 +605,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-  console.log({ tempInvoicePayer })
+
   return (
     <Fragment>
       <GridItem md={2}>

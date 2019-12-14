@@ -137,7 +137,7 @@ class Billing extends Component {
     },
   }
 
-  componentWillMount () {
+  componentDidMount () {
     const { history, dispatch } = this.props
     const { query } = history.location
     dispatch({
@@ -179,7 +179,7 @@ class Billing extends Component {
       schemeValidations: schemes,
       showSchemeValidationPrompt: doesNotMatch,
     })
-    return false
+    return !doesNotMatch
   }
 
   upsertByPassValidation = () => {
@@ -191,11 +191,11 @@ class Billing extends Component {
     const { dispatch, values, resetForm, patient } = this.props
     const { visitStatus, invoicePayer = [] } = values
     try {
-      const canSave = noValidation
+      const isSchemesValid = noValidation
         ? true
         : this.validateSchemesWithPatientProfile(invoicePayer)
 
-      if (canSave) {
+      if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = () => {
           if (visitStatus === 'COMPLETED') {
