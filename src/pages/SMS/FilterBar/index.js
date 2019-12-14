@@ -14,6 +14,7 @@ import { GridContainer, GridItem, ProgressButton } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   filterBar: {
@@ -111,6 +112,23 @@ export default compose(
         apptTypeProperty = 'in_Appointment_Resources.AppointmentTypeFK'
         stringAppType = appointmentType.join('|')
       }
+      const apptStatusProperty = appointmentStatus
+        ? 'AppointmentStatusFk'
+        : 'in_AppointmentStatusFk'
+
+      const previousProperty =
+        apptStatusProperty === 'AppointmentStatusFk'
+          ? 'in_AppointmentStatusFk'
+          : 'AppointmentStatusFk'
+      dispatch({
+        type: 'smsAppointment/updateState',
+        payload: {
+          filter: {
+            [previousProperty]: undefined,
+          },
+        },
+      })
+
       const appointmentPayload = {
         lgteql_AppointmentDate: upcomingAppointmentDate
           ? moment(upcomingAppointmentDate[0]).formatUTC()
@@ -118,7 +136,9 @@ export default compose(
         lsteql_AppointmentDate: upcomingAppointmentDate
           ? moment(upcomingAppointmentDate[1]).formatUTC(false)
           : undefined,
-        AppointmentStatusFk: appointmentStatus,
+        [apptStatusProperty]:
+          appointmentStatus ||
+          `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
         'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
         isReminderSent,
         [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
