@@ -1717,34 +1717,29 @@ export const getInventoryItemV2 = (
 
   // console.log({ rowsGroupByFK })
   const newOutstandingItem = outstandingItem.map((o) => {
-    const { quantityReceived, orderQuantity } = o
+    const {
+      quantityReceived,
+      orderQuantity,
+      quantityReceivedFromOtherDOs = 0,
+    } = o
 
     const activeItem = rowsGroupByFK.find(
       (i) => i[itemFKName] === o[itemFKName],
     )
     // console.log({ activeItem })
+    const remainingQuantityShouldReceive =
+      orderQuantity - quantityReceivedFromOtherDOs
     let remainingQuantity = orderQuantity - quantityReceived
-    let currentQtyReceived = quantityReceived
 
     if (activeItem) {
-      if (activeItem.totalCurrentReceivingQty === currentQtyReceived) {
-        // console.log('a')
-      } else if (activeItem.totalCurrentReceivingQty > currentQtyReceived) {
-        let tempActiveItemTotalQtyReceived = 0
-        tempActiveItemTotalQtyReceived =
-          activeItem.totalCurrentReceivingQty - currentQtyReceived
-        currentQtyReceived += tempActiveItemTotalQtyReceived
-        remainingQuantity = orderQuantity - currentQtyReceived
-      } else if (
-        existingData &&
-        activeItem.totalCurrentReceivingQty < currentQtyReceived
-      ) {
-        let tempActiveItemTotalQtyReceived = 0
-        tempActiveItemTotalQtyReceived =
-          currentQtyReceived - activeItem.totalCurrentReceivingQty
-        remainingQuantity += tempActiveItemTotalQtyReceived
+      if (existingData) {
+        remainingQuantity =
+          orderQuantity -
+          activeItem.totalCurrentReceivingQty -
+          quantityReceivedFromOtherDOs
       } else {
-        remainingQuantity -= activeItem.totalCurrentReceivingQty
+        remainingQuantity =
+          quantityReceived - activeItem.totalCurrentReceivingQty
       }
 
       if (remainingQuantity === 0) {
@@ -1754,28 +1749,13 @@ export const getInventoryItemV2 = (
         }
       }
     } else if (existingData && !activeItem) {
-      remainingQuantity = orderQuantity
+      remainingQuantity = remainingQuantityShouldReceive
     }
 
     return {
       ...o,
       remainingQuantity,
     }
-
-    // if (activeItem) {
-    //   if (remainingQuantity === activeItem.totalCurrentReceivingQty) {
-    //     remainingQuantity = activeItem.totalCurrentReceivingQty
-    //   } else {
-    //     remainingQuantity = activeItem.totalCurrentReceivingQty
-    //     // remainingQuantity -= activeItem.totalCurrentReceivingQty
-    //   }
-    // } else {
-    //   remainingQuantity = orderQuantity
-    // }
-    // return {
-    //   ...o,
-    //   remainingQuantity,
-    // }
   })
 
   let fullyReceivedArray = []
@@ -1923,6 +1903,16 @@ export const roundToPrecision = (x, precision) => {
   return y - y % (precision === undefined ? 1 : +precision)
 }
 
+export const groupByFKFunc = (array) => {
+  return _(array)
+    .groupBy((x) => x.itemFK)
+    .map((v, key) => ({
+      itemFK: parseInt(key, 10),
+      totalCurrentReceivingQty: _.sumBy(v, 'currentReceivingQty'),
+    }))
+    .value()
+}
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1977,5 +1967,6 @@ module.exports = {
   shortcutKeys,
   roundToPrecision,
   gstEnabled,
+  groupByFKFunc,
   ...module.exports,
 }
