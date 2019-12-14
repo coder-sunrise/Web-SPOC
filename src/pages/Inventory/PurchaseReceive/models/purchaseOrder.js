@@ -125,7 +125,6 @@ export default createFormViewModel({
             purchaseOrderDate: moment(),
             purchaseOrderStatusFK: 1,
             purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,
-            isGSTEnabled: false,
           },
         })
       },
