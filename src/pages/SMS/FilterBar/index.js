@@ -100,78 +100,77 @@ export default compose(
         appointmentType = [],
       } = values
       const { dispatch, type, setSelectedRows } = props
-      let stringDoctors = Number(doctor)
-      let doctorProperty = 'Appointment_Resources.ClinicianFK'
-      if (doctor.length > 1) {
-        doctorProperty = 'in_Appointment_Resources.ClinicianFK'
-        stringDoctors = doctor.join('|')
-      }
-      let stringAppType = Number(appointmentType)
-      let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'
-      if (appointmentType.length > 1) {
-        apptTypeProperty = 'in_Appointment_Resources.AppointmentTypeFK'
-        stringAppType = appointmentType.join('|')
-      }
-      const apptStatusProperty = appointmentStatus
-        ? 'AppointmentStatusFk'
-        : 'in_AppointmentStatusFk'
-
-      const previousProperty =
-        apptStatusProperty === 'AppointmentStatusFk'
-          ? 'in_AppointmentStatusFk'
-          : 'AppointmentStatusFk'
-      dispatch({
-        type: 'smsAppointment/updateState',
-        payload: {
-          filter: {
-            [previousProperty]: undefined,
-          },
-        },
-      })
-
-      const appointmentPayload = {
-        lgteql_AppointmentDate: upcomingAppointmentDate
-          ? moment(upcomingAppointmentDate[0]).formatUTC()
-          : undefined,
-        lsteql_AppointmentDate: upcomingAppointmentDate
-          ? moment(upcomingAppointmentDate[1]).formatUTC(false)
-          : undefined,
-        [apptStatusProperty]:
-          appointmentStatus ||
-          `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
-        'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
-        isReminderSent,
-        [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
-        [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
-      }
-      const patientPayload = {
-        group: [
-          {
-            name: patientName,
-            patientAccountNo: patientName,
-            patientReferenceNo: patientName,
-            'ContactFkNavigation.contactNumber.number': patientName,
-            combineCondition: 'or',
-          },
-        ],
-        'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
-        'PatientPdpaConsent.IsConsent': consent,
-        // 'lgteql_Visit.VisitDate': lastVisitDate
-        //   ? moment(lastVisitDate[0]).formatUTC()
-        //   : undefined,
-        // 'lsteql_Visit.VisitDate': lastVisitDate
-        //   ? moment(lastVisitDate[1]).formatUTC(false)
-        //   : undefined,
-      }
 
       let payload = {}
       let dispatchType = ''
       if (type === 'Appointment') {
         dispatchType = 'smsAppointment'
-        payload = appointmentPayload
+
+        let stringDoctors = Number(doctor)
+        let doctorProperty = 'Appointment_Resources.ClinicianFK'
+        if (doctor.length > 1) {
+          doctorProperty = 'in_Appointment_Resources.ClinicianFK'
+          stringDoctors = doctor.join('|')
+        }
+        let stringAppType = Number(appointmentType)
+        let apptTypeProperty = 'Appointment_Resources.AppointmentTypeFK'
+        if (appointmentType.length > 1) {
+          apptTypeProperty = 'in_Appointment_Resources.AppointmentTypeFK'
+          stringAppType = appointmentType.join('|')
+        }
+        const apptStatusProperty = appointmentStatus
+          ? 'AppointmentStatusFk'
+          : 'in_AppointmentStatusFk'
+
+        const previousProperty =
+          apptStatusProperty === 'AppointmentStatusFk'
+            ? 'in_AppointmentStatusFk'
+            : 'AppointmentStatusFk'
+        dispatch({
+          type: 'smsAppointment/updateState',
+          payload: {
+            filter: {
+              [previousProperty]: undefined,
+            },
+          },
+        })
+
+        payload = {
+          lgteql_AppointmentDate: upcomingAppointmentDate
+            ? moment(upcomingAppointmentDate[0]).formatUTC()
+            : undefined,
+          lsteql_AppointmentDate: upcomingAppointmentDate
+            ? moment(upcomingAppointmentDate[1]).formatUTC(false)
+            : undefined,
+          [apptStatusProperty]:
+            appointmentStatus ||
+            `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
+          'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
+          isReminderSent,
+          [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
+          [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
+        }
       } else {
         dispatchType = 'smsPatient'
-        payload = patientPayload
+        payload = {
+          group: [
+            {
+              name: patientName,
+              patientAccountNo: patientName,
+              patientReferenceNo: patientName,
+              'ContactFkNavigation.contactNumber.number': patientName,
+              combineCondition: 'or',
+            },
+          ],
+          'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
+          'PatientPdpaConsent.IsConsent': consent,
+          // 'lgteql_Visit.VisitDate': lastVisitDate
+          //   ? moment(lastVisitDate[0]).formatUTC()
+          //   : undefined,
+          // 'lsteql_Visit.VisitDate': lastVisitDate
+          //   ? moment(lastVisitDate[1]).formatUTC(false)
+          //   : undefined,
+        }
       }
 
       dispatch({
