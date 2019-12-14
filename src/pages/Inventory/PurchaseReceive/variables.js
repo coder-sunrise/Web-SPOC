@@ -88,6 +88,16 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
+export const enableSaveButton = (status) => {
+  const allowedStatus = [
+    // 'Draft',
+    1,
+    2,
+    3,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
 export const isInvoiceReadOnly = (status) => {
   const allowedStatus = [
     // 'Draft',
@@ -140,7 +150,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'supplier', title: 'Supplier' },
   { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
   { name: 'purchaseOrderStatus', title: 'PO Status' },
-  { name: 'totalAmount', title: 'Total' },
+  { name: 'totalAftGst', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remark', title: 'Remarks' },

@@ -22,6 +22,7 @@ import {
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
   isPOStatusFinalized,
+  enableSaveButton,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS } from '@/utils/constants'
@@ -617,7 +618,7 @@ class Index extends Component {
               <ProgressButton
                 color='primary'
                 icon={null}
-                disabled={!isPOStatusDraft(poStatus)}
+                disabled={!enableSaveButton(poStatus)}
                 onClick={() => this.onSubmitButtonClicked(poSubmitAction.SAVE)}
               >
                 {formatMessage({

@@ -5,6 +5,7 @@ import { compose } from 'redux'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { VaccinationDetailOption } from './variables'
@@ -197,6 +198,7 @@ export default compose(
           effectiveEndDate: values.effectiveDates[1],
           markupMargin: parseFloat(values.markupMargin),
           vaccinationStock: defaultVaccinationStock,
+          suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         },
       }).then((r) => {
         if (r) {

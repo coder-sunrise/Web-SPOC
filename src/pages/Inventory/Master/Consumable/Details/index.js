@@ -18,6 +18,7 @@ import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  roundTo,
 } from '@/utils/utils'
 
 const styles = () => ({
@@ -204,6 +205,7 @@ export default compose(
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
           consumableStock: defaultConsumableStock,
+          suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
         },
       }).then((r) => {
         if (r) {
