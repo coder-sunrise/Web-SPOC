@@ -75,9 +75,8 @@ const SessionSummary = () => {
     }
   }
 
-  const viewSessionSummaryReport = (event) => {
-    const { currentTarget } = event
-    router.push(`/report/sessionsummary/${currentTarget.id}`)
+  const viewSessionSummaryReport = (row) => {
+    router.push(`/report/sessionsummary/${row.id}`)
   }
 
   useEffect(() => {
@@ -125,7 +124,7 @@ const SessionSummary = () => {
             id={row.id}
             justIcon
             rounded
-            onClick={viewSessionSummaryReport}
+            onClick={() => viewSessionSummaryReport(row)}
           >
             <PageView />
           </Button>
@@ -139,6 +138,7 @@ const SessionSummary = () => {
       <h4 style={{ marginBottom: 16 }}>All Sessions</h4>
       <ReportDataGrid
         height='80vh'
+        onRowDoubleClick={viewSessionSummaryReport}
         data={state.sessionData}
         columns={SessionColumns}
         columnExtensions={columnExtensions}
