@@ -478,7 +478,6 @@ class Medication extends PureComponent {
       },
     }
 
-    console.log(values)
     return (
       <div>
         <GridContainer>
