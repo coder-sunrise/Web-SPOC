@@ -80,6 +80,7 @@ export default createFormViewModel({
           purchaseOrderNo,
           purchaseOrderDate,
           totalAmount,
+          totalAftGst = 0,
           purchaseOrderStatus,
           supplierFK,
           purchaseOrderStatusFK,
@@ -89,7 +90,6 @@ export default createFormViewModel({
 
         let totalPaidAmount = 0
         let newPurchaseOrderPayment
-
         if (purchaseOrderPayment.length >= 1) {
           let tempId = -99
           newPurchaseOrderPayment = purchaseOrderPayment
@@ -109,17 +109,20 @@ export default createFormViewModel({
               }
             })
         }
+
+        console.log('totalPaidAmount', totalPaidAmount)
         return {
           ...state,
           purchaseOrderDetails: {
             purchaseOrderNo,
             purchaseOrderDate,
             totalAmount,
+            totalAftGst,
             purchaseOrderStatus,
             outstandingAmount:
               invoiceStatusFK === INVOICE_STATUS.WRITEOFF
                 ? 0
-                : totalAmount - totalPaidAmount,
+                : totalAftGst - totalPaidAmount,
             supplierFK,
             purchaseOrderStatusFK,
             concurrencyToken,
