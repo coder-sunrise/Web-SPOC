@@ -88,6 +88,16 @@ export const isPOStatusDraft = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
+export const enableSaveButton = (status) => {
+  const allowedStatus = [
+    // 'Draft',
+    1,
+    2,
+    3,
+  ]
+  return allowedStatus.indexOf(status) > -1
+}
+
 export const isInvoiceReadOnly = (status) => {
   const allowedStatus = [
     // 'Draft',
