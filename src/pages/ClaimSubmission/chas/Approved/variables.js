@@ -69,6 +69,18 @@ export const ApprovedCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
   {
+    columnName: 'visitDoctorName',
+    sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
+  },
+  {
+    columnName: 'diagnosis',
+    sortingEnabled: false,
+  },
+  {
+    columnName: 'schemeTypeDisplayValue',
+    sortBy: 'SchemeTypeFKNavigation.DisplayValue',
+  },
+  {
     columnName: 'schemeCategoryDisplayValue',
     width: 145,
     sortBy: 'schemeCategory',
@@ -86,6 +98,16 @@ export const ApprovedCHASColumnExtensions = [
     currency: true,
     sortBy: 'claimAmt',
   },
-  { columnName: 'collectedPayment', type: 'currency', currency: true },
-  { columnName: 'approvedAmount', type: 'currency', currency: true },
+  {
+    columnName: 'collectedPayment',
+    type: 'currency',
+    currency: true,
+    sortingEnabled: false,
+  },
+  {
+    columnName: 'approvedAmount',
+    type: 'currency',
+    currency: true,
+    sortBy: 'ApprovedAmt',
+  },
 ]
