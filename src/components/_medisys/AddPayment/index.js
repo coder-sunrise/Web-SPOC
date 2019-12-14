@@ -277,6 +277,7 @@ class AddPayment extends Component {
         },
         () => {
           setFieldValue('cashReceived', cashAfterRounding)
+          setFieldValue('_cashAfterRounding', cashAfterRounding)
         },
       )
 
@@ -291,6 +292,7 @@ class AddPayment extends Component {
       }
     } else {
       setFieldValue('collectableAmount', totalPaid)
+      setFieldValue('_cashAfterRounding', 0)
       setFieldValue('cashReceived', 0)
       setFieldValue('cashReturned', 0)
       setFieldValue('cashRounding', 0)

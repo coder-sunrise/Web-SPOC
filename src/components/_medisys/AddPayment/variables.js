@@ -8,6 +8,7 @@ export const ValidationSchema = Yup.object().shape({
   totalAmtPaid: Yup.number(),
   finalPayable: Yup.number(),
   collectableAmount: Yup.number(),
+  _cashAfterRounding: Yup.number(),
   outstandingBalance: Yup.number(),
   outstandingAfterPayment: Yup.number(),
   showPaymentDate: Yup.boolean(),
@@ -39,17 +40,7 @@ export const ValidationSchema = Yup.object().shape({
               .required(),
             creditCardPayment: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              // creditCardNo: Yup.number().required(),
             }),
-            // chequePayment: Yup.object().shape({
-            //   chequeNo: Yup.string().required(),
-            // }),
-            // netsPayment: Yup.object().shape({
-            //   refNo: Yup.string().required(),
-            // }),
-            // giroPayment: Yup.object().shape({
-            //   refNo: Yup.string().required(),
-            // }),
           }),
         )
 
@@ -68,48 +59,35 @@ export const ValidationSchema = Yup.object().shape({
             is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
             then: Yup.object().shape({
               creditCardTypeFK: Yup.string().required(),
-              // creditCardNo: Yup.number().required(),
             }),
           }),
-          // chequePayment: Yup.object().when('paymentModeFK', {
-          //   is: (val) => val === PAYMENT_MODE.CHEQUE,
-          //   then: Yup.object().shape({
-          //     chequeNo: Yup.string().required(),
-          //   }),
-          // }),
-          // netsPayment: Yup.object().when('paymentModeFK', {
-          //   is: (val) => val === PAYMENT_MODE.NETS,
-          //   then: Yup.object().shape({
-          //     refNo: Yup.string().required(),
-          //   }),
-          // }),
-          // giroPayment: Yup.object().when('paymentModeFK', {
-          //   is: (val) => val === PAYMENT_MODE.GIRO,
-          //   then: Yup.object().shape({
-          //     refNo: Yup.string().required(),
-          //   }),
-          // }),
         }),
       )
     },
   ),
-  cashReceived: Yup.number().when('paymentList', (paymentList) => {
-    const cashPayment = paymentList.filter(
-      (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
-    )
+  cashReceived: Yup.number().when(
+    [
+      'paymentList',
+      '_cashAfterRounding',
+    ],
+    (paymentList, _cashAfterRounding) => {
+      const cashPayment = paymentList.filter(
+        (payment) => payment.paymentModeFK === PAYMENT_MODE.CASH,
+      )
 
-    if (cashPayment.length > 0) {
-      const minAmount = cashPayment[0].amt
+      if (cashPayment.length > 0) {
+        // const minAmount = cashPayment[0].amt
+        return Yup.number()
+          .min(
+            _cashAfterRounding,
+            `Cash Received must be at least $${_cashAfterRounding.toFixed(2)}`,
+          )
+          .required(requiredMsg)
+      }
+
       return Yup.number()
-        .min(
-          minAmount,
-          `Cash Received must be at least $${minAmount.toFixed(2)}`,
-        )
-        .required(requiredMsg)
-    }
-
-    return Yup.number()
-  }),
+    },
+  ),
 })
 
 export const paymentTypes = {
