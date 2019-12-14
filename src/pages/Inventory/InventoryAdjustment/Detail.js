@@ -147,10 +147,12 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       }
 
       const getStockObject = () => {
+        const stockQty = o.stock || 0
+        const adjQty = o.adjustmentQty || 0
         if (o.isManuallyCreated) {
           return {
             ...shareProperty,
-            stock: o.stock + o.adjustmentQty,
+            stock: stockQty + adjQty,
           }
         }
         if (values.inventoryAdjustmentStatusFK === 1) return undefined
@@ -160,7 +162,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         }
         return {
           ...shareProperty,
-          stock: o.stock + o.adjustmentQty,
+          stock: stockQty + adjQty,
         }
       }
 
