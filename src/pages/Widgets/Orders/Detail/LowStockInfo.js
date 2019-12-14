@@ -1,7 +1,7 @@
 import numeral from 'numeral'
 import Info from '@material-ui/icons/Info'
 
-import { qtyFormat, currencyFormat } from '@/utils/config'
+import { qtyFormat, currencyFormat, currencySymbol } from '@/utils/config'
 import { IconButton, Popover, Tooltip } from '@/components'
 
 const LowStockInfo = ({ sourceType, values, codetable }) => {
@@ -58,7 +58,10 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
               ''
             )}
           </p>
-          <p>Unit Price: {numeral(sellingPrice).format(currencyFormat)}</p>
+          <p>
+            Unit Price: {currencySymbol}
+            {numeral(sellingPrice).format(currencyFormat)}
+          </p>
           <p>CHAS Acute Claimable: {isChasAcuteClaimable ? 'Yes' : 'No'}</p>
           <p>CHAS Chronic Claimable: {isChasChronicClaimable ? 'Yes' : 'No'}</p>
         </div>
