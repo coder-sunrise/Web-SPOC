@@ -76,7 +76,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
         dosageFK: Yup.number().required(),
         prescribeUOMFK: Yup.number().required(),
         drugFrequencyFK: Yup.number().required(),
-        duration: Yup.number().min(1).required(),
+        duration: Yup.number()
+          .min(1, 'Duration must be greater than or equal to 1')
+          .required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
