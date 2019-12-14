@@ -28,8 +28,6 @@ import {
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 
-const gridHeight = window.innerHeight - 250
-
 const Grid = ({
   dispatch,
   codetable,
@@ -46,7 +44,7 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
-  mainDivHeight,
+  mainDivHeight = 700,
 }) => {
   const [
     anchorEl,
@@ -433,7 +431,8 @@ const Grid = ({
   const isLoading = showingVisitRegistration ? false : queryingList
   let loadingText = 'Refreshing queue...'
   if (!queryingList && queryingFormData) loadingText = ''
-
+  const height = mainDivHeight - 190
+  const TableProps = { height }
   return (
     // <div style={{ minHeight: '76vh' }}>
     <div>
@@ -445,7 +444,7 @@ const Grid = ({
         {filter !== StatusIndicator.APPOINTMENT && (
           <CommonTableGrid
             size='sm'
-            TableProps={{ height: mainDivHeight - 190 }}
+            TableProps={TableProps}
             rows={queueListingData}
             columnExtensions={[
               ...QueueColumnExtensions,
@@ -476,7 +475,7 @@ const Grid = ({
         {filter === StatusIndicator.APPOINTMENT && (
           <CommonTableGrid
             size='sm'
-            TableProps={{ height: mainDivHeight - 190 }}
+            TableProps={TableProps}
             rows={queueListingData}
             columnExtensions={[
               ...ApptColumnExtensions,

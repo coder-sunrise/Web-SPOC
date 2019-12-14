@@ -121,7 +121,7 @@ export default {
   'finance.scheme.setting.maximumCapServices': 'Max Cap (Services)',
   'finance.scheme.setting.maximumCapPackages': 'Max Cap (Packages)',
   'finance.scheme.setting.allItems': 'All Items',
-  'finance.scheme.setting.consumables': 'Consumable',
+  'finance.scheme.setting.consumables': 'Consumables',
   'finance.scheme.setting.medications': 'Medications',
   'finance.scheme.setting.vaccines': 'Vaccines',
   'finance.scheme.setting.services': 'Services',
