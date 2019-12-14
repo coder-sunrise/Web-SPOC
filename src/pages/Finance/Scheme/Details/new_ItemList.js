@@ -31,7 +31,7 @@ class ItemList extends React.Component {
 
   onClickAdd = (type) => {
     const { values } = this.props
-
+    if (values.tempSelectedItemFK === undefined) return
     const isExisted = values.rows
       .filter((row) => !row.isDeleted)
       .map((row) => row.itemFK)
@@ -110,7 +110,11 @@ class ItemList extends React.Component {
           />
         </GridItem>
         <GridItem xs={4}>
-          <Button color='primary' onClick={() => this.onClickAdd(type)}>
+          <Button
+            color='primary'
+            // disabled={this.props.values.tempSelectedItemFK === undefined}
+            onClick={() => this.onClickAdd(type)}
+          >
             Add
           </Button>
         </GridItem>
@@ -127,12 +131,18 @@ class ItemList extends React.Component {
     setFieldValue('rows', newRows)
   }
 
+  onTabChange = () => {
+    const { setFieldValue } = this.props
+    setFieldValue('tempSelectedItemFK', undefined)
+  }
+
   render () {
     const { theme, CPSwitch, CPNumber, values } = this.props
     return (
       <div style={{ marginTop: theme.spacing(1) }}>
         <Tabs
           defaultActiveKey='1'
+          onChange={this.onTabChange}
           options={[
             {
               id: 1,

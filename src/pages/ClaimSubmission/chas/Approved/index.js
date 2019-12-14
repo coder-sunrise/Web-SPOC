@@ -24,6 +24,7 @@ import CollectPaymentModal from '../../common/CollectPaymentModal'
 // variables
 import { ApprovedCHASColumnExtensions, ApprovedCHASColumns } from './variables'
 import { approvedStatus } from '@/utils/codes'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 const styles = (theme) => ({
   cardContainer: {
@@ -60,9 +61,7 @@ class ApprovedCHAS extends React.Component {
 
   handleSelectionChange = (selection) => {
     this.setState({
-      selectedRows: [
-        selection.pop(),
-      ],
+      selectedRows: selection,
     })
   }
 
@@ -97,21 +96,8 @@ class ApprovedCHAS extends React.Component {
     const { dispatch, claimSubmissionApproved } = this.props
     const { selectedRows } = this.state
     const { list } = claimSubmissionApproved || []
-    const rows = []
-    selectedRows.map((selected) => {
-      const row = list.find((x) => x.id === selected)
-
-      // Dev: CollectPaymentModal purpose (Pls delete after complete) -Start
-      row.approvedAmount = Math.floor(Math.random() * 100 + 1)
-      row.collectedPayment = Math.floor(Math.random() * row.approvedAmount + 1)
-      // Dev: CollectPaymentModal purpose (Pls delete after complete) -End
-
-      return rows.push(row)
-    })
-
-    let outstandingPayment = []
-
-    outstandingPayment = rows
+    const rows = list.filter((i) => selectedRows.includes(i.id))
+    const outstandingPayment = rows
       .filter(
         (x) =>
           x.approvedAmount > 0 || x.approvedAmount - x.collectedPayment > 0,
@@ -122,26 +108,24 @@ class ApprovedCHAS extends React.Component {
       })
 
     dispatch({
-      type: 'claimSubmission/queryById',
+      type: 'claimSubmissionApproved/updateState',
       payload: {
-        id: rows[0].id,
-      },
-    }).then((r) => {
-      dispatch({
-        type: 'claimSubmissionApproved/updateState',
-        payload: {
-          entity: {
-            rows: outstandingPayment,
-            paymentDate: moment(),
-            invoicePayerFK: r.payload.invoicePayerFK,
-          },
+        entity: {
+          rows: outstandingPayment,
+          paymentDate: moment(),
+          paymentModeFK: PAYMENT_MODE.GIRO,
         },
-      })
-      this.setState({ showCollectPayment: true })
+      },
     })
+    this.setState({ showCollectPayment: true })
   }
 
   onCloseCollectPayment = () => this.setState({ showCollectPayment: false })
+
+  collectPaymentSuccess = () => {
+    this.refreshDataGrid()
+    this.onCloseCollectPayment()
+  }
 
   render () {
     const {
@@ -198,15 +182,11 @@ class ApprovedCHAS extends React.Component {
                   selectable: true,
                   selectConfig: {
                     showSelectAll: true,
-                    rowSelectionEnabled: (row) => {
-                      if (
-                        row.status.toLowerCase() === 'paid' &&
-                        row.approvedAmount === row.collectedAmount
-                      )
-                        return false
-
-                      return true
-                    },
+                    rowSelectionEnabled: (row) =>
+                      !(
+                        row.chasClaimStatusCode.toLowerCase() === 'pd' &&
+                        row.approvedAmount === row.collectedPayment
+                      ),
                   },
                 }}
                 selection={this.state.selectedRows}
@@ -244,7 +224,7 @@ class ApprovedCHAS extends React.Component {
           maxWidth='lg'
           open={showCollectPayment}
           onClose={this.onCloseCollectPayment}
-          onConfirm={this.onCloseCollectPayment}
+          onConfirm={this.collectPaymentSuccess}
         >
           <CollectPaymentModal closeModal={this.onCloseCollectPayment} />
         </CommonModal>

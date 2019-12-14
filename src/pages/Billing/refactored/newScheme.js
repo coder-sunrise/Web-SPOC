@@ -16,6 +16,7 @@ import {
 import MaxCap from './MaxCap'
 import BalanceLabel from './BalanceLabel'
 import DeleteWithPopover from '../components/DeleteWithPopover'
+import NotEditableInfo from '../components/NotEditableInfo'
 import {
   SchemeInvoicePayerColumn,
   CompanyInvoicePayerColumn,
@@ -100,6 +101,7 @@ const Scheme = ({
     _isAppliedOnce,
     claimableSchemes = [],
     invoicePayerItem,
+    id,
     _hasError = false,
   } = invoicePayer
 
@@ -121,15 +123,29 @@ const Scheme = ({
   ]
 
   const showGrid = companyFK || !_.isEmpty(schemeConfig)
-
+  const disableEdit =
+    payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
+    id !== undefined &&
+    _.isEmpty(schemeConfig)
+  const titleColor = disableEdit ? 'grey' : 'darkblue'
   return (
     <Paper key={_key} elevation={4} className={classes.gridRow}>
       <GridContainer style={{ marginBottom: 16 }} alignItems='flex-start'>
         <GridItem md={3} style={{ marginTop: 8, marginBottom: 16 }}>
-          <p style={{ color: 'darkblue', fontWeight: 500, fontSize: '1rem' }}>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              fontWeight: 500,
+              fontSize: '1rem',
+              color: titleColor,
+            }}
+          >
+            {disableEdit && <NotEditableInfo />}
             {payerTypeFK === INVOICE_PAYER_TYPE.SCHEME &&
             _isEditing && (
               <Select
+                style={{ width: '100%' }}
                 size='sm'
                 allowClear={false}
                 simple
@@ -145,8 +161,9 @@ const Scheme = ({
                 ]}
               />
             )}
+
             {_isConfirmed && <span>{name}</span>}
-          </p>
+          </div>
         </GridItem>
         {schemeConfig &&
         schemeConfig.copayerFK === 1 && (
@@ -164,7 +181,11 @@ const Scheme = ({
         </GridItem>
         <GridItem
           md={schemeConfig && schemeConfig.copayerFK === 1 ? 5 : 7}
-          style={{ textAlign: 'right', paddingRight: '0px !important' }}
+          style={{
+            textAlign: 'right',
+            marginTop: 8,
+            paddingRight: '0px !important',
+          }}
         >
           <DeleteWithPopover
             index={index}
@@ -258,7 +279,7 @@ const Scheme = ({
               color='primary'
               className={classes.rightEndBtn}
               onClick={handleEditClick}
-              disabled={hasOtherEditing}
+              disabled={disableEdit}
             >
               Edit
             </Button>

@@ -3,7 +3,7 @@ import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
 import { notification } from '@/components'
 import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
-import * as service from '../services'
+import * as service from '@/pages/Billing/services'
 import { unlock } from '@/services/dispense'
 import { query as queryPatient } from '@/services/patient'
 

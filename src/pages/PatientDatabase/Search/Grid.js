@@ -87,7 +87,7 @@ class Grid extends PureComponent {
       patientSearch,
       onRowDblClick,
       overrideTableParas = {},
-      mainDivHeight,
+      mainDivHeight = 700,
       simple,
     } = this.props
     return (
