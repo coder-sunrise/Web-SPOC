@@ -59,6 +59,9 @@ class CoPayer extends Component {
     })
 
     this.setState({ invoiceItems: selectedItems })
+    this.props.dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   handleSelectionChange = (selection) => {

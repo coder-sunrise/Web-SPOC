@@ -225,7 +225,6 @@ const ApplyClaims = ({
           ..._payer,
           invoicePayerItem: _payer.invoicePayerItem.map((item) => {
             const { coverage } = getCoverageAmountAndType(null, item)
-            console.log({ coverage })
             return { ...item, coverage }
           }),
           _isConfirmed: true,
@@ -300,31 +299,39 @@ const ApplyClaims = ({
 
   const resetClaims = useCallback(
     () => {
+      const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
+        ...i,
+        _isDeleted: true,
+        isCancelled: true,
+        isModified: true,
+      }))
+
       if (claimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
           claimableSchemes: claimableSchemes[0],
           payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
         }
-        setCurEditInvoicePayerBackup(_invoicePayer)
-        setInitialState([
+        const newTempInvoicePayer = [
+          ..._newTempInvoicePayer,
           _invoicePayer,
-        ])
+        ]
+        setCurEditInvoicePayerBackup(_invoicePayer)
+        setInitialState(newTempInvoicePayer)
         handleSchemeChange(
           _invoicePayer.claimableSchemes[0].id,
-          0,
-          [
-            _invoicePayer,
-          ],
+          newTempInvoicePayer.length - 1,
+          newTempInvoicePayer,
           invoice.invoiceItems,
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
         setInitialState([])
-        setTempInvoicePayer([])
+        setTempInvoicePayer(_newTempInvoicePayer)
       }
     },
     [
+      tempInvoicePayer,
       claimableSchemes,
       invoice.invoiceItems,
     ],
