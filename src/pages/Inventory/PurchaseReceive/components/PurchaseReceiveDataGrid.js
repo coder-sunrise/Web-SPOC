@@ -72,7 +72,7 @@ const PurchaseReceiveDataGrid = ({
           columnName: 'exceptedDeliveryDate',
           type: 'date',
         },
-        { columnName: 'totalAmount', type: 'number', currency: true },
+        { columnName: 'totalAftGst', type: 'number', currency: true },
         {
           columnName: 'outstanding',
           type: 'number',
