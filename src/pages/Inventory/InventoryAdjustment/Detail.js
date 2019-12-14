@@ -185,6 +185,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         return {
           ...value,
           newQty,
+          oldQty: val.stock || 0,
           sortOrder: index + 1,
           id: o.getFromApi ? undefined : o.id,
           [getType.typeName]: {
