@@ -27,7 +27,10 @@ import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
 // utils
-import { constructPayload } from './utils'
+import {
+  constructPayload,
+  validateApplySchemesWithPatientSchemes,
+} from './utils'
 import { roundTo } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
@@ -167,103 +170,16 @@ class Billing extends Component {
     // })
   }
 
-  getPatientCorporateScheme = () => {
-    const { patient } = this.props
-    const today = moment()
-    return patient.patientScheme
-      .filter((ps) => {
-        const isExpired = today.isAfter(moment(ps.validTo))
-        return !isExpired && ps.schemeTypeFK === 15
-      })
-      .map((item) => {
-        return item.coPaymentSchemeFK
-      })
-  }
-
-  getPatientGovernmentScheme = () => {
-    const { patient, ctcopaymentscheme, ctschemetype } = this.props
-    const today = moment()
-    return patient.patientScheme.reduce((result, ps) => {
-      const isExpired = today.isAfter(moment(ps.validTo))
-      if (ps.schemeTypeFK !== 15 && !isExpired) {
-        const schemeType = ctschemetype.find((st) => st.id === ps.schemeTypeFK)
-        const copaymentschemes = ctcopaymentscheme.filter(
-          (cs) => cs.schemeTypeName === schemeType.name,
-        )
-
-        return [
-          ...result,
-          ...copaymentschemes.map((i) => i.id),
-        ]
-      }
-      return [
-        ...result,
-      ]
-    }, [])
-  }
-
   validateSchemesWithPatientProfile = (invoicePayers = []) => {
-    const { patient, ctcopaymentscheme, ctschemetype } = this.props
-    try {
-      const _appliedSchemes = invoicePayers.filter(
-        (payer) =>
-          payer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME && !payer.isCancelled,
-      )
-      const schemePayers = _appliedSchemes.map((item) => item.copaymentSchemeFK)
-      const patientCorporateSchemes = this.getPatientCorporateScheme()
-      const patientGovernmentSchemes = this.getPatientGovernmentScheme()
-      const patientSchemes = [
-        ...patientCorporateSchemes,
-        ...patientGovernmentSchemes,
-      ]
-
-      const checkIfPatientSchemesIncludesAppliedScheme = (result, schemeFK) => {
-        if (!patientSchemes.includes(schemeFK)) return true
-        return result
-      }
-      const doesNotMatch = schemePayers.reduce(
-        checkIfPatientSchemesIncludesAppliedScheme,
-        false,
-      )
-
-      let schemeValidations = { patient: [], billing: [] }
-
-      if (doesNotMatch) {
-        const mapPatientSchemeForValidation = (ps) => {
-          const isExpired = moment().isAfter(moment(ps.validTo))
-          if (ps.schemeTypeFK === 15) {
-            const _scheme = ctcopaymentscheme.find(
-              (scheme) => scheme.id === ps.coPaymentSchemeFK,
-            )
-            return { name: _scheme.name, isExpired }
-          }
-
-          const _scheme = ctschemetype.find(
-            (scheme) => scheme.id === ps.schemeTypeFK,
-          )
-          return { name: _scheme.name, isExpired }
-        }
-        schemeValidations = {
-          patient: patient.patientScheme.map(mapPatientSchemeForValidation),
-          billing: _appliedSchemes.map((ps) => ({
-            name: ps.name,
-            isExpired: false,
-            isDeleted: !patientSchemes.includes(ps.copaymentSchemeFK),
-          })),
-        }
-      }
-
-      this.setState({
-        schemeValidations,
-        showSchemeValidationPrompt: doesNotMatch,
-      })
-      return !doesNotMatch
-    } catch (error) {
-      notification.error({
-        message: 'Failed to validate schemes',
-      })
-      throw error
-    }
+    const { doesNotMatch, schemes } = validateApplySchemesWithPatientSchemes({
+      ...this.props,
+      invoicePayers,
+    })
+    this.setState({
+      schemeValidations: schemes,
+      showSchemeValidationPrompt: doesNotMatch,
+    })
+    return false
   }
 
   upsertByPassValidation = () => {
@@ -523,11 +439,18 @@ class Billing extends Component {
       sessionInfo,
       user,
       commitCount,
+      ctschemetype,
+      ctcopaymentscheme,
     } = this.props
     const formikBag = {
       values,
       setFieldValue,
       setValues,
+    }
+    const commonProps = {
+      patient,
+      ctschemetype,
+      ctcopaymentscheme,
     }
     return (
       <LoadingWrapper loading={loading} text='Getting billing info...'>
@@ -567,6 +490,7 @@ class Billing extends Component {
                   dispatch={dispatch}
                   commitCount={commitCount}
                   {...formikBag}
+                  {...commonProps}
                 />
               )}
             </GridContainer>

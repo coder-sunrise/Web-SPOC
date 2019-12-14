@@ -54,6 +54,9 @@ const ApplyClaims = ({
   submitCount,
   commitCount = 1,
   handleIsEditing,
+  patient,
+  ctschemetype,
+  ctcopaymentscheme,
 }) => {
   const {
     invoice,
@@ -187,6 +190,7 @@ const ApplyClaims = ({
               cs.find((_cs) => _cs.id === _payer.copaymentSchemeFK) !==
               undefined,
           )
+
           if (claimableSchemes[_claimableSchemesIndex]) {
             const schemeConfig = claimableSchemes[_claimableSchemesIndex].find(
               (cs) => cs.id === _payer.copaymentSchemeFK,
@@ -200,6 +204,7 @@ const ApplyClaims = ({
                     schemeConfig,
                     item,
                   )
+                  console.log({ coverage })
                   // const invoiceItemTypeFK = item.invoiceItemTypeFK
                   return { ...item, coverage }
                 })
@@ -218,6 +223,11 @@ const ApplyClaims = ({
 
         return {
           ..._payer,
+          invoicePayerItem: _payer.invoicePayerItem.map((item) => {
+            const { coverage } = getCoverageAmountAndType(null, item)
+            console.log({ coverage })
+            return { ...item, coverage }
+          }),
           _isConfirmed: true,
           _isDeleted: false,
           _isEditing: false,
@@ -595,7 +605,7 @@ const ApplyClaims = ({
   useEffect(updateValues, [
     tempInvoicePayer,
   ])
-
+  console.log({ tempInvoicePayer })
   return (
     <Fragment>
       <GridItem md={2}>
@@ -670,6 +680,9 @@ const ApplyClaims = ({
               onApplyClick={handleApplyClick}
               onDeleteClick={handleDeleteClick}
               hasOtherEditing={hasOtherEditing}
+              patient={patient}
+              ctschemetype={ctschemetype}
+              ctcopaymentscheme={ctcopaymentscheme}
             />
           )
         })}
