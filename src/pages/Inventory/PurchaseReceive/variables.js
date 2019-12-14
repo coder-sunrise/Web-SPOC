@@ -150,7 +150,7 @@ export const PurchaseReceiveGridCol = [
   { name: 'supplier', title: 'Supplier' },
   { name: 'exceptedDeliveryDate', title: 'Expected Delivery Date' },
   { name: 'purchaseOrderStatus', title: 'PO Status' },
-  { name: 'totalAmount', title: 'Total' },
+  { name: 'totalAftGst', title: 'Total' },
   { name: 'outstanding', title: 'Outstanding' },
   { name: 'invoiceStatus', title: 'Inv. Status' },
   { name: 'remark', title: 'Remarks' },

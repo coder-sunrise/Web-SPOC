@@ -8,6 +8,7 @@ import {
   DatePicker,
   NumberInput,
 } from '@/components'
+
 const poPrefix = 'purchaseOrderDetails'
 
 class Header extends PureComponent {
@@ -47,7 +48,7 @@ class Header extends PureComponent {
         <GridContainer>
           <GridItem xs>
             <FastField
-              name={`${poPrefix}.totalAmount`}
+              name={`${poPrefix}.totalAftGst`}
               render={(args) => (
                 <NumberInput
                   disabled
