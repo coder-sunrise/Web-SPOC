@@ -36,7 +36,8 @@ const patientColumns = [
 const appointmentColumnsExtensions = [
   {
     columnName: 'patientName',
-    sortBy: 'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Name',
+    // sortBy: 'AppointmentGroupFKNavigation.PatientProfileFKNavigation.Name',
+    sortingEnabled: false,
   },
   {
     columnName: 'patientContactNo',
