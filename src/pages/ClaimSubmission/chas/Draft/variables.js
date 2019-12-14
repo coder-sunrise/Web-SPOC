@@ -52,7 +52,33 @@ export const DraftCHASColumns = [
 export const DraftCHASColumnExtensions = [
   { columnName: 'visitDate', type: 'date' },
   { columnName: 'invoiceDate', type: 'date' },
-  { columnName: 'schemeCategoryDisplayValue', width: 145, sortBy:'schemeCategory' },
-  { columnName: 'invoiceAmount', type: 'currency', currency: true,sortBy:'invoiceAmt' },
-  { columnName: 'claimAmount', type: 'currency', currency: true,sortBy:'claimAmt' },
+  {
+    columnName: 'schemeCategoryDisplayValue',
+    width: 145,
+    sortBy: 'schemeCategory',
+  },
+  {
+    columnName: 'invoiceAmount',
+    type: 'currency',
+    currency: true,
+    sortBy: 'invoiceAmt',
+  },
+  {
+    columnName: 'claimAmount',
+    type: 'currency',
+    currency: true,
+    sortBy: 'claimAmt',
+  },
+  {
+    columnName: 'schemeTypeDisplayValue',
+    sortBy: 'SchemeTypeFKNavigation.DisplayValue',
+  },
+  {
+    columnName: 'visitDoctorName',
+    sortBy: 'DoctorProfileFKNavigation.ClinicianProfile.Name',
+  },
+  {
+    columnName: 'diagnosis',
+    sortingEnabled: false,
+  },
 ]
