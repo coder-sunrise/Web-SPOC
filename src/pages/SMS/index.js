@@ -7,7 +7,7 @@ import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
 import New from './New'
 import { SmsOption } from './variables'
-import { ADD_ON_FEATURE } from '@/utils/constants'
+import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = {
   sendBar: {
@@ -82,8 +82,8 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     if (type === 'Appointment') {
       return {
         lgteql_AppointmentDate: moment().formatUTC(),
-
         lsteql_AppointmentDate: moment().add(1, 'months').formatUTC(false),
+        in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
       }
     }
     return {
