@@ -2,7 +2,7 @@ import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
 import * as service from '../services/deliveryOrder'
-import { podoOrderType } from '@/utils/codes'
+import { podoOrderType, groupByFKFunc } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
 import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
 
@@ -114,6 +114,7 @@ export default createFormViewModel({
     reducers: {
       setAddNewDeliveryOrder (state, { payload }) {
         // const { deliveryOrderNo } = payload
+        console.log(state, payload)
         const {
           purchaseOrderDetails,
           MedicationItemList = [],
@@ -123,7 +124,9 @@ export default createFormViewModel({
         const {
           purchaseOrder,
           purchaseOrderOutstandingItem,
+          purchaseOrderItem,
         } = purchaseOrderDetails
+
         const newOSItem = purchaseOrderOutstandingItem.map((o) => {
           if (MedicationItemList.length > 0 && o.type === 1) {
             const m = MedicationItemList.find(
@@ -174,8 +177,29 @@ export default createFormViewModel({
           return o
         })
 
+        const itemRowsGroupByItemFK = groupByFKFunc(newOSItem)
+        console.log()
+        const newPurchaseOrderItem = purchaseOrderItem.map((o) => {
+          const currentItem = itemRowsGroupByItemFK.find(
+            (i) => i.itemFK === o.itemFK,
+          )
+          let quantityReceivedFromOtherDOs = 0
+          if (currentItem) {
+            quantityReceivedFromOtherDOs =
+              o.quantityReceived - currentItem.totalCurrentReceivingQty
+          }
+          return {
+            ...o,
+            quantityReceivedFromOtherDOs,
+          }
+        })
+
         return {
           ...state,
+          purchaseOrderDetails: {
+            ...purchaseOrderDetails,
+            purchaseOrderItem: newPurchaseOrderItem,
+          },
           entity: {
             purchaseOrderFK: purchaseOrder.id,
             // deliveryOrderNo,
@@ -187,6 +211,8 @@ export default createFormViewModel({
       },
 
       setDeliveryOrder (state, { payload }) {
+        const { purchaseOrderDetails } = state
+        const { purchaseOrderItem } = purchaseOrderDetails
         const { data } = payload
         const { deliveryOrderItem } = data
 
@@ -216,8 +242,30 @@ export default createFormViewModel({
             // expiryDate: null,
           }
         })
+
+        const itemRowsGroupByItemFK = groupByFKFunc(itemRows)
+
+        const newPurchaseOrderItem = purchaseOrderItem.map((o) => {
+          const currentItem = itemRowsGroupByItemFK.find(
+            (i) => i.itemFK === o.itemFK,
+          )
+          let quantityReceivedFromOtherDOs = 0
+          if (currentItem) {
+            quantityReceivedFromOtherDOs =
+              o.quantityReceived - currentItem.totalCurrentReceivingQty
+          }
+          return {
+            ...o,
+            quantityReceivedFromOtherDOs,
+          }
+        })
+
         return {
           ...state,
+          purchaseOrderDetails: {
+            ...purchaseOrderDetails,
+            purchaseOrderItem: newPurchaseOrderItem,
+          },
           entity: {
             ...data,
             rows: itemRows || [],

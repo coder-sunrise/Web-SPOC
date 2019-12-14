@@ -307,16 +307,17 @@ class Modal extends PureComponent {
 
   calculateBalanceAfter = (event) => {
     const { value } = event.target
-
-    const { isDeposit, errors, initialValues, setFieldValue } = this.props
-    const { balance } = this.props.values || 0
-    let finalBalance
-    if (!errors.amount) {
-      finalBalance = isDeposit ? balance + value : balance - value
-    } else {
-      finalBalance = initialValues.balance
+    if (value) {
+      const { isDeposit, errors, initialValues, setFieldValue } = this.props
+      const { balance } = this.props.values || 0
+      let finalBalance
+      if (!errors.amount) {
+        finalBalance = isDeposit ? balance + value : balance - value
+      } else {
+        finalBalance = initialValues.balance
+      }
+      setFieldValue('balanceAfter', finalBalance)
     }
-    setFieldValue('balanceAfter', finalBalance)
   }
 
   handleMaxLengthCardNumber = (e) => {
@@ -470,7 +471,7 @@ class Modal extends PureComponent {
             <GridItem md={3} />
             <GridItem md={3} />
             <GridItem md={3} className={classes.label}>
-              <span>Deposit Amount</span>
+              <span>{isDeposit ? 'Deposit Amount' : 'Refund Amount'}</span>
             </GridItem>
             <GridItem md={3}>
               <Field
