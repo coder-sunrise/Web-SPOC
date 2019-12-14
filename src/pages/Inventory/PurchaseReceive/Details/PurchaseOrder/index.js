@@ -46,23 +46,6 @@ const styles = (theme) => ({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
   mapPropsToValues: ({ purchaseOrderDetails }) => {
-    const newPurchaseOrderDetails = purchaseOrderDetails
-    if (newPurchaseOrderDetails) {
-      if (
-        newPurchaseOrderDetails.type &&
-        newPurchaseOrderDetails.type === 'dup' &&
-        newPurchaseOrderDetails.purchaseOrder
-      ) {
-        newPurchaseOrderDetails.purchaseOrder.purchaseOrderNo = null
-        newPurchaseOrderDetails.purchaseOrder.invoiceDate = null
-        newPurchaseOrderDetails.purchaseOrder.remark = null
-        newPurchaseOrderDetails.purchaseOrder.invoiceNo = null
-        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = null
-      } else if (newPurchaseOrderDetails.type === 'new') {
-        newPurchaseOrderDetails.purchaseOrder.exceptedDeliveryDate = undefined
-        newPurchaseOrderDetails.purchaseOrder.invoiceDate = undefined
-      }
-    }
     return {
       ...purchaseOrderDetails,
     }
@@ -285,6 +268,7 @@ class Index extends Component {
           bonusQuantity: x.bonusQuantity,
           totalQuantity: x.totalQuantity,
           totalPrice: x.totalPrice,
+          unitPrice: x.unitPrice,
           totalAfterAdjustments: x.totalAfterAdjustments,
           totalAfterGst: x.totalAfterGst,
           sortOrder: x.sortOrder,

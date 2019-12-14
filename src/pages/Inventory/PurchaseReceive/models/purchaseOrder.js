@@ -121,10 +121,27 @@ export default createFormViewModel({
           type: 'setPurchaseOrder',
           payload: {
             ...data,
-            // purchaseOrderNo: poRunningNumber, // Mock PurchaseOrder#
+            purchaseOrderNo: undefined,
             purchaseOrderDate: moment(),
             purchaseOrderStatusFK: 1,
             purchaseOrderStatus: getPurchaseOrderStatusFK(1).name,
+            exceptedDeliveryDate: undefined,
+            invoiceDate: undefined,
+            invoiceNo: undefined,
+            remark: undefined,
+            deliveryOrder: [],
+            purchaseOrderPayment: [],
+            purchaseOrderItem: data.purchaseOrderItem
+              ? data.purchaseOrderItem.map((o) => {
+                  return {
+                    ...o,
+                    bonusQuantity: 0,
+                    bonusReceived: 0,
+                    quantityReceived: 0,
+                    inventoryTransactionFK: undefined,
+                  }
+                })
+              : [],
           },
         })
       },
