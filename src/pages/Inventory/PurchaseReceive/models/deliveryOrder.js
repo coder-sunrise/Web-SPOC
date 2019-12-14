@@ -72,9 +72,7 @@ export default createFormViewModel({
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
-          (x) =>
-            x.totalQuantity - x.quantityReceived - x.bonusReceived > 0 &&
-            !x.isDeleted,
+          (x) => x.orderQuantity - x.quantityReceived > 0 && !x.isDeleted,
         )
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
@@ -85,7 +83,7 @@ export default createFormViewModel({
               // currentReceivingQty: x.orderQuantity - x.totalQtyReceived,
               // currentReceivingBonusQty: x.bonusQty - x.bonusReceived,
               currentReceivingQty: x.orderQuantity - x.quantityReceived,
-              currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
+              // currentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
               maxCurrentReceivingQty: x.orderQuantity - x.quantityReceived,
               maxCurrentReceivingBonusQty: x.bonusQuantity - x.bonusReceived,
             }

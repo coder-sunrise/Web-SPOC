@@ -135,7 +135,7 @@ class Grid extends PureComponent {
     row.uom = option.value
     row.orderQuantity = 0
     row.bonusReceived = 0
-    row.totalQuantity = 0
+    row.quantityReceived = 0
     row.totalReceived = 0
     this.setState({
       selectedItem: option,
@@ -160,7 +160,7 @@ class Grid extends PureComponent {
         let tempRow = addedRows[0]
         let tempOrderQty = tempRow.orderQuantity
         let tempBonusQty = tempRow.bonusReceived
-        let tempTotalQty = tempRow.totalQuantity
+        let tempTotalQty = tempRow.quantityReceived
         let tempQuantityReceived = tempRow.totalReceived
         let tempUnitPrice = tempRow.unitPrice
         let tempTotalPrice = tempRow.totalPrice
@@ -194,7 +194,7 @@ class Grid extends PureComponent {
         newAddedRows = addedRows.map((row) => ({
           ...row,
           itemFK: selectedItem.value,
-          totalQuantity: tempTotalQty,
+          quantityReceived: tempTotalQty,
           unitPrice: tempUnitPrice,
           totalPrice: tempTotalPrice,
         }))
@@ -205,7 +205,7 @@ class Grid extends PureComponent {
           ...row,
           orderQuantity: 0,
           bonusReceived: 0,
-          totalQuantity: 0,
+          quantityReceived: 0,
           totalReceived: 0,
           unitPrice: 0,
           totalPrice: 0,
@@ -302,7 +302,6 @@ class Grid extends PureComponent {
     if (row) {
       const { orderQuantity, unitPrice } = row
       row.totalPrice = orderQuantity * unitPrice
-      row.totalQuantity = orderQuantity
     }
   }
 
@@ -330,8 +329,8 @@ class Grid extends PureComponent {
         { name: 'uom', title: 'UOM' },
         { name: 'orderQuantity', title: 'Order Qty' },
         { name: 'bonusReceived', title: 'Bonus Qty' },
-        { name: 'totalQuantity', title: 'Total Qty' }, // Disabled, auto calc
-        { name: 'totalReceived', title: 'Total Received' },
+        { name: 'quantityReceived', title: 'Received Qty' }, // Disabled, auto calc
+        { name: 'totalReceived', title: 'Total Received Qty' },
         { name: 'unitPrice', title: 'Unit Price' },
         { name: 'totalPrice', title: 'Total Price' }, // Disabled, auto calc
       ],
@@ -407,7 +406,7 @@ class Grid extends PureComponent {
           disabled: true,
         },
         {
-          columnName: 'totalQuantity',
+          columnName: 'quantityReceived',
           type: 'number',
           format: '0.0',
           disabled: true,

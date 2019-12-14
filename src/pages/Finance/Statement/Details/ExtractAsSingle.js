@@ -11,6 +11,7 @@ import {
   CodeSelect,
   dateFormatLong,
   Field,
+  notification,
 } from '@/components'
 
 const styles = (theme) => ({})
@@ -55,6 +56,7 @@ const medicationSchema = Yup.object().shape({
         if (onConfirm) {
           onConfirm()
         }
+        notification.success({ message: 'Extracted success' })
         // dispatch({
         //   type: 'statement/query',
         // })
