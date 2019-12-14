@@ -306,8 +306,7 @@ class Modal extends PureComponent {
   }
 
   calculateBalanceAfter = (event) => {
-    const { value } = event.target
-
+    const { value = 0 } = event.target
     const { isDeposit, errors, initialValues, setFieldValue } = this.props
     const { balance } = this.props.values || 0
     let finalBalance
@@ -470,7 +469,7 @@ class Modal extends PureComponent {
             <GridItem md={3} />
             <GridItem md={3} />
             <GridItem md={3} className={classes.label}>
-              <span>Deposit Amount</span>
+              <span>{isDeposit ? 'Deposit Amount' : 'Refund Amount'}</span>
             </GridItem>
             <GridItem md={3}>
               <Field
