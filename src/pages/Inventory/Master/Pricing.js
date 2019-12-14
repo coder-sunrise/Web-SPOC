@@ -176,7 +176,6 @@ const Pricing = ({
                     label={formatMessage({
                       id: 'inventory.master.pricing.suggestedSellingPrice',
                     })}
-                    defaultValue='0.0000'
                     disabled
                     {...args}
                   />

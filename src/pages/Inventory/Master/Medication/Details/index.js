@@ -5,6 +5,7 @@ import { compose } from 'redux'
 import {
   errMsgForOutOfRange as errMsg,
   navigateDirtyCheck,
+  roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { MedicationDetailOption } from './variables'
@@ -267,6 +268,7 @@ export default compose(
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
         medicationStock: defaultMedicationStock,
+        suggestSellingPrice: roundTo(restValues.suggestSellingPrice),
       }
 
       dispatch({
