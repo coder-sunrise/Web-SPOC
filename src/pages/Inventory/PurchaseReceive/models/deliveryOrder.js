@@ -72,7 +72,7 @@ export default createFormViewModel({
         const { rows, purchaseOrder } = payload
         let outstandingItem = []
         const tempList = rows.filter(
-          (x) => x.totalQuantity - x.quantityReceived > 0 && !x.isDeleted,
+          (x) => x.orderQuantity - x.quantityReceived > 0 && !x.isDeleted,
         )
         if (!_.isEmpty(tempList)) {
           outstandingItem = tempList.map((x) => {
