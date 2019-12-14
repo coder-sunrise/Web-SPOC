@@ -84,34 +84,8 @@ const PaymentCard = ({
 
   return (
     <CardContainer hideHeader>
-      {/* <p className={classes.title}>
-        {payerTypeToString[payerTypeFK]} (
-        {payerTypeFK !== 1 ? (
-          <CodeSelect
-            className={classes.title}
-            text
-            code='LTInvoicePayerType'
-            value={payerTypeFK}
-          />
-        ) : (
-          patientName
-        )})
-      </p> */}
       {_payerName}
-
       <CardContainer hideHeader size='sm'>
-        {/* <IconButton
-          id={payerID}
-          className={classes.printButton}
-          onClick={handlePrinterClick}
-        >
-          <Printer />
-        </IconButton> */}
-
-        {/* {payments.map((payment) => (
-          <PaymentRow {...payment} handleVoidClick={handleVoidClick} />
-        ))} */}
-
         {payments ? (
           payments
             .sort((a, b) => moment(a.date) - moment(b.date))
@@ -133,7 +107,7 @@ const PaymentCard = ({
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
             companyFK={companyFK}
-            readOnly={readOnly}
+            readOnly={readOnly || companyFK === 1}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             {...buttonActions}

@@ -13,7 +13,10 @@ export const getCoverageAmountAndType = (scheme, invoiceItem) => {
 
   if (_.isEmpty(scheme))
     return {
-      coverage: invoiceItem.coverage,
+      coverage: convertAmountToPercentOrCurrency(
+        invoiceItem.schemeCoverageType,
+        invoiceItem.schemeCoverage,
+      ),
       schemeCoverage: invoiceItem.schemeCoverage,
       schemeCoverageType: invoiceItem.schemeCoverageType,
     }

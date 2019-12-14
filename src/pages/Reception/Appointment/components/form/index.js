@@ -731,6 +731,7 @@ class Form extends React.PureComponent {
     const primaryDoctorResource = datagrid.find(
       (item) => item.isPrimaryClinician,
     )
+    const firstResource = datagrid.find((i) => i.sortOrder === 0)
 
     const parameters = {
       md: 'visreg',
@@ -739,9 +740,9 @@ class Form extends React.PureComponent {
       pdid: primaryDoctorResource.clinicianFK, // primary clinician id
     }
 
-    if (primaryDoctorResource.roomFk) {
+    if (firstResource.roomFk) {
       // pdroomid: primaryDoctorResource.roomFk || null, // primary clinician resource room fk
-      parameters.pdroomid = primaryDoctorResource.roomFk
+      parameters.pdroomid = firstResource.roomFk
     }
 
     this.onCloseFormClick()

@@ -19,16 +19,55 @@ import {
   OutlinedTextField,
   Field,
   Select,
+  notification,
 } from '@/components'
 import { CollectPaymentColumns, amountProps } from './variables'
+import { PAYMENT_MODE } from '@/utils/constants'
 
 const paymentListSchema = Yup.object().shape({
   amountReceived: Yup.number().required(),
 })
 
-@connect(({ claimSubmissionApproved, user }) => ({
+const constructPayment = ({ row, ctpaymentmode, values }) => {
+  const {
+    paymentDate,
+    paymentCreatedBizSessionFK,
+    paymentReceivedByUserFK,
+    paymentModeFK,
+    remark,
+    concurrencyToken,
+  } = values
+  const paymentMode = ctpaymentmode.find((ct) => ct.id === values.paymentModeFK)
+  const isCash = values.paymentModeFK === PAYMENT_MODE.CASH
+
+  const basePayload = {
+    concurrencyToken,
+    invoicePayerFK: row.invoicePayerFK,
+    totalAmtPaid: row.amountReceived,
+    paymentCreatedBizSessionFK,
+    paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
+    paymentReceivedByUserFK,
+    paymentReceivedDate: paymentDate,
+    invoicePaymentMode: [
+      {
+        sequence: 0,
+        amt: row.amountReceived,
+        paymentMode: paymentMode.displayValue,
+        remark,
+        paymentModeFK,
+      },
+    ],
+  }
+  if (isCash) {
+    return { ...basePayload, cashReceived: row.amountReceived, cashRounding: 0 }
+  }
+  return basePayload
+}
+
+@connect(({ claimSubmissionApproved, user, codetable }) => ({
   claimSubmissionApproved,
   user,
+  ctpaymentmode: codetable.ctpaymentmode,
 }))
 @withFormikExtend({
   name: 'claimSubmissionCollectPayment',
@@ -39,27 +78,36 @@ const paymentListSchema = Yup.object().shape({
     paymentDate: Yup.string().required(),
     paymentModeFK: Yup.number().required(),
     rows: Yup.array().of(paymentListSchema),
+    paymentCreatedBizSessionFK: Yup.number().required(),
     creditCardTypeFK: Yup.number().when('paymentModeFK', {
-      is: (val) => val === 1,
+      is: (val) => val === PAYMENT_MODE.CREDIT_CARD,
       then: Yup.number().required(),
     }),
   }),
-  handleSubmit: (values, { props }) => {
-    const { dispatch, user, closeModal } = props
-    const { paymentCreatedBizSessionFK } = values
+  handleSubmit: async (values, { props }) => {
+    const { dispatch, ctpaymentmode, user, onConfirm } = props
+    const { rows } = values
     const paymentReceivedByUserFK = user.data.id
 
-    const payload = {
-      ...values,
-      paymentReceivedBizSessionFK: paymentCreatedBizSessionFK,
-      paymentReceivedByUserFK,
+    const results = await Promise.all(
+      rows.map((row) => {
+        const basePayload = constructPayment({
+          row,
+          ctpaymentmode,
+          values: { ...values, paymentReceivedByUserFK },
+        })
+        return dispatch({
+          type: 'claimSubmissionApproved/submitInvoicePayment',
+          payload: basePayload,
+        })
+      }),
+    )
+    if (results) {
+      notification.success({
+        message: 'Payment Collected',
+      })
+      onConfirm()
     }
-    dispatch({
-      type: 'claimSubmissionApproved/submitInvoicePayment',
-      payload,
-    }).then((r) => {
-      closeModal()
-    })
   },
 })
 class CollectPaymentModal extends PureComponent {
@@ -356,7 +404,7 @@ class CollectPaymentModal extends PureComponent {
                     )}
                   />
                 </GridItem>
-                <GridItem>
+                <GridItem md={4}>
                   <Field
                     name='cardNumber'
                     render={(args) => (
