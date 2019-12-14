@@ -454,6 +454,7 @@ class Medication extends PureComponent {
     setValues({
       ...orders.defaultMedication,
       type: orders.type,
+      visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
     })
   }
@@ -476,6 +477,8 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
+
+    console.log(values)
     return (
       <div>
         <GridContainer>
