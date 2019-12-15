@@ -117,6 +117,7 @@ const Scheme = ({
       columnName: 'claimAmount',
       align: 'right',
       type: 'currency',
+      width: 150,
       currency: true,
       disabled: _isConfirmed,
     },
@@ -236,6 +237,7 @@ const Scheme = ({
                     type: 'currency',
                     currency: true,
                     disabled: true,
+                    width: 150,
                   },
                 ]}
                 rows={invoicePayerItem}

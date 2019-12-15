@@ -174,6 +174,7 @@ export const mapPropsToValues = ({
         patientName,
         patientAccountNo,
         patientProfile,
+        countryCodeFK,
         ...restViewingAppointment
       } = viewingAppointment
 
@@ -182,8 +183,10 @@ export const mapPropsToValues = ({
         const _mobileContact = contactNumbers.find(
           (item) => item.numberTypeFK === 1,
         )
-        if (_mobileContact)
+        if (_mobileContact) {
           patientContactNo = parseInt(_mobileContact.number, 10)
+          countryCodeFK = _mobileContact.countryCodeFK
+        }
         patientName = name
         patientAccountNo = accNo
       }
@@ -199,6 +202,7 @@ export const mapPropsToValues = ({
         patientContactNo,
         patientName,
         patientAccountNo,
+        countryCodeFK,
         bookedByUser,
         overwriteEntireSeries: false,
         recurrenceChanged: false,

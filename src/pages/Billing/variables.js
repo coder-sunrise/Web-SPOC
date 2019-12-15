@@ -23,8 +23,7 @@ export const CompanyInvoicePayerColumn = [
 export const ApplyClaimsColumnExtension = [
   {
     columnName: 'invoiceItemTypeFK',
-    // type: 'codeSelect',
-    // code: 'ltinvoiceitemtype',
+    width: 150,
     render: (row) => {
       if (row.invoiceItemTypeFK) return INVOICE_ITEM_TYPE[row.invoiceItemTypeFK]
       return ''
@@ -36,17 +35,18 @@ export const ApplyClaimsColumnExtension = [
     columnName: 'coverage',
     align: 'right',
     disabled: true,
+    width: 150,
   },
   {
     columnName: 'payableBalance',
     type: 'currency',
     currency: true,
     disabled: true,
+    width: 150,
   },
 
   {
     columnName: 'error',
-
     editingEnabled: false,
     sortingEnabled: false,
     disabled: true,
