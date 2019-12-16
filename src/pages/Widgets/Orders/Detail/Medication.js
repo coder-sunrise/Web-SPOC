@@ -122,15 +122,17 @@ import { calculateAdjustAmount } from '@/utils/utils'
     }
 
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
-
+    const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
+      (i) => i.medicationPrecautionFK !== undefined,
+    )
     const data = {
       sequence: getNextSequence(),
       ...values,
+      corPrescriptionItemPrecaution,
       instruction,
       subject: currentType.getSubject(values),
       isDeleted: false,
     }
-
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
@@ -479,7 +481,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-
     return (
       <div>
         <GridContainer>
