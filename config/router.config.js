@@ -1,16 +1,6 @@
-const routes = [
-  // // user
-  // {
-  //   path: '/user',
-  //   component: '../layouts/UserLayout',
-  //   routes: [
-  //     { path: '/user', redirect: '/user/login' },
-  //     { path: '/user/login', component: './User/Login' },
-  //     { path: '/user/register', component: './User/Register' },
-  //     { path: '/user/register-result', component: './User/RegisterResult' },
-  //   ],
-  // },
-  //
+import devRoutes from './router.dev.config'
+
+const _routes = [
   // login
   {
     path: '/user',
@@ -28,18 +18,9 @@ const routes = [
       },
     ],
   },
-  // {
-  //   path: '/login',
-  //   component: './Login',
-  //   hideInMenu: true,
-  // },
-  // {
-  //   path: '/forgotpassword',
-  //   component: './ForgotPassword',
-  //   hideInMenu: true,
-  // },
+  // login
   //
-  // CMS
+  // Main routes
   {
     path: '/',
     component: '../layouts/BasicLayout',
@@ -885,59 +866,28 @@ const routes = [
         ],
       },
       {
-        hideInMenu: process.env.NODE_ENV === 'production',
-        path: '/development',
-        name: 'Development',
-
-        routes: [
-          {
-            path: '/development/control',
-            name: 'Control',
-            mini: 'C',
-            component: './Development/Control',
-          },
-          {
-            path: '/development/test',
-            name: 'Test',
-            mini: 'C',
-            component: './Development/Control',
-          },
-          // {
-          //   path: '/development/imageeditor',
-          //   name: 'TUIImageEditor',
-          //   mini: 'IE',
-          //   component: './Development/TUIImageEditor',
-          // },
-          {
-            path: '/development/imageeditor2',
-            name: 'LCImageEditor',
-            mini: 'CA',
-            component: './Development/LCImageEditor',
-          },
-          {
-            path: '/development/scribble',
-            name: 'Scribble',
-            mini: 'CA',
-            component: './Development/Scribble',
-          },
-          {
-            path: '/development/reportviewer',
-            name: 'Report Sample',
-            mini: 'RS',
-            component: './Development/Report',
-          },
-          {
-            path: '/development/dentalchart',
-            name: 'Dental Chart',
-            mini: 'DC',
-            component: './Development/DentalChart',
-          },
-        ],
-      },
-      {
         component: '404',
       },
     ],
   },
+  // Main routes
+  //
 ]
+
+const routes =
+  process.env.NODE_ENV === 'production'
+    ? _routes
+    : _routes.map((r, index) => {
+        if (index === 1) {
+          return {
+            ...r,
+            routes: [
+              devRoutes,
+              ...r.routes,
+            ],
+          }
+        }
+        return r
+      })
+
 export default routes
