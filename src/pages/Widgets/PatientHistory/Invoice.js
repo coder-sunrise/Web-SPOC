@@ -61,7 +61,10 @@ export default ({ classes, current, theme, setFieldValue }) => {
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+    if (
+      visitPurposeFK === VISIT_TYPE.RETAIL ||
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST
+    ) {
       columns = [
         { name: 'itemType', title: 'Type' },
         { name: 'itemName', title: 'Name' },
