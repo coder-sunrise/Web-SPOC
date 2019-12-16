@@ -185,7 +185,8 @@ class CommonTableGrid extends PureComponent {
     }
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
-      return this.scrollable ? (
+      const isScrollable = !!height
+      return isScrollable ? (
         <VirtualTable
           tableComponent={TableComponent}
           {...restProps}
