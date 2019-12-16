@@ -59,6 +59,9 @@ const Detail = (props) => {
           code: 'ctcopayer',
         },
       })
+      dispatch({
+        type: 'global/incrementCommitCount',
+      })
     },
     [
       data,
