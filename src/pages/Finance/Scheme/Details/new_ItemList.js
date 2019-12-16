@@ -17,6 +17,10 @@ import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
 class ItemList extends React.Component {
+  state = {
+    currentTab: 1,
+  }
+
   addItemToRows = (obj) => {
     const { setFieldValue, values } = this.props
     const newRows = values.rows
@@ -30,10 +34,11 @@ class ItemList extends React.Component {
   }
 
   onClickAdd = (type) => {
+    const { currentTab } = this.state
     const { values } = this.props
     if (values.tempSelectedItemFK === undefined) return
     const isExisted = values.rows
-      .filter((row) => !row.isDeleted)
+      .filter((row) => !row.isDeleted && row.type === currentTab)
       .map((row) => row.itemFK)
       .includes(values.tempSelectedItemFK)
 
@@ -43,6 +48,7 @@ class ItemList extends React.Component {
     }
 
     const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+
     let newItemRow = {
       uid: getUniqueId(),
       type: itemFieldName.value,
@@ -131,9 +137,12 @@ class ItemList extends React.Component {
     setFieldValue('rows', newRows)
   }
 
-  onTabChange = () => {
+  onTabChange = (tabId) => {
     const { setFieldValue } = this.props
     setFieldValue('tempSelectedItemFK', undefined)
+    this.setState({
+      currentTab: parseInt(tabId, 10),
+    })
   }
 
   render () {
