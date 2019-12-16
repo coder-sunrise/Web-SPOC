@@ -52,7 +52,7 @@ const styles = (theme) => ({
 
     let paymentData = purchaseOrderPayment.map((x, index) => {
       x.isCancelled = x.isDeleted
-
+      delete x.isDeleted
       if (_.has(x, 'isNew')) {
         return {
           purchaseOrderFK: values.id,
