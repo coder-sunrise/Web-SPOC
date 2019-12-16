@@ -12,7 +12,7 @@ import {
   TextField,
   Select,
 } from '@/components'
-import { smsStatus, messageStatus } from '@/utils/codes'
+import { smsStatus, messageStatus, pdpaConsentOptions } from '@/utils/codes'
 
 const styles = (theme) => ({
   checkbox: {
@@ -60,10 +60,16 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem>
-      <GridItem xs={4} className={classes.checkbox}>
+      <GridItem xs={2}>
         <FastField
-          name='consent'
-          render={(args) => <Checkbox label='PDPA Consent' {...args} />}
+          name='pdpaConsent'
+          render={(args) => (
+            <Select
+              label='PDPA Consent'
+              options={pdpaConsentOptions}
+              {...args}
+            />
+          )}
         />
       </GridItem>
       <GridItem md={6} />
