@@ -19,7 +19,7 @@ const styles = (theme) => ({
   },
 })
 
-const FilterBar = ({ classes, handleSubmit }) => {
+const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
