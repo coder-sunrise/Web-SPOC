@@ -22,7 +22,7 @@ class ItemList extends React.Component {
   }
 
   addItemToRows = (obj) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, dispatch } = this.props
     const newRows = values.rows
     newRows.push(obj)
     setFieldValue('rows', newRows)
@@ -31,6 +31,9 @@ class ItemList extends React.Component {
     setFieldValue('tempSelectedItemFK', '')
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   onClickAdd = (type) => {
@@ -129,12 +132,15 @@ class ItemList extends React.Component {
   }
 
   onDeleteClick = (row) => {
-    const { values, setFieldValue } = this.props
+    const { values, setFieldValue, dispatch } = this.props
     const newRows = values.rows.map(
       (item) =>
         item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
     )
     setFieldValue('rows', newRows)
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   onTabChange = (tabId) => {
@@ -147,6 +153,7 @@ class ItemList extends React.Component {
 
   render () {
     const { theme, CPSwitch, CPNumber, values } = this.props
+
     return (
       <div style={{ marginTop: theme.spacing(1) }}>
         <Tabs
@@ -214,15 +221,13 @@ class ItemList extends React.Component {
             {
               columnName: 'cpAmount',
               render: (row) => {
-                // const index = values.rows
-                //   .map((i) => i.itemFK)
-                //   .indexOf(row.itemFK)
-                // console.log({ row, index, rows: values.rows })
+                const { rows = [] } = values
+                const index = rows.map((i) => i.uid).indexOf(row.uid)
                 return (
                   <GridContainer>
                     <GridItem xs={8}>
                       <Field
-                        name={`rows[${row.rowIndex}].itemValue`}
+                        name={`rows[${index}].itemValue`}
                         render={CPNumber(
                           undefined,
                           row.itemValueType === 'ExactAmount'
@@ -233,7 +238,7 @@ class ItemList extends React.Component {
                     </GridItem>
                     <GridItem xs={4}>
                       <Field
-                        name={`rows[${row.rowIndex}].itemValueType`}
+                        name={`rows[${index}].itemValueType`}
                         render={CPSwitch(undefined)}
                       />
                     </GridItem>
