@@ -84,13 +84,13 @@ export default compose(
         moment().subtract(1, 'months'),
         moment(),
       ],
-      consent: true,
+      pdpaConsent: 1,
     }),
 
     handleSubmit: (values, { props }) => {
       const {
         patientName,
-        consent,
+        pdpaConsent,
         lastSMSSendStatus,
         // lastVisitDate,
         upcomingAppointmentDate,
@@ -152,6 +152,12 @@ export default compose(
         }
       } else {
         dispatchType = 'smsPatient'
+        let PDPAConsent
+        if (pdpaConsent === 2) {
+          PDPAConsent = true
+        } else if (pdpaConsent === 3) {
+          PDPAConsent = false
+        }
         payload = {
           group: [
             {
@@ -163,13 +169,15 @@ export default compose(
             },
           ],
           'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
-          'PatientPdpaConsent.IsConsent': consent,
           // 'lgteql_Visit.VisitDate': lastVisitDate
           //   ? moment(lastVisitDate[0]).formatUTC()
           //   : undefined,
           // 'lsteql_Visit.VisitDate': lastVisitDate
           //   ? moment(lastVisitDate[1]).formatUTC(false)
           //   : undefined,
+          apiCriteria: {
+            PDPAConsent,
+          },
         }
       }
 

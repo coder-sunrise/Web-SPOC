@@ -89,7 +89,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     return {
       'lgteql_Visit.VisitDate': moment().subtract(1, 'months').formatUTC(),
       'lsteql_Visit.VisitDate': moment().formatUTC(false),
-      'PatientPdpaConsent.IsConsent': true,
     }
   }
 
