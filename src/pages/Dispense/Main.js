@@ -167,7 +167,6 @@ class Main extends Component {
   makePayment = async () => {
     const { dispatch, dispense, values } = this.props
     const _values = constructPayload(values)
-    // console.log({ _values })
     const finalizeResponse = await dispatch({
       type: 'dispense/finalize',
       payload: {
