@@ -882,8 +882,8 @@ const routes =
           return {
             ...r,
             routes: [
-              ...r.routes,
               devRoutes,
+              ...r.routes,
             ],
           }
         }
