@@ -17,7 +17,7 @@ import {
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
 
-const FilterBar = ({ handleSubmit, values }) => {
+const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <GridContainer>
