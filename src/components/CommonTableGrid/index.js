@@ -169,9 +169,11 @@ class CommonTableGrid extends PureComponent {
       onContextMenu = undefined,
       onRowClick = (f) => f,
       rowMoveable = (f) => false,
+      height: pHeight,
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
+    this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -183,7 +185,7 @@ class CommonTableGrid extends PureComponent {
     }
 
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
-      return height ? (
+      return this.scrollable ? (
         <VirtualTable
           tableComponent={TableComponent}
           {...restProps}
