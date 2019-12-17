@@ -90,8 +90,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     let PDPAMessage = false
     let PDPAEmail = false
     return {
-      'lgteql_Visit.VisitDate': moment().subtract(1, 'months').formatUTC(),
-      'lsteql_Visit.VisitDate': moment().formatUTC(false),
       apiCriteria: {
         PDPAPhone,
         PDPAMessage,
