@@ -6,7 +6,7 @@ import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 
-import { Menu, Dropdown } from 'antd'
+import { Anchor, Menu, Dropdown } from 'antd'
 import {
   FormControl,
   InputLabel,
@@ -149,6 +149,8 @@ const sizes = Object.keys(breakpoints)
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 let lasActivedWidget = null
+
+const { Link } = Anchor
 // @connect(({ cestemplate }) => ({
 //   cestemplate,
 // }))
@@ -164,6 +166,8 @@ class Layout extends PureComponent {
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
+    this.ordersRef = React.createRef()
+    this.myRefs = []
 
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
@@ -524,6 +528,16 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
+  onAnchorClick = (id) => () => {
+    const element = document.getElementById(id)
+
+    if (element)
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'end',
+      })
+  }
+
   render () {
     const { state, props } = this
     const { currentLayout } = state
@@ -635,6 +649,21 @@ class Layout extends PureComponent {
             }}
             // onScroll={this.delayedMainDivScroll}
           >
+            <CardContainer hideHeader>
+              {state.currentLayout.widgets.map((id) => {
+                const w = widgets.find((o) => o.id === id)
+                return (
+                  <Button
+                    size='sm'
+                    variant='outlined'
+                    color='primary'
+                    onClick={this.onAnchorClick(w.name)}
+                  >
+                    {w.name}
+                  </Button>
+                )
+              })}
+            </CardContainer>
             <ResponsiveGridLayout {...layoutCfg}>
               {state.currentLayout.widgets.map((id) => {
                 const w = widgets.find((o) => o.id === id)
@@ -644,8 +673,10 @@ class Layout extends PureComponent {
                 // console.log(cfg, w)
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
+                console.log({ w, cfgs })
                 return (
                   <div
+                    ref={(ref) => this.myRefs.push(ref)}
                     className={classnames({
                       [classes.block]: true,
                       [classes.fullscreen]: state.fullScreenWidget === id,
@@ -655,6 +686,7 @@ class Layout extends PureComponent {
                         state.fullScreenWidget === id,
                     })}
                     key={id}
+                    id={w.name}
                   >
                     <Paper
                       {...this.generateConfig(id)}

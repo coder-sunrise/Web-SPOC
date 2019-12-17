@@ -2,8 +2,10 @@ import React from 'react'
 import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
+import { Anchor } from 'antd'
 // custom type
 import { FastField, Field, withFormik } from 'formik'
+import { Paper } from '@material-ui/core'
 import TimeSchemaType from './YupTime'
 // formik
 // common component
@@ -27,6 +29,7 @@ import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
 
 import { rounding } from '@/components/_medisys/AddPayment/utils'
 
+const { Link } = Anchor
 const doctors = [
   { value: 'bao', name: 'Bao' },
   { value: 'cheah', name: 'Cheah' },
@@ -57,6 +60,13 @@ class Report extends React.Component {
   state = {
     showReport: false,
     amount: 0.05,
+    targetOffset: undefined,
+  }
+
+  componentDidMount () {
+    this.setState({
+      targetOffset: window.innerHeight / 2,
+    })
   }
 
   toggleReport = () =>
@@ -84,13 +94,36 @@ class Report extends React.Component {
     })
   }
 
+  scrollTo = () => {
+    const el = document.getElementById('scrollcontainer')
+    console.log({ el })
+    // window.scrollTo({
+    //   top: 500,
+    //   behavior: 'smooth',
+    // })
+  }
+
   render () {
     const { showReport, showEndSessionSummary } = this.state
     return (
-      <CardContainer hideHeader size='sm'>
-        <Button onClick={this.showReport} color='primary'>
+      <CardContainer hideHeader size='sm' style={{ scrollBehavior: 'smooth' }}>
+        <Button onClick={this.scrollTo} color='primary'>
           Submit
         </Button>
+        <Paper>
+          <div style={{ height: 100, padding: 16 }}>
+            <Anchor
+              bounds={100}
+              targetOffset={this.state.targetOffset}
+              getContainer={() => document.getElementById('scrollcontainer')}
+            >
+              <Link href='#Orders' title='Orders' />
+              <Link href='#Test' title='Orders 1' />
+              <Link href='#Orders' title='Orders 2' />
+              <Link href='#Orders' title='Orders 3' />
+            </Anchor>
+          </div>
+        </Paper>
         <CommonModal
           open={showEndSessionSummary}
           title='Session Summary'
@@ -118,6 +151,20 @@ class Report extends React.Component {
             />
           </GridItem>
         </GridContainer>
+        <div id='scrollcontainer'>
+          <div style={{ height: 700 }}>
+            <span>div 1</span>
+          </div>
+          <div style={{ height: 700 }}>
+            <span>div 1</span>
+          </div>
+          <div style={{ height: 700 }} id='Orders'>
+            <span>Orders</span>
+          </div>
+          <div style={{ height: 700 }} id='Test'>
+            <span>Test</span>
+          </div>
+        </div>
       </CardContainer>
     )
   }
