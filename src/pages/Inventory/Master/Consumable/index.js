@@ -48,7 +48,7 @@ const Consumable = ({
       columnName: 'uom',
       type: 'codeSelect',
       code: 'ctConsumableUnitOfMeasurement',
-      sortBy: 'uomfk',
+      sortBy: 'UOMFkNavigation.DisplayValue',
       width: 110,
     },
     {

@@ -124,7 +124,7 @@ class ClinicInfo extends PureComponent {
           </GridItem>
           <GridItem md={3}>
             <FastField
-              name='clinicId'
+              name='heCode'
               render={(args) => (
                 <TextField label='Clinic ID (HCI Code)' disabled {...args} />
               )}
