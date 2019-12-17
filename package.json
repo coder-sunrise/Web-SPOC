@@ -115,6 +115,7 @@
     "react-router-dom": "^4.3.1",
     "react-simple-infinite-scroll": "0.0.1",
     "react-sketch": "^0.5.1",
+    "react-sortable-hoc": "^1.10.1",
     "react-swipeable-views": "^0.13.0",
     "react-table": "^6.8.6",
     "resize-base64": "^1.0.12",
