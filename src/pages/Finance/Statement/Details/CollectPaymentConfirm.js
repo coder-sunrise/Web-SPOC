@@ -200,8 +200,9 @@ class CollectPaymentConfirm extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    // const selectedDate = moment(event).format('YYMMDD')
-    this.props.getBizList(event)
+    if (event) {
+      this.props.getBizList(event)
+    }
   }
 
   onChangePaymentMode = (event, op) => {
