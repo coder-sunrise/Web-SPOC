@@ -340,10 +340,13 @@ class Detail extends PureComponent {
         maxSelected: 1,
         disableAll: true,
         options: (row) => {
-          const item = this.state.MedicationItemList.find(
-            (o) => o.itemFK === row.code,
-          )
-          return item.stock
+          if (row.code) {
+            const item = this.state.MedicationItemList.find(
+              (o) => o.itemFK === row.code,
+            )
+            if (item) return item.stock
+          }
+          return []
         },
         onChange: (e) => {
           this.handleSelectedBatch(e)
