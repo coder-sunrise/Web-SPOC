@@ -57,6 +57,7 @@ import SelectTypeProvider from './EditCellComponents/SelectTypeProvider'
 import DateTypeProvider from './EditCellComponents/DateTypeProvider'
 import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
+import ChecboxTypeProvider from './EditCellComponents/ChecboxTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import PatchedTableSelection from './plugins/PatchedTableSelection'
@@ -603,7 +604,12 @@ class CommonTableGrid extends PureComponent {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
       if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
-        if (colCfg.type !== 'radio') {
+        if (
+          ![
+            'radio',
+            'checkbox',
+          ].includes(colCfg.type)
+        ) {
           cfg = {
             tabIndex: 0,
             onFocus: onClick,
@@ -1007,6 +1013,7 @@ class CommonTableGrid extends PureComponent {
               <NumberTypeProvider {...cellComponentConfig} />
               <SelectTypeProvider {...cellComponentConfig} />
               <RadioTypeProvider {...cellComponentConfig} />
+              <ChecboxTypeProvider {...cellComponentConfig} />
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />

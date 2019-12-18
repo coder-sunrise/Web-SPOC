@@ -84,7 +84,7 @@ const CancelButton = ({
   </Tooltip>
 )
 
-const DeleteButton = ({ onExecute, text }) => {
+const DeleteButton = ({ onExecute, text, isDeletable, row, ...restProps }) => {
   return (
     <Tooltip title={text} placement='top'>
       <Button
@@ -94,8 +94,9 @@ const DeleteButton = ({ onExecute, text }) => {
           // updateGlobalVariable('gridIgnoreValidation', true)
           onExecute(e)
         }}
+        disabled={!isDeletable(row)}
         justIcon
-        color='primary'
+        color='danger'
       >
         <Delete />
       </Button>

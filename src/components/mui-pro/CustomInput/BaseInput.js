@@ -306,7 +306,7 @@ class BaseInput extends React.PureComponent {
             }
             enterDelay={0}
           >
-            <Error color='error' style={{ cursor: 'pointer' }} />
+            <Error color='error' style={{ cursor: 'pointer', top: 0 }} />
           </Tooltip>
         </InputAdornment>
       )
