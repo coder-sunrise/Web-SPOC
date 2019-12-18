@@ -17,6 +17,7 @@ import {
 } from '@material-ui/core'
 import Error from '@material-ui/icons/Error'
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight'
+import { navigateDirtyCheck, getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import Loading from '@/components/PageLoading/index'
 import {
   withFormikExtend,
@@ -38,7 +39,7 @@ import {
 } from '@/components'
 import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+
 import schema from './schema'
 import { queryList } from '@/services/patient'
 
@@ -332,16 +333,20 @@ class PatientDetail extends PureComponent {
   //   }, 2000)
   // }
 
-  registerVisit = () => {
-    this.props
-      .dispatch({
-        type: 'patient/closePatientModal',
-      })
-      .then(() => {
-        router.push(
-          `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
-        )
-      })
+  registerVisit = (e) => {
+    navigateDirtyCheck({
+      onProceed: () => {
+        this.props
+          .dispatch({
+            type: 'patient/closePatientModal',
+          })
+          .then(() => {
+            router.push(
+              `/reception/queue?md=visreg&pid=${this.props.patient.entity.id}`,
+            )
+          })
+      },
+    })(e)
   }
 
   handleOpenReplacementModal = () =>
