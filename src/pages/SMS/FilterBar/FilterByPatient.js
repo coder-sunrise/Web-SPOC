@@ -11,6 +11,7 @@ import {
   GridItem,
   TextField,
   Select,
+  GridContainer,
 } from '@/components'
 import { smsStatus, messageStatus } from '@/utils/codes'
 
@@ -60,11 +61,27 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem>
-      <GridItem xs={4} className={classes.checkbox}>
-        <FastField
-          name='consent'
-          render={(args) => <Checkbox label='PDPA Consent' {...args} />}
-        />
+      <GridItem xs={3}>
+        <GridContainer>
+          <GridItem xs={5} className={classes.checkbox}>
+            <FastField
+              name='phoneCall'
+              render={(args) => <Checkbox label='Phone Call' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={5} className={classes.checkbox}>
+            <FastField
+              name='textMessage'
+              render={(args) => <Checkbox label='Text Message' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.checkbox}>
+            <FastField
+              name='email'
+              render={(args) => <Checkbox label='Email' {...args} />}
+            />
+          </GridItem>
+        </GridContainer>
       </GridItem>
       <GridItem md={6} />
 

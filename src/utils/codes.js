@@ -205,6 +205,7 @@ const gstEnabled = [
   { value: false, name: 'No' },
   { value: true, name: 'Yes' },
 ]
+
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1467,17 +1468,17 @@ export const podoOrderType = [
 export const InventoryTypes = [
   {
     value: 1,
-    name: 'Comsumables',
-    prop: 'consumableValueDto',
-    itemFKName: 'inventoryConsumableFK',
-    ctName: 'inventoryconsumable',
-  },
-  {
-    value: 2,
     name: 'Medications',
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
+  },
+  {
+    value: 2,
+    name: 'Comsumables',
+    prop: 'consumableValueDto',
+    itemFKName: 'inventoryConsumableFK',
+    ctName: 'inventoryconsumable',
   },
   {
     value: 3,

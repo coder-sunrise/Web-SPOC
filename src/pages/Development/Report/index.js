@@ -1,36 +1,34 @@
 import React from 'react'
-import moment from 'moment'
 import { connect } from 'dva'
 import * as Yup from 'yup'
 // custom type
-import { FastField, Field, withFormik } from 'formik'
-import TimeSchemaType from './YupTime'
+import { withFormik } from 'formik'
+import AttachMoney from '@material-ui/icons/AttachMoney'
+import { withStyles } from '@material-ui/core'
 // formik
 // common component
 import {
   Button,
   CardContainer,
-  CodeSelect,
   GridContainer,
   GridItem,
-  TimePicker,
-  DatePicker,
-  DateRangePicker,
   NumberInput,
   CommonModal,
-  Select,
-  TextField,
 } from '@/components'
+import { DiagnosisSelect } from '@/components/_medisys'
 // component
-import { ReportViewer } from '@/components/_medisys'
 import EndSessionSummary from '@/pages/Report/SessionSummary/Details/index'
-
 import { rounding } from '@/components/_medisys/AddPayment/utils'
 
-const doctors = [
-  { value: 'bao', name: 'Bao' },
-  { value: 'cheah', name: 'Cheah' },
-]
+const styles = (theme) => ({
+  money: {
+    width: 16,
+    height: 16,
+    top: 3,
+    position: 'relative',
+    color: 'green',
+  },
+})
 
 @connect(({ codetable, clinicSettings }) => ({
   clinicSettings: clinicSettings.settings || clinicSettings.default,
@@ -85,6 +83,7 @@ class Report extends React.Component {
   }
 
   render () {
+    const { classes } = this.props
     const { showReport, showEndSessionSummary } = this.state
     return (
       <CardContainer hideHeader size='sm'>
@@ -117,10 +116,15 @@ class Report extends React.Component {
               value={this.state.rounded}
             />
           </GridItem>
+          <GridItem md={3}>
+            <DiagnosisSelect
+              prefix={<AttachMoney className={classes.money} />}
+            />
+          </GridItem>
         </GridContainer>
       </CardContainer>
     )
   }
 }
 
-export default Report
+export default withStyles(styles)(Report)

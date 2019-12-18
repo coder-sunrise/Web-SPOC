@@ -86,10 +86,15 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
         in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
       }
     }
+    let PDPAPhone = false
+    let PDPAMessage = false
+    let PDPAEmail = false
     return {
-      'lgteql_Visit.VisitDate': moment().subtract(1, 'months').formatUTC(),
-      'lsteql_Visit.VisitDate': moment().formatUTC(false),
-      'PatientPdpaConsent.IsConsent': true,
+      apiCriteria: {
+        PDPAPhone,
+        PDPAMessage,
+        PDPAEmail,
+      },
     }
   }
 

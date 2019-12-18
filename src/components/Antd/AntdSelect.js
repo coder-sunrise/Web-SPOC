@@ -341,7 +341,6 @@ class AntdSelect extends React.PureComponent {
   }
 
   handleFocus = (e) => {
-    console.log(e)
     this.setState({ shrink: true, focus: true })
     this.debounceFocus(this.myRef.current)
   }

@@ -318,18 +318,6 @@ class Modal extends PureComponent {
     setFieldValue('balanceAfter', finalBalance)
   }
 
-  handleMaxLengthCardNumber = (e) => {
-    const { value } = e.target
-    const stringValue = value.toString()
-    if (stringValue.length > 4) {
-      const cardNumber = Number(stringValue.substring(0, 4), 10)
-      this.props.setFieldValue(
-        'patientDepositTransaction.cardNumber',
-        cardNumber,
-      )
-    }
-  }
-
   render () {
     const { props } = this
     const { classes, footer, isDeposit, deposit } = props
@@ -414,7 +402,7 @@ class Modal extends PureComponent {
                   render={(args) => (
                     <NumberInput
                       label='Card Number'
-                      onChange={(e) => this.handleMaxLengthCardNumber(e)}
+                      precision={0}
                       inputProps={{ maxLength: 4 }}
                       maxLength={4}
                       {...args}

@@ -914,6 +914,14 @@ const getRefreshChasBalanceStatus = (status = []) => {
   return { ...defaultResponse, isSuccessful: true }
 }
 
+const sortAdjustment = (a, b) => {
+  const { sequence: aSequence } = a
+  const { sequence: bSequence } = b
+  if (aSequence < bSequence) return -1
+  if (aSequence > bSequence) return 1
+  return 0
+}
+
 const calculateAmount = (
   rows,
   adjustments,
@@ -1038,13 +1046,16 @@ const calculateAmount = (
 
   const r = {
     rows,
-    adjustments: adjustments.map((o, index) => ({
-      ...o,
-      index,
-      [invoiceItemAdjustmentField]: activeRows.map(
-        mapInvoiceItemAdjustment(o, index),
-      ),
-    })),
+    adjustments: adjustments
+      .map((o, index) => ({
+        ...o,
+        index,
+        sequence: index + 1,
+        [invoiceItemAdjustmentField]: activeRows.map(
+          mapInvoiceItemAdjustment(o, index),
+        ),
+      }))
+      .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
         rows.map((row) => row[totalField]).reduce(sumReducer, 0),
