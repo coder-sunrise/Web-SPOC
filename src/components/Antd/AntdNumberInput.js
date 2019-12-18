@@ -152,10 +152,21 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleFocus = (e) => {
-    // console.log('handleFocus', e.target.value)
     this.setState({
       focused: true,
     })
+    const { target } = e
+    setTimeout(() => {
+      const v = `${this.state.value}`
+
+      if (v) {
+        const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
+
+        if (dotIndex) {
+          target.setSelectionRange(dotIndex, dotIndex)
+        }
+      }
+    }, 0)
     // if (!e.target.value && e.target.value !== 0) {
     //   const cfg = this.getConfig()
     //   if (cfg && cfg.formatter)
@@ -234,10 +245,23 @@ class AntdNumberInput extends React.PureComponent {
       e.shiftKey &&
       ![
         187,
+        9,
       ].includes(e.keyCode)
     ) {
       e.preventDefault()
       return false
+    }
+    if (e.keyCode === 190) {
+      const v = `${this.state.value}`
+
+      const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
+      // console.log(v, dotIndex, v.length)
+
+      if (dotIndex) {
+        e.target.setSelectionRange(dotIndex + 1, dotIndex + 1)
+        e.preventDefault()
+        return false
+      }
     }
     if (
       !e.ctrlKey &&
@@ -252,6 +276,7 @@ class AntdNumberInput extends React.PureComponent {
         189,
         109,
         107,
+        190,
       ].includes(e.keyCode)
     ) {
       e.preventDefault()
@@ -446,27 +471,27 @@ class AntdNumberInput extends React.PureComponent {
           if (v.indexOf('+') >= 0) {
             v = `${v.replace('-', '').replace('+', '')}`
           }
-          if (v.indexOf('-') >= 0) {
+          if (v.indexOf('-') > 0) {
             v = `-${v.replace('-', '')}`
           }
         }
-        if (!Number(v) && this.state.value === '') return ''
-        if (format) {
-          if (format.lastIndexOf('.') > 0) {
-            v = `${v}`.replace('.', '')
-            const lastCharIsZero = v[v.length - 1] === '0'
-            const tv = Number(v) / Math.pow(10, dotPos.length)
-            if (Number.isNaN(tv)) return ''
-            v = `${tv}`
-            const idx = v.indexOf('.')
-            if (lastCharIsZero && idx >= 0) {
-              v += dotPos
-              v =
-                v.substring(0, idx) + v.substring(idx, idx + dotPos.length + 1)
-            }
-            if (idx < 0) v += `.${dotPos}`
-          }
-        }
+        if (!Number(v) && this.state.value === '' && v !== '-') return ''
+        // if (format && v !== '-') {
+        //   if (format.lastIndexOf('.') > 0) {
+        //     v = `${v}`.replace('.', '')
+        //     const lastCharIsZero = v[v.length - 1] === '0'
+        //     const tv = Number(v) / Math.pow(10, dotPos.length)
+        //     if (Number.isNaN(tv)) return ''
+        //     v = `${tv}`
+        //     const idx = v.indexOf('.')
+        //     if (lastCharIsZero && idx >= 0) {
+        //       v += dotPos
+        //       v =
+        //         v.substring(0, idx) + v.substring(idx, idx + dotPos.length + 1)
+        //     }
+        //     if (idx < 0) v += `.${dotPos}`
+        //   }
+        // }
         if (typeof v === 'number') return v
         return v.replace(/\$\s?|(,*)/g, '')
       }
