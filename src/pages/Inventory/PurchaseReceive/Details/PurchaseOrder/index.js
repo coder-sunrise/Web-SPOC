@@ -68,6 +68,12 @@ class Index extends Component {
     this.getPOdata()
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'purchaseOrderDetails/initializePurchaseOrder',
+    })
+  }
+
   getPOdata = (createdId) => {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails

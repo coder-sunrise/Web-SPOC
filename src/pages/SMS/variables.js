@@ -7,6 +7,30 @@ import {
   timeFormatSmallCase,
   Tooltip,
 } from '@/components'
+import { SMS_STATUS_TEXT } from '@/utils/constants'
+
+const renderSMSStatus = (status) => {
+  if (
+    status === SMS_STATUS_TEXT.SENT ||
+    status === SMS_STATUS_TEXT.DELIVERED ||
+    status === SMS_STATUS_TEXT.RECEIVING ||
+    status === SMS_STATUS_TEXT.RECEIVED ||
+    status === SMS_STATUS_TEXT.ACCEPTED ||
+    status === SMS_STATUS_TEXT.SCHEDULED ||
+    status === SMS_STATUS_TEXT.READ ||
+    status === SMS_STATUS_TEXT.QUEUED ||
+    status === SMS_STATUS_TEXT.SENDING
+  ) {
+    return SMS_STATUS_TEXT.SENT
+  }
+  if (
+    status === SMS_STATUS_TEXT.FAILED ||
+    status === SMS_STATUS_TEXT.UNDELIVERED
+  )
+    return SMS_STATUS_TEXT.FAILED
+
+  return null
+}
 
 const appointmentColumns = [
   { name: 'patientName', title: 'Patient Name' },
@@ -94,6 +118,7 @@ const appointmentColumnsExtensions = [
   {
     columnName: 'lastSMSSendStatus',
     sortingEnabled: false,
+    render: (row) => renderSMSStatus(row.lastSMSSendStatus),
     // sortBy:
     //   'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
   },
@@ -144,6 +169,7 @@ const patientColumnsExtensions = [
   {
     columnName: 'lastSMSSendStatus',
     sortingEnabled: false,
+    render: (row) => renderSMSStatus(row.lastSMSSendStatus),
     // sortBy:
     //   'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFkNavigation.displayValue',
   },
