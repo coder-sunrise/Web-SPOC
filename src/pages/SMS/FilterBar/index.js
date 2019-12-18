@@ -102,6 +102,7 @@ export default compose(
         isReminderSent,
         doctor = [],
         appointmentType = [],
+        pdpaConsent = [],
       } = values
       const { dispatch, type, setSelectedRows } = props
 
@@ -164,9 +165,9 @@ export default compose(
         }
       } else {
         dispatchType = 'smsPatient'
-        let PDPAPhone = phoneCall
-        let PDPAMessage = textMessage
-        let PDPAEmail = email
+        let PDPAPhone = pdpaConsent.includes('1') // phone
+        let PDPAMessage = pdpaConsent.includes('2') // sms
+        let PDPAEmail = pdpaConsent.includes('3') // email
         payload = {
           group: [
             {
