@@ -257,7 +257,7 @@ class AntdNumberInput extends React.PureComponent {
       const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
       // console.log(v, dotIndex, v.length)
 
-      if (dotIndex) {
+      if (e.target.value.split('.').length === 2) {
         e.target.setSelectionRange(dotIndex + 1, dotIndex + 1)
         e.preventDefault()
         return false
