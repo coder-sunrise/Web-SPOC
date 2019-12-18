@@ -21,6 +21,7 @@ import {
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
 import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { CrNoteColumns } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
@@ -38,10 +39,14 @@ import MiscCrNote from './MiscCrNote'
     return invoiceCreditNote
   },
   validate: (values) => {
-    const { creditNoteBalance, finalCredit } = values
+    const { creditNoteBalance, finalCredit, payerType } = values
     const errors = {}
     if (creditNoteBalance - finalCredit < 0) {
-      errors.finalCredit = `Total Credit Notes amount cannot be more than Outstanding Amount. (Balance: $${creditNoteBalance.toFixed(
+      const amountType =
+        payerType === INVOICE_PAYER_TYPE.PATIENT
+          ? 'Patient Payable Amount'
+          : 'Outstanding Amount'
+      errors.finalCredit = `Total Credit Notes amount cannot be more than ${amountType}. (Balance: $${creditNoteBalance.toFixed(
         2,
       )})`
     }
@@ -49,7 +54,6 @@ import MiscCrNote from './MiscCrNote'
   },
   handleSubmit: (values, { props }) => {
     const { invoiceDetail, dispatch, onConfirm, onRefresh } = props
-    // console.log({ values, props })
     const {
       creditNoteItem,
       invoicePayerFK,
@@ -62,7 +66,8 @@ import MiscCrNote from './MiscCrNote'
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
       0,
     )
-    const gstAmt = roundTo(gstAmount)
+    const gstAmt = roundTo(gstAmount) || 0
+
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,

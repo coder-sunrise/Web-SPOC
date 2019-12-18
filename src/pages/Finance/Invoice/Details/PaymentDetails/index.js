@@ -98,9 +98,9 @@ class PaymentDetails extends Component {
   }
 
   _validateOutstandingAmount = (invoicePayer, callback) => {
-    if (invoicePayer.outStanding === 0) {
+    if (invoicePayer.outStanding <= 0) {
       notification.error({
-        message: 'This payer does not have any outstanding',
+        message: 'This payer does not have any outstanding balance',
       })
     } else callback()
   }
@@ -231,7 +231,7 @@ class PaymentDetails extends Component {
   }
 
   onAddCrNoteClick = (invoicePayerFK, payerType) => {
-    const { dispatch, invoiceDetail, invoicePayment } = this.props
+    const { dispatch, invoiceDetail, invoicePayment, values } = this.props
     dispatch({
       type: 'invoiceCreditNote/mapCreditNote',
       payload: {
@@ -241,7 +241,6 @@ class PaymentDetails extends Component {
         invoicePaymentDetails: invoicePayment.entity || {},
       },
     })
-
     this.setState({ showAddCrNote: true })
   }
 
@@ -426,7 +425,6 @@ class PaymentDetails extends Component {
           values
             .sort((a, b) => a.payerTypeFK - b.payerTypeFK)
             .map((payment) => {
-              console.log({ payment })
               return (
                 <PaymentCard
                   coPaymentSchemeFK={payment.coPaymentSchemeFK}
