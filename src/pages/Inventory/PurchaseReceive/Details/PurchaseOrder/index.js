@@ -140,7 +140,7 @@ class Index extends Component {
 
   onSubmitButtonClicked = async (action) => {
     const { dispatch, validateForm, history } = this.props
-    let dispatchType = 'purchaseOrderDetails/upsert'
+    let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
     const isFormValid = await validateForm()
     let validation = false
