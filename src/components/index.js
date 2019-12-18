@@ -27,6 +27,7 @@ export CommonHeader from './CommonHeader'
 export CommonTableGrid from './CommonTableGrid'
 export Tooltip from './CommonToolTip'
 export EditableTableGrid from './CommonTableGrid/EditableTableGrid'
+export DragableTableGrid from './CommonTableGrid/DragableTableGrid'
 export NumberTypeProvider2 from './CommonTableGrid/EditCellComponents/NumberTypeProvider'
 
 export { default as AntdInput } from './mui-pro/CustomInput' // Antd/AntdInput'
