@@ -26,6 +26,7 @@ const AttachmentChipWithPopover = ({
   ] = useState(false)
 
   const toggleVisibleChange = () => setShow(!show)
+  const handleDelete = !isReadOnly ? toggleVisibleChange : null
   return (
     <span>
       <Chip
@@ -35,7 +36,7 @@ const AttachmentChipWithPopover = ({
         label={attachment.fileName}
         color={attachment.id ? 'primary' : ''}
         onClick={() => onClickAttachment(attachment)}
-        onDelete={toggleVisibleChange}
+        onDelete={handleDelete}
         className={classes.chip}
       />
       <Popover

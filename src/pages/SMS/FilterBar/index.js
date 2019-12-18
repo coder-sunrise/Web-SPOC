@@ -84,13 +84,17 @@ export default compose(
         moment().subtract(1, 'months'),
         moment(),
       ],
-      pdpaConsent: 1,
+      phoneCall: false,
+      textMessage: false,
+      email: false,
     }),
 
     handleSubmit: (values, { props }) => {
       const {
         patientName,
-        pdpaConsent,
+        phoneCall,
+        textMessage,
+        email,
         lastSMSSendStatus,
         // lastVisitDate,
         upcomingAppointmentDate,
@@ -152,12 +156,9 @@ export default compose(
         }
       } else {
         dispatchType = 'smsPatient'
-        let PDPAConsent
-        if (pdpaConsent === 2) {
-          PDPAConsent = true
-        } else if (pdpaConsent === 3) {
-          PDPAConsent = false
-        }
+        let PDPAPhone = phoneCall
+        let PDPAMessage = textMessage
+        let PDPAEmail = email
         payload = {
           group: [
             {
@@ -176,7 +177,9 @@ export default compose(
           //   ? moment(lastVisitDate[1]).formatUTC(false)
           //   : undefined,
           apiCriteria: {
-            PDPAConsent,
+            PDPAPhone,
+            PDPAMessage,
+            PDPAEmail,
           },
         }
       }

@@ -304,6 +304,8 @@ const ApplyClaims = ({
         _isDeleted: true,
         isCancelled: true,
         isModified: true,
+        _isConfirmed: true,
+        _isEditing: false,
       }))
 
       if (claimableSchemes.length > 0) {
@@ -317,7 +319,7 @@ const ApplyClaims = ({
           _invoicePayer,
         ]
         setCurEditInvoicePayerBackup(_invoicePayer)
-        setInitialState(newTempInvoicePayer)
+        // setInitialState(newTempInvoicePayer)
         handleSchemeChange(
           _invoicePayer.claimableSchemes[0].id,
           newTempInvoicePayer.length - 1,
@@ -326,7 +328,7 @@ const ApplyClaims = ({
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
-        setInitialState([])
+        // setInitialState([])
         setTempInvoicePayer(_newTempInvoicePayer)
       }
     },

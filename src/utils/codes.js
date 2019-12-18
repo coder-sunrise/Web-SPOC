@@ -206,11 +206,6 @@ const gstEnabled = [
   { value: true, name: 'Yes' },
 ]
 
-const pdpaConsentOptions = [
-  { value: 1, name: 'All' },
-  { value: 2, name: 'Confirmed' },
-  { value: 3, name: 'Unconfirmed' },
-]
 // const paymentMethods = [
 //   { name: 'Cash', value: 'cash' },
 //   { name: 'Nets', value: 'nets' },
@@ -1974,6 +1969,5 @@ module.exports = {
   roundToPrecision,
   gstEnabled,
   groupByFKFunc,
-  pdpaConsentOptions,
   ...module.exports,
 }
