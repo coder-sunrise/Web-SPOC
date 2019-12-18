@@ -242,15 +242,17 @@ class Modal extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    const { isDeposit } = this.props
-    const selectedDate = moment(event).format('YYMMDD')
+    if (event) {
+      const { isDeposit } = this.props
+      const selectedDate = moment(event).format('YYMMDD')
 
-    if (isDeposit && selectedDate === moment().format('YYMMDD')) {
-      this.setState({ isSessionRequired: false })
-    } else {
-      this.setState({ isSessionRequired: true })
+      if (isDeposit && selectedDate === moment().format('YYMMDD')) {
+        this.setState({ isSessionRequired: false })
+      } else {
+        this.setState({ isSessionRequired: true })
+      }
+      this.getBizList(event)
     }
-    this.getBizList(event)
   }
 
   getBizList = (date) => {
