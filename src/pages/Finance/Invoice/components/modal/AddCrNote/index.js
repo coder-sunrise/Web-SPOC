@@ -57,7 +57,6 @@ import MiscCrNote from './MiscCrNote'
       remark,
       finalCredit,
     } = values
-    console.log({ creditNoteItem })
     const gstAmount = creditNoteItem.reduce(
       (totalGstAmount, item) =>
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,

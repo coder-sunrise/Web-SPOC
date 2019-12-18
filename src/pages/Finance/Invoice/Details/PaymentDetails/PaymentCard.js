@@ -107,7 +107,7 @@ const PaymentCard = ({
             type={payerTypeFK}
             invoicePayerFK={invoicePayerFK}
             companyFK={companyFK}
-            readOnly={readOnly || companyFK === 1}
+            readOnly={readOnly}
             hasActiveSession={hasActiveSession}
             handlePrinterClick={handlePrinterClick}
             {...buttonActions}
