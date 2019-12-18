@@ -208,8 +208,12 @@ class TextTypeProvider extends React.Component {
       // console.log(cols[i].columnName, cols[i].type)
       // delete cols[i].type
       const defaultCompare = (a, b) => {
+        if (isFinite(a) && isFinite(b)) {
+          return a - b
+        }
+
         // eslint-disable-next-line no-nested-ternary
-        return (a || '').localeCompare(b || '')
+        return (a || '').toString().localeCompare(b || '').toString()
       }
       cols[i].compare = cols[i].compare || defaultCompare
       // cols[i].index = i
