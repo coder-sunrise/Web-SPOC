@@ -62,7 +62,18 @@ export default createListViewModel({
         const { data } = payload
         return {
           ...st,
-          entity: data,
+          entity: {
+            ...data,
+            inventoryAdjustmentItems: data.inventoryAdjustmentItems.map((o) => {
+              return {
+                ...o,
+                preInventoryTypeFK: o.inventoryTypeFK,
+                preVaccination: o.vaccination,
+                preConsumable: o.consumable,
+                preMedication: o.medication,
+              }
+            }),
+          },
         }
       },
 
