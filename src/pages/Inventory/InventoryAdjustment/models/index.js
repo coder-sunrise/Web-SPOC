@@ -68,9 +68,6 @@ export default createListViewModel({
               return {
                 ...o,
                 preInventoryTypeFK: o.inventoryTypeFK,
-                preVaccination: o.vaccination,
-                preConsumable: o.consumable,
-                preMedication: o.medication,
               }
             }),
           },

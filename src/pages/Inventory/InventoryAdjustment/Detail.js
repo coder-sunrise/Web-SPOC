@@ -84,9 +84,6 @@ const inventoryAdjustmentSchema = Yup.object().shape({
         return {
           ...o,
           inventoryTypeFK: o.preInventoryTypeFK,
-          vaccination: o.preVaccination,
-          consumable: o.preConsumable,
-          medication: o.preMedication,
         }
       }
       const type = (v) => {
