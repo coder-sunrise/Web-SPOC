@@ -80,6 +80,12 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
     // console.log('list', inventoryAdjustmentItems, stockList)
     const newInventoryAdjustmentItem = list.map((o, index) => {
+      if (o.isDeleted) {
+        return {
+          ...o,
+          inventoryTypeFK: o.preInventoryTypeFK,
+        }
+      }
       const type = (v) => {
         switch (v) {
           case INVENTORY_TYPE.MEDICATION:
@@ -630,7 +636,6 @@ class Detail extends PureComponent {
           row.stockFK = id
           row.stockId = id
           row.isManuallyCreated = false
-          row.concurrencyToken = concurrencyToken
         } else {
           row.stockFK = undefined
           row.isManuallyCreated = true
