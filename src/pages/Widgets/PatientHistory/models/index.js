@@ -78,9 +78,12 @@ export default createListViewModel({
             (o) =>
               o.coHistory.length >= 1 || o.visitPurposeFK === VISIT_TYPE.RETAIL,
           )
-
+          console.log({ filteredList })
           if (filteredList.length > 0) {
-            if (filteredList[0].visitPurposeFK === VISIT_TYPE.RETAIL) {
+            if (
+              filteredList[0].visitPurposeFK === VISIT_TYPE.RETAIL
+              // && filteredList[0].coHistory.length > 0
+            ) {
               yield put({
                 type: 'updateState',
                 payload: {
