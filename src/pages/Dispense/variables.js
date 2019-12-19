@@ -71,6 +71,21 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
+    columnName: 'instruction',
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.instruction}
+        </div>
+      )
+    },
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
     width: columnWidth,
     type: 'currency',
