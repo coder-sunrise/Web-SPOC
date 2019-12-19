@@ -310,77 +310,18 @@ export default ({ orders, dispatch, classes }) => {
           columnName: 'description',
           width: 300,
           render: (row) => {
-            const _renderHTML = (textList) => {
-              return (
-                <Tooltip
-                  title={
-                    <React.Fragment>
-                      <div>
-                        {textList.map((t) => {
-                          return <p>{t}</p>
-                        })}
-                      </div>
-                    </React.Fragment>
-                  }
+            return (
+              <Tooltip title={row.instruction}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
                 >
-                  <div>
-                    {textList.map((item) => {
-                      return (
-                        <p
-                          style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {item}
-                        </p>
-                      )
-                    })}
-                  </div>
-                </Tooltip>
-              )
-            }
-            let text = ''
-            if (row.usageMethodFK && row.dosageFK && row.uomfk) {
-              text = `${row.usageMethodDisplayValue
-                ? row.usageMethodDisplayValue
-                : ''} ${row.dosageDisplayValue
-                ? row.dosageDisplayValue
-                : ''} ${row.uomDisplayValue ? row.uomDisplayValue : ''} `
-            }
-
-            if (row.corPrescriptionItemInstruction) {
-              let nextStepdose = ''
-              const textArray = row.corPrescriptionItemInstruction.map(
-                (item, i) => {
-                  if (i < row.corPrescriptionItemInstruction.length - 1) {
-                    nextStepdose = ` ${row.corPrescriptionItemInstruction[i + 1]
-                      .stepdose}`
-                  } else {
-                    nextStepdose = ''
-                  }
-
-                  let txt = `${item.usageMethodDisplayValue
-                    ? item.usageMethodDisplayValue
-                    : ''} ${item.dosageDisplayValue
-                    ? item.dosageDisplayValue
-                    : ''} ${item.prescribeUOMDisplayValue
-                    ? item.prescribeUOMDisplayValue
-                    : ''} ${item.drugFrequencyDisplayValue
-                    ? item.drugFrequencyDisplayValue
-                    : ''} For ${item.duration
-                    ? item.duration
-                    : ''} day(s)${nextStepdose}`
-
-                  return txt
-                },
-              )
-              return _renderHTML(textArray)
-            }
-            return _renderHTML([
-              text,
-            ])
+                  {row.instruction}
+                </div>
+              </Tooltip>
+            )
           },
         },
         {
