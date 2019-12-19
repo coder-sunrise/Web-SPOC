@@ -8,7 +8,11 @@ import { headerHeight } from 'mui-pro-jss'
 import Warining from '@material-ui/icons/Error'
 import Edit from '@material-ui/icons/Edit'
 import Refresh from '@material-ui/icons/Sync'
-import { SchemePopover, MoreButton } from '@/components/_medisys'
+import {
+  SchemePopover,
+  MoreButton,
+  LoadingWrapper,
+} from '@/components/_medisys'
 import {
   GridContainer,
   GridItem,
@@ -36,9 +40,10 @@ const headerStyles = {
 }
 
 @control()
-@connect(({ patient, codetable }) => ({
+@connect(({ patient, codetable, loading }) => ({
   patient,
   codetable,
+  refreshingChasBalance: loading.effects['patient/refreshChasBalance'],
 }))
 class Banner extends PureComponent {
   state = {
@@ -342,6 +347,7 @@ class Banner extends PureComponent {
         // maxHeight: 100,
         backgroundColor: '#f0f8ff',
       },
+      refreshingChasBalance,
     } = props
 
     const { entity } = patient
@@ -463,92 +469,97 @@ class Banner extends PureComponent {
             />
           </GridItem>
           <GridItem xs={6} md={2}>
-            <Block
-              header={
-                <div style={headerStyles}>
-                  Scheme
-                  <span style={{ position: 'absolute', bottom: -2 }}>
-                    {(entity.patientScheme || [])
-                      .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
-                      <IconButton onClick={this.refreshChasBalance}>
-                        <Refresh />
-                      </IconButton>
-                    )}
-                  </span>
-                </div>
-              }
-              body={
-                <div>
-                  {entity.patientScheme.length &&
-                  entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
-                    .length > 0 ? (
-                    entity.patientScheme
-                      .filter((o) => o.schemeTypeFK <= 6)
-                      .map((o) => {
-                        const schemeData = this.getSchemeDetails(o)
-                        return (
-                          <div>
-                            {schemeData.statusDescription && (
-                              <Tooltip title={schemeData.statusDescription}>
-                                <Warining
-                                  color='error'
-                                  style={{ position: 'absolute' }}
-                                />
-                              </Tooltip>
-                            )}
-                            <CodeSelect
-                              style={{
-                                marginLeft: schemeData.statusDescription
-                                  ? 20
-                                  : 'inherit',
-                              }}
-                              text
-                              code='ctSchemeType'
-                              value={schemeData.schemeTypeFK}
-                            />
-                            <div
-                              style={{
-                                fontWeight: 500,
-                                display: 'inline-block',
-                              }}
-                            >
-                              :{' '}
-                              {schemeData.chronicBalanceStatusCode ===
-                              'SC105' ? (
-                                'Full Balance'
-                              ) : (
-                                <NumberInput
-                                  text
-                                  currency
-                                  value={schemeData.balance}
-                                />
+            <LoadingWrapper
+              loading={refreshingChasBalance}
+              text='Retrieving balance...'
+            >
+              <Block
+                header={
+                  <div style={headerStyles}>
+                    Scheme
+                    <span style={{ position: 'absolute', bottom: -2 }}>
+                      {(entity.patientScheme || [])
+                        .filter((o) => o.schemeTypeFK <= 6).length > 0 && (
+                        <IconButton onClick={this.refreshChasBalance}>
+                          <Refresh />
+                        </IconButton>
+                      )}
+                    </span>
+                  </div>
+                }
+                body={
+                  <div>
+                    {entity.patientScheme.length &&
+                    entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
+                      .length > 0 ? (
+                      entity.patientScheme
+                        .filter((o) => o.schemeTypeFK <= 6)
+                        .map((o) => {
+                          const schemeData = this.getSchemeDetails(o)
+                          return (
+                            <div>
+                              {schemeData.statusDescription && (
+                                <Tooltip title={schemeData.statusDescription}>
+                                  <Warining
+                                    color='error'
+                                    style={{ position: 'absolute' }}
+                                  />
+                                </Tooltip>
                               )}
-                            </div>
-                            <SchemePopover
-                              isBanner
-                              isShowReplacementModal={
-                                schemeData.isShowReplacementModal
-                              }
-                              handleRefreshChasBalance={() =>
-                                this.refreshChasBalance(
-                                  schemeData.patientCoPaymentSchemeFK,
-                                  schemeData.schemeTypeFK,
+                              <CodeSelect
+                                style={{
+                                  marginLeft: schemeData.statusDescription
+                                    ? 20
+                                    : 'inherit',
+                                }}
+                                text
+                                code='ctSchemeType'
+                                value={schemeData.schemeTypeFK}
+                              />
+                              <div
+                                style={{
+                                  fontWeight: 500,
+                                  display: 'inline-block',
+                                }}
+                              >
+                                :{' '}
+                                {schemeData.chronicBalanceStatusCode ===
+                                'SC105' ? (
+                                  'Full Balance'
+                                ) : (
+                                  <NumberInput
+                                    text
+                                    currency
+                                    value={schemeData.balance}
+                                  />
                                 )}
-                              entity={entity}
-                              schemeData={schemeData}
-                            />
-                            {/* <p style={{ color: 'red' }}>
+                              </div>
+                              <SchemePopover
+                                isBanner
+                                isShowReplacementModal={
+                                  schemeData.isShowReplacementModal
+                                }
+                                handleRefreshChasBalance={() =>
+                                  this.refreshChasBalance(
+                                    schemeData.patientCoPaymentSchemeFK,
+                                    schemeData.schemeTypeFK,
+                                  )}
+                                entity={entity}
+                                schemeData={schemeData}
+                              />
+                              {/* <p style={{ color: 'red' }}>
                               {schemeData.statusDescription}
                             </p> */}
-                          </div>
-                        )
-                      })
-                  ) : (
-                    '-'
-                  )}
-                </div>
-              }
-            />
+                            </div>
+                          )
+                        })
+                    ) : (
+                      '-'
+                    )}
+                  </div>
+                }
+              />
+            </LoadingWrapper>
           </GridItem>
           <GridItem xs={12} md={4}>
             {extraCmt}
