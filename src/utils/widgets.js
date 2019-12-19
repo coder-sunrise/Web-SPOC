@@ -104,31 +104,31 @@ const widgets = [
         padding: '0 5px',
       },
     },
-    toolbarAddon: (
-      <AuthorizedContext>
-        {(r) => {
-          if (r.rights !== 'enable') return null
-          return (
-            <Tooltip title='Add Diagnosis'>
-              <IconButton
-                style={{ float: 'left' }}
-                className='non-dragable'
-                onClick={() => {
-                  window.g_app._store.dispatch({
-                    type: 'diagnosis/updateState',
-                    payload: {
-                      shouldAddNew: true,
-                    },
-                  })
-                }}
-              >
-                <Add />
-              </IconButton>
-            </Tooltip>
-          )
-        }}
-      </AuthorizedContext>
-    ),
+    // toolbarAddon: (
+    //   <AuthorizedContext>
+    //     {(r) => {
+    //       if (r.rights !== 'enable') return null
+    //       return (
+    //         <Tooltip title='Add Diagnosis'>
+    //           <IconButton
+    //             style={{ float: 'left' }}
+    //             className='non-dragable'
+    //             onClick={() => {
+    //               window.g_app._store.dispatch({
+    //                 type: 'diagnosis/updateState',
+    //                 payload: {
+    //                   shouldAddNew: true,
+    //                 },
+    //               })
+    //             }}
+    //           >
+    //             <Add />
+    //           </IconButton>
+    //         </Tooltip>
+    //       )
+    //     }}
+    //   </AuthorizedContext>
+    // ),
   },
   {
     id: '3',
