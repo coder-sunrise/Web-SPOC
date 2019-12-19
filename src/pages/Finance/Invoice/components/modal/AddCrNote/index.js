@@ -66,8 +66,7 @@ import MiscCrNote from './MiscCrNote'
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
       0,
     )
-    const gstAmt = roundTo(gstAmount) || 0
-
+    const gstAmt = roundTo(gstAmount)
     const payload = {
       generatedDate: moment().formatUTC(false),
       invoicePayerFK,
@@ -102,9 +101,6 @@ import MiscCrNote from './MiscCrNote'
         if (onConfirm) onConfirm()
         // Refresh invoice & invoicePayer
         onRefresh()
-        // dispatch({
-        //   type: 'settingClinicService/query',
-        // })
       }
     })
   },
@@ -232,7 +228,7 @@ class AddCrNote extends Component {
 
     if (target && target.value && event.target.name !== '') {
       const parseValue = Number(target.value)
-      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100))
+      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100)) || 0
       const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
       setFieldValue(gstFieldName, gstAmt)
       setTimeout(() => this.handleCalcCrNoteItem(), 100)
@@ -242,6 +238,7 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
+
     return (
       <div>
         <CrNoteForm payerType={payerType} />
