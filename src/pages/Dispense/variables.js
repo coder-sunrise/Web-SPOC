@@ -71,6 +71,37 @@ export const PrescriptionColumnExtensions = (
 ) => [
   { columnName: 'unitPrice', width: columnWidth, type: 'currency' },
   {
+    columnName: 'name',
+    width: columnWidth,
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.name}
+        </div>
+      )
+    },
+  },
+  {
+    columnName: 'instruction',
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.instruction}
+        </div>
+      )
+    },
+  },
+  {
     columnName: 'totalAfterItemAdjustment',
     width: columnWidth,
     type: 'currency',
@@ -106,7 +137,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'batchNo',
-
+    width: 150,
     render: (row) => {
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
@@ -142,7 +173,7 @@ export const PrescriptionColumnExtensions = (
   },
   {
     columnName: 'expiryDate',
-
+    width: 130,
     render: (row) => {
       return (
         <FastField
@@ -227,6 +258,21 @@ export const VaccinationColumn = [
 
 export const VaccinationColumnExtensions = (viewOnly = false) => [
   {
+    columnName: 'name',
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.name}
+        </div>
+      )
+    },
+  },
+  {
     columnName: 'dispensedQuanity',
     type: 'number',
     width: columnWidth,
@@ -251,7 +297,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   },
   {
     columnName: 'batchNo',
-
+    width: 150,
     render: (row) => {
       return (
         <FastField
@@ -273,7 +319,7 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
   },
   {
     columnName: 'expiryDate',
-
+    width: 130,
     render: (row) => {
       return (
         <FastField
