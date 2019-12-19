@@ -394,7 +394,7 @@ class Main extends React.Component {
     } = visit
 
     const isModifiedOrder = _.isEqual(
-      rows.filter((i) => i.id && !i.isDeleted),
+      rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
 

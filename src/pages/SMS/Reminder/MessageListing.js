@@ -175,8 +175,8 @@ const MessageListing = ({
   }
 
   const checkIsItLoadedAllHistory = () => {
-    if (historyList.length >= totalHistory && currentPage > 1) {
-      message.warning('Infinite List loaded all')
+    if (historyList.length >= totalHistory) {
+      // message.warning('Infinite List loaded all')
       setHasMore(false)
       setLoading(false)
       return true

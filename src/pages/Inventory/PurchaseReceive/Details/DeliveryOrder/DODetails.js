@@ -186,8 +186,12 @@ class DODetails extends PureComponent {
   }
 
   componentDidMount = async () => {
-    const { mode, dispatch } = this.props
-    await this.initializeStateItemList()
+    const { mode, dispatch, deliveryOrderDetails } = this.props
+    podoOrderType.forEach((x) => {
+      this.setState({
+        [x.stateName]: deliveryOrderDetails[x.stateName],
+      })
+    })
     await this.props.refreshDeliveryOrder()
     if (mode === 'Add') {
       await dispatch({
@@ -198,45 +202,6 @@ class DODetails extends PureComponent {
         this.props.values.deliveryOrderDate,
       )
     }
-  }
-
-  initializeStateItemList = async () => {
-    const { dispatch } = this.props
-
-    await podoOrderType.map((x) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: x.ctName,
-        },
-      }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(
-          list,
-          x.itemFKName,
-          x.stateName,
-          x.stockName,
-        )
-        this.setState({
-          [x.stateName]: inventoryItemList,
-        })
-        dispatch({
-          type: 'deliveryOrderDetails/updateState',
-          payload: {
-            [x.stateName]: inventoryItemList,
-          },
-        })
-      })
-
-      return null
-    })
-
-    // dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   handleOnOrderTypeChanged = async (e) => {

@@ -147,8 +147,12 @@ const ReportViewer = ({
     if (value <= numOfPages && value > 0) setPageNumber(value)
   }
 
+  const handleDoubleClick = (event) => {
+    event.stopPropagation()
+  }
+
   return (
-    <div className={classes.root}>
+    <div className={classes.root} onDoubleClick={handleDoubleClick}>
       <LoadingWrapper loading={exporting} text='Exporting report...'>
         {showTopDivider && <Divider className={classes.divider} />}
 

@@ -6,7 +6,7 @@ const connectionObserver = {}
 
 const initStream = () => {
   const signalREndPoint = process.env.signalrUrl
-  console.log(connection)
+  // console.log(connection)
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
       accessTokenFactory: () => localStorage.getItem('token'),

@@ -68,16 +68,32 @@ class Index extends Component {
     this.getPOdata()
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'purchaseOrderDetails/initializePurchaseOrder',
+    })
+  }
+
   getPOdata = (createdId) => {
     const { purchaseOrderDetails } = this.props
     const { id, type } = purchaseOrderDetails
     switch (type) {
       // Duplicate order
       case 'dup':
-        this.props.dispatch({
-          type: 'purchaseOrderDetails/duplicatePurchaseOrder',
-          payload: { id, type },
-        })
+        if (createdId) {
+          router.push(
+            `/inventory/pr/pdodetails?id=${createdId}&&type=${'edit'}`,
+          )
+          this.props.dispatch({
+            type: 'purchaseOrderDetails/queryPurchaseOrder',
+            payload: { id: createdId, type: 'edit' },
+          })
+        } else {
+          this.props.dispatch({
+            type: 'purchaseOrderDetails/duplicatePurchaseOrder',
+            payload: { id, type },
+          })
+        }
         break
       // Edit order
       case 'edit':
@@ -130,7 +146,7 @@ class Index extends Component {
 
   onSubmitButtonClicked = async (action) => {
     const { dispatch, validateForm, history } = this.props
-    let dispatchType = 'purchaseOrderDetails/upsert'
+    let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
     const isFormValid = await validateForm()
     let validation = false
@@ -646,7 +662,7 @@ class Index extends Component {
             icon={null}
             onClick={this.toggleReport}
             authority='none'
-            disabled={!values.id}
+            disabled={!values.id || type === 'dup'}
           >
             {formatMessage({
               id: 'inventory.pr.detail.print',

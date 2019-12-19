@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
-
-import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
+import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
-import { Table, TableSummaryRow } from '@devexpress/dx-react-grid-material-ui'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import numeral from 'numeral'
 import {
@@ -17,23 +16,12 @@ import {
   NumberInput,
   Select,
   Checkbox,
-  CodeSelect,
-  Field,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
-import { sumReducer } from '@/utils/utils'
 
 // console.log(orderTypes)
-export default ({
-  orders,
-  dispatch,
-  classes,
-  theme,
-  handleAddAdjustment,
-  codetable,
-}) => {
+export default ({ orders, dispatch, classes }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
-  // console.log(orders)
   const { total, gst, totalWithGST } = summary
   const [
     checkedStatusIncldGST,
@@ -62,6 +50,10 @@ export default ({
         //   adjType: row.adjType,
         // },
       },
+    })
+    dispatch({
+      // force current edit row components to update
+      type: 'global/incrementCommitCount',
     })
   }
   // console.log(total, summary)
@@ -137,6 +129,8 @@ export default ({
       </div>
     )
   })
+
+  const shouldDisableDeleteButton = !_.isEmpty(orders.entity)
 
   return (
     <CommonTableGrid
@@ -434,7 +428,12 @@ export default ({
                   }}
                 >
                   <Tooltip title='Delete'>
-                    <Button size='sm' color='danger' justIcon>
+                    <Button
+                      size='sm'
+                      color='danger'
+                      justIcon
+                      disabled={shouldDisableDeleteButton}
+                    >
                       <Delete />
                     </Button>
                   </Tooltip>

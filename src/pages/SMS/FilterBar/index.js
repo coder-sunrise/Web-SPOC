@@ -14,7 +14,7 @@ import { GridContainer, GridItem, ProgressButton } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
-import { APPOINTMENT_STATUS } from '@/utils/constants'
+import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   filterBar: {
@@ -84,13 +84,17 @@ export default compose(
         moment().subtract(1, 'months'),
         moment(),
       ],
-      consent: true,
+      phoneCall: false,
+      textMessage: false,
+      email: false,
     }),
 
     handleSubmit: (values, { props }) => {
       const {
         patientName,
-        consent,
+        phoneCall,
+        textMessage,
+        email,
         lastSMSSendStatus,
         // lastVisitDate,
         upcomingAppointmentDate,
@@ -98,11 +102,20 @@ export default compose(
         isReminderSent,
         doctor = [],
         appointmentType = [],
+        pdpaConsent = [],
       } = values
       const { dispatch, type, setSelectedRows } = props
 
       let payload = {}
       let dispatchType = ''
+
+      let smsStatusPayload
+      if (lastSMSSendStatus === SMS_STATUS.SENT) {
+        smsStatusPayload = '1 | 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11'
+      } else if (lastSMSSendStatus === SMS_STATUS.FAILED) {
+        smsStatusPayload = '2 | 4'
+      }
+
       if (type === 'Appointment') {
         dispatchType = 'smsAppointment'
 
@@ -145,13 +158,16 @@ export default compose(
           [apptStatusProperty]:
             appointmentStatus ||
             `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
-          'AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
+          'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
           isReminderSent,
           [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
           [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
         }
       } else {
         dispatchType = 'smsPatient'
+        let PDPAPhone = pdpaConsent.includes('1') // phone
+        let PDPAMessage = pdpaConsent.includes('2') // sms
+        let PDPAEmail = pdpaConsent.includes('3') // email
         payload = {
           group: [
             {
@@ -162,14 +178,13 @@ export default compose(
               combineCondition: 'or',
             },
           ],
-          'PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': lastSMSSendStatus,
-          'PatientPdpaConsent.IsConsent': consent,
-          // 'lgteql_Visit.VisitDate': lastVisitDate
-          //   ? moment(lastVisitDate[0]).formatUTC()
-          //   : undefined,
-          // 'lsteql_Visit.VisitDate': lastVisitDate
-          //   ? moment(lastVisitDate[1]).formatUTC(false)
-          //   : undefined,
+          'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
+
+          apiCriteria: {
+            PDPAPhone,
+            PDPAMessage,
+            PDPAEmail,
+          },
         }
       }
 

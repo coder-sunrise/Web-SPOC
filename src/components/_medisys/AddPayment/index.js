@@ -177,6 +177,8 @@ class AddPayment extends Component {
   }
 
   fetchBizSessionList = (date) => {
+    if (!date) return
+
     const { setFieldValue } = this.props
     const momentDate = moment(date, serverDateFormat)
     const startDateTime = moment(

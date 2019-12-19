@@ -199,6 +199,7 @@ class StatementDetails extends PureComponent {
   }
 
   getBizList = (date) => {
+    if (!date) return
     const { dispatch, setFieldValue } = this.props
     const momentDate = moment(date, serverDateFormat)
 

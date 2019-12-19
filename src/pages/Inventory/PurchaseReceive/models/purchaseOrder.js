@@ -178,6 +178,16 @@ export default createFormViewModel({
         // }
         return r
       },
+      *savePO ({ payload }, { call }) {
+        const r = yield call(service.upsert, payload)
+        if (r) {
+          notification.success({
+            message: 'PO saved',
+          })
+          return r
+        }
+        return false
+      },
     },
     reducers: {
       setNewPurchaseOrder (state, { payload }) {
