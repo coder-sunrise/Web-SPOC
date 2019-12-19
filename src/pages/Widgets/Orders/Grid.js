@@ -39,7 +39,7 @@ export default ({ orders, dispatch, classes }) => {
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
-    if (!row.isActive) return
+    if (!row.isActive && row.type !== '5') return
 
     dispatch({
       type: 'orders/updateState',
@@ -423,7 +423,7 @@ export default ({ orders, dispatch, classes }) => {
                     justIcon
                     color='primary'
                     style={{ marginRight: 5 }}
-                    disabled={!row.isActive}
+                    disabled={!row.isActive && row.type !== '5'}
                   >
                     <Edit />
                   </Button>
