@@ -96,7 +96,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
         for (let index = 0; index < instructions.length; index++) {
           let item = instructions[index]
           if (instruction !== '') {
-            instruction += ' - '
+            instruction += ' '
           }
 
           if (index < instructions.length - 1) {
