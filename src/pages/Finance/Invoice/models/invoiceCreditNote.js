@@ -1,6 +1,7 @@
 import { createFormViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services/invoicePayment'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 const InitialCreditNote = {
   invoicePayerFK: 0,
@@ -50,12 +51,20 @@ export default createFormViewModel({
         } = invoiceDetail
         const sum = (a) => a.reduce((x, y) => x + y)
 
-        const filterInvPayment = invoicePaymentDetails.filter(
+        const filterInvPayment = invoicePaymentDetails.find(
           (x) => x.id === invoicePayerFK,
         )
+        const {
+          payerTypeFK,
+          payerDistributedAmt,
+          outStanding,
+          creditNote,
+        } = filterInvPayment
 
-        const creditNoteBalance = filterInvPayment[0].payerDistributedAmt
-        const { creditNote } = filterInvPayment[0]
+        const creditNoteBalance =
+          payerTypeFK === INVOICE_PAYER_TYPE.PATIENT
+            ? payerDistributedAmt
+            : outStanding
 
         const filteredCreditNote = creditNote.filter(
           (x) => x.invoicePayerFK === invoicePayerFK && !x.isCancelled,
@@ -80,21 +89,21 @@ export default createFormViewModel({
           )
 
         const remainingItems = invoiceItem.map((item) => {
-          const pastItemQuantity = pastCreditNoteItems[item.itemCode]
-          if (pastItemQuantity) {
-            const remainingQty = item.quantity - pastItemQuantity
-            return {
-              ...item,
-              invoiceItemFK: item.id,
-              itemTypeFK: item.invoiceItemTypeFK,
-              quantity: remainingQty,
-              originRemainingQty: remainingQty,
-              // totalAfterItemAdjustment: remaining quantity multiply unit price
-              totalAfterItemAdjustment:
-                (item.quantity - pastItemQuantity) * item.unitPrice,
-              _totalAfterGST: item.totalAfterGST,
-            }
-          }
+          // const pastItemQuantity = pastCreditNoteItems[item.itemCode]
+          // if (pastItemQuantity) {
+          //   const remainingQty = item.quantity - pastItemQuantity
+          //   return {
+          //     ...item,
+          //     invoiceItemFK: item.id,
+          //     itemTypeFK: item.invoiceItemTypeFK,
+          //     quantity: remainingQty,
+          //     originRemainingQty: remainingQty,
+          //     // totalAfterItemAdjustment: remaining quantity multiply unit price
+          //     totalAfterItemAdjustment:
+          //       (item.quantity - pastItemQuantity) * item.unitPrice,
+          //     _totalAfterGST: item.totalAfterGST,
+          //   }
+          // }
           return {
             ...item,
             invoiceItemFK: item.id,
