@@ -208,7 +208,7 @@ class PatientInfoSideBanner extends PureComponent {
             const schemeData = this.getSchemeDetails(o)
 
             return (
-              <LoadingWrapper loading={loading}>
+              <LoadingWrapper loading={loading} text='Retrieving balance...'>
                 <div style={{ marginBottom: theme.spacing(1) }}>
                   <p style={{ fontWeight: 500 }}>
                     {/* <CodeSelect text code='ctSchemeType' value={o.schemeTypeFK} /> */}

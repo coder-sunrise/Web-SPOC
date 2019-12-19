@@ -26,6 +26,8 @@ const LowStockInfo = ({ sourceType, values, codetable }) => {
     )
   } else return ''
 
+  if (!source) return ''
+
   const {
     criticalThreshold = 0.0,
     reOrderThreshold = 0.0,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Field, FastField } from 'formik'
 import _ from 'lodash'
-import { Divider } from '@material-ui/core'
+import { Paper, Divider } from '@material-ui/core'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import FilterList from '@material-ui/icons/FilterList'
@@ -109,7 +109,7 @@ const DiagnosisItem = ({
     }
   }
   return (
-    <React.Fragment>
+    <Paper elevation={4} className={classes.diagnosisRow}>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
         <GridItem xs={6}>
           <Field
@@ -122,6 +122,103 @@ const DiagnosisItem = ({
               />
             )}
           />
+        </GridItem>
+        <GridItem xs={6} style={{ position: 'relative' }}>
+          <Popover
+            content={
+              <div
+                style={{
+                  width:
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].defaultIsPersist
+                      ? '180px'
+                      : '340px',
+                }}
+              >
+                <p
+                  style={{
+                    paddingLeft: 20,
+                    paddingBottom: theme.spacing(2),
+                    fontSize: '0.8em',
+                  }}
+                >
+                  {form.values.corDiagnosis[index].isNew === true ||
+                  !form.values.corDiagnosis[index].defaultIsPersist ? (
+                    'Remove diagnosis?'
+                  ) : (
+                    'Remove persist diagnosis?'
+                  )}
+                </p>
+                {!form.values.corDiagnosis[index].isNew &&
+                form.values.corDiagnosis[index].defaultIsPersist &&
+                form.values.corDiagnosis[index].isPersist && (
+                  <div
+                    style={{
+                      fontSize: '0.8em',
+                      paddingBottom: theme.spacing(2),
+                    }}
+                  >
+                    Diagnosis will be removed from patient's medical problem
+                  </div>
+                )}
+                <Button
+                  onClick={() => {
+                    setShow(false)
+                  }}
+                  variant='outlined'
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color='primary'
+                  onClick={() => {
+                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                    // arrayHelpers.remove(index)
+                  }}
+                >
+                  {form.values.corDiagnosis[index].isNew === true ||
+                  !form.values.corDiagnosis[index].defaultIsPersist ? (
+                    'Confirm'
+                  ) : (
+                    'Current Visit'
+                  )}
+                </Button>
+                <Button
+                  color='primary'
+                  hidden={
+                    form.values.corDiagnosis[index].isNew === true ||
+                    !form.values.corDiagnosis[index].defaultIsPersist
+                  }
+                  onClick={() => {
+                    // arrayHelpers.remove(index)
+                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
+                    form.setFieldValue(
+                      `corDiagnosis[${index}].isPermanentDelete`,
+                      true,
+                    )
+                  }}
+                >
+                  Permanently
+                </Button>
+              </div>
+            }
+            trigger='click'
+            visible={show}
+            onVisibleChange={() => {
+              setShow(!show)
+            }}
+          >
+            <Tooltip title='Delete'>
+              <Button
+                style={{ position: 'absolute', bottom: 0, right: 0 }}
+                justIcon
+                color='danger'
+                size='sm'
+              >
+                <DeleteIcon />
+              </Button>
+            </Tooltip>
+          </Popover>
         </GridItem>
         {/* <GridItem xs={6}>
           {form.values && (
@@ -238,7 +335,7 @@ const DiagnosisItem = ({
             )}
           </div>
         </GridItem>
-        <GridItem xs={11}>
+        <GridItem xs={12}>
           <FastField
             name={`corDiagnosis[${index}].remarks`}
             render={(args) => {
@@ -248,106 +345,8 @@ const DiagnosisItem = ({
             }}
           />
         </GridItem>
-        <GridItem xs={1} style={{ position: 'relative' }}>
-          <Popover
-            content={
-              <div
-                style={{
-                  width:
-                    form.values.corDiagnosis[index].isNew === true ||
-                    !form.values.corDiagnosis[index].defaultIsPersist
-                      ? '180px'
-                      : '340px',
-                }}
-              >
-                <p
-                  style={{
-                    paddingLeft: 20,
-                    paddingBottom: theme.spacing(2),
-                    fontSize: '0.8em',
-                  }}
-                >
-                  {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Remove diagnosis?'
-                  ) : (
-                    'Remove persist diagnosis?'
-                  )}
-                </p>
-                {!form.values.corDiagnosis[index].isNew &&
-                form.values.corDiagnosis[index].defaultIsPersist &&
-                form.values.corDiagnosis[index].isPersist && (
-                  <div
-                    style={{
-                      fontSize: '0.8em',
-                      paddingBottom: theme.spacing(2),
-                    }}
-                  >
-                    Diagnosis will be removed from patient's medical problem
-                  </div>
-                )}
-                <Button
-                  onClick={() => {
-                    setShow(false)
-                  }}
-                  variant='outlined'
-                >
-                  Cancel
-                </Button>
-                <Button
-                  color='primary'
-                  onClick={() => {
-                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
-                    // arrayHelpers.remove(index)
-                  }}
-                >
-                  {form.values.corDiagnosis[index].isNew === true ||
-                  !form.values.corDiagnosis[index].defaultIsPersist ? (
-                    'Confirm'
-                  ) : (
-                    'Current Visit'
-                  )}
-                </Button>
-                <Button
-                  color='primary'
-                  hidden={
-                    form.values.corDiagnosis[index].isNew === true ||
-                    !form.values.corDiagnosis[index].defaultIsPersist
-                  }
-                  onClick={() => {
-                    // arrayHelpers.remove(index)
-                    form.setFieldValue(`corDiagnosis[${index}].isDeleted`, true)
-                    form.setFieldValue(
-                      `corDiagnosis[${index}].isPermanentDelete`,
-                      true,
-                    )
-                  }}
-                >
-                  Permanently
-                </Button>
-              </div>
-            }
-            trigger='click'
-            visible={show}
-            onVisibleChange={() => {
-              setShow(!show)
-            }}
-          >
-            <Tooltip title='Delete'>
-              <Button
-                style={{ position: 'absolute', bottom: theme.spacing(1) }}
-                justIcon
-                color='danger'
-                size='sm'
-              >
-                <DeleteIcon />
-              </Button>
-            </Tooltip>
-          </Popover>
-        </GridItem>
       </GridContainer>
-      <Divider />
-    </React.Fragment>
+    </Paper>
   )
 }
 
