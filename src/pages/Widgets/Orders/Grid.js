@@ -269,6 +269,7 @@ export default ({ orders, dispatch, classes }) => {
       columnExtensions={[
         {
           columnName: 'type',
+          width: 150,
           render: (row) => {
             const otype = orderTypes.find((o) => o.value === row.type)
             const texts = [
@@ -308,7 +309,7 @@ export default ({ orders, dispatch, classes }) => {
         },
         {
           columnName: 'description',
-          width: 300,
+          width: 260,
           render: (row) => {
             return (
               <Tooltip title={row.instruction}>
