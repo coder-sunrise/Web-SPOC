@@ -67,24 +67,26 @@ class Banner extends PureComponent {
 
   getAllergyLink (data) {
     const { props } = this
-    const { patient, codetable } = props
+    const { patient } = props
     const { entity } = patient
     const info = entity
     const { patientAllergy = [] } = info
-    const { ctdrugallergy = [] } = codetable
-
-    const filter = patientAllergy.filter((o) => o.type === 'Allergy')
-    const da = ctdrugallergy.filter((o) =>
-      filter.find((m) => m.allergyFK === o.id),
+    const da = _.orderBy(
+      patientAllergy,
+      [
+        'type',
+      ],
+      [
+        'asc',
+      ],
     )
-
     let allergyData = '-'
 
     if (da.length > 0) {
       if (da.length >= 2) {
-        allergyData = `${da[0].name}, ${da[1].name}`
+        allergyData = `${da[0].allergyName}, ${da[1].allergyName}`
       } else {
-        allergyData = `${da[0].name}`
+        allergyData = `${da[0].allergyName}`
       }
     }
 
@@ -130,7 +132,7 @@ class Banner extends PureComponent {
                       return (
                         <GridContainer>
                           <GridItem>
-                            {i + 1}. {item.name}
+                            {i + 1}. {item.allergyName}
                           </GridItem>
                         </GridContainer>
                       )
@@ -297,7 +299,7 @@ class Banner extends PureComponent {
 
     return (
       <div style={{ display: 'inline-block' }}>
-        <div style={{ paddingTop: 5, display: 'inline-block' }}>
+        <div style={{ display: 'inline-block' }}>
           {medicalProblemData.length > 25 ? (
             `${medicalProblemData.substring(0, 25).trim()}...`
           ) : (
@@ -462,7 +464,7 @@ class Banner extends PureComponent {
               body={this.displayMedicalProblemData(entity)}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
+          <GridItem xs={6} md={3}>
             <Block
               header={
                 <div style={headerStyles}>
@@ -550,7 +552,7 @@ class Banner extends PureComponent {
               }
             />
           </GridItem>
-          <GridItem xs={12} md={4}>
+          <GridItem xs={12} md={3}>
             {extraCmt}
           </GridItem>
         </GridContainer>
