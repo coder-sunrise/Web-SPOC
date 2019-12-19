@@ -529,13 +529,22 @@ class Layout extends PureComponent {
   }
 
   onAnchorClick = (id) => () => {
+    const parentElement = document.getElementById('mainPanel-root')
     const element = document.getElementById(id)
+    try {
+      if (parentElement && element) {
+        const screenPosition = element.getBoundingClientRect()
+        const { top, left } = screenPosition
 
-    if (element)
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
-      })
+        parentElement.scrollTo({
+          top: top - 164, // top minus Nav header height and Patient Banner height
+          left,
+          behavior: 'smooth',
+        })
+      }
+    } catch (error) {
+      console.error({ error })
+    }
   }
 
   render () {
@@ -647,6 +656,7 @@ class Layout extends PureComponent {
               overflowX: 'hidden',
               marginTop: 1,
             }}
+
             // onScroll={this.delayedMainDivScroll}
           >
             <CardContainer hideHeader>
@@ -657,7 +667,7 @@ class Layout extends PureComponent {
                     size='sm'
                     variant='outlined'
                     color='primary'
-                    onClick={this.onAnchorClick(w.name)}
+                    onClick={this.onAnchorClick(w.id)}
                   >
                     {w.name}
                   </Button>
@@ -673,10 +683,9 @@ class Layout extends PureComponent {
                 // console.log(cfg, w)
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
-                console.log({ w, cfgs })
+
                 return (
                   <div
-                    ref={(ref) => this.myRefs.push(ref)}
                     className={classnames({
                       [classes.block]: true,
                       [classes.fullscreen]: state.fullScreenWidget === id,
@@ -686,7 +695,7 @@ class Layout extends PureComponent {
                         state.fullScreenWidget === id,
                     })}
                     key={id}
-                    id={w.name}
+                    id={w.id}
                   >
                     <Paper
                       {...this.generateConfig(id)}
