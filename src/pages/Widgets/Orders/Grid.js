@@ -39,6 +39,8 @@ export default ({ orders, dispatch, classes }) => {
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
+    if (!row.isActive) return
+
     dispatch({
       type: 'orders/updateState',
       payload: {
@@ -267,23 +269,39 @@ export default ({ orders, dispatch, classes }) => {
       columnExtensions={[
         {
           columnName: 'type',
-          // type: 'select',
-          // options: orderTypes,
+          render: (row) => {
+            const otype = orderTypes.find((o) => o.value === row.type)
+            const texts = [
+              otype.name,
+              row.isExternalPrescription === true ? '(Ext.)' : '',
+              row.type === '5' || row.isActive ? '' : '(Inactive)',
+            ].join(' ')
+
+            return (
+              <Tooltip title={texts}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {texts}
+                </div>
+              </Tooltip>
+            )
+          },
+        },
+        {
+          columnName: 'subject',
           render: (row) => {
             return (
-              <div>
-                <Select
-                  text
-                  options={orderTypes}
-                  labelField='name'
-                  value={row.type}
-                />
-                {row.isExternalPrescription === true ? (
-                  <span> (Ext.) </span>
-                ) : (
-                  ''
-                )}
-                {row.isActive ? '' : '(Inactive)'}
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {row.subject}
               </div>
             )
           },
@@ -405,6 +423,7 @@ export default ({ orders, dispatch, classes }) => {
                     justIcon
                     color='primary'
                     style={{ marginRight: 5 }}
+                    disabled={!row.isActive}
                   >
                     <Edit />
                   </Button>
