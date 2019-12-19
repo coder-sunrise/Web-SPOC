@@ -5,7 +5,7 @@ import { FastField } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import debounce from 'lodash/debounce'
-import { TextField, Tooltip } from '@/components'
+import { TextField, OutlinedTextField, Tooltip } from '@/components'
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
 import {
