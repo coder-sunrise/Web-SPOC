@@ -451,7 +451,7 @@ class Queue extends React.Component {
                 errorState={error}
               />
             ) : (
-              <React.Fragment>
+              <div>
                 <DetailsActionBar
                   // selfOnly={queueLog.selfOnly}
                   // onSwitchClick={this.toggleFilterSelfOnly}
@@ -468,7 +468,7 @@ class Queue extends React.Component {
                   history={history}
                   searchQuery={search}
                 />
-              </React.Fragment>
+              </div>
             )}
             <CommonModal
               open={showPatientSearch}
