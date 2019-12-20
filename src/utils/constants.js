@@ -205,3 +205,9 @@ export const ORDER_TYPE_TAB = {
   OPENPRECRIPTION: '5',
   PACKAGE: '6',
 }
+
+export const FILE_STATUS = {
+  UPLOADED: 1,
+  CONFIRMED: 2,
+  ARCHIEVED: 3,
+}

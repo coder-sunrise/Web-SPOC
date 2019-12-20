@@ -1,66 +1,16 @@
 import React, { useState } from 'react'
-import * as Yup from 'yup'
+import { connect } from 'dva'
 // material ui
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 // common components
 import { Button, DragableTableGrid, Tooltip } from '@/components'
+import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
 import Editor from './Editor'
+// utils
+import { applyFilter, columns, columnExtensions, generateData } from './utils'
 
-const columns = [
-  { name: 'drag', title: ' ' },
-  { name: 'title', title: 'Title' },
-  { name: 'cannedText', title: 'Canned Text' },
-  { name: 'actions', title: 'Action' },
-]
-
-const columnExtensions = [
-  {
-    columnName: 'drag',
-    width: 100,
-  },
-  {
-    columnName: 'title',
-    width: '25%',
-  },
-]
-
-const ValidationSchema = Yup.object().shape({
-  title: Yup.string().required(),
-  cannedText: Yup.string().required(),
-})
-
-const generateData = () => {
-  let data = []
-  for (let i = 0; i < 3; i++) {
-    data.push({
-      id: i,
-      title: `Test ${i}`,
-      cannedText: `Test canned text ${i}`,
-      isSelected: false,
-    })
-  }
-  return data
-}
-
-const applyFilter = (filter, rows) => {
-  let returnData = [
-    ...rows,
-  ]
-  if (filter !== '') {
-    returnData = returnData.filter((each) => {
-      const { title, cannedText } = each
-      return (
-        title.toLowerCase().indexOf(filter) >= 0 ||
-        cannedText.toLowerCase().indexOf(filter) >= 0
-      )
-    })
-  }
-  return returnData
-}
-
-const Grid = ({ footer, handleAddCannedText }) => {
+const Grid = ({ dispatch, footer, handleAddCannedText }) => {
   const [
     filter,
     setFilter,
@@ -82,11 +32,15 @@ const Grid = ({ footer, handleAddCannedText }) => {
 
   const onEditClick = (id) => {
     setEditEntity(list.find((item) => item.id === id))
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   const ActionButtons = (row) => {
     const handleDeleteClick = () => onDeleteClick(row.id)
     const handleEditClick = () => onEditClick(row.id)
+
     return (
       <React.Fragment>
         <Tooltip title='Edit'>
@@ -94,11 +48,10 @@ const Grid = ({ footer, handleAddCannedText }) => {
             <Edit />
           </Button>
         </Tooltip>
-        <Tooltip title='Delete'>
-          <Button justIcon color='danger' onClick={handleDeleteClick}>
-            <Delete />
-          </Button>
-        </Tooltip>
+        <DeleteWithPopover
+          onConfirmDelete={handleDeleteClick}
+          disabled={!!editEntity}
+        />
       </React.Fragment>
     )
   }
@@ -107,7 +60,12 @@ const Grid = ({ footer, handleAddCannedText }) => {
     setList(rows)
   }
 
-  const clearEditEntity = () => setEditEntity(undefined)
+  const clearEditEntity = () => {
+    setEditEntity(undefined)
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
+  }
 
   const handleSearch = (values) => {
     setFilter(values.search)
@@ -132,9 +90,17 @@ const Grid = ({ footer, handleAddCannedText }) => {
     handleAddCannedText(selectedRows)
   }
 
+  const handleEditorCancelClick = () => {
+    clearEditEntity()
+  }
+
   return (
     <div>
-      <Editor entity={editEntity} onConfirm={handleEditorConfirmClick} />
+      <Editor
+        entity={editEntity}
+        onCancel={handleEditorCancelClick}
+        onConfirm={handleEditorConfirmClick}
+      />
       <Filterbar onSearchClick={handleSearch} />
       <DragableTableGrid
         dataSource={applyFilter(filter, list)}
@@ -152,7 +118,6 @@ const Grid = ({ footer, handleAddCannedText }) => {
         FuncProps={{
           pager: false,
         }}
-        schema={ValidationSchema}
       />
 
       {footer &&
@@ -164,4 +129,4 @@ const Grid = ({ footer, handleAddCannedText }) => {
   )
 }
 
-export default Grid
+export default connect()(Grid)

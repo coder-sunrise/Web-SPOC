@@ -1,4 +1,5 @@
 import React from 'react'
+import _ from 'lodash'
 import * as Yup from 'yup'
 // formik
 import { withFormik, FastField } from 'formik'
@@ -11,9 +12,25 @@ import {
   RichEditor,
   TextField,
 } from '@/components'
-import { getUniqueGUID } from '@/utils/utils'
+import { getUniqueGUID, htmlDecodeByRegExp } from '@/utils/utils'
 
-const Editor = ({ values, setFieldValue, handleSubmit }) => {
+const defaultEntity = {
+  title: undefined,
+  cannedText: undefined,
+  htmlCannedText: undefined,
+}
+
+const Editor = ({
+  values,
+  resetForm,
+  setFieldValue,
+  onCancel,
+  handleSubmit,
+}) => {
+  const handleCancelClick = () => {
+    resetForm(defaultEntity)
+    onCancel()
+  }
   const isEdit = values.id !== undefined
   return (
     <CardContainer hideHeader size='sm'>
@@ -26,22 +43,28 @@ const Editor = ({ values, setFieldValue, handleSubmit }) => {
         </GridItem>
         <GridItem md={12}>
           <FastField
-            name='cannedText'
+            name='_htmlCannedText'
             render={(args) => (
               <RichEditor
                 strongLabel
                 label='Canned Text'
                 {...args}
                 onBlur={(html, text) => {
+                  const decodedHtml = htmlDecodeByRegExp(html)
                   setFieldValue('cannedText', text)
+                  setFieldValue('htmlCannedText', decodedHtml)
                 }}
               />
             )}
           />
         </GridItem>
         <GridItem md={12} style={{ textAlign: 'right' }}>
+          <Button color='danger' size='sm' onClick={handleCancelClick}>
+            Cancel
+          </Button>
           <Button
             color='primary'
+            size='sm'
             onClick={handleSubmit}
             style={{ marginRight: 0 }}
           >
@@ -53,24 +76,24 @@ const Editor = ({ values, setFieldValue, handleSubmit }) => {
   )
 }
 
-const handleSubmit = (values, { props }) => {
+const handleSubmit = (values, { props, resetForm }) => {
   const { onConfirm } = props
   const isEdit = values.id !== undefined
   const result = isEdit ? values : { ...values, id: getUniqueGUID() }
   onConfirm(result)
+  resetForm(defaultEntity)
 }
 
 const mapPropsToValues = ({ entity }) => {
-  const defaultEntity = {
-    title: undefined,
-    cannedText: undefined,
-  }
-  return entity || defaultEntity
+  const _entity = _.isEmpty(entity)
+    ? defaultEntity
+    : { ...entity, _htmlCannedText: entity.htmlCannedText }
+  return _entity
 }
 
 const ValidationSchema = Yup.object().shape({
   title: Yup.string().required(),
-  cannedText: Yup.string().required(),
+  _htmlCannedText: Yup.string().required(),
 })
 
 export default withFormik({

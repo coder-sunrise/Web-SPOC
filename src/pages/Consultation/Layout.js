@@ -537,7 +537,7 @@ class Layout extends PureComponent {
         const { top, left } = screenPosition
 
         parentElement.scrollTo({
-          top: top - 164, // top minus Nav header height and Patient Banner height
+          top: top - 172, // top minus Nav header height and Patient Banner height
           left,
           behavior: 'smooth',
         })
@@ -647,6 +647,23 @@ class Layout extends PureComponent {
     // console.log(this.props)
     return (
       <div>
+        {!this.state.fullScreenWidget && (
+          <CardContainer hideHeader>
+            {state.currentLayout.widgets.map((id) => {
+              const w = widgets.find((o) => o.id === id)
+              return (
+                <Button
+                  size='sm'
+                  variant='outlined'
+                  color='primary'
+                  onClick={this.onAnchorClick(w.id)}
+                >
+                  {w.name}
+                </Button>
+              )
+            })}
+          </CardContainer>
+        )}
         {true && (
           <div
             ref={this.layoutContainer}
@@ -655,25 +672,11 @@ class Layout extends PureComponent {
               overflowY: 'auto',
               overflowX: 'hidden',
               marginTop: 1,
+              position: 'relative',
             }}
 
             // onScroll={this.delayedMainDivScroll}
           >
-            <CardContainer hideHeader>
-              {state.currentLayout.widgets.map((id) => {
-                const w = widgets.find((o) => o.id === id)
-                return (
-                  <Button
-                    size='sm'
-                    variant='outlined'
-                    color='primary'
-                    onClick={this.onAnchorClick(w.id)}
-                  >
-                    {w.name}
-                  </Button>
-                )
-              })}
-            </CardContainer>
             <ResponsiveGridLayout {...layoutCfg}>
               {state.currentLayout.widgets.map((id) => {
                 const w = widgets.find((o) => o.id === id)

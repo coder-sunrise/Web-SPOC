@@ -57,6 +57,18 @@ export const downloadAttachment = async (attachment) => {
   }
 }
 
+export const getImagePreview = async (id) => {
+  try {
+    const response = await getFileByFileID(id)
+
+    const { data, status } = response
+    if (status >= 200 && status < 300) return response
+  } catch (error) {
+    console.log({ error })
+  }
+  return false
+}
+
 export const deleteFileByFileID = async (fileID) => {
   const response = await request(`${url}/${fileID}`, { method: 'DELETE' })
   return response

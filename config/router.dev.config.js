@@ -34,16 +34,22 @@ const devRoutes = {
       component: './Development/Report',
     },
     {
+      path: '/development/dentalchart',
+      name: 'Dental Chart',
+      mini: 'DC',
+      component: './Development/DentalChart',
+    },
+    {
       path: '/development/cannedtext',
       name: 'Canned Text',
       mini: 'CT',
       component: './Development/CannedText',
     },
     {
-      path: '/development/dentalchart',
-      name: 'Dental Chart',
-      mini: 'DC',
-      component: './Development/DentalChart',
+      path: '/development/newattachment',
+      name: 'Attachment Enhancement',
+      mini: 'CT',
+      component: './Development/AttachmentWithThumbnail',
     },
   ],
 }

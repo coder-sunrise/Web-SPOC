@@ -1,10 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 // material ui
 import Delete from '@material-ui/icons/Delete'
 // common components
-import { Button, CardContainer, CommonModal } from '@/components'
+import {
+  Button,
+  CardContainer,
+  GridContainer,
+  GridItem,
+  CommonModal,
+} from '@/components'
 // sub components
 import Grid from './Grid'
+import { getImagePreview } from '@/services/file'
 
 const generateData = () => {
   let data = []
@@ -23,6 +30,25 @@ const CannedText = () => {
     showCannedText,
     setShowCannedText,
   ] = useState(false)
+
+  const [
+    imageData,
+    setImageData,
+  ] = useState(null)
+
+  const getImage = async () => {
+    const { data } = await getImagePreview(367)
+    const blobUrl = window.URL.createObjectURL(
+      new Blob([
+        data,
+      ]),
+    )
+    console.log({ blobUrl, data })
+    setImageData(blobUrl)
+  }
+  useEffect(() => {
+    getImage()
+  }, [])
 
   const toggleCannedText = () => setShowCannedText(!showCannedText)
 
@@ -44,6 +70,12 @@ const CannedText = () => {
       >
         <Grid handleAddCannedText={handleSaveCannedText} />
       </CommonModal>
+
+      <GridContainer>
+        <GridItem md={3}>
+          <img src={imageData} alt='test' width={100} height={100} />
+        </GridItem>
+      </GridContainer>
     </CardContainer>
   )
 }

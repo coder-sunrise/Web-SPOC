@@ -21,17 +21,17 @@ export default class ReportBase extends React.Component {
     // this.onSubmitClick = this.onSubmitClick.bind(this)
   }
 
-  componentDidMount () {
-    this.setState((state) => ({
-      ...state.default,
-    }))
-  }
+  // componentDidMount () {
+  //   this.setState((state) => ({
+  //     ...state.default,
+  //   }))
+  // }
 
-  componentWillUnmount () {
-    this.setState((state) => ({
-      ...state.default,
-    }))
-  }
+  // componentWillUnmount () {
+  //   this.setState((state) => ({
+  //     ...state.default,
+  //   }))
+  // }
 
   handleActivePanelChange = (event, panel) => {
     this.setState((state) => ({
