@@ -157,9 +157,12 @@ class Index extends Component {
           },
         }).then((r) => {
           if (r) {
-            if (action === 1 || action === 3) {
+            if (
+              action === poSubmitAction.SAVE ||
+              action === poSubmitAction.FINALIZE
+            ) {
               let message = 'PO saved'
-              if (action === 3) {
+              if (action === poSubmitAction.FINALIZE) {
                 message = 'PO finalized'
               }
               notification.success({
