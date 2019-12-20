@@ -138,12 +138,7 @@ export default ({ orders, dispatch, classes }) => {
     <CommonTableGrid
       size='sm'
       style={{ margin: 0 }}
-      rows={rows.map((o) => {
-        return {
-          ...o,
-          isEditingEntity,
-        }
-      })}
+      rows={rows}
       onRowDoubleClick={editRow}
       getRowId={(r) => r.uid}
       columns={[
@@ -371,7 +366,7 @@ export default ({ orders, dispatch, classes }) => {
                     color='primary'
                     style={{ marginRight: 5 }}
                     disabled={
-                      row.isEditingEntity || (!row.isActive && row.type !== '5')
+                      isEditingEntity || (!row.isActive && row.type !== '5')
                     }
                   >
                     <Edit />
@@ -400,7 +395,7 @@ export default ({ orders, dispatch, classes }) => {
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={row.isEditingEntity}
+                      disabled={isEditingEntity}
                     >
                       <Delete />
                     </Button>
