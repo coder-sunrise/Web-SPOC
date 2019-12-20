@@ -381,10 +381,36 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     columnName: 'type',
     compare: compareString,
     width: 160,
+    render: (row) => {
+      return (
+        <div
+          style={{
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {row.type}
+        </div>
+      )
+    },
   },
   {
     columnName: 'description',
     compare: compareString,
+    render: (row) => {
+      return (
+        <Tooltip title={row.description}>
+          <div
+            style={{
+              wordWrap: 'break-word',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {row.description}
+          </div>
+        </Tooltip>
+      )
+    },
   },
   {
     columnName: 'unitPrice',
