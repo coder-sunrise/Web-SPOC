@@ -51,7 +51,7 @@ class AllergyGrid extends PureComponent {
                 ).length > 0
               ) {
                 notification.error({
-                  message: 'The Allergy record already exists in the system',
+                  message: 'The Allergy record already exists.',
                 })
               }
               row.allergyCode = option.code || option.name
