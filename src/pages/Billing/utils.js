@@ -6,6 +6,7 @@ export const constructPayload = (values) => {
   const {
     concurrencyToken,
     visitId,
+    visitPurposeFK,
     visitStatus = 'BILLING',
     invoice,
     invoicePayer = [],
@@ -72,6 +73,7 @@ export const constructPayload = (values) => {
     })
 
   const payload = {
+    visitPurposeFK,
     mode,
     concurrencyToken,
     visitId,
