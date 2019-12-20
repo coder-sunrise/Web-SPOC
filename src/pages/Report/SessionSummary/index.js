@@ -114,6 +114,7 @@ class SessionSummary extends ReportBase {
     ]
     return <ReportDataGrid
       height='80vh'
+      style={{ marginTop: 6 }}
       onRowDoubleClick={this.viewSessionSummaryReport}
       data={reportDatas}
       columns={SessionColumns}
