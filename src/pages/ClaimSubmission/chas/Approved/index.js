@@ -54,8 +54,6 @@ class ApprovedCHAS extends React.Component {
     this.refreshDataGrid()
   }
 
-  onRefreshClicked = () => this.refreshDataGrid()
-
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
