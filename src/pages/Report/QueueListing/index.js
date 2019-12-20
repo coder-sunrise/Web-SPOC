@@ -17,10 +17,10 @@ import Summary from './Summary'
 import { AccordionTitle } from '@/components/_medisys'
 
 class QueueListing extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId: 1,
       fileName: 'Queue Listing Report',
     }

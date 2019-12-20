@@ -7,10 +7,10 @@ const fileName = 'Low Stock Medication Report'
 
 
 class LowStockMedicationReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

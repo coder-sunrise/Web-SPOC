@@ -4,34 +4,36 @@ import ReportLayoutWrapper from './ReportLayout'
 // services
 import { getRawData } from '@/services/report'
 
+const defaultState = {
+  loaded: false,
+  isLoading: false,
+  isSubmitting: false,
+  activePanel: -1,
+  reportDatas: null,
+  reportId: 0,
+  fileName: '',
+  isDisplayReportLayout: true,
+}
+
 export default class ReportBase extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      default: {
-        loaded: false,
-        isLoading: false,
-        isSubmitting: false,
-        activePanel: -1,
-        reportDatas: null,
-        reportId: 0,
-        fileName: '',
-      },
+      ...defaultState,
     }
     // this.onSubmitClick = this.onSubmitClick.bind(this)
   }
+  // componentDidMount () {
+  //   this.setState((state) => ({
+  //     ...defaultState,
+  //   }))
+  // }
 
-  componentDidMount () {
-    this.setState((state) => ({
-      ...state.default,
-    }))
-  }
-
-  componentWillUnmount () {
-    this.setState((state) => ({
-      ...state.default,
-    }))
-  }
+  // componentWillUnmount () {
+  //   this.setState(() => ({
+  //     ...defaultState,
+  //   }))
+  // }
 
   handleActivePanelChange = (event, panel) => {
     this.setState((state) => ({
@@ -43,6 +45,8 @@ export default class ReportBase extends React.Component {
   formatReportParams = (params) => {
     return params
   }
+
+  getReportDatas = async (params) => await getRawData(this.state.reportId, { ...params })
 
   onSubmitClick = async () => {
     if (this.props.validateForm) {
@@ -57,7 +61,7 @@ export default class ReportBase extends React.Component {
       reportDatas: null,
     }))
     const params = this.formatReportParams(this.props.values)
-    const reportDatas = await getRawData(this.state.reportId, { ...params })
+    const reportDatas = await this.getReportDatas(params)
 
     if (reportDatas) {
       this.setState((state) => ({
@@ -69,7 +73,8 @@ export default class ReportBase extends React.Component {
         reportDatas,
       }))
     } else {
-      this.setState(() => ({
+      this.setState((state) => ({
+        ...state,
         loaded: false,
         isLoading: false,
         isSubmitting: false,
@@ -86,7 +91,7 @@ export default class ReportBase extends React.Component {
             color='primary'
             onClick={handleSubmit}
             style={{ marginTop: 6 }}
-            disabled={this.state.isSubmitting}
+            disabled={isSubmitting}
           >
             Generate Report
           </Button>
@@ -101,24 +106,26 @@ export default class ReportBase extends React.Component {
 
   render () {
     const { height } = this.props
-    // console.log({ height })
-    const maxHeight = !height ? '100%' : height - 200
+    console.log('isDisplayReportLayout', this.state.isDisplayReportLayout)
     return (
       <GridContainer>
         <GridItem md={12}>
           {this.renderFilterBar(this.onSubmitClick, this.state.isSubmitting)}
         </GridItem>
         <GridItem md={12}>
-          <ReportLayoutWrapper
-            height={height}
-            loading={this.state.isLoading}
-            reportID={this.state.reportId}
-            reportParameters={this.formatReportParams(this.props.values)}
-            loaded={this.state.loaded}
-            fileName={this.state.fileName}
-          >
-            {this.renderContent(this.state.reportDatas)}
-          </ReportLayoutWrapper>
+          {this.state.isDisplayReportLayout ?
+            <ReportLayoutWrapper
+              height={height}
+              loading={this.state.isLoading}
+              reportID={this.state.reportId}
+              reportParameters={this.formatReportParams(this.props.values)}
+              loaded={this.state.loaded}
+              fileName={this.state.fileName}
+            >
+              {this.renderContent(this.state.reportDatas)}
+            </ReportLayoutWrapper>
+            : this.renderContent(this.state.reportDatas)
+          }
         </GridItem>
       </GridContainer>
     )

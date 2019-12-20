@@ -6,10 +6,10 @@ const reportId = 19
 const fileName = 'Low Stock Consumables Report'
 
 class LowStockConsumablesReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }
