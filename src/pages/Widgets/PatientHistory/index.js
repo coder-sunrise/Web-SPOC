@@ -414,7 +414,7 @@ class PatientHistory extends Component {
   }
 
   getTitle = (row) => {
-    const { visitPurposeName } = row
+    const { visitPurposeName = '' } = row
     const visitTitleLabel = visitPurposeName.includes('Visit')
       ? visitPurposeName
       : `${visitPurposeName} Visit`
