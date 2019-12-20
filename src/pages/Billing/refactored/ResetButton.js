@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core'
 import { Button, Tooltip } from '@/components'
 
-const ResetButton = ({ handleResetClick, handleRestoreClick }) => {
+const ResetButton = ({ disabled, handleResetClick, handleRestoreClick }) => {
   const [
     anchorEl,
     setAnchorEl,
@@ -37,7 +37,7 @@ const ResetButton = ({ handleResetClick, handleRestoreClick }) => {
   const open = Boolean(anchorEl)
   return (
     <React.Fragment>
-      <Button color='primary' size='sm' onClick={onClick}>
+      <Button color='primary' size='sm' onClick={onClick} disabled={disabled}>
         <More />
         More
       </Button>
