@@ -199,15 +199,7 @@ class Medication extends PureComponent {
             justIcon
             color='info'
             onClick={() => {
-              arrayHelpers.push(defaultValue)
-              if (prop === 'corPrescriptionItemInstruction') {
-                this.setInstruction(
-                  values.corPrescriptionItemInstruction.length,
-                )
-                setTimeout(() => {
-                  this.calculateQuantity()
-                }, 1)
-              }
+              this.handleAddStepdose(arrayHelpers, defaultValue, prop)
             }}
           >
             <Tooltip title={tooltip}>
@@ -295,9 +287,47 @@ class Medication extends PureComponent {
     }
   }
 
+  setTotalPrice = () => {
+    const { setFieldValue, values, disableEdit } = this.props
+    if (disableEdit === false) {
+      if (values.unitPrice) {
+        const total = (values.quantity || 0) * values.unitPrice
+        setFieldValue('totalPrice', total)
+        this.updateTotalPrice(total)
+      }
+    }
+  }
+
+  handleAddStepdose = (arrayHelpers, defaultValue, prop) => {
+    const { values, codetable, setFieldValue } = this.props
+    arrayHelpers.push(defaultValue)
+    if (prop === 'corPrescriptionItemInstruction') {
+      this.setInstruction(values.corPrescriptionItemInstruction.length)
+      const op = codetable.inventorymedication.find(
+        (o) => o.id === values.inventoryMedicationFK,
+      )
+
+      if (op && op.dispensingQuantity) {
+        setFieldValue(`quantity`, op.dispensingQuantity)
+        setTimeout(() => {
+          this.setTotalPrice()
+        }, 1)
+      } else {
+        setTimeout(() => {
+          this.calculateQuantity()
+        }, 1)
+      }
+    }
+  }
+
   setInstruction = (index = 0) => {
-    const { setFieldValue } = this.props
-    const op = this.state.selectedMedication
+    const { setFieldValue, codetable, values } = this.props
+    let op = this.state.selectedMedication
+    if (!op || !op.id) {
+      op = codetable.inventorymedication.find(
+        (o) => o.id === values.inventoryMedicationFK,
+      )
+    }
 
     setFieldValue(
       `corPrescriptionItemInstruction[${index}].usageMethodFK`,
@@ -852,13 +882,16 @@ class Medication extends PureComponent {
                     min={0}
                     // currency
                     onChange={(e) => {
-                      if (disableEdit === false) {
-                        if (values.unitPrice) {
-                          const total = e.target.value * values.unitPrice
-                          setFieldValue('totalPrice', total)
-                          this.updateTotalPrice(total)
-                        }
-                      }
+                      setTimeout(() => {
+                        this.setTotalPrice()
+                      }, 1)
+                      // if (disableEdit === false) {
+                      //   if (values.unitPrice) {
+                      //     const total = e.target.value * values.unitPrice
+                      //     setFieldValue('totalPrice', total)
+                      //     this.updateTotalPrice(total)
+                      //   }
+                      // }
                     }}
                     {...args}
                   />
