@@ -35,7 +35,11 @@ fabric.Object.prototype.isValidCell = function () {
   return this.name && this.name.indexOf(cellPrefix) === 0
 }
 fabric.Object.prototype.isDefaultCell = function () {
-  return !this.name || this.name.indexOf(cellPrefix) === 0
+  return (
+    !this.name ||
+    this.name.indexOf(cellPrefix) === 0 ||
+    this.name.indexOf('header_') === 0
+  )
 }
 export const strokeWidth = 2
 export const baseWidth = 30
@@ -44,11 +48,11 @@ export const zoom = 1
 export const fontColor = '#000000'
 export const innerFontSize = 22
 export const lockConfig = {
-  cornerSize: 0,
-  hasBorders: false,
-  lockMovementX: true,
-  lockMovementY: true,
-  lockRotation: true,
+  // cornerSize: 0,
+  // hasBorders: false,
+  // lockMovementX: true,
+  // lockMovementY: true,
+  // lockRotation: true,
   // selectable: false,
 }
 export const groupCfg = {
@@ -515,6 +519,7 @@ fabric.Image.fromURL(test, (img) => {
     ],
     {
       ...addonGroupCfg,
+      isShape: true,
     },
   )
   // img2.set('scaleX', 1)
@@ -526,11 +531,15 @@ fabric.Image.fromURL(test, (img) => {
 
 export const buttonConfigs = [
   {
+    id: 1,
     value: 'clear',
     icon: clear,
     text: 'Clear',
+    fixed: true,
+    method: 'na',
   },
   {
+    id: 2,
     value: 'missing',
     icon: missing,
     text: 'Missing',
@@ -541,55 +550,71 @@ export const buttonConfigs = [
         ],
         {
           ...addonGroupCfg,
+          isShape: true,
         },
       )
       return g
     },
+    fixed: true,
+    method: 'na',
   },
   {
+    id: 3,
     value: 'caries',
     icon: caries,
     text: 'Caries',
     type: 'cell',
     fill: '#824f4f',
+    method: 'surface',
   },
   {
+    id: 4,
     value: 'recurrentdecay',
     icon: recurrentdecay,
     text: 'Recurrent Decay',
     type: 'cell',
     fill: '#f79e02',
+    method: 'surface',
   },
   {
+    id: 5,
     value: 'nccl',
     icon: nccl,
     text: 'NCCL',
     type: 'cell',
     fill: '#ffe921',
+    method: 'surface',
   },
   {
+    id: 6,
     value: 'fractured',
     icon: test,
     text: 'Fractured',
     getShape: ({ canvas, group, config }) => {
       return fabric.util.object.clone(img1)
     },
+    method: 'tooth',
   },
   {
+    id: 7,
     value: 'filling',
     icon: filling,
     text: 'Filling',
     type: 'cell',
     fill: '#737372',
+    method: 'surface',
   },
   {
+    id: 8,
     value: 'temporarydressing',
     icon: temporarydressing,
     text: 'Temporary Dressing',
     type: 'cell',
     fill: '#9c9c98',
+    method: 'surface',
   },
   {
+    id: 9,
     value: 'onlayveneer',
     icon: onlayveneer,
     text: 'Onlay/Veneer',
@@ -600,18 +625,18 @@ export const buttonConfigs = [
         left: baseWidth * 0.5 / 2 + 5,
         width: baseWidth * 3.5 - 10,
         height: baseHeight * 3 - 10,
-        fill: '#cccccc',
         // top: baseHeight * 2 + 5,
         ...sharedCfg,
+        fill: '#cccccc',
       })
       const onlayveneerInner2 = new fabric.Triangle({
         top: baseHeight + 5,
         left: baseWidth / 2 + 15,
         width: baseWidth * 2,
         height: baseHeight * 2 - 10,
-        fill: '#ffffff',
         // top: baseHeight * 3 + 5,
         ...sharedCfg,
+        fill: '#ffffff',
       })
       onlayveneerInner1.rotate(180)
       onlayveneerInner2.rotate(180)
@@ -623,12 +648,15 @@ export const buttonConfigs = [
         ],
         {
           ...addonGroupCfg,
+          isShape: true,
         },
       )
       return group
     },
+    method: 'tooth',
   },
   {
+    id: 10,
     value: 'bridge',
     // icon: filling,
     text: 'Bridge',
@@ -808,24 +836,25 @@ export const buttonConfigs = [
         o.set('selectable', true)
       })
     },
+    method: 'tooth',
   },
-  {
-    value: 'topcell',
-    // icon: onlayveneer,
-    text: 'Top',
-    color: 'brown',
-    type: 'special',
-    ...sharedButtonConfig,
-    onSelect: ({ canvas }) => {},
-  },
+  // {
+  //   value: 'topcell',
+  //   // icon: onlayveneer,
+  //   text: 'Top',
+  //   color: 'brown',
+  //   type: 'special',
+  //   ...sharedButtonConfig,
+  //   onSelect: ({ canvas }) => {},
+  // },
 
-  {
-    value: 'bottomcell',
-    // icon: onlayveneer,
-    text: 'Bottom',
-    color: 'brown',
-    type: 'special',
+  // {
+  //   value: 'bottomcell',
+  //   // icon: onlayveneer,
+  //   text: 'Bottom',
+  //   color: 'brown',
+  //   type: 'special',
 
-    ...sharedButtonConfig,
-  },
+  //   ...sharedButtonConfig,
+  // },
 ]

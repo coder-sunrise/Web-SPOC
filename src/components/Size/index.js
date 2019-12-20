@@ -1,8 +1,8 @@
 import React from 'react'
-import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 import { standardRowHeight, smallRowHeight, largeRowHeight } from 'assets/jss'
 
 import { MuiThemeProvider } from '@material-ui/core'
+import { smallTheme, defaultTheme, largeTheme } from '@/utils/theme'
 
 export default function SizeContainer ({ children, size = 'md', ...props }) {
   let theme = defaultTheme

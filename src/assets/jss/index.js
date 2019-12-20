@@ -45,7 +45,7 @@ const hexToRgb = (input) => {
 const drawerWidth = 260
 
 const drawerMiniWidth = 80
-const headerHeight = 64
+const headerHeight = 56
 
 const transition = {
   transition: 'all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)',
@@ -331,6 +331,10 @@ const smallRowHeight = '45px'
 const standardRowHeight = '55px'
 const largeRowHeight = '65px'
 
+const smallSingleRowHeight = '29px'
+const standardSingleRowHeight = '39px'
+const largeSingleRowHeight = '50px'
+
 export {
   hexToRgb,
   // variables
@@ -386,6 +390,9 @@ export {
   standardRowHeight,
   smallRowHeight,
   largeRowHeight,
+  smallSingleRowHeight,
+  standardSingleRowHeight,
+  largeSingleRowHeight,
   borderColor,
   border,
   headerHeight,
