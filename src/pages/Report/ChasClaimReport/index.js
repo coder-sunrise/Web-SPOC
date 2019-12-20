@@ -15,10 +15,10 @@ import { Accordion } from '@/components'
 import { AccordionTitle } from '@/components/_medisys'
 
 class ChasClaimReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId: 30,
       fileName: 'CHAS Claim Report',
     }
