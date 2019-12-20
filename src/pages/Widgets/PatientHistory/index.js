@@ -356,16 +356,7 @@ class PatientHistory extends Component {
                     >
                       <GridContainer>
                         <GridItem sm={12} style={{ fontWeight: 500 }}>
-                          <TextField
-                            text
-                            value={
-                              row.visitPurposeName.includes('Visit') ? (
-                                row.visitPurposeName
-                              ) : (
-                                `${row.visitPurposeName} Visit`
-                              )
-                            }
-                          />
+                          <TextField text value={row.visitPurposeName} />
                           {row.visitDate && (
                             <span style={{ position: 'relative' }}>
                               &nbsp; (
@@ -415,9 +406,7 @@ class PatientHistory extends Component {
 
   getTitle = (row) => {
     const { visitPurposeName = '' } = row
-    const visitTitleLabel = visitPurposeName.includes('Visit')
-      ? visitPurposeName
-      : `${visitPurposeName} Visit`
+    const visitTitleLabel = visitPurposeName
 
     return (
       <div className={this.props.classes.title}>
