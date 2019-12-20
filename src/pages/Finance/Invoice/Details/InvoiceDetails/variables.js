@@ -1,3 +1,7 @@
+import numeral from 'numeral'
+import config from '@/utils/config'
+
+const { qtyFormat } = config
 export const DataGridColumns = [
   { name: 'itemType', title: 'Type' },
   { name: 'itemName', title: 'Name' },
@@ -15,7 +19,7 @@ export const DataGridColExtensions = [
     width: 180,
     render: (row) => {
       const { quantity, dispenseUOMDisplayValue = '' } = row
-      return `${quantity} ${dispenseUOMDisplayValue}`
+      return `${numeral(quantity).format(qtyFormat)} ${dispenseUOMDisplayValue}`
     },
   },
   { columnName: 'adjAmt', type: 'currency', currency: true, width: 180 },
