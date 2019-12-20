@@ -132,7 +132,7 @@ export default ({ orders, dispatch, classes }) => {
     )
   })
 
-  const shouldDisableDeleteButton = !_.isEmpty(orders.entity)
+  const isEditingEntity = !_.isEmpty(orders.entity)
 
   return (
     <CommonTableGrid
@@ -365,7 +365,9 @@ export default ({ orders, dispatch, classes }) => {
                     justIcon
                     color='primary'
                     style={{ marginRight: 5 }}
-                    disabled={!row.isActive && row.type !== '5'}
+                    disabled={
+                      isEditingEntity || (!row.isActive && row.type !== '5')
+                    }
                   >
                     <Edit />
                   </Button>
@@ -393,7 +395,7 @@ export default ({ orders, dispatch, classes }) => {
                       size='sm'
                       color='danger'
                       justIcon
-                      disabled={shouldDisableDeleteButton}
+                      disabled={isEditingEntity}
                     >
                       <Delete />
                     </Button>
