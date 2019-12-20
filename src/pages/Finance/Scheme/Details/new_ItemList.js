@@ -180,11 +180,12 @@ class ItemList extends React.Component {
               name: 'Service',
               content: this.addContent('ctservice'),
             },
-            {
-              id: 5,
-              name: 'Package',
-              content: this.addContent('inventorypackage'),
-            },
+            /* Commented Package Input - Need to re-test if enabling it back in the future */
+            // {
+            //   id: 5,
+            //   name: 'Package',
+            //   content: this.addContent('inventorypackage'),
+            // },
           ]}
         />
         <CommonTableGrid
