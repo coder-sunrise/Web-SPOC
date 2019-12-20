@@ -32,11 +32,11 @@ const Package = ({ dispatch, history, pack }) => {
       type: 'select',
       options: status,
       align: 'center',
-      width: 120,
+      width: 80,
     },
-    { columnName: 'Action', width: 110, align: 'center' },
-    { columnName: 'code', width: 230 },
-    { columnName: 'totalPrice', type: 'number', currency: true, width: 220 },
+    { columnName: 'action', width: 80, align: 'center' },
+    { columnName: 'code', width: 130 },
+    { columnName: 'totalPrice', type: 'number', currency: true, width: 120 },
   ])
 
   const filterProps = {
