@@ -24,13 +24,40 @@ class Allergies extends PureComponent {
     )
   }
 
-  updateValue = (type) => ({ rows }) => {
+  updateValue = (type) => ({ rows, added, changed, deleted }) => {
+    let _newRows = rows
+    if (type === 'NonAllergy') {
+      _newRows = this.isDuplicate({ rows, changed })
+    }
     let vals = this.props.values.patientAllergy.filter((o) => o.type === type)
-    vals = vals.concat(rows)
+    vals = vals.concat(_newRows)
     this.props.setFieldValue('patientAllergy', vals)
     if (this.isDisableAllergy()) {
       this.props.setFieldValue('patientAllergyMetaData[0].noAllergies', false)
     }
+  }
+
+  isDuplicate = ({ rows, changed }) => {
+    if (!changed) return rows
+    const key = Object.keys(changed)[0]
+    const { allergyFK } = changed[key]
+
+    const hasDuplicate = key
+      ? rows.filter((r) => !r.isDeleted && r.allergyFK === allergyFK).length >=
+        2
+      : []
+    let _newRows = [
+      ...rows,
+    ]
+
+    if (hasDuplicate) {
+      _newRows = _newRows.map(
+        (r) =>
+          r.id === parseInt(key, 10) ? { ...r, allergyFK: undefined } : r,
+      )
+    }
+
+    return _newRows
   }
 
   getRows = (type) => {
