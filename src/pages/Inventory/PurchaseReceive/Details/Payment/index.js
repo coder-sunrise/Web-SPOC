@@ -143,7 +143,7 @@ class index extends PureComponent {
 
   // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
 
-  recalculateOutstandingAmount = (type, value) => {
+  recalculateOutstandingAmount = (type, value = 0) => {
     const { values, setValues } = this.props
     if (type === 'add') {
       const outstandingAmt = values.outstandingAmt - value
