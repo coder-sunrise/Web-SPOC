@@ -237,7 +237,7 @@ export default ({ orders, dispatch, classes }) => {
                       </Tooltip>
                     </span>
                     {c1}
-                    {gstValue && (
+                    {gstValue >= 0 && (
                       <Checkbox
                         simple
                         label={formatMessage({
