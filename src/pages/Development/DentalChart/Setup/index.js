@@ -63,7 +63,7 @@ const methods = [
   },
 ]
 const rowSchema = Yup.object().shape({
-  name: Yup.string().required(),
+  text: Yup.string().required(),
   method: Yup.string().required(),
 })
 
@@ -86,10 +86,11 @@ const Setup = (props) => {
     dentalChartSetup,
     values,
     setFieldValue,
+    footer,
     ...restProps
   } = props
   const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
-  console.log(restProps, dentalChartSetup)
+  // console.log(restProps, dentalChartSetup)
   // style={{ height: `${height}px` }}
   const [
     rows,
@@ -127,6 +128,7 @@ const Setup = (props) => {
                   width: 400,
                   columnName: 'legend',
                   isReactComponent: true,
+                  type: 'custom',
                   render: Legend,
                 },
                 {
@@ -156,6 +158,12 @@ const Setup = (props) => {
             />
           </GridItem>
         </GridContainer>
+        {footer &&
+          footer({
+            align: 'center',
+            onConfirm: props.handleSubmit,
+            confirmBtnText: 'Save',
+          })}
       </Paper>
     </div>
   )
@@ -172,6 +180,7 @@ export default withFormikExtend({
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
+    console.log(values)
     const { dispatch, history, codetable } = props
   },
 

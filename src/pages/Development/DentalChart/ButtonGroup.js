@@ -143,9 +143,11 @@ export default function ButtonGroup (props) {
         title='Dental Chart Method Setup'
         maxWidth='lg'
         bodyNoPadding
-        // onConfirm={() => handleReplacementModalVisibility(false)}
+        // onConfirm={(ee) => {
+        //   console.log(ee)
+        // }}
         onClose={() => setOpenSettings(false)}
-        showFooter
+        // showFooter
         confirmText='Save'
       >
         <Setup

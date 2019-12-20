@@ -3,29 +3,75 @@ import moment from 'moment'
 import _ from 'lodash'
 import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
+import { dateFormatLong } from '@/components'
 
 const updateData = (data, payload) => {
-  const { toothIndex, value, target, forceSelect } = payload
+  const {
+    toothIndex,
+    value,
+    target,
+    forceSelect,
+    name,
+    subTarget,
+    deleted,
+  } = payload
+  // console.log(payload)
+  // if (!name) return data
   const exist = data.find(
     (o) =>
-      o.toothIndex === toothIndex && o.value === value && target === o.target,
+      o.toothIndex === toothIndex &&
+      o.value === value &&
+      target === o.target &&
+      o.subTarget === subTarget &&
+      o.name === name,
   )
   if (value === 'clear')
     return _.reject(data, (o) => o.toothIndex === toothIndex)
-  if (exist && !forceSelect) {
-    data = _.reject(
+
+  if (deleted) {
+    return _.reject(
       data,
-      (o) =>
-        o.toothIndex === toothIndex && o.value === value && target === o.target,
+      (o) => o.toothIndex === toothIndex && o.value === value,
     )
+  }
+  // if (others.length > 0) {
+  //   others.map((o) => (o.hide = true))
+  // }
+  if (exist) {
+    if (
+      data.find(
+        (o) =>
+          o.toothIndex === toothIndex &&
+          o.target === target &&
+          o.subTarget === subTarget &&
+          o.timestamp > exist.timestamp,
+      ) ||
+      forceSelect
+    ) {
+      exist.timestamp = Date.now()
+    } else {
+      data = _.reject(
+        data,
+        (o) =>
+          o.toothIndex === toothIndex &&
+          o.value === value &&
+          target === o.target &&
+          o.subTarget === subTarget &&
+          o.name === name,
+      )
+    }
+    // exist.timestamp = Date.now()
+    // exist.hide = !exist.hide
   } else {
-    data = _.reject(
-      data,
-      (o) =>
-        o.value !== value && o.toothIndex === toothIndex && target === o.target,
-    )
+    // data = _.reject(
+    //   data,
+    //   (o) =>
+    //     o.value !== value && o.toothIndex === toothIndex && target === o.target,
+    // )
     data.push({
       ...payload,
+      timestamp: Date.now(),
+      date: moment().format(dateFormatLong),
       // id: getUniqueId(),
     })
   }

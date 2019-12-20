@@ -92,6 +92,7 @@ class EditableTableGrid extends React.Component {
         })
       })
     })
+    // console.log(errorCells)
     return errorCells
   }
 

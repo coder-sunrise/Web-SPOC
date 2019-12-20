@@ -55,7 +55,7 @@ class CheckboxEditorBase extends PureComponent {
     // if (checked) {
     //   _checkboxSelectedMap[columnName] = row.id
     // }
-    // console.log(e, checked)
+    console.log(e, checked)
     onComponentChange.call(this, {
       value: e.target.value,
     })
@@ -119,11 +119,7 @@ class CheckboxTypeProvider extends React.Component {
     super(props)
     this.CheckboxEditor = (columns, text) => (editorProps) => {
       return (
-        <CheckboxEditor
-          editMode={!text}
-          columnExtensions={columns}
-          {...editorProps}
-        />
+        <CheckboxEditor editMode columnExtensions={columns} {...editorProps} />
       )
     }
   }

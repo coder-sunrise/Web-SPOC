@@ -35,7 +35,11 @@ fabric.Object.prototype.isValidCell = function () {
   return this.name && this.name.indexOf(cellPrefix) === 0
 }
 fabric.Object.prototype.isDefaultCell = function () {
-  return !this.name || this.name.indexOf(cellPrefix) === 0
+  return (
+    !this.name ||
+    this.name.indexOf(cellPrefix) === 0 ||
+    this.name.indexOf('header_') === 0
+  )
 }
 export const strokeWidth = 2
 export const baseWidth = 30
@@ -44,11 +48,11 @@ export const zoom = 1
 export const fontColor = '#000000'
 export const innerFontSize = 22
 export const lockConfig = {
-  cornerSize: 0,
-  hasBorders: false,
-  lockMovementX: true,
-  lockMovementY: true,
-  lockRotation: true,
+  // cornerSize: 0,
+  // hasBorders: false,
+  // lockMovementX: true,
+  // lockMovementY: true,
+  // lockRotation: true,
   // selectable: false,
 }
 export const groupCfg = {
@@ -515,6 +519,7 @@ fabric.Image.fromURL(test, (img) => {
     ],
     {
       ...addonGroupCfg,
+      isShape: true,
     },
   )
   // img2.set('scaleX', 1)
@@ -545,6 +550,7 @@ export const buttonConfigs = [
         ],
         {
           ...addonGroupCfg,
+          isShape: true,
         },
       )
       return g
@@ -642,6 +648,7 @@ export const buttonConfigs = [
         ],
         {
           ...addonGroupCfg,
+          isShape: true,
         },
       )
       return group

@@ -74,6 +74,21 @@ const styles = (theme) => ({
       marginLeft: theme.spacing(0.5),
     },
   },
+  toothJournal: {
+    paddingTop: 0,
+    paddingBottom: 0,
+  },
+  toothJournalItem: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingLeft: theme.spacing(1),
+  },
+  toothJournalItemSecondaryAction: {
+    paddingRight: theme.spacing(3),
+  },
+  toothJournalSecondaryAction: {
+    right: theme.spacing(1),
+  },
 })
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
@@ -106,13 +121,13 @@ class DentalChart extends React.Component {
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
         <GridContainer gutter={theme.spacing(0.5)}>
-          <GridItem md={9}>
+          <GridItem md={8}>
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
             <ButtonGroup {...this.props} />
           </GridItem>
-          <GridItem md={3}>
+          <GridItem md={4}>
             <RightPanel {...this.props} />
           </GridItem>
         </GridContainer>
