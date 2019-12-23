@@ -172,7 +172,7 @@ export default compose(
       }
 
       dispatch({
-        type: 'sms/upsert',
+        type: 'sms/sendSms',
         payload,
       }).then((r) => {
         if (r) {
