@@ -8,7 +8,6 @@ import { withStyles } from '@material-ui/core'
 import { formatMessage } from 'umi/locale'
 import { LoadingWrapper } from '@/components/_medisys'
 import {
-  CommonTableGrid,
   ProgressButton,
   GridContainer,
   GridItem,
@@ -32,16 +31,6 @@ const styles = (theme) => ({
   },
 })
 
-const TableConfig2 = {
-  FuncProps: {
-    selectable: true,
-    selectConfig: {
-      showSelectAll: true,
-      rowSelectionEnabled: () => true,
-    },
-  },
-}
-
 @connect(({ claimSubmissionNew }) => ({
   claimSubmissionNew,
 }))
@@ -61,23 +50,25 @@ class NewCHAS extends React.Component {
     })
   }
 
-  onRefreshClicked = () => this.refreshDataGrid()
-
-  handleSelectionChange = (selection) =>
-    this.setState({ selectedRows: selection })
-
-  refreshDataGrid = () => {
+  onRefreshClicked = () => {
     const { selectedRows } = this.state
-
     this.props.dispatch({
       type: 'claimSubmissionNew/refreshPatientDetails',
       payload:{claimIds: selectedRows},
     }).then((r)=>{
       if(!r){
-        this.props.dispatch({
-          type: 'claimSubmissionNew/query',
-        })
+        this.refreshDataGrid()
       }
+    })
+  }
+
+  handleSelectionChange = (selection) =>
+    this.setState({ selectedRows: selection })
+
+
+  refreshDataGrid = () => {
+    this.props.dispatch({
+      type: 'claimSubmissionNew/query',
     })
   }
 
@@ -141,7 +132,6 @@ class NewCHAS extends React.Component {
                 data={list}
                 columnExtensions={NewCHASColumnExtensions}
                 columns={NewCHASColumns}
-                // tableConfig={TableConfig2}
                 FuncProps={{
                   selectable: true,
                   selectConfig: {
