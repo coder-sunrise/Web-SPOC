@@ -136,7 +136,7 @@ export default compose(
           patientName = '',
           upcomingAppointmentDate = '',
           doctor = '',
-          patientCallingName = '',
+          callingName = '',
           lastVisitDate = '',
         } = selectedItem
         const {
@@ -164,7 +164,7 @@ export default compose(
         formattedContent = formattedContent.replace(/@NewLine/g, '\n')
         formattedContent = formattedContent.replace(
           /@PatientCallingName/g,
-          patientCallingName,
+          callingName,
         )
         formattedContent = formattedContent.replace(
           /@LastVisitDate/g,
