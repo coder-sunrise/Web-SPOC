@@ -8,7 +8,6 @@ const styles = () => ({})
 @control()
 class OutlinedTextField extends PureComponent {
   getComponent = ({ classes, ...restProps }) => {
-    console.log({ restProps })
     return (
       <TextField variant='outlined' {...restProps.inputProps} {...restProps} />
     )

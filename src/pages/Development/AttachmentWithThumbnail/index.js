@@ -27,7 +27,7 @@ const getFileExtension = (filename) => {
 const AttachmentWithThumbnail = ({
   classes,
   dispatch,
-  title = 'Attachment',
+  label = 'Attachment',
   handleUpdateAttachments,
   isReadOnly,
   attachments = [],
@@ -36,8 +36,8 @@ const AttachmentWithThumbnail = ({
   simple = false,
   attachmentType = '',
   thumbnailSize = {
-    height: 65,
-    width: 65,
+    height: 64,
+    width: 64,
   },
 }) => {
   const fileAttachments = attachments.filter(
@@ -159,8 +159,6 @@ const AttachmentWithThumbnail = ({
           .map((key) => mapFileToUploadObject(files[key])),
       )
 
-      console.log({ selectedFiles })
-
       setUploading(false)
       dispatch({
         type: 'global/updateState',
@@ -213,7 +211,7 @@ const AttachmentWithThumbnail = ({
 
   return (
     <div className={classes.root} id='imageroot'>
-      <span className={classes.attachmentLabel}>{title}</span>
+      <span className={classes.attachmentLabel}>{label}</span>
 
       <input
         style={{ display: 'none' }}
@@ -227,22 +225,25 @@ const AttachmentWithThumbnail = ({
       />
       {UploadButton}
       <LoadingWrapper loading={uploading} text='Uploading attachment...'>
-        <CardContainer hideHeader>
-          <GridContainer>
-            {fileAttachments.map((attachment) => {
-              return (
-                <Thumbnail
-                  simple={simple}
-                  size={thumbnailSize}
-                  attachment={attachment}
-                  isReadOnly={isReadOnly}
-                  onConfirmDelete={onDelete}
-                  onClickAttachment={onClick}
-                />
-              )
-            })}
-          </GridContainer>
-        </CardContainer>
+        {fileAttachments.length > 0 && (
+          <CardContainer hideHeader>
+            <GridContainer>
+              {fileAttachments.map((attachment, index) => {
+                return (
+                  <Thumbnail
+                    index={index}
+                    simple={simple}
+                    size={thumbnailSize}
+                    attachment={attachment}
+                    isReadOnly={isReadOnly}
+                    onConfirmDelete={onDelete}
+                    onClickAttachment={onClick}
+                  />
+                )
+              })}
+            </GridContainer>
+          </CardContainer>
+        )}
       </LoadingWrapper>
     </div>
   )

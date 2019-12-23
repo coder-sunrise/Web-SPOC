@@ -149,7 +149,7 @@ const VisitInfoCard = ({
         </GridItem>
         <GridItem xs md={12}>
           <AttachmentWithThumbnail
-            title='Visit Information'
+            label='Attachment'
             attachmentType='Visit'
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
