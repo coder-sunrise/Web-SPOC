@@ -47,11 +47,28 @@ const styles = (theme) => ({
     const returnValue = claimSubmission.entity || {}
     const { diagnosis } = returnValue
     let diagnosisOptions = []
+    let complicationList = []
+    let selectedComplication = []
+
     if (diagnosis) {
       diagnosis.forEach((o) => {
-        if (o.isSelected) diagnosisOptions.push(o.id)
-      })
-    }
+        if (o.isSelected) {
+          diagnosisOptions.push(o.id)
+        }
+
+        o.invoiceClaimComplicationDtos.forEach((complication)=>{
+          if(complication)
+          {
+            complicationList.push(complication)
+          }
+          if(o.isSelected){
+            selectedComplication.push(complication.id)
+          }
+        })
+
+
+    })
+  }
 
     if (diagnosis.length === diagnosisOptions.length && allowEdit) {
       diagnosisOptions.push(-99)
@@ -60,9 +77,13 @@ const styles = (theme) => ({
     return {
       ...returnValue,
       diagnosisSelections: diagnosisOptions,
+      complicationList,
+      selectedComplication,
     }
   },
 })
+
+
 class ClaimDetails extends Component {
   constructor (props) {
     super(props)
@@ -75,22 +96,7 @@ class ClaimDetails extends Component {
     })
   }
 
-  onSelectChange = (val) => {
-    const { setFieldValue, values } = this.props
-    const { diagnosis } = values
 
-    let processedRows = []
-    processedRows = diagnosis.map((x) => {
-      return { ...x, isSelected: false }
-    })
-    val.map((x) => {
-      const data = processedRows.find((diag) => diag.value === x)
-      data.isSelected = true
-      return x
-    })
-
-    setFieldValue('diagnosis', val)
-  }
 
   save = () => {
     const { dispatch, onConfirm, values } = this.props
@@ -115,11 +121,29 @@ class ClaimDetails extends Component {
     onConfirm()
   }
 
+  diagnosisOnChangeHandler = (v, op = {}) =>{
+    const { setFieldValue } = this.props
+    let latestSelectedComplication = []
+
+    if(op){ // Op is the selected Item
+      // Generate Latest Selected Complication
+      op.forEach((o)=>{
+        o.invoiceClaimComplicationDtos.forEach((complication) => {
+          if(complication)
+          {
+            latestSelectedComplication.push(complication.id)
+          }
+        })
+      })
+    }
+    setFieldValue('selectedComplication',latestSelectedComplication)
+  }
+
+
   render () {
     const { readOnly } = true
     const {
       classes,
-      onConfirm,
       onClose,
       renderClaimDetails,
       values,
@@ -130,20 +154,15 @@ class ClaimDetails extends Component {
     const {
       clinicianProfile: { title, name, doctorProfile },
       patientDetail: { dob, genderFK },
-      patientName,
-      // tier: maxDiagnosisSelectionCount,
       visitDate,
+      complicationList,
       patientDob,
       invoiceDate,
       diagnosis,
     } = values
-    const age = moment().diff(dob, 'years')
-    let patientGender = ctgender.find((x) => x.id === genderFK)
+
     const { doctorMCRNo } = doctorProfile
     let doctorNameLabel = `${title} ${name} (${doctorMCRNo})`
-    // let patientNameLabel = `${patientName} (${patientGender
-    //   ? patientGender.code
-    //   : ''}/${age})`
 
     return (
       <SizeContainer size='md'>
@@ -287,7 +306,7 @@ class ClaimDetails extends Component {
                         options={diagnosis}
                         labelField='diagnosisDescription'
                         valueField='id'
-                        // maxTagCount={diagnosis.length > 0 ? 0 : 0}
+                        onChange={this.diagnosisOnChangeHandler}
                         maxTagCount={allowEdit ? 0 : undefined}
                         maxTagPlaceholder='diagnosis'
                         {...args}
@@ -295,7 +314,24 @@ class ClaimDetails extends Component {
                     )}
                   />
                 </GridItem>
-                <GridItem md={7} />
+                <GridItem md={1} />
+                <GridItem md={5}>
+                  <Field
+                    name='selectedComplication'
+                    render={(args) => (
+                      <Select
+                        label='Complication'
+                        disabled
+                        mode='multiple'
+                        disableAll
+                        options={complicationList}
+                        labelField='complicationDescription'
+                        valueField='id'
+                        {...args}
+                      />
+                    )}
+                  />
+                </GridItem>
                 <GridItem md={5}>
                   <FastField
                     name='claimAmt'
