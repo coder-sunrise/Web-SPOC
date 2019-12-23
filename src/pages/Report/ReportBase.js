@@ -106,7 +106,6 @@ export default class ReportBase extends React.Component {
 
   render () {
     const { height } = this.props
-    console.log('isDisplayReportLayout', this.state.isDisplayReportLayout)
     return (
       <Card style={{ padding: 6 }}>
         <GridContainer>
