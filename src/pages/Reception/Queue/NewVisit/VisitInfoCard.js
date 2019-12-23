@@ -154,7 +154,6 @@ const VisitInfoCard = ({
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}
             isReadOnly={isReadOnly}
-            simple
           />
         </GridItem>
       </GridContainer>

@@ -69,7 +69,7 @@ const Thumbnail = ({
     fileName,
     fileExtension,
     id,
-    content = dummyThumbnail,
+    thumbnailData = dummyThumbnail,
     isbase64 = false,
   } = attachment
 
@@ -79,9 +79,9 @@ const Thumbnail = ({
 
   const handleAttachmentClicked = () => onClickAttachment(attachment)
 
-  let src = content
-  if (imageFileExtensions.includes(fileExtension))
-    if (isbase64) src = `data:image/png;base64,${content}`
+  let src = thumbnailData
+  // if (imageFileExtensions.includes(fileExtension))
+  //   if (isbase64) src = thumbnailData
 
   if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
 

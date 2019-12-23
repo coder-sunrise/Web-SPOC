@@ -14,7 +14,8 @@ import {
   deleteFileByFileID,
 } from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
-import { FILE_STATUS } from '@/utils/constants'
+import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
+import { getThumbnail, imageFileExtensions } from './utils'
 import styles from './styles'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
@@ -63,20 +64,44 @@ const AttachmentWithThumbnail = ({
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = FILE_STATUS.UPLOADED
+    const fileExtension = getFileExtension(file.name)
+
+    let thumbnailData
+    if (
+      [
+        'jpg',
+        'jpeg',
+        'png',
+      ].includes(fileExtension)
+    ) {
+      const imgEle = document.createElement('img')
+      imgEle.src = `data:image/${fileExtension};base64,${base64}`
+      await setTimeout(() => {
+        // wait for 1 milli second for img to set src successfully
+      }, 100)
+      const thumbnail = getThumbnail(imgEle, thumbnailSize)
+      thumbnailData = thumbnail.toDataURL(`image/png`)
+    }
 
     const uploadObject = {
       fileName: file.name,
       fileSize: file.size,
-      fileExtension: getFileExtension(file.name),
-      fileCategoryFK: 1,
+      fileCategoryFK: FILE_CATEGORY.VISITREG,
       content: base64,
-      // isConfirmed: false,
+      fileExtension,
+      thumbnailData,
       fileStatusFK,
       attachmentType,
     }
     const uploaded = await uploadFile(uploadObject)
 
-    return { ...uploaded, attachmentType, content: base64, isbase64: true }
+    return {
+      ...uploaded,
+      attachmentType,
+      content: base64,
+      thumbnailData,
+      isbase64: true,
+    }
   }
 
   const onFileChange = async (event) => {
@@ -134,6 +159,8 @@ const AttachmentWithThumbnail = ({
           .map((key) => mapFileToUploadObject(files[key])),
       )
 
+      console.log({ selectedFiles })
+
       setUploading(false)
       dispatch({
         type: 'global/updateState',
@@ -185,7 +212,7 @@ const AttachmentWithThumbnail = ({
   if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} id='imageroot'>
       <span className={classes.attachmentLabel}>{title}</span>
 
       <input
