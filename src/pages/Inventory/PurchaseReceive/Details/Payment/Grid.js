@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import moment from 'moment'
-import { GridContainer, EditableTableGrid, dateFormatLong } from '@/components'
+import _ from 'lodash'
+import {
+  GridContainer,
+  EditableTableGrid,
+  dateFormatLong,
+  CommonModal,
+} from '@/components'
 import Yup from '@/utils/yup'
+import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
-const purchaseOrderPaymentSchema = (outstandingAmount) =>
-  Yup.object().shape({
-    // paymentNo: Yup.string().required(),
-    // paymentDate: Yup.string().required(),
-    paymentModeFK: Yup.string().required(),
-    // reference: Yup.string().required(),
-    paymentAmount: Yup.number()
-      .min(0)
-      .max(outstandingAmount, (e) => {
-        return `Payment Amount must be less than or equal to ${e.max.toFixed(
-          2,
-        )}`
-      })
-      .required(),
-    // Remarks: Yup.string().required(),
-  })
+const purchaseOrderPaymentSchema = Yup.object().shape({
+  paymentModeFK: Yup.string().required(),
+  paymentAmount: Yup.number()
+    .min(0)
+    .max(Yup.ref('outstandingAmt'), (e) => {
+      return `Payment Amount must be less than or equal to ${e.max.toFixed(2)}`
+    })
+    .required(),
+})
+
 let commitCount = 1000 // uniqueNumber
 const Grid = ({
   dispatch,
   values,
-  isEditable,
   setFieldValue,
   recalculateOutstandingAmount,
 }) => {
@@ -40,6 +40,26 @@ const Grid = ({
     setSelection,
   ] = useState([])
 
+  const [
+    showDeleteConfirmation,
+    setShowDeleteConfirmation,
+  ] = useState(false)
+
+  const [
+    allRows,
+    setAllRows,
+  ] = useState()
+
+  const [
+    deletedRow,
+    setDeletedRow,
+  ] = useState()
+
+  const [
+    obj,
+    setObj,
+  ] = useState({})
+
   const getCreditCardList = async () => {
     dispatch({
       type: 'codetable/fetchCodes',
@@ -50,7 +70,6 @@ const Grid = ({
       setCreditCardTypeList(v)
     })
   }
-
   const getPaymentModeList = async () => {
     dispatch({
       type: 'codetable/fetchCodes',
@@ -141,6 +160,7 @@ const Grid = ({
         type: 'select',
         options: selection,
         sortingEnabled: false,
+        isDisabled: (row) => row.id > 0,
         onChange: (p) => {
           const { option, row } = p
           if (option) {
@@ -152,24 +172,47 @@ const Grid = ({
       {
         columnName: 'referenceNo',
         compare: compareString,
+        isDisabled: (row) => row.id > 0,
       },
       {
         columnName: 'paymentAmount',
         type: 'number',
         currency: true,
+        isDisabled: (row) => row.id > 0,
       },
       {
         columnName: 'remark',
         compare: compareString,
+        isDisabled: (row) => row.id > 0,
       },
     ],
   }
 
+  const voidPayment = (reason) => {
+    deletedRow.isDeleted = true
+    deletedRow.cancelReason = reason
+    recalculateOutstandingAmount('delete', deletedRow.paymentAmount)
+    setFieldValue('purchaseOrderPayment', allRows)
+    setShowDeleteConfirmation(false)
+  }
+
   const onCommitChanges = ({ rows, deleted }) => {
     if (deleted) {
-      rows.find((v) => v.id === deleted[0]).isDeleted = true
-      recalculateOutstandingAmount('delete', deleted[0].paymentAmount)
-      setFieldValue('purchaseOrderPayment', rows)
+      const currentRow = rows.find((v) => v.id === deleted[0])
+      if (currentRow.paymentNo) {
+        setAllRows(rows)
+        setDeletedRow(currentRow)
+        setObj({ type: 'Payment', itemID: currentRow.paymentNo })
+        setShowDeleteConfirmation(true)
+      } else {
+        currentRow.isDeleted = true
+        recalculateOutstandingAmount('delete', currentRow.paymentAmount)
+        const setRows = rows.filter(
+          (o) => o.id > 0 || (o.isNew && !o.isDeleted),
+        )
+
+        setFieldValue('purchaseOrderPayment', setRows)
+      }
     } else {
       rows[0].isDeleted = false
       if (rows[0].referenceNo === undefined) {
@@ -180,22 +223,39 @@ const Grid = ({
         rows[0].remark = ''
       }
       recalculateOutstandingAmount('add', rows[0].paymentAmount)
-      setFieldValue('purchaseOrderPayment', rows)
+      const activeRows = rows.filter((o) => o.isDeleted === false)
+      const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
+
+      const newRows = rows.map((o) => {
+        if (o.isNew && !o.isDeleted) {
+          return {
+            ...o,
+            outstandingAmt: values.invoiceAmount - paymentPaid,
+          }
+        }
+
+        return {
+          ...o,
+        }
+      })
+      setFieldValue('purchaseOrderPayment', newRows)
     }
 
     return rows
   }
+  const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
+
   return (
     <GridContainer>
       <EditableTableGrid
         rows={values.purchaseOrderPayment}
-        schema={purchaseOrderPaymentSchema(values.outstandingAmt)}
+        schema={purchaseOrderPaymentSchema}
         FuncProps={{
           edit: false,
           pager: false,
         }}
         EditingProps={{
-          showAddCommand: values.outstandingAmt > 0,
+          showAddCommand: values.currentOutstandingAmt > 0,
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
@@ -203,6 +263,18 @@ const Grid = ({
         }}
         {...tableParas}
       />
+      <CommonModal
+        open={showDeleteConfirmation}
+        title='Void Payment'
+        onConfirm={closeDeleteConfirmationModal}
+        onClose={closeDeleteConfirmationModal}
+        maxWidth='sm'
+      >
+        <DeleteConfirmation
+          handleSubmit={(reason) => voidPayment(reason)}
+          {...obj}
+        />
+      </CommonModal>
     </GridContainer>
   )
 }
