@@ -45,6 +45,9 @@ const initialState = {
   defaultPackage: {
     packageItems: [],
   },
+  defaultTreatment: {
+    quantity: 1,
+  },
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {
