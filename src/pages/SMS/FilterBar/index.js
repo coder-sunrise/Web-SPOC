@@ -84,19 +84,17 @@ export default compose(
         moment().subtract(1, 'months'),
         moment(),
       ],
-      phoneCall: false,
-      textMessage: false,
-      email: false,
+      pdpaConsent: [
+        '1',
+        '2',
+        '3',
+      ],
     }),
 
     handleSubmit: (values, { props }) => {
       const {
         patientName,
-        phoneCall,
-        textMessage,
-        email,
         lastSMSSendStatus,
-        // lastVisitDate,
         upcomingAppointmentDate,
         appointmentStatus,
         isReminderSent,
