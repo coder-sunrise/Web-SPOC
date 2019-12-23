@@ -3,7 +3,6 @@ import { connect } from 'dva'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
 // common components
-import moment from 'moment'
 import {
   Button,
   DatePicker,
@@ -19,6 +18,7 @@ import {
   dateFormatLongWithTimeNoSec,
   Field,
 } from '@/components'
+import Yup from '@/utils/yup'
 
 const styles = (theme) => ({
   container: {
@@ -81,6 +81,28 @@ const styles = (theme) => ({
       selectedComplication,
     }
   },
+  validationSchema: Yup.object().shape({
+    diagnosisSelections: Yup.array()
+      .required('At least one diagnosis is required.'),
+    selectedComplication: Yup.array().when(['schemeCategoryDisplayValue', 'diagnosisSelections'],
+      {
+        is:(schemeCategoryDisplayValue, diagnosisSelections) => diagnosisSelections >= 2 && schemeCategoryDisplayValue === 'Chronic Tier 2',
+        then : Yup.array().min(1,'At least two diagnosis / one diagnosis with one complication for Chronic Tier 2'),
+        otherwise : Yup.array().min(0,'Not Required'),
+      }),
+  }),
+  handleSubmit: (values, { props }) => {
+    const { dispatch, onConfirm } = props
+    dispatch({
+      type: 'claimSubmission/updateState',
+      payload: {
+        entity: {
+          ...values,
+        },
+      },
+    })
+    onConfirm()
+  },
 })
 
 
@@ -99,10 +121,10 @@ class ClaimDetails extends Component {
 
 
   save = () => {
-    const { dispatch, onConfirm, values } = this.props
-    const { diagnosisSelections } = values
+    const { values, validateForm } = this.props
+    const { diagnosisSelections,diagnosis } = values
 
-    values.diagnosis.forEach((o) => {
+    diagnosis.forEach((o) => {
       const selectedId = diagnosisSelections.find((i) => i === o.id)
       if (selectedId) {
         o.isSelected = true
@@ -110,15 +132,9 @@ class ClaimDetails extends Component {
         o.isSelected = false
       }
     })
-    dispatch({
-      type: 'claimSubmission/updateState',
-      payload: {
-        entity: {
-          ...values,
-        },
-      },
-    })
-    onConfirm()
+
+    validateForm()
+    this.props.handleSubmit()
   }
 
   diagnosisOnChangeHandler = (v, op = {}) =>{
@@ -150,7 +166,6 @@ class ClaimDetails extends Component {
       codetable,
       allowEdit,
     } = this.props
-    const { ctgender = [] } = codetable
     const {
       clinicianProfile: { title, name, doctorProfile },
       patientDetail: { dob, genderFK },
