@@ -63,7 +63,7 @@ class PaymentCollection extends ReportBase {
             content: <Summary reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Summary By Payment Model' />,
+            title: <AccordionTitle title='Summary By Payment Mode' />,
             content: <SumList reportDatas={reportDatas} />,
           },
         ]}
