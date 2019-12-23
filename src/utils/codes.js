@@ -17,6 +17,7 @@ import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import Package from '@/pages/Widgets/Orders/Detail/Package'
+import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
@@ -956,6 +957,13 @@ const orderTypes = [
     name: 'Package',
     value: '6',
     component: (props) => <Package {...props} />,
+  },
+  {
+    name: 'Treatment',
+    value: '7',
+    prop: 'corTreatment',
+    getSubject: (r) => r.treatmentName,
+    component: (props) => <Treatment {...props} />,
   },
 ]
 const buttonTypes = [
