@@ -1,29 +1,21 @@
-import React, { useRef, useState, useEffect } from 'react'
+import React, { useRef, useState } from 'react'
 import { connect } from 'dva'
 // material ui
-import Delete from '@material-ui/icons/Delete'
-import PdfIcon from '@material-ui/icons/PictureAsPdf'
+import AttachFile from '@material-ui/icons/AttachFile'
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer, GridItem } from '@/components'
+import { Button, CardContainer, GridContainer } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 // sub components
-import { getImagePreview, uploadFile } from '@/services/file'
+import Thumbnail from './Thumbnail'
+import {
+  downloadAttachment,
+  uploadFile,
+  deleteFileByFileID,
+} from '@/services/file'
 import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS } from '@/utils/constants'
-import image from '@/assets/img/bg-pricing.jpeg'
-
-const styles = (theme) => ({
-  imageContainer: {
-    padding: theme.spacing(1),
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    '& img': {
-      maxWidth: '100%',
-      maxHeight: '100%',
-    },
-  },
-})
+import styles from './styles'
 
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
@@ -34,34 +26,38 @@ const getFileExtension = (filename) => {
 const AttachmentWithThumbnail = ({
   classes,
   dispatch,
+  title = 'Attachment',
   handleUpdateAttachments,
+  isReadOnly,
   attachments = [],
-  allowedMultiple = false,
+  filterTypes = [],
+  allowedMultiple = true,
+  simple = false,
   attachmentType = '',
+  thumbnailSize = {
+    height: 65,
+    width: 65,
+  },
 }) => {
+  const fileAttachments = attachments.filter(
+    (attachment) =>
+      (!attachmentType ||
+        attachment.attachmentType === attachmentType ||
+        filterTypes.indexOf(attachment.attachmentType) >= 0) &&
+      !attachment.isDeleted,
+  )
+
   const inputEl = useRef(null)
+
+  const [
+    errorText,
+    setErrorText,
+  ] = useState('')
 
   const [
     uploading,
     setUploading,
   ] = useState(false)
-
-  const simple = true
-  const [
-    imageData,
-    setImageData,
-  ] = useState(null)
-
-  const getImage = async () => {
-    const { data } = await getImagePreview(367)
-    const blobUrl = window.URL.createObjectURL(
-      new Blob([
-        data,
-      ]),
-    )
-    console.log({ blobUrl, data })
-    setImageData(blobUrl)
-  }
 
   const mapFileToUploadObject = async (file) => {
     // file type and file size validation
@@ -80,7 +76,7 @@ const AttachmentWithThumbnail = ({
     }
     const uploaded = await uploadFile(uploadObject)
 
-    return { ...uploaded, attachmentType }
+    return { ...uploaded, attachmentType, content: base64, isbase64: true }
   }
 
   const onFileChange = async (event) => {
@@ -106,23 +102,23 @@ const AttachmentWithThumbnail = ({
         filesArray.forEach((o) => {
           totalFilesSize += o.size
         })
-      // attachments.forEach((o) => {
-      //   if (!o.isDeleted) {
-      //     totalFilesSize += o.fileSize
-      //   }
-      // })
+      attachments.forEach((o) => {
+        if (!o.isDeleted) {
+          totalFilesSize += o.fileSize
+        }
+      })
 
-      // if (totalFilesSize > maxUploadSize) {
-      //   setErrorText('Cannot upload more than 30MB')
-      //   setUploading(false)
-      //   dispatch({
-      //     type: 'global/updateState',
-      //     payload: {
-      //       disableSave: false,
-      //     },
-      //   })
-      //   return
-      // }
+      if (totalFilesSize > maxUploadSize) {
+        setErrorText('Cannot upload more than 30MB')
+        setUploading(false)
+        dispatch({
+          type: 'global/updateState',
+          payload: {
+            disableSave: false,
+          },
+        })
+        return
+      }
 
       // if (numberOfNewFiles + attachments.length > 5) {
       //   setErrorText('Cannot upload more than 5 attachments')
@@ -137,7 +133,7 @@ const AttachmentWithThumbnail = ({
           .filter((key) => !skipped.includes(files[key].name))
           .map((key) => mapFileToUploadObject(files[key])),
       )
-      console.log({ selectedFiles })
+
       setUploading(false)
       dispatch({
         type: 'global/updateState',
@@ -145,9 +141,9 @@ const AttachmentWithThumbnail = ({
           disableSave: false,
         },
       })
-      // handleUpdateAttachments({
-      //   added: selectedFiles,
-      // })
+      handleUpdateAttachments({
+        added: selectedFiles,
+      })
     } catch (error) {
       console.log({ error })
     }
@@ -161,65 +157,70 @@ const AttachmentWithThumbnail = ({
     inputEl.current.click()
   }
 
+  const onDelete = (fileIndexFK, id) => {
+    if (!fileIndexFK && id) {
+      deleteFileByFileID(id)
+    }
+
+    handleUpdateAttachments({
+      deleted: !fileIndexFK ? id : fileIndexFK,
+    })
+  }
+
+  const onClick = (attachment) => {
+    downloadAttachment(attachment)
+  }
+
+  let UploadButton = (
+    <Button
+      color='rose'
+      size='sm'
+      onClick={onUploadClick}
+      disabled={uploading || global.disableSave}
+    >
+      <AttachFile /> Upload
+    </Button>
+  )
+
+  if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null
+
   return (
-    <CardContainer hideHeader>
-      <h4>Attachment with thumbnail</h4>
-      <CardContainer
-        hideHeader
-        // size='sm'
-        style={{ width: 150, textAlign: 'center' }}
-      >
-        <input
-          style={{ display: 'none' }}
-          type='file'
-          accept={allowedFiles}
-          id='uploadVisitAttachment'
-          ref={inputEl}
-          multiple={allowedMultiple}
-          onChange={onFileChange}
-          onClick={clearValue}
-        />
-        {!imageData && (
-          <Button color='rose' size='sm' onClick={onUploadClick}>
-            Upload
-          </Button>
-        )}
-        {imageData && (
-          <GridContainer justify='center'>
-            {!simple && (
-              <React.Fragment>
-                <GridItem md={9}>
-                  <span>Filename.jpg</span>
-                </GridItem>
-                <GridItem md={3}>
-                  <Button justIcon color='danger' style={{ marginRight: 0 }}>
-                    <Delete />
-                  </Button>
-                </GridItem>
-              </React.Fragment>
-            )}
-            <GridItem md={12} style={{ textAlign: 'center' }}>
-              <div className={classes.imageContainer}>
-                <img src={imageData} alt='test' />
-              </div>
-            </GridItem>
-            <GridItem md={12} style={{ textAlign: 'center' }}>
-              <Button
-                size='sm'
-                color='primary'
-                variant='outlined'
-                style={{ marginRight: 0 }}
-              >
-                Change
-              </Button>
-            </GridItem>
+    <div className={classes.root}>
+      <span className={classes.attachmentLabel}>{title}</span>
+
+      <input
+        style={{ display: 'none' }}
+        type='file'
+        accept={allowedFiles}
+        id='uploadVisitAttachment'
+        ref={inputEl}
+        multiple={allowedMultiple}
+        onChange={onFileChange}
+        onClick={clearValue}
+      />
+      {UploadButton}
+      <LoadingWrapper loading={uploading} text='Uploading attachment...'>
+        <CardContainer hideHeader>
+          <GridContainer>
+            {fileAttachments.map((attachment) => {
+              return (
+                <Thumbnail
+                  simple={simple}
+                  size={thumbnailSize}
+                  attachment={attachment}
+                  isReadOnly={isReadOnly}
+                  onConfirmDelete={onDelete}
+                  onClickAttachment={onClick}
+                />
+              )
+            })}
           </GridContainer>
-        )}
-      </CardContainer>
-    </CardContainer>
+        </CardContainer>
+      </LoadingWrapper>
+    </div>
   )
 }
 
-const Connected = connect()(AttachmentWithThumbnail)
+const Connected = connect(({ global }) => ({ global }))(AttachmentWithThumbnail)
 
 export default withStyles(styles)(Connected)
