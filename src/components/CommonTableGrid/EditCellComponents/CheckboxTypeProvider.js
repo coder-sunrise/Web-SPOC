@@ -55,10 +55,21 @@ class CheckboxEditorBase extends PureComponent {
     // if (checked) {
     //   _checkboxSelectedMap[columnName] = row.id
     // }
-    console.log(e, checked)
     onComponentChange.call(this, {
       value: e.target.value,
     })
+
+    const { control = {}, getRowId } = cfg
+    const { commitChanges } = control
+    if (commitChanges) {
+      commitChanges({
+        changed: {
+          [getRowId(row)]: {
+            [columnName]: e.target.value,
+          },
+        },
+      })
+    }
   }
 
   renderComponent = ({

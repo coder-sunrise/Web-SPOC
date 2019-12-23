@@ -92,8 +92,9 @@ const styles = (theme) => ({
 })
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
-@connect(({ dentalChartComponent, global }) => ({
+@connect(({ dentalChartComponent, dentalChartSetup, global }) => ({
   dentalChartComponent,
+  dentalChartSetup,
   global,
 }))
 class DentalChart extends React.Component {

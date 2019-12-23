@@ -23,7 +23,10 @@ import {
   ButtonSelect,
   Tabs,
   EditableTableGrid,
+  CommonTableGrid,
+  DragableTableGrid,
   withFormikExtend,
+  Switch,
 } from '@/components'
 import {
   strokeWidth,
@@ -79,7 +82,6 @@ const Setup = (props) => {
     style,
     onChange,
     value,
-    mode,
     onDataSouceChange,
     dentalChartComponent,
     height,
@@ -93,69 +95,115 @@ const Setup = (props) => {
   // console.log(restProps, dentalChartSetup)
   // style={{ height: `${height}px` }}
   const [
-    rows,
-    setRows,
-  ] = React.useState(false)
-
-  const handleCommitChanges = ({ rows }) => {
-    console.log(rows)
+    selectedRows,
+    setSelectedRows,
+  ] = React.useState([])
+  const [
+    mode,
+    setMode,
+  ] = useState('color')
+  const handleCommitChanges = ({ rows, changed }) => {
+    console.log(rows, changed)
     setFieldValue('rows', rows)
   }
   // useState()
+  const columnExtensions = [
+    {
+      width: 400,
+      columnName: 'legend',
+      isReactComponent: true,
+      type: 'custom',
+      render: Legend,
+    },
+    {
+      columnName: 'method',
+      type: 'select',
+      options: methods,
+    },
+    {
+      columnName: 'isDisplay',
+      type: 'checkbox',
+      align: 'center',
+    },
+  ]
+  // if(mode==='sort'){
+  //   columnExtensions.
+  // }
+  const tableProps = {
+    size: 'sm',
+    rows: values.rows,
+    dataSource: values.rows,
+    rowDragable: true,
+    columns: [
+      { name: 'code', title: 'Code' },
+      { name: 'method', title: 'Method' },
+      { name: 'legend', title: 'Legend' },
+
+      {
+        name: 'text',
+        title: 'Name',
+      },
+      {
+        name: 'isDisplay',
+        title: 'Display in Diagnosis',
+      },
+    ],
+    columnExtensions,
+
+    FuncProps: {
+      pager: false,
+
+      // selectable: true,
+      // selectConfig: {
+      //   showSelectAll: true,
+      //   rowSelectionEnabled: () => true,
+      // },
+    },
+    // selection: selectedRows,
+    // onSelectionChange: (rows) => {
+    //   console.log(rows)
+    //   setSelectedRows(rows)
+    // },
+    EditingProps: {
+      showAddCommand: true,
+      isDeletable: (row) => {
+        return !row.fixed
+      },
+      // showDeleteCommand: false,
+      onCommitChanges: handleCommitChanges,
+      // onEditingRowIdsChange: this.handleEditingRowIdsChange,
+    },
+    onRowDrop: (rows) => {
+      console.log(rows)
+      setFieldValue('rows', rows)
+    },
+    schema: rowSchema,
+  }
   return (
     <div>
       <Paper elevation={0}>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={12}>
-            <EditableTableGrid
-              size='sm'
-              rows={values.rows}
-              columns={[
-                { name: 'code', title: 'Code' },
-                { name: 'method', title: 'Method' },
-                { name: 'legend', title: 'Legend' },
-                {
-                  name: 'text',
-                  title: 'Name',
-                },
-                {
-                  name: 'isDisplay',
-                  title: 'Display in Diagnosis',
-                },
-              ]}
-              columnExtensions={[
-                {
-                  width: 400,
-                  columnName: 'legend',
-                  isReactComponent: true,
-                  type: 'custom',
-                  render: Legend,
-                },
-                {
-                  columnName: 'method',
-                  type: 'select',
-                  options: methods,
-                },
-                {
-                  columnName: 'isDisplay',
-                  type: 'checkbox',
-                  align: 'center',
-                },
-              ]}
-              FuncProps={{
-                pager: false,
+            <Switch
+              value={mode}
+              onOffMode={false}
+              checkedChildren='Edit'
+              checkedValue='edit'
+              unCheckedChildren='Sort'
+              unCheckedValue='sort'
+              onChange={(v) => {
+                setMode(v)
               }}
-              EditingProps={{
-                showAddCommand: true,
-                isDeletable: (row) => {
-                  return !row.fixed
-                },
-                // showDeleteCommand: false,
-                onCommitChanges: handleCommitChanges,
-                // onEditingRowIdsChange: this.handleEditingRowIdsChange,
-              }}
-              schema={rowSchema}
             />
+          </GridItem>
+          <GridItem xs={12}>
+            {/* <DragableTableGrid {...tableProps} /> */}
+
+            {mode === 'edit' ? (
+              <EditableTableGrid {...tableProps} />
+            ) : (
+              <CommonTableGrid {...tableProps} />
+            )}
           </GridItem>
         </GridContainer>
         {footer &&
@@ -169,9 +217,9 @@ const Setup = (props) => {
   )
 }
 export default withFormikExtend({
-  mapPropsToValues: ({ dentalChartComponent }) => {
+  mapPropsToValues: ({ dentalChartSetup }) => {
     return {
-      rows: buttonConfigs,
+      rows: dentalChartSetup.rows || buttonConfigs,
     }
   },
 
@@ -181,7 +229,14 @@ export default withFormikExtend({
 
   handleSubmit: (values, { props, resetForm }) => {
     console.log(values)
-    const { dispatch, history, codetable } = props
+    const { dispatch, history, codetable, onConfirm } = props
+    dispatch({
+      type: 'dentalChartSetup/updateState',
+      payload: {
+        rows: values.rows,
+      },
+    })
+    if (onConfirm) onConfirm()
   },
 
   displayName: 'DentalChartMethodSetup',

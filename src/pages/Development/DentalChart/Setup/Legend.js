@@ -120,13 +120,13 @@ const Legend = ({ row, columnConfig, cellProps }) => {
               // row.apptDurationMinute = e
               // setEndTime(row)
               // validSchema(row)
-              // commitChanges({
-              //   changed: {
-              //     [row.id]: {
-              //       endTime: row.endTime,
-              //     },
-              //   },
-              // })
+              commitChanges({
+                changed: {
+                  [row.id]: {
+                    symbol: v,
+                  },
+                },
+              })
             }}
             // onBlur={() => {
             //   debounceBlur(true)

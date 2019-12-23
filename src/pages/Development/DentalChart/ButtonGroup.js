@@ -15,7 +15,6 @@ import Paper from '@material-ui/core/Paper'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 
-import { buttonConfigs } from './variables'
 import {
   Button,
   GridContainer,
@@ -54,7 +53,9 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 }))(ToggleButtonGroup)
 
 export default function ButtonGroup (props) {
-  const { dispatch, classes, theme, ...restProps } = props
+  const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
+  const { rows } = dentalChartSetup
+
   const [
     selectedStyle,
     setSelectedStyle,
@@ -66,8 +67,7 @@ export default function ButtonGroup (props) {
 
   const handleAction = (event, v) => {
     setSelectedStyle(v)
-
-    const btn = buttonConfigs.find((o) => o.value === v)
+    const btn = rows.find((o) => o.value === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -122,7 +122,7 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {buttonConfigs.map(({ value, icon, text }) => {
+              {rows.map(({ value, icon, text }) => {
                 return [
                   <ToggleButton value={value}>
                     <img src={icon} {...sharedCfg} />
@@ -143,9 +143,9 @@ export default function ButtonGroup (props) {
         title='Dental Chart Method Setup'
         maxWidth='lg'
         bodyNoPadding
-        // onConfirm={(ee) => {
-        //   console.log(ee)
-        // }}
+        onConfirm={(ee) => {
+          setOpenSettings(false)
+        }}
         onClose={() => setOpenSettings(false)}
         // showFooter
         confirmText='Save'

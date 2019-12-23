@@ -498,12 +498,14 @@ class EditableTableGrid extends React.Component {
       cfg.containerComponent = this.containerComponent
     }
     const sharedCfg = {
+      editableGrid: true,
       gridId: this.gridId,
       columnExtensions,
       editingRowIds,
       getRowId,
       extraCellConfig: {
         commitChanges: this._onCommitChanges,
+        editingCells,
       },
       extraState: [
         <EditingState

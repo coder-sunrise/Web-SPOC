@@ -3,6 +3,7 @@ import moment from 'moment'
 import _ from 'lodash'
 import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
+import { buttonConfigs } from '../variables'
 
 const updateData = (data, payload) => {
   const { toothIndex, value, target, forceSelect } = payload
@@ -40,13 +41,7 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      rows: [
-        {
-          id: 1,
-          code: 1,
-          method: 'Surface',
-        },
-      ],
+      rows: buttonConfigs,
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
