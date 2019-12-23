@@ -40,7 +40,7 @@ const DeleteWithPopover = ({
 
   const onConfirmClick = () => {
     onConfirmDelete(index, toggleVisibleChange)
-    // toggleVisibleChange()
+    toggleVisibleChange()
   }
 
   return (

@@ -71,12 +71,19 @@ const filterMenuData = (menuData) => {
       // make dom
       // console.log(item)
       const ItemDom = getSubMenu(item)
+
       const data = check(item.authority, ItemDom)
       return data
     })
     .filter((item) => item)
   // console.log(filtered)
   return filtered
+}
+
+const filterBySpecialist = (specialist = 'GP', menus) => {
+  return menus.filter(
+    (menu) => menu.specialist && menu.specialist.includes(specialist),
+  )
 }
 
 export default {
@@ -88,12 +95,16 @@ export default {
   },
 
   effects: {
-    *getMenuData ({ payload }, { put }) {
+    *getMenuData ({ payload }, { put, select }) {
       const { routes, authority } = payload
+      const clinicInfo = yield select((st) => st.clinicInfo)
+      const { clinicSpecialist = 'Dental' } = clinicInfo
       const menus = filterMenuData(memoizeOneFormatter(routes, authority))
+      const clinicMenus = filterBySpecialist(clinicSpecialist, menus)
+
       yield put({
         type: 'save',
-        payload: menus,
+        payload: clinicMenus,
       })
       return menus
     },

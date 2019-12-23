@@ -211,3 +211,8 @@ export const FILE_STATUS = {
   CONFIRMED: 2,
   ARCHIEVED: 3,
 }
+
+export const FILE_CATEGORY = {
+  VISITREG: 1,
+  CONSULTATION: 2,
+}
