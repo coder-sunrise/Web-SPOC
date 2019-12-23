@@ -4,6 +4,20 @@ export const imageFileExtensions = [
   '.png',
 ]
 
+export const wordFileExtensions = [
+  '.doc',
+  '.docx',
+]
+
+export const excelFileExtensions = [
+  '.xls',
+  '.xlsx',
+]
+
+export const pdfFileExtensions = [
+  '.pdf',
+]
+
 export const getThumbnail = (original, { scale, width, height }) => {
   let canvas = document.createElement('canvas')
 

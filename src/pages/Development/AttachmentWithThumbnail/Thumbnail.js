@@ -8,6 +8,13 @@ import { Button, GridContainer, GridItem, Tooltip } from '@/components'
 import { DeleteWithPopover } from '@/components/_medisys'
 import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
 import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
+import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
+import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
+import {
+  pdfFileExtensions,
+  excelFileExtensions,
+  wordFileExtensions,
+} from './utils'
 
 const styles = (theme) => ({
   simpleRoot: {
@@ -45,16 +52,6 @@ const styles = (theme) => ({
   },
 })
 
-const imageFileExtensions = [
-  '.jpg',
-  '.jpeg',
-  '.png',
-]
-
-const pdfFileExtensions = [
-  '.pdf',
-]
-
 const Thumbnail = ({
   classes,
   isReadOnly = false,
@@ -84,6 +81,9 @@ const Thumbnail = ({
   //   if (isbase64) src = thumbnailData
 
   if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
+  if (wordFileExtensions.includes(fileExtension)) src = wordIcon
+  if (excelFileExtensions.includes(fileExtension)) src = excelIcon
+  console.log({ attachment })
 
   if (simple) {
     return (

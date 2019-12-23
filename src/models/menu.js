@@ -97,8 +97,8 @@ export default {
   effects: {
     *getMenuData ({ payload }, { put, select }) {
       const { routes, authority } = payload
-      const clinicSettings = yield select((st) => st.clinicSettings)
-      const { clinicSpecialist = 'Dental' } = clinicSettings
+      const clinicInfo = yield select((st) => st.clinicInfo)
+      const { clinicSpecialist = 'Dental' } = clinicInfo
       const menus = filterMenuData(memoizeOneFormatter(routes, authority))
       const clinicMenus = filterBySpecialist(clinicSpecialist, menus)
 
