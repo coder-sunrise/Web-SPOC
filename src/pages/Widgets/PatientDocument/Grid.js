@@ -29,7 +29,6 @@ class Grid extends PureComponent {
           { name: 'createDate', title: 'Create Date' },
           { name: 'action', title: 'Action' },
         ]}
-        // FuncProps={{ pager: false }}
         columnExtensions={[
           {
             columnName: 'documentTemplateTypeFK',

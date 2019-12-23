@@ -1,15 +1,18 @@
-import React, { PureComponent, Component } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'dva'
-
+// material ui
 import { withStyles } from '@material-ui/core'
+// styles
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
-import { CardContainer, CommonModal, FastField } from '@/components'
-
+// common components
+import { FastField } from '@/components'
+import { Attachment } from '@/components/_medisys'
+// sub components
 import Filter from './Filter'
 import Grid from './Grid'
+// models
 import model from './models'
-import { Attachment } from '@/components/_medisys'
+// utils
 import { findGetParameter } from '@/utils/utils'
 
 window.g_app.replaceModel(model)
@@ -17,6 +20,9 @@ window.g_app.replaceModel(model)
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
+
+const getLargestSortOrder = (largestIndex, attachment) =>
+  attachment.sortOrder > largestIndex ? attachment.sortOrder : largestIndex
 
 @connect(({ patientAttachment }) => ({
   patientAttachment,
@@ -36,8 +42,9 @@ class PatientDocument extends Component {
 
   updateAttachments = (args) => ({ added, deleted }) => {
     // console.log({ added, deleted }, args)
-    const { dispatch } = this.props
-    const { form, field } = args
+    const { dispatch, patientAttachment = [] } = this.props
+    const { list = [] } = patientAttachment
+    const { field } = args
 
     let updated = [
       ...(field.value || []),
@@ -67,22 +74,34 @@ class PatientDocument extends Component {
           { ...item },
         ]
       }, [])
+    const sorted = updated.sort((a, b) => {
+      if (a.id > b.id) return 1
+      if (a.id < b.id) return -1
+      return 0
+    })
+    const startOrder = list.reduce(getLargestSortOrder, 0) + 1
 
-    const sortIndex = this.props.patientAttachment.list.length
-    dispatch({
-      type: 'patientAttachment/upsert',
-      payload: {
-        patientProfileFK: findGetParameter('pid'),
-        sortOrder: sortIndex + 1,
-        fileIndexFK: updated[0].fileIndexFK,
-      },
-    }).then((r) => {
-      if (r) {
+    Promise.all(
+      sorted.map((attachment, index) =>
+        dispatch({
+          type: 'patientAttachment/upsert',
+          payload: {
+            cfg: { message: 'Uploaded Attachment' },
+            patientProfileFK: findGetParameter('pid'),
+            sortOrder: startOrder + index,
+            fileIndexFK: attachment.fileIndexFK,
+          },
+        }),
+      ),
+    )
+      .then(() => {
         dispatch({
           type: 'patientAttachment/query',
         })
-      }
-    })
+      })
+      .catch((error) => {
+        console.error({ error })
+      })
   }
 
   render () {
