@@ -259,6 +259,11 @@ class Main extends React.Component {
     )
       return true
     if (
+      nextProps.visitRegistration.entity.id !==
+      this.props.visitRegistration.entity.id
+    )
+      return true
+    if (
       nextProps.orders.summary.totalWithGST !==
       this.props.orders.summary.totalWithGST
     )
@@ -456,7 +461,6 @@ class Main extends React.Component {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
-
     return (
       <SizeContainer size='sm'>
         <div
