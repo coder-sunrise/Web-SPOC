@@ -86,14 +86,12 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
         in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
       }
     }
-    let PDPAPhone = false
-    let PDPAMessage = false
-    let PDPAEmail = false
+
     return {
       apiCriteria: {
-        PDPAPhone,
-        PDPAMessage,
-        PDPAEmail,
+        PDPAPhone: true,
+        PDPAMessage: true,
+        PDPAEmail: true,
       },
     }
   }
