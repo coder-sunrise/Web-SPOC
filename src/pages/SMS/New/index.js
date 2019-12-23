@@ -130,10 +130,19 @@ export default compose(
         smsPatient,
       } = props
       let payload = []
-      const createPayload = (patientProfFK, o) => {
+      const createPayload = (selectedItem, o) => {
+        let { patientProfileFK: patientProfFK } = selectedItem
+        const {
+          patientName = '',
+          upcomingAppointmentDate = '',
+          doctor = '',
+          patientCallingName = '',
+          lastVisitDate = '',
+        } = selectedItem
         const {
           smsPatient: smsPat,
           smsAppointment: smsAppt,
+          content,
           ...restValues
         } = values
         let patientProfileFK = patientProfFK
@@ -142,8 +151,28 @@ export default compose(
           patientProfileFK = o
           appointmentFK = undefined
         }
+        let formattedContent = content
+        formattedContent = formattedContent.replace(
+          /@PatientName/g,
+          patientName,
+        )
+        formattedContent = formattedContent.replace(
+          /@AppointmentDateTime/g,
+          upcomingAppointmentDate,
+        )
+        formattedContent = formattedContent.replace(/@Doctor/g, doctor)
+        formattedContent = formattedContent.replace(/@NewLine/g, '\n')
+        formattedContent = formattedContent.replace(
+          /@PatientCallingName/g,
+          patientCallingName,
+        )
+        formattedContent = formattedContent.replace(
+          /@LastVisitDate/g,
+          lastVisitDate,
+        )
         const tempObject = {
           ...restValues,
+          content: formattedContent,
           patientOutgoingSMS: {
             patientProfileFK,
             appointmentReminderDto: {
@@ -160,17 +189,16 @@ export default compose(
         payload.push(tempObject)
       }
       if (recipient) {
-        const { id, patientProfileFK } = recipient
-        createPayload(patientProfileFK, id)
+        const { id } = recipient
+        createPayload(recipient, id)
       } else {
         selectedRows.forEach((o) => {
-          const { patientProfileFK } =
+          const selectedItem =
             smsAppointment.list.find((r) => r.id === o) ||
             smsPatient.list.find((r) => r.id === o)
-          createPayload(patientProfileFK, o)
+          createPayload(selectedItem, o)
         })
       }
-
       dispatch({
         type: 'sms/sendSms',
         payload,
