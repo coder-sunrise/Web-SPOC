@@ -1,10 +1,19 @@
 import React from 'react'
+// formik
+import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 // common components
-import { Button, GridContainer, GridItem, Tooltip } from '@/components'
+import {
+  Button,
+  GridContainer,
+  GridItem,
+  OutlinedTextField,
+  SizeContainer,
+  Tooltip,
+} from '@/components'
 import { DeleteWithPopover } from '@/components/_medisys'
 import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
 import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
@@ -27,8 +36,8 @@ const styles = (theme) => ({
     },
   },
   root: {
-    textAlign: 'center',
-    width: 110,
+    textAlign: 'left',
+    width: 140,
     margin: 8,
   },
   filenameContainer: {
@@ -54,12 +63,13 @@ const styles = (theme) => ({
 
 const Thumbnail = ({
   classes,
+  index,
   isReadOnly = false,
   simple,
   attachment,
   onConfirmDelete,
   onClickAttachment,
-  size = { width: 65, height: 65 },
+  size = { width: 64, height: 64 },
 }) => {
   const {
     fileIndexFK,
@@ -83,7 +93,6 @@ const Thumbnail = ({
   if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
   if (wordFileExtensions.includes(fileExtension)) src = wordIcon
   if (excelFileExtensions.includes(fileExtension)) src = excelIcon
-  console.log({ attachment })
 
   if (simple) {
     return (
@@ -124,13 +133,23 @@ const Thumbnail = ({
             onConfirmDelete={handleConfirmDelete}
           />
         </GridItem>
-        <GridItem md={12}>
+        <GridItem md={12} style={{ cursor: 'pointer' }}>
           <div
             className={classes.imageContainer}
             onClick={handleAttachmentClicked}
           >
             <img src={src} alt='test' width={size.width} height={size.height} />
           </div>
+        </GridItem>
+        <GridItem md={12}>
+          <SizeContainer size='sm'>
+            <FastField
+              name={`visitAttachment[${index}].remark`}
+              render={(args) => (
+                <OutlinedTextField {...args} size='sm' label='Remark' />
+              )}
+            />
+          </SizeContainer>
         </GridItem>
       </GridContainer>
     </div>

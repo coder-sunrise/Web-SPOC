@@ -100,11 +100,11 @@ export default {
       const clinicInfo = yield select((st) => st.clinicInfo)
       const { clinicSpecialist = 'Dental' } = clinicInfo
       const menus = filterMenuData(memoizeOneFormatter(routes, authority))
-      const clinicMenus = filterBySpecialist(clinicSpecialist, menus)
+      // const clinicMenus = filterBySpecialist(clinicSpecialist, menus)
 
       yield put({
         type: 'save',
-        payload: clinicMenus,
+        payload: menus,
       })
       return menus
     },

@@ -11,6 +11,7 @@ import {
   GridItem,
 } from '@/components'
 import { Attachment } from '@/components/_medisys'
+import AttachmentWithThumbnail from '@/pages/Development/AttachmentWithThumbnail'
 import FormField from './formField'
 
 class ReferralCard extends PureComponent {
@@ -60,7 +61,8 @@ class ReferralCard extends PureComponent {
           </GridItem>
           <GridItem xs md={8} />
           <GridItem xs md={12}>
-            <Attachment
+            <AttachmentWithThumbnail
+              label='Attachment'
               attachmentType='VisitReferral'
               handleUpdateAttachments={handleUpdateAttachments}
               attachments={attachments}
