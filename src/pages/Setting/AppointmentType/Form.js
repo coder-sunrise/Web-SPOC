@@ -19,11 +19,8 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
     if (color) setFieldValue('tagColorHex', color.hex)
   }
 
-  useEffect(() => {
-    setFieldValue('tagColorHex', '#2B1E6B')
-  }, [])
-
   const isEdit = values.id !== undefined
+
   return (
     <Fragment>
       <GridContainer alignItems='flex-start'>
@@ -87,7 +84,6 @@ const Form = ({ classes, footer, setFieldValue, handleSubmit, values }) => {
 
 export default withFormikExtend({
   displayName: 'AppointmentTypeSettingForm',
-  notDirtyDuration: 0.5,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
