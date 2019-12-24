@@ -786,7 +786,7 @@ class Layout extends PureComponent {
                     size='small'
                     onClick={this.toggleDrawer}
                   >
-                    <Settings />
+                    <Settings />&nbsp;Widget Settings
                   </Fab>
                 </div>
               </Slide>

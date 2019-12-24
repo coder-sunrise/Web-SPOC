@@ -1,5 +1,5 @@
 import React from 'react'
-import { GridContainer, GridItem, Button } from '@/components'
+import { GridContainer, GridItem, Button, Card } from '@/components'
 import ReportLayoutWrapper from './ReportLayout'
 // services
 import { getRawData } from '@/services/report'
@@ -106,28 +106,29 @@ export default class ReportBase extends React.Component {
 
   render () {
     const { height } = this.props
-    console.log('isDisplayReportLayout', this.state.isDisplayReportLayout)
     return (
-      <GridContainer>
-        <GridItem md={12}>
-          {this.renderFilterBar(this.onSubmitClick, this.state.isSubmitting)}
-        </GridItem>
-        <GridItem md={12}>
-          {this.state.isDisplayReportLayout ?
-            <ReportLayoutWrapper
-              height={height}
-              loading={this.state.isLoading}
-              reportID={this.state.reportId}
-              reportParameters={this.formatReportParams(this.props.values)}
-              loaded={this.state.loaded}
-              fileName={this.state.fileName}
-            >
-              {this.renderContent(this.state.reportDatas)}
-            </ReportLayoutWrapper>
-            : this.renderContent(this.state.reportDatas)
-          }
-        </GridItem>
-      </GridContainer>
+      <Card style={{ padding: 6 }}>
+        <GridContainer>
+          <GridItem md={12}>
+            {this.renderFilterBar(this.onSubmitClick, this.state.isSubmitting)}
+          </GridItem>
+          <GridItem md={12}>
+            {this.state.isDisplayReportLayout ?
+              <ReportLayoutWrapper
+                height={height}
+                loading={this.state.isLoading}
+                reportID={this.state.reportId}
+                reportParameters={this.formatReportParams(this.props.values)}
+                loaded={this.state.loaded}
+                fileName={this.state.fileName}
+              >
+                {this.renderContent(this.state.reportDatas)}
+              </ReportLayoutWrapper>
+              : this.renderContent(this.state.reportDatas)
+            }
+          </GridItem>
+        </GridContainer>
+      </Card>
     )
   }
 }

@@ -196,7 +196,9 @@ export default createFormViewModel({
             type: 'setTransferData',
             payload: data,
           })
+          return data
         }
+        return false
       },
 
       *submitTransfer ({ payload }, { call }) {
