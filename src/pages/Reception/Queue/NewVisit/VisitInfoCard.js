@@ -18,8 +18,8 @@ import {
   DoctorLabel,
   DoctorProfileSelect,
   Attachment,
+  AttachmentWithThumbnail,
 } from '@/components/_medisys'
-import AttachmentWithThumbnail from '@/pages/Development/AttachmentWithThumbnail'
 import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
 

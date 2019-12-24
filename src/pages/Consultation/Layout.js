@@ -519,6 +519,7 @@ class Layout extends PureComponent {
 
   getLayoutRowHeight = () => {
     const topHeight = (this.props.height ? 0 : headerHeight) + 114
+    console.log({ topHeight })
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,
@@ -537,7 +538,7 @@ class Layout extends PureComponent {
         const { top, left } = screenPosition
 
         parentElement.scrollTo({
-          top: top - 172, // top minus Nav header height and Patient Banner height
+          top: top - 208, // top minus Nav header height and Patient Banner height
           left,
           behavior: 'smooth',
         })
@@ -648,7 +649,19 @@ class Layout extends PureComponent {
     return (
       <div>
         {!this.state.fullScreenWidget && (
-          <CardContainer hideHeader>
+          <CardContainer
+            hideHeader
+            style={{
+              marginTop: 0,
+              position: 'sticky',
+              overflowY: 'auto',
+              top: headerHeight + 100,
+              zIndex: 1000,
+              paddingLeft: 16,
+              paddingRight: 16,
+              // backgroundColor: '#f0f8ff',
+            }}
+          >
             {state.currentLayout.widgets.map((id) => {
               const w = widgets.find((o) => o.id === id)
               return (
