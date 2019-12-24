@@ -17,9 +17,9 @@ import authStyle from '@/assets/jss/material-dashboard-pro-react/layouts/authSty
 import loginBackground from '@/assets/img/login_background.jpg'
 import defaultSettings from '@/defaultSettings'
 
-console.log(moment.locale())
+// console.log(moment.locale())
 moment.locale('en') // TODO should be removed in furture, solve deafult display chinese date bug
-console.log(moment.locale())
+// console.log(moment.locale())
 const styles = (theme) => ({
   ...authStyle(theme),
 })

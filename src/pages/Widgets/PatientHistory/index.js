@@ -282,7 +282,7 @@ class PatientHistory extends Component {
     const { patientHistory, mode, clinicSettings } = this.props
     const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
-
+    const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
     let newArray = []
     if (
       settings.showConsultationVersioning === false ||
@@ -290,11 +290,12 @@ class PatientHistory extends Component {
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
+      } else if (isRetailVisit) {
+        newArray.push(row)
       }
     } else {
       newArray = row.coHistory
     }
-
     return (
       <List
         component='nav'
@@ -318,28 +319,31 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  this.props
-                    .dispatch({
-                      type: 'patientHistory/queryOne',
-                      payload: o.id,
-                    })
-                    .then((r) => {
-                      if (r) {
-                        this.props.dispatch({
-                          type: 'patientHistory/updateState',
-                          payload: {
-                            selected: row,
-                            selectedSubRow: o,
-                          },
-                        })
-                        // this.props.dispatch({
-                        //   type: 'consultationDocument/updateState',
-                        //   payload: {
-                        //     rows: r.documents,
-                        //   },
-                        // })
-                      }
-                    })
+                  if (isRetailVisit) {
+                    this.handleRetailVisitHistory(row)
+                  } else
+                    this.props
+                      .dispatch({
+                        type: 'patientHistory/queryOne',
+                        payload: o.id,
+                      })
+                      .then((r) => {
+                        if (r) {
+                          this.props.dispatch({
+                            type: 'patientHistory/updateState',
+                            payload: {
+                              selected: row,
+                              selectedSubRow: o,
+                            },
+                          })
+                          // this.props.dispatch({
+                          //   type: 'consultationDocument/updateState',
+                          //   payload: {
+                          //     rows: r.documents,
+                          //   },
+                          // })
+                        }
+                      })
                 }}
               >
                 <ListItemText
@@ -360,7 +364,13 @@ class PatientHistory extends Component {
                                 text
                                 showTime
                                 format='DD MMM YYYY h:mm a'
-                                value={o.signOffDate}
+                                value={
+                                  row.visitPurposeFK === VISIT_TYPE.RETAIL ? (
+                                    row.visitDate
+                                  ) : (
+                                    o.signOffDate
+                                  )
+                                }
                               />)
                             </span>
                           )}
@@ -395,18 +405,15 @@ class PatientHistory extends Component {
   }
 
   getTitle = (row) => {
-    const { coHistory } = row
-    let { visitPurposeName } = row
-    const latest = coHistory[coHistory.length] || {}
-    if (visitPurposeName === VISIT_TYPE_NAME.RETAIL)
-      visitPurposeName += ' Visit'
+    const { visitPurposeName = '' } = row
+    const visitTitleLabel = visitPurposeName
 
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
           <GridItem sm={12}>
             <p>
-              <span>{visitPurposeName}</span>
+              <span>{visitTitleLabel}</span>
               <span style={{ position: 'relative' }}>
                 &nbsp; (<DatePicker text value={row.visitDate} />)
               </span>
@@ -484,7 +491,8 @@ class PatientHistory extends Component {
 
     const fromConsultation = location.pathname.includes('consultation')
 
-    const isRetailVisit = selected.visitPurposeName === VISIT_TYPE_NAME.RETAIL
+    const isRetailVisit = selected.visitPurposeFK === VISIT_TYPE.RETAIL
+
     return (
       <CardContainer
         hideHeader
@@ -661,6 +669,27 @@ class PatientHistory extends Component {
     )
   }
 
+  handleRetailVisitHistory = (v) => {
+    this.props
+      .dispatch({
+        type: 'patientHistory/queryRetailHistory',
+        payload: {
+          id: v.invoiceFK,
+        },
+      })
+      .then((r) => {
+        if (r) {
+          this.props.dispatch({
+            type: 'patientHistory/updateState',
+            payload: {
+              selected: v,
+              selectedSubRow: v,
+            },
+          })
+        }
+      })
+  }
+
   render () {
     const {
       theme,
@@ -690,32 +719,14 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter(
           (o) =>
-            o.coHistory.length >= 1 ||
-            o.visitPurposeName === VISIT_TYPE_NAME.RETAIL,
+            o.visitPurposeFK === VISIT_TYPE.RETAIL || o.coHistory.length >= 1,
         )
       : ''
 
-    const handleRetailVisitHistory = (v) => {
-      this.props
-        .dispatch({
-          type: 'patientHistory/queryRetailHistory',
-          payload: {
-            id: v.invoiceFK,
-          },
-        })
-        .then((r) => {
-          if (r) {
-            this.props.dispatch({
-              type: 'patientHistory/updateState',
-              payload: {
-                selected: v,
-                selectedSubRow: v,
-              },
-            })
-          }
-        })
-    }
-
+    // console.log({
+    //   sortedPatientHistory,
+    //   settings: settings.showConsultationVersioning,
+    // })
     return (
       <div {...cfg}>
         <CardContainer
@@ -735,8 +746,7 @@ class PatientHistory extends Component {
             <Accordion
               defaultActive={0}
               collapses={sortedPatientHistory.map((o) => {
-                const isRetailVisit =
-                  o.visitPurposeName === VISIT_TYPE_NAME.RETAIL
+                const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
                 const returnValue = {
                   title: this.getTitle(o),
                   content: this.getContent(o),
@@ -745,7 +755,7 @@ class PatientHistory extends Component {
                 if (isRetailVisit) {
                   return {
                     ...returnValue,
-                    onClickSummary: () => handleRetailVisitHistory(o),
+                    onClickSummary: () => this.handleRetailVisitHistory(o),
                   }
                 }
                 return {

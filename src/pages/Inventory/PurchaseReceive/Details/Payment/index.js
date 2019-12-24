@@ -3,20 +3,12 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-import Add from '@material-ui/icons/Add'
-import {
-  GridContainer,
-  Button,
-  withFormikExtend,
-  ProgressButton,
-  CommonModal,
-} from '@/components'
+import { GridContainer, withFormikExtend, ProgressButton } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { isPOStatusFinalized } from '../../variables'
-import PaymentDetails from './PaymentDetails'
-import { navigateDirtyCheck } from '@/utils/utils'
+import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
 const styles = (theme) => ({
@@ -32,18 +24,38 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: ({ podoPayment }) => {
     let outstandingAmount = {}
+    let newPurchaseOrderPayment = []
     if (
       podoPayment &&
       podoPayment.purchaseOrderDetails &&
       podoPayment.purchaseOrderDetails.outstandingAmount
     ) {
+      const osAmt = roundTo(podoPayment.purchaseOrderDetails.outstandingAmount)
       outstandingAmount = {
-        outstandingAmt: podoPayment.purchaseOrderDetails.outstandingAmount,
+        outstandingAmt: osAmt,
+        currentOutstandingAmt: osAmt,
+        invoiceAmount: podoPayment.purchaseOrderDetails.totalAftGst,
       }
+
+      const { purchaseOrderPayment } = podoPayment
+      newPurchaseOrderPayment = purchaseOrderPayment.map((o) => {
+        let tempOutstandingAmount = {}
+        if (o.id) {
+          tempOutstandingAmount = {
+            outstandingAmt: o.paymentAmount,
+          }
+        }
+        return {
+          ...o,
+          ...tempOutstandingAmount,
+        }
+      })
     }
+
     return {
       ...podoPayment,
       ...outstandingAmount,
+      purchaseOrderPayment: newPurchaseOrderPayment,
     }
   },
   handleSubmit: (values, { props }) => {
@@ -52,7 +64,6 @@ const styles = (theme) => ({
 
     let paymentData = purchaseOrderPayment.map((x, index) => {
       x.isCancelled = x.isDeleted
-      delete x.isDeleted
       if (_.has(x, 'isNew')) {
         return {
           purchaseOrderFK: values.id,
@@ -69,10 +80,12 @@ const styles = (theme) => ({
         }
       }
 
+      delete x.isDeleted
       return {
         ...x,
         clinicPaymentDto: {
           ...x.clinicPaymentDto,
+          cancelReason: x.cancelReason,
           isCancelled: x.isCancelled,
         },
       }
@@ -143,19 +156,20 @@ class index extends PureComponent {
 
   // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
 
-  recalculateOutstandingAmount = (type, value) => {
+  recalculateOutstandingAmount = (type, value = 0) => {
     const { values, setValues } = this.props
     if (type === 'add') {
-      const outstandingAmt = values.outstandingAmt - value
+      const currentOutstandingAmt = values.outstandingAmt - value
       setValues({
         ...values,
-        outstandingAmt,
+        currentOutstandingAmt,
       })
     } else {
-      const outstandingAmt = values.outstandingAmt + value
+      const currentOutstandingAmt = values.outstandingAmt + value
       setValues({
         ...values,
-        outstandingAmt,
+        currentOutstandingAmt,
+        outstandingAmt: currentOutstandingAmt,
       })
     }
   }

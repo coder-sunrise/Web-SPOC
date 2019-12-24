@@ -20,10 +20,10 @@ import CategorySummary from './CategorySummary'
 const reportId = 3
 const fileName = 'Sales Summary Report'
 class SalesSummary extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

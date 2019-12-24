@@ -11,6 +11,7 @@ import {
   GridItem,
   ProgressButton,
   CommonModal,
+  notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import POForm from './POForm'
@@ -66,6 +67,12 @@ class Index extends Component {
 
   componentDidMount () {
     this.getPOdata()
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'purchaseOrderDetails/initializePurchaseOrder',
+    })
   }
 
   getPOdata = (createdId) => {
@@ -140,7 +147,7 @@ class Index extends Component {
 
   onSubmitButtonClicked = async (action) => {
     const { dispatch, validateForm, history } = this.props
-    let dispatchType = 'purchaseOrderDetails/upsert'
+    let dispatchType = 'purchaseOrderDetails/savePO'
     let processedPayload = {}
     const isFormValid = await validateForm()
     let validation = false
@@ -156,6 +163,18 @@ class Index extends Component {
           },
         }).then((r) => {
           if (r) {
+            if (
+              action === poSubmitAction.SAVE ||
+              action === poSubmitAction.FINALIZE
+            ) {
+              let message = 'PO saved'
+              if (action === poSubmitAction.FINALIZE) {
+                message = 'PO finalized'
+              }
+              notification.success({
+                message,
+              })
+            }
             const { id } = r
             // dispatch({
             //   type: `formik/clean`,

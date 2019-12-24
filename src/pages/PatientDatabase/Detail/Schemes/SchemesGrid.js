@@ -237,7 +237,9 @@ class SchemesGrid extends PureComponent {
       ? rows.filter((r) => !r.isDeleted && r.schemeTypeFK === schemeTypeFK)
           .length >= 2
       : []
-    const chasSchemes = rows.filter((r) => this.isCHAS(r.schemeTypeFK))
+    const chasSchemes = rows.filter(
+      (r) => !r.isDeleted && this.isCHAS(r.schemeTypeFK),
+    )
     const isCurrentSelectedCHAS = this.isCHAS(schemeTypeFK)
 
     let _newRows = [
@@ -358,7 +360,6 @@ class SchemesGrid extends PureComponent {
 
       onCommitChanges: this.commitChanges,
     }
-    console.log({ rows: this.getSortedRows(rows) })
     return (
       <EditableTableGrid
         rows={this.getSortedRows(rows)}

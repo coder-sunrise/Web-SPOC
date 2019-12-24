@@ -9,17 +9,18 @@ import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 import { Accordion } from '@/components'
 // sub components
 import FilterBar from './FilterBar'
-import InvoicePayer from './InvoicePayer'
 import PastPaymentsCollection from './PastPaymentsCollection'
 import ReportBase from '../ReportBase'
 import VisitListing from './VisitListing'
+import PatientDeposit from './PatientDeposit'
+import Summary from './Summary'
 import { AccordionTitle } from '@/components/_medisys'
 
 class QueueListing extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId: 1,
       fileName: 'Queue Listing Report',
     }
@@ -30,6 +31,7 @@ class QueueListing extends ReportBase {
   }
 
   renderContent = (reportDatas) => {
+    if (!reportDatas) return null
     return (
       <Accordion
         // active={this.state.activePanel}
@@ -52,8 +54,16 @@ class QueueListing extends ReportBase {
             content: <PastPaymentsCollection reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Invoice Payer' />,
-            content: <InvoicePayer reportDatas={reportDatas} />,
+            title: <AccordionTitle title='Patient Deposit' />,
+            content: <PatientDeposit DepositDatas={reportDatas.PatientDeposit} />,
+          },
+          {
+            title: <AccordionTitle title='Patient Refund' />,
+            content: <PatientDeposit DepositDatas={reportDatas.PatientRefund} />,
+          },
+          {
+            title: <AccordionTitle title='Summary' />,
+            content: <Summary reportDatas={reportDatas} />,
           },
         ]}
       />

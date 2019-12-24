@@ -9,10 +9,10 @@ import SalesList from './SalesList'
 import ReportBase from '../ReportBase'
 
 class SalesListingReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId: 17,
       fileName: 'Sales Listing Report',
     }

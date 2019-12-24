@@ -26,6 +26,7 @@ const Summary = ({ classes, values }) => {
   const getGST = (gstValue = 0, isGstInclusive = false) =>
     `${gstValue.toFixed(2)}% GST${isGstInclusive ? ' inclusive' : ''}:`
   const { invoiceAdjustment = [] } = values
+
   return (
     <div className={classes.summaryContent}>
       <GridContainer>
@@ -88,12 +89,12 @@ const Summary = ({ classes, values }) => {
           </GridContainer>
 
           <GridItem md={6} xs={6}>
-            {values.gstValue && (
+            {values.gstValue >= 0 && (
               <span>{getGST(values.gstValue, values.isGSTInclusive)}</span>
             )}
           </GridItem>
           <GridItem md={6} xs={6}>
-            {values.gstValue && (
+            {values.gstValue >= 0 && (
               <FastField
                 name='invoiceGSTAmt'
                 render={(args) => {

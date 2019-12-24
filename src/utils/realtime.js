@@ -7,7 +7,7 @@ const connectionObserver = {}
 
 const initStream = () => {
   const signalREndPoint = process.env.signalrUrl
-  console.log({ connection, signalR })
+  // console.log(connection)
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
       accessTokenFactory: () => localStorage.getItem('token'),
@@ -114,6 +114,7 @@ const sendNotification = (type, data) => {
     },
   } = getState()
   data.sender = user.data.clinicianProfile.name
+  data.timestamp = Date.now()
   console.log('sendNotification', type, data)
   connection.invoke('SendNotification', type, data).catch((err) => {
     return console.error(err)

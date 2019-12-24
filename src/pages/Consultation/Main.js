@@ -259,6 +259,11 @@ class Main extends React.Component {
     )
       return true
     if (
+      nextProps.visitRegistration.entity.id !==
+      this.props.visitRegistration.entity.id
+    )
+      return true
+    if (
       nextProps.orders.summary.totalWithGST !==
       this.props.orders.summary.totalWithGST
     )
@@ -394,7 +399,7 @@ class Main extends React.Component {
     } = visit
 
     const isModifiedOrder = _.isEqual(
-      rows.filter((i) => i.id && !i.isDeleted),
+      rows.filter((i) => !(i.id === undefined && i.isDeleted)),
       _originalRows,
     )
 
@@ -456,7 +461,6 @@ class Main extends React.Component {
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
-
     return (
       <SizeContainer size='sm'>
         <div

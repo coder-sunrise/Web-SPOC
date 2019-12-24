@@ -1,19 +1,23 @@
-import React, { useEffect, useReducer } from 'react'
+import React from 'react'
+import * as Yup from 'yup'
 import moment from 'moment'
 import router from 'umi/router'
+// formik
+import { withFormik } from 'formik'
 // material ui
 import PageView from '@material-ui/icons/Pageview'
+import ReportBase from '../ReportBase'
 // common components
 import {
-  dateFormatLongWithTime,
+  dateFormatLongWithTimeNoSec12h,
   Button,
   Tooltip,
-  CardContainer,
 } from '@/components'
 // sub components
 import { ReportDataGrid } from '@/components/_medisys'
 // services
 import { getBizSession } from '@/pages/Reception/Queue/services/index'
+import FilterBar from './FilterBar'
 
 const SessionColumns = [
   { name: 'sessionNo', title: 'Session No.' },
@@ -23,128 +27,111 @@ const SessionColumns = [
   { name: 'action', title: 'Action' },
 ]
 
-const initialState = {
-  loaded: false,
-  isLoading: false,
-  activePanel: -1,
-  sessionData: [],
-}
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'toggleLoading':
-      return { ...state, isLoading: !state.isLoading }
-    case 'setActivePanel':
-      return { ...state, activePanel: action.payload }
-    case 'setLoaded':
-      return { ...state, loaded: action.payload }
-    case 'updateState': {
-      return { ...state, ...action.payload }
+
+class SessionSummary extends ReportBase {
+  constructor(props) {
+    super(props)
+    this.state = {
+      ...this.state,
+      isDisplayReportLayout: false,
     }
-    case 'reset':
-      return { ...initialState }
-    default:
-      throw new Error()
+    console.log('super.defaultState', this.xx)
   }
-}
 
-const SessionSummary = () => {
-  const [
-    state,
-    dispatch,
-  ] = useReducer(reducer, initialState)
+  viewSessionSummaryReport = (row) => {
+    router.push(`/report/sessionsummary/${row.id}`)
+  }
 
-  const getAllSession = async () => {
+  getReportDatas = async (params) => {
     try {
-      const result = await getBizSession({
+      let criteria = {
         pagesize: 99999,
+        lgteql_sessionStartDate: params.dateFrom,
         sorting: [
           { columnName: 'sessionStartDate', direction: 'desc' },
         ],
-      })
+      }
+      if (params.dateTo) {
+        criteria.lst_sessionCloseDate = moment(params.dateTo).add(1, 'day').formatUTC()
+      }
+      const result = await getBizSession(criteria)
       const { status, data } = result
       if (status === '200') {
-        dispatch({
-          type: 'updateState',
-          payload: {
-            sessionData: data.data,
-          },
-        })
+        return data.data
       }
     } catch (error) {
       console.log({ error })
     }
+    return null
   }
 
-  const viewSessionSummaryReport = (row) => {
-    router.push(`/report/sessionsummary/${row.id}`)
+  renderFilterBar = (handleSubmit, isSubmitting) => {
+    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
   }
 
-  useEffect(() => {
-    /* 
-    clean up function
-    set data to empty array when leaving the page 
-    */
-    getAllSession()
-    return () =>
-      dispatch({
-        type: 'reset',
-      })
-  }, [])
-
-  const columnExtensions = [
-    {
-      columnName: 'isClinicSessionClosed',
-      sortingEnabled: false,
-      render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'Ongoing'),
-    },
-    {
-      columnName: 'sessionStartDate',
-      sortingEnabled: false,
-      render: (row) =>
-        moment(row.sessionStartDate).format(dateFormatLongWithTime),
-    },
-    {
-      columnName: 'sessionCloseDate',
-      sortingEnabled: false,
-      render: (row) =>
-        row.sessionCloseDate
-          ? moment(row.sessionCloseDate).format(dateFormatLongWithTime)
-          : '',
-    },
-    {
-      align: 'center',
-      columnName: 'action',
-      // width: 240,
-      render: (row) => (
-        <Tooltip title='View Session Summary Report'>
-          <Button
-            className='noPadding'
-            color='primary'
-            size='sm'
-            id={row.id}
-            justIcon
-            rounded
-            onClick={() => viewSessionSummaryReport(row)}
-          >
-            <PageView />
-          </Button>
-        </Tooltip>
-      ),
-    },
-  ]
-  console.log({ data: state.sessionData })
-  return (
-    <CardContainer hideHeader>
-      <h4 style={{ marginBottom: 16 }}>All Sessions</h4>
-      <ReportDataGrid
-        height='80vh'
-        onRowDoubleClick={viewSessionSummaryReport}
-        data={state.sessionData}
-        columns={SessionColumns}
-        columnExtensions={columnExtensions}
-      />
-    </CardContainer>
-  )
+  renderContent = (reportDatas) => {
+    if (!reportDatas) return null
+    const columnExtensions = [
+      {
+        columnName: 'isClinicSessionClosed',
+        sortingEnabled: false,
+        render: (row) => (row.isClinicSessionClosed ? 'Closed' : 'Ongoing'),
+      },
+      {
+        columnName: 'sessionStartDate',
+        sortingEnabled: false,
+        type: 'date',
+        showTime: true,
+        format: dateFormatLongWithTimeNoSec12h,
+      },
+      {
+        columnName: 'sessionCloseDate',
+        sortingEnabled: false,
+        type: 'date',
+        format: dateFormatLongWithTimeNoSec12h,
+        showTime: true,
+      },
+      {
+        align: 'center',
+        columnName: 'action',
+        // width: 240,
+        render: (row) => (
+          <Tooltip title='View Session Summary Report'>
+            <Button
+              className='noPadding'
+              color='primary'
+              size='sm'
+              id={row.id}
+              justIcon
+              rounded
+              onClick={() => this.viewSessionSummaryReport(row)}
+            >
+              <PageView />
+            </Button>
+          </Tooltip>
+        ),
+      },
+    ]
+    return <ReportDataGrid
+      height='80vh'
+      style={{ marginTop: 6 }}
+      onRowDoubleClick={this.viewSessionSummaryReport}
+      data={reportDatas}
+      columns={SessionColumns}
+      columnExtensions={columnExtensions}
+    />
+  }
 }
 
-export default SessionSummary
+const SessionSummaryWithFormik = withFormik({
+  validationSchema: Yup.object().shape({
+    dateFrom: Yup.date().required(),
+  }),
+  mapPropsToValues: () => ({
+    dateFrom: moment(new Date()).add(-3, 'month').toDate(),
+    dateTo: moment(new Date()).toDate(),
+    filterType: 'Credit Note',
+  }),
+})(SessionSummary)
+export default SessionSummaryWithFormik
+

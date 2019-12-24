@@ -54,8 +54,6 @@ class ApprovedCHAS extends React.Component {
     this.refreshDataGrid()
   }
 
-  onRefreshClicked = () => this.refreshDataGrid()
-
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
@@ -194,6 +192,11 @@ class ApprovedCHAS extends React.Component {
                 onContextMenuItemClick={handleContextMenuItemClick}
                 type='approved'
               />
+            </GridItem>
+            <GridItem md={12} style={{ marginTop: 12}}>
+              <p className={classes.footerNote}>
+                Approved Amt. only available for Paid claim status.
+              </p>
             </GridItem>
             <GridItem md={4} className={classes.buttonGroup}>
               <ProgressButton

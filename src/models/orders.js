@@ -103,6 +103,9 @@ export default createListViewModel({
               entity: undefined,
             },
           })
+          yield put({
+            type: 'global/incrementCommitCount',
+          })
         }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {

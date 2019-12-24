@@ -24,6 +24,7 @@ const styles = () => ({
       borderBottomRightRadius: '4px !important',
       borderBottomLeftRadius: '4px !important',
     },
+    cursor: 'pointer',
   },
   rightEnd: {
     marginRight: 0,
@@ -95,7 +96,12 @@ const StatusFilterButton = ({
 
   return (
     <React.Fragment>
-      <Paper elevation={6} className={classnames(classes.container)}>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.ALL}
+        onClick={onButtonClick}
+      >
         <h4
           className={classnames([
             classes.number,
@@ -120,7 +126,12 @@ const StatusFilterButton = ({
         </Button>
       </Paper>
 
-      <Paper elevation={6} className={classnames(classes.container)}>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.WAITING}
+        onClick={onButtonClick}
+      >
         <h4
           className={classnames([
             classes.number,
@@ -146,7 +157,12 @@ const StatusFilterButton = ({
           {StatusIndicator.WAITING}
         </Button>
       </Paper>
-      <Paper elevation={6} className={classnames(classes.container)}>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.IN_PROGRESS}
+        onClick={onButtonClick}
+      >
         <h4
           className={classnames([
             classes.number,
@@ -175,7 +191,12 @@ const StatusFilterButton = ({
           {StatusIndicator.IN_PROGRESS}
         </Button>
       </Paper>
-      <Paper elevation={6} className={classnames(classes.container)}>
+      <Paper
+        elevation={6}
+        className={classnames(classes.container)}
+        id={StatusIndicator.COMPLETED}
+        onClick={onButtonClick}
+      >
         <h4
           className={classnames([
             classes.number,
@@ -208,6 +229,8 @@ const StatusFilterButton = ({
           [classes.container]: true,
           [classes.rightEnd]: true,
         })}
+        id={StatusIndicator.APPOINTMENT}
+        onClick={onButtonClick}
       >
         <h4
           className={classnames([

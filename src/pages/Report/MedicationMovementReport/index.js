@@ -11,10 +11,10 @@ import ReportBase from '../ReportBase'
 const reportId = 22
 const fileName = 'Medication Movement Report'
 class MedicationMovementReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

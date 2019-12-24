@@ -115,32 +115,50 @@ class Transfer extends PureComponent {
       payload: {
         id: values.invoicePayerFK,
       },
+    }).then((r) => {
+      if (r) {
+        r.invoicePayerInfo.forEach((o) => {
+          this.setState((prevState) => {
+            return {
+              selectedRows: [
+                ...prevState.selectedRows,
+                o.id,
+              ],
+            }
+          })
+        })
+      }
     })
   }
 
   handleTransferAmount = (e, from) => {
     const { values, setFieldValue, setValues } = this.props
+    const { selectedRows } = this.state
     const { invoicePayerInfo = [] } = values
-    if (from === 'grid') {
-      const totalTransferAmt = _.sumBy(
-        values.invoicePayerInfo,
-        'transferAmount',
-      )
+    const filterSelectedRows = values.invoicePayerInfo.filter((o) =>
+      selectedRows.find((i) => i === o.id),
+    )
+    if (from === 'grid' || from === 'checkbox') {
+      const totalTransferAmt = _.sumBy(filterSelectedRows, 'transferAmount')
       setFieldValue('transferAmount', totalTransferAmt)
 
       return
     }
 
-    let tempTransferAmt = e.target.value
+    let tempTransferAmt = e.target.value || 0
     const distributedTransferAmtArray = invoicePayerInfo.map((o) => {
-      let transferAmt
+      const isSelected = selectedRows.find((i) => i === o.id)
 
-      if (tempTransferAmt >= o.claimAmount) {
-        transferAmt = o.claimAmount
-        tempTransferAmt -= o.claimAmount
-      } else {
-        transferAmt = tempTransferAmt
-        tempTransferAmt = 0
+      let transferAmt = 0
+
+      if (isSelected) {
+        if (tempTransferAmt >= o.claimAmount) {
+          transferAmt = o.claimAmount
+          tempTransferAmt -= o.claimAmount
+        } else {
+          transferAmt = tempTransferAmt
+          tempTransferAmt = 0
+        }
       }
 
       return {
@@ -156,13 +174,14 @@ class Transfer extends PureComponent {
     })
   }
 
-  handleSelectionChange = (selection) => {
+  handleSelectionChange = async (selection) => {
     const { setValues, values } = this.props
-    this.setState({ selectedRows: selection })
+    await this.setState({ selectedRows: selection })
     setValues({
       ...values,
       selectedRows: selection,
     })
+    this.handleTransferAmount(null, 'checkbox')
   }
 
   render () {
