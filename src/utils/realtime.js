@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import * as signalR from '@microsoft/signalr'
 import { notification } from '@/components'
 
 let connection = null
@@ -6,11 +7,12 @@ const connectionObserver = {}
 
 const initStream = () => {
   const signalREndPoint = process.env.signalrUrl
-  console.log(connection)
+  console.log({ connection, signalR })
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
       accessTokenFactory: () => localStorage.getItem('token'),
     })
+    .withAutomaticReconnect()
     .build()
   // console.log(connection)
   connection.on('NewNotification', (type, response) => {
