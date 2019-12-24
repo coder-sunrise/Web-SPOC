@@ -170,7 +170,7 @@ const DispenseDetails = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to discard the dispense ?`,
+        openConfirmContent: `Discard dispense?`,
         onConfirmSave:
           visitPurposeFK === VISIT_TYPE.RETAIL
             ? discardAddOrderDetails
