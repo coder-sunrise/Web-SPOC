@@ -118,39 +118,19 @@ const Attachment = ({
       (item) => item.code.toUpperCase() === 'UPLOADED',
     )
 
-    const uploadObject = [
-      {
-        fileName: file.name,
-        fileSize: file.size,
-        fileExtension: getFileExtension(file.name),
-        fileCategoryFK: 1,
-        content: base64,
-        // isConfirmed: false,
-        fileStatusFK: fileStatusFK.id,
-        attachmentType,
-      },
-      {
-        fileName: file.name,
-        fileSize: file.size,
-        fileExtension: getFileExtension(file.name),
-        fileCategoryFK: 1,
-        content: base64,
-        // isConfirmed: false,
-        fileStatusFK: fileStatusFK.id,
-        attachmentType,
-        isThumbnail: true,
-      },
-    ]
+    const uploadObject = {
+      fileName: file.name,
+      fileSize: file.size,
+      fileExtension: getFileExtension(file.name),
+      fileCategoryFK: 1,
+      content: base64,
+      // isConfirmed: false,
+      fileStatusFK: fileStatusFK.id,
+      attachmentType,
+    }
     const uploaded = await uploadFile(uploadObject)
 
-    return uploaded.map((m) => {
-      return {
-        ...m,
-        attachmentType,
-      }
-    })
-
-    // return { ...uploaded, attachmentType }
+    return { ...uploaded, attachmentType }
   }
 
   const onUploadClick = () => {
@@ -236,7 +216,6 @@ const Attachment = ({
           .filter((key) => !skipped.includes(files[key].name))
           .map((key) => mapFileToUploadObject(files[key])),
       )
-
       setUploading(false)
       dispatch({
         type: 'global/updateState',
@@ -252,12 +231,9 @@ const Attachment = ({
     }
   }
 
-  const onDelete = (attachment) => {
-    const { fileIndexFK, id, thumbnailIndexFK } = attachment
-    console.log(attachment)
+  const onDelete = (fileIndexFK, id) => {
     if (!fileIndexFK && id) {
       deleteFileByFileID(id)
-      if (thumbnailIndexFK) deleteFileByFileID(thumbnailIndexFK)
     }
 
     handleUpdateAttachments({

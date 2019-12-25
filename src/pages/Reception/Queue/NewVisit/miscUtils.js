@@ -8,14 +8,7 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  {
-    fileIndexFK,
-    fileName,
-    attachmentType,
-    isDeleted,
-    thumbnailIndexFK,
-    ...rest
-  },
+  { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
   index,
 ) =>
   !fileIndexFK
@@ -26,7 +19,6 @@ const mapAttachmentToUploadInput = (
         fileName,
         attachmentType,
         isDeleted,
-        thumbnailIndexFK,
       }
     : {
         // file status === confirmed, need to provide full object for API
@@ -36,7 +28,6 @@ const mapAttachmentToUploadInput = (
         attachmentType,
         isDeleted,
         sortOrder: index,
-        thumbnailIndexFK,
       }
 
 export const formikMapPropsToValues = ({
