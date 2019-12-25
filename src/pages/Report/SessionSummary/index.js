@@ -9,7 +9,7 @@ import PageView from '@material-ui/icons/Pageview'
 import ReportBase from '../ReportBase'
 // common components
 import {
-  dateFormatLongWithTime,
+  dateFormatLongWithTimeNoSec12h,
   Button,
   Tooltip,
 } from '@/components'
@@ -52,7 +52,7 @@ class SessionSummary extends ReportBase {
         ],
       }
       if (params.dateTo) {
-        criteria.lsteql_sessionCloseDate = params.dateTo
+        criteria.lst_sessionCloseDate = moment(params.dateTo).add(1, 'day').formatUTC()
       }
       const result = await getBizSession(criteria)
       const { status, data } = result
@@ -80,16 +80,16 @@ class SessionSummary extends ReportBase {
       {
         columnName: 'sessionStartDate',
         sortingEnabled: false,
-        render: (row) =>
-          moment(row.sessionStartDate).format(dateFormatLongWithTime),
+        type: 'date',
+        showTime: true,
+        format: dateFormatLongWithTimeNoSec12h,
       },
       {
         columnName: 'sessionCloseDate',
         sortingEnabled: false,
-        render: (row) =>
-          row.sessionCloseDate
-            ? moment(row.sessionCloseDate).format(dateFormatLongWithTime)
-            : '',
+        type: 'date',
+        format: dateFormatLongWithTimeNoSec12h,
+        showTime: true,
       },
       {
         align: 'center',

@@ -265,7 +265,6 @@ class Demographic extends PureComponent {
                       label='Nationality'
                       code='ctNationality'
                       autoComplete
-                      max={5}
                       {...args}
                     />
                   )}

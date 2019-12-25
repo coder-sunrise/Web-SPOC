@@ -1,5 +1,6 @@
 import { createListViewModel } from 'medisys-model'
 import * as service from '../services'
+import { notification } from '@/components'
 
 export default createListViewModel({
   namespace: 'sms',
@@ -23,6 +24,15 @@ export default createListViewModel({
             payload: response.data,
           })
           return response
+        }
+        return false
+      },
+
+      *sendSms ({ payload }, { call, put }) {
+        const response = yield call(service.upsert, payload)
+        if (response === 204) {
+          notification.success({ message: 'SMS Sent' })
+          return true
         }
         return false
       },
