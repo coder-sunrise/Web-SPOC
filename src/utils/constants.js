@@ -233,3 +233,15 @@ export const SMS_STATUS_TEXT = {
   QUEUED: 'Queued',
   SENDING: 'Sending',
 }
+
+export const FILE_STATUS = {
+  UPLOADED: 1,
+  CONFIRMED: 2,
+  ARCHIEVED: 3,
+}
+
+export const FILE_CATEGORY = {
+  VISITREG: 1,
+  CONSULTATION: 2,
+  PATIENT: 3,
+}
