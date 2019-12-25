@@ -64,7 +64,7 @@ const AttachmentChipWithPopover = ({
               onClick={() => {
                 if (!isReadOnly) {
                   toggleVisibleChange()
-                  onConfirmDelete(attachment.fileIndexFK, attachment.id)
+                  onConfirmDelete(attachment)
                 }
               }}
             >

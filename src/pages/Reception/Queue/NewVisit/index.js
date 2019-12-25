@@ -134,12 +134,22 @@ class NewVisit extends PureComponent {
     let updated = [
       ...visitAttachment,
     ]
+    if (added) {
+      // updated = [
+      //   ...updated,
+      //   ...added,
+      // ]
 
-    if (added)
-      updated = [
-        ...updated,
-        ...added,
-      ]
+      added.map((a) => {
+        if (Array.isArray(a) && a.length === 2) {
+          updated.push({
+            ...a[0],
+            thumbnailIndexFK: a[1].id,
+          })
+        }
+        return a
+      })
+    }
 
     if (deleted)
       updated = updated.reduce((attachments, item) => {
@@ -158,6 +168,8 @@ class NewVisit extends PureComponent {
         ]
       }, [])
     setFieldValue('visitAttachment', updated)
+
+    console.log({ updated })
   }
 
   validatePatient = () => {
