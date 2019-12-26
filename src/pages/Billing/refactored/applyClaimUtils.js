@@ -322,14 +322,14 @@ export const validateClaimAmount = (schemeRow) => {
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
     vaccinationCoverageMaxCap,
-    packageCoverageMaxCap,
+    orderSetCoverageMaxCap,
 
     isCoverageMaxCapCheckRequired,
     isMedicationCoverageMaxCapCheckRequired,
     isConsumableCoverageMaxCapCheckRequired,
     isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
-    isPackageCoverageMaxCapCheckRequired,
+    isOrderSetCoverageMaxCapCheckRequired,
   } = schemeConfig
 
   const listOfLimits = []
@@ -365,7 +365,7 @@ export const validateClaimAmount = (schemeRow) => {
     const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItem, 2)
     const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 3)
     const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItem, 4)
-    const packageTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
+    const orderSetTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
 
     if (
       isMedicationCoverageMaxCapCheckRequired &&
@@ -392,10 +392,10 @@ export const validateClaimAmount = (schemeRow) => {
       invalidMessage.push('Service total claim amount has exceed the max cap')
 
     if (
-      isPackageCoverageMaxCapCheckRequired &&
-      packageTotalClaim > packageCoverageMaxCap
+      isOrderSetCoverageMaxCapCheckRequired &&
+      orderSetTotalClaim > orderSetCoverageMaxCap
     )
-      invalidMessage.push('Package total claim amount has exceed the max cap')
+      invalidMessage.push('Order Set total claim amount has exceed the max cap')
   }
 
   const maximumLimit = listOfLimits.reduce(

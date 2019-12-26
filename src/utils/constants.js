@@ -82,14 +82,14 @@ export const INVOICE_ITEM_TYPE = {
   2: 'Consumable',
   3: 'Vaccination',
   4: 'Service',
-  5: 'Package',
+  5: 'OrderSet',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
   Medication: 1,
   Consumable: 2,
   Service: 3,
-  Package: 4,
+  OrderSet: 4,
 }
 
 export const INVOICE_ITEM_TYPE_BY_NAME = {
@@ -97,7 +97,7 @@ export const INVOICE_ITEM_TYPE_BY_NAME = {
   CONSUMABLE: 2,
   VACCINATION: 3,
   SERVICE: 4,
-  PACKAGE: 5,
+  ORDERSET: 5,
   MISC: 6,
 }
 
@@ -203,7 +203,7 @@ export const ORDER_TYPE_TAB = {
   SERVICE: '3',
   CONSUMABLE: '4',
   OPENPRECRIPTION: '5',
-  PACKAGE: '6',
+  ORDERSET: '6',
 }
 
 export const SMS_STATUS = {

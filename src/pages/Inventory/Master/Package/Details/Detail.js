@@ -50,7 +50,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.package.code',
+                        id: 'inventory.master.orderSet.code',
                       })}
                       disabled={!values.isActive}
                       {...args}
@@ -66,7 +66,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.package.name',
+                        id: 'inventory.master.orderSet.name',
                       })}
                       {...args}
                     />
@@ -81,7 +81,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.package.description',
+                        id: 'inventory.master.orderSet.description',
                       })}
                       {...args}
                     />
@@ -96,7 +96,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.package.remarks',
+                        id: 'inventory.master.orderSet.remarks',
                       })}
                       multiline
                       rowsMax='5'

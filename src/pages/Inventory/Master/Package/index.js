@@ -8,7 +8,7 @@ import FilterBar from './FilterBar'
 import Grid from '../Grid'
 
 const styles = () => ({})
-const Package = ({ dispatch, history, pack }) => {
+const OrderSet = ({ dispatch, history, pack }) => {
   const [
     tableParas,
     setTableParas,
@@ -48,22 +48,22 @@ const Package = ({ dispatch, history, pack }) => {
     if (list) {
       list.map((r) => {
         const {
-          medicationPackageItem,
-          consumablePackageItem,
-          vaccinationPackageItem,
-          servicePackageItem,
+          medicationOrderSetItem,
+          consumableOrderSetItem,
+          vaccinationOrderSetItem,
+          serviceOrderSetItem,
         } = r
         let sellingPrice = 0
-        medicationPackageItem.forEach((o) => {
+        medicationOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        consumablePackageItem.forEach((o) => {
+        consumableOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        vaccinationPackageItem.forEach((o) => {
+        vaccinationOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        servicePackageItem.forEach((o) => {
+        serviceOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
         return {
@@ -79,7 +79,7 @@ const Package = ({ dispatch, history, pack }) => {
   const gridProps = {
     ...filterProps,
     pack,
-    namespace: 'package',
+    namespace: 'orderSet',
     // list: getPackList(pack.list),
     list: pack.list || [],
     tableParas,
@@ -122,4 +122,4 @@ export default compose(
   connect(({ pack }) => ({
     pack,
   })),
-)(Package)
+)(OrderSet)

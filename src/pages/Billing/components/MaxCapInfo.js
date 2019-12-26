@@ -52,14 +52,14 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
 
       isMedicationCoverageMaxCapCheckRequired,
       isConsumableCoverageMaxCapCheckRequired,
-      isPackageCoverageMaxCapCheckRequired,
+      isOrderSetCoverageMaxCapCheckRequired,
       isServiceCoverageMaxCapCheckRequired,
       isVaccinationCoverageMaxCapCheckRequired,
 
       medicationCoverageMaxCap,
       consumableCoverageMaxCap,
       serviceCoverageMaxCap,
-      packageCoverageMaxCap,
+      orderSetCoverageMaxCap,
       vaccinationCoverageMaxCap,
     } = scheme
 
@@ -81,10 +81,10 @@ const MaxCapInfo = ({ classes, claimableSchemes = [], copaymentSchemeFK }) => {
         value: serviceCoverageMaxCap,
       })
 
-    if (isPackageCoverageMaxCapCheckRequired)
+    if (isOrderSetCoverageMaxCapCheckRequired)
       categoriesMaxCap.push({
-        type: 'Package',
-        value: packageCoverageMaxCap,
+        type: 'OrderSet',
+        value: orderSetCoverageMaxCap,
       })
 
     if (isVaccinationCoverageMaxCapCheckRequired)

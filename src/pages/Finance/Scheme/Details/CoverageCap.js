@@ -32,10 +32,11 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
         'itemGroupMaxCapacityDto.serviceMaxCapacity.maxCapValue',
         undefined,
       )
-      setFieldValue(
-        'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
-        undefined,
-      )
+      /* Commented Package Input - Need to re-test if enabling it back in the future */
+      // setFieldValue(
+      //   'itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue',
+      //   undefined,
+      // )
     }
 
     if (target.value === 'all') {
@@ -57,10 +58,12 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
           'itemGroupMaxCapacityDto.serviceMaxCapacity.isDeleted',
           true,
         )
-        setFieldValue(
-          'itemGroupMaxCapacityDto.packageMaxCapacity.isDeleted',
-          true,
-        )
+
+        /* Commented Package Input - Need to re-test if enabling it back in the future */
+        // setFieldValue(
+        //   'itemGroupMaxCapacityDto.packageMaxCapacity.isDeleted',
+        //   true,
+        // )
       }
     }
   }

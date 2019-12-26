@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 import InventoryTypeListing from './InventoryTypeListing'
-import { PackageDetailOption } from './variables'
+import { OrderSetDetailOption } from './variables'
 
 import {
   NavPills,
@@ -157,19 +157,19 @@ const Detail = ({
   // ] = useState(0)
   // const calTotal = () => {
   //   setTotal(0)
-  //   medicationPackageItem.map((row) => {
+  //   medicationOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   servicePackageItem.map((row) => {
+  //   serviceOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   consumablePackageItem.map((row) => {
+  //   consumableOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   vaccinationPackageItem.map((row) => {
+  //   vaccinationOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
   // }
@@ -216,7 +216,7 @@ const Detail = ({
       <Tabs
         style={{ marginTop: 20 }}
         defaultActiveKey='0'
-        options={PackageDetailOption(detailProps, typeListingProps)}
+        options={OrderSetDetailOption(detailProps, typeListingProps)}
       />
       <div className={classes.actionDiv}>
         <Button
@@ -243,10 +243,10 @@ export default compose(
     enableReinitialize: true,
     mapPropsToValues: ({ packDetail }) => {
       const returnValue = packDetail.entity || packDetail.default
-      const { servicePackageItem } = returnValue
-      let newServicePackageItem = []
-      if (servicePackageItem.length > 0) {
-        newServicePackageItem = servicePackageItem.map((o) => {
+      const { serviceOrderSetItem } = returnValue
+      let newserviceOrderSetItem = []
+      if (serviceOrderSetItem.length > 0) {
+        newserviceOrderSetItem = serviceOrderSetItem.map((o) => {
           const { service } = o
           return {
             ...o,
@@ -260,7 +260,7 @@ export default compose(
       }
       return {
         ...returnValue,
-        servicePackageItem: newServicePackageItem,
+        serviceOrderSetItem: newserviceOrderSetItem,
       }
     },
 
@@ -272,9 +272,9 @@ export default compose(
 
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history, codetable } = props
-      const { servicePackageItem } = values
+      const { serviceOrderSetItem } = values
 
-      const newServicePackageArray = servicePackageItem.map((o) => {
+      const newServiceOrderSetArray = serviceOrderSetItem.map((o) => {
         return {
           ...o,
           serviceCenterServiceFK:
@@ -288,7 +288,7 @@ export default compose(
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
-          servicePackageItem: newServicePackageArray,
+          serviceOrderSetItem: newServiceOrderSetArray,
         },
       }).then((r) => {
         if (r) {
@@ -298,6 +298,6 @@ export default compose(
       })
     },
 
-    displayName: 'InventoryPackageDetail',
+    displayName: 'InventoryOrderSetDetail',
   }),
 )(Detail)
