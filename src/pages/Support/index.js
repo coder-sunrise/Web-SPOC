@@ -3,6 +3,7 @@ import classnames from 'classnames'
 import _ from 'lodash'
 import Call from '@material-ui/icons/Call'
 import Print from '@material-ui/icons/Print'
+import { formatMessage } from 'umi/locale'
 
 import { withStyles } from '@material-ui/core'
 
@@ -17,8 +18,8 @@ const menuData = [
   },
   {
     title: 'Download',
-    text: 'Drug Label',
-    url: '/support/druglabel',
+    text: formatMessage({ id: 'menu.support.printingtool' }),
+    url: '/support/printingtool',
     icon: <Print />,
   },
 ]
