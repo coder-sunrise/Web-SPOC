@@ -216,3 +216,9 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
 }
+
+export const SCRIBBLE_NOTE_TYPE = {
+  CLINICALNOTES: 1,
+  CHIEFCOMPLAINTS: 2,
+  PLAN: 3,
+}

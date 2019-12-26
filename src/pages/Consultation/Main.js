@@ -192,6 +192,7 @@ const discardConsultation = ({
 // @skeleton()
 @connect(
   ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -200,6 +201,7 @@ const discardConsultation = ({
     formik,
     cestemplate,
   }) => ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -775,7 +777,7 @@ class Main extends React.Component {
           : rights,
     }
     // console.log(matches)
-
+    console.log('main', { values })
     return (
       <div className={classes.root}>
         <PatientBanner extraCmt={this.getExtraComponent()} {...this.props} />

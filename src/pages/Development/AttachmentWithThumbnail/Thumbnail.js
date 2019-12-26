@@ -105,13 +105,14 @@ const Thumbnail = ({
             <img src={src} alt='test' width={size.width} height={size.height} />
           </div>
         </Tooltip>
-        <Tooltip title='Change'>
-          <Button simple justIcon color='primary' size='sm'>
-            <Edit />
-          </Button>
-        </Tooltip>
         <Tooltip title='Delete'>
-          <Button simple justIcon color='danger' size='sm'>
+          <Button
+            simple
+            justIcon
+            color='danger'
+            size='sm'
+            onClick={handleConfirmDelete}
+          >
             <Delete />
           </Button>
         </Tooltip>
