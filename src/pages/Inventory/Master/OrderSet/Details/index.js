@@ -31,7 +31,7 @@ const Detail = ({
   classes,
   dispatch,
   pack,
-  packDetail,
+  orderSetDetail,
   history,
   setFieldValue,
   handleSubmit,
@@ -124,7 +124,7 @@ const Detail = ({
   const { currentTab } = pack
   const detailProps = {
     values,
-    packDetail,
+    orderSetDetail,
     dispatch,
     setFieldValue,
     showTransfer: false,
@@ -138,7 +138,7 @@ const Detail = ({
 
   const typeListingProps = {
     dispatch,
-    packDetail,
+    orderSetDetail,
     setFieldValue,
     values,
     selectedItem,
@@ -173,7 +173,7 @@ const Detail = ({
   //     return setTotal(total + row.subTotal)
   //   })
   // }
-  // console.log('packDetail', packDetail)
+  // console.log('orderSetDetail', orderSetDetail)
   return (
     <React.Fragment>
       {/* <NavPills
@@ -197,7 +197,7 @@ const Detail = ({
             tabContent: (
               <InventoryTypeListing
                 dispatch={dispatch}
-                packDetail={packDetail}
+                orderSetDetail={orderSetDetail}
                 setFieldValue={setFieldValue}
                 values={values}
                 selectedItem={selectedItem}
@@ -227,22 +227,22 @@ const Detail = ({
         >
           Close
         </Button>
-        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
+        <ProgressButton submitKey='orderSetDetail/submit' onClick={handleSubmit} />
       </div>
     </React.Fragment>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ pack, packDetail, codetable }) => ({
+  connect(({ pack, orderSetDetail, codetable }) => ({
     pack,
-    packDetail,
+    orderSetDetail,
     codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ packDetail }) => {
-      const returnValue = packDetail.entity || packDetail.default
+    mapPropsToValues: ({ orderSetDetail }) => {
+      const returnValue = orderSetDetail.entity || orderSetDetail.default
       const { serviceOrderSetItem } = returnValue
       let newserviceOrderSetItem = []
       if (serviceOrderSetItem.length > 0) {
@@ -283,7 +283,7 @@ export default compose(
         }
       })
       dispatch({
-        type: 'packDetail/upsert',
+        type: 'orderSetDetail/upsert',
         payload: {
           ...values,
           effectiveStartDate: values.effectiveDates[0],

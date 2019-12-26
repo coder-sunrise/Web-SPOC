@@ -6,7 +6,7 @@ import { queryServiceCenter } from '../services'
 const { upsert } = service
 
 export default createFormViewModel({
-  namespace: 'packDetail',
+  namespace: 'orderSetDetail',
   config: {
     queryOnLoad: false,
   },

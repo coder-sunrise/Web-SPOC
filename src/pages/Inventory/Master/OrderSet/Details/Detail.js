@@ -20,13 +20,13 @@ import {
 
 const styles = () => ({})
 
-const Detail = ({ packDetail, dispatch, values, theme }) => {
+const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
   useEffect(() => {
-    if (packDetail.currentId) {
+    if (orderSetDetail.currentId) {
       dispatch({
-        type: 'packDetail/query',
+        type: 'orderSetDetail/query',
         payload: {
-          id: packDetail.currentId,
+          id: orderSetDetail.currentId,
         },
       }) // .then((v) => console.log('v', v))
     }
@@ -149,7 +149,7 @@ const Detail = ({ packDetail, dispatch, values, theme }) => {
 export default compose(
   withStyles(styles, { withTheme: true }),
   React.memo,
-  connect(({ packDetail }) => ({
-    packDetail,
+  connect(({ orderSetDetail }) => ({
+    orderSetDetail,
   })),
 )(Detail)

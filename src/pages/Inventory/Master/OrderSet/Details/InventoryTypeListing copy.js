@@ -33,7 +33,7 @@ let commitCount = 1000 // uniqueNumber
 const InventoryTypeListing = ({
   dispatch,
   classes,
-  packDetail,
+  orderSetDetail,
   setFieldValue,
   setValues,
   values,
@@ -180,8 +180,8 @@ const InventoryTypeListing = ({
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
       if (
-        packDetail.entity &&
-        packDetail.entity.serviceOrderSetItem.length > 0
+        orderSetDetail.entity &&
+        orderSetDetail.entity.serviceOrderSetItem.length > 0
       ) {
         serviceOrderSetItem.forEach((o) => {
           o.serviceName = serviceCenterServices.find(
@@ -257,7 +257,7 @@ const InventoryTypeListing = ({
       })
     },
     [
-      packDetail,
+      orderSetDetail,
     ],
   )
 
@@ -354,7 +354,7 @@ const InventoryTypeListing = ({
           },
         })
         dispatch({
-          type: 'packDetail/updateState',
+          type: 'orderSetDetail/updateState',
           payload: {
             entity: {
               ...values,

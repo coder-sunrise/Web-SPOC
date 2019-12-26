@@ -93,7 +93,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 color='primary'
                 onClick={() => {
                   dispatch({
-                    type: 'packDetail/updateState',
+                    type: 'orderSetDetail/updateState',
                     payload: {
                       entity: undefined,
                       currentId: undefined,
