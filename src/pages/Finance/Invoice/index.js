@@ -23,9 +23,9 @@ import Authorized from '@/utils/Authorized'
         moment().add(-1, 'month'),
         moment(),
       ],
-      isPatientOS: true,
-      isGovtOS: true,
-      isCorporateOS: true,
+      isIncludePatientOS: true,
+      isIncludeGovtOS: true,
+      isIncludeCorporateOS: true,
     }
   },
 })
@@ -34,11 +34,6 @@ class Invoice extends React.Component {
     this.props.dispatch({
       type: 'invoiceList/query',
       payload: {
-        apiCriteria: {
-          isPatientOS: true,
-          isGovtOS: true,
-          isCorporateOS: true,
-        },
         lgteql_invoiceDate: moment().add(-1, 'month').formatUTC(),
         lsteql_invoiceDate: moment().formatUTC(false),
       },
