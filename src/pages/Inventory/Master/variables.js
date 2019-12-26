@@ -34,7 +34,7 @@ export const InventoryMasterOption = (props) => [
   },
   {
     id: 3,
-    name: 'OrderSet',
+    name: 'Order Set',
     content: addContent(4, props),
   },
 ]

@@ -954,7 +954,7 @@ const orderTypes = [
     component: (props) => <Medication openPrescription {...props} />,
   },
   {
-    name: 'OrderSet',
+    name: 'Order Set',
     value: '6',
     component: (props) => <OrderSet {...props} />,
   },

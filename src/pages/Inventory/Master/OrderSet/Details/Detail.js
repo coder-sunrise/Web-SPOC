@@ -50,7 +50,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.orderSet.code',
+                        id: 'inventory.master.orderset.code',
                       })}
                       disabled={!values.isActive}
                       {...args}
@@ -66,7 +66,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.orderSet.name',
+                        id: 'inventory.master.orderset.name',
                       })}
                       {...args}
                     />
@@ -81,7 +81,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.orderSet.description',
+                        id: 'inventory.master.orderset.description',
                       })}
                       {...args}
                     />
@@ -96,7 +96,7 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                   return (
                     <TextField
                       label={formatMessage({
-                        id: 'inventory.master.orderSet.remarks',
+                        id: 'inventory.master.orderset.remarks',
                       })}
                       multiline
                       rowsMax='5'

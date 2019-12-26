@@ -30,7 +30,6 @@ const styles = () => ({
 const Detail = ({
   classes,
   dispatch,
-  pack,
   orderSetDetail,
   history,
   setFieldValue,
@@ -121,7 +120,6 @@ const Detail = ({
   //   return { ...row, unitPrice: sellingPrice }
   // }
 
-  const { currentTab } = pack
   const detailProps = {
     values,
     orderSetDetail,
@@ -227,15 +225,17 @@ const Detail = ({
         >
           Close
         </Button>
-        <ProgressButton submitKey='orderSetDetail/submit' onClick={handleSubmit} />
+        <ProgressButton
+          submitKey='orderSetDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ pack, orderSetDetail, codetable }) => ({
-    pack,
+  connect(({ orderSetDetail, codetable }) => ({
     orderSetDetail,
     codetable,
   })),

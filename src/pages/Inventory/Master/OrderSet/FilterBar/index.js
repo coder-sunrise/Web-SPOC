@@ -57,7 +57,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               return (
                 <Select
                   label={formatMessage({
-                    id: 'inventory.master.OrderSet.status',
+                    id: 'inventory.master.orderset.status',
                   })}
                   options={status}
                   {...args}
