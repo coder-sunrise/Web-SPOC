@@ -127,7 +127,7 @@ const FilterByAppointment = ({ classes, values, setFieldValue }) => {
 
       <GridItem xs={4} className={classes.checkbox}>
         <FastField
-          name='isReminderSent'
+          name='isExcludeReminderSent'
           render={(args) => (
             <Checkbox
               simple
