@@ -39,7 +39,7 @@ const widgets = [
     disabled: true,
     layoutConfig: {
       minW: 12,
-      minH: 10,
+      minH: 7,
       style: {
         padding: '0 5px',
       },

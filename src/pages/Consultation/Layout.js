@@ -1,75 +1,34 @@
-import React, { PureComponent, Suspense } from 'react'
-import { connect } from 'dva'
-import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
+import React, { PureComponent } from 'react'
+import { Responsive, WidthProvider } from 'react-grid-layout'
 
 import _ from 'lodash'
 import $ from 'jquery'
 import classnames from 'classnames'
 
 import { Anchor, Menu, Dropdown } from 'antd'
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Slide,
-  Tooltip,
-  Drawer,
-} from '@material-ui/core'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Delete from '@material-ui/icons/Delete'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
+import { Paper, Divider, Slide, Tooltip, Drawer } from '@material-ui/core'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
-import GetApp from '@material-ui/icons/GetApp'
-import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
+import Accessibility from '@material-ui/icons/Accessibility'
 
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import { headerHeight } from 'mui-pro-jss'
 import {
   CardContainer,
-  TextField,
   Button,
-  CommonHeader,
-  CommonModal,
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
-  notification,
-  Select,
-  DatePicker,
   CheckboxGroup,
   ProgressButton,
-  Checkbox,
-  NumberFormatter,
-  confirm,
   SizeContainer,
   Popconfirm,
-  withFormikExtend,
-  FastField,
-  NumberInput,
-  Skeleton,
   IconButton,
   CustomInputWrapper,
   Fab,
 } from '@/components'
-import { sendNotification } from '@/utils/realtime'
+import PatientHistory from '@/pages/Widgets/PatientHistory'
 import { control } from '@/components/Decorator'
-
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import Authorized from '@/utils/Authorized'
-import { getAppendUrl } from '@/utils/utils'
 import { widgets } from '@/utils/widgets'
-import styles from './style'
 import Templates from './Templates'
 
 const _defaultLayout = [
@@ -188,7 +147,7 @@ class Layout extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-    console.log(defaultLayout)
+
     this.widgetMenu = (
       <Menu>
         {widgets.map((o) => {
@@ -253,6 +212,7 @@ class Layout extends PureComponent {
       showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
+      openPatientHistoryDrawer: false,
     }
   }
 
@@ -401,7 +361,6 @@ class Layout extends PureComponent {
   }
 
   getDefaultLayout = () => {
-    console.log('getDefaultLayout')
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
@@ -449,6 +408,12 @@ class Layout extends PureComponent {
         type: 'cestemplate/query',
       })
     }
+  }
+
+  togglePatientHistoryDrawer = () => {
+    this.setState((prevState) => ({
+      openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
+    }))
   }
 
   compareNodeLayoutChange = (a, b) => {
@@ -518,7 +483,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 114
+    const topHeight = (this.props.height ? 0 : headerHeight) + 168 // 168 = nav header height + patient banner height + anchor height
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,
@@ -534,10 +499,12 @@ class Layout extends PureComponent {
     try {
       if (parentElement && element) {
         const screenPosition = element.getBoundingClientRect()
+        const { scrollTop } = parentElement
         const { top, left } = screenPosition
 
         parentElement.scrollTo({
-          top: top - 172, // top minus Nav header height and Patient Banner height
+          // scrolled top position + element top position - Nav header height and Patient Banner height
+          top: scrollTop + top - 208,
           left,
           behavior: 'smooth',
         })
@@ -645,10 +612,22 @@ class Layout extends PureComponent {
     }
 
     // console.log(this.props)
+    console.log({ widgets })
     return (
       <div>
         {!this.state.fullScreenWidget && (
-          <CardContainer hideHeader>
+          <CardContainer
+            hideHeader
+            style={{
+              marginTop: 0,
+              position: 'sticky',
+              overflowY: 'auto',
+              top: headerHeight + 100,
+              zIndex: 1000,
+              borderRadius: 0,
+              // backgroundColor: '#f0f8ff',
+            }}
+          >
             {state.currentLayout.widgets.map((id) => {
               const w = widgets.find((o) => o.id === id)
               return (
@@ -828,6 +807,24 @@ class Layout extends PureComponent {
                     style={{ marginRight: 8 }}
                     variant='extended'
                     size='small'
+                    onClick={this.togglePatientHistoryDrawer}
+                  >
+                    <Accessibility />
+                  </Fab>
+                </div>
+              </Slide>
+              <Slide
+                direction='up'
+                in={this.state.mode === 'edit'}
+                mountOnEnter
+              >
+                <div>
+                  <Fab
+                    color='secondary'
+                    className={classes.fab}
+                    style={{ marginRight: 8 }}
+                    variant='extended'
+                    size='small'
                     onClick={this.toggleDrawer}
                   >
                     <Settings />
@@ -835,6 +832,18 @@ class Layout extends PureComponent {
                 </div>
               </Slide>
             </div>
+            <Drawer
+              anchor='right'
+              open={this.state.openPatientHistoryDrawer}
+              onClose={this.togglePatientHistoryDrawer}
+            >
+              <div style={{ width: '50vw', padding: theme.spacing(2) }}>
+                <h4>Patient History</h4>
+                <SizeContainer size='sm'>
+                  <PatientHistory {...widgetProps} mode='integrated' />
+                </SizeContainer>
+              </div>
+            </Drawer>
             <Drawer
               anchor='right'
               open={this.state.openDraw}
