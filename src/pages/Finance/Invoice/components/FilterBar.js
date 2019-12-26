@@ -13,6 +13,7 @@ import {
   SizeContainer,
   TextField,
   Select,
+  Checkbox,
 } from '@/components'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
@@ -50,6 +51,9 @@ const FilterBar = ({ classes, dispatch, values }) => {
       invoiceDates,
       outstandingBalanceStatus,
       session,
+      isPatientOS,
+      isGovtOS,
+      isCorporateOS,
     } = values
     let SessionID
     let SessionType
@@ -80,6 +84,9 @@ const FilterBar = ({ classes, dispatch, values }) => {
         apiCriteria: {
           SessionID,
           SessionType,
+          isPatientOS,
+          isGovtOS,
+          isCorporateOS,
         },
         group: [
           {
@@ -119,20 +126,6 @@ const FilterBar = ({ classes, dispatch, values }) => {
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={3}>
-            <FastField
-              name='outstandingBalanceStatus'
-              render={(args) => {
-                return (
-                  <Select
-                    label='O/S Balance'
-                    options={osBalanceStatus}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem>
         </GridContainer>
         <GridContainer>
           <GridItem xs={6} md={3}>
@@ -157,6 +150,44 @@ const FilterBar = ({ classes, dispatch, values }) => {
               )}
             />
           </GridItem>
+        </GridContainer>
+        <GridContainer>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='outstandingBalanceStatus'
+              render={(args) => {
+                return (
+                  <Select
+                    label='O/S Balance'
+                    options={osBalanceStatus}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridContainer md={2}>
+            <GridItem md={4} style={{ marginTop: 30 }}>
+              <FastField
+                name='isPatientOS'
+                render={(args) => <Checkbox simple label='Patient' {...args} />}
+              />
+            </GridItem>
+            <GridItem md={4} style={{ marginTop: 30 }}>
+              <FastField
+                name='isGovtOS'
+                render={(args) => <Checkbox simple label='Govt.' {...args} />}
+              />
+            </GridItem>
+            <GridItem md={4} style={{ marginTop: 30 }}>
+              <FastField
+                name='isCorporateOS'
+                render={(args) => (
+                  <Checkbox simple label='Corporate' {...args} />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
         </GridContainer>
 
         <div className={classes.searchButton}>
