@@ -123,7 +123,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         ]
       }, [])
 
-    row.attachments = updated
+    row.attachments = updated.map((o) => ({ thumbnailData: o.thumbnailData }))
     setAttachments(updated)
     commitChanges({
       changed: {
@@ -145,21 +145,21 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         zoom={1 / 5}
         // custom={row.getShape}
         image={row.attachments}
-        fill={[
-          row.fill,
-          row.fill,
-          row.fill,
-          row.fill,
-          row.fill,
-        ]}
-        symbol={[
-          row.symbol,
-          row.symbol,
-          row.symbol,
-          row.symbol,
-          row.symbol,
-          row.symbol,
-        ]}
+        action={row}
+        fill={{
+          left: row.fill,
+          right: row.fill,
+          top: row.fill,
+          bottom: row.fill,
+          centerfull: row.fill || 'white',
+        }}
+        symbol={{
+          left: row.symbol,
+          right: row.symbol,
+          top: row.symbol,
+          bottom: row.symbol,
+          centerfull: row.symbol,
+        }}
         name={row.text}
       />
     )

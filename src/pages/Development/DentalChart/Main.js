@@ -85,8 +85,19 @@ const styles = (theme) => ({
   toothJournalItemSecondaryAction: {
     paddingRight: theme.spacing(3),
   },
-  toothJournalSecondaryAction: {
-    right: theme.spacing(1),
+  toothJournalItemText: {
+    margin: theme.spacing(0),
+  },
+  // toothJournalSecondaryAction: {
+  //   right: theme.spacing(1),
+  //   display: 'none',
+  // },
+  toothIcon: {
+    minWidth: 'auto',
+  },
+  sortableContainer: {
+    // overflow: 'hidden',
+    // backgroundColor: 'red',
   },
   attachmentContainer: {
     margin: 0,

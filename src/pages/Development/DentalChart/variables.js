@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import color from '@material-ui/core/colors/amber'
+import { Row } from 'antd'
 import clear from '@/assets/img/dentalChart/clear.png'
 import missing from '@/assets/img/dentalChart/missing.png'
 import caries from '@/assets/img/dentalChart/caries.png'
@@ -90,6 +91,7 @@ export const overlayShapeTypes = [
   'bridge',
   'missing',
 ]
+const imageCache = {}
 const checkIsValidElement = (item, name, checker) => {
   if (checker) return checker(item, name)
   if (item.name === name) {
@@ -137,7 +139,7 @@ const makeCircle = (cfg) => {
 }
 let currentSelectedStyle = null
 let currentSelectedGroup = null
-const renderBackgroud = () => {
+export const createRectangle = (cfg) => {
   return new fabric.Rect({
     ...sharedCfg,
     width: baseWidth * 4,
@@ -145,6 +147,7 @@ const renderBackgroud = () => {
     name: 'replaceObject',
     fill: '#ffffff',
     opacity: 1,
+    ...cfg,
   })
 }
 let currentPointer
@@ -505,34 +508,6 @@ const sharedButtonConfig = {
   },
 }
 
-let img1
-
-fabric.Image.fromURL(test, (img) => {
-  // console.log(
-  //   (img.height - strokeWidth * 2) / (baseHeight * 3),
-  //   baseHeight * 3 / img.height,
-  //   img.height,
-  //   baseHeight * 3,
-  // )
-  const img2 = img
-    .set({ left: 0, top: 0 })
-    .scale((baseHeight * 3 + strokeWidth * 2) / img.height)
-  const group = new fabric.Group(
-    [
-      img2,
-    ],
-    {
-      ...addonGroupCfg,
-      isShape: true,
-    },
-  )
-  // img2.set('scaleX', 1)
-  // img2.set('scaleY', 1)
-
-  // group.setZoom(0.5)
-  img1 = group
-})
-
 export const buttonConfigs = [
   {
     id: 1,
@@ -546,27 +521,12 @@ export const buttonConfigs = [
     id: 2,
     value: 'missing',
     text: 'Missing',
-    attachments: [
-      {
-        thumbnailData: missing,
-      },
-    ],
-    getShape: () => {
-      const g = new fabric.Group(
-        [
-          renderBackgroud(),
-        ],
-        {
-          ...addonGroupCfg,
-          isShape: true,
-        },
-      )
-      return g
-    },
+    fill: 'white',
     fixed: true,
     method: 'na',
     isDiagnosis: true,
-    editMode: 'image',
+    editMode: 'color',
+    symbol: '',
   },
   {
     id: 3,
@@ -596,9 +556,7 @@ export const buttonConfigs = [
     id: 6,
     value: 'fractured',
     text: 'Fractured',
-    getShape: () => {
-      return fabric.util.object.clone(img1)
-    },
+
     method: 'tooth',
   },
   {
@@ -622,40 +580,7 @@ export const buttonConfigs = [
     value: 'onlayveneer',
     text: 'Onlay/Veneer',
     ...sharedButtonConfig,
-    getShape: () => {
-      const onlayveneerInner1 = new fabric.Triangle({
-        top: 5,
-        left: baseWidth * 0.5 / 2 + 5,
-        width: baseWidth * 3.5 - 10,
-        height: baseHeight * 3 - 10,
-        // top: baseHeight * 2 + 5,
-        ...sharedCfg,
-        fill: '#cccccc',
-      })
-      const onlayveneerInner2 = new fabric.Triangle({
-        top: baseHeight + 5,
-        left: baseWidth / 2 + 15,
-        width: baseWidth * 2,
-        height: baseHeight * 2 - 10,
-        // top: baseHeight * 3 + 5,
-        ...sharedCfg,
-        fill: '#ffffff',
-      })
-      onlayveneerInner1.rotate(180)
-      onlayveneerInner2.rotate(180)
-      const group = new fabric.Group(
-        [
-          renderBackgroud(),
-          onlayveneerInner1,
-          onlayveneerInner2,
-        ],
-        {
-          ...addonGroupCfg,
-          isShape: true,
-        },
-      )
-      return group
-    },
+
     method: 'tooth',
   },
   {
@@ -664,181 +589,7 @@ export const buttonConfigs = [
     // icon: filling,
     text: 'Bridge',
     type: 'connect',
-    // fill: '#737372',
-    getShape: () => {
-      let line = makeLine([
-        0,
-        -3,
-        baseWidth * 2 + strokeWidth / 2,
-        -3,
-      ])
-      let line2 = makeLine([
-        0,
-        -3,
-        -baseWidth * 2 - strokeWidth / 2,
-        -3,
-      ])
 
-      let c = makeCircle({
-        left: -8,
-        top: -8,
-      })
-      // c.hasControls = c.hasBorders = false
-
-      c.line1 = line
-      c.line2 = line2
-
-      const groupConnect = new fabric.Group(
-        [
-          line,
-          line2,
-          c,
-        ],
-        {
-          ...groupCfg,
-          name: `bridge`,
-          disableAutoReplace: true,
-        },
-      )
-      return groupConnect
-    },
-
-    onSelect: ({ canvas }) => {
-      // let startTarget
-      // let endTarget
-      // let started = false
-      // let line = null
-      // let selected = []
-      // canvas.set('selection', false)
-      // canvas.getObjects('group').map((o) => {
-      //   o.set('selectable', false)
-      //   // o.set('selectable', false)
-      //   const _anchor = makeCircle({
-      //     left: 0,
-      //     top: 0,
-      //     selectable: true,
-      //     name: `${selectablePrefix}_${o.name}_anchor`,
-      //     ...lockConfig,
-      //     lockMovementX: false,
-      //   })
-      //   console.log('add anchor', _anchor)
-      //   o.add(_anchor)
-      //   // canvas.setActiveObject(_anchor, e)
-      //   // canvas.bringToFront(_anchor)
-      //   console.log(o)
-      //   canvas.renderAll()
-      //   // canvas.sendToBack(o)
-      // })
-      // canvas.off('mouse:down')
-      // canvas.on('mouse:down', (e) => {
-      //   started = true
-      //   startTarget = e.target
-      //   console.log(e)
-      //   // const anchor = canvas._objects.find(
-      //   //   (o) => o.name === `${selectablePrefix}anchor`,
-      //   // )
-      //   // if (anchor) {
-      //   //   // canvas.setActiveObject(anchor, e)
-      //   //   anchor.set('left', e.pointer.x)
-      //   //   anchor.setCoords()
-      //   //   canvas.renderAll()
-      //   // }
-      //   if (!line && e.target) {
-      //     // line = makeLine(
-      //     //   [
-      //     //     e.pointer.x,
-      //     //     e.pointer.y,
-      //     //     e.pointer.x,
-      //     //     e.pointer.y,
-      //     //   ],
-      //     //   {
-      //     //     lockMovementX: true,
-      //     //   },
-      //     // )
-      //     // canvas.add(line)
-      //   }
-      // })
-      // canvas.off('mouse:up')
-      // canvas.on('mouse:up', (e) => {
-      //   started = false
-      //   endTarget = e.target
-      //   console.log(e)
-      //   console.log(startTarget, endTarget)
-      // })
-      // canvas.off('object:moving')
-      // canvas.on('object:moving', (e) => {
-      //   console.log('object:moving', e)
-      //   const anchor = canvas._objects.find(
-      //     (o) => o.name === `${selectablePrefix}anchor`,
-      //   )
-      //   if (anchor) {
-      //     if (!selected.find((o) => o === e.target.name)) {
-      //       // selected.
-      //     }
-      //     // canvas.setActiveObject(anchor, e)
-      //     anchor.set('left', e.pointer.x)
-      //     anchor.setCoords()
-      //     canvas.renderAll()
-      //   }
-      // })
-      // canvas.off('mouse:move')
-      // canvas.on('mouse:move', (e) => {
-      //   if (started) {
-      //     const anchor = canvas._objects.find(
-      //       (o) => o.name === `${selectablePrefix}anchor`,
-      //     )
-      //     if (anchor) {
-      //       console.log('mouse:move', e)
-      //       // canvas.setActiveObject(anchor, e)
-      //       anchor.set('left', e.pointer.x)
-      //       anchor.setCoords()
-      //       canvas.renderAll()
-      //     }
-      //   }
-      // })
-      // canvas.off('mouse:over')
-      // canvas.on('mouse:over', (e) => {
-      //   if (e.target) {
-      //     const anchor = canvas._objects.find(
-      //       (o) => o.name === `${selectablePrefix}anchor`,
-      //     )
-      //     if (anchor && !started) {
-      //       // console.log(11)
-      //       // anchor.set({
-      //       //   left: e.target.left + e.target.width / 2 - 8,
-      //       //   top: e.target.top + e.target.height / 2 - 8,
-      //       // })
-      //       // // canvas.setActiveObject(anchor, e)
-      //       // canvas.bringToFront(anchor)
-      //       // canvas.renderAll()
-      //     } else if (
-      //       !canvas._objects.find((o) => o.name === `${selectablePrefix}anchor`)
-      //     ) {
-      //       console.log(22)
-      //       // const _anchor = makeCircle({
-      //       //   left: e.target.left + e.target.width / 2 - 8,
-      //       //   top: e.target.top + e.target.height / 2 - 8,
-      //       //   selectable: true,
-      //       //   name: `${selectablePrefix}anchor`,
-      //       //   ...lockConfig,
-      //       //   lockMovementX: false,
-      //       // })
-      //       // console.log('add anchor', _anchor)
-      //       // canvas.add(_anchor)
-      //       // // canvas.setActiveObject(_anchor, e)
-      //       // canvas.bringToFront(_anchor)
-      //       // canvas.renderAll()
-      //     }
-      //   }
-      // })
-    },
-    onDeselect: ({ canvas }) => {
-      canvas.set('selection', true)
-
-      canvas.getObjects('group').map((o) => {
-        o.set('selectable', true)
-      })
-    },
     method: 'tooth',
   },
   // {
@@ -869,9 +620,9 @@ export const createFont = ({ text, ...restProps }) => {
   })
 }
 export const createToothShape = ({
-  text = [],
-  fill = [],
-  symbol = [],
+  text = {},
+  fill = {},
+  symbol = {},
   index,
   width,
   height,
@@ -884,16 +635,18 @@ export const createToothShape = ({
   custom,
   image,
   canvas,
+  action,
 }) => {
+  // console.log(action)
   const cfg = {
     ...sharedCfg,
     top: baseHeight * 2,
     // strokeUniform: true,
   }
 
-  if (symbol) {
-    // fixedItems.push(g5)
-  }
+  // if (symbol) {
+  //   // fixedItems.push(g5)
+  // }
   // console.log(fixedItems)
   const cCfg = {
     ...groupCfg,
@@ -921,38 +674,59 @@ export const createToothShape = ({
   if (index) {
     cCfg.name = `${index}`
   }
-
-  if (custom) {
-    console.log(custom)
+  const _width = width || groupWidth
+  const _height = height || groupHeight
+  // if (custom) {
+  //   console.log(custom)
+  //   return new fabric.Group(
+  //     [
+  //       typeof custom === 'function' ? custom() : custom,
+  //     ],
+  //     cCfg,
+  //   )
+  // }
+  if (action && action.method === 'tooth' && !image) {
+    // console.log(fill, symbol)
     return new fabric.Group(
       [
-        typeof custom === 'function' ? custom() : custom,
+        createRectangle({
+          fill: action.fill,
+        }),
+        createFont({
+          text: action.symbol,
+          left: _width / 2 - _width / 8,
+          top: _height / 2 - _height / 4,
+          fontSize: _width / 2,
+        }),
       ],
-      cCfg,
+      {
+        ...groupCfg,
+        isShape: true,
+      },
     )
   }
   if (image) {
     const data = image[0] || image
     const { thumbnailData, content } = data
-
+    if (imageCache[action.value]) return imageCache[action.value]
     fabric.Image.fromURL(thumbnailData, (img) => {
-      canvas.add(
-        new fabric.Group(
-          [
-            img.set({
-              left: 0,
-              top: 0,
-              width: width || groupWidth,
-              height: height || groupHeight,
-            }),
-            // .scale((width || groupWidth) / img.width),
-          ],
-          {
-            ...groupCfg,
-            isShape: true,
-          },
-        ),
+      imageCache[action.value] = new fabric.Group(
+        [
+          img.set({
+            left: 0,
+            top: 0,
+            width: width || groupWidth,
+            height: height || groupHeight,
+          }),
+          // .scale((width || groupWidth) / img.width),
+        ],
+        {
+          ...groupCfg,
+          isShape: true,
+        },
       )
+
+      canvas.add(imageCache[action.value])
     })
     return
   }
@@ -965,8 +739,8 @@ export const createToothShape = ({
     ],
     {
       ...cfg,
-      name: text[0],
-      fill: fill[0] || 'white',
+      name: text.left,
+      fill: fill.left || 'white',
     },
   )
 
@@ -980,8 +754,8 @@ export const createToothShape = ({
     {
       ...cfg,
       top: baseHeight * 4,
-      name: text[1],
-      fill: fill[1] || 'white',
+      name: text.bottom,
+      fill: fill.bottom || 'white',
     },
   )
 
@@ -994,8 +768,8 @@ export const createToothShape = ({
     ],
     {
       ...cfg,
-      name: text[2],
-      fill: fill[2] || 'white',
+      name: text.right,
+      fill: fill.right || 'white',
     },
   )
 
@@ -1010,8 +784,8 @@ export const createToothShape = ({
     ],
     {
       ...cfg,
-      name: text[3],
-      fill: fill[3] || 'white',
+      name: text.top,
+      fill: fill.top || 'white',
     },
   )
 
@@ -1019,12 +793,12 @@ export const createToothShape = ({
     [
       polygon,
       createFont({
-        text: text[0],
+        text: text.left,
         left: baseWidth / 2 - innerFontSize / 4,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
       createFont({
-        text: symbol[0],
+        text: symbol.left,
         left: baseWidth / 2 - innerFontSize / 3,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
@@ -1032,7 +806,7 @@ export const createToothShape = ({
     {
       ...groupCfg,
       name: `${cellPrefix}left`,
-      target: text[0],
+      target: text.left,
       toothIndex: index,
       top: baseHeight * 2,
       // left: 0 - groupWidth / 2,
@@ -1044,12 +818,12 @@ export const createToothShape = ({
     [
       polygon2,
       createFont({
-        text: text[1],
+        text: text.bottom,
         left: baseWidth * 2 - innerFontSize / 4,
         top: baseHeight * 5 - innerFontSize * 1.5,
       }),
       createFont({
-        text: symbol[1],
+        text: symbol.bottom,
         left: baseWidth * 2 - innerFontSize / 4 - 3,
         top: baseHeight * 5 - innerFontSize * 1.5,
       }),
@@ -1057,7 +831,7 @@ export const createToothShape = ({
     {
       ...groupCfg,
       name: `${cellPrefix}bottom`,
-      target: text[1],
+      target: text.bottom,
       toothIndex: index,
       top: baseHeight * 4,
     },
@@ -1066,12 +840,12 @@ export const createToothShape = ({
     [
       polygon3,
       createFont({
-        text: text[2],
-        left: baseWidth * 4 - innerFontSize,
+        text: text.right,
+        left: baseWidth * 4 - innerFontSize * 1.1,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
       createFont({
-        text: symbol[2],
+        text: symbol.right,
         left: baseWidth * 4 - innerFontSize,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
@@ -1079,7 +853,7 @@ export const createToothShape = ({
     {
       ...groupCfg,
       name: `${cellPrefix}right`,
-      target: text[2],
+      target: text.right,
       toothIndex: index,
       top: baseHeight * 2,
     },
@@ -1088,12 +862,12 @@ export const createToothShape = ({
     [
       polygon4,
       createFont({
-        text: text[3],
+        text: text.top,
         left: baseWidth * 2 - innerFontSize / 4,
         top: baseHeight * 2 + innerFontSize / 2,
       }),
       createFont({
-        text: symbol[3],
+        text: symbol.top,
         left: baseWidth * 2 - innerFontSize / 4 - 3,
         top: baseHeight * 2 + innerFontSize / 2,
       }),
@@ -1101,7 +875,7 @@ export const createToothShape = ({
     {
       ...groupCfg,
       name: `${cellPrefix}top`,
-      target: text[3],
+      target: text.top,
       toothIndex: index,
       top: baseHeight * 2,
     },
@@ -1109,123 +883,121 @@ export const createToothShape = ({
   let g5
   let g6
   let g7
-  if (text) {
-    if (text[5]) {
-      const polygon5 = new fabric.Polygon( // center left
-        [
-          { x: baseWidth, y: baseHeight },
+  if (!fill.centerfull && !text.centerfull) {
+    const polygon5 = new fabric.Polygon( // center left
+      [
+        { x: baseWidth, y: baseHeight },
 
-          { x: baseWidth, y: baseHeight * 2 },
+        { x: baseWidth, y: baseHeight * 2 },
 
-          { x: baseWidth * 2, y: baseHeight * 2 },
-          { x: baseWidth * 2, y: baseHeight },
-        ],
-        {
-          ...cfg,
-          top: baseHeight * 3,
-          name: text[4],
-          fill: fill[4] || 'white',
-        },
-      )
-      const polygon6 = new fabric.Polygon( // center right
-        [
-          { x: baseWidth * 2, y: baseHeight },
+        { x: baseWidth * 2, y: baseHeight * 2 },
+        { x: baseWidth * 2, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerLeft,
+        fill: fill.centerLeft || 'white',
+      },
+    )
+    const polygon6 = new fabric.Polygon( // center right
+      [
+        { x: baseWidth * 2, y: baseHeight },
 
-          { x: baseWidth * 2, y: baseHeight * 2 },
+        { x: baseWidth * 2, y: baseHeight * 2 },
 
-          { x: baseWidth * 3, y: baseHeight * 2 },
-          { x: baseWidth * 3, y: baseHeight },
-        ],
-        {
-          ...cfg,
-          top: baseHeight * 3,
-          name: text[5],
-          fill: fill[5] || 'white',
-        },
-      )
-      g5 = new fabric.Group(
-        [
-          polygon5,
-          createFont({
-            text: text[4],
-            left: baseWidth / 2 + baseWidth - innerFontSize / 4,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-          createFont({
-            text: symbol[4],
-            left: baseWidth / 2 + baseWidth - innerFontSize / 4,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-        ],
-        {
-          ...groupCfg,
-          toothIndex: index,
-          target: text[4],
-          name: `${cellPrefix}centerLeft`,
-          fill: fill[4] || 'white',
-        },
-      )
-      g6 = new fabric.Group(
-        [
-          polygon6,
-          createFont({
-            text: text[5],
-            left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-          createFont({
-            text: symbol[5],
-            left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-        ],
-        {
-          ...groupCfg,
-          toothIndex: index,
-          target: text[5],
-          name: `${cellPrefix}centerRight`,
-          fill: fill[5] || 'white',
-        },
-      )
-    } else {
-      const polygon7 = new fabric.Polygon( // center
-        [
-          { x: baseWidth, y: baseHeight },
+        { x: baseWidth * 3, y: baseHeight * 2 },
+        { x: baseWidth * 3, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerRight,
+        fill: fill.centerRight || 'white',
+      },
+    )
+    g5 = new fabric.Group(
+      [
+        polygon5,
+        createFont({
+          text: text.centerLeft,
+          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerLeft,
+          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerLeft,
+        name: `${cellPrefix}centerLeft`,
+        fill: fill.centerLeft || 'white',
+      },
+    )
+    g6 = new fabric.Group(
+      [
+        polygon6,
+        createFont({
+          text: text.centerRight,
+          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerRight,
+          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerRight,
+        name: `${cellPrefix}centerRight`,
+        fill: fill.centerRight || 'white',
+      },
+    )
+  } else {
+    const polygon7 = new fabric.Polygon( // center
+      [
+        { x: baseWidth, y: baseHeight },
 
-          { x: baseWidth, y: baseHeight * 2 },
+        { x: baseWidth, y: baseHeight * 2 },
 
-          { x: baseWidth * 3, y: baseHeight * 2 },
-          { x: baseWidth * 3, y: baseHeight },
-        ],
-        {
-          ...cfg,
-          top: baseHeight * 3,
-          name: text[4],
-          fill: fill[4] || 'white',
-        },
-      )
-      g7 = new fabric.Group(
-        [
-          polygon7,
-          createFont({
-            text: text[4],
-            left: baseWidth * 2 - innerFontSize / 4,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-          createFont({
-            text: symbol[4],
-            left: baseWidth * 2 - innerFontSize / 4 - 3,
-            top: baseHeight * 3.5 - innerFontSize / 2,
-          }),
-        ],
-        {
-          ...groupCfg,
-          toothIndex: index,
-          target: text[4],
-          name: `${cellPrefix}centerfull`,
-        },
-      )
-    }
+        { x: baseWidth * 3, y: baseHeight * 2 },
+        { x: baseWidth * 3, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerfull,
+        fill: fill.centerfull || 'white',
+      },
+    )
+    g7 = new fabric.Group(
+      [
+        polygon7,
+        createFont({
+          text: text.centerfull,
+          left: baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerfull,
+          left: baseWidth * 2 - innerFontSize / 4 - 3,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerfull,
+        name: `${cellPrefix}centerfull`,
+      },
+    )
   }
   const fixedItems = [
     // headerText,

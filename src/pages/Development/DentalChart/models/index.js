@@ -9,6 +9,7 @@ const updateData = (data, payload) => {
   const {
     toothIndex,
     value,
+    action,
     target,
     forceSelect,
     name,
@@ -17,6 +18,7 @@ const updateData = (data, payload) => {
   } = payload
   // console.log(payload)
   // if (!name) return data
+  // console.log(action)
   const exist = data.find(
     (o) =>
       o.toothIndex === toothIndex &&
@@ -88,16 +90,16 @@ export default createFormViewModel({
     state: {
       showPedo: false,
       data: [
-        {
-          id: 'system-id-1',
-          toothIndex: 11,
-          value: 'topcell',
-        },
-        {
-          value: 'onlayveneer',
-          toothIndex: 17,
-          id: 'sys-gen--231',
-        },
+        // {
+        //   id: 'system-id-1',
+        //   toothIndex: 11,
+        //   value: 'topcell',
+        // },
+        // {
+        //   value: 'onlayveneer',
+        //   toothIndex: 17,
+        //   id: 'sys-gen--231',
+        // },
       ],
     },
     subscriptions: ({ dispatch, history }) => {},

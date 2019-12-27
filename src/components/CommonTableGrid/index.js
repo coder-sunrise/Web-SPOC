@@ -286,10 +286,10 @@ class CommonTableGrid extends PureComponent {
         return <DragableRow {...rowProps} index={index} />
       }
       const onSortEnd = ({ newIndex, oldIndex }) => {
-        console.log(newIndex, oldIndex)
+        // console.log(newIndex, oldIndex)
         const rows=this.getData()
         const newRows = arrayMove(rows, oldIndex, newIndex)
-        console.log(rows,newRows)
+        // console.log(rows,newRows)
         if(onRowDrop)onRowDrop(newRows)
         // const newRows = arrayMove(dataSource, oldIndex, newIndex)
         // onRowDrop(newRows)

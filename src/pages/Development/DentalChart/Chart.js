@@ -43,6 +43,7 @@ import {
   groupHeight,
   createToothShape,
   createFont,
+  createRectangle,
 } from './variables'
 
 const { fabric } = require('fabric')
@@ -65,21 +66,21 @@ const styles = (theme) => ({
     display: 'block',
   },
 })
-const text1 = [
-  'd',
-  'p',
-  'm',
-  'b',
-  'o',
-  'o',
-]
-const text2 = [
-  'd',
-  'p',
-  'm',
-  'b',
-  'i',
-]
+const text1 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text2 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerfull: 'i',
+}
 const debouncedAction = _.debounce(
   (cb) => {
     cb()
@@ -544,6 +545,7 @@ class Chart extends React.Component {
     const groups = _.groupBy(this.configs, 'line')
     Object.keys(groups).forEach((k) => {
       groups[k].map((o, order) => {
+        // console.log(o, this.props)
         this.addGroup({
           ...o,
           order,
@@ -944,6 +946,7 @@ class Chart extends React.Component {
     height,
     width,
   }) => {
+    // console.log(text, index, order, width, height, left, line, posAjustTop)
     this.canvas.add(
       createToothShape({
         text,
@@ -1086,7 +1089,7 @@ class Chart extends React.Component {
         // console.log(o)
         const target = rows.find((m) => m.value === o.value)
         if (target) {
-          // console.log(target)
+          // console.log(target, o, group)
 
           // if (target.getShape && o.target === group.name) {
           //   // console.log('getShape')
@@ -1151,6 +1154,44 @@ class Chart extends React.Component {
                 ),
               )
             }
+          } else if (
+            [
+              'tooth',
+              'na',
+            ].includes(target.method) &&
+            (target.editMode === 'color' || !target.editMode)
+          ) {
+            let shape = null
+            // console.log(o)
+            if (o.subTarget === 'tooth') {
+              shape = new fabric.Group([
+                createRectangle({
+                  fill: target.fill,
+                }),
+                createFont({
+                  text: target.symbol || '',
+                  left: groupWidth / 2 - innerFontSize / 1.8,
+                  top: groupHeight / 2 - innerFontSize,
+                  fontSize: innerFontSize * 2,
+                }),
+              ])
+            } else {
+              shape = fabric.util.object.clone(group._objects[0])
+              shape._objects[0].set('fill', target.fill)
+              shape._objects[2].set('text', target.symbol || '')
+            }
+            group.add(
+              new fabric.Group(
+                [
+                  shape,
+                ],
+                {
+                  ...addonGroupCfg,
+                  isShape: true,
+                  name: o.value,
+                },
+              ),
+            )
           } else if (target.type === 'cell') {
             // console.log(group.filter((n) => n.isValidCell()), o)
             // console.log(group)
@@ -1158,7 +1199,7 @@ class Chart extends React.Component {
               .filter((n) => n.isValidCell())
               .find((t) => t.name === o.subTarget)
             if (cell) {
-              console.log(target, cell, group)
+              // console.log(target, cell, group)
               cell._objects[0].set('fill', target.fill)
               if (
                 cell._objects[2] &&
@@ -1244,6 +1285,7 @@ class Chart extends React.Component {
           payload: {
             toothIndex: group.index || item.toothIndex,
             value: action.value,
+            action,
             target: group.name,
             subTarget: item.name,
             forceSelect: select,
@@ -1269,11 +1311,12 @@ class Chart extends React.Component {
           type: 'dentalChartComponent/toggleMultiSelect',
           payload: ary.map(({ group, item = {}, select }) => {
             // console.log(item)
-            console.log(group, group.name)
+            // console.log(group, group.name)
 
             return {
               toothIndex: group.index || item.toothIndex,
               value: action.value,
+              action,
               target: group.name,
               subTarget: item.name,
               forceSelect: select,

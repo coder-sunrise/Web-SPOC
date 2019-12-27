@@ -89,7 +89,7 @@ export default function ButtonGroup (props) {
   //     left: 0,
   //   },
   // }
-  console.log(rows)
+  // console.log(rows)
   // console.log(theme.props)
   return (
     <div>
@@ -137,21 +137,21 @@ export default function ButtonGroup (props) {
                       paddingTop={1}
                       zoom={1 / 5}
                       image={row.attachments}
-                      fill={[
-                        row.fill,
-                        row.fill,
-                        row.fill,
-                        row.fill,
-                        row.fill,
-                      ]}
-                      symbol={[
-                        row.symbol,
-                        row.symbol,
-                        row.symbol,
-                        row.symbol,
-                        row.symbol,
-                        row.symbol,
-                      ]}
+                      action={row}
+                      fill={{
+                        left: row.fill,
+                        right: row.fill,
+                        top: row.fill,
+                        bottom: row.fill,
+                        centerfull: row.fill || 'white',
+                      }}
+                      symbol={{
+                        left: row.symbol,
+                        right: row.symbol,
+                        top: row.symbol,
+                        bottom: row.symbol,
+                        centerfull: row.symbol,
+                      }}
                       name={row.text}
                     />
                     <span style={{ marginLeft: groupWidth / 5 + 20 }}>
