@@ -1,11 +1,12 @@
+import { CLINIC_SPECIALIST } from '@/utils/constants'
 import defaultConfigs, { dentalConfigs } from './config'
 
 export const getConfig = (clinicInfo) => {
-  const { clinicSpecialist = 'GP' } = clinicInfo
+  const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
   switch (clinicSpecialist) {
-    case 'GP':
+    case CLINIC_SPECIALIST.GP:
       return defaultConfigs
-    case 'Dental':
+    case CLINIC_SPECIALIST.DENTAL:
       return defaultConfigs
     default:
       return defaultConfigs

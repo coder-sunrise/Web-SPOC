@@ -25,6 +25,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
+import gpWidgets from './config'
 
 import model from './models'
 
@@ -134,104 +135,105 @@ class PatientHistory extends Component {
 
   constructor (props) {
     super(props)
-    this.widgets = [
-      {
-        id: '1',
-        name: 'Clinical Notes',
-        component: Loadable({
-          loader: () => import('./ClinicalNotes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
-        name: 'Chief Complaints',
-        component: Loadable({
-          loader: () => import('./ChiefComplaints'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '3',
-        name: 'Plan',
-        component: Loadable({
-          loader: () => import('./Plan'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '4',
-        name: 'Diagnosis',
-        component: Loadable({
-          loader: () => import('./Diagnosis'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '5',
-        name: 'Orders',
-        component: Loadable({
-          loader: () => import('./Orders'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
-        name: 'Consultation Document',
-        component: Loadable({
-          loader: () => import('./ConsultationDocument'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      // {
-      //   id: '6',
-      //   name: 'Result History',
-      //   component: Loadable({
-      //     loader: () => import('./ResultHistory'),
-      //     render: (loaded, p) => {
-      //       let Cmpnet = loaded.default
-      //       return <Cmpnet {...props} {...p} />
-      //     },
-      //     loading: Loading,
-      //   }),
-      // },
-      {
-        id: '7',
-        name: 'Invoice',
-        component: Loadable({
-          loader: () => import('./Invoice'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-    ]
+    this.widgets = gpWidgets(props)
+    // this.widgets = [
+    //   {
+    //     id: '1',
+    //     name: 'Clinical Notes',
+    //     component: Loadable({
+    //       loader: () => import('./ClinicalNotes'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   {
+    //     id: '2',
+    //     name: 'Chief Complaints',
+    //     component: Loadable({
+    //       loader: () => import('./ChiefComplaints'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   {
+    //     id: '3',
+    //     name: 'Plan',
+    //     component: Loadable({
+    //       loader: () => import('./Plan'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   {
+    //     id: '4',
+    //     name: 'Diagnosis',
+    //     component: Loadable({
+    //       loader: () => import('./Diagnosis'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   {
+    //     id: '5',
+    //     name: 'Orders',
+    //     component: Loadable({
+    //       loader: () => import('./Orders'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   {
+    //     id: '6',
+    //     name: 'Consultation Document',
+    //     component: Loadable({
+    //       loader: () => import('./ConsultationDocument'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    //   // {
+    //   //   id: '6',
+    //   //   name: 'Result History',
+    //   //   component: Loadable({
+    //   //     loader: () => import('./ResultHistory'),
+    //   //     render: (loaded, p) => {
+    //   //       let Cmpnet = loaded.default
+    //   //       return <Cmpnet {...props} {...p} />
+    //   //     },
+    //   //     loading: Loading,
+    //   //   }),
+    //   // },
+    //   {
+    //     id: '7',
+    //     name: 'Invoice',
+    //     component: Loadable({
+    //       loader: () => import('./Invoice'),
+    //       render: (loaded, p) => {
+    //         let Cmpnet = loaded.default
+    //         return <Cmpnet {...props} {...p} />
+    //       },
+    //       loading: Loading,
+    //     }),
+    //   },
+    // ]
   }
 
   componentWillMount () {

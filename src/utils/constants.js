@@ -222,3 +222,8 @@ export const SCRIBBLE_NOTE_TYPE = {
   CHIEFCOMPLAINTS: 2,
   PLAN: 3,
 }
+
+export const CLINIC_SPECIALIST = {
+  GP: 'GP',
+  DENTAL: 'DENTAL',
+}

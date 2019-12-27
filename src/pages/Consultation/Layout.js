@@ -35,6 +35,7 @@ import Templates from './Templates'
 // utils
 import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { CLINIC_SPECIALIST } from '@/utils/constants'
 
 // const _defaultLayout = [
 //   {
@@ -138,9 +139,9 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { clinicSpecialist = 'GP' } = clinicInfo
+    const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
     this.pageDefaultWidgets = gpLayoutCfg
-    if (clinicSpecialist === 'Dental') {
+    if (clinicSpecialist === CLINIC_SPECIALIST.DENTAL) {
       this.pageDefaultWidgets = dentalLayoutCfg
     }
 
@@ -673,7 +674,7 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                // console.log(cfg, w)
+                console.log({ cfg, w })
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
 

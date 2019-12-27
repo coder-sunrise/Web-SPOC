@@ -2,8 +2,6 @@ import React, { PureComponent } from 'react'
 import classnames from 'classnames'
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
-import { orderTypes } from '@/utils/codes'
-import { VISIT_TYPE } from '@/utils/constants'
 import {
   Button,
   GridContainer,
@@ -19,6 +17,9 @@ import Service from './Service'
 import Consumable from './Consumable'
 import Package from './Package'
 // import Others from './Others'
+// utils
+import { orderTypes } from '@/utils/codes'
+import { VISIT_TYPE, CLINIC_SPECIALIST } from '@/utils/constants'
 
 const styles = (theme) => ({
   editor: {
@@ -171,7 +172,8 @@ class Details extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, orders, dispatch, fromDispense } = props
+    const { classes, orders, dispatch, clinicInfo, fromDispense } = props
+    const { clinicSpecialist = 'GP ' } = clinicInfo
     const { type } = orders
 
     const cfg = {
@@ -190,6 +192,13 @@ class Details extends PureComponent {
         (o) => o.value !== '2' && o.value !== '6',
       )
     }
+
+    if (clinicSpecialist === CLINIC_SPECIALIST.DENTAL) {
+      orderTypeArray = orderTypes.filter(
+        (o) => o.value === '1' || o.value === '4',
+      )
+    }
+
     return (
       <div>
         <div className={classes.detail}>
