@@ -106,9 +106,9 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          // sendNotification('QueueListing', {
-          //   message: `Dispense started`,
-          // })
+          sendNotification('QueueListing', {
+            message: `Dispense Started`,
+          })
         }
         return response
       },
@@ -135,7 +135,7 @@ export default createFormViewModel({
 
         if (response) {
           sendNotification('QueueListing', {
-            message: `Dispense discarded`,
+            message: `Dispense Discarded`,
           })
         }
         return response
@@ -149,6 +149,9 @@ export default createFormViewModel({
               toBillingPage: true,
             },
           })
+        sendNotification('QueueListing', {
+          message: 'Dispense Finalized',
+        })
         return response
       },
       *unlock ({ payload }, { call }) {
@@ -213,6 +216,9 @@ export default createFormViewModel({
         const response = yield call(service.removeAddOrderDetails, payload)
         if (response === 204) {
           notification.success({ message: 'Retail visit discarded' })
+          sendNotification('QueueListing', {
+            message: 'Retail Visit Discarded',
+          })
           return true
         }
         return false
@@ -221,6 +227,9 @@ export default createFormViewModel({
         const response = yield call(service.removeBillFirstVisit, payload)
         if (response === 204) {
           notification.success({ message: 'Bill-First visit discarded' })
+          sendNotification('QueueListing', {
+            message: 'Bill-First Visit Discarded',
+          })
           return true
         }
         return false
