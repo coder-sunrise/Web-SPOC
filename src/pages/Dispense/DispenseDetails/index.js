@@ -205,6 +205,7 @@ const DispenseDetails = ({
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
   const disableRefreshOrder = isBillFirstVisit && !values.clinicalObjectRecordFK
+  const disableDiscard = totalPayment > 0 || !!values.clinicalObjectRecordFK
 
   return (
     <React.Fragment>
@@ -265,7 +266,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Delete />}
                 onClick={discardDispense}
-                disabled={totalPayment > 0}
+                disabled={disableDiscard}
               >
                 Discard
               </ProgressButton>
