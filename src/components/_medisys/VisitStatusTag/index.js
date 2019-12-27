@@ -4,7 +4,7 @@ import color from 'color'
 import { withStyles } from '@material-ui/core'
 // variables
 import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, VISIT_TYPE_NAME } from '@/utils/constants'
 
 const styles = () => ({
   container: {
@@ -98,10 +98,18 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
     [classes[colorTag]]: true,
   }
 
+  const visitType = VISIT_TYPE_NAME.find(
+    (o) => o.visitPurposeFK === visitPurposeFK,
+  )
+
   return (
     <div className={classnames(cssClass)} onClick={handleClick}>
       <span>
-        {visitPurposeFK === VISIT_TYPE.RETAIL ? `${value} (RETAIL)` : value}
+        {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
+          `${value} (${visitType.displayName})`
+        ) : (
+          value
+        )}
       </span>
     </div>
   )
