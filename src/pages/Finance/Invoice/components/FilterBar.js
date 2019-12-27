@@ -63,7 +63,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
     }
 
     let { isIncludePatientOS, isIncludeGovtOS, isIncludeCorporateOS } = values
-    let isOSGreaterZero
+    let isHasOutstanding
     if (
       outstandingBalanceStatus === undefined ||
       outstandingBalanceStatus === 'all'
@@ -71,11 +71,11 @@ const FilterBar = ({ classes, dispatch, values }) => {
       isIncludePatientOS = false
       isIncludeGovtOS = false
       isIncludeCorporateOS = false
-      isOSGreaterZero = undefined
+      isHasOutstanding = undefined
     } else if (outstandingBalanceStatus === 'yes') {
-      isOSGreaterZero = true
+      isHasOutstanding = true
     } else {
-      isOSGreaterZero = false
+      isHasOutstanding = false
     }
     dispatch({
       type: 'invoiceList/query',
@@ -90,7 +90,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
           isIncludePatientOS,
           isIncludeGovtOS,
           isIncludeCorporateOS,
-          isOSGreaterZero,
+          isHasOutstanding,
         },
         group: [
           {
