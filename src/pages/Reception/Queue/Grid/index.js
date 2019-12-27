@@ -450,7 +450,7 @@ const Grid = ({
               ...QueueColumnExtensions,
               {
                 columnName: 'visitStatus',
-                width: 180,
+                width: 190,
                 render: (row) => (
                   <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
@@ -481,7 +481,7 @@ const Grid = ({
               ...ApptColumnExtensions,
               {
                 columnName: 'visitStatus',
-                width: 180,
+                width: 190,
                 render: (row) => (
                   <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
