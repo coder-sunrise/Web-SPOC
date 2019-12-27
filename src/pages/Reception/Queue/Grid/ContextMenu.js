@@ -51,7 +51,6 @@ const styles = (theme) => ({
 })
 
 const ContextMenu = ({ show, row, handleClick, classes }) => {
-  console.log({ row })
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
