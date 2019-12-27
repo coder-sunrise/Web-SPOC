@@ -97,12 +97,12 @@ export default {
   'reception.queue.dispense.consumableItem.consumable': 'Consumable',
   'reception.queue.dispense.consumableItem.remarks': 'Remarks',
 
-  'reception.queue.dispense.packageItem.package': 'Package',
-  'reception.queue.dispense.packageItem.packageType': 'Package Type',
-  'reception.queue.dispense.packageItem.expireDate': 'Expire Date',
-  'reception.queue.dispense.packageItem.credit': 'Credit',
-  'reception.queue.dispense.packageItem.price': 'Price',
-  'reception.queue.dispense.packageItem.options': 'Options',
+  'reception.queue.dispense.orderSetItem.orderSet': 'Order Set',
+  'reception.queue.dispense.orderSetItem.orderSetType': 'Order Set Type',
+  'reception.queue.dispense.orderSetItem.expireDate': 'Expire Date',
+  'reception.queue.dispense.orderSetItem.credit': 'Credit',
+  'reception.queue.dispense.orderSetItem.price': 'Price',
+  'reception.queue.dispense.orderSetItem.options': 'Options',
 
   'reception.queue.dispense.otherItem.openCode': 'Open Code',
   'reception.queue.dispense.otherItem.description': 'Description',

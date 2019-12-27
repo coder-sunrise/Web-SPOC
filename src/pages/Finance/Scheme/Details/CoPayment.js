@@ -74,9 +74,9 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
         'ExactAmount',
       )
 
-      setFieldValue('itemGroupValueDto.packageGroupValue.itemGroupValue', 0)
+      setFieldValue('itemGroupValueDto.orderSetGroupValue.itemGroupValue', 0)
       setFieldValue(
-        'itemGroupValueDto.packageGroupValue.groupValueType',
+        'itemGroupValueDto.OrderSetGroupValue.groupValueType',
         'ExactAmount',
       )
     }
@@ -90,7 +90,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
         setFieldValue('itemGroupValueDto.consumableGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.vaccinationGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.serviceGroupValue.isDeleted', true)
-        setFieldValue('itemGroupValueDto.packageGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.orderSetGroupValue.isDeleted', true)
       }
     }
   }
@@ -221,7 +221,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           render={CPSwitch('sub')}
         /> */}
         <Field
-          name='itemGroupValueDto.packageGroupValue.groupValueType'
+          name='itemGroupValueDto.orderSetGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
       </GridItem>
