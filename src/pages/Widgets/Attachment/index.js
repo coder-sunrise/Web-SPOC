@@ -106,9 +106,9 @@ class Attachment extends Component {
       onConfirmDelete: () => {},
       onClickAttachment: this.handleClickAttachment,
     }
-    const { consultation, values } = parentProps
+    const { consultation } = parentProps
     const { corAttachment = [] } = consultation.entity || consultation.default
-    console.log({ values, state: this.state })
+
     return (
       <div>
         <FastField
@@ -125,22 +125,34 @@ class Attachment extends Component {
 
         <CardContainer hideHeader>
           <h5>Visit Attachment</h5>
-          {visitAttachment.map((attachment) => (
-            <Thumbnail attachment={attachment} {...commonProps} />
+          {visitAttachment.map((attachment, index) => (
+            <Thumbnail
+              key={`attachment-${index}`}
+              attachment={attachment}
+              {...commonProps}
+            />
           ))}
         </CardContainer>
 
         <CardContainer hideHeader>
           <h5>Referral Attachment</h5>
-          {referralAttachment.map((attachment) => (
-            <Thumbnail attachment={attachment} {...commonProps} />
+          {referralAttachment.map((attachment, index) => (
+            <Thumbnail
+              key={`attachment-${index}`}
+              attachment={attachment}
+              {...commonProps}
+            />
           ))}
         </CardContainer>
 
         <CardContainer hideHeader>
           <h5>Clinical Notes Attachment</h5>
-          {clinicalNotesAttachment.map((attachment) => (
-            <Thumbnail attachment={attachment} {...commonProps} />
+          {clinicalNotesAttachment.map((attachment, index) => (
+            <Thumbnail
+              key={`attachment-${index}`}
+              attachment={attachment}
+              {...commonProps}
+            />
           ))}
         </CardContainer>
       </div>

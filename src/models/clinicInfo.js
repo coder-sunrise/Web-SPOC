@@ -62,7 +62,7 @@ export default createFormViewModel({
         }
         const clinicInfo = {
           ...data,
-          clinicSpecialist: CLINIC_SPECIALIST.GP,
+          clinicSpecialist: CLINIC_SPECIALIST.DENTAL,
           contact: data.contact ? data.contact : contact,
         }
 

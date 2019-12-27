@@ -29,7 +29,7 @@ import {
   Fab,
 } from '@/components'
 // sub components
-import PatientHistory from '@/pages/Widgets/PatientHistory'
+import PatientHistoryDrawer from './PatientHistoryDrawer'
 import { control } from '@/components/Decorator'
 import Templates from './Templates'
 // utils
@@ -674,7 +674,7 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                console.log({ cfg, w })
+
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
 
@@ -852,12 +852,17 @@ class Layout extends PureComponent {
               open={this.state.openPatientHistoryDrawer}
               onClose={this.togglePatientHistoryDrawer}
             >
-              <div style={{ width: '50vw', padding: theme.spacing(2) }}>
+              <PatientHistoryDrawer
+                {...widgetProps}
+                onClose={this.togglePatientHistoryDrawer}
+              />
+              {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
                 <h4>Patient History</h4>
+                <Button />
                 <SizeContainer size='sm'>
                   <PatientHistory {...widgetProps} mode='integrated' />
                 </SizeContainer>
-              </div>
+              </div> */}
             </Drawer>
             <Drawer
               anchor='right'
