@@ -13,6 +13,7 @@ import {
   GridItem,
   OutlinedTextField,
   SizeContainer,
+  TextField,
   Tooltip,
 } from '@/components'
 import { DeleteWithPopover } from '@/components/_medisys'
@@ -29,6 +30,7 @@ import {
 const styles = (theme) => ({
   simpleRoot: {
     position: 'relative',
+    display: 'inline-block',
     textAlign: 'center',
     minWidth: 64,
     // margin: 8,
@@ -44,6 +46,7 @@ const styles = (theme) => ({
     },
   },
   root: {
+    display: 'inline-block',
     textAlign: 'left',
     width: 140,
     margin: 8,
@@ -189,7 +192,12 @@ const Thumbnail = ({
             <FastField
               name={`visitAttachment[${index}].remark`}
               render={(args) => (
-                <OutlinedTextField {...args} size='sm' label='Remark' />
+                <OutlinedTextField
+                  {...args}
+                  size='sm'
+                  label='Remark'
+                  disabled={isReadOnly}
+                />
               )}
             />
           </SizeContainer>

@@ -31,6 +31,7 @@ const AttachmentWithThumbnail = ({
   label,
   handleUpdateAttachments,
   isReadOnly,
+  buttonOnly = false,
   attachments = [],
   filterTypes = [],
   allowedMultiple = true,
@@ -237,6 +238,8 @@ const AttachmentWithThumbnail = ({
         <Thumbnail index={index} attachment={attachment} {...commonProps} />
       )
     })
+
+  if (buttonOnly) Body = null
 
   return (
     <div className={classes.root}>

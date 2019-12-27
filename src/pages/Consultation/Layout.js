@@ -1,11 +1,12 @@
 import React, { PureComponent } from 'react'
-import { Responsive, WidthProvider } from 'react-grid-layout'
-
+import classnames from 'classnames'
 import _ from 'lodash'
 import $ from 'jquery'
-import classnames from 'classnames'
-
+// react-grid-layout
+import { Responsive, WidthProvider } from 'react-grid-layout'
+// antd
 import { Anchor, Menu, Dropdown } from 'antd'
+// material ui
 import { Paper, Divider, Slide, Tooltip, Drawer } from '@material-ui/core'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
@@ -15,6 +16,7 @@ import CompareArrows from '@material-ui/icons/CompareArrows'
 import Accessibility from '@material-ui/icons/Accessibility'
 
 import { headerHeight } from 'mui-pro-jss'
+// common components
 import {
   CardContainer,
   Button,
@@ -26,82 +28,85 @@ import {
   CustomInputWrapper,
   Fab,
 } from '@/components'
+// sub components
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import { control } from '@/components/Decorator'
-import { widgets } from '@/utils/widgets'
 import Templates from './Templates'
+// utils
+import { widgets } from '@/utils/widgets'
+import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 
-const _defaultLayout = [
-  {
-    id: '1',
-    config: {
-      lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '4',
-    config: {
-      lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '2',
-    config: {
-      lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
-      sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '7',
-    config: {
-      lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
-      sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '3',
-    config: {
-      lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
-      md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
-      sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
-      xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
-    },
-  },
+// const _defaultLayout = [
+//   {
+//     id: '1',
+//     config: {
+//       lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '4',
+//     config: {
+//       lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '2',
+//     config: {
+//       lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
+//       md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
+//       sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
+//       xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
+//       xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '7',
+//     config: {
+//       lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
+//       md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
+//       sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
+//       xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
+//       xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '3',
+//     config: {
+//       lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
+//       md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
+//       sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
+//     },
+//   },
 
-  {
-    id: '5',
-    config: {
-      lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
+//   {
+//     id: '5',
+//     config: {
+//       lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
 
-  // {
-  //   id: '1002',
-  //   config: {
-  //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-  //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
-  //   },
-  // },
-]
+//   // {
+//   //   id: '1002',
+//   //   config: {
+//   //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+//   //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+//   //   },
+//   // },
+// ]
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
@@ -131,10 +136,16 @@ class Layout extends PureComponent {
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
-    const { userDefaultLayout } = props
-    this.pageDefaultWidgets = _defaultLayout
+    const { userDefaultLayout, clinicInfo } = props
+
+    const { clinicSpecialist = 'GP' } = clinicInfo
+    this.pageDefaultWidgets = gpLayoutCfg
+    if (clinicSpecialist === 'Dental') {
+      this.pageDefaultWidgets = dentalLayoutCfg
+    }
+
     let defaultLayout
-    // console.log('userDefaultLayout', userDefaultLayout)
+    // console.log('userDefaultLayout', { userDefaultLayout })
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (true) {
@@ -612,7 +623,7 @@ class Layout extends PureComponent {
     }
 
     // console.log(this.props)
-    console.log({ widgets })
+
     return (
       <div>
         {!this.state.fullScreenWidget && (
@@ -782,7 +793,10 @@ class Layout extends PureComponent {
                         style={w.layoutConfig.style}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} />
+                          <LoadableComponent
+                            {...widgetProps}
+                            {...w.restProps}
+                          />
                         </SizeContainer>
                       </div>
                     </Paper>

@@ -44,6 +44,9 @@ const widgets = [
         padding: '0 5px',
       },
     },
+    testProps: {
+      test: '123',
+    },
     toolbarAddon: (
       <AuthorizedContext>
         {(r) => {
@@ -276,6 +279,25 @@ const widgets = [
         </IconButton>
       </Tooltip>
     ),
+  },
+  {
+    id: '8',
+    name: 'Attachment',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/Attachment'),
+      loading: Loading,
+    }),
+    model: 'attachment',
+    associatedProps: [
+      'corAttachment',
+    ],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
   },
   // {
   //   id: '1001',

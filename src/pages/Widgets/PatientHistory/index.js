@@ -474,6 +474,7 @@ class PatientHistory extends Component {
       codetable,
       user,
     } = this.props
+    console.log({ props: this.props })
     const { entity, selected, patientID } = patientHistory
     const { id: visitId } = selected
     const { visitPurposeFK } = selected
