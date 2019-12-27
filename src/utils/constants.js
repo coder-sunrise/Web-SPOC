@@ -187,10 +187,20 @@ export const VISIT_TYPE = {
   BILL_FIRST: 3,
 }
 
-export const VISIT_TYPE_NAME = {
-  CONS: 'Consultation',
-  RETAIL: 'Retail',
-}
+export const VISIT_TYPE_NAME = [
+  {
+    visitPurposeFK: VISIT_TYPE.CONS,
+    displayName: 'CONSULTATION',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.RETAIL,
+    displayName: 'RETAIL',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.BILL_FIRST,
+    displayName: 'BILL-FIRST',
+  },
+]
 
 export const DEFAULT_PAYMENT_MODE_GIRO = {
   PAYMENT_FK: 5,
