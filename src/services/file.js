@@ -40,8 +40,10 @@ export const downloadFile = async (data, fileName) => {
     document.body.appendChild(link)
     link.click()
     link.parentNode.removeChild(link)
+    return true
   } catch (error) {
     console.log({ error })
+    return false
   }
 }
 
@@ -51,7 +53,8 @@ export const downloadAttachment = async (attachment) => {
     const response = await getFileByFileID(!fileIndexFK ? id : fileIndexFK)
 
     const { data, status } = response
-    if (status >= 200 && status < 300) downloadFile(data, attachment.fileName)
+    if (status >= 200 && status < 300)
+      return downloadFile(data, attachment.fileName)
   } catch (error) {
     console.log({ error })
   }

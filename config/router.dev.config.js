@@ -45,12 +45,6 @@ const devRoutes = {
       mini: 'CT',
       component: './Development/CannedText',
     },
-    {
-      path: '/development/newattachment',
-      name: 'Attachment Enhancement',
-      mini: 'CT',
-      component: './Development/AttachmentWithThumbnail',
-    },
   ],
 }
 

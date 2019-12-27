@@ -4,7 +4,7 @@ import { connect } from 'dva'
 import AttachFile from '@material-ui/icons/AttachFile'
 import { withStyles } from '@material-ui/core'
 // common components
-import { Button, CardContainer, GridContainer } from '@/components'
+import { Button, CardContainer, Danger, GridContainer } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 // sub components
 import Thumbnail from './Thumbnail'
@@ -60,6 +60,11 @@ const AttachmentWithThumbnail = ({
   const [
     uploading,
     setUploading,
+  ] = useState(false)
+
+  const [
+    downloading,
+    setDownlaoding,
   ] = useState(false)
 
   const mapFileToUploadObject = async (file) => {
@@ -194,8 +199,10 @@ const AttachmentWithThumbnail = ({
     })
   }
 
-  const onClick = (attachment) => {
-    downloadAttachment(attachment)
+  const onClick = async (attachment) => {
+    setDownlaoding(true)
+    await downloadAttachment(attachment)
+    setDownlaoding(false)
   }
 
   let UploadButton = (
@@ -240,7 +247,9 @@ const AttachmentWithThumbnail = ({
     })
 
   if (buttonOnly) Body = null
+  let loadingPrefix = 'Uploading'
 
+  if (downloading) loadingPrefix = 'Downloading'
   return (
     <div className={classes.root} id='imageroot'>
       {label && <span className={classes.attachmentLabel}>{label}</span>}
@@ -255,7 +264,13 @@ const AttachmentWithThumbnail = ({
         onClick={clearValue}
       />
       {UploadButton}
-      <LoadingWrapper loading={uploading} text='Uploading attachment...'>
+      <Danger style={{ display: 'inline-block' }}>
+        <span style={{ fontWeight: 500 }}>{errorText}</span>
+      </Danger>
+      <LoadingWrapper
+        loading={uploading || downloading}
+        text={`${loadingPrefix} attachment...`}
+      >
         {fileAttachments.length > 0 && Body}
       </LoadingWrapper>
     </div>

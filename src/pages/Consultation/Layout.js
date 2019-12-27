@@ -815,25 +815,7 @@ class Layout extends PureComponent {
                 in={this.state.mode === 'edit'}
                 mountOnEnter
               >
-                <div>
-                  <Fab
-                    color='secondary'
-                    className={classes.fab}
-                    style={{ marginRight: 8 }}
-                    variant='extended'
-                    size='small'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />
-                  </Fab>
-                </div>
-              </Slide>
-              <Slide
-                direction='up'
-                in={this.state.mode === 'edit'}
-                mountOnEnter
-              >
-                <div>
+                <div style={{ display: 'inline-block' }}>
                   <Fab
                     color='secondary'
                     className={classes.fab}
@@ -843,6 +825,24 @@ class Layout extends PureComponent {
                     onClick={this.toggleDrawer}
                   >
                     <Settings />&nbsp;Widget Settings
+                  </Fab>
+                </div>
+              </Slide>
+              <Slide
+                direction='up'
+                in={this.state.mode === 'edit'}
+                mountOnEnter
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <Fab
+                    color='secondary'
+                    className={classes.fab}
+                    style={{ marginRight: 8 }}
+                    variant='extended'
+                    size='small'
+                    onClick={this.togglePatientHistoryDrawer}
+                  >
+                    <Accessibility />&nbsp;Patient History
                   </Fab>
                 </div>
               </Slide>

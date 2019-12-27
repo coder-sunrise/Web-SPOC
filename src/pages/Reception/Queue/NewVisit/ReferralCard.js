@@ -10,8 +10,7 @@ import {
   GridContainer,
   GridItem,
 } from '@/components'
-import { Attachment } from '@/components/_medisys'
-import AttachmentWithThumbnail from '@/pages/Development/AttachmentWithThumbnail'
+import { Attachment, AttachmentWithThumbnail } from '@/components/_medisys'
 import FormField from './formField'
 
 class ReferralCard extends PureComponent {
