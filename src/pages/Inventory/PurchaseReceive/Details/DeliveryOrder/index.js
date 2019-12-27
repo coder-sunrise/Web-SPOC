@@ -16,6 +16,7 @@ import DODetails from './DODetails'
 import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
+import { podoOrderType, getInventoryItemList } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -61,7 +62,37 @@ class index extends Component {
 
   onAddDeliveryOrderClicked = () => {
     const { dispatch } = this.props
-    this.setState({ showDeliveryOrderDetails: true, mode: 'Add' })
+    let counter = 0
+
+    podoOrderType.forEach((x) => {
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: x.ctName,
+        },
+      }).then((list) => {
+        const { inventoryItemList } = getInventoryItemList(
+          list,
+          x.itemFKName,
+          x.stateName,
+          x.stockName,
+        )
+        this.setState({
+          [x.stateName]: inventoryItemList,
+        })
+        dispatch({
+          type: 'deliveryOrderDetails/updateState',
+          payload: {
+            [x.stateName]: inventoryItemList,
+          },
+        })
+        counter += 1
+        if (counter === 3) {
+          this.setState({ showDeliveryOrderDetails: true, mode: 'Add' })
+        }
+      })
+    })
+
     // dispatch({
     //   type: 'deliveryOrderDetails/addNewDeliveryOrder',
     // })

@@ -110,7 +110,6 @@ export default createFormViewModel({
             })
         }
 
-        console.log('totalPaidAmount', totalPaidAmount)
         return {
           ...state,
           purchaseOrderDetails: {

@@ -21,6 +21,7 @@ import {
 } from '@/components'
 import { showErrorNotification } from '@/utils/error'
 import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import { CrNoteColumns } from './variables'
 // sub components
 import CrNoteForm from './CrNoteForm'
@@ -38,10 +39,14 @@ import MiscCrNote from './MiscCrNote'
     return invoiceCreditNote
   },
   validate: (values) => {
-    const { creditNoteBalance, finalCredit } = values
+    const { creditNoteBalance, finalCredit, payerType } = values
     const errors = {}
     if (creditNoteBalance - finalCredit < 0) {
-      errors.finalCredit = `Total Credit Notes amount cannot be more than Outstanding Amount. (Balance: $${creditNoteBalance.toFixed(
+      const amountType =
+        payerType === INVOICE_PAYER_TYPE.PATIENT
+          ? 'Patient Payable Amount'
+          : 'Outstanding Amount'
+      errors.finalCredit = `Total Credit Notes amount cannot be more than ${amountType}. (Balance: $${creditNoteBalance.toFixed(
         2,
       )})`
     }
@@ -49,7 +54,6 @@ import MiscCrNote from './MiscCrNote'
   },
   handleSubmit: (values, { props }) => {
     const { invoiceDetail, dispatch, onConfirm, onRefresh } = props
-    // console.log({ values, props })
     const {
       creditNoteItem,
       invoicePayerFK,
@@ -57,7 +61,6 @@ import MiscCrNote from './MiscCrNote'
       remark,
       finalCredit,
     } = values
-    console.log({ creditNoteItem })
     const gstAmount = creditNoteItem.reduce(
       (totalGstAmount, item) =>
         item.isSelected ? totalGstAmount + item.gstAmount : totalGstAmount,
@@ -98,9 +101,6 @@ import MiscCrNote from './MiscCrNote'
         if (onConfirm) onConfirm()
         // Refresh invoice & invoicePayer
         onRefresh()
-        // dispatch({
-        //   type: 'settingClinicService/query',
-        // })
       }
     })
   },
@@ -228,7 +228,7 @@ class AddCrNote extends Component {
 
     if (target && target.value && event.target.name !== '') {
       const parseValue = Number(target.value)
-      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100))
+      gstAmt = roundTo(parseValue - parseValue / (1 + gstValue / 100)) || 0
       const gstFieldName = `${target.name.split('.')[0]}.gstAmount`
       setFieldValue(gstFieldName, gstAmt)
       setTimeout(() => this.handleCalcCrNoteItem(), 100)
@@ -238,6 +238,7 @@ class AddCrNote extends Component {
   render () {
     const { handleSubmit, onConfirm, values } = this.props
     const { creditNoteItem, finalCredit, payerType } = values
+
     return (
       <div>
         <CrNoteForm payerType={payerType} />

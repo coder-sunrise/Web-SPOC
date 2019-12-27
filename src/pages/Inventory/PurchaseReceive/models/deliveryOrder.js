@@ -139,7 +139,7 @@ export default createFormViewModel({
               batchNo,
             }
           }
-          if (MedicationItemList.length > 0 && o.type === 2) {
+          if (ConsumableItemList.length > 0 && o.type === 2) {
             const m = ConsumableItemList.find(
               (f) =>
                 f.inventoryConsumableFK === o.inventoryConsumableFK &&
@@ -154,7 +154,7 @@ export default createFormViewModel({
               batchNo,
             }
           }
-          if (MedicationItemList.length > 0 && o.type === 3) {
+          if (VaccinationItemList.length > 0 && o.type === 3) {
             const m = VaccinationItemList.find(
               (f) =>
                 f.inventoryVaccinationFK === o.inventoryVaccinationFK &&

@@ -40,7 +40,7 @@ const countrySettings = [
           },
         })
         numeral.locale('sg')
-      } catch (error) { }
+      } catch (error) {}
     },
     moment: () => {
       moment.defineLocale('sg', {
@@ -71,10 +71,10 @@ const countrySettings = [
           },
         })
         numeral.locale('my')
-      } catch (error) { }
+      } catch (error) {}
     },
     moment: () => {
-      moment.locale('ms-my')
+      moment.locale('en')
     },
   },
 ]

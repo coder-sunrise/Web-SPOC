@@ -86,10 +86,13 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
         in_AppointmentStatusFk: `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
       }
     }
+
     return {
-      'lgteql_Visit.VisitDate': moment().subtract(1, 'months').formatUTC(),
-      'lsteql_Visit.VisitDate': moment().formatUTC(false),
-      'PatientPdpaConsent.IsConsent': true,
+      apiCriteria: {
+        PDPAPhone: true,
+        PDPAMessage: true,
+        PDPAEmail: true,
+      },
     }
   }
 
@@ -98,12 +101,14 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
       setShowWarning(true)
       return false
     }
-    await dispatch({
+    const ctAddonFeature = await dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'ctAddonFeature',
       },
-    }).then((ctAddonFeature) => {
+    })
+
+    if (ctAddonFeature) {
       const currentDate = moment().formatUTC()
       const {
         effectiveStartDate,
@@ -119,17 +124,7 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
         setShowWarning(true)
         return false
       }
-      return true
-    })
-  }
 
-  useEffect(() => {
-    const { addOnSubscriptions } = clinicInfo
-    const smsService = addOnSubscriptions.find(
-      (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
-    )
-
-    if (checkSmsConfiguration(smsService)) {
       dispatch({
         type: 'smsAppointment/query',
         payload: {
@@ -144,7 +139,20 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
           ...defaultSearchQuery(),
         },
       })
+
+      return true
     }
+
+    return false
+  }
+
+  useEffect(() => {
+    const { addOnSubscriptions } = clinicInfo
+    const smsService = addOnSubscriptions.find(
+      (o) => o.ctAddOnFeatureFK === ADD_ON_FEATURE.SMS,
+    )
+
+    checkSmsConfiguration(smsService)
   }, [])
   return (
     <div>

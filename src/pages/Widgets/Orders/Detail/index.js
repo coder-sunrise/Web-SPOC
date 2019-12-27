@@ -95,6 +95,10 @@ class Details extends PureComponent {
                     entity: undefined,
                   },
                 })
+                this.props.dispatch({
+                  // force current edit row components to update
+                  type: 'global/incrementCommitCount',
+                })
               } else {
                 onReset()
               }

@@ -17,8 +17,12 @@ import { getUniqueId } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 
 class ItemList extends React.Component {
+  state = {
+    currentTab: 1,
+  }
+
   addItemToRows = (obj) => {
-    const { setFieldValue, values } = this.props
+    const { setFieldValue, values, dispatch } = this.props
     const newRows = values.rows
     newRows.push(obj)
     setFieldValue('rows', newRows)
@@ -27,13 +31,17 @@ class ItemList extends React.Component {
     setFieldValue('tempSelectedItemFK', '')
     setFieldValue('tempSelectedItemSellingPrice', '')
     setFieldValue('tempSelectedItemTotalPrice', '')
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
   onClickAdd = (type) => {
+    const { currentTab } = this.state
     const { values } = this.props
     if (values.tempSelectedItemFK === undefined) return
     const isExisted = values.rows
-      .filter((row) => !row.isDeleted)
+      .filter((row) => !row.isDeleted && row.type === currentTab)
       .map((row) => row.itemFK)
       .includes(values.tempSelectedItemFK)
 
@@ -43,6 +51,7 @@ class ItemList extends React.Component {
     }
 
     const itemFieldName = InventoryTypes.filter((x) => x.ctName === type)[0]
+
     let newItemRow = {
       uid: getUniqueId(),
       type: itemFieldName.value,
@@ -123,21 +132,28 @@ class ItemList extends React.Component {
   }
 
   onDeleteClick = (row) => {
-    const { values, setFieldValue } = this.props
+    const { values, setFieldValue, dispatch } = this.props
     const newRows = values.rows.map(
       (item) =>
         item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
     )
     setFieldValue('rows', newRows)
+    dispatch({
+      type: 'global/incrementCommitCount',
+    })
   }
 
-  onTabChange = () => {
+  onTabChange = (tabId) => {
     const { setFieldValue } = this.props
     setFieldValue('tempSelectedItemFK', undefined)
+    this.setState({
+      currentTab: parseInt(tabId, 10),
+    })
   }
 
   render () {
     const { theme, CPSwitch, CPNumber, values } = this.props
+
     return (
       <div style={{ marginTop: theme.spacing(1) }}>
         <Tabs
@@ -164,11 +180,12 @@ class ItemList extends React.Component {
               name: 'Service',
               content: this.addContent('ctservice'),
             },
-            {
-              id: 5,
-              name: 'Package',
-              content: this.addContent('inventorypackage'),
-            },
+            /* Commented Package Input - Need to re-test if enabling it back in the future */
+            // {
+            //   id: 5,
+            //   name: 'Package',
+            //   content: this.addContent('inventorypackage'),
+            // },
           ]}
         />
         <CommonTableGrid
@@ -205,15 +222,13 @@ class ItemList extends React.Component {
             {
               columnName: 'cpAmount',
               render: (row) => {
-                // const index = values.rows
-                //   .map((i) => i.itemFK)
-                //   .indexOf(row.itemFK)
-                // console.log({ row, index, rows: values.rows })
+                const { rows = [] } = values
+                const index = rows.map((i) => i.uid).indexOf(row.uid)
                 return (
                   <GridContainer>
                     <GridItem xs={8}>
                       <Field
-                        name={`rows[${row.rowIndex}].itemValue`}
+                        name={`rows[${index}].itemValue`}
                         render={CPNumber(
                           undefined,
                           row.itemValueType === 'ExactAmount'
@@ -224,7 +239,7 @@ class ItemList extends React.Component {
                     </GridItem>
                     <GridItem xs={4}>
                       <Field
-                        name={`rows[${row.rowIndex}].itemValueType`}
+                        name={`rows[${index}].itemValueType`}
                         render={CPSwitch(undefined)}
                       />
                     </GridItem>

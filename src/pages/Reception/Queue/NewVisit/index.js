@@ -269,7 +269,7 @@ class NewVisit extends PureComponent {
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <VitalSignCard
-                        isReadOnly={isRetail || isReadOnly}
+                        isReadOnly={isReadOnly}
                         handleCalculateBMI={this.calculateBMI}
                       />
                     </GridItem>

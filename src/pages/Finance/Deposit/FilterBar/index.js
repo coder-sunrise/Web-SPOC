@@ -73,12 +73,13 @@ class FilterBar extends PureComponent {
             />
           </GridItem>
 
-          <GridItem xs={6} md={3}>
+          <GridItem xs={6} md={4}>
             <FastField
               name='transactionDates'
               render={(args) => {
                 return (
                   <DateRangePicker
+                    style={{ maxWidth: 380 }}
                     label='Transaction Date From'
                     label2='To'
                     {...args}
@@ -87,9 +88,9 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-          <GridItem md={3} />
+          <GridItem md={4} />
 
-          <GridItem xs sm={6} md={3}>
+          <GridItem xs sm={6} md={4}>
             <FastField
               name='transactionOnly'
               render={(args) => {

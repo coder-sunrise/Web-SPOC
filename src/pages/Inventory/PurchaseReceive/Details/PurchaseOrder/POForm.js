@@ -218,6 +218,9 @@ const POForm = ({ setFieldValue, isReadOnly = false, isFinalize }) => {
                 }}
               />
             </GridItem>
+            <GridItem xs={12}>
+              <p style={{ minHeight: 52 }} />
+            </GridItem>
           </GridContainer>
         </GridItem>
 

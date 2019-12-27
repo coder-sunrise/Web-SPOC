@@ -242,15 +242,17 @@ class Modal extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    const { isDeposit } = this.props
-    const selectedDate = moment(event).format('YYMMDD')
+    if (event) {
+      const { isDeposit } = this.props
+      const selectedDate = moment(event).format('YYMMDD')
 
-    if (isDeposit && selectedDate === moment().format('YYMMDD')) {
-      this.setState({ isSessionRequired: false })
-    } else {
-      this.setState({ isSessionRequired: true })
+      if (isDeposit && selectedDate === moment().format('YYMMDD')) {
+        this.setState({ isSessionRequired: false })
+      } else {
+        this.setState({ isSessionRequired: true })
+      }
+      this.getBizList(event)
     }
-    this.getBizList(event)
   }
 
   getBizList = (date) => {
@@ -316,18 +318,6 @@ class Modal extends PureComponent {
       finalBalance = initialValues.balance
     }
     setFieldValue('balanceAfter', finalBalance)
-  }
-
-  handleMaxLengthCardNumber = (e) => {
-    const { value } = e.target
-    const stringValue = value.toString()
-    if (stringValue.length > 4) {
-      const cardNumber = Number(stringValue.substring(0, 4), 10)
-      this.props.setFieldValue(
-        'patientDepositTransaction.cardNumber',
-        cardNumber,
-      )
-    }
   }
 
   render () {
@@ -414,7 +404,7 @@ class Modal extends PureComponent {
                   render={(args) => (
                     <NumberInput
                       label='Card Number'
-                      onChange={(e) => this.handleMaxLengthCardNumber(e)}
+                      precision={0}
                       inputProps={{ maxLength: 4 }}
                       maxLength={4}
                       {...args}

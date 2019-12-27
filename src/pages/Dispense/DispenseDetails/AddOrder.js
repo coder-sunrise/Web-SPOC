@@ -115,11 +115,17 @@ const AddOrder = ({
           payload: {
             rows: newRows,
             finalAdjustments: newRetailInvoiceAdjustment,
+            isGSTInclusive: r.isGSTInclusive,
+            gstValue: r.gstValue,
           },
         })
 
         dispatch({
           type: 'orders/calculateAmount',
+          payload: {
+            isGSTInclusive: r.isGSTInclusive,
+            gstValue: r.gstValue,
+          },
         })
       }
     })
@@ -422,7 +428,6 @@ export default compose(
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
-
         dispatch({
           type: 'dispense/saveAddOrderDetails',
           payload,

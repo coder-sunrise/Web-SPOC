@@ -52,7 +52,6 @@ class SubmittedCHAS extends React.Component {
   handleLoadingVisibility = (visibility = false) =>
     this.setState({ isLoading: visibility })
 
-  onRefreshClicked = () => this.refreshDataGrid()
 
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
@@ -61,10 +60,6 @@ class SubmittedCHAS extends React.Component {
     this.props.dispatch({
       type: 'claimSubmissionSubmitted/query',
     })
-  }
-
-  handleSelectionChange = (selection) => {
-    this.setState({ selectedRows: selection })
   }
 
   handleGetStatusClicked = () => {

@@ -25,10 +25,10 @@ const DiagnosisDetailsExtensions = [
 const reportId = 6
 const fileName = 'Diagnosis Trending'
 class DiagnosisTrending extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

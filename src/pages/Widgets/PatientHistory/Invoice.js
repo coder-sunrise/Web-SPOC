@@ -38,6 +38,7 @@ const baseColumns = [
   { name: 'itemType', title: 'Type' },
   { name: 'itemName', title: 'Name' },
   { name: 'quantity', title: 'Quantity' },
+  { name: 'dispenseUOMDisplayValue', title: 'UOM' },
   { name: 'adjAmt', title: 'Adj' },
   { name: 'totalAfterItemAdjustment', title: 'Total' },
 ]
@@ -61,7 +62,10 @@ export default ({ classes, current, theme, setFieldValue }) => {
     invoiceItemData = invoiceItem
     invoiceAdjustmentData = invoiceAdjustment
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+    if (
+      visitPurposeFK === VISIT_TYPE.RETAIL ||
+      visitPurposeFK === VISIT_TYPE.BILL_FIRST
+    ) {
       columns = [
         { name: 'itemType', title: 'Type' },
         { name: 'itemName', title: 'Name' },
@@ -109,7 +113,8 @@ export default ({ classes, current, theme, setFieldValue }) => {
         columnExtensions={[
           { columnName: 'itemType', width: 150 },
           { columnName: 'description', width: 'auto' },
-          { columnName: 'quantity', width: 90 },
+          { columnName: 'quantity', width: 90, type: 'number' },
+          { columnName: 'dispenseUOMDisplayValue', width: 100 },
           { columnName: 'adjAmt', type: 'number', currency: true, width: 120 },
           {
             columnName: 'totalAfterItemAdjustment',

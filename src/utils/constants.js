@@ -227,3 +227,30 @@ export const CLINIC_SPECIALIST = {
   GP: 'GP',
   DENTAL: 'DENTAL',
 }
+export const SMS_STATUS = {
+  SENT: 1,
+  FAILED: 2,
+  DELIVERED: 3,
+  UNDELIVERED: 4,
+  RECEIVING: 5,
+  RECEIVED: 6,
+  ACCEPTED: 7,
+  SCHEDULED: 8,
+  READ: 9,
+  QUEUED: 10,
+  SENDING: 11,
+}
+
+export const SMS_STATUS_TEXT = {
+  SENT: 'Sent',
+  FAILED: 'Failed',
+  DELIVERED: 'Delivered',
+  UNDELIVERED: 'Undelivered',
+  RECEIVING: 'Receiving',
+  RECEIVED: 'Received',
+  ACCEPTED: 'Accepted',
+  SCHEDULED: 'Scheduled',
+  READ: 'Read',
+  QUEUED: 'Queued',
+  SENDING: 'Sending',
+}

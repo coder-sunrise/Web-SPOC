@@ -14,33 +14,27 @@ const Summary = ({ reportDatas }) => {
   if (sumDetail) {
     sumData = [
       {
-        id: '0',
-        name: 'Total Payments:',
-        isCurrency: false,
-        value: sumDetail.totalPaymentCount.formatString(),
-      },
-      {
-        id: '2',
+        id: '1',
         isCurrency: true,
         name: 'Total Amount Collected:',
         value: sumDetail.totalCollectedAmount,
       },
       {
-        id: '4',
+        id: '3',
         isCurrency: true,
         name: 'Total Cash Rounding:',
         value: sumDetail.totalCashRounding,
       },
     ]
     if (sumDetail.isDisplayGST) {
-      sumData.splice(1, 0, {
-        id: '2',
+      sumData.splice(0, 0, {
+        id: '0',
         name: 'Total Amount Collected before GST:',
         isCurrency: true,
         value: sumDetail.totalCollectedAmountBeforeGst,
       })
-      sumData.splice(3, 0, {
-        id: '4',
+      sumData.splice(2, 0, {
+        id: '2',
         name: 'Total GST Collected:',
         isCurrency: true,
         value: sumDetail.totalCollectedGst,

@@ -20,10 +20,10 @@ const reportId = 28
 const fileName = 'GST Report'
 
 class GSTReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

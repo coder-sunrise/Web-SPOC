@@ -7,7 +7,6 @@ import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core'
 // common components1
 import NearMe from '@material-ui/icons/NearMe'
-import { Progress } from 'antd'
 import {
   ProgressButton,
   GridContainer,
@@ -39,33 +38,33 @@ const styles = (theme) => ({
 class DraftCHAS extends React.Component {
   state = {
     selectedRows: [],
-    isLoading: false,
   }
-
-
 
   componentDidMount () {
     this.refreshDataGrid()
   }
 
   refreshDataGrid = () => {
-    const { selectedRows } = this.state
     this.props.dispatch({
-      type: 'claimSubmissionDraft/refreshPatientDetails',
-      payload:{claimIds: selectedRows},
-    }).then((r)=>{
-      if(!r){
-        this.props.dispatch({
-          type: 'claimSubmissionDraft/query',
-        })
-      }
+      type: 'claimSubmissionDraft/query',
     })
   }
 
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
 
-  onRefreshClicked = () => this.refreshDataGrid()
+  onRefreshClicked = () => {
+    const { selectedRows } = this.state
+    this.props.dispatch({
+      type: 'claimSubmissionDraft/refreshPatientDetails',
+      payload:{claimIds: selectedRows},
+    }).then((r)=>{
+      if(!r){
+        this.refreshDataGrid()
+      }
+    })
+
+  }
 
   render () {
     const overrideContextMenuOptions = [
@@ -83,7 +82,7 @@ class DraftCHAS extends React.Component {
       dispatch,
     } = this.props
     const { list } = claimSubmissionDraft || []
-    const { isLoading, selectedRows } = this.state
+    const { selectedRows } = this.state
     return (
       <CardContainer
         hideHeader

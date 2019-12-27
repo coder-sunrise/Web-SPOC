@@ -184,7 +184,8 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
             'sub',
           )}
         />
-        <Field
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* <Field
           name='itemGroupValueDto.packageGroupValue.itemGroupValue'
           render={CPNumber(
             formatMessage({
@@ -196,7 +197,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               : 'ExactAmount',
             'sub',
           )}
-        />
+        /> */}
         <p style={{ marginTop: theme.spacing(1) }}>&nbsp;</p>
       </GridItem>
       <GridItem xs={2}>
@@ -214,10 +215,11 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
-        <Field
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* <Field
           name='itemGroupValueDto.serviceGroupValue.groupValueType'
           render={CPSwitch('sub')}
-        />
+        /> */}
         <Field
           name='itemGroupValueDto.packageGroupValue.groupValueType'
           render={CPSwitch('sub')}

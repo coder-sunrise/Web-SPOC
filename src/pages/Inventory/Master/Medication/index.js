@@ -32,7 +32,8 @@ const Medication = ({ dispatch, history, medication, values }) => {
     colExtensions,
     setColExtensions,
   ] = useState([
-    { columnName: 'action', width: 110, align: 'center' },
+    { columnName: 'code', width: 130 },
+    { columnName: 'action', width: 80, align: 'center' },
     {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
@@ -44,7 +45,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       columnName: 'dispensingUOM',
       type: 'codeSelect',
       code: 'ctmedicationunitofmeasurement',
-      sortBy: 'dispensingUOMFK',
+      sortBy: 'DispensingUOMFkNavigation.DisplayValue',
       width: 110,
     },
     {
@@ -60,7 +61,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       type: 'select',
       options: status,
       align: 'center',
-      width: 120,
+      width: 80,
     },
     {
       columnName: 'averageCostPrice',
@@ -69,7 +70,7 @@ const Medication = ({ dispatch, history, medication, values }) => {
       width: 120,
       precision: 4,
     },
-    { columnName: 'sellingPrice', type: 'number', currency: true, width: 200 },
+    { columnName: 'sellingPrice', type: 'number', currency: true, width: 120 },
   ])
 
   const filterProps = {
