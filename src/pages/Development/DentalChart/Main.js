@@ -37,7 +37,6 @@ import {
   fontCfg,
   groupCfg,
   cellPrefix,
-  buttonConfigs,
   overlayShapeTypes,
   lockConfig,
   selectablePrefix,
@@ -88,6 +87,14 @@ const styles = (theme) => ({
   },
   toothJournalSecondaryAction: {
     right: theme.spacing(1),
+  },
+  attachmentContainer: {
+    margin: 0,
+    width: 'auto',
+  },
+  buttonIcon: {
+    position: 'absolute',
+    left: theme.spacing(0.5),
   },
 })
 const groupWidth = baseWidth * 4 // + strokeWidth

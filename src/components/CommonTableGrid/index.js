@@ -213,6 +213,7 @@ class CommonTableGrid extends PureComponent {
       rowDragable = false,
       height: pHeight,
       onRowDrop,
+      editableGrid,
       getRowId= (row) => (row.Id ? row.Id : row.id)
     } = props
     // console.log(props)
@@ -275,7 +276,7 @@ class CommonTableGrid extends PureComponent {
     this.TableBody = Table.TableBody
     this.TableRow = tableRowRender
 
-    if (rowDragable) {
+    if (!editableGrid && rowDragable) {
       this.TableRow = (rowProps) => {
         const {tableRow}= rowProps
         const {row}=tableRow
@@ -297,7 +298,6 @@ class CommonTableGrid extends PureComponent {
         // })
       }
       this.TableBody = ({ row, ...restProps }) => {
-        console.log('TableBody')
         const TableBody = SortableContainer(Table.TableBody)
         return (
           <TableBody

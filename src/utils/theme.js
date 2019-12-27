@@ -293,6 +293,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: defaultFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -503,6 +504,7 @@ export const smallTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: smallFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -692,6 +694,7 @@ export const largeTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: largeFontSize,
         '&.Mui-disabled': {
           color: 'inherit',

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import { connect } from 'dva'
-
+import { saveAs } from 'file-saver'
 import _ from 'lodash'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import FilterList from '@material-ui/icons/FilterList'
+import CloudDownload from '@material-ui/icons/CloudDownload'
 import moment from 'moment'
 import logo from '@/assets/img/logo/logo_blue.png'
 import { getUniqueId } from '@/utils/utils'
@@ -34,15 +34,20 @@ import {
   sharedCfg,
   fontCfg,
   groupCfg,
+  addonGroupCfg,
   cellPrefix,
-  buttonConfigs,
   overlayShapeTypes,
   lockConfig,
   selectablePrefix,
+  groupWidth,
+  groupHeight,
+  createToothShape,
+  createFont,
 } from './variables'
 
 const { fabric } = require('fabric')
 
+const imageCache = {}
 const styles = (theme) => ({
   paper: {
     display: 'flex',
@@ -85,8 +90,9 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-const groupWidth = baseWidth * 4 // + strokeWidth
-const groupHeight = baseHeight * 3 // + strokeWidth
+const isUpperSection = (index) => {
+  return (index > 0 && index < 30) || (index > 50 && index < 70)
+}
 
 class Chart extends React.Component {
   state = {
@@ -523,6 +529,7 @@ class Chart extends React.Component {
       // renderOnAddRemove: false,
       // skipTargetFind: true
       name: 'container',
+      backgroundColor: 'white',
     })
     canvas.setZoom(width / 2200)
     fabric.Object.prototype.transparentCorners = false
@@ -597,7 +604,22 @@ class Chart extends React.Component {
               toothIndex: index,
             },
           )
-
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }).rotate(180),
+          )
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }).rotate(180),
+          )
           p.rotate(180)
 
           let g11 = new fabric.Group(
@@ -616,6 +638,7 @@ class Chart extends React.Component {
               subTargetCheck: true,
             },
           )
+
           g11.on('mousedown', (e) => {
             // console.log({ group: e.target, item: e.subTargets[0] })
             const { action } = this.props.dentalChartComponent
@@ -660,6 +683,22 @@ class Chart extends React.Component {
               toothIndex: index,
             },
           )
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }),
+          )
+          p.add(
+            createFont({
+              text: '',
+              left: -innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }),
+          )
           let g12 = new fabric.Group(
             [
               p,
@@ -677,6 +716,7 @@ class Chart extends React.Component {
               subTargetCheck: true,
             },
           )
+
           g12.on('mousedown', (e) => {
             // console.log('g12 mousedown')
             const { action } = this.props.dentalChartComponent
@@ -740,7 +780,12 @@ class Chart extends React.Component {
               } else {
                 this.toggleSelect({ item: e.subTargets[0], group })
               }
-            } else if (action.method === 'tooth') {
+            } else if (
+              [
+                'tooth',
+                'na',
+              ].includes(action.method)
+            ) {
               this.toggleSelect({
                 group,
                 item: {
@@ -881,7 +926,7 @@ class Chart extends React.Component {
   getCanvasSize = (props) => {
     const { pedoChart } = (props || this.props).dentalChartComponent
 
-    const width = this.divContainer.current.offsetWidth
+    const width = this.divContainer.current.offsetWidth - 4
     // console.log(pedoChart, width)
     return {
       width,
@@ -895,314 +940,22 @@ class Chart extends React.Component {
     line = 0,
     order,
     left = 0,
-    headerPos,
     posAjustTop = 0,
-    top,
-    bottom,
     height,
     width,
-    values,
-    dentalChartComponent,
   }) => {
-    const cfg = {
-      ...sharedCfg,
-      top: baseHeight * 2,
-      // strokeUniform: true,
-    }
-
-    // console.log(groupCfg, logo)
-    const polygon = new fabric.Polygon( // left
-      [
-        { x: 0, y: 0 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: baseWidth, y: baseHeight },
-      ],
-      {
-        ...cfg,
-        name: text[0],
-      },
+    this.canvas.add(
+      createToothShape({
+        text,
+        index,
+        order,
+        width,
+        height,
+        left,
+        line,
+        posAjustTop,
+      }),
     )
-
-    const polygon2 = new fabric.Polygon( // bottom
-      [
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        ...cfg,
-        top: baseHeight * 4,
-        name: text[1],
-      },
-    )
-
-    const polygon3 = new fabric.Polygon( // right
-      [
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        ...cfg,
-        name: text[2],
-      },
-    )
-
-    const polygon4 = new fabric.Polygon( // top
-      [
-        { x: 0, y: 0 },
-
-        { x: baseWidth, y: baseHeight },
-
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-      ],
-      {
-        ...cfg,
-        name: text[3],
-      },
-    )
-
-    const g1 = new fabric.Group(
-      [
-        polygon,
-        new fabric.IText(text[0] || '', {
-          left: baseWidth / 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}left`,
-        target: text[0],
-        toothIndex: index,
-        top: baseHeight * 2,
-        // left: 0 - groupWidth / 2,
-        // originX: 'center',
-        // originY: 'center',
-      },
-    )
-    const g2 = new fabric.Group(
-      [
-        polygon2,
-        new fabric.IText(text[1] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 5 - innerFontSize * 1.5,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}bottom`,
-        target: text[1],
-        toothIndex: index,
-        top: baseHeight * 4,
-      },
-    )
-    const g3 = new fabric.Group(
-      [
-        polygon3,
-        new fabric.IText(text[2] || '', {
-          left: baseWidth * 4 - innerFontSize * 1.2,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}right`,
-        target: text[2],
-        toothIndex: index,
-        top: baseHeight * 2,
-      },
-    )
-    const g4 = new fabric.Group(
-      [
-        polygon4,
-        new fabric.IText(text[3] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 2 + innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}top`,
-        target: text[3],
-        toothIndex: index,
-        top: baseHeight * 2,
-      },
-    )
-    let g5
-    let g6
-    let g7
-    if (text) {
-      if (text[5]) {
-        const polygon5 = new fabric.Polygon( // center left
-          [
-            { x: baseWidth, y: baseHeight },
-
-            { x: baseWidth, y: baseHeight * 2 },
-
-            { x: baseWidth * 2, y: baseHeight * 2 },
-            { x: baseWidth * 2, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[4],
-          },
-        )
-        const polygon6 = new fabric.Polygon( // center right
-          [
-            { x: baseWidth * 2, y: baseHeight },
-
-            { x: baseWidth * 2, y: baseHeight * 2 },
-
-            { x: baseWidth * 3, y: baseHeight * 2 },
-            { x: baseWidth * 3, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[5],
-          },
-        )
-        const polygon5Text = new fabric.IText(text[4] || '', {
-          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        const polygon6Text = new fabric.IText(text[5] || '', {
-          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        g5 = new fabric.Group(
-          [
-            polygon5,
-            polygon5Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[4],
-            name: `${cellPrefix}centerLeft`,
-          },
-        )
-        g6 = new fabric.Group(
-          [
-            polygon6,
-            polygon6Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[5],
-            name: `${cellPrefix}centerRight`,
-          },
-        )
-      } else {
-        const polygon7 = new fabric.Polygon( // center
-          [
-            { x: baseWidth, y: baseHeight },
-
-            { x: baseWidth, y: baseHeight * 2 },
-
-            { x: baseWidth * 3, y: baseHeight * 2 },
-            { x: baseWidth * 3, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[4],
-          },
-        )
-        const polygon7Text = new fabric.IText(text[4] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        g7 = new fabric.Group(
-          [
-            polygon7,
-            polygon7Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[4],
-            name: `${cellPrefix}centerfull`,
-          },
-        )
-      }
-    }
-
-    const fixedItems = [
-      // headerText,
-      g1,
-      g2,
-      g3,
-      g4,
-    ]
-    if (g7) {
-      fixedItems.push(g7)
-    } else {
-      fixedItems.push(g5)
-      fixedItems.push(g6)
-    }
-    // console.log(fixedItems)
-    const group = new fabric.Group(fixedItems.filter((o) => !width && !!o), {
-      ...groupCfg,
-      ...lockConfig,
-
-      width: width || groupWidth,
-      height: height || groupHeight,
-      // padding: 300,
-      left: (order + left) * groupWidth + 30,
-      top: groupHeight * line + 20 + posAjustTop,
-      // originX: 'left',
-      index,
-      // originY: 'center',
-      subTargetCheck: true,
-      selectable: false,
-      selectionBackgroundColor: '#cccccc',
-      // opacity: 0,
-      // transparentCorners: true,
-      // cornerColor: 'white',
-
-      // padding: 20,
-      // cornerStrokeColor: 'black',
-      // cornerStyle: 'circle',
-      name: `${index}`,
-    })
-
-    // group.add(headerText)
-
-    // group.addWithUpdate(g1)
-    // group.addWithUpdate(g2)
-
-    // canvas
-    //     .getObjects('group')
-    //     .filter((n) => Number(n.name) > 0)
-    //     .map((group) => {
-
-    //     })
-
-    // console.log(group)
-
-    this.canvas.add(group)
   }
 
   unbindCanvas = (props) => {
@@ -1216,8 +969,9 @@ class Chart extends React.Component {
 
   renderCanvas = (props) => {
     // console.log('renderCanvas', props.dentalChartComponent.data)
-    const { dentalChartComponent, dispatch } = props
+    const { dentalChartComponent, dentalChartSetup, dispatch } = props
     const { action = {}, data, pedoChart, surfaceLabel } = dentalChartComponent
+    const { rows } = dentalChartSetup
     const { icon, type, hoverColor: hc, onSelect, clear } = action
 
     this.canvas.getObjects('group').filter((n) => n.index > 0).map((group) => {
@@ -1267,6 +1021,7 @@ class Chart extends React.Component {
           } else {
             o._objects[1].set('opacity', 0)
           }
+        if (o._objects[2] instanceof fabric.IText) o._objects[2].set('text', '')
       })
       // const root = this.canvas._objects.find(
       //   (t) =>
@@ -1329,25 +1084,73 @@ class Chart extends React.Component {
         ],
       ).map((o) => {
         // console.log(o)
-        const target = buttonConfigs.find((m) => m.value === o.value)
+        const target = rows.find((m) => m.value === o.value)
         if (target) {
-          if (target.getShape && o.target === group.name) {
+          // console.log(target)
+
+          // if (target.getShape && o.target === group.name) {
+          //   // console.log('getShape')
+          //   let newShape = target.getShape()
+          //   let existed = group.filter((x) => x.name === o.value)[0]
+          //   // console.log(group)
+          //   if (!existed && newShape && newShape.set) {
+          //     // console.log(newShape)
+          //     newShape.set('name', o.value)
+          //     group.add(newShape)
+          //     existed = newShape
+          //   }
+          //   if (existed) existed.bringToFront()
+          // }
+          if (
+            target.editMode === 'image' &&
+            target.attachments &&
+            o.target === group.name
+          ) {
             // console.log('getShape')
 
-            let newShape = target.getShape({
-              canvas: this.canvas,
-              group,
-              config: o,
-            })
-            let existed = group.filter((x) => x.name === o.value)[0]
+            // let newShape = target.getShape()
+            let existed = imageCache[o.value] // group.filter((x) => x.name === o.value)[0]
             // console.log(group)
-            if (!existed && newShape && newShape.set) {
+            if (!existed) {
               // console.log(newShape)
-              newShape.set('name', o.value)
-              group.add(newShape)
-              existed = newShape
+              fabric.Image.fromURL(
+                target.attachments[0].thumbnailData,
+                (img) => {
+                  group.add(
+                    new fabric.Group(
+                      [
+                        img
+                          .scale(groupWidth / img.width)
+                          .rotate(isUpperSection(index) ? 180 : 0),
+                      ],
+                      {
+                        ...addonGroupCfg,
+                        isShape: true,
+                        name: o.value,
+                      },
+                    ),
+                  )
+                  imageCache[o.value] = img.scale(groupWidth / img.width)
+                  this.canvas.renderAll()
+                },
+              )
             }
-            if (existed) existed.bringToFront()
+            if (existed) {
+              group.add(
+                new fabric.Group(
+                  [
+                    fabric.util.object
+                      .clone(existed)
+                      .rotate(isUpperSection(index) ? 180 : 0),
+                  ],
+                  {
+                    ...addonGroupCfg,
+                    isShape: true,
+                    name: o.value,
+                  },
+                ),
+              )
+            }
           } else if (target.type === 'cell') {
             // console.log(group.filter((n) => n.isValidCell()), o)
             // console.log(group)
@@ -1355,7 +1158,21 @@ class Chart extends React.Component {
               .filter((n) => n.isValidCell())
               .find((t) => t.name === o.subTarget)
             if (cell) {
+              console.log(target, cell, group)
               cell._objects[0].set('fill', target.fill)
+              if (
+                cell._objects[2] &&
+                cell._objects[2] instanceof fabric.IText
+              ) {
+                cell._objects[2].set('text', target.symbol || '')
+              }
+              // if(target.symbol)
+              // cell.add(new fabric.IText(target.symbol || '', {
+              //   0,
+              //   0,
+              //   fontSize: innerFontSize,
+              //   ...fontCfg,
+              // }))
               // console.log(group._objects, group.filter((n) => n.isShape))
             }
             group.filter((n) => n.isShape).map((n) => {
@@ -1511,7 +1328,29 @@ class Chart extends React.Component {
     //   console.log(this.divContainer.current.offsetWidth)
     // }
     return (
-      <div ref={this.divContainer} style={{ width: '100%' }}>
+      <div
+        ref={this.divContainer}
+        style={{ width: '100%', position: 'relative' }}
+      >
+        <Tooltip title='Save to local'>
+          <Button
+            justIcon
+            color='primary'
+            style={{
+              position: 'absolute',
+              zIndex: 100,
+              right: 0,
+              bottom: 8,
+            }}
+            onClick={() => {
+              this._canvasContainer.current.toBlob((blob) => {
+                saveAs(blob, 'dentalchart.png')
+              }, 'image/png')
+            }}
+          >
+            <CloudDownload />
+          </Button>
+        </Tooltip>
         <Paper elevation={0} className={classes.paper}>
           <canvas id={this.id} ref={this._canvasContainer} />
         </Paper>

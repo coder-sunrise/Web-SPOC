@@ -30,7 +30,10 @@ import {
   Tabs,
   CommonModal,
 } from '@/components'
+import { groupWidth, groupHeight } from './variables'
 import Setup from './Setup/index'
+
+import Tooth from './Tooth'
 
 const useStyles = makeStyles((theme) => ({}))
 
@@ -76,17 +79,17 @@ export default function ButtonGroup (props) {
     })
   }
 
-  const sharedCfg = {
-    alt: '',
-    style: {
-      height: '100%',
-      padding: theme.spacing(0.25),
-      marginRight: 4,
-      position: 'absolute',
-      left: 0,
-    },
-  }
-  // console.log(props)
+  // const sharedCfg = {
+  //   alt: '',
+  //   style: {
+  //     height: '100%',
+  //     padding: theme.spacing(0.25),
+  //     marginRight: 4,
+  //     position: 'absolute',
+  //     left: 0,
+  //   },
+  // }
+  console.log(rows)
   // console.log(theme.props)
   return (
     <div>
@@ -122,11 +125,38 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {rows.map(({ value, icon, text }) => {
+              {rows.map((row) => {
+                const { value, text } = row
                 return [
                   <ToggleButton value={value}>
-                    <img src={icon} {...sharedCfg} />
-                    <span style={{ marginLeft: 20 }}>{text}</span>
+                    <Tooth
+                      className={classes.buttonIcon}
+                      width={groupWidth / 5 + 2}
+                      height={groupHeight / 5 + 2}
+                      paddingLeft={1}
+                      paddingTop={1}
+                      zoom={1 / 5}
+                      image={row.attachments}
+                      fill={[
+                        row.fill,
+                        row.fill,
+                        row.fill,
+                        row.fill,
+                        row.fill,
+                      ]}
+                      symbol={[
+                        row.symbol,
+                        row.symbol,
+                        row.symbol,
+                        row.symbol,
+                        row.symbol,
+                        row.symbol,
+                      ]}
+                      name={row.text}
+                    />
+                    <span style={{ marginLeft: groupWidth / 5 + 20 }}>
+                      {text}
+                    </span>
                   </ToggleButton>,
                   // <Divider
                   //   orientation='vertical'
@@ -143,7 +173,7 @@ export default function ButtonGroup (props) {
         title='Dental Chart Method Setup'
         maxWidth='lg'
         bodyNoPadding
-        onConfirm={(ee) => {
+        onConfirm={() => {
           setOpenSettings(false)
         }}
         onClose={() => setOpenSettings(false)}

@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import color from '@material-ui/core/colors/amber'
 import clear from '@/assets/img/dentalChart/clear.png'
 import missing from '@/assets/img/dentalChart/missing.png'
 import caries from '@/assets/img/dentalChart/caries.png'
@@ -41,9 +42,12 @@ fabric.Object.prototype.isDefaultCell = function () {
     this.name.indexOf('header_') === 0
   )
 }
+
 export const strokeWidth = 2
 export const baseWidth = 30
 export const baseHeight = 40
+export const groupWidth = baseWidth * 4 // + strokeWidth
+export const groupHeight = baseHeight * 3 // + strokeWidth
 export const zoom = 1
 export const fontColor = '#000000'
 export const innerFontSize = 22
@@ -58,7 +62,7 @@ export const lockConfig = {
 export const groupCfg = {
   selectable: false,
 }
-const addonGroupCfg = {
+export const addonGroupCfg = {
   ...groupCfg,
   top: -baseHeight * 1.5 - strokeWidth / 2,
   left: -baseWidth * 2 - strokeWidth / 2,
@@ -216,7 +220,7 @@ const renderOutsideTopCell = (
       }
     }
   })
-  console.log(shape)
+  // console.log(shape)
 
   if (shape) {
     if (group.filter((o) => o.name === name).length === 0) {
@@ -533,17 +537,21 @@ export const buttonConfigs = [
   {
     id: 1,
     value: 'clear',
-    icon: clear,
     text: 'Clear',
     fixed: true,
     method: 'na',
+    isDiagnosis: true,
   },
   {
     id: 2,
     value: 'missing',
-    icon: missing,
     text: 'Missing',
-    getShape: ({ canvas, group, config }) => {
+    attachments: [
+      {
+        thumbnailData: missing,
+      },
+    ],
+    getShape: () => {
       const g = new fabric.Group(
         [
           renderBackgroud(),
@@ -557,11 +565,12 @@ export const buttonConfigs = [
     },
     fixed: true,
     method: 'na',
+    isDiagnosis: true,
+    editMode: 'image',
   },
   {
     id: 3,
     value: 'caries',
-    icon: caries,
     text: 'Caries',
     type: 'cell',
     fill: '#824f4f',
@@ -570,7 +579,6 @@ export const buttonConfigs = [
   {
     id: 4,
     value: 'recurrentdecay',
-    icon: recurrentdecay,
     text: 'Recurrent Decay',
     type: 'cell',
     fill: '#f79e02',
@@ -579,7 +587,6 @@ export const buttonConfigs = [
   {
     id: 5,
     value: 'nccl',
-    icon: nccl,
     text: 'NCCL',
     type: 'cell',
     fill: '#ffe921',
@@ -588,9 +595,8 @@ export const buttonConfigs = [
   {
     id: 6,
     value: 'fractured',
-    icon: test,
     text: 'Fractured',
-    getShape: ({ canvas, group, config }) => {
+    getShape: () => {
       return fabric.util.object.clone(img1)
     },
     method: 'tooth',
@@ -598,7 +604,6 @@ export const buttonConfigs = [
   {
     id: 7,
     value: 'filling',
-    icon: filling,
     text: 'Filling',
     type: 'cell',
     fill: '#737372',
@@ -607,7 +612,6 @@ export const buttonConfigs = [
   {
     id: 8,
     value: 'temporarydressing',
-    icon: temporarydressing,
     text: 'Temporary Dressing',
     type: 'cell',
     fill: '#9c9c98',
@@ -616,7 +620,6 @@ export const buttonConfigs = [
   {
     id: 9,
     value: 'onlayveneer',
-    icon: onlayveneer,
     text: 'Onlay/Veneer',
     ...sharedButtonConfig,
     getShape: () => {
@@ -858,3 +861,384 @@ export const buttonConfigs = [
   //   ...sharedButtonConfig,
   // },
 ]
+export const createFont = ({ text, ...restProps }) => {
+  return new fabric.IText(text || '', {
+    fontSize: innerFontSize,
+    ...fontCfg,
+    ...restProps,
+  })
+}
+export const createToothShape = ({
+  text = [],
+  fill = [],
+  symbol = [],
+  index,
+  width,
+  height,
+  order = 0,
+  left = 0,
+  line = 0,
+  posAjustTop = 0,
+  paddingLeft = 30,
+  paddingTop = 20,
+  custom,
+  image,
+  canvas,
+}) => {
+  const cfg = {
+    ...sharedCfg,
+    top: baseHeight * 2,
+    // strokeUniform: true,
+  }
+
+  if (symbol) {
+    // fixedItems.push(g5)
+  }
+  // console.log(fixedItems)
+  const cCfg = {
+    ...groupCfg,
+    ...lockConfig,
+
+    width: width || groupWidth,
+    height: height || groupHeight,
+    // padding: 300,
+    left: (order + left) * groupWidth + paddingLeft,
+    top: groupHeight * line + paddingTop + posAjustTop,
+    // originX: 'left',
+    index,
+    // originY: 'center',
+    subTargetCheck: true,
+    selectable: false,
+    selectionBackgroundColor: '#cccccc',
+    // opacity: 0,
+    // transparentCorners: true,
+    // cornerColor: 'white',
+
+    // padding: 20,
+    // cornerStrokeColor: 'black',
+    // cornerStyle: 'circle',
+  }
+  if (index) {
+    cCfg.name = `${index}`
+  }
+
+  if (custom) {
+    console.log(custom)
+    return new fabric.Group(
+      [
+        typeof custom === 'function' ? custom() : custom,
+      ],
+      cCfg,
+    )
+  }
+  if (image) {
+    const data = image[0] || image
+    const { thumbnailData, content } = data
+
+    fabric.Image.fromURL(thumbnailData, (img) => {
+      canvas.add(
+        new fabric.Group(
+          [
+            img.set({
+              left: 0,
+              top: 0,
+              width: width || groupWidth,
+              height: height || groupHeight,
+            }),
+            // .scale((width || groupWidth) / img.width),
+          ],
+          {
+            ...groupCfg,
+            isShape: true,
+          },
+        ),
+      )
+    })
+    return
+  }
+  const polygon = new fabric.Polygon( // left
+    [
+      { x: 0, y: 0 },
+      { x: 0, y: baseHeight * 3 },
+      { x: baseWidth, y: baseHeight * 2 },
+      { x: baseWidth, y: baseHeight },
+    ],
+    {
+      ...cfg,
+      name: text[0],
+      fill: fill[0] || 'white',
+    },
+  )
+
+  const polygon2 = new fabric.Polygon( // bottom
+    [
+      { x: baseWidth, y: baseHeight * 2 },
+      { x: 0, y: baseHeight * 3 },
+      { x: baseWidth * 4, y: baseHeight * 3 },
+      { x: baseWidth * 3, y: baseHeight * 2 },
+    ],
+    {
+      ...cfg,
+      top: baseHeight * 4,
+      name: text[1],
+      fill: fill[1] || 'white',
+    },
+  )
+
+  const polygon3 = new fabric.Polygon( // right
+    [
+      { x: baseWidth * 3, y: baseHeight },
+      { x: baseWidth * 4, y: 0 },
+      { x: baseWidth * 4, y: baseHeight * 3 },
+      { x: baseWidth * 3, y: baseHeight * 2 },
+    ],
+    {
+      ...cfg,
+      name: text[2],
+      fill: fill[2] || 'white',
+    },
+  )
+
+  const polygon4 = new fabric.Polygon( // top
+    [
+      { x: 0, y: 0 },
+
+      { x: baseWidth, y: baseHeight },
+
+      { x: baseWidth * 3, y: baseHeight },
+      { x: baseWidth * 4, y: 0 },
+    ],
+    {
+      ...cfg,
+      name: text[3],
+      fill: fill[3] || 'white',
+    },
+  )
+
+  const g1 = new fabric.Group(
+    [
+      polygon,
+      createFont({
+        text: text[0],
+        left: baseWidth / 2 - innerFontSize / 4,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol[0],
+        left: baseWidth / 2 - innerFontSize / 3,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}left`,
+      target: text[0],
+      toothIndex: index,
+      top: baseHeight * 2,
+      // left: 0 - groupWidth / 2,
+      // originX: 'center',
+      // originY: 'center',
+    },
+  )
+  const g2 = new fabric.Group(
+    [
+      polygon2,
+      createFont({
+        text: text[1],
+        left: baseWidth * 2 - innerFontSize / 4,
+        top: baseHeight * 5 - innerFontSize * 1.5,
+      }),
+      createFont({
+        text: symbol[1],
+        left: baseWidth * 2 - innerFontSize / 4 - 3,
+        top: baseHeight * 5 - innerFontSize * 1.5,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}bottom`,
+      target: text[1],
+      toothIndex: index,
+      top: baseHeight * 4,
+    },
+  )
+  const g3 = new fabric.Group(
+    [
+      polygon3,
+      createFont({
+        text: text[2],
+        left: baseWidth * 4 - innerFontSize,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol[2],
+        left: baseWidth * 4 - innerFontSize,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}right`,
+      target: text[2],
+      toothIndex: index,
+      top: baseHeight * 2,
+    },
+  )
+  const g4 = new fabric.Group(
+    [
+      polygon4,
+      createFont({
+        text: text[3],
+        left: baseWidth * 2 - innerFontSize / 4,
+        top: baseHeight * 2 + innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol[3],
+        left: baseWidth * 2 - innerFontSize / 4 - 3,
+        top: baseHeight * 2 + innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}top`,
+      target: text[3],
+      toothIndex: index,
+      top: baseHeight * 2,
+    },
+  )
+  let g5
+  let g6
+  let g7
+  if (text) {
+    if (text[5]) {
+      const polygon5 = new fabric.Polygon( // center left
+        [
+          { x: baseWidth, y: baseHeight },
+
+          { x: baseWidth, y: baseHeight * 2 },
+
+          { x: baseWidth * 2, y: baseHeight * 2 },
+          { x: baseWidth * 2, y: baseHeight },
+        ],
+        {
+          ...cfg,
+          top: baseHeight * 3,
+          name: text[4],
+          fill: fill[4] || 'white',
+        },
+      )
+      const polygon6 = new fabric.Polygon( // center right
+        [
+          { x: baseWidth * 2, y: baseHeight },
+
+          { x: baseWidth * 2, y: baseHeight * 2 },
+
+          { x: baseWidth * 3, y: baseHeight * 2 },
+          { x: baseWidth * 3, y: baseHeight },
+        ],
+        {
+          ...cfg,
+          top: baseHeight * 3,
+          name: text[5],
+          fill: fill[5] || 'white',
+        },
+      )
+      g5 = new fabric.Group(
+        [
+          polygon5,
+          createFont({
+            text: text[4],
+            left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+          createFont({
+            text: symbol[4],
+            left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+        ],
+        {
+          ...groupCfg,
+          toothIndex: index,
+          target: text[4],
+          name: `${cellPrefix}centerLeft`,
+          fill: fill[4] || 'white',
+        },
+      )
+      g6 = new fabric.Group(
+        [
+          polygon6,
+          createFont({
+            text: text[5],
+            left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+          createFont({
+            text: symbol[5],
+            left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+        ],
+        {
+          ...groupCfg,
+          toothIndex: index,
+          target: text[5],
+          name: `${cellPrefix}centerRight`,
+          fill: fill[5] || 'white',
+        },
+      )
+    } else {
+      const polygon7 = new fabric.Polygon( // center
+        [
+          { x: baseWidth, y: baseHeight },
+
+          { x: baseWidth, y: baseHeight * 2 },
+
+          { x: baseWidth * 3, y: baseHeight * 2 },
+          { x: baseWidth * 3, y: baseHeight },
+        ],
+        {
+          ...cfg,
+          top: baseHeight * 3,
+          name: text[4],
+          fill: fill[4] || 'white',
+        },
+      )
+      g7 = new fabric.Group(
+        [
+          polygon7,
+          createFont({
+            text: text[4],
+            left: baseWidth * 2 - innerFontSize / 4,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+          createFont({
+            text: symbol[4],
+            left: baseWidth * 2 - innerFontSize / 4 - 3,
+            top: baseHeight * 3.5 - innerFontSize / 2,
+          }),
+        ],
+        {
+          ...groupCfg,
+          toothIndex: index,
+          target: text[4],
+          name: `${cellPrefix}centerfull`,
+        },
+      )
+    }
+  }
+  const fixedItems = [
+    // headerText,
+    g1,
+    g2,
+    g3,
+    g4,
+  ]
+  if (g7) {
+    fixedItems.push(g7)
+  } else {
+    fixedItems.push(g5)
+    fixedItems.push(g6)
+  }
+  return new fabric.Group(fixedItems.filter((o) => !width && !!o), cCfg)
+}

@@ -92,7 +92,7 @@ const Setup = (props) => {
     ...restProps
   } = props
   const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
-  // console.log(restProps, dentalChartSetup)
+  // console.log(props)
   // style={{ height: `${height}px` }}
   const [
     selectedRows,
@@ -103,7 +103,7 @@ const Setup = (props) => {
     setMode,
   ] = useState('color')
   const handleCommitChanges = ({ rows, changed }) => {
-    console.log(rows, changed)
+    // console.log(rows, changed)
     setFieldValue('rows', rows)
   }
   // useState()
@@ -113,17 +113,31 @@ const Setup = (props) => {
       columnName: 'legend',
       isReactComponent: true,
       type: 'custom',
-      render: Legend,
+      render: (p) => {
+        return <Legend {...p} viewOnly={mode !== 'edit'} />
+      },
     },
     {
       columnName: 'method',
       type: 'select',
       options: methods,
+      isDisabled: (row) => {
+        return row.fixed
+      },
     },
     {
-      columnName: 'isDisplay',
+      columnName: 'isDiagnosis',
       type: 'checkbox',
       align: 'center',
+      isDisabled: (row) => {
+        return row.fixed
+      },
+    },
+    {
+      columnName: 'text',
+      isDisabled: (row) => {
+        return row.fixed
+      },
     },
   ]
   // if(mode==='sort'){
@@ -144,7 +158,7 @@ const Setup = (props) => {
         title: 'Name',
       },
       {
-        name: 'isDisplay',
+        name: 'isDiagnosis',
         title: 'Display in Diagnosis',
       },
     ],
@@ -236,6 +250,7 @@ export default withFormikExtend({
         rows: values.rows,
       },
     })
+    localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
     if (onConfirm) onConfirm()
   },
 

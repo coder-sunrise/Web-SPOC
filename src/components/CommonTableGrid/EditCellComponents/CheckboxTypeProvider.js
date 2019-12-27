@@ -72,19 +72,12 @@ class CheckboxEditorBase extends PureComponent {
     }
   }
 
-  renderComponent = ({
-    type,
-    code,
-    options,
-    row,
-    value,
-    editMode,
-    ...commonCfg
-  }) => {
+  renderComponent = ({ type, code, options, row, editMode, ...commonCfg }) => {
     const {
       columnExtensions,
       column: { name: columnName },
       classes,
+      value,
     } = this.props
 
     const cfg =
@@ -99,13 +92,15 @@ class CheckboxEditorBase extends PureComponent {
     // if (_checkboxSelectedMap[columnName]) {
     //   commonCfg.checked = _checkboxSelectedMap[columnName] === row.id
     // }
-
+    // console.log(commonCfg, row)
     return (
       <Checkbox
+        checked={value}
         className={classnames({
           [classes.main]: true,
         })}
         {...commonCfg}
+        fullWidth={false}
       />
     )
   }

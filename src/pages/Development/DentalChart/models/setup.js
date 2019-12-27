@@ -41,7 +41,8 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      rows: buttonConfigs,
+      rows:
+        JSON.parse(localStorage.getItem('dentalChartSetup')) || buttonConfigs,
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {},

@@ -38,13 +38,13 @@ import {
   strokeWidth,
   baseWidth,
   baseHeight,
-  zoom,
   fontColor,
   innerFontSize,
   sharedCfg,
   fontCfg,
   groupCfg,
   cellPrefix,
+  createToothShape,
 } from './variables'
 
 const { fabric } = require('fabric')
@@ -53,107 +53,40 @@ class Tooth extends React.PureComponent {
   constructor (props) {
     super(props)
 
-    this._canvas = React.createRef()
-    this.divContainer = React.createRef()
+    this._canvasContainer = React.createRef()
 
-    this.hoverColor = '#ffffff'
-    this.hoverOpacity = 1
-    this.backgroudImage = null
+    this.divContainer = React.createRef()
 
     this.id = getUniqueId()
   }
 
   componentDidMount () {
-    this.initCanvas()
-    // this.renderCanvas(this.props)
+    const { zoom, width, height, ...restProps } = this.props
+    this.canvas = new fabric.Canvas(this._canvasContainer.current, {
+      width,
+      height,
+    })
+    this.canvas.hoverCursor = 'default'
+    if (zoom) this.canvas.setZoom(zoom)
+    this.group = createToothShape({
+      ...restProps,
+      canvas: this.canvas,
+    })
+    if (this.group) this.canvas.add(this.group)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent } = nextProps
-    // console.log(
-    //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
-    // )
-    if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
-      this.renderCanvas(nextProps)
+    if (!_.isEqual(nextProps, this.props)) {
+      if (this.group) this.canvas.remove(this.group)
+      const { zoom, width, height, ...restProps } = nextProps
+      this.group = createToothShape({
+        ...restProps,
+        canvas: this.canvas,
+      })
+      if (this.group) this.canvas.add(this.group)
+
+      this.canvas.renderAll()
     }
-  }
-
-  renderCanvas = (props) => {
-    console.log('renderCanvas', props.values)
-    const { dentalChartComponent } = props
-    const { action = {} } = dentalChartComponent
-    const { icon, type, hoverColor: hc, render, clear } = action
-    if (clear) clear(this.canvas, props)
-
-    if (render) render(this.canvas, props)
-
-    props.canvas.renderAll()
-
-    // fabric.Image.fromURL('../assets/pug.jpg', function(img) {
-    //   var oImg = img.set({ left: 0, top: 0}).scale(0.25);
-    //   canvas.add(oImg);
-    // });
-  }
-
-  initCanvas = () => {
-    const { index, text, dentalChartComponent, canvas } = this.props
-    const { action = {} } = dentalChartComponent
-    const { icon } = action
-
-    // console.log(action)
-
-    // console.log(canvas.hoverCursor)
-
-    // const polygon12 = new fabric.Polygon( // outside top
-    //   [
-    //     { x: 0, y: baseHeight },
-
-    //     { x: baseWidth * 1, y: 0 },
-
-    //     { x: baseWidth * 3, y: 0 },
-    //     { x: baseWidth * 4, y: baseHeight },
-    //   ],
-    //   {
-    //     ...cfg,
-    //     fill: 'brown',
-    //     top: baseHeight * 5,
-    //   },
-    // )
-    // polygon12.rotate(180)
-
-    // canvas.add(polygon12)
-
-    // canvas.on('mouse:over', (e) => {
-    //   // console.log(e, e.target)
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
-    //     if (item) {
-    //       item.set('fill', this.hoverColor)
-    //       canvas.getObjects('group').map((o) => {
-    //         if (o.name === 'cell') o.set('opacity', this.hoverOpacity)
-    //       })
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
-
-    // canvas.on('mouse:out', (e) => {
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
-    //     if (item) {
-    //       item.set('fill', 'white')
-    //       canvas.getObjects('group').map((o) => {
-    //         if (o.name === 'cell') o.set('opacity', 1)
-    //       })
-
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
-    // canvas.setZoom(zoom)
-    // this.canvas = canvas
-    // this.props.container.add(this.canvas)
-    // console.log(this.canvas, this.props.container)
   }
 
   render () {
@@ -174,7 +107,11 @@ class Tooth extends React.PureComponent {
       container,
       ...props
     } = this.props
-    return <div />
+    return (
+      <div ref={this.divContainer} className={className}>
+        <canvas id={this.id} ref={this._canvasContainer} />
+      </div>
+    )
   }
 }
 

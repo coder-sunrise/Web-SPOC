@@ -45,6 +45,7 @@ const Diagnosis = ({
   mode,
   onDataSouceChange,
   dentalChartComponent,
+  global,
   ...props
 }) => {
   const { data = [], pedoChart, surfaceLabel } = dentalChartComponent
@@ -55,7 +56,13 @@ const Diagnosis = ({
     setSelected,
   ] = useState()
   return (
-    <div>
+    <div
+      style={{
+        height: global.mainDivHeight - 115,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+      }}
+    >
       <h4>Tooth Journal</h4>
       {Object.keys(groups).map((k) => {
         const ary = groups[k]

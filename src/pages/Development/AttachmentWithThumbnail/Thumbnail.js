@@ -1,6 +1,8 @@
 import React from 'react'
 // formik
 import { FastField } from 'formik'
+import classnames from 'classnames'
+
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
@@ -69,6 +71,7 @@ const Thumbnail = ({
   attachment,
   onConfirmDelete,
   onClickAttachment,
+  containerClass,
   size = { width: 64, height: 64 },
 }) => {
   const {
@@ -96,13 +99,22 @@ const Thumbnail = ({
 
   if (simple) {
     return (
-      <div className={classes.simpleRoot}>
+      <div
+        className={classnames({
+          [classes.simpleRoot]: true,
+        })}
+      >
         <Tooltip title={fileName}>
           <div
             className={classes.imageContainer}
             onClick={handleAttachmentClicked}
           >
-            <img src={src} alt='test' width={size.width} height={size.height} />
+            <img
+              src={src}
+              alt='Attachment'
+              width={size.width}
+              height={size.height}
+            />
           </div>
         </Tooltip>
         <Tooltip title='Change'>

@@ -239,7 +239,7 @@ const AttachmentWithThumbnail = ({
     })
 
   return (
-    <div className={classes.root} id='imageroot'>
+    <div className={classes.root}>
       {label && <span className={classes.attachmentLabel}>{label}</span>}
       <input
         style={{ display: 'none' }}
