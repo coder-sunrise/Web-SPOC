@@ -114,6 +114,7 @@ const sendNotification = (type, data) => {
     },
   } = getState()
   data.sender = user.data.clinicianProfile.name
+  data.senderId = user.data.id
   data.timestamp = Date.now()
   console.log('sendNotification', type, data)
   connection.invoke('SendNotification', type, data).catch((err) => {

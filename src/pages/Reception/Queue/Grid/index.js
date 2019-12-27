@@ -99,11 +99,6 @@ const Grid = ({
       payload: {
         id,
       },
-    }).then((response) => {
-      if (response === 204)
-        notification.success({
-          message: 'Visit Deleted',
-        })
     })
   }
 
