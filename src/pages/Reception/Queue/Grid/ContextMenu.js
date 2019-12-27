@@ -57,6 +57,7 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
   )
   // const isStatusDispense = row.visitStatus === VISIT_STATUS.DISPENSE
   const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
+  const isBillFirstVisit = row.visitPurposeFK === VISIT_TYPE.BILL_FIRST
 
   const isStatusCompleted = [
     VISIT_STATUS.BILLING,
@@ -82,7 +83,17 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
       VISIT_STATUS.ORDER_UPDATED,
     ].includes(row.visitStatus)
 
-    if (isRetailVisit && retailDispense) return true
+    const billFirstDispense = [
+      VISIT_STATUS.WAITING,
+      VISIT_STATUS.DISPENSE,
+    ].includes(row.visitStatus)
+
+    if (
+      (isRetailVisit && retailDispense) ||
+      (isBillFirstVisit && billFirstDispense)
+    )
+      return true
+
     return consDispense
   }
 
@@ -111,19 +122,19 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
           return {
             ...opt,
             disabled: isStatusInProgress,
-            hidden: !isStatusWaiting || isRetailVisit,
+            hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
             disabled: !isStatusInProgress,
-            hidden: hideResumeButton || isRetailVisit,
+            hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
             disabled: !isStatusCompleted,
-            hidden: !isStatusCompleted || isRetailVisit,
+            hidden: !isStatusCompleted || isRetailVisit || isBillFirstVisit,
           }
         default:
           return { ...opt }
