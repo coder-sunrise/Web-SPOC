@@ -220,6 +220,9 @@ class Details extends PureComponent {
                       type: key,
                     },
                   })
+                  dispatch({
+                    type: 'global/incrementCommitCount',
+                  })
                 }}
               />
             </GridItem>

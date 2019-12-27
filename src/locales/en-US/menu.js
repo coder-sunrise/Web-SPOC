@@ -154,7 +154,7 @@ export default {
   'menu.support': 'Support',
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',
-  'menu.support.druglabel': 'Drug Label',
+  'menu.support.printingtool': 'Printing Tool',
 
   'menu.wardmanagement': 'Ward Management',
 }

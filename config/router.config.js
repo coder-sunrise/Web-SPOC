@@ -859,9 +859,9 @@ const _routes = [
             component: './support/teamviewer',
           },
           {
-            path: '/support/druglabel',
-            name: 'druglabel',
-            component: './support/druglabel',
+            path: '/support/printingtool',
+            name: 'printingtool',
+            component: './support/PrintingTool',
           },
         ],
       },
