@@ -42,19 +42,20 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
     else response = await changeUserPassword(payload)
 
     const { data } = response
-
-    if (data && data.succeeded) {
-      notification.success({
-        message: 'Change password success.',
-      })
-      sessionStorage.removeItem('user')
-      // fetch again to refresh
-      dispatch({ type: 'user/fetchCurrent' })
-      onConfirm()
-    } else {
-      notification.error({
-        message: 'Current password is not correct.',
-      })
+    if (data) {
+      if (data.succeeded) {
+        notification.success({
+          message: 'Change password success.',
+        })
+        sessionStorage.removeItem('user')
+        // fetch again to refresh
+        dispatch({ type: 'user/fetchCurrent' })
+        onConfirm()
+      } else {
+        notification.error({
+          message: 'Current password is not correct.',
+        })
+      }
     }
   },
 })
