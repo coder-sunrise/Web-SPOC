@@ -102,6 +102,11 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
     VISIT_STATUS.COMPLETED,
   ].includes(row.visitStatus)
 
+  const hideEditConsultation =
+    !isStatusCompleted ||
+    isRetailVisit ||
+    (isBillFirstVisit && !row.hasSignedCOR)
+
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
       switch (opt.id) {
@@ -134,7 +139,7 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
           return {
             ...opt,
             disabled: !isStatusCompleted,
-            hidden: !isStatusCompleted || isRetailVisit || isBillFirstVisit,
+            hidden: hideEditConsultation,
           }
         default:
           return { ...opt }
