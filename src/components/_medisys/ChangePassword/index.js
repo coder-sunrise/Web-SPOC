@@ -43,7 +43,7 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
 
     const { data } = response
 
-    if (data.succeeded) {
+    if (data && data.succeeded) {
       notification.success({
         message: 'Change password success.',
       })
@@ -53,7 +53,7 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
       onConfirm()
     } else {
       notification.error({
-        message: 'Failed to change password.',
+        message: 'Current password is not correct.',
       })
     }
   },
@@ -136,6 +136,15 @@ class ChangePassword extends React.PureComponent {
                 />
               )}
             />
+          </GridItem>
+          <GridItem>
+            <p style={{ margin: '10px 0px' }}>
+              Password must be
+              <li style={{ marginLeft: 30 }}>8 to 18 characters long</li>
+              <li style={{ marginLeft: 30 }}>
+                contain a mix of letters, numebrs, and/or special characters
+              </li>
+            </p>
           </GridItem>
         </GridContainer>
         {footer &&

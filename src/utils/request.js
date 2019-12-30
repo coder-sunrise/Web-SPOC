@@ -61,7 +61,7 @@ const codeMessage = {
 }
 
 const _errorMessageMapping = {
-  V00031: 'Invalid password format',
+  V00031: 'Invalid new password format',
 }
 
 export function updateAPIType (type) {
