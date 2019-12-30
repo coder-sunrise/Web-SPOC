@@ -42,19 +42,20 @@ import { changeCurrentUserPassword, changeUserPassword } from '@/services/user'
     else response = await changeUserPassword(payload)
 
     const { data } = response
-
-    if (data.succeeded) {
-      notification.success({
-        message: 'Change password success.',
-      })
-      sessionStorage.removeItem('user')
-      // fetch again to refresh
-      dispatch({ type: 'user/fetchCurrent' })
-      onConfirm()
-    } else {
-      notification.error({
-        message: 'Failed to change password.',
-      })
+    if (data) {
+      if (data.succeeded) {
+        notification.success({
+          message: 'Change password success.',
+        })
+        sessionStorage.removeItem('user')
+        // fetch again to refresh
+        dispatch({ type: 'user/fetchCurrent' })
+        onConfirm()
+      } else {
+        notification.error({
+          message: 'Current password is not correct.',
+        })
+      }
     }
   },
 })
@@ -136,6 +137,15 @@ class ChangePassword extends React.PureComponent {
                 />
               )}
             />
+          </GridItem>
+          <GridItem>
+            <p style={{ margin: '10px 0px' }}>
+              Password must be
+              <li style={{ marginLeft: 30 }}>8 to 18 characters long</li>
+              <li style={{ marginLeft: 30 }}>
+                contain a mix of letters, numebrs, and/or special characters
+              </li>
+            </p>
           </GridItem>
         </GridContainer>
         {footer &&
