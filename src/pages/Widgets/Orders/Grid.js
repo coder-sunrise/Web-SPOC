@@ -1,12 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
-
-import { withStyles, Divider, Paper, IconButton } from '@material-ui/core'
+import _ from 'lodash'
 import Add from '@material-ui/icons/Add'
 import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
-import { Table, TableSummaryRow } from '@devexpress/dx-react-grid-material-ui'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 import numeral from 'numeral'
 import {
@@ -17,23 +16,12 @@ import {
   NumberInput,
   Select,
   Checkbox,
-  CodeSelect,
-  Field,
 } from '@/components'
 import { orderTypes } from '@/utils/codes'
-import { sumReducer } from '@/utils/utils'
 
 // console.log(orderTypes)
-export default ({
-  orders,
-  dispatch,
-  classes,
-  theme,
-  handleAddAdjustment,
-  codetable,
-}) => {
+export default ({ orders, dispatch, classes }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
-  // console.log(orders)
   const { total, gst, totalWithGST } = summary
   const [
     checkedStatusIncldGST,
@@ -51,6 +39,8 @@ export default ({
 
   const adjustments = finalAdjustments.filter((o) => !o.isDeleted)
   const editRow = (row) => {
+    if (!row.isActive && row.type !== '5') return
+
     dispatch({
       type: 'orders/updateState',
       payload: {
@@ -62,6 +52,10 @@ export default ({
         //   adjType: row.adjType,
         // },
       },
+    })
+    dispatch({
+      // force current edit row components to update
+      type: 'global/incrementCommitCount',
     })
   }
   // console.log(total, summary)
@@ -137,6 +131,8 @@ export default ({
       </div>
     )
   })
+
+  const isEditingEntity = !_.isEmpty(orders.entity)
 
   return (
     <CommonTableGrid
@@ -241,7 +237,7 @@ export default ({
                       </Tooltip>
                     </span>
                     {c1}
-                    {gstValue && (
+                    {gstValue >= 0 && (
                       <Checkbox
                         simple
                         label={formatMessage({
@@ -273,102 +269,60 @@ export default ({
       columnExtensions={[
         {
           columnName: 'type',
-          // type: 'select',
-          // options: orderTypes,
+          width: 150,
+          render: (row) => {
+            const otype = orderTypes.find((o) => o.value === row.type)
+            const texts = [
+              otype.name,
+              row.isExternalPrescription === true ? '(Ext.)' : '',
+              row.type === '5' || row.isActive ? '' : '(Inactive)',
+            ].join(' ')
+
+            return (
+              <Tooltip title={texts}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
+                >
+                  {texts}
+                </div>
+              </Tooltip>
+            )
+          },
+        },
+        {
+          columnName: 'subject',
           render: (row) => {
             return (
-              <div>
-                <Select
-                  text
-                  options={orderTypes}
-                  labelField='name'
-                  value={row.type}
-                />
-                {row.isExternalPrescription === true ? (
-                  <span> (Ext.) </span>
-                ) : (
-                  ''
-                )}
-                {row.isActive ? '' : '(Inactive)'}
+              <div
+                style={{
+                  wordWrap: 'break-word',
+                  whiteSpace: 'pre-wrap',
+                }}
+              >
+                {row.subject}
               </div>
             )
           },
         },
         {
           columnName: 'description',
-          width: 300,
+          width: 260,
           render: (row) => {
-            const _renderHTML = (textList) => {
-              return (
-                <Tooltip
-                  title={
-                    <React.Fragment>
-                      <div>
-                        {textList.map((t) => {
-                          return <p>{t}</p>
-                        })}
-                      </div>
-                    </React.Fragment>
-                  }
+            return (
+              <Tooltip title={row.instruction}>
+                <div
+                  style={{
+                    wordWrap: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                  }}
                 >
-                  <div>
-                    {textList.map((item) => {
-                      return (
-                        <p
-                          style={{
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {item}
-                        </p>
-                      )
-                    })}
-                  </div>
-                </Tooltip>
-              )
-            }
-            let text = ''
-            if (row.usageMethodFK && row.dosageFK && row.uomfk) {
-              text = `${row.usageMethodDisplayValue
-                ? row.usageMethodDisplayValue
-                : ''} ${row.dosageDisplayValue
-                ? row.dosageDisplayValue
-                : ''} ${row.uomDisplayValue ? row.uomDisplayValue : ''} `
-            }
-
-            if (row.corPrescriptionItemInstruction) {
-              let nextStepdose = ''
-              const textArray = row.corPrescriptionItemInstruction.map(
-                (item, i) => {
-                  if (i < row.corPrescriptionItemInstruction.length - 1) {
-                    nextStepdose = ` ${row.corPrescriptionItemInstruction[i + 1]
-                      .stepdose}`
-                  } else {
-                    nextStepdose = ''
-                  }
-
-                  let txt = `${item.usageMethodDisplayValue
-                    ? item.usageMethodDisplayValue
-                    : ''} ${item.dosageDisplayValue
-                    ? item.dosageDisplayValue
-                    : ''} ${item.prescribeUOMDisplayValue
-                    ? item.prescribeUOMDisplayValue
-                    : ''} ${item.drugFrequencyDisplayValue
-                    ? item.drugFrequencyDisplayValue
-                    : ''} For ${item.duration
-                    ? item.duration
-                    : ''} day(s)${nextStepdose}`
-
-                  return txt
-                },
-              )
-              return _renderHTML(textArray)
-            }
-            return _renderHTML([
-              text,
-            ])
+                  {row.instruction}
+                </div>
+              </Tooltip>
+            )
           },
         },
         {
@@ -411,6 +365,9 @@ export default ({
                     justIcon
                     color='primary'
                     style={{ marginRight: 5 }}
+                    disabled={
+                      isEditingEntity || (!row.isActive && row.type !== '5')
+                    }
                   >
                     <Edit />
                   </Button>
@@ -434,7 +391,12 @@ export default ({
                   }}
                 >
                   <Tooltip title='Delete'>
-                    <Button size='sm' color='danger' justIcon>
+                    <Button
+                      size='sm'
+                      color='danger'
+                      justIcon
+                      disabled={isEditingEntity}
+                    >
                       <Delete />
                     </Button>
                   </Tooltip>

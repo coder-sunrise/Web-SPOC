@@ -161,7 +161,8 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
             />
           )}
         />
-        <Field
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* <Field
           name='itemGroupMaxCapacityDto.packageMaxCapacity.maxCapValue'
           render={(args) => (
             <NumberInput
@@ -174,7 +175,7 @@ const CoverageCap = ({ values, theme, classes, setFieldValue }) => {
               {...args}
             />
           )}
-        />
+        /> */}
         <p style={{ marginTop: theme.spacing(1) }}>Leave blank if no cap</p>
       </GridItem>
     </GridContainer>

@@ -24,7 +24,12 @@ import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
+import {
+  VISIT_TYPE_NAME,
+  VISIT_TYPE,
+  CLINIC_SPECIALIST,
+} from '@/utils/constants'
+import * as WidgetConfig from './config'
 
 import model from './models'
 
@@ -108,130 +113,34 @@ const styles = (theme) => ({
   // handleSubmit: () => {},
   // displayName: 'PatientHistory',
 })
-@connect(({ patientHistory, clinicSettings, codetable, user }) => ({
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
   codetable,
   user,
+  clinicInfo,
 }))
 class PatientHistory extends Component {
-  state = {
-    selectedItems: [
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-    ],
-  }
-
   static defaultProps = {
     mode: 'split',
   }
 
   constructor (props) {
     super(props)
-    this.widgets = [
-      {
-        id: '1',
-        name: 'Clinical Notes',
-        component: Loadable({
-          loader: () => import('./ClinicalNotes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
-        name: 'Chief Complaints',
-        component: Loadable({
-          loader: () => import('./ChiefComplaints'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '3',
-        name: 'Plan',
-        component: Loadable({
-          loader: () => import('./Plan'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '4',
-        name: 'Diagnosis',
-        component: Loadable({
-          loader: () => import('./Diagnosis'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '5',
-        name: 'Orders',
-        component: Loadable({
-          loader: () => import('./Orders'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
-        name: 'Consultation Document',
-        component: Loadable({
-          loader: () => import('./ConsultationDocument'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      // {
-      //   id: '6',
-      //   name: 'Result History',
-      //   component: Loadable({
-      //     loader: () => import('./ResultHistory'),
-      //     render: (loaded, p) => {
-      //       let Cmpnet = loaded.default
-      //       return <Cmpnet {...props} {...p} />
-      //     },
-      //     loading: Loading,
-      //   }),
-      // },
-      {
-        id: '7',
-        name: 'Invoice',
-        component: Loadable({
-          loader: () => import('./Invoice'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-    ]
+    const { clinicInfo } = props
+    const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
+
+    this.widgets = WidgetConfig.gpWidgets(props)
+    switch (clinicSpecialist) {
+      case CLINIC_SPECIALIST.DENTAL:
+        this.widgets = WidgetConfig.dentalWidgets(props)
+        break
+      default:
+        break
+    }
+    this.state = {
+      selectedItems: this.widgets.map((widget) => widget.id),
+    }
   }
 
   componentWillMount () {
@@ -282,7 +191,7 @@ class PatientHistory extends Component {
     const { patientHistory, mode, clinicSettings } = this.props
     const { settings = [] } = clinicSettings
     const { selectedSubRow } = patientHistory
-
+    const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
     let newArray = []
     if (
       settings.showConsultationVersioning === false ||
@@ -290,11 +199,12 @@ class PatientHistory extends Component {
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
+      } else if (isRetailVisit) {
+        newArray.push(row)
       }
     } else {
       newArray = row.coHistory
     }
-
     return (
       <List
         component='nav'
@@ -318,28 +228,31 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
-                  this.props
-                    .dispatch({
-                      type: 'patientHistory/queryOne',
-                      payload: o.id,
-                    })
-                    .then((r) => {
-                      if (r) {
-                        this.props.dispatch({
-                          type: 'patientHistory/updateState',
-                          payload: {
-                            selected: row,
-                            selectedSubRow: o,
-                          },
-                        })
-                        // this.props.dispatch({
-                        //   type: 'consultationDocument/updateState',
-                        //   payload: {
-                        //     rows: r.documents,
-                        //   },
-                        // })
-                      }
-                    })
+                  if (isRetailVisit) {
+                    this.handleRetailVisitHistory(row)
+                  } else
+                    this.props
+                      .dispatch({
+                        type: 'patientHistory/queryOne',
+                        payload: o.id,
+                      })
+                      .then((r) => {
+                        if (r) {
+                          this.props.dispatch({
+                            type: 'patientHistory/updateState',
+                            payload: {
+                              selected: row,
+                              selectedSubRow: o,
+                            },
+                          })
+                          // this.props.dispatch({
+                          //   type: 'consultationDocument/updateState',
+                          //   payload: {
+                          //     rows: r.documents,
+                          //   },
+                          // })
+                        }
+                      })
                 }}
               >
                 <ListItemText
@@ -360,7 +273,13 @@ class PatientHistory extends Component {
                                 text
                                 showTime
                                 format='DD MMM YYYY h:mm a'
-                                value={o.signOffDate}
+                                value={
+                                  row.visitPurposeFK === VISIT_TYPE.RETAIL ? (
+                                    row.visitDate
+                                  ) : (
+                                    o.signOffDate
+                                  )
+                                }
                               />)
                             </span>
                           )}
@@ -395,18 +314,15 @@ class PatientHistory extends Component {
   }
 
   getTitle = (row) => {
-    const { coHistory } = row
-    let { visitPurposeName } = row
-    const latest = coHistory[coHistory.length] || {}
-    if (visitPurposeName === VISIT_TYPE_NAME.RETAIL)
-      visitPurposeName += ' Visit'
+    const { visitPurposeName = '' } = row
+    const visitTitleLabel = visitPurposeName
 
     return (
       <div className={this.props.classes.title}>
         <GridContainer>
           <GridItem sm={12}>
             <p>
-              <span>{visitPurposeName}</span>
+              <span>{visitTitleLabel}</span>
               <span style={{ position: 'relative' }}>
                 &nbsp; (<DatePicker text value={row.visitDate} />)
               </span>
@@ -474,7 +390,7 @@ class PatientHistory extends Component {
       codetable,
       user,
     } = this.props
-    console.log({ props: this.props })
+
     const { entity, selected, patientID } = patientHistory
     const { id: visitId } = selected
     const { visitPurposeFK } = selected
@@ -485,7 +401,8 @@ class PatientHistory extends Component {
 
     const fromConsultation = location.pathname.includes('consultation')
 
-    const isRetailVisit = selected.visitPurposeName === VISIT_TYPE_NAME.RETAIL
+    const isRetailVisit = selected.visitPurposeFK === VISIT_TYPE.RETAIL
+
     return (
       <CardContainer
         hideHeader
@@ -506,16 +423,10 @@ class PatientHistory extends Component {
                 // prefix='Filter By'
                 mode='multiple'
                 // maxTagCount={4}
-                options={[
-                  { name: 'Clinical Notes', value: '1' },
-                  { name: 'Chief Complaints', value: '2' },
-                  { name: 'Plan', value: '3' },
-                  { name: 'Diagnosis', value: '4' },
-                  { name: 'Orders', value: '5' },
-                  { name: 'Consultation Document', value: '6' },
-                  // { name: 'Result History', value: '6' },
-                  { name: 'Invoice', value: '7' },
-                ]}
+                options={this.widgets.map((item) => ({
+                  name: item.name,
+                  value: item.id,
+                }))}
                 style={{ marginBottom: theme.spacing(1) }}
                 onChange={this.onSelectChange}
                 maxTagCount={maxItemTagCount}
@@ -662,6 +573,27 @@ class PatientHistory extends Component {
     )
   }
 
+  handleRetailVisitHistory = (v) => {
+    this.props
+      .dispatch({
+        type: 'patientHistory/queryRetailHistory',
+        payload: {
+          id: v.invoiceFK,
+        },
+      })
+      .then((r) => {
+        if (r) {
+          this.props.dispatch({
+            type: 'patientHistory/updateState',
+            payload: {
+              selected: v,
+              selectedSubRow: v,
+            },
+          })
+        }
+      })
+  }
+
   render () {
     const {
       theme,
@@ -691,32 +623,14 @@ class PatientHistory extends Component {
     sortedPatientHistory = patientHistory.list
       ? patientHistory.list.filter(
           (o) =>
-            o.coHistory.length >= 1 ||
-            o.visitPurposeName === VISIT_TYPE_NAME.RETAIL,
+            o.visitPurposeFK === VISIT_TYPE.RETAIL || o.coHistory.length >= 1,
         )
       : ''
 
-    const handleRetailVisitHistory = (v) => {
-      this.props
-        .dispatch({
-          type: 'patientHistory/queryRetailHistory',
-          payload: {
-            id: v.invoiceFK,
-          },
-        })
-        .then((r) => {
-          if (r) {
-            this.props.dispatch({
-              type: 'patientHistory/updateState',
-              payload: {
-                selected: v,
-                selectedSubRow: v,
-              },
-            })
-          }
-        })
-    }
-
+    // console.log({
+    //   sortedPatientHistory,
+    //   settings: settings.showConsultationVersioning,
+    // })
     return (
       <div {...cfg}>
         <CardContainer
@@ -736,8 +650,7 @@ class PatientHistory extends Component {
             <Accordion
               defaultActive={0}
               collapses={sortedPatientHistory.map((o) => {
-                const isRetailVisit =
-                  o.visitPurposeName === VISIT_TYPE_NAME.RETAIL
+                const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
                 const returnValue = {
                   title: this.getTitle(o),
                   content: this.getContent(o),
@@ -746,7 +659,7 @@ class PatientHistory extends Component {
                 if (isRetailVisit) {
                   return {
                     ...returnValue,
-                    onClickSummary: () => handleRetailVisitHistory(o),
+                    onClickSummary: () => this.handleRetailVisitHistory(o),
                   }
                 }
                 return {

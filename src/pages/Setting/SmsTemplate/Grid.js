@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react'
 
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { status } from '@/utils/codes'
-import Delete from '@material-ui/icons/Delete'
 import Edit from '@material-ui/icons/Edit'
-import * as service from './services'
 import htmlToText from 'html-to-text'
-import { CommonTableGrid, Button, Tooltip, dateFormatLong } from '@/components'
+import { status } from '@/utils/codes'
+import { CommonTableGrid, Button, Tooltip } from '@/components'
 import MouseOverPopover from './MouseOverPopover'
 
 class Grid extends PureComponent {
@@ -36,7 +33,6 @@ class Grid extends PureComponent {
   // }
 
   render () {
-    const { classes } = this.props
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
@@ -63,12 +59,15 @@ class Grid extends PureComponent {
             width: 100,
           },
           {
+            columnName: 'code',
+            width: 200,
+          },
+          {
             columnName: 'displayValue',
-            width: 500,
+            width: 350,
           },
           {
             columnName: 'templateMessage',
-            width: 500,
             render: (row) => {
               // return htmlToText.fromString(row.templateMessage)
               const templateMessageProps = {
@@ -79,23 +78,10 @@ class Grid extends PureComponent {
             },
           },
           {
-            columnName: 'effectiveStartDate',
-            sortingEnabled: false,
-            width: 130,
-            type: 'date',
-            format: dateFormatLong,
-          },
-          {
-            columnName: 'effectiveEndDate',
-            sortingEnabled: false,
-            width: 130,
-            type: 'date',
-            format: dateFormatLong,
-          },
-          {
             columnName: 'action',
             sortingEnabled: false,
             align: 'center',
+            width: 100,
             render: (row) => {
               return (
                 <Tooltip title='Edit SMS Template' placement='top-end'>

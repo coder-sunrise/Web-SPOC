@@ -47,21 +47,22 @@ class RejectedCHAS extends React.Component {
     this.refreshDataGrid()
   }
 
-  onRefreshClicked = () => this.refreshDataGrid()
-
-  refreshDataGrid = () => {
+  onRefreshClicked = () => {
     const { selectedRows } = this.state
     this.props.dispatch({
       type: 'claimSubmissionRejected/refreshPatientDetails',
       payload:{claimIds: selectedRows},
     }).then((r)=>{
       if(!r){
-        this.props.dispatch({
-          type: 'claimSubmissionRejected/query',
-        })
+        this.refreshDataGrid()
       }
     })
+  }
 
+  refreshDataGrid = () => {
+    this.props.dispatch({
+      type: 'claimSubmissionRejected/query',
+    })
   }
 
   handleSelectionChange = (selection) =>

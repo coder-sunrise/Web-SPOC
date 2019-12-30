@@ -26,13 +26,13 @@ class InvoiceDetails extends Component {
   }
 
   componentWillUnmount () {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'invoiceDetail/reset',
-    })
-    dispatch({
-      type: 'invoicePayment/reset',
-    })
+    // const { dispatch } = this.props
+    // dispatch({
+    //   type: 'invoiceDetail/reset',
+    // })
+    // dispatch({
+    //   type: 'invoicePayment/reset',
+    // })
   }
 
   refresh = () => {

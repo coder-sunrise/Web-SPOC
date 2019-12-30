@@ -11,6 +11,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import AddAlert from '@material-ui/icons/AddAlert'
 // sub components
 import TableData from './TableData'
+import VaccinationGrid from './VaccinationGrid'
 // common component
 import {
   Button,
@@ -325,15 +326,14 @@ const DispenseDetails = ({
               )}
               data={prescription}
             />
-            {!isRetailVisit && (
-              <TableData
-                title='Vaccination'
-                idPrefix='vaccination'
-                columns={VaccinationColumn}
-                colExtensions={VaccinationColumnExtensions(viewOnly)}
-                data={vaccination}
-              />
-            )}
+            <VaccinationGrid
+              title='Vaccination'
+              idPrefix='vaccination'
+              columns={VaccinationColumn}
+              colExtensions={VaccinationColumnExtensions(viewOnly)}
+              data={vaccination}
+              visitPurposeFK={visitPurposeFK}
+            />
 
             <TableData
               title='Other Orders'

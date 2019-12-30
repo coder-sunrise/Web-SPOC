@@ -29,12 +29,13 @@ import {
   Fab,
 } from '@/components'
 // sub components
-import PatientHistory from '@/pages/Widgets/PatientHistory'
+import PatientHistoryDrawer from './PatientHistoryDrawer'
 import { control } from '@/components/Decorator'
 import Templates from './Templates'
 // utils
 import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { CLINIC_SPECIALIST } from '@/utils/constants'
 
 // const _defaultLayout = [
 //   {
@@ -138,9 +139,9 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { clinicSpecialist = 'GP' } = clinicInfo
+    const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
     this.pageDefaultWidgets = gpLayoutCfg
-    if (clinicSpecialist === 'Dental') {
+    if (clinicSpecialist === CLINIC_SPECIALIST.DENTAL) {
       this.pageDefaultWidgets = dentalLayoutCfg
     }
 
@@ -673,7 +674,7 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                // console.log(cfg, w)
+
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
 
@@ -814,25 +815,7 @@ class Layout extends PureComponent {
                 in={this.state.mode === 'edit'}
                 mountOnEnter
               >
-                <div>
-                  <Fab
-                    color='secondary'
-                    className={classes.fab}
-                    style={{ marginRight: 8 }}
-                    variant='extended'
-                    size='small'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />
-                  </Fab>
-                </div>
-              </Slide>
-              <Slide
-                direction='up'
-                in={this.state.mode === 'edit'}
-                mountOnEnter
-              >
-                <div>
+                <div style={{ display: 'inline-block' }}>
                   <Fab
                     color='secondary'
                     className={classes.fab}
@@ -841,7 +824,25 @@ class Layout extends PureComponent {
                     size='small'
                     onClick={this.toggleDrawer}
                   >
-                    <Settings />
+                    <Settings />&nbsp;Widget Settings
+                  </Fab>
+                </div>
+              </Slide>
+              <Slide
+                direction='up'
+                in={this.state.mode === 'edit'}
+                mountOnEnter
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <Fab
+                    color='secondary'
+                    className={classes.fab}
+                    style={{ marginRight: 8 }}
+                    variant='extended'
+                    size='small'
+                    onClick={this.togglePatientHistoryDrawer}
+                  >
+                    <Accessibility />&nbsp;Patient History
                   </Fab>
                 </div>
               </Slide>
@@ -851,12 +852,17 @@ class Layout extends PureComponent {
               open={this.state.openPatientHistoryDrawer}
               onClose={this.togglePatientHistoryDrawer}
             >
-              <div style={{ width: '50vw', padding: theme.spacing(2) }}>
+              <PatientHistoryDrawer
+                {...widgetProps}
+                onClose={this.togglePatientHistoryDrawer}
+              />
+              {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
                 <h4>Patient History</h4>
+                <Button />
                 <SizeContainer size='sm'>
                   <PatientHistory {...widgetProps} mode='integrated' />
                 </SizeContainer>
-              </div>
+              </div> */}
             </Drawer>
             <Drawer
               anchor='right'

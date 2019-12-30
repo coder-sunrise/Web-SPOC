@@ -516,7 +516,7 @@ class Billing extends Component {
                     label='Invoice Remarks'
                     multiline
                     maxLength={2000}
-                    rowsMax={2}
+                    rowsMax={5}
                     rows={2}
                     {...args}
                   />

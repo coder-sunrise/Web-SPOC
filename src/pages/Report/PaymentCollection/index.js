@@ -15,10 +15,10 @@ import SumList from './SumList'
 import ReportBase from '../ReportBase'
 
 class PaymentCollection extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId: 4,
       fileName: 'Payment Collection Details',
     }
@@ -63,7 +63,7 @@ class PaymentCollection extends ReportBase {
             content: <Summary reportDatas={reportDatas} />,
           },
           {
-            title: <AccordionTitle title='Summary By Payment Model' />,
+            title: <AccordionTitle title='Summary By Payment Mode' />,
             content: <SumList reportDatas={reportDatas} />,
           },
         ]}

@@ -10,9 +10,12 @@ import {
   GridContainer,
   GridItem,
   withFormikExtend,
+  withVisibilityControl,
 } from '@/components'
 import FormField from './formField'
+import { CLINIC_SPECIALIST } from '@/utils/constants'
 
+@withVisibilityControl({ hiddenFor: CLINIC_SPECIALIST.DENTAL })
 class VitalSignCard extends PureComponent {
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props

@@ -11,6 +11,8 @@ import {
   GridItem,
   TextField,
   Select,
+  GridContainer,
+  CheckboxGroup,
 } from '@/components'
 import { smsStatus, messageStatus } from '@/utils/codes'
 
@@ -60,11 +62,62 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem>
-      <GridItem xs={4} className={classes.checkbox}>
+      <GridItem xs={3}>
         <FastField
-          name='consent'
-          render={(args) => <Checkbox label='PDPA Consent' {...args} />}
+          name='pdpaConsent'
+          render={(args) => (
+            <CheckboxGroup
+              label='PDPA Consent - Agree to receive marketing material via:'
+              horizontal
+              valueField='id'
+              textField='name'
+              options={[
+                {
+                  id: '1',
+                  name: 'Phone Call',
+                  layoutConfig: {
+                    style: {},
+                  },
+                },
+                {
+                  id: '2',
+                  name: 'Text Message',
+                  layoutConfig: {
+                    style: {},
+                  },
+                },
+                {
+                  id: '3',
+                  name: 'Email',
+                  layoutConfig: {
+                    style: {},
+                  },
+                },
+              ]}
+              {...args}
+            />
+          )}
         />
+        {/* <GridContainer>
+          <GridItem xs={5} className={classes.checkbox}>
+            <FastField
+              name='phoneCall'
+              render={(args) => <Checkbox label='Phone Call' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={5} className={classes.checkbox}>
+            <FastField
+              name='textMessage'
+              render={(args) => <Checkbox label='Text Message' {...args} />}
+            />
+          </GridItem>
+          <GridItem xs={2} className={classes.checkbox}>
+            <FastField
+              name='email'
+              render={(args) => <Checkbox label='Email' {...args} />}
+            />
+          </GridItem>
+        </GridContainer> */}
       </GridItem>
       <GridItem md={6} />
 

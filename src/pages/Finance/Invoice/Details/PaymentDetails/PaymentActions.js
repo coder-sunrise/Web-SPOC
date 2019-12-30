@@ -50,7 +50,7 @@ const PaymentActions = ({
       {type === PayerType.PATIENT && (
         <Button
           onClick={() => handleWriteOff(invoicePayerFK)}
-          disabled={!handleAddCrNote || readOnly}
+          disabled={!handleWriteOff || readOnly}
           {...ButtonProps}
         >
           <Add />
@@ -60,7 +60,7 @@ const PaymentActions = ({
       {type === PayerType.COPAYER_REAL && (
         <Button
           onClick={() => handleTransferClick(invoicePayerFK, type)}
-          disabled={!handleAddCrNote || readOnly}
+          disabled={!handleTransferClick || readOnly}
           {...ButtonProps}
         >
           <RepeatIcon />

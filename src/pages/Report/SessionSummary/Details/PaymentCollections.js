@@ -106,9 +106,9 @@ const PaymentCollections = ({
   const PaymentCollectionsRow = (p) => {
     const { row, children } = p
     let newchildren = []
-    const invoiceColumnCount = TotalDetails[0].isDisplayGST ? 3 : 2
+    const payerNameColIndex = TotalDetails[0].isDisplayGST ? 3 : 2
     if (row.countNumber === 1) {
-      newchildren.push(children.filter((value, index) => index < invoiceColumnCount).map(
+      newchildren.push(children.filter((value, index) => index < payerNameColIndex).map(
         (item) => ({
           ...item,
           props: {
@@ -120,7 +120,7 @@ const PaymentCollections = ({
     }
     if (row.payerCountNumber === 1) {
       newchildren.push(
-        children.filter((value, index) => index === 3).map((item) => ({
+        children.filter((value, index) => index === payerNameColIndex).map((item) => ({
           ...item,
           props: {
             ...item.props,

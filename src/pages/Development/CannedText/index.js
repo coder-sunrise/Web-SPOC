@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 // material ui
 import Delete from '@material-ui/icons/Delete'
+import Close from '@material-ui/icons/Close'
+
 // common components
 import {
   Button,
@@ -62,6 +64,9 @@ const CannedText = () => {
       <h4>Canned Text</h4>
       <Button color='primary' onClick={toggleCannedText}>
         Toggle Canned Text
+      </Button>
+      <Button justIcon key='close' aria-label='Close' color='transparent'>
+        <Close />
       </Button>
       <CommonModal
         open={showCannedText}

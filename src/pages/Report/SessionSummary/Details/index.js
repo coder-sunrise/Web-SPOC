@@ -10,11 +10,11 @@ const reportId = 5
 const fileName = 'Session Summary Report'
 
 class SessionSummary extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     console.log({ superState: super.state, thisState: this.state })
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

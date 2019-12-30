@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
-import { EditableTableGrid } from '@/components'
+import { EditableTableGrid, notification } from '@/components'
 
 @connect(({ user }) => ({
   user,
@@ -44,6 +44,16 @@ class AllergyGrid extends PureComponent {
           autoComplete: true,
           onChange: ({ val, option, row }) => {
             if (option) {
+              let { rows } = this.props
+              if (
+                rows.filter(
+                  (o) => !o.isDeleted && o.allergyFK === val && o.id !== row.id,
+                ).length > 0
+              ) {
+                notification.error({
+                  message: 'The Allergy record already exists.',
+                })
+              }
               row.allergyCode = option.code || option.name
               row.allergyName = option.name
             }

@@ -13,10 +13,10 @@ const reportId = 21
 const fileName = 'Consumable Movement Report'
 
 class ConsumableMovementReport extends ReportBase {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
-      ...super.state,
+      ...this.state,
       reportId,
       fileName,
     }

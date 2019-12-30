@@ -83,13 +83,15 @@ const styles = (theme) => ({
   fabContainer: {
     position: 'fixed',
     right: -3,
-    top: '50%',
+    top: '30%',
     zIndex: 1000,
     '& button': {
       borderRadius: '0px !important',
       borderTopLeftRadius: '3px !important',
       borderBottomLeftRadius: '3px !important',
     },
+    '-webkit-transform': 'rotate(270deg)',
+    transformOrigin: '100% 100%',
   },
   widgetPopper: {
     zIndex: 101,

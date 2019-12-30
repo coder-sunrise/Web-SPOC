@@ -26,7 +26,7 @@ import {
   sortItemByID,
 } from './applyClaimUtils'
 import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -63,6 +63,7 @@ const ApplyClaims = ({
     invoicePayment,
     invoicePayer: payerList,
     claimableSchemes,
+    visitPurposeFK = 1,
   } = values
 
   const [
@@ -114,7 +115,9 @@ const ApplyClaims = ({
   const shouldDisableAddClaim =
     tempInvoicePayer.filter(
       (invoicePayer) => invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME,
-    ).length < invoice.claimableSchemes || hasOtherEditing
+    ).length < invoice.claimableSchemes ||
+    hasOtherEditing ||
+    visitPurposeFK === VISIT_TYPE.RETAIL
 
   const incrementCommitCount = () => {
     dispatch({
@@ -304,6 +307,8 @@ const ApplyClaims = ({
         _isDeleted: true,
         isCancelled: true,
         isModified: true,
+        _isConfirmed: true,
+        _isEditing: false,
       }))
 
       if (claimableSchemes.length > 0) {
@@ -317,7 +322,7 @@ const ApplyClaims = ({
           _invoicePayer,
         ]
         setCurEditInvoicePayerBackup(_invoicePayer)
-        setInitialState(newTempInvoicePayer)
+        // setInitialState(newTempInvoicePayer)
         handleSchemeChange(
           _invoicePayer.claimableSchemes[0].id,
           newTempInvoicePayer.length - 1,
@@ -326,7 +331,7 @@ const ApplyClaims = ({
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
-        setInitialState([])
+        // setInitialState([])
         setTempInvoicePayer(_newTempInvoicePayer)
       }
     },
@@ -642,6 +647,7 @@ const ApplyClaims = ({
           Reset
         </Button> */}
         <ResetButton
+          disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
           handleResetClick={handleResetClick}
           handleRestoreClick={handleRestoreClick}
         />

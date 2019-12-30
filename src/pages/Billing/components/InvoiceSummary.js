@@ -120,7 +120,7 @@ const InvoiceSummary = ({
       <GridItem md={10}>
         <CardContainer hideHeader>
           <GridContainer justify='space-between'>
-            {gstValue && (
+            {gstValue >= 0 && (
               <React.Fragment>
                 <GridItem md={6}>
                   <h5>

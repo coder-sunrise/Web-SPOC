@@ -2,7 +2,12 @@ import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
 import Delete from '@material-ui/icons/Delete'
 
-import { CommonTableGrid, Button, dateFormatLong } from '@/components'
+import {
+  CommonTableGrid,
+  Button,
+  dateFormatLong,
+  Popconfirm,
+} from '@/components'
 
 class Grid extends PureComponent {
   configs = {
@@ -30,17 +35,23 @@ class Grid extends PureComponent {
               >
                 <Edit />
               </Button>
-              <Button
-                size='sm'
-                onClick={() => {
-                  this.cancelRow(row)
+              <Popconfirm
+                title='Are you sure?'
+                onConfirm={() => {
+                  setTimeout(() => {
+                    this.cancelRow(row)
+                  }, 1)
                 }}
-                justIcon
-                color='danger'
-                disabled={row.status !== 'Draft'}
               >
-                <Delete />
-              </Button>
+                <Button
+                  size='sm'
+                  justIcon
+                  color='danger'
+                  disabled={row.status !== 'Draft'}
+                >
+                  <Delete />
+                </Button>
+              </Popconfirm>
             </React.Fragment>
           )
         },
@@ -88,29 +99,18 @@ class Grid extends PureComponent {
   }
 
   cancelRow = (row) => {
-    const { dispatch, inventoryAdjustment } = this.props
-
-    dispatch({
-      type: 'global/updateAppState',
-      payload: {
-        openConfirm: true,
-        openConfirmContent: `Are you sure want to delete record - ${row.transactionNo} ?`,
-        onConfirmSave: () => {
-          this.props
-            .dispatch({
-              type: 'inventoryAdjustment/removeRow',
-              payload: {
-                id: row.id,
-              },
-            })
-            .then(() => {
-              this.props.dispatch({
-                type: 'inventoryAdjustment/query',
-              })
-            })
+    this.props
+      .dispatch({
+        type: 'inventoryAdjustment/removeRow',
+        payload: {
+          id: row.id,
         },
-      },
-    })
+      })
+      .then(() => {
+        this.props.dispatch({
+          type: 'inventoryAdjustment/query',
+        })
+      })
   }
 
   render () {

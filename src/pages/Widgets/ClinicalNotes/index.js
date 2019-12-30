@@ -194,6 +194,12 @@ class ClinicalNotes extends Component {
         ]
       }, [])
     } else {
+      const newData = {
+        scribbleNoteTypeFK: categoryIndex,
+        scribbleNoteTypeName: category,
+        subject: values,
+        scribbleNoteLayers: temp,
+      }
       dispatch({
         type: 'scriblenotes/updateState',
         payload: {
@@ -201,22 +207,12 @@ class ClinicalNotes extends Component {
           [category]: {
             [arrayName]: [
               ...scriblenotes[category][arrayName],
-              {
-                scribbleNoteTypeFK: categoryIndex,
-                scribbleNoteTypeName: category,
-                subject: values,
-                scribbleNoteLayers: temp,
-              },
+              newData,
             ],
           },
         },
       })
-      previousData.push({
-        scribbleNoteTypeFK: categoryIndex,
-        scribbleNoteTypeName: category,
-        subject: values,
-        scribbleNoteLayers: temp,
-      })
+      previousData.push(newData)
     }
 
     this.form.setFieldValue('corScribbleNotes', previousData)

@@ -142,6 +142,7 @@ const ActionButton = ({ row, onClick }) => {
     [
       row.rowIndex,
       row.visitStatus,
+      row.visitPurposeFK,
     ],
   )
   return (
