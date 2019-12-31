@@ -67,6 +67,12 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
+    text: 'Treatment Category',
+    // icon: <FolderOpen />,
+    url: '/setting/treatmentcategory',
+  },
+  {
+    title: 'Clinic Setting',
     text: 'Revenue Category',
     // icon: <FolderOpen />,
     url: '/setting/revenuecategory',
