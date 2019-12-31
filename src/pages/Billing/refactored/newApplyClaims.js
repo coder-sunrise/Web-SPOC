@@ -358,7 +358,7 @@ const ApplyClaims = ({
       payload: {
         openConfirm: true,
         openConfirmContent:
-          'Reset will revert all changes that had not been saved. Continue?',
+          'Restore will restore back to last saved state. Continue?',
         openConfirmText: 'Continue',
         onConfirmSave: restoreClaims,
       },
