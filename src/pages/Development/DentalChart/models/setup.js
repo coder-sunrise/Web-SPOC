@@ -43,6 +43,43 @@ export default createFormViewModel({
     state: {
       rows:
         JSON.parse(localStorage.getItem('dentalChartSetup')) || buttonConfigs,
+
+      treatments: [
+        {
+          id: '1',
+          text: 'Filling',
+          subItems: [
+            {
+              id: '2',
+              text: 'Amalgam Filling',
+            },
+            {
+              id: '7',
+              text: 'XXXX',
+            },
+          ],
+        },
+        {
+          id: '3',
+          text: 'Tooth Extract',
+          subItems: [
+            {
+              id: '4',
+              text: 'Hello',
+            },
+          ],
+        },
+        {
+          id: '5',
+          text: 'Consult',
+          subItems: [
+            {
+              id: '6',
+              text: 'Hello',
+            },
+          ],
+        },
+      ],
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {},

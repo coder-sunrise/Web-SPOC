@@ -15,6 +15,7 @@ const updateData = (data, payload) => {
     name,
     subTarget,
     deleted,
+    remark,
   } = payload
   // console.log(payload)
   // if (!name) return data
@@ -40,7 +41,9 @@ const updateData = (data, payload) => {
   //   others.map((o) => (o.hide = true))
   // }
   if (exist) {
-    if (
+    if (remark) {
+      exist.remark = payload.remark
+    } else if (
       data.find(
         (o) =>
           o.toothIndex === toothIndex &&
@@ -71,6 +74,7 @@ const updateData = (data, payload) => {
     //     o.value !== value && o.toothIndex === toothIndex && target === o.target,
     // )
     data.push({
+      remark: '',
       ...payload,
       timestamp: Date.now(),
       date: moment().format(dateFormatLong),
@@ -89,6 +93,9 @@ export default createFormViewModel({
     service,
     state: {
       showPedo: false,
+      mode: 'diagnosis',
+      // mode: 'treatment',
+
       data: [
         // {
         //   id: 'system-id-1',

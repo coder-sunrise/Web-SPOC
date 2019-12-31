@@ -227,7 +227,7 @@ class EditableTableGrid extends React.Component {
   }
 
   _onCommitChanges = ({ added, changed, deleted }) => {
-    console.log('_onCommitChanges')
+    // console.log('_onCommitChanges')
     const { EditingProps, rows = [], schema, getRowId } = this.props
     // console.log(changed)
     const { onCommitChanges = (f) => f } = EditingProps

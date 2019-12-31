@@ -4,7 +4,7 @@ import { Field, FastField } from 'formik'
 import _ from 'lodash'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import History from '@material-ui/icons/History'
+import HistoryIcon from '@material-ui/icons/History'
 import moment from 'moment'
 import {
   Button,
@@ -18,9 +18,12 @@ import {
   Tooltip,
   Select,
   ButtonSelect,
+  CommonModal,
   Tabs,
 } from '@/components'
 import Diagnosis from './Diagnosis'
+import Treatment from './Treatment'
+import History from './History'
 
 const RightPanel = (props) => {
   const {
@@ -37,10 +40,14 @@ const RightPanel = (props) => {
     mode,
     onDataSouceChange,
     dentalChartComponent,
+    height,
     ...restProps
   } = props
   const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
-
+  const [
+    openHistory,
+    setOpenHistory,
+  ] = React.useState(false)
   return (
     <Paper elevation={0} className={classes.paper}>
       <div>
@@ -80,8 +87,15 @@ const RightPanel = (props) => {
             style={{ lineHeight: theme.props.singleRowHeight }}
           >
             <Tooltip title='History' placement='left'>
-              <Button size='sm' onClick={() => {}} justIcon color='primary'>
-                <History />
+              <Button
+                size='sm'
+                onClick={() => {
+                  setOpenHistory(true)
+                }}
+                justIcon
+                color='primary'
+              >
+                <HistoryIcon />
               </Button>
             </Tooltip>
           </GridItem>
@@ -89,21 +103,46 @@ const RightPanel = (props) => {
             <Tabs
               // style={{ marginTop: 20 }}
               defaultActiveKey='0'
+              onChange={(tabId) => {
+                if (tabId === '1') {
+                  dispatch({
+                    type: 'dentalChartComponent/updateState',
+                    payload: {
+                      mode: 'diagnosis',
+                    },
+                  })
+                }
+              }}
               options={[
                 {
-                  id: 1,
+                  id: '1',
                   name: 'Diagnosis',
                   content: <Diagnosis {...props} />,
                 },
                 {
-                  id: 2,
+                  id: '2',
                   name: 'Treatment',
-                  content: <div>2</div>,
+                  content: <Treatment {...props} />,
                 },
               ]}
             />
           </GridItem>
         </GridContainer>
+        <CommonModal
+          open={openHistory}
+          title='Dental Chart History'
+          maxWidth='lg'
+          // fullScreen
+          bodyNoPadding
+          onConfirm={() => {
+            setOpenHistory(false)
+          }}
+          onClose={() => setOpenHistory(false)}
+          // showFooter
+          confirmText='Save'
+        >
+          <History {...props} />
+        </CommonModal>
       </div>
     </Paper>
   )

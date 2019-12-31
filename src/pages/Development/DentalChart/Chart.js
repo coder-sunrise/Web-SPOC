@@ -540,7 +540,7 @@ class Chart extends React.Component {
 
     this.canvas = canvas
     const { data = {}, pedoChart } = this.props.dentalChartComponent
-    const { dispatch } = this.props
+    const { dispatch, readOnly } = this.props
     // console.log()
     const groups = _.groupBy(this.configs, 'line')
     Object.keys(groups).forEach((k) => {
@@ -838,7 +838,7 @@ class Chart extends React.Component {
       // console.log(target.type)
       this.canvas.discardActiveObject()
 
-      if (!this.props.dentalChartComponent.action) return
+      if (!this.props.dentalChartComponent.action || readOnly) return
       setTimeout(() => {
         // console.log('selection:created, mouseMoved', e, target)
         if (
@@ -884,17 +884,19 @@ class Chart extends React.Component {
         // console.log('selection:created', rest)
       }, 1)
     })
-
     this.renderCanvas(this.props)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent, global } = nextProps
+    const { dentalChartComponent, global, readOnly } = nextProps
     // console.log(
     //   'componentWillReceiveProps',
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
     // )
-    if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
+    if (
+      !readOnly &&
+      !_.isEqual(dentalChartComponent, this.props.dentalChartComponent)
+    ) {
       this.unbindCanvas(this.props)
       this.renderCanvas(nextProps)
     }
@@ -972,7 +974,7 @@ class Chart extends React.Component {
 
   renderCanvas = (props) => {
     // console.log('renderCanvas', props.dentalChartComponent.data)
-    const { dentalChartComponent, dentalChartSetup, dispatch } = props
+    const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
     const { action = {}, data, pedoChart, surfaceLabel } = dentalChartComponent
     const { rows } = dentalChartSetup
     const { icon, type, hoverColor: hc, onSelect, clear } = action
@@ -1275,7 +1277,8 @@ class Chart extends React.Component {
   }
 
   toggleSelect = ({ item = {}, group, select }) => {
-    const { dentalChartComponent } = this.props
+    const { dentalChartComponent, readOnly } = this.props
+    if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
       // console.log(item, group)
@@ -1302,7 +1305,8 @@ class Chart extends React.Component {
   }
 
   toggleMultiSelect = (ary) => {
-    const { dentalChartComponent } = this.props
+    const { dentalChartComponent, readOnly } = this.props
+    if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
       // console.log(ary)
@@ -1373,7 +1377,7 @@ class Chart extends React.Component {
     return (
       <div
         ref={this.divContainer}
-        style={{ width: '100%', position: 'relative' }}
+        style={{ width: '100%', position: 'relative', ...style }}
       >
         <Tooltip title='Save to local'>
           <Button
