@@ -4,20 +4,50 @@ import { notification } from '@/components'
 
 let connection = null
 const connectionObserver = {}
+const tenMinutesInMillisecond = 600000
+const retryIntervalInMillisecond = 5000
+
+const setSignalRConnectedState = (state = false) => {
+  window.g_app._store.dispatch({
+    type: 'header/updateState',
+    payload: {
+      signalRConnected: state,
+    },
+  })
+}
+
+const automaticReconnectConfig = {
+  nextRetryDelayInMilliseconds: (retryContext) => {
+    const { previousRetryCount, elapsedMilliseconds } = retryContext
+
+    if (elapsedMilliseconds < tenMinutesInMillisecond) {
+      // If we've been reconnecting for less than 10 minutes so far,
+      // wait between 0 and 20 seconds before the next reconnect attempt.
+      const retryCount = previousRetryCount + 1
+      const reconnectInterval = retryCount * retryIntervalInMillisecond
+      console.log(`Reconnect in ${reconnectInterval}ms`)
+      return reconnectInterval
+    }
+
+    // If we've been reconnecting for more than 10 minutes so far, stop reconnecting.
+    console.log('Stopping reconnect attempt')
+    return null
+  },
+}
 
 const initStream = () => {
   const signalREndPoint = process.env.signalrUrl
-  // console.log(connection)
+
   connection = new signalR.HubConnectionBuilder()
     .withUrl(signalREndPoint, {
       accessTokenFactory: () => localStorage.getItem('token'),
     })
-    .withAutomaticReconnect()
+    .withAutomaticReconnect(automaticReconnectConfig)
     .build()
-  // console.log(connection)
+
   connection.on('NewNotification', (type, response) => {
     const { sender, message } = response
-    console.log({ type, response, connectionObserver })
+
     const { dispatch, getState } = window.g_app._store
     const {
       user = {
@@ -31,14 +61,6 @@ const initStream = () => {
     } = getState()
     if (sender !== user.data.clinicianProfile.name) {
       const { notifications = [] } = header
-      // notification.info({
-      //   // icon: WarningIcon,
-      //   icon: null,
-      //   placement: 'bottomRight',
-      //   message: `${sender}: ${message}`,
-      //   // description:
-      //   //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
-      // })
 
       notifications.push(response)
       dispatch({
@@ -66,26 +88,49 @@ const initStream = () => {
     // })
   })
 
-  connection
-    .start()
-    .then(() => {
-      window.g_app._store.dispatch({
-        type: 'header/updateState',
-        payload: {
-          signalRConnected: true,
-        },
+  let retryAttempt = 0
+
+  const startConnection = () => {
+    connection
+      .start()
+      .then(() => {
+        setSignalRConnectedState(true)
+        console.log('Connection started')
       })
-      console.log('Connected started')
-    })
-    .catch((err) => {
-      window.g_app._store.dispatch({
-        type: 'header/updateState',
-        payload: {
-          signalRConnected: false,
-        },
+      .catch((err) => {
+        setSignalRConnectedState(false)
+        if (connection.connectionState !== 'Connected') {
+          retryAttempt += 1
+          const interval = retryAttempt * retryIntervalInMillisecond
+
+          if (retryAttempt > 4) {
+            return console.log(err)
+          }
+
+          setTimeout(() => {
+            console.log(
+              `Retry attempt:${retryAttempt}, next retry in: ${interval}ms`,
+            )
+            startConnection()
+          }, interval)
+        }
+        return console.log(err)
       })
-      return console.log(err)
-    }) // JSON-string from `response.json()` call
+  }
+
+  connection.onclose(() => {
+    console.log('Disconnected')
+    setSignalRConnectedState(false)
+  })
+
+  connection.onreconnected(() => {
+    console.log('Reconnected')
+    setSignalRConnectedState(true)
+  })
+
+  startConnection()
+
+  // JSON-string from `response.json()` call
   // .catch((error) => console.log(error))
 
   // setInterval(() => {
