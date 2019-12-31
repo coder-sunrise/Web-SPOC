@@ -66,6 +66,14 @@ export default createFormViewModel({
         const { version, visitID, md2 } = payload
         const patientState = yield select((st) => st.patient)
 
+        yield put({
+          type: 'updateState',
+          payload: {
+            visitID,
+            patientID: payload.pid,
+          },
+        })
+
         if (
           payload.pid &&
           (!patientState.entity || patientState.entity.id !== payload.pid)
@@ -78,13 +86,7 @@ export default createFormViewModel({
           })
           yield take('patient/query/@@end')
         }
-        yield put({
-          type: 'updateState',
-          payload: {
-            visitID,
-            patientID: payload.pid,
-          },
-        })
+
         yield put({
           type: 'query',
           payload: {
