@@ -202,10 +202,15 @@ const DispenseDetails = ({
       },
     })
   }
+
+  const { clinicalObjectRecordFK } = values || {
+    clinicalObjectRecordFK: undefined,
+  }
+
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
-  const disableRefreshOrder = isBillFirstVisit && !values.clinicalObjectRecordFK
-  const disableDiscard = totalPayment > 0 || !!values.clinicalObjectRecordFK
+  const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
+  const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
 
   return (
     <React.Fragment>
