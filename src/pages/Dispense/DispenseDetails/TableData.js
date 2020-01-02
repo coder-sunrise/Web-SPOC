@@ -4,6 +4,8 @@ import { withStyles } from '@material-ui/core'
 import { CommonTableGrid } from '@/components'
 // variables
 import { tableConfig } from '../variables'
+// utils
+import { getUniqueGUID } from '@/utils/utils'
 
 const styles = (theme) => ({
   tableContainer: {
@@ -26,7 +28,8 @@ const TableData = ({
 }) => {
   const getRowId = (r) => {
     if (idPrefix === 'otherOrders') {
-      return `${idPrefix}-${r.id}-${r.sourceFK}`
+      const itemFK = r.invoiceItemFK || r.sourceFK
+      return `${idPrefix}-${r.id}-${itemFK}`
     }
     return `${idPrefix}-${r.id}`
   }
