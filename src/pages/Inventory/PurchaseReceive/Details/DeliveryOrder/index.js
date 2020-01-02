@@ -60,46 +60,48 @@ class index extends Component {
     })
   }
 
-  onAddDeliveryOrderClicked = () => {
-    const { dispatch } = this.props
-    let counter = 0
-
-    podoOrderType.forEach((x) => {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: x.ctName,
-        },
-      }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(
-          list,
-          x.itemFKName,
-          x.stateName,
-          x.stockName,
-        )
-        this.setState({
-          [x.stateName]: inventoryItemList,
-        })
-        dispatch({
-          type: 'deliveryOrderDetails/updateState',
-          payload: {
-            [x.stateName]: inventoryItemList,
-          },
-        })
-        counter += 1
-        if (counter === 3) {
-          this.setState({ showDeliveryOrderDetails: true, mode: 'Add' })
-        }
-      })
-    })
-
-    // dispatch({
-    //   type: 'deliveryOrderDetails/addNewDeliveryOrder',
-    // })
+  onAddDeliveryOrderClicked = async () => {
+    await this.queryInventoryItem()
+    this.setState({ showDeliveryOrderDetails: true, mode: 'Add' })
   }
 
-  onEditDeliveryOrderClicked = (row) => {
+  queryInventoryItem = async () => {
     const { dispatch } = this.props
+    let inventoryList = []
+    for (const x of podoOrderType) {
+      inventoryList.push(
+        dispatch({
+          type: 'codetable/fetchCodes',
+          payload: {
+            code: x.ctName,
+          },
+        }),
+      )
+    }
+
+    inventoryList = await Promise.all(inventoryList)
+    for (let i = 0; i < podoOrderType.length; i++) {
+      const { inventoryItemList } = getInventoryItemList(
+        inventoryList[i],
+        podoOrderType[i].itemFKName,
+        podoOrderType[i].stateName,
+        podoOrderType[i].stockName,
+      )
+      this.setState({
+        [podoOrderType[i].stateName]: inventoryItemList,
+      })
+      dispatch({
+        type: 'deliveryOrderDetails/updateState',
+        payload: {
+          [podoOrderType[i].stateName]: inventoryItemList,
+        },
+      })
+    }
+  }
+
+  onEditDeliveryOrderClicked = async (row) => {
+    const { dispatch } = this.props
+    await this.queryInventoryItem()
     this.setState({ showDeliveryOrderDetails: true, mode: 'Edit' })
     dispatch({
       type: 'deliveryOrderDetails/queryDeliveryOrder',
