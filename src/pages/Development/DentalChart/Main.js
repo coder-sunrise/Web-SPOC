@@ -42,10 +42,13 @@ import {
   selectablePrefix,
 } from './variables'
 
+import Tooth from './Tooth'
+
 import ButtonGroup from './ButtonGroup'
-import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
+
+const { fabric } = require('fabric')
 
 const styles = (theme) => ({
   paper: {
@@ -127,12 +130,13 @@ class DentalChart extends React.Component {
       style,
       onChange,
       value,
+      mode,
       onDataSouceChange,
       dentalChartComponent,
       dispatch,
       ...props
     } = this.props
-    const { mode } = dentalChartComponent
+    const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
         <GridContainer gutter={theme.spacing(0.5)}>
@@ -140,8 +144,7 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <ButtonGroup {...this.props} />}
-            {mode === 'treatment' && <TreatmentForm {...this.props} />}
+            <ButtonGroup {...this.props} />
           </GridItem>
           <GridItem md={4}>
             <RightPanel {...this.props} />

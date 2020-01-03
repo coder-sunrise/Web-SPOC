@@ -58,8 +58,6 @@ const Diagnosis = ({
     setSelected,
   ] = useState()
 
-  // const [remarks,setReamr]
-
   const getCellConfig = (subAry) => {
     return subAry.reduce((a, b) => {
       // console.log(a, b)
@@ -69,7 +67,7 @@ const Diagnosis = ({
       }
     })
   }
-  // console.log(selected)
+
   return (
     <div>
       <div
@@ -183,22 +181,9 @@ const Diagnosis = ({
                     }}
                     button
                     // selected={selectedIndex === 0}
-                    onClick={() => {
-                      console.log(selected, v)
-                      setSelected(
-                        selected &&
-                        v.toothIndex === selected.toothIndex &&
-                        v.value === selected.value
-                          ? undefined
-                          : v,
-                      )
-                    }}
+                    onClick={(event) => setSelected(selected ? undefined : v)}
                     index={idx}
-                    selected={
-                      selected &&
-                      v.toothIndex === selected.toothIndex &&
-                      v.value === selected.value
-                    }
+                    selected={v === selected}
                   >
                     <ListItemIcon
                       classes={{
@@ -251,24 +236,22 @@ const Diagnosis = ({
                               paddingTop: 2,
                             }}
                           >
-                            {v.action.isDiagnosis && (
-                              <Tooltip title='Delete'>
-                                <IconButton
-                                  onClick={() => {
-                                    dispatch({
-                                      type:
-                                        'dentalChartComponent/toggleMultiSelect',
-                                      payload: subAry.map((o) => ({
-                                        ...o,
-                                        deleted: true,
-                                      })),
-                                    })
-                                  }}
-                                >
-                                  <Delete />
-                                </IconButton>
-                              </Tooltip>
-                            )}
+                            <Tooltip title='Delete'>
+                              <IconButton
+                                onClick={() => {
+                                  dispatch({
+                                    type:
+                                      'dentalChartComponent/toggleMultiSelect',
+                                    payload: subAry.map((o) => ({
+                                      ...o,
+                                      deleted: true,
+                                    })),
+                                  })
+                                }}
+                              >
+                                <Delete />
+                              </IconButton>
+                            </Tooltip>
                           </GridItem>
                         </GridContainer>
                       }
@@ -287,26 +270,15 @@ const Diagnosis = ({
           multiline
           maxLength={2000}
           rowsMax={3}
-          value={selected.remark}
           rows={3}
           onChange={(v) => {
-            const shapes = data.filter(
-              (o) =>
-                o.toothIndex === selected.toothIndex &&
-                o.value === selected.value,
-            )
-            // console.log(v.target.value, selected.remark)
-            if (v.target.value !== selected.remark) {
-              dispatch({
-                type: 'dentalChartComponent/toggleMultiSelect',
-                payload: shapes.map((o) => ({
-                  ...o,
-                  forceSelect: true,
-                  remark: v.target.value,
-                })),
-              })
-              // console.log(selected, v)
-            }
+            dispatch({
+              type: 'dentalChartComponent/toggleSelect',
+              payload: {
+                ...selected,
+              },
+            })
+            console.log(selected, v)
           }}
         />
       )}
