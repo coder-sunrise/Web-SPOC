@@ -36,7 +36,7 @@ import keydown, { Keys } from 'react-keydown'
 import { Radio } from 'antd'
 import { connect } from 'dva'
 import Yup from '@/utils/yup'
-
+import { getThumbnail } from '@/components/_medisys/AttachmentWithThumbnail/utils'
 import {
   GridContainer,
   GridItem,
@@ -129,7 +129,13 @@ let temp = null
   }),
 
   handleSubmit: (values, { props }) => {
-    props.addScribble(values.subject, temp)
+    const payload = {
+      subject: values.subject,
+      thumbnail: values.thumbnail,
+      temp,
+    }
+    console.log({ payload })
+    props.addScribble(payload)
     props.toggleScribbleModal()
   },
   displayName: 'ScribbleNotePage',
@@ -310,6 +316,25 @@ class Scribble extends React.Component {
     this._sketch.downloadImage()
   }
 
+  _generateThumbnail = async () => {
+    try {
+      const result = this._sketch.exportToImageDataUrl()
+      const imgEle = document.createElement('img')
+      imgEle.src = result
+      await setTimeout(() => {
+        // wait for 1 milli second for img to set src successfully
+      }, 100)
+      const thumbnailSize = { width: 64, height: 64 }
+      const thumbnail = getThumbnail(imgEle, thumbnailSize)
+      const thumbnailData = thumbnail.toDataURL(`image/png`)
+
+      return thumbnailData
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  }
+
   _onSketchChange = (action) => {
     const prev = this.state.canUndo
     const now = this._sketch.canUndo()
@@ -450,6 +475,31 @@ class Scribble extends React.Component {
       })
     }
     this._onSketchChange('deleteAction')
+  }
+
+  onSaveClick = async () => {
+    temp = this._sketch.getAllLayerData()
+    const thumbnail = await this._generateThumbnail()
+    await this.props.setFieldValue('thumbnail', thumbnail)
+    this.props.handleSubmit()
+  }
+
+  onInsertClick = (event) => {
+    const imageDataUrl = this._sketch.exportToImageDataUrl()
+    const { dispatch, exportToClinicalNote } = this.props
+    // this.props.dispatch({
+    //   type: 'scriblenotes/updateState',
+    //   payload: {
+    //     selectedScribbleDataUrl: imageDataUrl,
+    //   },
+    // })
+    if (exportToClinicalNote) {
+      exportToClinicalNote(imageDataUrl)
+    }
+    navigateDirtyCheck({
+      displayName: 'ScribbleNotePage',
+      onProceed: this.props.toggleScribbleModal,
+    })(event)
   }
 
   render () {
@@ -1083,6 +1133,9 @@ class Scribble extends React.Component {
                   ''
                 )}
 
+                <Button color='danger' onClick={this.onInsertClick}>
+                  Insert Into
+                </Button>
                 <Button
                   color='danger'
                   onClick={navigateDirtyCheck({
@@ -1092,12 +1145,7 @@ class Scribble extends React.Component {
                 >
                   Cancel
                 </Button>
-                <ProgressButton
-                  onClick={() => {
-                    temp = this._sketch.getAllLayerData()
-                    handleSubmit()
-                  }}
-                />
+                <ProgressButton onClick={this.onSaveClick} />
               </div>
             </div>
             <div className={classes.sketchArea}>

@@ -41,6 +41,7 @@ const AttachmentWithThumbnail = ({
     height: 64,
     width: 64,
   },
+  renderBody = undefined,
 }) => {
   const fileAttachments = attachments.filter(
     (attachment) =>
@@ -250,6 +251,11 @@ const AttachmentWithThumbnail = ({
   let loadingPrefix = 'Uploading'
 
   if (downloading) loadingPrefix = 'Downloading'
+
+  if (renderBody) {
+    Body = renderBody(attachments)
+  }
+
   return (
     <div className={classes.root} id='imageroot'>
       {label && <span className={classes.attachmentLabel}>{label}</span>}
@@ -271,7 +277,7 @@ const AttachmentWithThumbnail = ({
         loading={uploading || downloading}
         text={`${loadingPrefix} attachment...`}
       >
-        {fileAttachments.length > 0 && Body}
+        {Body}
       </LoadingWrapper>
     </div>
   )

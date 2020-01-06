@@ -155,7 +155,7 @@ class ClinicalNotes extends Component {
     }
   }
 
-  scribbleNoteDrawing = (values, temp) => {
+  scribbleNoteDrawing = ({ subject, temp, thumbnail = null }) => {
     const { scriblenotes, dispatch } = this.props
     const { category, arrayName, categoryIndex, config } = this.state
     const { fields } = config
@@ -174,8 +174,9 @@ class ClinicalNotes extends Component {
       const newArrayItems = [
         ...scriblenotes[category][arrayName],
       ]
-      newArrayItems[scriblenotes.selectedIndex].subject = values
+      newArrayItems[scriblenotes.selectedIndex].subject = subject
       newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
+      newArrayItems[scriblenotes.selectedIndex].thumbnail = thumbnail
 
       dispatch({
         type: 'scriblenotes/updateState',
@@ -195,9 +196,10 @@ class ClinicalNotes extends Component {
       }, [])
     } else {
       const newData = {
+        subject,
+        thumbnail,
         scribbleNoteTypeFK: categoryIndex,
         scribbleNoteTypeName: category,
-        subject: values,
         scribbleNoteLayers: temp,
       }
       dispatch({
@@ -386,6 +388,30 @@ class ClinicalNotes extends Component {
     this.closeCannedText()
   }
 
+  insertIntoClinicalNote = (dataUrl) => {
+    const { selectedData, config } = this.state
+    const { fields = [] } = config
+    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { entity } = consultation
+    const contents = `<img src=${dataUrl} alt='scribbleNote' />`
+
+    const { corDoctorNote = [] } = entity
+    const scribbleNoteField = fields.find(
+      (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
+    )
+
+    const prevData =
+      corDoctorNote.length > 0
+        ? corDoctorNote[0][scribbleNoteField.fieldName]
+        : ''
+
+    const value = `${prevData} ${contents}`
+
+    this.onEditorChange(scribbleNoteField.fieldName)(value)
+
+    this.form.setFieldValue(`${prefix}${scribbleNoteField.fieldName}`, value)
+  }
+
   render () {
     const {
       prefix = 'corDoctorNote[0].',
@@ -567,6 +593,7 @@ class ClinicalNotes extends Component {
           <ScribbleNote
             {...this.props}
             addScribble={this.scribbleNoteDrawing}
+            exportToClinicalNote={this.insertIntoClinicalNote}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}
