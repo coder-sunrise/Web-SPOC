@@ -1,7 +1,10 @@
+import { Checkbox } from '@/components'
+
 export const columns = [
   { name: 'drag', title: ' ' },
   { name: 'title', title: 'Title' },
   { name: 'cannedText', title: 'Canned Text' },
+  { name: 'isGlobal', title: 'Is Shared' },
   { name: 'actions', title: 'Action' },
 ]
 
@@ -13,6 +16,11 @@ export const columnExtensions = [
   {
     columnName: 'title',
     width: '25%',
+  },
+  {
+    columnName: 'isGlobal',
+    width: 90,
+    render: (row) => <Checkbox checked={row.isGlobal} simple disabled />,
   },
 ]
 

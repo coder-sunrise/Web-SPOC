@@ -6,6 +6,7 @@ import { withFormik, FastField } from 'formik'
 // common components
 import {
   Button,
+  Checkbox,
   CardContainer,
   GridContainer,
   GridItem,
@@ -39,6 +40,12 @@ const Editor = ({
           <FastField
             name='title'
             render={(args) => <TextField label='Canned Text Title' {...args} />}
+          />
+        </GridItem>
+        <GridItem md={3}>
+          <FastField
+            name='isGlobal'
+            render={(args) => <Checkbox {...args} simple label='Is Shared' />}
           />
         </GridItem>
         <GridItem md={12}>

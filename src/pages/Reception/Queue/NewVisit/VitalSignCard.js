@@ -4,18 +4,9 @@ import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
-import {
-  NumberInput,
-  CommonCard,
-  GridContainer,
-  GridItem,
-  withFormikExtend,
-  withVisibilityControl,
-} from '@/components'
+import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
 import FormField from './formField'
-import { CLINIC_SPECIALIST } from '@/utils/constants'
 
-@withVisibilityControl({ hiddenFor: CLINIC_SPECIALIST.DENTAL })
 class VitalSignCard extends PureComponent {
   render () {
     const { handleCalculateBMI, isReadOnly = false } = this.props
