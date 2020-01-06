@@ -49,8 +49,8 @@ import Chart from './Chart'
 import model from './models'
 import modelSetup from './models/setup'
 
-// window.g_app.replaceModel(model)
-// window.g_app.replaceModel(modelSetup)
+window.g_app.replaceModel(model)
+window.g_app.replaceModel(modelSetup)
 const styles = (theme) => ({
   paper: {
     display: 'flex',

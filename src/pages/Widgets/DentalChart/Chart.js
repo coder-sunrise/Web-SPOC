@@ -648,7 +648,7 @@ class Chart extends React.Component {
           g11.on('mousedown', (e) => {
             // console.log({ group: e.target, item: e.subTargets[0] })
             const { action } = this.props.dentalChartComponent
-            if (action && action.method !== 'bridging')
+            if (action)
               this.toggleSelect({
                 group: e.target,
                 item: e.target._objects.find(
@@ -726,7 +726,7 @@ class Chart extends React.Component {
           g12.on('mousedown', (e) => {
             // console.log('g12 mousedown')
             const { action } = this.props.dentalChartComponent
-            if (action && action.method !== 'bridging')
+            if (action)
               this.toggleSelect({
                 group: e.target,
                 item: e.target._objects.find(
@@ -830,7 +830,6 @@ class Chart extends React.Component {
                   .filter((n) =>
                     this.isToothCrossed(n, selectedTooth[0], selectedTooth[1]),
                   )
-                if (items.length < 2) return
                 this.toggleMultiSelect(
                   items.map((g) => ({
                     group: g,
@@ -904,21 +903,18 @@ class Chart extends React.Component {
         if (this.props.dentalChartComponent.action.type !== 'cell') {
           // console.log(selected)
           this.toggleMultiSelect(
-            selected
-              .filter((o) => o._objects && o._objects.length)
-              .map((g) => ({
-                group: g,
-                item:
-                  g._objects.filter(
-                    (o) => o.name.indexOf(`${cellPrefix}`) === 0,
-                  ).length === 1
-                    ? g._objects[0]
-                    : {
-                        name: 'tooth',
-                      },
+            selected.filter((o) => o._objects.length).map((g) => ({
+              group: g,
+              item:
+                g._objects.filter((o) => o.name.indexOf(`${cellPrefix}`) === 0)
+                  .length === 1
+                  ? g._objects[0]
+                  : {
+                      name: 'tooth',
+                    },
 
-                select: true,
-              })),
+              select: true,
+            })),
           )
         } else if (this.props.dentalChartComponent.action.type === 'cell') {
           let cells = []
@@ -1388,7 +1384,7 @@ class Chart extends React.Component {
     if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
-      console.log(item, group)
+      // console.log(item, group)
       debouncedAction(() => {
         this.props.dispatch({
           type: 'dentalChartComponent/toggleSelect',

@@ -67,10 +67,7 @@ export default function ButtonGroup (props) {
     openSettings,
     setOpenSettings,
   ] = React.useState(false)
-  const [
-    search,
-    setSearch,
-  ] = React.useState('')
+
   const handleAction = (event, v) => {
     setSelectedStyle(v)
     const btn = rows.find((o) => o.value === v)
@@ -99,12 +96,7 @@ export default function ButtonGroup (props) {
       <Paper elevation={0} className={classes.paper}>
         <GridContainer>
           <GridItem md={9}>
-            <TextField
-              prefix={<Search />}
-              onChange={(e) => {
-                setSearch(e.target.value)
-              }}
-            />
+            <TextField prefix={<Search />} />
           </GridItem>
           <GridItem md={3} style={{ lineHeight: theme.props.singleRowHeight }}>
             <Tooltip title='Settings'>
@@ -133,53 +125,45 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {rows
-                .filter(
-                  (o) =>
-                    o.isDiagnosis &&
-                    !o.isDeleted &&
-                    (!search ||
-                      o.text.toLowerCase().indexOf(search.toLowerCase()) >= 0),
-                )
-                .map((row) => {
-                  const { value, text } = row
-                  return [
-                    <ToggleButton value={value}>
-                      <Tooth
-                        className={classes.buttonIcon}
-                        width={groupWidth / 5 + 2}
-                        height={groupHeight / 5 + 2}
-                        paddingLeft={1}
-                        paddingTop={1}
-                        zoom={1 / 5}
-                        image={row.attachments}
-                        action={row}
-                        fill={{
-                          left: row.fill,
-                          right: row.fill,
-                          top: row.fill,
-                          bottom: row.fill,
-                          centerfull: row.fill || 'white',
-                        }}
-                        symbol={{
-                          left: row.symbol,
-                          right: row.symbol,
-                          top: row.symbol,
-                          bottom: row.symbol,
-                          centerfull: row.symbol,
-                        }}
-                        name={text}
-                      />
-                      <span style={{ marginLeft: groupWidth / 5 + 20 }}>
-                        {text}
-                      </span>
-                    </ToggleButton>,
-                    // <Divider
-                    //   orientation='vertical'
-                    //   className={classes.divider}
-                    // />,
-                  ]
-                })}
+              {rows.filter((o) => o.isDiagnosis && !o.isDeleted).map((row) => {
+                const { value, text } = row
+                return [
+                  <ToggleButton value={value}>
+                    <Tooth
+                      className={classes.buttonIcon}
+                      width={groupWidth / 5 + 2}
+                      height={groupHeight / 5 + 2}
+                      paddingLeft={1}
+                      paddingTop={1}
+                      zoom={1 / 5}
+                      image={row.attachments}
+                      action={row}
+                      fill={{
+                        left: row.fill,
+                        right: row.fill,
+                        top: row.fill,
+                        bottom: row.fill,
+                        centerfull: row.fill || 'white',
+                      }}
+                      symbol={{
+                        left: row.symbol,
+                        right: row.symbol,
+                        top: row.symbol,
+                        bottom: row.symbol,
+                        centerfull: row.symbol,
+                      }}
+                      name={row.text}
+                    />
+                    <span style={{ marginLeft: groupWidth / 5 + 20 }}>
+                      {text}
+                    </span>
+                  </ToggleButton>,
+                  // <Divider
+                  //   orientation='vertical'
+                  //   className={classes.divider}
+                  // />,
+                ]
+              })}
             </StyledToggleButtonGroup>
           </GridItem>
         </GridContainer>

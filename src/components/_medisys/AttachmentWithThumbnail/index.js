@@ -264,9 +264,9 @@ const AttachmentWithThumbnail = ({
         onClick={clearValue}
       />
       {UploadButton}
-      <Danger style={{ display: 'inline-block' }}>
+      {errorText && <Danger style={{ display: 'inline-block' }}>
         <span style={{ fontWeight: 500 }}>{errorText}</span>
-      </Danger>
+      </Danger>}
       <LoadingWrapper
         loading={uploading || downloading}
         text={`${loadingPrefix} attachment...`}

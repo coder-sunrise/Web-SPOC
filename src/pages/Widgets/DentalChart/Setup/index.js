@@ -124,7 +124,7 @@ const Setup = (props) => {
       type: 'checkbox',
       align: 'center',
       isDisabled: (row) => {
-        return row.fixed || mode === 'sort' || row.method === 'bridging'
+        return row.fixed || mode === 'sort'
       },
     },
     {
@@ -143,7 +143,7 @@ const Setup = (props) => {
     dataSource: values.rows,
     rowDragable: true,
     columns: [
-      // { name: 'code', title: 'Code' },
+      { name: 'code', title: 'Code' },
       { name: 'method', title: 'Method' },
       { name: 'legend', title: 'Legend' },
 
