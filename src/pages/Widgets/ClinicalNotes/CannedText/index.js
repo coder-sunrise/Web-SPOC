@@ -8,9 +8,19 @@ import { DeleteWithPopover } from '@/components/_medisys'
 import Filterbar from './Filterbar'
 import Editor from './Editor'
 // utils
-import { applyFilter, columns, columnExtensions, generateData } from './utils'
+import { applyFilter, columns, columnExtensions } from './utils'
 
-const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
+const CannedText = ({
+  dispatch,
+  footer,
+  handleAddCannedText,
+  // values = { list: [] },
+  cannedText,
+  user,
+}) => {
+  const { selectedNote, fields = [] } = cannedText
+  const list = cannedText[selectedNote.fieldName]
+
   const [
     filter,
     setFilter,
@@ -22,16 +32,29 @@ const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
   ] = useState(undefined)
 
   const [
-    list,
-    setList,
-  ] = useState(generateData())
+    prevIsGlobalTicked,
+    setPrevIsGlobalTicked,
+  ] = useState(false)
+
+  const setList = (_list) => {
+    dispatch({
+      type: 'cannedText/setList',
+      payload: {
+        field: selectedNote.fieldName,
+        list: _list,
+      },
+    })
+  }
 
   const onDeleteClick = (id) => {
     setList(list.map((item) => ({ ...item, isDeleted: item.id === id })))
   }
 
   const onEditClick = (id) => {
-    setEditEntity(list.find((item) => item.id === id))
+    const entity = list.find((item) => item.id === id)
+    const { isGlobal } = entity
+    setEditEntity(entity)
+    setPrevIsGlobalTicked(isGlobal)
     dispatch({
       type: 'global/incrementCommitCount',
     })
@@ -67,14 +90,68 @@ const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
     })
   }
 
-  const handleSearch = (values) => {
-    setFilter(values.search)
+  const handleSearch = (value) => {
+    setFilter(value.search)
+  }
+
+  const updateOtherFields = (entity) => {
+    const mapList = (item) =>
+      item.id === entity.id ? { ...entity } : { ...item }
+
+    const excludeCurrentSelectedFields = fields.filter(
+      (field) => field !== selectedNote.fieldName,
+    )
+
+    const updateFieldList = (field) => {
+      const _list = cannedText[field]
+      const existing = _list.find((item) => item.id === entity.id)
+      const result = existing
+        ? _list.map(mapList)
+        : [
+            ..._list,
+            entity,
+          ]
+
+      dispatch({
+        type: 'cannedText/setList',
+        payload: {
+          field,
+          list: result,
+        },
+      })
+    }
+
+    excludeCurrentSelectedFields.forEach(updateFieldList)
+  }
+
+  const removeFromOtherFields = (entity) => {
+    const excludeCurrentSelectedFields = fields.filter(
+      (field) => field !== selectedNote.fieldName,
+    )
+
+    const removeFromList = (field) => {
+      const _list = cannedText[field]
+      dispatch({
+        type: 'cannedText/setList',
+        payload: {
+          field,
+          list: _list.map(
+            (item) =>
+              item.id === entity.id ? { ...item, isDeleted: true } : item,
+          ),
+        },
+      })
+    }
+    excludeCurrentSelectedFields.forEach(removeFromList)
   }
 
   const handleEditorConfirmClick = (entity) => {
+    const { isGlobal } = entity
+
     const mapList = (item) =>
       item.id === entity.id ? { ...entity } : { ...item }
     const existing = list.find((item) => item.id === entity.id)
+
     if (existing) {
       setList(list.map(mapList))
     } else
@@ -82,6 +159,11 @@ const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
         ...list,
         entity,
       ])
+
+    if (isGlobal && !prevIsGlobalTicked) updateOtherFields(entity)
+    else {
+      removeFromOtherFields(entity)
+    }
     clearEditEntity()
   }
 
@@ -97,9 +179,12 @@ const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
   return (
     <div>
       <Editor
+        dispatch={dispatch}
         entity={editEntity}
         onCancel={handleEditorCancelClick}
         onConfirm={handleEditorConfirmClick}
+        user={user}
+        cannedTextTypeFK={selectedNote.cannedTextTypeFK}
       />
       <Filterbar onSearchClick={handleSearch} />
       <DragableTableGrid
@@ -129,4 +214,9 @@ const CannedText = ({ dispatch, footer, handleAddCannedText }) => {
   )
 }
 
-export default connect()(CannedText)
+const Connected = connect(({ cannedText, user }) => ({
+  cannedText,
+  user: user.data,
+}))(CannedText)
+
+export default Connected

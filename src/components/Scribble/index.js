@@ -1133,9 +1133,9 @@ class Scribble extends React.Component {
                   ''
                 )}
 
-                <Button color='danger' onClick={this.onInsertClick}>
+                {/* <Button color='danger' onClick={this.onInsertClick}>
                   Insert Into
-                </Button>
+                </Button> */}
                 <Button
                   color='danger'
                   onClick={navigateDirtyCheck({
