@@ -132,7 +132,7 @@ const AttachmentWithThumbnail = ({
         }, 100)
         const thumbnail = getThumbnail(imgEle, thumbnailSize)
         let [
-          prefix,
+          base64Prefix,
           thumbnailData,
         ] = thumbnail.toDataURL(`image/png`).split(',')
         const thumbnailFile = {
@@ -140,7 +140,7 @@ const AttachmentWithThumbnail = ({
           fileSize: file.size,
           fileCategoryFK: FILE_CATEGORY.VISITREG,
           content: thumbnailData,
-          isThumbnail: true,
+          isThumbnail,
           fileExtension,
           fileStatusFK,
           attachmentType,
@@ -155,6 +155,7 @@ const AttachmentWithThumbnail = ({
       fileSize: file.size,
       fileCategoryFK: FILE_CATEGORY.VISITREG,
       content: base64,
+      isThumbnail,
       fileExtension,
       fileStatusFK,
       attachmentType,
