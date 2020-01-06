@@ -99,7 +99,7 @@ const initStream = () => {
       })
       .catch((err) => {
         setSignalRConnectedState(false)
-        if (connection.connectionState !== 'Connected') {
+        if (connection.connectionState === 'Disconnected') {
           retryAttempt += 1
           const interval = retryAttempt * retryIntervalInMillisecond
 
@@ -109,7 +109,7 @@ const initStream = () => {
 
           setTimeout(() => {
             console.log(
-              `Retry attempt:${retryAttempt}, next retry in: ${interval}ms`,
+              `Retry attempt: ${retryAttempt}, next retry in: ${interval}ms`,
             )
             startConnection()
           }, interval)
