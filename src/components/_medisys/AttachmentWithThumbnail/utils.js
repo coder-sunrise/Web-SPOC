@@ -2,20 +2,28 @@ export const imageFileExtensions = [
   '.jpg',
   '.jpeg',
   '.png',
+  'jpg',
+  'jpeg',
+  'png',
 ]
 
 export const wordFileExtensions = [
   '.doc',
   '.docx',
+  'doc',
+  'docx',
 ]
 
 export const excelFileExtensions = [
   '.xls',
   '.xlsx',
+  'xlsx',
+  'xls',
 ]
 
 export const pdfFileExtensions = [
   '.pdf',
+  'pdf',
 ]
 
 export const getThumbnail = (original, { scale, width, height }) => {

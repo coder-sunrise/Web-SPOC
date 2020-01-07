@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import classnames from 'classnames'
 // formik
 import { FastField } from 'formik'
@@ -16,16 +16,21 @@ import {
   TextField,
   Tooltip,
 } from '@/components'
-import { DeleteWithPopover } from '@/components/_medisys'
-import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
-import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
-import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
-import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
+import { DeleteWithPopover, LoadingWrapper } from '@/components/_medisys'
+// utils
 import {
   pdfFileExtensions,
   excelFileExtensions,
   wordFileExtensions,
 } from './utils'
+import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
+// services
+import { getFileByFileID } from '@/services/file'
+// assets
+import dummyThumbnail from '@/assets/thumbnail-icons/dummy-thumbnail-icon.png'
+import pdfIcon from '@/assets/thumbnail-icons/pdf-icon.png'
+import wordIcon from '@/assets/thumbnail-icons/word-icon.png'
+import excelIcon from '@/assets/thumbnail-icons/excel-icon.png'
 
 const styles = (theme) => ({
   simpleRoot: {
@@ -60,6 +65,7 @@ const styles = (theme) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingTop: theme.spacing(1),
     '& img': {
       maxWidth: '100%',
       maxHeight: '100%',
@@ -111,23 +117,59 @@ const Thumbnail = ({
     fileName,
     fileExtension,
     id,
-    thumbnailData = dummyThumbnail,
-    isbase64 = false,
+    thumbnailIndexFK,
+    thumbnail = { id: undefined },
   } = attachment
+
+  const [
+    imgSrc,
+    setImgSrc,
+  ] = useState(dummyThumbnail)
+
+  const [
+    loadingThumbnail,
+    setLoadingThumbnail,
+  ] = useState(true)
+
+  const doFetch = async () => {
+    try {
+      let src
+      const thumbnailId = thumbnailIndexFK || thumbnail.id
+
+      if (thumbnailId) {
+        const response = await getFileByFileID(thumbnailId)
+        if (response && response.status === 200) {
+          const { data } = response
+          const thumbnailDataInBase64 = arrayBufferToBase64(data)
+          const base64Prefix = 'data:image/png;base64,'
+          src = `${base64Prefix}${thumbnailDataInBase64}`
+        }
+      } else {
+        if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
+        if (wordFileExtensions.includes(fileExtension)) src = wordIcon
+        if (excelFileExtensions.includes(fileExtension)) src = excelIcon
+      }
+      setImgSrc(src)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoadingThumbnail(false)
+    }
+  }
+
+  const getThumbnail = () => {
+    doFetch()
+  }
+
+  useEffect(getThumbnail, [
+    attachment,
+  ])
 
   const handleConfirmDelete = () => {
     onConfirmDelete(fileIndexFK, id)
   }
 
   const handleAttachmentClicked = () => onClickAttachment(attachment)
-
-  let src = thumbnailData
-  // if (imageFileExtensions.includes(fileExtension))
-  //   if (isbase64) src = thumbnailData
-
-  if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
-  if (wordFileExtensions.includes(fileExtension)) src = wordIcon
-  if (excelFileExtensions.includes(fileExtension)) src = excelIcon
 
   const simpleThumbnailClass = classnames({
     [classes.simpleRoot]: true,
@@ -139,81 +181,92 @@ const Thumbnail = ({
     [classes.imageBorder]: !noBorder,
     [classes.imageSpacing]: !noBorder,
   })
+
   if (simple) {
     return (
       <div className={simpleThumbnailClass}>
-        <Tooltip title={fileName}>
-          <div
-            className={classes.imageContainer}
-            onClick={handleAttachmentClicked}
-          >
-            <img src={src} alt='test' width={size.width} height={size.height} />
-          </div>
-        </Tooltip>
-        <div className={classes.simpleButtonGroup}>
-          <Tooltip title='Change'>
-            <Button justIcon color='primary' size='sm'>
-              <Edit />
-            </Button>
-          </Tooltip>
-          <Tooltip title='Delete'>
-            <Button
-              justIcon
-              color='danger'
-              size='sm'
-              onClick={handleConfirmDelete}
-            >
-              <Delete />
-            </Button>
-          </Tooltip>
-        </div>
+        <LoadingWrapper loading={loadingThumbnail}>
+          <React.Fragment>
+            <Tooltip title={fileName}>
+              <div
+                className={classes.imageContainer}
+                onClick={handleAttachmentClicked}
+              >
+                <img
+                  src={imgSrc}
+                  alt='test'
+                  width={size.width}
+                  height={size.height}
+                />
+              </div>
+            </Tooltip>
+            <div className={classes.simpleButtonGroup}>
+              <Tooltip title='Change'>
+                <Button justIcon color='primary' size='sm'>
+                  <Edit />
+                </Button>
+              </Tooltip>
+              <Tooltip title='Delete'>
+                <DeleteWithPopover
+                  disabled={isReadOnly}
+                  onConfirmDelete={handleConfirmDelete}
+                  buttonProps={{
+                    size: 'sm',
+                  }}
+                />
+              </Tooltip>
+            </div>
+          </React.Fragment>
+        </LoadingWrapper>
       </div>
     )
   }
 
   return (
     <div className={thumbnailClass}>
-      <GridContainer>
-        <GridItem md={9} className={classes.filenameContainer}>
-          <Tooltip title={fileName}>
-            <span style={{ fontSize: '0.75rem' }}>{fileName}</span>
-          </Tooltip>
-        </GridItem>
-        <GridItem md={3}>
-          <DeleteWithPopover
-            disabled={isReadOnly}
-            onConfirmDelete={handleConfirmDelete}
-          />
-        </GridItem>
-        <GridItem md={12} style={{ cursor: 'pointer' }}>
-          <div
-            className={classes.imageContainer}
-            onClick={handleAttachmentClicked}
-          >
-            <img
-              src={src}
-              alt={fileName}
-              width={size.width}
-              height={size.height}
+      <LoadingWrapper loading={loadingThumbnail}>
+        <GridContainer>
+          <GridItem md={9} className={classes.filenameContainer}>
+            <Tooltip title={fileName}>
+              <span style={{ fontSize: '0.75rem' }}>{fileName}</span>
+            </Tooltip>
+          </GridItem>
+          <GridItem md={3}>
+            <DeleteWithPopover
+              disabled={isReadOnly}
+              onConfirmDelete={handleConfirmDelete}
             />
-          </div>
-        </GridItem>
-        <GridItem md={12}>
-          <SizeContainer size='sm'>
-            <FastField
-              name={`${fieldName}[${index}].remark`}
-              render={(args) => (
-                <TextField
-                  {...args}
-                  size='sm'
-                  label='Remark'
-                  disabled={isReadOnly}
-                />
-              )}
-            />
-          </SizeContainer>
-        </GridItem>
-      </GridContainer>
+          </GridItem>
+          <GridItem md={12} style={{ cursor: 'pointer' }}>
+            <div
+              className={classes.imageContainer}
+              onClick={handleAttachmentClicked}
+            >
+              <img
+                src={imgSrc}
+                alt={fileName}
+                width={size.width}
+                height={size.height}
+              />
+            </div>
+          </GridItem>
+          <GridItem md={12}>
+            <SizeContainer size='sm'>
+              <FastField
+                name={`${fieldName}[${index}].remark`}
+                render={(args) => (
+                  <TextField
+                    {...args}
+                    size='sm'
+                    label='Remark'
+                    disabled={isReadOnly}
+                  />
+                )}
+              />
+            </SizeContainer>
+          </GridItem>
+        </GridContainer>
+      </LoadingWrapper>
     </div>
   )
 }
