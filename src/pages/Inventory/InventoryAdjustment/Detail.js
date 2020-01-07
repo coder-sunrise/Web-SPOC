@@ -42,11 +42,12 @@ const inventoryAdjustmentSchema = Yup.object().shape({
   inventoryTypeFK: Yup.number().required(),
   code: Yup.number().required(),
   displayValue: Yup.number().required(),
-  batchNo: Yup.array().when('expiryDate', {
-    is: (v) => v === undefined || v === '',
-    then: Yup.array().nullable(),
-    otherwise: Yup.array().required(),
-  }),
+  // batchNo: Yup.array().when('expiryDate', {
+  //   is: (v) => v === undefined || v === '',
+  //   then: Yup.array().nullable(),
+  //   otherwise: Yup.array().required(),
+  // }),
+  batchNo: Yup.array().required(),
   adjustmentQty: Yup.number()
     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
@@ -75,6 +76,7 @@ const inventoryAdjustmentSchema = Yup.object().shape({
       inventoryAdjustmentStatusString,
       ...restValue
     } = values
+    console.log({ values })
     const { dispatch, onConfirm } = props
     const list =
       inventoryAdjustmentItems.length > 0 ? inventoryAdjustmentItems : stockList
