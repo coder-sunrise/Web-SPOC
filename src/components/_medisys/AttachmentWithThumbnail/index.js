@@ -36,6 +36,7 @@ const AttachmentWithThumbnail = ({
   filterTypes = [],
   allowedMultiple = true,
   simple = false,
+  local=false,
   attachmentType = '',
   thumbnailSize = {
     height: 64,
@@ -100,7 +101,7 @@ const AttachmentWithThumbnail = ({
       fileStatusFK,
       attachmentType,
     }
-    const uploaded = await uploadFile(uploadObject)
+    const uploaded =local?{}: await uploadFile(uploadObject)
 
     return {
       ...uploaded,

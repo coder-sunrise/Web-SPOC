@@ -89,7 +89,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   const { commitChanges } = control
 
   const handleUpdateAttachments = ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
+    console.log({ added, deleted })
 
     let updated = [
       ...(attachments || []),
@@ -124,6 +124,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
       }, [])
 
     row.attachments = updated.map((o) => ({ thumbnailData: o.thumbnailData }))
+    row.image = updated[0].thumbnailData
     setAttachments(updated)
     commitChanges({
       changed: {
@@ -272,6 +273,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             }}
             attachmentType='DentalChartMethod'
             simple
+            local
             isReadOnly={!viewOnly}
             allowedMultiple={false}
             handleUpdateAttachments={handleUpdateAttachments}
