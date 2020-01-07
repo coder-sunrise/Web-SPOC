@@ -795,7 +795,7 @@ export const createToothShape = ({
       polygon,
       createFont({
         text: text.left,
-        left: baseWidth / 2 - innerFontSize / 4,
+        left: baseWidth / 2 - innerFontSize / 3,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
       createFont({

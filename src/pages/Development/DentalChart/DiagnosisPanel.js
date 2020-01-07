@@ -32,6 +32,7 @@ import {
 } from '@/components'
 import { groupWidth, groupHeight } from './variables'
 import Setup from './Setup/index'
+import Setup2 from './Setup/index2'
 
 import Tooth from './Tooth'
 
@@ -55,7 +56,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
   },
 }))(ToggleButtonGroup)
 
-export default function ButtonGroup (props) {
+export default function DiagnosisPanel (props) {
   const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
   const { rows } = dentalChartSetup
 
@@ -196,12 +197,10 @@ export default function ButtonGroup (props) {
         // showFooter
         confirmText='Save'
       >
-        <Setup
-          {...props}
-          // entity={entity}
-          // refreshedSchemeData={schemeData}
-          // handleOnClose={() => handleReplacementModalVisibility(false)}
-        />
+        <div>
+          <Setup {...props} />
+          <Setup2 {...props} />
+        </div>
       </CommonModal>
     </div>
   )

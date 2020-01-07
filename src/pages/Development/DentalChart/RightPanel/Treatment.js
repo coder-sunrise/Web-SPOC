@@ -18,6 +18,8 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+import { getUniqueId } from '@/utils/utils'
+
 import {
   Button,
   GridContainer,
@@ -49,6 +51,7 @@ const Treatment = ({
   mode,
   dentalChartSetup,
   global,
+  codetable,
   ...props
 }) => {
   const { data = [], rows, pedoChart, surfaceLabel } = dentalChartSetup
@@ -56,7 +59,35 @@ const Treatment = ({
     search,
     setSearch,
   ] = useState()
-
+  const [
+    treatments,
+    setTreatments,
+  ] = useState()
+  // console.log(codetable)
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'cttreatment' },
+    }).then((list) => {
+      console.log(list)
+      setTreatments(list)
+    })
+    console.log('did m')
+  }, [])
+  console.log(_.groupBy(treatments, 'treatmentCategoryFK'))
+  const treeItems = Object.values(
+    _.groupBy(treatments, 'treatmentCategoryFK'),
+  ).map((o) => {
+    return {
+      id: getUniqueId(),
+      text: o[0].treatmentCategory.displayValue,
+      subItems: o.map((m) => ({
+        id: m.id,
+        text: m.displayValue,
+      })),
+    }
+  })
+  console.log(treeItems)
   return (
     <div>
       <div

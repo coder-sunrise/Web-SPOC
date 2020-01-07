@@ -69,7 +69,7 @@ const styles = (theme) => ({
     display: 'block',
   },
 })
-const text1 = {
+const text1l1 = {
   left: 'd',
   bottom: 'p',
   right: 'm',
@@ -77,13 +77,60 @@ const text1 = {
   centerLeft: 'o',
   centerRight: 'o',
 }
-const text2 = {
+const text1l2 = {
   left: 'd',
   bottom: 'p',
   right: 'm',
   top: 'b',
   centerfull: 'i',
 }
+const text1r1 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text1r2 = {
+  left: 'm',
+  bottom: 'p',
+  right: 'd',
+  top: 'b',
+  centerfull: 'i',
+}
+
+const text2l1 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text2l2 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerfull: 'i',
+}
+const text2r1 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text2r2 = {
+  left: 'm',
+  bottom: 'b',
+  right: 'd',
+  top: 'l',
+  centerfull: 'i',
+}
+
 const debouncedAction = _.debounce(
   (cb) => {
     cb()
@@ -113,56 +160,56 @@ class Chart extends React.Component {
     this.configs = [
       {
         index: 18,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 17,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 16,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 15,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 14,
-        text: text1,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 13,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 12,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 11,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -175,56 +222,56 @@ class Chart extends React.Component {
       },
       {
         index: 21,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 22,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 23,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 24,
-        text: text1,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 25,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 26,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 27,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 28,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -233,7 +280,7 @@ class Chart extends React.Component {
         index: 55,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1l1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
@@ -241,14 +288,14 @@ class Chart extends React.Component {
         index: 54,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1l1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
       {
         index: 53,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -256,7 +303,7 @@ class Chart extends React.Component {
       {
         index: 52,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -264,7 +311,7 @@ class Chart extends React.Component {
       {
         index: 51,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -279,7 +326,7 @@ class Chart extends React.Component {
       {
         index: 61,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -287,7 +334,7 @@ class Chart extends React.Component {
       {
         index: 62,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -295,7 +342,7 @@ class Chart extends React.Component {
       {
         index: 63,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -304,14 +351,14 @@ class Chart extends React.Component {
         index: 64,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1r1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
       {
         index: 65,
         pedo: true,
-        text: text1,
+        text: text1r1,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -321,7 +368,7 @@ class Chart extends React.Component {
         index: 85,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2l1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
@@ -329,14 +376,14 @@ class Chart extends React.Component {
         index: 84,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2l1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 83,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -344,7 +391,7 @@ class Chart extends React.Component {
       {
         index: 82,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -352,7 +399,7 @@ class Chart extends React.Component {
       {
         index: 81,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -367,7 +414,7 @@ class Chart extends React.Component {
       {
         index: 71,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -375,7 +422,7 @@ class Chart extends React.Component {
       {
         index: 72,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -383,7 +430,7 @@ class Chart extends React.Component {
       {
         index: 73,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -392,63 +439,63 @@ class Chart extends React.Component {
         index: 74,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2r1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 75,
         pedo: true,
-        text: text1,
+        text: text2r1,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 48,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 47,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 46,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 45,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 44,
-        text: text1,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 43,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 42,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 41,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
@@ -459,49 +506,49 @@ class Chart extends React.Component {
       },
       {
         index: 31,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 32,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 33,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 34,
-        text: text1,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 35,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 36,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 37,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 38,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
@@ -1388,7 +1435,7 @@ class Chart extends React.Component {
     if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
-      console.log(item, group)
+      // console.log(item, group)
       debouncedAction(() => {
         this.props.dispatch({
           type: 'dentalChartComponent/toggleSelect',
@@ -1536,7 +1583,7 @@ class Chart extends React.Component {
             <CloudDownload />
           </Button>
         </Tooltip>
-        <Paper elevation={0} className={classes.paper}>
+        <Paper className={classes.paper}>
           <canvas id={this.id} ref={this._canvasContainer} />
         </Paper>
       </div>

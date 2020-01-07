@@ -1,7 +1,7 @@
-import { createFormViewModel } from 'medisys-model'
+import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services'
+import * as service from '../services/setup'
 import { getUniqueId } from '@/utils/utils'
 import { buttonConfigs } from '../variables'
 
@@ -33,7 +33,7 @@ const updateData = (data, payload) => {
 
   return data
 }
-export default createFormViewModel({
+export default createListViewModel({
   namespace: 'dentalChartSetup',
   config: {
     queryOnLoad: false,
