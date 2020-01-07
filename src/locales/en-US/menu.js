@@ -157,4 +157,5 @@ export default {
   'menu.support.druglabel': 'Drug Label',
 
   'menu.wardmanagement': 'Ward Management',
+  'menu.patient-monitoring': 'Patient Monitoring',
 }

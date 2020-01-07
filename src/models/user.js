@@ -7,11 +7,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
   // for testing only
-  // if (name === 'patientdatabase') {
-  //   return [
-  //     { name, rights: 'disable' },
-  //   ]
-  // }
+  if (name === 'patientdatabase') {
+    return [
+      { name, rights: 'disable' },
+    ]
+  }
 
   // if (rights === 'hidden') {
   //   return [
@@ -70,6 +70,28 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   return []
 }
 
+const parseUserRights = (user) => {
+  const disableList = [
+    'reception/appointment',
+    'patientdatabase',
+    'communication',
+    'inventory',
+    'finance',
+    'report',
+    'settings',
+    'support',
+    'claimsubmission',
+  ]
+  const result = {
+    ...user,
+    accessRights: user.accessRights.map((access) => ({
+      ...access,
+      rights: disableList.includes(access.name) ? 'disable' : access.rights,
+    })),
+  }
+  return result
+}
+
 const defaultState = {
   accessRights: [],
   data: {
@@ -112,9 +134,15 @@ export default {
             data: data.userProfileDetailDto,
             accessRights,
           }
+          // for AiOT user only
+          if (user && user.data && user.data.id === 46) {
+            user = parseUserRights(user)
+            console.log({ user })
+          }
         }
         sessionStorage.setItem('user', JSON.stringify(user))
       }
+
       yield put({
         type: 'saveCurrentUser',
         payload: user,

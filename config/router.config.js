@@ -841,6 +841,23 @@ const _routes = [
         ],
       },
       // Settings
+      //
+      // AiOT
+      {
+        path: '/patient-monitoring',
+        icon: 'group',
+        name: 'patient-monitoring',
+        hideChildrenInMenu: true,
+        routes: [
+          {
+            path: '/patient-monitoring',
+            name: 'patient-monitoring',
+            component: './PatientMonitoring',
+          },
+        ],
+      },
+      // AiOT
+      //
       // Support
       {
         path: '/support',
@@ -865,6 +882,8 @@ const _routes = [
           },
         ],
       },
+      // Support
+      //
       {
         component: '404',
       },
