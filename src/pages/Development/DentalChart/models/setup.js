@@ -1,8 +1,9 @@
-import { createFormViewModel } from 'medisys-model'
+import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import _ from 'lodash'
-import * as service from '../services'
+import * as service from '../services/setup'
 import { getUniqueId } from '@/utils/utils'
+import { buttonConfigs } from '../variables'
 
 const updateData = (data, payload) => {
   const { toothIndex, value, target, forceSelect } = payload
@@ -32,7 +33,7 @@ const updateData = (data, payload) => {
 
   return data
 }
-export default createFormViewModel({
+export default createListViewModel({
   namespace: 'dentalChartSetup',
   config: {
     queryOnLoad: false,
@@ -40,11 +41,43 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      rows: [
+      rows:
+        JSON.parse(localStorage.getItem('dentalChartSetup')) || buttonConfigs,
+
+      treatments: [
         {
-          id: 1,
-          code: 1,
-          method: 'Surface',
+          id: '1',
+          text: 'Filling',
+          subItems: [
+            {
+              id: '2',
+              text: 'Amalgam Filling',
+            },
+            {
+              id: '7',
+              text: 'XXXX',
+            },
+          ],
+        },
+        {
+          id: '3',
+          text: 'Tooth Extract',
+          subItems: [
+            {
+              id: '4',
+              text: 'Hello',
+            },
+          ],
+        },
+        {
+          id: '5',
+          text: 'Consult',
+          subItems: [
+            {
+              id: '6',
+              text: 'Hello',
+            },
+          ],
         },
       ],
     },

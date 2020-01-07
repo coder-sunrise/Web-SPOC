@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import { connect } from 'dva'
-
+import { saveAs } from 'file-saver'
 import _ from 'lodash'
 import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
-import FilterList from '@material-ui/icons/FilterList'
+import CloudDownload from '@material-ui/icons/CloudDownload'
 import moment from 'moment'
 import logo from '@/assets/img/logo/logo_blue.png'
 import { getUniqueId } from '@/utils/utils'
@@ -34,15 +34,24 @@ import {
   sharedCfg,
   fontCfg,
   groupCfg,
+  addonGroupCfg,
   cellPrefix,
-  buttonConfigs,
   overlayShapeTypes,
   lockConfig,
   selectablePrefix,
+  groupWidth,
+  groupHeight,
+  createToothShape,
+  createFont,
+  createRectangle,
+  createCircle,
+  createLine,
 } from './variables'
 
 const { fabric } = require('fabric')
 
+let selectedTooth = []
+const imageCache = {}
 const styles = (theme) => ({
   paper: {
     display: 'flex',
@@ -60,21 +69,68 @@ const styles = (theme) => ({
     display: 'block',
   },
 })
-const text1 = [
-  'd',
-  'p',
-  'm',
-  'b',
-  'o',
-  'o',
-]
-const text2 = [
-  'd',
-  'p',
-  'm',
-  'b',
-  'i',
-]
+const text1l1 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text1l2 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerfull: 'i',
+}
+const text1r1 = {
+  left: 'd',
+  bottom: 'p',
+  right: 'm',
+  top: 'b',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text1r2 = {
+  left: 'm',
+  bottom: 'p',
+  right: 'd',
+  top: 'b',
+  centerfull: 'i',
+}
+
+const text2l1 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text2l2 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerfull: 'i',
+}
+const text2r1 = {
+  left: 'd',
+  bottom: 'b',
+  right: 'm',
+  top: 'l',
+  centerLeft: 'o',
+  centerRight: 'o',
+}
+const text2r2 = {
+  left: 'm',
+  bottom: 'b',
+  right: 'd',
+  top: 'l',
+  centerfull: 'i',
+}
+
 const debouncedAction = _.debounce(
   (cb) => {
     cb()
@@ -85,12 +141,14 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-const groupWidth = baseWidth * 4 // + strokeWidth
-const groupHeight = baseHeight * 3 // + strokeWidth
+const isUpperSection = (index) => {
+  return (index > 0 && index < 30) || (index > 50 && index < 70)
+}
 
 class Chart extends React.Component {
   state = {
     container: null,
+    bridgingTooths: [],
   }
 
   constructor (props) {
@@ -102,56 +160,56 @@ class Chart extends React.Component {
     this.configs = [
       {
         index: 18,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 17,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 16,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 15,
-        text: text1,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 14,
-        text: text1,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 13,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 12,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 11,
-        text: text2,
+        text: text1l2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -164,56 +222,56 @@ class Chart extends React.Component {
       },
       {
         index: 21,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 22,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 23,
-        text: text2,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 24,
-        text: text1,
+        text: text1r2,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 25,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 26,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 27,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
       },
       {
         index: 28,
-        text: text1,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -222,7 +280,7 @@ class Chart extends React.Component {
         index: 55,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1l1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
@@ -230,14 +288,14 @@ class Chart extends React.Component {
         index: 54,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1l1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
       {
         index: 53,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -245,7 +303,7 @@ class Chart extends React.Component {
       {
         index: 52,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -253,7 +311,7 @@ class Chart extends React.Component {
       {
         index: 51,
         pedo: true,
-        text: text2,
+        text: text1l2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -268,7 +326,7 @@ class Chart extends React.Component {
       {
         index: 61,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -276,7 +334,7 @@ class Chart extends React.Component {
       {
         index: 62,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -284,7 +342,7 @@ class Chart extends React.Component {
       {
         index: 63,
         pedo: true,
-        text: text2,
+        text: text1r2,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -293,14 +351,14 @@ class Chart extends React.Component {
         index: 64,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text1r1,
         line: 1,
         posAjustTop: baseHeight * 5,
       },
       {
         index: 65,
         pedo: true,
-        text: text1,
+        text: text1r1,
         left: 3,
         line: 1,
         posAjustTop: baseHeight * 5,
@@ -310,7 +368,7 @@ class Chart extends React.Component {
         index: 85,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2l1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
@@ -318,14 +376,14 @@ class Chart extends React.Component {
         index: 84,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2l1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 83,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -333,7 +391,7 @@ class Chart extends React.Component {
       {
         index: 82,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -341,7 +399,7 @@ class Chart extends React.Component {
       {
         index: 81,
         pedo: true,
-        text: text2,
+        text: text2l2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -356,7 +414,7 @@ class Chart extends React.Component {
       {
         index: 71,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -364,7 +422,7 @@ class Chart extends React.Component {
       {
         index: 72,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -372,7 +430,7 @@ class Chart extends React.Component {
       {
         index: 73,
         pedo: true,
-        text: text2,
+        text: text2r2,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
@@ -381,63 +439,63 @@ class Chart extends React.Component {
         index: 74,
         pedo: true,
         left: 3,
-        text: text1,
+        text: text2r1,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 75,
         pedo: true,
-        text: text1,
+        text: text2r1,
         left: 3,
         line: 2,
         posAjustTop: baseHeight * 5.5,
       },
       {
         index: 48,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 47,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 46,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 45,
-        text: text1,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
       {
         index: 44,
-        text: text1,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 43,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 42,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
       {
         index: 41,
-        text: text2,
+        text: text2l2,
         bottom: true,
         line: 3,
       },
@@ -448,49 +506,49 @@ class Chart extends React.Component {
       },
       {
         index: 31,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 32,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 33,
-        text: text2,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 34,
-        text: text1,
+        text: text2r2,
         bottom: true,
         line: 3,
       },
       {
         index: 35,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 36,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 37,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
       {
         index: 38,
-        text: text1,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
@@ -523,6 +581,7 @@ class Chart extends React.Component {
       // renderOnAddRemove: false,
       // skipTargetFind: true
       name: 'container',
+      backgroundColor: 'white',
     })
     canvas.setZoom(width / 2200)
     fabric.Object.prototype.transparentCorners = false
@@ -532,11 +591,12 @@ class Chart extends React.Component {
 
     this.canvas = canvas
     const { data = {}, pedoChart } = this.props.dentalChartComponent
-    const { dispatch } = this.props
+    const { dispatch, readOnly } = this.props
     // console.log()
     const groups = _.groupBy(this.configs, 'line')
     Object.keys(groups).forEach((k) => {
       groups[k].map((o, order) => {
+        // console.log(o, this.props)
         this.addGroup({
           ...o,
           order,
@@ -597,7 +657,22 @@ class Chart extends React.Component {
               toothIndex: index,
             },
           )
-
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }).rotate(180),
+          )
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }).rotate(180),
+          )
           p.rotate(180)
 
           let g11 = new fabric.Group(
@@ -616,10 +691,11 @@ class Chart extends React.Component {
               subTargetCheck: true,
             },
           )
+
           g11.on('mousedown', (e) => {
             // console.log({ group: e.target, item: e.subTargets[0] })
             const { action } = this.props.dentalChartComponent
-            if (action)
+            if (action && action.method !== 'bridging')
               this.toggleSelect({
                 group: e.target,
                 item: e.target._objects.find(
@@ -660,6 +736,22 @@ class Chart extends React.Component {
               toothIndex: index,
             },
           )
+          p.add(
+            createFont({
+              text: '',
+              left: innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }),
+          )
+          p.add(
+            createFont({
+              text: '',
+              left: -innerFontSize / 2,
+              top: -baseHeight,
+              fontSize: innerFontSize * 2,
+            }),
+          )
           let g12 = new fabric.Group(
             [
               p,
@@ -677,10 +769,11 @@ class Chart extends React.Component {
               subTargetCheck: true,
             },
           )
+
           g12.on('mousedown', (e) => {
             // console.log('g12 mousedown')
             const { action } = this.props.dentalChartComponent
-            if (action)
+            if (action && action.method !== 'bridging')
               this.toggleSelect({
                 group: e.target,
                 item: e.target._objects.find(
@@ -740,13 +833,63 @@ class Chart extends React.Component {
               } else {
                 this.toggleSelect({ item: e.subTargets[0], group })
               }
-            } else if (action.method === 'tooth') {
+            } else if (
+              [
+                'tooth',
+                'na',
+              ].includes(action.method)
+            ) {
               this.toggleSelect({
                 group,
                 item: {
                   name: 'tooth',
                 },
               })
+            } else if (action.method === 'bridging') {
+              if (selectedTooth.length < 2) {
+                if (selectedTooth.length === 0) {
+                  group.add(
+                    new fabric.Group(
+                      [
+                        createCircle(),
+                      ],
+                      {
+                        // ...sharedCfg,
+                        name: `bridgeStartPoint`,
+                        // toothIndex: index,
+                      },
+                    ),
+                  )
+                }
+
+                if (selectedTooth.length === 1) {
+                  if (selectedTooth[0].line !== group.line) return
+                }
+                selectedTooth.push(group)
+              }
+              // console.log(group)
+
+              if (selectedTooth.length === 2) {
+                selectedTooth = _.orderBy(selectedTooth, (o) => Number(o.name))
+                // console.log(selectedTooth)
+                const items = this.canvas
+                  .getObjects('group')
+                  .filter((n) =>
+                    this.isToothCrossed(n, selectedTooth[0], selectedTooth[1]),
+                  )
+                if (items.length < 2) return
+                this.toggleMultiSelect(
+                  items.map((g) => ({
+                    group: g,
+                    item: {
+                      name: 'tooth',
+                      nodes: selectedTooth.map((o) => Number(o.name)),
+                    },
+                    select: true,
+                  })),
+                )
+              }
+              this.canvas.renderAll()
             }
           }
         })
@@ -786,12 +929,15 @@ class Chart extends React.Component {
     })
     this.canvas.on('selection:created', ({ selected, e, target }) => {
       // console.log(selected.filter(o=>o._objects.length))
-
+      // console.log(selected)
       // return
       // console.log(target.type)
       this.canvas.discardActiveObject()
+      const { action } = this.props.dentalChartComponent
 
-      if (!this.props.dentalChartComponent.action) return
+      if (!action || readOnly) return
+      // console.log(action)
+      if (action.method === 'bridging') return
       setTimeout(() => {
         // console.log('selection:created, mouseMoved', e, target)
         if (
@@ -805,18 +951,21 @@ class Chart extends React.Component {
         if (this.props.dentalChartComponent.action.type !== 'cell') {
           // console.log(selected)
           this.toggleMultiSelect(
-            selected.filter((o) => o._objects.length).map((g) => ({
-              group: g,
-              item:
-                g._objects.filter((o) => o.name.indexOf(`${cellPrefix}`) === 0)
-                  .length === 1
-                  ? g._objects[0]
-                  : {
-                      name: 'tooth',
-                    },
+            selected
+              .filter((o) => o._objects && o._objects.length)
+              .map((g) => ({
+                group: g,
+                item:
+                  g._objects.filter(
+                    (o) => o.name.indexOf(`${cellPrefix}`) === 0,
+                  ).length === 1
+                    ? g._objects[0]
+                    : {
+                        name: 'tooth',
+                      },
 
-              select: true,
-            })),
+                select: true,
+              })),
           )
         } else if (this.props.dentalChartComponent.action.type === 'cell') {
           let cells = []
@@ -837,18 +986,20 @@ class Chart extends React.Component {
         // console.log('selection:created', rest)
       }, 1)
     })
-
     this.renderCanvas(this.props)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent, global } = nextProps
+    const { dentalChartComponent, global, readOnly } = nextProps
     // console.log(
     //   'componentWillReceiveProps',
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
     // )
-    if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
-      this.unbindCanvas(this.props)
+    if (
+      !readOnly &&
+      !_.isEqual(dentalChartComponent, this.props.dentalChartComponent)
+    ) {
+      // this.unbindCanvas(this.props)
       this.renderCanvas(nextProps)
     }
     this.resize(nextProps)
@@ -881,7 +1032,7 @@ class Chart extends React.Component {
   getCanvasSize = (props) => {
     const { pedoChart } = (props || this.props).dentalChartComponent
 
-    const width = this.divContainer.current.offsetWidth
+    const width = this.divContainer.current.offsetWidth - 4
     // console.log(pedoChart, width)
     return {
       width,
@@ -895,314 +1046,23 @@ class Chart extends React.Component {
     line = 0,
     order,
     left = 0,
-    headerPos,
     posAjustTop = 0,
-    top,
-    bottom,
     height,
     width,
-    values,
-    dentalChartComponent,
   }) => {
-    const cfg = {
-      ...sharedCfg,
-      top: baseHeight * 2,
-      // strokeUniform: true,
-    }
-
-    // console.log(groupCfg, logo)
-    const polygon = new fabric.Polygon( // left
-      [
-        { x: 0, y: 0 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: baseWidth, y: baseHeight },
-      ],
-      {
-        ...cfg,
-        name: text[0],
-      },
+    // console.log(text, index, order, width, height, left, line, posAjustTop)
+    this.canvas.add(
+      createToothShape({
+        text,
+        index,
+        order,
+        width,
+        height,
+        left,
+        line,
+        posAjustTop,
+      }),
     )
-
-    const polygon2 = new fabric.Polygon( // bottom
-      [
-        { x: baseWidth, y: baseHeight * 2 },
-        { x: 0, y: baseHeight * 3 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        ...cfg,
-        top: baseHeight * 4,
-        name: text[1],
-      },
-    )
-
-    const polygon3 = new fabric.Polygon( // right
-      [
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-        { x: baseWidth * 4, y: baseHeight * 3 },
-        { x: baseWidth * 3, y: baseHeight * 2 },
-      ],
-      {
-        ...cfg,
-        name: text[2],
-      },
-    )
-
-    const polygon4 = new fabric.Polygon( // top
-      [
-        { x: 0, y: 0 },
-
-        { x: baseWidth, y: baseHeight },
-
-        { x: baseWidth * 3, y: baseHeight },
-        { x: baseWidth * 4, y: 0 },
-      ],
-      {
-        ...cfg,
-        name: text[3],
-      },
-    )
-
-    const g1 = new fabric.Group(
-      [
-        polygon,
-        new fabric.IText(text[0] || '', {
-          left: baseWidth / 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}left`,
-        target: text[0],
-        toothIndex: index,
-        top: baseHeight * 2,
-        // left: 0 - groupWidth / 2,
-        // originX: 'center',
-        // originY: 'center',
-      },
-    )
-    const g2 = new fabric.Group(
-      [
-        polygon2,
-        new fabric.IText(text[1] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 5 - innerFontSize * 1.5,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}bottom`,
-        target: text[1],
-        toothIndex: index,
-        top: baseHeight * 4,
-      },
-    )
-    const g3 = new fabric.Group(
-      [
-        polygon3,
-        new fabric.IText(text[2] || '', {
-          left: baseWidth * 4 - innerFontSize * 1.2,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}right`,
-        target: text[2],
-        toothIndex: index,
-        top: baseHeight * 2,
-      },
-    )
-    const g4 = new fabric.Group(
-      [
-        polygon4,
-        new fabric.IText(text[3] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 2 + innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        }),
-      ],
-      {
-        ...groupCfg,
-        name: `${cellPrefix}top`,
-        target: text[3],
-        toothIndex: index,
-        top: baseHeight * 2,
-      },
-    )
-    let g5
-    let g6
-    let g7
-    if (text) {
-      if (text[5]) {
-        const polygon5 = new fabric.Polygon( // center left
-          [
-            { x: baseWidth, y: baseHeight },
-
-            { x: baseWidth, y: baseHeight * 2 },
-
-            { x: baseWidth * 2, y: baseHeight * 2 },
-            { x: baseWidth * 2, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[4],
-          },
-        )
-        const polygon6 = new fabric.Polygon( // center right
-          [
-            { x: baseWidth * 2, y: baseHeight },
-
-            { x: baseWidth * 2, y: baseHeight * 2 },
-
-            { x: baseWidth * 3, y: baseHeight * 2 },
-            { x: baseWidth * 3, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[5],
-          },
-        )
-        const polygon5Text = new fabric.IText(text[4] || '', {
-          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        const polygon6Text = new fabric.IText(text[5] || '', {
-          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        g5 = new fabric.Group(
-          [
-            polygon5,
-            polygon5Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[4],
-            name: `${cellPrefix}centerLeft`,
-          },
-        )
-        g6 = new fabric.Group(
-          [
-            polygon6,
-            polygon6Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[5],
-            name: `${cellPrefix}centerRight`,
-          },
-        )
-      } else {
-        const polygon7 = new fabric.Polygon( // center
-          [
-            { x: baseWidth, y: baseHeight },
-
-            { x: baseWidth, y: baseHeight * 2 },
-
-            { x: baseWidth * 3, y: baseHeight * 2 },
-            { x: baseWidth * 3, y: baseHeight },
-          ],
-          {
-            ...cfg,
-            top: baseHeight * 3,
-            name: text[4],
-          },
-        )
-        const polygon7Text = new fabric.IText(text[4] || '', {
-          left: baseWidth * 2 - innerFontSize / 4,
-          top: baseHeight * 3.5 - innerFontSize / 2,
-          fontSize: innerFontSize,
-          ...fontCfg,
-        })
-        g7 = new fabric.Group(
-          [
-            polygon7,
-            polygon7Text,
-          ],
-          {
-            ...groupCfg,
-            toothIndex: index,
-            target: text[4],
-            name: `${cellPrefix}centerfull`,
-          },
-        )
-      }
-    }
-
-    const fixedItems = [
-      // headerText,
-      g1,
-      g2,
-      g3,
-      g4,
-    ]
-    if (g7) {
-      fixedItems.push(g7)
-    } else {
-      fixedItems.push(g5)
-      fixedItems.push(g6)
-    }
-    // console.log(fixedItems)
-    const group = new fabric.Group(fixedItems.filter((o) => !width && !!o), {
-      ...groupCfg,
-      ...lockConfig,
-
-      width: width || groupWidth,
-      height: height || groupHeight,
-      // padding: 300,
-      left: (order + left) * groupWidth + 30,
-      top: groupHeight * line + 20 + posAjustTop,
-      // originX: 'left',
-      index,
-      // originY: 'center',
-      subTargetCheck: true,
-      selectable: false,
-      selectionBackgroundColor: '#cccccc',
-      // opacity: 0,
-      // transparentCorners: true,
-      // cornerColor: 'white',
-
-      // padding: 20,
-      // cornerStrokeColor: 'black',
-      // cornerStyle: 'circle',
-      name: `${index}`,
-    })
-
-    // group.add(headerText)
-
-    // group.addWithUpdate(g1)
-    // group.addWithUpdate(g2)
-
-    // canvas
-    //     .getObjects('group')
-    //     .filter((n) => Number(n.name) > 0)
-    //     .map((group) => {
-
-    //     })
-
-    // console.log(group)
-
-    this.canvas.add(group)
   }
 
   unbindCanvas = (props) => {
@@ -1215,11 +1075,23 @@ class Chart extends React.Component {
   }
 
   renderCanvas = (props) => {
-    // console.log('renderCanvas', props.dentalChartComponent.data)
-    const { dentalChartComponent, dispatch } = props
+    // console.log(
+    //   'renderCanvas',
+    //   this.canvas._objects.filter((o) => o.name === 'bridgeLine'),
+    // )
+
+    const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
     const { action = {}, data, pedoChart, surfaceLabel } = dentalChartComponent
+    const { rows } = dentalChartSetup
     const { icon, type, hoverColor: hc, onSelect, clear } = action
 
+    if (action.method === 'bridging') {
+      selectedTooth = []
+
+      this.canvas._objects
+        .filter((o) => o.name === 'bridgeLine')
+        .map((o) => this.canvas.remove(o))
+    }
     this.canvas.getObjects('group').filter((n) => n.index > 0).map((group) => {
       // console.log(group)
       const { index } = group
@@ -1267,6 +1139,7 @@ class Chart extends React.Component {
           } else {
             o._objects[1].set('opacity', 0)
           }
+        if (o._objects[2] instanceof fabric.IText) o._objects[2].set('text', '')
       })
       // const root = this.canvas._objects.find(
       //   (t) =>
@@ -1329,25 +1202,111 @@ class Chart extends React.Component {
         ],
       ).map((o) => {
         // console.log(o)
-        const target = buttonConfigs.find((m) => m.value === o.value)
+        const target = rows.find((m) => m.value === o.value)
         if (target) {
-          if (target.getShape && o.target === group.name) {
+          // console.log(target, o, group)
+
+          // if (target.getShape && o.target === group.name) {
+          //   // console.log('getShape')
+          //   let newShape = target.getShape()
+          //   let existed = group.filter((x) => x.name === o.value)[0]
+          //   // console.log(group)
+          //   if (!existed && newShape && newShape.set) {
+          //     // console.log(newShape)
+          //     newShape.set('name', o.value)
+          //     group.add(newShape)
+          //     existed = newShape
+          //   }
+          //   if (existed) existed.bringToFront()
+          // }
+          if (
+            target.editMode === 'image' &&
+            target.attachments &&
+            o.target === group.name
+          ) {
             // console.log('getShape')
 
-            let newShape = target.getShape({
-              canvas: this.canvas,
-              group,
-              config: o,
-            })
-            let existed = group.filter((x) => x.name === o.value)[0]
+            // let newShape = target.getShape()
+            let existed = imageCache[o.value] // group.filter((x) => x.name === o.value)[0]
             // console.log(group)
-            if (!existed && newShape && newShape.set) {
+            if (!existed) {
               // console.log(newShape)
-              newShape.set('name', o.value)
-              group.add(newShape)
-              existed = newShape
+              fabric.Image.fromURL(
+                target.attachments[0].thumbnailData,
+                (img) => {
+                  group.add(
+                    new fabric.Group(
+                      [
+                        img
+                          .scale(groupWidth / img.width)
+                          .rotate(isUpperSection(index) ? 180 : 0),
+                      ],
+                      {
+                        ...addonGroupCfg,
+                        isShape: true,
+                        name: o.value,
+                      },
+                    ),
+                  )
+                  imageCache[o.value] = img.scale(groupWidth / img.width)
+                  this.canvas.renderAll()
+                },
+              )
             }
-            if (existed) existed.bringToFront()
+            if (existed) {
+              group.add(
+                new fabric.Group(
+                  [
+                    fabric.util.object
+                      .clone(existed)
+                      .rotate(isUpperSection(index) ? 180 : 0),
+                  ],
+                  {
+                    ...addonGroupCfg,
+                    isShape: true,
+                    name: o.value,
+                  },
+                ),
+              )
+            }
+          } else if (
+            [
+              'tooth',
+              'na',
+            ].includes(target.method) &&
+            (target.editMode === 'color' || !target.editMode)
+          ) {
+            let shape = null
+            // console.log(o)
+            if (o.subTarget === 'tooth') {
+              shape = new fabric.Group([
+                createRectangle({
+                  fill: target.fill,
+                }),
+                createFont({
+                  text: target.symbol || '',
+                  left: groupWidth / 2 - innerFontSize / 1.8,
+                  top: groupHeight / 2 - innerFontSize,
+                  fontSize: innerFontSize * 2,
+                }),
+              ])
+            } else {
+              shape = fabric.util.object.clone(group._objects[0])
+              shape._objects[0].set('fill', target.fill)
+              shape._objects[2].set('text', target.symbol || '')
+            }
+            group.add(
+              new fabric.Group(
+                [
+                  shape,
+                ],
+                {
+                  ...addonGroupCfg,
+                  isShape: true,
+                  name: o.value,
+                },
+              ),
+            )
           } else if (target.type === 'cell') {
             // console.log(group.filter((n) => n.isValidCell()), o)
             // console.log(group)
@@ -1355,7 +1314,21 @@ class Chart extends React.Component {
               .filter((n) => n.isValidCell())
               .find((t) => t.name === o.subTarget)
             if (cell) {
+              // console.log(target, cell, group)
               cell._objects[0].set('fill', target.fill)
+              if (
+                cell._objects[2] &&
+                cell._objects[2] instanceof fabric.IText
+              ) {
+                cell._objects[2].set('text', target.symbol || '')
+              }
+              // if(target.symbol)
+              // cell.add(new fabric.IText(target.symbol || '', {
+              //   0,
+              //   0,
+              //   fontSize: innerFontSize,
+              //   ...fontCfg,
+              // }))
               // console.log(group._objects, group.filter((n) => n.isShape))
             }
             group.filter((n) => n.isShape).map((n) => {
@@ -1365,6 +1338,47 @@ class Chart extends React.Component {
             // toothIndex: index,
             // target: text[4],
             // name: `${cellPrefix}centerLeft`,
+          } else if (
+            [
+              'bridging',
+            ].includes(target.method) &&
+            o.nodes
+          ) {
+            // if (target) console.log('bridging', target, data, o)
+            if (o.toothIndex === o.nodes[0]) {
+              setTimeout(() => {
+                const start = this.canvas._objects.find(
+                  (m) => Number(m.name) === o.nodes[0],
+                )
+                const end = this.canvas._objects.find(
+                  (m) => Number(m.name) === o.nodes[1],
+                )
+                // console.log(start, end)
+                const line = createLine([
+                  start.translateX,
+                  start.translateY,
+                  end.translateX,
+                  end.translateY,
+                  // 10,
+                  // 10,
+                  // 30,
+                  // 30,
+                ])
+                // console.log(group, line)
+
+                this.canvas.add(
+                  new fabric.Group(
+                    [
+                      line,
+                      // createCircle(),
+                    ],
+                    {
+                      name: `bridgeLine`,
+                    },
+                  ),
+                )
+              }, 0)
+            }
           }
           if (target.render) {
             target.render({ group, canvas: this.canvas })
@@ -1409,7 +1423,7 @@ class Chart extends React.Component {
     //   onSelect({ canvas: this.canvas })
     // }
     this.canvas.renderAll()
-
+    // console.log(this.canvas)
     // fabric.Image.fromURL(logo, (img) => {
     //   let oImg = img.set({ left: 0, top: 0 }).scale(0.25)
     //   this.canvas.add(oImg)
@@ -1417,7 +1431,8 @@ class Chart extends React.Component {
   }
 
   toggleSelect = ({ item = {}, group, select }) => {
-    const { dentalChartComponent } = this.props
+    const { dentalChartComponent, readOnly } = this.props
+    if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
       // console.log(item, group)
@@ -1427,6 +1442,7 @@ class Chart extends React.Component {
           payload: {
             toothIndex: group.index || item.toothIndex,
             value: action.value,
+            action,
             target: group.name,
             subTarget: item.name,
             forceSelect: select,
@@ -1436,6 +1452,7 @@ class Chart extends React.Component {
                 : item.name,
             prevColor:
               item.isValidCell && item.isValidCell() ? item.item(0).fill : '',
+            nodes: item.nodes,
           },
         })
       })
@@ -1443,7 +1460,8 @@ class Chart extends React.Component {
   }
 
   toggleMultiSelect = (ary) => {
-    const { dentalChartComponent } = this.props
+    const { dentalChartComponent, readOnly } = this.props
+    if (readOnly) return
     const { action } = dentalChartComponent
     if (action && action.value) {
       // console.log(ary)
@@ -1452,11 +1470,12 @@ class Chart extends React.Component {
           type: 'dentalChartComponent/toggleMultiSelect',
           payload: ary.map(({ group, item = {}, select }) => {
             // console.log(item)
-            console.log(group, group.name)
+            // console.log(group, group.name)
 
             return {
               toothIndex: group.index || item.toothIndex,
               value: action.value,
+              action,
               target: group.name,
               subTarget: item.name,
               forceSelect: select,
@@ -1466,11 +1485,41 @@ class Chart extends React.Component {
                   : item.name,
               prevColor:
                 item.isValidCell && item.isValidCell() ? item.item(0).fill : '',
+              nodes: item.nodes,
             }
           }),
         })
       })
     }
+  }
+
+  isToothCrossed = (n, start, end) => {
+    // console.log(n, start, end)
+    const startChar1 = start.name.substring(0, 1)
+    const endChar1 = end.name.substring(0, 1)
+    if (!n.name || !Number(n.name)) return false
+    if (startChar1 === endChar1) {
+      return (
+        (Number(n.name) >= Number(start.name) &&
+          Number(n.name) <= Number(end.name)) ||
+        (Number(n.name) >= Number(end.name) &&
+          Number(n.name) <= Number(start.name))
+      )
+    }
+    if (n.name.substring(0, 1) === startChar1) {
+      return (
+        Number(n.name) > Number(`${startChar1}0`) &&
+        Number(n.name) <= Number(start.name)
+      )
+    }
+    if (n.name.substring(0, 1) === endChar1) {
+      return (
+        Number(n.name) > Number(`${endChar1}0`) &&
+        Number(n.name) <= Number(end.name)
+      )
+    }
+
+    return false
   }
 
   // resize () {
@@ -1511,8 +1560,30 @@ class Chart extends React.Component {
     //   console.log(this.divContainer.current.offsetWidth)
     // }
     return (
-      <div ref={this.divContainer} style={{ width: '100%' }}>
-        <Paper elevation={0} className={classes.paper}>
+      <div
+        ref={this.divContainer}
+        style={{ width: '100%', position: 'relative', ...style }}
+      >
+        <Tooltip title='Save to local'>
+          <Button
+            justIcon
+            color='primary'
+            style={{
+              position: 'absolute',
+              zIndex: 100,
+              right: 0,
+              bottom: 8,
+            }}
+            onClick={() => {
+              this._canvasContainer.current.toBlob((blob) => {
+                saveAs(blob, 'dentalchart.png')
+              }, 'image/png')
+            }}
+          >
+            <CloudDownload />
+          </Button>
+        </Tooltip>
+        <Paper className={classes.paper}>
           <canvas id={this.id} ref={this._canvasContainer} />
         </Paper>
       </div>

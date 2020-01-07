@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import color from '@material-ui/core/colors/amber'
+import { Row } from 'antd'
 import clear from '@/assets/img/dentalChart/clear.png'
 import missing from '@/assets/img/dentalChart/missing.png'
 import caries from '@/assets/img/dentalChart/caries.png'
@@ -41,9 +43,12 @@ fabric.Object.prototype.isDefaultCell = function () {
     this.name.indexOf('header_') === 0
   )
 }
+
 export const strokeWidth = 2
 export const baseWidth = 30
 export const baseHeight = 40
+export const groupWidth = baseWidth * 4 // + strokeWidth
+export const groupHeight = baseHeight * 3 // + strokeWidth
 export const zoom = 1
 export const fontColor = '#000000'
 export const innerFontSize = 22
@@ -56,15 +61,15 @@ export const lockConfig = {
   // selectable: false,
 }
 export const groupCfg = {
-  selectable: false,
+  // selectable: false,
 }
-const addonGroupCfg = {
+export const addonGroupCfg = {
   ...groupCfg,
   top: -baseHeight * 1.5 - strokeWidth / 2,
   left: -baseWidth * 2 - strokeWidth / 2,
 }
 export const sharedCfg = {
-  selectable: false,
+  // selectable: false,
   strokeWidth,
   stroke: '#000000',
   objectCaching: true,
@@ -86,6 +91,7 @@ export const overlayShapeTypes = [
   'bridge',
   'missing',
 ]
+const imageCache = {}
 const checkIsValidElement = (item, name, checker) => {
   if (checker) return checker(item, name)
   if (item.name === name) {
@@ -110,7 +116,7 @@ const debouncedAction = _.debounce(
     trailing: false,
   },
 )
-const makeLine = (coords, cfg) => {
+export const createLine = (coords, cfg) => {
   return new fabric.Line(coords, {
     fill: 'red',
     stroke: 'red',
@@ -120,7 +126,7 @@ const makeLine = (coords, cfg) => {
     ...cfg,
   })
 }
-const makeCircle = (cfg) => {
+export const createCircle = (cfg) => {
   return new fabric.Circle({
     left: -8,
     top: -8,
@@ -131,9 +137,9 @@ const makeCircle = (cfg) => {
     ...cfg,
   })
 }
-let currentSelectedStyle = null
-let currentSelectedGroup = null
-const renderBackgroud = () => {
+// let currentSelectedStyle = null
+// let currentSelectedGroup = null
+export const createRectangle = (cfg) => {
   return new fabric.Rect({
     ...sharedCfg,
     width: baseWidth * 4,
@@ -141,312 +147,313 @@ const renderBackgroud = () => {
     name: 'replaceObject',
     fill: '#ffffff',
     opacity: 1,
+    ...cfg,
   })
 }
-let currentPointer
-const toggleSelect = ({ item, selected, config, values, dispatch, group }) => {
-  debouncedAction(() => {
-    // console.log(config, selected, values, item.name)
+// let currentPointer
+// const toggleSelect = ({ item, selected, config, values, dispatch, group }) => {
+//   debouncedAction(() => {
+//     // console.log(config, selected, values, item.name)
 
-    const currentSelctedValue = selected.find(
-      (o) => o.value === config.value && (o.target === item.name || !o.target),
-    )
-    dispatch({
-      type: 'dentalChartComponent/toggleSelect',
-      payload: {
-        ...config,
-        ...currentSelctedValue,
-        toothIndex: Number(group.name),
-        target: item.name,
-        prevColor: item.isValidCell() ? item.item(0).fill : '',
-      },
-    })
+//     const currentSelctedValue = selected.find(
+//       (o) => o.value === config.value && (o.target === item.name || !o.target),
+//     )
+//     dispatch({
+//       type: 'dentalChartComponent/toggleSelect',
+//       payload: {
+//         ...config,
+//         ...currentSelctedValue,
+//         toothIndex: Number(group.name),
+//         target: item.name,
+//         prevColor: item.isValidCell() ? item.item(0).fill : '',
+//       },
+//     })
 
-    // if (currentSelctedValue) {
-    //   item.set('opacity', unselectedOpactiy || 0.1)
-    //   item.set('fill', 'white')
-    //   if (shape) group.sendToBack(item)
-    // } else {
-    //   item.set('opacity', 1)
-    //   if (shape) group.bringToFront(item)
-    // }
+//     // if (currentSelctedValue) {
+//     //   item.set('opacity', unselectedOpactiy || 0.1)
+//     //   item.set('fill', 'white')
+//     //   if (shape) group.sendToBack(item)
+//     // } else {
+//     //   item.set('opacity', 1)
+//     //   if (shape) group.bringToFront(item)
+//     // }
 
-    // item.set('fill', config.fill)
+//     // item.set('fill', config.fill)
 
-    // canvas.renderAll()
-  })
-}
-const renderOutsideTopCell = (
-  {
-    addonShapeHandler,
-    customizeHover = false,
-    unselectedOpactiy = 0,
-    ...config
-  },
-  { canvas, group, dispatch, values = [] },
-) => {
-  console.log(config, values)
-  const { value } = config
+//     // canvas.renderAll()
+//   })
+// }
+// const renderOutsideTopCell = (
+//   {
+//     addonShapeHandler,
+//     customizeHover = false,
+//     unselectedOpactiy = 0,
+//     ...config
+//   },
+//   { canvas, group, dispatch, values = [] },
+// ) => {
+//   console.log(config, values)
+//   const { value } = config
 
-  let selected = values.filter((o) => o.value === value)
-  // if (
-  //   overlayShapeTypes.includes(value) &&
-  //   values.find((o) => o.value !== value)
-  // ) {
-  //   dispatch()
-  // }
-  const name = `${modifierNamePrefix}${value}`
-  const shape =
-    typeof addonShapeHandler === 'function'
-      ? addonShapeHandler({ selected, config })
-      : undefined
-  group.off('mouseup')
+//   let selected = values.filter((o) => o.value === value)
+//   // if (
+//   //   overlayShapeTypes.includes(value) &&
+//   //   values.find((o) => o.value !== value)
+//   // ) {
+//   //   dispatch()
+//   // }
+//   const name = `${modifierNamePrefix}${value}`
+//   const shape =
+//     typeof addonShapeHandler === 'function'
+//       ? addonShapeHandler({ selected, config })
+//       : undefined
+//   group.off('mouseup')
 
-  group.on('mouseup', (e) => {
-    console.log('gesture', e)
-    if (e.target) {
-      const item = group.object(value)
+//   group.on('mouseup', (e) => {
+//     console.log('gesture', e)
+//     if (e.target) {
+//       const item = group.object(value)
 
-      if (
-        item // &&
-        // e.target.canvas // &&
-        // checkIsValidElement(item, name, config.isValidElement)
-      ) {
-        toggleSelect({ item, selected, config, values, dispatch, group })
-      }
-    }
-  })
-  console.log(shape)
+//       if (
+//         item // &&
+//         // e.target.canvas // &&
+//         // checkIsValidElement(item, name, config.isValidElement)
+//       ) {
+//         toggleSelect({ item, selected, config, values, dispatch, group })
+//       }
+//     }
+//   })
+//   // console.log(shape)
 
-  if (shape) {
-    if (group.filter((o) => o.name === name).length === 0) {
-      shape.set('name', name)
-      group.add(shape)
-      // if (selected.length === 0) shape.sendToBack()
-    } else {
-      // console.log(group.filter((o) => o.name === name))
-      group.filter((o) => o.name === name)[0].bringToFront()
-    }
-  }
-  console.log(selected)
-  // const group = new fabric.Group(
-  //   [
-  //     shape,
-  //   ],
-  //   {
-  //     ...groupCfg,
-  //     name: 'selectedGroup',
-  //   },
-  // )
-  // canvas.off('mouse:over')
-  // canvas.off('mouse:out')
-  // canvas.off('mouse:up')
-  group.off('mouseover')
-  group.off('mouseout')
-  // if (selected.length === 0) {
+//   if (shape) {
+//     if (group.filter((o) => o.name === name).length === 0) {
+//       shape.set('name', name)
+//       group.add(shape)
+//       // if (selected.length === 0) shape.sendToBack()
+//     } else {
+//       // console.log(group.filter((o) => o.name === name))
+//       group.filter((o) => o.name === name)[0].bringToFront()
+//     }
+//   }
+//   console.log(selected)
+//   // const group = new fabric.Group(
+//   //   [
+//   //     shape,
+//   //   ],
+//   //   {
+//   //     ...groupCfg,
+//   //     name: 'selectedGroup',
+//   //   },
+//   // )
+//   // canvas.off('mouse:over')
+//   // canvas.off('mouse:out')
+//   // canvas.off('mouse:up')
+//   group.off('mouseover')
+//   group.off('mouseout')
+//   // if (selected.length === 0) {
 
-  // }
-  if (
-    [
-      'topcell',
-      'bottomcell',
-    ].includes(config.value)
-  ) {
-    group.on('mouseover', (e) => {
-      console.log(e)
-      if (selected.length === 0) {
-        group.object(value).set('opacity', 1)
-        canvas.renderAll()
-      }
-    })
-    group.on('mouseout', (e) => {
-      if (selected.length === 0) {
-        group.object(value).set('opacity', unselectedOpactiy)
-        canvas.renderAll()
-      }
-    })
+//   // }
+//   if (
+//     [
+//       'topcell',
+//       'bottomcell',
+//     ].includes(config.value)
+//   ) {
+//     group.on('mouseover', (e) => {
+//       console.log(e)
+//       if (selected.length === 0) {
+//         group.object(value).set('opacity', 1)
+//         canvas.renderAll()
+//       }
+//     })
+//     group.on('mouseout', (e) => {
+//       if (selected.length === 0) {
+//         group.object(value).set('opacity', unselectedOpactiy)
+//         canvas.renderAll()
+//       }
+//     })
 
-    // canvas.on('mouse:over', (e) => {
-    //   if (e.target) {
-    //     const item = e.target
+//     // canvas.on('mouse:over', (e) => {
+//     //   if (e.target) {
+//     //     const item = e.target
 
-    //     if (item && item.name === name && selected.length === 0) {
-    //       item.set('opacity', 1)
-    //       item.set('fill', config.fill)
+//     //     if (item && item.name === name && selected.length === 0) {
+//     //       item.set('opacity', 1)
+//     //       item.set('fill', config.fill)
 
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
-    // canvas.on('mouse:out', (e) => {
-    //   if (e.target) {
-    //     const item = e.target
-    //     if (item && item.name === name && selected.length === 0) {
-    //       item.set('opacity', 0.1)
-    //       item.set('fill', config.fill)
+//     //       canvas.renderAll()
+//     //     }
+//     //   }
+//     // })
+//     // canvas.on('mouse:out', (e) => {
+//     //   if (e.target) {
+//     //     const item = e.target
+//     //     if (item && item.name === name && selected.length === 0) {
+//     //       item.set('opacity', 0.1)
+//     //       item.set('fill', config.fill)
 
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
-  } else if (
-    [
-      'temporarydressing',
-    ].includes(config.value)
-  ) {
-    // console.log(selected, config)
-    group._objects.filter((o) => o.isValidCell()).map((sub) => {
-      sub.off('mouseup')
-      sub.on('mouseup', (e) => {
-        console.log(e.subTargets[0])
-        if (
-          e.subTargets[0] instanceof fabric.Group &&
-          e.subTargets[0].isValidCell()
-        ) {
-          toggleSelect({
-            item: e.subTargets[0],
-            selected,
-            config,
-            values,
-            dispatch,
-            group,
-          })
-        }
-      })
-      sub.on('dragover', (e) => {
-        console.log('dragenter', e)
-      })
+//     //       canvas.renderAll()
+//     //     }
+//     //   }
+//     // })
+//   } else if (
+//     [
+//       'temporarydressing',
+//     ].includes(config.value)
+//   ) {
+//     // console.log(selected, config)
+//     group._objects.filter((o) => o.isValidCell()).map((sub) => {
+//       sub.off('mouseup')
+//       sub.on('mouseup', (e) => {
+//         console.log(e.subTargets[0])
+//         if (
+//           e.subTargets[0] instanceof fabric.Group &&
+//           e.subTargets[0].isValidCell()
+//         ) {
+//           toggleSelect({
+//             item: e.subTargets[0],
+//             selected,
+//             config,
+//             values,
+//             dispatch,
+//             group,
+//           })
+//         }
+//       })
+//       sub.on('dragover', (e) => {
+//         console.log('dragenter', e)
+//       })
 
-      if (selected.find((o) => o.target === sub.name)) {
-        sub.item(0).set('fill', config.fill)
-      } else {
-        sub.item(0).set('fill', 'white')
+//       if (selected.find((o) => o.target === sub.name)) {
+//         sub.item(0).set('fill', config.fill)
+//       } else {
+//         sub.item(0).set('fill', 'white')
 
-        sub.off('mouseover')
-        sub.off('mouseout')
+//         sub.off('mouseover')
+//         sub.off('mouseout')
 
-        let prevColor = null
-        sub.on('mouseover', (e) => {
-          if (e.target instanceof fabric.Group && e.target.isValidCell()) {
-            const item = e.target.item(0)
-            prevColor = item.get('fill')
-            e.target.item(0).set('fill', config.fill)
-            canvas.renderAll()
-          }
-        })
-        sub.on('mouseout', (e) => {
-          if (e.target instanceof fabric.Group && e.target.isValidCell()) {
-            e.target.item(0).set('fill', prevColor)
-            canvas.renderAll()
-          }
-        })
-      }
-    })
+//         let prevColor = null
+//         sub.on('mouseover', (e) => {
+//           if (e.target instanceof fabric.Group && e.target.isValidCell()) {
+//             const item = e.target.item(0)
+//             prevColor = item.get('fill')
+//             e.target.item(0).set('fill', config.fill)
+//             canvas.renderAll()
+//           }
+//         })
+//         sub.on('mouseout', (e) => {
+//           if (e.target instanceof fabric.Group && e.target.isValidCell()) {
+//             e.target.item(0).set('fill', prevColor)
+//             canvas.renderAll()
+//           }
+//         })
+//       }
+//     })
 
-    group.on('mouseout', (e) => {
-      group._objects.map((sub) => {
-        if (sub instanceof fabric.Group && sub.isValidCell()) {
-          if (!selected.find((o) => o.target === sub.name)) {
-            sub.item(0).set('fill', 'white')
-            canvas.renderAll()
-          }
-        }
-      })
-      canvas.renderAll()
-    })
-    // group.on('mouseover', (e) => {
-    //   console.log(e)
-    //   if (selected.length === 0) {
-    //     // group.object(value).set('opacity', 1)
-    //     canvas.renderAll()
-    //   }
-    // })
-    // group.on('mouseout', (e) => {
-    //   if (selected.length === 0) {
-    //     // group.object(value).set('opacity', unselectedOpactiy)
-    //     canvas.renderAll()
-    //   }
-    // })
+//     group.on('mouseout', (e) => {
+//       group._objects.map((sub) => {
+//         if (sub instanceof fabric.Group && sub.isValidCell()) {
+//           if (!selected.find((o) => o.target === sub.name)) {
+//             sub.item(0).set('fill', 'white')
+//             canvas.renderAll()
+//           }
+//         }
+//       })
+//       canvas.renderAll()
+//     })
+//     // group.on('mouseover', (e) => {
+//     //   console.log(e)
+//     //   if (selected.length === 0) {
+//     //     // group.object(value).set('opacity', 1)
+//     //     canvas.renderAll()
+//     //   }
+//     // })
+//     // group.on('mouseout', (e) => {
+//     //   if (selected.length === 0) {
+//     //     // group.object(value).set('opacity', unselectedOpactiy)
+//     //     canvas.renderAll()
+//     //   }
+//     // })
 
-    // canvas
-    //   .getObjects()
-    //   .filter((o) => o.name && o.name.indexOf(cellPrefix) === 0)
-    //   .map((g) => {
-    //     const item = g.item(0)
-    //     if (item) {
-    //       if (selected.find((m) => g.name === m.target)) {
-    //         item.set('fill', config.fill)
-    //       } else {
-    //         item.set('fill', `white`)
-    //       }
-    //     }
-    //   })
+//     // canvas
+//     //   .getObjects()
+//     //   .filter((o) => o.name && o.name.indexOf(cellPrefix) === 0)
+//     //   .map((g) => {
+//     //     const item = g.item(0)
+//     //     if (item) {
+//     //       if (selected.find((m) => g.name === m.target)) {
+//     //         item.set('fill', config.fill)
+//     //       } else {
+//     //         item.set('fill', `white`)
+//     //       }
+//     //     }
+//     //   })
 
-    // let colorBefore = null
-    // canvas.on('mouse:over', (e) => {
-    //   // console.log(e, e.target)
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
+//     // let colorBefore = null
+//     // canvas.on('mouse:over', (e) => {
+//     //   // console.log(e, e.target)
+//     //   if (e.target && e.target.item) {
+//     //     const item = e.target.item(0)
 
-    //     if (item && !selected.find((o) => o.target === e.target.name)) {
-    //       colorBefore = item.get('fill')
-    //       item.set('fill', config.fill)
-    //       // canvas.getObjects('group').map((o) => {
-    //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 1)
-    //       // })
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
+//     //     if (item && !selected.find((o) => o.target === e.target.name)) {
+//     //       colorBefore = item.get('fill')
+//     //       item.set('fill', config.fill)
+//     //       // canvas.getObjects('group').map((o) => {
+//     //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 1)
+//     //       // })
+//     //       canvas.renderAll()
+//     //     }
+//     //   }
+//     // })
 
-    // canvas.on('mouse:out', (e) => {
-    //   if (e.target && e.target.item) {
-    //     const item = e.target.item(0)
-    //     if (item && !selected.find((o) => o.target === e.target.name)) {
-    //       item.set('fill', colorBefore || 'white')
-    //       // canvas.getObjects('group').map((o) => {
-    //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 0.1)
-    //       // })
+//     // canvas.on('mouse:out', (e) => {
+//     //   if (e.target && e.target.item) {
+//     //     const item = e.target.item(0)
+//     //     if (item && !selected.find((o) => o.target === e.target.name)) {
+//     //       item.set('fill', colorBefore || 'white')
+//     //       // canvas.getObjects('group').map((o) => {
+//     //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 0.1)
+//     //       // })
 
-    //       canvas.renderAll()
-    //     }
-    //   }
-    // })
-  } else if (overlayShapeTypes.includes(value)) {
-    // group.on('mouseover', (e) => {
-    //   if (selected.length === 0) {
-    //     group.object(value).set('opacity', 1)
-    //     canvas.renderAll()
-    //   }
-    // })
-    // group.on('mouseout', (e) => {
-    //   if (selected.length === 0) {
-    //     group.object(value).set('opacity', unselectedOpactiy)
-    //     canvas.renderAll()
-    //   }
-    // })
-  }
+//     //       canvas.renderAll()
+//     //     }
+//     //   }
+//     // })
+//   } else if (overlayShapeTypes.includes(value)) {
+//     // group.on('mouseover', (e) => {
+//     //   if (selected.length === 0) {
+//     //     group.object(value).set('opacity', 1)
+//     //     canvas.renderAll()
+//     //   }
+//     // })
+//     // group.on('mouseout', (e) => {
+//     //   if (selected.length === 0) {
+//     //     group.object(value).set('opacity', unselectedOpactiy)
+//     //     canvas.renderAll()
+//     //   }
+//     // })
+//   }
 
-  const item = group.object(value)
-  if (item) {
-    if (selected.length === 0) {
-      group.sendToBack(item)
-      item.set('opacity', unselectedOpactiy)
-    } else {
-      group.bringToFront(item)
-      item.set('opacity', 1)
-    }
-  }
+//   const item = group.object(value)
+//   if (item) {
+//     if (selected.length === 0) {
+//       group.sendToBack(item)
+//       item.set('opacity', unselectedOpactiy)
+//     } else {
+//       group.bringToFront(item)
+//       item.set('opacity', 1)
+//     }
+//   }
 
-  const existOverlay = group.object(
-    values.find((o) => overlayShapeTypes.includes(o.value)),
-  )
+//   const existOverlay = group.object(
+//     values.find((o) => overlayShapeTypes.includes(o.value)),
+//   )
 
-  if (existOverlay) {
-    existOverlay.set('opacity', 1)
-    existOverlay.bringToFront()
-  }
-}
+//   if (existOverlay) {
+//     existOverlay.set('opacity', 1)
+//     existOverlay.bringToFront()
+//   }
+// }
 const sharedButtonConfig = {
   clear: ({ canvas, group, values = [] }) => {
     // canvas.remove()
@@ -501,67 +508,29 @@ const sharedButtonConfig = {
   },
 }
 
-let img1
-
-fabric.Image.fromURL(test, (img) => {
-  // console.log(
-  //   (img.height - strokeWidth * 2) / (baseHeight * 3),
-  //   baseHeight * 3 / img.height,
-  //   img.height,
-  //   baseHeight * 3,
-  // )
-  const img2 = img
-    .set({ left: 0, top: 0 })
-    .scale((baseHeight * 3 + strokeWidth * 2) / img.height)
-  const group = new fabric.Group(
-    [
-      img2,
-    ],
-    {
-      ...addonGroupCfg,
-      isShape: true,
-    },
-  )
-  // img2.set('scaleX', 1)
-  // img2.set('scaleY', 1)
-
-  // group.setZoom(0.5)
-  img1 = group
-})
-
 export const buttonConfigs = [
   {
     id: 1,
     value: 'clear',
-    icon: clear,
     text: 'Clear',
     fixed: true,
     method: 'na',
+    isDiagnosis: true,
   },
   {
     id: 2,
     value: 'missing',
-    icon: missing,
     text: 'Missing',
-    getShape: ({ canvas, group, config }) => {
-      const g = new fabric.Group(
-        [
-          renderBackgroud(),
-        ],
-        {
-          ...addonGroupCfg,
-          isShape: true,
-        },
-      )
-      return g
-    },
+    fill: 'white',
     fixed: true,
     method: 'na',
+    isDiagnosis: true,
+    editMode: 'color',
+    symbol: '',
   },
   {
     id: 3,
     value: 'caries',
-    icon: caries,
     text: 'Caries',
     type: 'cell',
     fill: '#824f4f',
@@ -570,7 +539,6 @@ export const buttonConfigs = [
   {
     id: 4,
     value: 'recurrentdecay',
-    icon: recurrentdecay,
     text: 'Recurrent Decay',
     type: 'cell',
     fill: '#f79e02',
@@ -579,7 +547,6 @@ export const buttonConfigs = [
   {
     id: 5,
     value: 'nccl',
-    icon: nccl,
     text: 'NCCL',
     type: 'cell',
     fill: '#ffe921',
@@ -588,17 +555,13 @@ export const buttonConfigs = [
   {
     id: 6,
     value: 'fractured',
-    icon: test,
     text: 'Fractured',
-    getShape: ({ canvas, group, config }) => {
-      return fabric.util.object.clone(img1)
-    },
+
     method: 'tooth',
   },
   {
     id: 7,
     value: 'filling',
-    icon: filling,
     text: 'Filling',
     type: 'cell',
     fill: '#737372',
@@ -607,7 +570,6 @@ export const buttonConfigs = [
   {
     id: 8,
     value: 'temporarydressing',
-    icon: temporarydressing,
     text: 'Temporary Dressing',
     type: 'cell',
     fill: '#9c9c98',
@@ -616,43 +578,9 @@ export const buttonConfigs = [
   {
     id: 9,
     value: 'onlayveneer',
-    icon: onlayveneer,
     text: 'Onlay/Veneer',
     ...sharedButtonConfig,
-    getShape: () => {
-      const onlayveneerInner1 = new fabric.Triangle({
-        top: 5,
-        left: baseWidth * 0.5 / 2 + 5,
-        width: baseWidth * 3.5 - 10,
-        height: baseHeight * 3 - 10,
-        // top: baseHeight * 2 + 5,
-        ...sharedCfg,
-        fill: '#cccccc',
-      })
-      const onlayveneerInner2 = new fabric.Triangle({
-        top: baseHeight + 5,
-        left: baseWidth / 2 + 15,
-        width: baseWidth * 2,
-        height: baseHeight * 2 - 10,
-        // top: baseHeight * 3 + 5,
-        ...sharedCfg,
-        fill: '#ffffff',
-      })
-      onlayveneerInner1.rotate(180)
-      onlayveneerInner2.rotate(180)
-      const group = new fabric.Group(
-        [
-          renderBackgroud(),
-          onlayveneerInner1,
-          onlayveneerInner2,
-        ],
-        {
-          ...addonGroupCfg,
-          isShape: true,
-        },
-      )
-      return group
-    },
+
     method: 'tooth',
   },
   {
@@ -661,181 +589,7 @@ export const buttonConfigs = [
     // icon: filling,
     text: 'Bridge',
     type: 'connect',
-    // fill: '#737372',
-    getShape: () => {
-      let line = makeLine([
-        0,
-        -3,
-        baseWidth * 2 + strokeWidth / 2,
-        -3,
-      ])
-      let line2 = makeLine([
-        0,
-        -3,
-        -baseWidth * 2 - strokeWidth / 2,
-        -3,
-      ])
 
-      let c = makeCircle({
-        left: -8,
-        top: -8,
-      })
-      // c.hasControls = c.hasBorders = false
-
-      c.line1 = line
-      c.line2 = line2
-
-      const groupConnect = new fabric.Group(
-        [
-          line,
-          line2,
-          c,
-        ],
-        {
-          ...groupCfg,
-          name: `bridge`,
-          disableAutoReplace: true,
-        },
-      )
-      return groupConnect
-    },
-
-    onSelect: ({ canvas }) => {
-      // let startTarget
-      // let endTarget
-      // let started = false
-      // let line = null
-      // let selected = []
-      // canvas.set('selection', false)
-      // canvas.getObjects('group').map((o) => {
-      //   o.set('selectable', false)
-      //   // o.set('selectable', false)
-      //   const _anchor = makeCircle({
-      //     left: 0,
-      //     top: 0,
-      //     selectable: true,
-      //     name: `${selectablePrefix}_${o.name}_anchor`,
-      //     ...lockConfig,
-      //     lockMovementX: false,
-      //   })
-      //   console.log('add anchor', _anchor)
-      //   o.add(_anchor)
-      //   // canvas.setActiveObject(_anchor, e)
-      //   // canvas.bringToFront(_anchor)
-      //   console.log(o)
-      //   canvas.renderAll()
-      //   // canvas.sendToBack(o)
-      // })
-      // canvas.off('mouse:down')
-      // canvas.on('mouse:down', (e) => {
-      //   started = true
-      //   startTarget = e.target
-      //   console.log(e)
-      //   // const anchor = canvas._objects.find(
-      //   //   (o) => o.name === `${selectablePrefix}anchor`,
-      //   // )
-      //   // if (anchor) {
-      //   //   // canvas.setActiveObject(anchor, e)
-      //   //   anchor.set('left', e.pointer.x)
-      //   //   anchor.setCoords()
-      //   //   canvas.renderAll()
-      //   // }
-      //   if (!line && e.target) {
-      //     // line = makeLine(
-      //     //   [
-      //     //     e.pointer.x,
-      //     //     e.pointer.y,
-      //     //     e.pointer.x,
-      //     //     e.pointer.y,
-      //     //   ],
-      //     //   {
-      //     //     lockMovementX: true,
-      //     //   },
-      //     // )
-      //     // canvas.add(line)
-      //   }
-      // })
-      // canvas.off('mouse:up')
-      // canvas.on('mouse:up', (e) => {
-      //   started = false
-      //   endTarget = e.target
-      //   console.log(e)
-      //   console.log(startTarget, endTarget)
-      // })
-      // canvas.off('object:moving')
-      // canvas.on('object:moving', (e) => {
-      //   console.log('object:moving', e)
-      //   const anchor = canvas._objects.find(
-      //     (o) => o.name === `${selectablePrefix}anchor`,
-      //   )
-      //   if (anchor) {
-      //     if (!selected.find((o) => o === e.target.name)) {
-      //       // selected.
-      //     }
-      //     // canvas.setActiveObject(anchor, e)
-      //     anchor.set('left', e.pointer.x)
-      //     anchor.setCoords()
-      //     canvas.renderAll()
-      //   }
-      // })
-      // canvas.off('mouse:move')
-      // canvas.on('mouse:move', (e) => {
-      //   if (started) {
-      //     const anchor = canvas._objects.find(
-      //       (o) => o.name === `${selectablePrefix}anchor`,
-      //     )
-      //     if (anchor) {
-      //       console.log('mouse:move', e)
-      //       // canvas.setActiveObject(anchor, e)
-      //       anchor.set('left', e.pointer.x)
-      //       anchor.setCoords()
-      //       canvas.renderAll()
-      //     }
-      //   }
-      // })
-      // canvas.off('mouse:over')
-      // canvas.on('mouse:over', (e) => {
-      //   if (e.target) {
-      //     const anchor = canvas._objects.find(
-      //       (o) => o.name === `${selectablePrefix}anchor`,
-      //     )
-      //     if (anchor && !started) {
-      //       // console.log(11)
-      //       // anchor.set({
-      //       //   left: e.target.left + e.target.width / 2 - 8,
-      //       //   top: e.target.top + e.target.height / 2 - 8,
-      //       // })
-      //       // // canvas.setActiveObject(anchor, e)
-      //       // canvas.bringToFront(anchor)
-      //       // canvas.renderAll()
-      //     } else if (
-      //       !canvas._objects.find((o) => o.name === `${selectablePrefix}anchor`)
-      //     ) {
-      //       console.log(22)
-      //       // const _anchor = makeCircle({
-      //       //   left: e.target.left + e.target.width / 2 - 8,
-      //       //   top: e.target.top + e.target.height / 2 - 8,
-      //       //   selectable: true,
-      //       //   name: `${selectablePrefix}anchor`,
-      //       //   ...lockConfig,
-      //       //   lockMovementX: false,
-      //       // })
-      //       // console.log('add anchor', _anchor)
-      //       // canvas.add(_anchor)
-      //       // // canvas.setActiveObject(_anchor, e)
-      //       // canvas.bringToFront(_anchor)
-      //       // canvas.renderAll()
-      //     }
-      //   }
-      // })
-    },
-    onDeselect: ({ canvas }) => {
-      canvas.set('selection', true)
-
-      canvas.getObjects('group').map((o) => {
-        o.set('selectable', true)
-      })
-    },
     method: 'tooth',
   },
   // {
@@ -858,3 +612,424 @@ export const buttonConfigs = [
   //   ...sharedButtonConfig,
   // },
 ]
+export const createFont = ({ text, ...restProps }) => {
+  return new fabric.IText(text || '', {
+    fontSize: innerFontSize,
+    ...fontCfg,
+    ...restProps,
+  })
+}
+export const createToothShape = ({
+  text = {},
+  fill = {},
+  symbol = {},
+  index,
+  width,
+  height,
+  order = 0,
+  left = 0,
+  line = 0,
+  posAjustTop = 0,
+  paddingLeft = 30,
+  paddingTop = 20,
+  custom,
+  image,
+  canvas,
+  action,
+}) => {
+  // console.log(action)
+  const cfg = {
+    ...sharedCfg,
+    top: baseHeight * 2,
+    // strokeUniform: true,
+  }
+
+  // if (symbol) {
+  //   // fixedItems.push(g5)
+  // }
+  // console.log(fixedItems)
+  const cCfg = {
+    ...groupCfg,
+    ...lockConfig,
+
+    width: width || groupWidth,
+    height: height || groupHeight,
+    // padding: 300,
+    left: (order + left) * groupWidth + paddingLeft,
+    top: groupHeight * line + paddingTop + posAjustTop,
+    // originX: 'left',
+    index,
+    // originY: 'center',
+    subTargetCheck: true,
+    selectable: false,
+    selectionBackgroundColor: '#cccccc',
+    line,
+    // opacity: 0,
+    // transparentCorners: true,
+    // cornerColor: 'white',
+
+    // padding: 20,
+    // cornerStrokeColor: 'black',
+    // cornerStyle: 'circle',
+  }
+  if (index) {
+    cCfg.name = `${index}`
+  }
+  const _width = width || groupWidth
+  const _height = height || groupHeight
+  // if (custom) {
+  //   console.log(custom)
+  //   return new fabric.Group(
+  //     [
+  //       typeof custom === 'function' ? custom() : custom,
+  //     ],
+  //     cCfg,
+  //   )
+  // }
+  if (action && action.method === 'tooth' && !image) {
+    // console.log(fill, symbol)
+    return new fabric.Group(
+      [
+        createRectangle({
+          fill: action.fill,
+        }),
+        createFont({
+          text: action.symbol,
+          left: _width / 2 - _width / 8,
+          top: _height / 2 - _height / 4,
+          fontSize: _width / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        isShape: true,
+      },
+    )
+  }
+  if (image) {
+    const data = image[0] || image
+    const { thumbnailData, content } = data
+    if (imageCache[action.value]) return imageCache[action.value]
+    fabric.Image.fromURL(thumbnailData, (img) => {
+      imageCache[action.value] = new fabric.Group(
+        [
+          img.set({
+            left: 0,
+            top: 0,
+            width: width || groupWidth,
+            height: height || groupHeight,
+          }),
+          // .scale((width || groupWidth) / img.width),
+        ],
+        {
+          ...groupCfg,
+          isShape: true,
+        },
+      )
+
+      canvas.add(imageCache[action.value])
+    })
+    return
+  }
+  const polygon = new fabric.Polygon( // left
+    [
+      { x: 0, y: 0 },
+      { x: 0, y: baseHeight * 3 },
+      { x: baseWidth, y: baseHeight * 2 },
+      { x: baseWidth, y: baseHeight },
+    ],
+    {
+      ...cfg,
+      name: text.left,
+      fill: fill.left || 'white',
+    },
+  )
+
+  const polygon2 = new fabric.Polygon( // bottom
+    [
+      { x: baseWidth, y: baseHeight * 2 },
+      { x: 0, y: baseHeight * 3 },
+      { x: baseWidth * 4, y: baseHeight * 3 },
+      { x: baseWidth * 3, y: baseHeight * 2 },
+    ],
+    {
+      ...cfg,
+      top: baseHeight * 4,
+      name: text.bottom,
+      fill: fill.bottom || 'white',
+    },
+  )
+
+  const polygon3 = new fabric.Polygon( // right
+    [
+      { x: baseWidth * 3, y: baseHeight },
+      { x: baseWidth * 4, y: 0 },
+      { x: baseWidth * 4, y: baseHeight * 3 },
+      { x: baseWidth * 3, y: baseHeight * 2 },
+    ],
+    {
+      ...cfg,
+      name: text.right,
+      fill: fill.right || 'white',
+    },
+  )
+
+  const polygon4 = new fabric.Polygon( // top
+    [
+      { x: 0, y: 0 },
+
+      { x: baseWidth, y: baseHeight },
+
+      { x: baseWidth * 3, y: baseHeight },
+      { x: baseWidth * 4, y: 0 },
+    ],
+    {
+      ...cfg,
+      name: text.top,
+      fill: fill.top || 'white',
+    },
+  )
+
+  const g1 = new fabric.Group(
+    [
+      polygon,
+      createFont({
+        text: text.left,
+        left: baseWidth / 2 - innerFontSize / 3,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol.left,
+        left: baseWidth / 2 - innerFontSize / 3,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}left`,
+      target: text.left,
+      toothIndex: index,
+      top: baseHeight * 2,
+      // left: 0 - groupWidth / 2,
+      // originX: 'center',
+      // originY: 'center',
+    },
+  )
+  const g2 = new fabric.Group(
+    [
+      polygon2,
+      createFont({
+        text: text.bottom,
+        left: baseWidth * 2 - innerFontSize / 4,
+        top: baseHeight * 5 - innerFontSize * 1.5,
+      }),
+      createFont({
+        text: symbol.bottom,
+        left: baseWidth * 2 - innerFontSize / 4 - 3,
+        top: baseHeight * 5 - innerFontSize * 1.5,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}bottom`,
+      target: text.bottom,
+      toothIndex: index,
+      top: baseHeight * 4,
+    },
+  )
+  const g3 = new fabric.Group(
+    [
+      polygon3,
+      createFont({
+        text: text.right,
+        left: baseWidth * 4 - innerFontSize * 1.1,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol.right,
+        left: baseWidth * 4 - innerFontSize,
+        top: baseHeight * 3.5 - innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}right`,
+      target: text.right,
+      toothIndex: index,
+      top: baseHeight * 2,
+    },
+  )
+  const g4 = new fabric.Group(
+    [
+      polygon4,
+      createFont({
+        text: text.top,
+        left: baseWidth * 2 - innerFontSize / 4,
+        top: baseHeight * 2 + innerFontSize / 2,
+      }),
+      createFont({
+        text: symbol.top,
+        left: baseWidth * 2 - innerFontSize / 4 - 3,
+        top: baseHeight * 2 + innerFontSize / 2,
+      }),
+    ],
+    {
+      ...groupCfg,
+      name: `${cellPrefix}top`,
+      target: text.top,
+      toothIndex: index,
+      top: baseHeight * 2,
+    },
+  )
+  let g5
+  let g6
+  let g7
+  if (!fill.centerfull && !text.centerfull) {
+    const polygon5 = new fabric.Polygon( // center left
+      [
+        { x: baseWidth, y: baseHeight },
+
+        { x: baseWidth, y: baseHeight * 2 },
+
+        { x: baseWidth * 2, y: baseHeight * 2 },
+        { x: baseWidth * 2, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerLeft,
+        fill: fill.centerLeft || 'white',
+      },
+    )
+    const polygon6 = new fabric.Polygon( // center right
+      [
+        { x: baseWidth * 2, y: baseHeight },
+
+        { x: baseWidth * 2, y: baseHeight * 2 },
+
+        { x: baseWidth * 3, y: baseHeight * 2 },
+        { x: baseWidth * 3, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerRight,
+        fill: fill.centerRight || 'white',
+      },
+    )
+    g5 = new fabric.Group(
+      [
+        polygon5,
+        createFont({
+          text: text.centerLeft,
+          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerLeft,
+          left: baseWidth / 2 + baseWidth - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerLeft,
+        name: `${cellPrefix}centerLeft`,
+        fill: fill.centerLeft || 'white',
+      },
+    )
+    g6 = new fabric.Group(
+      [
+        polygon6,
+        createFont({
+          text: text.centerRight,
+          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerRight,
+          left: baseWidth / 2 + baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerRight,
+        name: `${cellPrefix}centerRight`,
+        fill: fill.centerRight || 'white',
+      },
+    )
+  } else {
+    const polygon7 = new fabric.Polygon( // center
+      [
+        { x: baseWidth, y: baseHeight },
+
+        { x: baseWidth, y: baseHeight * 2 },
+
+        { x: baseWidth * 3, y: baseHeight * 2 },
+        { x: baseWidth * 3, y: baseHeight },
+      ],
+      {
+        ...cfg,
+        top: baseHeight * 3,
+        name: text.centerfull,
+        fill: fill.centerfull || 'white',
+      },
+    )
+    g7 = new fabric.Group(
+      [
+        polygon7,
+        createFont({
+          text: text.centerfull,
+          left: baseWidth * 2 - innerFontSize / 4,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+        createFont({
+          text: symbol.centerfull,
+          left: baseWidth * 2 - innerFontSize / 4 - 3,
+          top: baseHeight * 3.5 - innerFontSize / 2,
+        }),
+      ],
+      {
+        ...groupCfg,
+        toothIndex: index,
+        target: text.centerfull,
+        name: `${cellPrefix}centerfull`,
+      },
+    )
+  }
+  let fixedItems = [
+    // headerText,
+    g1,
+    g2,
+    g3,
+    g4,
+  ]
+  if (g7) {
+    fixedItems.push(g7)
+  } else {
+    fixedItems.push(g5)
+    fixedItems.push(g6)
+  }
+  if (action && action.method === 'bridging') {
+    fixedItems = []
+    fixedItems.push(
+      new fabric.Group(
+        [
+          createLine([
+            -baseWidth * 2,
+            0,
+            baseWidth * 2,
+            0,
+          ]),
+        ],
+        {
+          name: 'bridgingIcon',
+        },
+      ),
+    )
+  }
+  return new fabric.Group(fixedItems.filter((o) => !width && !!o), cCfg)
+}

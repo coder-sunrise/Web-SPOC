@@ -293,6 +293,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: defaultFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -454,6 +455,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+      },
+    },
   },
 })
 
@@ -503,6 +511,7 @@ export const smallTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: smallFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -649,6 +658,17 @@ export const smallTheme = createMuiTheme({
         },
       },
     },
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+        height: 'auto',
+      },
+      deleteIcon: {
+        width: 16,
+        height: 16,
+      },
+    },
   },
 })
 
@@ -692,6 +712,7 @@ export const largeTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: largeFontSize,
         '&.Mui-disabled': {
           color: 'inherit',

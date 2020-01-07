@@ -319,7 +319,7 @@ const AttachmentWithThumbnail = ({
   }
 
   return (
-    <div className={classes.root} id='imageroot'>
+    <div className={classes.root}>
       {label && <span className={classes.attachmentLabel}>{label}</span>}
       <input
         style={{ display: 'none' }}
@@ -332,9 +332,9 @@ const AttachmentWithThumbnail = ({
         onClick={clearValue}
       />
       {UploadButton}
-      <Danger style={{ display: 'inline-block' }}>
+      {errorText && <Danger style={{ display: 'inline-block' }}>
         <span style={{ fontWeight: 500 }}>{errorText}</span>
-      </Danger>
+      </Danger>}
       <LoadingWrapper
         loading={uploading || downloading}
         text={`${loadingPrefix} attachment...`}

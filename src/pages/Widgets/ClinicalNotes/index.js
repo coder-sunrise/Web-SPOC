@@ -18,6 +18,7 @@ import CannedText from './CannedText'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
+import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 
@@ -57,6 +58,7 @@ const styles = (theme) => ({
 })
 
 window.g_app.replaceModel(model)
+window.g_app.replaceModel(cannedTextModel)
 
 // @withFormikExtend({
 //   mapPropsToValues: ({ clinicalnotes }) => {
@@ -135,9 +137,24 @@ class ClinicalNotes extends Component {
         {},
       ),
     }
+    const cannedTextPayload = {
+      entity: '',
+      selectedIndex: '',
+      ...fields.reduce(
+        (_result, field) => ({ ..._result, [field.fieldName]: [] }),
+        {},
+      ),
+      fields: fields.map((field) => field.fieldName),
+    }
+
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload,
+    })
+
+    this.props.dispatch({
+      type: 'cannedText/updateState',
+      payload: cannedTextPayload,
     })
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -357,6 +374,10 @@ class ClinicalNotes extends Component {
   }
 
   closeCannedText = () => {
+    this.props.dispatch({
+      type: 'cannedText/setSelectedNote',
+      payload: undefined,
+    })
     this.setState({
       showCannedText: false,
       cannedTextRow: undefined,
@@ -364,6 +385,10 @@ class ClinicalNotes extends Component {
   }
 
   openCannedText = (note) => {
+    this.props.dispatch({
+      type: 'cannedText/setSelectedNote',
+      payload: note,
+    })
     this.setState({
       cannedTextRow: note,
       showCannedText: true,

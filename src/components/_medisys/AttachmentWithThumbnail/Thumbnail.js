@@ -37,8 +37,8 @@ const styles = (theme) => ({
     position: 'relative',
     display: 'inline-block',
     textAlign: 'center',
-    width: 110,
-    margin: 8,
+    minWidth: 64,
+    // margin: 8,
     '& button': {
       marginRight: 0,
       padding: '0px !important',
@@ -82,8 +82,11 @@ const styles = (theme) => ({
   },
   simpleButtonGroup: {
     position: 'absolute',
-    top: '16px',
-    left: '24px',
+    top: 0,
+    // left: '24px',
+    width: '100%',
+    height: '100%',
+    paddingTop: theme.spacing(1),
     opacity: 0,
     '&:hover': {
       opacity: 1,

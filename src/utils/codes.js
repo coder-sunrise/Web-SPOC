@@ -1158,6 +1158,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'cttreatment',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable

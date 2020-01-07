@@ -15,7 +15,6 @@ import Paper from '@material-ui/core/Paper'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
 
-import { buttonConfigs } from './variables'
 import {
   Button,
   GridContainer,
@@ -31,7 +30,10 @@ import {
   Tabs,
   CommonModal,
 } from '@/components'
+import { groupWidth, groupHeight } from './variables'
 import Setup from './Setup/index'
+
+import Tooth from './Tooth'
 
 const useStyles = makeStyles((theme) => ({}))
 
@@ -54,7 +56,9 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 }))(ToggleButtonGroup)
 
 export default function ButtonGroup (props) {
-  const { dispatch, classes, theme, ...restProps } = props
+  const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
+  const { rows } = dentalChartSetup
+
   const [
     selectedStyle,
     setSelectedStyle,
@@ -66,8 +70,7 @@ export default function ButtonGroup (props) {
 
   const handleAction = (event, v) => {
     setSelectedStyle(v)
-
-    const btn = buttonConfigs.find((o) => o.value === v)
+    const btn = rows.find((o) => o.value === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -76,17 +79,17 @@ export default function ButtonGroup (props) {
     })
   }
 
-  const sharedCfg = {
-    alt: '',
-    style: {
-      height: '100%',
-      padding: theme.spacing(0.25),
-      marginRight: 4,
-      position: 'absolute',
-      left: 0,
-    },
-  }
-  // console.log(props)
+  // const sharedCfg = {
+  //   alt: '',
+  //   style: {
+  //     height: '100%',
+  //     padding: theme.spacing(0.25),
+  //     marginRight: 4,
+  //     position: 'absolute',
+  //     left: 0,
+  //   },
+  // }
+  // console.log(rows)
   // console.log(theme.props)
   return (
     <div>
@@ -122,11 +125,38 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {buttonConfigs.map(({ value, icon, text }) => {
+              {rows.filter((o) => o.isDiagnosis && !o.isDeleted).map((row) => {
+                const { value, text } = row
                 return [
                   <ToggleButton value={value}>
-                    <img src={icon} {...sharedCfg} />
-                    <span style={{ marginLeft: 20 }}>{text}</span>
+                    <Tooth
+                      className={classes.buttonIcon}
+                      width={groupWidth / 5 + 2}
+                      height={groupHeight / 5 + 2}
+                      paddingLeft={1}
+                      paddingTop={1}
+                      zoom={1 / 5}
+                      image={row.attachments}
+                      action={row}
+                      fill={{
+                        left: row.fill,
+                        right: row.fill,
+                        top: row.fill,
+                        bottom: row.fill,
+                        centerfull: row.fill || 'white',
+                      }}
+                      symbol={{
+                        left: row.symbol,
+                        right: row.symbol,
+                        top: row.symbol,
+                        bottom: row.symbol,
+                        centerfull: row.symbol,
+                      }}
+                      name={row.text}
+                    />
+                    <span style={{ marginLeft: groupWidth / 5 + 20 }}>
+                      {text}
+                    </span>
                   </ToggleButton>,
                   // <Divider
                   //   orientation='vertical'
@@ -143,9 +173,9 @@ export default function ButtonGroup (props) {
         title='Dental Chart Method Setup'
         maxWidth='lg'
         bodyNoPadding
-        // onConfirm={(ee) => {
-        //   console.log(ee)
-        // }}
+        onConfirm={() => {
+          setOpenSettings(false)
+        }}
         onClose={() => setOpenSettings(false)}
         // showFooter
         confirmText='Save'

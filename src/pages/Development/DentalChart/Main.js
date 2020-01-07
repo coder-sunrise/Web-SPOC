@@ -37,19 +37,22 @@ import {
   fontCfg,
   groupCfg,
   cellPrefix,
-  buttonConfigs,
   overlayShapeTypes,
   lockConfig,
   selectablePrefix,
 } from './variables'
 
-import Tooth from './Tooth'
-
-import ButtonGroup from './ButtonGroup'
+import DiagnosisPanel from './DiagnosisPanel'
+import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
+import model from './models'
+import modelSetup from './models/setup'
+import modelTreatment from './models/treatment'
 
-const { fabric } = require('fabric')
+// window.g_app.replaceModel(model)
+// window.g_app.replaceModel(modelSetup)
+// window.g_app.replaceModel(modelTreatment)
 
 const styles = (theme) => ({
   paper: {
@@ -86,16 +89,47 @@ const styles = (theme) => ({
   toothJournalItemSecondaryAction: {
     paddingRight: theme.spacing(3),
   },
-  toothJournalSecondaryAction: {
-    right: theme.spacing(1),
+  toothJournalItemText: {
+    margin: theme.spacing(0),
+  },
+  // toothJournalSecondaryAction: {
+  //   right: theme.spacing(1),
+  //   display: 'none',
+  // },
+  toothIcon: {
+    minWidth: 'auto',
+  },
+  sortableContainer: {
+    // overflow: 'hidden',
+    // backgroundColor: 'red',
+  },
+  attachmentContainer: {
+    margin: 0,
+    width: 'auto',
+  },
+  buttonIcon: {
+    position: 'absolute',
+    left: theme.spacing(0.5),
   },
 })
+
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
-@connect(({ dentalChartComponent, global }) => ({
-  dentalChartComponent,
-  global,
-}))
+@connect(
+  ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }) => ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }),
+)
 class DentalChart extends React.Component {
   render () {
     const {
@@ -111,13 +145,12 @@ class DentalChart extends React.Component {
       style,
       onChange,
       value,
-      mode,
       onDataSouceChange,
       dentalChartComponent,
       dispatch,
       ...props
     } = this.props
-    const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
+    const { mode } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
         <GridContainer gutter={theme.spacing(0.5)}>
@@ -125,7 +158,8 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            <ButtonGroup {...this.props} />
+            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
+            {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>
             <RightPanel {...this.props} />

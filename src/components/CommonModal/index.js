@@ -24,9 +24,10 @@ function Transition (props) {
 function getContainerHeight (props) {
   return (
     window.innerHeight -
-    44 -
-    (props.showFooter ? 63 : 0) -
-    (props.bodyNoPadding ? -16 : 0)
+    58 -
+    (props.showFooter ? 54 : 0) -
+    (props.bodyNoPadding ? -16 : 0) -
+    (props.maxWidth === 'lg' ? 63 : 0)
   )
 }
 
