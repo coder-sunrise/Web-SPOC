@@ -112,42 +112,36 @@ const AttachmentWithThumbnail = ({
     }
   }
 
-  const mapToFileDto = async ({ file, isThumbnail }) => {
+  const mapToFileDto = async (file) => {
     // file type and file size validation
     const base64 = await convertToBase64(file)
     const fileStatusFK = FILE_STATUS.UPLOADED
     const fileExtension = getFileExtension(file.name)
-    if (isThumbnail) {
-      if (
-        [
-          'jpg',
-          'jpeg',
-          'png',
-        ].includes(fileExtension)
-      ) {
-        const imgEle = document.createElement('img')
-        imgEle.src = `data:image/${fileExtension};base64,${base64}`
-        await setTimeout(() => {
-          // wait for 1 milli second for img to set src successfully
-        }, 100)
-        const thumbnail = getThumbnail(imgEle, thumbnailSize)
-        let [
-          base64Prefix,
-          thumbnailData,
-        ] = thumbnail.toDataURL(`image/png`).split(',')
-        const thumbnailFile = {
-          fileName: `Thumbnail_${file.name}`,
-          fileSize: file.size,
-          fileCategoryFK: FILE_CATEGORY.VISITREG,
-          content: thumbnailData,
-          isThumbnail,
-          fileExtension,
-          fileStatusFK,
-          attachmentType,
-        }
-        return thumbnailFile
+    let _thumbnailDto
+    if (
+      [
+        'jpg',
+        'jpeg',
+        'png',
+      ].includes(fileExtension)
+    ) {
+      const imgEle = document.createElement('img')
+      imgEle.src = `data:image/${fileExtension};base64,${base64}`
+      await setTimeout(() => {
+        // wait for 1 milli second for img to set src successfully
+      }, 100)
+      const thumbnail = getThumbnail(imgEle, thumbnailSize)
+      let [
+        base64Prefix,
+        thumbnailData,
+      ] = thumbnail.toDataURL(`image/png`).split(',')
+
+      _thumbnailDto = {
+        fileExtension: '.png',
+        fileSize: 0,
+        content: thumbnailData,
+        isDeleted: false,
       }
-      return null
     }
 
     const originalFile = {
@@ -155,13 +149,29 @@ const AttachmentWithThumbnail = ({
       fileSize: file.size,
       fileCategoryFK: FILE_CATEGORY.VISITREG,
       content: base64,
-      isThumbnail,
+      thumbnail: _thumbnailDto,
       fileExtension,
       fileStatusFK,
       attachmentType,
     }
 
     return originalFile
+  }
+
+  const mapUploadResponseToAttachmentDto = (files, response) => {
+    return response.map((item, index) => {
+      const { thumbnail, ...rest } = item
+      const file = files[index]
+      return {
+        ...rest,
+        ...file,
+        thumbnail: {
+          ...thumbnail,
+          content: file.thumbnail ? file.thumbnail.content : null,
+        },
+        content: file.content,
+      }
+    })
   }
 
   const onFileChange = async (event) => {
@@ -205,46 +215,20 @@ const AttachmentWithThumbnail = ({
         return
       }
 
-      // if (numberOfNewFiles + attachments.length > 5) {
-      //   setErrorText('Cannot upload more than 5 attachments')
-      //   setUploading(false)
-      //   return
-      // }
-      // const skipped = validateFileSize(files)
-      // const skipped = []
+      const selectedFiles = await Promise.all(
+        Object.keys(files).map((key) => mapToFileDto(files[key])),
+      )
 
-      // const selectedFiles = await Promise.all(
-      //   Object.keys(files)
-      //     .filter((key) => !skipped.includes(files[key].name))
-      //     .map((key) => mapFileToUploadObject(files[key])),
-      // )
-      const originalFiles = await Promise.all(
-        Object.keys(files).map((key) =>
-          mapToFileDto({ file: files[key], isThumbnail: false }),
-        ),
-      )
-      const thumbnailFiles = await Promise.all(
-        Object.keys(files)
-          .filter((key) => {
-            const file = files[key]
-            const fileExtension = getFileExtension(file.name)
-            if (
-              [
-                'jpg',
-                'jpeg',
-                'png',
-              ].includes(fileExtension)
-            )
-              return true
-            return false
-          })
-          .map((key) => mapToFileDto({ file: files[key], isThumbnail: true })),
-      )
-      const selectedFiles = [
-        ...originalFiles,
-        ...thumbnailFiles,
-      ]
-      console.log({ selectedFiles })
+      const uploadResponse = await uploadFile(selectedFiles)
+
+      let uploadedAttachment = []
+      if (uploadResponse) {
+        uploadedAttachment = mapUploadResponseToAttachmentDto(
+          selectedFiles,
+          uploadResponse,
+        )
+      }
+
       setUploading(false)
       dispatch({
         type: 'global/updateState',
@@ -253,7 +237,7 @@ const AttachmentWithThumbnail = ({
         },
       })
       handleUpdateAttachments({
-        added: selectedFiles,
+        added: uploadedAttachment,
       })
     } catch (error) {
       console.log({ error })

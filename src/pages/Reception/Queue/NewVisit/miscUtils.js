@@ -8,13 +8,14 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
+  { fileIndexFK, fileName, attachmentType, isDeleted, thumbnail, ...rest },
   index,
 ) =>
   !fileIndexFK
     ? {
         // file status === uploaded, only 4 info needed for API
         fileIndexFK: rest.id,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         sortOrder: index,
         fileName,
         attachmentType,
@@ -24,6 +25,7 @@ const mapAttachmentToUploadInput = (
         // file status === confirmed, need to provide full object for API
         ...rest,
         fileIndexFK,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         fileName,
         attachmentType,
         isDeleted,
@@ -167,6 +169,7 @@ export const formikHandleSubmit = (
     },
   }
 
+  console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
