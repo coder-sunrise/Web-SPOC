@@ -58,7 +58,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 
 export default function DiagnosisPanel (props) {
   const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
-  const { rows } = dentalChartSetup
+  const { list = [] } = dentalChartSetup
 
   const [
     selectedStyle,
@@ -74,7 +74,9 @@ export default function DiagnosisPanel (props) {
   ] = React.useState('')
   const handleAction = (event, v) => {
     setSelectedStyle(v)
-    const btn = rows.find((o) => o.value === v)
+
+    console.log(v, list)
+    const btn = list.find((o) => o.id === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -82,7 +84,7 @@ export default function DiagnosisPanel (props) {
       },
     })
   }
-
+  // console.log(list)
   // const sharedCfg = {
   //   alt: '',
   //   style: {
@@ -134,18 +136,20 @@ export default function DiagnosisPanel (props) {
               exclusive
               onChange={handleAction}
             >
-              {rows
+              {list
                 .filter(
                   (o) =>
-                    o.isDiagnosis &&
+                    o.isDisplayInDiagnosis &&
                     !o.isDeleted &&
                     (!search ||
-                      o.text.toLowerCase().indexOf(search.toLowerCase()) >= 0),
+                      o.displayValue
+                        .toLowerCase()
+                        .indexOf(search.toLowerCase()) >= 0),
                 )
                 .map((row) => {
-                  const { value, text } = row
+                  const { id, displayValue } = row
                   return [
-                    <ToggleButton value={value}>
+                    <ToggleButton value={id}>
                       <Tooth
                         className={classes.buttonIcon}
                         width={groupWidth / 5 + 2}
@@ -153,26 +157,26 @@ export default function DiagnosisPanel (props) {
                         paddingLeft={1}
                         paddingTop={1}
                         zoom={1 / 5}
-                        image={row.attachments}
+                        image={row.image}
                         action={row}
                         fill={{
-                          left: row.fill,
-                          right: row.fill,
-                          top: row.fill,
-                          bottom: row.fill,
-                          centerfull: row.fill || 'white',
+                          left: row.chartMethodColorBlock,
+                          right: row.chartMethodColorBlock,
+                          top: row.chartMethodColorBlock,
+                          bottom: row.chartMethodColorBlock,
+                          centerfull: row.chartMethodColorBlock || 'white',
                         }}
                         symbol={{
-                          left: row.symbol,
-                          right: row.symbol,
-                          top: row.symbol,
-                          bottom: row.symbol,
-                          centerfull: row.symbol,
+                          left: row.chartMethodText,
+                          right: row.chartMethodText,
+                          top: row.chartMethodText,
+                          bottom: row.chartMethodText,
+                          centerfull: row.chartMethodText,
                         }}
-                        name={text}
+                        name={displayValue}
                       />
-                      <span style={{ marginLeft: groupWidth / 5 + 20 }}>
-                        {text}
+                      <span style={{ marginLeft: groupWidth / 5 }}>
+                        {displayValue}
                       </span>
                     </ToggleButton>,
                     // <Divider
@@ -197,10 +201,11 @@ export default function DiagnosisPanel (props) {
         // showFooter
         confirmText='Save'
       >
-        <div>
+        <Setup2 {...props} />
+
+        {/* <div>
           <Setup {...props} />
-          <Setup2 {...props} />
-        </div>
+        </div> */}
       </CommonModal>
     </div>
   )

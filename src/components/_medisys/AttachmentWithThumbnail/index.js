@@ -103,7 +103,7 @@ const AttachmentWithThumbnail = ({
       attachmentType,
     }
     const uploaded =local?{}: await uploadFile(uploadObject)
-
+    
     return {
       ...uploaded,
       attachmentType,

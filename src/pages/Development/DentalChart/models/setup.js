@@ -41,7 +41,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      rows:
+      list:
         JSON.parse(localStorage.getItem('dentalChartSetup')) || buttonConfigs,
 
       treatments: [

@@ -34,56 +34,74 @@ const styles = (theme) => ({
 
 const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   const { value, control = {}, validSchema, text, ...restProps } = columnConfig
-  const { method } = row
+  const { chartMethodTypeFK } = row
   // if (
   //   [
-  //     'na',
-  //     'bridging',
-  //   ].includes(method)
+  //     4,
+  //     3,
+  //   ].includes(chartMethodTypeFK)
   // )
   //   return null
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
   // console.log(restProps)
+
   const [
     mode,
     setMode,
-  ] = useState(row.editMode || 'color')
+  ] = useState(row.image ? 'image' : 'color')
+  // console.log(chartMethodTypeFK, row.editMode, mode)
+  // if (chartMethodTypeFK === 1 && mode !== 'color') {
+  //   setMode('color')
+  // }
   const [
     color,
     setColor,
-  ] = useState(row.fill)
+  ] = useState(row.chartMethodColorBlock)
   const [
     symbol,
     setSymbol,
-  ] = useState(row.symbol)
+  ] = useState(row.chartMethodText)
 
   const [
     attachments,
     setAttachments,
   ] = useState(row.attachments)
-  const [
-    blur,
-    setBlur,
-  ] = useState(false)
-  const debounceBlur = _.debounce(setBlur, 100, {
-    leading: false,
-    trailing: true,
-  })
+  // const [
+  //   blur,
+  //   setBlur,
+  // ] = useState(false)
+  // const debounceBlur = _.debounce(setBlur, 100, {
+  //   leading: false,
+  //   trailing: true,
+  // })
   useEffect(
     () => {
-      if (method === 'na') return
+      if (chartMethodTypeFK === 4) return
+
       if (mode === 'color') {
         setAttachments([])
         delete row.attachments
+        delete row.image
       } else if (mode === 'image') {
-        delete row.symbol
-        delete row.color
+        delete row.chartMethodColorBlock
+        delete row.chartMethodText
         setSymbol(undefined)
         setColor(undefined)
       }
     },
     [
       mode,
+    ],
+  )
+  useEffect(
+    () => {
+      // console.log('legend', chartMethodTypeFK)
+      if (chartMethodTypeFK === 1 && mode !== 'color') {
+        setMode('color')
+      }
+    },
+    [
+      chartMethodTypeFK,
     ],
   )
   const { commitChanges } = control
@@ -124,17 +142,17 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
       }, [])
 
     row.attachments = updated.map((o) => ({ thumbnailData: o.thumbnailData }))
-    row.image = updated[0].thumbnailData
     setAttachments(updated)
     commitChanges({
       changed: {
         [row.id]: {
+          image: updated[0].thumbnailData,
           attachments: updated,
         },
       },
     })
   }
-  // console.log(row.fill)
+  // console.log(row.chartMethodColorBlock)
   // console.log(row)
   if (viewOnly) {
     return (
@@ -145,21 +163,21 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         paddingTop={1}
         zoom={1 / 5}
         // custom={row.getShape}
-        image={row.attachments}
+        image={row.image}
         action={row}
         fill={{
-          left: row.fill,
-          right: row.fill,
-          top: row.fill,
-          bottom: row.fill,
-          centerfull: row.fill || 'white',
+          left: row.chartMethodColorBlock,
+          right: row.chartMethodColorBlock,
+          top: row.chartMethodColorBlock,
+          bottom: row.chartMethodColorBlock,
+          centerfull: row.chartMethodColorBlock || 'white',
         }}
         symbol={{
-          left: row.symbol,
-          right: row.symbol,
-          top: row.symbol,
-          bottom: row.symbol,
-          centerfull: row.symbol,
+          left: row.chartMethodText,
+          right: row.chartMethodText,
+          top: row.chartMethodText,
+          bottom: row.chartMethodText,
+          centerfull: row.chartMethodText,
         }}
         name={row.text}
       />
@@ -168,14 +186,14 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
 
   if (
     [
-      'na',
-      'bridging',
-    ].includes(method)
+      4,
+      3,
+    ].includes(chartMethodTypeFK)
   )
     return null
   return (
     <GridContainer>
-      {method === 'tooth' &&
+      {chartMethodTypeFK === 2 &&
       !viewOnly && (
         <GridItem xs={6}>
           <Switch
@@ -207,12 +225,12 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
               <SketchPicker
                 color={color}
                 onChangeComplete={(e) => {
-                  row.fill = e.hex
+                  row.chartMethodColorBlock = e.hex
                   setColor(e.hex)
                   commitChanges({
                     changed: {
                       [row.id]: {
-                        fill: e.hex,
+                        chartMethodColorBlock: e.hex,
                       },
                     },
                   })
@@ -229,7 +247,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
                 color: 'black',
               }}
             >
-              {symbol} &nbsp;
+              {(symbols.find((o) => o.value === symbol) || {}).name} &nbsp;
             </Button>
           </Popper>
         </GridItem>
@@ -241,15 +259,18 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             value={symbol}
             {...restProps}
             text={viewOnly}
-            onChange={(v) => {
+            onChange={(v, option) => {
+              console.log(v, option)
               setSymbol(v)
+              row.chartMethodText = option.name
               // row.apptDurationMinute = e
               // setEndTime(row)
               // validSchema(row)
               commitChanges({
                 changed: {
                   [row.id]: {
-                    symbol: v,
+                    chartMethodText: option.name,
+                    // symbol: v,
                   },
                 },
               })

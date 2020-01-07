@@ -8,7 +8,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import History from '@material-ui/icons/History'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, difference } from '@/utils/utils'
 
 import {
   Button,
@@ -89,6 +89,7 @@ const Setup = (props) => {
     dentalChartSetup,
     values,
     setFieldValue,
+    setValues,
     footer,
     ...restProps
   } = props
@@ -96,16 +97,21 @@ const Setup = (props) => {
     mode,
     setMode,
   ] = useState('sort')
-  useEffect(() => {
-    dispatch({
-      type: 'dentalChartSetup/query',
-    }).then((list) => {
-      console.log(list)
-    })
-    console.log('did h')
-  }, [])
+  // useEffect(() => {
+  //   if (!values.rows || values.rows.Legend === 0)
+  //     dispatch({
+  //       type: 'dentalChartSetup/query',
+  //     }).then((response) => {
+  //       if (response.data)
+  //         setValues({
+  //           rows: response.data,
+  //         })
+  //       // console.log(list)
+  //     })
+  //   // console.log('did h')
+  // }, [])
   const handleCommitChanges = ({ rows, changed }) => {
-    // console.log(rows, changed)
+    console.log(rows, changed)
     setFieldValue('rows', rows)
   }
   // useState()
@@ -157,10 +163,10 @@ const Setup = (props) => {
   // }
   const tableProps = {
     size: 'sm',
-    // rows: values.rows,
+    rows: values.rows,
     // dataSource: values.rows,
-    type: 'dentalChartSetup',
-    entity: dentalChartSetup,
+    // type: 'dentalChartSetup',
+    // entity: dentalChartSetup,
     rowDragable: true,
     columns: [
       { name: 'code', title: 'Code' },
@@ -200,13 +206,13 @@ const Setup = (props) => {
       onCommitChanges: handleCommitChanges,
       onAddedRowsChange: (rows) => {
         return rows.map((o) => {
-          return { value: getUniqueId(), ...o }
+          return { value: getUniqueId(), isUserMaintainable: true, ...o }
         })
       },
       // onEditingRowIdsChange: this.handleEditingRowIdsChange,
     },
     onRowDrop: (rows) => {
-      // console.log(rows)
+      console.log(rows)
       setFieldValue('rows', rows)
     },
     schema: rowSchema,
@@ -251,7 +257,9 @@ const Setup = (props) => {
 export default withFormikExtend({
   mapPropsToValues: ({ dentalChartSetup }) => {
     return {
-      rows: dentalChartSetup.rows || buttonConfigs,
+      rows:
+        JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+        dentalChartSetup.list, // || buttonConfigs,
     }
   },
 
@@ -261,13 +269,17 @@ export default withFormikExtend({
 
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
-    const { dispatch, history, codetable, onConfirm } = props
+    const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
+    const { list } = dentalChartSetup
     dispatch({
       type: 'dentalChartSetup/updateState',
       payload: {
         rows: values.rows,
       },
     })
+    console.log(list, values.rows, difference(list, values.rows))
+    // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
+
     localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
     if (onConfirm) onConfirm()
   },

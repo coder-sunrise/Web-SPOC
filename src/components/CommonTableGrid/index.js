@@ -288,6 +288,7 @@ class CommonTableGrid extends PureComponent {
       const onSortEnd = ({ newIndex, oldIndex }) => {
         // console.log(newIndex, oldIndex)
         const rows=this.getData()
+        console.log(_.minBy(rows,(n)=>n.sortOrder))
         const newRows = arrayMove(rows, oldIndex, newIndex)
         // console.log(rows,newRows)
         if(onRowDrop)onRowDrop(newRows)

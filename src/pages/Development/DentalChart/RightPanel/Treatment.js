@@ -54,7 +54,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { data = [], rows, pedoChart, surfaceLabel } = dentalChartSetup
+  const { data = [], list = [], pedoChart, surfaceLabel } = dentalChartSetup
   const [
     search,
     setSearch,
@@ -68,9 +68,9 @@ const Treatment = ({
     dispatch({
       type: 'codetable/fetchCodes',
       payload: { code: 'cttreatment' },
-    }).then((list) => {
+    }).then((rows) => {
       console.log(list)
-      setTreatments(list)
+      setTreatments(rows)
     })
     console.log('did m')
   }, [])
@@ -87,7 +87,7 @@ const Treatment = ({
       })),
     }
   })
-  console.log(treeItems)
+  // console.log(treeItems)
   return (
     <div>
       <div
@@ -106,7 +106,7 @@ const Treatment = ({
           prefix={<Search />}
         />
         <Tree
-          items={rows.filter((o) => !o.isDiagnosis)}
+          items={list.filter((o) => !o.isDisplayInDiagnosis)}
           search={search}
           labelField='text'
           onItemFocus={(item) => {

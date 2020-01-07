@@ -57,7 +57,7 @@ import TreatmentGrid from './TreatmentGrid'
       }
     })
     let tooth = groupsAry.map((o) => o.text).join(',')
-    if (action.method === 'bridging') {
+    if (action.method === 3) {
       groupsAry = Object.values(
         _.groupBy(data.filter((o) => o.value === action.value), 'nodes'),
       ).map((o) => {

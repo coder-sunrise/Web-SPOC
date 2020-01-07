@@ -58,11 +58,11 @@ const methods = [
     name: 'Tooth',
   },
   {
-    value: 'bridging',
+    value: 3,
     name: 'Bridging',
   },
   {
-    value: 'na',
+    value: 4,
     name: 'NA',
   },
 ]

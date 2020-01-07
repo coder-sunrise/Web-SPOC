@@ -83,13 +83,13 @@ const Diagnosis = ({
         {Object.keys(groups).map((k) => {
           const ary = groups[k]
 
-          const valueGroups = _.groupBy(_.orderBy(ary, 'timestamp'), 'value')
+          const valueGroups = _.groupBy(_.orderBy(ary, 'timestamp'), 'id')
           const SortList = SortableContainer(List)
-          const items = Object.keys(valueGroups)
+          const items = Object.keys(valueGroups).map((o) => Number(o))
           const onSortEnd = ({ newIndex, oldIndex }) => {
             if (newIndex === oldIndex) return
-            let currentItems = ary.filter((o) => o.value === items[oldIndex])
-            const existItems = ary.filter((o) => o.value === items[newIndex])
+            let currentItems = ary.filter((o) => o.id === items[oldIndex])
+            const existItems = ary.filter((o) => o.id === items[newIndex])
             currentItems = currentItems.map((o) => ({
               ...o,
               timestamp:
@@ -104,7 +104,7 @@ const Diagnosis = ({
             ary
               .filter(
                 (o) =>
-                  o.value !== currentItems[0].value &&
+                  o.id !== currentItems[0].id &&
                   o.timestamp < currentItems[0].timestamp,
               )
               .map((o) => {
@@ -113,7 +113,7 @@ const Diagnosis = ({
             ary
               .filter(
                 (o) =>
-                  o.value !== currentItems[0].value &&
+                  o.id !== currentItems[0].id &&
                   o.timestamp > currentItems[0].timestamp,
               )
               .map((o) => {
@@ -127,7 +127,7 @@ const Diagnosis = ({
                   ...data.filter(
                     (o) =>
                       (o.toothIndex === Number(k) &&
-                        o.value !== items[oldIndex]) ||
+                        o.id !== items[oldIndex]) ||
                       o.toothIndex !== Number(k),
                   ),
                   ...currentItems,
@@ -152,7 +152,7 @@ const Diagnosis = ({
                 const subAry = valueGroups[j]
                 const v = subAry[0]
                 // console.log(v.info)
-                if (v.action.method !== 'bridging')
+                if (v.action.method !== 3)
                   v.info = subAry.map((o) => o.name).join(',')
                 // console.log(subAry)
                 if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
@@ -172,14 +172,15 @@ const Diagnosis = ({
                 //     })),
                 //   ),
                 // )
-                const { action = {}, subTarget, value } = v
-
+                const { action = {}, subTarget, id } = v
                 const SortableListItem = SortableElement(ListItem)
                 // console.log(items, v)
-                const idx = items.indexOf(value)
+                const idx = items.indexOf(id)
+                console.log(v, items, idx)
 
                 return (
                   <SortableListItem
+                    key={idx}
                     classes={{
                       root: classes.toothJournalItem,
                       secondaryAction: classes.toothJournalItemSecondaryAction,
@@ -191,7 +192,7 @@ const Diagnosis = ({
                       setSelected(
                         selected &&
                         v.toothIndex === selected.toothIndex &&
-                        v.value === selected.value
+                        v.id === selected.id
                           ? undefined
                           : v,
                       )
@@ -200,7 +201,7 @@ const Diagnosis = ({
                     selected={
                       selected &&
                       v.toothIndex === selected.toothIndex &&
-                      v.value === selected.value
+                      v.id === selected.id
                     }
                   >
                     <ListItemIcon
@@ -214,16 +215,18 @@ const Diagnosis = ({
                         paddingLeft={1}
                         paddingTop={1}
                         zoom={1 / 6}
-                        image={action.attachments}
+                        image={action.image}
                         action={action}
                         fill={getCellConfig(
                           subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action.fill,
+                            [o.subTarget.replace('cell_', '')]: o.action
+                              .chartMethodColorBlock,
                           })),
                         )}
                         symbol={getCellConfig(
                           subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action.symbol,
+                            [o.subTarget.replace('cell_', '')]: o.action
+                              .chartMethodText,
                           })),
                         )}
                         // name={row.text}
@@ -254,10 +257,11 @@ const Diagnosis = ({
                               paddingTop: 2,
                             }}
                           >
-                            {v.action.isDiagnosis && (
+                            {v.action.isDisplayInDiagnosis && (
                               <Tooltip title='Delete'>
                                 <IconButton
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     dispatch({
                                       type:
                                         'dentalChartComponent/toggleMultiSelect',
@@ -295,8 +299,7 @@ const Diagnosis = ({
           onChange={(v) => {
             const shapes = data.filter(
               (o) =>
-                o.toothIndex === selected.toothIndex &&
-                o.value === selected.value,
+                o.toothIndex === selected.toothIndex && o.id === selected.id,
             )
             // console.log(v.target.value, selected.remark)
             if (v.target.value !== selected.remark) {
