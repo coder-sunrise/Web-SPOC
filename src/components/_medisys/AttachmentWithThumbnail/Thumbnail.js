@@ -207,9 +207,13 @@ const Thumbnail = ({
                 </Button>
               </Tooltip>
               <Tooltip title='Delete'>
-                <Button justIcon color='danger' size='sm'>
-                  <Delete />
-                </Button>
+                <DeleteWithPopover
+                  disabled={isReadOnly}
+                  onConfirmDelete={handleConfirmDelete}
+                  buttonProps={{
+                    size: 'sm',
+                  }}
+                />
               </Tooltip>
             </div>
           </React.Fragment>
