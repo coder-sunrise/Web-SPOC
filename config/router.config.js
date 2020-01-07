@@ -843,19 +843,19 @@ const _routes = [
       // Settings
       //
       // AiOT
-      {
-        path: '/patient-monitoring',
-        icon: 'group',
-        name: 'patient-monitoring',
-        hideChildrenInMenu: true,
-        routes: [
-          {
-            path: '/patient-monitoring',
-            name: 'patient-monitoring',
-            component: './PatientMonitoring',
-          },
-        ],
-      },
+      // {
+      //   path: '/patient-monitoring',
+      //   icon: 'group',
+      //   name: 'patient-monitoring',
+      //   hideChildrenInMenu: true,
+      //   routes: [
+      //     {
+      //       path: '/patient-monitoring',
+      //       name: 'patient-monitoring',
+      //       component: './PatientMonitoring',
+      //     },
+      //   ],
+      // },
       // AiOT
       //
       // Support

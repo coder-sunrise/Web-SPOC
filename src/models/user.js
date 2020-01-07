@@ -7,11 +7,11 @@ const convertServerRights = ({ accessRight, type, permission }) => {
   const name = accessRight.replace('SEMRWebApp:', '').toLowerCase()
   const rights = permission.toLowerCase()
   // for testing only
-  if (name === 'patientdatabase') {
-    return [
-      { name, rights: 'disable' },
-    ]
-  }
+  // if (name === 'patientdatabase') {
+  //   return [
+  //     { name, rights: 'disable' },
+  //   ]
+  // }
 
   // if (rights === 'hidden') {
   //   return [
