@@ -61,7 +61,7 @@ const codeMessage = {
 }
 
 const _errorMessageMapping = {
-  V00031: 'Invalid password format',
+  V00031: 'Invalid new password format',
 }
 
 export function updateAPIType (type) {
@@ -366,8 +366,15 @@ const request = (url, option, showNotification = true) => {
 
             notification.destroy()
             if (response.responseJSON) {
-              const overwriteMessage =
+              let overwriteMessage =
                 _errorMessageMapping[response.responseJSON.status]
+
+              if (
+                overwriteMessage === _errorMessageMapping.V00031 &&
+                url === '/api/ClinicianProfile'
+              ) {
+                overwriteMessage = 'Invalid password format'
+              }
 
               const description =
                 overwriteMessage ||

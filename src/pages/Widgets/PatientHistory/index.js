@@ -284,18 +284,20 @@ class PatientHistory extends Component {
     const { selectedSubRow } = patientHistory
     const isRetailVisit = row.visitPurposeFK === VISIT_TYPE.RETAIL
     let newArray = []
-    if (
+
+    if (isRetailVisit) {
+      newArray.push(row)
+    } else if (
       settings.showConsultationVersioning === false ||
       settings.showConsultationVersioning === undefined
     ) {
       if (row.coHistory.length >= 1) {
         newArray.push(row.coHistory[0])
-      } else if (isRetailVisit) {
-        newArray.push(row)
       }
     } else {
       newArray = row.coHistory
     }
+
     return (
       <List
         component='nav'
@@ -306,6 +308,7 @@ class PatientHistory extends Component {
       >
         {newArray.map((o) => {
           const _title = o.userTitle ? `${o.userTitle} ` : ''
+
           return (
             <React.Fragment>
               <ListItem
@@ -381,7 +384,8 @@ class PatientHistory extends Component {
                           <TextField
                             text
                             value={
-                              settings.showConsultationVersioning ? (
+                              settings.showConsultationVersioning &&
+                              !isRetailVisit ? (
                                 `V${o.versionNumber}, ${_title}${o.userName}`
                               ) : (
                                 `${_title}${o.userName}`

@@ -217,10 +217,11 @@ class Modal extends PureComponent {
       const { status, data } = response
       if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
         const { data: sessionData } = data
-        let paymentDate = moment(
-          sessionData[0].sessionStartDate,
-          serverDateFormat,
-        )
+        const { isClinicSessionClosed, sessionStartDate } = sessionData[0]
+        let paymentDate = moment()
+        if (isClinicSessionClosed === true) {
+          paymentDate = moment(sessionStartDate, serverDateFormat)
+        }
         setFieldValue(
           'patientDepositTransaction.transactionDate',
           paymentDate.format(serverDateFormat),

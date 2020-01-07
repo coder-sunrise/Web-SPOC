@@ -319,6 +319,7 @@ class ClaimDetails extends Component {
                         disabled={!allowEdit}
                         mode='multiple'
                         options={diagnosis}
+                        disableAll={!allowEdit}
                         labelField='diagnosisDescription'
                         valueField='id'
                         onChange={this.diagnosisOnChangeHandler}

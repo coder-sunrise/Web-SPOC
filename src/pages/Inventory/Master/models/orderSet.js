@@ -1,8 +1,8 @@
 import update from 'immutability-helper'
+import { createListViewModel } from 'medisys-model'
 import { getUniqueId } from '@/utils/utils'
 import { fakeSubmitForm } from '@/services/api'
-import { createListViewModel } from 'medisys-model'
-import * as service from '../Package/services'
+import * as service from '../OrderSet/services'
 
 const namespace = 'pack'
 export default createListViewModel({

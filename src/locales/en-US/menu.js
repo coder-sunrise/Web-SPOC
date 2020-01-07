@@ -70,8 +70,8 @@ export default {
   'menu.inventory.medication.editmedication': 'Edit Medication',
   'menu.inventory.vaccination.vaccination': 'Add Vaccination',
   'menu.inventory.vaccination.editvaccination': 'Edit Vaccination',
-  'menu.inventory.package.package': 'Add Package',
-  'menu.inventory.package.editpackage': 'Edit Package',
+  'menu.inventory.orderset.orderset': 'Add Order Set',
+  'menu.inventory.orderset.editorderset': 'Edit Order Set',
   'menu.inventory.inventoryadjustment': 'Inventory Adjustment',
 
   'menu.queuelisting': 'Queue Listing',
@@ -154,7 +154,7 @@ export default {
   'menu.support': 'Support',
   'menu.support.support': 'Support',
   'menu.support.contactus': 'Contact Us',
-  'menu.support.druglabel': 'Drug Label',
+  'menu.support.printingtool': 'Printing Tool',
 
   'menu.wardmanagement': 'Ward Management',
   'menu.patient-monitoring': 'Patient Monitoring',

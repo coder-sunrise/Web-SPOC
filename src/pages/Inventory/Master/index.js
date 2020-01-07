@@ -75,8 +75,8 @@ const InventoryMaster = ({ inventoryMaster, dispatch, history }) => {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ inventoryMaster, pack }) => ({
+  connect(({ inventoryMaster, orderSet }) => ({
     inventoryMaster,
-    pack,
+    orderSet,
   })),
 )(InventoryMaster)

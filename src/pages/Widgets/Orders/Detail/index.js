@@ -17,7 +17,7 @@ import Medication from './Medication'
 import Vaccination from './Vaccination'
 import Service from './Service'
 import Consumable from './Consumable'
-import Package from './Package'
+import OrderSet from './OrderSet'
 // import Others from './Others'
 
 const styles = (theme) => ({
@@ -219,6 +219,9 @@ class Details extends PureComponent {
                       entity: undefined,
                       type: key,
                     },
+                  })
+                  dispatch({
+                    type: 'global/incrementCommitCount',
                   })
                 }}
               />

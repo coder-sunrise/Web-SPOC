@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/InventoryPackage'
+const url = '/api/InventoryOrderSet'
 const serviceCenterUrl = '/api/CodeTable/Search?ctname=ctservicecenter'
 module.exports = {
   queryList: (params) => service.queryList(url, params),

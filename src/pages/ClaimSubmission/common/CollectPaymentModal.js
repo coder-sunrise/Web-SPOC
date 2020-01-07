@@ -20,9 +20,11 @@ import {
   Field,
   Select,
   notification,
+  serverDateFormat,
 } from '@/components'
 import { CollectPaymentColumns, amountProps } from './variables'
 import { PAYMENT_MODE } from '@/utils/constants'
+import { getBizSession } from '@/services/queue'
 
 const paymentListSchema = Yup.object().shape({
   amountReceived: Yup.number().required(),
@@ -114,7 +116,7 @@ class CollectPaymentModal extends PureComponent {
   state = { isCardPayment: false }
 
   componentDidMount () {
-    this.getBizList(moment().formatUTC('YYMMDD'))
+    this.fetchLatestBizSessions()
   }
 
   calculateSummarySubTotal = () => {
@@ -160,13 +162,63 @@ class CollectPaymentModal extends PureComponent {
     }
   }
 
-  getBizList = (e) => {
+  fetchLatestBizSessions = () => {
+    const { setFieldValue } = this.props
+    const payload = {
+      pagesize: 1,
+      sorting: [
+        { columnName: 'sessionStartDate', direction: 'desc' },
+      ],
+    }
+    getBizSession(payload).then((response) => {
+      const { status, data } = response
+      if (parseInt(status, 10) === 200 && data.totalRecords > 0) {
+        const { data: sessionData } = data
+        const { isClinicSessionClosed, sessionStartDate } = sessionData[0]
+        let paymentDate = moment()
+        if (isClinicSessionClosed === true) {
+          paymentDate = moment(sessionStartDate, serverDateFormat)
+        }
+
+        const formateDate = paymentDate.format(serverDateFormat)
+        setFieldValue('paymentCreatedBizSessionFK', sessionData[0].id)
+        setFieldValue('paymentDate', formateDate)
+
+        this.getBizList(formateDate)
+      } else {
+        setFieldValue('paymentCreatedBizSessionFK', undefined)
+        setFieldValue('paymentDate', null)
+      }
+    })
+  }
+
+  getBizList = (date) => {
+    if (!date) return
     const { dispatch, setFieldValue } = this.props
+    const momentDate = moment(date, serverDateFormat)
+
+    const startDateTime = moment(
+      momentDate.set({ hour: 0, minute: 0, second: 0 }),
+    ).formatUTC(false)
+    const endDateTime = moment(
+      momentDate.set({ hour: 23, minute: 59, second: 59 }),
+    ).formatUTC(false)
+
     dispatch({
       type: 'claimSubmissionApproved/getAllBizSession',
       payload: {
-        sessionNoPrefix: e,
         pagesize: 999,
+        lsteql_SessionStartDate: endDateTime,
+        group: [
+          {
+            isClinicSessionClosed: false,
+            lgteql_SessionCloseDate: startDateTime,
+            combineCondition: 'or',
+          },
+        ],
+        sorting: [
+          { columnName: 'sessionStartDate', direction: 'desc' },
+        ],
       },
     }).then(() => {
       const { bizSessionList } = this.props.claimSubmissionApproved
@@ -180,15 +232,7 @@ class CollectPaymentModal extends PureComponent {
   }
 
   onChangeDate = (event) => {
-    const { isDeposit } = this.props
-    const selectedDate = moment(event).format('YYMMDD')
-
-    if (isDeposit && selectedDate === moment().format('YYMMDD')) {
-      this.setState({ isSessionRequired: false })
-    } else {
-      this.setState({ isSessionRequired: true })
-      this.getBizList(selectedDate)
-    }
+    this.getBizList(event)
   }
 
   render () {

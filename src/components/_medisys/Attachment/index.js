@@ -16,6 +16,7 @@ import {
 // utils
 import { getCodes } from '@/utils/codes'
 import AttachmentChipWithPopover from './AttachmentChipWithPopover'
+import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
 
 const styles = (theme) => ({
   noPadding: {
@@ -84,23 +85,11 @@ const Attachment = ({
     uploading,
     setUploading,
   ] = useState(false)
-  const [
-    fileStatusList,
-    setFileStatusList,
-  ] = useState([])
 
   const [
     errorText,
     setErrorText,
   ] = useState('')
-
-  useEffect(() => {
-    getCodes('ltfilestatus').then((response) => {
-      setFileStatusList([
-        ...response,
-      ])
-    })
-  }, [])
 
   const fileAttachments = attachments.filter(
     (attachment) =>
@@ -114,18 +103,28 @@ const Attachment = ({
   const mapFileToUploadObject = async (file) => {
     // file type and file size validation
     const base64 = await convertToBase64(file)
-    const fileStatusFK = fileStatusList.find(
-      (item) => item.code.toUpperCase() === 'UPLOADED',
-    )
+    let fileStatusFK
+    let fileCategoryFK
+    if (attachmentType === 'patientAttachment') {
+      fileStatusFK = FILE_STATUS.CONFIRMED
+      fileCategoryFK = FILE_CATEGORY.PATIENT
+    } else {
+      fileStatusFK = FILE_STATUS.UPLOADED
+      if (attachmentType === 'VisitReferral' || attachmentType === 'Visit') {
+        fileCategoryFK = FILE_CATEGORY.VISITREG
+      } else {
+        fileCategoryFK = FILE_CATEGORY.CONSULTATION
+      }
+    }
 
     const uploadObject = {
       fileName: file.name,
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
-      fileCategoryFK: 1,
+      fileCategoryFK: fileCategoryFK,
       content: base64,
       // isConfirmed: false,
-      fileStatusFK: fileStatusFK.id,
+      fileStatusFK: fileStatusFK,
       attachmentType,
     }
     const uploaded = await uploadFile(uploadObject)

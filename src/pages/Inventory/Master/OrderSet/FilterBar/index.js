@@ -38,7 +38,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           <FastField
             name='code'
             render={(args) => {
-              return <TextField label='Package Code' {...args} />
+              return <TextField label='Order Set Code' {...args} />
             }}
           />
         </GridItem>
@@ -46,7 +46,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
           <FastField
             name='displayValue'
             render={(args) => {
-              return <TextField label='Package Name' {...args} />
+              return <TextField label='Order Set Name' {...args} />
             }}
           />
         </GridItem>
@@ -57,7 +57,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               return (
                 <Select
                   label={formatMessage({
-                    id: 'inventory.master.package.status',
+                    id: 'inventory.master.orderset.status',
                   })}
                   options={status}
                   {...args}
@@ -93,13 +93,13 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
                 color='primary'
                 onClick={() => {
                   dispatch({
-                    type: 'packDetail/updateState',
+                    type: 'orderSetDetail/updateState',
                     payload: {
                       entity: undefined,
                       currentId: undefined,
                     },
                   })
-                  history.push('/inventory/master/package')
+                  history.push('/inventory/master/orderSet')
                 }}
               >
                 <Add />
