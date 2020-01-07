@@ -14,7 +14,6 @@ const CannedText = ({
   dispatch,
   footer,
   handleAddCannedText,
-  // values = { list: [] },
   cannedText,
   user,
 }) => {

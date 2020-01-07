@@ -157,7 +157,12 @@ const Thumbnail = ({
             </Button>
           </Tooltip>
           <Tooltip title='Delete'>
-            <Button justIcon color='danger' size='sm'>
+            <Button
+              justIcon
+              color='danger'
+              size='sm'
+              onClick={handleConfirmDelete}
+            >
               <Delete />
             </Button>
           </Tooltip>
