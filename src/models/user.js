@@ -135,10 +135,10 @@ export default {
             accessRights,
           }
           // for AiOT user only
-          if (user && user.data && user.data.id === 46) {
-            user = parseUserRights(user)
-            console.log({ user })
-          }
+          // if (user && user.data && user.data.id === 46) {
+          //   user = parseUserRights(user)
+          //   console.log({ user })
+          // }
         }
         sessionStorage.setItem('user', JSON.stringify(user))
       }
