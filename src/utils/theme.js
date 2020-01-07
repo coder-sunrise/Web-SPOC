@@ -455,6 +455,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+      },
+    },
   },
 })
 
@@ -649,6 +656,17 @@ export const smallTheme = createMuiTheme({
         '& .ant-tabs-bar': {
           zoom: '80%',
         },
+      },
+    },
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+        height: 'auto',
+      },
+      deleteIcon: {
+        width: 16,
+        height: 16,
       },
     },
   },

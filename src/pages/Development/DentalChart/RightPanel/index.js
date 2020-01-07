@@ -49,8 +49,8 @@ const RightPanel = (props) => {
     setOpenHistory,
   ] = React.useState(false)
   return (
-    <Paper elevation={0} className={classes.paper}>
-      <div>
+    <Paper className={classes.paper}>
+      <div style={{ width: '100%' }}>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={5}>
             <Checkbox
@@ -109,6 +109,13 @@ const RightPanel = (props) => {
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'diagnosis',
+                    },
+                  })
+                } else {
+                  dispatch({
+                    type: 'dentalChartComponent/updateState',
+                    payload: {
+                      mode: 'treatment',
                     },
                   })
                 }

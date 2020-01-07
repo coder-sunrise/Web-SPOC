@@ -138,6 +138,7 @@ const Diagnosis = ({
           return (
             <SortList
               // lockToContainerEdges
+              key={k}
               lockAxis='y'
               distance={10}
               onSortEnd={onSortEnd}

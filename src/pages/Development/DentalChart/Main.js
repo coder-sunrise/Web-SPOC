@@ -42,15 +42,18 @@ import {
   selectablePrefix,
 } from './variables'
 
-import ButtonGroup from './ButtonGroup'
+import DiagnosisPanel from './DiagnosisPanel'
 import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
 import model from './models'
 import modelSetup from './models/setup'
+import modelTreatment from './models/treatment'
 
 // window.g_app.replaceModel(model)
 // window.g_app.replaceModel(modelSetup)
+// window.g_app.replaceModel(modelTreatment)
+
 const styles = (theme) => ({
   paper: {
     display: 'flex',
@@ -112,11 +115,21 @@ const styles = (theme) => ({
 
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
-@connect(({ dentalChartComponent, dentalChartSetup, global }) => ({
-  dentalChartComponent,
-  dentalChartSetup,
-  global,
-}))
+@connect(
+  ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }) => ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }),
+)
 class DentalChart extends React.Component {
   render () {
     const {
@@ -145,7 +158,7 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <ButtonGroup {...this.props} />}
+            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>
