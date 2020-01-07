@@ -2,50 +2,81 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 // formik
 import { FastField } from 'formik'
+// material ui
+import SolidExpandMore from '@material-ui/icons/ArrowDropDown'
 // common components
-import { CardContainer } from '@/components'
+import { Accordion, CommonModal } from '@/components'
 import { AttachmentWithThumbnail } from '@/components/_medisys'
 import Thumbnail from '@/components/_medisys/AttachmentWithThumbnail/Thumbnail'
+import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
+import ScribbleThumbnail from './ScribbleThumbnail'
 // services
-import { downloadAttachment } from '@/services/file'
+import { deleteFileByFileID, downloadAttachment } from '@/services/file'
+import { navigateDirtyCheck } from '@/utils/utils'
 
 @connect()
 class Attachment extends Component {
-  constructor (props) {
-    super(props)
-
-    this.state = {
-      visitAttachment: [],
-      referralAttachment: [],
-      clinicalNotesAttachment: [],
-    }
+  state = {
+    showScribbleModal: false,
+    selectedScribbleNoteData: undefined,
   }
 
   componentDidMount () {
     const { parentProps } = this.props
     const { consultation } = parentProps
-    const { corAttachment = [] } = consultation.entity || consultation.default
+    const { corAttachment = [], corScribbleNotes = [] } =
+      consultation.entity || consultation.default
 
-    this.mapAttachments(corAttachment)
+    this.mapAttachments(corAttachment, corScribbleNotes)
   }
 
-  mapAttachments = (attachments) => {
-    const visitAttachment = attachments.filter(
-      (attachment) => attachment.attachmentType === 'Visit',
-    )
-
-    const referralAttachment = attachments.filter(
-      (attachment) => attachment.attachmentType === 'VisitReferral',
-    )
-
-    const clinicalNotesAttachment = attachments.filter(
-      (attachment) => attachment.attachmentType === 'ClinicalNotes',
-    )
-    this.setState({
+  mapAttachments = (attachments, scribbleNotes = []) => {
+    let {
       visitAttachment,
       referralAttachment,
       clinicalNotesAttachment,
-    })
+    } = attachments.reduce(
+      (result, attachment, index) => {
+        if (attachment.attachmentType === 'Visit') {
+          return {
+            ...result,
+            visitAttachment: [
+              ...result.visitAttachment,
+              { ...attachment, index },
+            ],
+          }
+        }
+        if (attachment.attachmentType === 'VisitReferral') {
+          return {
+            ...result,
+            referralAttachment: [
+              ...result.referralAttachment,
+              { ...attachment, index },
+            ],
+          }
+        }
+        if (attachment.attachmentType === 'ClinicalNotes') {
+          return {
+            ...result,
+            clinicalNotesAttachment: [
+              ...result.clinicalNotesAttachment,
+              { ...attachment, index },
+            ],
+          }
+        }
+        return { ...result }
+      },
+      {
+        visitAttachment: [],
+        referralAttachment: [],
+        clinicalNotesAttachment: [],
+      },
+    )
+    // clinicalNotesAttachment = [
+    //   ...clinicalNotesAttachment,
+    //   ...scribbleNotes.map((sn) => ({ ...sn, isScribbleNote: true })),
+    // ]
+    return { visitAttachment, referralAttachment, clinicalNotesAttachment }
   }
 
   handleClickAttachment = (attachment) => {
@@ -53,12 +84,12 @@ class Attachment extends Component {
   }
 
   handleUpdateAttachments = (args) => ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
     const { form, field } = args
 
     let updated = [
       ...(field.value || []),
     ]
+
     if (added)
       updated = [
         ...updated,
@@ -89,72 +120,186 @@ class Attachment extends Component {
       }, [])
 
     form.setFieldValue('corAttachment', updated)
-    console.log({ updated })
-    this.mapAttachments(updated)
+  }
+
+  handleDeleteAttachment = (args) => (fileIndexFK, id) => {
+    if (!fileIndexFK && id) {
+      deleteFileByFileID(id)
+    }
+
+    this.handleUpdateAttachments(args)({
+      deleted: !fileIndexFK ? id : fileIndexFK,
+    })
+  }
+
+  closeScribbleNote = () => {
+    navigateDirtyCheck({
+      onProceed: this.toggleScribbleModal(),
+    })
+  }
+
+  handleScribbleThumbnailClick = (data) => {
+    this.setState({
+      selectedScribbleNoteData: data,
+      showScribbleModal: true,
+    })
+    this.props.dispatch({
+      type: 'scriblenotes/updateState',
+      payload: {
+        selectedScribbleNoteData: data,
+      },
+    })
+  }
+
+  toggleScribbleModal = () => {
+    this.setState((preState) => ({
+      showScribbleModal: !preState.showScribbleModal,
+    }))
   }
 
   render () {
-    const { parentProps } = this.props
-    const {
-      visitAttachment,
-      referralAttachment,
-      clinicalNotesAttachment,
-    } = this.state
-
+    const { showScribbleModal, selectedScribbleNoteData } = this.state
+    const { dispatch } = this.props
     const commonProps = {
-      isReadOnly: true,
-      onConfirmDelete: () => {},
+      fieldName: 'corAttachment',
       onClickAttachment: this.handleClickAttachment,
     }
-    const { consultation } = parentProps
-    const { corAttachment = [] } = consultation.entity || consultation.default
-
     return (
       <div>
         <FastField
           name='corAttachment'
-          render={(args) => (
-            <AttachmentWithThumbnail
-              attachments={corAttachment}
-              buttonOnly
-              attachmentType='ClinicalNotes'
-              handleUpdateAttachments={this.handleUpdateAttachments(args)}
-            />
-          )}
+          render={(args) => {
+            const { form } = args
+            this.form = form
+            const { values } = form
+            const { corAttachment = [], corScribbleNotes = [] } = values
+
+            return (
+              <AttachmentWithThumbnail
+                attachments={corAttachment}
+                buttonOnly
+                attachmentType='ClinicalNotes'
+                handleUpdateAttachments={this.handleUpdateAttachments(args)}
+                renderBody={(attachments) => {
+                  const {
+                    visitAttachment,
+                    referralAttachment,
+                    clinicalNotesAttachment,
+                  } = this.mapAttachments(attachments, corScribbleNotes)
+                  const onDeleteClick = this.handleDeleteAttachment(args)
+                  return (
+                    <Accordion
+                      leftIcon
+                      expandIcon={<SolidExpandMore fontSize='large' />}
+                      mode='multiple'
+                      defaultActive={[
+                        0,
+                        1,
+                        2,
+                      ]}
+                      collapses={[
+                        {
+                          title: (
+                            <h5 style={{ paddingLeft: 8 }}>
+                              Clinical Notes Attachment
+                            </h5>
+                          ),
+                          content: (
+                            <div>
+                              {clinicalNotesAttachment
+                                .filter((attachment) => !attachment.isDeleted)
+                                .map(
+                                  (attachment, index) =>
+                                    attachment.isScribbleNote ? (
+                                      <ScribbleThumbnail
+                                        key={`attachment-${index}`}
+                                        attachment={attachment}
+                                        dispatch={dispatch}
+                                        onClick={
+                                          this.handleScribbleThumbnailClick
+                                        }
+                                        onInsertClick={this.handleInsertClick}
+                                        // onConfirmDelete={onDeleteClick}
+                                        // index={attachment.index}
+                                        // {...commonProps}
+                                      />
+                                    ) : (
+                                      <Thumbnail
+                                        key={`attachment-${index}`}
+                                        attachment={attachment}
+                                        onConfirmDelete={onDeleteClick}
+                                        index={attachment.index}
+                                        {...commonProps}
+                                      />
+                                    ),
+                                )}
+                            </div>
+                          ),
+                        },
+                        {
+                          title: (
+                            <h5 style={{ paddingLeft: 8 }}>Visit Attachment</h5>
+                          ),
+                          content: (
+                            <div>
+                              {visitAttachment
+                                .filter((attachment) => !attachment.isDeleted)
+                                .map((attachment, index) => (
+                                  <Thumbnail
+                                    key={`attachment-${index}`}
+                                    attachment={attachment}
+                                    onConfirmDelete={onDeleteClick}
+                                    {...commonProps}
+                                  />
+                                ))}
+                            </div>
+                          ),
+                        },
+                        {
+                          title: (
+                            <h5 style={{ paddingLeft: 8 }}>
+                              Referral Attachment
+                            </h5>
+                          ),
+                          content: (
+                            <div>
+                              {referralAttachment
+                                .filter((attachment) => !attachment.isDeleted)
+                                .map((attachment, index) => (
+                                  <Thumbnail
+                                    key={`attachment-${index}`}
+                                    attachment={attachment}
+                                    onConfirmDelete={onDeleteClick}
+                                    {...commonProps}
+                                  />
+                                ))}
+                            </div>
+                          ),
+                        },
+                      ]}
+                    />
+                  )
+                }}
+              />
+            )
+          }}
         />
-
-        <CardContainer hideHeader>
-          <h5>Visit Attachment</h5>
-          {visitAttachment.map((attachment, index) => (
-            <Thumbnail
-              key={`attachment-${index}`}
-              attachment={attachment}
-              {...commonProps}
-            />
-          ))}
-        </CardContainer>
-
-        <CardContainer hideHeader>
-          <h5>Referral Attachment</h5>
-          {referralAttachment.map((attachment, index) => (
-            <Thumbnail
-              key={`attachment-${index}`}
-              attachment={attachment}
-              {...commonProps}
-            />
-          ))}
-        </CardContainer>
-
-        <CardContainer hideHeader>
-          <h5>Clinical Notes Attachment</h5>
-          {clinicalNotesAttachment.map((attachment, index) => (
-            <Thumbnail
-              key={`attachment-${index}`}
-              attachment={attachment}
-              {...commonProps}
-            />
-          ))}
-        </CardContainer>
+        <CommonModal
+          open={showScribbleModal}
+          title='Scribble'
+          fullScreen
+          bodyNoPadding
+          observe='ScribbleNotePage'
+          onClose={this.closeScribbleNote}
+        >
+          <ScribbleNote
+            {...this.props}
+            // addScribble={this.scribbleNoteDrawing}
+            toggleScribbleModal={this.toggleScribbleModal}
+            scribbleData={selectedScribbleNoteData}
+            deleteScribbleNote={this.deleteScribbleNote}
+          />
+        </CommonModal>
       </div>
     )
   }

@@ -1,4 +1,4 @@
-import { SCRIBBLE_NOTE_TYPE } from '@/utils/constants'
+import { SCRIBBLE_NOTE_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 
 export const gpConfigs = {
   fields: [
@@ -40,6 +40,7 @@ export const dentalConfigs = {
       fieldTitle: 'Clinical Notes',
       scribbleField: 'notesScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.CLINICALNOTES,
       index: 0,
     },
     {
@@ -48,6 +49,7 @@ export const dentalConfigs = {
       fieldTitle: 'Chief Complaints',
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.CHIEFCOMPLAINTS,
       index: 1,
     },
     {
@@ -56,6 +58,7 @@ export const dentalConfigs = {
       fieldTitle: 'Associated History',
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.ASSOCIATEDHISTORY,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.ASSOCIATEDHISTORY,
       index: 2,
     },
     {
@@ -64,6 +67,7 @@ export const dentalConfigs = {
       fieldTitle: 'Intra Oral',
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.INTRAORAL,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.INTRAORAL,
       index: 3,
     },
     {
@@ -72,6 +76,7 @@ export const dentalConfigs = {
       fieldTitle: 'Extra Oral',
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.EXTRAORAL,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.EXTRAORAL,
       index: 4,
     },
   ],

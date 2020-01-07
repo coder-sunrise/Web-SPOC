@@ -254,3 +254,11 @@ export const SMS_STATUS_TEXT = {
   QUEUED: 'Queued',
   SENDING: 'Sending',
 }
+
+export const CANNED_TEXT_TYPE = {
+  CLINICALNOTES: 1,
+  CHIEFCOMPLAINTS: 2,
+  ASSOCIATEDHISTORY: 3,
+  INTRAORAL: 4,
+  EXTRAORAL: 5,
+}

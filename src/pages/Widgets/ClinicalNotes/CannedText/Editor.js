@@ -6,6 +6,7 @@ import { withFormik, FastField } from 'formik'
 // common components
 import {
   Button,
+  Checkbox,
   CardContainer,
   GridContainer,
   GridItem,
@@ -14,10 +15,18 @@ import {
 } from '@/components'
 import { getUniqueGUID, htmlDecodeByRegExp } from '@/utils/utils'
 
+// "title": "string",
+// "text": "string",
+// "isShared": true,
+// "cannedTextTypeFK": 0,
+// "ownedByUserFK": 0,
+
 const defaultEntity = {
   title: undefined,
-  cannedText: undefined,
+  text: undefined,
   htmlCannedText: undefined,
+  isShared: false,
+  ownedByUserFK: undefined,
 }
 
 const Editor = ({
@@ -27,6 +36,7 @@ const Editor = ({
   onCancel,
   handleSubmit,
 }) => {
+  console.log({ values })
   const handleCancelClick = () => {
     resetForm(defaultEntity)
     onCancel()
@@ -41,6 +51,12 @@ const Editor = ({
             render={(args) => <TextField label='Canned Text Title' {...args} />}
           />
         </GridItem>
+        <GridItem md={3}>
+          <FastField
+            name='isShared'
+            render={(args) => <Checkbox {...args} simple label='Is Shared' />}
+          />
+        </GridItem>
         <GridItem md={12}>
           <FastField
             name='_htmlCannedText'
@@ -51,7 +67,7 @@ const Editor = ({
                 {...args}
                 onBlur={(html, text) => {
                   const decodedHtml = htmlDecodeByRegExp(html)
-                  setFieldValue('cannedText', text)
+                  setFieldValue('text', text)
                   setFieldValue('htmlCannedText', decodedHtml)
                 }}
               />
@@ -76,17 +92,25 @@ const Editor = ({
   )
 }
 
-const handleSubmit = (values, { props, resetForm }) => {
-  const { onConfirm } = props
+const handleSubmit = async (values, { props, resetForm }) => {
+  const { dispatch, onConfirm } = props
   const isEdit = values.id !== undefined
   const result = isEdit ? values : { ...values, id: getUniqueGUID() }
-  onConfirm(result)
-  resetForm(defaultEntity)
+  console.log({ result })
+  // const response = await dispatch({
+  //   type: 'text/upsert',
+  //   payload: result,
+  // })
+
+  // if (response) {
+  //   if (onConfirm) onConfirm(result)
+  //   resetForm(defaultEntity)
+  // }
 }
 
-const mapPropsToValues = ({ entity }) => {
+const mapPropsToValues = ({ entity, user }) => {
   const _entity = _.isEmpty(entity)
-    ? defaultEntity
+    ? { ...defaultEntity, ownedByUserFK: user.id }
     : { ...entity, _htmlCannedText: entity.htmlCannedText }
   return _entity
 }

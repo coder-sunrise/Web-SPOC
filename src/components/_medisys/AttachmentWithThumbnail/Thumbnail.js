@@ -103,6 +103,7 @@ const Thumbnail = ({
   onConfirmDelete,
   onClickAttachment,
   noBorder,
+  fieldName = 'visitAttachment',
   size = { width: 64, height: 64 },
 }) => {
   const {
@@ -156,7 +157,12 @@ const Thumbnail = ({
             </Button>
           </Tooltip>
           <Tooltip title='Delete'>
-            <Button justIcon color='danger' size='sm'>
+            <Button
+              justIcon
+              color='danger'
+              size='sm'
+              onClick={handleConfirmDelete}
+            >
               <Delete />
             </Button>
           </Tooltip>
@@ -170,7 +176,7 @@ const Thumbnail = ({
       <GridContainer>
         <GridItem md={9} className={classes.filenameContainer}>
           <Tooltip title={fileName}>
-            <span>{fileName}</span>
+            <span style={{ fontSize: '0.75rem' }}>{fileName}</span>
           </Tooltip>
         </GridItem>
         <GridItem md={3}>
@@ -184,15 +190,20 @@ const Thumbnail = ({
             className={classes.imageContainer}
             onClick={handleAttachmentClicked}
           >
-            <img src={src} alt='test' width={size.width} height={size.height} />
+            <img
+              src={src}
+              alt={fileName}
+              width={size.width}
+              height={size.height}
+            />
           </div>
         </GridItem>
         <GridItem md={12}>
           <SizeContainer size='sm'>
             <FastField
-              name={`visitAttachment[${index}].remark`}
+              name={`${fieldName}[${index}].remark`}
               render={(args) => (
-                <OutlinedTextField
+                <TextField
                   {...args}
                   size='sm'
                   label='Remark'
