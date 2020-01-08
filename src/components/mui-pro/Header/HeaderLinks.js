@@ -150,7 +150,7 @@ class HeaderLinks extends React.Component {
                 </Button>
               </Badge> */}
               {!signalRConnected && (
-                <Tooltip title='Realtime update is not available'>
+                <Tooltip title='Real-time update signal is down. Please refresh manually.'>
                   <Button justIcon color='transparent'>
                     <Badge
                       ripple
