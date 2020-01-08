@@ -164,8 +164,19 @@ export default createFormViewModel({
       //     },
       //   })
       // },
-      *closePatientModal ({ payload }, { all, put }) {
+      *closePatientModal ({ payload }, { all, put, select }) {
+        const patientState = yield select((st) => st.patient)
         const { history } = payload || { history: undefined }
+
+        if (patientState.shouldQuery) {
+          yield put({ type: 'query' })
+          yield put({
+            type: 'updateState',
+            payload: {
+              shouldQuery: false,
+            },
+          })
+        }
 
         // do not remove PID query in these URLs
         const exceptionalPaths = [

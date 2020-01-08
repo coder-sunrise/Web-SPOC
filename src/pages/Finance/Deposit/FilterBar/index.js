@@ -139,18 +139,18 @@ class FilterBar extends PureComponent {
                         ? transactionDates[1]
                         : undefined,
                       apiCriteria: {
-                        searchValue: ExpenseType,
+                        // searchValue: ExpenseType,
                         OnlyWithDeposit: showTransactionOnly,
                       },
-                      // group: [
-                      //   {
-                      //     'contactFkNavigation.contactNumber.number': ExpenseType,
-                      //     patientReferenceNo: ExpenseType,
-                      //     patientAccountNo: ExpenseType,
-                      //     name: ExpenseType,
-                      //     combineCondition: 'or',
-                      //   },
-                      // ],
+                      group: [
+                        {
+                          'contactFkNavigation.contactNumber.number': ExpenseType,
+                          patientReferenceNo: ExpenseType,
+                          patientAccountNo: ExpenseType,
+                          name: ExpenseType,
+                          combineCondition: 'or',
+                        },
+                      ],
                     },
                   })
                 }}

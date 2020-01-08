@@ -167,19 +167,19 @@ export default compose(
         let PDPAMessage = pdpaConsent.includes('2') // sms
         let PDPAEmail = pdpaConsent.includes('3') // email
         payload = {
-          // group: [
-          //   {
-          //     name: patientName,
-          //     patientAccountNo: patientName,
-          //     patientReferenceNo: patientName,
-          //     'ContactFkNavigation.contactNumber.number': patientName,
-          //     combineCondition: 'or',
-          //   },
-          // ],
+          group: [
+            {
+              name: patientName,
+              patientAccountNo: patientName,
+              patientReferenceNo: patientName,
+              'ContactFkNavigation.contactNumber.number': patientName,
+              combineCondition: 'or',
+            },
+          ],
           'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
 
           apiCriteria: {
-            searchValue: patientName,
+            // searchValue: patientName,
             PDPAPhone,
             PDPAMessage,
             PDPAEmail,

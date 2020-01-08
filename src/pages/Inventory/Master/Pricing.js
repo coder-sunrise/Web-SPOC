@@ -103,6 +103,7 @@ const Pricing = ({
                         id: 'inventory.master.pricing.lastCostPriceBefBonus',
                       })}
                       disabled={isEditMode()}
+                      precision={4}
                       {...args}
                     />
                   )
@@ -120,6 +121,7 @@ const Pricing = ({
                         id: 'inventory.master.pricing.lastCostPriceAftBonus',
                       })}
                       disabled={isEditMode()}
+                      precision={4}
                       {...args}
                     />
                   )
