@@ -28,7 +28,8 @@ const updateData = (data, payload) => {
       o.subTarget === subTarget &&
       o.name === name,
   )
-  if (id === 'clear') return _.reject(data, (o) => o.toothIndex === toothIndex)
+  if (action.code === 'SYS01')
+    return _.reject(data, (o) => o.toothIndex === toothIndex)
 
   if (deleted) {
     return _.reject(data, (o) => o.toothIndex === toothIndex && o.id === id)

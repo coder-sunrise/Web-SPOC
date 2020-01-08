@@ -257,7 +257,6 @@ const AttachmentWithThumbnail = ({
     if (!fileIndexFK && id) {
       deleteFileByFileID(id)
     }
-
     handleUpdateAttachments({
       deleted: !fileIndexFK ? id : fileIndexFK,
     })
@@ -302,7 +301,6 @@ const AttachmentWithThumbnail = ({
       </GridContainer>
     </CardContainer>
   )
-
   if (simple && !allowedMultiple)
     Body = fileAttachments.map((attachment, index) => {
       return (
@@ -318,7 +316,6 @@ const AttachmentWithThumbnail = ({
   if (renderBody) {
     Body = renderBody(attachments)
   }
-
   return (
     <div className={classes.root}>
       {label && <span className={classes.attachmentLabel}>{label}</span>}

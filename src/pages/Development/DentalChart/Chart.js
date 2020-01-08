@@ -1221,7 +1221,7 @@ class Chart extends React.Component {
           // }
           if (
             target.editMode === 'image' &&
-            target.attachments &&
+            target.image &&
             o.target === group.name
           ) {
             // console.log('getShape')
@@ -1231,27 +1231,24 @@ class Chart extends React.Component {
             // console.log(group)
             if (!existed) {
               // console.log(newShape)
-              fabric.Image.fromURL(
-                target.attachments[0].thumbnailData,
-                (img) => {
-                  group.add(
-                    new fabric.Group(
-                      [
-                        img
-                          .scale(groupWidth / img.width)
-                          .rotate(isUpperSection(index) ? 180 : 0),
-                      ],
-                      {
-                        ...addonGroupCfg,
-                        isShape: true,
-                        name: `${o.id}`,
-                      },
-                    ),
-                  )
-                  imageCache[o.id] = img.scale(groupWidth / img.width)
-                  this.canvas.renderAll()
-                },
-              )
+              fabric.Image.fromURL(target.image, (img) => {
+                group.add(
+                  new fabric.Group(
+                    [
+                      img
+                        .scale(groupWidth / img.width)
+                        .rotate(isUpperSection(index) ? 180 : 0),
+                    ],
+                    {
+                      ...addonGroupCfg,
+                      isShape: true,
+                      name: `${o.id}`,
+                    },
+                  ),
+                )
+                imageCache[o.id] = img.scale(groupWidth / img.width)
+                this.canvas.renderAll()
+              })
             }
             if (existed) {
               group.add(

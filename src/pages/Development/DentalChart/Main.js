@@ -131,6 +131,14 @@ const groupHeight = baseHeight * 3 // + strokeWidth
   }),
 )
 class DentalChart extends React.Component {
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'dentalChartSetup/query',
+      pageSize: 99999,
+    })
+  }
+
   render () {
     const {
       className,

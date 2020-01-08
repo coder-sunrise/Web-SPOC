@@ -48,7 +48,7 @@ const TreatmentGrid = (props) => {
     height,
     dentalChartSetup,
     dentalChartTreatment,
-
+    codetable,
     values,
     setFieldValue,
     footer,
@@ -65,14 +65,31 @@ const TreatmentGrid = (props) => {
   }
   // useState()
   const editRow = (row) => {
+    const { list = [] } = dentalChartSetup
+    const { cttreatment = [] } = codetable
+
     dispatch({
       type: 'dentalChartTreatment/updateState',
       payload: {
         entity: row,
       },
     })
+    const treatment = cttreatment.find((o) => o.id === row.treatmentFK) || {}
+    const action = list.find((o) => o.id === treatment.chartMethodFK)
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action,
+      },
+    })
   }
   const columnExtensions = [
+    {
+      columnName: 'treatmentFK',
+      type: 'codeSelect',
+      code: 'cttreatment',
+      labelField: 'displayValue',
+    },
     {
       columnName: 'unit',
       type: 'number',
@@ -86,7 +103,7 @@ const TreatmentGrid = (props) => {
       type: 'currency',
     },
     {
-      columnName: 'adjustment',
+      columnName: 'adjAmount',
       type: 'currency',
     },
     {
@@ -138,12 +155,14 @@ const TreatmentGrid = (props) => {
     rows: dentalChartTreatment.rows.filter((o) => !o.isDeleted),
     columns: [
       // { name: 'code', title: 'Code' },
-      { name: 'treatment', title: 'Treatment' },
-      { name: 'tooth', title: 'Tooth' },
+      { name: 'treatmentFK', title: 'Treatment' },
+
+      { name: 'toothInfo', title: 'Tooth' },
+
       { name: 'details', title: 'Details' },
       { name: 'unit', title: 'Unit' },
       { name: 'unitPrice', title: 'Unit Price' },
-      { name: 'adjustment', title: 'Discount' },
+      { name: 'adjAmount', title: 'Discount' },
       { name: 'finalAmount', title: 'Sub Total' },
       { name: 'actions', title: 'Actions' },
     ],

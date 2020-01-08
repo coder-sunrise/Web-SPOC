@@ -39,14 +39,23 @@ import TreatmentGrid from './TreatmentGrid'
   mapPropsToValues: ({
     dentalChartTreatment,
     dentalChartComponent,
+    codetable,
     ...rest
   }) => {
     const { data = [], action = {} } = dentalChartComponent
+    const { entity = {}, rows } = dentalChartTreatment
+
     // console.log(rest, this)
     let groupsAry = []
     if (!action.isDisplayInDiagnosis) {
       let groups = _.groupBy(
-        data.filter((o) => o.id === action.id),
+        data.filter(
+          (o) =>
+            o.id === action.id &&
+            (!rows.find((m) => m.toothInfo.indexOf(`#${o.toothIndex}`) >= 0) ||
+              (entity.treatmentFK === action.id &&
+                entity.toothInfo.indexOf(`#${o.toothIndex}`) >= 0)),
+        ),
         'toothIndex',
       )
       groupsAry = Object.keys(groups).map((k) => {
@@ -59,7 +68,7 @@ import TreatmentGrid from './TreatmentGrid'
         }
       })
       // let tooth = groupsAry.map((o) => o.text).join(',')
-      if (action.method === 3) {
+      if (action.chartMethodTypeFK === 3) {
         groupsAry = Object.values(
           _.groupBy(data.filter((o) => o.id === action.id), 'nodes'),
         ).map((o) => {
@@ -72,19 +81,35 @@ import TreatmentGrid from './TreatmentGrid'
         })
       }
     }
-
+    const treatment =
+      (codetable.cttreatment || [])
+        .find((o) => o.chartMethodFK === action.id) || {}
+    let { isExactAmount, adjustment = 0, unitPrice = 0 } = entity
+    if (!unitPrice || action.id !== entity.treatmentFK) {
+      unitPrice = treatment.sellingPrice || 0
+    }
+    // console.log(treatment, action)
+    // console.log(action, entity, treatment, unitPrice)
     return {
-      finalAmount: 0,
       isExactAmount: false,
       ...dentalChartTreatment.entity,
+      unitPrice,
+
+      treatmentFK: treatment.id,
+      finalAmount: calculateAdjustAmount(
+        isExactAmount,
+        unitPrice * groupsAry.length,
+        -adjustment,
+      ).amount,
       unit: groupsAry.length,
       groups: groupsAry,
+      toothInfo: groupsAry.map((o) => o.text).join(','),
     }
   },
   validationSchema: Yup.object().shape({
     unit: Yup.number().required(),
     unitPrice: Yup.number().required(),
-    code: Yup.number().required(),
+    treatmentFK: Yup.number().required(),
   }),
   handleSubmit: async (values, { props }) => {
     const { dispatch } = props
@@ -94,6 +119,12 @@ import TreatmentGrid from './TreatmentGrid'
         ...values,
       },
     })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
   },
   enableReinitialize: true,
   displayName: 'TreatmentForm',
@@ -101,19 +132,56 @@ import TreatmentGrid from './TreatmentGrid'
 class TreatmentForm extends Component {
   // componentWillReceiveProps (nextProps) {
   //   // console.log(_.isEqual(this.props.values, nextProps.values), nextProps)
-  //   if (!_.isEqual(this.props.values, nextProps.values)) {
+  //   if (
+  //     !_.isEqual(this.props.values.treatmentFK, nextProps.values.treatmentFK)
+  //   ) {
+  //     console.log(
+  //       nextProps.codetable.cttreatment.find(
+  //         (o) => o.id === nextProps.values.treatmentFK,
+  //       ),
+  //     )
+  //     this.changeTreatment(
+  //       nextProps.codetable.cttreatment.find(
+  //         (o) => o.id === nextProps.values.treatmentFK,
+  //       ),
+  //     )
+  //     this.getFinalAmount(nextProps)
   //   }
   // }
 
-  getFinalAmount = () => {
-    const { values, setFieldValue } = this.props
+  getFinalAmount = (props) => {
+    const { values, setFieldValue } = props || this.props
     const { isExactAmount, adjustment = 0, unitPrice = 0, unit = 0 } = values
     // console.log(calculateAdjustAmount(isExactAmount, unitPrice, -adjustment))
-    setFieldValue(
-      'finalAmount',
-      calculateAdjustAmount(isExactAmount, unitPrice * unit, -adjustment)
-        .amount,
+    const subTotal = calculateAdjustAmount(
+      isExactAmount,
+      unitPrice * unit,
+      -adjustment,
     )
+    // console.log(subTotal)
+    setFieldValue('finalAmount', subTotal.amount)
+    setFieldValue('adjAmount', Math.abs(subTotal.adjAmount))
+    this.updateValueToStore()
+  }
+
+  changeTreatment = (option = {}) => {
+    const { setFieldValue } = this.props
+
+    const { sellingPrice } = option
+
+    setFieldValue('unitPrice', sellingPrice)
+  }
+
+  updateValueToStore = (vals) => {
+    this.props.dispatch({
+      type: 'dentalChartTreatment/updateState',
+      payload: {
+        entity: {
+          ...this.props.values,
+          ...vals,
+        },
+      },
+    })
   }
 
   render () {
@@ -157,12 +225,6 @@ class TreatmentForm extends Component {
       discountCfg.percentage = true
       discountCfg.max = 100
       discountCfg.min = 0
-    }
-
-    const changeTreatment = (option) => {
-      const { sellingPrice } = option
-
-      setFieldValue('unitPrice', sellingPrice)
     }
 
     // console.log(discountCfg)
@@ -210,6 +272,11 @@ class TreatmentForm extends Component {
                     maxLength={2000}
                     rowsMax={6}
                     rows={6}
+                    onChange={(e) => {
+                      this.updateValueToStore({
+                        details: e.target.value,
+                      })
+                    }}
                     {...args}
                   />
                 )}
@@ -217,15 +284,16 @@ class TreatmentForm extends Component {
             </GridItem>
             <GridItem xs={12} md={4}>
               <FastField
-                name='code'
+                name='treatmentFK'
                 render={(args) => (
                   <CodeSelect
                     code='cttreatment'
                     labelField='displayValue'
                     label='Treatment'
-                    onChange={(v, op) => {
-                      changeTreatment(op)
-                    }}
+                    disabled
+                    // onChange={(v, op) => {
+                    //   this.changeTreatment(op)
+                    // }}
                     {...args}
                   />
                 )}
@@ -250,11 +318,8 @@ class TreatmentForm extends Component {
                 render={(args) => (
                   <NumberInput
                     label='Unit Price'
-                    onChange={() => {
-                      setTimeout(() => {
-                        this.getFinalAmount()
-                      }, 1)
-                    }}
+                    currency
+                    onChange={(v) => {}}
                     {...args}
                   />
                 )}
@@ -324,7 +389,7 @@ class TreatmentForm extends Component {
                     entity: undefined,
                   },
                 })
-                this.props.resetForm()
+                // this.props.resetForm()
               }}
             >
               Discard

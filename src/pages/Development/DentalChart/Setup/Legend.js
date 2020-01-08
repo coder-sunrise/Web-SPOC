@@ -6,6 +6,7 @@ import ColorLens from '@material-ui/icons/ColorLens'
 import { withStyles } from '@material-ui/core'
 
 import { AttachmentWithThumbnail } from '@/components/_medisys'
+import { getUniqueId } from '@/utils/utils'
 
 import {
   GridContainer,
@@ -44,7 +45,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   //   return null
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
   // console.log(restProps)
-
+  // console.log(row)
   const [
     mode,
     setMode,
@@ -62,10 +63,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
     setSymbol,
   ] = useState(row.chartMethodText)
 
-  const [
-    attachments,
-    setAttachments,
-  ] = useState(row.attachments)
   // const [
   //   blur,
   //   setBlur,
@@ -74,25 +71,23 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   //   leading: false,
   //   trailing: true,
   // })
-  useEffect(
-    () => {
-      if (chartMethodTypeFK === 4) return
+  // useEffect(
+  //   () => {
+  //     if (chartMethodTypeFK === 4) return
 
-      if (mode === 'color') {
-        setAttachments([])
-        delete row.attachments
-        delete row.image
-      } else if (mode === 'image') {
-        delete row.chartMethodColorBlock
-        delete row.chartMethodText
-        setSymbol(undefined)
-        setColor(undefined)
-      }
-    },
-    [
-      mode,
-    ],
-  )
+  //     if (mode === 'color') {
+  //       row.image = ''
+  //     } else if (mode === 'image') {
+  //       row.chartMethodColorBlock = ''
+  //       row.chartMethodText = ''
+  //       setSymbol(undefined)
+  //       setColor(undefined)
+  //     }
+  //   },
+  //   [
+  //     mode,
+  //   ],
+  // )
   useEffect(
     () => {
       // console.log('legend', chartMethodTypeFK)
@@ -107,47 +102,20 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   const { commitChanges } = control
 
   const handleUpdateAttachments = ({ added, deleted }) => {
-    console.log({ added, deleted })
-
-    let updated = [
-      ...(attachments || []),
-    ]
-    if (added)
-      updated = [
-        ...updated,
-        ...added.map((o) => {
-          const { id, ...resetProps } = o
-          return {
-            ...resetProps,
-            fileIndexFK: o.id,
-          }
-        }),
-      ]
-
-    if (deleted)
-      updated = updated.reduce((_attachments, item) => {
-        if (
-          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
-          (item.fileIndexFK === undefined && item.id === deleted)
-        )
-          return [
-            ..._attachments,
-            { ...item, isDeleted: true },
-          ]
-
-        return [
-          ..._attachments,
-          { ...item },
-        ]
-      }, [])
-
-    row.attachments = updated.map((o) => ({ thumbnailData: o.thumbnailData }))
-    setAttachments(updated)
+    const image = added
+      ? added.map(
+          (o) =>
+            `data:image/${o.thumbnail.fileExtension.replace('.', '')};base64,${o
+              .thumbnail.content}`,
+        )[0]
+      : ''
+    row.image = image
     commitChanges({
       changed: {
         [row.id]: {
-          image: updated[0].thumbnailData,
-          attachments: updated,
+          image,
+          chartMethodColorBlock: '',
+          chartMethodText: '',
         },
       },
     })
@@ -223,14 +191,17 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             trigger='click'
             overlay={
               <SketchPicker
-                color={color}
+                color={row.chartMethodColorBlock}
                 onChangeComplete={(e) => {
                   row.chartMethodColorBlock = e.hex
-                  setColor(e.hex)
+                  row.image = ''
+
+                  // setColor(e.hex)
                   commitChanges({
                     changed: {
                       [row.id]: {
                         chartMethodColorBlock: e.hex,
+                        image: '',
                       },
                     },
                   })
@@ -242,12 +213,16 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             <Button
               justIcon
               style={{
-                backgroundColor: color || 'transparent',
+                backgroundColor: row.chartMethodColorBlock || 'transparent',
                 minWidth: 60,
                 color: 'black',
               }}
             >
-              {(symbols.find((o) => o.value === symbol) || {}).name} &nbsp;
+              {
+                (symbols.find((o) => o.value === row.chartMethodText) || {})
+                  .name
+              }{' '}
+              &nbsp;
             </Button>
           </Popper>
         </GridItem>
@@ -256,13 +231,14 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         <GridItem xs={3}>
           <Select
             options={symbols}
-            value={symbol}
+            value={row.chartMethodText}
             {...restProps}
             text={viewOnly}
             onChange={(v, option) => {
-              console.log(v, option)
-              setSymbol(v)
+              // console.log(v, option)
+              // setSymbol(v)
               row.chartMethodText = option.name
+              row.image = ''
               // row.apptDurationMinute = e
               // setEndTime(row)
               // validSchema(row)
@@ -270,6 +246,8 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
                 changed: {
                   [row.id]: {
                     chartMethodText: option.name,
+                    image: '',
+
                     // symbol: v,
                   },
                 },
@@ -292,13 +270,23 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             classes={{
               root: classes.attachmentContainer,
             }}
-            attachmentType='DentalChartMethod'
             simple
             local
-            isReadOnly={!viewOnly}
+            isReadOnly={viewOnly}
             allowedMultiple={false}
             handleUpdateAttachments={handleUpdateAttachments}
-            attachments={attachments}
+            attachments={
+              row.image ? (
+                [
+                  {
+                    fileIndexFK: getUniqueId(),
+                    thumbnailData: row.image,
+                  },
+                ]
+              ) : (
+                []
+              )
+            }
             // isReadOnly={isReadOnly}
           />
         </GridItem>

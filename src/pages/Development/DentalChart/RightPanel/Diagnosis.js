@@ -256,8 +256,8 @@ const Diagnosis = ({
                               #{v.toothIndex}.&nbsp;
                               {moment(v.timestamp).format(dateFormatLong)}{' '}
                               -&nbsp;
-                              {action.text}
-                              {v.info && ` (${v.info})`}
+                              {action.displayValue}
+                              {v.info && ` (${v.info})`.replace('(tooth)', '')}
                             </div>
                           </GridItem>
                           <GridItem

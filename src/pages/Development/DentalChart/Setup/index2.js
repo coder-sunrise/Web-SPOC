@@ -97,6 +97,7 @@ const Setup = (props) => {
     mode,
     setMode,
   ] = useState('sort')
+  console.log(restProps)
   // useEffect(() => {
   //   if (!values.rows || values.rows.Legend === 0)
   //     dispatch({
@@ -163,7 +164,7 @@ const Setup = (props) => {
   // }
   const tableProps = {
     size: 'sm',
-    rows: values.rows,
+    rows: values.rows.filter((d) => !!d),
     // dataSource: values.rows,
     // type: 'dentalChartSetup',
     // entity: dentalChartSetup,
@@ -212,7 +213,7 @@ const Setup = (props) => {
       // onEditingRowIdsChange: this.handleEditingRowIdsChange,
     },
     onRowDrop: (rows) => {
-      console.log(rows)
+      // console.log(rows)
       setFieldValue('rows', rows)
     },
     schema: rowSchema,
@@ -270,17 +271,35 @@ export default withFormikExtend({
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
     const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
-    const { list } = dentalChartSetup
+    // const { list } = dentalChartSetup
+    const list = JSON.parse(localStorage.getItem('dentalChartSetup')) || []
     dispatch({
       type: 'dentalChartSetup/updateState',
       payload: {
-        rows: values.rows,
+        list: values.rows,
       },
     })
-    console.log(list, values.rows, difference(list, values.rows))
+    let diffs = difference(list, values.rows)
+    console.log(list, values.rows, diffs)
+    console.log(diffs)
     // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
-
-    localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
+    diffs = diffs.map((o, i) => {
+      console.log(o, i)
+      if (o) {
+        return {
+          ...values.rows[i],
+          sortOrder: i,
+        }
+      }
+    })
+    localStorage.setItem(
+      'dentalChartSetup',
+      JSON.stringify(
+        values.rows
+          .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
+          .concat(diffs.filter((d) => !!d)),
+      ),
+    )
     if (onConfirm) onConfirm()
   },
 

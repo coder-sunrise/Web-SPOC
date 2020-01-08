@@ -139,6 +139,7 @@ export default function DiagnosisPanel (props) {
               {list
                 .filter(
                   (o) =>
+                    !!o &&
                     o.isDisplayInDiagnosis &&
                     !o.isDeleted &&
                     (!search ||
@@ -153,7 +154,7 @@ export default function DiagnosisPanel (props) {
                       <Tooth
                         className={classes.buttonIcon}
                         width={groupWidth / 5 + 2}
-                        height={groupHeight / 5 + 2}
+                        height={groupHeight / 5}
                         paddingLeft={1}
                         paddingTop={1}
                         zoom={1 / 5}
