@@ -43,31 +43,34 @@ import TreatmentGrid from './TreatmentGrid'
   }) => {
     const { data = [], action = {} } = dentalChartComponent
     // console.log(rest, this)
-    let groups = _.groupBy(
-      data.filter((o) => o.value === action.value),
-      'toothIndex',
-    )
-    let groupsAry = Object.keys(groups).map((k) => {
-      return {
-        text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
-          '(tooth)',
-          '',
-        ),
-        items: groups[k],
-      }
-    })
-    let tooth = groupsAry.map((o) => o.text).join(',')
-    if (action.method === 3) {
-      groupsAry = Object.values(
-        _.groupBy(data.filter((o) => o.value === action.value), 'nodes'),
-      ).map((o) => {
-        // console.log(o[0].nodes)
-        const { nodes } = o[0]
+    let groupsAry = []
+    if (!action.isDisplayInDiagnosis) {
+      let groups = _.groupBy(
+        data.filter((o) => o.id === action.id),
+        'toothIndex',
+      )
+      groupsAry = Object.keys(groups).map((k) => {
         return {
-          text: `#${nodes[0]} - ${nodes[1]}`,
-          items: o,
+          text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
+            '(tooth)',
+            '',
+          ),
+          items: groups[k],
         }
       })
+      // let tooth = groupsAry.map((o) => o.text).join(',')
+      if (action.method === 3) {
+        groupsAry = Object.values(
+          _.groupBy(data.filter((o) => o.id === action.id), 'nodes'),
+        ).map((o) => {
+          // console.log(o[0].nodes)
+          const { nodes } = o[0]
+          return {
+            text: `#${nodes[0]} - ${nodes[1]}`,
+            items: o,
+          }
+        })
+      }
     }
 
     return {
@@ -75,7 +78,6 @@ import TreatmentGrid from './TreatmentGrid'
       isExactAmount: false,
       ...dentalChartTreatment.entity,
       unit: groupsAry.length,
-      tooth,
       groups: groupsAry,
     }
   },
@@ -133,9 +135,9 @@ class TreatmentForm extends Component {
     } = dentalChartComponent
 
     // console.log(values)
-    // console.log(data.filter((o) => o.value === action.value))
+    // console.log(data.filter((o) => o.id === action.id))
     // const groups = _.groupBy(
-    //   data.filter((o) => o.value === action.value),
+    //   data.filter((o) => o.id === action.id),
     //   'toothIndex',
     // )
     // const tooth = Object.keys(groups)
@@ -154,6 +156,7 @@ class TreatmentForm extends Component {
     } else {
       discountCfg.percentage = true
       discountCfg.max = 100
+      discountCfg.min = 0
     }
 
     const changeTreatment = (option) => {

@@ -62,7 +62,7 @@ export const lockConfig = {
   // selectable: false,
 }
 export const groupCfg = {
-  // selectable: false,
+  selectable: false,
 }
 export const addonGroupCfg = {
   ...groupCfg,

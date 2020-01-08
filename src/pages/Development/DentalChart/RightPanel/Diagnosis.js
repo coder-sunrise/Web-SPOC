@@ -83,9 +83,16 @@ const Diagnosis = ({
         {Object.keys(groups).map((k) => {
           const ary = groups[k]
 
-          const valueGroups = _.groupBy(_.orderBy(ary, 'timestamp'), 'id')
+          const valueGroups = _.groupBy(ary, 'id')
           const SortList = SortableContainer(List)
-          const items = Object.keys(valueGroups).map((o) => Number(o))
+          const items = Object.values(
+            _.orderBy(valueGroups, (o) => o[0].timestamp),
+          ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
+          // console.log(
+          //   Object.values(_.orderBy(valueGroups, (o) => o[0].timestamp)).map(
+          //     (o) => o[0].id,
+          //   ),
+          // )
           const onSortEnd = ({ newIndex, oldIndex }) => {
             if (newIndex === oldIndex) return
             let currentItems = ary.filter((o) => o.id === items[oldIndex])
@@ -101,6 +108,7 @@ const Diagnosis = ({
                       return n.timestamp
                     }).timestamp - 1,
             }))
+            // console.log(currentItems, existItems)
             ary
               .filter(
                 (o) =>
@@ -135,6 +143,7 @@ const Diagnosis = ({
               },
             })
           }
+          // console.log(items)
           return (
             <SortList
               // lockToContainerEdges
@@ -176,11 +185,11 @@ const Diagnosis = ({
                 const SortableListItem = SortableElement(ListItem)
                 // console.log(items, v)
                 const idx = items.indexOf(id)
-                console.log(v, items, idx)
+                // console.log(v, items, k, idx, id)
 
                 return (
                   <SortableListItem
-                    key={idx}
+                    key={id}
                     classes={{
                       root: classes.toothJournalItem,
                       secondaryAction: classes.toothJournalItemSecondaryAction,

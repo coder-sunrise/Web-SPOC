@@ -1032,7 +1032,7 @@ class Chart extends React.Component {
   getCanvasSize = (props) => {
     const { pedoChart } = (props || this.props).dentalChartComponent
 
-    const width = this.divContainer.current.offsetWidth - 4
+    const width = this.divContainer.current.offsetWidth // - 4
     // console.log(pedoChart, width)
     return {
       width,

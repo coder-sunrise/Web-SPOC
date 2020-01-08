@@ -75,7 +75,7 @@ export default function DiagnosisPanel (props) {
   const handleAction = (event, v) => {
     setSelectedStyle(v)
 
-    console.log(v, list)
+    // console.log(v, list)
     const btn = list.find((o) => o.id === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
@@ -99,7 +99,7 @@ export default function DiagnosisPanel (props) {
   // console.log(theme.props)
   return (
     <div>
-      <Paper elevation={0} className={classes.paper}>
+      <Paper className={classes.paper}>
         <GridContainer>
           <GridItem md={9}>
             <TextField
