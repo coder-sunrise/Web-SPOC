@@ -100,16 +100,19 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'patientSearch/query',
                     payload: {
-                      group: [
-                        {
-                          // [`${prefix}patientReferenceNo`]: search,
-                          [`${prefix}name`]: search,
-                          [`${prefix}patientAccountNo`]: search,
-                          [`${prefix}patientReferenceNo`]: search,
-                          [`${prefix}contactFkNavigation.contactNumber.number`]: search,
-                          combineCondition: 'or',
-                        },
-                      ],
+                      // group: [
+                      //   {
+                      //     // [`${prefix}patientReferenceNo`]: search,
+                      //     [`${prefix}name`]: search,
+                      //     [`${prefix}patientAccountNo`]: search,
+                      //     [`${prefix}patientReferenceNo`]: search,
+                      //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
+                      //     combineCondition: 'or',
+                      //   },
+                      // ],
+                      apiCriteria: {
+                        searchValue: search,
+                      },
                     },
                   })
                 }}
