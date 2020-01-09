@@ -15,7 +15,7 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRoom }) => settingRoom.filter || {},
+  mapPropsToValues: ({ settingTreatmentCategory }) => settingTreatmentCategory.filter || {},
   handleSubmit: () => {},
   displayName: 'TreatmentCategoryFilter',
 })
@@ -60,7 +60,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
-                    type: 'settingRoom/query',
+                    type: 'settingTreatmentCategory/query',
                     payload: {
                       isActive,
                       group: [
@@ -81,7 +81,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingRoom/updateState',
+                    type: 'settingTreatmentCategory/updateState',
                     payload: {
                       entity: undefined,
                     },

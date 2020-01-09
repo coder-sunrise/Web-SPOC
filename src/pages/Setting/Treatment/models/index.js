@@ -3,8 +3,13 @@ import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'settingClinicService',
-  config: {},
+  namespace: 'settingTreatment',
+  config: {
+    codetable: {
+      message: 'Treatment updated',
+      code: 'cttreatment',
+    },
+  },
   param: {
     service,
     state: {
@@ -14,23 +19,32 @@ export default createListViewModel({
           moment().formatUTC(),
           moment('2099-12-31T23:59:59').formatUTC(false),
         ],
-        ctServiceCenter_ServiceNavigation: [],
         description: '',
-        isAutoOrder: false,
       },
     },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
-    },
+    // subscriptions: ({ dispatch, history }) => {
+    //   history.listen(async (loct, method) => {
+    //     const { pathname, search, query = {} } = loct
+    //   })
+    // },
     effects: {},
     reducers: {
-      queryDone (st, { payload }) {
+      queryOneDone (st, { payload }) {
         const { data } = payload
+        data.effectiveDates = [
+          data.effectiveStartDate,
+          data.effectiveEndDate,
+        ]
         return {
           ...st,
-          // filter: {},
+          entity: data,
+        }
+      },
+      queryDone (st, { payload }) {
+        const { data } = payload
+
+        return {
+          ...st,
           list: data.data.map((o) => {
             return {
               ...o,
@@ -40,14 +54,6 @@ export default createListViewModel({
               ],
             }
           }),
-        }
-      },
-      queryOneDone (st, { payload }) {
-        const { data } = payload
-        // console.log('single', data)
-        return {
-          ...st,
-          entity: data,
         }
       },
     },

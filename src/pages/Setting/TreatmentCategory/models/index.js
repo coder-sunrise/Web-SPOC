@@ -3,11 +3,11 @@ import moment from 'moment'
 import * as service from '../services'
 
 export default createListViewModel({
-  namespace: 'settingRoom',
+  namespace: 'settingTreatmentCategory',
   config: {
     codetable: {
-      message: 'Room updated',
-      code: 'ctroom',
+      message: 'Treatment Category updated',
+      code: 'cttreatmentcategory',
     },
   },
   param: {

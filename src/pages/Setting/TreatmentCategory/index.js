@@ -14,30 +14,30 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingRoom }) => ({
-  settingRoom,
+@connect(({ settingTreatmentCategory }) => ({
+  settingTreatmentCategory,
 }))
-@withSettingBase({ modelName: 'settingRoom' })
+@withSettingBase({ modelName: 'settingTreatmentCategory' })
 class TreatmentCategory extends PureComponent {
   state = {}
 
   componentDidMount () {
     this.props.dispatch({
-      type: 'settingRoom/query',
+      type: 'settingTreatmentCategory/query',
     })
   }
 
   toggleModal = () => {
     this.props.dispatch({
-      type: 'settingRoom/updateState',
+      type: 'settingTreatmentCategory/updateState',
       payload: {
-        showModal: !this.props.settingRoom.showModal,
+        showModal: !this.props.settingTreatmentCategory.showModal,
       },
     })
   }
 
   render () {
-    const { classes, settingRoom, dispatch, theme, ...restProps } = this.props
+    const { classes, settingTreatmentCategory, dispatch, theme, ...restProps } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
@@ -47,9 +47,9 @@ class TreatmentCategory extends PureComponent {
         <Filter {...cfg} {...this.props} />
         <Grid {...this.props} />
         <CommonModal
-          open={settingRoom.showModal}
+          open={settingTreatmentCategory.showModal}
           observe='TreatmentCategoryDetail'
-          title={settingRoom.entity ? 'Edit Treatment Category' : 'Add Treatment Category'}
+          title={settingTreatmentCategory.entity ? 'Edit Treatment Category' : 'Add Treatment Category'}
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}

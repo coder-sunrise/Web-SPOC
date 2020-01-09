@@ -14,8 +14,8 @@ import {
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingRoom }) =>
-    settingRoom.entity || settingRoom.default,
+  mapPropsToValues: ({ settingTreatmentCategory }) =>
+    settingTreatmentCategory.entity || settingTreatmentCategory.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
@@ -26,7 +26,7 @@ const styles = (theme) => ({})
     const { dispatch, onConfirm } = props
 
     dispatch({
-      type: 'settingRoom/upsert',
+      type: 'settingTreatmentCategory/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
@@ -37,12 +37,12 @@ const styles = (theme) => ({})
       if (r) {
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingRoom/query',
+          type: 'settingTreatmentCategory/query',
         })
       }
     })
   },
-  displayName: 'RoomDetail',
+  displayName: 'TreatmentCategoryDetail',
 })
 class Detail extends PureComponent {
   render () {

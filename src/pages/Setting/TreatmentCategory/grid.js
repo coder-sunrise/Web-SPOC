@@ -53,18 +53,18 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
-    const { dispatch, settingRoom } = this.props
-    const { list } = settingRoom
+    const { dispatch, settingTreatmentCategory } = this.props
+    const { list } = settingTreatmentCategory
     // For complex object retrieve from server
     // dispatch({
-    //   type: 'settingRoom/queryOne',
+    //   type: 'settingTreatmentCategory/queryOne',
     //   payload: {
     //     id: row.id,
     //   },
     // }).then(toggleModal)
-    // console.log(settingRoom, row.id, e)
+    // console.log(settingTreatmentCategory, row.id, e)
     dispatch({
-      type: 'settingRoom/updateState',
+      type: 'settingTreatmentCategory/updateState',
       payload: {
         showModal: true,
         entity: list.find((o) => o.id === row.id),
@@ -73,12 +73,12 @@ class Grid extends PureComponent {
   }
 
   render () {
-    const { dispatch, classes, settingRoom, toggleModal } = this.props
+    const { dispatch, classes, settingTreatmentCategory, toggleModal } = this.props
 
     return (
       <CommonTableGrid
         style={{ margin: 0 }}
-        type='settingRoom'
+        type='settingTreatmentCategory'
         onRowDoubleClick={this.editRow}
         {...this.configs}
       />
