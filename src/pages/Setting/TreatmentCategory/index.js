@@ -1,27 +1,28 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 
-import { withStyles, Divider } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
-import Filter from './filter'
-import Grid from './grid'
-import Detail from './detail'
+import Filter from './Filter'
+import Grid from './Grid'
+import Detail from './Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingTreatmentCategory }) => ({
+@connect(({ settingTreatmentCategory, global }) => ({
   settingTreatmentCategory,
+  global,
 }))
 @withSettingBase({ modelName: 'settingTreatmentCategory' })
 class TreatmentCategory extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingTreatmentCategory/query',
     })
@@ -36,26 +37,31 @@ class TreatmentCategory extends PureComponent {
     })
   }
 
-  render () {
-    const { classes, settingTreatmentCategory, dispatch, theme, ...restProps } = this.props
+  render() {
+    const { settingTreatmentCategory } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }
-
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
-        <Grid {...this.props} />
+        <Grid {...cfg} {...this.props} />
         <CommonModal
           open={settingTreatmentCategory.showModal}
           observe='TreatmentCategoryDetail'
-          title={settingTreatmentCategory.entity ? 'Edit Treatment Category' : 'Add Treatment Category'}
+          title={
+            settingTreatmentCategory.entity ? (
+              'Edit Treatment Category'
+            ) : (
+                'Add Treatment Category'
+              )
+          }
           maxWidth='md'
           bodyNoPadding
           onClose={this.toggleModal}
           onConfirm={this.toggleModal}
         >
-          <Detail {...this.props} />
+          <Detail {...cfg} {...this.props} />
         </CommonModal>
       </CardContainer>
     )

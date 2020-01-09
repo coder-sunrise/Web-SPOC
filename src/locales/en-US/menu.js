@@ -120,6 +120,7 @@ export default {
   'menu.setting.servicecenter': 'Service Center',
   'menu.setting.servicecentercategory': 'Service Center Category',
   'menu.setting.servicecategory': 'Service Category',
+  'menu.setting.treatmentcategory': 'Treatment Category',
   'menu.setting.medicationfrequency': 'Medication Frequency',
   'menu.setting.medicationprecautions': 'Medication Precaution',
   'menu.setting.medicationconsumptionmethod': 'Medication Consumption Method',
