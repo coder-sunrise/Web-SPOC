@@ -180,7 +180,8 @@ class Main extends Component {
         values: _values,
       },
     })
-    if (finalizeResponse) {
+
+    if (finalizeResponse === 204) {
       await dispatch({
         type: 'dispense/query',
         payload: {

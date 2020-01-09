@@ -3,6 +3,8 @@ import numeral from 'numeral'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
+const sumAll = (total, price) => total + price
+
 export const convertAmountToPercentOrCurrency = (type, amount) =>
   type.toLowerCase() === 'percentage' ? `${amount}%` : `$${amount.toFixed(2)}`
 
@@ -72,7 +74,9 @@ export const getApplicableClaimAmount = (
   invoicePayerItem,
   scheme,
   remainingCoverageMaxCap,
+  totalClaimableAmount,
 ) => {
+  console.log({ totalClaimableAmount })
   const {
     coPaymentByCategory,
     coPaymentByItem,
@@ -147,6 +151,9 @@ export const getApplicableClaimAmount = (
   }
   if (returnClaimAmount > payableBalance) returnClaimAmount = payableBalance
 
+  if (returnClaimAmount > totalClaimableAmount)
+    returnClaimAmount = totalClaimableAmount
+
   return returnClaimAmount
 }
 
@@ -157,7 +164,17 @@ export const getInvoiceItemsWithClaimAmount = (
   shouldGenerateDummyID = false,
 ) => {
   if (!schemeConfig || _.isEmpty(schemeConfig)) return []
-  const { coverageMaxCap } = schemeConfig
+  const { coverageMaxCap, patientMinCoPaymentAmount = 0 } = schemeConfig
+
+  const totalInvoiceAmount = originalInvoiceItems
+    .map((item) => item.totalAfterGst)
+    .reduce(sumAll, 0)
+
+  const totalClaimableAmount =
+    totalInvoiceAmount < patientMinCoPaymentAmount
+      ? 0
+      : totalInvoiceAmount - patientMinCoPaymentAmount
+
   const invoiceItems = originalInvoiceItems.reduce((result, item) => {
     if (
       item.notClaimableBySchemeIds.includes(schemeConfig.id) ||
@@ -177,13 +194,17 @@ export const getInvoiceItemsWithClaimAmount = (
     } = getCoverageAmountAndType(schemeConfig, item)
     const { invoiceItemTypeFK } = item
 
-    const remainingCoverageMaxCap =
-      coverageMaxCap - result.reduce((total, i) => total + i.claimAmount, 0)
+    const pastItemClaimedAmount = result.reduce(
+      (total, i) => total + i.claimAmount,
+      0,
+    )
+    const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
 
     const _claimAmount = getApplicableClaimAmount(
       item,
       schemeConfig,
       remainingCoverageMaxCap,
+      totalClaimableAmount - pastItemClaimedAmount,
     )
 
     if (existedItem)
