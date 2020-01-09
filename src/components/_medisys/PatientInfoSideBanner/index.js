@@ -199,7 +199,7 @@ class PatientInfoSideBanner extends PureComponent {
             value={entity.genderFK}
           />)
         </p>
-        <PrintLabLabelButton />
+        <PrintLabLabelButton patientId={entity.id} />
         <Divider light />
         <div
           className={classes.schemeContainer}

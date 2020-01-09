@@ -20,18 +20,17 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async ({ reportID, payload }) => {
-      console.log({ reportID, payload })
-      // const pdfResult = await postPDF(reportID, payload)
-      // if (pdfResult) {
-      //   const base64Result = arrayBufferToBase64(pdfResult)
-      //   if (this.iswsConnect === true) {
-      //     this.wsConnection.send(`["${base64Result}"]`)
-      //   } else {
-      //     notification.error({
-      //       message: `Medicloud printing tool is not running, please start it.`,
-      //     })
-      //   }
-      // }
+      const pdfResult = await postPDF(reportID, payload)
+      if (pdfResult) {
+        const base64Result = arrayBufferToBase64(pdfResult)
+        if (this.iswsConnect === true) {
+          this.wsConnection.send(`["${base64Result}"]`)
+        } else {
+          notification.error({
+            message: `Medicloud printing tool is not running, please start it.`,
+          })
+        }
+      }
     }
 
     connectWebSocket () {

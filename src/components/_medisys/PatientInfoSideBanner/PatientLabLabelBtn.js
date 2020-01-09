@@ -1,39 +1,50 @@
 import React, { useState } from 'react'
-// material ui
-import Print from '@material-ui/icons/Print'
+// ant design
+import { InputNumber } from 'antd'
 // common components
-import { Button, NumberInput, SizeContainer, Tooltip } from '@/components'
+import {
+  Button,
+  NumberInput,
+  SizeContainer,
+  OutlinedTextField,
+} from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 
-const PatientLabLabelButton = ({ handlePrint }) => {
-  const reportID = 24
+const PatientLabLabelButton = ({ handlePrint, patientId }) => {
+  const reportID = 33
   const [
     copyNo,
     setCopyNo,
   ] = useState(1)
 
-  const handleCopyNoChange = (event) => setCopyNo(event.target.value)
+  const handleCopyNoChange = (value) => setCopyNo(value)
 
   const handlePrintClick = () => {
-    handlePrint({ reportID, payload: {} })
+    for (let i = 0; i < copyNo; i++) {
+      handlePrint({
+        reportID,
+        payload: {
+          patientId,
+        },
+      })
+    }
   }
 
   return (
     <SizeContainer size='sm'>
       <div>
-        <div style={{ width: '40%', display: 'inline-block', marginRight: 8 }}>
-          <NumberInput
-            prefix='No. Of Copy: '
-            onChange={handleCopyNoChange}
+        <div style={{ display: 'inline-block', marginRight: 8 }}>
+          <InputNumber
+            size='small'
+            min={1}
             value={copyNo}
-            precision={0}
+            onChange={handleCopyNoChange}
+            style={{ width: '75px' }}
           />
         </div>
-        <Tooltip title='Print Patient Lab Label'>
-          <Button justIcon color='primary' size='sm' onClick={handlePrintClick}>
-            <Print />
-          </Button>
-        </Tooltip>
+        <Button color='primary' size='sm' onClick={handlePrintClick}>
+          Print Patient Lab Label
+        </Button>
       </div>
     </SizeContainer>
   )
