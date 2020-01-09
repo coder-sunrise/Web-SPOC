@@ -6,9 +6,9 @@ import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLa
 
 import { CardContainer, CommonModal, withSettingBase } from '@/components'
 
-import Filter from './filter'
-import Grid from './grid'
-import Detail from './detail'
+import Filter from './Filter'
+import Grid from './Grid'
+import Detail from './Detail'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
