@@ -79,6 +79,18 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
+    text: 'Treatment',
+    // icon: <FolderOpen />,
+    url: '/setting/treatment',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Treatment Category',
+    // icon: <FolderOpen />,
+    url: '/setting/treatmentcategory',
+  },
+  {
+    title: 'Clinic Setting',
     text: 'Room',
     url: '/setting/room',
   },

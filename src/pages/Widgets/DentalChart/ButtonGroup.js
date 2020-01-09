@@ -125,7 +125,7 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {rows.filter((o) => o.isDiagnosis && !o.isDeleted).map((row) => {
+              {rows.map((row) => {
                 const { value, text } = row
                 return [
                   <ToggleButton value={value}>

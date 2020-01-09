@@ -58,8 +58,6 @@ const Diagnosis = ({
     setSelected,
   ] = useState()
 
-  // const [remarks,setReamr]
-
   const getCellConfig = (subAry) => {
     return subAry.reduce((a, b) => {
       // console.log(a, b)
@@ -69,7 +67,7 @@ const Diagnosis = ({
       }
     })
   }
-  // console.log(selected)
+
   return (
     <div>
       <div
@@ -303,7 +301,6 @@ const Diagnosis = ({
           multiline
           maxLength={2000}
           rowsMax={3}
-          value={selected.remark}
           rows={3}
           onChange={(v) => {
             const shapes = data.filter(

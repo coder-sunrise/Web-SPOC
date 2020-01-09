@@ -706,6 +706,16 @@ const _routes = [
             component: './Setting/Service',
           },
           {
+            path: '/setting/treatment',
+            name: 'treatment',
+            component: './Setting/Treatment',
+          },
+          {
+            path: '/setting/treatmentcategory',
+            name: 'treatmentcategory',
+            component: './Setting/TreatmentCategory',
+          },
+          {
             path: '/setting/room',
             name: 'room',
             component: './Setting/Room',
@@ -912,18 +922,7 @@ const _routes = [
 
 const routes =
   process.env.NODE_ENV === 'production'
-    ? _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
-          }
-        }
-        return r
-      })
+    ? _routes
     : _routes.map((r, index) => {
         if (index === 1) {
           return {
