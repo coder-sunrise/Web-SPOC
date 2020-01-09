@@ -18,6 +18,7 @@ import {
   TextField,
 } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
+import PrintLabLabelButton from './PatientLabLabelBtn'
 // assets
 import styles from './styles.js'
 
@@ -198,7 +199,7 @@ class PatientInfoSideBanner extends PureComponent {
             value={entity.genderFK}
           />)
         </p>
-
+        <PrintLabLabelButton patientId={entity.id} />
         <Divider light />
         <div
           className={classes.schemeContainer}
