@@ -18,6 +18,8 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+import { getUniqueId } from '@/utils/utils'
+
 import {
   Button,
   GridContainer,
@@ -37,7 +39,6 @@ import {
   dateFormatLong,
   Tree,
 } from '@/components'
-import Tooth from '../Tooth'
 
 const Treatment = ({
   dispatch,
@@ -49,19 +50,52 @@ const Treatment = ({
   mode,
   dentalChartSetup,
   global,
+  codetable,
   ...props
 }) => {
-  const { data = [], rows, pedoChart, surfaceLabel } = dentalChartSetup
+  const { data = [], list = [], pedoChart, surfaceLabel } = dentalChartSetup
   const [
     search,
     setSearch,
   ] = useState()
+  const [
+    treatments,
+    setTreatments,
+  ] = useState([])
+  // console.log(codetable)
+  useEffect(() => {
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'cttreatment' },
+    }).then((rows) => {
+      // console.log(list)
+      const treeItems = Object.values(
+        _.groupBy(
+          rows.filter((o) => !o.isDisplayInDiagnosis),
+          'treatmentCategoryFK',
+        ),
+      ).map((o) => {
+        return {
+          id: getUniqueId(),
+          text: o[0].treatmentCategory.displayValue,
+          subItems: o.map((m) => ({
+            id: m.id,
+            text: m.displayValue,
+            chartMethodFK: m.chartMethodFK,
+          })),
+        }
+      })
 
+      setTreatments(treeItems)
+    })
+  }, [])
+
+  // console.log(treeItems)
   return (
     <div>
       <div
         style={{
-          height: global.mainDivHeight - 115,
+          // height: global.mainDivHeight - 115,
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
@@ -75,16 +109,19 @@ const Treatment = ({
           prefix={<Search />}
         />
         <Tree
-          items={rows.filter((o) => !o.isDiagnosis)}
+          items={treatments}
           search={search}
           labelField='text'
           onItemFocus={(item) => {
             if (!item.subItems) {
+              const action = list.find((o) => o.id === item.chartMethodFK)
+              // console.log(action)
+
               dispatch({
                 type: 'dentalChartComponent/updateState',
                 payload: {
                   mode: 'treatment',
-                  action: item,
+                  action,
                 },
               })
             }

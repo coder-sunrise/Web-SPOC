@@ -18,6 +18,7 @@ import CannedText from './CannedText'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
+import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 
@@ -57,6 +58,7 @@ const styles = (theme) => ({
 })
 
 window.g_app.replaceModel(model)
+window.g_app.replaceModel(cannedTextModel)
 
 // @withFormikExtend({
 //   mapPropsToValues: ({ clinicalnotes }) => {
@@ -135,9 +137,24 @@ class ClinicalNotes extends Component {
         {},
       ),
     }
+    const cannedTextPayload = {
+      entity: '',
+      selectedIndex: '',
+      ...fields.reduce(
+        (_result, field) => ({ ..._result, [field.fieldName]: [] }),
+        {},
+      ),
+      fields: fields.map((field) => field.fieldName),
+    }
+
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload,
+    })
+
+    this.props.dispatch({
+      type: 'cannedText/updateState',
+      payload: cannedTextPayload,
     })
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -155,7 +172,7 @@ class ClinicalNotes extends Component {
     }
   }
 
-  scribbleNoteDrawing = (values, temp) => {
+  scribbleNoteDrawing = ({ subject, temp, thumbnail = null }) => {
     const { scriblenotes, dispatch } = this.props
     const { category, arrayName, categoryIndex, config } = this.state
     const { fields } = config
@@ -174,8 +191,9 @@ class ClinicalNotes extends Component {
       const newArrayItems = [
         ...scriblenotes[category][arrayName],
       ]
-      newArrayItems[scriblenotes.selectedIndex].subject = values
+      newArrayItems[scriblenotes.selectedIndex].subject = subject
       newArrayItems[scriblenotes.selectedIndex].scribbleNoteLayers = temp
+      newArrayItems[scriblenotes.selectedIndex].thumbnail = thumbnail
 
       dispatch({
         type: 'scriblenotes/updateState',
@@ -195,9 +213,10 @@ class ClinicalNotes extends Component {
       }, [])
     } else {
       const newData = {
+        subject,
+        thumbnail,
         scribbleNoteTypeFK: categoryIndex,
         scribbleNoteTypeName: category,
-        subject: values,
         scribbleNoteLayers: temp,
       }
       dispatch({
@@ -355,6 +374,10 @@ class ClinicalNotes extends Component {
   }
 
   closeCannedText = () => {
+    this.props.dispatch({
+      type: 'cannedText/setSelectedNote',
+      payload: undefined,
+    })
     this.setState({
       showCannedText: false,
       cannedTextRow: undefined,
@@ -362,6 +385,10 @@ class ClinicalNotes extends Component {
   }
 
   openCannedText = (note) => {
+    this.props.dispatch({
+      type: 'cannedText/setSelectedNote',
+      payload: note,
+    })
     this.setState({
       cannedTextRow: note,
       showCannedText: true,
@@ -384,6 +411,30 @@ class ClinicalNotes extends Component {
 
     this.form.setFieldValue(`${prefix}${cannedTextRow.fieldName}`, value)
     this.closeCannedText()
+  }
+
+  insertIntoClinicalNote = (dataUrl) => {
+    const { selectedData, config } = this.state
+    const { fields = [] } = config
+    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { entity } = consultation
+    const contents = `<img src=${dataUrl} alt='scribbleNote' />`
+
+    const { corDoctorNote = [] } = entity
+    const scribbleNoteField = fields.find(
+      (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
+    )
+
+    const prevData =
+      corDoctorNote.length > 0
+        ? corDoctorNote[0][scribbleNoteField.fieldName]
+        : ''
+
+    const value = `${prevData} ${contents}`
+
+    this.onEditorChange(scribbleNoteField.fieldName)(value)
+
+    this.form.setFieldValue(`${prefix}${scribbleNoteField.fieldName}`, value)
   }
 
   render () {
@@ -567,6 +618,7 @@ class ClinicalNotes extends Component {
           <ScribbleNote
             {...this.props}
             addScribble={this.scribbleNoteDrawing}
+            exportToClinicalNote={this.insertIntoClinicalNote}
             toggleScribbleModal={this.toggleScribbleModal}
             scribbleData={this.state.selectedData}
             deleteScribbleNote={this.deleteScribbleNote}

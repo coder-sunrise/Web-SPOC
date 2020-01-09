@@ -42,11 +42,17 @@ import {
   selectablePrefix,
 } from './variables'
 
-import Tooth from './Tooth'
-
-import ButtonGroup from './ButtonGroup'
+import DiagnosisPanel from './DiagnosisPanel'
+import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
+import model from './models'
+import modelSetup from './models/setup'
+import modelTreatment from './models/treatment'
+
+// window.g_app.replaceModel(model)
+// window.g_app.replaceModel(modelSetup)
+// window.g_app.replaceModel(modelTreatment)
 
 const { fabric } = require('fabric')
 
@@ -108,14 +114,33 @@ const styles = (theme) => ({
     left: theme.spacing(0.5),
   },
 })
+
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
-@connect(({ dentalChartComponent, dentalChartSetup, global }) => ({
-  dentalChartComponent,
-  dentalChartSetup,
-  global,
-}))
+@connect(
+  ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }) => ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    codetable,
+    global,
+  }),
+)
 class DentalChart extends React.Component {
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'dentalChartSetup/query',
+      pageSize: 99999,
+    })
+  }
+
   render () {
     const {
       className,
@@ -144,7 +169,8 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            <ButtonGroup {...this.props} />
+            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
+            {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>
             <RightPanel {...this.props} />

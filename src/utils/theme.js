@@ -53,7 +53,7 @@ const largetButton = {
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
 const sharedToggleButtonGroup = {
   grouped: {
-    height: 'auto',
+    // height: 'initial',
     lineHeight: 1.5,
   },
   sizeSmall: {
@@ -455,6 +455,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+      },
+    },
   },
 })
 
@@ -474,6 +481,11 @@ export const smallTheme = createMuiTheme({
       groupedSizeSmall: {
         padding: '2px 6px',
         fontSize: smallFontSize,
+      },
+    },
+    MuiToggleButton: {
+      sizeSmall: {
+        height: 26,
       },
     },
     MuiFormControlLabel: {
@@ -649,6 +661,17 @@ export const smallTheme = createMuiTheme({
         '& .ant-tabs-bar': {
           zoom: '80%',
         },
+      },
+    },
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+        height: 'auto',
+      },
+      deleteIcon: {
+        width: 16,
+        height: 16,
       },
     },
   },

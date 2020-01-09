@@ -939,15 +939,26 @@ class SketchField extends PureComponent {
   downloadImage = () => {
     let canvas = this._fc
     // let url = canvas.toDataURL('image/png')
+
+    const result = canvas.toDataURL()
     let link = document.createElement('a')
     link.download = 'drawing.png'
-    link.href = canvas.toDataURL()
+    link.href = result
 
     // canvas.toDataURL().set({
     //   id: 'template',
     // })
 
     link.click()
+  }
+
+  exportToImageDataUrl = () => {
+    const canvas = this._fc
+    const sizeLimit = 500
+    const shouldResize = canvas.width > sizeLimit || canvas.height > sizeLimit
+
+    const result = canvas.toDataURL()
+    return result
   }
 
   addText = (text, color, options = {}) => {

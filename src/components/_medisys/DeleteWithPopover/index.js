@@ -25,6 +25,7 @@ const DeleteWithPopover = ({
   extraCmd,
   onConfirmDelete,
   onCancelClick,
+  buttonProps = {},
 }) => {
   const [
     show,
@@ -73,7 +74,7 @@ const DeleteWithPopover = ({
       }
     >
       <Tooltip title={tooltipText || title}>
-        <Button justIcon color='danger' disabled={disabled}>
+        <Button justIcon color='danger' disabled={disabled} {...buttonProps}>
           <Delete />
         </Button>
       </Tooltip>

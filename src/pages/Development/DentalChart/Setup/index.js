@@ -57,11 +57,11 @@ const methods = [
     name: 'Tooth',
   },
   {
-    value: 'bridging',
+    value: 3,
     name: 'Bridging',
   },
   {
-    value: 'na',
+    value: 4,
     name: 'NA',
   },
 ]
@@ -126,11 +126,11 @@ const Setup = (props) => {
       },
     },
     {
-      columnName: 'isDiagnosis',
+      columnName: 'isDisplayInDiagnosis',
       type: 'checkbox',
       align: 'center',
       isDisabled: (row) => {
-        return row.fixed
+        return row.fixed || mode === 'sort' || row.method === 3
       },
     },
     {
@@ -149,7 +149,7 @@ const Setup = (props) => {
     dataSource: values.rows,
     rowDragable: true,
     columns: [
-      { name: 'code', title: 'Code' },
+      // { name: 'code', title: 'Code' },
       { name: 'method', title: 'Method' },
       { name: 'legend', title: 'Legend' },
 
@@ -158,7 +158,7 @@ const Setup = (props) => {
         title: 'Name',
       },
       {
-        name: 'isDiagnosis',
+        name: 'isDisplayInDiagnosis',
         title: 'Display in Diagnosis',
       },
     ],

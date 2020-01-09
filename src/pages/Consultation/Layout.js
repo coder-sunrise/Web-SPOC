@@ -791,7 +791,7 @@ class Layout extends PureComponent {
                       )}
                       <div
                         className='non-dragable'
-                        style={w.layoutConfig.style}
+                        style={w.layoutConfig ? w.layoutConfig.style : {}}
                       >
                         <SizeContainer size='sm'>
                           <LoadableComponent

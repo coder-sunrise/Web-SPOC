@@ -42,8 +42,8 @@ const RightPanel = (props) => {
   const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
 
   return (
-    <Paper elevation={0} className={classes.paper}>
-      <div>
+    <Paper className={classes.paper}>
+      <div style={{ width: '100%' }}>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={5}>
             <Checkbox
@@ -89,6 +89,23 @@ const RightPanel = (props) => {
             <Tabs
               // style={{ marginTop: 20 }}
               defaultActiveKey='0'
+              onChange={(tabId) => {
+                if (tabId === '1') {
+                  dispatch({
+                    type: 'dentalChartComponent/updateState',
+                    payload: {
+                      mode: 'diagnosis',
+                    },
+                  })
+                } else {
+                  dispatch({
+                    type: 'dentalChartComponent/updateState',
+                    payload: {
+                      mode: 'treatment',
+                    },
+                  })
+                }
+              }}
               options={[
                 {
                   id: 1,
