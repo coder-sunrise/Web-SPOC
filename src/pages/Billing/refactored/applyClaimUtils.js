@@ -76,7 +76,6 @@ export const getApplicableClaimAmount = (
   remainingCoverageMaxCap,
   totalClaimableAmount,
 ) => {
-  console.log({ totalClaimableAmount })
   const {
     coPaymentByCategory,
     coPaymentByItem,
@@ -364,17 +363,29 @@ export const validateClaimAmount = (schemeRow) => {
   )
 
   const totalPayable = invoicePayerItem.reduce(calculateTotalPaybable, 0)
+  const patientDistributedAmount = totalPayable - totalClaimAmount
 
   if (patientMinCoPaymentAmount > 0) {
     const amount =
       patientMinCoPaymentAmountType === 'ExactAmount'
         ? patientMinCoPaymentAmount
         : totalClaimAmount * (patientMinCoPaymentAmount / 100)
-
-    listOfLimits.push({
-      type: 'Amount after Patient Min. Payable',
-      value: totalPayable - amount,
-    })
+    if (patientDistributedAmount < patientMinCoPaymentAmount) {
+      invalidMessage.push(
+        `Current Patient Min. Payment Amount is: $${patientDistributedAmount.toFixed(
+          2,
+        )}`,
+      )
+      invalidMessage.push(
+        `Patient Min. Payment Amount must be at least: $${patientMinCoPaymentAmount.toFixed(
+          2,
+        )}`,
+      )
+    } else
+      listOfLimits.push({
+        type: 'Amount after Patient Min. Payable',
+        value: totalPayable - amount,
+      })
   }
   if (isCoverageMaxCapCheckRequired) {
     if (coverageMaxCap > 0)
@@ -417,6 +428,16 @@ export const validateClaimAmount = (schemeRow) => {
       orderSetTotalClaim > orderSetCoverageMaxCap
     )
       invalidMessage.push('Order Set total claim amount has exceed the max cap')
+
+    const total =
+      medicationTotalClaim +
+      consumableTotalClaim +
+      vaccinationTotalClaim +
+      serviceTotalClaim +
+      orderSetTotalClaim
+
+    if (total <= 0)
+      invalidMessage.push('Total Claim Amount must be at least $0.01')
   }
 
   const maximumLimit = listOfLimits.reduce(
@@ -433,7 +454,6 @@ export const validateClaimAmount = (schemeRow) => {
     invalidMessage.push('Total claim amount has exceed the maximum limit:')
     invalidMessage.push(`${maximumLimit.type}: ${_v}`)
   }
-
   return invalidMessage
 }
 
@@ -500,7 +520,6 @@ export const updateInvoicePayerPayableBalance = (
       .filter((p) => !p.isCancelled)
       .reduce(flattenInvoicePayersInvoiceItemList, [])
       .reduce(computeInvoiceItemPrevClaimedAmount, [])
-    // console.log({ prevIndexInvoiceItemsWithSubtotal })
     // update payable balance according to the claimed amount
     const newInvoicePayerItem = payer.invoicePayerItem.map((item) => {
       const _existed = prevIndexInvoiceItemsWithSubtotal.find(
