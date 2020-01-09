@@ -132,12 +132,12 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[0]
-                        : undefined,
-                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[1]
-                        : undefined,
+                      // 'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                      //   ? transactionDates[0]
+                      //   : undefined,
+                      // 'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                      //   ? transactionDates[1]
+                      //   : undefined,
                       apiCriteria: {
                         searchValue: ExpenseType,
                         OnlyWithDeposit: showTransactionOnly,

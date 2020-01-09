@@ -16,9 +16,9 @@ const PatientLabLabelButton = ({ handlePrint, patientId }) => {
     setCopyNo,
   ] = useState(1)
 
-  const handleCopyNoChange = (event) => setCopyNo(event.target.value)
+  // const handleCopyNoChange = (event) => setCopyNo(event.target.value)
 
-  // const handleCopyNoChange = (value) => setCopyNo(value)
+  const handleCopyNoChange = (value) => setCopyNo(value)
 
   const handlePrintClick = () => {
     for (let i = 0; i < copyNo; i++) {
@@ -33,18 +33,23 @@ const PatientLabLabelButton = ({ handlePrint, patientId }) => {
 
   return (
     <SizeContainer size='md'>
-      <div style={{ marginBottom: 8 }}>
+      <div
+        style={{
+          marginBottom: 8,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <Button color='primary' size='sm' onClick={handlePrintClick}>
           Print Patient Lab Label
         </Button>
         <div
           style={{
-            // width: 100,
             display: 'inline-block',
             marginRight: 8,
           }}
         >
-          <span>Copy:&nbsp;</span>
           <InputNumber
             size='small'
             min={1}
@@ -52,6 +57,7 @@ const PatientLabLabelButton = ({ handlePrint, patientId }) => {
             onChange={handleCopyNoChange}
             style={{ width: '50px', textAlign: 'right' }}
           />
+          <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
           {/* <NumberInput
             min={1}
             prefix='Copy:'
