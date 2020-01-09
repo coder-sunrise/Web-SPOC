@@ -2,7 +2,7 @@ import React from 'react'
 // common component
 import { notification } from '@/components'
 // services
-import { postPDF } from '@/services/report'
+import { getPDF } from '@/services/report'
 // utils
 import { arrayBufferToBase64 } from '@/components/_medisys/ReportViewer/utils'
 
@@ -20,7 +20,7 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async ({ reportID, payload }) => {
-      const pdfResult = await postPDF(reportID, payload)
+      const pdfResult = await getPDF(reportID, payload)
       if (pdfResult) {
         const base64Result = arrayBufferToBase64(pdfResult)
         if (this.iswsConnect === true) {
