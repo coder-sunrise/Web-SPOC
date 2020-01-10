@@ -132,31 +132,31 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      // 'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                      //   ? transactionDates[0]
-                      //   : undefined,
-                      // 'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                      //   ? transactionDates[1]
-                      //   : undefined,
+                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                        ? transactionDates[0]
+                        : undefined,
+                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
+                        ? transactionDates[1]
+                        : undefined,
                       apiCriteria: {
-                        searchValue: ExpenseType,
+                        // searchValue: ExpenseType,
                         OnlyWithDeposit: showTransactionOnly,
-                        startDate: transactionDates
-                          ? transactionDates[0]
-                          : undefined,
-                        endDate: transactionDates
-                          ? transactionDates[1]
-                          : undefined,
+                        // startDate: transactionDates
+                        //   ? transactionDates[0]
+                        //   : undefined,
+                        // endDate: transactionDates
+                        //   ? transactionDates[1]
+                        //   : undefined,
                       },
-                      // group: [
-                      //   {
-                      //     'contactFkNavigation.contactNumber.number': ExpenseType,
-                      //     patientReferenceNo: ExpenseType,
-                      //     patientAccountNo: ExpenseType,
-                      //     name: ExpenseType,
-                      //     combineCondition: 'or',
-                      //   },
-                      // ],
+                      group: [
+                        {
+                          'contactFkNavigation.contactNumber.number': ExpenseType,
+                          patientReferenceNo: ExpenseType,
+                          patientAccountNo: ExpenseType,
+                          name: ExpenseType,
+                          combineCondition: 'or',
+                        },
+                      ],
                     },
                   })
                 }}
