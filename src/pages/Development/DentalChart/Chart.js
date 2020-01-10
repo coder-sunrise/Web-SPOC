@@ -592,7 +592,7 @@ class Chart extends React.Component {
 
     this.canvas = canvas
     const { data = {}, pedoChart } = this.props.dentalChartComponent
-    const { dispatch, readOnly } = this.props
+    const { dispatch } = this.props
     // console.log()
     const groups = _.groupBy(this.configs, 'line')
     Object.keys(groups).forEach((k) => {
@@ -1003,11 +1003,12 @@ class Chart extends React.Component {
         // console.log('selection:created', rest)
       }, 1)
     })
+
     this.renderCanvas(this.props)
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent, global, readOnly } = nextProps
+    const { dentalChartComponent, global } = nextProps
     // console.log(
     //   'componentWillReceiveProps',
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
@@ -1408,8 +1409,7 @@ class Chart extends React.Component {
   }
 
   toggleSelect = ({ item = {}, group, select }) => {
-    const { dentalChartComponent, readOnly } = this.props
-    if (readOnly) return
+    const { dentalChartComponent } = this.props
     const { action } = dentalChartComponent
     if (action && action.id) {
       // console.log(item, group)
@@ -1437,8 +1437,7 @@ class Chart extends React.Component {
   }
 
   toggleMultiSelect = (ary) => {
-    const { dentalChartComponent, readOnly } = this.props
-    if (readOnly) return
+    const { dentalChartComponent } = this.props
     const { action } = dentalChartComponent
     if (action && action.id) {
       // console.log(ary)
@@ -1539,7 +1538,7 @@ class Chart extends React.Component {
     return (
       <div
         ref={this.divContainer}
-        style={{ width: '100%', position: 'relative', ...style }}
+        style={{ width: '100%', position: 'relative' }}
       >
         <Tooltip title='Save to local'>
           <Button
