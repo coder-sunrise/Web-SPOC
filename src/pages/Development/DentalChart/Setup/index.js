@@ -242,13 +242,18 @@ export default withFormikExtend({
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
     const { dispatch, history, codetable, onConfirm } = props
+    // dispatch({
+    //   type: 'dentalChartSetup/updateState',
+    //   payload: {
+    //     rows: values.rows,
+    //   },
+    // })
+
     dispatch({
-      type: 'dentalChartSetup/updateState',
-      payload: {
-        rows: values.rows,
-      },
+      type: 'dentalChartSetup/post',
+      payload: values.rows,
     })
-    localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
+    // localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
     if (onConfirm) onConfirm()
   },
 

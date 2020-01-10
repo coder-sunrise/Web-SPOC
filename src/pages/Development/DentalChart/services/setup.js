@@ -6,5 +6,11 @@ module.exports = {
   // remove: (params) => service.remove(url, params),
   query: (params) => service.query(url, params),
   queryList: (params) => service.queryList(url, params),
-  upsert: (params) => service.upsert(url, params),
+  post: async (params) => {
+    const r = await request(`${url}/save`, {
+      method: 'POST',
+      body: params,
+    })
+    return r
+  },
 }

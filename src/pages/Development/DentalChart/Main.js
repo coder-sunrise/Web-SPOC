@@ -135,7 +135,9 @@ class DentalChart extends React.Component {
     super(props)
     this.props.dispatch({
       type: 'dentalChartSetup/query',
-      pageSize: 99999,
+      payload: {
+        pagesize: 99999,
+      },
     })
   }
 

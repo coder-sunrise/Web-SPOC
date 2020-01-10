@@ -44,20 +44,26 @@ import TreatmentGrid from './TreatmentGrid'
   }) => {
     const { data = [], action = {} } = dentalChartComponent
     const { entity = {}, rows } = dentalChartTreatment
-
+    console.log(action, data, rows)
     // console.log(rest, this)
+    const dataFiltered = data.filter(
+      (o) =>
+        o.id === action.id &&
+        (!rows.find((m) =>
+          m.groups.find((k) =>
+            k.items.find((j) => j.toothIndex === o.toothIndex),
+          ),
+        ) ||
+          (entity.chartMethodFK === action.id &&
+            entity.groups.find((k) =>
+              k.items.find((j) => j.toothIndex === o.toothIndex),
+            ))),
+    )
+    console.log(dataFiltered)
     let groupsAry = []
+    let unit = 0
     if (!action.isDisplayInDiagnosis) {
-      let groups = _.groupBy(
-        data.filter(
-          (o) =>
-            o.id === action.id &&
-            (!rows.find((m) => m.toothInfo.indexOf(`#${o.toothIndex}`) >= 0) ||
-              (entity.treatmentFK === action.id &&
-                entity.toothInfo.indexOf(`#${o.toothIndex}`) >= 0)),
-        ),
-        'toothIndex',
-      )
+      let groups = _.groupBy(dataFiltered, 'toothIndex')
       groupsAry = Object.keys(groups).map((k) => {
         return {
           text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
@@ -67,13 +73,16 @@ import TreatmentGrid from './TreatmentGrid'
           items: groups[k],
         }
       })
+      console.log(groupsAry)
+      unit = groupsAry.length
       // let tooth = groupsAry.map((o) => o.text).join(',')
       if (action.chartMethodTypeFK === 3) {
-        groupsAry = Object.values(
-          _.groupBy(data.filter((o) => o.id === action.id), 'nodes'),
-        ).map((o) => {
+        unit = 0
+        groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map((o) => {
           // console.log(o[0].nodes)
           const { nodes } = o[0]
+          unit += o.length
+
           return {
             text: `#${nodes[0]} - ${nodes[1]}`,
             items: o,
@@ -81,9 +90,11 @@ import TreatmentGrid from './TreatmentGrid'
         })
       }
     }
-    const treatment =
-      (codetable.cttreatment || [])
-        .find((o) => o.chartMethodFK === action.id) || {}
+    let treatment = {}
+    if (action.id)
+      treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.chartMethodFK === action.id) || {}
     let { isExactAmount, adjustment = 0, unitPrice = 0 } = entity
     if (!unitPrice || action.id !== entity.treatmentFK) {
       unitPrice = treatment.sellingPrice || 0
@@ -94,14 +105,14 @@ import TreatmentGrid from './TreatmentGrid'
       isExactAmount: false,
       ...dentalChartTreatment.entity,
       unitPrice,
-
+      chartMethodFK: action.id,
       treatmentFK: treatment.id,
       finalAmount: calculateAdjustAmount(
         isExactAmount,
         unitPrice * groupsAry.length,
         -adjustment,
       ).amount,
-      unit: groupsAry.length,
+      unit,
       groups: groupsAry,
       toothInfo: groupsAry.map((o) => o.text).join(','),
     }
@@ -117,6 +128,12 @@ import TreatmentGrid from './TreatmentGrid'
       type: 'dentalChartTreatment/upsertRow',
       payload: {
         ...values,
+      },
+    })
+    dispatch({
+      type: 'dentalChartTreatment/updateState',
+      payload: {
+        entity: undefined,
       },
     })
     dispatch({
@@ -387,6 +404,12 @@ class TreatmentForm extends Component {
                   type: 'dentalChartTreatment/updateState',
                   payload: {
                     entity: undefined,
+                  },
+                })
+                dispatch({
+                  type: 'dentalChartComponent/updateState',
+                  payload: {
+                    action: undefined,
                   },
                 })
                 // this.props.resetForm()

@@ -43,6 +43,7 @@ import {
   groupHeight,
   createToothShape,
   createFont,
+  createTriangle,
   createRectangle,
   createCircle,
   createLine,
@@ -821,16 +822,31 @@ class Chart extends React.Component {
           )
             return
           if (action) {
+            if (
+              action.chartMethodTypeFK === 1 &&
+              e.subTargets &&
+              e.subTargets[0].isShape
+            ) {
+              group.filter((o) => o.isShape).map((o) => {
+                group.remove(o)
+              })
+              this.canvas.renderAll()
+              return
+            }
+
             // console.log(action, dentalChartComponent)
             if (action.chartMethodTypeFK === 1) {
               // console.log(e.subTargets[0], group)
-              const existShapes = group.filter((o) => o.isShape)
-              if (existShapes.length > 0) {
-                existShapes.map((o) => group.remove(o))
-                this.canvas.renderAll()
-              } else {
+              // const existShapes = group.filter((o) => o.isShape)
+              // if (existShapes.length > 0) {
+              //   existShapes.map((o) => group.remove(o))
+              //   this.canvas.renderAll()
+              // } else {
+
+              // }
+              // console.log(e.subTargets[0])
+              if (e.subTargets[0].isDefaultCell())
                 this.toggleSelect({ item: e.subTargets[0], group })
-              }
             } else if (
               [
                 2,
@@ -930,6 +946,7 @@ class Chart extends React.Component {
       // console.log(selected)
       // return
       // console.log(target.type)
+      // return
       this.canvas.discardActiveObject()
       const { action } = this.props.dentalChartComponent
 
@@ -955,7 +972,7 @@ class Chart extends React.Component {
                 group: g,
                 item:
                   g._objects.filter(
-                    (o) => o.name.indexOf(`${cellPrefix}`) === 0,
+                    (o) => o.name && o.name.indexOf(`${cellPrefix}`) === 0,
                   ).length === 1
                     ? g._objects[0]
                     : {
@@ -1075,11 +1092,6 @@ class Chart extends React.Component {
   }
 
   renderCanvas = (props) => {
-    // console.log(
-    //   'renderCanvas',
-    //   this.canvas._objects.filter((o) => o.name === 'bridgeLine'),
-    // )
-
     const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
     const { action = {}, data, pedoChart, surfaceLabel } = dentalChartComponent
     const { list = [] } = dentalChartSetup
@@ -1107,17 +1119,11 @@ class Chart extends React.Component {
       }
       if (!pedoChart && index >= 50) {
         group.set('opacity', 0)
-        // group.set('evented', false)
-        // group.sendToBack()
-
-        // this.canvas.remove(group)
 
         return false
       }
       // console.log(group._objects.find((m) => m.name === `header_${index}`))
       group.set('opacity', 1)
-      // group.set('evented', true)
-      // group.bringToFront()
 
       if (index > 30 && index < 50) {
         if (!pedoChart) {
@@ -1132,7 +1138,7 @@ class Chart extends React.Component {
       group.filter((n) => !n.isDefaultCell()).map((o) => group.remove(o))
       group._objects.filter((o) => o._objects).map((o) => {
         // console.log(o)
-        o._objects[0].set('fill', 'white')
+        o._objects[0].set('fill', 'transparent')
         if (o._objects[1])
           if (surfaceLabel) {
             o._objects[1].set('opacity', 1)
@@ -1141,84 +1147,23 @@ class Chart extends React.Component {
           }
         if (o._objects[2] instanceof fabric.IText) o._objects[2].set('text', '')
       })
-      // const root = this.canvas._objects.find(
-      //   (t) =>
-      //     t.name === `${cellPrefix}${index}outsidebottom` ||
-      //     t.name === `${cellPrefix}${index}outsidetop`,
-      // )
-      // group.off('mouseup')
 
-      // group.on('mouseup', (e) => {
-      //   setTimeout(() => {
-      //     console.log('gesture', e)
-      //     // console.log(action, dentalChartComponent)
-      //     if (action.onClick) {
-      //       action.onClick({ group, dispatch })
-      //     } else if (action && overlayShapeTypes.includes(action.value)) {
-      //       this.toggleSelect({ group })
-      //     } else if (
-      //       e.subTargets[0] &&
-      //       action.type === 'cell' &&
-      //       e.subTargets[0].isValidCell()
-      //     ) {
-      //       this.toggleSelect({ item: e.subTargets[0], group })
-      //     }
-      //   }, 2)
-      // })
-      // group.filter((n) => n.isValidCell()).map((item) => {
-      //   item.off('mousedown')
-      //   item.on('mousedown', (e) => {
-      //     console.log('cell gesture', e)
-      //     if (
-      //       action &&
-      //       action.type === 'cell' &&
-      //       e.subTargets[0] &&
-      //       e.subTargets[0].isValidCell()
-      //     )
-      //       this.toggleSelect({ item, group })
-      //     // if (e.target) {
-      //     //   const item = group.object(value)
-
-      //     //   if (
-      //     //     item // &&
-      //     //     // e.target.canvas // &&
-      //     //     // checkIsValidElement(item, name, config.isValidElement)
-      //     //   ) {
-      //     //     toggleSelect({ item, selected, config, values, dispatch, group })
-      //     //   }
-      //     // }
-      //   })
-      // })
-
+      const toothItems = data.filter(
+        (m) => m.toothIndex === index && m.target === group.name, // && !m.hide,
+      )
       _.orderBy(
-        data.filter(
-          (m) => m.toothIndex === index && m.target === group.name, // && !m.hide,
-        ),
+        toothItems,
         [
           'timestamp',
         ],
         [
           'asc',
         ],
-      ).map((o) => {
-        // console.log(o)
+      ).map((o, i) => {
         const target = list.find((m) => m.id === o.id)
         if (target) {
-          // console.log(target, o, group)
+          // console.log(target, o, group, toothItems.length, i)
 
-          // if (target.getShape && o.target === group.name) {
-          //   // console.log('getShape')
-          //   let newShape = target.getShape()
-          //   let existed = group.filter((x) => x.name === o.id)[0]
-          //   // console.log(group)
-          //   if (!existed && newShape && newShape.set) {
-          //     // console.log(newShape)
-          //     newShape.set('name', o.id)
-          //     group.add(newShape)
-          //     existed = newShape
-          //   }
-          //   if (existed) existed.bringToFront()
-          // }
           if (
             target.editMode === 'image' &&
             target.image &&
@@ -1232,30 +1177,10 @@ class Chart extends React.Component {
             if (!existed) {
               // console.log(newShape)
               fabric.Image.fromURL(target.image, (img) => {
-                group.add(
-                  new fabric.Group(
-                    [
-                      img
-                        .scale(groupWidth / img.width)
-                        .rotate(isUpperSection(index) ? 180 : 0),
-                    ],
-                    {
-                      ...addonGroupCfg,
-                      isShape: true,
-                      name: `${o.id}`,
-                    },
-                  ),
-                )
-                imageCache[o.id] = img.scale(groupWidth / img.width)
-                this.canvas.renderAll()
-              })
-            }
-            if (existed) {
-              group.add(
-                new fabric.Group(
+                const d = new fabric.Group(
                   [
-                    fabric.util.object
-                      .clone(existed)
+                    img
+                      .scale(groupWidth / img.width)
                       .rotate(isUpperSection(index) ? 180 : 0),
                   ],
                   {
@@ -1263,8 +1188,43 @@ class Chart extends React.Component {
                     isShape: true,
                     name: `${o.id}`,
                   },
-                ),
+                )
+                if (toothItems.length - 1 !== i) {
+                  group._objects.splice(
+                    group._objects.filter((k) => k.isShape).length,
+                    0,
+                    d,
+                  )
+                } else {
+                  group.add(d)
+                }
+                imageCache[o.id] = img.scale(groupWidth / img.width)
+                this.canvas.renderAll()
+              })
+            }
+            if (existed) {
+              const d = new fabric.Group(
+                [
+                  fabric.util.object
+                    .clone(existed)
+                    .rotate(isUpperSection(index) ? 180 : 0),
+                ],
+                {
+                  ...addonGroupCfg,
+                  isShape: true,
+                  name: `${o.id}`,
+                },
               )
+              if (d)
+                if (toothItems.length - 1 !== i) {
+                  group._objects.splice(
+                    group._objects.filter((k) => k.isShape).length,
+                    0,
+                    d,
+                  )
+                } else {
+                  group.add(d)
+                }
             }
           } else if (
             [
@@ -1273,37 +1233,53 @@ class Chart extends React.Component {
             ].includes(target.chartMethodTypeFK) &&
             (target.editMode === 'color' || !target.editMode)
           ) {
-            let shape = null
-            // console.log(o)
-            if (o.subTarget === 'tooth') {
-              shape = new fabric.Group([
-                createRectangle({
-                  fill: target.chartMethodColorBlock,
-                }),
-                createFont({
-                  text: target.chartMethodText || '',
-                  left: groupWidth / 2 - innerFontSize / 1.8,
-                  top: groupHeight / 2 - innerFontSize,
-                  fontSize: innerFontSize * 2,
-                }),
-              ])
-            } else {
-              shape = fabric.util.object.clone(group._objects[0])
-              shape._objects[0].set('fill', target.chartMethodColorBlock)
-              shape._objects[2].set('text', target.chartMethodText || '')
-            }
-            group.add(
-              new fabric.Group(
-                [
-                  shape,
-                ],
-                {
-                  ...addonGroupCfg,
-                  isShape: true,
-                  name: `${o.id}`,
-                },
-              ),
+            // console.log(group)
+            // console.log(group.filter((n) => n.isShape))
+            // console.log(group._objects.filter((n) => n.isShape))
+
+            // group.filter((n) => n.isShape).map((n) => {
+            //   // console.log(n)
+            //   group.remove(n)
+            // })
+
+            let shape = new fabric.Group([
+              o.subTarget === 'tooth'
+                ? createRectangle({
+                    fill: target.chartMethodColorBlock,
+                  })
+                : createTriangle({
+                    fill: target.chartMethodColorBlock,
+                  }),
+              createFont({
+                text: target.chartMethodText || '',
+                left: groupWidth / 2 - innerFontSize / 1.8,
+                top: groupHeight / 2 - innerFontSize,
+                fontSize: innerFontSize * 2,
+              }),
+            ])
+            const d = new fabric.Group(
+              [
+                shape,
+              ],
+              {
+                ...addonGroupCfg,
+                isShape: true,
+                name: `${o.id}`,
+              },
             )
+            if (d)
+              if (toothItems.length - 1 !== i) {
+                group._objects.splice(
+                  group._objects.filter((k) => k.isShape).length,
+                  0,
+                  d,
+                )
+              } else {
+                group.add(d)
+              }
+
+            // console.log(group)
+            // if (toothItems.length - 1 !== i) d.sendToBack()
           } else if (target.chartMethodTypeFK === 1) {
             // console.log(group.filter((n) => n.isValidCell()), o)
             // console.log(group)
@@ -1330,7 +1306,7 @@ class Chart extends React.Component {
             }
             group.filter((n) => n.isShape).map((n) => {
               // console.log(n)
-              group.remove(n)
+              // group.remove(n)
             })
             // toothIndex: index,
             // target: text[4],
@@ -1384,6 +1360,8 @@ class Chart extends React.Component {
       })
 
       // console.log(group)
+
+      // console.log(group)
       // const cfg = {
       //   ...props,
       //   values: props.dentalChartComponent.data.filter(
@@ -1401,7 +1379,7 @@ class Chart extends React.Component {
       .getObjects('group')
       .filter((n) => n.name && n.name.indexOf('outside') > 0)
       .map((o) => {
-        o.item(0).set('fill', 'white')
+        o.item(0).set('fill', 'transparent')
         // o.set('opacity', 1)
         // console.log(o)
         if (o.index > 30 && o.index < 50) {
@@ -1425,6 +1403,8 @@ class Chart extends React.Component {
     //   let oImg = img.set({ left: 0, top: 0 }).scale(0.25)
     //   this.canvas.add(oImg)
     // })
+
+    // console.log(this.canvas)
   }
 
   toggleSelect = ({ item = {}, group, select }) => {

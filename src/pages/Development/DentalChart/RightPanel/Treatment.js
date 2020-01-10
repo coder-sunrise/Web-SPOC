@@ -124,6 +124,12 @@ const Treatment = ({
                   action,
                 },
               })
+              dispatch({
+                type: 'dentalChartTreatment/updateState',
+                payload: {
+                  entity: undefined,
+                },
+              })
             }
           }}
         />
