@@ -103,4 +103,9 @@ export const dentalLayoutCfg = [
   },
 ]
 
+// console.log({
+//   gpLayoutCfg: JSON.stringify(gpLayoutCfg),
+//   parsed: JSON.parse(JSON.stringify(gpLayoutCfg)),
+// })
+// console.log({ dentalLayoutCfg: JSON.stringify(dentalLayoutCfg) })
 export default gpLayoutCfg

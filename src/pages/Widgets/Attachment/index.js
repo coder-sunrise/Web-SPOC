@@ -201,7 +201,7 @@ class Attachment extends Component {
                         {
                           title: (
                             <h5 style={{ paddingLeft: 8 }}>
-                              Clinical Notes Attachment
+                              Consultation Attachment
                             </h5>
                           ),
                           content: (
