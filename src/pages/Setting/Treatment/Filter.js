@@ -10,24 +10,29 @@ import {
   GridItem,
   Button,
   TextField,
-  ProgressButton,
   Select,
+  ProgressButton,
 } from '@/components'
 
-// for what use
 @withFormikExtend({
-  mapPropsToValues: ({ settingTreatmentCategory }) =>
-    settingTreatmentCategory.filter || {},
+  mapPropsToValues: ({ settingTreatment }) => settingTreatment.filter || {},
   handleSubmit: () => {},
-  // displayName: 'ServiceCenterFilter', to determine
+  displayName: 'TreatmentFilter',
 })
 class Filter extends PureComponent {
   render () {
-    // console.log({ props: this.props.values })
     const { classes } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
+          {/* <GridItem xs={6} md={3}>
+            <FastField
+              name='code'
+              render={(args) => {
+                return <TextField label='Code' {...args} />
+              }}
+            />
+          </GridItem> */}
           <GridItem xs={6} md={3}>
             <FastField
               name='codeDisplayValue'
@@ -55,7 +60,7 @@ class Filter extends PureComponent {
                 onClick={() => {
                   const { codeDisplayValue, isActive } = this.props.values
                   this.props.dispatch({
-                    type: 'settingTreatmentCategory/query',
+                    type: 'settingTreatment/query',
                     payload: {
                       isActive,
                       group: [
@@ -76,7 +81,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingServiceCategory/updateState',
+                    type: 'settingTreatment/updateState',
                     payload: {
                       entity: undefined,
                     },

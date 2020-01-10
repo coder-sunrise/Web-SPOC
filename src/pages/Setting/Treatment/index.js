@@ -37,7 +37,13 @@ class Treatment extends PureComponent {
   }
 
   render () {
-    const { classes, settingTreatment, dispatch, theme, ...restProps } = this.props
+    const {
+      classes,
+      settingTreatment,
+      dispatch,
+      theme,
+      ...restProps
+    } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
     }

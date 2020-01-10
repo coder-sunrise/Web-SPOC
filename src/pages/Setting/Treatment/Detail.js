@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
-import { FormattedMessage } from 'umi/locale'
+import { formatMessage, FormattedMessage } from 'umi/locale'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -9,46 +9,52 @@ import {
   GridItem,
   TextField,
   DateRangePicker,
+  CodeSelect,
 } from '@/components'
 
 const styles = (theme) => ({})
 
 @withFormikExtend({
-  mapPropsToValues: ({ settingTreatmentCategory }) =>
-    settingTreatmentCategory.entity || settingTreatmentCategory.default,
+  mapPropsToValues: ({ settingTreatment }) =>
+    settingTreatment.entity || settingTreatment.default,
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { effectiveDates, ...restValues } = values
+    const {
+      effectiveDates,
+      treatmentCategory,
+      revenueCategory,
+      chartMethod,
+      ...restValues
+    } = values
     const { dispatch, onConfirm } = props
+    console.log('submit', restValues)
     dispatch({
-      type: 'settingTreatmentCategory/upsert',
+      type: 'settingTreatment/upsert',
       payload: {
         ...restValues,
         effectiveStartDate: effectiveDates[0],
         effectiveEndDate: effectiveDates[1],
+        roomStatusFK: 1,
       },
     }).then((r) => {
       if (r) {
-        resetForm()
         if (onConfirm) onConfirm()
         dispatch({
-          type: 'settingTreatmentCategory/query',
+          type: 'settingTreatment/query',
         })
       }
     })
   },
-  displayName: 'ServiceCategoryDetail',
+  displayName: 'TreatmentDetail',
 })
 class Detail extends PureComponent {
-  state = {}
-
   render () {
     const { props } = this
-    const { theme, footer, settingTreatmentCategory } = props
+    let { classes, theme, footer, values } = props
     // console.log('detail', props)
     return (
       <React.Fragment>
@@ -57,20 +63,24 @@ class Detail extends PureComponent {
             <GridItem md={6}>
               <FastField
                 name='code'
-                render={(args) => (
-                  <TextField
-                    label='Code'
-                    autoFocus
-                    {...args}
-                    disabled={!!settingTreatmentCategory.entity}
-                  />
-                )}
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Code'
+                      autoFocus
+                      disabled={!!values.id}
+                      {...args}
+                    />
+                  )
+                }}
               />
             </GridItem>
             <GridItem md={6}>
               <FastField
                 name='displayValue'
-                render={(args) => <TextField label='Display Value' {...args} />}
+                render={(args) => {
+                  return <TextField label='Display Value' {...args} />
+                }}
               />
             </GridItem>
             <GridItem md={6}>
@@ -79,8 +89,94 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
+                      // showTime
                       label='Effective Start Date'
                       label2='End Date'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={1}>
+              <div
+                render={(row) => {
+                  const { chartMethod } = row
+                  if (chartMethod) {
+                    return (
+                      <img src={chartMethod.image} width='50px' height='50px' />
+                    )
+                  }
+                  return ''
+                }}
+              />
+            </GridItem>
+            <GridItem xs={5}>
+              <FastField
+                name='chartMethodFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Chart Method'
+                      code='CTChartMethod'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={6}>
+              <FastField
+                name='treatmentCategoryFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Treatment Category'
+                      code='CTTreatmentCategory'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={6}>
+              <FastField
+                name='revenueCategoryFK'
+                render={(args) => {
+                  return (
+                    <CodeSelect
+                      label='Revenue Category'
+                      code='CTRevenueCategory'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={6}>
+              <FastField
+                name='costPrice'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Cost'
+                      type='number'
+                      prefix='$'
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem xs={6}>
+              <FastField
+                name='sellingPrice'
+                render={(args) => {
+                  return (
+                    <TextField
+                      label='Selling Price/Unit'
+                      type='number'
+                      prefix='$'
                       {...args}
                     />
                   )
