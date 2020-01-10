@@ -116,6 +116,10 @@ const mapEntityToValues = (entity) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
     const { location } = history
+    const shouldCloseForm = location.pathname
+      ? !location.pathname.includes('patientdb')
+      : false
+
     const cfg = {
       message: 'Patient profile saved.',
     }
@@ -137,7 +141,7 @@ const mapEntityToValues = (entity) => {
       dispatch({
         type: 'patient/updateState',
         payload: {
-          shouldQuery: true,
+          shouldQueryOnClose: location.pathname.includes('patientdb'),
         },
       })
       if (r) {
@@ -167,10 +171,6 @@ const mapEntityToValues = (entity) => {
           const newEntity = mapEntityToValues(response)
           resetForm(newEntity)
         })
-
-        const shouldCloseForm = location.pathname
-          ? !location.pathname.includes('patientdb')
-          : false
 
         if (onConfirm && shouldCloseForm) {
           onConfirm()

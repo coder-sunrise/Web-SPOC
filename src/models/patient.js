@@ -168,12 +168,12 @@ export default createFormViewModel({
         const patientState = yield select((st) => st.patient)
         const { history } = payload || { history: undefined }
 
-        if (patientState.shouldQuery) {
+        if (patientState.shouldQueryOnClose) {
           yield put({ type: 'query' })
           yield put({
             type: 'updateState',
             payload: {
-              shouldQuery: false,
+              shouldQueryOnClose: false,
             },
           })
         }
