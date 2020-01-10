@@ -42,7 +42,8 @@ const PatientLabLabelButton = ({ handlePrint, patientId }) => {
         }}
       >
         <Button color='primary' size='sm' onClick={handlePrintClick}>
-          Print Patient Lab Label
+          <Print />
+          Lab Label
         </Button>
         <div
           style={{
