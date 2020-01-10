@@ -9,6 +9,7 @@ import {
   OutlinedTextField,
   Switch,
   CodeSelect,
+  Select,
 } from '@/components'
 import Yup from '@/utils/yup'
 
@@ -22,8 +23,8 @@ import Yup from '@/utils/yup'
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    treatmentCategory: Yup.number().required(),
-    treatment: Yup.number().required(),
+    treatmentCategoryFK: Yup.number().required(),
+    treatmentFK: Yup.number().required(),
     quantity: Yup.number().required(),
     unitPrice: Yup.number().required(),
   }),
@@ -35,6 +36,8 @@ import Yup from '@/utils/yup'
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,
+      totalPrice: values.unitPrice,
+      totalAfterItemAdjustment: values.totalPrice,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -45,59 +48,74 @@ import Yup from '@/utils/yup'
   displayName: 'OrderPage',
 })
 class Treatment extends PureComponent {
+  state = {
+    ctTreatment: [],
+  }
+
+  componentDidMount () {
+    this.props
+      .dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'cttreatment',
+        },
+      })
+      .then((v) => {
+        this.setState({ ctTreatment: v })
+      })
+  }
+
   calculateSubtotal = (
     quantity = 0,
     unitPrice = 0,
-    discount = 0,
-    discountType = 'Percentage',
+    adjAmount = 0,
+    adjType = 'Percentage',
   ) => {
     let subtotal = unitPrice * quantity
 
-    if (discountType === 'ExactAmount') {
-      subtotal -= discount
+    if (adjType === 'ExactAmount') {
+      subtotal -= adjAmount
     } else {
-      subtotal *= (100 - discount) / 100
+      if (adjAmount > 100) adjAmount = 100
+      subtotal *= (100 - adjAmount) / 100
     }
 
-    this.props.setFieldValue('subtotal', subtotal)
+    this.props.setFieldValue('totalPrice', subtotal)
+  }
+
+  setItemName = (v, op) => {
+    const { setFieldValue, values } = this.props
+    const { displayValue, sellingPrice, isActive } = op
+
+    setFieldValue('itemName', displayValue)
+    setFieldValue('unitPrice', sellingPrice)
+    setFieldValue('isActive', isActive)
+    this.calculateSubtotal(
+      values.quantity,
+      sellingPrice,
+      values.adjAmount,
+      values.adjType,
+    )
   }
 
   render () {
-    const { values, footer, handleSubmit } = this.props
-    const isExactAmount = values.discountType === 'ExactAmount'
-
+    const { values, footer, handleSubmit, setFieldValue } = this.props
+    const isExactAmount = values.adjType === 'ExactAmount'
     return (
       <div>
         <GridContainer>
           <GridItem xs={8}>
             <GridItem>
               <FastField
-                name='treatmentCategory'
+                name='treatmentCategoryFK'
                 render={(args) => {
                   return (
                     <CodeSelect
                       temp
                       label='Treatment Category'
-                      code='inventorypackage'
-                      labelField='displayValue'
-                      // onChange={this.changePackage}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem>
-              <FastField
-                name='treatment'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      temp
-                      label='Treatment'
-                      code='inventorypackage'
-                      labelField='displayValue'
-                      // onChange={this.changePackage}
+                      code='cttreatmentcategory'
+                      labelField='name'
+                      onChange={() => setFieldValue('treatmentFK', undefined)}
                       {...args}
                     />
                   )
@@ -106,7 +124,29 @@ class Treatment extends PureComponent {
             </GridItem>
             <GridItem>
               <Field
-                name='remarks'
+                name='treatmentFK'
+                render={(args) => {
+                  return (
+                    <Select
+                      label='Treatment'
+                      labelField='displayValue'
+                      valueField='id'
+                      options={this.state.ctTreatment.filter(
+                        (o) =>
+                          o.treatmentCategoryFK === values.treatmentCategoryFK,
+                      )}
+                      onChange={(v, op = {}) => {
+                        this.setItemName(v, op)
+                      }}
+                      {...args}
+                    />
+                  )
+                }}
+              />
+            </GridItem>
+            <GridItem>
+              <Field
+                name='remark'
                 render={(args) => {
                   return (
                     <OutlinedTextField
@@ -135,8 +175,8 @@ class Treatment extends PureComponent {
                         this.calculateSubtotal(
                           e.target.value,
                           values.unitPrice,
-                          values.discount,
-                          values.discountType,
+                          values.adjAmount,
+                          values.adjType,
                         )}
                       {...args}
                     />
@@ -157,8 +197,8 @@ class Treatment extends PureComponent {
                         this.calculateSubtotal(
                           values.quantity,
                           e.target.value,
-                          values.discount,
-                          values.discountType,
+                          values.adjAmount,
+                          values.adjType,
                         )}
                       {...args}
                     />
@@ -170,7 +210,7 @@ class Treatment extends PureComponent {
             <GridItem container direction='row' style={{ padding: 0 }}>
               <GridItem>
                 <Field
-                  name='discount'
+                  name='adjAmount'
                   render={(args) => {
                     return (
                       <NumberInput
@@ -182,7 +222,7 @@ class Treatment extends PureComponent {
                             values.quantity,
                             values.unitPrice,
                             e.target.value,
-                            values.discountType,
+                            values.adjType,
                           )}
                         {...args}
                       />
@@ -192,7 +232,7 @@ class Treatment extends PureComponent {
               </GridItem>
               <GridItem style={{ padding: 0 }}>
                 <Field
-                  name='discountType'
+                  name='adjType'
                   render={(args) => {
                     return (
                       <Switch
@@ -205,7 +245,7 @@ class Treatment extends PureComponent {
                           this.calculateSubtotal(
                             values.quantity,
                             values.unitPrice,
-                            values.discount,
+                            values.adjAmount,
                             e,
                           )}
                         {...args}
@@ -218,7 +258,7 @@ class Treatment extends PureComponent {
 
             <GridItem>
               <Field
-                name='subtotal'
+                name='totalPrice'
                 render={(args) => {
                   return (
                     <NumberInput
