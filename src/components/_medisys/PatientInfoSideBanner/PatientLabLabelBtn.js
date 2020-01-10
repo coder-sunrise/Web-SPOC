@@ -59,6 +59,7 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
           <InputNumber
             size='small'
             min={1}
+            max={10}
             value={copyNo}
             onChange={handleCopyNoChange}
             style={{ width: '50px', textAlign: 'right' }}
