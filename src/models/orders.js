@@ -47,6 +47,7 @@ const initialState = {
   },
   defaultTreatment: {
     quantity: 1,
+    adjType: 'Percentage',
   },
   // default: {
   //   corPrescriptionItemPrecaution: [
