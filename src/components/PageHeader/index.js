@@ -6,12 +6,12 @@ import BreadcrumbView from './breadcrumb'
 
 const { TabPane } = Tabs
 export default class PageHeader extends PureComponent {
-  onChange = key => {
+  onChange = (key) => {
     const { onTabChange } = this.props
     if (onTabChange) {
       onTabChange(key)
     }
-  };
+  }
 
   render () {
     const {
@@ -57,7 +57,9 @@ export default class PageHeader extends PureComponent {
               </div>
               <div className={styles.row}>
                 {content && <div className={styles.content}>{content}</div>}
-                {extraContent && <div className={styles.extraContent}>{extraContent}</div>}
+                {extraContent && (
+                  <div className={styles.extraContent}>{extraContent}</div>
+                )}
               </div>
             </div>
           </div>
@@ -68,11 +70,9 @@ export default class PageHeader extends PureComponent {
               onChange={this.onChange}
               tabBarExtraContent={tabBarExtraContent}
             >
-              {tabList.map(item => (
-                <TabPane tab={item.tab} key={item.key} />
-                ))}
+              {tabList.map((item) => <TabPane tab={item.tab} key={item.key} />)}
             </Tabs>
-            ) : null}
+          ) : null}
         </Skeleton>
       </div>
     )
