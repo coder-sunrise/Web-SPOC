@@ -163,7 +163,14 @@ class PatientInfoSideBanner extends PureComponent {
   }
 
   render () {
-    const { height, theme, classes, entity, loading } = this.props
+    const {
+      height,
+      theme,
+      classes,
+      entity,
+      loading,
+      clinicSettings,
+    } = this.props
 
     const entityNameClass = classnames({
       [classes.cardCategory]: true,
@@ -199,7 +206,10 @@ class PatientInfoSideBanner extends PureComponent {
             value={entity.genderFK}
           />)
         </p>
-        <PrintLabLabelButton patientId={entity.id} />
+        <PrintLabLabelButton
+          patientId={entity.id}
+          clinicSettings={clinicSettings}
+        />
         <Divider light />
         <div
           className={classes.schemeContainer}
@@ -289,9 +299,12 @@ class PatientInfoSideBanner extends PureComponent {
     ) : null
   }
 }
-const ConnectedPatientInfoSideBanner = connect(({ loading }) => ({
-  loading: loading.models.patient,
-}))(PatientInfoSideBanner)
+const ConnectedPatientInfoSideBanner = connect(
+  ({ loading, clinicSettings }) => ({
+    loading: loading.models.patient,
+    clinicSettings: clinicSettings.settings,
+  }),
+)(PatientInfoSideBanner)
 
 export default withStyles(styles, {
   withTheme: true,

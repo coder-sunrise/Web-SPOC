@@ -1,16 +1,15 @@
 import React, { useState } from 'react'
 // material ui
 import Print from '@material-ui/icons/Print'
-// formik
-import { withFormik } from 'formik'
 // ant design
 import { InputNumber } from 'antd'
 // common components
-import { Button, NumberInput, SizeContainer, Tooltip } from '@/components'
+import { Button, SizeContainer } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 
-const PatientLabLabelButton = ({ handlePrint, patientId }) => {
-  const reportID = 33
+const labLabelReport = 33
+const labLabelReport89mm = 34
+const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
   const [
     copyNo,
     setCopyNo,
@@ -21,6 +20,12 @@ const PatientLabLabelButton = ({ handlePrint, patientId }) => {
   const handleCopyNoChange = (value) => setCopyNo(value)
 
   const handlePrintClick = () => {
+    const { labelPrinterSize } = clinicSettings
+    let reportID = labLabelReport
+    if (labelPrinterSize === '8.9cmx3.6cm') {
+      reportID = labLabelReport89mm
+    }
+
     for (let i = 0; i < copyNo; i++) {
       handlePrint({
         reportID,
