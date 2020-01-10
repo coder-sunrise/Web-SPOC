@@ -8,7 +8,6 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import History from '@material-ui/icons/History'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { getUniqueId } from '@/utils/utils'
 
 import {
   Button,
@@ -58,11 +57,11 @@ const methods = [
     name: 'Tooth',
   },
   {
-    value: 'bridging',
+    value: 3,
     name: 'Bridging',
   },
   {
-    value: 'na',
+    value: 4,
     name: 'NA',
   },
 ]
@@ -92,10 +91,17 @@ const Setup = (props) => {
     footer,
     ...restProps
   } = props
+  const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
+  // console.log(props)
+  // style={{ height: `${height}px` }}
+  const [
+    selectedRows,
+    setSelectedRows,
+  ] = React.useState([])
   const [
     mode,
     setMode,
-  ] = useState('sort')
+  ] = useState('color')
   const handleCommitChanges = ({ rows, changed }) => {
     // console.log(rows, changed)
     setFieldValue('rows', rows)
@@ -120,11 +126,11 @@ const Setup = (props) => {
       },
     },
     {
-      columnName: 'isDiagnosis',
+      columnName: 'isDisplayInDiagnosis',
       type: 'checkbox',
       align: 'center',
       isDisabled: (row) => {
-        return row.fixed || mode === 'sort' || row.method === 'bridging'
+        return row.fixed || mode === 'sort' || row.method === 3
       },
     },
     {
@@ -152,14 +158,15 @@ const Setup = (props) => {
         title: 'Name',
       },
       {
-        name: 'isDiagnosis',
+        name: 'isDisplayInDiagnosis',
         title: 'Display in Diagnosis',
       },
     ],
     columnExtensions,
 
     FuncProps: {
-      // pager: false,
+      pager: false,
+
       // selectable: true,
       // selectConfig: {
       //   showSelectAll: true,
@@ -178,15 +185,10 @@ const Setup = (props) => {
       },
       // showDeleteCommand: false,
       onCommitChanges: handleCommitChanges,
-      onAddedRowsChange: (rows) => {
-        return rows.map((o) => {
-          return { value: getUniqueId(), ...o }
-        })
-      },
       // onEditingRowIdsChange: this.handleEditingRowIdsChange,
     },
     onRowDrop: (rows) => {
-      // console.log(rows)
+      console.log(rows)
       setFieldValue('rows', rows)
     },
     schema: rowSchema,
@@ -240,7 +242,7 @@ export default withFormikExtend({
   }),
 
   handleSubmit: (values, { props, resetForm }) => {
-    // console.log(values)
+    console.log(values)
     const { dispatch, history, codetable, onConfirm } = props
     dispatch({
       type: 'dentalChartSetup/updateState',

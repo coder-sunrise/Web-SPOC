@@ -164,15 +164,19 @@ export default function Tree ({
   }
 
   const findMatch = (item, results = []) => {
+    let matched = false
     if (item[labelField].toUpperCase().indexOf(search.toUpperCase()) >= 0) {
       results.push(item[valueField])
+      matched = true
     }
 
     if (item.subItems) {
       item.subItems.map((m) => {
-        findMatch(m, results)
+        const x = findMatch(m, results)
+        if (!matched && m) matched = x
       })
     }
+    return matched
   }
 
   useEffect(
@@ -183,8 +187,11 @@ export default function Tree ({
       if (!search) return
       const filterIds = []
       items.map((n) => {
-        findMatch(n, filterIds)
+        const matched = findMatch(n, filterIds)
+        // console.log(matched)
+        if (matched) filterIds.push(n[valueField])
       })
+      // console.log(filterIds)
       setExpendNodes(filterIds)
       // setFilteredItems(fileredItems)
       // console.log(search, filterIds, items)

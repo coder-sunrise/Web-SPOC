@@ -8,14 +8,13 @@ import { dateFormatLong } from '@/components'
 const updateData = (data, payload) => {
   const {
     toothIndex,
-    value,
+    id,
     action,
     target,
     forceSelect,
     name,
     subTarget,
     deleted,
-    remark,
   } = payload
   // console.log(payload)
   // if (!name) return data
@@ -23,27 +22,22 @@ const updateData = (data, payload) => {
   const exist = data.find(
     (o) =>
       o.toothIndex === toothIndex &&
-      o.value === value &&
+      o.id === id &&
       target === o.target &&
       o.subTarget === subTarget &&
       o.name === name,
   )
-  if (value === 'clear')
+  if (action.code === 'SYS01')
     return _.reject(data, (o) => o.toothIndex === toothIndex)
 
   if (deleted) {
-    return _.reject(
-      data,
-      (o) => o.toothIndex === toothIndex && o.value === value,
-    )
+    return _.reject(data, (o) => o.toothIndex === toothIndex && o.id === id)
   }
   // if (others.length > 0) {
   //   others.map((o) => (o.hide = true))
   // }
   if (exist) {
-    if (remark) {
-      exist.remark = payload.remark
-    } else if (
+    if (
       data.find(
         (o) =>
           o.toothIndex === toothIndex &&
@@ -59,7 +53,7 @@ const updateData = (data, payload) => {
         data,
         (o) =>
           o.toothIndex === toothIndex &&
-          o.value === value &&
+          o.id === id &&
           target === o.target &&
           o.subTarget === subTarget &&
           o.name === name,
@@ -71,10 +65,9 @@ const updateData = (data, payload) => {
     // data = _.reject(
     //   data,
     //   (o) =>
-    //     o.value !== value && o.toothIndex === toothIndex && target === o.target,
+    //     o.id !== id && o.toothIndex === toothIndex && target === o.target,
     // )
     data.push({
-      remark: '',
       ...payload,
       timestamp: Date.now(),
       date: moment().format(dateFormatLong),
@@ -93,17 +86,14 @@ export default createFormViewModel({
     service,
     state: {
       showPedo: false,
-      mode: 'diagnosis',
-      // mode: 'treatment',
-
       data: [
         // {
         //   id: 'system-id-1',
         //   toothIndex: 11,
-        //   value: 'topcell',
+        //   id: 'topcell',
         // },
         // {
-        //   value: 'onlayveneer',
+        //   id: 'onlayveneer',
         //   toothIndex: 17,
         //   id: 'sys-gen--231',
         // },

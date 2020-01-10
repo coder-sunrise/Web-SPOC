@@ -133,23 +133,27 @@ const Thumbnail = ({
 
   const doFetch = async () => {
     try {
-      let src
-      const thumbnailId = thumbnailIndexFK || thumbnail.id
-
-      if (thumbnailId) {
-        const response = await getFileByFileID(thumbnailId)
-        if (response && response.status === 200) {
-          const { data } = response
-          const thumbnailDataInBase64 = arrayBufferToBase64(data)
-          const base64Prefix = 'data:image/png;base64,'
-          src = `${base64Prefix}${thumbnailDataInBase64}`
-        }
+      if (attachment && attachment.thumbnailData) {
+        setImgSrc(attachment.thumbnailData)
       } else {
-        if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
-        if (wordFileExtensions.includes(fileExtension)) src = wordIcon
-        if (excelFileExtensions.includes(fileExtension)) src = excelIcon
+        let src
+        const thumbnailId = thumbnailIndexFK || thumbnail.id
+
+        if (thumbnailId) {
+          const response = await getFileByFileID(thumbnailId)
+          if (response && response.status === 200) {
+            const { data } = response
+            const thumbnailDataInBase64 = arrayBufferToBase64(data)
+            const base64Prefix = 'data:image/png;base64,'
+            src = `${base64Prefix}${thumbnailDataInBase64}`
+          }
+        } else {
+          if (pdfFileExtensions.includes(fileExtension)) src = pdfIcon
+          if (wordFileExtensions.includes(fileExtension)) src = wordIcon
+          if (excelFileExtensions.includes(fileExtension)) src = excelIcon
+        }
+        setImgSrc(src)
       }
-      setImgSrc(src)
     } catch (error) {
       console.error(error)
     } finally {
@@ -181,7 +185,6 @@ const Thumbnail = ({
     [classes.imageBorder]: !noBorder,
     [classes.imageSpacing]: !noBorder,
   })
-
   if (simple) {
     return (
       <div className={simpleThumbnailClass}>
@@ -201,11 +204,11 @@ const Thumbnail = ({
               </div>
             </Tooltip>
             <div className={classes.simpleButtonGroup}>
-              <Tooltip title='Change'>
+              {/* <Tooltip title='Change'>
                 <Button justIcon color='primary' size='sm'>
                   <Edit />
                 </Button>
-              </Tooltip>
+              </Tooltip> */}
               <Tooltip title='Delete'>
                 <DeleteWithPopover
                   disabled={isReadOnly}

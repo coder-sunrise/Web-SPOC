@@ -53,7 +53,7 @@ const largetButton = {
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
 const sharedToggleButtonGroup = {
   grouped: {
-    height: 'auto',
+    // height: 'initial',
     lineHeight: 1.5,
   },
   sizeSmall: {
@@ -481,6 +481,11 @@ export const smallTheme = createMuiTheme({
       groupedSizeSmall: {
         padding: '2px 6px',
         fontSize: smallFontSize,
+      },
+    },
+    MuiToggleButton: {
+      sizeSmall: {
+        height: 26,
       },
     },
     MuiFormControlLabel: {

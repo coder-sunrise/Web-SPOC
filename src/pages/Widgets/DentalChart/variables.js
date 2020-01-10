@@ -514,7 +514,7 @@ export const buttonConfigs = [
     value: 'clear',
     text: 'Clear',
     fixed: true,
-    method: 'na',
+    method: 4,
     isDiagnosis: true,
   },
   {
@@ -523,7 +523,7 @@ export const buttonConfigs = [
     text: 'Missing',
     fill: 'white',
     fixed: true,
-    method: 'na',
+    method: 4,
     isDiagnosis: true,
     editMode: 'color',
     symbol: '',
@@ -1013,7 +1013,7 @@ export const createToothShape = ({
     fixedItems.push(g5)
     fixedItems.push(g6)
   }
-  if (action && action.method === 'bridging') {
+  if (action && action.method === 3) {
     fixedItems = []
     fixedItems.push(
       new fabric.Group(

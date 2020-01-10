@@ -151,7 +151,7 @@ const Diagnosis = ({
                 const subAry = valueGroups[j]
                 const v = subAry[0]
                 // console.log(v.info)
-                if (v.action.method !== 'bridging')
+                if (v.action.method !== 3)
                   v.info = subAry.map((o) => o.name).join(',')
                 // console.log(subAry)
                 if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {

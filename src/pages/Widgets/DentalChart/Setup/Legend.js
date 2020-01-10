@@ -37,8 +37,8 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   const { method } = row
   // if (
   //   [
-  //     'na',
-  //     'bridging',
+  //     4,
+  //     3,
   //   ].includes(method)
   // )
   //   return null
@@ -71,7 +71,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   })
   useEffect(
     () => {
-      if (method === 'na') return
+      if (method === 4) return
       if (mode === 'color') {
         setAttachments([])
         delete row.attachments
@@ -167,8 +167,8 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
 
   if (
     [
-      'na',
-      'bridging',
+      4,
+      3,
     ].includes(method)
   )
     return null

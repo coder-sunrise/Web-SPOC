@@ -789,7 +789,7 @@ class Chart extends React.Component {
             } else if (
               [
                 'tooth',
-                'na',
+                4,
               ].includes(action.method)
             ) {
               this.toggleSelect({
@@ -798,7 +798,7 @@ class Chart extends React.Component {
                   name: 'tooth',
                 },
               })
-            } else if (action.method === 'bridging') {
+            } else if (action.method === 3) {
               if (selectedTooth.length < 2) {
                 if (selectedTooth.length === 0) {
                   group.add(
@@ -889,7 +889,7 @@ class Chart extends React.Component {
 
       if (!action || readOnly) return
       // console.log(action)
-      if (action.method === 'bridging') return
+      if (action.method === 3) return
       setTimeout(() => {
         // console.log('selection:created, mouseMoved', e, target)
         if (
@@ -1034,7 +1034,7 @@ class Chart extends React.Component {
     const { rows } = dentalChartSetup
     const { icon, type, hoverColor: hc, onSelect, clear } = action
 
-    if (action.method === 'bridging') {
+    if (action.method === 3) {
       selectedTooth = []
 
       this.canvas._objects
@@ -1221,7 +1221,7 @@ class Chart extends React.Component {
           } else if (
             [
               'tooth',
-              'na',
+              4,
             ].includes(target.method) &&
             (target.editMode === 'color' || !target.editMode)
           ) {
@@ -1289,11 +1289,11 @@ class Chart extends React.Component {
             // name: `${cellPrefix}centerLeft`,
           } else if (
             [
-              'bridging',
+              3,
             ].includes(target.method) &&
             o.nodes
           ) {
-            // if (target) console.log('bridging', target, data, o)
+            // if (target) console.log(3, target, data, o)
             if (o.toothIndex === o.nodes[0]) {
               setTimeout(() => {
                 const start = this.canvas._objects.find(

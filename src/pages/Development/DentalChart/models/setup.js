@@ -41,8 +41,7 @@ export default createListViewModel({
   param: {
     service,
     state: {
-      rows:
-        JSON.parse(localStorage.getItem('dentalChartSetup')) || buttonConfigs,
+      list: JSON.parse(localStorage.getItem('dentalChartSetup')) || [],
 
       treatments: [
         {
@@ -84,6 +83,13 @@ export default createListViewModel({
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
     reducers: {
+      queryDone (st, { payload }) {
+        const { data } = payload
+        return {
+          ...st,
+          list: _.orderBy(data.data, 'sortOrder'),
+        }
+      },
       clean (state, { payload }) {
         let data = _.cloneDeep(state.data)
 

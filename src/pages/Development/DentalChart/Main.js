@@ -54,6 +54,8 @@ import modelTreatment from './models/treatment'
 // window.g_app.replaceModel(modelSetup)
 // window.g_app.replaceModel(modelTreatment)
 
+const { fabric } = require('fabric')
+
 const styles = (theme) => ({
   paper: {
     display: 'flex',
@@ -131,6 +133,14 @@ const groupHeight = baseHeight * 3 // + strokeWidth
   }),
 )
 class DentalChart extends React.Component {
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'dentalChartSetup/query',
+      pageSize: 99999,
+    })
+  }
+
   render () {
     const {
       className,
@@ -145,12 +155,13 @@ class DentalChart extends React.Component {
       style,
       onChange,
       value,
+      mode,
       onDataSouceChange,
       dentalChartComponent,
       dispatch,
       ...props
     } = this.props
-    const { mode } = dentalChartComponent
+    const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
         <GridContainer gutter={theme.spacing(0.5)}>
