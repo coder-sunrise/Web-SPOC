@@ -223,10 +223,6 @@ export const SCRIBBLE_NOTE_TYPE = {
   PLAN: 3,
 }
 
-export const CLINIC_SPECIALIST = {
-  GP: 'GP',
-  DENTAL: 'DENTAL',
-}
 export const SMS_STATUS = {
   SENT: 1,
   FAILED: 2,
@@ -269,4 +265,9 @@ export const CANNED_TEXT_TYPE_FIELD = {
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',
+}
+
+export const CLINIC_TYPE = {
+  GP: 1,
+  DENTAL: 2,
 }

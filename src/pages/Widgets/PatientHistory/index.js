@@ -24,11 +24,7 @@ import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import {
-  VISIT_TYPE_NAME,
-  VISIT_TYPE,
-  CLINIC_SPECIALIST,
-} from '@/utils/constants'
+import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
 import model from './models'
@@ -128,11 +124,11 @@ class PatientHistory extends Component {
   constructor (props) {
     super(props)
     const { clinicInfo } = props
-    const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
     this.widgets = WidgetConfig.gpWidgets(props)
-    switch (clinicSpecialist) {
-      case CLINIC_SPECIALIST.DENTAL:
+    switch (clinicTypeFK) {
+      case CLINIC_TYPE.DENTAL:
         this.widgets = WidgetConfig.dentalWidgets(props)
         break
       default:

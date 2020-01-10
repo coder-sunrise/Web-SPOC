@@ -19,7 +19,7 @@ import Package from './Package'
 // import Others from './Others'
 // utils
 import { orderTypes } from '@/utils/codes'
-import { VISIT_TYPE, CLINIC_SPECIALIST } from '@/utils/constants'
+import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   editor: {
@@ -177,7 +177,7 @@ class Details extends PureComponent {
   render () {
     const { props } = this
     const { classes, orders, dispatch, clinicInfo, fromDispense } = props
-    const { clinicSpecialist = 'GP ' } = clinicInfo
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     const { type } = orders
 
     const cfg = {
@@ -197,7 +197,7 @@ class Details extends PureComponent {
       )
     }
 
-    if (clinicSpecialist === CLINIC_SPECIALIST.DENTAL) {
+    if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
       orderTypeArray = orderTypes.filter(
         (o) => o.value === '1' || o.value === '4',
       )
