@@ -84,7 +84,7 @@ export default function DiagnosisPanel (props) {
       },
     })
   }
-  // console.log(list)
+  console.log(list)
   // const sharedCfg = {
   //   alt: '',
   //   style: {

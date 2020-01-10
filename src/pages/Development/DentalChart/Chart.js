@@ -1163,12 +1163,8 @@ class Chart extends React.Component {
         const target = list.find((m) => m.id === o.id)
         if (target) {
           // console.log(target, o, group, toothItems.length, i)
-
-          if (
-            target.editMode === 'image' &&
-            target.image &&
-            o.target === group.name
-          ) {
+          console.log(target.image, o.target === group.name)
+          if (target.image && o.target === group.name) {
             // console.log('getShape')
 
             // let newShape = target.getShape()
@@ -1230,8 +1226,7 @@ class Chart extends React.Component {
             [
               2,
               4,
-            ].includes(target.chartMethodTypeFK) &&
-            (target.editMode === 'color' || !target.editMode)
+            ].includes(target.chartMethodTypeFK)
           ) {
             // console.log(group)
             // console.log(group.filter((n) => n.isShape))

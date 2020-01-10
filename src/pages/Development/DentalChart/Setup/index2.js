@@ -98,7 +98,7 @@ const Setup = (props) => {
     mode,
     setMode,
   ] = useState('sort')
-  console.log(restProps)
+  // console.log(restProps)
   // useEffect(() => {
   //   if (!values.rows || values.rows.Legend === 0)
   //     dispatch({
@@ -271,17 +271,33 @@ export default withFormikExtend({
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
     const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
-    // const { list } = dentalChartSetup
-    const list = [] // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+    const { list } = dentalChartSetup
+    // const list = [] // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
     // dispatch({
     //   type: 'dentalChartSetup/updateState',
     //   payload: {
     //     list: values.rows,
     //   },
     // })
+
+    let diffs = difference(values.rows, list)
+    console.log(list, values.rows, diffs)
+    console.log(diffs)
+    // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
+    const updated = values.rows
+      .map((o, i) => {
+        console.log(o, i)
+        if (o) {
+          return {
+            ...o,
+            sortOrder: i,
+          }
+        }
+      })
+      .filter((o, i) => !diffs[i] || Object.values(diffs[i]).length)
     dispatch({
       type: 'dentalChartSetup/post',
-      payload: values.rows,
+      payload: updated,
     }).then((o) => {
       console.log(o)
       if (o) {
@@ -294,19 +310,6 @@ export default withFormikExtend({
             pagesize: 99999,
           },
         })
-      }
-    })
-    let diffs = difference(list, values.rows)
-    console.log(list, values.rows, diffs)
-    console.log(diffs)
-    // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
-    diffs = diffs.map((o, i) => {
-      console.log(o, i)
-      if (o) {
-        return {
-          ...values.rows[i],
-          sortOrder: i,
-        }
       }
     })
     // localStorage.setItem(
