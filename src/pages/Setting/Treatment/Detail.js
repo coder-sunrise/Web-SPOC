@@ -10,7 +10,9 @@ import {
   TextField,
   DateRangePicker,
   CodeSelect,
+  NumberInput,
 } from '@/components'
+import Legend from '@/pages/Development/DentalChart/Setup/Legend'
 
 const styles = (theme) => ({})
 
@@ -21,6 +23,7 @@ const styles = (theme) => ({})
     code: Yup.string().required(),
     displayValue: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    treatmentCategoryFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {
@@ -31,7 +34,6 @@ const styles = (theme) => ({})
       ...restValues
     } = values
     const { dispatch, onConfirm } = props
-    console.log('submit', restValues)
     dispatch({
       type: 'settingTreatment/upsert',
       payload: {
@@ -54,8 +56,10 @@ const styles = (theme) => ({})
 class Detail extends PureComponent {
   render () {
     const { props } = this
-    let { classes, theme, footer, values } = props
+    let { classes, theme, footer, values, codetable } = props
+    const { ctchartmethod } = codetable
     // console.log('detail', props)
+    const row = ctchartmethod.find((o) => o.id === values.chartMethodFK)
     return (
       <React.Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -98,7 +102,7 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
-            <GridItem xs={1}>
+            {/* <GridItem xs={1}>
               <div
                 render={(row) => {
                   const { chartMethod } = row
@@ -110,15 +114,28 @@ class Detail extends PureComponent {
                   return ''
                 }}
               />
-            </GridItem>
-            <GridItem xs={5}>
+            </GridItem> */}
+            <GridItem xs={6}>
               <FastField
                 name='chartMethodFK'
                 render={(args) => {
                   return (
                     <CodeSelect
                       label='Chart Method'
-                      code='CTChartMethod'
+                      code='ctchartmethod'
+                      prefix={row ? <Legend row={row} viewOnly /> : null}
+                      labelField='displayValue'
+                      renderDropdown={(option) => {
+                        const { displayValue } = option
+                        return (
+                          <p style={{ lineHeight: '24px' }}>
+                            <Legend row={option} viewOnly />
+                            <span style={{ marginLeft: theme.spacing(1) }}>
+                              {displayValue}
+                            </span>
+                          </p>
+                        )
+                      }}
                       {...args}
                     />
                   )
@@ -157,14 +174,7 @@ class Detail extends PureComponent {
               <FastField
                 name='costPrice'
                 render={(args) => {
-                  return (
-                    <TextField
-                      label='Cost'
-                      type='number'
-                      prefix='$'
-                      {...args}
-                    />
-                  )
+                  return <NumberInput currency label='Cost' {...args} />
                 }}
               />
             </GridItem>
@@ -173,10 +183,9 @@ class Detail extends PureComponent {
                 name='sellingPrice'
                 render={(args) => {
                   return (
-                    <TextField
+                    <NumberInput
+                      currency
                       label='Selling Price/Unit'
-                      type='number'
-                      prefix='$'
                       {...args}
                     />
                   )

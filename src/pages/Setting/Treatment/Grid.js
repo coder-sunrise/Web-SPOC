@@ -6,6 +6,7 @@ import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import * as service from './services'
+import Legend from '@/pages/Development/DentalChart/Setup/Legend'
 
 class Grid extends PureComponent {
   configs = {
@@ -37,20 +38,25 @@ class Grid extends PureComponent {
         render: (row) => {
           const { chartMethod } = row
           if (chartMethod) {
-            return chartMethod.displayValue
+            return (
+              <div style={{ lineHeight: '26px' }}>
+                <Legend row={chartMethod} viewOnly />
+                <span style={{ marginLeft: 8 }}>
+                  {chartMethod.displayValue}
+                </span>
+              </div>
+            )
           }
           return ''
         },
       },
       {
         columnName: 'costPrice',
-        type: 'number',
+        type: 'currency',
       },
       {
         columnName: 'sellingPrice',
-        type: 'number',
-        currency: true,
-        width: 150,
+        type: 'currency',
       },
       {
         columnName: 'treatmentCategoryDisplayValue',

@@ -257,10 +257,10 @@ const Setup = (props) => {
   )
 }
 export default withFormikExtend({
-  mapPropsToValues: ({ dentalChartSetup }) => {
+  mapPropsToValues: ({ codetable }) => {
     return {
       // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
-      rows: dentalChartSetup.list, // || buttonConfigs,
+      rows: codetable.ctchartmethod, // || buttonConfigs,
     }
   },
 
@@ -271,7 +271,7 @@ export default withFormikExtend({
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
     const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
-    const { list } = dentalChartSetup
+    const { ctchartmethod } = codetable
     // const list = [] // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
     // dispatch({
     //   type: 'dentalChartSetup/updateState',
@@ -280,46 +280,51 @@ export default withFormikExtend({
     //   },
     // })
 
-    let diffs = difference(values.rows, list)
-    console.log(list, values.rows, diffs)
-    console.log(diffs)
-    // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
-    const updated = values.rows
-      .map((o, i) => {
-        console.log(o, i)
-        if (o) {
-          return {
-            ...o,
-            sortOrder: i,
+    let diffs = difference(
+      values.rows.map(({ rowIndex, ...o }) => o),
+      ctchartmethod,
+    )
+    console.log(ctchartmethod, values.rows, diffs)
+    if (diffs.length !== 0) {
+      // console.log(diffs)
+      // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
+      const updated = values.rows
+        .map((o, i) => {
+          if (o) {
+            return {
+              ...o,
+              sortOrder: i,
+            }
           }
+        })
+        .filter((o, i) => diffs[i] && Object.values(diffs[i]).length)
+      dispatch({
+        type: 'dentalChartSetup/post',
+        payload: updated,
+      }).then((o) => {
+        // console.log(o)
+        if (o) {
+          notification.success({
+            message: 'Setting updated',
+          })
+          // dispatch({
+          //   type: 'dentalChartSetup/query',
+          //   payload: {
+          //     pagesize: 99999,
+          //   },
+          // })
         }
       })
-      .filter((o, i) => !diffs[i] || Object.values(diffs[i]).length)
-    dispatch({
-      type: 'dentalChartSetup/post',
-      payload: updated,
-    }).then((o) => {
-      console.log(o)
-      if (o) {
-        notification.success({
-          message: 'Setting updated',
-        })
-        dispatch({
-          type: 'dentalChartSetup/query',
-          payload: {
-            pagesize: 99999,
-          },
-        })
-      }
-    })
-    // localStorage.setItem(
-    //   'dentalChartSetup',
-    //   JSON.stringify(
-    //     values.rows
-    //       .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
-    //       .concat(diffs.filter((d) => !!d)),
-    //   ),
-    // )
+      // localStorage.setItem(
+      //   'dentalChartSetup',
+      //   JSON.stringify(
+      //     values.rows
+      //       .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
+      //       .concat(diffs.filter((d) => !!d)),
+      //   ),
+      // )
+    }
+
     if (onConfirm) onConfirm()
   },
 

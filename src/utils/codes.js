@@ -1164,6 +1164,12 @@ const tenantCodesMap = new Map([
       ...defaultParams,
     },
   ],
+  [
+    'ctchartmethod',
+    {
+      ...defaultParams,
+    },
+  ],
 ])
 
 // always get latest codetable

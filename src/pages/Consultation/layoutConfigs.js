@@ -82,7 +82,7 @@ export const dentalLayoutCfg = [
     },
   },
   {
-    id: '8',
+    id: '5',
     config: {
       lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
       md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
@@ -92,13 +92,23 @@ export const dentalLayoutCfg = [
     },
   },
   {
-    id: '5',
+    id: '21',
     config: {
-      lg: { x: 0, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
+      lg: { x: 0, y: 6, w: 12, h: 6, minH: 3, minW: 4 },
+      md: { x: 5, y: 6, w: 10, h: 6, minH: 3, minW: 3 },
+      sm: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+      xs: { x: 0, y: 12, w: 8, h: 6, minH: 3, minW: 4 },
+      xxs: { x: 0, y: 12, w: 4, h: 6, minH: 3, minW: 2 },
+    },
+  },
+  {
+    id: '8',
+    config: {
+      lg: { x: 0, y: 12, w: 12, h: 3, minH: 3, minW: 4 },
+      md: { x: 5, y: 12, w: 10, h: 3, minH: 3, minW: 3 },
+      sm: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
+      xs: { x: 0, y: 18, w: 8, h: 3, minH: 3, minW: 4 },
+      xxs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 2 },
     },
   },
 ]

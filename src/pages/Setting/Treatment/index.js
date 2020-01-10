@@ -14,12 +14,23 @@ const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
-@connect(({ settingTreatment }) => ({
+@connect(({ settingTreatment, codetable }) => ({
   settingTreatment,
+  codetable,
 }))
 @withSettingBase({ modelName: 'settingTreatment' })
 class Treatment extends PureComponent {
   state = {}
+
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctchartmethod',
+      },
+    })
+  }
 
   componentDidMount () {
     this.props.dispatch({
