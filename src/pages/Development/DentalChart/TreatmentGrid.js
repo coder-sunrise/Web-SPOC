@@ -75,7 +75,10 @@ const TreatmentGrid = (props) => {
       },
     })
     const treatment = cttreatment.find((o) => o.id === row.treatmentFK) || {}
+    // console.log(treatment)
     const action = list.find((o) => o.id === treatment.chartMethodFK)
+
+    // console.log(action)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {

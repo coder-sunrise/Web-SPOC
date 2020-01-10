@@ -125,7 +125,7 @@ export default withFormikExtend({
         rows: values.rows,
       },
     })
-    localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
+    // localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
     if (onConfirm) onConfirm()
   },
 

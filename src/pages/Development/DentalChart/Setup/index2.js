@@ -28,6 +28,7 @@ import {
   DragableTableGrid,
   withFormikExtend,
   Switch,
+  notification,
 } from '@/components'
 import {
   strokeWidth,
@@ -258,9 +259,8 @@ const Setup = (props) => {
 export default withFormikExtend({
   mapPropsToValues: ({ dentalChartSetup }) => {
     return {
-      rows:
-        JSON.parse(localStorage.getItem('dentalChartSetup')) ||
-        dentalChartSetup.list, // || buttonConfigs,
+      // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+      rows: dentalChartSetup.list, // || buttonConfigs,
     }
   },
 
@@ -272,12 +272,29 @@ export default withFormikExtend({
     // console.log(values)
     const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
     // const { list } = dentalChartSetup
-    const list = JSON.parse(localStorage.getItem('dentalChartSetup')) || []
+    const list = [] // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+    // dispatch({
+    //   type: 'dentalChartSetup/updateState',
+    //   payload: {
+    //     list: values.rows,
+    //   },
+    // })
     dispatch({
-      type: 'dentalChartSetup/updateState',
-      payload: {
-        list: values.rows,
-      },
+      type: 'dentalChartSetup/post',
+      payload: values.rows,
+    }).then((o) => {
+      console.log(o)
+      if (o) {
+        notification.success({
+          message: 'Setting updated',
+        })
+        dispatch({
+          type: 'dentalChartSetup/query',
+          payload: {
+            pagesize: 99999,
+          },
+        })
+      }
     })
     let diffs = difference(list, values.rows)
     console.log(list, values.rows, diffs)
@@ -292,14 +309,14 @@ export default withFormikExtend({
         }
       }
     })
-    localStorage.setItem(
-      'dentalChartSetup',
-      JSON.stringify(
-        values.rows
-          .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
-          .concat(diffs.filter((d) => !!d)),
-      ),
-    )
+    // localStorage.setItem(
+    //   'dentalChartSetup',
+    //   JSON.stringify(
+    //     values.rows
+    //       .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
+    //       .concat(diffs.filter((d) => !!d)),
+    //   ),
+    // )
     if (onConfirm) onConfirm()
   },
 
