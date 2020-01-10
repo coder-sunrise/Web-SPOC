@@ -836,11 +836,6 @@ const _routes = [
             component: './Setting/serviceCenterCategory',
           },
           {
-            path: '/setting/treatmentcategory',
-            name: 'treatmentcategory',
-            component: './Setting/treatmentCategory',
-          },
-          {
             path: '/setting/servicecategory',
             name: 'servicecategory',
             component: './Setting/serviceCategory',
