@@ -13,13 +13,6 @@ import {
   RichEditor,
   TextField,
 } from '@/components'
-import { getUniqueGUID, htmlDecodeByRegExp } from '@/utils/utils'
-
-// "title": "string",
-// "text": "string",
-// "isShared": true,
-// "cannedTextTypeFK": 0,
-// "ownedByUserFK": 0,
 
 const defaultEntity = {
   title: undefined,
@@ -29,21 +22,14 @@ const defaultEntity = {
   ownedByUserFK: undefined,
 }
 
-const Editor = ({
-  values,
-  resetForm,
-  setFieldValue,
-  onCancel,
-  handleSubmit,
-}) => {
-  console.log({ values })
+const Editor = ({ values, resetForm, onCancel, handleSubmit }) => {
   const handleCancelClick = () => {
     resetForm(defaultEntity)
     onCancel()
   }
   const isEdit = values.id !== undefined
   return (
-    <CardContainer hideHeader size='sm'>
+    <CardContainer hideHeader size='sm' style={{ marginBottom: 24 }}>
       <GridContainer alignItems='center'>
         <GridItem md={6}>
           <FastField
@@ -59,17 +45,17 @@ const Editor = ({
         </GridItem>
         <GridItem md={12}>
           <FastField
-            name='_htmlCannedText'
+            name='text'
             render={(args) => (
               <RichEditor
                 strongLabel
                 label='Canned Text'
                 {...args}
-                onBlur={(html, text) => {
-                  const decodedHtml = htmlDecodeByRegExp(html)
-                  setFieldValue('text', text)
-                  setFieldValue('htmlCannedText', decodedHtml)
-                }}
+                // onBlur={(html, text) => {
+                //   const decodedHtml = htmlDecodeByRegExp(html)
+                //   setFieldValue('plainText', text)
+                //   setFieldValue('htmlCannedText', decodedHtml)
+                // }}
               />
             )}
           />
@@ -93,31 +79,32 @@ const Editor = ({
 }
 
 const handleSubmit = async (values, { props, resetForm }) => {
-  const { dispatch, onConfirm } = props
-  const isEdit = values.id !== undefined
-  const result = isEdit ? values : { ...values, id: getUniqueGUID() }
-  console.log({ result })
-  // const response = await dispatch({
-  //   type: 'text/upsert',
-  //   payload: result,
-  // })
+  const { dispatch, onConfirm, cannedTextTypeFK } = props
+  const response = await dispatch({
+    type: 'cannedText/upsert',
+    payload: values,
+  })
 
-  // if (response) {
-  //   if (onConfirm) onConfirm(result)
-  //   resetForm(defaultEntity)
-  // }
+  if (response) {
+    dispatch({
+      type: 'cannedText/query',
+      payload: cannedTextTypeFK,
+    })
+    if (onConfirm) onConfirm(response)
+    resetForm()
+  }
 }
 
-const mapPropsToValues = ({ entity, user }) => {
+const mapPropsToValues = ({ entity, user, cannedTextTypeFK }) => {
   const _entity = _.isEmpty(entity)
-    ? { ...defaultEntity, ownedByUserFK: user.id }
-    : { ...entity, _htmlCannedText: entity.htmlCannedText }
+    ? { ...defaultEntity, ownedByUserFK: user.id, cannedTextTypeFK }
+    : { ...entity }
   return _entity
 }
 
 const ValidationSchema = Yup.object().shape({
   title: Yup.string().required(),
-  _htmlCannedText: Yup.string().required(),
+  text: Yup.string().required(),
 })
 
 export default withFormik({

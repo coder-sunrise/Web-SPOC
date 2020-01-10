@@ -53,6 +53,7 @@ const DragableTableGrid = ({
   columnExtensions,
   onRowDrop,
   handleCommitChanges,
+  height,
   ...restGridProps
 }) => {
   const onSortEnd = ({ newIndex, oldIndex }) => {
@@ -105,12 +106,12 @@ const DragableTableGrid = ({
         <Table.Cell {...restProps}>
           <div className={classes.dragCellContainer}>
             <DragHandle />
-            <Checkbox
+            {/* <Checkbox
               style={{ display: 'inline-block' }}
               simple
               checked={row.isSelected}
               onChange={handleChange}
-            />
+            /> */}
           </div>
         </Table.Cell>
       )

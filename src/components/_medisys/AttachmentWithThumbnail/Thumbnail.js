@@ -261,7 +261,7 @@ const Thumbnail = ({
                   <TextField
                     {...args}
                     size='sm'
-                    label='Remark'
+                    label='Remarks'
                     disabled={isReadOnly}
                   />
                 )}

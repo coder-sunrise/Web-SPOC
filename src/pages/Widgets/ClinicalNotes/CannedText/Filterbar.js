@@ -2,7 +2,12 @@ import React from 'react'
 // formik
 import { FastField, withFormik } from 'formik'
 // common components
-import { Button, GridContainer, GridItem, TextField } from '@/components'
+import {
+  ProgressButton,
+  GridContainer,
+  GridItem,
+  TextField,
+} from '@/components'
 
 const Filterbar = ({ handleSubmit }) => {
   return (
@@ -14,9 +19,9 @@ const Filterbar = ({ handleSubmit }) => {
         />
       </GridItem>
       <GridItem md={4}>
-        <Button color='primary' size='sm' onClick={handleSubmit}>
+        <ProgressButton color='primary' size='sm' onClick={handleSubmit}>
           Search
-        </Button>
+        </ProgressButton>
       </GridItem>
     </GridContainer>
   )

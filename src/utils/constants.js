@@ -262,3 +262,11 @@ export const CANNED_TEXT_TYPE = {
   INTRAORAL: 4,
   EXTRAORAL: 5,
 }
+
+export const CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicianNote',
+  2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+}

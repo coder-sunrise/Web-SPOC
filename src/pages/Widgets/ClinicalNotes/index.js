@@ -15,6 +15,7 @@ import {
   TextField,
 } from '@/components'
 import CannedText from './CannedText'
+import CannedTextButton from './CannedText/CannedTextButton'
 import UploadAttachment from './UploadAttachment'
 import ScribbleNote from '../../Shared/ScribbleNote/ScribbleNote'
 import model from './models'
@@ -145,6 +146,7 @@ class ClinicalNotes extends Component {
         {},
       ),
       fields: fields.map((field) => field.fieldName),
+      cannedTextTypes: fields.map((field) => field.cannedTextTypeFK),
     }
 
     this.props.dispatch({
@@ -155,6 +157,9 @@ class ClinicalNotes extends Component {
     this.props.dispatch({
       type: 'cannedText/updateState',
       payload: cannedTextPayload,
+    })
+    this.props.dispatch({
+      type: 'cannedText/queryAll',
     })
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -395,22 +400,21 @@ class ClinicalNotes extends Component {
     })
   }
 
-  handleAddCannedText = (cannedTexts = []) => {
+  handleAddCannedText = (cannedText) => {
     const { cannedTextRow } = this.state
+
     const { consultation, prefix = 'corDoctorNote[0].' } = this.props
     const { entity } = consultation
-    const contents = cannedTexts
-      .map((item) => item.htmlCannedText)
-      .join('<br />')
+    const { text } = cannedText
+
     const { corDoctorNote = [] } = entity
     const prevData =
       corDoctorNote.length > 0 ? corDoctorNote[0][cannedTextRow.fieldName] : ''
 
-    const value = `${prevData} ${contents}`
-    this.onEditorChange(cannedTextRow.fieldName)(value)
+    const value = `${prevData || ''}${text}`
 
+    this.onEditorChange(cannedTextRow.fieldName)(value)
     this.form.setFieldValue(`${prefix}${cannedTextRow.fieldName}`, value)
-    this.closeCannedText()
   }
 
   insertIntoClinicalNote = (dataUrl) => {
@@ -435,6 +439,12 @@ class ClinicalNotes extends Component {
     this.onEditorChange(scribbleNoteField.fieldName)(value)
 
     this.form.setFieldValue(`${prefix}${scribbleNoteField.fieldName}`, value)
+  }
+
+  handleCannedTextButtonClick = (note) => {
+    this.setState({
+      cannedTextRow: note,
+    })
   }
 
   render () {
@@ -500,7 +510,9 @@ class ClinicalNotes extends Component {
           defaultActive={defaultActive}
           mode='multiple'
           collapses={contents.map((item) => {
-            const onCannedTextClick = () => this.openCannedText(item)
+            const onCannedTextClick = () =>
+              this.handleCannedTextButtonClick(item)
+            const onSettingClick = () => this.openCannedText(item)
             return {
               title: item.fieldTitle,
               content: (
@@ -530,19 +542,12 @@ class ClinicalNotes extends Component {
                             gridItemWidth={this.state.width}
                           />
 
-                          <Button
-                            color='info'
-                            style={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 435,
-                              right: 0,
-                              top: 10,
-                            }}
-                            onClick={onCannedTextClick}
-                          >
-                            Canned Text
-                          </Button>
+                          <CannedTextButton
+                            onSettingClick={onSettingClick}
+                            onCannedTextClick={onCannedTextClick}
+                            cannedTextTypeFK={item.cannedTextTypeFK}
+                            handleSelectCannedText={this.handleAddCannedText}
+                          />
 
                           <RichEditor
                             strongLabel
@@ -601,7 +606,7 @@ class ClinicalNotes extends Component {
           observe='CannedText'
           onClose={this.closeCannedText}
         >
-          <CannedText handleAddCannedText={this.handleAddCannedText} />
+          <CannedText />
         </CommonModal>
 
         <CommonModal
