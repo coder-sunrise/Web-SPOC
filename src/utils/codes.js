@@ -963,7 +963,7 @@ const orderTypes = [
     name: 'Treatment',
     value: '7',
     prop: 'corTreatment',
-    getSubject: (r) => r.treatmentName,
+    getSubject: (r) => r.itemName,
     component: (props) => <Treatment {...props} />,
   },
 ]
