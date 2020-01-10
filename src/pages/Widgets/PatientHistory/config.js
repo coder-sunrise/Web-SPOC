@@ -1,6 +1,5 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
-import { CLINIC_SPECIALIST } from '@/utils/constants'
 
 export const gpWidgets = (props) => [
   {
