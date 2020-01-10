@@ -47,12 +47,15 @@ const Diagnosis = ({
   onChange,
   mode,
   dentalChartComponent,
+  codetable,
   global,
   ...props
 }) => {
-  const { data = [], pedoChart, surfaceLabel } = dentalChartComponent
-  const groups = _.groupBy(data, 'toothIndex')
+  const { data = [], isPedoChart, isSurfaceLabel } = dentalChartComponent
+  const { cttreatment } = codetable
+  const groups = _.groupBy(data, 'toothNo')
   // console.log(groups)
+  // console.log(cttreatment)
   const [
     selected,
     setSelected,
@@ -88,11 +91,7 @@ const Diagnosis = ({
           const items = Object.values(
             _.orderBy(valueGroups, (o) => o[0].timestamp),
           ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
-          // console.log(
-          //   Object.values(_.orderBy(valueGroups, (o) => o[0].timestamp)).map(
-          //     (o) => o[0].id,
-          //   ),
-          // )
+
           const onSortEnd = ({ newIndex, oldIndex }) => {
             if (newIndex === oldIndex) return
             let currentItems = ary.filter((o) => o.id === items[oldIndex])
@@ -134,9 +133,8 @@ const Diagnosis = ({
                 data: [
                   ...data.filter(
                     (o) =>
-                      (o.toothIndex === Number(k) &&
-                        o.id !== items[oldIndex]) ||
-                      o.toothIndex !== Number(k),
+                      (o.toothNo === Number(k) && o.id !== items[oldIndex]) ||
+                      o.toothNo !== Number(k),
                   ),
                   ...currentItems,
                 ],
@@ -157,13 +155,10 @@ const Diagnosis = ({
               }}
             >
               {items.map((j) => {
-                // console.log(j, valueGroups[j])
                 const subAry = valueGroups[j]
                 const v = subAry[0]
-                // console.log(v.info)
                 if (v.action.method !== 3)
                   v.info = subAry.map((o) => o.name).join(',')
-                // console.log(subAry)
                 if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
                   subAry.push({
                     subTarget: 'centerfull',
@@ -197,10 +192,10 @@ const Diagnosis = ({
                     button
                     // selected={selectedIndex === 0}
                     onClick={() => {
-                      console.log(selected, v)
+                      // console.log(selected, v)
                       setSelected(
                         selected &&
-                        v.toothIndex === selected.toothIndex &&
+                        v.toothNo === selected.toothNo &&
                         v.id === selected.id
                           ? undefined
                           : v,
@@ -209,7 +204,7 @@ const Diagnosis = ({
                     index={idx}
                     selected={
                       selected &&
-                      v.toothIndex === selected.toothIndex &&
+                      v.toothNo === selected.toothNo &&
                       v.id === selected.id
                     }
                   >
@@ -253,7 +248,7 @@ const Diagnosis = ({
                                 padding: theme.spacing(0.5, 0, 0.5, 1),
                               }}
                             >
-                              #{v.toothIndex}.&nbsp;
+                              #{v.toothNo}.&nbsp;
                               {moment(v.timestamp).format(dateFormatLong)}{' '}
                               -&nbsp;
                               {action.displayValue}
@@ -266,7 +261,10 @@ const Diagnosis = ({
                               paddingTop: 2,
                             }}
                           >
-                            {v.action.isDisplayInDiagnosis && (
+                            {!cttreatment.find(
+                              (m) => m.chartMethodFK === v.action.id,
+                            ) &&
+                            v.action.isDisplayInDiagnosis && (
                               <Tooltip title='Delete'>
                                 <IconButton
                                   onClick={(e) => {
@@ -307,8 +305,7 @@ const Diagnosis = ({
           rows={3}
           onChange={(v) => {
             const shapes = data.filter(
-              (o) =>
-                o.toothIndex === selected.toothIndex && o.id === selected.id,
+              (o) => o.toothNo === selected.toothNo && o.id === selected.id,
             )
             // console.log(v.target.value, selected.remark)
             if (v.target.value !== selected.remark) {

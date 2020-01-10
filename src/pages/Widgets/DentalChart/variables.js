@@ -480,7 +480,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}left`,
       target: text.left,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
       // opacity: 0.5,
       // left: 0 - groupWidth / 2,
@@ -506,7 +506,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}bottom`,
       target: text.bottom,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 4,
     },
   )
@@ -528,7 +528,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}right`,
       target: text.right,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -550,7 +550,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}top`,
       target: text.top,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -606,7 +606,7 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerLeft,
         name: `${cellPrefix}centerLeft`,
         fill: fill.centerLeft,
@@ -628,7 +628,7 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerRight,
         name: `${cellPrefix}centerRight`,
         fill: fill.centerRight,
@@ -667,7 +667,7 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerfull,
         name: `${cellPrefix}centerfull`,
       },

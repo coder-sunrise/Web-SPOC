@@ -7,7 +7,7 @@ import { dateFormatLong } from '@/components'
 
 const updateData = (data, payload) => {
   const {
-    toothIndex,
+    toothNo,
     id,
     action,
     target,
@@ -22,17 +22,17 @@ const updateData = (data, payload) => {
   // console.log(action)
   const exist = data.find(
     (o) =>
-      o.toothIndex === toothIndex &&
+      o.toothNo === toothNo &&
       o.id === id &&
       target === o.target &&
       o.subTarget === subTarget &&
       o.name === name,
   )
   if (action.code === 'SYS01')
-    return _.reject(data, (o) => o.toothIndex === toothIndex)
+    return _.reject(data, (o) => o.toothNo === toothNo)
 
   if (deleted) {
-    return _.reject(data, (o) => o.toothIndex === toothIndex && o.id === id)
+    return _.reject(data, (o) => o.toothNo === toothNo && o.id === id)
   }
   // if (others.length > 0) {
   //   others.map((o) => (o.hide = true))
@@ -43,7 +43,7 @@ const updateData = (data, payload) => {
     } else if (
       data.find(
         (o) =>
-          o.toothIndex === toothIndex &&
+          o.toothNo === toothNo &&
           o.target === target &&
           o.subTarget === subTarget &&
           o.timestamp > exist.timestamp,
@@ -55,7 +55,7 @@ const updateData = (data, payload) => {
       data = _.reject(
         data,
         (o) =>
-          o.toothIndex === toothIndex &&
+          o.toothNo === toothNo &&
           o.id === id &&
           target === o.target &&
           o.subTarget === subTarget &&
@@ -68,7 +68,7 @@ const updateData = (data, payload) => {
     // data = _.reject(
     //   data,
     //   (o) =>
-    //     o.id !== id && o.toothIndex === toothIndex && target === o.target,
+    //     o.id !== id && o.toothNo === toothNo && target === o.target,
     // )
     data.push({
       remark: '',
@@ -96,12 +96,12 @@ export default createFormViewModel({
       data: [
         // {
         //   id: 'system-id-1',
-        //   toothIndex: 11,
+        //   toothNo: 11,
         //   id: 'topcell',
         // },
         // {
         //   id: 'onlayveneer',
-        //   toothIndex: 17,
+        //   toothNo: 17,
         //   id: 'sys-gen--231',
         // },
       ],
@@ -114,7 +114,7 @@ export default createFormViewModel({
 
         return {
           ...state,
-          data: _.reject(data, (o) => o.toothIndex === payload.toothIndex),
+          data: _.reject(data, (o) => o.toothNo === payload.toothNo),
         }
       },
 
@@ -133,6 +133,14 @@ export default createFormViewModel({
         return {
           ...state,
           data: updateData(_.cloneDeep(state.data), payload),
+        }
+      },
+      deleteTreatment (state, { payload }) {
+        return {
+          ...state,
+          data: state.data.filter(
+            (o) => o.action && o.action.dentalTreatmentFK !== payload.id,
+          ),
         }
       },
     },

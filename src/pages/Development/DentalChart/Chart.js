@@ -591,7 +591,7 @@ class Chart extends React.Component {
     canvas.hoverCursor = 'default'
 
     this.canvas = canvas
-    const { data = {}, pedoChart } = this.props.dentalChartComponent
+    const { data = {}, isPedoChart } = this.props.dentalChartComponent
     const { dispatch, readOnly } = this.props
     // console.log()
     const groups = _.groupBy(this.configs, 'line')
@@ -602,7 +602,7 @@ class Chart extends React.Component {
           ...o,
           order,
           line: k,
-          values: data.filter((m) => m.toothIndex === o.index),
+          values: data.filter((m) => m.toothNo === o.index),
           ...this.props,
         })
       })
@@ -655,7 +655,7 @@ class Chart extends React.Component {
             {
               ...sharedCfg,
               name: `${cellPrefix}outsidetop`,
-              toothIndex: index,
+              toothNo: index,
             },
           )
           p.add(
@@ -734,7 +734,7 @@ class Chart extends React.Component {
             {
               ...sharedCfg,
               name: `${cellPrefix}outsidebottom`,
-              toothIndex: index,
+              toothNo: index,
             },
           )
           p.add(
@@ -870,7 +870,7 @@ class Chart extends React.Component {
                       {
                         // ...sharedCfg,
                         name: `bridgeStartPoint`,
-                        // toothIndex: index,
+                        // toothNo: index,
                       },
                     ),
                   )
@@ -989,7 +989,7 @@ class Chart extends React.Component {
           selected.filter((o) => o._objects).map((g) => {
             // console.log(g)
             cells = cells.concat(
-              g._objects.filter((m) => m.toothIndex).map((item) => ({
+              g._objects.filter((m) => m.toothNo).map((item) => ({
                 group: g,
                 item,
                 select: true,
@@ -1017,7 +1017,11 @@ class Chart extends React.Component {
       !_.isEqual(dentalChartComponent, this.props.dentalChartComponent)
     ) {
       // this.unbindCanvas(this.props)
-      this.renderCanvas(nextProps)
+      this.renderCanvas(
+        nextProps,
+        dentalChartComponent.isPedoChart !==
+          this.props.dentalChartComponent.isPedoChart,
+      )
     }
     this.resize(nextProps)
   }
@@ -1035,11 +1039,11 @@ class Chart extends React.Component {
 
     if (
       width !== this.state.width ||
-      dentalChartComponent.pedoChart !== this.state.pedoChart
+      dentalChartComponent.isPedoChart !== this.state.isPedoChart
     ) {
       this.setState({
         width,
-        pedoChart: dentalChartComponent.pedoChart,
+        isPedoChart: dentalChartComponent.isPedoChart,
       })
       this.canvas.setDimensions(this.getCanvasSize(props))
       this.canvas.setZoom(width / 2200)
@@ -1047,13 +1051,13 @@ class Chart extends React.Component {
   }
 
   getCanvasSize = (props) => {
-    const { pedoChart } = (props || this.props).dentalChartComponent
+    const { isPedoChart } = (props || this.props).dentalChartComponent
 
     const width = this.divContainer.current.offsetWidth // - 4
-    // console.log(pedoChart, width)
+    // console.log(isPedoChart, width)
     return {
       width,
-      height: pedoChart ? Math.floor(width / 2.3) : Math.floor(width / 3.3),
+      height: isPedoChart ? Math.floor(width / 2.3) : Math.floor(width / 3.3),
     }
   }
 
@@ -1093,17 +1097,24 @@ class Chart extends React.Component {
 
   renderCanvas = (props) => {
     const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
-    const { action = {}, data, pedoChart, surfaceLabel } = dentalChartComponent
+    const {
+      action = {},
+      data,
+      isPedoChart,
+      isSurfaceLabel,
+    } = dentalChartComponent
     // const { list = [] } = dentalChartSetup
     // const { icon, type, hoverColor: hc, onSelect, clear } = action
 
-    if (action.chartMethodTypeFK === 3) {
+    if (action.chartMethodTypeFK === 3 || !action) {
       selectedTooth = []
-
       this.canvas._objects
-        .filter((o) => o.name === 'bridgeLine')
-        .map((o) => this.canvas.remove(o))
+        .filter((d) => d.name && d.name.indexOf('bridgeLine') === 0)
+        .map((d) => {
+          this.canvas.remove(d)
+        })
     }
+
     this.canvas.getObjects('group').filter((n) => n.index > 0).map((group) => {
       // console.log(group)
       const { index } = group
@@ -1113,11 +1124,11 @@ class Chart extends React.Component {
           (m) => m.name === `header_${index}`,
         )
         if (header) {
-          header.set('opacity', pedoChart ? 1 : 0)
+          header.set('opacity', isPedoChart ? 1 : 0)
           // header.set('top', group.translateY + 50)
         }
       }
-      if (!pedoChart && index >= 50) {
+      if (!isPedoChart && index >= 50) {
         group.set('opacity', 0)
 
         return false
@@ -1126,7 +1137,7 @@ class Chart extends React.Component {
       group.set('opacity', 1)
 
       if (index > 30 && index < 50) {
-        if (!pedoChart) {
+        if (!isPedoChart) {
           group.set('top', baseHeight * 8)
         } else {
           group.set('top', baseHeight * 16)
@@ -1140,7 +1151,7 @@ class Chart extends React.Component {
         // console.log(o)
         o._objects[0].set('fill', 'transparent')
         if (o._objects[1])
-          if (surfaceLabel) {
+          if (isSurfaceLabel) {
             o._objects[1].set('opacity', 1)
           } else {
             o._objects[1].set('opacity', 0)
@@ -1149,7 +1160,7 @@ class Chart extends React.Component {
       })
 
       const toothItems = data.filter(
-        (m) => m.toothIndex === index && m.target === group.name, // && !m.hide,
+        (m) => m.toothNo === index && m.target === group.name, // && !m.hide,
       )
       _.orderBy(
         toothItems,
@@ -1244,7 +1255,7 @@ class Chart extends React.Component {
                   })
                 : createTriangle({
                     fill: target.chartMethodColorBlock,
-                  }),
+                  }).rotate(isUpperSection(index) ? 0 : 180),
               createFont({
                 text: target.chartMethodText || '',
                 left: groupWidth / 2 - innerFontSize / 1.8,
@@ -1303,7 +1314,7 @@ class Chart extends React.Component {
               // console.log(n)
               // group.remove(n)
             })
-            // toothIndex: index,
+            // toothNo: index,
             // target: text[4],
             // name: `${cellPrefix}centerLeft`,
           } else if (
@@ -1313,7 +1324,9 @@ class Chart extends React.Component {
             o.nodes
           ) {
             // if (target) console.log(3, target, data, o)
-            if (o.toothIndex === o.nodes[0]) {
+            if (o.toothNo === o.nodes[0]) {
+              const name = `bridgeLine${o.nodes[0]}-${o.nodes[1]}`
+
               setTimeout(() => {
                 const start = this.canvas._objects.find(
                   (m) => Number(m.name) === o.nodes[0],
@@ -1341,7 +1354,7 @@ class Chart extends React.Component {
                       // createCircle(),
                     ],
                     {
-                      name: `bridgeLine`,
+                      name,
                     },
                   ),
                 )
@@ -1360,7 +1373,7 @@ class Chart extends React.Component {
       // const cfg = {
       //   ...props,
       //   values: props.dentalChartComponent.data.filter(
-      //     (m) => m.toothIndex === Number(group.name),
+      //     (m) => m.toothNo === Number(group.name),
       //   ),
       //   canvas: this.canvas,
       //   group,
@@ -1378,7 +1391,7 @@ class Chart extends React.Component {
         // o.set('opacity', 1)
         // console.log(o)
         if (o.index > 30 && o.index < 50) {
-          if (!pedoChart) {
+          if (!isPedoChart) {
             o.set('top', baseHeight * 11 - strokeWidth)
 
             // o.set('top', (o.orgY || o.top) - baseHeight * 9)
@@ -1412,7 +1425,7 @@ class Chart extends React.Component {
         this.props.dispatch({
           type: 'dentalChartComponent/toggleSelect',
           payload: {
-            toothIndex: group.index || item.toothIndex,
+            toothNo: group.index || item.toothNo,
             id: action.id,
             action,
             target: group.name,
@@ -1445,7 +1458,7 @@ class Chart extends React.Component {
             // console.log(group, group.name)
 
             return {
-              toothIndex: group.index || item.toothIndex,
+              toothNo: group.index || item.toothNo,
               id: action.id,
               action,
               target: group.name,
@@ -1527,7 +1540,7 @@ class Chart extends React.Component {
       dispatch,
       ...props
     } = this.props
-    const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
+    const { data = {}, isPedoChart, isSurfaceLabel } = dentalChartComponent
     // if (this.divContainer.current) {
     //   console.log(this.divContainer.current.offsetWidth)
     // }

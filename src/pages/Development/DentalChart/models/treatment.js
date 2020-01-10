@@ -48,7 +48,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: newRow,
+          // entity: newRow,
           // totalAfterAdj: undefined,
         }
       },

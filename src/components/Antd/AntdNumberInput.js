@@ -559,11 +559,12 @@ class AntdNumberInput extends React.PureComponent {
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, min } = nextProps
     const { convertedPrecision: precision } = this.state
-
     if (field) {
       this.setState({
         value:
-          field.value === undefined || Number.isNaN(Number(field.value))
+          field.value === undefined ||
+          Number.isNaN(Number(field.value)) ||
+          field.value === ''
             ? ''
             : roundTo(Number(field.value), precision),
         // focused:
@@ -575,7 +576,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (value || value === 0) {
       this.setState({
         value:
-          value === undefined || Number.isNaN(Number(value))
+          value === undefined || Number.isNaN(Number(value)) || value === ''
             ? ''
             : roundTo(Number(value), precision),
         // focused:
@@ -599,7 +600,7 @@ class AntdNumberInput extends React.PureComponent {
       shrink:
         !(!this.state.value && this.state.value !== 0) || this.state.focused,
     }
-
+    // console.log(this.state.value)
     return (
       <CustomInput
         labelProps={labelProps}

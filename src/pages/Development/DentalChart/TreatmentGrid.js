@@ -75,10 +75,10 @@ const TreatmentGrid = (props) => {
       },
     })
     const treatment = cttreatment.find((o) => o.id === row.treatmentFK) || {}
-    // console.log(treatment)
+    console.log(treatment)
     const action = ctchartmethod.find((o) => o.id === treatment.chartMethodFK)
 
-    // console.log(action)
+    console.log(action)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -94,7 +94,7 @@ const TreatmentGrid = (props) => {
       labelField: 'displayValue',
     },
     {
-      columnName: 'unit',
+      columnName: 'quantity',
       type: 'number',
     },
     {
@@ -102,7 +102,7 @@ const TreatmentGrid = (props) => {
       type: 'currency',
     },
     {
-      columnName: 'finalAmount',
+      columnName: 'totalAfterItemAdjustment',
       type: 'currency',
     },
     {
@@ -137,6 +137,12 @@ const TreatmentGrid = (props) => {
                     id: row.id,
                   },
                 })
+                dispatch({
+                  type: 'dentalChartComponent/deleteTreatment',
+                  payload: {
+                    id: row.treatmentFK,
+                  },
+                })
               }}
             >
               <Tooltip title='Delete'>
@@ -162,11 +168,11 @@ const TreatmentGrid = (props) => {
 
       { name: 'toothInfo', title: 'Tooth' },
 
-      { name: 'details', title: 'Details' },
-      { name: 'unit', title: 'Unit' },
+      { name: 'itemsNotes', title: 'Details' },
+      { name: 'quantity', title: 'Unit' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'adjAmount', title: 'Discount' },
-      { name: 'finalAmount', title: 'Sub Total' },
+      { name: 'totalAfterItemAdjustment', title: 'Sub Total' },
       { name: 'actions', title: 'Actions' },
     ],
     columnExtensions,

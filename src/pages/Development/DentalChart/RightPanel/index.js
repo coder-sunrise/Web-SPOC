@@ -43,7 +43,7 @@ const RightPanel = (props) => {
     height,
     ...restProps
   } = props
-  const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
+  const { data = {}, isPedoChart, isSurfaceLabel } = dentalChartComponent
   const [
     openHistory,
     setOpenHistory,
@@ -55,13 +55,13 @@ const RightPanel = (props) => {
           <GridItem xs={5}>
             <Checkbox
               label='Pedo Chart'
-              checked={pedoChart}
+              checked={isPedoChart}
               style={{ marginLeft: 8 }}
               onChange={(v) => {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
                   payload: {
-                    pedoChart: v.target.value,
+                    isPedoChart: v.target.value,
                   },
                 })
               }}
@@ -70,12 +70,12 @@ const RightPanel = (props) => {
           <GridItem xs={6}>
             <Checkbox
               label='Surface Label'
-              checked={surfaceLabel}
+              checked={isSurfaceLabel}
               onChange={(v) => {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
                   payload: {
-                    surfaceLabel: v.target.value,
+                    isSurfaceLabel: v.target.value,
                   },
                 })
               }}
