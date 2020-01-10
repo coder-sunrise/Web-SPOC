@@ -50,9 +50,9 @@ import model from './models'
 import modelSetup from './models/setup'
 import modelTreatment from './models/treatment'
 
-// window.g_app.replaceModel(model)
-// window.g_app.replaceModel(modelSetup)
-// window.g_app.replaceModel(modelTreatment)
+window.g_app.replaceModel(model)
+window.g_app.replaceModel(modelSetup)
+window.g_app.replaceModel(modelTreatment)
 
 const styles = (theme) => ({
   paper: {
