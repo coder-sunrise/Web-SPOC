@@ -166,7 +166,7 @@ export const getInvoiceItemsWithClaimAmount = (
   const { coverageMaxCap, patientMinCoPaymentAmount = 0 } = schemeConfig
 
   const totalInvoiceAmount = originalInvoiceItems
-    .map((item) => item.totalAfterGst)
+    .map((item) => item.totalAfterGst - (item._claimedAmount || 0))
     .reduce(sumAll, 0)
 
   const totalClaimableAmount =
@@ -197,13 +197,18 @@ export const getInvoiceItemsWithClaimAmount = (
       (total, i) => total + i.claimAmount,
       0,
     )
+
     const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
+    const remainingClaimableAmount =
+      totalClaimableAmount - pastItemClaimedAmount <= 0
+        ? 0
+        : totalClaimableAmount - pastItemClaimedAmount
 
     const _claimAmount = getApplicableClaimAmount(
       item,
       schemeConfig,
       remainingCoverageMaxCap,
-      totalClaimableAmount - pastItemClaimedAmount,
+      remainingClaimableAmount,
     )
 
     if (existedItem)
@@ -363,7 +368,10 @@ export const validateClaimAmount = (schemeRow) => {
   )
 
   const totalPayable = invoicePayerItem.reduce(calculateTotalPaybable, 0)
-  const patientDistributedAmount = totalPayable - totalClaimAmount
+  const patientDistributedAmount =
+    totalClaimAmount > 0
+      ? totalPayable - totalClaimAmount
+      : patientMinCoPaymentAmount
 
   if (patientMinCoPaymentAmount > 0) {
     const amount =
