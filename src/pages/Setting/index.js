@@ -223,6 +223,7 @@ const Authority = {
   'Master Setting': 'settings.mastersetting',
   'Clinic Setting': 'settings.clinicsetting',
   'Print Setup': 'settings.printsetup',
+  'System User': 'settings.systemuser',
   'User Preference': 'settings.userpreference',
   Templates: 'settings.template',
   Contact: 'settings.contact',
@@ -237,7 +238,7 @@ class SystemSetting extends PureComponent {
   constructor (props) {
     super(props)
     this.group = _.groupBy(menuData, 'title')
-    console.log({ group: this.group })
+
     // console.log(menuData, group, Object.keys(group))
     const { classes, theme } = props
   }
