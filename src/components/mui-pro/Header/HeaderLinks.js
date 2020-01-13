@@ -22,6 +22,8 @@ import Avatar from '@material-ui/core/Avatar'
 import Typography from '@material-ui/core/Typography'
 import ListItemText from '@material-ui/core/ListItemText'
 
+import moment from 'moment'
+
 // @material-ui/icons
 import Person from '@material-ui/icons/Person'
 import Notifications from '@material-ui/icons/Notifications'
@@ -153,25 +155,27 @@ class HeaderLinks extends React.Component {
         return result
       }
 
-      const getTimeAgo = (timestamp) => {
-        let resultInterval
-        let interval = (new Date().getTime() - timestamp) / 1000
-        for (let key in timeInterval()) {
-          resultInterval = { scale: key, interval: timeInterval()[key] }
-          if (
-            interval >= timeInterval()[key].lower &&
-            interval < timeInterval()[key].upper
-          )
-            break
-        }
-        const result = parseInt(interval / resultInterval.interval.lower, 10)
-        return result
-          .toString()
-          .concat(' ')
-          .concat(resultInterval.scale)
-          .concat(result > 1 ? 's ' : ' ')
-          .concat('ago')
-      }
+      // const getTimeAgo = (timestamp) => {
+      //   console.log(timeInterval())
+      //   let resultInterval
+      //   let interval = (new Date().getTime() - timestamp) / 1000
+      //   for (let key in timeInterval()) {
+      //     resultInterval = { scale: key, interval: timeInterval()[key] }
+      //     if (
+      //       interval >= timeInterval()[key].lower &&
+      //       interval < timeInterval()[key].upper
+      //     )
+      //       break
+      //   }
+      //   console.log(resultInterval)
+      //   const result = parseInt(interval / resultInterval.interval.lower, 10)
+      //   return result
+      //     .toString()
+      //     .concat(' ')
+      //     .concat(resultInterval.scale)
+      //     .concat(result > 1 ? 's ' : ' ')
+      //     .concat('ago')
+      // }
 
       const NotificationContent = () => {
         if (notifications.length > 0) {
@@ -203,7 +207,7 @@ class HeaderLinks extends React.Component {
                             <div style={{ display: 'flex' }}>
                               <b>{n.sender}</b>
                               <p style={{ marginLeft: 15 }}>
-                                {getTimeAgo(n.timestamp)}
+                                {moment(n.timestamp).toNow(true).concat(' ago')}
                               </p>
                             </div>
                           }
