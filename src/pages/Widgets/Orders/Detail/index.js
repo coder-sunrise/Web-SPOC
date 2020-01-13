@@ -197,11 +197,11 @@ class Details extends PureComponent {
       )
     }
 
-    if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
-      orderTypeArray = orderTypes.filter(
-        (o) => o.value === '1' || o.value === '4',
-      )
-    }
+    // if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
+    //   orderTypeArray = orderTypes.filter(
+    //     (o) => o.value === '1' || o.value === '4',
+    //   )
+    // }
 
     return (
       <div>

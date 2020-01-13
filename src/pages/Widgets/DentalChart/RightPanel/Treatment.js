@@ -63,30 +63,26 @@ const Treatment = ({
   ] = useState([])
   // console.log(codetable)
   useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: { code: 'cttreatment' },
-    }).then((rows) => {
-      // console.log(list)
-      const treeItems = Object.values(
-        _.groupBy(
-          rows.filter((o) => !o.isDisplayInDiagnosis),
-          'treatmentCategoryFK',
-        ),
-      ).map((o) => {
-        return {
-          id: getUniqueId(),
-          text: o[0].treatmentCategory.displayValue,
-          subItems: o.map((m) => ({
-            id: m.id,
-            text: m.displayValue,
-            chartMethodFK: m.chartMethodFK,
-          })),
-        }
-      })
-
-      setTreatments(treeItems)
+    const { cttreatment } = codetable
+    // console.log(list)
+    const treeItems = Object.values(
+      _.groupBy(
+        cttreatment.filter((o) => !o.isDisplayInDiagnosis),
+        'treatmentCategoryFK',
+      ),
+    ).map((o) => {
+      return {
+        id: getUniqueId(),
+        text: o[0].treatmentCategory.displayValue,
+        subItems: o.map((m) => ({
+          id: m.id,
+          text: m.displayValue,
+          chartMethodFK: m.chartMethodFK,
+        })),
+      }
     })
+
+    setTreatments(treeItems)
   }, [])
 
   // console.log(treeItems)

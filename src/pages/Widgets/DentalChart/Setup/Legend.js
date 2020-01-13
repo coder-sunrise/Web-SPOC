@@ -22,8 +22,36 @@ import { groupWidth, groupHeight } from '../variables'
 import Tooth from '../Tooth'
 
 const symbols = [
+  { name: 'x', value: 'x' },
+  { name: '#', value: '#' },
+  { name: '~', value: '~' },
+  { name: '+', value: '+' },
+  { name: '|', value: '|' },
+  { name: 'O', value: 'O' },
+  { name: 'P', value: 'P' },
+  { name: 'U', value: 'U' },
+  { name: 'W', value: 'W' },
+  { name: 'A', value: 'A' },
+  { name: 'B', value: 'B' },
+  { name: 'C', value: 'C' },
+  { name: 'Q', value: 'Q' },
+  { name: 'E', value: 'E' },
   { name: '$', value: '$' },
   { name: '%', value: '%' },
+  { name: '&', value: '&' },
+  { name: '/', value: '/' },
+  { name: '—', value: '—' },
+  { name: '⤾', value: '⤾' },
+  { name: '⤿', value: '⤿' },
+  { name: '⤸', value: '⤸' },
+  { name: '⤺', value: '⤺' },
+  { name: '⤻', value: '⤻' },
+  { name: '←', value: '←' },
+  { name: '→', value: '→' },
+  { name: '↑', value: '↑' },
+  { name: '↓', value: '↓' },
+  { name: '↖', value: '↖' },
+  { name: '↗', value: '↗' },
 ]
 
 const styles = (theme) => ({

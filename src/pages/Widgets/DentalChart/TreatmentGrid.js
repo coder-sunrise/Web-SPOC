@@ -48,6 +48,7 @@ const TreatmentGrid = (props) => {
     height,
     dentalChartSetup,
     dentalChartTreatment,
+    orders,
     codetable,
     values,
     setFieldValue,
@@ -75,10 +76,10 @@ const TreatmentGrid = (props) => {
       },
     })
     const treatment = cttreatment.find((o) => o.id === row.treatmentFK) || {}
-    console.log(treatment)
+    // console.log(treatment)
     const action = ctchartmethod.find((o) => o.id === treatment.chartMethodFK)
 
-    console.log(action)
+    // console.log(action)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -131,12 +132,19 @@ const TreatmentGrid = (props) => {
             </Tooltip>
             <Popconfirm
               onConfirm={() => {
+                // dispatch({
+                //   type: 'dentalChartTreatment/deleteRow',
+                //   payload: {
+                //     id: row.id,
+                //   },
+                // })
                 dispatch({
-                  type: 'dentalChartTreatment/deleteRow',
+                  type: 'orders/deleteRow',
                   payload: {
-                    id: row.id,
+                    uid: row.uid,
                   },
                 })
+                console.log(row)
                 dispatch({
                   type: 'dentalChartComponent/deleteTreatment',
                   payload: {
@@ -161,7 +169,7 @@ const TreatmentGrid = (props) => {
   // }
   const tableProps = {
     size: 'sm',
-    rows: dentalChartTreatment.rows.filter((o) => !o.isDeleted),
+    rows: orders.rows.filter((o) => !o.isDeleted && o.type === '7'),
     columns: [
       // { name: 'code', title: 'Code' },
       { name: 'treatmentFK', title: 'Treatment' },

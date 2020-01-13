@@ -6,6 +6,7 @@ import { isNumber } from 'util'
 import * as Yup from 'yup'
 
 import _ from 'lodash'
+import { orderTypes } from '@/utils/codes'
 
 // common component
 import {
@@ -40,6 +41,7 @@ import TreatmentGrid from './TreatmentGrid'
     dentalChartTreatment,
     dentalChartComponent,
     codetable,
+    orders,
     ...rest
   }) => {
     const { data = [], action = {} } = dentalChartComponent
@@ -47,19 +49,19 @@ import TreatmentGrid from './TreatmentGrid'
     // console.log(action, data, rows)
     // console.log(rest, this)
     const dataFiltered = data.filter(
-      (o) =>
-        o.id === action.id &&
-        (!rows.find((m) =>
-          m.groups.find((k) =>
-            k.items.find(
-              (j) => j.action.id === o.id && j.toothNo === o.toothNo,
-            ),
-          ),
-        ) ||
-          (entity.chartMethodFK === action.id &&
-            entity.groups.find((k) =>
-              k.items.find((j) => j.toothNo === o.toothNo),
-            ))),
+      (o) => o.id === action.id,
+      // &&
+      // (!rows.find((m) =>
+      //   m.groups.find((k) =>
+      //     k.items.find(
+      //       (j) => j.action.id === o.id && j.toothNo === o.toothNo,
+      //     ),
+      //   ),
+      // ) ||
+      //   (entity.chartMethodFK === action.id &&
+      //     entity.groups.find((k) =>
+      //       k.items.find((j) => j.toothNo === o.toothNo),
+      //     ))),
     )
     // console.log(dataFiltered)
     let treatment = {}
@@ -71,14 +73,14 @@ import TreatmentGrid from './TreatmentGrid'
     let groupsAry = []
     let quantity
     if (treatment.id) {
-      let groups = _.groupBy(dataFiltered, 'toothNo')
-      groupsAry = Object.keys(groups).map((k) => {
+      let gs = _.groupBy(dataFiltered, 'toothNo')
+      groupsAry = Object.keys(gs).map((k) => {
         return {
-          text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
+          text: `#${k}(${gs[k].map((o) => o.name).join(',')})`.replace(
             '(tooth)',
             '',
           ),
-          items: groups[k],
+          items: gs[k],
         }
       })
       // console.log(groupsAry)
@@ -121,23 +123,44 @@ import TreatmentGrid from './TreatmentGrid'
       adjAmount: Math.abs(final.adjAmount),
       totalAfterItemAdjustment: final.amount,
       quantity,
-      groups: groupsAry,
+      // groups: groupsAry,
       toothInfo: groupsAry.map((o) => o.text).join(','),
     }
   },
   validationSchema: Yup.object().shape({
-    quantity: Yup.number().required(),
+    quantity: Yup.number()
+      .min(1, 'Need apply at least one treatment')
+      .required(),
     unitPrice: Yup.number().required(),
     treatmentFK: Yup.number().required(),
   }),
   handleSubmit: async (values, { props }) => {
-    const { dispatch } = props
+    const { dispatch, orders } = props
     dispatch({
       type: 'dentalChartTreatment/upsertRow',
       payload: {
         ...values,
       },
     })
+
+    const { rows = [] } = orders
+    const treatment = orderTypes.find((o) => o.value === '7')
+    const data = {
+      type: '7',
+      sequence:
+        _.maxBy(rows.filter((o) => !o.isDeleted), 'sequence').sequence + 1 || 0,
+      ...values,
+      subject: treatment.getSubject(values),
+      isDeleted: false,
+      totalPrice: values.unitPrice,
+      totalAfterItemAdjustment: values.totalAfterItemAdjustment,
+    }
+    console.log(data)
+    dispatch({
+      type: 'orders/upsertRow',
+      payload: data,
+    })
+
     dispatch({
       type: 'dentalChartTreatment/updateState',
       payload: {
@@ -271,7 +294,7 @@ class TreatmentForm extends Component {
               {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
               <p>
                 {/* Tooth No.{' '} */}
-                {values.groups.map((o) => {
+                {(values.groups || []).map((o) => {
                   return (
                     <Chip
                       // icon={<FaceIcon />}
@@ -440,7 +463,7 @@ class TreatmentForm extends Component {
               Discard
             </Button>
             <ProgressButton color='primary' onClick={this.props.handleSubmit}>
-              {values.id ? 'Update' : 'Add'}
+              {values.uid ? 'Update' : 'Add'}
             </ProgressButton>
           </p>
         </Paper>

@@ -120,12 +120,14 @@ const groupHeight = baseHeight * 3 // + strokeWidth
     dentalChartComponent,
     dentalChartSetup,
     dentalChartTreatment,
+    orders,
     codetable,
     global,
   }) => ({
     dentalChartComponent,
     dentalChartSetup,
     dentalChartTreatment,
+    orders,
     codetable,
     global,
   }),
@@ -135,7 +137,11 @@ class DentalChart extends React.Component {
     super(props)
     this.props.dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'ctchartmethod', force: true },
+      payload: { code: 'ctchartmethod' },
+    })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'cttreatment' },
     })
   }
 

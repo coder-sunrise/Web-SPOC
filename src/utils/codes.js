@@ -962,7 +962,7 @@ const orderTypes = [
   {
     name: 'Treatment',
     value: '7',
-    prop: 'corTreatment',
+    prop: 'corDentalTreatments',
     getSubject: (r) => r.itemName,
     component: (props) => <Treatment {...props} />,
   },
