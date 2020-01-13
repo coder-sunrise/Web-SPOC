@@ -241,12 +241,16 @@ export default createFormViewModel({
       },
       *editOrder ({ payload }, { call, put, take }) {
         const response = yield call(service.editOrder, payload.id)
+        const { queueID } = payload
+
         if (response) {
-          yield put({
-            type: 'visitRegistration/query',
-            payload: { id: payload.id, version: Date.now() },
-          })
-          yield take('visitRegistration/query/@@end')
+          if (queueID) {
+            yield put({
+              type: 'visitRegistration/query',
+              payload: { id: queueID, version: Date.now() },
+            })
+            yield take('visitRegistration/query/@@end')
+          }
 
           yield put({
             type: 'updateState',

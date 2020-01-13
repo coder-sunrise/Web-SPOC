@@ -194,7 +194,9 @@ class Main extends Component {
   }
 
   _editOrder = () => {
-    const { dispatch, dispense, values } = this.props
+    const { dispatch, dispense, values, history } = this.props
+    const { location } = history
+    const { query } = location
     const { visitPurposeFK } = values
     const addOrderList = [
       VISIT_TYPE.RETAIL,
@@ -204,12 +206,12 @@ class Main extends Component {
     if (shouldShowAddOrderModal) {
       this.handleOrderModal()
     }
-
     if (visitPurposeFK !== VISIT_TYPE.RETAIL) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
           id: values.id,
+          queueID: query.qid,
           version: dispense.version,
         },
       }).then((o) => {
