@@ -15,7 +15,7 @@ const DatePickerWithLimit = ({
     <Field
       name={fieldName}
       render={(args) => {
-        const { field, form } = args
+        const { form } = args
         const { values } = form
         const startDate = values[startDateFieldName]
         const maximumDateLimit = moment(startDate).add(limit.number, limit.type)

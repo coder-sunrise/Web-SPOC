@@ -65,30 +65,7 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
             fromDateLabel='Visit Date From'
             toDateLabel='Visit Date To'
           />
-          <GridItem md={2}>
-            <Field
-              name='dateFrom'
-              render={(args) => (
-                <DatePicker
-                  {...args}
-                  disabled={values.isAllDate}
-                  label='Visit Date From'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <Field
-              name='dateTo'
-              render={(args) => (
-                <DatePicker
-                  {...args}
-                  disabled={values.isAllDate}
-                  label='Visit Date To'
-                />
-              )}
-            />
-          </GridItem>
+
           <GridItem md={1}>
             <FastField
               name='isAllDate'

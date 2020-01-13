@@ -16,7 +16,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <ReportDateRangePicker />
+          <ReportDateRangePicker limit={{ number: 6, type: 'month' }} />
 
           <GridItem md={3}>
             <Button

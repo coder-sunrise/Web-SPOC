@@ -12,7 +12,7 @@ const reportId = 2
 const fileName = 'Patient Listing Report'
 
 class PatientListing extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -38,8 +38,8 @@ const PatientListingWithFormik = withFormik({
   ),
   mapPropsToValues: () => ({
     patientCriteria: '',
-    dateFrom: moment(new Date()).add(-1, 'year').toDate(),
-    dateTo: moment(new Date()).toDate(),
+    dateFrom: moment(new Date()).startOf('month').toDate(),
+    dateTo: moment(new Date()).endOf('month').toDate(),
     ageFrom: 0,
     ageTo: 0,
     isAllDate: false,

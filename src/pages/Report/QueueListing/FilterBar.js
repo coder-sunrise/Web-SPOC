@@ -22,6 +22,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           <ReportDateRangePicker
             fromDateFieldName='listingFrom'
             toDateFieldName='listingTo'
+            limit={{ number: 6, type: 'month' }}
           />
 
           <GridItem md={2}>

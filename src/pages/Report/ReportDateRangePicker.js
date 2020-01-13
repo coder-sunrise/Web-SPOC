@@ -50,6 +50,7 @@ const ReportDateRangePicker = ({
           label={toDateLabel}
           fieldName={toDateFieldName}
           startDateFieldName={fromDateFieldName}
+          limit={limit}
         />
       </GridItem>
     </React.Fragment>
