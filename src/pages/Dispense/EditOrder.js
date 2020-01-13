@@ -73,11 +73,14 @@ class EditOrder extends Component {
   }
 
   editOrder = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
+    const { dispatch, dispense, visitRegistration, history } = this.props
+    const { location } = history
+    const { query } = location
     dispatch({
       type: `consultation/editOrder`,
       payload: {
         id: dispense.visitID,
+        queueID: query.qid,
         version: dispense.version,
       },
     }).then((o) => {
