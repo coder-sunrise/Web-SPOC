@@ -1,5 +1,6 @@
 import React from 'react'
 import classnames from 'classnames'
+import { formatMessage } from 'umi/locale'
 // formik
 import { FastField } from 'formik'
 // material ui
@@ -11,7 +12,6 @@ import {
   CodeSelect,
   GridItem,
   TextField,
-  NumberInput,
   ProgressButton,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
@@ -39,28 +39,22 @@ const PatientInfoInput = ({
   return (
     <React.Fragment>
       <GridItem xs md={3}>
-        {isEdit ? (
-          <TextField
-            value={values.patientName}
-            label='Patient Name / Acc. No.'
-            disabled
-          />
-        ) : (
-          <FastField
-            name='patientName'
-            render={(args) => {
-              return (
-                <TextField
-                  {...args}
-                  // autoFocus
-                  defaultValue={undefined}
-                  label='Patient Name / Acc. No.'
-                  loseFocusOnEnterPressed
-                />
-              )
-            }}
-          />
-        )}
+        <FastField
+          name='search'
+          render={(args) => {
+            return (
+              <TextField
+                {...args}
+                // autoFocus
+                defaultValue={undefined}
+                label={formatMessage({
+                  id: 'reception.queue.patientSearchPlaceholder',
+                })}
+                loseFocusOnEnterPressed
+              />
+            )
+          }}
+        />
       </GridItem>
       <GridItem xs md={5}>
         <div className={classnames(classes.buttonGroup)}>
@@ -113,6 +107,26 @@ const PatientInfoInput = ({
         </div>
       </GridItem>
       <GridItem ms md={4} />
+      <GridItem xs md={3}>
+        {isEdit ? (
+          <TextField value={values.patientName} label='Patient Name' disabled />
+        ) : (
+          <FastField
+            name='patientName'
+            render={(args) => {
+              return (
+                <TextField
+                  {...args}
+                  // autoFocus
+                  defaultValue={undefined}
+                  label='Patient Name'
+                  loseFocusOnEnterPressed
+                />
+              )
+            }}
+          />
+        )}
+      </GridItem>
       <GridItem xs md={3}>
         <FastField
           name='countryCodeFK'

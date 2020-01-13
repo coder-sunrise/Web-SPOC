@@ -97,7 +97,7 @@ export default compose(
         lastSMSSendStatus,
         upcomingAppointmentDate,
         appointmentStatus,
-        isReminderSent,
+        isExcludeReminderSent,
         doctor = [],
         appointmentType = [],
         pdpaConsent = [],
@@ -157,7 +157,7 @@ export default compose(
             appointmentStatus ||
             `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
           'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
-          isReminderSent,
+          isReminderSent: isExcludeReminderSent ? false : undefined,
           [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
           [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
         }
@@ -179,6 +179,7 @@ export default compose(
           'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
 
           apiCriteria: {
+            // searchValue: patientName,
             PDPAPhone,
             PDPAMessage,
             PDPAEmail,

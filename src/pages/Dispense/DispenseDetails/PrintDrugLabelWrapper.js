@@ -28,7 +28,7 @@ class PrintDrugLabelWrapper extends React.Component {
     let patientLabelReportID
     let drugLabelReportID
     let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    if (settings.labelPrinterSize === '89mmx36mm') {
+    if (settings.labelPrinterSize === '8.9cmx3.6cm') {
       drugLabelReportID = 31
       patientLabelReportID = 32
     } else {

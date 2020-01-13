@@ -171,8 +171,8 @@ const ItemList = ({
     },
     {
       id: 5,
-      name: 'Package',
-      content: addContent('inventorypackage'),
+      name: 'OrderSet',
+      content: addContent('inventoryOrderSet'),
     },
   ]
 

@@ -16,7 +16,7 @@ import Medication from '@/pages/Widgets/Orders/Detail/Medication'
 import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
-import Package from '@/pages/Widgets/Orders/Detail/Package'
+import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
@@ -955,9 +955,9 @@ const orderTypes = [
     component: (props) => <Medication openPrescription {...props} />,
   },
   {
-    name: 'Package',
+    name: 'Order Set',
     value: '6',
-    component: (props) => <Package {...props} />,
+    component: (props) => <OrderSet {...props} />,
   },
   {
     name: 'Treatment',
@@ -1082,7 +1082,7 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'inventorypackage',
+    'inventoryorderset',
     {
       ...defaultParams,
       sorting: [
@@ -1516,10 +1516,10 @@ export const InventoryTypes = [
   },
   {
     value: 5,
-    name: 'Packages',
-    prop: 'packageValueDto',
-    itemFKName: 'inventoryPackageFK',
-    ctName: 'inventorypackage',
+    name: 'OrderSets',
+    prop: 'orderSetValueDto',
+    itemFKName: 'inventoryOrderSetFK',
+    ctName: 'inventoryorderset',
   },
 ]
 
@@ -1558,8 +1558,11 @@ const tagList = [
     getter: () => {
       const { user } = window.g_app._store.getState()
       if (user && user.data && user.data.clinicianProfile) {
-        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
-          .name}`
+        const title = user.data.clinicianProfile.title
+          ? `${user.data.clinicianProfile.title} `
+          : ''
+
+        return `${title}${user.data.clinicianProfile.name}`
       }
       return 'N.A.'
     },

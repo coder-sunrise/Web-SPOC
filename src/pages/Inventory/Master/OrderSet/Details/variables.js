@@ -32,7 +32,7 @@ const tabHeader = (tabName, detailsProps) => {
   return returnTabHeader()
 }
 
-export const PackageDetailOption = (detailsProps, typeListingProps) => [
+export const OrderSetDetailOption = (detailsProps, typeListingProps) => [
   {
     id: 0,
     name: tabHeader('Details', detailsProps),

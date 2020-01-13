@@ -1,3 +1,5 @@
+import { Tooltip } from '@/components'
+
 export const NewCHASColumns = [
   {
     name: 'visitDate',
@@ -85,6 +87,16 @@ export const NewCHASColumnExtensions = [
   {
     columnName: 'diagnosis',
     sortingEnabled: false,
+    render: (row) => {
+      let diagnoisisList = row.diagnosis.join(", ")
+      return (
+        <Tooltip title={diagnoisisList}>
+          <span className title={diagnoisisList}>
+            {diagnoisisList}
+          </span>
+        </Tooltip>
+      )
+    },
   },
   {
     columnName: 'schemeTypeDisplayValue',

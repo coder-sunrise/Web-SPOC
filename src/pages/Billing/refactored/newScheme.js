@@ -162,6 +162,8 @@ const Scheme = ({
                 ]}
               />
             )}
+            {payerTypeFK === INVOICE_PAYER_TYPE.COMPANY &&
+            _isEditing && <span>{name}</span>}
 
             {_isConfirmed && <span>{name}</span>}
           </div>

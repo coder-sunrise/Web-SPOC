@@ -15,7 +15,7 @@ import Medication from './Medication'
 import Vaccination from './Vaccination'
 import Service from './Service'
 import Consumable from './Consumable'
-import Package from './Package'
+import OrderSet from './OrderSet'
 // import Others from './Others'
 // utils
 import { orderTypes } from '@/utils/codes'
@@ -228,6 +228,9 @@ class Details extends PureComponent {
                       entity: undefined,
                       type: key,
                     },
+                  })
+                  dispatch({
+                    type: 'global/incrementCommitCount',
                   })
                 }}
               />

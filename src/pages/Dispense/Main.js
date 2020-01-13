@@ -5,6 +5,7 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
 import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
+import AddOrder from './DispenseDetails/AddOrder'
 // utils
 import {
   calculateAmount,
@@ -13,7 +14,7 @@ import {
 } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
-import AddOrder from './DispenseDetails/AddOrder'
+import Authorized from '@/utils/Authorized'
 
 const calculateInvoiceAmounts = (entity) => {
   const obj = { ...entity }
@@ -140,6 +141,9 @@ class Main extends Component {
     })
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
+    const { rights: editOrderRights } = Authorized.check(
+      'queue.dispense.editorder',
+    )
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
@@ -152,9 +156,11 @@ class Main extends Component {
           this.openFirstTabAddOrder()
         },
       )
+      return
     }
 
     if (
+      editOrderRights !== 'hidden' &&
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
@@ -174,7 +180,8 @@ class Main extends Component {
         values: _values,
       },
     })
-    if (finalizeResponse) {
+
+    if (finalizeResponse === 204) {
       await dispatch({
         type: 'dispense/query',
         payload: {
@@ -187,7 +194,9 @@ class Main extends Component {
   }
 
   _editOrder = () => {
-    const { dispatch, dispense, values } = this.props
+    const { dispatch, dispense, values, history } = this.props
+    const { location } = history
+    const { query } = location
     const { visitPurposeFK } = values
     const addOrderList = [
       VISIT_TYPE.RETAIL,
@@ -197,12 +206,12 @@ class Main extends Component {
     if (shouldShowAddOrderModal) {
       this.handleOrderModal()
     }
-
     if (visitPurposeFK !== VISIT_TYPE.RETAIL) {
       dispatch({
         type: `consultation/editOrder`,
         payload: {
           id: values.id,
+          queueID: query.qid,
           version: dispense.version,
         },
       }).then((o) => {

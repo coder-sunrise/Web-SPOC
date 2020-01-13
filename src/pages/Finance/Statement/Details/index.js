@@ -185,10 +185,11 @@ class StatementDetails extends PureComponent {
       const { status, data } = response
       if (status === '200' && data.totalRecords > 0) {
         const { data: sessionData } = data
-        let paymentDate = moment(
-          sessionData[0].sessionStartDate,
-          serverDateFormat,
-        )
+        const { isClinicSessionClosed, sessionStartDate } = sessionData[0]
+        let paymentDate = moment()
+        if (isClinicSessionClosed === true) {
+          paymentDate = moment(sessionStartDate, serverDateFormat)
+        }
 
         this.getBizList(paymentDate.format(serverDateFormat))
       } else {

@@ -1,6 +1,7 @@
 import React from 'react'
 import Send from '@material-ui/icons/Send'
 import MailIcon from '@material-ui/icons/Mail'
+import moment from 'moment'
 import { compose } from 'redux'
 import lodash from 'lodash'
 import { Badge } from '@material-ui/core'
@@ -15,6 +16,9 @@ import {
   FastField,
   CodeSelect,
   Field,
+  dateFormatLong,
+  timeFormat24HourWithSecond,
+  timeFormatSmallCase,
 } from '@/components'
 
 const New = ({
@@ -135,10 +139,12 @@ export default compose(
         const {
           patientName = '',
           upcomingAppointmentDate = '',
+          upcomingAppointmentStartTime = '',
           doctor = '',
           callingName = '',
           lastVisitDate = '',
         } = selectedItem
+
         const {
           smsPatient: smsPat,
           smsAppointment: smsAppt,
@@ -158,7 +164,10 @@ export default compose(
         )
         formattedContent = formattedContent.replace(
           /@AppointmentDateTime/g,
-          upcomingAppointmentDate,
+          `${moment(upcomingAppointmentDate).format(dateFormatLong)} ${moment(
+            upcomingAppointmentStartTime,
+            timeFormat24HourWithSecond,
+          ).format(timeFormatSmallCase)}`,
         )
         formattedContent = formattedContent.replace(/@Doctor/g, doctor)
         formattedContent = formattedContent.replace(/@NewLine/g, '\n')
@@ -168,7 +177,7 @@ export default compose(
         )
         formattedContent = formattedContent.replace(
           /@LastVisitDate/g,
-          lastVisitDate,
+          moment(lastVisitDate).format(dateFormatLong),
         )
         const tempObject = {
           ...restValues,
@@ -199,6 +208,7 @@ export default compose(
           createPayload(selectedItem, o)
         })
       }
+
       dispatch({
         type: 'sms/sendSms',
         payload,

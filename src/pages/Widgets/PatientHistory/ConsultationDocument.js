@@ -23,8 +23,11 @@ export default ({ current }) => {
         {
           columnName: 'from',
           render: (r) => {
-            return `${r.from.clinicianProfile.title} ${r.from.clinicianProfile
-              .name}`
+            const title = r.from.clinicianProfile.title
+              ? `${r.from.clinicianProfile.title} `
+              : ''
+
+            return `${title}${r.from.clinicianProfile.name}`
           },
         },
       ]}

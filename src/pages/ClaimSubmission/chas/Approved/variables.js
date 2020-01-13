@@ -1,3 +1,7 @@
+import React from 'react'
+import {Tooltip} from '@/components'
+import NumberInput from '@/components/NumberInput'
+
 export const ApprovedCHASColumns = [
   {
     name: 'submissionDate',
@@ -75,6 +79,16 @@ export const ApprovedCHASColumnExtensions = [
   {
     columnName: 'diagnosis',
     sortingEnabled: false,
+    render: (row) => {
+      let diagnoisisList = row.diagnosis.join(", ")
+      return (
+        <Tooltip title={diagnoisisList}>
+          <span className title={diagnoisisList}>
+            {diagnoisisList}
+          </span>
+        </Tooltip>
+      )
+    },
   },
   {
     columnName: 'schemeTypeDisplayValue',
@@ -103,11 +117,22 @@ export const ApprovedCHASColumnExtensions = [
     type: 'currency',
     currency: true,
     sortingEnabled: false,
+    render: (row) => {
+      if(row.chasClaimStatusDescription==='Paid')
+        return (<NumberInput currency text value={row.collectedPayment} rightAlign readonly />)
+      return '-'
+
+    },
   },
   {
     columnName: 'approvedAmount',
     type: 'currency',
     currency: true,
     sortBy: 'ApprovedAmt',
+    render: (row) => {
+       if(row.chasClaimStatusDescription==='Paid')
+         return (<NumberInput currency text value={row.approvedAmount} rightAlign readonly />)
+       return '-'
+    },
   },
 ]

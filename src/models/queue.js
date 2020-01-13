@@ -1,8 +1,9 @@
 import { createListViewModel } from 'medisys-model'
 // moment
 import moment from 'moment'
-import { subscribeNotification } from '@/utils/realtime'
+import { subscribeNotification, sendNotification } from '@/utils/realtime'
 import * as service from '../services/queue'
+import { notification } from '@/components'
 import {
   StatusIndicator,
   VISIT_STATUS,
@@ -38,11 +39,16 @@ export default createListViewModel({
         message: '',
       },
     },
-    subscriptions: ({ history, dispatch }) => {
+    subscriptions: ({ history, dispatch, ...restProps }) => {
       subscribeNotification('QueueListing', {
-        callback: () => {
+        callback: (response) => {
           const { location } = history
-          if (location.pathname === '/reception/queue')
+          const { user } = window.g_app._store.getState()
+          const { senderId } = response
+          if (
+            user.data.id !== senderId &&
+            location.pathname === '/reception/queue'
+          )
             dispatch({ type: 'refresh' })
         },
       })
@@ -210,9 +216,17 @@ export default createListViewModel({
       },
       *deleteQueueByQueueID ({ payload }, { call, put }) {
         const result = yield call(service.deleteQueue, payload)
-        yield put({
-          type: 'refresh',
-        })
+        if (result) {
+          notification.success({
+            message: 'Visit Deleted',
+          })
+          yield put({
+            type: 'refresh',
+          })
+          sendNotification('QueueListing', {
+            message: 'Visit Deleted',
+          })
+        }
         return result
       },
       *refresh ({ payload }, { put }) {
@@ -229,10 +243,13 @@ export default createListViewModel({
           type: 'patientSearch/query',
           payload: {
             version: Date.now(),
-            [`${prefix}name`]: searchQuery,
-            [`${prefix}patientAccountNo`]: searchQuery,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-            combineCondition: 'or',
+            // [`${prefix}name`]: searchQuery,
+            // [`${prefix}patientAccountNo`]: searchQuery,
+            // [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            // combineCondition: 'or',
+            apiCriteria: {
+              searchValue: searchQuery,
+            },
           },
         })
 
