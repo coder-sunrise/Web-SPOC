@@ -12,6 +12,7 @@ import {
   RadioGroup,
 } from '@/components'
 import { DiagnosisSelect } from '@/components/_medisys'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const styles = (theme) => ({
   generateBtn: {
@@ -24,18 +25,11 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <GridItem md={2}>
-            <FastField
-              name='listingFrom'
-              render={(args) => <DatePicker {...args} label='From' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='listingTO'
-              render={(args) => <DatePicker {...args} label='To' />}
-            />
-          </GridItem>
+          <ReportDateRangePicker
+            fromDateFieldName='listingFrom'
+            toDateFieldName='listingTo'
+          />
+
           <GridItem md={2}>
             <FastField
               name='viewBy'

@@ -10,24 +10,14 @@ import {
   SizeContainer,
   CodeSelect,
 } from '@/components'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <GridItem md={2}>
-            <FastField
-              name='dateFrom'
-              render={(args) => <DatePicker {...args} label='From' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='dateTo'
-              render={(args) => <DatePicker {...args} label='To' />}
-            />
-          </GridItem>
+          <ReportDateRangePicker />
           <GridItem md={3}>
             <Button
               color='primary'

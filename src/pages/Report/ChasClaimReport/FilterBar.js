@@ -12,6 +12,7 @@ import {
   Checkbox,
   CodeSelect,
 } from '@/components'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 import { claimStatus, chasSchemeTypes } from '@/utils/codes'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
@@ -19,18 +20,12 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <GridItem md={2}>
-            <FastField
-              name='dateFrom'
-              render={(args) => <DatePicker {...args} label='From' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='dateTo'
-              render={(args) => <DatePicker {...args} label='To' />}
-            />
-          </GridItem>
+          <ReportDateRangePicker
+            fromDateLabel='From'
+            toDateLabel='To'
+            fromDateFieldName='dateFrom'
+            toDateFieldName='dateTo'
+          />
           <GridItem md={4}>
             <FastField
               name='claimStatus'
