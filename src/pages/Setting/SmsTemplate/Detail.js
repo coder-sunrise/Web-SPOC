@@ -60,6 +60,7 @@ class Detail extends PureComponent {
   render () {
     const { props } = this
     const { theme, footer, settingSmsTemplate, height } = props
+    const smsTaglist = tagList.filter((f) => f.value !== 'PatientInfo')
 
     return (
       <React.Fragment>
@@ -111,7 +112,7 @@ class Detail extends PureComponent {
                       toolbarHidden={() => true}
                       // handlePastedText={() => false}
                       label='Template Message'
-                      tagList={tagList}
+                      tagList={smsTaglist}
                       {...cfg}
                       onBlur={(html, text) => {
                         this.props.setFieldValue('templateMessage', text)

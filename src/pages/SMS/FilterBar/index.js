@@ -84,22 +84,20 @@ export default compose(
         moment().subtract(1, 'months'),
         moment(),
       ],
-      phoneCall: false,
-      textMessage: false,
-      email: false,
+      pdpaConsent: [
+        '1',
+        '2',
+        '3',
+      ],
     }),
 
     handleSubmit: (values, { props }) => {
       const {
         patientName,
-        phoneCall,
-        textMessage,
-        email,
         lastSMSSendStatus,
-        // lastVisitDate,
         upcomingAppointmentDate,
         appointmentStatus,
-        isReminderSent,
+        isExcludeReminderSent,
         doctor = [],
         appointmentType = [],
         pdpaConsent = [],
@@ -159,7 +157,7 @@ export default compose(
             appointmentStatus ||
             `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
           'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
-          isReminderSent,
+          isReminderSent: isExcludeReminderSent ? false : undefined,
           [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
           [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
         }

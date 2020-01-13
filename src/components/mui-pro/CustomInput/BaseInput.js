@@ -190,7 +190,7 @@ class BaseInput extends React.PureComponent {
       prefixProps,
       suffixProps,
       label,
-
+      readonly = false,
       inputProps = {},
       labelProps = {},
       children,
@@ -233,6 +233,7 @@ class BaseInput extends React.PureComponent {
     const { rowsMax, ...resetProps } = inputProps
     const cfg = {
       fullWidth: fullWidth || !text,
+      readOnly:readonly,
     }
     const adornmentClasses = classNames({
       [classes.adornment]: true,

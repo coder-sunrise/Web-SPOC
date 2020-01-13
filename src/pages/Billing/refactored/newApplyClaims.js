@@ -26,7 +26,7 @@ import {
   sortItemByID,
 } from './applyClaimUtils'
 import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
+import { INVOICE_PAYER_TYPE, VISIT_TYPE } from '@/utils/constants'
 
 const defaultInvoicePayer = {
   _indexInClaimableSchemes: 0,
@@ -63,6 +63,7 @@ const ApplyClaims = ({
     invoicePayment,
     invoicePayer: payerList,
     claimableSchemes,
+    visitPurposeFK = 1,
   } = values
 
   const [
@@ -114,7 +115,9 @@ const ApplyClaims = ({
   const shouldDisableAddClaim =
     tempInvoicePayer.filter(
       (invoicePayer) => invoicePayer.payerTypeFK === INVOICE_PAYER_TYPE.SCHEME,
-    ).length < invoice.claimableSchemes || hasOtherEditing
+    ).length < invoice.claimableSchemes ||
+    hasOtherEditing ||
+    visitPurposeFK === VISIT_TYPE.RETAIL
 
   const incrementCommitCount = () => {
     dispatch({
@@ -355,7 +358,7 @@ const ApplyClaims = ({
       payload: {
         openConfirm: true,
         openConfirmContent:
-          'Reset will revert all changes that had not been saved. Continue?',
+          'Restore will restore back to last saved state. Continue?',
         openConfirmText: 'Continue',
         onConfirmSave: restoreClaims,
       },
@@ -644,6 +647,7 @@ const ApplyClaims = ({
           Reset
         </Button> */}
         <ResetButton
+          disabled={visitPurposeFK === VISIT_TYPE.RETAIL}
           handleResetClick={handleResetClick}
           handleRestoreClick={handleRestoreClick}
         />

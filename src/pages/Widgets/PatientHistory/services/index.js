@@ -5,7 +5,7 @@ const url = '/api/PatientHistory'
 module.exports = {
   // remove: (params) => service.remove(url, params),
   queryList: (params) => {
-    return service.queryList(url, params)
+    return service.queryList(url, { ...params, pagesize: 9999 })
   },
   query: (params) => {
     return service.query(url, params)

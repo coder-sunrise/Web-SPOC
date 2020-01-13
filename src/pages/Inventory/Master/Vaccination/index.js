@@ -38,7 +38,8 @@ const Vaccination = ({
     colExtensions,
     setColExtensions,
   ] = useState([
-    { columnName: 'action', width: 110, align: 'center' },
+    { columnName: 'code', width: 130 },
+    { columnName: 'action', width: 80, align: 'center' },
     {
       columnName: 'favouriteSupplier',
       type: 'codeSelect',
@@ -66,7 +67,7 @@ const Vaccination = ({
       type: 'select',
       options: status,
       align: 'center',
-      width: 120,
+      width: 80,
     },
     {
       columnName: 'averageCostPrice',
@@ -75,7 +76,7 @@ const Vaccination = ({
       width: 120,
       precision: 4,
     },
-    { columnName: 'sellingPrice', type: 'number', currency: true, width: 200 },
+    { columnName: 'sellingPrice', type: 'number', currency: true, width: 120 },
   ])
 
   const filterProps = {

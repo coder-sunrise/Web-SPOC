@@ -254,19 +254,19 @@ const _routes = [
             ],
           },
           {
-            path: '/inventory/master/package',
-            name: 'package.package',
+            path: '/inventory/master/orderset',
+            name: 'orderset.orderset',
             hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
+            component: './Inventory/Master/OrderSet/Details',
             authority: [
               'inventory/inventorymaster',
             ],
           },
           {
-            path: '/inventory/master/editpackage',
-            name: 'package.editpackage',
+            path: '/inventory/master/editorderset',
+            name: 'orderset.editorderset',
             hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
+            component: './Inventory/Master/OrderSet/Details',
             authority: [
               'inventory/inventorymaster',
             ],
@@ -841,6 +841,23 @@ const _routes = [
         ],
       },
       // Settings
+      //
+      // AiOT
+      // {
+      //   path: '/patient-monitoring',
+      //   icon: 'group',
+      //   name: 'patient-monitoring',
+      //   hideChildrenInMenu: true,
+      //   routes: [
+      //     {
+      //       path: '/patient-monitoring',
+      //       name: 'patient-monitoring',
+      //       component: './PatientMonitoring',
+      //     },
+      //   ],
+      // },
+      // AiOT
+      //
       // Support
       {
         path: '/support',
@@ -859,12 +876,14 @@ const _routes = [
             component: './support/teamviewer',
           },
           {
-            path: '/support/druglabel',
-            name: 'druglabel',
-            component: './support/druglabel',
+            path: '/support/printingtool',
+            name: 'printingtool',
+            component: './support/PrintingTool',
           },
         ],
       },
+      // Support
+      //
       {
         component: '404',
       },

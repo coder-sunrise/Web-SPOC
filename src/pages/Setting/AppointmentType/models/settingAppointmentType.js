@@ -14,6 +14,7 @@ export default createListViewModel({
     service,
     state: {
       default: {
+        tagColorHex: '#2B1E6B',
         isUserMaintainable: true,
         effectiveDates: [
           moment().formatUTC(),

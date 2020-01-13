@@ -16,7 +16,7 @@ import Medication from '@/pages/Widgets/Orders/Detail/Medication'
 import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
-import Package from '@/pages/Widgets/Orders/Detail/Package'
+import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
@@ -954,9 +954,9 @@ const orderTypes = [
     component: (props) => <Medication openPrescription {...props} />,
   },
   {
-    name: 'Package',
+    name: 'Order Set',
     value: '6',
-    component: (props) => <Package {...props} />,
+    component: (props) => <OrderSet {...props} />,
   },
 ]
 const buttonTypes = [
@@ -1074,7 +1074,7 @@ const tenantCodesMap = new Map([
     },
   ],
   [
-    'inventorypackage',
+    'inventoryorderset',
     {
       ...defaultParams,
       sorting: [
@@ -1496,10 +1496,10 @@ export const InventoryTypes = [
   },
   {
     value: 5,
-    name: 'Packages',
-    prop: 'packageValueDto',
-    itemFKName: 'inventoryPackageFK',
-    ctName: 'inventorypackage',
+    name: 'OrderSets',
+    prop: 'orderSetValueDto',
+    itemFKName: 'inventoryOrderSetFK',
+    ctName: 'inventoryorderset',
   },
 ]
 

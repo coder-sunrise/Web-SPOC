@@ -25,13 +25,21 @@ class PrintDrugLabelWrapper extends React.Component {
 
   getPrintResult = async (type, row) => {
     let printResult
+    let patientLabelReportID
+    let drugLabelReportID
+    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    if (settings.labelPrinterSize === '8.9cmx3.6cm') {
+      drugLabelReportID = 31
+      patientLabelReportID = 32
+    } else {
+      drugLabelReportID = 24
+      patientLabelReportID = 27
+    }
+
     if (type === 'Medication') {
       let drugLableSource = await this.generateDrugLablePrintSource(row)
       if (drugLableSource) {
-        printResult = await postPDF(
-          drugLableSource.reportId,
-          drugLableSource.payload,
-        )
+        printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
     } else if (type === 'Medications') {
       const { dispense, values } = this.props
@@ -41,14 +49,11 @@ class PrintDrugLabelWrapper extends React.Component {
         prescription,
       )
       if (drugLableSource) {
-        printResult = await postPDF(
-          drugLableSource.reportId,
-          drugLableSource.payload,
-        )
+        printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
     } else if (type === 'Patient') {
       const { patient, values } = this.props
-      printResult = await getPDF(27, {
+      printResult = await getPDF(patientLabelReportID, {
         patientId: patient ? patient.id : values.patientProfileFK,
       })
     }
@@ -109,7 +114,7 @@ class PrintDrugLabelWrapper extends React.Component {
           return this.getDrugLabelDetails(o, row)
         }),
       )
-      return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
+      return { payload: { DrugLabelDetails: drugLabelDetail } }
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,
@@ -128,7 +133,7 @@ class PrintDrugLabelWrapper extends React.Component {
           return this.getDrugLabelDetails(o, prescriptionItem)
         }),
       )
-      return { reportId: 24, payload: { DrugLabelDetails: drugLabelDetail } }
+      return { payload: { DrugLabelDetails: drugLabelDetail } }
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,

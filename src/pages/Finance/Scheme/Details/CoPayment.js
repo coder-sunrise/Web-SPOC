@@ -74,9 +74,9 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
         'ExactAmount',
       )
 
-      setFieldValue('itemGroupValueDto.packageGroupValue.itemGroupValue', 0)
+      setFieldValue('itemGroupValueDto.orderSetGroupValue.itemGroupValue', 0)
       setFieldValue(
-        'itemGroupValueDto.packageGroupValue.groupValueType',
+        'itemGroupValueDto.OrderSetGroupValue.groupValueType',
         'ExactAmount',
       )
     }
@@ -90,7 +90,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
         setFieldValue('itemGroupValueDto.consumableGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.vaccinationGroupValue.isDeleted', true)
         setFieldValue('itemGroupValueDto.serviceGroupValue.isDeleted', true)
-        setFieldValue('itemGroupValueDto.packageGroupValue.isDeleted', true)
+        setFieldValue('itemGroupValueDto.orderSetGroupValue.isDeleted', true)
       }
     }
   }
@@ -184,7 +184,8 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
             'sub',
           )}
         />
-        <Field
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* <Field
           name='itemGroupValueDto.packageGroupValue.itemGroupValue'
           render={CPNumber(
             formatMessage({
@@ -196,7 +197,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
               : 'ExactAmount',
             'sub',
           )}
-        />
+        /> */}
         <p style={{ marginTop: theme.spacing(1) }}>&nbsp;</p>
       </GridItem>
       <GridItem xs={2}>
@@ -214,12 +215,13 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
           name='itemGroupValueDto.vaccinationGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
-        <Field
+        {/* Commented Package Input - Need to re-test if enabling it back in the future */}
+        {/* <Field
           name='itemGroupValueDto.serviceGroupValue.groupValueType'
           render={CPSwitch('sub')}
-        />
+        /> */}
         <Field
-          name='itemGroupValueDto.packageGroupValue.groupValueType'
+          name='itemGroupValueDto.orderSetGroupValue.groupValueType'
           render={CPSwitch('sub')}
         />
       </GridItem>

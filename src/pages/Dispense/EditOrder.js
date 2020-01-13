@@ -14,24 +14,28 @@ import { widgets } from '@/utils/widgets'
 import Authorized from '@/utils/Authorized'
 
 const discardConsultation = async ({ dispatch, dispense }) => {
-  const consultationResult = await dispatch({
-    type: 'consultation/discard',
-    payload: dispense.entity.clinicalObjectRecordFK,
-  })
-  if (consultationResult) {
-    await dispatch({
-      type: 'dispense/query',
-      payload: {
-        id: dispense.visitID,
-        version: Date.now(),
-      },
+  try {
+    const consultationResult = await dispatch({
+      type: 'consultation/discard',
+      payload: dispense.entity.clinicalObjectRecordFK,
     })
-    dispatch({
-      type: `dispense/updateState`,
-      payload: {
-        editingOrder: false,
-      },
-    })
+    if (consultationResult) {
+      await dispatch({
+        type: 'dispense/query',
+        payload: {
+          id: dispense.visitID,
+          version: Date.now(),
+        },
+      })
+      dispatch({
+        type: `dispense/updateState`,
+        payload: {
+          editingOrder: false,
+        },
+      })
+    }
+  } catch (error) {
+    console.error({ error })
   }
 }
 
@@ -101,7 +105,7 @@ class EditOrder extends Component {
     })
   }
 
-  handleCancel = async () => {
+  handleCancel = () => {
     discardConsultation(this.props)
   }
 

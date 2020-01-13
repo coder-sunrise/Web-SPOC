@@ -11,6 +11,7 @@ import {
   GridItem,
   ProgressButton,
   CommonModal,
+  notification,
 } from '@/components'
 import { ReportViewer } from '@/components/_medisys'
 import POForm from './POForm'
@@ -162,6 +163,18 @@ class Index extends Component {
           },
         }).then((r) => {
           if (r) {
+            if (
+              action === poSubmitAction.SAVE ||
+              action === poSubmitAction.FINALIZE
+            ) {
+              let message = 'PO saved'
+              if (action === poSubmitAction.FINALIZE) {
+                message = 'PO finalized'
+              }
+              notification.success({
+                message,
+              })
+            }
             const { id } = r
             // dispatch({
             //   type: `formik/clean`,

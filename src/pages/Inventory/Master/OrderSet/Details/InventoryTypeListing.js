@@ -25,7 +25,7 @@ let commitCount = 1000 // uniqueNumber
 const InventoryTypeListing = ({
   dispatch,
   classes,
-  packDetail,
+  orderSetDetail,
   setFieldValue,
   setValues,
   values,
@@ -45,10 +45,10 @@ const InventoryTypeListing = ({
   }, [])
 
   const {
-    medicationPackageItem,
-    consumablePackageItem,
-    vaccinationPackageItem,
-    servicePackageItem,
+    medicationOrderSetItem,
+    consumableOrderSetItem,
+    vaccinationOrderSetItem,
+    serviceOrderSetItem,
   } = values
 
   const medicationSchema = Yup.object().shape({
@@ -72,19 +72,19 @@ const InventoryTypeListing = ({
   const [
     medicationRows,
     setMedicationRows,
-  ] = useState(medicationPackageItem)
+  ] = useState(medicationOrderSetItem)
   const [
     consumableRows,
     setConsumableRows,
-  ] = useState(consumablePackageItem)
+  ] = useState(consumableOrderSetItem)
   const [
     vaccinationRows,
     setVaccinationRows,
-  ] = useState(vaccinationPackageItem)
+  ] = useState(vaccinationOrderSetItem)
   const [
     serviceRows,
     setServiceRows,
-  ] = useState(servicePackageItem)
+  ] = useState(serviceOrderSetItem)
 
   const [
     medicationList,
@@ -141,10 +141,10 @@ const InventoryTypeListing = ({
       setServiceCenterss(serviceCenters)
       setServiceCenterServicess(serviceCenterServices)
       // if (
-      //   packDetail.entity &&
-      //   packDetail.entity.servicePackageItem.length > 0
+      //   orderSetDetail.entity &&
+      //   orderSetDetail.entity.serviceOrderSetItem.length > 0
       // ) {
-      //   servicePackageItem.forEach((o) => {
+      //   serviceOrderSetItem.forEach((o) => {
       //     o.serviceName = serviceCenterServices.find(
       //       (i) => i.serviceCenter_ServiceId === o.serviceCenterServiceFK,
       //     ).serviceCenterId
@@ -205,10 +205,10 @@ const InventoryTypeListing = ({
 
   useEffect(
     () => {
-      setMedicationRows(medicationPackageItem)
-      setConsumableRows(consumablePackageItem)
-      setVaccinationRows(vaccinationPackageItem)
-      setServiceRows(servicePackageItem)
+      setMedicationRows(medicationOrderSetItem)
+      setConsumableRows(consumableOrderSetItem)
+      setVaccinationRows(vaccinationOrderSetItem)
+      setServiceRows(serviceOrderSetItem)
       // dispatch({
       //   // force current edit row components to update
       //   type: 'global/updateState',
@@ -218,7 +218,7 @@ const InventoryTypeListing = ({
       // })
     },
     [
-      packDetail,
+      orderSetDetail,
     ],
   )
 
@@ -252,19 +252,19 @@ const InventoryTypeListing = ({
         calTotal(row)
       })
 
-      setFieldValue('medicationPackageItem', medicationRows)
-      setFieldValue('consumablePackageItem', consumableRows)
-      setFieldValue('vaccinationPackageItem', vaccinationRows)
-      setFieldValue('servicePackageItem', serviceRows)
+      setFieldValue('medicationOrderSetItem', medicationRows)
+      setFieldValue('consumableOrderSetItem', consumableRows)
+      setFieldValue('vaccinationOrderSetItem', vaccinationRows)
+      setFieldValue('serviceOrderSetItem', serviceRows)
 
       setTotalPrice(total)
 
       setValues({
         ...values,
-        medicationPackageItem: medicationRows,
-        consumablePackageItem: consumableRows,
-        vaccinationPackageItem: vaccinationRows,
-        servicePackageItem: serviceRows,
+        medicationOrderSetItem: medicationRows,
+        consumableOrderSetItem: consumableRows,
+        vaccinationOrderSetItem: vaccinationRows,
+        serviceOrderSetItem: serviceRows,
         totalPrice: total,
       })
 
@@ -314,11 +314,11 @@ const InventoryTypeListing = ({
   //         },
   //       })
   //       dispatch({
-  //         type: 'packDetail/updateState',
+  //         type: 'orderSetDetail/updateState',
   //         payload: {
   //           entity: {
   //             ...values,
-  //             servicePackageItem: newServiceRows,
+  //             serviceOrderSetItem: newServiceRows,
   //           },
   //         },
   //       })
@@ -347,16 +347,16 @@ const InventoryTypeListing = ({
       })
 
       switch (type) {
-        case 'medicationPackageItem': {
+        case 'medicationOrderSetItem': {
           return setMedicationRows(newArray)
         }
-        case 'consumablePackageItem': {
+        case 'consumableOrderSetItem': {
           return setConsumableRows(newArray)
         }
-        case 'vaccinationPackageItem': {
+        case 'vaccinationOrderSetItem': {
           return setVaccinationRows(newArray)
         }
-        case 'servicePackageItem': {
+        case 'serviceOrderSetItem': {
           return setServiceRows(newArray)
         }
 
@@ -366,28 +366,28 @@ const InventoryTypeListing = ({
       }
     } else if (added) {
       switch (type) {
-        case 'medicationPackageItem': {
+        case 'medicationOrderSetItem': {
           setMedicationRows([
             ...medicationRows,
             rows[0],
           ])
           return setFieldValue(`${type}`, medicationRows)
         }
-        case 'consumablePackageItem': {
+        case 'consumableOrderSetItem': {
           setConsumableRows([
             ...consumableRows,
             rows[0],
           ])
           return setFieldValue(`${type}`, consumableRows)
         }
-        case 'vaccinationPackageItem': {
+        case 'vaccinationOrderSetItem': {
           setVaccinationRows([
             ...vaccinationRows,
             rows[0],
           ])
           return setFieldValue(`${type}`, vaccinationRows)
         }
-        case 'servicePackageItem': {
+        case 'serviceOrderSetItem': {
           const { serviceCenterServiceFK, serviceName } = rows[0]
           const serviceCenterService =
             serviceCenterServicess.find(
@@ -420,25 +420,25 @@ const InventoryTypeListing = ({
     } else if (changed) {
       const getType = (t) => {
         switch (t) {
-          case 'medicationPackageItem': {
+          case 'medicationOrderSetItem': {
             return {
               stateRows: medicationRows,
               setStateRow: (v) => setMedicationRows(v),
             }
           }
-          case 'consumablePackageItem': {
+          case 'consumableOrderSetItem': {
             return {
               stateRows: consumableRows,
               setStateRow: (v) => setConsumableRows(v),
             }
           }
-          case 'vaccinationPackageItem': {
+          case 'vaccinationOrderSetItem': {
             return {
               stateRows: vaccinationRows,
               setStateRow: (v) => setVaccinationRows(v),
             }
           }
-          case 'servicePackageItem': {
+          case 'serviceOrderSetItem': {
             return {
               stateRows: serviceRows,
               setStateRow: (v) => setServiceRows(v),
@@ -855,7 +855,7 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete medication',
     },
     showAddCommand: true,
-    onCommitChanges: onCommitChanges('medicationPackageItem'),
+    onCommitChanges: onCommitChanges('medicationOrderSetItem'),
     onAddedRowsChange: onAddedRowsChange('medication'),
   }
 
@@ -865,7 +865,7 @@ const InventoryTypeListing = ({
     },
     showAddCommand: true,
     onAddedRowsChange: onAddedRowsChange('consumable'),
-    onCommitChanges: onCommitChanges('consumablePackageItem'),
+    onCommitChanges: onCommitChanges('consumableOrderSetItem'),
   }
 
   const vaccinationEditingProps = {
@@ -873,7 +873,7 @@ const InventoryTypeListing = ({
       deleteCommand: 'Delete vaccination',
     },
     showAddCommand: true,
-    onCommitChanges: onCommitChanges('vaccinationPackageItem'),
+    onCommitChanges: onCommitChanges('vaccinationOrderSetItem'),
     onAddedRowsChange: onAddedRowsChange('vaccination'),
   }
 
@@ -883,7 +883,7 @@ const InventoryTypeListing = ({
     },
     showAddCommand: true,
     onAddedRowsChange: onAddedRowsChange('service'),
-    onCommitChanges: onCommitChanges('servicePackageItem'),
+    onCommitChanges: onCommitChanges('serviceOrderSetItem'),
   }
   return (
     <div>
@@ -899,7 +899,7 @@ const InventoryTypeListing = ({
           <GridItem xs={12}>
             <div className={classes.displayDiv}>
               <h4>
-                <b>Package Price: ${totalPrice.toFixed(2)}</b>
+                <b>Order Set Price: ${totalPrice.toFixed(2)}</b>
               </h4>
             </div>
           </GridItem>

@@ -23,14 +23,14 @@ const { qtyFormat } = config
 @withFormikExtend({
   mapPropsToValues: ({ orders = {}, type }) => {
     const v = {
-      ...(orders.entity || orders.defaultPackage),
+      ...(orders.entity || orders.defaultOrderSet),
       type,
     }
     return v
   },
   enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    inventorypackageFK: Yup.number().required(),
+    inventoryOrderSetFK: Yup.number().required(),
   }),
   handleSubmit: (values, { props, onConfirm }) => {
     const { dispatch, orders, codetable, getNextSequence } = props
@@ -72,8 +72,8 @@ const { qtyFormat } = config
       return instruction
     }
 
-    const getOrderMedicationFromPackage = (packageCode, packageItem) => {
-      const { inventoryMedication } = packageItem
+    const getOrderMedicationFromOrderSet = (orderSetCode, orderSetItem) => {
+      const { inventoryMedication } = orderSetItem
 
       let item
       if (inventoryMedication.isActive === true) {
@@ -115,16 +115,16 @@ const { qtyFormat } = config
           inventoryMedicationFK: inventoryMedication.id,
           drugCode: inventoryMedication.code,
           drugName: inventoryMedication.displayValue,
-          quantity: packageItem.quantity,
+          quantity: orderSetItem.quantity,
           costPrice: inventoryMedication.costPrice,
-          unitPrice: packageItem.unitPrice,
-          totalPrice: packageItem.unitPrice * packageItem.quantity,
+          unitPrice: orderSetItem.unitPrice,
+          totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
           totalAfterItemAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
+            orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
-          packageCode,
+            orderSetItem.unitPrice * orderSetItem.quantity,
+          orderSetCode,
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
@@ -177,8 +177,8 @@ const { qtyFormat } = config
       return item
     }
 
-    const getOrderVaccinationFromPackage = (packageCode, packageItem) => {
-      const { inventoryVaccination } = packageItem
+    const getOrderVaccinationFromOrderSet = (orderSetCode, orderSetItem) => {
+      const { inventoryVaccination } = orderSetItem
       let item
       if (inventoryVaccination.isActive === true) {
         const vaccinationUOM = ctvaccinationunitofmeasurement.find(
@@ -215,14 +215,14 @@ const { qtyFormat } = config
           uomCode: vaccinationUOM ? vaccinationUOM.code : undefined,
           uomDisplayValue: vaccinationUOM ? vaccinationUOM.name : undefined,
           quantity: inventoryVaccination.dispensingQuantity,
-          unitPrice: packageItem.unitPrice,
-          totalPrice: packageItem.unitPrice * packageItem.quantity,
+          unitPrice: orderSetItem.unitPrice,
+          totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
           totalAfterItemAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
+            orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
-          packageCode,
+            orderSetItem.unitPrice * orderSetItem.quantity,
+          orderSetCode,
           expiryDate: isDefaultBatchNo
             ? isDefaultBatchNo.expiryDate
             : undefined,
@@ -232,11 +232,11 @@ const { qtyFormat } = config
       return item
     }
 
-    const getOrderServiceCenterServiceFromPackage = (
-      packageCode,
-      packageItem,
+    const getOrderServiceCenterServiceFromOrderSet = (
+      orderSetCode,
+      orderSetItem,
     ) => {
-      const { service } = packageItem
+      const { service } = orderSetItem
       const serviceCenterService = service.ctServiceCenter_ServiceNavigation[0]
       const serviceCenter = serviceCenterService.serviceCenterFKNavigation
       let item
@@ -248,15 +248,15 @@ const { qtyFormat } = config
         item = {
           isActive: serviceCenter.isActive && service.isActive,
           serviceCenterServiceFK: serviceCenterService.id,
-          quantity: packageItem.quantity,
-          unitPrice: packageItem.unitPrice,
-          total: packageItem.unitPrice * packageItem.quantity,
+          quantity: orderSetItem.quantity,
+          unitPrice: orderSetItem.unitPrice,
+          total: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
           totalAfterItemAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
+            orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
-          packageCode,
+            orderSetItem.unitPrice * orderSetItem.quantity,
+          orderSetCode,
           // priority:,
           serviceCode: service.code,
           serviceName: service.displayValue,
@@ -267,23 +267,23 @@ const { qtyFormat } = config
       return item
     }
 
-    const getOrderConsumableFromPackage = (packageCode, packageItem) => {
-      const { inventoryConsumable } = packageItem
+    const getOrderConsumableFromOrderSet = (orderSetCode, orderSetItem) => {
+      const { inventoryConsumable } = orderSetItem
       let item
       if (inventoryConsumable.isActive === true) {
         item = {
           inventoryConsumableFK: inventoryConsumable.id,
           // unitOfMeasurement:,
           isActive: inventoryConsumable.isActive,
-          quantity: packageItem.quantity,
-          unitPrice: packageItem.unitPrice,
-          totalPrice: packageItem.unitPrice * packageItem.quantity,
+          quantity: orderSetItem.quantity,
+          unitPrice: orderSetItem.unitPrice,
+          totalPrice: orderSetItem.unitPrice * orderSetItem.quantity,
           adjAmount: 0,
           totalAfterItemAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
+            orderSetItem.unitPrice * orderSetItem.quantity,
           totalAfterOverallAdjustment:
-            packageItem.unitPrice * packageItem.quantity,
-          packageCode,
+            orderSetItem.unitPrice * orderSetItem.quantity,
+          orderSetCode,
           consumableCode: inventoryConsumable.code,
           consumableName: inventoryConsumable.displayValue,
         }
@@ -291,35 +291,38 @@ const { qtyFormat } = config
 
       return item
     }
-    const getOrderFromPackage = (packageCode, packageItem) => {
+    const getOrderFromOrderSet = (orderSetCode, orderSetItem) => {
       let item
-      if (packageItem.type === '1') {
-        item = getOrderMedicationFromPackage(packageCode, packageItem)
+      if (orderSetItem.type === '1') {
+        item = getOrderMedicationFromOrderSet(orderSetCode, orderSetItem)
       }
-      if (packageItem.type === '2') {
-        item = getOrderVaccinationFromPackage(packageCode, packageItem)
+      if (orderSetItem.type === '2') {
+        item = getOrderVaccinationFromOrderSet(orderSetCode, orderSetItem)
       }
-      if (packageItem.type === '3') {
-        item = getOrderServiceCenterServiceFromPackage(packageCode, packageItem)
+      if (orderSetItem.type === '3') {
+        item = getOrderServiceCenterServiceFromOrderSet(
+          orderSetCode,
+          orderSetItem,
+        )
       }
-      if (packageItem.type === '4') {
-        item = getOrderConsumableFromPackage(packageCode, packageItem)
+      if (orderSetItem.type === '4') {
+        item = getOrderConsumableFromOrderSet(orderSetCode, orderSetItem)
       }
       return item
     }
 
-    const { packageItems, packageCode } = values
+    const { orderSetItems, orderSetCode } = values
     let datas = []
     let nextSequence = getNextSequence()
-    for (let index = 0; index < packageItems.length; index++) {
-      const newOrder = getOrderFromPackage(packageCode, packageItems[index])
+    for (let index = 0; index < orderSetItems.length; index++) {
+      const newOrder = getOrderFromOrderSet(orderSetCode, orderSetItems[index])
       if (newOrder) {
         const data = {
           sequence: nextSequence,
           ...newOrder,
-          subject: packageItems[index].name,
+          subject: orderSetItems[index].name,
           isDeleted: false,
-          type: packageItems[index].type,
+          type: orderSetItems[index].type,
         }
         datas.push(data)
         nextSequence += 1
@@ -333,7 +336,7 @@ const { qtyFormat } = config
   },
   displayName: 'OrderPage',
 })
-class Package extends PureComponent {
+class OrderSet extends PureComponent {
   constructor (props) {
     super(props)
     const { dispatch } = props
@@ -414,12 +417,12 @@ class Package extends PureComponent {
       ],
     }
 
-    this.changePackage = (v, op) => {
+    this.changeOrderSet = (v, op) => {
       const { setValues, values, orderTypes } = this.props
       let rows = []
-      if (op && op.medicationPackageItem) {
+      if (op && op.medicationOrderSetItem) {
         rows = rows.concat(
-          op.medicationPackageItem.map((o) => {
+          op.medicationOrderSetItem.map((o) => {
             return {
               ...o,
               name: o.medicationName,
@@ -433,9 +436,9 @@ class Package extends PureComponent {
           }),
         )
       }
-      if (op && op.vaccinationPackageItem) {
+      if (op && op.vaccinationOrderSetItem) {
         rows = rows.concat(
-          op.vaccinationPackageItem.map((o) => {
+          op.vaccinationOrderSetItem.map((o) => {
             return {
               ...o,
               name: o.vaccinationName,
@@ -449,9 +452,9 @@ class Package extends PureComponent {
           }),
         )
       }
-      if (op && op.servicePackageItem) {
+      if (op && op.serviceOrderSetItem) {
         rows = rows.concat(
-          op.servicePackageItem.map((o) => {
+          op.serviceOrderSetItem.map((o) => {
             return {
               ...o,
               name: o.serviceName,
@@ -474,9 +477,9 @@ class Package extends PureComponent {
           }),
         )
       }
-      if (op && op.consumablePackageItem) {
+      if (op && op.consumableOrderSetItem) {
         rows = rows.concat(
-          op.consumablePackageItem.map((o) => {
+          op.consumableOrderSetItem.map((o) => {
             return {
               ...o,
               name: o.consumableName,
@@ -492,15 +495,15 @@ class Package extends PureComponent {
       }
       setValues({
         ...values,
-        packageItems: rows,
-        packageCode: op ? op.code : '',
+        orderSetItems: rows,
+        orderSetCode: op ? op.code : '',
       })
     }
 
     this.handleReset = () => {
       const { setValues, orders } = this.props
       setValues({
-        ...orders.defaultPackage,
+        ...orders.defaultOrderSet,
         type: orders.type,
       })
     }
@@ -513,15 +516,15 @@ class Package extends PureComponent {
         <GridContainer>
           <GridItem xs={6}>
             <Field
-              name='inventorypackageFK'
+              name='inventoryOrderSetFK'
               render={(args) => {
                 return (
                   <CodeSelect
                     temp
-                    label='Package Name'
-                    code='inventorypackage'
+                    label='Order Set Name'
+                    code='inventoryorderset'
                     labelField='displayValue'
-                    onChange={this.changePackage}
+                    onChange={this.changeOrderSet}
                     {...args}
                   />
                 )
@@ -530,7 +533,7 @@ class Package extends PureComponent {
           </GridItem>
           <GridItem xs={12}>
             <CommonTableGrid
-              rows={values.packageItems}
+              rows={values.orderSetItems}
               style={{
                 margin: `${theme.spacing(1)}px 0`,
               }}
@@ -547,4 +550,4 @@ class Package extends PureComponent {
     )
   }
 }
-export default Package
+export default OrderSet

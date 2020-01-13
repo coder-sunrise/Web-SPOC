@@ -119,13 +119,13 @@ export default {
   'finance.scheme.setting.maximumCapMedications': 'Max Cap (Medications)',
   'finance.scheme.setting.maximumCapVaccines': 'Max Cap (Vaccines)',
   'finance.scheme.setting.maximumCapServices': 'Max Cap (Services)',
-  'finance.scheme.setting.maximumCapPackages': 'Max Cap (Packages)',
+  'finance.scheme.setting.maximumCapOrderSets': 'Max Cap (OrderSets)',
   'finance.scheme.setting.allItems': 'All Items',
   'finance.scheme.setting.consumables': 'Consumables',
   'finance.scheme.setting.medications': 'Medications',
   'finance.scheme.setting.vaccines': 'Vaccines',
   'finance.scheme.setting.services': 'Services',
-  'finance.scheme.setting.packages': 'Packages',
+  'finance.scheme.setting.ordersets': 'OrderSets',
 
   // Finance -> Credit/Debit Note (cdnote)
   'finance.cdNote.title': 'Credit / Debit Note',

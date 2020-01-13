@@ -26,7 +26,14 @@ import CustomInput from 'mui-pro-components/CustomInput'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
-import { Badge, SizeContainer, TextField, Popper, Button } from '@/components'
+import {
+  Badge,
+  SizeContainer,
+  TextField,
+  Tooltip,
+  Popper,
+  Button,
+} from '@/components'
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -129,7 +136,7 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              {/* <Badge
+              {/*  <Badge
                 badgeContent={notifications.length}
                 color='primary'
                 anchorOrigin={{
@@ -140,36 +147,25 @@ class HeaderLinks extends React.Component {
                 <Button justIcon color='transparent'>
                   <Notifications fontSize='large' />
                 </Button>
-              </Badge>
-              <Button justIcon color='transparent'>
-                {signalRConnected ? (
-                  <Badge
-                    ripple
-                    color='info'
-                    overlap='circle'
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    variant='dot'
-                  >
-                    <Link />
-                  </Badge>
-                ) : (
-                  <Badge
-                    ripple
-                    color='danger'
-                    overlap='circle'
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    variant='dot'
-                  >
-                    <LinkOff />
-                  </Badge>
-                )}
-              </Button> */}
+              </Badge> */}
+              {!signalRConnected && (
+                <Tooltip title='Realtime update is not available'>
+                  <Button justIcon color='transparent'>
+                    <Badge
+                      ripple
+                      color='danger'
+                      overlap='circle'
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      variant='dot'
+                    >
+                      <LinkOff />
+                    </Badge>
+                  </Button>
+                </Tooltip>
+              )}
 
               {/* <Button
                 justIcon

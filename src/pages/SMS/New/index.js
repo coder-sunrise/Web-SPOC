@@ -1,6 +1,7 @@
 import React from 'react'
 import Send from '@material-ui/icons/Send'
 import MailIcon from '@material-ui/icons/Mail'
+import moment from 'moment'
 import { compose } from 'redux'
 import lodash from 'lodash'
 import { Badge } from '@material-ui/core'
@@ -15,6 +16,9 @@ import {
   FastField,
   CodeSelect,
   Field,
+  dateFormatLong,
+  timeFormat24HourWithSecond,
+  timeFormatSmallCase,
 } from '@/components'
 
 const New = ({
@@ -130,10 +134,21 @@ export default compose(
         smsPatient,
       } = props
       let payload = []
-      const createPayload = (patientProfFK, o) => {
+      const createPayload = (selectedItem, o) => {
+        let { patientProfileFK: patientProfFK } = selectedItem
+        const {
+          patientName = '',
+          upcomingAppointmentDate = '',
+          upcomingAppointmentStartTime = '',
+          doctor = '',
+          callingName = '',
+          lastVisitDate = '',
+        } = selectedItem
+
         const {
           smsPatient: smsPat,
           smsAppointment: smsAppt,
+          content,
           ...restValues
         } = values
         let patientProfileFK = patientProfFK
@@ -142,8 +157,31 @@ export default compose(
           patientProfileFK = o
           appointmentFK = undefined
         }
+        let formattedContent = content
+        formattedContent = formattedContent.replace(
+          /@PatientName/g,
+          patientName,
+        )
+        formattedContent = formattedContent.replace(
+          /@AppointmentDateTime/g,
+          `${moment(upcomingAppointmentDate).format(dateFormatLong)} ${moment(
+            upcomingAppointmentStartTime,
+            timeFormat24HourWithSecond,
+          ).format(timeFormatSmallCase)}`,
+        )
+        formattedContent = formattedContent.replace(/@Doctor/g, doctor)
+        formattedContent = formattedContent.replace(/@NewLine/g, '\n')
+        formattedContent = formattedContent.replace(
+          /@PatientCallingName/g,
+          callingName,
+        )
+        formattedContent = formattedContent.replace(
+          /@LastVisitDate/g,
+          moment(lastVisitDate).format(dateFormatLong),
+        )
         const tempObject = {
           ...restValues,
+          content: formattedContent,
           patientOutgoingSMS: {
             patientProfileFK,
             appointmentReminderDto: {
@@ -160,19 +198,19 @@ export default compose(
         payload.push(tempObject)
       }
       if (recipient) {
-        const { id, patientProfileFK } = recipient
-        createPayload(patientProfileFK, id)
+        const { id } = recipient
+        createPayload(recipient, id)
       } else {
         selectedRows.forEach((o) => {
-          const { patientProfileFK } =
+          const selectedItem =
             smsAppointment.list.find((r) => r.id === o) ||
             smsPatient.list.find((r) => r.id === o)
-          createPayload(patientProfileFK, o)
+          createPayload(selectedItem, o)
         })
       }
 
       dispatch({
-        type: 'sms/upsert',
+        type: 'sms/sendSms',
         payload,
       }).then((r) => {
         if (r) {
