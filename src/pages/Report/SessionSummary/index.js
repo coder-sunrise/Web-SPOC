@@ -8,11 +8,7 @@ import { withFormik } from 'formik'
 import PageView from '@material-ui/icons/Pageview'
 import ReportBase from '../ReportBase'
 // common components
-import {
-  dateFormatLongWithTimeNoSec12h,
-  Button,
-  Tooltip,
-} from '@/components'
+import { dateFormatLongWithTimeNoSec12h, Button, Tooltip } from '@/components'
 // sub components
 import { ReportDataGrid } from '@/components/_medisys'
 // services
@@ -27,9 +23,8 @@ const SessionColumns = [
   { name: 'action', title: 'Action' },
 ]
 
-
 class SessionSummary extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -52,7 +47,9 @@ class SessionSummary extends ReportBase {
         ],
       }
       if (params.dateTo) {
-        criteria.lst_sessionCloseDate = moment(params.dateTo).add(1, 'day').formatUTC()
+        criteria.lst_sessionCloseDate = moment(params.dateTo)
+          .add(1, 'day')
+          .formatUTC()
       }
       const result = await getBizSession(criteria)
       const { status, data } = result
@@ -112,14 +109,16 @@ class SessionSummary extends ReportBase {
         ),
       },
     ]
-    return <ReportDataGrid
-      height='80vh'
-      style={{ marginTop: 6 }}
-      onRowDoubleClick={this.viewSessionSummaryReport}
-      data={reportDatas}
-      columns={SessionColumns}
-      columnExtensions={columnExtensions}
-    />
+    return (
+      <ReportDataGrid
+        height='80vh'
+        style={{ marginTop: 6 }}
+        onRowDoubleClick={this.viewSessionSummaryReport}
+        data={reportDatas}
+        columns={SessionColumns}
+        columnExtensions={columnExtensions}
+      />
+    )
   }
 }
 
@@ -128,10 +127,8 @@ const SessionSummaryWithFormik = withFormik({
     dateFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).add(-3, 'month').toDate(),
+    dateFrom: moment(new Date()).toDate(),
     dateTo: moment(new Date()).toDate(),
-    filterType: 'Credit Note',
   }),
 })(SessionSummary)
 export default SessionSummaryWithFormik
-

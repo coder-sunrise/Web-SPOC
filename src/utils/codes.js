@@ -1538,8 +1538,11 @@ const tagList = [
     getter: () => {
       const { user } = window.g_app._store.getState()
       if (user && user.data && user.data.clinicianProfile) {
-        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
-          .name}`
+        const title = user.data.clinicianProfile.title
+          ? `${user.data.clinicianProfile.title} `
+          : ''
+
+        return `${title}${user.data.clinicianProfile.name}`
       }
       return 'N.A.'
     },

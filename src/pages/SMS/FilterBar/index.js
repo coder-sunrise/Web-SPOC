@@ -179,6 +179,7 @@ export default compose(
           'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
 
           apiCriteria: {
+            // searchValue: patientName,
             PDPAPhone,
             PDPAMessage,
             PDPAEmail,

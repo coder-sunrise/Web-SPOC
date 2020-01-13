@@ -24,16 +24,19 @@ import {
   Field,
   ClinicianSelect,
 } from '@/components'
+import { getClinicianProfile } from './utils'
 
 @connect(({ patient }) => ({
   patient,
 }))
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    return (
-      consultationDocument.entity ||
-      consultationDocument.defaultVaccinationCertificate
-    )
+  mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    return {
+      ...(consultationDocument.entity ||
+        consultationDocument.defaultVaccinationCertificate),
+      issuedByUserFK: clinicianProfile.userProfileFK,
+    }
   },
   validationSchema: Yup.object().shape({
     issuedByUserFK: Yup.number().required(),

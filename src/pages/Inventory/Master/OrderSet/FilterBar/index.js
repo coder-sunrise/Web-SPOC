@@ -76,7 +76,7 @@ const FilterBar = ({ classes, dispatch, history, values }) => {
               onClick={() => {
                 const { code, displayValue, isActive } = values
                 dispatch({
-                  type: 'pack/query',
+                  type: 'orderSet/query',
                   payload: {
                     code,
                     displayValue,

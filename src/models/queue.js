@@ -243,10 +243,13 @@ export default createListViewModel({
           type: 'patientSearch/query',
           payload: {
             version: Date.now(),
-            [`${prefix}name`]: searchQuery,
-            [`${prefix}patientAccountNo`]: searchQuery,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-            combineCondition: 'or',
+            // [`${prefix}name`]: searchQuery,
+            // [`${prefix}patientAccountNo`]: searchQuery,
+            // [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+            // combineCondition: 'or',
+            apiCriteria: {
+              searchValue: searchQuery,
+            },
           },
         })
 

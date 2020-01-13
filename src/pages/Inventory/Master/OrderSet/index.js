@@ -8,7 +8,7 @@ import FilterBar from './FilterBar'
 import Grid from '../Grid'
 
 const styles = () => ({})
-const OrderSet = ({ dispatch, history, pack }) => {
+const OrderSet = ({ dispatch, history, orderSet }) => {
   const [
     tableParas,
     setTableParas,
@@ -78,17 +78,17 @@ const OrderSet = ({ dispatch, history, pack }) => {
 
   const gridProps = {
     ...filterProps,
-    pack,
+    orderSet,
     namespace: 'orderSet',
     // list: getPackList(pack.list),
-    list: pack.list || [],
+    list: orderSet.list || [],
     tableParas,
     colExtensions,
   }
 
   useEffect(() => {
     dispatch({
-      type: 'pack/query',
+      type: 'orderSet/query',
       payload: {
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
@@ -119,7 +119,7 @@ const OrderSet = ({ dispatch, history, pack }) => {
 }
 export default compose(
   withStyles(styles),
-  connect(({ pack }) => ({
-    pack,
+  connect(({ orderSet }) => ({
+    orderSet,
   })),
 )(OrderSet)

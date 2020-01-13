@@ -19,6 +19,7 @@ import Person from '@material-ui/icons/Person'
 import Notifications from '@material-ui/icons/Notifications'
 import Link from '@material-ui/icons/Link'
 import LinkOff from '@material-ui/icons/LinkOff'
+import WifiOff from '@material-ui/icons/WifiOff'
 import Search from '@material-ui/icons/Search'
 
 // core components
@@ -149,7 +150,7 @@ class HeaderLinks extends React.Component {
                 </Button>
               </Badge> */}
               {!signalRConnected && (
-                <Tooltip title='Realtime update is not available'>
+                <Tooltip title='Real-time update signal is down. Please refresh manually.'>
                   <Button justIcon color='transparent'>
                     <Badge
                       ripple
@@ -161,7 +162,7 @@ class HeaderLinks extends React.Component {
                       }}
                       variant='dot'
                     >
-                      <LinkOff />
+                      <WifiOff />
                     </Badge>
                   </Button>
                 </Tooltip>
