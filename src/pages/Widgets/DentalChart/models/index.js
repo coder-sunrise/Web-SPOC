@@ -89,22 +89,8 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      showPedo: false,
       mode: 'diagnosis',
-      // mode: 'treatment',
-
-      data: [
-        // {
-        //   id: 'system-id-1',
-        //   toothNo: 11,
-        //   id: 'topcell',
-        // },
-        // {
-        //   id: 'onlayveneer',
-        //   toothNo: 17,
-        //   id: 'sys-gen--231',
-        // },
-      ],
+      data: [],
     },
     subscriptions: ({ dispatch, history }) => {},
     effects: {},

@@ -293,7 +293,7 @@ class TreatmentForm extends Component {
                 })}
               </p>
               <FastField
-                name='itemsNotes'
+                name='itemNotes'
                 render={(args) => (
                   <OutlinedTextField
                     autoFocus
@@ -304,7 +304,7 @@ class TreatmentForm extends Component {
                     rows={6}
                     onChange={(e) => {
                       this.updateValueToStore({
-                        itemsNotes: e.target.value,
+                        itemNotes: e.target.value,
                       })
                     }}
                     {...args}

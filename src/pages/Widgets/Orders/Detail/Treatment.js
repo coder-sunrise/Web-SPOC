@@ -1,4 +1,6 @@
 import React, { PureComponent } from 'react'
+import { Paper, Divider, Chip } from '@material-ui/core'
+
 import {
   GridContainer,
   GridItem,
@@ -12,271 +14,417 @@ import {
   Select,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { calculateAdjustAmount } from '@/utils/utils'
 
+const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
+// @Authorized.Secured('queue.dispense.editorder')
 @withFormikExtend({
-  mapPropsToValues: ({ orders = {}, type }) => {
-    const v = {
-      ...(orders.entity || orders.defaultTreatment),
-      type,
+  // authority: [
+  //   'queue.dispense.editorder',
+  // ],
+  // notDirtyDuration: 0, // this page should alwasy show warning message when leave
+  mapPropsToValues: ({
+    dentalChartTreatment = {},
+    dentalChartComponent = {},
+    codetable,
+    orders,
+    ...rest
+  }) => {
+    // console.log(dentalChartComponent, dentalChartTreatment)
+    const { data = [], action = {} } = dentalChartComponent
+    const { entity = {} } = orders
+    const { rows } = orders
+    // console.log(action, data, rows)
+    // console.log(rest, this)
+    let treatment = {}
+
+    if (action.id)
+      treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.chartMethodFK === action.id) || {}
+    const existedTooths = []
+    const otherTreatmentTooths = []
+    rows.filter((o) => o.type === '7').forEach((r) => {
+      let matches = (r.itemNotes || '').matchAll(rangeReg)
+      for (let result of matches) {
+        if (result[2]) {
+          for (
+            let index = Number(result[1]);
+            index <= Number(result[2]);
+            index++
+          ) {
+            if (r.uid !== entity.uid) {
+              otherTreatmentTooths.push(index)
+            } else {
+              existedTooths.push(index)
+            }
+          }
+        } else if (r.uid !== entity.uid) {
+          otherTreatmentTooths.push(Number(result[1]))
+        } else {
+          existedTooths.push(Number(result[1]))
+        }
+      }
+    })
+
+    // console.log(existedTooths, otherTreatmentTooths)
+    const dataFiltered = data.filter(
+      (o) =>
+        o.id === action.id &&
+        o.action.dentalTreatmentFK === treatment.id &&
+        (existedTooths.indexOf(o.toothNo) >= 0 ||
+          otherTreatmentTooths.indexOf(o.toothNo) < 0),
+      // (!rows.find((m) =>
+      //   m.groups.find((k) =>
+      //     k.items.find(
+      //       (j) => j.action.id === o.id && j.toothNo === o.toothNo,
+      //     ),
+      //   ),
+      // ) ||
+      //   (entity.chartMethodFK === action.id &&
+      //     entity.groups.find((k) =>
+      //       k.items.find((j) => j.toothNo === o.toothNo),
+      //     ))),
+    )
+    // console.log(dataFiltered)
+
+    let groupsAry = []
+    let quantity
+    if (treatment.id) {
+      let groups = _.groupBy(dataFiltered, 'toothNo')
+      groupsAry = Object.keys(groups).map((k) => {
+        return {
+          text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
+            '(tooth)',
+            '',
+          ),
+          items: groups[k],
+        }
+      })
+      // console.log(groupsAry)
+      quantity = groupsAry.length
+      // let tooth = groupsAry.map((o) => o.text).join(',')
+      if (action.chartMethodTypeFK === 3) {
+        quantity = 0
+        groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map((o) => {
+          // console.log(o[0].nodes)
+          const { nodes } = o[0]
+          quantity += o.length
+
+          return {
+            text: `#${nodes[0]} - ${nodes[1]}`,
+            items: o,
+          }
+        })
+      }
     }
-    return v
+    // console.log(entity)
+    let { adjType, adjValue = 0, unitPrice } = entity
+    if (!unitPrice || action.id !== entity.treatmentFK) {
+      unitPrice = treatment.sellingPrice
+    }
+    const totalPrice = unitPrice * quantity || undefined
+    // console.log(groupsAry)
+    // console.log(action, entity, treatment, unitPrice)
+    const isExactAmount = adjType === 'ExactAmount'
+
+    const final = calculateAdjustAmount(isExactAmount, totalPrice, adjValue)
+    return {
+      isExactAmount,
+      isActive: true,
+      ...orders.entity,
+      unitPrice,
+      chartMethodFK: action.id,
+      treatmentFK: treatment.id,
+      itemName: treatment.displayValue,
+      totalPrice,
+      adjustment: adjValue,
+      adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+      adjAmount: final.adjAmount,
+      totalAfterItemAdjustment: final.amount || undefined,
+      quantity,
+      groups: groupsAry,
+      itemNotes: groupsAry.map((o) => o.text).join(','),
+    }
   },
-  enableReinitialize: true,
   validationSchema: Yup.object().shape({
-    treatmentCategoryFK: Yup.number().required(),
-    treatmentFK: Yup.number().required(),
-    quantity: Yup.number().required(),
+    quantity: Yup.number()
+      .min(1, 'Need apply at least one treatment')
+      .required(),
     unitPrice: Yup.number().required(),
+    treatmentFK: Yup.number().required(),
   }),
-  handleSubmit: (values, { props, onConfirm }) => {
-    const { dispatch, currentType, getNextSequence } = props
+  handleReset: () => {
+    const { setValues, orders } = this.props
+    setValues({
+      ...orders.defaultTreatment,
+      type: orders.type,
+    })
+  },
+  handleSubmit: async (values, { props, onConfirm }) => {
+    const { dispatch, orders, currentType, getNextSequence } = props
+    // dispatch({
+    //   type: 'dentalChartTreatment/upsertRow',
+    //   payload: {
+    //     ...values,
+    //   },
+    // })
 
     const data = {
+      type: '7',
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
+      instruction: values.itemNotes,
       isDeleted: false,
-      totalPrice: values.unitPrice,
-      totalAfterItemAdjustment: values.totalPrice,
+      totalAfterItemAdjustment: values.totalAfterItemAdjustment,
     }
+    // console.log(data)
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
     })
+
+    // dispatch({
+    //   type: 'dentalChartTreatment/updateState',
+    //   payload: {
+    //     entity: undefined,
+    //   },
+    // })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
+
     if (onConfirm) onConfirm()
   },
-  displayName: 'OrderPage',
+  enableReinitialize: true,
+  displayName: 'TreatmentForm',
 })
 class Treatment extends PureComponent {
-  state = {
-    ctTreatment: [],
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'cttreatment',
+      },
+    })
   }
 
-  componentDidMount () {
-    this.props
-      .dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'cttreatment',
-        },
-      })
-      .then((v) => {
-        this.setState({ ctTreatment: v })
-      })
-  }
-
-  calculateSubtotal = (
-    quantity = 0,
-    unitPrice = 0,
-    adjAmount = 0,
-    adjType = 'Percentage',
-  ) => {
-    let subtotal = unitPrice * quantity
-
-    if (adjType === 'ExactAmount') {
-      subtotal -= adjAmount
-    } else {
-      if (adjAmount > 100) adjAmount = 100
-      subtotal *= (100 - adjAmount) / 100
+  setTotalPrice = () => {
+    const { setFieldValue, values, disableEdit } = this.props
+    if (disableEdit === false) {
+      if (values.unitPrice) {
+        const total = (values.quantity || 0) * values.unitPrice
+        setFieldValue('totalPrice', total)
+        this.updateTotalPrice(total)
+      }
     }
-
-    this.props.setFieldValue('totalPrice', subtotal)
   }
 
-  setItemName = (v, op) => {
-    const { setFieldValue, values } = this.props
-    const { displayValue, sellingPrice, isActive } = op
+  updateTotalPrice = (v) => {
+    if (v || v === 0) {
+      const { adjType, adjValue } = this.props.values
+      const adjustment = calculateAdjustAmount(
+        adjType === 'ExactAmount',
+        v,
+        adjValue,
+      )
+      this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
+      this.props.setFieldValue('adjAmount', adjustment.adjAmount)
+    } else {
+      this.props.setFieldValue('totalAfterItemAdjustment', undefined)
+      this.props.setFieldValue('adjAmount', undefined)
+    }
+  }
 
-    setFieldValue('itemName', displayValue)
+  changeTreatment = (option = {}) => {
+    const { setFieldValue } = this.props
+
+    const { sellingPrice } = option
+
     setFieldValue('unitPrice', sellingPrice)
-    setFieldValue('isActive', isActive)
-    this.calculateSubtotal(
-      values.quantity,
-      sellingPrice,
-      values.adjAmount,
-      values.adjType,
-    )
+  }
+
+  updateValueToStore = (vals) => {
+    this.props.dispatch({
+      type: 'orders/updateState',
+      payload: {
+        entity: {
+          ...this.props.values,
+          ...vals,
+        },
+      },
+    })
   }
 
   render () {
-    const { values, footer, handleSubmit, setFieldValue } = this.props
-    const isExactAmount = values.adjType === 'ExactAmount'
+    const {
+      classes,
+      dispense,
+      consultation,
+      dispatch,
+      theme,
+      dentalChartComponent,
+      setFieldValue,
+      values,
+      codetable = {},
+      footer,
+      handleSubmit,
+      from,
+    } = this.props
+    // const {
+    //   data = [],
+    //   isPedoChart,
+    //   isSurfaceLabel,
+    //   action = {},
+    // } = dentalChartComponent
+    const isDoctor = from === 'doctor'
+    const { cttreatment } = codetable
+    // console.log(cttreatment)
     return (
       <div>
         <GridContainer>
-          <GridItem xs={8}>
-            <GridItem>
+          <GridItem xs={12} md={8}>
+            {/* <p style={{ marginBottom: 0 }}>Tooth No. {values.tooth}</p> */}
+            <p>
+              {/* Tooth No.{' '} */}
+              {(values.groups || []).map((o) => {
+                return (
+                  <Chip
+                    // icon={<FaceIcon />}
+                    label={o.text}
+                    onDelete={() => {
+                      dispatch({
+                        type: 'dentalChartComponent/toggleMultiSelect',
+                        payload: o.items.map((m) => ({
+                          ...m,
+                          deleted: true,
+                        })),
+                      })
+                      // console.log(o)
+                    }}
+                    style={{ margin: theme.spacing(0, 0.25, 0.25, 0) }}
+                    color='primary'
+                  />
+                )
+              })}
+            </p>
+            <FastField
+              name='remark'
+              render={(args) => (
+                <OutlinedTextField
+                  autoFocus
+                  label='Treatment Details'
+                  multiline
+                  maxLength={2000}
+                  rowsMax={6}
+                  rows={6}
+                  onChange={(e) => {
+                    this.updateValueToStore({
+                      remark: e.target.value,
+                    })
+                  }}
+                  {...args}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem xs={12} md={4}>
+            {!isDoctor && (
               <FastField
                 name='treatmentCategoryFK'
-                render={(args) => {
-                  return (
-                    <CodeSelect
-                      temp
-                      label='Treatment Category'
-                      code='cttreatmentcategory'
-                      labelField='name'
-                      onChange={() => setFieldValue('treatmentFK', undefined)}
-                      {...args}
-                    />
-                  )
-                }}
+                render={(args) => (
+                  <CodeSelect
+                    label='Treatment Category'
+                    code='cttreatmentcategory'
+                    labelField='name'
+                    onChange={() => setFieldValue('treatmentFK', undefined)}
+                    {...args}
+                  />
+                )}
               />
-            </GridItem>
-            <GridItem>
-              <Field
-                name='treatmentFK'
-                render={(args) => {
-                  return (
-                    <Select
-                      label='Treatment'
-                      labelField='displayValue'
-                      valueField='id'
-                      options={this.state.ctTreatment.filter(
+            )}
+            <FastField
+              name='treatmentFK'
+              render={(args) => (
+                <Select
+                  options={
+                    isDoctor ? (
+                      cttreatment
+                    ) : (
+                      cttreatment.filter(
                         (o) =>
                           o.treatmentCategoryFK === values.treatmentCategoryFK,
-                      )}
-                      onChange={(v, op = {}) => {
-                        this.setItemName(v, op)
-                      }}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-            <GridItem>
-              <Field
-                name='remark'
-                render={(args) => {
-                  return (
-                    <OutlinedTextField
-                      label='Remarks'
-                      multiline
-                      rowsMax={3}
-                      rows={2}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-          </GridItem>
-          <GridItem xs={4}>
-            <GridItem>
-              <Field
-                name='quantity'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      precision={0}
-                      label='Quantity'
-                      min={1}
-                      onChange={(e) =>
-                        this.calculateSubtotal(
-                          e.target.value,
-                          values.unitPrice,
-                          values.adjAmount,
-                          values.adjType,
-                        )}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-
-            <GridItem>
-              <Field
-                name='unitPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Unit Price'
-                      currency
-                      onChange={(e) =>
-                        this.calculateSubtotal(
-                          values.quantity,
-                          e.target.value,
-                          values.adjAmount,
-                          values.adjType,
-                        )}
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
-
-            <GridItem container direction='row' style={{ padding: 0 }}>
-              <GridItem>
-                <Field
-                  name='adjAmount'
-                  render={(args) => {
-                    return (
-                      <NumberInput
-                        label='Discount'
-                        currency={isExactAmount}
-                        percentage={!isExactAmount}
-                        onChange={(e) =>
-                          this.calculateSubtotal(
-                            values.quantity,
-                            values.unitPrice,
-                            e.target.value,
-                            values.adjType,
-                          )}
-                        {...args}
-                      />
+                      )
                     )
-                  }}
+                  }
+                  valueField='id'
+                  labelField='displayValue'
+                  label='Treatment'
+                  disabled={isDoctor}
+                  // onChange={(v, op) => {
+                  //   this.changeTreatment(op)
+                  // }}
+                  {...args}
                 />
-              </GridItem>
-              <GridItem style={{ padding: 0 }}>
-                <Field
-                  name='adjType'
-                  render={(args) => {
-                    return (
-                      <Switch
-                        checkedChildren='$'
-                        unCheckedChildren='%'
-                        checkedValue='ExactAmount'
-                        unCheckedValue='Percentage'
-                        label=''
-                        onChange={(e) =>
-                          this.calculateSubtotal(
-                            values.quantity,
-                            values.unitPrice,
-                            values.adjAmount,
-                            e,
-                          )}
-                        {...args}
-                      />
-                    )
+              )}
+            />
+            <FastField
+              name='quantity'
+              render={(args) => (
+                <NumberInput
+                  label='Unit'
+                  onChange={() => {
+                    setTimeout(() => {
+                      this.setTotalPrice()
+                    }, 1)
                   }}
+                  disabled={isDoctor}
+                  {...args}
                 />
-              </GridItem>
-            </GridItem>
-
-            <GridItem>
-              <Field
-                name='totalPrice'
-                render={(args) => {
-                  return (
-                    <NumberInput
-                      label='Sub-Total'
-                      disabled
-                      currency
-                      {...args}
-                    />
-                  )
-                }}
-              />
-            </GridItem>
+              )}
+            />
+            <FastField
+              name='unitPrice'
+              render={(args) => (
+                <NumberInput
+                  label='Unit Price'
+                  currency
+                  onChange={(v) => {
+                    setTimeout(() => {
+                      this.setTotalPrice()
+                    }, 1)
+                  }}
+                  {...args}
+                />
+              )}
+            />
+            <FastField
+              name='totalPrice'
+              render={(args) => {
+                return <NumberInput label='Total' disabled currency {...args} />
+              }}
+            />
+            <FastField
+              name='totalAfterItemAdjustment'
+              render={(args) => (
+                <NumberInput
+                  disabled
+                  currency
+                  label='Total After Adj'
+                  {...args}
+                />
+              )}
+            />
           </GridItem>
         </GridContainer>
         {footer({
           onSave: handleSubmit,
           onReset: this.handleReset,
-          showAdjustment: false,
         })}
       </div>
     )

@@ -45,10 +45,7 @@ const initialState = {
   defaultPackage: {
     packageItems: [],
   },
-  defaultTreatment: {
-    quantity: 1,
-    adjType: 'Percentage',
-  },
+  defaultTreatment: {},
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {

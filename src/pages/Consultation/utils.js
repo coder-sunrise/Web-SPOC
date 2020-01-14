@@ -1,9 +1,6 @@
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 
-const convertToConsultation = (
-  values,
-  { consultationDocument, orders, dentalChartComponent },
-) => {
+const convertToConsultation = (values, { consultationDocument, orders }) => {
   const { rows = [] } = consultationDocument
   consultationDocumentTypes.forEach((p) => {
     values[p.prop] = rows.filter((o) => o.type === p.value)
@@ -20,18 +17,20 @@ const convertToConsultation = (
       }
     }
   })
+  const { dentalChartComponent } = window.g_app._store.getState()
+  // console.log('dentalChartComponent', dentalChartComponent)
 
   if (dentalChartComponent) {
-    console.log('dentalChartComponent')
     const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
     values.corDentalCharts = [
       {
+        ...(values.corDentalCharts || [])[0],
         isPedoChart,
         isSurfaceLabel,
-        // remarks:JSON.stringify(data)
+        dentalChart: JSON.stringify(data),
       },
     ]
-    // values.corDentalToothJournals = data.map(o=>)
+    // values.corDentalCharts = data.map(o=>)
   }
   return {
     ...values,

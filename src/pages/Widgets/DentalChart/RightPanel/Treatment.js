@@ -52,7 +52,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { ctchartmethod } = codetable
+  const { ctchartmethod = [] } = codetable
   const [
     search,
     setSearch,

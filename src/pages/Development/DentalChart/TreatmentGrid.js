@@ -168,7 +168,7 @@ const TreatmentGrid = (props) => {
 
       { name: 'toothInfo', title: 'Tooth' },
 
-      { name: 'itemsNotes', title: 'Details' },
+      { name: 'itemNotes', title: 'Details' },
       { name: 'quantity', title: 'Unit' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'adjAmount', title: 'Discount' },
