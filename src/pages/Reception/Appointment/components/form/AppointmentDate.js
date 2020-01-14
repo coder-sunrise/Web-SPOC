@@ -12,6 +12,7 @@ import {
 
 const AppointmentDate = ({ disabled }) => (
   <React.Fragment>
+    <GridItem xs md={3} />
     <GridItem xs md={3}>
       <FastField
         name='currentAppointment.appointmentDate'
@@ -26,7 +27,6 @@ const AppointmentDate = ({ disabled }) => (
         )}
       />
     </GridItem>
-    <GridItem xs md={3} />
 
     <GridItem xs md={3}>
       <FastField

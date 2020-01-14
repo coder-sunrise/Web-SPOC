@@ -100,6 +100,11 @@ const ActionButton = ({ row, onClick }) => {
     VISIT_STATUS.COMPLETED,
   ].includes(row.visitStatus)
 
+  const hideEditConsultation =
+    !isStatusCompleted ||
+    isRetailVisit ||
+    (isBillFirstVisit && !row.hasSignedCOR)
+
   const newContextMenuOptions = useMemo(
     () =>
       ContextMenuOptions.map((opt) => {
@@ -133,7 +138,7 @@ const ActionButton = ({ row, onClick }) => {
             return {
               ...opt,
               disabled: !isStatusCompleted,
-              hidden: !isStatusCompleted || isRetailVisit || isBillFirstVisit,
+              hidden: hideEditConsultation,
             }
           default:
             return { ...opt }
@@ -143,6 +148,7 @@ const ActionButton = ({ row, onClick }) => {
       row.rowIndex,
       row.visitStatus,
       row.visitPurposeFK,
+      row.hasSignedCOR,
     ],
   )
   return (

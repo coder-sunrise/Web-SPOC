@@ -171,7 +171,7 @@ const DispenseDetails = ({
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Are you sure want to discard the dispense ?`,
+        openConfirmContent: `Discard dispense?`,
         onConfirmSave:
           visitPurposeFK === VISIT_TYPE.RETAIL
             ? discardAddOrderDetails
@@ -203,9 +203,15 @@ const DispenseDetails = ({
       },
     })
   }
+
+  const { clinicalObjectRecordFK } = values || {
+    clinicalObjectRecordFK: undefined,
+  }
+
   const isRetailVisit = visitPurposeFK === VISIT_TYPE.RETAIL
   const isBillFirstVisit = visitPurposeFK === VISIT_TYPE.BILL_FIRST
-  const disableRefreshOrder = isBillFirstVisit && !values.clinicalObjectRecordFK
+  const disableRefreshOrder = isBillFirstVisit && !clinicalObjectRecordFK
+  const disableDiscard = totalPayment > 0 || !!clinicalObjectRecordFK
 
   return (
     <React.Fragment>
@@ -266,7 +272,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Delete />}
                 onClick={discardDispense}
-                disabled={totalPayment > 0}
+                disabled={disableDiscard}
               >
                 Discard
               </ProgressButton>

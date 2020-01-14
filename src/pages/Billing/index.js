@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import moment from 'moment'
 import router from 'umi/router'
 import { connect } from 'dva'
 // material ui
@@ -130,7 +129,6 @@ class Billing extends Component {
     showSchemeValidationPrompt: false,
     isEditing: false,
     submitCount: 0,
-    dispenseLoaded: false,
     schemeValidations: {
       patient: [],
       billing: [],
@@ -194,7 +192,6 @@ class Billing extends Component {
       const isSchemesValid = noValidation
         ? true
         : this.validateSchemesWithPatientProfile(invoicePayer)
-
       if (isSchemesValid) {
         const payload = constructPayload(values)
         const defaultCallback = () => {
@@ -268,7 +265,6 @@ class Billing extends Component {
 
   onExpandDispenseDetails = () => {
     const { dispense } = this.props
-    const { dispenseLoaded } = this.state
 
     if (!dispense.entity) {
       this.props.dispatch({

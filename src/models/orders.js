@@ -42,8 +42,8 @@ const initialState = {
     unitPrice: 0,
   },
   defaultConsumable: { quantity: 1 },
-  defaultPackage: {
-    packageItems: [],
+  defaultOrderSet: {
+    orderSetItems: [],
   },
   defaultTreatment: {},
   // default: {
@@ -204,7 +204,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: { uid: getUniqueId(), packageItems: [] },
+          entity: { uid: getUniqueId(), orderSetItems: [] },
           // totalAfterAdj: undefined,
         }
       },

@@ -13,7 +13,7 @@ const reportId = 23
 const fileName = 'Deposit Transaction Report'
 
 class DepositTransactionReport extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -35,10 +35,14 @@ const DepositTransactionReportWithFormik = withFormik({
   validationSchema: Yup.object().shape({
     dateFrom: Yup.date().required(),
   }),
-  mapPropsToValues: () => ({
-    dateFrom: moment(new Date()).startOf('month').toDate(),
-    dateTo: moment(new Date()).endOf('month').toDate(),
-  }),
+  mapPropsToValues: () => {
+    const values = {
+      dateFrom: moment(new Date()).startOf('month').toDate(),
+      dateTo: moment(new Date()).endOf('month').toDate(),
+    }
+    console.log({ values })
+    return values
+  },
 })(DepositTransactionReport)
 
 export default DepositTransactionReportWithFormik

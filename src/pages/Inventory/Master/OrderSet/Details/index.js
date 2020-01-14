@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 import InventoryTypeListing from './InventoryTypeListing'
-import { PackageDetailOption } from './variables'
+import { OrderSetDetailOption } from './variables'
 
 import {
   NavPills,
@@ -30,8 +30,7 @@ const styles = () => ({
 const Detail = ({
   classes,
   dispatch,
-  pack,
-  packDetail,
+  orderSetDetail,
   history,
   setFieldValue,
   handleSubmit,
@@ -121,10 +120,9 @@ const Detail = ({
   //   return { ...row, unitPrice: sellingPrice }
   // }
 
-  const { currentTab } = pack
   const detailProps = {
     values,
-    packDetail,
+    orderSetDetail,
     dispatch,
     setFieldValue,
     showTransfer: false,
@@ -138,7 +136,7 @@ const Detail = ({
 
   const typeListingProps = {
     dispatch,
-    packDetail,
+    orderSetDetail,
     setFieldValue,
     values,
     selectedItem,
@@ -157,23 +155,23 @@ const Detail = ({
   // ] = useState(0)
   // const calTotal = () => {
   //   setTotal(0)
-  //   medicationPackageItem.map((row) => {
+  //   medicationOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   servicePackageItem.map((row) => {
+  //   serviceOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   consumablePackageItem.map((row) => {
+  //   consumableOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
 
-  //   vaccinationPackageItem.map((row) => {
+  //   vaccinationOrderSetItem.map((row) => {
   //     return setTotal(total + row.subTotal)
   //   })
   // }
-  // console.log('packDetail', packDetail)
+  // console.log('orderSetDetail', orderSetDetail)
   return (
     <React.Fragment>
       {/* <NavPills
@@ -197,7 +195,7 @@ const Detail = ({
             tabContent: (
               <InventoryTypeListing
                 dispatch={dispatch}
-                packDetail={packDetail}
+                orderSetDetail={orderSetDetail}
                 setFieldValue={setFieldValue}
                 values={values}
                 selectedItem={selectedItem}
@@ -216,7 +214,7 @@ const Detail = ({
       <Tabs
         style={{ marginTop: 20 }}
         defaultActiveKey='0'
-        options={PackageDetailOption(detailProps, typeListingProps)}
+        options={OrderSetDetailOption(detailProps, typeListingProps)}
       />
       <div className={classes.actionDiv}>
         <Button
@@ -227,26 +225,28 @@ const Detail = ({
         >
           Close
         </Button>
-        <ProgressButton submitKey='packDetail/submit' onClick={handleSubmit} />
+        <ProgressButton
+          submitKey='orderSetDetail/submit'
+          onClick={handleSubmit}
+        />
       </div>
     </React.Fragment>
   )
 }
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ pack, packDetail, codetable }) => ({
-    pack,
-    packDetail,
+  connect(({ orderSetDetail, codetable }) => ({
+    orderSetDetail,
     codetable,
   })),
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: ({ packDetail }) => {
-      const returnValue = packDetail.entity || packDetail.default
-      const { servicePackageItem } = returnValue
-      let newServicePackageItem = []
-      if (servicePackageItem.length > 0) {
-        newServicePackageItem = servicePackageItem.map((o) => {
+    mapPropsToValues: ({ orderSetDetail }) => {
+      const returnValue = orderSetDetail.entity || orderSetDetail.default
+      const { serviceOrderSetItem } = returnValue
+      let newserviceOrderSetItem = []
+      if (serviceOrderSetItem.length > 0) {
+        newserviceOrderSetItem = serviceOrderSetItem.map((o) => {
           const { service } = o
           return {
             ...o,
@@ -260,7 +260,7 @@ export default compose(
       }
       return {
         ...returnValue,
-        servicePackageItem: newServicePackageItem,
+        serviceOrderSetItem: newserviceOrderSetItem,
       }
     },
 
@@ -272,9 +272,9 @@ export default compose(
 
     handleSubmit: (values, { props, resetForm }) => {
       const { dispatch, history, codetable } = props
-      const { servicePackageItem } = values
+      const { serviceOrderSetItem } = values
 
-      const newServicePackageArray = servicePackageItem.map((o) => {
+      const newServiceOrderSetArray = serviceOrderSetItem.map((o) => {
         return {
           ...o,
           serviceCenterServiceFK:
@@ -283,12 +283,12 @@ export default compose(
         }
       })
       dispatch({
-        type: 'packDetail/upsert',
+        type: 'orderSetDetail/upsert',
         payload: {
           ...values,
           effectiveStartDate: values.effectiveDates[0],
           effectiveEndDate: values.effectiveDates[1],
-          servicePackageItem: newServicePackageArray,
+          serviceOrderSetItem: newServiceOrderSetArray,
         },
       }).then((r) => {
         if (r) {
@@ -298,6 +298,6 @@ export default compose(
       })
     },
 
-    displayName: 'InventoryPackageDetail',
+    displayName: 'InventoryOrderSetDetail',
   }),
 )(Detail)

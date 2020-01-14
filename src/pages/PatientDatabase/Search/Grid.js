@@ -43,9 +43,16 @@ class Grid extends PureComponent {
           sortingEnabled: false,
           // sortBy: 'genderFkNavigation.displayValue',
         },
-        { columnName: 'dob', type: 'date' },
-        { columnName: 'race', sortBy: 'raceFkNavigation.displayValue' },
-        { columnName: 'lastPayment', type: 'date' },
+        {
+          columnName: 'dob',
+          type: 'date',
+          sortingEnabled: false,
+        },
+        {
+          columnName: 'race',
+          sortingEnabled: false,
+          // sortBy: 'raceFkNavigation.displayValue',
+        },
         {
           columnName: 'action',
           align: 'center',
@@ -69,7 +76,8 @@ class Grid extends PureComponent {
         },
         {
           columnName: 'nationality',
-          sortBy: 'nationalityFkNavigation.displayValue',
+          // sortBy: 'nationalityFkNavigation.displayValue',
+          sortingEnabled: false,
         },
         { columnName: 'mobileNo', sortingEnabled: false },
         { columnName: 'homeNo', sortingEnabled: false },

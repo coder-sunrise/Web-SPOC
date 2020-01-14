@@ -239,16 +239,19 @@ class Form extends React.PureComponent {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        group: [
-          {
-            [`${prefix}name`]: values.patientName,
-            [`${prefix}patientAccountNo`]: values.patientName,
-            [`${prefix}patientReferenceNo`]: values.patientName,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
-              ''}`,
-            combineCondition: 'or',
-          },
-        ],
+        // group: [
+        //   {
+        //     [`${prefix}name`]: values.patientName,
+        //     [`${prefix}patientAccountNo`]: values.patientName,
+        //     [`${prefix}patientReferenceNo`]: values.patientName,
+        //     [`${prefix}contactFkNavigation.contactNumber.number`]: `${values.patientContactNo ||
+        //       ''}`,
+        //     combineCondition: 'or',
+        //   },
+        // ],
+        apiCriteria: {
+          searchValue: values.search,
+        },
       },
     })
     this.showSearchResult()

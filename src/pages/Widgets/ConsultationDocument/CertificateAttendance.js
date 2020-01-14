@@ -15,12 +15,14 @@ import {
   timeFormat24HourWithSecond as timeFormat,
 } from '@/components'
 import * as service from '@/services/common'
+import { getClinicianProfile } from './utils'
 
 const isSameOrAfterTime = (startTime, endTime) =>
   moment(startTime, timeFormat).isSameOrAfter(endTime)
 
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument, visitEntity }) => {
+  mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
     const visitDataValue = moment(visitEntity.visit.visitDate).format('HH:mm')
     const currentTime = moment().format('HH:mm')
     if (consultationDocument.entity === undefined) {
@@ -35,8 +37,10 @@ const isSameOrAfterTime = (startTime, endTime) =>
         )
           ? moment(visitEntity.visit.visitDate).format('HH:mm')
           : moment().format('HH:mm'),
+        issuedByUserFK: clinicianProfile.userProfileFK,
       }
     }
+    console.log({ clinicianProfile })
     return {
       ...consultationDocument.entity,
       attendanceStartTime: moment(
@@ -45,6 +49,7 @@ const isSameOrAfterTime = (startTime, endTime) =>
       attendanceEndTime: moment(
         consultationDocument.entity.attendanceEndTime,
       ).format('HH:mm'),
+      issuedByUserFK: clinicianProfile.userProfileFK,
     }
   },
 
