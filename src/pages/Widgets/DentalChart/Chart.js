@@ -146,11 +146,8 @@ const isUpperSection = (index) => {
   return (index > 0 && index < 30) || (index > 50 && index < 70)
 }
 
-class Chart extends React.Component {
-  state = {
-    container: null,
-    bridgingTooths: [],
-  }
+class Chart extends React.PureComponent {
+  state = {}
 
   constructor (props) {
     super(props)
@@ -610,6 +607,7 @@ class Chart extends React.Component {
     this.canvas.renderAll()
     let mouseMoved = false
     let startPointer = null
+
     this.canvas
       .getObjects('group')
       .filter((n) => Number(n.name) > 0)

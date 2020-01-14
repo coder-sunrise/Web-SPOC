@@ -218,6 +218,23 @@ class Treatment extends PureComponent {
     })
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+  }
+
   setTotalPrice = () => {
     const { setFieldValue, values, disableEdit } = this.props
     if (disableEdit === false) {

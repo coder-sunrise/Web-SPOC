@@ -63,7 +63,7 @@ const Treatment = ({
   ] = useState([])
   // console.log(codetable)
   useEffect(() => {
-    const { cttreatment } = codetable
+    const { cttreatment = [] } = codetable
     // console.log(list)
     const treeItems = Object.values(
       _.groupBy(

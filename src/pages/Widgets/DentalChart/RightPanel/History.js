@@ -148,7 +148,15 @@ const History = (props) => {
                         }).then(({ dentalChart = [] }) => {
                           if (dentalChart[0] && dentalChart[0].dentalChart) {
                             const d = {
-                              data: JSON.parse(dentalChart[0].dentalChart),
+                              data: JSON.parse(
+                                dentalChart[0].dentalChart,
+                              ).map(({ action, ...rest }) => {
+                                delete action.dentalTreatmentFK
+                                return {
+                                  ...rest,
+                                  action,
+                                }
+                              }),
                               isPedoChart: dentalChart[0].isPedoChart,
                               isSurfaceLabel: dentalChart[0].isSurfaceLabel,
                             }
