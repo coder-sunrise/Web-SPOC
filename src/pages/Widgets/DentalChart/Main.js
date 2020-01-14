@@ -122,6 +122,7 @@ const groupHeight = baseHeight * 3 // + strokeWidth
     dentalChartTreatment,
     orders,
     codetable,
+    consultation,
     global,
   }) => ({
     dentalChartComponent,
@@ -129,6 +130,7 @@ const groupHeight = baseHeight * 3 // + strokeWidth
     dentalChartTreatment,
     orders,
     codetable,
+    consultation,
     global,
   }),
 )
@@ -142,6 +144,40 @@ class DentalChart extends React.Component {
     this.props.dispatch({
       type: 'codetable/fetchCodes',
       payload: { code: 'cttreatment' },
+    })
+  }
+
+  componentWillReceiveProps (np) {
+    // co/nsole.log(this.props.dentalChartComponent.data, np.consultation)
+    if (
+      this.props.dentalChartComponent.data.length === 0 &&
+      np.consultation.entity &&
+      np.consultation.entity.corDentalCharts[0]
+    ) {
+      const d = {
+        ...np.consultation.entity.corDentalCharts[0],
+        data: JSON.parse(np.consultation.entity.corDentalCharts[0].dentalChart),
+      }
+      delete d.dentalChart
+      this.props.dispatch({
+        type: 'dentalChartComponent/updateState',
+        payload: d,
+      })
+    }
+    // if (data.corDentalCharts && data.corDentalCharts[0]) {
+    //   yield put({
+    //     type: 'dentalChartComponent/updateState',
+    //     payload: {
+    //       ...data.corDentalCharts[0],
+    //       data: JSON.parse(data.corDentalCharts[0].dentalChart),
+    //     },
+    //   })
+    // }
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'dentalChartComponent/reset',
     })
   }
 

@@ -591,7 +591,7 @@ class Chart extends React.Component {
     canvas.hoverCursor = 'default'
 
     this.canvas = canvas
-    const { data = {}, isPedoChart } = this.props.dentalChartComponent
+    const { data = [], isPedoChart } = this.props.dentalChartComponent
     const { dispatch, readOnly } = this.props
     // console.log()
     const groups = _.groupBy(this.configs, 'line')
@@ -1097,16 +1097,11 @@ class Chart extends React.Component {
 
   renderCanvas = (props, force) => {
     const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
-    const {
-      action = {},
-      data,
-      isPedoChart,
-      isSurfaceLabel,
-    } = dentalChartComponent
+    const { action, data, isPedoChart, isSurfaceLabel } = dentalChartComponent
     // const { list = [] } = dentalChartSetup
     // const { icon, type, hoverColor: hc, onSelect, clear } = action
-
-    if (action.chartMethodTypeFK === 3 || !action || force) {
+    // console.log(action, action.chartMethodTypeFK === 3, !action, force)
+    if (!action || action.chartMethodTypeFK === 3 || force) {
       selectedTooth = []
       this.canvas._objects
         .filter((d) => d.name && d.name.indexOf('bridgeLine') === 0)
@@ -1419,6 +1414,7 @@ class Chart extends React.Component {
     const { dentalChartComponent, readOnly } = this.props
     if (readOnly) return
     const { action } = dentalChartComponent
+    // console.log(action)
     if (action && action.id) {
       // console.log(item, group)
       debouncedAction(() => {
@@ -1448,6 +1444,8 @@ class Chart extends React.Component {
     const { dentalChartComponent, readOnly } = this.props
     if (readOnly) return
     const { action } = dentalChartComponent
+    console.log(action)
+
     if (action && action.id) {
       // console.log(ary)
       debouncedAction(() => {

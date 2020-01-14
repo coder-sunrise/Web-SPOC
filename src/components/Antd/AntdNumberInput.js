@@ -132,7 +132,7 @@ class AntdNumberInput extends React.PureComponent {
     this.state = {
       value: roundTo(
         Number(
-          field.value !== undefined && field.value !== ''
+          field.value || field.value === 0
             ? field.value
             : defaultValue || value,
         ),
@@ -332,12 +332,12 @@ class AntdNumberInput extends React.PureComponent {
     if (!isNumber(newV)) {
       newV = undefined
     }
-    if ((newV === undefined || newV === null) && !this.props.allowEmpty) {
+    if (!newV && newV !== 0 && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-    if (newV === undefined || newV === null) newV = ''
+    if (!newV && newV !== 0) newV = ''
     // console.log(!newV && newV !== 0 ? '' : newV)
     this.setState({
       value: !newV && newV !== 0 ? '' : newV,

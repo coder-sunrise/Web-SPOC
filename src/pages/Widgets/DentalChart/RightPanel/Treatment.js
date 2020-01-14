@@ -52,7 +52,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { ctchartmethod } = codetable
+  const { ctchartmethod = [] } = codetable
   const [
     search,
     setSearch,
@@ -113,23 +113,30 @@ const Treatment = ({
                 (o) => o.id === item.chartMethodFK,
               )
               // console.log(action)
-
-              dispatch({
-                type: 'dentalChartComponent/updateState',
-                payload: {
-                  mode: 'treatment',
-                  action: {
-                    ...action,
-                    dentalTreatmentFK: item.id,
+              if (action) {
+                dispatch({
+                  type: 'dentalChartComponent/updateState',
+                  payload: {
+                    mode: 'treatment',
+                    action: {
+                      ...action,
+                      dentalTreatmentFK: item.id,
+                    },
                   },
-                },
-              })
-              dispatch({
-                type: 'dentalChartTreatment/updateState',
-                payload: {
-                  entity: undefined,
-                },
-              })
+                })
+                dispatch({
+                  type: 'dentalChartTreatment/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
+                dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    type: '7',
+                  },
+                })
+              }
             }
           }}
         />

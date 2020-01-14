@@ -45,10 +45,7 @@ const initialState = {
   defaultOrderSet: {
     orderSetItems: [],
   },
-  defaultTreatment: {
-    quantity: 1,
-    adjType: 'Percentage',
-  },
+  defaultTreatment: {},
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {

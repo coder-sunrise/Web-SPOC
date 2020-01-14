@@ -70,9 +70,10 @@ const TreatmentGrid = (props) => {
     const { cttreatment = [] } = codetable
 
     dispatch({
-      type: 'dentalChartTreatment/updateState',
+      type: 'orders/updateState',
       payload: {
         entity: row,
+        type: '7',
       },
     })
     const treatment = cttreatment.find((o) => o.id === row.treatmentFK) || {}
@@ -83,7 +84,10 @@ const TreatmentGrid = (props) => {
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
-        action,
+        action: {
+          ...action,
+          dentalTreatmentFK: treatment.id,
+        },
       },
     })
   }
@@ -144,7 +148,6 @@ const TreatmentGrid = (props) => {
                     uid: row.uid,
                   },
                 })
-                console.log(row)
                 dispatch({
                   type: 'dentalChartComponent/deleteTreatment',
                   payload: {
@@ -174,9 +177,9 @@ const TreatmentGrid = (props) => {
       // { name: 'code', title: 'Code' },
       { name: 'treatmentFK', title: 'Treatment' },
 
-      { name: 'toothInfo', title: 'Tooth' },
+      { name: 'itemNotes', title: 'Tooth' },
 
-      { name: 'itemsNotes', title: 'Details' },
+      { name: 'remark', title: 'Details' },
       { name: 'quantity', title: 'Unit' },
       { name: 'unitPrice', title: 'Unit Price' },
       { name: 'adjAmount', title: 'Discount' },

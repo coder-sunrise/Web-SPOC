@@ -19,13 +19,13 @@ export default createListViewModel({
             chartMethodColorBlock: '',
             chartMethodText: '',
             chartMethodColorText: '',
+            effectiveStartDate: moment('2001-01-01'),
+            effectiveEndDate: moment('2099-12-31'),
             ...o,
             id: o.isNew ? undefined : o.id,
-            effectiveStartDate: moment(),
-            effectiveEndDate: moment('2099-12-31'),
           })),
         )
-        console.log(r)
+        // console.log(r)
         if (r) {
           // notification.success({ message: 'Saved' })
           return true
