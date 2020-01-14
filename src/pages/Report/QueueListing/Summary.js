@@ -1,11 +1,7 @@
 import React from 'react'
 import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { ReportDataGrid } from '@/components/_medisys'
-import {
-  GridContainer,
-  GridItem,
-  NumberInput,
-} from '@/components'
+import { GridContainer, GridItem, NumberInput } from '@/components'
 import InvoicePayer from './InvoicePayer'
 
 const Summary = ({ reportDatas }) => {
@@ -28,9 +24,24 @@ const Summary = ({ reportDatas }) => {
 
   const SummaryTableColumnExtension = [
     { columnName: 'mode', sortingEnabled: false },
-    { columnName: 'queue', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'past', type: 'currency', currency: true, sortingEnabled: false },
-    { columnName: 'subTotal', type: 'currency', currency: true, sortingEnabled: false },
+    {
+      columnName: 'queue',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'past',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
+    {
+      columnName: 'subTotal',
+      type: 'currency',
+      currency: true,
+      sortingEnabled: false,
+    },
   ]
 
   const FuncProps = {
@@ -55,9 +66,10 @@ const Summary = ({ reportDatas }) => {
     },
   }
   return (
-    <GridContainer md={6}>
+    <GridContainer md={6} style={{ marginBottom: 8 }}>
       <GridItem md={12}>
-        <NumberInput prefix='Total Cash Rounding:'
+        <NumberInput
+          prefix='Total Cash Rounding:'
           style={{ margin: 6 }}
           currency
           text
@@ -76,7 +88,8 @@ const Summary = ({ reportDatas }) => {
         />
       </GridItem>
       <GridItem md={12}>
-        <NumberInput prefix=' Company Payable Amount:'
+        <NumberInput
+          prefix=' Company Payable Amount:'
           currency
           style={{ margin: 6 }}
           text
