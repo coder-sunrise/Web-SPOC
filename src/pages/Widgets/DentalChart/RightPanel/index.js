@@ -138,7 +138,7 @@ const RightPanel = (props) => {
         <CommonModal
           open={openHistory}
           title='Dental Chart History'
-          maxWidth='lg'
+          maxWidth='md'
           // fullScreen
           bodyNoPadding
           onConfirm={() => {

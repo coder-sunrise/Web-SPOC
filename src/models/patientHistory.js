@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '../services/patientHistory'
 import { VISIT_TYPE } from '@/utils/constants'
 
 export default createListViewModel({
@@ -71,7 +71,7 @@ export default createListViewModel({
         yield take('query/@@end')
 
         if (mode === 'split') {
-          const st = yield select((st) => st.patientHistory)
+          const st = yield select((s) => s.patientHistory)
 
           const { list = [] } = st
           const filteredList = list.filter(

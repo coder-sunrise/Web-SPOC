@@ -661,18 +661,6 @@ const _routes = [
           },
         ],
       },
-      //
-      // Ward Demo
-      // {
-      //   path: '/wardmanagement',
-      //   icon: 'hotel',
-      //   name: 'wardmanagement',
-      //   hideChildrenInMenu: true,
-      //   authority: [
-      //     'wardmanagement',
-      //   ],
-      //   component: './WardManagement/Search',
-      // },
       // Claim Submission
       //
       // Settings

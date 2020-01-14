@@ -27,9 +27,9 @@ import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
-import model from './models'
+// import model from './models'
 
-window.g_app.replaceModel(model)
+// window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   root: {},

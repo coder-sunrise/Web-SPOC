@@ -1007,15 +1007,12 @@ class Chart extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent, global, readOnly } = nextProps
+    const { dentalChartComponent, global } = nextProps
     // console.log(
     //   'componentWillReceiveProps',
     //   _.isEqual(dentalChartComponent, this.props.dentalChartComponent),
     // )
-    if (
-      !readOnly &&
-      !_.isEqual(dentalChartComponent, this.props.dentalChartComponent)
-    ) {
+    if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
       // this.unbindCanvas(this.props)
       this.renderCanvas(
         nextProps,
@@ -1444,7 +1441,7 @@ class Chart extends React.Component {
     const { dentalChartComponent, readOnly } = this.props
     if (readOnly) return
     const { action } = dentalChartComponent
-    console.log(action)
+    // console.log(action)
 
     if (action && action.id) {
       // console.log(ary)
