@@ -5,7 +5,14 @@ import Paper from '@material-ui/core/Paper'
 import Popper from '@material-ui/core/Popper'
 import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 
-export default ({ children, overlay, trigger = 'hover', ...props }) => {
+export default ({
+  children,
+  overlay,
+  trigger = 'hover',
+  disabled,
+  ...props
+}) => {
+  if (disabled) return children
   const [
     anchorEl,
     setAnchorEl,
@@ -58,6 +65,7 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
           vertical: 'center',
           horizontal: 'center',
         }}
+        style={{ zIndex: 1500 }}
         {...props}
       >
         {({ TransitionProps, placement }) => (
@@ -65,7 +73,7 @@ export default ({ children, overlay, trigger = 'hover', ...props }) => {
             <Paper>
               <ClickAwayListener
                 onClickAway={() => {
-                  console.log('onClickAway')
+                  // console.log('onClickAway')
                   trigger !== 'hover' ? setAnchorEl(null) : undefined
                 }}
               >

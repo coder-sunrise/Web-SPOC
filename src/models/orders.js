@@ -45,6 +45,7 @@ const initialState = {
   defaultOrderSet: {
     orderSetItems: [],
   },
+  defaultTreatment: {},
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {
@@ -162,6 +163,9 @@ export default createListViewModel({
       upsertRowState (state, { payload }) {
         let newRow
         let { rows, type } = state
+        if (payload.type) {
+          type = payload.type
+        }
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =

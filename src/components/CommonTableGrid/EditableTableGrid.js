@@ -92,6 +92,7 @@ class EditableTableGrid extends React.Component {
         })
       })
     })
+    // console.log(errorCells)
     return errorCells
   }
 
@@ -226,6 +227,7 @@ class EditableTableGrid extends React.Component {
   }
 
   _onCommitChanges = ({ added, changed, deleted }) => {
+    // console.log('_onCommitChanges')
     const { EditingProps, rows = [], schema, getRowId } = this.props
     // console.log(changed)
     const { onCommitChanges = (f) => f } = EditingProps
@@ -462,6 +464,7 @@ class EditableTableGrid extends React.Component {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        isDeletable = (f) => true,
         messages = {
           commitCommand: 'Save',
           editCommand: 'Edit',
@@ -495,12 +498,14 @@ class EditableTableGrid extends React.Component {
       cfg.containerComponent = this.containerComponent
     }
     const sharedCfg = {
+      editableGrid: true,
       gridId: this.gridId,
       columnExtensions,
       editingRowIds,
       getRowId,
       extraCellConfig: {
         commitChanges: this._onCommitChanges,
+        editingCells,
       },
       extraState: [
         <EditingState
@@ -532,6 +537,27 @@ class EditableTableGrid extends React.Component {
           // showEditCommand={showEditCommand}
           showDeleteCommand={showDeleteCommand}
           commandComponent={CommandComponent}
+          cellComponent={(cellProps) => {
+            const { children, ...p } = cellProps
+            return (
+              <Table.Cell {...p}>
+                {children.map((o) => {
+                  if (o) {
+                    return React.cloneElement(o, {
+                      row: p.row,
+                      // editingRowIds,
+                      // key: o.props.id,
+                      // schema: this.props.schema,
+                      // gridId: this.gridId,
+                      isDeletable,
+                      // ...o.props,
+                    })
+                  }
+                  return null
+                })}
+              </Table.Cell>
+            )
+          }}
           messages={messages}
         />,
         <TableInlineCellEditing

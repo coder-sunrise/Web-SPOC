@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
@@ -13,6 +14,13 @@ import ClickAwayListener from '@material-ui/core/ClickAwayListener'
 import Paper from '@material-ui/core/Paper'
 import Grow from '@material-ui/core/Grow'
 import Hidden from '@material-ui/core/Hidden'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import MaterialDivider from '@material-ui/core/Divider'
+import ListItemAvatar from '@material-ui/core/ListItemAvatar'
+import Avatar from '@material-ui/core/Avatar'
+import Typography from '@material-ui/core/Typography'
+import ListItemText from '@material-ui/core/ListItemText'
 
 // @material-ui/icons
 import Person from '@material-ui/icons/Person'
@@ -132,23 +140,178 @@ class HeaderLinks extends React.Component {
 
     const clinicShortCode = clinicInfo ? clinicInfo.clinicShortCode : ''
 
+    const NotificationComponent = () => {
+      const timeDic = {
+        second: 60,
+        minute: 60,
+        hour: 24,
+        day: 7,
+        week: Infinity,
+      }
+
+      const timeInterval = () => {
+        let result = {}
+        let lower = 1
+        let upper = 1
+        for (let key in timeDic) {
+          lower = upper
+          upper = lower * timeDic[key]
+          result[key] = { lower, upper }
+        }
+        return result
+      }
+
+      const getTimeAgo = (timestamp) => {
+        let resultInterval
+        let interval = (new Date().getTime() - timestamp) / 1000
+        for (let key in timeInterval()) {
+          resultInterval = { scale: key, interval: timeInterval()[key] }
+          if (
+            interval >= timeInterval()[key].lower &&
+            interval < timeInterval()[key].upper
+          )
+            break
+        }
+        const result = parseInt(interval / resultInterval.interval.lower, 10)
+        return result
+          .toString()
+          .concat(' ')
+          .concat(resultInterval.scale)
+          .concat(result > 1 ? 's ' : ' ')
+          .concat('ago')
+      }
+
+      const NotificationContent = () => {
+        if (notifications.length > 0) {
+          const sorted = notifications.sort(
+            (a, b) => (a.timestamp < b.timestamp ? 1 : -1),
+          )
+          return (
+            <div>
+              <div
+                style={{
+                  width: '100%',
+                  minWidth: 300,
+                  maxWidth: 400,
+                  maxHeight: 290,
+                  overflowY: 'auto',
+                }}
+              >
+                {sorted.map((n) => {
+                  return (
+                    <div style={{ maxHeight: 100 }} key={n.senderId}>
+                      <ListItem alignItems='flex-start'>
+                        <ListItemAvatar>
+                          <Avatar style={{ backgroundColor: 'orange' }}>
+                            <Person />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                          primary={
+                            <div style={{ display: 'flex' }}>
+                              <b>{n.sender}</b>
+                              <p style={{ marginLeft: 15 }}>
+                                {getTimeAgo(n.timestamp)}
+                              </p>
+                            </div>
+                          }
+                          secondary={
+                            <Typography color='textPrimary'>
+                              {n.message}
+                            </Typography>
+                          }
+                        />
+                      </ListItem>
+                      <hr style={{ margin: 0 }} />
+                    </div>
+                  )
+                })}
+              </div>
+              <div
+                style={{
+                  height: 50,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  borderTop: 'solid 1px #DCDCDC',
+                }}
+              >
+                <a
+                  style={{ margin: 'auto' }}
+                  onClick={() => {
+                    this.props.dispatch({
+                      type: 'header/clearNotifications',
+                    })
+                  }}
+                >
+                  Clear notifications
+                </a>
+              </div>
+            </div>
+          )
+        }
+        return (
+          <div
+            style={{
+              width: '100%',
+              minWidth: 300,
+              maxWidth: 400,
+              minHeight: 290,
+              maxHeight: 290,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <p style={{ margin: 'auto' }}>You have viewed all notifications</p>
+          </div>
+        )
+      }
+      const overlay = (
+        <div>
+          <div
+            style={{
+              display: 'flex',
+              height: 50,
+              borderBottom: 'solid 1px #DCDCDC',
+            }}
+          >
+            <p style={{ margin: 'auto auto auto 15px', fontSize: 16 }}>
+              Notifications
+            </p>
+          </div>
+          {NotificationContent()}
+        </div>
+      )
+      return (
+        <Popper
+          trigger='click'
+          className={classNames({
+            [classes.pooperResponsive]: true,
+            [classes.pooperNav]: true,
+          })}
+          overlay={overlay}
+        >
+          <Badge
+            badgeContent={notifications.length}
+            color='primary'
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+          >
+            <Button justIcon color='transparent'>
+              <Notifications fontSize='large' />
+            </Button>
+          </Badge>
+        </Popper>
+      )
+    }
+
     return (
       <div className={wrapper}>
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              {/*  <Badge
-                badgeContent={notifications.length}
-                color='primary'
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-              >
-                <Button justIcon color='transparent'>
-                  <Notifications fontSize='large' />
-                </Button>
-              </Badge> */}
+              {NotificationComponent()}
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>
                   <Button justIcon color='transparent'>
@@ -167,7 +330,6 @@ class HeaderLinks extends React.Component {
                   </Button>
                 </Tooltip>
               )}
-
               {/* <Button
                 justIcon
                 color='transparent'

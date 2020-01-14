@@ -39,6 +39,12 @@ const devRoutes = {
       mini: 'DC',
       component: './Development/DentalChart',
     },
+    {
+      path: '/development/cannedtext',
+      name: 'Canned Text',
+      mini: 'CT',
+      component: './Development/CannedText',
+    },
   ],
 }
 

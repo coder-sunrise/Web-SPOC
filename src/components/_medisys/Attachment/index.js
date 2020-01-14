@@ -252,6 +252,8 @@ const Attachment = ({
     e.target.value = null
   }
 
+  console.log({ fileAttachments })
+
   return (
     <GridContainer>
       {label && (

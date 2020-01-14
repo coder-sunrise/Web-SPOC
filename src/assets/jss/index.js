@@ -331,6 +331,10 @@ const smallRowHeight = '45px'
 const standardRowHeight = '55px'
 const largeRowHeight = '65px'
 
+const smallSingleRowHeight = '29px'
+const standardSingleRowHeight = '39px'
+const largeSingleRowHeight = '50px'
+
 export {
   hexToRgb,
   // variables
@@ -386,6 +390,9 @@ export {
   standardRowHeight,
   smallRowHeight,
   largeRowHeight,
+  smallSingleRowHeight,
+  standardSingleRowHeight,
+  largeSingleRowHeight,
   borderColor,
   border,
   headerHeight,

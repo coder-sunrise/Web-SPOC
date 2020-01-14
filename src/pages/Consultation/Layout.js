@@ -1,154 +1,121 @@
-import React, { PureComponent, Suspense } from 'react'
-import { connect } from 'dva'
-import GridLayout, { Responsive, WidthProvider } from 'react-grid-layout'
-
+import React, { PureComponent } from 'react'
+import classnames from 'classnames'
 import _ from 'lodash'
 import $ from 'jquery'
-import classnames from 'classnames'
-
-import { Menu, Dropdown } from 'antd'
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Slide,
-  Tooltip,
-  Drawer,
-} from '@material-ui/core'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Delete from '@material-ui/icons/Delete'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
+// react-grid-layout
+import { Responsive, WidthProvider } from 'react-grid-layout'
+// antd
+import { Anchor, Menu, Dropdown } from 'antd'
+// material ui
+import { Paper, Divider, Slide, Tooltip, Drawer } from '@material-ui/core'
 import Clear from '@material-ui/icons/Clear'
 import Settings from '@material-ui/icons/Settings'
-import GetApp from '@material-ui/icons/GetApp'
-import Edit from '@material-ui/icons/Edit'
 import Fullscreen from '@material-ui/icons/Fullscreen'
 import FullscreenExit from '@material-ui/icons/FullscreenExit'
 import CompareArrows from '@material-ui/icons/CompareArrows'
+import Accessibility from '@material-ui/icons/Accessibility'
 
-import { standardRowHeight, headerHeight } from 'mui-pro-jss'
+import { headerHeight } from 'mui-pro-jss'
+// common components
 import {
   CardContainer,
-  TextField,
   Button,
-  CommonHeader,
-  CommonModal,
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
-  notification,
-  Select,
-  DatePicker,
   CheckboxGroup,
   ProgressButton,
-  Checkbox,
-  NumberFormatter,
-  confirm,
   SizeContainer,
   Popconfirm,
-  withFormikExtend,
-  FastField,
-  NumberInput,
-  Skeleton,
   IconButton,
   CustomInputWrapper,
   Fab,
 } from '@/components'
-import { sendNotification } from '@/utils/realtime'
+// sub components
+import PatientHistoryDrawer from './PatientHistoryDrawer'
 import { control } from '@/components/Decorator'
-
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import Authorized from '@/utils/Authorized'
-import { getAppendUrl } from '@/utils/utils'
-import { widgets } from '@/utils/widgets'
-import styles from './style'
 import Templates from './Templates'
+// utils
+import { widgets } from '@/utils/widgets'
+import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
+import { CLINIC_TYPE } from '@/utils/constants'
 
-const _defaultLayout = [
-  {
-    id: '1',
-    config: {
-      lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '4',
-    config: {
-      lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
-  {
-    id: '2',
-    config: {
-      lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
-      sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '7',
-    config: {
-      lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
-      md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
-      sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
-      xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
-      xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
-    },
-  },
-  {
-    id: '3',
-    config: {
-      lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
-      md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
-      sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
-      xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
-    },
-  },
+// const _defaultLayout = [
+//   {
+//     id: '1',
+//     config: {
+//       lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '4',
+//     config: {
+//       lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '2',
+//     config: {
+//       lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
+//       md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
+//       sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
+//       xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
+//       xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '7',
+//     config: {
+//       lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
+//       md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
+//       sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
+//       xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
+//       xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
+//     },
+//   },
+//   {
+//     id: '3',
+//     config: {
+//       lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
+//       md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
+//       sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
+//     },
+//   },
 
-  {
-    id: '5',
-    config: {
-      lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
-      md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
-      sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
-      xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
-      xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
-    },
-  },
+//   {
+//     id: '5',
+//     config: {
+//       lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
+//       md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
+//       sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
+//       xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
+//       xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
+//     },
+//   },
 
-  // {
-  //   id: '1002',
-  //   config: {
-  //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-  //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
-  //   },
-  // },
-]
+//   // {
+//   //   id: '1002',
+//   //   config: {
+//   //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
+//   //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
+//   //   },
+//   // },
+// ]
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
 let lasActivedWidget = null
+
+const { Link } = Anchor
 // @connect(({ cestemplate }) => ({
 //   cestemplate,
 // }))
@@ -164,14 +131,23 @@ class Layout extends PureComponent {
     this.delayedResize = _.debounce(this.resize, 300)
     window.addEventListener('resize', this.delayedResize)
     this.delayedChangeLayout = _.debounce(this.changeLayout, 300)
+    this.ordersRef = React.createRef()
+    this.myRefs = []
 
     // console.log(localStorage.getItem('consultationLayout'))
     // console.log(JSON.parse(localStorage.getItem('consultationLayout') || '{}'))
 
-    const { userDefaultLayout } = props
-    this.pageDefaultWidgets = _defaultLayout
+    const { userDefaultLayout, clinicInfo } = props
+
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+
+    this.pageDefaultWidgets = gpLayoutCfg
+    if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
+      this.pageDefaultWidgets = dentalLayoutCfg
+    }
+
     let defaultLayout
-    // console.log('userDefaultLayout', userDefaultLayout)
+    // console.log('userDefaultLayout', { userDefaultLayout })
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (true) {
@@ -184,7 +160,7 @@ class Layout extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-    console.log(defaultLayout)
+
     this.widgetMenu = (
       <Menu>
         {widgets.map((o) => {
@@ -249,6 +225,7 @@ class Layout extends PureComponent {
       showInvoiceAdjustment: false,
       collapsed: global.collapsed,
       currentLayout: defaultLayout,
+      openPatientHistoryDrawer: false,
     }
   }
 
@@ -397,7 +374,6 @@ class Layout extends PureComponent {
   }
 
   getDefaultLayout = () => {
-    console.log('getDefaultLayout')
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
@@ -445,6 +421,12 @@ class Layout extends PureComponent {
         type: 'cestemplate/query',
       })
     }
+  }
+
+  togglePatientHistoryDrawer = () => {
+    this.setState((prevState) => ({
+      openPatientHistoryDrawer: !prevState.openPatientHistoryDrawer,
+    }))
   }
 
   compareNodeLayoutChange = (a, b) => {
@@ -514,7 +496,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 114
+    const topHeight = (this.props.height ? 0 : headerHeight) + 168 // 168 = nav header height + patient banner height + anchor height
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,
@@ -522,6 +504,27 @@ class Layout extends PureComponent {
     // )
 
     return ((this.props.height || window.innerHeight) - topHeight) / 6
+  }
+
+  onAnchorClick = (id) => {
+    const parentElement = document.getElementById('mainPanel-root')
+    const element = document.getElementById(id)
+    try {
+      if (parentElement && element) {
+        const screenPosition = element.getBoundingClientRect()
+        const { scrollTop } = parentElement
+        const { top, left } = screenPosition
+
+        parentElement.scrollTo({
+          // scrolled top position + element top position - Nav header height and Patient Banner height
+          top: scrollTop + top - 208,
+          left,
+          behavior: 'smooth',
+        })
+      }
+    } catch (error) {
+      console.error({ error })
+    }
   }
 
   render () {
@@ -622,8 +625,40 @@ class Layout extends PureComponent {
     }
 
     // console.log(this.props)
+
     return (
       <div>
+        {!this.state.fullScreenWidget && (
+          <CardContainer
+            hideHeader
+            style={{
+              marginTop: 0,
+              position: 'sticky',
+              overflowY: 'auto',
+              top: headerHeight + 100,
+              zIndex: 1000,
+              borderRadius: 0,
+              marginBottom: 0,
+              // backgroundColor: '#f0f8ff',
+            }}
+          >
+            {state.currentLayout.widgets.map((id) => {
+              const w = widgets.find((o) => o.id === id)
+              if (!w) return null
+              const onClick = () => this.onAnchorClick(w.id)
+              return (
+                <Button
+                  size='sm'
+                  variant='outlined'
+                  color='primary'
+                  onClick={onClick}
+                >
+                  {w.name}
+                </Button>
+              )
+            })}
+          </CardContainer>
+        )}
         {true && (
           <div
             ref={this.layoutContainer}
@@ -632,7 +667,9 @@ class Layout extends PureComponent {
               overflowY: 'auto',
               overflowX: 'hidden',
               marginTop: 1,
+              position: 'relative',
             }}
+
             // onScroll={this.delayedMainDivScroll}
           >
             <ResponsiveGridLayout {...layoutCfg}>
@@ -641,9 +678,10 @@ class Layout extends PureComponent {
                 if (!w) return <div />
                 const cfgs = state.currentLayout[state.breakpoint]
                 const cfg = cfgs.find((o) => o.i === id)
-                // console.log(cfg, w)
+
                 if (!cfg) return <div key={id} />
                 const LoadableComponent = w.component
+
                 return (
                   <div
                     className={classnames({
@@ -655,6 +693,7 @@ class Layout extends PureComponent {
                         state.fullScreenWidget === id,
                     })}
                     key={id}
+                    id={w.id}
                   >
                     <Paper
                       {...this.generateConfig(id)}
@@ -756,10 +795,13 @@ class Layout extends PureComponent {
                       )}
                       <div
                         className='non-dragable'
-                        style={w.layoutConfig.style}
+                        style={w.layoutConfig ? w.layoutConfig.style : {}}
                       >
                         <SizeContainer size='sm'>
-                          <LoadableComponent {...widgetProps} />
+                          <LoadableComponent
+                            {...widgetProps}
+                            {...w.restProps}
+                          />
                         </SizeContainer>
                       </div>
                     </Paper>
@@ -777,7 +819,7 @@ class Layout extends PureComponent {
                 in={this.state.mode === 'edit'}
                 mountOnEnter
               >
-                <div>
+                <div style={{ display: 'inline-block' }}>
                   <Fab
                     color='secondary'
                     className={classes.fab}
@@ -790,7 +832,42 @@ class Layout extends PureComponent {
                   </Fab>
                 </div>
               </Slide>
+              <Slide
+                direction='up'
+                in={this.state.mode === 'edit'}
+                mountOnEnter
+              >
+                <div style={{ display: 'inline-block' }}>
+                  <Fab
+                    color='secondary'
+                    className={classes.fab}
+                    style={{ marginRight: 8 }}
+                    variant='extended'
+                    size='small'
+                    onClick={this.togglePatientHistoryDrawer}
+                  >
+                    <Accessibility />&nbsp;Patient History
+                  </Fab>
+                </div>
+              </Slide>
             </div>
+            <Drawer
+              anchor='right'
+              open={this.state.openPatientHistoryDrawer}
+              onClose={this.togglePatientHistoryDrawer}
+            >
+              <PatientHistoryDrawer
+                {...widgetProps}
+                onClose={this.togglePatientHistoryDrawer}
+              />
+              {/* <div style={{ width: '67vw', padding: theme.spacing(2) }}>
+                <h4>Patient History</h4>
+                <Button />
+                <SizeContainer size='sm'>
+                  <PatientHistory {...widgetProps} mode='integrated' />
+                </SizeContainer>
+              </div> */}
+            </Drawer>
             <Drawer
               anchor='right'
               open={this.state.openDraw}

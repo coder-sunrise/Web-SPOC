@@ -4,13 +4,7 @@ import { Field } from 'formik'
 // umi
 import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
-import {
-  NumberInput,
-  CommonCard,
-  GridContainer,
-  GridItem,
-  withFormikExtend,
-} from '@/components'
+import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
 import FormField from './formField'
 
 class VitalSignCard extends PureComponent {

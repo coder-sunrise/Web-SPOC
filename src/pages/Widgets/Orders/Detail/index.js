@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
+
 import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
-import { orderTypes } from '@/utils/codes'
-import { VISIT_TYPE } from '@/utils/constants'
 import {
   Button,
   GridContainer,
@@ -19,6 +19,9 @@ import Service from './Service'
 import Consumable from './Consumable'
 import OrderSet from './OrderSet'
 // import Others from './Others'
+// utils
+import { orderTypes } from '@/utils/codes'
+import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 
 const styles = (theme) => ({
   editor: {
@@ -43,6 +46,9 @@ const styles = (theme) => ({
   },
 })
 
+@connect(({ orders }) => ({
+  orders,
+}))
 class Details extends PureComponent {
   state = {
     disableEdit: false,
@@ -98,7 +104,7 @@ class Details extends PureComponent {
                   // force current edit row components to update
                   type: 'global/incrementCommitCount',
                 })
-              } else {
+              } else if (onReset) {
                 onReset()
               }
             }}
@@ -175,7 +181,7 @@ class Details extends PureComponent {
 
   render () {
     const { props } = this
-    const { classes, orders, dispatch, fromDispense } = props
+    const { classes, orders, dispatch, fromDispense, singleMode, from } = props
     const { type } = orders
 
     const cfg = {
@@ -187,13 +193,23 @@ class Details extends PureComponent {
       getNextSequence: this.getNextSequence,
       ...props,
     }
-
     let orderTypeArray = orderTypes
     if (fromDispense) {
       orderTypeArray = orderTypes.filter(
         (o) => o.value !== '2' && o.value !== '6',
       )
     }
+
+    // if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
+    //   orderTypeArray = orderTypes.filter(
+    //     (o) => o.value === '1' || o.value === '4',
+    //   )
+    // }
+    if (singleMode)
+      return orderTypeArray.find((o) => o.value === '7').component({
+        ...cfg,
+        type: '7',
+      })
     return (
       <div>
         <div className={classes.detail}>
@@ -201,16 +217,21 @@ class Details extends PureComponent {
             <GridItem xs={12}>
               <Tabs
                 activeKey={type}
-                options={orderTypeArray.map((o) => {
-                  return {
-                    id: o.value,
-                    name: o.name,
-                    content: o.component({
-                      ...cfg,
-                      type: o.value,
-                    }),
-                  }
-                })}
+                options={orderTypeArray
+                  .filter(
+                    (o) =>
+                      o.value !== '7' || (o.value === '7' && from === 'ca'),
+                  )
+                  .map((o) => {
+                    return {
+                      id: o.value,
+                      name: o.name,
+                      content: o.component({
+                        ...cfg,
+                        type: o.value,
+                      }),
+                    }
+                  })}
                 tabStyle={{}}
                 onChange={(key) => {
                   dispatch({

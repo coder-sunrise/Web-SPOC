@@ -44,6 +44,10 @@ const _routes = [
         authority: [
           'reception',
         ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         routes: [
           {
             path: '/reception/queue',
@@ -111,6 +115,10 @@ const _routes = [
         authority: [
           'patientdatabase',
         ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         component: './PatientDatabase/Search',
         // routes: [
         //   // {
@@ -163,6 +171,9 @@ const _routes = [
         authority: [
           'communication',
         ],
+        specialist: [
+          'GP',
+        ],
         routes: [
           {
             path: '/communication/sms',
@@ -188,6 +199,9 @@ const _routes = [
         // component: './inventory',
         authority: [
           'inventory',
+        ],
+        specialist: [
+          'GP',
         ],
         routes: [
           {
@@ -323,6 +337,9 @@ const _routes = [
         name: 'finance',
         authority: [
           'finance',
+        ],
+        specialist: [
+          'GP',
         ],
         routes: [
           {
@@ -489,6 +506,9 @@ const _routes = [
         authority: [
           'report',
         ],
+        specialist: [
+          'GP',
+        ],
         routes: [
           {
             path: '/report',
@@ -608,6 +628,9 @@ const _routes = [
         authority: [
           'claimsubmission',
         ],
+        specialist: [
+          'GP',
+        ],
         routes: [
           {
             path: '/claim-submission',
@@ -660,6 +683,10 @@ const _routes = [
         authority: [
           'settings',
         ],
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         hideChildrenInMenu: true,
         routes: [
           {
@@ -677,6 +704,16 @@ const _routes = [
             path: '/setting/service',
             name: 'service',
             component: './Setting/Service',
+          },
+          {
+            path: '/setting/treatment',
+            name: 'treatment',
+            component: './Setting/Treatment',
+          },
+          {
+            path: '/setting/treatmentcategory',
+            name: 'treatmentcategory',
+            component: './Setting/TreatmentCategory',
           },
           {
             path: '/setting/room',
@@ -864,6 +901,10 @@ const _routes = [
         icon: 'local_phone',
         name: 'support',
         hideChildrenInMenu: true,
+        specialist: [
+          'GP',
+          'Dental',
+        ],
         routes: [
           {
             path: '/support',

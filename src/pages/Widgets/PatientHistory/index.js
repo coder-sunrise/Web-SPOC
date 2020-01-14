@@ -24,7 +24,8 @@ import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE_NAME, VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import * as WidgetConfig from './config'
 
 import model from './models'
 
@@ -108,130 +109,34 @@ const styles = (theme) => ({
   // handleSubmit: () => {},
   // displayName: 'PatientHistory',
 })
-@connect(({ patientHistory, clinicSettings, codetable, user }) => ({
+@connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
   codetable,
   user,
+  clinicInfo,
 }))
 class PatientHistory extends Component {
-  state = {
-    selectedItems: [
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-    ],
-  }
-
   static defaultProps = {
     mode: 'split',
   }
 
   constructor (props) {
     super(props)
-    this.widgets = [
-      {
-        id: '1',
-        name: 'Clinical Notes',
-        component: Loadable({
-          loader: () => import('./ClinicalNotes'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '2',
-        name: 'Chief Complaints',
-        component: Loadable({
-          loader: () => import('./ChiefComplaints'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '3',
-        name: 'Plan',
-        component: Loadable({
-          loader: () => import('./Plan'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '4',
-        name: 'Diagnosis',
-        component: Loadable({
-          loader: () => import('./Diagnosis'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '5',
-        name: 'Orders',
-        component: Loadable({
-          loader: () => import('./Orders'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
-        name: 'Consultation Document',
-        component: Loadable({
-          loader: () => import('./ConsultationDocument'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      // {
-      //   id: '6',
-      //   name: 'Result History',
-      //   component: Loadable({
-      //     loader: () => import('./ResultHistory'),
-      //     render: (loaded, p) => {
-      //       let Cmpnet = loaded.default
-      //       return <Cmpnet {...props} {...p} />
-      //     },
-      //     loading: Loading,
-      //   }),
-      // },
-      {
-        id: '7',
-        name: 'Invoice',
-        component: Loadable({
-          loader: () => import('./Invoice'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...props} {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-    ]
+    const { clinicInfo } = props
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+
+    this.widgets = WidgetConfig.gpWidgets(props)
+    switch (clinicTypeFK) {
+      case CLINIC_TYPE.DENTAL:
+        this.widgets = WidgetConfig.dentalWidgets(props)
+        break
+      default:
+        break
+    }
+    this.state = {
+      selectedItems: this.widgets.map((widget) => widget.id),
+    }
   }
 
   componentWillMount () {
@@ -485,6 +390,7 @@ class PatientHistory extends Component {
       codetable,
       user,
     } = this.props
+
     const { entity, selected, patientID } = patientHistory
     const { id: visitId } = selected
     const { visitPurposeFK } = selected
@@ -517,16 +423,10 @@ class PatientHistory extends Component {
                 // prefix='Filter By'
                 mode='multiple'
                 // maxTagCount={4}
-                options={[
-                  { name: 'Clinical Notes', value: '1' },
-                  { name: 'Chief Complaints', value: '2' },
-                  { name: 'Plan', value: '3' },
-                  { name: 'Diagnosis', value: '4' },
-                  { name: 'Orders', value: '5' },
-                  { name: 'Consultation Document', value: '6' },
-                  // { name: 'Result History', value: '6' },
-                  { name: 'Invoice', value: '7' },
-                ]}
+                options={this.widgets.map((item) => ({
+                  name: item.name,
+                  value: item.id,
+                }))}
                 style={{ marginBottom: theme.spacing(1) }}
                 onChange={this.onSelectChange}
                 maxTagCount={maxItemTagCount}

@@ -82,7 +82,7 @@ const customDropdownStyle = (theme) => ({
     padding: '0',
   },
   pooperResponsive: {
-    zIndex: '1200',
+    zIndex: '1500',
     [theme.breakpoints.down('sm')]: {
       zIndex: '1640',
       position: 'static',
