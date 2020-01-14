@@ -52,7 +52,7 @@ const Diagnosis = ({
   ...props
 }) => {
   const { data = [], isPedoChart, isSurfaceLabel } = dentalChartComponent
-  const { cttreatment } = codetable
+  const { cttreatment = [] } = codetable
   const groups = _.groupBy(data, 'toothNo')
   // console.log(groups)
   // console.log(cttreatment)
