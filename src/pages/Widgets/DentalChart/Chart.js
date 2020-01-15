@@ -641,7 +641,7 @@ class Chart extends React.PureComponent {
           p.add(
             createFont({
               text: '',
-              left: innerFontSize / 2,
+              left: innerFontSize / 1.5,
               top: -baseHeight,
               fontSize: innerFontSize * 2,
             }).rotate(180),
@@ -649,7 +649,7 @@ class Chart extends React.PureComponent {
           p.add(
             createFont({
               text: '',
-              left: innerFontSize / 2,
+              left: innerFontSize / 1.5,
               top: -baseHeight,
               fontSize: innerFontSize * 2,
             }).rotate(180),
@@ -720,7 +720,7 @@ class Chart extends React.PureComponent {
           p.add(
             createFont({
               text: '',
-              left: innerFontSize / 2,
+              left: innerFontSize / 1.5,
               top: -baseHeight,
               fontSize: innerFontSize * 2,
             }),
@@ -728,7 +728,7 @@ class Chart extends React.PureComponent {
           p.add(
             createFont({
               text: '',
-              left: -innerFontSize / 2,
+              left: -innerFontSize / 1.5,
               top: -baseHeight,
               fontSize: innerFontSize * 2,
             }),

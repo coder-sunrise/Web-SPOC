@@ -45,7 +45,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    width: 195,
+    width: 194,
     border: '1px solid rgba(0, 0, 0, 0.38)',
   },
 }))(ToggleButtonGroup)
