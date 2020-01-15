@@ -98,7 +98,7 @@
     "react-dnd-html5-backend": "^7.4.4",
     "react-document-title": "^2.0.3",
     "react-dom": "16.9.0",
-    "react-draft-wysiwyg": "^1.13.2",
+    "react-draft-wysiwyg": "1.14.1",
     "react-dropzone": "^10.1.7",
     "react-escape-html": "^1.0.5",
     "react-fabric": "^0.4.1",
