@@ -73,11 +73,14 @@ class EditOrder extends Component {
   }
 
   editOrder = () => {
-    const { dispatch, dispense, visitRegistration } = this.props
+    const { dispatch, dispense, visitRegistration, history } = this.props
+    const { location } = history
+    const { query } = location
     dispatch({
       type: `consultation/editOrder`,
       payload: {
         id: dispense.visitID,
+        queueID: query.qid,
         version: dispense.version,
       },
     }).then((o) => {
@@ -150,7 +153,7 @@ class EditOrder extends Component {
         <GridContainer>
           <GridItem xs={12} md={6}>
             <h5>Orders</h5>
-            <Order className={classes.orderPanel} status='' />
+            <Order className={classes.orderPanel} status='' from='ca' />
           </GridItem>
           <GridItem xs={12} md={6}>
             <h5>

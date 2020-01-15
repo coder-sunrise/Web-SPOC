@@ -16,6 +16,7 @@ import {
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
   return (
@@ -60,30 +61,11 @@ const FilterBar = ({ handleSubmit, values, isSubmitting }) => {
           </GridItem>
           <GridItem md={5} />
           {/* 2nd row  */}
-          <GridItem md={2}>
-            <Field
-              name='dateFrom'
-              render={(args) => (
-                <DatePicker
-                  {...args}
-                  disabled={values.isAllDate}
-                  label='Visit Date From'
-                />
-              )}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <Field
-              name='dateTo'
-              render={(args) => (
-                <DatePicker
-                  {...args}
-                  disabled={values.isAllDate}
-                  label='Visit Date To'
-                />
-              )}
-            />
-          </GridItem>
+          <ReportDateRangePicker
+            fromDateLabel='Visit Date From'
+            toDateLabel='Visit Date To'
+          />
+
           <GridItem md={1}>
             <FastField
               name='isAllDate'

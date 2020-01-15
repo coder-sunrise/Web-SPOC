@@ -17,6 +17,7 @@ import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
+import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
@@ -958,6 +959,13 @@ const orderTypes = [
     value: '6',
     component: (props) => <OrderSet {...props} />,
   },
+  {
+    name: 'Treatment',
+    value: '7',
+    prop: 'corDentalTreatments',
+    getSubject: (r) => r.itemName,
+    component: (props) => <Treatment {...props} />,
+  },
 ]
 const buttonTypes = [
   'RegularButton',
@@ -1146,6 +1154,18 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctmedicationprecaution',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'cttreatment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctchartmethod',
     {
       ...defaultParams,
     },
@@ -1538,8 +1558,11 @@ const tagList = [
     getter: () => {
       const { user } = window.g_app._store.getState()
       if (user && user.data && user.data.clinicianProfile) {
-        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
-          .name}`
+        const title = user.data.clinicianProfile.title
+          ? `${user.data.clinicianProfile.title} `
+          : ''
+
+        return `${title}${user.data.clinicianProfile.name}`
       }
       return 'N.A.'
     },

@@ -43,6 +43,7 @@ export default createListViewModel({
         })
       },
       *refreshCodes ({ payload }, { call, put }) {
+        // console.log('refreshCodes')
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
         yield put({

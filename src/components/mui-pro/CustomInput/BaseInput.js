@@ -229,11 +229,10 @@ class BaseInput extends React.PureComponent {
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
     // }
-
     const { rowsMax, ...resetProps } = inputProps
     const cfg = {
-      fullWidth: fullWidth || !text,
-      readOnly:readonly,
+      fullWidth: fullWidth !== undefined ? fullWidth : !text,
+      readOnly: readonly,
     }
     const adornmentClasses = classNames({
       [classes.adornment]: true,
@@ -307,7 +306,7 @@ class BaseInput extends React.PureComponent {
             }
             enterDelay={0}
           >
-            <Error color='error' style={{ cursor: 'pointer' }} />
+            <Error color='error' style={{ cursor: 'pointer', top: 0 }} />
           </Tooltip>
         </InputAdornment>
       )

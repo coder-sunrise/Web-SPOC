@@ -1200,6 +1200,14 @@ const locationQueryParameters = () => {
   return params
 }
 
+export const convertToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.onerror = (error) => reject(error)
+  })
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,

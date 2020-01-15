@@ -1,10 +1,12 @@
 import React from 'react'
-import { withStyles } from '@material-ui/core'
-
+import _ from 'lodash'
+import classnames from 'classnames'
 import { connect } from 'dva'
+// material ui
+import { withStyles } from '@material-ui/core'
 import GridList from '@material-ui/core/GridList'
 import GridListTile from '@material-ui/core/GridListTile'
-
+// common components
 import { GridContainer, GridItem, Button } from '@/components'
 
 const styles = (theme) => ({
@@ -55,10 +57,13 @@ class ScribbleNoteItem extends React.Component {
       scribbleNoteUpdateState,
       scribbleNoteArray,
       gridItemWidth,
+      editorButtonStyle = {},
     } = this.props
-
+    const rootClass = classnames({
+      [classes.editorBtn]: _.isEmpty(editorButtonStyle),
+    })
     return (
-      <div className={classes.editorBtn}>
+      <div className={rootClass} style={editorButtonStyle}>
         <Button
           color='info'
           onClick={() => {

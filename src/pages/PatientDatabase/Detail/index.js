@@ -116,6 +116,10 @@ const mapEntityToValues = (entity) => {
     const { props, resetForm } = component
     const { dispatch, history, patient, onConfirm } = props
     const { location } = history
+    const shouldCloseForm = location.pathname
+      ? !location.pathname.includes('patientdb')
+      : false
+
     const cfg = {
       message: 'Patient profile saved.',
     }
@@ -134,6 +138,12 @@ const mapEntityToValues = (entity) => {
         cfg,
       },
     }).then((r) => {
+      dispatch({
+        type: 'patient/updateState',
+        payload: {
+          shouldQueryOnClose: location.pathname.includes('patientdb'),
+        },
+      })
       if (r) {
         // POST request -> r.id === true
         // PUT request -> r.id === false
@@ -162,25 +172,21 @@ const mapEntityToValues = (entity) => {
           resetForm(newEntity)
         })
 
-        const shouldCloseForm = location.pathname
-          ? !location.pathname.includes('patientdb')
-          : false
-
         if (onConfirm && shouldCloseForm) {
           onConfirm()
         }
 
-        if (!shouldCloseForm) {
-          dispatch({
-            type: 'patientSearch/query',
-            payload: {
-              sorting: [
-                // { columnName: 'isActive', direction: 'asc' },
-                { columnName: 'name', direction: 'asc' },
-              ],
-            },
-          })
-        }
+        // if (!shouldCloseForm) {
+        //   dispatch({
+        //     type: 'patientSearch/query',
+        //     payload: {
+        //       sorting: [
+        //         // { columnName: 'isActive', direction: 'asc' },
+        //         { columnName: 'name', direction: 'asc' },
+        //       ],
+        //     },
+        //   })
+        // }
       }
     })
   },
@@ -367,12 +373,24 @@ class PatientDetail extends PureComponent {
     }
 
     const response = await queryList({
-      ...search,
-      combineCondition: 'and',
+      // ...search,
+      // combineCondition: 'and',
+      apiCriteria: {
+        searchValue: values.patientAccountNo,
+      },
     })
 
     const { data } = response
-    if (data && data.totalRecords > 0) {
+    let shouldPromptSaveConfirmation = false
+    if (data) {
+      if (data.length === 1)
+        shouldPromptSaveConfirmation = data[0].id !== values.id
+      else if (data.length > 1) {
+        shouldPromptSaveConfirmation = true
+      }
+    }
+
+    if (shouldPromptSaveConfirmation) {
       return dispatch({
         type: 'global/updateAppState',
         payload: {
@@ -385,6 +403,20 @@ class PatientDetail extends PureComponent {
         },
       })
     }
+
+    // if (data && data.totalRecords > 0) {
+    //   return dispatch({
+    //     type: 'global/updateAppState',
+    //     payload: {
+    //       openConfirm: true,
+    //       openConfirmTitle: '',
+    //       openConfirmText: 'OK',
+    //       openConfirmContent:
+    //         'Duplicate Account No. found. OK to continue or Cancel to make changes',
+    //       onConfirmSave: handleSubmit,
+    //     },
+    //   })
+    // }
     return handleSubmit()
   }
 

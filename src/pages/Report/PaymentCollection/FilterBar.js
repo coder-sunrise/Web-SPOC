@@ -13,6 +13,7 @@ import {
 } from '@/components'
 // medisys components
 import { DoctorProfileSelect } from '@/components/_medisys'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
@@ -20,18 +21,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
       <GridContainer>
         <GridContainer alignItems='center'>
           {/* 1st row  */}
-          <GridItem md={2}>
-            <FastField
-              name='dateFrom'
-              render={(args) => <DatePicker {...args} label='From' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='dateTo'
-              render={(args) => <DatePicker {...args} label='To' />}
-            />
-          </GridItem>
+          <ReportDateRangePicker />
+
           <GridItem md={2}>
             <FastField
               name='doctorID'

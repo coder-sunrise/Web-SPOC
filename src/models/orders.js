@@ -45,6 +45,7 @@ const initialState = {
   defaultOrderSet: {
     orderSetItems: [],
   },
+  defaultTreatment: {},
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {
@@ -103,9 +104,9 @@ export default createListViewModel({
               entity: undefined,
             },
           })
-          yield put({
-            type: 'global/incrementCommitCount',
-          })
+          // yield put({
+          //   type: 'global/incrementCommitCount',
+          // })
         }
       },
       *upsertRows ({ payload }, { select, call, put, delay }) {
@@ -162,6 +163,9 @@ export default createListViewModel({
       upsertRowState (state, { payload }) {
         let newRow
         let { rows, type } = state
+        if (payload.type) {
+          type = payload.type
+        }
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =

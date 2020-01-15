@@ -1023,8 +1023,8 @@ class Medication extends PureComponent {
               }}
             />
           </GridItem>
-          {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
-            <GridItem xs={12}>
+          <GridItem xs={12}>
+            {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
               <FastField
                 name='isExternalPrescription'
                 render={(args) => {
@@ -1036,7 +1036,8 @@ class Medication extends PureComponent {
                   return (
                     <Checkbox
                       label='External Prescription'
-                      labelPlacement='start'
+                      // labelPlacement='start'
+                      // fullWidth={false}
                       {...args}
                       onChange={(e) => {
                         if (e.target.value) {
@@ -1067,10 +1068,10 @@ class Medication extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
-          ) : (
-            ''
-          )}
+            ) : (
+              ''
+            )}
+          </GridItem>
         </GridContainer>
         {footer({
           onSave: handleSubmit,

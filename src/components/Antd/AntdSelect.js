@@ -221,6 +221,7 @@ class AntdSelect extends React.PureComponent {
       maxSelected,
     } = nextProps
     let v = this.state.value
+    // console.log(v)
     if (field) {
       v = [
         'multiple',
@@ -263,6 +264,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
+          shrink: v !== undefined,
         })
       }
     } else if (value !== undefined) {
@@ -301,7 +303,7 @@ class AntdSelect extends React.PureComponent {
           value: v,
         })
       }
-    } else {
+    } else if (!this.state.value || this.state.value.length) {
       this.setState({
         value: [
           'multiple',
@@ -716,7 +718,7 @@ class AntdSelect extends React.PureComponent {
       labelProps.shrink =
         (value && value.length > 0) || this.state.shrink || this.state.focus
     }
-    // console.log(this.state, labelProps)
+    // console.log(value && value.length > 0, this.state.shrink, this.state.focus)
     return (
       <CustomInput
         labelProps={labelProps}

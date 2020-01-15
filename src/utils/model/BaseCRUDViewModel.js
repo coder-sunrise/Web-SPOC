@@ -479,7 +479,7 @@ export default class BaseCRUDViewModel {
       },
 
       reset (st, { payload }) {
-        return state.default || {}
+        return state || {}
       },
 
       showModal (st, { payload }) {
