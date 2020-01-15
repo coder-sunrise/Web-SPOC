@@ -307,6 +307,7 @@ export default withFormikExtend({
           notification.success({
             message: 'Setting updated',
           })
+          if (onConfirm) onConfirm()
           // dispatch({
           //   type: 'dentalChartSetup/query',
           //   payload: {
@@ -324,8 +325,6 @@ export default withFormikExtend({
       //   ),
       // )
     }
-
-    if (onConfirm) onConfirm()
   },
 
   displayName: 'DentalChartMethodSetup',

@@ -58,7 +58,6 @@ class TreatmentForm extends PureComponent {
             padding: theme.spacing(1, 0),
           }}
         >
-          <Divider light />
           <Form
             singleMode='7'
             from='doctor'
