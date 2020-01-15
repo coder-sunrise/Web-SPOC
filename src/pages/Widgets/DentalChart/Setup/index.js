@@ -284,7 +284,7 @@ export default withFormikExtend({
       values.rows.map(({ rowIndex, ...o }) => o),
       ctchartmethod,
     )
-    console.log(ctchartmethod, values.rows, diffs)
+    // console.log(ctchartmethod, values.rows, diffs)
     if (diffs.length !== 0) {
       // console.log(diffs)
       // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
@@ -307,6 +307,7 @@ export default withFormikExtend({
           notification.success({
             message: 'Setting updated',
           })
+          if (onConfirm) onConfirm()
           // dispatch({
           //   type: 'dentalChartSetup/query',
           //   payload: {
@@ -324,8 +325,6 @@ export default withFormikExtend({
       //   ),
       // )
     }
-
-    if (onConfirm) onConfirm()
   },
 
   displayName: 'DentalChartMethodSetup',

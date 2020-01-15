@@ -148,8 +148,8 @@ export default function DiagnosisPanel (props) {
                 )
                 .map((row) => {
                   const { id, displayValue } = row
-                  return [
-                    <ToggleButton value={id}>
+                  return (
+                    <ToggleButton value={id} key={id}>
                       <Tooth
                         className={classes.buttonIcon}
                         width={groupWidth / 5 + 2}
@@ -178,12 +178,8 @@ export default function DiagnosisPanel (props) {
                       <span style={{ marginLeft: groupWidth / 5 }}>
                         {displayValue}
                       </span>
-                    </ToggleButton>,
-                    // <Divider
-                    //   orientation='vertical'
-                    //   className={classes.divider}
-                    // />,
-                  ]
+                    </ToggleButton>
+                  )
                 })}
             </StyledToggleButtonGroup>
           </GridItem>
