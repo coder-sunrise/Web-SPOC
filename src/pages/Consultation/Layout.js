@@ -376,7 +376,7 @@ class Layout extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
-    console.log({ defaultWidgets })
+    // console.log({ defaultWidgets })
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
     }

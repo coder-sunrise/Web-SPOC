@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
 import _ from 'lodash'
 import Delete from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
-import History from '@material-ui/icons/History'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
-import ListItemAvatar from '@material-ui/core/ListItemAvatar'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
 import ListItemText from '@material-ui/core/ListItemText'
 import moment from 'moment'
-import {
-  SortableContainer,
-  SortableHandle,
-  SortableElement,
-  arrayMove,
-} from 'react-sortable-hoc'
+import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 import {
   Button,
   GridContainer,
@@ -51,28 +40,21 @@ const Diagnosis = ({
   global,
   ...props
 }) => {
-  const { data = [], isPedoChart, isSurfaceLabel } = dentalChartComponent
-  const { cttreatment = [] } = codetable
+  const { data = [] } = dentalChartComponent
   const groups = _.groupBy(data, 'toothNo')
-  // console.log(groups)
-  // console.log(cttreatment)
   const [
     selected,
     setSelected,
   ] = useState()
 
-  // const [remarks,setReamr]
-
   const getCellConfig = (subAry) => {
     return subAry.reduce((a, b) => {
-      // console.log(a, b)
       return {
         ...a,
         ...b,
       }
     })
   }
-  // console.log(selected)
   return (
     <div>
       <div
@@ -141,7 +123,6 @@ const Diagnosis = ({
               },
             })
           }
-          // console.log(items)
           return (
             <SortList
               // lockToContainerEdges
@@ -168,19 +149,9 @@ const Diagnosis = ({
                     },
                   })
                 }
-                // console.log(
-                //   subAry,
-                //   getCellConfig(
-                //     subAry.map((o) => ({
-                //       [o.subTarget.replace('cell_', '')]: o.action.fill,
-                //     })),
-                //   ),
-                // )
                 const { action = {}, subTarget, id } = v
                 const SortableListItem = SortableElement(ListItem)
-                // console.log(items, v)
                 const idx = items.indexOf(id)
-                // console.log(v, items, k, idx, id)
 
                 return (
                   <SortableListItem
@@ -190,9 +161,7 @@ const Diagnosis = ({
                       secondaryAction: classes.toothJournalItemSecondaryAction,
                     }}
                     button
-                    // selected={selectedIndex === 0}
                     onClick={() => {
-                      // console.log(selected, v)
                       setSelected(
                         selected &&
                         v.toothNo === selected.toothNo &&
@@ -304,7 +273,6 @@ const Diagnosis = ({
             const shapes = data.filter(
               (o) => o.toothNo === selected.toothNo && o.id === selected.id,
             )
-            // console.log(v.target.value, selected.remark)
             if (v.target.value !== selected.remark) {
               dispatch({
                 type: 'dentalChartComponent/toggleMultiSelect',
@@ -314,7 +282,6 @@ const Diagnosis = ({
                   remark: v.target.value,
                 })),
               })
-              // console.log(selected, v)
             }
           }}
         />

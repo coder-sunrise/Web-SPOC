@@ -17,9 +17,6 @@ const updateData = (data, payload) => {
     deleted,
     remark,
   } = payload
-  // console.log(payload)
-  // if (!name) return data
-  // console.log(action)
   const exist = data.find(
     (o) =>
       o.toothNo === toothNo &&
@@ -34,9 +31,6 @@ const updateData = (data, payload) => {
   if (deleted) {
     return _.reject(data, (o) => o.toothNo === toothNo && o.id === id)
   }
-  // if (others.length > 0) {
-  //   others.map((o) => (o.hide = true))
-  // }
   if (exist) {
     if (remark) {
       exist.remark = payload.remark

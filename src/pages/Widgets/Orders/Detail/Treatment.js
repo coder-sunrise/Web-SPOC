@@ -24,24 +24,20 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   // ],
   // notDirtyDuration: 0, // this page should alwasy show warning message when leave
   mapPropsToValues: ({
-    dentalChartTreatment = {},
     dentalChartComponent = {},
     codetable,
     orders,
     ...rest
   }) => {
-    // console.log(dentalChartComponent, dentalChartTreatment)
     const { data = [], action = {} } = dentalChartComponent
     const { entity = {} } = orders
     const { rows } = orders
     // console.log(action, data, rows)
     // console.log(rest, this)
-    let treatment = {}
 
-    if (action.id)
-      treatment =
-        (codetable.cttreatment || [])
-          .find((o) => o.id === action.dentalTreatmentFK) || {}
+    const treatment =
+      (codetable.cttreatment || [])
+        .find((o) => o.id === action.dentalTreatmentFK) || {}
     const existedTooths = []
     const otherTreatmentTooths = []
     rows
@@ -167,12 +163,6 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   },
   handleSubmit: async (values, { props, onConfirm }) => {
     const { dispatch, orders, currentType, getNextSequence } = props
-    // dispatch({
-    //   type: 'dentalChartTreatment/upsertRow',
-    //   payload: {
-    //     ...values,
-    //   },
-    // })
 
     const data = {
       type: '7',
@@ -189,12 +179,6 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
       payload: data,
     })
 
-    // dispatch({
-    //   type: 'dentalChartTreatment/updateState',
-    //   payload: {
-    //     entity: undefined,
-    //   },
-    // })
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -404,7 +388,7 @@ class Treatment extends PureComponent {
                       this.setTotalPrice()
                     }, 1)
                   }}
-                  disabled={isDoctor}
+                  disabled={isDoctor && values.chartMethodFK}
                   {...args}
                 />
               )}

@@ -6,7 +6,7 @@ import Edit from '@material-ui/icons/Edit'
 import { status } from '@/utils/codes'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import * as service from './services'
-import Legend from '@/pages/Development/DentalChart/Setup/Legend'
+import Legend from '@/pages/Widgets/DentalChart/Setup/Legend'
 
 class Grid extends PureComponent {
   configs = {

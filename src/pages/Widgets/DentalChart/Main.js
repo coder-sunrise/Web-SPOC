@@ -2,45 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { withStyles, Divider, Paper } from '@material-ui/core'
 import { connect } from 'dva'
 
-import _ from 'lodash'
-import DeleteIcon from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
-import FilterList from '@material-ui/icons/FilterList'
-import moment from 'moment'
-import logo from '@/assets/img/logo/logo_blue.png'
-import { getUniqueId } from '@/utils/utils'
-import {
-  Button,
-  GridContainer,
-  GridItem,
-  TextField,
-  CodeSelect,
-  DatePicker,
-  Checkbox,
-  Popover,
-  Tooltip,
-  Select,
-  ButtonSelect,
-  SketchField,
-  SizeContainer,
-  CommonModal,
-} from '@/components'
-
-import {
-  strokeWidth,
-  baseWidth,
-  baseHeight,
-  zoom,
-  fontColor,
-  innerFontSize,
-  sharedCfg,
-  fontCfg,
-  groupCfg,
-  cellPrefix,
-  overlayShapeTypes,
-  lockConfig,
-  selectablePrefix,
-} from './variables'
+import { GridContainer, GridItem } from '@/components'
 
 import DiagnosisPanel from './DiagnosisPanel'
 import TreatmentForm from './TreatmentForm'
@@ -48,11 +10,9 @@ import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
 import model from './models'
 import modelSetup from './models/setup'
-import modelTreatment from './models/treatment'
 
 window.g_app.replaceModel(model)
 window.g_app.replaceModel(modelSetup)
-window.g_app.replaceModel(modelTreatment)
 
 const styles = (theme) => ({
   paper: {
@@ -109,17 +69,14 @@ const styles = (theme) => ({
   },
   buttonIcon: {
     position: 'absolute',
-    left: theme.spacing(0.5),
+    left: 0,
   },
 })
 
-const groupWidth = baseWidth * 4 // + strokeWidth
-const groupHeight = baseHeight * 3 // + strokeWidth
 @connect(
   ({
     dentalChartComponent,
     dentalChartSetup,
-    dentalChartTreatment,
     orders,
     codetable,
     consultation,
@@ -127,7 +84,6 @@ const groupHeight = baseHeight * 3 // + strokeWidth
   }) => ({
     dentalChartComponent,
     dentalChartSetup,
-    dentalChartTreatment,
     orders,
     codetable,
     consultation,
@@ -148,7 +104,6 @@ class DentalChart extends React.Component {
   }
 
   componentWillReceiveProps (np) {
-    // co/nsole.log(this.props.dentalChartComponent.data, np.consultation)
     if (
       this.props.dentalChartComponent.data.length === 0 &&
       np.consultation.entity &&
@@ -169,15 +124,6 @@ class DentalChart extends React.Component {
         })
       }
     }
-    // if (data.corDentalCharts && data.corDentalCharts[0]) {
-    //   yield put({
-    //     type: 'dentalChartComponent/updateState',
-    //     payload: {
-    //       ...data.corDentalCharts[0],
-    //       data: JSON.parse(data.corDentalCharts[0].dentalChart),
-    //     },
-    //   })
-    // }
   }
 
   componentWillUnmount () {

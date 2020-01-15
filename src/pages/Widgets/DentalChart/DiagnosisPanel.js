@@ -1,13 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
-import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft'
-import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter'
-import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight'
-import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify'
-import FormatBoldIcon from '@material-ui/icons/FormatBold'
-import FormatItalicIcon from '@material-ui/icons/FormatItalic'
-import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined'
 import Settings from '@material-ui/icons/Settings'
 import Search from '@material-ui/icons/Search'
 import Divider from '@material-ui/core/Divider'
@@ -83,19 +76,6 @@ export default function DiagnosisPanel (props) {
       },
     })
   }
-  // console.log(list)
-  // const sharedCfg = {
-  //   alt: '',
-  //   style: {
-  //     height: '100%',
-  //     padding: theme.spacing(0.25),
-  //     marginRight: 4,
-  //     position: 'absolute',
-  //     left: 0,
-  //   },
-  // }
-  // console.log(rows)
-  // console.log(theme.props)
   return (
     <div>
       <Paper className={classes.paper}>
@@ -149,36 +129,36 @@ export default function DiagnosisPanel (props) {
                 .map((row) => {
                   const { id, displayValue } = row
                   return (
-                    <ToggleButton value={id} key={id}>
-                      <Tooth
-                        className={classes.buttonIcon}
-                        width={groupWidth / 5 + 2}
-                        height={groupHeight / 5}
-                        paddingLeft={1}
-                        paddingTop={1}
-                        zoom={1 / 5}
-                        image={row.image}
-                        action={row}
-                        fill={{
-                          left: row.chartMethodColorBlock,
-                          right: row.chartMethodColorBlock,
-                          top: row.chartMethodColorBlock,
-                          bottom: row.chartMethodColorBlock,
-                          centerfull: row.chartMethodColorBlock || 'white',
-                        }}
-                        symbol={{
-                          left: row.chartMethodText,
-                          right: row.chartMethodText,
-                          top: row.chartMethodText,
-                          bottom: row.chartMethodText,
-                          centerfull: row.chartMethodText,
-                        }}
-                        name={displayValue}
-                      />
-                      <span style={{ marginLeft: groupWidth / 5 }}>
-                        {displayValue}
-                      </span>
-                    </ToggleButton>
+                    <Tooltip title={displayValue}>
+                      <ToggleButton value={id} key={id}>
+                        <Tooth
+                          className={classes.buttonIcon}
+                          width={groupWidth / 5 + 2}
+                          height={groupHeight / 5}
+                          paddingLeft={1}
+                          paddingTop={1}
+                          zoom={1 / 5}
+                          image={row.image}
+                          action={row}
+                          fill={{
+                            left: row.chartMethodColorBlock,
+                            right: row.chartMethodColorBlock,
+                            top: row.chartMethodColorBlock,
+                            bottom: row.chartMethodColorBlock,
+                            centerfull: row.chartMethodColorBlock || 'white',
+                          }}
+                          symbol={{
+                            left: row.chartMethodText,
+                            right: row.chartMethodText,
+                            top: row.chartMethodText,
+                            bottom: row.chartMethodText,
+                            centerfull: row.chartMethodText,
+                          }}
+                          name={displayValue}
+                        />
+                        <span style={{ marginLeft: 64 }}>{displayValue}</span>
+                      </ToggleButton>
+                    </Tooltip>
                   )
                 })}
             </StyledToggleButtonGroup>
