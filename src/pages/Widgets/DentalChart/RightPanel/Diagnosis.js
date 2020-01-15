@@ -261,10 +261,7 @@ const Diagnosis = ({
                               paddingTop: 2,
                             }}
                           >
-                            {!cttreatment.find(
-                              (m) => m.chartMethodFK === v.action.id,
-                            ) &&
-                            v.action.isDisplayInDiagnosis && (
+                            {!v.action.dentalTreatmentFK && (
                               <Tooltip title='Delete'>
                                 <IconButton
                                   onClick={(e) => {

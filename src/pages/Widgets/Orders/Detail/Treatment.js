@@ -41,36 +41,40 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     if (action.id)
       treatment =
         (codetable.cttreatment || [])
-          .find((o) => o.chartMethodFK === action.id) || {}
+          .find((o) => o.id === action.dentalTreatmentFK) || {}
     const existedTooths = []
     const otherTreatmentTooths = []
-    rows.filter((o) => o.type === '7').forEach((r) => {
-      let matches = (r.itemNotes || '').matchAll(rangeReg)
-      for (let result of matches) {
-        if (result[2]) {
-          for (
-            let index = Number(result[1]);
-            index <= Number(result[2]);
-            index++
-          ) {
-            if (r.uid !== entity.uid) {
-              otherTreatmentTooths.push(index)
-            } else {
-              existedTooths.push(index)
+    rows
+      .filter(
+        (o) => o.type === '7' && o.treatmentFK === action.dentalTreatmentFK,
+      )
+      .forEach((r) => {
+        let matches = (r.itemNotes || '').matchAll(rangeReg)
+        for (let result of matches) {
+          if (result[2]) {
+            for (
+              let index = Number(result[1]);
+              index <= Number(result[2]);
+              index++
+            ) {
+              if (r.uid !== entity.uid) {
+                otherTreatmentTooths.push(index)
+              } else {
+                existedTooths.push(index)
+              }
             }
+          } else if (r.uid !== entity.uid) {
+            otherTreatmentTooths.push(Number(result[1]))
+          } else {
+            existedTooths.push(Number(result[1]))
           }
-        } else if (r.uid !== entity.uid) {
-          otherTreatmentTooths.push(Number(result[1]))
-        } else {
-          existedTooths.push(Number(result[1]))
         }
-      }
-    })
+      })
 
     // console.log(existedTooths, otherTreatmentTooths)
     const dataFiltered = data.filter(
       (o) =>
-        o.id === action.id &&
+        // o.id === action.id &&
         o.action.dentalTreatmentFK === treatment.id &&
         (existedTooths.indexOf(o.toothNo) >= 0 ||
           otherTreatmentTooths.indexOf(o.toothNo) < 0),
@@ -214,6 +218,23 @@ class Treatment extends PureComponent {
     })
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+  }
+
   setTotalPrice = () => {
     const { setFieldValue, values, disableEdit } = this.props
     if (disableEdit === false) {
@@ -317,7 +338,7 @@ class Treatment extends PureComponent {
               name='remark'
               render={(args) => (
                 <OutlinedTextField
-                  autoFocus
+                  // autoFocus
                   label='Treatment Details'
                   multiline
                   maxLength={2000}

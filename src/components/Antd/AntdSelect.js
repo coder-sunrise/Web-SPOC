@@ -303,7 +303,7 @@ class AntdSelect extends React.PureComponent {
           value: v,
         })
       }
-    } else {
+    } else if (!this.state.value || this.state.value.length) {
       this.setState({
         value: [
           'multiple',

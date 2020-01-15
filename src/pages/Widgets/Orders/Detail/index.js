@@ -100,10 +100,10 @@ class Details extends PureComponent {
                     entity: undefined,
                   },
                 })
-                this.props.dispatch({
-                  // force current edit row components to update
-                  type: 'global/incrementCommitCount',
-                })
+                // this.props.dispatch({
+                //   // force current edit row components to update
+                //   type: 'global/incrementCommitCount',
+                // })
               } else if (onReset) {
                 onReset()
               }
@@ -241,9 +241,9 @@ class Details extends PureComponent {
                       type: key,
                     },
                   })
-                  dispatch({
-                    type: 'global/incrementCommitCount',
-                  })
+                  // dispatch({
+                  //   type: 'global/incrementCommitCount',
+                  // })
                 }}
               />
             </GridItem>

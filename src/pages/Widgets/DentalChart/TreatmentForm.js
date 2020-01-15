@@ -46,6 +46,7 @@ class TreatmentForm extends PureComponent {
       dentalChartTreatment,
       setFieldValue,
       values,
+      global,
       codetable,
     } = this.props
 
@@ -65,6 +66,7 @@ class TreatmentForm extends PureComponent {
             codetable={codetable}
             dentalChartComponent={dentalChartComponent}
             dentalChartTreatment={dentalChartTreatment}
+            global={global}
           />
         </Paper>
         <TreatmentGrid {...this.props} />

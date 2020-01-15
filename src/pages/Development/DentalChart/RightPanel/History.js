@@ -7,8 +7,9 @@ import DeleteIcon from '@material-ui/icons/Delete'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { getUniqueId } from '@/utils/utils'
+import { findGetParameter } from '@/utils/utils'
 import Chart from '../Chart'
+
 import {
   Button,
   GridContainer,
@@ -56,7 +57,7 @@ const History = (props) => {
     footer,
     ...restProps
   } = props
-  console.log(props)
+
   return (
     <div>
       <SizeContainer size='sm'>
