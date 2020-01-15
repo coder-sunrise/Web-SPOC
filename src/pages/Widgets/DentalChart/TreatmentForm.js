@@ -43,7 +43,6 @@ class TreatmentForm extends PureComponent {
       dispatch,
       theme,
       dentalChartComponent,
-      dentalChartTreatment,
       setFieldValue,
       values,
       global,
@@ -64,7 +63,6 @@ class TreatmentForm extends PureComponent {
             currentType={orderTypes.find((o) => o.value === '7')}
             codetable={codetable}
             dentalChartComponent={dentalChartComponent}
-            dentalChartTreatment={dentalChartTreatment}
             global={global}
           />
         </Paper>

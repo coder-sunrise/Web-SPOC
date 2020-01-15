@@ -12,7 +12,7 @@ import {
   CodeSelect,
   NumberInput,
 } from '@/components'
-import Legend from '@/pages/Development/DentalChart/Setup/Legend'
+import Legend from '@/pages/Widgets/DentalChart/Setup/Legend'
 
 const styles = (theme) => ({})
 

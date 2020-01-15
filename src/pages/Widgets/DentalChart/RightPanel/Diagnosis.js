@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
 import _ from 'lodash'
-import Delete from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
-import History from '@material-ui/icons/History'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemAvatar from '@material-ui/core/ListItemAvatar'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import ListItemText from '@material-ui/core/ListItemText'
+
 import moment from 'moment'
-import {
-  SortableContainer,
-  SortableHandle,
-  SortableElement,
-  arrayMove,
-} from 'react-sortable-hoc'
 import {
   Button,
   GridContainer,
@@ -36,7 +20,7 @@ import {
   IconButton,
   dateFormatLong,
 } from '@/components'
-import Tooth from '../Tooth'
+import SortItem from './SortItem'
 
 const Diagnosis = ({
   dispatch,
@@ -51,28 +35,9 @@ const Diagnosis = ({
   global,
   ...props
 }) => {
-  const { data = [], isPedoChart, isSurfaceLabel } = dentalChartComponent
-  const { cttreatment = [] } = codetable
+  const { data = [], selected } = dentalChartComponent
   const groups = _.groupBy(data, 'toothNo')
-  // console.log(groups)
-  // console.log(cttreatment)
-  const [
-    selected,
-    setSelected,
-  ] = useState()
-
-  // const [remarks,setReamr]
-
-  const getCellConfig = (subAry) => {
-    return subAry.reduce((a, b) => {
-      // console.log(a, b)
-      return {
-        ...a,
-        ...b,
-      }
-    })
-  }
-  // console.log(selected)
+  console.log(selected)
   return (
     <div>
       <div
@@ -84,210 +49,16 @@ const Diagnosis = ({
       >
         <h4>Tooth Journal</h4>
         {Object.keys(groups).map((k) => {
-          const ary = groups[k]
-
-          const valueGroups = _.groupBy(ary, 'id')
-          const SortList = SortableContainer(List)
-          const items = Object.values(
-            _.orderBy(valueGroups, (o) => o[0].timestamp),
-          ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
-
-          const onSortEnd = ({ newIndex, oldIndex }) => {
-            if (newIndex === oldIndex) return
-            let currentItems = ary.filter((o) => o.id === items[oldIndex])
-            const existItems = ary.filter((o) => o.id === items[newIndex])
-            currentItems = currentItems.map((o) => ({
-              ...o,
-              timestamp:
-                newIndex > oldIndex
-                  ? _.maxBy(existItems, (n) => {
-                      return n.timestamp
-                    }).timestamp + 1
-                  : _.minBy(existItems, (n) => {
-                      return n.timestamp
-                    }).timestamp - 1,
-            }))
-            // console.log(currentItems, existItems)
-            ary
-              .filter(
-                (o) =>
-                  o.id !== currentItems[0].id &&
-                  o.timestamp < currentItems[0].timestamp,
-              )
-              .map((o) => {
-                o.timestamp -= 1
-              })
-            ary
-              .filter(
-                (o) =>
-                  o.id !== currentItems[0].id &&
-                  o.timestamp > currentItems[0].timestamp,
-              )
-              .map((o) => {
-                o.timestamp += 1
-              })
-
-            dispatch({
-              type: 'dentalChartComponent/updateState',
-              payload: {
-                data: [
-                  ...data.filter(
-                    (o) =>
-                      (o.toothNo === Number(k) && o.id !== items[oldIndex]) ||
-                      o.toothNo !== Number(k),
-                  ),
-                  ...currentItems,
-                ],
-              },
-            })
-          }
-          // console.log(items)
           return (
-            <SortList
-              // lockToContainerEdges
-              key={k}
-              lockAxis='y'
-              distance={10}
-              onSortEnd={onSortEnd}
-              helperClass={classes.sortableContainer}
-              classes={{
-                padding: classes.toothJournal,
-              }}
-            >
-              {items.map((j) => {
-                const subAry = valueGroups[j]
-                const v = subAry[0]
-                if (v.action.method !== 3)
-                  v.info = subAry.map((o) => o.name).join(',')
-                if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
-                  subAry.push({
-                    subTarget: 'centerfull',
-                    action: {
-                      fill: 'white',
-                      symbol: '',
-                    },
-                  })
-                }
-                // console.log(
-                //   subAry,
-                //   getCellConfig(
-                //     subAry.map((o) => ({
-                //       [o.subTarget.replace('cell_', '')]: o.action.fill,
-                //     })),
-                //   ),
-                // )
-                const { action = {}, subTarget, id } = v
-                const SortableListItem = SortableElement(ListItem)
-                // console.log(items, v)
-                const idx = items.indexOf(id)
-                // console.log(v, items, k, idx, id)
-
-                return (
-                  <SortableListItem
-                    key={id}
-                    classes={{
-                      root: classes.toothJournalItem,
-                      secondaryAction: classes.toothJournalItemSecondaryAction,
-                    }}
-                    button
-                    // selected={selectedIndex === 0}
-                    onClick={() => {
-                      // console.log(selected, v)
-                      setSelected(
-                        selected &&
-                        v.toothNo === selected.toothNo &&
-                        v.id === selected.id
-                          ? undefined
-                          : v,
-                      )
-                    }}
-                    index={idx}
-                    selected={
-                      selected &&
-                      v.toothNo === selected.toothNo &&
-                      v.id === selected.id
-                    }
-                  >
-                    <ListItemIcon
-                      classes={{
-                        root: classes.toothIcon,
-                      }}
-                    >
-                      <Tooth
-                        width={20}
-                        height={20}
-                        paddingLeft={1}
-                        paddingTop={1}
-                        zoom={1 / 6}
-                        image={action.image}
-                        action={action}
-                        fill={getCellConfig(
-                          subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action
-                              .chartMethodColorBlock,
-                          })),
-                        )}
-                        symbol={getCellConfig(
-                          subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action
-                              .chartMethodText,
-                          })),
-                        )}
-                        // name={row.text}
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      classes={{
-                        root: classes.toothJournalItemText,
-                      }}
-                      primary={
-                        <GridContainer gutter={0}>
-                          <GridItem xs={11}>
-                            <div
-                              style={{
-                                padding: theme.spacing(0.5, 0, 0.5, 1),
-                              }}
-                            >
-                              #{v.toothNo}.&nbsp;
-                              {moment(v.timestamp).format(dateFormatLong)}{' '}
-                              -&nbsp;
-                              {action.displayValue}
-                              {v.info && ` (${v.info})`.replace('(tooth)', '')}
-                            </div>
-                          </GridItem>
-                          <GridItem
-                            xs={1}
-                            style={{
-                              paddingTop: 2,
-                            }}
-                          >
-                            {!v.action.dentalTreatmentFK && (
-                              <Tooltip title='Delete'>
-                                <IconButton
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    dispatch({
-                                      type:
-                                        'dentalChartComponent/toggleMultiSelect',
-                                      payload: subAry.map((o) => ({
-                                        ...o,
-                                        deleted: true,
-                                      })),
-                                    })
-                                  }}
-                                >
-                                  <Delete />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                          </GridItem>
-                        </GridContainer>
-                      }
-                    />
-                  </SortableListItem>
-                )
-              })}
-            </SortList>
+            <SortItem
+              theme={theme}
+              dispatch={dispatch}
+              item={groups[k]}
+              data={data}
+              classes={classes}
+              index={k}
+              selected={selected}
+            />
           )
         })}
       </div>
@@ -304,7 +75,6 @@ const Diagnosis = ({
             const shapes = data.filter(
               (o) => o.toothNo === selected.toothNo && o.id === selected.id,
             )
-            // console.log(v.target.value, selected.remark)
             if (v.target.value !== selected.remark) {
               dispatch({
                 type: 'dentalChartComponent/toggleMultiSelect',
@@ -314,7 +84,6 @@ const Diagnosis = ({
                   remark: v.target.value,
                 })),
               })
-              // console.log(selected, v)
             }
           }}
         />

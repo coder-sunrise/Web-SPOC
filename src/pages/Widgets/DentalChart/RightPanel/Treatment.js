@@ -1,23 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
+import React, { useState, useEffect, useMemo } from 'react'
 import _ from 'lodash'
 import Search from '@material-ui/icons/Search'
-import AttachMoney from '@material-ui/icons/AttachMoney'
-import History from '@material-ui/icons/History'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemAvatar from '@material-ui/core/ListItemAvatar'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction'
-import ListItemText from '@material-ui/core/ListItemText'
-import moment from 'moment'
-import {
-  SortableContainer,
-  SortableHandle,
-  SortableElement,
-  arrayMove,
-} from 'react-sortable-hoc'
+
 import { getUniqueId } from '@/utils/utils'
 
 import {
@@ -61,7 +45,6 @@ const Treatment = ({
     treatments,
     setTreatments,
   ] = useState([])
-  // console.log(codetable)
   useEffect(() => {
     // console.log(list)
     const treeItems = Object.values(
@@ -84,7 +67,6 @@ const Treatment = ({
     setTreatments(treeItems)
   }, [])
 
-  // console.log(treeItems)
   return (
     <div>
       <div
@@ -111,30 +93,23 @@ const Treatment = ({
               const action = ctchartmethod.find(
                 (o) => o.id === item.chartMethodFK,
               )
-              if (action) {
-                dispatch({
-                  type: 'dentalChartComponent/updateState',
-                  payload: {
-                    mode: 'treatment',
-                    action: {
-                      ...action,
-                      dentalTreatmentFK: item.id,
-                    },
+              dispatch({
+                type: 'dentalChartComponent/updateState',
+                payload: {
+                  mode: 'treatment',
+                  action: {
+                    ...action,
+                    dentalTreatmentFK: item.id,
                   },
-                })
-                dispatch({
-                  type: 'dentalChartTreatment/updateState',
-                  payload: {
-                    entity: undefined,
-                  },
-                })
-                dispatch({
-                  type: 'orders/updateState',
-                  payload: {
-                    type: '7',
-                  },
-                })
-              }
+                },
+              })
+
+              dispatch({
+                type: 'orders/updateState',
+                payload: {
+                  type: '7',
+                },
+              })
             }
           }}
         />
@@ -143,4 +118,9 @@ const Treatment = ({
   )
 }
 
-export default Treatment
+export default React.memo(
+  Treatment,
+  ({ codetable }, { codetable: codetableNext }) => {
+    return codetable.cttreatment === codetableNext.cttreatment
+  },
+)

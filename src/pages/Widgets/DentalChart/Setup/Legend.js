@@ -64,60 +64,14 @@ const styles = (theme) => ({
 const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   if (!row) return null
   const { chartMethodTypeFK } = row
-  // if (
-  //   [
-  //     4,
-  //     3,
-  //   ].includes(chartMethodTypeFK)
-  // )
-  //   return null
-  // console.log(restProps)
-  // console.log(row)
+
   const [
     mode,
     setMode,
   ] = useState(row.image ? 'image' : 'color')
-  // console.log(chartMethodTypeFK, row.editMode, mode)
-  // if (chartMethodTypeFK === 1 && mode !== 'color') {
-  //   setMode('color')
-  // }
-  // const [
-  //   color,
-  //   setColor,
-  // ] = useState(row.chartMethodColorBlock)
-  // const [
-  //   symbol,
-  //   setSymbol,
-  // ] = useState(row.chartMethodText)
 
-  // const [
-  //   blur,
-  //   setBlur,
-  // ] = useState(false)
-  // const debounceBlur = _.debounce(setBlur, 100, {
-  //   leading: false,
-  //   trailing: true,
-  // })
-  // useEffect(
-  //   () => {
-  //     if (chartMethodTypeFK === 4) return
-
-  //     if (mode === 'color') {
-  //       row.image = ''
-  //     } else if (mode === 'image') {
-  //       row.chartMethodColorBlock = ''
-  //       row.chartMethodText = ''
-  //       setSymbol(undefined)
-  //       setColor(undefined)
-  //     }
-  //   },
-  //   [
-  //     mode,
-  //   ],
-  // )
   useEffect(
     () => {
-      // console.log('legend', chartMethodTypeFK)
       if (chartMethodTypeFK === 1 && mode !== 'color') {
         setMode('color')
       }
@@ -127,8 +81,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
     ],
   )
 
-  // console.log(row.chartMethodColorBlock)
-  // console.log(row)
   if (viewOnly) {
     return (
       <Tooth
@@ -269,13 +221,9 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             {...restProps}
             text={viewOnly}
             onChange={(v, option = {}) => {
-              // console.log(v, option)
-              // setSymbol(v)
               row.chartMethodText = option.name || ''
               row.image = ''
-              // row.apptDurationMinute = e
-              // setEndTime(row)
-              // validSchema(row)
+
               commitChanges({
                 changed: {
                   [row.id]: {
@@ -287,12 +235,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
                 },
               })
             }}
-            // onBlur={() => {
-            //   debounceBlur(true)
-            // }}
-            // onFocus={() => {
-            //   debounceBlur(false)
-            // }}
           />
         </GridItem>
       )}
@@ -321,7 +263,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
                 []
               )
             }
-            // isReadOnly={isReadOnly}
           />
         </GridItem>
       )}

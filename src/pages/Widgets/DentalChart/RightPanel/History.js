@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
 import { connect } from 'dva'
+import { Paper } from '@material-ui/core'
+
 import { compose } from 'redux'
 import _ from 'lodash'
-import DeleteIcon from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
@@ -31,11 +29,6 @@ import {
 } from '@/components'
 import { findGetParameter } from '@/utils/utils'
 import Chart from '../Chart'
-
-const rowSchema = Yup.object().shape({
-  text: Yup.string().required(),
-  method: Yup.string().required(),
-})
 
 const History = (props) => {
   const {

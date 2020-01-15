@@ -47,7 +47,6 @@ const TreatmentGrid = (props) => {
     dentalChartComponent,
     height,
     dentalChartSetup,
-    dentalChartTreatment,
     orders,
     codetable,
     values,
@@ -136,12 +135,6 @@ const TreatmentGrid = (props) => {
             </Tooltip>
             <Popconfirm
               onConfirm={() => {
-                // dispatch({
-                //   type: 'dentalChartTreatment/deleteRow',
-                //   payload: {
-                //     id: row.id,
-                //   },
-                // })
                 dispatch({
                   type: 'orders/deleteRow',
                   payload: {
