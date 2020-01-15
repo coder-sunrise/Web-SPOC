@@ -71,19 +71,19 @@ export default createFormViewModel({
           const field = CANNED_TEXT_TYPE_FIELD[cannedText.cannedTextTypeFK]
           const currentField = _result[field] || []
           let rest = {}
-          if (cannedText.isShared) {
-            const insertIntoOtherFields = (merged, eachField) => ({
-              ...merged,
-              [eachField]: [
-                ...(_result[eachField] || [])
-                  .filter((item) => item.id !== cannedText.id),
-                cannedText,
-              ],
-            })
-            rest = fields.reduce(insertIntoOtherFields, {
-              ...restState,
-            })
-          }
+          // if (cannedText.isShared) {
+          //   const insertIntoOtherFields = (merged, eachField) => ({
+          //     ...merged,
+          //     [eachField]: [
+          //       ...(_result[eachField] || [])
+          //         .filter((item) => item.id !== cannedText.id),
+          //       cannedText,
+          //     ],
+          //   })
+          //   rest = fields.reduce(insertIntoOtherFields, {
+          //     ...restState,
+          //   })
+          // }
 
           return {
             ..._result,
@@ -96,6 +96,7 @@ export default createFormViewModel({
         }
 
         const result = data.reduce(splitByCannedTextType, { ...restState })
+        console.log({ result })
         return { ...state, ...result }
       },
       setList (state, { payload }) {
