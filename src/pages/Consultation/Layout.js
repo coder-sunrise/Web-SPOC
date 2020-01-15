@@ -227,6 +227,7 @@ class Layout extends PureComponent {
       currentLayout: defaultLayout,
       openPatientHistoryDrawer: false,
     }
+    localStorage.setItem('consultationLayout', JSON.stringify(defaultLayout))
   }
 
   // componentDidMount () {}
@@ -375,6 +376,7 @@ class Layout extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
+    console.log({ defaultWidgets })
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
     }
