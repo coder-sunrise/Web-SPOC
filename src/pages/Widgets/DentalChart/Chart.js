@@ -1210,6 +1210,7 @@ class Chart extends React.PureComponent {
                   ...addonGroupCfg,
                   isShape: true,
                   name: `${o.id}`,
+                  opacity: 1,
                 },
               )
               if (d)

@@ -22,12 +22,13 @@ import Avatar from '@material-ui/core/Avatar'
 import Typography from '@material-ui/core/Typography'
 import ListItemText from '@material-ui/core/ListItemText'
 
+import moment from 'moment'
+
 // @material-ui/icons
 import Person from '@material-ui/icons/Person'
 import Notifications from '@material-ui/icons/Notifications'
 import Link from '@material-ui/icons/Link'
 import LinkOff from '@material-ui/icons/LinkOff'
-import WifiOff from '@material-ui/icons/WifiOff'
 import Search from '@material-ui/icons/Search'
 
 // core components
@@ -35,14 +36,7 @@ import CustomInput from 'mui-pro-components/CustomInput'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
-import {
-  Badge,
-  SizeContainer,
-  TextField,
-  Tooltip,
-  Popper,
-  Button,
-} from '@/components'
+import { Badge, SizeContainer, TextField, Popper, Button } from '@/components'
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -161,25 +155,27 @@ class HeaderLinks extends React.Component {
         return result
       }
 
-      const getTimeAgo = (timestamp) => {
-        let resultInterval
-        let interval = (new Date().getTime() - timestamp) / 1000
-        for (let key in timeInterval()) {
-          resultInterval = { scale: key, interval: timeInterval()[key] }
-          if (
-            interval >= timeInterval()[key].lower &&
-            interval < timeInterval()[key].upper
-          )
-            break
-        }
-        const result = parseInt(interval / resultInterval.interval.lower, 10)
-        return result
-          .toString()
-          .concat(' ')
-          .concat(resultInterval.scale)
-          .concat(result > 1 ? 's ' : ' ')
-          .concat('ago')
-      }
+      // const getTimeAgo = (timestamp) => {
+      //   console.log(timeInterval())
+      //   let resultInterval
+      //   let interval = (new Date().getTime() - timestamp) / 1000
+      //   for (let key in timeInterval()) {
+      //     resultInterval = { scale: key, interval: timeInterval()[key] }
+      //     if (
+      //       interval >= timeInterval()[key].lower &&
+      //       interval < timeInterval()[key].upper
+      //     )
+      //       break
+      //   }
+      //   console.log(resultInterval)
+      //   const result = parseInt(interval / resultInterval.interval.lower, 10)
+      //   return result
+      //     .toString()
+      //     .concat(' ')
+      //     .concat(resultInterval.scale)
+      //     .concat(result > 1 ? 's ' : ' ')
+      //     .concat('ago')
+      // }
 
       const NotificationContent = () => {
         if (notifications.length > 0) {
@@ -211,7 +207,7 @@ class HeaderLinks extends React.Component {
                             <div style={{ display: 'flex' }}>
                               <b>{n.sender}</b>
                               <p style={{ marginLeft: 15 }}>
-                                {getTimeAgo(n.timestamp)}
+                                {moment(n.timestamp).toNow(true).concat(' ago')}
                               </p>
                             </div>
                           }
@@ -312,24 +308,35 @@ class HeaderLinks extends React.Component {
           <SizeContainer size='lg'>
             <div>
               {NotificationComponent()}
-              {!signalRConnected && (
-                <Tooltip title='Real-time update signal is down. Please refresh manually.'>
-                  <Button justIcon color='transparent'>
-                    <Badge
-                      ripple
-                      color='danger'
-                      overlap='circle'
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                      }}
-                      variant='dot'
-                    >
-                      <WifiOff />
-                    </Badge>
-                  </Button>
-                </Tooltip>
-              )}
+              <Button justIcon color='transparent'>
+                {signalRConnected ? (
+                  <Badge
+                    ripple
+                    color='info'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <Link />
+                  </Badge>
+                ) : (
+                  <Badge
+                    ripple
+                    color='danger'
+                    overlap='circle'
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    variant='dot'
+                  >
+                    <LinkOff />
+                  </Badge>
+                )}
+              </Button>
               {/* <Button
                 justIcon
                 color='transparent'

@@ -154,15 +154,20 @@ class DentalChart extends React.Component {
       np.consultation.entity &&
       np.consultation.entity.corDentalCharts[0]
     ) {
-      const d = {
-        ...np.consultation.entity.corDentalCharts[0],
-        data: JSON.parse(np.consultation.entity.corDentalCharts[0].dentalChart),
+      const data = JSON.parse(
+        np.consultation.entity.corDentalCharts[0].dentalChart,
+      )
+      if (data.length > 0) {
+        const d = {
+          ...np.consultation.entity.corDentalCharts[0],
+          data,
+        }
+        delete d.dentalChart
+        this.props.dispatch({
+          type: 'dentalChartComponent/updateState',
+          payload: d,
+        })
       }
-      delete d.dentalChart
-      this.props.dispatch({
-        type: 'dentalChartComponent/updateState',
-        payload: d,
-      })
     }
     // if (data.corDentalCharts && data.corDentalCharts[0]) {
     //   yield put({
