@@ -54,7 +54,7 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {type === 'copayer' ? (
+            {type === 'copayer' || type === 'referral' ? (
               []
             ) : (
               <FastField
@@ -66,7 +66,7 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          <GridItem md={type === 'copayer' ? 12 : 6}>
+          <GridItem md={type === 'copayer' || type === 'referral' ? 12 : 6}>
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (

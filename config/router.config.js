@@ -863,6 +863,11 @@ const _routes = [
             name: 'appointmenttype',
             component: './Setting/AppointmentType',
           },
+          {
+            path: '/setting/referralsource',
+            name: 'referralsource',
+            component: './Setting/ReferralSource',
+          },
         ],
       },
       // Settings
