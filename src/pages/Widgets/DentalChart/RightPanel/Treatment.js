@@ -67,7 +67,6 @@ const Treatment = ({
 
     setTreatments(treeItems)
   }, [])
-
   return (
     <div>
       <div

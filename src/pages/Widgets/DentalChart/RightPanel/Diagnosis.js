@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import _ from 'lodash'
 
 import moment from 'moment'
@@ -37,12 +37,12 @@ const Diagnosis = ({
 }) => {
   const { data = [], selected } = dentalChartComponent
   const groups = _.groupBy(data, 'toothNo')
-  console.log(selected)
+
   return (
     <div>
       <div
         style={{
-          // height: global.mainDivHeight - 115 - (selected ? 135 : 0),
+          height: selected ? 600 : 'auto',
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
