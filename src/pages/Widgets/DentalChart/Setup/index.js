@@ -113,7 +113,7 @@ const Setup = (props) => {
   //   // console.log('did h')
   // }, [])
   const handleCommitChanges = ({ rows, changed }) => {
-    console.log(rows, changed)
+    // console.log(rows, changed)
     setFieldValue('rows', rows)
   }
   // useState()
@@ -284,7 +284,7 @@ export default withFormikExtend({
       values.rows.map(({ rowIndex, ...o }) => o),
       ctchartmethod,
     )
-    console.log(ctchartmethod, values.rows, diffs)
+    // console.log(ctchartmethod, values.rows, diffs)
     if (diffs.length !== 0) {
       // console.log(diffs)
       // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())

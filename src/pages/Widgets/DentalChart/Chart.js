@@ -961,11 +961,12 @@ class Chart extends React.PureComponent {
           return
         target.set(lockConfig)
 
-        if (this.props.dentalChartComponent.action.chartMethodTypeFK !== 1) {
-          // console.log(selected)
+        if (action.chartMethodTypeFK === 2) {
           this.toggleMultiSelect(
             selected
-              .filter((o) => o._objects && o._objects.length)
+              .filter(
+                (o) => o._objects && o._objects.length && o.target !== 'root',
+              )
               .map((g) => ({
                 group: g,
                 item:
@@ -980,9 +981,7 @@ class Chart extends React.PureComponent {
                 select: true,
               })),
           )
-        } else if (
-          this.props.dentalChartComponent.action.chartMethodTypeFK === 1
-        ) {
+        } else if (action.chartMethodTypeFK === 1) {
           let cells = []
           selected.filter((o) => o._objects).map((g) => {
             // console.log(g)
