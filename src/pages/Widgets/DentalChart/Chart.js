@@ -1030,7 +1030,7 @@ class Chart extends React.PureComponent {
           this.canvas.remove(d)
         })
     }
-    if (!action || !action.id) {
+    if (!readOnly && (!action || !action.id)) {
       this.canvas.hoverCursor = 'no-drop'
     } else {
       this.canvas.hoverCursor = 'default'

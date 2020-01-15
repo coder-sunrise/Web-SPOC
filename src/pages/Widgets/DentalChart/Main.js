@@ -69,7 +69,7 @@ const styles = (theme) => ({
   },
   buttonIcon: {
     position: 'absolute',
-    left: 0,
+    left: -1,
   },
 })
 

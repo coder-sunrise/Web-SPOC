@@ -21,6 +21,7 @@ import {
   Select,
   ButtonSelect,
   Tabs,
+  Skeleton,
   CommonModal,
 } from '@/components'
 import { groupWidth, groupHeight } from './variables'
@@ -41,6 +42,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
     '&:first-child': {
       borderRadius: theme.shape.borderRadius,
     },
+
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     width: 195,
@@ -50,8 +52,8 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 
 export default function DiagnosisPanel (props) {
   const { dispatch, classes, theme, codetable, ...restProps } = props
-  const { ctchartmethod = [] } = codetable
-
+  const { ctchartmethod } = codetable
+  if (!ctchartmethod) return <Skeleton height={120} />
   const [
     selectedStyle,
     setSelectedStyle,
@@ -129,36 +131,37 @@ export default function DiagnosisPanel (props) {
                 .map((row) => {
                   const { id, displayValue } = row
                   return (
-                    <Tooltip title={displayValue}>
-                      <ToggleButton value={id} key={id}>
-                        <Tooth
-                          className={classes.buttonIcon}
-                          width={groupWidth / 5 + 2}
-                          height={groupHeight / 5}
-                          paddingLeft={1}
-                          paddingTop={1}
-                          zoom={1 / 5}
-                          image={row.image}
-                          action={row}
-                          fill={{
-                            left: row.chartMethodColorBlock,
-                            right: row.chartMethodColorBlock,
-                            top: row.chartMethodColorBlock,
-                            bottom: row.chartMethodColorBlock,
-                            centerfull: row.chartMethodColorBlock || 'white',
-                          }}
-                          symbol={{
-                            left: row.chartMethodText,
-                            right: row.chartMethodText,
-                            top: row.chartMethodText,
-                            bottom: row.chartMethodText,
-                            centerfull: row.chartMethodText,
-                          }}
-                          name={displayValue}
-                        />
-                        <span style={{ marginLeft: 64 }}>{displayValue}</span>
-                      </ToggleButton>
-                    </Tooltip>
+                    <ToggleButton value={id} key={id}>
+                      <Tooth
+                        className={classes.buttonIcon}
+                        width={26}
+                        height={26}
+                        paddingLeft={1}
+                        paddingTop={1}
+                        zoom={0.21}
+                        image={row.image}
+                        action={row}
+                        fill={{
+                          left: row.chartMethodColorBlock,
+                          right: row.chartMethodColorBlock,
+                          top: row.chartMethodColorBlock,
+                          bottom: row.chartMethodColorBlock,
+                          centerfull: row.chartMethodColorBlock || 'white',
+                        }}
+                        symbol={{
+                          left: row.chartMethodText,
+                          right: row.chartMethodText,
+                          top: row.chartMethodText,
+                          bottom: row.chartMethodText,
+                          centerfull: row.chartMethodText,
+                        }}
+                        name={displayValue}
+                      />
+
+                      <Tooltip title={displayValue}>
+                        <span>{displayValue}</span>
+                      </Tooltip>
+                    </ToggleButton>
                   )
                 })}
             </StyledToggleButtonGroup>
