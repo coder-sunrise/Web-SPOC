@@ -235,6 +235,11 @@ class Layout extends PureComponent {
   componentWillUnmount () {
     window.removeEventListener('resize', this.delayedResize)
     $(window.mainPanel).css('overflow', 'auto')
+
+    this.state.currentLayout.widgets.map((id) => {
+      const w = widgets.find((o) => o.id === id)
+      if (w.onUnmount) w.onUnmount()
+    })
   }
 
   resize = (e) => {

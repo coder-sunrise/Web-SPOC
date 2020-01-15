@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
+import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import Settings from '@material-ui/icons/Settings'
 import Search from '@material-ui/icons/Search'
@@ -24,9 +25,8 @@ import {
   Skeleton,
   CommonModal,
 } from '@/components'
-import { groupWidth, groupHeight } from './variables'
-import Setup from './Setup/index'
 
+import Setup from './Setup/index'
 import Tooth from './Tooth'
 
 const useStyles = makeStyles((theme) => ({}))
@@ -50,7 +50,7 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
   },
 }))(ToggleButtonGroup)
 
-export default function DiagnosisPanel (props) {
+const DiagnosisPanel = (props) => {
   const { dispatch, classes, theme, codetable, ...restProps } = props
   const { ctchartmethod } = codetable
   if (!ctchartmethod) return <Skeleton height={120} />
@@ -185,3 +185,10 @@ export default function DiagnosisPanel (props) {
     </div>
   )
 }
+
+export default React.memo(
+  DiagnosisPanel,
+  ({ codetable }, { codetable: codetableNext }) => {
+    return codetable.ctchartmethod === codetableNext.ctchartmethod
+  },
+)
