@@ -459,7 +459,7 @@ class Scribble extends React.Component {
     }
   }
 
-  @keydown('backspace')
+  @keydown('delete')
   shortcutKeyDelete () {
     const result = this._sketch._deleteSelectedObject()
     if (!result) {
