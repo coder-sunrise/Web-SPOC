@@ -52,7 +52,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { ctchartmethod = [] } = codetable
+  const { ctchartmethod = [], cttreatment = [] } = codetable
   const [
     search,
     setSearch,
@@ -63,7 +63,6 @@ const Treatment = ({
   ] = useState([])
   // console.log(codetable)
   useEffect(() => {
-    const { cttreatment = [] } = codetable
     // console.log(list)
     const treeItems = Object.values(
       _.groupBy(
@@ -112,7 +111,6 @@ const Treatment = ({
               const action = ctchartmethod.find(
                 (o) => o.id === item.chartMethodFK,
               )
-              // console.log(action)
               if (action) {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
