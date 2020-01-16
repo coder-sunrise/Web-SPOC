@@ -6,9 +6,13 @@ import { formatMessage, FormattedMessage } from 'umi/locale'
 // common components
 import { NumberInput, CommonCard, GridContainer, GridItem } from '@/components'
 import FormField from './formField'
+import Authorized from '@/utils/Authorized'
 
 class VitalSignCard extends PureComponent {
   render () {
+    const accessRight = Authorized.check('queue.registervisit.vitalsign')
+    if (accessRight && accessRight.rights === 'hidden') return null
+
     const { handleCalculateBMI, isReadOnly = false } = this.props
     return (
       <CommonCard
