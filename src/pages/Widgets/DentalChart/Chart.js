@@ -8,7 +8,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import CloudDownload from '@material-ui/icons/CloudDownload'
 import moment from 'moment'
 import logo from '@/assets/img/logo/logo_blue.png'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, difference } from '@/utils/utils'
 import {
   Button,
   GridContainer,
@@ -956,8 +956,13 @@ class Chart extends React.PureComponent {
 
   componentWillReceiveProps (nextProps) {
     const { dentalChartComponent, global } = nextProps
+    const { selected, ...restPropsNext } = dentalChartComponent
+    const { selected: a, ...restProps } = this.props.dentalChartComponent
 
-    if (!_.isEqual(dentalChartComponent, this.props.dentalChartComponent)) {
+    if (!_.isEqual(restPropsNext, restProps)) {
+      // console.log(
+      //   difference(dentalChartComponent, this.props.dentalChartComponent),
+      // )
       this.renderCanvas(
         nextProps,
         dentalChartComponent.isPedoChart !==
