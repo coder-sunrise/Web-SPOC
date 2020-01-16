@@ -36,7 +36,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { ctchartmethod = [] } = codetable
+  const { ctchartmethod = [], cttreatment = [] } = codetable
   const [
     search,
     setSearch,
@@ -46,7 +46,6 @@ const Treatment = ({
     setTreatments,
   ] = useState([])
   useEffect(() => {
-    const { cttreatment = [] } = codetable
     // console.log(list)
     const treeItems = Object.values(
       _.groupBy(

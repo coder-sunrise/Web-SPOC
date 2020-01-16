@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'dva'
 import { Paper, Divider, Chip } from '@material-ui/core'
-
+import _ from 'lodash'
 import {
   GridContainer,
   GridItem,
@@ -18,6 +19,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
 const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 // @Authorized.Secured('queue.dispense.editorder')
+@connect(({ codetable, global }) => ({ codetable, global }))
 @withFormikExtend({
   // authority: [
   //   'queue.dispense.editorder',
@@ -29,6 +31,19 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     orders,
     ...rest
   }) => {
+    if (
+      orders.entity &&
+      orders.entity.treatmentFK &&
+      _.isEmpty(dentalChartComponent)
+    ) {
+      const treatment = (codetable.cttreatment || [])
+        .find((o) => o.id === orders.entity.treatmentFK)
+      return {
+        ...orders.entity,
+        treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
+      }
+    }
+    // console.log(dentalChartComponent, dentalChartTreatment)
     const { data = [], action = {} } = dentalChartComponent
     const { entity = {} } = orders
     const { rows } = orders
@@ -165,13 +180,13 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const { dispatch, orders, currentType, getNextSequence } = props
 
     const data = {
-      type: '7',
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       instruction: values.itemNotes,
       isDeleted: false,
       totalAfterItemAdjustment: values.totalAfterItemAdjustment,
+      type: '7',
     }
     // console.log(data)
     dispatch({
@@ -198,6 +213,12 @@ class Treatment extends PureComponent {
       type: 'codetable/fetchCodes',
       payload: {
         code: 'cttreatment',
+      },
+    })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctchartmethod',
       },
     })
   }
@@ -266,6 +287,23 @@ class Treatment extends PureComponent {
     })
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+  }
+
   render () {
     const {
       classes,
@@ -288,7 +326,7 @@ class Treatment extends PureComponent {
     //   action = {},
     // } = dentalChartComponent
     const isDoctor = from === 'doctor'
-    const { cttreatment } = codetable
+    const { cttreatment = [] } = codetable
     // console.log(cttreatment)
     return (
       <div>
