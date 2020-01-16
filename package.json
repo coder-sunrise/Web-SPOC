@@ -116,7 +116,7 @@
     "react-router-dom": "^4.3.1",
     "react-simple-infinite-scroll": "0.0.1",
     "react-sketch": "^0.5.1",
-    "react-swipeable-views": "^0.13.0",
+    "react-swipeable-views": "0.13.3",
     "react-table": "^6.8.6",
     "resize-base64": "^1.0.12",
     "resize-image": "^0.1.0",
