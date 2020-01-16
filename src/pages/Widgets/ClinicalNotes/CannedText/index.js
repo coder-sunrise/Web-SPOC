@@ -22,14 +22,7 @@ const styles = (theme) => ({
 })
 
 const defaultMaxHeight = 600
-const CannedText = ({
-  // footer,
-  classes,
-  dispatch,
-  cannedText,
-  user,
-  height,
-}) => {
+const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
   const { selectedNote } = cannedText
   const list = cannedText[selectedNote.fieldName]
 
@@ -105,17 +98,22 @@ const CannedText = ({
   const ActionButtons = (row) => {
     const handleDeleteClick = () => onDeleteClick(row.id)
     const handleEditClick = () => onEditClick(row.id)
-
+    const isOwnCannedText = row.ownedByUserFK === user.id
     return (
       <React.Fragment>
         <Tooltip title='Edit'>
-          <Button justIcon color='primary' onClick={handleEditClick}>
+          <Button
+            justIcon
+            color='primary'
+            onClick={handleEditClick}
+            disabled={!isOwnCannedText}
+          >
             <Edit />
           </Button>
         </Tooltip>
         <DeleteWithPopover
           onConfirmDelete={handleDeleteClick}
-          disabled={!!editEntity}
+          disabled={!!editEntity || !isOwnCannedText}
         />
       </React.Fragment>
     )
@@ -150,17 +148,8 @@ const CannedText = ({
           ]}
           onRowDrop={handleRowDrop}
           handleCommitChanges={handleRowDrop}
-          // FuncProps={{
-          //   pager: false,
-          // }}
         />
       </CardContainer>
-
-      {/* footer &&
-        footer({
-          onConfirm: onAddClick,
-          confirmBtnText: 'Add',
-        }) */}
     </div>
   )
 }
