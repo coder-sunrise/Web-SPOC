@@ -42,7 +42,11 @@ const inventoryAdjustmentSchema = Yup.object().shape({
   inventoryTypeFK: Yup.number().required(),
   code: Yup.number().required(),
   displayValue: Yup.number().required(),
-  batchNo: Yup.array().required(),
+  batchNo: Yup.array().required().compact((v) => {
+    if (!v) return true
+    if (v && v.trim() === '') return true
+    return false
+  }),
   adjustmentQty: Yup.number()
     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
