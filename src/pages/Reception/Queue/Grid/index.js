@@ -173,6 +173,7 @@ const Grid = ({
             payload: {
               id: row.visitFK,
               version,
+              qid: row.id,
             },
           }).then((o) => {
             if (o)
@@ -216,6 +217,7 @@ const Grid = ({
               payload: {
                 id: row.visitFK,
                 version,
+                qid: row.id,
               },
             }).then((o) => {
               if (o)

@@ -121,6 +121,7 @@ export default createFormViewModel({
 
           sendNotification('QueueListing', {
             message: `Consultation started`,
+            qid: payload.qid,
           })
         }
         return response

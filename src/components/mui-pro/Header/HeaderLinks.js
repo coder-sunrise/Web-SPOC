@@ -197,24 +197,30 @@ class HeaderLinks extends React.Component {
                   return (
                     <div style={{ maxHeight: 100 }} key={n.senderId}>
                       <ListItem alignItems='flex-start'>
-                        <ListItemAvatar>
-                          <Avatar style={{ backgroundColor: 'orange' }}>
-                            <Person />
-                          </Avatar>
-                        </ListItemAvatar>
                         <ListItemText
                           primary={
                             <div style={{ display: 'flex' }}>
-                              <b>{n.sender}</b>
-                              <p style={{ marginLeft: 15 }}>
-                                {moment(n.timestamp).toNow(true).concat(' ago')}
-                              </p>
+                              <b>
+                                {'Q. No. '.concat(
+                                  (n.qid &&
+                                    typeof n.qid === 'number' &&
+                                    n.qid.toString().concat('.0')) ||
+                                    'xx.x',
+                                )}
+                              </b>
+                              <p style={{ marginLeft: 10 }}>{n.message}</p>
                             </div>
                           }
                           secondary={
-                            <Typography color='textPrimary'>
-                              {n.message}
-                            </Typography>
+                            <p
+                              style={{
+                                color: 'grey',
+                                fontSize: 12,
+                                marginTop: 5,
+                              }}
+                            >
+                              {moment(n.timestamp).toNow(true).concat(' ago')}
+                            </p>
                           }
                         />
                       </ListItem>
