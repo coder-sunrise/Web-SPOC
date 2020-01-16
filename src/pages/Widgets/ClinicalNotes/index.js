@@ -138,29 +138,12 @@ class ClinicalNotes extends Component {
         {},
       ),
     }
-    const cannedTextPayload = {
-      entity: '',
-      selectedIndex: '',
-      ...fields.reduce(
-        (_result, field) => ({ ..._result, [field.fieldName]: [] }),
-        {},
-      ),
-      fields: fields.map((field) => field.fieldName),
-      cannedTextTypes: fields.map((field) => field.cannedTextTypeFK),
-    }
 
     this.props.dispatch({
       type: 'scriblenotes/updateState',
       payload,
     })
 
-    this.props.dispatch({
-      type: 'cannedText/updateState',
-      payload: cannedTextPayload,
-    })
-    this.props.dispatch({
-      type: 'cannedText/queryAll',
-    })
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
   }

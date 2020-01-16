@@ -28,7 +28,7 @@ class TextField extends React.PureComponent {
   validationCount = 0
 
   static defaultProps = {
-    autocomplete: 'nope',
+    autocomplete: 'off',
     debounceDuration: 1000,
     useLeading: true,
   }

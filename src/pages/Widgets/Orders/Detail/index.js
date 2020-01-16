@@ -12,16 +12,10 @@ import {
   Tabs,
 } from '@/components'
 import { currencySymbol } from '@/utils/config'
-
-import Medication from './Medication'
-import Vaccination from './Vaccination'
-import Service from './Service'
-import Consumable from './Consumable'
-import OrderSet from './OrderSet'
 // import Others from './Others'
 // utils
 import { orderTypes } from '@/utils/codes'
-import { VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   editor: {
@@ -183,7 +177,7 @@ class Details extends PureComponent {
     const { props } = this
     const { classes, orders, dispatch, fromDispense, singleMode, from } = props
     const { type } = orders
-
+    // console.log({ props })
     const cfg = {
       disableEdit: this.state.disableEdit,
       setDisable: this.setDisable,
@@ -222,6 +216,13 @@ class Details extends PureComponent {
                     (o) =>
                       o.value !== '7' || (o.value === '7' && from === 'ca'),
                   )
+                  .filter((o) => {
+                    const accessRight = Authorized.check(o.accessRight)
+
+                    if (accessRight && accessRight.rights === 'hidden')
+                      return false
+                    return true
+                  })
                   .map((o) => {
                     return {
                       id: o.value,

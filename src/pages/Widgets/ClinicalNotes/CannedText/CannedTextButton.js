@@ -7,6 +7,7 @@ import Settings from '@material-ui/icons/Settings'
 // common components
 import { primaryColor } from 'mui-pro-jss'
 import { Button, Popover, Tooltip } from '@/components'
+import { LoadingWrapper } from '@/components/_medisys'
 import { CANNED_TEXT_TYPE_FIELD } from '@/utils/constants'
 
 const styles = (theme) => ({
@@ -55,12 +56,14 @@ const ListItem = ({ classes, title, onClick }) => {
 }
 
 const CannedTextButton = ({
+  dispatch,
   classes,
   cannedText,
   cannedTextTypeFK,
   onSettingClick,
   handleSelectCannedText,
   onCannedTextClick,
+  loading,
 }) => {
   const [
     show,
@@ -71,6 +74,17 @@ const CannedTextButton = ({
   const list = cannedText[field] || []
 
   const toggleVisibleChange = () => setShow(!show)
+
+  const handleMainButtonClick = () => {
+    if (cannedTextTypeFK) {
+      dispatch({
+        type: 'cannedText/query',
+        payload: cannedTextTypeFK,
+      })
+    }
+
+    onCannedTextClick()
+  }
 
   const onListItemClick = (selectedCannedText) => {
     handleSelectCannedText(selectedCannedText)
@@ -90,26 +104,28 @@ const CannedTextButton = ({
       visible={show}
       onVisibleChange={toggleVisibleChange}
       content={
-        <div className={classes.popoverContainer}>
-          <div className={classes.item} onClick={handleSettingClick}>
-            <Settings />
-            <span>Settings</span>
+        <LoadingWrapper loading={loading}>
+          <div className={classes.popoverContainer}>
+            <div className={classes.item} onClick={handleSettingClick}>
+              <Settings />
+              <span>Settings</span>
+            </div>
+            <Divider className={classes.divider} />
+            <div className={classes.listContainer}>
+              {list.map((item) => {
+                const handleClick = () => onListItemClick(item)
+                return (
+                  <ListItem
+                    key={`cannedText-${item.id}`}
+                    classes={classes}
+                    onClick={handleClick}
+                    {...item}
+                  />
+                )
+              })}
+            </div>
           </div>
-          <Divider className={classes.divider} />
-          <div className={classes.listContainer}>
-            {list.map((item) => {
-              const handleClick = () => onListItemClick(item)
-              return (
-                <ListItem
-                  key={`cannedText-${item.id}`}
-                  classes={classes}
-                  onClick={handleClick}
-                  {...item}
-                />
-              )
-            })}
-          </div>
-        </div>
+        </LoadingWrapper>
       }
     >
       <Button
@@ -121,7 +137,7 @@ const CannedTextButton = ({
           right: 0,
           top: 10,
         }}
-        onClick={onCannedTextClick}
+        onClick={handleMainButtonClick}
       >
         Canned Text
       </Button>
@@ -129,8 +145,9 @@ const CannedTextButton = ({
   )
 }
 
-const Connected = connect(({ cannedText }) => ({ cannedText }))(
-  CannedTextButton,
-)
+const Connected = connect(({ cannedText, loading }) => ({
+  cannedText,
+  loading: loading.effects['cannedText/query'],
+}))(CannedTextButton)
 
 export default withStyles(styles, { name: 'CannedTextButton' })(Connected)

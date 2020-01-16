@@ -33,6 +33,9 @@ const styles = (theme) => ({
       color: '#999',
     },
   },
+  uploadBtn: {
+    marginBottom: theme.spacing(1),
+  },
 })
 
 export default styles
