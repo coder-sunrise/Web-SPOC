@@ -109,7 +109,8 @@ export default createFormViewModel({
             },
           })
           sendNotification('QueueListing', {
-            message: `Dispense Started`,
+            message: `Dispense started`,
+            qid: payload.qid,
           })
         }
         return response
