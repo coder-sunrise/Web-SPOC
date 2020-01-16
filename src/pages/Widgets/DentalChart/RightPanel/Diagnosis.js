@@ -42,7 +42,7 @@ const Diagnosis = ({
     <div>
       <div
         style={{
-          height: selected ? 600 : 'auto',
+          height: selected ? 300 : 'auto',
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
