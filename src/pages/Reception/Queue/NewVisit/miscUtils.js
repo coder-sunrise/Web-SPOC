@@ -1,4 +1,5 @@
 import { VISIT_STATUS } from '../variables'
+import { sendNotification } from '@/utils/realtime'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -186,6 +187,10 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
       onConfirm()
+      sendNotification('QueueListing', {
+        message: `New visit created.`,
+        qid: payload.queueNo && parseFloat(payload.queueNo),
+      })
     } else {
       setSubmitting(false)
     }
