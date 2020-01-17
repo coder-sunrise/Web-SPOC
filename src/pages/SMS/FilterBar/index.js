@@ -6,11 +6,12 @@ import { FormattedMessage } from 'umi/locale'
 import { withFormik } from 'formik'
 // material ui
 import Search from '@material-ui/icons/Search'
+import Print from '@material-ui/icons/Print'
 import { withStyles } from '@material-ui/core'
 import { standardRowHeight } from 'mui-pro-jss'
 // common components
 import moment from 'moment'
-import { GridContainer, GridItem, ProgressButton } from '@/components'
+import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
@@ -64,6 +65,11 @@ const FilterBar = ({
           >
             <FormattedMessage id='sms.search' />
           </ProgressButton>
+          {type !== 'Appointment' && (
+            <Button variant='contained' color='primary' onClick={handleSubmit}>
+              <Print /> <FormattedMessage id='sms.postCardLabel' />
+            </Button>
+          )}
         </div>
       </GridItem>
     </div>
