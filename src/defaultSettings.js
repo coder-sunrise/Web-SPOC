@@ -17,5 +17,5 @@ module.exports = {
   collapse: true,
   ui: 'mui',
   pwa: false,
-  appTitle: 'HMI Group',
+  appTitle: 'NSCMH',
 }

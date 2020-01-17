@@ -10,7 +10,7 @@ const titles = [
   'React',
   'Vue',
   'Webpack',
-  'HMI Group',
+  'NSCMH',
 ]
 const avatars = [
   'https://gw.alipayobjects.com/zos/rmsportal/WdGqmHpayyMjiEhcKoVE.png', // Alipay
