@@ -22,6 +22,7 @@ import {
   Button,
   Switch,
   WarningSnackbar,
+  CodeSelect,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -58,6 +59,8 @@ const styles = (theme) => ({
       currencyRounding,
       currencyRoundingToTheClosest,
       showConsultationVersioning,
+      autoRefresh,
+      defaultVisitType,
     } = values
 
     const payload = [
@@ -72,6 +75,12 @@ const styles = (theme) => ({
       },
       {
         ...showConsultationVersioning,
+      },
+      {
+        ...autoRefresh,
+      },
+      {
+        ...defaultVisitType,
       },
     ]
     const { dispatch, onConfirm, history } = props
@@ -185,19 +194,6 @@ class GeneralSetting extends PureComponent {
           </GridContainer>
 
           <GridContainer>
-            {/* <GridItem md={3}>
-              <Field
-                name='.settingValue'
-                render={(args) => (
-                  <Select
-                    label='To The Closest'
-                    options={currencyRoundingToTheClosest}
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem> */}
             <GridItem md={3}>
               <Field
                 name='showConsultationVersioning.settingValue'
@@ -205,6 +201,35 @@ class GeneralSetting extends PureComponent {
                   <Switch
                     label='Show Consultation Versioning'
                     {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoRefresh.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Queue Listing Auto Refresh'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='defaultVisitType.settingValue'
+                render={(args) => (
+                  <CodeSelect
+                    label='Default Visit Type'
+                    {...args}
+                    code='ctvisitpurpose'
                     disabled={!!hasActiveSession}
                   />
                 )}
