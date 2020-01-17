@@ -182,7 +182,8 @@ const Pricing = ({
                       label={formatMessage({
                         id: 'inventory.master.pricing.suggestedSellingPrice',
                       })}
-                      disabled
+                      disabled={isEditMode()}
+                      precision={4}
                       {...args}
                     />
                   )}

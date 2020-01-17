@@ -15,6 +15,11 @@ export default createBasicModel({
     setting: {},
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
-    reducers: {},
+    reducers: {
+      clearNotifications (state) {
+        sessionStorage.removeItem('notifications')
+        return { ...state, notifications: [] }
+      },
+    },
   },
 })

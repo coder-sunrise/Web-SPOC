@@ -239,9 +239,19 @@ export default createFormViewModel({
 
         return response
       },
-      *editOrder ({ payload }, { call, put }) {
+      *editOrder ({ payload }, { call, put, take }) {
         const response = yield call(service.editOrder, payload.id)
+        const { queueID } = payload
+
         if (response) {
+          if (queueID) {
+            yield put({
+              type: 'visitRegistration/query',
+              payload: { id: queueID, version: Date.now() },
+            })
+            yield take('visitRegistration/query/@@end')
+          }
+
           yield put({
             type: 'updateState',
             payload: {
@@ -332,6 +342,7 @@ export default createFormViewModel({
                   subject: p.getSubject ? p.getSubject(o) : '',
                   ...o,
                   sequence: o.sequence || maxSeq,
+                  instruction: o.instruction || o.itemNotes,
                 }
                 return p.convert ? p.convert(d) : d
               }),

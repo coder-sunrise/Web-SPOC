@@ -83,7 +83,7 @@ const styles = (theme) => ({
   fabContainer: {
     position: 'fixed',
     right: -3,
-    top: '45%',
+    top: '30%',
     zIndex: 1000,
     '& button': {
       borderRadius: '0px !important',

@@ -112,7 +112,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     <div style={style}>{newChildren}</div>
   ) : (
     <FormControl
-      fullWidth={fullWidth || !text}
+      fullWidth={fullWidth !== undefined ? fullWidth : !text}
       {...formControlProps}
       className={formControlClasses}
       style={style}

@@ -158,6 +158,18 @@ const menuData = [
     url: '/setting/appointmenttype',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Treatment',
+    // icon: <FolderOpen />,
+    url: '/setting/treatment',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Treatment Category',
+    // icon: <FolderOpen />,
+    url: '/setting/treatmentcategory',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',
@@ -223,6 +235,7 @@ const Authority = {
   'Master Setting': 'settings.mastersetting',
   'Clinic Setting': 'settings.clinicsetting',
   'Print Setup': 'settings.printsetup',
+  'System User': 'settings.systemuser',
   'User Preference': 'settings.userpreference',
   Templates: 'settings.template',
   Contact: 'settings.contact',
@@ -237,7 +250,7 @@ class SystemSetting extends PureComponent {
   constructor (props) {
     super(props)
     this.group = _.groupBy(menuData, 'title')
-    console.log({ group: this.group })
+
     // console.log(menuData, group, Object.keys(group))
     const { classes, theme } = props
   }

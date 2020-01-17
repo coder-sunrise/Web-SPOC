@@ -16,7 +16,7 @@ export default createListViewModel({
     subscriptions: ({ dispatch }) => {
       subscribeNotification('CodetableUpdated', {
         callback: ({ code }) => {
-          console.log(code, 'rete')
+          // console.log(code, 'rete')
           if (code === 'clinicianprofile') {
             window.g_app._store.dispatch({
               type: 'codetable/refreshCodes',
@@ -43,6 +43,7 @@ export default createListViewModel({
         })
       },
       *refreshCodes ({ payload }, { call, put }) {
+        // console.log('refreshCodes')
         const { code } = payload
         const response = yield call(getCodes, { ...payload, refresh: true })
         yield put({

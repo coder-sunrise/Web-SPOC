@@ -33,11 +33,17 @@ const devRoutes = {
       mini: 'RS',
       component: './Development/Report',
     },
+    // {
+    //   path: '/development/dentalchart',
+    //   name: 'Dental Chart',
+    //   mini: 'DC',
+    //   component: './Development/DentalChart',
+    // },
     {
-      path: '/development/dentalchart',
-      name: 'Dental Chart',
-      mini: 'DC',
-      component: './Development/DentalChart',
+      path: '/development/cannedtext',
+      name: 'Canned Text',
+      mini: 'CT',
+      component: './Development/CannedText',
     },
   ],
 }

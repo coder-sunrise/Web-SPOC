@@ -11,6 +11,7 @@ import {
   GridItem,
   SizeContainer,
 } from '@/components'
+import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const styles = (theme) => ({
   generateBtn: {
@@ -23,18 +24,8 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
     <SizeContainer size='sm'>
       <React.Fragment>
         <GridContainer alignItems='flex-end'>
-          <GridItem md={2}>
-            <FastField
-              name='dateFrom'
-              render={(args) => <DatePicker {...args} label='From' />}
-            />
-          </GridItem>
-          <GridItem md={2}>
-            <FastField
-              name='dateTo'
-              render={(args) => <DatePicker {...args} label='To' />}
-            />
-          </GridItem>
+          <ReportDateRangePicker />
+
           <GridItem>
             <FastField
               name='asAt'

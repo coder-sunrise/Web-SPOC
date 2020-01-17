@@ -523,6 +523,7 @@ class BasicLayout extends React.PureComponent {
                             // />
                           )}
                           <div
+                            id='mainPanel-root'
                             className={mainPanel}
                             ref={(node) => {
                               // this.mainPanel = node

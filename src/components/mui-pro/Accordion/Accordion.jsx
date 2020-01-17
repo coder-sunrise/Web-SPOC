@@ -1,16 +1,35 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-
+import color from 'color'
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel'
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
-
 import ExpandMore from '@material-ui/icons/ExpandMore'
-
+// styles
 import accordionStyle from 'mui-pro-jss/material-dashboard-pro-react/components/accordionStyle.jsx'
+import { primaryColor } from 'mui-pro-jss'
+
+const styles = (theme) => ({
+  ...accordionStyle(theme),
+  expansionPanel: {
+    boxShadow: 'none',
+    '&:before': {
+      display: 'none !important',
+    },
+    borderColor: '#AAAAAA',
+    borderStyle: 'solid',
+    borderWidth: 'thin',
+    // marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  expansionPanelExpanded: {
+    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+})
 
 class Accordion extends React.Component {
   constructor (props) {
@@ -134,4 +153,4 @@ Accordion.propTypes = {
   ).isRequired,
 }
 
-export default withStyles(accordionStyle)(Accordion)
+export default withStyles(styles)(Accordion)

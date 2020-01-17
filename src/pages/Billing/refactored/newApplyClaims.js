@@ -207,7 +207,6 @@ const ApplyClaims = ({
                     schemeConfig,
                     item,
                   )
-                  console.log({ coverage })
                   // const invoiceItemTypeFK = item.invoiceItemTypeFK
                   return { ...item, coverage }
                 })

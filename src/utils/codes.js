@@ -17,6 +17,7 @@ import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
+import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
@@ -918,6 +919,7 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.medication',
     filter: (r) => !!r.inventoryMedicationFK,
     getSubject: (r) => {
       return r.drugName
@@ -928,6 +930,7 @@ const orderTypes = [
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
+    accessRight: 'queue.consultation.order.vaccination',
     getSubject: (r) => r.vaccinationName,
     component: (props) => <Vaccination {...props} />,
   },
@@ -935,6 +938,7 @@ const orderTypes = [
     name: 'Service',
     value: '3',
     prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
     getSubject: (r) => r.serviceName,
     component: (props) => <Service {...props} />,
   },
@@ -942,6 +946,7 @@ const orderTypes = [
     name: 'Consumable',
     value: '4',
     prop: 'corConsumable',
+    accessRight: 'queue.consultation.order.consumable',
     getSubject: (r) => r.consumableName,
     component: (props) => <Consumable {...props} />,
   },
@@ -949,6 +954,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.openPrescription',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
     component: (props) => <Medication openPrescription {...props} />,
@@ -956,7 +962,16 @@ const orderTypes = [
   {
     name: 'Order Set',
     value: '6',
+    accessRight: 'queue.consultation.order.orderSet',
     component: (props) => <OrderSet {...props} />,
+  },
+  {
+    name: 'Treatment',
+    value: '7',
+    prop: 'corDentalTreatments',
+    accessRight: 'queue.consultation.order.treatment',
+    getSubject: (r) => r.itemName,
+    component: (props) => <Treatment {...props} />,
   },
 ]
 const buttonTypes = [
@@ -1146,6 +1161,18 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctmedicationprecaution',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'cttreatment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctchartmethod',
     {
       ...defaultParams,
     },
@@ -1538,8 +1565,11 @@ const tagList = [
     getter: () => {
       const { user } = window.g_app._store.getState()
       if (user && user.data && user.data.clinicianProfile) {
-        return `${user.data.clinicianProfile.title} ${user.data.clinicianProfile
-          .name}`
+        const title = user.data.clinicianProfile.title
+          ? `${user.data.clinicianProfile.title} `
+          : ''
+
+        return `${title}${user.data.clinicianProfile.name}`
       }
       return 'N.A.'
     },
