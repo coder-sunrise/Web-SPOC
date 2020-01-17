@@ -438,7 +438,7 @@ class PaymentDetails extends Component {
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
-                  readOnly={false}
+                  readOnly={readOnly}
                   hasActiveSession={hasActiveSession}
                 />
               )

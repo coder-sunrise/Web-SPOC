@@ -342,6 +342,7 @@ export default createFormViewModel({
                   subject: p.getSubject ? p.getSubject(o) : '',
                   ...o,
                   sequence: o.sequence || maxSeq,
+                  instruction: o.instruction || o.itemNotes,
                 }
                 return p.convert ? p.convert(d) : d
               }),

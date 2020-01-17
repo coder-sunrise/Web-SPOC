@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import _ from 'lodash'
 import Search from '@material-ui/icons/Search'
 
@@ -36,7 +36,7 @@ const Treatment = ({
   codetable,
   ...props
 }) => {
-  const { ctchartmethod = [] } = codetable
+  const { ctchartmethod = [], cttreatment = [] } = codetable
   const [
     search,
     setSearch,
@@ -46,7 +46,6 @@ const Treatment = ({
     setTreatments,
   ] = useState([])
   useEffect(() => {
-    const { cttreatment = [] } = codetable
     // console.log(list)
     const treeItems = Object.values(
       _.groupBy(
@@ -67,7 +66,6 @@ const Treatment = ({
 
     setTreatments(treeItems)
   }, [])
-
   return (
     <div>
       <div
@@ -94,7 +92,6 @@ const Treatment = ({
               const action = ctchartmethod.find(
                 (o) => o.id === item.chartMethodFK,
               )
-              // console.log(action)
               dispatch({
                 type: 'dentalChartComponent/updateState',
                 payload: {
@@ -120,4 +117,9 @@ const Treatment = ({
   )
 }
 
-export default Treatment
+export default React.memo(
+  Treatment,
+  ({ codetable }, { codetable: codetableNext }) => {
+    return codetable.cttreatment === codetableNext.cttreatment
+  },
+)

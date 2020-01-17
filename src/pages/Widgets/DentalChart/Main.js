@@ -126,12 +126,6 @@ class DentalChart extends React.Component {
     }
   }
 
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'dentalChartComponent/reset',
-    })
-  }
-
   render () {
     const {
       className,
