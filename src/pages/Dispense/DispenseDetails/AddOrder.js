@@ -20,7 +20,7 @@ const AddOrder = ({
   handleSubmit,
   dispatch,
   dispense,
-  ctservice,
+  codetable: { ctservice, inventoryconsumable, inventorymedication },
   visitType,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
@@ -42,6 +42,11 @@ const AddOrder = ({
                 ...restValues
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
+              const isActive = inventorymedication.find(
+                (medication) =>
+                  medication.id ===
+                  o.retailVisitInvoiceDrug.inventoryMedicationFK,
+              )
               obj = {
                 type: o.invoiceItemTypeFK.toString(),
                 ...o.retailVisitInvoiceDrug,
@@ -55,6 +60,7 @@ const AddOrder = ({
                 corPrescriptionItemPrecaution:
                   o.retailVisitInvoiceDrug.retailPrescriptionItem
                     .retailPrescriptionItemPrecaution,
+                isActive,
               }
               break
             }
@@ -63,6 +69,11 @@ const AddOrder = ({
               const { serviceId, serviceCenterId } = servicesList.find(
                 (s) =>
                   s.serviceCenter_ServiceId ===
+                  o.retailVisitInvoiceService.serviceCenterServiceFK,
+              )
+              const isActive = ctservice.find(
+                (service) =>
+                  service.serviceCenter_ServiceId ===
                   o.retailVisitInvoiceService.serviceCenterServiceFK,
               )
               obj = {
@@ -74,11 +85,17 @@ const AddOrder = ({
                   o.retailVisitInvoiceService.concurrencyToken,
                 ...o.retailVisitInvoiceService,
                 ...o.retailVisitInvoiceService.retailService,
+                isActive,
               }
               break
             }
 
             case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
+              const isActive = inventoryconsumable.find(
+                (consumable) =>
+                  consumable.id ===
+                  o.retailVisitInvoiceConsumable.inventoryConsumableFK,
+              )
               obj = {
                 type: ORDER_TYPE_TAB.CONSUMABLE,
                 innerLayerId: o.retailVisitInvoiceConsumable.id,
@@ -86,6 +103,7 @@ const AddOrder = ({
                   o.retailVisitInvoiceConsumable.concurrencyToken,
                 ...o.retailVisitInvoiceConsumable,
                 ...o.retailVisitInvoiceConsumable.retailConsumable,
+                isActive,
               }
               break
             }
@@ -98,7 +116,6 @@ const AddOrder = ({
             outerLayerId: o.id,
             outerLayerConcurrencyToken: o.concurrencyToken,
             subject: o.itemName,
-            isActive: true,
             uid: o.id,
             ...obj,
           }
@@ -135,21 +152,8 @@ const AddOrder = ({
     const { entity } = dispense
     const { invoice } = entity
 
-    let servicesList = ctservice
-
-    if (!ctservice) {
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-        },
-      }).then((services) => {
-        if (visitType === VISIT_TYPE.RETAIL)
-          displayExistingOrders(invoice.id, services)
-      })
-    } else if (visitType === VISIT_TYPE.RETAIL) {
-      displayExistingOrders(invoice.id, servicesList)
-    }
+    if (visitType === VISIT_TYPE.RETAIL)
+      displayExistingOrders(invoice.id, ctservice)
   }, [])
 
   return (
@@ -174,7 +178,7 @@ export default compose(
     dispense,
     orders,
     consultation,
-    ctservice: codetable.ctservice,
+    codetable,
     inventoryConsumable: codetable.inventoryconsumable,
   })),
   withFormikExtend({
