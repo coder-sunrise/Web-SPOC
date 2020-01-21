@@ -24,111 +24,121 @@ const AddOrder = ({
   visitType,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
-    await dispatch({
+    const r = await dispatch({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
       },
-    }).then((r) => {
-      if (r) {
-        const { retailInvoiceAdjustment, retailInvoiceItem } = r
-        const newRows = retailInvoiceItem.map((o) => {
-          let obj
-          switch (o.invoiceItemTypeFK) {
-            case INVOICE_ITEM_TYPE_BY_NAME.MEDICATION: {
-              const {
-                retailPrescriptionItemInstruction,
-                retailPrescriptionItemPrecaution,
-                ...restValues
-              } = o.retailVisitInvoiceDrug.retailPrescriptionItem
-
-              obj = {
-                type: o.invoiceItemTypeFK.toString(),
-                ...o.retailVisitInvoiceDrug,
-                innerLayerId: o.retailVisitInvoiceDrug.id,
-                innerLayerConcurrencyToken:
-                  o.retailVisitInvoiceDrug.concurrencyToken,
-                ...restValues,
-                corPrescriptionItemInstruction:
-                  o.retailVisitInvoiceDrug.retailPrescriptionItem
-                    .retailPrescriptionItemInstruction,
-                corPrescriptionItemPrecaution:
-                  o.retailVisitInvoiceDrug.retailPrescriptionItem
-                    .retailPrescriptionItemPrecaution,
-              }
-              break
-            }
-
-            case INVOICE_ITEM_TYPE_BY_NAME.SERVICE: {
-              const { serviceId, serviceCenterId } = servicesList.find(
-                (s) =>
-                  s.serviceCenter_ServiceId ===
-                  o.retailVisitInvoiceService.serviceCenterServiceFK,
-              )
-              obj = {
-                type: ORDER_TYPE_TAB.SERVICE,
-                serviceFK: serviceId,
-                serviceCenterFK: serviceCenterId,
-                innerLayerId: o.retailVisitInvoiceService.id,
-                innerLayerConcurrencyToken:
-                  o.retailVisitInvoiceService.concurrencyToken,
-                ...o.retailVisitInvoiceService,
-                ...o.retailVisitInvoiceService.retailService,
-              }
-              break
-            }
-
-            case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
-              obj = {
-                type: ORDER_TYPE_TAB.CONSUMABLE,
-                innerLayerId: o.retailVisitInvoiceConsumable.id,
-                innerLayerConcurrencyToken:
-                  o.retailVisitInvoiceConsumable.concurrencyToken,
-                ...o.retailVisitInvoiceConsumable,
-                ...o.retailVisitInvoiceConsumable.retailConsumable,
-              }
-              break
-            }
-            default: {
-              break
-            }
-          }
-
-          return {
-            outerLayerId: o.id,
-            outerLayerConcurrencyToken: o.concurrencyToken,
-            subject: o.itemName,
-            isActive: true,
-            uid: o.id,
-            ...obj,
-          }
-        })
-
-        const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map((o) => {
-          return {
-            ...o,
-            uid: o.id,
-          }
-        })
-        dispatch({
-          type: 'orders/updateState',
-          payload: {
-            rows: newRows,
-            finalAdjustments: newRetailInvoiceAdjustment,
-            isGSTInclusive: r.isGSTInclusive,
-            gstValue: r.gstValue,
-          },
-        })
-
-        dispatch({
-          type: 'orders/calculateAmount',
-          payload: {
-            isGSTInclusive: r.isGSTInclusive,
-            gstValue: r.gstValue,
-          },
-        })
-      }
     })
+
+    if (r) {
+      const { retailInvoiceAdjustment, retailInvoiceItem } = r
+
+      const mapRetailItemPropertyToOrderProperty = (o) => {
+        let obj
+        switch (o.invoiceItemTypeFK) {
+          case INVOICE_ITEM_TYPE_BY_NAME.MEDICATION: {
+            const {
+              retailPrescriptionItemInstruction,
+              retailPrescriptionItemPrecaution,
+              ...restValues
+            } = o.retailVisitInvoiceDrug.retailPrescriptionItem
+
+            obj = {
+              type: o.invoiceItemTypeFK.toString(),
+              ...o.retailVisitInvoiceDrug,
+              innerLayerId: o.retailVisitInvoiceDrug.id,
+              innerLayerConcurrencyToken:
+                o.retailVisitInvoiceDrug.concurrencyToken,
+              ...restValues,
+              corPrescriptionItemInstruction:
+                o.retailVisitInvoiceDrug.retailPrescriptionItem
+                  .retailPrescriptionItemInstruction,
+              corPrescriptionItemPrecaution:
+                o.retailVisitInvoiceDrug.retailPrescriptionItem
+                  .retailPrescriptionItemPrecaution,
+            }
+            break
+          }
+
+          case INVOICE_ITEM_TYPE_BY_NAME.SERVICE: {
+            const { serviceId, serviceCenterId } = servicesList.find(
+              (s) =>
+                s.serviceCenter_ServiceId ===
+                o.retailVisitInvoiceService.serviceCenterServiceFK,
+            )
+            obj = {
+              type: ORDER_TYPE_TAB.SERVICE,
+              serviceFK: serviceId,
+              serviceCenterFK: serviceCenterId,
+              innerLayerId: o.retailVisitInvoiceService.id,
+              innerLayerConcurrencyToken:
+                o.retailVisitInvoiceService.concurrencyToken,
+              ...o.retailVisitInvoiceService,
+              ...o.retailVisitInvoiceService.retailService,
+            }
+            break
+          }
+
+          case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
+            obj = {
+              type: ORDER_TYPE_TAB.CONSUMABLE,
+              innerLayerId: o.retailVisitInvoiceConsumable.id,
+              innerLayerConcurrencyToken:
+                o.retailVisitInvoiceConsumable.concurrencyToken,
+              ...o.retailVisitInvoiceConsumable,
+              ...o.retailVisitInvoiceConsumable.retailConsumable,
+            }
+            break
+          }
+          default: {
+            break
+          }
+        }
+
+        return {
+          outerLayerId: o.id,
+          outerLayerConcurrencyToken: o.concurrencyToken,
+          subject: o.itemName,
+          isActive: true,
+          uid: o.id,
+          ...obj,
+        }
+      }
+
+      const assignRetailAdjustmentIdToOrderAdjustmentUid = (o) => {
+        return {
+          ...o,
+          uid: o.id,
+        }
+      }
+
+      const newRows = retailInvoiceItem.map(
+        mapRetailItemPropertyToOrderProperty,
+      )
+
+      const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map(
+        assignRetailAdjustmentIdToOrderAdjustmentUid,
+      )
+
+      dispatch({
+        type: 'orders/updateState',
+        payload: {
+          rows: newRows,
+          finalAdjustments: newRetailInvoiceAdjustment,
+          isGSTInclusive: r.isGSTInclusive,
+          gstValue: r.gstValue,
+        },
+      })
+
+      dispatch({
+        type: 'orders/calculateAmount',
+        payload: {
+          isGSTInclusive: r.isGSTInclusive,
+          gstValue: r.gstValue,
+        },
+      })
+    }
   }
 
   useEffect(() => {
@@ -192,6 +202,23 @@ export default compose(
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
       if (visitType === VISIT_TYPE.RETAIL) {
+        const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = (
+          o,
+        ) => {
+          return {
+            ...o,
+            id: undefined,
+            concurrencyToken: undefined,
+          }
+        }
+
+        const setIsDeletedToUnwantedPrescriptionsOrInstructions = (o) => {
+          return {
+            ...o,
+            isDeleted: true,
+          }
+        }
+
         const medicationPrecautionsArray = (
           corPrescriptionItemPrecaution,
           retailPrescriptionItemPrecaution,
@@ -219,29 +246,19 @@ export default compose(
             combinedOldNewPrecautions,
           )
 
-          const formatNewAddedPrecautions = newAddedPrecautions.map((o) => {
-            return {
-              ...o,
-              id: undefined,
-              concurrencyToken: undefined,
-            }
-          })
+          const formatNewAddedPrecautions = newAddedPrecautions.map(
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+          )
 
           let deleteUnwantedItem = []
           if (combinedOldNewPrecautions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemPrecaution.map((o) => {
-              return {
-                ...o,
-                isDeleted: true,
-              }
-            })
+            deleteUnwantedItem = retailPrescriptionItemPrecaution.map(
+              setIsDeletedToUnwantedPrescriptionsOrInstructions,
+            )
           } else {
-            deleteUnwantedItem = unwantedItem.map((o) => {
-              return {
-                ...o,
-                isDeleted: true,
-              }
-            })
+            deleteUnwantedItem = unwantedItem.map(
+              setIsDeletedToUnwantedPrescriptionsOrInstructions,
+            )
           }
 
           return [
@@ -283,29 +300,19 @@ export default compose(
             combinedOldNewInstructions,
           )
 
-          const formatNewAddedInstructions = newAddedIntructions.map((o) => {
-            return {
-              ...o,
-              id: undefined,
-              concurrencyToken: undefined,
-            }
-          })
+          const formatNewAddedInstructions = newAddedIntructions.map(
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+          )
 
           let deleteUnwantedItem = []
           if (combinedOldNewInstructions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemInstruction.map((o) => {
-              return {
-                ...o,
-                isDeleted: true,
-              }
-            })
+            deleteUnwantedItem = retailPrescriptionItemInstruction.map(
+              setIsDeletedToUnwantedPrescriptionsOrInstructions,
+            )
           } else {
-            deleteUnwantedItem = unwantedItem.map((o) => {
-              return {
-                ...o,
-                isDeleted: true,
-              }
-            })
+            deleteUnwantedItem = unwantedItem.map(
+              setIsDeletedToUnwantedPrescriptionsOrInstructions,
+            )
           }
 
           return [
@@ -314,7 +321,8 @@ export default compose(
             ...deleteUnwantedItem,
           ]
         }
-        const retailInvoiceItem = rows.map((o) => {
+
+        const mapRetailItemPropertyToAPi = (o) => {
           let obj
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
@@ -420,7 +428,9 @@ export default compose(
             gstAmount: o.gstAmount,
             ...obj,
           }
-        })
+        }
+
+        const retailInvoiceItem = rows.map(mapRetailItemPropertyToAPi)
 
         const payload = {
           ...addOrderDetails,
