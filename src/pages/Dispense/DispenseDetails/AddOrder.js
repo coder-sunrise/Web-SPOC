@@ -179,7 +179,6 @@ export default compose(
     orders,
     consultation,
     codetable,
-    inventoryConsumable: codetable.inventoryconsumable,
   })),
   withFormikExtend({
     handleSubmit: (values, { props }) => {
@@ -190,7 +189,7 @@ export default compose(
         onConfirm,
         dispense,
         onReloadClick,
-        inventoryConsumable,
+        codetable: { inventoryconsumable },
         visitType,
       } = props
       const { rows, summary, finalAdjustments } = orders
@@ -385,7 +384,7 @@ export default compose(
               break
             }
             case ORDER_TYPE_TAB.CONSUMABLE: {
-              const { uom } = inventoryConsumable.find(
+              const { uom } = inventoryconsumable.find(
                 (c) => c.id === o.inventoryConsumableFK,
               )
               obj = {
