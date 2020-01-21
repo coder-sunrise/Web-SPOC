@@ -45,7 +45,8 @@ const AddOrder = ({
               const medicationItem = inventorymedication.find(
                 (medication) =>
                   medication.id ===
-                  o.retailVisitInvoiceDrug.inventoryMedicationFK,
+                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  medication.isActive,
               )
               obj = {
                 type: o.invoiceItemTypeFK.toString(),
@@ -69,7 +70,8 @@ const AddOrder = ({
               const { serviceId, serviceCenterId } = servicesList.find(
                 (s) =>
                   s.serviceCenter_ServiceId ===
-                  o.retailVisitInvoiceService.serviceCenterServiceFK,
+                    o.retailVisitInvoiceService.serviceCenterServiceFK &&
+                  s.isActive,
               )
               const serviceItem = ctservice.find(
                 (service) =>
@@ -94,7 +96,8 @@ const AddOrder = ({
               const consumableItem = inventoryconsumable.find(
                 (consumable) =>
                   consumable.id ===
-                  o.retailVisitInvoiceConsumable.inventoryConsumableFK,
+                    o.retailVisitInvoiceConsumable.inventoryConsumableFK &&
+                  consumable.isActive,
               )
               obj = {
                 type: ORDER_TYPE_TAB.CONSUMABLE,
