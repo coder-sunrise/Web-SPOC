@@ -42,7 +42,7 @@ const AddOrder = ({
                 ...restValues
               } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
-              const isActive = inventorymedication.find(
+              const medicationItem = inventorymedication.find(
                 (medication) =>
                   medication.id ===
                   o.retailVisitInvoiceDrug.inventoryMedicationFK,
@@ -60,7 +60,7 @@ const AddOrder = ({
                 corPrescriptionItemPrecaution:
                   o.retailVisitInvoiceDrug.retailPrescriptionItem
                     .retailPrescriptionItemPrecaution,
-                isActive,
+                isActive: !!medicationItem,
               }
               break
             }
@@ -71,7 +71,7 @@ const AddOrder = ({
                   s.serviceCenter_ServiceId ===
                   o.retailVisitInvoiceService.serviceCenterServiceFK,
               )
-              const isActive = ctservice.find(
+              const serviceItem = ctservice.find(
                 (service) =>
                   service.serviceCenter_ServiceId ===
                   o.retailVisitInvoiceService.serviceCenterServiceFK,
@@ -85,13 +85,13 @@ const AddOrder = ({
                   o.retailVisitInvoiceService.concurrencyToken,
                 ...o.retailVisitInvoiceService,
                 ...o.retailVisitInvoiceService.retailService,
-                isActive,
+                isActive: !!serviceItem,
               }
               break
             }
 
             case INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE: {
-              const isActive = inventoryconsumable.find(
+              const consumableItem = inventoryconsumable.find(
                 (consumable) =>
                   consumable.id ===
                   o.retailVisitInvoiceConsumable.inventoryConsumableFK,
@@ -103,7 +103,7 @@ const AddOrder = ({
                   o.retailVisitInvoiceConsumable.concurrencyToken,
                 ...o.retailVisitInvoiceConsumable,
                 ...o.retailVisitInvoiceConsumable.retailConsumable,
-                isActive,
+                isActive: !!consumableItem,
               }
               break
             }
