@@ -488,7 +488,7 @@ class Detail extends PureComponent {
   rowOptions = (row) => {
     const getCurrentOptions = (stateName, filteredOptions) => {
       const selectedItem = this.state[stateName].find(
-        (o) => o.itemFK === row.itemFK,
+        (o) => o.itemFK === (row.itemFK || row.code),
       )
       let currentOptions = filteredOptions
       if (selectedItem) {
