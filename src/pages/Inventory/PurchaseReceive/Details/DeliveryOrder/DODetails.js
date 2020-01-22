@@ -123,6 +123,9 @@ const receivingDetailsSchema = Yup.object().shape({
         purchaseOrderConsumableItem,
         ...restX
       } = x
+
+      let batchNo = Array.isArray(x.batchNo) ? x.batchNo[0] : x.batchNo
+      if (!batchNo) batchNo = null
       return {
         ...restX,
         // inventoryTransactionItemFK: 39, // Temporary hard code, will remove once Soe fix the API
@@ -130,7 +133,7 @@ const receivingDetailsSchema = Yup.object().shape({
         recevingQuantity: x.currentReceivingQty,
         bonusQuantity: x.currentReceivingBonusQty,
         isDeleted: x.isDeleted,
-        batchNo: Array.isArray(x.batchNo) ? x.batchNo[0] : x.batchNo,
+        batchNo,
         expiryDate: x.expiryDate,
         sortOrder: index + 1,
         id: values.id ? x.id : undefined,
