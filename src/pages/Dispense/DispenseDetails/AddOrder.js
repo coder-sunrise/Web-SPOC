@@ -224,9 +224,19 @@ export default compose(
           }
         }
 
+        const setIsDeletedIfWholeItemIsDeleted = (o, itemIsDeleted) => {
+          if (o.isDeleted) return o
+
+          return {
+            ...o,
+            isDeleted: itemIsDeleted,
+          }
+        }
+
         const medicationPrecautionsArray = (
           corPrescriptionItemPrecaution,
           retailPrescriptionItemPrecaution,
+          itemIsDeleted,
         ) => {
           const combinedOldNewPrecautions = _.intersectionBy(
             corPrescriptionItemPrecaution,
@@ -266,16 +276,19 @@ export default compose(
             )
           }
 
-          return [
+          const returnedPrecautionsArray = [
             ...combinedOldNewPrecautions,
             ...formatNewAddedPrecautions,
             ...deleteUnwantedItem,
-          ]
+          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+
+          return returnedPrecautionsArray
         }
 
         const medicationIntructionsArray = (
           corPrescriptionItemInstruction,
           retailPrescriptionItemInstruction,
+          itemIsDeleted,
         ) => {
           // const compareCriteria = [
           //   'dosageFK',
@@ -320,11 +333,13 @@ export default compose(
             )
           }
 
-          return [
+          const returnedInstructionsArray = [
             ...combinedOldNewInstructions,
             ...formatNewAddedInstructions,
             ...deleteUnwantedItem,
-          ]
+          ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
+
+          return returnedInstructionsArray
         }
 
         const mapRetailItemPropertyToApi = (o) => {
@@ -358,16 +373,20 @@ export default compose(
                   expiryDate: o.expiryDate,
                   batchNo: o.batchNo,
                   dispensedQuanity: o.dispensedQuanity,
+                  isDeleted: o.isDeleted,
                   retailPrescriptionItem: {
                     ...restO,
+                    isDeleted: o.isDeleted,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
                     retailPrescriptionItemInstruction: medicationIntructionsArray(
                       corPrescriptionItemInstruction,
                       retailPrescriptionItemInstruction,
+                      o.isDeleted,
                     ),
                     retailPrescriptionItemPrecaution: medicationPrecautionsArray(
                       corPrescriptionItemPrecaution,
                       retailPrescriptionItemPrecaution,
+                      o.isDeleted,
                     ),
                   },
                 },
@@ -431,6 +450,7 @@ export default compose(
             totalAfterOverallAdjustment: roundTo(o.totalAfterOverallAdjustment),
             totalAfterGST: roundTo(o.totalAfterGST),
             gstAmount: o.gstAmount,
+            isDeleted: o.isDeleted,
             ...obj,
           }
         }
