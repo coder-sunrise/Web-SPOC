@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { formatMessage } from 'umi/locale'
 import { Radio } from 'antd'
+import SharedContainer from './SharedContainer'
 import {
   CardContainer,
   GridContainer,
@@ -109,71 +110,73 @@ const Stock = ({
     ],
   })
   return (
-    <CardContainer
-      hideHeader
-      style={{
-        margin: theme.spacing(1),
-        minHeight: 700,
-        maxHeight: 700,
-      }}
-    >
-      <h4 style={{ fontWeight: 400 }}>
-        <b>Stock</b>
-      </h4>
-      <GridContainer className={classes.infoPanl}>
-        <GridItem xs={12} md={4}>
-          <Field
-            name={`${objectType()}`}
-            // name={`${objectType()}.length`}
-            render={(args) => {
-              return (
-                <NumberInput
-                  label={formatMessage({
-                    id: 'inventory.master.stock.currentStock',
-                  })}
-                  value={stockQty}
-                  disabled
-                  format='0.0'
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
-            name='reOrderThreshold'
-            render={(args) => {
-              return (
-                <NumberInput
-                  label={formatMessage({
-                    id: 'inventory.master.stock.reorderThreshold',
-                  })}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-        <GridItem xs={12} md={4}>
-          <FastField
-            name='criticalThreshold'
-            render={(args) => {
-              return (
-                <NumberInput
-                  label={formatMessage({
-                    id: 'inventory.master.stock.criticalThreshold',
-                  })}
-                  {...args}
-                />
-              )
-            }}
-          />
-        </GridItem>
-      </GridContainer>
-      <CommonTableGrid rows={stock} {...tableParas} />
-      {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
-    </CardContainer>
+    <SharedContainer>
+      <div
+        hideHeader
+        style={{
+          margin: theme.spacing(1),
+          minHeight: 700,
+          maxHeight: 700,
+        }}
+      >
+        <h4 style={{ fontWeight: 400 }}>
+          <b>Stock</b>
+        </h4>
+        <GridContainer className={classes.infoPanl}>
+          <GridItem xs={12} md={4}>
+            <Field
+              name={`${objectType()}`}
+              // name={`${objectType()}.length`}
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.stock.currentStock',
+                    })}
+                    value={stockQty}
+                    disabled
+                    format='0.0'
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} md={4}>
+            <FastField
+              name='reOrderThreshold'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.stock.reorderThreshold',
+                    })}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+          <GridItem xs={12} md={4}>
+            <FastField
+              name='criticalThreshold'
+              render={(args) => {
+                return (
+                  <NumberInput
+                    label={formatMessage({
+                      id: 'inventory.master.stock.criticalThreshold',
+                    })}
+                    {...args}
+                  />
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        <CommonTableGrid rows={stock} {...tableParas} />
+        {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
+      </div>
+    </SharedContainer>
   )
 }
 export default withStyles(styles, { withTheme: true })(Stock)
