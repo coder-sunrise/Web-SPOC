@@ -339,6 +339,17 @@ class PatientDetail extends PureComponent {
   //   }, 2000)
   // }
 
+  componentWillUnmount () {
+    const {dispatch} = this.props
+    const menuErrors = {}
+    dispatch({
+      type: 'patient/updateState',
+      payload: {
+        menuErrors,
+      },
+    })
+  }
+
   registerVisit = (e) => {
     navigateDirtyCheck({
       onProceed: () => {

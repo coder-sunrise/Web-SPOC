@@ -1,14 +1,165 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useEffect, useState } from 'react'
 
 import { withStyles } from '@material-ui/core'
-import { GridContainer, GridItem } from '@/components'
+import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
 import SchemesGrid from './SchemesGrid'
-import PayersGrid from './PayersGrid'
+import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
+
 
 const styles = () => ({})
 class Schemes extends PureComponent {
-  state = {}
+
+  state = {
+    showReplacementModal : false,
+    refreshedSchemeData :{},
+  }
+
+  handleReplacementModalVisibility = (show = false) => {
+
+    this.setState({
+      showReplacementModal:show,
+    })
+  }
+
+  prepareReplacementModel = (result,oldSchemeTypeFK,patientCoPaymentSchemeFK) =>{
+    const {
+      balance,
+      schemeTypeFk,
+      validFrom,
+      validTo,
+      acuteVisitPatientBalance,
+      acuteVisitClinicBalance,
+      isSuccessful,
+      statusDescription,
+      acuteBalanceStatusCode,
+      chronicBalanceStatusCode,
+    } = result
+
+    if (!isSuccessful) {
+      this.setState({
+        refreshedSchemeData: {
+          statusDescription,
+          isSuccessful,
+        },
+      })
+    } else {
+      if (oldSchemeTypeFK !== schemeTypeFk && oldSchemeTypeFK !== 0) {
+        this.handleReplacementModalVisibility(true)
+      }
+      this.setState({
+        refreshedSchemeData: {
+          oldSchemeTypeFK,
+          balance,
+          patientCoPaymentSchemeFK,
+          schemeTypeFK: schemeTypeFk,
+          validFrom,
+          validTo,
+          acuteVisitPatientBalance,
+          acuteVisitClinicBalance,
+          isSuccessful,
+          acuteBalanceStatusCode,
+          chronicBalanceStatusCode,
+        },
+      })
+    }
+
+  }
+
+  createNewScheme = (result, values) => {
+    let newPatientScheme ={}
+    newPatientScheme.isNew = true
+    newPatientScheme.validRange =[]
+    newPatientScheme.validFrom = result.validFrom
+    newPatientScheme.validTo = result.validTo
+    newPatientScheme.validRange.push(result.validFrom)
+    newPatientScheme.validRange.push(result.validTo)
+    newPatientScheme.schemeTypeFK = result.schemeTypeFk
+    newPatientScheme.accountNumber = result.PatientNric
+    newPatientScheme.coPaymentScheme = undefined
+    values.patientScheme.push(newPatientScheme)
+  }
+
+  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
+
+    const { values, dispatch } = this.props
+    const{ patientAccountNo } = values
+    let isSaveToDb = false
+
+    dispatch({
+      type: 'patient/refreshChasBalance',
+      payload: {
+        patientAccountNo,
+        patientCoPaymentSchemeFK,
+        isSaveToDb,
+      },
+    }).then((result) => {
+
+      this.prepareReplacementModel(result,oldSchemeTypeFK,patientCoPaymentSchemeFK)
+
+      if (result && result.schemeTypeFk) {
+
+        let chasScheme = values.patientScheme.filter(x=>x.schemeTypeFK <= 6 && !x.isDeleted)
+        let isNewChasScheme = false
+
+        if(chasScheme && chasScheme.length > 0) {
+
+          let chasSchemeObject = chasScheme[0]
+
+          if(chasSchemeObject.schemeTypeFK === result.schemeTypeFk){
+            // If same scheme type , update valid from and to date
+            chasSchemeObject.validFrom = result.validFrom
+            chasSchemeObject.validTo = result.validTo
+
+            if(chasSchemeObject.validRange && chasSchemeObject.validRange.length > 2)
+            {
+              chasSchemeObject.validRange = []
+            }
+            chasSchemeObject.validRange.push(result.validFrom)
+            chasSchemeObject.validRange.push(result.validTo)
+
+            if(chasSchemeObject._errors && chasSchemeObject._errors.length > 0) {
+              const errorsLength = chasSchemeObject._errors.length
+              chasSchemeObject._errors.splice(0,errorsLength)
+            }
+
+          }
+          else {
+            // Delete old chas Scheme and allow add new Scheme
+            chasScheme[0].isDeleted = true
+            isNewChasScheme = true
+          }
+
+        }else{
+          // No chas scheme , allow add new Scheme
+          isNewChasScheme = true
+        }
+
+        if(isNewChasScheme){
+          // Add a new Scheme to Grid
+          this.createNewScheme(result,values)
+        }
+
+      }else{
+
+
+        let ChasScheme = values.patientScheme.filter(x=>x.schemeTypeFK <= 6 && !x.isDeleted)
+        // Don't have CHAS SCHEME, Remove it from record.
+        if(result.statusDescription === 'Patient is not a CHAS/PG/PA cardholder.'
+          && ChasScheme && ChasScheme.length > 0) {
+            ChasScheme[0].isDeleted = true
+         }
+      }
+
+      dispatch({
+        type: 'patient/updateState',
+        payload: {
+          patientScheme: values.patientScheme,
+        },
+      })
+
+    })
+  }
 
   render () {
     const {
@@ -18,19 +169,70 @@ class Schemes extends PureComponent {
       dispatch,
       values,
       schema,
+      entity,
       theme,
+      setValues,
+      global,
       ...restProps
     } = this.props
 
+    const { disableSave } = global
+    const { patientScheme } = values
+
+    const SchemeData = patientScheme.filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
+    let tempPatientCoPaymentSchemeFK = 0
+    let tempSchemeTypeFK = 0
+
+    if(SchemeData && SchemeData[0])
+    {
+      const { patientCoPaymentSchemeFK, schemeTypeFK}   = SchemeData[0]
+
+      tempPatientCoPaymentSchemeFK = patientCoPaymentSchemeFK
+
+      tempSchemeTypeFK = schemeTypeFK
+    }
+
     return (
       <div>
-        <h4>Schemes</h4>
+        <div>
+          <GridContainer>
+            <GridItem md={4}>
+              <h4>
+                Schemes
+              </h4>
+            </GridItem>
+            <GridItem md={6} />
+            <GridItem md={2} alignItems='flex-end'>
+              <Button color='primary'
+                size='sm'
+                alignSelf='flex-end'
+                onClick={() => this.refreshChasBalance(tempPatientCoPaymentSchemeFK, tempSchemeTypeFK)}
+                disabled={disableSave}
+              >
+                Get CHAS
+              </Button>
+            </GridItem>
+          </GridContainer>
+        </div>
         <SchemesGrid
           rows={values.patientScheme}
           schema={schema.patientScheme._subType}
           values={values}
           {...restProps}
         />
+        <CommonModal
+          open={this.state.showReplacementModal}
+          title='CHAS Card Replacement'
+          maxWidth='sm'
+          onConfirm={() => this.handleReplacementModalVisibility(false)}
+          onClose={() => this.handleReplacementModalVisibility(false)}
+        >
+          <CHASCardReplacement
+            entity={values}
+            refreshedSchemeData={this.state.refreshedSchemeData}
+            handleOnClose={() => this.handleReplacementModalVisibility(false)}
+          />
+        </CommonModal>
         {/* TODO: hide medisave payer until feature is fully built */}
         {/* <h4
           style={{
@@ -47,8 +249,13 @@ class Schemes extends PureComponent {
           {...restProps}
         /> */}
       </div>
+
+
     )
   }
+
+
+
 }
 
 export default withStyles(styles, { withTheme: true })(Schemes)

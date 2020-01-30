@@ -56,7 +56,9 @@ const styles = (theme) => ({
       supplierFK: Yup.string().required(),
       purchaseOrderDate: Yup.date().required(),
     }),
-    rows: Yup.array().required('At least one item is required.'),
+    rows: Yup.array()
+      .compact((x) => x.isDeleted)
+      .required('At least one item is required.'),
   }),
   handleSubmit: () => {},
 })
@@ -323,7 +325,8 @@ class Index extends Component {
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         let result = {}
-        if (x.isNew) {
+
+        if (x.isNew && !x.isDeleted) {
           result = {
             isDeleted: x.isDeleted || false,
             inventoryItemTypeFK: itemType.value,
@@ -331,6 +334,7 @@ class Index extends Component {
             bonusQuantity: x.bonusQuantity,
             totalQuantity: x.totalQuantity,
             totalPrice: x.totalPrice,
+            unitPrice: x.unitPrice,
             totalAfterAdjustments: x.totalAfterAdjustments,
             totalAfterGst: x.totalAfterGst,
             sortOrder: x.sortOrder,

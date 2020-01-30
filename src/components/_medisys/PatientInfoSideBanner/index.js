@@ -41,13 +41,16 @@ class PatientInfoSideBanner extends PureComponent {
     }
   }
 
-  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
+   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
     const { dispatch, entity, setValues } = this.props
+    const isSaveToDb = true
+
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: {
         ...entity,
         patientCoPaymentSchemeFK,
+        isSaveToDb,
       },
     }).then((result) => {
       if (result) {
@@ -63,47 +66,7 @@ class PatientInfoSideBanner extends PureComponent {
           })
         }
 
-        const {
-          balance,
-          schemeTypeFk,
-          validFrom,
-          validTo,
-          acuteVisitPatientBalance,
-          acuteVisitClinicBalance,
-          isSuccessful,
-          statusDescription,
-          acuteBalanceStatusCode,
-          chronicBalanceStatusCode,
-        } = result
-        let isShowReplacementModal = false
-        if (!isSuccessful) {
-          this.setState({
-            refreshedSchemeData: {
-              statusDescription,
-              isSuccessful,
-            },
-          })
-        } else {
-          if (oldSchemeTypeFK !== schemeTypeFk) {
-            isShowReplacementModal = true
-          }
-          this.setState({
-            refreshedSchemeData: {
-              isShowReplacementModal,
-              oldSchemeTypeFK,
-              balance,
-              patientCoPaymentSchemeFK,
-              schemeTypeFK: schemeTypeFk,
-              validFrom,
-              validTo,
-              acuteVisitPatientBalance,
-              acuteVisitClinicBalance,
-              isSuccessful,
-              acuteBalanceStatusCode,
-              chronicBalanceStatusCode,
-            },
-          })
-        }
+
       }
     })
   }
