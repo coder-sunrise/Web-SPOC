@@ -66,6 +66,47 @@ class PatientInfoSideBanner extends PureComponent {
           })
         }
 
+        const {
+          balance,
+          schemeTypeFk,
+          validFrom,
+          validTo,
+          acuteVisitPatientBalance,
+          acuteVisitClinicBalance,
+          isSuccessful,
+          statusDescription,
+          acuteBalanceStatusCode,
+          chronicBalanceStatusCode,
+        } = result
+        let isShowReplacementModal = false
+        if (!isSuccessful) {
+          this.setState({
+            refreshedSchemeData: {
+              statusDescription,
+              isSuccessful,
+            },
+          })
+        } else {
+          if (oldSchemeTypeFK !== schemeTypeFk) {
+            isShowReplacementModal = true
+          }
+          this.setState({
+            refreshedSchemeData: {
+              isShowReplacementModal,
+              oldSchemeTypeFK,
+              balance,
+              patientCoPaymentSchemeFK,
+              schemeTypeFK: schemeTypeFk,
+              validFrom,
+              validTo,
+              acuteVisitPatientBalance,
+              acuteVisitClinicBalance,
+              isSuccessful,
+              acuteBalanceStatusCode,
+              chronicBalanceStatusCode,
+            },
+          })
+        }
 
       }
     })
