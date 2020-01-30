@@ -97,6 +97,14 @@ class Detail extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem md={6}>
+              <FastField
+                name='remarks'
+                render={(args) => (
+                  <TextField label='Remarks' multiline {...args} />
+                )}
+              />
+            </GridItem>
           </GridContainer>
           <Contact theme={theme} type='referral' />
         </div>
