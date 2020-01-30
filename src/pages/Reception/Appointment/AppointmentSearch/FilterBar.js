@@ -26,11 +26,14 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
     filterByDoctor = [],
     filterByApptType = [],
     filterByRoomBlockGroup = [],
+    filterByAppointmentStatus = [],
   } = values
 
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
+  const maxAppointmentStatusTagCount =
+    filterByAppointmentStatus.length <= 1 ? 1 : 0
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
   return (
@@ -100,7 +103,7 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
                 label='Room'
                 code='ctRoom'
                 mode='multiple'
-                // allValue={-99}
+                maxTagPlaceholder='rooms'
                 maxTagCount={maxRoomBlockGroupTagCount}
                 {...args}
               />
@@ -156,14 +159,17 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
       </GridItem>
       <GridItem md={6}>
         <FastField
-          name='appointmentStatus'
+          name='filterByAppointmentStatus'
           render={(args) => {
             return (
               <Select
                 label={formatMessage({
                   id: 'sms.appointment.status',
                 })}
+                mode='multiple'
                 options={appointmentStatusReception}
+                maxTagCount={maxAppointmentStatusTagCount}
+                maxTagPlaceholder='appointment status'
                 {...args}
               />
             )
