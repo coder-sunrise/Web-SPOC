@@ -25,12 +25,10 @@ const styles = (theme) => ({
   mapPropsToValues: ({ podoPayment }) => {
     let outstandingAmount = {}
     let newPurchaseOrderPayment = []
-    if (
-      podoPayment &&
-      podoPayment.purchaseOrderDetails &&
-      podoPayment.purchaseOrderDetails.outstandingAmount
-    ) {
-      const osAmt = roundTo(podoPayment.purchaseOrderDetails.outstandingAmount)
+    if (podoPayment && podoPayment.purchaseOrderDetails) {
+      const osAmt = roundTo(
+        podoPayment.purchaseOrderDetails.outstandingAmount || 0,
+      )
       outstandingAmount = {
         outstandingAmt: osAmt,
         currentOutstandingAmt: osAmt,
