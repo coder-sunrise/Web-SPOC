@@ -464,6 +464,7 @@ class EditableTableGrid extends React.Component {
         showAddCommand = false,
         showEditCommand = true,
         showDeleteCommand = true,
+        onRowDelete,
         isDeletable = (f) => true,
         messages = {
           commitCommand: 'Save',
@@ -549,6 +550,7 @@ class EditableTableGrid extends React.Component {
                       // key: o.props.id,
                       // schema: this.props.schema,
                       // gridId: this.gridId,
+                      onRowDelete,
                       isDeletable,
                       // ...o.props,
                     })

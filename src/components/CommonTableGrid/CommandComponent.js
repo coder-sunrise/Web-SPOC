@@ -84,7 +84,14 @@ const CancelButton = ({
   </Tooltip>
 )
 
-const DeleteButton = ({ onExecute, text, isDeletable, row, ...restProps }) => {
+const DeleteButton = ({
+  onExecute,
+  onRowDelete,
+  text,
+  isDeletable,
+  row,
+  ...restProps
+}) => {
   return (
     <Tooltip title={text} placement='top'>
       <Button
@@ -92,7 +99,14 @@ const DeleteButton = ({ onExecute, text, isDeletable, row, ...restProps }) => {
         size='sm'
         onClick={(e) => {
           // updateGlobalVariable('gridIgnoreValidation', true)
-          onExecute(e)
+          if (onRowDelete) {
+            const r = onRowDelete(row, () => {
+              onExecute(e)
+            })
+            if (r) onExecute(e)
+          } else {
+            onExecute(e)
+          }
         }}
         disabled={!isDeletable(row)}
         justIcon
@@ -182,51 +196,6 @@ class CommitButton extends React.PureComponent {
             size='sm'
             disabled={this.state.disabled}
             onClick={(e) => {
-              // if (schema) {
-              //   try {
-              //     schema.validateSync(
-              //       window.$tempGridRow[gridId]
-              //         ? window.$tempGridRow[gridId][row.id] || {}
-              //         : row,
-              //       {
-              //         abortEarly: false,
-              //       },
-              //     )
-              //     // console.log({ r })
-
-              //     // row._$error = false
-              //   } catch (er) {
-              //     // console.log(er)
-              //     // $(element).parents('tr').find('.grid-commit').attr('disabled', true)
-              //     // console.log(er, this.myRef.current)
-              //     $(this.myRef.current).find('button').attr('disabled', true)
-              //     // const actualError = er.inner.find((o) => o.path === columnName)
-              //     // return actualError ? actualError.message : ''
-              //     // row._$error = true
-              //     window.g_app._store.dispatch({
-              //       type: 'global/updateState',
-              //       payload: {
-              //         commitCount: commitCount++,
-              //       },
-              //     })
-              //     return false
-              //   }
-              // }
-
-              // updateGlobalVariable('gridIgnoreValidation', false)
-              // if (
-              //   (!row.id && editingRowIds.length === 0) ||
-              //   (row.id && editingRowIds.length === 1)
-              // ) {
-              //   window.g_app._store.dispatch({
-              //     type: 'global/updateState',
-              //     payload: {
-              //       disableSave: false,
-              //     },
-              //   })
-              // }
-              // delete window.$tempGridRow[gridId][row.id]
-              // console.log(window.$tempGridRow[gridId])
               onExecute(e)
             }}
             justIcon

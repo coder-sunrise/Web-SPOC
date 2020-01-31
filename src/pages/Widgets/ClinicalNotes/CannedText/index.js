@@ -30,7 +30,6 @@ const CannedText = ({
   user,
   height,
 }) => {
-  console.log({ height })
   const { selectedNote } = cannedText
   const list = cannedText[selectedNote.fieldName]
 
@@ -80,25 +79,6 @@ const CannedText = ({
     })
   }
 
-  const ActionButtons = (row) => {
-    const handleDeleteClick = () => onDeleteClick(row.id)
-    const handleEditClick = () => onEditClick(row.id)
-
-    return (
-      <React.Fragment>
-        <Tooltip title='Edit'>
-          <Button justIcon color='primary' onClick={handleEditClick}>
-            <Edit />
-          </Button>
-        </Tooltip>
-        <DeleteWithPopover
-          onConfirmDelete={handleDeleteClick}
-          disabled={!!editEntity}
-        />
-      </React.Fragment>
-    )
-  }
-
   const handleRowDrop = (rows) => {
     setList(rows)
   }
@@ -120,6 +100,25 @@ const CannedText = ({
 
   const handleEditorCancelClick = () => {
     clearEditEntity()
+  }
+
+  const ActionButtons = (row) => {
+    const handleDeleteClick = () => onDeleteClick(row.id)
+    const handleEditClick = () => onEditClick(row.id)
+
+    return (
+      <React.Fragment>
+        <Tooltip title='Edit'>
+          <Button justIcon color='primary' onClick={handleEditClick}>
+            <Edit />
+          </Button>
+        </Tooltip>
+        <DeleteWithPopover
+          onConfirmDelete={handleDeleteClick}
+          disabled={!!editEntity}
+        />
+      </React.Fragment>
+    )
   }
 
   const maxHeight = height ? height - 150 : defaultMaxHeight

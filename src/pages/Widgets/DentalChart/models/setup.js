@@ -33,14 +33,5 @@ export default createListViewModel({
         return r
       },
     },
-    // reducers: {
-    //   queryDone (st, { payload }) {
-    //     const { data } = payload
-    //     return {
-    //       ...st,
-    //       list: _.orderBy(data.data, 'sortOrder'),
-    //     }
-    //   },
-    // },
   },
 })

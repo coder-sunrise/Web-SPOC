@@ -1,13 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
+import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
-import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft'
-import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter'
-import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight'
-import FormatAlignJustifyIcon from '@material-ui/icons/FormatAlignJustify'
-import FormatBoldIcon from '@material-ui/icons/FormatBold'
-import FormatItalicIcon from '@material-ui/icons/FormatItalic'
-import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined'
 import Settings from '@material-ui/icons/Settings'
 import Search from '@material-ui/icons/Search'
 import Divider from '@material-ui/core/Divider'
@@ -28,11 +22,11 @@ import {
   Select,
   ButtonSelect,
   Tabs,
+  Skeleton,
   CommonModal,
 } from '@/components'
-import { groupWidth, groupHeight } from './variables'
-import Setup from './Setup/index'
 
+import Setup from './Setup/index'
 import Tooth from './Tooth'
 
 const useStyles = makeStyles((theme) => ({}))
@@ -48,17 +42,18 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
     '&:first-child': {
       borderRadius: theme.shape.borderRadius,
     },
+
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    width: 195,
+    width: 194,
     border: '1px solid rgba(0, 0, 0, 0.38)',
   },
 }))(ToggleButtonGroup)
 
-export default function DiagnosisPanel (props) {
+const DiagnosisPanel = (props) => {
   const { dispatch, classes, theme, codetable, ...restProps } = props
-  const { ctchartmethod = [] } = codetable
-
+  const { ctchartmethod } = codetable
+  if (!ctchartmethod) return <Skeleton height={120} />
   const [
     selectedStyle,
     setSelectedStyle,
@@ -83,19 +78,6 @@ export default function DiagnosisPanel (props) {
       },
     })
   }
-  // console.log(list)
-  // const sharedCfg = {
-  //   alt: '',
-  //   style: {
-  //     height: '100%',
-  //     padding: theme.spacing(0.25),
-  //     marginRight: 4,
-  //     position: 'absolute',
-  //     left: 0,
-  //   },
-  // }
-  // console.log(rows)
-  // console.log(theme.props)
   return (
     <div>
       <Paper className={classes.paper}>
@@ -152,11 +134,11 @@ export default function DiagnosisPanel (props) {
                     <ToggleButton value={id} key={id}>
                       <Tooth
                         className={classes.buttonIcon}
-                        width={groupWidth / 5 + 2}
-                        height={groupHeight / 5}
+                        width={26}
+                        height={26}
                         paddingLeft={1}
                         paddingTop={1}
-                        zoom={1 / 5}
+                        zoom={0.21}
                         image={row.image}
                         action={row}
                         fill={{
@@ -175,9 +157,10 @@ export default function DiagnosisPanel (props) {
                         }}
                         name={displayValue}
                       />
-                      <span style={{ marginLeft: groupWidth / 5 }}>
-                        {displayValue}
-                      </span>
+
+                      <Tooltip title={displayValue}>
+                        <span>{displayValue}</span>
+                      </Tooltip>
                     </ToggleButton>
                   )
                 })}
@@ -202,3 +185,10 @@ export default function DiagnosisPanel (props) {
     </div>
   )
 }
+
+export default React.memo(
+  DiagnosisPanel,
+  ({ codetable }, { codetable: codetableNext }) => {
+    return codetable.ctchartmethod === codetableNext.ctchartmethod
+  },
+)

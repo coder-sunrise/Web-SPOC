@@ -419,7 +419,8 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
       return <NumberInput text currency value={row.unitPrice} />
     },
   },
@@ -430,7 +431,8 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
       return <NumberInput text currency value={row.adjAmt} />
     },
   },
@@ -441,7 +443,8 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: columnWidth,
     render: (row) => {
       const { type } = row
-      if (type !== 'Service' && type !== 'Consumable') return 'N/A'
+      if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
+        return 'N/A'
       return <NumberInput text currency value={row.totalAfterItemAdjustment} />
     },
   },
@@ -451,7 +454,8 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 80,
     render: (r) => {
       const { type } = r
-      if (type === 'Service' || type === 'Consumable') return null
+      if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
+        return null
       return (
         <Tooltip title='Print'>
           <Button

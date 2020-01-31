@@ -317,6 +317,11 @@ const widgets = [
       loader: () => import('@/pages/Widgets/DentalChart'),
       loading: Loading,
     }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
     // layoutConfig: {
     //   style: {
     //     height: 'calc(100% - 36px)',

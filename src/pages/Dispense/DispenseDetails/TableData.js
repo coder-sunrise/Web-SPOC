@@ -27,11 +27,12 @@ const TableData = ({
   ...props
 }) => {
   const getRowId = (r) => {
+    const suffix = r.type
     if (idPrefix === 'otherOrders') {
       const itemFK = r.invoiceItemFK || r.sourceFK
-      return `${idPrefix}-${r.id}-${itemFK}`
+      return `${idPrefix}-${r.id}-${itemFK}-${suffix}`
     }
-    return `${idPrefix}-${r.id}`
+    return `${idPrefix}-${r.id}-${suffix}`
   }
   return (
     <div className={classes.tableContainer}>

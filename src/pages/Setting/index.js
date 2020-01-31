@@ -67,27 +67,9 @@ const menuData = [
   },
   {
     title: 'Clinic Setting',
-    text: 'Treatment Category',
-    // icon: <FolderOpen />,
-    url: '/setting/treatmentcategory',
-  },
-  {
-    title: 'Clinic Setting',
     text: 'Revenue Category',
     // icon: <FolderOpen />,
     url: '/setting/revenuecategory',
-  },
-  {
-    title: 'Clinic Setting',
-    text: 'Treatment',
-    // icon: <FolderOpen />,
-    url: '/setting/treatment',
-  },
-  {
-    title: 'Clinic Setting',
-    text: 'Treatment Category',
-    // icon: <FolderOpen />,
-    url: '/setting/treatmentcategory',
   },
   {
     title: 'Clinic Setting',
@@ -174,6 +156,18 @@ const menuData = [
     title: 'Clinic Setting',
     text: 'Appointment Type',
     url: '/setting/appointmenttype',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Treatment',
+    // icon: <FolderOpen />,
+    url: '/setting/treatment',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Treatment Category',
+    // icon: <FolderOpen />,
+    url: '/setting/treatmentcategory',
   },
   {
     title: 'System User',

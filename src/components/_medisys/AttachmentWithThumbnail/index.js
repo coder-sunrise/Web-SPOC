@@ -36,7 +36,7 @@ const AttachmentWithThumbnail = ({
   filterTypes = [],
   allowedMultiple = true,
   simple = false,
-  local=false,
+  local = false,
   attachmentType = '',
   thumbnailSize = {
     height: 64,
@@ -102,8 +102,8 @@ const AttachmentWithThumbnail = ({
       fileStatusFK,
       attachmentType,
     }
-    const uploaded =local?{}: await uploadFile(uploadObject)
-    
+    const uploaded = local ? {} : await uploadFile(uploadObject)
+
     return {
       ...uploaded,
       attachmentType,
@@ -274,6 +274,7 @@ const AttachmentWithThumbnail = ({
       size='sm'
       onClick={onUploadClick}
       disabled={uploading || global.disableSave}
+      className={classes.uploadBtn}
     >
       <AttachFile /> Upload
     </Button>
@@ -290,17 +291,23 @@ const AttachmentWithThumbnail = ({
     noBorder: simple && !allowedMultiple,
   }
 
-  let Body = (
-    <CardContainer hideHeader styles={cardStyles}>
-      <GridContainer>
-        {fileAttachments.map((attachment, index) => {
-          return (
-            <Thumbnail index={index} attachment={attachment} {...commonProps} />
-          )
-        })}
-      </GridContainer>
-    </CardContainer>
-  )
+  let Body =
+    fileAttachments.length > 0 ? (
+      <CardContainer hideHeader styles={cardStyles}>
+        <GridContainer>
+          {fileAttachments.map((attachment, index) => {
+            return (
+              <Thumbnail
+                index={index}
+                attachment={attachment}
+                {...commonProps}
+              />
+            )
+          })}
+        </GridContainer>
+      </CardContainer>
+    ) : null
+
   if (simple && !allowedMultiple)
     Body = fileAttachments.map((attachment, index) => {
       return (
@@ -330,9 +337,11 @@ const AttachmentWithThumbnail = ({
         onClick={clearValue}
       />
       {UploadButton}
-      {errorText && <Danger style={{ display: 'inline-block' }}>
-        <span style={{ fontWeight: 500 }}>{errorText}</span>
-      </Danger>}
+      {errorText && (
+        <Danger style={{ display: 'inline-block' }}>
+          <span style={{ fontWeight: 500 }}>{errorText}</span>
+        </Danger>
+      )}
       <LoadingWrapper
         loading={uploading || downloading}
         text={`${loadingPrefix} attachment...`}

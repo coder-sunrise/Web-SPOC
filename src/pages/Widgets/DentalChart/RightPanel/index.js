@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import { Field, FastField } from 'formik'
+import { Paper } from '@material-ui/core'
 import _ from 'lodash'
-import DeleteIcon from '@material-ui/icons/Delete'
-import AttachMoney from '@material-ui/icons/AttachMoney'
 import HistoryIcon from '@material-ui/icons/History'
-import moment from 'moment'
 import {
   Button,
   GridContainer,
@@ -43,7 +39,7 @@ const RightPanel = (props) => {
     height,
     ...restProps
   } = props
-  const { data = {}, isPedoChart, isSurfaceLabel } = dentalChartComponent
+  const { isPedoChart, isSurfaceLabel } = dentalChartComponent
   const [
     openHistory,
     setOpenHistory,

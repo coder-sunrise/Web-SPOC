@@ -1,29 +1,9 @@
 import _ from 'lodash'
-import color from '@material-ui/core/colors/amber'
-import { Row } from 'antd'
-import clear from '@/assets/img/dentalChart/clear.png'
-import missing from '@/assets/img/dentalChart/missing.png'
-import caries from '@/assets/img/dentalChart/caries.png'
-import recurrentdecay from '@/assets/img/dentalChart/recurrentdecay.png'
-import nccl from '@/assets/img/dentalChart/nccl.png'
-import fractured from '@/assets/img/dentalChart/fractured.png'
-import filling from '@/assets/img/dentalChart/filling.png'
-import temporarydressing from '@/assets/img/dentalChart/temporarydressing.png'
-import onlayveneer from '@/assets/img/dentalChart/onlayveneer.png'
-import test from '@/assets/img/dentalChart/test2.png'
 
 const { fabric } = require('fabric')
 
-const modifierNamePrefix = 'selected_'
 export const cellPrefix = 'cell_'
 export const selectablePrefix = 'selectable_'
-// fabric.Object.prototype.set({
-//   cornerSize: 0,
-//   hasBorders: false,
-//   lockMovementX: true,
-//   lockMovementY: true,
-//   lockRotation: true,
-// })
 fabric.Group.prototype.getLastAddedObject = function () {
   return this._objects[this._objects.length - 1]
 }
@@ -37,7 +17,6 @@ fabric.Object.prototype.isValidCell = function () {
   return this.name && this.name.indexOf(cellPrefix) === 0
 }
 fabric.Object.prototype.isDefaultCell = function () {
-  // console.log(this.name)
   return (
     !this.name ||
     this.name.indexOf(cellPrefix) === 0 ||
@@ -85,38 +64,8 @@ export const fontCfg = {
   fill: fontColor,
   editable: false,
 }
-export const overlayShapeTypes = [
-  'onlayveneer',
-  'clear',
-  'fractured',
-  'bridge',
-  'missing',
-]
 const imageCache = {}
-const checkIsValidElement = (item, name, checker) => {
-  if (checker) return checker(item, name)
-  if (item.name === name) {
-    return true
-  }
-  if (
-    item.getObjects &&
-    item.getObjects &&
-    item.getObjects().filter((n) => n.name && n.name === name).length > 0
-  ) {
-    return true
-  }
-  return false
-}
-const debouncedAction = _.debounce(
-  (cb) => {
-    cb()
-  },
-  100,
-  {
-    leading: true,
-    trailing: false,
-  },
-)
+
 export const createLine = (coords, cfg) => {
   return new fabric.Line(coords, {
     fill: 'red',
@@ -138,8 +87,6 @@ export const createCircle = (cfg) => {
     ...cfg,
   })
 }
-// let currentSelectedStyle = null
-// let currentSelectedGroup = null
 export const createRectangle = (cfg) => {
   return new fabric.Rect({
     ...sharedCfg,
@@ -162,128 +109,7 @@ export const createTriangle = (cfg) => {
     ...cfg,
   })
 }
-const sharedButtonConfig = {
-  clear: ({ canvas, group, values = [] }) => {
-    // canvas.remove()
-    console.log('clear', group.filter((o) => !o.isDefaultCell()))
-    // console.log(
-    //   group.filter((o) => !o.isDefaultCell),
-    //   group._objects.filter((o) => !o.isDefaultCell),
-    //   group._objects.filter((o) => {
-    //     console.log(o)
-    //     return !o.name || o.name.indexOf(cellPrefix) === 0
-    //   }),
-    // )
-    group.filter((o) => !o.isDefaultCell()).map((sub) => {
-      // sub.sendToBack()
-    })
-  },
-}
 
-export const buttonConfigs = [
-  {
-    id: 1,
-    value: 'clear',
-    text: 'Clear',
-    fixed: true,
-    method: 4,
-    isDisplayInDiagnosis: true,
-  },
-  {
-    id: 2,
-    value: 'missing',
-    text: 'Missing',
-    fill: 'white',
-    fixed: true,
-    method: 4,
-    isDisplayInDiagnosis: true,
-    editMode: 'color',
-    symbol: '',
-  },
-  {
-    id: 3,
-    value: 'caries',
-    text: 'Caries',
-    type: 'cell',
-    fill: '#824f4f',
-    method: 'surface',
-  },
-  {
-    id: 4,
-    value: 'recurrentdecay',
-    text: 'Recurrent Decay',
-    type: 'cell',
-    fill: '#f79e02',
-    method: 'surface',
-  },
-  {
-    id: 5,
-    value: 'nccl',
-    text: 'NCCL',
-    type: 'cell',
-    fill: '#ffe921',
-    method: 'surface',
-  },
-  {
-    id: 6,
-    value: 'fractured',
-    text: 'Fractured',
-
-    method: 'tooth',
-  },
-  {
-    id: 7,
-    value: 'filling',
-    text: 'Filling',
-    type: 'cell',
-    fill: '#737372',
-    method: 'surface',
-  },
-  {
-    id: 8,
-    value: 'temporarydressing',
-    text: 'Temporary Dressing',
-    type: 'cell',
-    fill: '#9c9c98',
-    method: 'surface',
-  },
-  {
-    id: 9,
-    value: 'onlayveneer',
-    text: 'Onlay/Veneer',
-    ...sharedButtonConfig,
-
-    method: 'tooth',
-  },
-  {
-    id: 10,
-    value: 'bridge',
-    // icon: filling,
-    text: 'Bridge',
-    type: 'connect',
-
-    method: 'tooth',
-  },
-  // {
-  //   value: 'topcell',
-  //   // icon: onlayveneer,
-  //   text: 'Top',
-  //   color: 'brown',
-  //   type: 'special',
-  //   ...sharedButtonConfig,
-  //   onSelect: ({ canvas }) => {},
-  // },
-
-  // {
-  //   value: 'bottomcell',
-  //   // icon: onlayveneer,
-  //   text: 'Bottom',
-  //   color: 'brown',
-  //   type: 'special',
-
-  //   ...sharedButtonConfig,
-  // },
-]
 export const createFont = ({ text, ...restProps }) => {
   return new fabric.IText(text || '', {
     fontSize: innerFontSize,
@@ -315,10 +141,6 @@ export const createToothShape = ({
     // strokeUniform: true,
   }
 
-  // if (symbol) {
-  //   // fixedItems.push(g5)
-  // }
-  // console.log(fixedItems)
   const cCfg = {
     ...groupCfg,
     ...lockConfig,
@@ -349,19 +171,8 @@ export const createToothShape = ({
   }
   const _width = width || groupWidth
   const _height = height || groupHeight
-  // console.log(action, index, _width, _height, text, fill, image, baseHeight)
 
-  // if (custom) {
-  //   console.log(custom)
-  //   return new fabric.Group(
-  //     [
-  //       typeof custom === 'function' ? custom() : custom,
-  //     ],
-  //     cCfg,
-  //   )
-  // }
   if (action && action.chartMethodTypeFK === 2 && !image) {
-    // console.log(fill, symbol)
     return new fabric.Group(
       [
         createRectangle({

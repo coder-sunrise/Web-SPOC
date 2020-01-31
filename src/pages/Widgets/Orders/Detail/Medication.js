@@ -1036,7 +1036,7 @@ class Medication extends PureComponent {
                   return (
                     <Checkbox
                       label='External Prescription'
-                      // labelPlacement='start'
+                      labelPlacement='start'
                       // fullWidth={false}
                       {...args}
                       onChange={(e) => {
