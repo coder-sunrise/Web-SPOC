@@ -738,6 +738,7 @@ class CommonTableGrid extends PureComponent {
       loading,
       gridId,
       extraCellConfig,
+      getAllRowsIncludedIsDeleted,
     } = this.props
 
     const {
@@ -935,12 +936,18 @@ class CommonTableGrid extends PureComponent {
           ) */}
           <LoadingWrapper loading={_loading} linear text='Loading...'>
             <DevGrid
-              rows={getIndexedRows(
-                this.state.entity
-                  ? this.state.entity.list
-                  : rows.filter((o) => !o.isDeleted),
-                this.state.pagination,
-              )} // this.state.data ||
+              rows={
+                getAllRowsIncludedIsDeleted ? (
+                  rows
+                ) : (
+                  getIndexedRows(
+                    this.state.entity
+                      ? this.state.entity.list
+                      : rows.filter((o) => !o.isDeleted),
+                    this.state.pagination,
+                  )
+                )
+              } // this.state.data ||
               columns={newColumns}
               getRowId={getRowId}
               rootComponent={Root}

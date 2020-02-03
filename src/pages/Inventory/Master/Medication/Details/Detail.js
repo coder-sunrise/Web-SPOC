@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
 import { compose } from 'redux'
-import { getBizSession } from '@/services/queue'
 import Sdd from '../../Sdd'
 import {
   CodeSelect,
@@ -27,22 +26,9 @@ const Detail = ({
   setFieldValue,
   sddDetail,
   theme,
+  hasActiveSession,
   ...props
 }) => {
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
-  const checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-
-    setHasActiveSession(data.length > 0)
-  }
-
   const [
     toggle,
     setToggle,
@@ -60,9 +46,6 @@ const Detail = ({
     setFieldValue('sddDescription', name)
   }
 
-  useEffect(() => {
-    checkHasActiveSession()
-  }, [])
   return (
     <CardContainer
       hideHeader
