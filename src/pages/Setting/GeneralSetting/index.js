@@ -1,11 +1,10 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { getBizSession } from '@/services/queue'
 
-import Yup from '@/utils/yup'
 import {
   currenciesList,
   currencyRoundingList,
@@ -41,9 +40,18 @@ const styles = (theme) => ({
       clinicSettings.entity &&
       clinicSettings.entity.showConsultationVersioning
     ) {
-      const { showConsultationVersioning } = clinicSettings.entity
+      const { showConsultationVersioning, autoRefresh, defaultVisitType } = clinicSettings.entity
+
       return {
         ...clinicSettings.entity,
+        defaultVisitType:{
+          ...defaultVisitType,
+          settingValue: Number(defaultVisitType.settingValue),
+        },
+        autoRefresh:{
+          ...autoRefresh,
+          settingValue: autoRefresh.settingValue === 'true',
+        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
@@ -83,7 +91,7 @@ const styles = (theme) => ({
         ...defaultVisitType,
       },
     ]
-    const { dispatch, onConfirm, history } = props
+    const { dispatch, history } = props
 
     dispatch({
       type: 'clinicSettings/upsert',
