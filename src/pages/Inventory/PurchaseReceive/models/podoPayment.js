@@ -91,7 +91,7 @@ export default createFormViewModel({
         let totalPaidAmount = 0
         let newPurchaseOrderPayment
         if (purchaseOrderPayment.length >= 1) {
-          let tempId = -99
+          let tempId = 9999
           newPurchaseOrderPayment = purchaseOrderPayment
             .filter((x) => x.clinicPaymentDto.isCancelled === false)
             .map((x) => {

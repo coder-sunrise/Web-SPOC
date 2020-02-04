@@ -74,6 +74,8 @@ const styles = (theme) => ({
             clinicPaymentTypeFK: 1,
             transactionOnBizSessionFK: currentBizSessionInfo.id,
             isCancelled: x.isCancelled,
+            paymentMode: x.paymentModeTypeName,
+            creditCardType: x.creditCardTypeName,
           },
         }
       }

@@ -87,7 +87,7 @@ const Grid = ({
         let tempList = []
         paymentModeList.forEach((o) => {
           if (o.displayValue === 'Credit Card') {
-            let tempId = -99
+            let tempId = 9999
             creditCardTypeList.forEach((i) => {
               tempList.push({
                 value: tempId - o.id,
@@ -95,11 +95,17 @@ const Grid = ({
                 typeId: i.id,
                 type: i.name,
                 creditCardId: o.id,
+                creditCardTypeName: i.name,
+                paymentModeTypeName: o.displayValue,
               })
               tempId -= 1
             })
           } else {
-            tempList.push({ value: o.id, name: o.displayValue })
+            tempList.push({
+              value: o.id,
+              name: o.displayValue,
+              paymentModeTypeName: o.displayValue,
+            })
           }
         })
 
@@ -166,6 +172,8 @@ const Grid = ({
           if (option) {
             row.typeId = option.typeId
             row.creditCardId = option.creditCardId || option.value
+            row.paymentModeTypeName = option.paymentModeTypeName
+            row.creditCardTypeName = option.creditCardTypeName
           }
         },
       },
