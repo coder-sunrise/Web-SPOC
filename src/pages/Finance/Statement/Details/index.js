@@ -21,12 +21,12 @@ const styles = () => ({})
     const returnValue = statement.entity || statement
     let newStatementInvoice = []
     let total = 0
-    let adminChargeValue = 0
+    let adminChargeValueField = 0
     if (returnValue.statementInvoice) {
       newStatementInvoice = returnValue.statementInvoice.map((o) => {
         const { statementInvoicePayment, adminCharge, outstandingAmount } = o
         total += outstandingAmount
-        adminChargeValue += adminCharge
+        adminChargeValueField += adminCharge
 
         return {
           ...o,
@@ -39,12 +39,14 @@ const styles = () => ({})
     }
 
     const outstandingBalance =
-      returnValue.totalAmount - returnValue.collectedAmount - adminChargeValue
+      returnValue.totalAmount -
+      returnValue.collectedAmount -
+      adminChargeValueField
 
     return {
       ...returnValue,
       outstandingBalance,
-      adminChargeValue,
+      adminChargeValueField,
       amount: Number(total).toFixed(2),
       maxAmount: Number(total).toFixed(2),
       paymentModeFK: DEFAULT_PAYMENT_MODE_GIRO.PAYMENT_FK, // GIRO
