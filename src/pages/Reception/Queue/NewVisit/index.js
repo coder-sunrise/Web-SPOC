@@ -70,6 +70,7 @@ const getHeight = (propsHeight) => {
 
 @connect(
   ({
+    clinicSettings,
     clinicInfo,
     queueLog,
     loading,
@@ -77,6 +78,7 @@ const getHeight = (propsHeight) => {
     patient,
     codetable,
   }) => ({
+    clinicSettings,
     clinicInfo,
     queueLog,
     loading,
