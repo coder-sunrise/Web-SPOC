@@ -193,6 +193,7 @@ const FilterBar = ({ classes, dispatch, values }) => {
                   <Checkbox
                     simple
                     label='Govt.'
+                    fullWidth
                     disabled={disabledOSOpts}
                     {...args}
                   />

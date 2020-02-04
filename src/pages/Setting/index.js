@@ -158,6 +158,18 @@ const menuData = [
     url: '/setting/appointmenttype',
   },
   {
+    title: 'Clinic Setting',
+    text: 'Treatment',
+    // icon: <FolderOpen />,
+    url: '/setting/treatment',
+  },
+  {
+    title: 'Clinic Setting',
+    text: 'Treatment Category',
+    // icon: <FolderOpen />,
+    url: '/setting/treatmentcategory',
+  },
+  {
     title: 'System User',
     text: 'System User',
     url: '/setting/userprofile',

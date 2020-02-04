@@ -39,10 +39,13 @@ const widgets = [
     disabled: true,
     layoutConfig: {
       minW: 12,
-      minH: 10,
+      minH: 7,
       style: {
         padding: '0 5px',
       },
+    },
+    testProps: {
+      test: '123',
     },
     toolbarAddon: (
       <AuthorizedContext>
@@ -277,6 +280,25 @@ const widgets = [
       </Tooltip>
     ),
   },
+  {
+    id: '8',
+    name: 'Attachment',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/Attachment'),
+      loading: Loading,
+    }),
+    model: 'attachment',
+    associatedProps: [
+      'corAttachment',
+    ],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+  },
   // {
   //   id: '1001',
   //   name: 'Test Widget',
@@ -288,19 +310,24 @@ const widgets = [
   //     style: {},
   //   },
   // },
-  // {
-  //   id: '1002',
-  //   name: 'Dental Chart',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/DentalChartDemo'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {
-  //       height: 'calc(100% - 36px)',
-  //     },
-  //   },
-  // },
+  {
+    id: '21',
+    name: 'Dental Chart',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/DentalChart'),
+      loading: Loading,
+    }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
+    // layoutConfig: {
+    //   style: {
+    //     height: 'calc(100% - 36px)',
+    //   },
+    // },
+  },
 ]
 
 module.exports = {

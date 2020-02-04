@@ -1,14 +1,20 @@
 import React from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Link from 'umi/link'
-import PageHeader from '@/components/PageHeader'  
 import { connect } from 'dva'
 import Paper from '@material-ui/core/Paper'
+import PageHeader from '@/components/PageHeader'
 import GridContent from './GridContent'
 import styles from './index.less'
 import MenuContext from '@/layouts/MenuContext'
 
-const PageHeaderWrapper = ({ children, contentWidth, wrapperClassName, top, ...restProps }) => (
+const PageHeaderWrapper = ({
+  children,
+  contentWidth,
+  wrapperClassName,
+  top,
+  ...restProps
+}) => (
   <div>
     {top}
     {/* <MenuContext.Consumer>

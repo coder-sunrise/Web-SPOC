@@ -18,6 +18,7 @@ import {
   DoctorLabel,
   DoctorProfileSelect,
   Attachment,
+  AttachmentWithThumbnail,
 } from '@/components/_medisys'
 import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
@@ -147,8 +148,8 @@ const VisitInfoCard = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Attachment
-            title='Visit Information'
+          <AttachmentWithThumbnail
+            label='Attachment'
             attachmentType='Visit'
             handleUpdateAttachments={handleUpdateAttachments}
             attachments={attachments}

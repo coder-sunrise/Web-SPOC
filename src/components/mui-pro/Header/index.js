@@ -18,10 +18,10 @@ import ViewList from '@material-ui/icons/ViewList'
 import Button from 'mui-pro-components/CustomButtons'
 
 import headerStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerStyle.jsx'
+import Link from 'umi/link'
 import HeaderLinks from './HeaderLinks'
 
 import PageHeader from '@/components/PageHeader'
-import Link from 'umi/link'
 import MenuContext from '@/layouts/MenuContext'
 
 function Header ({ isMobile, collapsed, setting, ...props }) {

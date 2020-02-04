@@ -7,8 +7,6 @@ import { GridContainer, GridItem, notification } from '@/components'
 // sub component
 import ResetPassForm from './ResetPasswordForm'
 import NewPassForm from './NewPasswordForm'
-// medisys component
-import { LoadingWrapper } from '@/components/_medisys'
 // services
 import { getOTP, resetPassword } from '@/services/user'
 // styles
@@ -35,6 +33,7 @@ class ForgotPassword extends React.Component {
   }
 
   handleResetClick = (values) => {
+    notification.destroy()
     this.setState({
       gettingOTP: true,
     })

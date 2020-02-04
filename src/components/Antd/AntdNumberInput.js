@@ -132,7 +132,7 @@ class AntdNumberInput extends React.PureComponent {
     this.state = {
       value: roundTo(
         Number(
-          field.value !== undefined && field.value !== ''
+          field.value || field.value === 0
             ? field.value
             : defaultValue || value,
         ),
@@ -332,12 +332,12 @@ class AntdNumberInput extends React.PureComponent {
     if (!isNumber(newV)) {
       newV = undefined
     }
-    if ((newV === undefined || newV === null) && !this.props.allowEmpty) {
+    if (!newV && newV !== 0 && !this.props.allowEmpty) {
       newV = this.props.min
     } else if (v > this.props.max) {
       newV = this.props.max
     }
-    if (newV === undefined || newV === null) newV = ''
+    if (!newV && newV !== 0) newV = ''
     // console.log(!newV && newV !== 0 ? '' : newV)
     this.setState({
       value: !newV && newV !== 0 ? '' : newV,
@@ -559,11 +559,12 @@ class AntdNumberInput extends React.PureComponent {
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, min } = nextProps
     const { convertedPrecision: precision } = this.state
-
     if (field) {
       this.setState({
         value:
-          field.value === undefined || Number.isNaN(Number(field.value))
+          field.value === undefined ||
+          Number.isNaN(Number(field.value)) ||
+          field.value === ''
             ? ''
             : roundTo(Number(field.value), precision),
         // focused:
@@ -575,7 +576,7 @@ class AntdNumberInput extends React.PureComponent {
     } else if (value || value === 0) {
       this.setState({
         value:
-          value === undefined || Number.isNaN(Number(value))
+          value === undefined || Number.isNaN(Number(value)) || value === ''
             ? ''
             : roundTo(Number(value), precision),
         // focused:
@@ -599,7 +600,7 @@ class AntdNumberInput extends React.PureComponent {
       shrink:
         !(!this.state.value && this.state.value !== 0) || this.state.focused,
     }
-
+    // console.log(this.state.value)
     return (
       <CustomInput
         labelProps={labelProps}

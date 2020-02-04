@@ -56,9 +56,10 @@ const Filterbar = ({
           render={(args) => (
             <TextField
               {...args}
-              inputProps={{
-                autocomplete: 'queue-listing-filterbar-search',
-              }}
+              autocomplete='off'
+              // inputProps={{
+              //   autocomplete: 'queue-listing-filterbar-search',
+              // }}
               label={formatMessage({
                 id: 'reception.queue.patientSearchPlaceholder',
               })}

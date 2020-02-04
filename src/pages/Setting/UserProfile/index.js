@@ -142,7 +142,7 @@ class UserProfile extends React.Component {
                 <TextField
                   {...args}
                   label='Name / Login Account'
-                  inputProps={{ autoComplete: 'off' }}
+                  autocomplete='off'
                 />
               )}
             />

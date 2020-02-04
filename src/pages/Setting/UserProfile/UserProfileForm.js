@@ -410,10 +410,7 @@ class UserProfileForm extends React.PureComponent {
                           {...args}
                           label='Password'
                           type='password'
-                          inputProps={{
-                            autoComplete: 'new-password',
-                            maxLength: 18,
-                          }}
+                          autocomplete='off'
                           maxLength={18}
                         />
                       )}
