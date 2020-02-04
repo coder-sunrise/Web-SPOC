@@ -47,10 +47,10 @@ steps:
   inputs:
     SourceFolder: '.\dist'
     Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\malaysia'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\malaysia'
     ArtifactName: 'drop-malaysia'
     publishLocation: 'Container'
