@@ -1,6 +1,6 @@
 import * as service from '@/services/common'
 
-const url = '/api/ctreferralsource'
+const url = '/api/referralsource'
 
 module.exports = {
   // remove: (params) => service.remove(url, params),
