@@ -228,9 +228,11 @@ const Grid = ({
 
       const newRows = rows.map((o) => {
         if (o.isNew && !o.isDeleted) {
+          const outstandingAmt = values.invoiceAmount - paymentPaid
           return {
             ...o,
-            outstandingAmt: values.invoiceAmount - paymentPaid,
+            outstandingAmt,
+            paymentAmount: o.paymentAmount || outstandingAmt,
           }
         }
 
