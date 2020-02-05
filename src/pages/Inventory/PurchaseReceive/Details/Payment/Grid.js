@@ -165,6 +165,7 @@ const Grid = ({
         ],
         format: dateFormatLong,
         compare: compareString,
+        isDisabled: (row) => row.id > 0,
       },
       {
         columnName: 'paymentModeFK',
@@ -259,7 +260,12 @@ const Grid = ({
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-
+  const onAddedRowsChange = (addedRows) => {
+    return addedRows.map((row) => ({
+      paymentDate: moment(),
+      ...row,
+    }))
+  }
   return (
     <GridContainer>
       <EditableTableGrid
@@ -274,7 +280,7 @@ const Grid = ({
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
-          // onAddedRowsChange: this.onAddedRowsChange,
+          onAddedRowsChange,
         }}
         {...tableParas}
       />
