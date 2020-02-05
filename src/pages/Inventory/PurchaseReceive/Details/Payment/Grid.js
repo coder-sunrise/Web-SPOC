@@ -11,7 +11,8 @@ import Yup from '@/utils/yup'
 import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const purchaseOrderPaymentSchema = Yup.object().shape({
-  paymentModeFK: Yup.string().required(),
+  paymentModeFK: Yup.number().required(),
+  paymentDate: Yup.date().required(),
   paymentAmount: Yup.number()
     .min(0)
     .max(Yup.ref('outstandingAmt'), (e) => {
@@ -157,9 +158,12 @@ const Grid = ({
       {
         columnName: 'paymentDate',
         type: 'date',
+        restrictFromTo: [
+          values.purchaseOrderDetails &&
+            values.purchaseOrderDetails.purchaseOrderDate,
+          moment().formatUTC(),
+        ],
         format: dateFormatLong,
-        value: moment(),
-        disabled: true,
         compare: compareString,
       },
       {

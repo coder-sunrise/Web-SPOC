@@ -230,7 +230,7 @@ class AntdDatePicker extends PureComponent {
   // }
 
   buildInRestrict = (current) => {
-    const { dobRestrict, recurrenceRestrict } = this.props
+    const { dobRestrict, recurrenceRestrict, restrictFromTo } = this.props
     if (dobRestrict) {
       return (
         current &&
@@ -246,6 +246,24 @@ class AntdDatePicker extends PureComponent {
           current > moment().add(3, 'months').startOf('day'))
       )
     }
+
+    if (restrictFromTo) {
+      const restrictFrom = restrictFromTo[0]
+        ? moment(restrictFromTo[0]).startOf('day')
+        : moment().startOf('day')
+      const restrictTo = restrictFromTo[1]
+        ? moment(restrictFromTo[1]).endOf('day')
+        : null
+
+      if (!restrictTo && restrictFrom) {
+        return restrictFrom.isAfter(current)
+      }
+
+      return !(
+        restrictFrom.isSameOrBefore(current) && restrictTo.isAfter(current)
+      )
+    }
+
     return false
   }
 
