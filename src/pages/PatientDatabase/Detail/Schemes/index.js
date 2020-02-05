@@ -110,11 +110,7 @@ class Schemes extends PureComponent {
             // If same scheme type , update valid from and to date
             chasSchemeObject.validFrom = result.validFrom
             chasSchemeObject.validTo = result.validTo
-
-            if(chasSchemeObject.validRange && chasSchemeObject.validRange.length > 2)
-            {
-              chasSchemeObject.validRange = []
-            }
+            chasSchemeObject.validRange = []
             chasSchemeObject.validRange.push(result.validFrom)
             chasSchemeObject.validRange.push(result.validTo)
 
