@@ -236,8 +236,14 @@ const Grid = ({
       if (rows[0].remark === undefined) {
         rows[0].remark = ''
       }
-      recalculateOutstandingAmount('add', rows[0].paymentAmount)
+
       const activeRows = rows.filter((o) => o.isDeleted === false)
+      const newAddedRows = activeRows.filter((o) => o.isNew)
+
+      const paymentPaidOnNewAddedRows =
+        _.sumBy(newAddedRows, 'paymentAmount') || 0
+      recalculateOutstandingAmount('add', paymentPaidOnNewAddedRows)
+
       const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
 
       const newRows = rows.map((o) => {
@@ -263,6 +269,7 @@ const Grid = ({
   const onAddedRowsChange = (addedRows) => {
     return addedRows.map((row) => ({
       paymentDate: moment(),
+      outstandingAmt: values.currentOutstandingAmt,
       ...row,
     }))
   }

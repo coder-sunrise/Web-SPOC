@@ -165,7 +165,7 @@ class index extends PureComponent {
         currentOutstandingAmt,
       })
     } else {
-      const currentOutstandingAmt = values.outstandingAmt + value
+      const currentOutstandingAmt = values.currentOutstandingAmt + value
       setValues({
         ...values,
         currentOutstandingAmt,
