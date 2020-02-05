@@ -866,8 +866,8 @@ class CommonTableGrid extends PureComponent {
   }
 
   getData =()=>{
-    const { rows=[],getAllRowsIncludedIsDeleted}=this.props
-    if(getAllRowsIncludedIsDeleted) return rows
+    const { rows=[],showIsDeleted}=this.props
+    if(showIsDeleted) return rows
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list
@@ -926,7 +926,6 @@ class CommonTableGrid extends PureComponent {
       loading,
       gridId,
       extraCellConfig,
-      getAllRowsIncludedIsDeleted,
       editableGrid,
     } = this.props
 

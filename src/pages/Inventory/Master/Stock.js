@@ -181,6 +181,7 @@ const Stock = ({
             <Radio
               checked={row.isDefault}
               onChange={() => changeIsDefault(row)}
+              disabled={row.isDeleted}
             />
           )
         },
@@ -274,11 +275,7 @@ const Stock = ({
             />
           </GridItem>
         </GridContainer>
-        <CommonTableGrid
-          rows={stock}
-          getAllRowsIncludedIsDeleted
-          {...tableParas}
-        />
+        <CommonTableGrid rows={stock} showIsDeleted {...tableParas} />
         {/* <Divider style={{ margin: '40px 0 20px 0' }} /> */}
       </div>
     </SharedContainer>
