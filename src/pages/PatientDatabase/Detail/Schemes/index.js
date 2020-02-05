@@ -5,6 +5,7 @@ import { Button, CommonModal, GridContainer, GridItem } from '@/components'
 
 import SchemesGrid from './SchemesGrid'
 import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
+import { locationQueryParameters } from '@/utils/utils'
 
 
 const styles = () => ({})
@@ -80,12 +81,10 @@ class Schemes extends PureComponent {
     values.patientScheme.push(newPatientScheme)
   }
 
-  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
+  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK, isSaveToDb) => {
 
     const { values, dispatch } = this.props
     const{ patientAccountNo } = values
-    let isSaveToDb = false
-
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: {
@@ -175,6 +174,10 @@ class Schemes extends PureComponent {
     const { disableSave } = global
     const { patientScheme } = values
 
+    const params = locationQueryParameters()
+    const isCreatingPatient = params.new
+    let isSaveToDb = !isCreatingPatient
+
     const SchemeData = patientScheme.filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
     let tempPatientCoPaymentSchemeFK = 0
     let tempSchemeTypeFK = 0
@@ -202,7 +205,7 @@ class Schemes extends PureComponent {
               <Button color='primary'
                 size='sm'
                 alignSelf='flex-end'
-                onClick={() => this.refreshChasBalance(tempPatientCoPaymentSchemeFK, tempSchemeTypeFK)}
+                onClick={() => this.refreshChasBalance(tempPatientCoPaymentSchemeFK, tempSchemeTypeFK,isSaveToDb)}
                 disabled={disableSave}
               >
                 Get CHAS
