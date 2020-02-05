@@ -248,19 +248,20 @@ class AntdDatePicker extends PureComponent {
     }
 
     if (restrictFromTo) {
-      const restrictFrom = restrictFromTo[0]
-        ? moment(restrictFromTo[0]).startOf('day')
-        : moment().startOf('day')
-      const restrictTo = restrictFromTo[1]
-        ? moment(restrictFromTo[1]).endOf('day')
-        : null
+      let restrictFromDate = moment(restrictFromTo[0]).startOf('day')
+      if (!restrictFromDate.isValid())
+        restrictFromDate = moment().startOf('day')
 
-      if (!restrictTo && restrictFrom) {
-        return restrictFrom.isAfter(current)
+      let restrictToDate = moment(restrictFromTo[1]).endOf('day')
+      if (!restrictToDate.isValid()) restrictToDate = null
+
+      if (!restrictToDate && restrictFromDate) {
+        return restrictFromDate.isAfter(current)
       }
 
       return !(
-        restrictFrom.isSameOrBefore(current) && restrictTo.isAfter(current)
+        restrictFromDate.isSameOrBefore(current) &&
+        restrictToDate.isAfter(current)
       )
     }
 
