@@ -11,8 +11,7 @@ import Yup from '@/utils/yup'
 import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const purchaseOrderPaymentSchema = Yup.object().shape({
-  paymentModeFK: Yup.number().required(),
-  paymentDate: Yup.date().required(),
+  paymentModeFK: Yup.string().required(),
   paymentAmount: Yup.number()
     .min(0)
     .max(Yup.ref('outstandingAmt'), (e) => {
@@ -158,14 +157,10 @@ const Grid = ({
       {
         columnName: 'paymentDate',
         type: 'date',
-        restrictFromTo: [
-          values.purchaseOrderDetails &&
-            values.purchaseOrderDetails.purchaseOrderDate,
-          moment().formatUTC(),
-        ],
         format: dateFormatLong,
+        value: moment(),
+        disabled: true,
         compare: compareString,
-        isDisabled: (row) => row.id > 0,
       },
       {
         columnName: 'paymentModeFK',
@@ -236,14 +231,8 @@ const Grid = ({
       if (rows[0].remark === undefined) {
         rows[0].remark = ''
       }
-
+      recalculateOutstandingAmount('add', rows[0].paymentAmount)
       const activeRows = rows.filter((o) => o.isDeleted === false)
-      const newAddedRows = activeRows.filter((o) => o.isNew)
-
-      const paymentPaidOnNewAddedRows =
-        _.sumBy(newAddedRows, 'paymentAmount') || 0
-      recalculateOutstandingAmount('add', paymentPaidOnNewAddedRows)
-
       const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
 
       const newRows = rows.map((o) => {
@@ -266,13 +255,7 @@ const Grid = ({
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-  const onAddedRowsChange = (addedRows) => {
-    return addedRows.map((row) => ({
-      paymentDate: moment(),
-      outstandingAmt: values.currentOutstandingAmt,
-      ...row,
-    }))
-  }
+
   return (
     <GridContainer>
       <EditableTableGrid
@@ -287,7 +270,7 @@ const Grid = ({
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
-          onAddedRowsChange,
+          // onAddedRowsChange: this.onAddedRowsChange,
         }}
         {...tableParas}
       />
