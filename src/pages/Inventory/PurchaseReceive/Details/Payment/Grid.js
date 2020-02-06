@@ -260,7 +260,13 @@ const Grid = ({
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-
+  const onAddedRowsChange = (addedRows) => {
+    return addedRows.map((row) => ({
+      paymentDate: moment(),
+      // outstandingAmt: values.currentOutstandingAmt,
+      ...row,
+    }))
+  }
   return (
     <GridContainer>
       <EditableTableGrid
@@ -275,7 +281,7 @@ const Grid = ({
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
-          // onAddedRowsChange: this.onAddedRowsChange,
+          onAddedRowsChange,
         }}
         {...tableParas}
       />
