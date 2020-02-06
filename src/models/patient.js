@@ -228,7 +228,7 @@ export default createFormViewModel({
           }),
           yield put({
             type: 'updateState',
-            paylaod: {
+            payload: {
               callback: undefined,
               default: defaultPatientEntity,
             },
