@@ -21,17 +21,22 @@ import {
     if (transfer) {
       maxTransferAmount = transfer.transferAmount
     }
-    const selectedRows = []
     return {
       invoicePayerFK,
       ...transfer,
       maxTransferAmount,
-      selectedRows,
     }
   },
 
   validationSchema: Yup.object().shape({
     transferAmount: Yup.number().max(Yup.ref('maxTransferAmount')),
+    invoicePayerInfo: Yup.array().of(
+      Yup.object().shape({
+        transferAmount: Yup.number().max(Yup.ref('claimAmount'), (e) => {
+          return `transferAmount must be less than or equal to ${e.max}`
+        }),
+      }),
+    ),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const {
@@ -82,7 +87,7 @@ class Transfer extends PureComponent {
         currency: true,
         render: (row) => {
           return (
-            <GridItem xs={8}>
+            <GridItem xs={8} style={{ whiteSpace: 'initial' }}>
               <Field
                 name={`invoicePayerInfo[${row.rowIndex}].transferAmount`}
                 render={(args) => (
@@ -109,7 +114,7 @@ class Transfer extends PureComponent {
   }
 
   componentDidMount () {
-    const { dispatch, values } = this.props
+    const { dispatch, values, setFieldValue } = this.props
     dispatch({
       type: 'invoicePayment/getTransferData',
       payload: {
@@ -117,16 +122,19 @@ class Transfer extends PureComponent {
       },
     }).then((r) => {
       if (r) {
+        let defaultSelectedRows = []
         r.invoicePayerInfo.forEach((o) => {
-          this.setState((prevState) => {
-            return {
-              selectedRows: [
-                ...prevState.selectedRows,
-                o.id,
-              ],
-            }
-          })
+          defaultSelectedRows.push(o.id)
         })
+        this.setState((prevState) => {
+          return {
+            selectedRows: [
+              ...prevState.selectedRows,
+              ...defaultSelectedRows,
+            ],
+          }
+        })
+        setFieldValue('selectedRows', defaultSelectedRows)
       }
     })
   }
@@ -135,7 +143,7 @@ class Transfer extends PureComponent {
     const { values, setFieldValue, setValues } = this.props
     const { selectedRows } = this.state
     const { invoicePayerInfo = [] } = values
-    const filterSelectedRows = values.invoicePayerInfo.filter((o) =>
+    const filterSelectedRows = invoicePayerInfo.filter((o) =>
       selectedRows.find((i) => i === o.id),
     )
     if (from === 'grid' || from === 'checkbox') {
@@ -187,6 +195,7 @@ class Transfer extends PureComponent {
   render () {
     const { values, onConfirm, handleSubmit } = this.props
     const { columns, columnExtensions } = this.state
+    const { selectedRows, transferAmount } = values
     return (
       <React.Fragment>
         <GridContainer>
@@ -251,7 +260,7 @@ class Transfer extends PureComponent {
             <Button
               color='primary'
               onClick={handleSubmit}
-              disabled={values.selectedRows.length <= 0}
+              disabled={(selectedRows || []).length <= 0 || transferAmount <= 0}
             >
               Save
             </Button>
