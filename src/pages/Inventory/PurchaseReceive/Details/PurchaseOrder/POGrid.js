@@ -11,7 +11,7 @@ import {
 
 // let commitCount = 2200 // uniqueNumber
 
-const receivingDetailsSchema = Yup.object().shape({
+const purchaseOrderDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
   name: Yup.number().required(),
@@ -438,7 +438,7 @@ class Grid extends PureComponent {
           <EditableTableGrid
             getRowId={(r) => r.uid}
             rows={rows}
-            schema={receivingDetailsSchema}
+            schema={purchaseOrderDetailsSchema}
             FuncProps={{
               edit: isEditable,
               pager: false,
