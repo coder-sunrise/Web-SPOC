@@ -236,25 +236,17 @@ const Grid = ({
       if (rows[0].remark === undefined) {
         rows[0].remark = ''
       }
-
+      recalculateOutstandingAmount('add', rows[0].paymentAmount)
       const activeRows = rows.filter((o) => o.isDeleted === false)
-      const newAddedRows = activeRows.filter((o) => o.isNew)
-
-      const paymentPaidOnNewAddedRows =
-        _.sumBy(newAddedRows, 'paymentAmount') || 0
-      recalculateOutstandingAmount('add', paymentPaidOnNewAddedRows)
-
       const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
 
       const newRows = rows.map((o) => {
         if (o.isNew && !o.isDeleted) {
-          let outstandingAmt = values.invoiceAmount - paymentPaid
-          if (o.isAdded) outstandingAmt += o.paymentAmount
+          const outstandingAmt = values.invoiceAmount - paymentPaid
           return {
             ...o,
             outstandingAmt,
             paymentAmount: o.paymentAmount || outstandingAmt,
-            isAdded: true,
           }
         }
 
@@ -268,13 +260,7 @@ const Grid = ({
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-  const onAddedRowsChange = (addedRows) => {
-    return addedRows.map((row) => ({
-      paymentDate: moment(),
-      outstandingAmt: values.currentOutstandingAmt,
-      ...row,
-    }))
-  }
+
   return (
     <GridContainer>
       <EditableTableGrid
@@ -289,7 +275,7 @@ const Grid = ({
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
-          onAddedRowsChange,
+          // onAddedRowsChange: this.onAddedRowsChange,
         }}
         {...tableParas}
       />

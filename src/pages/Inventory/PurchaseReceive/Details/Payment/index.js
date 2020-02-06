@@ -165,10 +165,11 @@ class index extends PureComponent {
         currentOutstandingAmt,
       })
     } else {
-      const currentOutstandingAmt = values.currentOutstandingAmt + value
+      const currentOutstandingAmt = values.outstandingAmt + value
       setValues({
         ...values,
         currentOutstandingAmt,
+        outstandingAmt: currentOutstandingAmt,
       })
     }
   }
@@ -183,6 +184,8 @@ class index extends PureComponent {
       : false
     const isEditable = isPOStatusFinalized(poStatus)
     const allowEdit = () => {
+      if (poStatus === 6 && outstandingAmt === 0 && currentOutstandingAmt === 0)
+        return false
       if (isWriteOff) return false
       return true
     }
