@@ -34,6 +34,7 @@ const Adjustment = ({
             textOverflow: 'ellipsis',
             wordBreak: 'keep-all',
             whiteSpace: 'nowrap',
+            marginLeft: 20,
           }}
         >
           <Popconfirm
