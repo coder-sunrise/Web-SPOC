@@ -169,7 +169,6 @@ class index extends PureComponent {
       setValues({
         ...values,
         currentOutstandingAmt,
-        outstandingAmt: currentOutstandingAmt,
       })
     }
   }
