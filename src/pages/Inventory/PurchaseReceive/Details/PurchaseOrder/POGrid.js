@@ -16,7 +16,7 @@ const receivingDetailsSchema = Yup.object().shape({
   code: Yup.number().required(),
   name: Yup.number().required(),
   orderQuantity: Yup.number()
-    .min(1, 'Order Quantity nust be greater than or equal to 1')
+    .min(1, 'Order Quantity must be greater than or equal to 1')
     .required(),
   // bonusReceived: Yup.number()
   //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
