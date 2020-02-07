@@ -620,7 +620,8 @@ class Index extends Component {
         >
           {poStatus !== 6 && (
             <div>
-              {deliveryOrder.length === 0 &&
+              {poStatus !== 4 &&
+              deliveryOrder.length === 0 &&
               purchaseOrderPayment.length === 0 &&
               type === 'edit' ? (
                 <ProgressButton
