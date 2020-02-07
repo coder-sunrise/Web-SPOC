@@ -84,13 +84,15 @@ class Schemes extends PureComponent {
   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK, isSaveToDb) => {
 
     const { values, dispatch } = this.props
-    const{ patientAccountNo } = values
+    const{ patientAccountNo,id } = values
+
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: {
         patientAccountNo,
         patientCoPaymentSchemeFK,
         isSaveToDb,
+        patientProfileId:id,
       },
     }).then((result) => {
 
@@ -137,13 +139,8 @@ class Schemes extends PureComponent {
 
       }else{
 
-
         let ChasScheme = values.patientScheme.filter(x=>x.schemeTypeFK <= 6 && !x.isDeleted)
-        // Don't have CHAS SCHEME, Remove it from record.
-        if(result.statusDescription === 'Patient is not a CHAS/PG/PA cardholder.'
-          && ChasScheme && ChasScheme.length > 0) {
-            ChasScheme[0].isDeleted = true
-         }
+
       }
 
       dispatch({
@@ -186,7 +183,7 @@ class Schemes extends PureComponent {
     {
       const { patientCoPaymentSchemeFK, schemeTypeFK}   = SchemeData[0]
 
-      tempPatientCoPaymentSchemeFK = patientCoPaymentSchemeFK
+      tempPatientCoPaymentSchemeFK = SchemeData[0].id
 
       tempSchemeTypeFK = schemeTypeFK
     }
@@ -200,7 +197,10 @@ class Schemes extends PureComponent {
                 Schemes
               </h4>
             </GridItem>
-            <GridItem md={6} />
+            <GridItem md={3} />
+            <GridItem md={3} style={{ color: 'red' }}>
+              {this.state.refreshedSchemeData && !this.state.refreshedSchemeData.isSuccessful?(this.state.refreshedSchemeData.statusDescription):''}
+            </GridItem>
             <GridItem md={2} alignItems='flex-end'>
               <Button color='primary'
                 size='sm'
