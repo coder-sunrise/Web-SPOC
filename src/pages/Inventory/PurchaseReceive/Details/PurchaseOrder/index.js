@@ -498,7 +498,14 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment, rows } = values
-    const { isGSTEnabled, isGstInclusive, gstValue } = purchaseOrder || false
+    const {
+      isGSTEnabled,
+      isGstInclusive,
+      gstValue,
+      deliveryOrder = [],
+      purchaseOrderPayment = [],
+    } =
+      purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
@@ -613,7 +620,9 @@ class Index extends Component {
         >
           {poStatus !== 6 && (
             <div>
-              {isPOStatusDraft(poStatus) && type === 'edit' ? (
+              {deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              type === 'edit' ? (
                 <ProgressButton
                   color='danger'
                   icon={null}
