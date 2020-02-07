@@ -49,14 +49,17 @@ class PurchaseReceive extends Component {
   }
 
   componentDidMount () {
-    this.props.dispatch({
+    const { dispatch, purchaseReceiveList } = this.props
+    dispatch({
       type: 'purchaseReceiveList/query',
       payload: {
         sorting: [
           { columnName: 'purchaseOrderNo', direction: 'asc' },
         ],
-        lgteql_purchaseOrderDate: moment().startOf('month').formatUTC(),
-        lsteql_purchaseOrderDate: moment().formatUTC(false),
+        lgteql_purchaseOrderDate:
+          purchaseReceiveList.filterSearch.transactionDates[0],
+        lsteql_purchaseOrderDate:
+          purchaseReceiveList.filterSearch.transactionDates[1],
       },
     })
   }
