@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
+import moment from 'moment'
 import {
   CardContainer,
   withFormik,
@@ -48,12 +49,14 @@ class PurchaseReceive extends Component {
   }
 
   componentDidMount () {
-   this.props.dispatch({
+    this.props.dispatch({
       type: 'purchaseReceiveList/query',
       payload: {
         sorting: [
           { columnName: 'purchaseOrderNo', direction: 'asc' },
         ],
+        lgteql_purchaseOrderDate: moment().startOf('month').formatUTC(),
+        lsteql_purchaseOrderDate: moment().formatUTC(false),
       },
     })
   }
