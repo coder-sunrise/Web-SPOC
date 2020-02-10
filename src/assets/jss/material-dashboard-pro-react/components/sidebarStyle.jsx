@@ -131,7 +131,7 @@ const sidebarStyle = (theme) => ({
     maxHeight: '30px',
     marginLeft: '22px',
     marginRight: '18px',
-    marginTop: '7px',
+    marginTop: 0,
     color: 'inherit',
   },
   logoMiniRTL: {
