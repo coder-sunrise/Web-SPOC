@@ -25,12 +25,10 @@ const styles = (theme) => ({
   mapPropsToValues: ({ podoPayment }) => {
     let outstandingAmount = {}
     let newPurchaseOrderPayment = []
-    if (
-      podoPayment &&
-      podoPayment.purchaseOrderDetails &&
-      podoPayment.purchaseOrderDetails.outstandingAmount
-    ) {
-      const osAmt = roundTo(podoPayment.purchaseOrderDetails.outstandingAmount)
+    if (podoPayment && podoPayment.purchaseOrderDetails) {
+      const osAmt = roundTo(
+        podoPayment.purchaseOrderDetails.outstandingAmount || 0,
+      )
       outstandingAmount = {
         outstandingAmt: osAmt,
         currentOutstandingAmt: osAmt,
@@ -76,6 +74,8 @@ const styles = (theme) => ({
             clinicPaymentTypeFK: 1,
             transactionOnBizSessionFK: currentBizSessionInfo.id,
             isCancelled: x.isCancelled,
+            paymentMode: x.paymentModeTypeName,
+            creditCardType: x.creditCardTypeName,
           },
         }
       }
@@ -175,7 +175,8 @@ class index extends PureComponent {
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
+    const { purchaseOrderDetails, values } = this.props
+    const { outstandingAmt, currentOutstandingAmt } = values
     const { purchaseOrder: po } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 1
     const isWriteOff = po
@@ -183,7 +184,8 @@ class index extends PureComponent {
       : false
     const isEditable = isPOStatusFinalized(poStatus)
     const allowEdit = () => {
-      if (poStatus === 6) return false
+      if (poStatus === 6 && outstandingAmt === 0 && currentOutstandingAmt === 0)
+        return false
       if (isWriteOff) return false
       return true
     }
