@@ -246,6 +246,7 @@ const Grid = ({ dispatch, values, setFieldValue, getTotalPaid }) => {
         }
       })
       setFieldValue('purchaseOrderPayment', newRows)
+      return newRows
     }
 
     return rows
