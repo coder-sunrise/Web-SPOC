@@ -365,15 +365,35 @@ class PaymentDetails extends Component {
   }
 
   onTransferClick = (invoicePayerFK) => {
-    const { dispatch } = this.props
+    const { dispatch, invoiceDetail } = this.props
     dispatch({
-      type: 'invoicePayment/updateState',
+      type: 'invoicePayment/query',
       payload: {
-        invoicePayerFK,
+        id: invoiceDetail.currentId,
       },
-    })
+    }).then((response) => {
+      if (response.length > 0) {
+        const company = response.find(
+          (o) => o.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+        )
+        if (company && company.statementInvoice.length > 0) {
+          notification.warning({
+            message: `Invoice is already added to statement ${company
+              .statementInvoice[0]
+              .statementNo}. Please remove the invoice from statement before transfer`,
+          })
+          return
+        }
 
-    this.setState({ showAddTransfer: true })
+        dispatch({
+          type: 'invoicePayment/updateState',
+          payload: {
+            invoicePayerFK,
+          },
+        })
+        this.setState({ showAddTransfer: true })
+      }
+    })
   }
 
   render () {
