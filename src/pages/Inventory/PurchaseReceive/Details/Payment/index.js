@@ -152,31 +152,16 @@ class index extends PureComponent {
     })
   }
 
-  // onClickAddPayment = () => this.setState({ showPODOPaymentModal: true })
-
-  // onCloseAddPayment = () => this.setState({ showPODOPaymentModal: false })
-
-  recalculateOutstandingAmount = (type, value = 0) => {
-    const { values, setValues } = this.props
-    if (type === 'add') {
-      const currentOutstandingAmt = values.outstandingAmt - value
-      setValues({
-        ...values,
-        currentOutstandingAmt,
-      })
-    } else {
-      const currentOutstandingAmt = values.outstandingAmt + value
-      setValues({
-        ...values,
-        currentOutstandingAmt,
-        outstandingAmt: currentOutstandingAmt,
-      })
-    }
+  getTotalPaid = () => {
+    const activeRows = this.props.values.purchaseOrderPayment.filter(
+      (payment) => !payment.isDeleted,
+    )
+    return _.sumBy(activeRows, 'paymentAmount') || 0
   }
 
   render () {
     const { purchaseOrderDetails, values } = this.props
-    const { outstandingAmt, currentOutstandingAmt } = values
+    const { invoiceAmount } = values
     const { purchaseOrder: po } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 1
     const isWriteOff = po
@@ -184,16 +169,17 @@ class index extends PureComponent {
       : false
     const isEditable = isPOStatusFinalized(poStatus)
     const allowEdit = () => {
-      if (poStatus === 6 && outstandingAmt === 0 && currentOutstandingAmt === 0)
+      if (
+        (poStatus === 6 && invoiceAmount === this.getTotalPaid()) ||
+        isWriteOff
+      )
         return false
-      if (isWriteOff) return false
       return true
     }
     return (
       <AuthorizedContext.Provider
         value={{
           rights: allowEdit() ? 'enable' : 'disable',
-          // rights: 'disable',
         }}
       >
         <GridContainer>
@@ -201,32 +187,10 @@ class index extends PureComponent {
           <Grid
             {...this.props}
             isEditable={isEditable}
-            recalculateOutstandingAmount={this.recalculateOutstandingAmount}
+            getTotalPaid={this.getTotalPaid}
           />
         </GridContainer>
-        {/* <CommonModal
-          open={showPODOPaymentModal}
-          title='Add Payment'
-          maxWidth='md'
-          bodyNoPadding
-          onConfirm={this.onCloseAddPayment}
-          onClose={this.onCloseAddPayment}
-        >
-          <PaymentDetails
-            refreshPodoPayment={this.refreshPodoPayment}
-            {...this.props}
-          />
-        </CommonModal> */}
-        {/* <Button
-          disabled={isEditable}
-          onClick={this.onClickAddPayment}
-          // hideIfNoEditRights
-          color='info'
-          link
-        >
-          <Add />
-          Add Payment
-        </Button> */}
+
         <div style={{ textAlign: 'center' }}>
           <ProgressButton
             color='danger'

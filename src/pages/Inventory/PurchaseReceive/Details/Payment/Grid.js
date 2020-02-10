@@ -22,12 +22,7 @@ const purchaseOrderPaymentSchema = Yup.object().shape({
 })
 
 let commitCount = 1000 // uniqueNumber
-const Grid = ({
-  dispatch,
-  values,
-  setFieldValue,
-  recalculateOutstandingAmount,
-}) => {
+const Grid = ({ dispatch, values, setFieldValue, getTotalPaid }) => {
   const [
     creditCardTypeList,
     setCreditCardTypeList,
@@ -205,7 +200,6 @@ const Grid = ({
   const voidPayment = (reason) => {
     deletedRow.isDeleted = true
     deletedRow.cancelReason = reason
-    recalculateOutstandingAmount('delete', deletedRow.paymentAmount)
     setFieldValue('purchaseOrderPayment', allRows)
     setShowDeleteConfirmation(false)
   }
@@ -220,7 +214,6 @@ const Grid = ({
         setShowDeleteConfirmation(true)
       } else {
         currentRow.isDeleted = true
-        recalculateOutstandingAmount('delete', currentRow.paymentAmount)
         const setRows = rows.filter(
           (o) => o.id > 0 || (o.isNew && !o.isDeleted),
         )
@@ -236,13 +229,11 @@ const Grid = ({
       if (rows[0].remark === undefined) {
         rows[0].remark = ''
       }
-      recalculateOutstandingAmount('add', rows[0].paymentAmount)
-      const activeRows = rows.filter((o) => o.isDeleted === false)
-      const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
 
       const newRows = rows.map((o) => {
         if (o.isNew && !o.isDeleted) {
-          const outstandingAmt = values.invoiceAmount - paymentPaid
+          const outstandingAmt =
+            values.invoiceAmount - getTotalPaid() + (o.paymentAmount || 0)
           return {
             ...o,
             outstandingAmt,
@@ -261,12 +252,15 @@ const Grid = ({
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
   const onAddedRowsChange = (addedRows) => {
+    const outstandingAmt = values.invoiceAmount - getTotalPaid()
     return addedRows.map((row) => ({
       paymentDate: moment(),
-      // outstandingAmt: values.currentOutstandingAmt,
+      outstandingAmt,
+      paymentAmount: outstandingAmt,
       ...row,
     }))
   }
+  const isFullyPaid = values.invoiceAmount === getTotalPaid()
   return (
     <GridContainer>
       <EditableTableGrid
@@ -277,7 +271,7 @@ const Grid = ({
           pager: false,
         }}
         EditingProps={{
-          showAddCommand: values.currentOutstandingAmt > 0,
+          showAddCommand: !isFullyPaid,
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
