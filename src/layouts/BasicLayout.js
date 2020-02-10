@@ -154,50 +154,9 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  // componentDidMount () {
-  //   const {
-  //     dispatch,
-  //     route: { routes, authority },
-  //   } = this.props
-
-  //   dispatch({
-  //     type: 'user/fetchCurrent',
-  //   })
-  //   dispatch({
-  //     type: 'setting/getSetting',
-  //   })
-  //   dispatch({
-  //     type: 'menu/getMenuData',
-  //     payload: { routes, authority },
-  //   })
-  // }
-
-  // componentDidUpdate (preProps) {
-  //   // After changing to phone mode,
-  //   // if collapsed is true, you need to click twice to display
-  //   this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-  //   const { collapsed, isMobile } = this.props
-  //   if (isMobile && !preProps.isMobile && !collapsed) {
-  //     this.handleMenuCollapse(false)
-  //   }
-  // }
-
   componentDidMount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps = new PerfectScrollbar(this.refs.mainPanel, {
-    //     suppressScrollX: true,
-    //     suppressScrollY: false,
-    //   })
-    //   document.body.style.overflow = "hidden"
-    // }
-
-    // check token, logout if token not exist
-    // const accessToken = localStorage.getItem('token')
-    // !accessToken && router.push('/login')
-
     window.addEventListener('resize', this.resize)
     this.resize()
-    // const { dispatch, route: { routes, authority } } = this.props
   }
 
   componentDidUpdate (e) {
@@ -207,20 +166,9 @@ class BasicLayout extends React.PureComponent {
         this.setState({ mobileOpen: false })
       }
     }
-
-    // After changing to phone mode,
-    // if collapsed is true, you need to click twice to display
-    // this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-    // const { collapsed, isMobile } = this.props
-    // if (isMobile && !preProps.isMobile && !collapsed) {
-    //   this.handleMenuCollapse(false)
-    // }
   }
 
   componentWillUnmount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps.destroy()
-    // }
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
   }
