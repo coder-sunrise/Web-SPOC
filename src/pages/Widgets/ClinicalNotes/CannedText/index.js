@@ -32,7 +32,7 @@ const CannedText = ({
 }) => {
   const { selectedNote } = cannedText
   const list = cannedText[selectedNote.fieldName]
-
+  console.log({ list })
   const [
     filter,
     setFilter,
