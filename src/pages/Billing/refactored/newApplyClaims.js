@@ -306,6 +306,9 @@ const ApplyClaims = ({
         payload: { id: values.visitId },
       })
 
+      // abort early if failed to reset bill
+      if (!response) return
+
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
