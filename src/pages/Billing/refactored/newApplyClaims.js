@@ -300,7 +300,15 @@ const ApplyClaims = ({
   }
 
   const resetClaims = useCallback(
-    () => {
+    async () => {
+      const response = await dispatch({
+        type: 'billing/query',
+        payload: { id: values.visitId },
+      })
+
+      // abort early if failed to reset bill
+      if (!response) return
+
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
@@ -309,11 +317,12 @@ const ApplyClaims = ({
         _isConfirmed: true,
         _isEditing: false,
       }))
+      const { claimableSchemes: refreshedClaimableSchemes } = response
 
-      if (claimableSchemes.length > 0) {
+      if (refreshedClaimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
-          claimableSchemes: claimableSchemes[0],
+          claimableSchemes: refreshedClaimableSchemes[0],
           payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
         }
         const newTempInvoicePayer = [
@@ -323,7 +332,7 @@ const ApplyClaims = ({
         setCurEditInvoicePayerBackup(_invoicePayer)
         // setInitialState(newTempInvoicePayer)
         handleSchemeChange(
-          _invoicePayer.claimableSchemes[0].id,
+          _invoicePayer.refreshedClaimableSchemes[0].id,
           newTempInvoicePayer.length - 1,
           newTempInvoicePayer,
           invoice.invoiceItems,
@@ -336,7 +345,7 @@ const ApplyClaims = ({
     },
     [
       tempInvoicePayer,
-      claimableSchemes,
+      // claimableSchemes,
       invoice.invoiceItems,
     ],
   )
