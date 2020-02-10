@@ -69,7 +69,7 @@ class SelectEditor extends PureComponent {
     // if (!commonCfg.error) commonCfg.open = true
 
     if (localFilter) commonCfg.options = commonCfg.options.filter(localFilter)
-    // console.log({ commonCfg, type })
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (

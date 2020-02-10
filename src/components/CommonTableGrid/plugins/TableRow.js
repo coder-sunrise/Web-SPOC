@@ -23,9 +23,10 @@ class TableRow extends React.Component {
   shouldComponentUpdate (nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
     // console.log(nextProps.row === this.props.row)
-    const { extraCellConfig: orgConfig } = this.props
+    const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
-    const { getRowId, extraCellConfig } = nextProps
+    const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
+
     if (
       extraCellConfig &&
       extraCellConfig.editingCells &&
@@ -42,6 +43,11 @@ class TableRow extends React.Component {
     )
       return true
 
+    // if (columnExtensions.find((o) => typeof o.options === 'function')) {
+    //   return true
+    // }
+
+    if (!_.isEqual(orgRow._errors, row._errors)) return true
     return false
   }
 

@@ -47,17 +47,16 @@ class TableCell extends React.Component {
   shouldComponentUpdate (nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
     // console.log(nextProps.row === this.props.row)
-    const { extraCellConfig: orgConfig } = this.props
+    const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
-    const { getRowId, extraCellConfig } = nextProps
+    const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
     // console.log(orgConfig, extraCellConfig, nextProps)
     if (
       extraCellConfig &&
       extraCellConfig.editingCells &&
       extraCellConfig.editingCells.find(
-        (o) =>
-          o.rowId === getRowId(nextProps.row) &&
-          o.columnName === nextProps.column.name,
+        (o) => o.rowId === getRowId(nextProps.row), // &&
+        // o.columnName === nextProps.column.name,
       )
     ) {
       return true
@@ -67,13 +66,24 @@ class TableCell extends React.Component {
       orgConfig &&
       orgConfig.editingCells &&
       orgConfig.editingCells.find(
-        (o) =>
-          o.rowId === getRowId(this.props.row) &&
-          o.columnName === nextProps.column.name,
+        (o) => o.rowId === getRowId(this.props.row), // &&
+        // o.columnName === nextProps.column.name,
       )
     )
       return true
 
+    if (nextProps.column) {
+      const col =
+        columnExtensions.find((o) => o.columnName === nextProps.column.name) ||
+        {}
+      if (
+        // typeof col.options === 'function' ||
+        row._errors &&
+        row._errors.find((o) => o.params.path === nextProps.column.name)
+      )
+        return true
+    }
+    // if (!_.isEqual(orgRow._errors, row._errors)) return true
     // if (this.editing === true) {
     //   this.editing = false
     //   return true
@@ -82,6 +92,11 @@ class TableCell extends React.Component {
     return false
     // if (nextProps.extraCellConfig) return true
     // return nextProps.row !== this.props.row
+  }
+
+  moveRow = (row, direction) => () => {
+    const { onRowMove } = this.props
+    if (onRowMove) onRowMove(row, direction)
   }
 
   render () {
@@ -93,7 +108,7 @@ class TableCell extends React.Component {
       onClick,
       ...restProps
     } = this.props
-    console.log(1)
+    // console.log(restProps.row)
     // return null
     const { column, row } = restProps
     // const { cellEditingDisabled } = column
