@@ -161,21 +161,12 @@ class StatementDetails extends PureComponent {
     const { statement, dispatch, history } = this.props
     if (statement.currentId) {
       dispatch({
-        type: 'statement/queryOne',
+        type: 'statement/refreshStatement',
         payload: {
           id: statement.currentId,
         },
-      }).then((v) => {
-        if (v) {
-          dispatch({
-            type: 'statement/refreshStatement',
-            payload: {
-              id: statement.currentId,
-            },
-          }).then(() => {
-            this.fetchLatestBizSessions()
-          })
-        }
+      }).then((response) => {
+        if (response) this.fetchLatestBizSessions()
       })
     } else {
       history.push('/finance/statement/')
