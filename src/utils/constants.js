@@ -144,6 +144,12 @@ export const REPORT_TYPE = {
   29: 'Payment Receipt',
 }
 
+export const REPORT_TYPE_ID = {
+  PATIENT_LABEL: 27,
+  LAB_LABEL: 33,
+  LAB_LABEL_89MM: 34,
+}
+
 export const INVOICE_STATUS = {
   PAID: 1,
   OVERPAID: 2,
