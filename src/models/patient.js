@@ -231,6 +231,7 @@ export default createFormViewModel({
             payload: {
               callback: undefined,
               default: defaultPatientEntity,
+              menuErrors: {},
             },
           }),
         ])
