@@ -167,7 +167,14 @@ class StatementDetails extends PureComponent {
         },
       }).then((v) => {
         if (v) {
-          this.fetchLatestBizSessions()
+          dispatch({
+            type: 'statement/refreshStatement',
+            payload: {
+              id: statement.currentId,
+            },
+          }).then(() => {
+            this.fetchLatestBizSessions()
+          })
         }
       })
     } else {
