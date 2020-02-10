@@ -69,6 +69,10 @@ import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
+import TableRow from './plugins/TableRow'
+import GridTableCell from './plugins/TableCell'
+
+
 import { LoadingWrapper } from '@/components/_medisys'
 
 window.$tempGridRow = {}
@@ -262,7 +266,10 @@ class CommonTableGrid extends PureComponent {
         )
     }
 
-    const tableRowRender = ({ row, tableRow, ...restProps }) => {
+    const tableRowRender = (p) => {
+      console.log(p,props)
+      return <TableRow {...props} {...p}/>
+      const { row, tableRow, ...restProps } = p
       return (
         <Table.Row
           {...restProps}
@@ -286,7 +293,7 @@ class CommonTableGrid extends PureComponent {
       )
     }
     this.TableBody = Table.TableBody
-    this.TableRow = tableRowRender
+    this.TableRow =TableRow// tableRowRender
 
     if (!editableGrid && rowDragable) {
       this.TableRow = (rowProps) => {
@@ -760,6 +767,10 @@ class CommonTableGrid extends PureComponent {
   //   return <DragableRow {...rowProps} index={row.rowIndex} />
   // }
 
+  Row = (p)=>{
+    return <TableRow {... this.props} {...p} />
+  }
+
   Cell = (p) => {
     const { columnExtensions = [], extraState, getRowId, classes: clses } = this.props
     const { classes, onClick, ...restProps } = p
@@ -768,6 +779,8 @@ class CommonTableGrid extends PureComponent {
     // console.log(p2)
     // return null
     // console.log(restProps)
+
+    return <GridTableCell {... this.props} {...p} />
     let cfg = {
       // tabIndex: 0,
     }
@@ -781,6 +794,7 @@ class CommonTableGrid extends PureComponent {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
       if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
+        console.log(colCfg)
         if (
           ![
             'radio',
@@ -1040,8 +1054,10 @@ class CommonTableGrid extends PureComponent {
       columnExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
+      rowComponent:this.Row
     }
-    // console.log('tableProps',tableProps)
+    
+    // console.log('tableProps',tableProps,(this.props.ActionProps || {}).TableCellComponent , GridTableCell , this.Cell)
     // const extraPagerConfig = {
     //   ...pagerConfig,
     // }
@@ -1232,7 +1248,6 @@ class CommonTableGrid extends PureComponent {
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
               <TableBase
                 // height={height}
-                rowComponent={this.TableRow}
                 bodyComponent={this.TableBody}
                 {...tableProps}
               />
