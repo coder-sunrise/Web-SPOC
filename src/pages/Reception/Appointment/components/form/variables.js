@@ -10,34 +10,11 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Appt Duration' },
-  // { name: 'endTime', title: 'Time To' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
 export const AppointmentDataColExtensions = [
-  // {
-  //   columnName: 'conflicts',
-  //   // type: 'error',
-  //   editingEnabled: false,
-  //   sortingEnabled: false,
-  //   disabled: true,
-  //   width: 60,
-  //   render: (row) => {
-  //     if (row.conflicts && row.conflicts.length > 0)
-  //       return <ErrorPopover errors={row.conflicts} />
-  //     return null
-  //   },
-  // },
-  // {
-  //   columnName: 'clinicianFK',
-  //   width: 200,
-  //   type: 'codeSelect',
-  //   code: 'clinicianprofile',
-  //   labelField: 'name',
-  //   valueField: 'id',
-  //   renderDropdown: (option) => <DoctorLabel doctor={option} />,
-  // },
   {
     columnName: 'clinicianFK',
     width: 150,
@@ -46,7 +23,7 @@ export const AppointmentDataColExtensions = [
     labelField: 'clinicianProfile.name',
     valueField: 'clinicianProfile.id',
     remoteFilter: {
-      'clinicianProfile.isActive': true,
+      'clinicianProfile.isActive': false,
     },
     renderDropdown: (option) => <DoctorLabel doctor={option} />,
   },
@@ -70,7 +47,6 @@ export const AppointmentDataColExtensions = [
     width: 110,
     format: timeFormat,
     allowClear: false,
-    // value: '00:00',
   },
   {
     columnName: 'roomFk',

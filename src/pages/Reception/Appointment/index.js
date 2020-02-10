@@ -114,10 +114,20 @@ class Appointment extends React.PureComponent {
         lsteql_appointmentDate: endOfMonth,
       },
     })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+        filter: {
+          isActive: undefined,
+        },
+      },
+    })
 
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'doctorprofile' },
+      payload: { code: 'doctorprofile', force: true, filter: {} },
     }).then((response) => {
       response
 
@@ -159,6 +169,30 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
+    })
+  }
+
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    // reset doctor profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+
+    // reset clinician profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+      },
     })
   }
 
