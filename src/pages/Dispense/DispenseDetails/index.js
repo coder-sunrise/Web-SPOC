@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
@@ -87,23 +87,40 @@ const DispenseDetails = ({
   dispense,
   history,
 }) => {
+  const [
+    loading,
+    setLoading,
+  ] = useState(false)
   useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryconsumable',
-        force: true,
-        temp: true,
-      },
-    })
+    const getCodeTables = async () => {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventorymedication',
+          force: true,
+          temp: true,
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryconsumable',
+          force: true,
+          temp: true,
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+          force: true,
+          temp: true,
+        },
+      })
+      setLoading(false)
+    }
+    setLoading(true)
+    getCodeTables()
   }, [])
 
   const {
@@ -290,6 +307,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Edit />}
                 onClick={onEditOrderClick}
+                disabled={loading}
               >
                 Add Order
               </ProgressButton>

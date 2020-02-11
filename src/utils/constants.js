@@ -262,6 +262,7 @@ export const CANNED_TEXT_TYPE = {
   ASSOCIATEDHISTORY: 3,
   INTRAORAL: 4,
   EXTRAORAL: 5,
+  PLAN: 6,
 }
 
 export const CANNED_TEXT_TYPE_FIELD = {
@@ -270,6 +271,7 @@ export const CANNED_TEXT_TYPE_FIELD = {
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',
+  6: 'plan',
 }
 
 export const CLINIC_TYPE = {
@@ -281,4 +283,13 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+}
+
+export const PURCHASE_ORDER_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  PARTIALREVD: 3,
+  CANCELLED: 4,
+  FULFILLED: 5,
+  COMPLETED: 6,
 }

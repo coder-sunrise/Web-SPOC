@@ -103,6 +103,7 @@ export default ({ orders, dispatch, classes }) => {
           overflow: 'hidden',
           display: 'inline-block',
           textOverflow: 'ellipsis',
+          marginLeft: 20,
         }}
       >
         <Popconfirm
