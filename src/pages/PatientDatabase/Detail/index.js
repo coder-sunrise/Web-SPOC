@@ -201,7 +201,7 @@ class PatientDetail extends PureComponent {
       {
         id: '1',
         name: 'Demographic',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         schema: schema.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
@@ -215,7 +215,7 @@ class PatientDetail extends PureComponent {
       {
         id: '2',
         name: 'Emergency Contact',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         schema: schema.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
@@ -236,7 +236,7 @@ class PatientDetail extends PureComponent {
       {
         id: '3',
         name: 'Allergies',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         schema: schema.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
@@ -250,7 +250,7 @@ class PatientDetail extends PureComponent {
       {
         id: '4',
         name: 'Schemes',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         schema: schema.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
@@ -264,7 +264,7 @@ class PatientDetail extends PureComponent {
       {
         id: '5',
         name: 'Appointment History',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         component: Loadable({
           loader: () => import('./AppointmentHistory'),
           render: (loaded, p) => {
@@ -277,7 +277,7 @@ class PatientDetail extends PureComponent {
       {
         id: '6',
         name: 'Patient History',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -290,9 +290,22 @@ class PatientDetail extends PureComponent {
       {
         id: '7',
         name: 'Patient Document',
-        access: 'patient.view',
+        access: 'patientdatabase.patientprofiledetails',
         component: Loadable({
           loader: () => import('./PatientDocument'),
+          render: (loaded, p) => {
+            let Cmpnet = loaded.default
+            return <Cmpnet {...p} />
+          },
+          loading: Loading,
+        }),
+      },
+      {
+        id: '8',
+        name: 'Admission',
+        access: 'demorights', // 'wardmanagement',
+        component: Loadable({
+          loader: () => import('./Admission'),
           render: (loaded, p) => {
             let Cmpnet = loaded.default
             return <Cmpnet {...p} />
@@ -469,59 +482,59 @@ class PatientDetail extends PureComponent {
                       Number(o.id) <= 4,
                   )
                   .map((o) => (
-                    // <Authorized authority={o.access}>
-                    <MenuItem
-                      key={o.name}
-                      className={classes.menuItem}
-                      selected={currentMenu.name === o.name}
-                      disabled={
-                        global.disableSave && currentMenu.name !== o.name
-                      }
-                      onClick={(e) => {
-                        onMenuClick(e, o)
-                        // console.log('here', entity, values)
-                        dispatch({
-                          type: 'patient/updateState',
-                          payload: {
-                            entity: entity || undefined,
-                          },
-                        })
-                        this.setState({
-                          selectedMenu: o.id,
-                        })
-                        // this.props.history.push(
-                        //   getAppendUrl({
-                        //     md: 'pt',
-                        //     cmt: o.id,
-                        //   }),
-                        // )
-                      }}
-                    >
-                      <ListItemIcon style={{ minWidth: 25 }}>
-                        <KeyboardArrowRight />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <span
-                            style={{
-                              color: menuErrors[o.id] ? 'red' : 'inherit',
-                            }}
-                          >
-                            {o.name}
-                            {menuErrors[o.id] ? (
-                              <Error
-                                style={{
-                                  position: 'absolute',
-                                  top: 13,
-                                  right: 8,
-                                }}
-                              />
-                            ) : null}
-                          </span>
+                    <Authorized authority={o.access}>
+                      <MenuItem
+                        key={o.name}
+                        className={classes.menuItem}
+                        selected={currentMenu.name === o.name}
+                        disabled={
+                          global.disableSave && currentMenu.name !== o.name
                         }
-                      />
-                    </MenuItem>
-                    // </Authorized>
+                        onClick={(e) => {
+                          onMenuClick(e, o)
+                          // console.log('here', entity, values)
+                          dispatch({
+                            type: 'patient/updateState',
+                            payload: {
+                              entity: entity || undefined,
+                            },
+                          })
+                          this.setState({
+                            selectedMenu: o.id,
+                          })
+                          // this.props.history.push(
+                          //   getAppendUrl({
+                          //     md: 'pt',
+                          //     cmt: o.id,
+                          //   }),
+                          // )
+                        }}
+                      >
+                        <ListItemIcon style={{ minWidth: 25 }}>
+                          <KeyboardArrowRight />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <span
+                              style={{
+                                color: menuErrors[o.id] ? 'red' : 'inherit',
+                              }}
+                            >
+                              {o.name}
+                              {menuErrors[o.id] ? (
+                                <Error
+                                  style={{
+                                    position: 'absolute',
+                                    top: 13,
+                                    right: 8,
+                                  }}
+                                />
+                              ) : null}
+                            </span>
+                          }
+                        />
+                      </MenuItem>
+                    </Authorized>
                   ))}
               </MenuList>
               {isCreatingPatient && <Divider light />}

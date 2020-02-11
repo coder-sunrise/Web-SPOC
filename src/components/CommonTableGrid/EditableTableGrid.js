@@ -117,7 +117,6 @@ class EditableTableGrid extends React.Component {
         errorCells,
       })
     }, 1)
-
     this.setState({
       editingCells,
     })

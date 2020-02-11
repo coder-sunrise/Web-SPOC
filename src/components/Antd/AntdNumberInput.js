@@ -251,7 +251,12 @@ class AntdNumberInput extends React.PureComponent {
       e.preventDefault()
       return false
     }
-    if (e.keyCode === 190) {
+    if (
+      [
+        190,
+        110,
+      ].includes(e.keyCode)
+    ) {
       const v = e.target.value
 
       const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
@@ -274,6 +279,7 @@ class AntdNumberInput extends React.PureComponent {
         46,
         187,
         189,
+        110,
         109,
         107,
         190,

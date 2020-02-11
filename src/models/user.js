@@ -130,6 +130,20 @@ export default {
             return a.concat(convertServerRights(b))
           }, [])
 
+          // for demo only, TODO: should have a better way to handle it
+          if (
+            data.userProfileDetailDto &&
+            data.userProfileDetailDto.clinicianProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile.userName ===
+              'demouser'
+          ) {
+            accessRights.push({
+              name: 'demorights',
+              rights: 'enable',
+            })
+          }
+
           user = {
             data: data.userProfileDetailDto,
             accessRights,

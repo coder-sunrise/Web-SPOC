@@ -26,7 +26,7 @@ import {
   enableSaveButton,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
-import { INVOICE_STATUS } from '@/utils/constants'
+import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
 
@@ -178,10 +178,7 @@ class Index extends Component {
               })
             }
             const { id } = r
-            // dispatch({
-            //   type: `formik/clean`,
-            //   payload: 'purchaseOrderDetails',
-            // })
+
             this.getPOdata(id)
           }
         })
@@ -198,7 +195,7 @@ class Index extends Component {
             onConfirmSave: async () => {
               processedPayload = this.processSubmitPayload(false, statusCode)
               await submit()
-              if (statusCode === 4) {
+              if (statusCode === PURCHASE_ORDER_STATUS.CANCELLED) {
                 history.push('/inventory/pr')
               }
             },
@@ -214,26 +211,26 @@ class Index extends Component {
         case poSubmitAction.CANCEL:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
-            4,
+            PURCHASE_ORDER_STATUS.CANCELLED,
             'Are you sure want to cancel PO?',
             'Cancel PO',
           )
-          break
+          return true
         case poSubmitAction.FINALIZE:
-          // dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
-          processedPayload = this.processSubmitPayload(false, 2)
+          processedPayload = this.processSubmitPayload(
+            false,
+            PURCHASE_ORDER_STATUS.FINALIZED,
+          )
           break
         case poSubmitAction.COMPLETE:
           dispatchType = 'purchaseOrderDetails/upsertWithStatusCode'
           openConfirmationModal(
-            6,
+            PURCHASE_ORDER_STATUS.COMPLETED,
             'Are you sure want to complete PO?',
             'Complete PO',
           )
-          break
-        // case poSubmitAction.PRINT:
-        //   this.toggleReport()
-        //   break
+          return true
+
         default:
         // case block
       }
@@ -255,7 +252,7 @@ class Index extends Component {
     let newPoAdjustment
     let newPurchaseOrderStatusFK = purchaseOrderStatusFK
     if (type === 'new') {
-      newPurchaseOrderStatusFK = 1
+      newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       purchaseOrderItem = rows.map((x) => {
         const itemType = podoOrderType.find((y) => y.value === x.type)
         return {
@@ -272,7 +269,6 @@ class Index extends Component {
           IsACPUpdated: false,
           unitOfMeasurement: x.unitOfMeasurement,
           [itemType.prop]: {
-            // [itemType.itemFKName]: x[itemType.itemFKName],
             [itemType.itemFKName]: x.code,
             [itemType.itemCode]: x.codeString,
             [itemType.itemName]: x.nameString,
@@ -281,7 +277,7 @@ class Index extends Component {
         }
       })
     } else if (type === 'dup') {
-      newPurchaseOrderStatusFK = 1
+      newPurchaseOrderStatusFK = PURCHASE_ORDER_STATUS.DRAFT
       delete purchaseOrder.id
       delete purchaseOrder.concurrencyToken
       newPoAdjustment = poAdjustment.map((adj) => {
@@ -316,7 +312,7 @@ class Index extends Component {
     } else {
       if (!isSaveAction) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
-      } else if (purchaseOrderStatusFK === 6) {
+      } else if (purchaseOrderStatusFK === PURCHASE_ORDER_STATUS.COMPLETED) {
         newPurchaseOrderStatusFK = purchaseOrderStatusFK
       } else {
         newPurchaseOrderStatusFK = purchaseOrder.purchaseOrderStatusFK
@@ -491,6 +487,16 @@ class Index extends Component {
     }))
   }
 
+  isEditable = (poStatus, isWriteOff, poItem) => {
+    if (
+      (poItem && poStatus !== PURCHASE_ORDER_STATUS.DRAFT) ||
+      poStatus > PURCHASE_ORDER_STATUS.DRAFT ||
+      isWriteOff
+    )
+      return false
+    return true
+  }
+
   render () {
     const {
       purchaseOrderDetails,
@@ -502,34 +508,32 @@ class Index extends Component {
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
     const { purchaseOrder, purchaseOrderAdjustment, rows } = values
-    const { isGSTEnabled, isGstInclusive, gstValue } = purchaseOrder || false
+    const {
+      isGSTEnabled,
+      isGstInclusive,
+      gstValue,
+      deliveryOrder = [],
+      purchaseOrderPayment = [],
+    } =
+      purchaseOrder || false
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = (poItem) => {
-      if ((poItem && poStatus !== 1) || poStatus > 1) return false
-      if (isWriteOff) return false
-      return true
-    }
+
     const currentGstValue = isGSTEnabled ? gstValue : undefined
     return (
-      // <AuthorizedContext.Provider
-      //   value={{
-      //     rights: poStatus !== 6 ? 'enable' : 'disable',
-      //     // rights: 'disable',
-      //   }}
-      // >
       <React.Fragment>
         <POForm
-          isReadOnly={!isEditable()}
+          isReadOnly={!this.isEditable(poStatus, isWriteOff)}
           isFinalize={isPOStatusFinalized(poStatus)}
           setFieldValue={setFieldValue}
           {...this.props}
         />
         <AuthorizedContext.Provider
           value={{
-            rights: isEditable() ? 'enable' : 'disable',
-            // rights: 'disable',
+            rights: this.isEditable(poStatus, isWriteOff)
+              ? 'enable'
+              : 'disable',
           }}
         >
           {errors.rows && (
@@ -537,14 +541,15 @@ class Index extends Component {
           )}
           <POGrid
             calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-            isEditable={isEditable('poItem')}
+            isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
             {...this.props}
           />
         </AuthorizedContext.Provider>
         <AuthorizedContext.Provider
           value={{
-            rights: isEditable() ? 'enable' : 'disable',
-            // rights: 'disable',
+            rights: this.isEditable(poStatus, isWriteOff)
+              ? 'enable'
+              : 'disable',
           }}
         >
           <GridContainer>
@@ -565,16 +570,6 @@ class Index extends Component {
                   gstValue: currentGstValue,
                 }}
                 onValueChanged={(v) => {
-                  // const newInvoice = {
-                  //   ...values.invoice,
-
-                  //   isGSTInclusive: !!v.summary.isGSTInclusive,
-                  // }
-                  // setValues({
-                  //   ...values,
-                  //   invoice: newInvoice,
-                  // })
-
                   setFieldValue('purchaseOrder.totalAmount', v.summary.total)
                   setFieldValue(
                     'purchaseOrder.totalAfterAdj',
@@ -615,9 +610,12 @@ class Index extends Component {
             justifyContent: 'flex-end',
           }}
         >
-          {poStatus !== 6 && (
+          {poStatus !== PURCHASE_ORDER_STATUS.COMPLETED && (
             <div>
-              {isPOStatusDraft(poStatus) && type === 'edit' ? (
+              {poStatus !== PURCHASE_ORDER_STATUS.CANCELLED &&
+              deliveryOrder.length === 0 &&
+              purchaseOrderPayment.length === 0 &&
+              type === 'edit' ? (
                 <ProgressButton
                   color='danger'
                   icon={null}
@@ -701,7 +699,6 @@ class Index extends Component {
           />
         </CommonModal>
       </React.Fragment>
-      // </AuthorizedContext.Provider>
     )
   }
 }

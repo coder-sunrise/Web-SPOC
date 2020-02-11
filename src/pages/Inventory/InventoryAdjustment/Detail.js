@@ -42,7 +42,11 @@ const inventoryAdjustmentSchema = Yup.object().shape({
   inventoryTypeFK: Yup.number().required(),
   code: Yup.number().required(),
   displayValue: Yup.number().required(),
-  batchNo: Yup.array().required(),
+  batchNo: Yup.array().required().compact((v) => {
+    if (!v) return true
+    if (v && v.trim() === '') return true
+    return false
+  }),
   adjustmentQty: Yup.number()
     .min(-9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9')
     .max(9999.9, 'Adjustment Qty must between -9,999.9 and 9,999.9'),
@@ -343,7 +347,8 @@ class Detail extends PureComponent {
         disableAll: true,
         options: (row) => {
           if (row.code) {
-            const item = this.state.MedicationItemList.find(
+            const getType = this.type(row.inventoryTypeFK)
+            const item = this.state[getType.initialStateName].find(
               (o) => o.itemFK === row.code,
             )
             if (item) return item.stock
@@ -488,7 +493,7 @@ class Detail extends PureComponent {
   rowOptions = (row) => {
     const getCurrentOptions = (stateName, filteredOptions) => {
       const selectedItem = this.state[stateName].find(
-        (o) => o.itemFK === row.itemFK,
+        (o) => o.itemFK === (row.itemFK || row.code),
       )
       let currentOptions = filteredOptions
       if (selectedItem) {
@@ -667,6 +672,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryMedicationFK',
           stateName: 'stockMedication',
           filterStateName: 'filterStockMedication',
+          initialStateName: 'MedicationItemList',
         }
       case INVENTORY_TYPE.VACCINATION:
         return {
@@ -678,6 +684,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryVaccinationFK',
           stateName: 'stockVaccination',
           filterStateName: 'filterStockVaccination',
+          initialStateName: 'VaccinationItemList',
         }
       case INVENTORY_TYPE.CONSUMABLE:
         return {
@@ -689,6 +696,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryConsumableFK',
           stateName: 'stockConsumable',
           filterStateName: 'filterStockConsumable',
+          initialStateName: 'ConsumableItemList',
         }
       default:
         return {}
