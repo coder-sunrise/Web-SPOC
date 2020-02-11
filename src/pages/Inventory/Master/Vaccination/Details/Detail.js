@@ -118,7 +118,6 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.vaccination.code',
                       })}
-                      disabled={!props.values.isActive}
                       {...args}
                     />
                   )
