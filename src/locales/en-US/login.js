@@ -1,5 +1,5 @@
 export default {
-  'app.login.title': 'NSCMH',
+  'app.login.title': 'Medicloud',
   'app.login.username': 'Username',
   'app.login.email': 'Email',
   'app.login.password': 'Password',
