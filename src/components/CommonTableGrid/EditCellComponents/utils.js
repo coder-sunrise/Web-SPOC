@@ -45,8 +45,8 @@ function onComponentChange (args, config) {
   const {
     columnExtensions,
     column: { name: columnName },
-    value,
     onValueChange,
+    value,
     row,
   } = this.props
   const cfg =
@@ -63,6 +63,7 @@ function onComponentChange (args, config) {
     getRowId,
     ...restProps
   } = cfg
+  if (value === Object.values(args)[0]) return
   let errors = updateCellValue(this.props, null, Object.values(args)[0])
 
   const latestRow = window.$tempGridRow[gridId]

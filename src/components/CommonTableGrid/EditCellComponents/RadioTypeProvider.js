@@ -22,7 +22,7 @@ const styles = (theme) => ({
 
 let _radioSelectedMap = {}
 
-class RadioEditorBase extends PureComponent {
+class RadioEditorBase extends React.Component {
   state = {}
 
   constructor (props) {
@@ -103,13 +103,15 @@ class RadioEditorBase extends PureComponent {
     if (_radioSelectedMap[columnName]) {
       commonCfg.checked = _radioSelectedMap[columnName] === row.id
     }
-
+    console.log(commonCfg.checked)
     return (
       <Radio
         className={classnames({
           [classes.main]: true,
         })}
-        {...commonCfg}
+        onChange={this._onChange}
+        checked={commonCfg.checked}
+        // {...commonCfg}
       />
     )
   }
@@ -199,7 +201,7 @@ export const RadioEditor = withStyles(styles, {
   withTheme: true,
 })(RadioEditorBase)
 
-class RadioTypeProvider extends PureComponent {
+class RadioTypeProvider extends React.Component {
   static propTypes = {
     for: PropTypes.array,
     columnExtensions: PropTypes.array,

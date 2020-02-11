@@ -1403,7 +1403,7 @@ class Chart extends React.PureComponent {
         ref={this.divContainer}
         style={{ width: '100%', position: 'relative', ...style }}
       >
-        <Tooltip title='Save to local'>
+        <Tooltip title='Export chart to image'>
           <Button
             justIcon
             color='primary'
