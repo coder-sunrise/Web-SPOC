@@ -1,23 +1,7 @@
 import React from 'react'
-import { Getter, Plugin } from '@devexpress/dx-react-core'
 
 import _ from 'lodash'
-import {
-  DragDropProvider,
-  Grid as DevGrid,
-  GroupingPanel,
-  PagingPanel,
-  Table,
-  TableGroupRow,
-  TableHeaderRow,
-  TableSummaryRow,
-  TableSelection,
-  Toolbar,
-  TableFixedColumns,
-  VirtualTable,
-  TableTreeColumn,
-  IntegratedSelection,
-} from '@devexpress/dx-react-grid-material-ui'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 
 class TableRow extends React.Component {
   shouldComponentUpdate (nextProps) {
@@ -62,7 +46,7 @@ class TableRow extends React.Component {
       rowSelectionEnabled,
       ...restProps
     } = this.props
-    console.log(2)
+    // console.log(2)
     return (
       <Table.Row
         {...restProps}

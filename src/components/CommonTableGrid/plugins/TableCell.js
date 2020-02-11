@@ -6,23 +6,7 @@ import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
 import ReOrder from '@material-ui/icons/Reorder'
 
-import { Getter, Plugin } from '@devexpress/dx-react-core'
-import {
-  DragDropProvider,
-  Grid as DevGrid,
-  GroupingPanel,
-  PagingPanel,
-  Table,
-  TableGroupRow,
-  TableHeaderRow,
-  TableSummaryRow,
-  TableSelection,
-  Toolbar,
-  TableFixedColumns,
-  VirtualTable,
-  TableTreeColumn,
-  IntegratedSelection,
-} from '@devexpress/dx-react-grid-material-ui'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   SortableContainer,
   SortableHandle,
