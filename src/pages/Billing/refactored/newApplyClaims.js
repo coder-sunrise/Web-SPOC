@@ -144,8 +144,14 @@ const ApplyClaims = ({
     incrementCommitCount()
   }
 
-  const handleSchemeChange = (value, index, invoicePayerList, invoiceItems) => {
-    const flattenSchemes = claimableSchemes.reduce(
+  const handleSchemeChange = (
+    value,
+    index,
+    invoicePayerList,
+    invoiceItems,
+    allSchemes,
+  ) => {
+    const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
         ...schemes,
         ...cs.map((item) => ({ ...item })),
@@ -259,6 +265,7 @@ const ApplyClaims = ({
           _invoicePayer,
         ],
         invoice.invoiceItems,
+        claimableSchemes,
       )
     } else {
       setInitialState([])
@@ -318,7 +325,6 @@ const ApplyClaims = ({
         _isEditing: false,
       }))
       const { claimableSchemes: refreshedClaimableSchemes } = response
-
       if (refreshedClaimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
@@ -332,10 +338,11 @@ const ApplyClaims = ({
         setCurEditInvoicePayerBackup(_invoicePayer)
         // setInitialState(newTempInvoicePayer)
         handleSchemeChange(
-          _invoicePayer.refreshedClaimableSchemes[0].id,
+          _invoicePayer.claimableSchemes[0].id,
           newTempInvoicePayer.length - 1,
           newTempInvoicePayer,
           invoice.invoiceItems,
+          refreshedClaimableSchemes,
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
@@ -345,7 +352,7 @@ const ApplyClaims = ({
     },
     [
       tempInvoicePayer,
-      // claimableSchemes,
+      claimableSchemes,
       invoice.invoiceItems,
     ],
   )
@@ -589,6 +596,8 @@ const ApplyClaims = ({
         invoicePayer.claimableSchemes[nestedIndex].id,
         newTempInvoicePayer.length - 1,
         newTempInvoicePayer,
+        undefined,
+        claimableSchemes,
       )
     }
     return setTempInvoicePayer(newTempInvoicePayer)
