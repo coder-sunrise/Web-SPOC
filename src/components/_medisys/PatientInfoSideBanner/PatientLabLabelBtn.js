@@ -10,20 +10,28 @@ import withWebSocket from '@/components/Decorator/withWebSocket'
 
 const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
   const [
-    copyNo,
-    setCopyNo,
+    labLabelCopyNo,
+    setLabLabelCopyNo,
   ] = useState(1)
 
-  const handleCopyNoChange = (value) => setCopyNo(value)
+  const [
+    ptnLabelCopyNo,
+    setPtnLabelCopyNo,
+  ] = useState(1)
+
+  const handleCopyNoChange = (value) => setLabLabelCopyNo(value)
+
+  const handlePtnLabelCopyNoChanges = (value) => setPtnLabelCopyNo(value)
 
   const handlePrintClick = () => {
     const { labelPrinterSize } = clinicSettings
+    if (!Number.isInteger(labLabelCopyNo)) return
+
     let reportID = REPORT_TYPE_ID.LAB_LABEL
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_TYPE_ID.LAB_LABEL_89MM
     }
-
-    for (let i = 0; i < copyNo; i++) {
+    for (let i = 0; i < labLabelCopyNo; i++) {
       handlePrint({
         reportID,
         payload: {
@@ -35,7 +43,9 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
 
   const handlePatientLabelClick = () => {
     let reportID = REPORT_TYPE_ID.PATIENT_LABEL
-    for (let i = 0; i < copyNo; i++) {
+
+    if (!Number.isInteger(ptnLabelCopyNo)) return
+    for (let i = 0; i < ptnLabelCopyNo; i++) {
       handlePrint({
         reportID,
         payload: {
@@ -55,7 +65,12 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
           alignItems: 'center',
         }}
       >
-        <Button color='primary' size='sm' onClick={handlePrintClick}>
+        <Button
+          color='primary'
+          size='sm'
+          onClick={handlePrintClick}
+          disabled={!Number.isInteger(labLabelCopyNo)}
+        >
           <Print />
           Lab Label
         </Button>
@@ -69,7 +84,7 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
             size='small'
             min={1}
             max={10}
-            value={copyNo}
+            value={labLabelCopyNo}
             onChange={handleCopyNoChange}
             style={{ width: '50px', textAlign: 'right' }}
           />
@@ -84,7 +99,12 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
           alignItems: 'center',
         }}
       >
-        <Button color='primary' size='sm' onClick={handlePatientLabelClick}>
+        <Button
+          color='primary'
+          size='sm'
+          onClick={handlePatientLabelClick}
+          disabled={!Number.isInteger(ptnLabelCopyNo)}
+        >
           <Print />
           Patient Label
         </Button>
@@ -98,8 +118,8 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
             size='small'
             min={1}
             max={10}
-            value={copyNo}
-            onChange={handleCopyNoChange}
+            value={ptnLabelCopyNo}
+            onChange={handlePtnLabelCopyNoChanges}
             style={{ width: '50px', textAlign: 'right' }}
           />
           <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
