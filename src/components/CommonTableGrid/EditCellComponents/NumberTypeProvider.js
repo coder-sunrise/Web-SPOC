@@ -65,7 +65,6 @@ class NumberEditor extends PureComponent {
       commonCfg.onBlur = this.props.onBlur
       commonCfg.onFocus = this.props.onFocus
       commonCfg.onKeyDown = this.props.onKeyDown
-      commonCfg.defaultValue = value
       commonCfg.autoFocus = true
       commonCfg.debounceDuration = 0
       commonCfg.preventDefaultKeyDownEvent = true
@@ -79,6 +78,8 @@ class NumberEditor extends PureComponent {
         display: 'inline-block',
       }
     }
+    commonCfg.defaultValue = value
+
     commonCfg.currency = currency || type === 'currency'
     return <NumberInput {...commonCfg} />
   }
