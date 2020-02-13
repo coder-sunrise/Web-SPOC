@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 // formik
-import { FastField, Field } from 'formik'
+import { FastField } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import moment from 'moment'
@@ -13,7 +13,6 @@ import {
   SizeContainer,
   TextField,
   Select,
-  Checkbox,
 } from '@/components'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
@@ -62,21 +61,6 @@ const FilterBar = ({ classes, dispatch, values }) => {
       SessionType = 'PastSession'
     }
 
-    let { isIncludePatientOS, isIncludeGovtOS, isIncludeCorporateOS } = values
-    let isHasOutstanding
-    if (
-      outstandingBalanceStatus === undefined ||
-      outstandingBalanceStatus === 'all'
-    ) {
-      isIncludePatientOS = false
-      isIncludeGovtOS = false
-      isIncludeCorporateOS = false
-      isHasOutstanding = undefined
-    } else if (outstandingBalanceStatus === 'yes') {
-      isHasOutstanding = true
-    } else {
-      isHasOutstanding = false
-    }
     dispatch({
       type: 'invoiceList/query',
       payload: {
@@ -84,13 +68,19 @@ const FilterBar = ({ classes, dispatch, values }) => {
         // combineCondition: 'and',
         lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
         lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
+        lgt_OutstandingBalance:
+          outstandingBalanceStatus === 'yes' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
+        lsteql_OutstandingBalance:
+          outstandingBalanceStatus === 'no' &&
+          outstandingBalanceStatus !== 'all'
+            ? '0'
+            : undefined,
         apiCriteria: {
           SessionID,
           SessionType,
-          isIncludePatientOS,
-          isIncludeGovtOS,
-          isIncludeCorporateOS,
-          isHasOutstanding,
         },
         group: [
           {
@@ -103,8 +93,6 @@ const FilterBar = ({ classes, dispatch, values }) => {
       },
     })
   }
-  const { outstandingBalanceStatus } = values
-  const disabledOSOpts = outstandingBalanceStatus === undefined
 
   return (
     <SizeContainer>
@@ -172,47 +160,6 @@ const FilterBar = ({ classes, dispatch, values }) => {
               }}
             />
           </GridItem>
-          <GridContainer md={2}>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludePatientOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Patient'
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludeGovtOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Govt.'
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludeCorporateOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Corporate'
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
         </GridContainer>
 
         <div className={classes.searchButton}>
