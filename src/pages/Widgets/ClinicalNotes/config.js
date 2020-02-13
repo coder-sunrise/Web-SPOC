@@ -26,7 +26,7 @@ export const gpConfigs = {
       fieldTitle: 'Plan',
       scribbleField: 'planScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.PLAN,
-      cannedTextTypeFK: undefined,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.PLAN,
       index: 2,
     },
   ],

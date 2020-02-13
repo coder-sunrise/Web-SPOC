@@ -97,7 +97,6 @@ class EditableTableGrid extends React.Component {
   }
 
   _onEditingCellsChange = (editingCells) => {
-    // console.log(errorCells)
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
@@ -121,10 +120,6 @@ class EditableTableGrid extends React.Component {
         errorCells,
       })
     }, 1)
-    // this.setState({
-    //   editingCells: _.unionWith(editingCells, errorCells, _.isEqual),
-    //   errorCells,
-    // })
     this.setState({
       editingCells,
     })

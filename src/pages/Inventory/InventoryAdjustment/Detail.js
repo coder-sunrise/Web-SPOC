@@ -347,7 +347,8 @@ class Detail extends PureComponent {
         disableAll: true,
         options: (row) => {
           if (row.code) {
-            const item = this.state.MedicationItemList.find(
+            const getType = this.type(row.inventoryTypeFK)
+            const item = this.state[getType.initialStateName].find(
               (o) => o.itemFK === row.code,
             )
             if (item) return item.stock
@@ -671,6 +672,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryMedicationFK',
           stateName: 'stockMedication',
           filterStateName: 'filterStockMedication',
+          initialStateName: 'MedicationItemList',
         }
       case INVENTORY_TYPE.VACCINATION:
         return {
@@ -682,6 +684,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryVaccinationFK',
           stateName: 'stockVaccination',
           filterStateName: 'filterStockVaccination',
+          initialStateName: 'VaccinationItemList',
         }
       case INVENTORY_TYPE.CONSUMABLE:
         return {
@@ -693,6 +696,7 @@ class Detail extends PureComponent {
           itemFK: 'inventoryConsumableFK',
           stateName: 'stockConsumable',
           filterStateName: 'filterStockConsumable',
+          initialStateName: 'ConsumableItemList',
         }
       default:
         return {}

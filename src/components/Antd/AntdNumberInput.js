@@ -89,6 +89,8 @@ const STYLES = () => {
   }
 }
 
+const reg = /^0\d/gi
+
 @control()
 class AntdNumberInput extends React.PureComponent {
   static propTypes = {
@@ -241,19 +243,29 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   handleKeyDown = (e) => {
+    const v = e.target.value
+    // console.log(e.keyCode)
     if (
-      e.shiftKey &&
-      ![
-        187,
-        9,
-      ].includes(e.keyCode)
+      (e.shiftKey &&
+        ![
+          187,
+          9,
+        ].includes(e.keyCode)) ||
+      (!e.shiftKey &&
+        [
+          187,
+        ].includes(e.keyCode)) ||
+      (e.keyCode === 189 && v.indexOf('-') >= 0)
     ) {
       e.preventDefault()
       return false
     }
-    if (e.keyCode === 190) {
-      const v = e.target.value
-
+    if (
+      [
+        190,
+        110,
+      ].includes(e.keyCode)
+    ) {
       const dotIndex = v.indexOf('.') > 0 ? v.indexOf('.') : v.length
       // console.log(v, dotIndex, v.length)
 
@@ -269,11 +281,14 @@ class AntdNumberInput extends React.PureComponent {
       !(e.keyCode >= 96 && e.keyCode <= 105) &&
       !(e.keyCode >= 37 && e.keyCode <= 40) &&
       ![
+        35,
+        36,
         8,
         9,
         46,
         187,
         189,
+        110,
         109,
         107,
         190,
@@ -466,13 +481,22 @@ class AntdNumberInput extends React.PureComponent {
           : ''
       extraCfg.parser = (v) => {
         if (v === '') return v
+
         // console.log('parser', v)
         if (v) {
           if (v.indexOf('+') >= 0) {
             v = `${v.replace('-', '').replace('+', '')}`
           }
-          if (v.indexOf('-') > 0) {
-            v = `-${v.replace('-', '')}`
+          if (v.indexOf('-') >= 0) {
+            v = v.replace('-', '')
+            while (v && v.match(reg)) {
+              v = v.substring(1, v.length)
+            }
+            v = `-${v}`
+          } else {
+            while (v && v.match(reg)) {
+              v = v.substring(1, v.length)
+            }
           }
         }
         if (!Number(v) && this.state.value === '' && v !== '-') return ''
@@ -557,8 +581,9 @@ class AntdNumberInput extends React.PureComponent {
   }
 
   UNSAFE_componentWillReceiveProps (nextProps) {
-    const { field, value, min } = nextProps
+    const { field, value, min, defaultValue } = nextProps
     const { convertedPrecision: precision } = this.state
+    const v = value || defaultValue
     if (field) {
       this.setState({
         value:
@@ -573,12 +598,12 @@ class AntdNumberInput extends React.PureComponent {
         //   field.value !== '' &&
         //   !Number.isNaN(field.value),
       })
-    } else if (value || value === 0) {
+    } else if (v || v === 0) {
       this.setState({
         value:
-          value === undefined || Number.isNaN(Number(value)) || value === ''
+          v === undefined || Number.isNaN(Number(v)) || v === ''
             ? ''
-            : roundTo(Number(value), precision),
+            : roundTo(Number(v), precision),
         // focused:
         //   value !== undefined &&
         //   value !== null &&

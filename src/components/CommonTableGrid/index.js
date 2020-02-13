@@ -94,18 +94,6 @@ const cellStyle = {
   },
 }
 
-const cellStyleWithFirstColumnCustomPadding = (customPadding) => {
-  return {
-    ...cellStyle,
-    cell: {
-      ...cellStyle.cell,
-      '&:first-child': {
-        paddingLeft: customPadding,
-      },
-    },
-  }
-}
-
 // console.log(colorManipulator)
 const styles = (theme) => ({
   tableCursorPointer: {
@@ -478,22 +466,14 @@ class CommonTableGrid extends PureComponent {
             borderRightWidth: 0,
           },
         },
-        TableCell: this.props.firstColumnCustomPadding
-          ? cellStyleWithFirstColumnCustomPadding(
-              this.props.firstColumnCustomPadding,
-            )
-          : cellStyle,
+        TableCell: cellStyle,
         EditCell: {
           cell: {
             padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
           },
         },
-        TableHeaderCell: this.props.firstColumnCustomPadding
-          ? cellStyleWithFirstColumnCustomPadding(
-              this.props.firstColumnCustomPadding,
-            )
-          : cellStyle,
+        TableHeaderCell: cellStyle,
         Table: {
           table: {
             // tableLayout: 'auto',

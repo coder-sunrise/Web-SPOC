@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import { FastField } from 'formik'
+import _ from 'lodash'
 import { formatMessage } from 'umi/locale'
 import moment from 'moment'
 import { Radio } from 'antd'
@@ -56,7 +57,7 @@ const Stock = ({
   const [
     stock,
     setStock,
-  ] = useState(values[objectType().stockProp])
+  ] = useState(_.sortBy(values[objectType().stockProp], 'id'))
 
   const changeIsDefault = (row) => {
     stock.forEach((o) => {
