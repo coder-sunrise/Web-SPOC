@@ -544,6 +544,7 @@ class Layout extends PureComponent {
       values,
       cestemplate,
       rights,
+      clinicInfo,
       onSaveLayout = (f) => f,
     } = props
     const widgetProps = {
@@ -632,7 +633,7 @@ class Layout extends PureComponent {
     }
 
     // console.log(this.props)
-
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>
         {!this.state.fullScreenWidget && (
@@ -839,24 +840,26 @@ class Layout extends PureComponent {
                   </Fab>
                 </div>
               </Slide>
-              <Slide
-                direction='up'
-                in={this.state.mode === 'edit'}
-                mountOnEnter
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <Fab
-                    color='secondary'
-                    className={classes.fab}
-                    style={{ marginRight: 8 }}
-                    variant='extended'
-                    size='small'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />&nbsp;Patient History
-                  </Fab>
-                </div>
-              </Slide>
+              {clinicTypeFK === CLINIC_TYPE.DENTAL && (
+                <Slide
+                  direction='up'
+                  in={this.state.mode === 'edit'}
+                  mountOnEnter
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <Fab
+                      color='secondary'
+                      className={classes.fab}
+                      style={{ marginRight: 8 }}
+                      variant='extended'
+                      size='small'
+                      onClick={this.togglePatientHistoryDrawer}
+                    >
+                      <Accessibility />&nbsp;Patient History
+                    </Fab>
+                  </div>
+                </Slide>
+              )}
             </div>
             <Drawer
               anchor='right'
