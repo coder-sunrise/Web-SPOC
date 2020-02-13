@@ -93,15 +93,15 @@ class ChangePassword extends React.PureComponent {
                   <input
                     className='visually-hidden'
                     name='fake_username'
-                    value=''
+                    value='fakefake'
                   />
                   <TextField
-                    autoFocus
                     {...args}
                     label='Current Password'
                     type='password'
+                    autocomplete='off'
                     inputProps={{
-                      autoComplete: 'nope',
+                      autoComplete: 'off',
                     }}
                   />
                 </React.Fragment>
@@ -117,7 +117,7 @@ class ChangePassword extends React.PureComponent {
                   label='New Password'
                   type='password'
                   inputProps={{
-                    autoComplete: 'new-password',
+                    autoComplete: 'off',
                   }}
                 />
               )}
@@ -132,7 +132,7 @@ class ChangePassword extends React.PureComponent {
                   label='Confirm Password'
                   type='password'
                   inputProps={{
-                    autoComplete: 'new-password',
+                    autoComplete: 'off',
                   }}
                 />
               )}

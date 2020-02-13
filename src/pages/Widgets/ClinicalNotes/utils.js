@@ -7,7 +7,7 @@ export const getConfig = (clinicInfo) => {
     case CLINIC_TYPE.GP:
       return defaultConfigs
     case CLINIC_TYPE.DENTAL:
-      return defaultConfigs
+      return dentalConfigs
     default:
       return defaultConfigs
   }
