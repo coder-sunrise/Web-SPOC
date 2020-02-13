@@ -1058,7 +1058,7 @@ const calculateAmount = (
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        rows.map((row) => row[totalField]).reduce(sumReducer, 0),
+        activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
       ),
       gst,
       total,
