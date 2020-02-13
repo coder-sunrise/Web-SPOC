@@ -69,6 +69,7 @@ const updateData = (data, payload) => {
       ...payload,
       timestamp: Date.now(),
       date: moment().format(dateFormatLong),
+      key: payload.id + payload.target,
       // id: getUniqueId(),
     })
   }
