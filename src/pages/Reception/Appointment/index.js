@@ -9,6 +9,7 @@ import { CardContainer, CommonModal } from '@/components'
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
 import PopoverContent from './components/PopoverContent'
+import ApptPopover from './components/ApptPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
@@ -450,7 +451,7 @@ class Appointment extends React.PureComponent {
           }}
           disableRestoreFocus
         >
-          <PopoverContent
+          <ApptPopover
             popoverEvent={popoverEvent}
             calendarView={calendarView}
           />
