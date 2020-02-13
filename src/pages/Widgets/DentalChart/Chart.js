@@ -1161,6 +1161,12 @@ class Chart extends React.PureComponent {
               4,
             ].includes(target.chartMethodTypeFK)
           ) {
+            let offset = innerFontSize
+            if (o.subTarget === 'cell_outsidebottom') {
+              offset *= 1.8
+            } else if (o.subTarget === 'cell_outsidetop') {
+              offset *= 0.2
+            }
             let shape = new fabric.Group([
               o.subTarget === 'tooth'
                 ? createRectangle({
@@ -1171,9 +1177,9 @@ class Chart extends React.PureComponent {
                   }).rotate(isUpperSection(index) ? 0 : 180),
               createFont({
                 text: target.chartMethodText || '',
-                left: groupWidth / 2 - innerFontSize / 1.8,
-                top: groupHeight / 2 - innerFontSize,
-                fontSize: innerFontSize * 2,
+                left: groupWidth / 3 - innerFontSize / 3,
+                top: groupHeight / 3 - offset,
+                fontSize: innerFontSize * 4,
               }),
             ])
             const d = new fabric.Group(

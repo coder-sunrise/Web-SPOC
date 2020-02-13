@@ -48,16 +48,21 @@ const SortItem = ({
 }) => {
   const ary = item
   // console.log(item)
-  const valueGroups = _.groupBy(ary, 'id')
-  const SortList = SortableContainer(List)
-  const items = Object.values(
-    _.orderBy(valueGroups, (o) => o[0].timestamp),
-  ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
+  const valueGroups = _.groupBy(ary, 'key')
+  // console.log(valueGroups)
 
+  const SortList = SortableContainer(List)
+  let items = Object.values(_.orderBy(valueGroups, (o) => o[0].timestamp)).map(
+    (o) => o[0].key,
+  ) // Object.keys(valueGroups).map((o) => Number(o))
+  // if (root) {
+  //   items.push(root)
+  //   items = items.filter((o) => o.name !== 'root')
+  // }
   const onSortEnd = ({ newIndex, oldIndex }) => {
     if (newIndex === oldIndex) return
-    let currentItems = ary.filter((o) => o.id === items[oldIndex])
-    const existItems = ary.filter((o) => o.id === items[newIndex])
+    let currentItems = ary.filter((o) => o.key === items[oldIndex])
+    const existItems = ary.filter((o) => o.key === items[newIndex])
     currentItems = currentItems.map((o) => ({
       ...o,
       timestamp:
@@ -73,7 +78,7 @@ const SortItem = ({
     ary
       .filter(
         (o) =>
-          o.id !== currentItems[0].id &&
+          o.key !== currentItems[0].key &&
           o.timestamp < currentItems[0].timestamp,
       )
       .map((o) => {
@@ -82,7 +87,7 @@ const SortItem = ({
     ary
       .filter(
         (o) =>
-          o.id !== currentItems[0].id &&
+          o.key !== currentItems[0].key &&
           o.timestamp > currentItems[0].timestamp,
       )
       .map((o) => {
@@ -95,7 +100,7 @@ const SortItem = ({
         data: [
           ...data.filter(
             (o) =>
-              (o.toothNo === Number(index) && o.id !== items[oldIndex]) ||
+              (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
               o.toothNo !== Number(index),
           ),
           ...currentItems,
@@ -117,8 +122,10 @@ const SortItem = ({
     >
       {items.map((j) => {
         const subAry = valueGroups[j]
+        console.log(j, valueGroups, valueGroups[j])
         const v = subAry[0]
         if (v.action.method !== 3) v.info = subAry.map((o) => o.name).join(',')
+
         if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
           subAry.push({
             subTarget: 'centerfull',
@@ -128,13 +135,13 @@ const SortItem = ({
             },
           })
         }
-        const { action = {}, subTarget, id } = v
+        const { action = {}, subTarget, key } = v
         const SortableListItem = SortableElement(ListItem)
-        const idx = items.indexOf(id)
+        const idx = items.indexOf(key)
         // console.log(v, selected)
         return (
           <SortableListItem
-            key={id}
+            key={key}
             classes={{
               root: classes.toothJournalItem,
               secondaryAction: classes.toothJournalItemSecondaryAction,
@@ -147,7 +154,7 @@ const SortItem = ({
                   selected:
                     selected &&
                     v.toothNo === selected.toothNo &&
-                    v.id === selected.id
+                    v.key === selected.key
                       ? undefined
                       : v,
                 },
@@ -155,7 +162,9 @@ const SortItem = ({
             }}
             index={idx}
             selected={
-              selected && v.toothNo === selected.toothNo && v.id === selected.id
+              selected &&
+              v.toothNo === selected.toothNo &&
+              v.key === selected.key
             }
           >
             <ListItemIcon
@@ -183,6 +192,7 @@ const SortItem = ({
                       .chartMethodText,
                   })),
                 )}
+                target={v}
                 // name={row.text}
               />
             </ListItemIcon>
