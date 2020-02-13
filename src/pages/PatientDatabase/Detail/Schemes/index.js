@@ -197,14 +197,13 @@ class Schemes extends PureComponent {
                 Schemes
               </h4>
             </GridItem>
-            <GridItem md={3} />
+            <GridItem md={4} />
             <GridItem md={3} style={{ color: 'red' }}>
               {this.state.refreshedSchemeData && !this.state.refreshedSchemeData.isSuccessful?(this.state.refreshedSchemeData.statusDescription):''}
             </GridItem>
-            <GridItem md={2} alignItems='flex-end'>
+            <GridItem md={1}>
               <Button color='primary'
                 size='sm'
-                alignSelf='flex-end'
                 onClick={() => this.refreshChasBalance(tempPatientCoPaymentSchemeFK, tempSchemeTypeFK,isSaveToDb)}
                 disabled={disableSave}
               >
