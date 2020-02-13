@@ -91,7 +91,7 @@ const DiagnosisPanel = (props) => {
             />
           </GridItem>
           <GridItem md={3} style={{ lineHeight: theme.props.singleRowHeight }}>
-            <Tooltip title='Settings'>
+            <Tooltip title='Chart Method'>
               <Button
                 // style={{ margin: `${theme.spacing(1)}px 0` }}
 

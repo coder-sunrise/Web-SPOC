@@ -132,22 +132,37 @@ class BasicLayout extends React.PureComponent {
     this.initUserData()
     initStream()
 
-    let sessionTimeOutTimer = null
+    let sessionTimeOutInterval = null
     this.refreshTokenInterval = null
 
     const resetSessionTimeOut = (e) => {
       // console.log(e)
-      clearTimeout(sessionTimeOutTimer)
-      sessionTimeOutTimer = setTimeout(() => {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            showSessionTimeout: true,
-          },
-        })
+      clearTimeout(sessionTimeOutInterval)
+      const now = Date.now()
+      localStorage.setItem('lastActiveTime', now)
+      sessionTimeOutInterval = setInterval(() => {
+        if (
+          Number(localStorage.getItem('lastActiveTime')) <=
+          Date.now() - sessionTimeoutTimer
+        ) {
+          if (localStorage.getItem('token')) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: true,
+              },
+            })
+            clearInterval(sessionTimeOutInterval)
+          } else {
+            window.location.reload()
+          }
+        }
       }, sessionTimeoutTimer)
     }
-    const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
+    const debouncedRST = _.debounce(resetSessionTimeOut, 10000, {
+      leading: true,
+      trailing: false,
+    })
     $(document).on('click', debouncedRST)
     $(document).on('keydown', debouncedRST)
 
