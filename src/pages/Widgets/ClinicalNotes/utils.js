@@ -23,18 +23,20 @@ export const getContent = (config) => {
   }))
 }
 
-export const getDefaultActivePanel = (entity, config) => {
+export const getDefaultActivePanel = (entity, config, prefix) => {
   try {
     const { fields } = config
 
-    const { corDoctorNote = [], corScribbleNotes = [] } = entity
+    const { corScribbleNotes = [] } = entity
+    const notes = entity[prefix] || []
+    console.log({ notes, entity, prefix })
     let defaultActive = fields.map((field) => field.index)
 
-    if (corDoctorNote.length === 0 && corScribbleNotes.length === 0) return []
+    if (notes.length === 0 && corScribbleNotes.length === 0) return []
 
     // check if panel contains doctor notes
-    if (corDoctorNote.length > 0) {
-      const doctorNote = { ...corDoctorNote[0] }
+    if (notes.length > 0) {
+      const doctorNote = { ...notes[0] }
       const panelWithData = fields.filter((field) => {
         if (doctorNote[field.fieldName]) return true
         return false
