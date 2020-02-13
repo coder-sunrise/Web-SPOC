@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { timeFormat } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
@@ -47,6 +48,21 @@ export const AppointmentDataColExtensions = [
     width: 110,
     format: timeFormat,
     allowClear: false,
+    onChange: (props) => {
+      const { row } = props
+      const { apptDurationHour = 0, apptDurationMinute = 0 } = row
+      let { startTime } = row
+      let _endTime = row.endTime
+
+      if (startTime) {
+        const startMoment = moment(startTime, 'HH:mm A')
+        _endTime = startMoment
+          .add(apptDurationHour, 'hour')
+          .add(apptDurationMinute, 'minute')
+          .format('HH:mm')
+        row.endTime = _endTime
+      }
+    },
   },
   {
     columnName: 'roomFk',

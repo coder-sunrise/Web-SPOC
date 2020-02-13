@@ -504,7 +504,6 @@ class Form extends React.PureComponent {
         appointmentResources: [],
         newAppointmentStatusFK: appointmentStatusFK,
       }
-
       setSubmitting(false)
 
       dispatch({
