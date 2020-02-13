@@ -320,30 +320,6 @@ class PatientDetail extends PureComponent {
   //   console.log('PatientDetail componentDidMount')
   // }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    const { errors, dispatch, patient, values, validateForm } = nextProps
-    // validateForm(values).then((o) => {
-    //   console.log(o)
-    // })
-    const menuErrors = {}
-    Object.keys(errors).forEach((k) => {
-      this.widgets.forEach((w) => {
-        menuErrors[w.id] = !!(w.schema && w.schema[k])
-      })
-    })
-    if (!_.isEqual(patient.menuErrors, menuErrors)) {
-      const { currentComponent, currentId, entity } = patient
-      const currentMenu =
-        this.widgets.find((o) => o.id === currentComponent) || {}
-      dispatch({
-        type: 'patient/updateState',
-        payload: {
-          menuErrors,
-        },
-      })
-    }
-  }
-
   // componentDidMount () {
   //   setTimeout(() => {
   //     if (this.props.patient.entity) {
@@ -351,6 +327,17 @@ class PatientDetail extends PureComponent {
   //     }
   //   }, 2000)
   // }
+
+  componentWillUnmount () {
+    const {dispatch} = this.props
+    const menuErrors = {}
+    dispatch({
+      type: 'patient/updateState',
+      payload: {
+        menuErrors,
+      },
+    })
+  }
 
   registerVisit = (e) => {
     navigateDirtyCheck({
@@ -431,6 +418,30 @@ class PatientDetail extends PureComponent {
     //   })
     // }
     return handleSubmit()
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    const { errors, dispatch, patient, values, validateForm } = nextProps
+    // validateForm(values).then((o) => {
+    //   console.log(o)
+    // })
+    const menuErrors = {}
+    Object.keys(errors).forEach((k) => {
+      this.widgets.forEach((w) => {
+        menuErrors[w.id] = !!(w.schema && w.schema[k])
+      })
+    })
+    if (!_.isEqual(patient.menuErrors, menuErrors)) {
+      const { currentComponent, currentId, entity } = patient
+      const currentMenu =
+        this.widgets.find((o) => o.id === currentComponent) || {}
+      dispatch({
+        type: 'patient/updateState',
+        payload: {
+          menuErrors,
+        },
+      })
+    }
   }
 
   render () {

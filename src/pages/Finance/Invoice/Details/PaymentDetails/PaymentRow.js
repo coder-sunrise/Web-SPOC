@@ -1,14 +1,22 @@
 import React from 'react'
 import moment from 'moment'
+import classNames from 'classnames'
 // material ui
 import { IconButton, withStyles } from '@material-ui/core'
 import Printer from '@material-ui/icons/Print'
 import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
-import { GridContainer, GridItem, Tooltip, dateFormatLong } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  Tooltip,
+  dateFormatLong,
+  Popper,
+} from '@/components'
 import styles from './styles'
 import { currencyFormatter } from '@/utils/utils'
+import PaymentDetails from './PaymentDetails'
 
 const PaymentRow = ({
   // id,
@@ -33,6 +41,7 @@ const PaymentRow = ({
     reason,
     isCancelled,
     patientDepositTransaction,
+    invoicePaymentMode,
   } = payment
 
   let tooltipMsg = ''
@@ -77,7 +86,16 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          <span>{type}</span>
+          <Popper
+            className={classNames({
+              [classes.pooperResponsive]: true,
+              [classes.pooperNav]: true,
+            })}
+            style={{ marginLeft: 280, width: 450 }}
+            overlay={<PaymentDetails paymentModeDetails={invoicePaymentMode} />}
+          >
+            <span>{type}</span>
+          </Popper>
         </GridItem>
         <GridItem md={2}>
           <span>{itemID}</span>

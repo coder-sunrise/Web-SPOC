@@ -846,7 +846,8 @@ class CommonTableGrid extends PureComponent {
   }
 
   getData =()=>{
-    const { rows=[]}=this.props
+    const { rows=[],showIsDeleted}=this.props
+    if(showIsDeleted) return rows
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list

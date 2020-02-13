@@ -18,9 +18,6 @@ const purchaseOrderDetailsSchema = Yup.object().shape({
   orderQuantity: Yup.number()
     .min(1, 'Order Quantity must be greater than or equal to 1')
     .required(),
-  // bonusReceived: Yup.number()
-  //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
-  //   .required(),
 })
 
 class Grid extends PureComponent {

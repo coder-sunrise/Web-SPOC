@@ -75,11 +75,7 @@ class EditableTableGrid extends React.Component {
     const errorRows = Object.values(window.$tempGridRow[this.gridId]).filter(
       (o) => o._errors && o._errors.length && !o.isDeleted,
     )
-    // console.log(
-    //   errorRows,
-    //   this.state.editingCells,
-    //   window.$tempGridRow[this.gridId],
-    // )
+
     const errorCells = []
     errorRows.forEach((r) => {
       const { _errors } = r
@@ -97,6 +93,7 @@ class EditableTableGrid extends React.Component {
   }
 
   _onEditingCellsChange = (editingCells) => {
+
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
@@ -224,7 +221,6 @@ class EditableTableGrid extends React.Component {
   _onCommitChanges = ({ added, changed, deleted }) => {
     // console.log('_onCommitChanges')
     const { EditingProps, rows = [], schema, getRowId } = this.props
-    // console.log(changed)
     const { onCommitChanges = (f) => f } = EditingProps
     let shouldUpdate = false
     if (added && Object.values(added)[0]) shouldUpdate = true
@@ -334,8 +330,14 @@ class EditableTableGrid extends React.Component {
     })
     // window.$tempGridRow[this.gridId]={}
     if (updatedRows && Array.isArray(updatedRows)) {
-      // console.log(updatedRows, window.$tempGridRow[this.gridId])
-      window.$tempGridRow[this.gridId] = {}
+
+      // Fix schema validation which will gone when delete,
+      // thus skip when deleted to avoid the
+      // existing error validation being cleared (PO grid)
+      if(added||changed)
+      {
+        window.$tempGridRow[this.gridId] = {}
+      }
       updatedRows.forEach((r) => {
         if (!window.$tempGridRow[this.gridId][r.id])
           window.$tempGridRow[this.gridId][r.id] = {}

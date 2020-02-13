@@ -67,6 +67,7 @@ const CreditCard = ({
                 label='Amount'
                 {...args}
                 min={0}
+                precision={0}
                 currency
                 onChange={handleAmountChange}
               />
