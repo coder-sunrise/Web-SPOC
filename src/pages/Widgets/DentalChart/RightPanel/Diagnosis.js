@@ -59,14 +59,13 @@ const Diagnosis = ({
             selected,
           }
 
-          // console.log(k[0])
           return (
             <React.Fragment>
-              {k[0].target.indexOf('top') > 0 && (
+              {k.find((o) => o.target.indexOf('top') > 0) && (
                 <SortItem {...cfg} item={k.filter((o) => o.name === 'root')} />
               )}
               <SortItem {...cfg} item={k.filter((o) => o.name !== 'root')} />
-              {k[0].target.indexOf('bottom') > 0 && (
+              {k.find((o) => o.target.indexOf('bottom') > 0) && (
                 <SortItem {...cfg} item={k.filter((o) => o.name === 'root')} />
               )}
             </React.Fragment>
