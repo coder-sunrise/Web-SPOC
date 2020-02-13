@@ -124,6 +124,20 @@ export default createFormViewModel({
           ),
         }
       },
+      sortItems (state, { payload }) {
+        const { index, oldIndex, currentItems, items } = payload
+        return {
+          ...state,
+          data: [
+            ...state.data.filter(
+              (o) =>
+                (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
+                o.toothNo !== Number(index),
+            ),
+            ...currentItems,
+          ],
+        }
+      },
     },
   },
 })
