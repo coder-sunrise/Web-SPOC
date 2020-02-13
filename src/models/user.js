@@ -1,6 +1,7 @@
 import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 import * as serviceQueue from '../services/queue'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
@@ -67,6 +68,15 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     ]
   }
 
+  if (type === 'Field') {
+    return [
+      {
+        name,
+        rights,
+        // orgName,
+      },
+    ]
+  }
   return []
 }
 
@@ -117,8 +127,9 @@ export default {
         payload: response,
       })
     },
-    *fetchCurrent (_, { call, put }) {
+    *fetchCurrent (_, { select, call, put }) {
       let user = JSON.parse(sessionStorage.getItem('user'))
+      const clinicInfo = yield select((state) => state.clinicInfo)
       if (!user) {
         const response = yield call(queryCurrent)
         if (!response) {
@@ -130,7 +141,47 @@ export default {
             return a.concat(convertServerRights(b))
           }, [])
 
-          // for demo only, TODO: should have a better way to handle it
+          if (clinicInfo && clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL) {
+            // temporary use this for demo
+
+            accessRights.push({
+              name: 'queue.registervisit.vitalsign',
+              rights: 'hidden',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.clinicalnotes',
+              rights: 'enable',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.diagnosis',
+              rights: 'hidden',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.consultationdocument',
+              rights: 'hidden',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.patienthistory',
+              rights: 'hidden',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.order',
+              rights: 'enable',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.vitalsign',
+              rights: 'hidden',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.attachment',
+              rights: 'enable',
+            })
+            accessRights.push({
+              name: 'queue.consultation.widgets.dentalchart',
+              rights: 'enable',
+            })
+          }
+
           if (
             data.userProfileDetailDto &&
             data.userProfileDetailDto.clinicianProfile &&
@@ -138,6 +189,7 @@ export default {
             data.userProfileDetailDto.clinicianProfile.userProfile.userName ===
               'demouser'
           ) {
+            // for demo only, TODO: should have a better way to handle it
             accessRights.push({
               name: 'demorights',
               rights: 'enable',

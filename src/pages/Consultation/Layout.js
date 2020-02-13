@@ -33,6 +33,7 @@ import PatientHistoryDrawer from './PatientHistoryDrawer'
 import { control } from '@/components/Decorator'
 import Templates from './Templates'
 // utils
+import Authorized from '@/utils/Authorized'
 import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 import { CLINIC_TYPE } from '@/utils/constants'
@@ -893,7 +894,17 @@ class Layout extends PureComponent {
                     value={currentLayout.widgets}
                     valueField='id'
                     textField='name'
-                    options={widgets}
+                    options={widgets.filter((widget) => {
+                      const widgetAccessRight = Authorized.check(
+                        widget.accessRight,
+                      )
+                      if (
+                        widgetAccessRight &&
+                        widgetAccessRight.rights === 'hidden'
+                      )
+                        return false
+                      return true
+                    })}
                     onChange={(e, s) => {
                       // console.log(e)
                       // dispatch({
