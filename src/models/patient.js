@@ -226,11 +226,13 @@ export default createFormViewModel({
               currentPatientId: null,
             },
           }),
+          // reset patient model state to default state
           yield put({
             type: 'updateState',
             payload: {
               callback: undefined,
               default: defaultPatientEntity,
+              menuErrors: {},
             },
           }),
         ])
