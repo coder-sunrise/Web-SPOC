@@ -157,6 +157,18 @@ class Attachment extends Component {
     }))
   }
 
+  getDefaultActivePanels = ({
+    visitAttachment = [],
+    referralAttachment = [],
+    clinicalNotesAttachment = [],
+  }) => {
+    let defaultActive = []
+    if (clinicalNotesAttachment.length > 0) defaultActive.push(0)
+    if (visitAttachment.length > 0) defaultActive.push(1)
+    if (referralAttachment.length > 0) defaultActive.push(2)
+    return defaultActive
+  }
+
   render () {
     const { showScribbleModal, selectedScribbleNoteData } = this.state
     const { dispatch } = this.props
@@ -187,23 +199,20 @@ class Attachment extends Component {
                     clinicalNotesAttachment,
                   } = this.mapAttachments(attachments, corScribbleNotes)
                   const onDeleteClick = this.handleDeleteAttachment(args)
+                  const defaultActive = this.getDefaultActivePanels({
+                    visitAttachment,
+                    referralAttachment,
+                    clinicalNotesAttachment,
+                  })
                   return (
                     <Accordion
                       leftIcon
                       expandIcon={<SolidExpandMore fontSize='large' />}
                       mode='multiple'
-                      defaultActive={[
-                        0,
-                        1,
-                        2,
-                      ]}
+                      defaultActive={defaultActive}
                       collapses={[
                         {
-                          title: (
-                            <h5 style={{ paddingLeft: 8 }}>
-                              Consultation Attachment
-                            </h5>
-                          ),
+                          title: 'Consultation Attachment',
                           content: (
                             <div>
                               {clinicalNotesAttachment
@@ -237,9 +246,7 @@ class Attachment extends Component {
                           ),
                         },
                         {
-                          title: (
-                            <h5 style={{ paddingLeft: 8 }}>Visit Attachment</h5>
-                          ),
+                          title: 'Visit Attachment',
                           content: (
                             <div>
                               {visitAttachment
@@ -256,11 +263,7 @@ class Attachment extends Component {
                           ),
                         },
                         {
-                          title: (
-                            <h5 style={{ paddingLeft: 8 }}>
-                              Referral Attachment
-                            </h5>
-                          ),
+                          title: 'Referral Attachment',
                           content: (
                             <div>
                               {referralAttachment
