@@ -113,7 +113,7 @@ const query = {
 }
 
 const refreshTokenTimer = 10 * 60 * 1000
-const sessionTimeoutTimer = 1 * 60 * 1000
+const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
