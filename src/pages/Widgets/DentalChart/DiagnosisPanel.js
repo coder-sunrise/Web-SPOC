@@ -42,8 +42,10 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
     '&:first-child': {
       borderRadius: theme.shape.borderRadius,
     },
-
-    whiteSpace: 'nowrap',
+    height: 35,
+    lineHeight: 1,
+    // whiteSpace: 'nowrap',
+    paddingLeft: 37,
     overflow: 'hidden',
     width: 194,
     border: '1px solid rgba(0, 0, 0, 0.38)',
@@ -134,11 +136,11 @@ const DiagnosisPanel = (props) => {
                     <ToggleButton value={id} key={id}>
                       <Tooth
                         className={classes.buttonIcon}
-                        width={26}
-                        height={26}
+                        width={35}
+                        height={35}
                         paddingLeft={1}
                         paddingTop={1}
-                        zoom={0.21}
+                        zoom={0.28}
                         image={row.image}
                         action={row}
                         fill={{
