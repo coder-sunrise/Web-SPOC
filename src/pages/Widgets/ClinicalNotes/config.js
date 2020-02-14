@@ -39,7 +39,7 @@ export const dentalConfigs = {
   fields: [
     {
       category: 'ClinicianNote',
-      fieldName: 'clinicianNote',
+      fieldName: 'clinicalNotes',
       fieldTitle: 'Clinical Notes',
       scribbleField: 'notesScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
@@ -48,7 +48,7 @@ export const dentalConfigs = {
     },
     {
       category: 'ChiefComplaints',
-      fieldName: 'chiefComplaints',
+      fieldName: 'complaints',
       fieldTitle: 'Chief Complaints',
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS,

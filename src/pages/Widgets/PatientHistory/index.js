@@ -127,6 +127,7 @@ class PatientHistory extends Component {
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
     this.widgets = WidgetConfig.gpWidgets(props)
+    console.log({ clinicTypeFK })
     switch (clinicTypeFK) {
       case CLINIC_TYPE.DENTAL:
         this.widgets = WidgetConfig.dentalWidgets(props)
@@ -134,6 +135,7 @@ class PatientHistory extends Component {
       default:
         break
     }
+    console.log({ widgets: this.widgets })
     this.state = {
       selectedItems: this.widgets.map((widget) => widget.id),
     }
