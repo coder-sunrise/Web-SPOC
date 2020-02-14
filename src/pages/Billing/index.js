@@ -167,12 +167,6 @@ class Billing extends Component {
       })
   }
 
-  // componentDidMount () {
-  //   const { history, dispatch } = this.props
-  //   const { query } = history.location
-
-  // }
-
   componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
