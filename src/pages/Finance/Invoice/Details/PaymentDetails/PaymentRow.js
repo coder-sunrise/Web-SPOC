@@ -86,16 +86,22 @@ const PaymentRow = ({
       >
         <GridItem md={2}>
           {getIconByType()}
-          <Popper
-            className={classNames({
-              [classes.pooperResponsive]: true,
-              [classes.pooperNav]: true,
-            })}
-            style={{ marginLeft: 280, width: 450 }}
-            overlay={<PaymentDetails paymentModeDetails={invoicePaymentMode} />}
-          >
+          {type === 'Payment' ? (
+            <Popper
+              className={classNames({
+                [classes.pooperResponsive]: true,
+                [classes.pooperNav]: true,
+              })}
+              style={{ marginLeft: 280, width: 450 }}
+              overlay={
+                <PaymentDetails paymentModeDetails={invoicePaymentMode} />
+              }
+            >
+              <span>{type}</span>
+            </Popper>
+          ) : (
             <span>{type}</span>
-          </Popper>
+          )}
         </GridItem>
         <GridItem md={2}>
           <span>{itemID}</span>
