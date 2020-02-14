@@ -5,7 +5,13 @@ import moment from 'moment'
 import { Divider, withStyles } from '@material-ui/core'
 import Calendar from '@material-ui/icons/CalendarToday'
 // common component
-import { CodeSelect, GridContainer, GridItem, TextField } from '@/components'
+import {
+  CodeSelect,
+  DatePicker,
+  GridContainer,
+  GridItem,
+  TextField,
+} from '@/components'
 import * as Helper from './helper'
 import { primaryColor } from '@/assets/jss'
 
@@ -49,6 +55,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     appointmentTypeFK,
     appointmentStatusFk,
     bookedByUser,
+    bookedDate,
     patientName,
     patientProfile,
     patientContactNo,
@@ -145,6 +152,9 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
         </GridItem>
         <GridItem md={12}>
           <TextField disabled label='Book By' value={bookedByUser} />
+        </GridItem>
+        <GridItem md={12}>
+          <DatePicker disabled label='Book On' value={bookedDate} />
         </GridItem>
         <GridItem md={12}>
           <TextField
