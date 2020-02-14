@@ -29,7 +29,7 @@ export const getDefaultActivePanel = (entity, config, prefix) => {
 
     const { corScribbleNotes = [] } = entity
     const notes = entity[prefix] || []
-    console.log({ notes, entity, prefix })
+
     let defaultActive = fields.map((field) => field.index)
 
     if (notes.length === 0 && corScribbleNotes.length === 0) return []
