@@ -22,7 +22,7 @@ import { groupWidth, groupHeight } from '../variables'
 import Tooth from '../Tooth'
 
 const symbols = [
-  { name: 'x', value: 'x' },
+  { name: 'X', value: 'X' },
   { name: '#', value: '#' },
   { name: '~', value: '~' },
   { name: '+', value: '+' },

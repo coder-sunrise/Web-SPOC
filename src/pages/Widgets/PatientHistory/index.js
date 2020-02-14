@@ -127,6 +127,7 @@ class PatientHistory extends Component {
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
     this.widgets = WidgetConfig.gpWidgets(props)
+
     switch (clinicTypeFK) {
       case CLINIC_TYPE.DENTAL:
         this.widgets = WidgetConfig.dentalWidgets(props)

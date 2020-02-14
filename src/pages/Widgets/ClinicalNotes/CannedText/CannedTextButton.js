@@ -76,7 +76,7 @@ const CannedTextButton = ({
   const toggleVisibleChange = () => setShow(!show)
 
   const handleMainButtonClick = () => {
-    if (cannedTextTypeFK) {
+    if (cannedTextTypeFK && !show) {
       dispatch({
         type: 'cannedText/query',
         payload: cannedTextTypeFK,

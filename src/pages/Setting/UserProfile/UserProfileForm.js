@@ -389,13 +389,19 @@ class UserProfileForm extends React.PureComponent {
                   <TextField
                     value={values.userProfile.userName}
                     label='Username'
+                    autocomplete='off'
                     disabled
                   />
                 ) : (
                   <FastField
                     name='userProfile.userName'
                     render={(args) => (
-                      <TextField {...args} label='Username' autoFocus />
+                      <TextField
+                        {...args}
+                        label='Username'
+                        autocomplete='off'
+                        autoFocus
+                      />
                     )}
                   />
                 )}

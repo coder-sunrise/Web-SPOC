@@ -127,18 +127,42 @@ export const dentalWidgets = (props) => [
   },
   {
     id: '3',
-    name: 'Plan',
+    name: 'Associated History',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
         let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} fieldName='plan' />
+        return <Cmpnet {...props} {...p} fieldName='associatedHistory' />
       },
       loading: Loading,
     }),
   },
   {
     id: '4',
+    name: 'Intra Oral',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='intraOral' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '5',
+    name: 'Extra Oral',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='extraOral' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '6',
     name: 'Attachment',
     component: Loadable({
       loader: () => import('./Attachment'),
@@ -150,7 +174,7 @@ export const dentalWidgets = (props) => [
     }),
   },
   {
-    id: '5',
+    id: '7',
     name: 'Orders',
     component: Loadable({
       loader: () => import('./Orders'),
@@ -162,7 +186,7 @@ export const dentalWidgets = (props) => [
     }),
   },
   {
-    id: '6',
+    id: '8',
     name: 'Invoice',
     component: Loadable({
       loader: () => import('./Invoice'),

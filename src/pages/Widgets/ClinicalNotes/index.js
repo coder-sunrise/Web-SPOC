@@ -22,6 +22,12 @@ import model from './models'
 import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
+import { CLINIC_TYPE } from '@/utils/constants'
+
+const PREFIX = {
+  GP: 'corDoctorNote',
+  DENTAL: 'corDentalNotes',
+}
 
 const styles = (theme) => ({
   editor: {
@@ -386,13 +392,16 @@ class ClinicalNotes extends Component {
   handleAddCannedText = (cannedText) => {
     const { cannedTextRow } = this.state
 
-    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { consultation, clinicInfo } = this.props
+    const _prefix =
+      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
+    const prefix = `${_prefix}[0]`
     const { entity } = consultation
     const { text } = cannedText
 
-    const { corDoctorNote = [] } = entity
-    const prevData =
-      corDoctorNote.length > 0 ? corDoctorNote[0][cannedTextRow.fieldName] : ''
+    // const { corDoctorNote = [] } = entity
+    const note = entity[prefix] || []
+    const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
 
     const value = `${prevData || ''}${text}`
 
@@ -403,19 +412,20 @@ class ClinicalNotes extends Component {
   insertIntoClinicalNote = (dataUrl) => {
     const { selectedData, config } = this.state
     const { fields = [] } = config
-    const { consultation, prefix = 'corDoctorNote[0].' } = this.props
+    const { consultation, clinicInfo } = this.props
+    const _prefix =
+      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
+    const prefix = `${_prefix}[0]`
     const { entity } = consultation
     const contents = `<img src=${dataUrl} alt='scribbleNote' />`
 
-    const { corDoctorNote = [] } = entity
+    // const { corDoctorNote = [] } = entity
+    const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
       (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
     )
 
-    const prevData =
-      corDoctorNote.length > 0
-        ? corDoctorNote[0][scribbleNoteField.fieldName]
-        : ''
+    const prevData = note.length > 0 ? note[0][scribbleNoteField.fieldName] : ''
 
     const value = `${prevData} ${contents}`
 
@@ -432,18 +442,22 @@ class ClinicalNotes extends Component {
 
   render () {
     const {
-      prefix = 'corDoctorNote[0].',
+      // prefix = 'corDoctorNote[0].',
       classes,
       scriblenotes,
       theme,
       dispatch,
       consultation,
+      clinicInfo,
     } = this.props
+    const _prefix =
+      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
+    const prefix = `${_prefix}[0]`
     const { config, contents, showCannedText } = this.state
     const { entity = {} } = consultation
 
     const { fields } = config
-    const defaultActive = getDefaultActivePanel(entity, config)
+    const defaultActive = getDefaultActivePanel(entity, config, _prefix)
 
     return (
       <div>
