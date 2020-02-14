@@ -129,7 +129,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <CodeSelect
             disabled
             code='ctappointmenttype'
-            label='Appointment Type'
+            label='Appt. Type'
             labelField='displayValue'
             valueField='id'
             value={appointmentTypeFK}
@@ -139,7 +139,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <CodeSelect
             disabled
             code='ltappointmentstatus'
-            label='Appointment Status'
+            label='Appt. Status'
             value={appointmentStatusFk && Number(appointmentStatusFk)}
           />
         </GridItem>
