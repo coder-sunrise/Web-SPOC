@@ -337,6 +337,7 @@ const CalendarView = ({
           appointmentRemarks,
           appointmentStatusFk,
           bookedByUser,
+          createDate,
         } = appointment
 
         const apptEvents = apptResources.map((item) => ({
@@ -350,6 +351,7 @@ const CalendarView = ({
           appointmentRemarks,
           appointmentStatusFk,
           bookedByUser,
+          createDate,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,

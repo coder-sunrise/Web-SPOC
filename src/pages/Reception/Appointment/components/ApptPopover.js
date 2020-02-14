@@ -55,7 +55,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
     appointmentTypeFK,
     appointmentStatusFk,
     bookedByUser,
-    bookedDate,
+    createDate,
     patientName,
     patientProfile,
     patientContactNo,
@@ -154,7 +154,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <TextField disabled label='Book By' value={bookedByUser} />
         </GridItem>
         <GridItem md={12}>
-          <DatePicker disabled label='Book On' value={bookedDate} />
+          <DatePicker disabled label='Book On' value={createDate} />
         </GridItem>
         <GridItem md={12}>
           <TextField
