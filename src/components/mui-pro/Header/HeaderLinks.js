@@ -195,8 +195,8 @@ class HeaderLinks extends React.Component {
               <div
                 style={{
                   width: '100%',
-                  minWidth: 300,
-                  maxWidth: 400,
+                  minWidth: 400,
+                  maxWidth: 500,
                   maxHeight: 290,
                   overflowY: 'auto',
                 }}
@@ -263,8 +263,8 @@ class HeaderLinks extends React.Component {
           <div
             style={{
               width: '100%',
-              minWidth: 300,
-              maxWidth: 400,
+              minWidth: 400,
+              maxWidth: 500,
               minHeight: 290,
               maxHeight: 290,
               display: 'flex',
@@ -287,6 +287,14 @@ class HeaderLinks extends React.Component {
             <p style={{ margin: 'auto auto auto 15px', fontSize: 16 }}>
               Notifications
             </p>
+            <a
+              style={{ margin: 'auto 15px auto auto', fontSize: 16 }}
+              onClick={() => {
+                this.forceUpdate()
+              }}
+            >
+              Refresh Q
+            </a>
           </div>
           {NotificationContent()}
         </div>
