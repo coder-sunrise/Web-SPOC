@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core'
 // common components
 import {
   Button,
+  Checkbox,
   DatePicker,
   GridContainer,
   GridItem,
@@ -67,6 +68,12 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
               render={(args) => <DiagnosisSelect {...args} mode='multiple' />}
             />
           </GridItem>
+          <GridItem md={4}>
+          <FastField
+            name='showDetails'
+            render={(args) => <Checkbox {...args} label='Show Details'/>}
+          />
+        </GridItem>
         </GridContainer>
       </React.Fragment>
     </SizeContainer>
