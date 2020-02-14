@@ -8,7 +8,8 @@ import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
-import PopoverContent from './components/PopoverContent'
+import ApptPopover from './components/ApptPopover'
+import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
@@ -441,19 +442,23 @@ class Appointment extends React.PureComponent {
           onClose={this.handleClosePopover}
           placement='top-start'
           anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'right',
+            vertical: 'top',
+            horizontal: 'center',
           }}
           transformOrigin={{
-            vertical: 'center',
-            horizontal: 'left',
+            vertical: 'bottom',
+            horizontal: 'center',
           }}
           disableRestoreFocus
         >
-          <PopoverContent
-            popoverEvent={popoverEvent}
-            calendarView={calendarView}
-          />
+          {popoverEvent.doctor ? (
+            <DoctorBlockPopover
+              popoverEvent={popoverEvent}
+              calendarView={calendarView}
+            />
+          ) : (
+            <ApptPopover popoverEvent={popoverEvent} />
+          )}
         </Popover>
 
         <FilterBar
