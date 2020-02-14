@@ -175,6 +175,11 @@ const menuData = [
     url: '/setting/userprofile',
   },
   {
+    title: 'System User',
+    text: 'Role',
+    url: '/setting/userrole',
+  },
+  {
     title: 'Print Setup',
     text: 'Printout Setting',
     url: '/setting/printoutsetting',

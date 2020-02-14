@@ -1,4 +1,6 @@
 import React from 'react'
+// formik
+import { withFormik, FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
@@ -15,6 +17,7 @@ import {
   CommonTableGrid,
   GridContainer,
   GridItem,
+  Select,
   TextField,
   Tooltip,
   ProgressButton,
@@ -30,6 +33,11 @@ const styles = (theme) => ({
   },
 })
 
+@withFormik({
+  mapPropsToValues: () => ({
+    status: true,
+  }),
+})
 class UserRole extends React.Component {
   state = {
     filter: {
@@ -86,7 +94,21 @@ class UserRole extends React.Component {
               onChange={this.onTextFieldChange}
             />
           </GridItem>
-
+          <GridItem md={2}>
+            <FastField
+              name='status'
+              render={(args) => (
+                <Select
+                  {...args}
+                  label='Status'
+                  options={[
+                    { name: 'Active', value: true },
+                    { name: 'Inactive', value: false },
+                  ]}
+                />
+              )}
+            />
+          </GridItem>
           <GridItem md={12} className={classes.verticalSpacing}>
             <ProgressButton icon={<Search />} color='primary'>
               <FormattedMessage id='form.search' />
