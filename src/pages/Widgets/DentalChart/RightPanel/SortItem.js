@@ -49,17 +49,13 @@ const SortItem = ({
   const ary = item
   // console.log(item)
   const valueGroups = _.groupBy(ary, 'key')
-  // console.log(valueGroups)
-
   const SortList = SortableContainer(List)
-  let items = Object.values(_.orderBy(valueGroups, (o) => o[0].timestamp)).map(
-    (o) => o[0].key,
-  ) // Object.keys(valueGroups).map((o) => Number(o))
-  // if (root) {
-  //   items.push(root)
-  //   items = items.filter((o) => o.name !== 'root')
-  // }
+  const items = Object.values(
+    _.orderBy(valueGroups, (o) => o[0].timestamp),
+  ).map((o, i) => o[0].key) // Object.keys(valueGroups).map((o) => Number(o))
+  // console.log(valueGroups, items)
   const onSortEnd = ({ newIndex, oldIndex }) => {
+    // console.log(newIndex, oldIndex)
     if (newIndex === oldIndex) return
     let currentItems = ary.filter((o) => o.key === items[oldIndex])
     const existItems = ary.filter((o) => o.key === items[newIndex])
@@ -94,17 +90,27 @@ const SortItem = ({
         o.timestamp += 1
       })
 
+    // dispatch({
+    //   type: 'dentalChartComponent/updateState',
+    //   payload: {
+    //     data: [
+    //       ...data.filter(
+    //         (o) =>
+    //           (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
+    //           o.toothNo !== Number(index),
+    //       ),
+    //       ...currentItems,
+    //     ],
+    //   },
+    // })
+
     dispatch({
-      type: 'dentalChartComponent/updateState',
+      type: 'dentalChartComponent/sortItems',
       payload: {
-        data: [
-          ...data.filter(
-            (o) =>
-              (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
-              o.toothNo !== Number(index),
-          ),
-          ...currentItems,
-        ],
+        currentItems,
+        index,
+        oldIndex,
+        items,
       },
     })
   }
@@ -122,10 +128,8 @@ const SortItem = ({
     >
       {items.map((j) => {
         const subAry = valueGroups[j]
-        console.log(j, valueGroups, valueGroups[j])
         const v = subAry[0]
         if (v.action.method !== 3) v.info = subAry.map((o) => o.name).join(',')
-
         if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
           subAry.push({
             subTarget: 'centerfull',
@@ -138,7 +142,7 @@ const SortItem = ({
         const { action = {}, subTarget, key } = v
         const SortableListItem = SortableElement(ListItem)
         const idx = items.indexOf(key)
-        // console.log(v, selected)
+        // console.log(idx)
         return (
           <SortableListItem
             key={key}
@@ -249,6 +253,7 @@ const SortItem = ({
   )
 }
 
+// export default SortItem
 export default React.memo(
   SortItem,
   ({ item, selected }, { item: itemNext, selected: selectedNext }) => {
