@@ -176,6 +176,15 @@ export const COUNTRY_CODE = {
   6: '+81 Japan',
 }
 
+export const COUNTRY_CODE_NUMBER = {
+  1: '+65',
+  2: '+60',
+  3: '+62',
+  4: '+63',
+  5: '+66',
+  6: '+81',
+}
+
 export const ADD_ON_FEATURE = {
   SMS: 1,
   MIMS: 2,
@@ -292,4 +301,11 @@ export const PURCHASE_ORDER_STATUS = {
   CANCELLED: 4,
   FULFILLED: 5,
   COMPLETED: 6,
+}
+
+export const NUMBER_TYPE = {
+  MOBILE: 1,
+  HOME: 2,
+  WORK: 3,
+  FAX: 4,
 }

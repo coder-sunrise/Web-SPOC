@@ -1,79 +1,167 @@
 import React, { Fragment } from 'react'
+import { connect } from 'dva'
 import moment from 'moment'
-import classnames from 'classnames'
 // material icon
-import { withStyles } from '@material-ui/core'
-import AccessTime from '@material-ui/icons/AccessTime'
-// big calendar
-import BigCalendar from 'react-big-calendar'
+import { Divider, withStyles } from '@material-ui/core'
+import Calendar from '@material-ui/icons/CalendarToday'
 // common component
-import {
-  CardContainer,
-  GridContainer,
-  GridItem,
-  timeFormat,
-  timeFormat24Hour,
-} from '@/components'
+import { CodeSelect, GridContainer, GridItem, TextField } from '@/components'
+import * as Helper from './helper'
+import { primaryColor } from '@/assets/jss'
 
 const styles = (theme) => ({
   root: {
-    width: '250px',
+    width: '500px',
     textAlign: 'left',
     padding: theme.spacing(1),
   },
+  appointmentTypeColorBanner: {
+    width: '100%',
+    height: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  divider: {
+    backgroundColor: '#999',
+  },
+  titleLabel: {
+    fontWeight: 500,
+  },
+  datetimeLabel: {
+    display: 'inline-block',
+    fontSize: '0.9rem',
+  },
   icon: {
-    position: 'relative',
-    top: 6,
-    marginRight: 15,
+    marginRight: theme.spacing(1),
   },
   iconRow: {
-    marginBottom: 10,
-  },
-  statusRow: {
-    position: 'absolute',
-    right: 8,
-    top: 8,
-    textAlign: 'right',
-    color: '#999',
-    fontSize: '.75rem',
+    display: 'flex',
+    alignItems: 'center',
   },
 })
 
-const getTimeString = (value) => {
-  if (moment(value, timeFormat).isValid()) {
-    return moment(value, timeFormat).format(timeFormat)
-  }
-  if (moment(value, timeFormat24Hour).isValid()) {
-    return moment(value, timeFormat24Hour).format(timeFormat24Hour)
-  }
-  return 'N/A'
-}
+const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
+  const {
+    appointment_Resources: appointmentResources,
+    appointmentDate,
+    appointmentRemarks,
+    appointmentTypeFK,
+    appointmentStatusFk,
+    bookedByUser,
+    patientName,
+    patientProfile,
+    patientContactNo,
+    clinicianFK,
+    startTime,
+    endTime,
+  } = popoverEvent
 
-const ApptPopover = ({ classes, popoverEvent, calendarView }) => {
-  const getTimeRange = () => {
-    if (calendarView === BigCalendar.Views.MONTH) return ''
+  const date = moment(appointmentDate)
+  const title = Helper.constructTitle(
+    patientName,
+    patientProfile,
+    patientContactNo,
+  )
 
-    return (
-      <Fragment>
-        <AccessTime className={classnames(classes.icon)} />
-        <span>
-          {getTimeString(popoverEvent.startTime)} -&nbsp;
-          {getTimeString(popoverEvent.endTime)}
-        </span>
-      </Fragment>
-    )
-  }
+  const AppointmentDateLabel = (
+    <Fragment>
+      <Calendar className={classes.icon} />
+      <span className={classes.datetimeLabel}>
+        {Helper.parseDateToDay(date)}, {Helper.parseDateToFullDate(date)}
+      </span>
+    </Fragment>
+  )
+  const TimeLabel = (
+    <Fragment>
+      <span className={classes.datetimeLabel}>
+        {Helper.getTimeRange(appointmentResources, { startTime, endTime })}
+      </span>
+    </Fragment>
+  )
+
+  const appointmentType = ctappointmenttype.find(
+    (item) => item.id === appointmentTypeFK,
+  )
+  const appointmentColor = appointmentType
+    ? appointmentType.tagColorHex
+    : primaryColor
 
   return (
-    <CardContainer hideHeader className={classes.root}>
-      <div />
-      <GridContainer>
+    <div className={classes.root}>
+      <div
+        className={classes.appointmentTypeColorBanner}
+        style={{
+          backgroundColor: appointmentColor,
+        }}
+      />
+      <GridContainer style={{ marginTop: 12 }}>
         <GridItem md={12}>
-          <h4>Patient name</h4>
+          <h4 className={classes.titleLabel}>{title}</h4>
+        </GridItem>
+        <GridItem className={classes.iconRow}>{AppointmentDateLabel}</GridItem>
+        <GridItem>
+          <Divider
+            orientation='vertical'
+            flexItem
+            className={classes.divider}
+            style={{ display: 'inline-block', width: 3 }}
+          />
+        </GridItem>
+        <GridItem className={classes.iconRow}>{TimeLabel}</GridItem>
+        <GridItem md={12}>
+          <Divider
+            className={classes.divider}
+            style={{ marginTop: 8, marginBottom: 8 }}
+          />
+        </GridItem>
+        <GridItem md={12}>
+          <CodeSelect
+            disabled
+            code='doctorprofile'
+            label='Doctor'
+            labelField='clinicianProfile.name'
+            valueField='clinicianProfile.id'
+            value={clinicianFK}
+          />
+        </GridItem>
+        <GridItem md={12}>
+          <CodeSelect
+            disabled
+            code='ctappointmenttype'
+            label='Appointment Type'
+            labelField='displayValue'
+            valueField='id'
+            value={appointmentTypeFK}
+          />
+        </GridItem>
+        <GridItem md={12}>
+          <CodeSelect
+            disabled
+            code='ltappointmentstatus'
+            label='Appointment Status'
+            value={appointmentStatusFk && Number(appointmentStatusFk)}
+          />
+        </GridItem>
+        <GridItem md={12}>
+          <TextField disabled label='Book By' value={bookedByUser} />
+        </GridItem>
+        <GridItem md={12}>
+          <TextField
+            disabled
+            multiline
+            rowsMax='5'
+            label='Remarks'
+            value={appointmentRemarks}
+          />
         </GridItem>
       </GridContainer>
-    </CardContainer>
+    </div>
   )
 }
 
-export default withStyles(styles, { name: 'ApptPopover' })(ApptPopover)
+const Connected = connect(({ codetable }) => ({
+  ctappointmenttype: codetable.ctappointmenttype,
+}))(ApptPopover)
+
+export default withStyles(styles, { name: 'ApptPopover' })(Connected)
