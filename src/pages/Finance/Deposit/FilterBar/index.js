@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
-import { FastField, withFormik } from 'formik'
+import moment from 'moment'
+import { FastField, Field, withFormik } from 'formik'
 import { formatMessage, FormattedMessage } from 'umi/locale'
 import PersonAdd from '@material-ui/icons/PersonAdd'
 import Search from '@material-ui/icons/Search'
@@ -13,8 +14,11 @@ import {
   TextField,
   Checkbox,
   DateRangePicker,
+  DatePicker,
   ProgressButton,
 } from '@/components'
+// utils
+import { roundTo } from '@/utils/utils'
 
 const styles = (theme) => ({
   filterBar: {
@@ -37,7 +41,10 @@ const styles = (theme) => ({
 })
 
 @withFormik({
-  mapPropsToValues: () => {},
+  mapPropsToValues: () => ({
+    transactionStartDate: moment().add(-1, 'month'),
+    transactionEndDate: moment(),
+  }),
 })
 class FilterBar extends PureComponent {
   componentWillUnmount () {
@@ -53,7 +60,8 @@ class FilterBar extends PureComponent {
     })
 
   render () {
-    const { classes, dispatch, theme, queryDepositListing } = this.props
+    const { classes, dispatch, theme, queryDepositListing, values } = this.props
+    const { transactionStartDate, transactionEndDate } = values
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -72,8 +80,61 @@ class FilterBar extends PureComponent {
               }}
             />
           </GridItem>
-
-          <GridItem xs={6} md={4}>
+          <GridItem md={2}>
+            <Field
+              name='transactionStartDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Transaction Date From'
+                  disabledDate={(d) => {
+                    const endDate = transactionEndDate
+                      ? moment(transactionEndDate)
+                      : undefined
+                    if (endDate) {
+                      const range = moment.duration(d.diff(endDate))
+                      const years = roundTo(range.asYears())
+                      return (
+                        !d ||
+                        d.isAfter(moment()) ||
+                        d.isAfter(endDate) ||
+                        years < -1.0
+                      )
+                    }
+                    return !d || d.isAfter(moment())
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <Field
+              name='transactionEndDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Transaction Date To'
+                  disabledDate={(d) => {
+                    const startDate = transactionStartDate
+                      ? moment(transactionStartDate)
+                      : undefined
+                    if (startDate) {
+                      const range = moment.duration(d.diff(startDate))
+                      const years = roundTo(range.asYears())
+                      return (
+                        !d ||
+                        d.isAfter(moment()) ||
+                        d.isBefore(startDate) ||
+                        years > 1.0
+                      )
+                    }
+                    return !d || d.isAfter(moment())
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          {/* <GridItem xs={6} md={4}>
             <FastField
               name='transactionDates'
               render={(args) => {
@@ -82,12 +143,24 @@ class FilterBar extends PureComponent {
                     style={{ maxWidth: 380 }}
                     label='Transaction Date From'
                     label2='To'
+                    disabledDate={(d) => {
+                      const startDate = transactionDates[0]
+                        ? moment(transactionDates[0])
+                        : undefined
+                      if (startDate) {
+                        const range = moment.duration(d.diff(startDate))
+                        const years = roundTo(range.asYears())
+
+                        return years > 1.0
+                      }
+                      return false
+                    }}
                     {...args}
                   />
                 )
               }}
             />
-          </GridItem>
+          </GridItem> */}
           <GridItem md={4} />
 
           <GridItem xs sm={6} md={4}>
@@ -132,12 +205,10 @@ class FilterBar extends PureComponent {
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[0]
-                        : undefined,
-                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[1]
-                        : undefined,
+                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate':
+                        transactionStartDate || undefined,
+                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate':
+                        transactionEndDate || undefined,
                       apiCriteria: {
                         // searchValue: ExpenseType,
                         OnlyWithDeposit: showTransactionOnly,
