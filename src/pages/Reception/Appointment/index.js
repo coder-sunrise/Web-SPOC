@@ -127,7 +127,11 @@ class Appointment extends React.PureComponent {
 
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'doctorprofile', force: true, filter: {} },
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {},
+      },
     }).then((response) => {
       response
 
@@ -137,6 +141,7 @@ class Appointment extends React.PureComponent {
 
       if (response) {
         resources = response
+          .filter((clinician) => clinician.clinicianProfile.isActive)
           .filter((_, index) => index < 5)
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
