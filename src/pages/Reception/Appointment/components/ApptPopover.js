@@ -150,7 +150,7 @@ const ApptPopover = ({ classes, popoverEvent, ctappointmenttype = [] }) => {
           <TextField
             disabled
             multiline
-            rowsMax='5'
+            rowsMax={3}
             label='Remarks'
             value={appointmentRemarks}
           />
