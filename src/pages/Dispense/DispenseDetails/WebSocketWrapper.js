@@ -87,9 +87,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
     try {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      if (settings.labelPrinterSize === '8.9cmx3.6cm') {
-        // drugLabelReportID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_89MM_36MM
-        // patientLabelReportID = PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_89MM_36MM
+      if (settings && settings.labelPrinterSize === '8.9cmx3.6cm') {
         drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
       }
@@ -110,7 +108,6 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
               ReportContext: reportContext,
             }),
           }))
-          console.log({ payload })
           return payload
         }
       }
@@ -119,13 +116,15 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         const reportContext = await getReportContext(drugLabelReportID)
         const data = await generateDrugLablePrintSource(row)
         if (data) {
-          return {
-            ReportId: drugLabelReportID,
-            ReportData: JSON.stringify({
-              ...data,
-              ReportContext: reportContext,
-            }),
-          }
+          return [
+            {
+              ReportId: drugLabelReportID,
+              ReportData: JSON.stringify({
+                ...data,
+                ReportContext: reportContext,
+              }),
+            },
+          ]
         }
       }
 
@@ -135,12 +134,14 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         const data = await getRawData(patientLabelReportID, {
           patientId: patient ? patient.id : values.patientProfileFK,
         })
-        return {
-          ReportId: patientLabelReportID,
-          ReportData: JSON.stringify({
-            ...data,
-          }),
-        }
+        return [
+          {
+            ReportId: patientLabelReportID,
+            ReportData: JSON.stringify({
+              ...data,
+            }),
+          },
+        ]
       }
     } catch (error) {
       console.log({ error })
@@ -152,13 +153,8 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     if (withoutPrintPreview.includes(type)) {
       const printResult = await getPrintResult(type, row)
       if (!printResult) return
-      console.log({ printResult, stringified: JSON.stringify(printResult) })
 
-      handlePrint(
-        JSON.stringify([
-          printResult,
-        ]),
-      )
+      handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(
         (o) =>
