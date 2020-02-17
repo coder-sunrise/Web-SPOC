@@ -74,7 +74,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           return getDrugLabelDetails(o, prescriptionItem)
         }),
       )
-      return { DrugLabelDetails: drugLabelDetail }
+      return drugLabelDetail
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,
@@ -84,11 +84,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
 
   const getPrintResult = async (type, row) => {
     let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM
-    let printingToolDrugLabelID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
-    let printingToolPatientLabelID =
-      PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_80MM_45MM
-
     try {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       if (settings.labelPrinterSize === '8.9cmx3.6cm') {
@@ -96,25 +92,26 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         // patientLabelReportID = PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_89MM_36MM
         drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
         patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
-        // TODO: hard coded printing tool report id
-        printingToolDrugLabelID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
-        printingToolPatientLabelID =
-          PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_80MM_45MM
       }
 
       if (type === CONSTANTS.ALL_DRUG_LABEL) {
         const { dispense, values } = restProps
         const { prescription } = values
         const reportContext = await getReportContext(drugLabelReportID)
-        const data = await generateDrugLablesPrintSource(
+        const drugLabelList = await generateDrugLablesPrintSource(
           dispense ? dispense.visitID : values.id,
           prescription,
         )
-        if (data) {
-          return {
-            ReportId: printingToolDrugLabelID,
-            ReportData: { ...data, ReportContext: reportContext },
-          }
+        if (drugLabelList) {
+          const payload = drugLabelList.map((drugLabel) => ({
+            ReportId: drugLabelReportID,
+            ReportData: JSON.stringify({
+              DrugLabelDetails: { ...drugLabel },
+              ReportContext: reportContext,
+            }),
+          }))
+          console.log({ payload })
+          return payload
         }
       }
 
@@ -123,8 +120,11 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
         const data = await generateDrugLablePrintSource(row)
         if (data) {
           return {
-            ReportId: printingToolDrugLabelID,
-            ReportData: { ...data, ReportContext: reportContext },
+            ReportId: drugLabelReportID,
+            ReportData: JSON.stringify({
+              ...data,
+              ReportContext: reportContext,
+            }),
           }
         }
       }
@@ -136,10 +136,10 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           patientId: patient ? patient.id : values.patientProfileFK,
         })
         return {
-          ReportId: printingToolPatientLabelID,
-          ReportData: {
+          ReportId: patientLabelReportID,
+          ReportData: JSON.stringify({
             ...data,
-          },
+          }),
         }
       }
     } catch (error) {
