@@ -9,7 +9,7 @@ import { currencyFormatter } from '@/utils/utils'
 const PaymentDetails = ({ paymentModeDetails, classes }) => {
   return (
     <Fragment>
-      <GridContainer className={classes.container}>
+      <GridContainer className={classes.popupContainer}>
         {paymentModeDetails.map((mode) => {
           const modeName =
             mode.paymentModeFK === PAYMENT_MODE.CREDIT_CARD
