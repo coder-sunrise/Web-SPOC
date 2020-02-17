@@ -18,7 +18,6 @@ import {
   timeFormat,
   timeFormat24Hour,
 } from '@/components'
-import { MobileNumberInput } from '@/components/_medisys'
 
 const styles = () => ({
   icon: {
@@ -87,7 +86,7 @@ const DoctorEventContent = ({ popoverEvent, classes }) => {
   )
 }
 
-class PopoverContent extends React.Component {
+class DoctorBlockPopover extends React.Component {
   getTimeRange = () => {
     const { classes, popoverEvent, calendarView } = this.props
     if (calendarView === BigCalendar.Views.MONTH) return ''
@@ -105,33 +104,8 @@ class PopoverContent extends React.Component {
 
   render () {
     const { popoverEvent, classes } = this.props
-    const {
-      hasConflict,
-      doctor,
-      // patientName,
-      // patientContactNo,
-      clinicianFK,
-      appointmentTypeFK,
-      appointmentStatusFk,
-      patientProfile,
-    } = popoverEvent
+    const { appointmentStatusFk } = popoverEvent
 
-    let { patientName, patientContactNo, appointmentRemarks } = popoverEvent
-    // const _contactNo =
-    //   patientProfile &&
-    //   patientProfile.contactNumbers.find((item) => item.numberTypeFK === 1)
-
-    if (patientProfile) {
-      const { name, contactNumbers } = patientProfile
-      const _mobileContact = contactNumbers.find(
-        (item) => item.numberTypeFK === 1,
-      )
-      if (_mobileContact) patientContactNo = _mobileContact.number
-      patientName = name
-      // patientAccountNo = accNo
-    }
-
-    // const _patientContactNo = _contactNo ? _contactNo.number : patientContactNo
     return (
       <CardBody>
         <div className={classes.statusRow}>
@@ -141,61 +115,12 @@ class PopoverContent extends React.Component {
             value={parseInt(appointmentStatusFk, 10)}
           />
         </div>
-        {doctor ? (
-          <DoctorEventContent {...this.props} />
-        ) : (
-          <GridContainer direction='column'>
-            {hasConflict && (
-              <GridItem className={classnames(classes.iconRow)}>
-                <ErrorOutline className={classnames(classes.icon)} />
-                <Danger style={{ display: 'inline' }}>
-                  <span>This appointment has conflict</span>
-                </Danger>
-              </GridItem>
-            )}
-            <GridItem className={classnames(classes.iconRow)}>
-              {this.getTimeRange()}
-            </GridItem>
-
-            <GridItem>
-              <TextField disabled label='Patient Name' value={patientName} />
-            </GridItem>
-            <GridItem>
-              {/* <TextField
-                disabled
-                label='Contact No.'
-                value={patientContactNo}
-              /> */}
-              <MobileNumberInput disabled value={patientContactNo} />
-            </GridItem>
-            <GridItem md={12}>
-              <CodeSelect
-                disabled
-                code='doctorprofile'
-                label='Doctor'
-                labelField='clinicianProfile.name'
-                valueField='clinicianProfile.id'
-                value={clinicianFK}
-              />
-            </GridItem>
-            <GridItem>
-              <CodeSelect
-                disabled
-                code='ctappointmenttype'
-                label='Appointment Type'
-                labelField='displayValue'
-                valueField='id'
-                value={appointmentTypeFK}
-              />
-            </GridItem>
-            <GridItem>
-              <TextField disabled label='Remarks' value={appointmentRemarks} />
-            </GridItem>
-          </GridContainer>
-        )}
+        <DoctorEventContent {...this.props} />
       </CardBody>
     )
   }
 }
 
-export default withStyles(styles, { name: 'PopoverContent' })(PopoverContent)
+export default withStyles(styles, { name: 'DoctorBlockPopover' })(
+  DoctorBlockPopover,
+)

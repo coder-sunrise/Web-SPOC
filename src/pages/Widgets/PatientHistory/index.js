@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
+import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
 import Loadable from 'react-loadable'
@@ -127,7 +128,7 @@ class PatientHistory extends Component {
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
     this.widgets = WidgetConfig.gpWidgets(props)
-
+    this.myRef = React.createRef()
     switch (clinicTypeFK) {
       case CLINIC_TYPE.DENTAL:
         this.widgets = WidgetConfig.dentalWidgets(props)
@@ -203,7 +204,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
-
     return (
       <List
         component='nav'
@@ -211,6 +211,7 @@ class PatientHistory extends Component {
           root: this.props.classes.listRoot,
         }}
         disablePadding
+        onClick={() => {}}
       >
         {newArray.map((o) => {
           const _title = o.userTitle ? `${o.userTitle} ` : ''
@@ -632,6 +633,7 @@ class PatientHistory extends Component {
     //   sortedPatientHistory,
     //   settings: settings.showConsultationVersioning,
     // })
+    console.log(this.myRef)
     return (
       <div {...cfg}>
         <CardContainer
@@ -648,26 +650,40 @@ class PatientHistory extends Component {
           settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
-            <Accordion
-              defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => {
-                const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
-                const returnValue = {
-                  title: this.getTitle(o),
-                  content: this.getContent(o),
-                  hideExpendIcon: isRetailVisit,
-                }
-                if (isRetailVisit) {
+            <div ref={this.myRef}>
+              <Accordion
+                defaultActive={0}
+                onChange={(event, p, expanded) => {
+                  console.log(event, p, expanded)
+                  if (expanded) {
+                    setTimeout(() => {
+                      $(this.myRef.current)
+                        .find('div[aria-expanded=true]')
+                        .next()
+                        .find('div[role="button"]:eq(0)')
+                        .trigger('click')
+                    }, 1)
+                  }
+                }}
+                collapses={sortedPatientHistory.map((o) => {
+                  const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
+                  const returnValue = {
+                    title: this.getTitle(o),
+                    content: this.getContent(o),
+                    hideExpendIcon: isRetailVisit,
+                  }
+                  if (isRetailVisit) {
+                    return {
+                      ...returnValue,
+                      onClickSummary: () => this.handleRetailVisitHistory(o),
+                    }
+                  }
                   return {
                     ...returnValue,
-                    onClickSummary: () => this.handleRetailVisitHistory(o),
                   }
-                }
-                return {
-                  ...returnValue,
-                }
-              })}
-            />
+                })}
+              />
+            </div>
           ) : (
             <p>No Visit Record Found</p>
           ) : (
