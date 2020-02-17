@@ -10,6 +10,7 @@ import {
   queryDrugLabelDetails,
   queryDrugLabelsDetails,
 } from '@/services/dispense'
+import CONSTANTS from './constants'
 
 const defaultSocketPortsState = [
   { portNumber: 7182, attempted: false },
@@ -47,12 +48,12 @@ class PrintDrugLabelWrapper extends React.Component {
       patientLabelReportID = 27
     }
 
-    if (type === 'Medication') {
+    if (type === CONSTANTS.DRUG_LABEL) {
       let drugLableSource = await this.generateDrugLablePrintSource(row)
       if (drugLableSource) {
         printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
-    } else if (type === 'Medications') {
+    } else if (type === CONSTANTS.ALL_DRUG_LABEL) {
       const { dispense, values } = this.props
       const { prescription } = values
       let drugLableSource = await this.generateDrugLablesPrintSource(
@@ -62,7 +63,7 @@ class PrintDrugLabelWrapper extends React.Component {
       if (drugLableSource) {
         printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
-    } else if (type === 'Patient') {
+    } else if (type === CONSTANTS.PATIENT_LABEL) {
       const { patient, values } = this.props
       printResult = await getPDF(patientLabelReportID, {
         patientId: patient ? patient.id : values.patientProfileFK,
@@ -104,8 +105,14 @@ class PrintDrugLabelWrapper extends React.Component {
     })
   }
 
-  handleOnPrint = async (type, row = {}) => {
-    if (type === 'Medication' || type === 'Medications' || type === 'Patient') {
+  handleOnPrint = async ({ type, row = {} }) => {
+    const withoutPrintPreview = [
+      CONSTANTS.ALL_DRUG_LABEL,
+      CONSTANTS.DRUG_LABEL,
+      CONSTANTS.PATIENT_LABEL,
+    ]
+    console.log({ type, row })
+    if (withoutPrintPreview.includes(type)) {
       let printResult = await this.getPrintResult(type, row)
 
       if (printResult) {
@@ -217,7 +224,7 @@ class PrintDrugLabelWrapper extends React.Component {
   // send job if there is any successful connection or already connected
   initializeWebSocket = (isFirstLoad = false) => {
     const { socketPorts } = this.state
-
+    console.log({ isWsConnected: this.isWsConnected })
     if (this.isWsConnected === false) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { printToolSocketURL = '' } = settings
@@ -246,12 +253,14 @@ class PrintDrugLabelWrapper extends React.Component {
       if (wsUrl && !this.isWsConnected) {
         this.wsConnection = new window.WebSocket(wsUrl)
         this.wsConnection.onopen = () => {
+          console.log('on open')
           this.isWsConnected = true
           this.setSocketPortsState(socket)
           this.sendJobToWebSocket()
         }
 
         this.wsConnection.onclose = () => {
+          console.log('on close')
           this.isWsConnected = false
           this.setSocketPortsState(socket)
           this.initializeWebSocket(isFirstLoad)

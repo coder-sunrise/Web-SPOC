@@ -1,15 +1,23 @@
 import React, { useState } from 'react'
 // material ui
 import Print from '@material-ui/icons/Print'
+import Refresh from '@material-ui/icons/Refresh'
 // ant design
 import { InputNumber } from 'antd'
 // common components
 import { Button, SizeContainer } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
+// services
+import { getPDF } from '@/services/report'
 
 const labLabelReport = 33
 const labLabelReport89mm = 34
-const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
+const PatientLabLabelButton = ({
+  handlePrint,
+  patientId,
+  clinicSettings,
+  sendingJob,
+}) => {
   const [
     copyNo,
     setCopyNo,
@@ -19,20 +27,18 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
 
   const handleCopyNoChange = (value) => setCopyNo(value)
 
-  const handlePrintClick = () => {
+  const handlePrintClick = async () => {
     const { labelPrinterSize } = clinicSettings
     let reportID = labLabelReport
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = labLabelReport89mm
     }
-
+    const payload = {
+      patientId,
+    }
+    const pdfResult = await getPDF(reportID, payload)
     for (let i = 0; i < copyNo; i++) {
-      handlePrint({
-        reportID,
-        payload: {
-          patientId,
-        },
-      })
+      handlePrint(pdfResult)
     }
   }
 
@@ -46,8 +52,13 @@ const PatientLabLabelButton = ({ handlePrint, patientId, clinicSettings }) => {
           alignItems: 'center',
         }}
       >
-        <Button color='primary' size='sm' onClick={handlePrintClick}>
-          <Print />
+        <Button
+          color='primary'
+          size='sm'
+          onClick={handlePrintClick}
+          disabled={sendingJob}
+        >
+          {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
           Lab Label
         </Button>
         <div
