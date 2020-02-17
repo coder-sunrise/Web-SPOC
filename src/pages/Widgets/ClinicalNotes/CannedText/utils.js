@@ -1,10 +1,13 @@
+import { EditorState, ContentState } from 'draft-js'
+import htmlToDraft from 'html-to-draftjs'
 import { Checkbox } from '@/components'
+import { htmlDecodeByRegExp } from '@/utils/utils'
 
 export const columns = [
   { name: 'drag', title: ' ' },
   { name: 'title', title: 'Title' },
-  { name: 'cannedText', title: 'Canned Text' },
-  { name: 'isGlobal', title: 'Is Shared' },
+  { name: 'text', title: 'Canned Text' },
+  { name: 'isShared', title: 'Is Shared' },
   { name: 'actions', title: 'Action' },
 ]
 
@@ -18,9 +21,27 @@ export const columnExtensions = [
     width: '25%',
   },
   {
-    columnName: 'isGlobal',
+    columnName: 'text',
+    render: (row) => {
+      const { text } = row
+      // const encodede = htmlEncodeByRegExp(
+      //   draftToHtml(convertToRaw(this.state.value.getCurrentContent())),
+      // )
+      // console.log({ decodedHtml })
+      const contentBlock = htmlToDraft(htmlDecodeByRegExp(text))
+      const newEditorState = EditorState.createWithContent(
+        ContentState.createFromBlockArray(contentBlock.contentBlocks),
+      )
+      if (newEditorState) {
+        return newEditorState.getCurrentContent().getPlainText()
+      }
+      return ''
+    },
+  },
+  {
+    columnName: 'isShared',
     width: 90,
-    render: (row) => <Checkbox checked={row.isGlobal} simple disabled />,
+    render: (row) => <Checkbox checked={row.isShared} simple disabled />,
   },
 ]
 
@@ -44,10 +65,18 @@ export const applyFilter = (filter, rows) => {
   ]
   if (filter !== '') {
     returnData = returnData.filter((each) => {
-      const { title, cannedText } = each
+      const { title, text } = each
+      const contentBlock = htmlToDraft(htmlDecodeByRegExp(text))
+      const newEditorState = EditorState.createWithContent(
+        ContentState.createFromBlockArray(contentBlock.contentBlocks),
+      )
+      let plainText = ''
+      if (newEditorState) {
+        plainText = newEditorState.getCurrentContent().getPlainText()
+      }
       return (
         title.toLowerCase().indexOf(filter) >= 0 ||
-        cannedText.toLowerCase().indexOf(filter) >= 0
+        plainText.toLowerCase().indexOf(filter) >= 0
       )
     })
   }

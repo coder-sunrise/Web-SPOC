@@ -17,7 +17,7 @@ import Summary from './Summary'
 import { AccordionTitle } from '@/components/_medisys'
 
 class QueueListing extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -55,11 +55,15 @@ class QueueListing extends ReportBase {
           },
           {
             title: <AccordionTitle title='Patient Deposit' />,
-            content: <PatientDeposit DepositDatas={reportDatas.PatientDeposit} />,
+            content: (
+              <PatientDeposit DepositDatas={reportDatas.PatientDeposit} />
+            ),
           },
           {
             title: <AccordionTitle title='Patient Refund' />,
-            content: <PatientDeposit DepositDatas={reportDatas.PatientRefund} />,
+            content: (
+              <PatientDeposit DepositDatas={reportDatas.PatientRefund} />
+            ),
           },
           {
             title: <AccordionTitle title='Summary' />,
@@ -76,8 +80,8 @@ const QueueListingWithFormik = withFormik({
     listingFrom: Yup.date().required(),
   }),
   mapPropsToValues: () => ({
-    listingFrom: moment(new Date()).toDate(),
-    listingTo: moment(new Date()).toDate(),
+    listingFrom: moment(new Date()).startOf('month').toDate(),
+    listingTo: moment(new Date()).endOf('month').toDate(),
   }),
 })(QueueListing)
 

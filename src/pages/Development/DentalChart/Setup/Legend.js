@@ -34,7 +34,7 @@ const styles = (theme) => ({
 })
 
 const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
-  const { value, control = {}, validSchema, text, ...restProps } = columnConfig
+  if (!row) return null
   const { chartMethodTypeFK } = row
   // if (
   //   [
@@ -43,7 +43,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   //   ].includes(chartMethodTypeFK)
   // )
   //   return null
-  const { onBlur, onFocus, autoFocus, ...props } = cellProps
   // console.log(restProps)
   // console.log(row)
   const [
@@ -54,14 +53,14 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   // if (chartMethodTypeFK === 1 && mode !== 'color') {
   //   setMode('color')
   // }
-  const [
-    color,
-    setColor,
-  ] = useState(row.chartMethodColorBlock)
-  const [
-    symbol,
-    setSymbol,
-  ] = useState(row.chartMethodText)
+  // const [
+  //   color,
+  //   setColor,
+  // ] = useState(row.chartMethodColorBlock)
+  // const [
+  //   symbol,
+  //   setSymbol,
+  // ] = useState(row.chartMethodText)
 
   // const [
   //   blur,
@@ -99,27 +98,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
       chartMethodTypeFK,
     ],
   )
-  const { commitChanges } = control
 
-  const handleUpdateAttachments = ({ added, deleted }) => {
-    const image = added
-      ? added.map(
-          (o) =>
-            `data:image/${o.thumbnail.fileExtension.replace('.', '')};base64,${o
-              .thumbnail.content}`,
-        )[0]
-      : ''
-    row.image = image
-    commitChanges({
-      changed: {
-        [row.id]: {
-          image,
-          chartMethodColorBlock: '',
-          chartMethodText: '',
-        },
-      },
-    })
-  }
   // console.log(row.chartMethodColorBlock)
   // console.log(row)
   if (viewOnly) {
@@ -151,7 +130,29 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
       />
     )
   }
+  const { onBlur, onFocus, autoFocus, ...props } = cellProps
+  const { value, control = {}, validSchema, text, ...restProps } = columnConfig
+  const { commitChanges } = control
 
+  const handleUpdateAttachments = ({ added, deleted }) => {
+    const image = added
+      ? added.map(
+          (o) =>
+            `data:image/${o.thumbnail.fileExtension.replace('.', '')};base64,${o
+              .thumbnail.content}`,
+        )[0]
+      : ''
+    row.image = image
+    commitChanges({
+      changed: {
+        [row.id]: {
+          image,
+          chartMethodColorBlock: '',
+          chartMethodText: '',
+        },
+      },
+    })
+  }
   if (
     [
       4,
@@ -173,11 +174,16 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             unCheckedValue='color'
             onChange={(v) => {
               setMode(v)
+              if (v === 'color') {
+                row.chartMethodColorBlock = '#ffffff'
+                row.image = ''
+              } else {
+                row.chartMethodColorBlock = ''
+                row.chartMethodText = ''
+              }
               commitChanges({
                 changed: {
-                  [row.id]: {
-                    editMode: v,
-                  },
+                  [row.id]: row,
                 },
               })
             }}
@@ -234,10 +240,10 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             value={row.chartMethodText}
             {...restProps}
             text={viewOnly}
-            onChange={(v, option) => {
+            onChange={(v, option = {}) => {
               // console.log(v, option)
               // setSymbol(v)
-              row.chartMethodText = option.name
+              row.chartMethodText = option.name || ''
               row.image = ''
               // row.apptDurationMinute = e
               // setEndTime(row)
@@ -245,7 +251,7 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
               commitChanges({
                 changed: {
                   [row.id]: {
-                    chartMethodText: option.name,
+                    chartMethodText: option.name || '',
                     image: '',
 
                     // symbol: v,

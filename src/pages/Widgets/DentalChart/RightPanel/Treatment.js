@@ -18,6 +18,8 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+import { getUniqueId } from '@/utils/utils'
+
 import {
   Button,
   GridContainer,
@@ -37,7 +39,6 @@ import {
   dateFormatLong,
   Tree,
 } from '@/components'
-import Tooth from '../Tooth'
 
 const Treatment = ({
   dispatch,
@@ -47,16 +48,44 @@ const Treatment = ({
   style,
   onChange,
   mode,
-  dentalChartSetup,
   global,
+  codetable,
   ...props
 }) => {
-  const { data = [], rows, pedoChart, surfaceLabel } = dentalChartSetup
+  const { ctchartmethod = [] } = codetable
   const [
     search,
     setSearch,
   ] = useState()
+  const [
+    treatments,
+    setTreatments,
+  ] = useState([])
+  // console.log(codetable)
+  useEffect(() => {
+    const { cttreatment } = codetable
+    // console.log(list)
+    const treeItems = Object.values(
+      _.groupBy(
+        cttreatment.filter((o) => !o.isDisplayInDiagnosis),
+        'treatmentCategoryFK',
+      ),
+    ).map((o) => {
+      return {
+        id: getUniqueId(),
+        text: o[0].treatmentCategory.displayValue,
+        subItems: o.map((m) => ({
+          id: m.id,
+          text: m.displayValue,
+          chartMethodFK: m.chartMethodFK,
+        })),
+      }
+    })
 
+    setTreatments(treeItems)
+  }, [])
+
+  // console.log(treeItems)
   return (
     <div>
       <div
@@ -75,18 +104,39 @@ const Treatment = ({
           prefix={<Search />}
         />
         <Tree
-          items={rows.filter((o) => !o.isDiagnosis)}
+          items={treatments}
           search={search}
           labelField='text'
           onItemFocus={(item) => {
             if (!item.subItems) {
-              dispatch({
-                type: 'dentalChartComponent/updateState',
-                payload: {
-                  mode: 'treatment',
-                  action: item,
-                },
-              })
+              const action = ctchartmethod.find(
+                (o) => o.id === item.chartMethodFK,
+              )
+              // console.log(action)
+              if (action) {
+                dispatch({
+                  type: 'dentalChartComponent/updateState',
+                  payload: {
+                    mode: 'treatment',
+                    action: {
+                      ...action,
+                      dentalTreatmentFK: item.id,
+                    },
+                  },
+                })
+                dispatch({
+                  type: 'dentalChartTreatment/updateState',
+                  payload: {
+                    entity: undefined,
+                  },
+                })
+                dispatch({
+                  type: 'orders/updateState',
+                  payload: {
+                    type: '7',
+                  },
+                })
+              }
             }
           }}
         />

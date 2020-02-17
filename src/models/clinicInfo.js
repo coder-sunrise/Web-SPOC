@@ -1,7 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/clinicInfo'
 import { notification } from '@/components'
-import { CLINIC_SPECIALIST } from '@/utils/constants'
 
 export default createFormViewModel({
   namespace: 'clinicInfo',
@@ -62,7 +61,6 @@ export default createFormViewModel({
         }
         const clinicInfo = {
           ...data,
-          clinicSpecialist: CLINIC_SPECIALIST.DENTAL,
           contact: data.contact ? data.contact : contact,
         }
 

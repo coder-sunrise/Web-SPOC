@@ -44,20 +44,34 @@ import TreatmentGrid from './TreatmentGrid'
   }) => {
     const { data = [], action = {} } = dentalChartComponent
     const { entity = {}, rows } = dentalChartTreatment
-
+    // console.log(action, data, rows)
     // console.log(rest, this)
+    const dataFiltered = data.filter(
+      (o) =>
+        o.id === action.id &&
+        (!rows.find((m) =>
+          m.groups.find((k) =>
+            k.items.find(
+              (j) => j.action.id === o.id && j.toothNo === o.toothNo,
+            ),
+          ),
+        ) ||
+          (entity.chartMethodFK === action.id &&
+            entity.groups.find((k) =>
+              k.items.find((j) => j.toothNo === o.toothNo),
+            ))),
+    )
+    // console.log(dataFiltered)
+    let treatment = {}
+    if (action.id)
+      treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.chartMethodFK === action.id) || {}
+
     let groupsAry = []
-    if (!action.isDisplayInDiagnosis) {
-      let groups = _.groupBy(
-        data.filter(
-          (o) =>
-            o.id === action.id &&
-            (!rows.find((m) => m.toothInfo.indexOf(`#${o.toothIndex}`) >= 0) ||
-              (entity.treatmentFK === action.id &&
-                entity.toothInfo.indexOf(`#${o.toothIndex}`) >= 0)),
-        ),
-        'toothIndex',
-      )
+    let quantity
+    if (treatment.id) {
+      let groups = _.groupBy(dataFiltered, 'toothNo')
       groupsAry = Object.keys(groups).map((k) => {
         return {
           text: `#${k}(${groups[k].map((o) => o.name).join(',')})`.replace(
@@ -67,13 +81,16 @@ import TreatmentGrid from './TreatmentGrid'
           items: groups[k],
         }
       })
+      // console.log(groupsAry)
+      quantity = groupsAry.length
       // let tooth = groupsAry.map((o) => o.text).join(',')
       if (action.chartMethodTypeFK === 3) {
-        groupsAry = Object.values(
-          _.groupBy(data.filter((o) => o.id === action.id), 'nodes'),
-        ).map((o) => {
+        quantity = 0
+        groupsAry = Object.values(_.groupBy(dataFiltered, 'nodes')).map((o) => {
           // console.log(o[0].nodes)
           const { nodes } = o[0]
+          quantity += o.length
+
           return {
             text: `#${nodes[0]} - ${nodes[1]}`,
             items: o,
@@ -81,33 +98,35 @@ import TreatmentGrid from './TreatmentGrid'
         })
       }
     }
-    const treatment =
-      (codetable.cttreatment || [])
-        .find((o) => o.chartMethodFK === action.id) || {}
-    let { isExactAmount, adjustment = 0, unitPrice = 0 } = entity
+
+    let { adjType, adjustment = 0, unitPrice } = entity
     if (!unitPrice || action.id !== entity.treatmentFK) {
-      unitPrice = treatment.sellingPrice || 0
+      unitPrice = treatment.sellingPrice
     }
-    // console.log(treatment, action)
+    const totalPrice = unitPrice * quantity
+    // console.log(groupsAry)
     // console.log(action, entity, treatment, unitPrice)
+    const isExactAmount = adjType === 'ExactAmount'
+
+    const final = calculateAdjustAmount(isExactAmount, totalPrice, -adjustment)
     return {
-      isExactAmount: false,
+      isExactAmount,
       ...dentalChartTreatment.entity,
       unitPrice,
-
+      chartMethodFK: action.id,
       treatmentFK: treatment.id,
-      finalAmount: calculateAdjustAmount(
-        isExactAmount,
-        unitPrice * groupsAry.length,
-        -adjustment,
-      ).amount,
-      unit: groupsAry.length,
+      itemName: treatment.displayValue,
+      totalPrice,
+      // adjType: isExactAmount ? 'ExactAmount' : 'Percentage',
+      adjAmount: Math.abs(final.adjAmount),
+      totalAfterItemAdjustment: final.amount,
+      quantity,
       groups: groupsAry,
       toothInfo: groupsAry.map((o) => o.text).join(','),
     }
   },
   validationSchema: Yup.object().shape({
-    unit: Yup.number().required(),
+    quantity: Yup.number().required(),
     unitPrice: Yup.number().required(),
     treatmentFK: Yup.number().required(),
   }),
@@ -117,6 +136,12 @@ import TreatmentGrid from './TreatmentGrid'
       type: 'dentalChartTreatment/upsertRow',
       payload: {
         ...values,
+      },
+    })
+    dispatch({
+      type: 'dentalChartTreatment/updateState',
+      payload: {
+        entity: undefined,
       },
     })
     dispatch({
@@ -151,15 +176,20 @@ class TreatmentForm extends Component {
 
   getFinalAmount = (props) => {
     const { values, setFieldValue } = props || this.props
-    const { isExactAmount, adjustment = 0, unitPrice = 0, unit = 0 } = values
+    const {
+      isExactAmount,
+      adjustment = 0,
+      unitPrice = 0,
+      quantity = 0,
+    } = values
     // console.log(calculateAdjustAmount(isExactAmount, unitPrice, -adjustment))
     const subTotal = calculateAdjustAmount(
       isExactAmount,
-      unitPrice * unit,
+      unitPrice * quantity,
       -adjustment,
     )
     // console.log(subTotal)
-    setFieldValue('finalAmount', subTotal.amount)
+    setFieldValue('totalAfterItemAdjustment', subTotal.amount)
     setFieldValue('adjAmount', Math.abs(subTotal.adjAmount))
     this.updateValueToStore()
   }
@@ -197,8 +227,8 @@ class TreatmentForm extends Component {
     } = this.props
     const {
       data = [],
-      pedoChart,
-      surfaceLabel,
+      isPedoChart,
+      isSurfaceLabel,
       action = {},
     } = dentalChartComponent
 
@@ -206,7 +236,7 @@ class TreatmentForm extends Component {
     // console.log(data.filter((o) => o.id === action.id))
     // const groups = _.groupBy(
     //   data.filter((o) => o.id === action.id),
-    //   'toothIndex',
+    //   'toothNo',
     // )
     // const tooth = Object.keys(groups)
     //   .map((k) => {
@@ -263,7 +293,7 @@ class TreatmentForm extends Component {
                 })}
               </p>
               <FastField
-                name='details'
+                name='itemNotes'
                 render={(args) => (
                   <OutlinedTextField
                     autoFocus
@@ -274,7 +304,7 @@ class TreatmentForm extends Component {
                     rows={6}
                     onChange={(e) => {
                       this.updateValueToStore({
-                        details: e.target.value,
+                        itemNotes: e.target.value,
                       })
                     }}
                     {...args}
@@ -299,7 +329,7 @@ class TreatmentForm extends Component {
                 )}
               />
               <FastField
-                name='unit'
+                name='quantity'
                 render={(args) => (
                   <NumberInput
                     label='Unit'
@@ -319,7 +349,11 @@ class TreatmentForm extends Component {
                   <NumberInput
                     label='Unit Price'
                     currency
-                    onChange={(v) => {}}
+                    onChange={(v) => {
+                      setTimeout(() => {
+                        this.getFinalAmount()
+                      }, 1)
+                    }}
                     {...args}
                   />
                 )}
@@ -345,7 +379,12 @@ class TreatmentForm extends Component {
                               checkedChildren='$'
                               unCheckedChildren='%'
                               label=''
-                              onChange={() => {
+                              onChange={(v) => {
+                                // console.log(v)
+                                setFieldValue(
+                                  'adjType',
+                                  v ? 'ExactAmount' : 'Percentage',
+                                )
                                 setTimeout(() => {
                                   this.getFinalAmount()
                                 }, 1)
@@ -362,7 +401,7 @@ class TreatmentForm extends Component {
                 )}
               />
               <FastField
-                name='finalAmount'
+                name='totalAfterItemAdjustment'
                 render={(args) => (
                   <NumberInput
                     disabled
@@ -387,6 +426,12 @@ class TreatmentForm extends Component {
                   type: 'dentalChartTreatment/updateState',
                   payload: {
                     entity: undefined,
+                  },
+                })
+                dispatch({
+                  type: 'dentalChartComponent/updateState',
+                  payload: {
+                    action: undefined,
                   },
                 })
                 // this.props.resetForm()

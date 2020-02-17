@@ -186,6 +186,10 @@ export const formikHandleSubmit = (
         dispatch({
           type: 'queueLog/refresh',
         })
+
+      sendNotification('QueueListing', {
+        message: 'Visit Created',
+      })
       onConfirm()
       sendNotification('QueueListing', {
         message: `New visit created.`,

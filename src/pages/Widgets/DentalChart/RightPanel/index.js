@@ -43,25 +43,25 @@ const RightPanel = (props) => {
     height,
     ...restProps
   } = props
-  const { data = {}, pedoChart, surfaceLabel } = dentalChartComponent
+  const { data = {}, isPedoChart, isSurfaceLabel } = dentalChartComponent
   const [
     openHistory,
     setOpenHistory,
   ] = React.useState(false)
   return (
-    <Paper elevation={0} className={classes.paper}>
-      <div>
+    <Paper className={classes.paper}>
+      <div style={{ width: '100%' }}>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={5}>
             <Checkbox
               label='Pedo Chart'
-              checked={pedoChart}
+              checked={isPedoChart}
               style={{ marginLeft: 8 }}
               onChange={(v) => {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
                   payload: {
-                    pedoChart: v.target.value,
+                    isPedoChart: v.target.value,
                   },
                 })
               }}
@@ -70,12 +70,12 @@ const RightPanel = (props) => {
           <GridItem xs={6}>
             <Checkbox
               label='Surface Label'
-              checked={surfaceLabel}
+              checked={isSurfaceLabel}
               onChange={(v) => {
                 dispatch({
                   type: 'dentalChartComponent/updateState',
                   payload: {
-                    surfaceLabel: v.target.value,
+                    isSurfaceLabel: v.target.value,
                   },
                 })
               }}
@@ -109,6 +109,13 @@ const RightPanel = (props) => {
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'diagnosis',
+                    },
+                  })
+                } else {
+                  dispatch({
+                    type: 'dentalChartComponent/updateState',
+                    payload: {
+                      mode: 'treatment',
                     },
                   })
                 }

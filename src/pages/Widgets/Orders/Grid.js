@@ -354,6 +354,7 @@ export default ({ orders, dispatch, classes }) => {
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
+            if (row.type === '7') return null
             return (
               <div>
                 <Tooltip title='Edit'>

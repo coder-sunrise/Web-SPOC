@@ -336,29 +336,33 @@ class Queue extends React.Component {
     await dispatch({
       type: 'patientSearch/query',
       payload: {
-        group: [
-          {
-            [`${prefix}name`]: searchQuery,
-            [`${prefix}patientAccountNo`]: searchQuery,
-            [`${prefix}patientReferenceNo`]: searchQuery,
-            [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
-            combineCondition: 'or',
-          },
-        ],
+        // group: [
+        //   {
+        //     [`${prefix}name`]: searchQuery,
+        //     [`${prefix}patientAccountNo`]: searchQuery,
+        //     [`${prefix}patientReferenceNo`]: searchQuery,
+        //     [`${prefix}contactFkNavigation.contactNumber.number`]: searchQuery,
+        //     combineCondition: 'or',
+        //   },
+        // ],
+        apiCriteria: {
+          searchValue: searchQuery,
+        },
       },
     })
-    this.showSearchResult()
+    const hasSearchQuery = !!searchQuery
+    this.showSearchResult(hasSearchQuery)
   }
 
-  showSearchResult = () => {
+  showSearchResult = (hasSearchQuery = false) => {
     const { patientSearchResult = [] } = this.props
     const totalRecords = patientSearchResult.length
 
-    if (totalRecords === 1)
+    if (totalRecords === 1 && hasSearchQuery)
       return this.showVisitRegistration({
         patientID: patientSearchResult[0].id,
       })
-    if (totalRecords > 1) {
+    if (totalRecords >= 1) {
       return this.togglePatientSearch()
     }
     return this.toggleRegisterNewPatient()

@@ -4,7 +4,12 @@ import * as service from '../services'
 
 export default createListViewModel({
   namespace: 'settingTreatmentCategory',
-  config: {},
+  config: {
+    codetable: {
+      message: 'Treatment Category updated',
+      code: 'cttreatmentcategory',
+    },
+  },
   param: {
     service,
     state: {

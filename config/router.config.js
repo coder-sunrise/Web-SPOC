@@ -268,19 +268,19 @@ const _routes = [
             ],
           },
           {
-            path: '/inventory/master/package',
-            name: 'package.package',
+            path: '/inventory/master/orderset',
+            name: 'orderset.orderset',
             hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
+            component: './Inventory/Master/OrderSet/Details',
             authority: [
               'inventory/inventorymaster',
             ],
           },
           {
-            path: '/inventory/master/editpackage',
-            name: 'package.editpackage',
+            path: '/inventory/master/editorderset',
+            name: 'orderset.editorderset',
             hideInMenu: true,
-            component: './Inventory/Master/Package/Details',
+            component: './Inventory/Master/OrderSet/Details',
             authority: [
               'inventory/inventorymaster',
             ],
@@ -706,6 +706,16 @@ const _routes = [
             component: './Setting/Service',
           },
           {
+            path: '/setting/treatment',
+            name: 'treatment',
+            component: './Setting/Treatment',
+          },
+          {
+            path: '/setting/treatmentcategory',
+            name: 'treatmentcategory',
+            component: './Setting/TreatmentCategory',
+          },
+          {
             path: '/setting/room',
             name: 'room',
             component: './Setting/Room',
@@ -826,11 +836,6 @@ const _routes = [
             component: './Setting/serviceCenterCategory',
           },
           {
-            path: '/setting/treatmentcategory',
-            name: 'treatmentcategory',
-            component: './Setting/treatmentCategory',
-          },
-          {
             path: '/setting/servicecategory',
             name: 'servicecategory',
             component: './Setting/serviceCategory',
@@ -873,6 +878,23 @@ const _routes = [
         ],
       },
       // Settings
+      //
+      // AiOT
+      // {
+      //   path: '/patient-monitoring',
+      //   icon: 'group',
+      //   name: 'patient-monitoring',
+      //   hideChildrenInMenu: true,
+      //   routes: [
+      //     {
+      //       path: '/patient-monitoring',
+      //       name: 'patient-monitoring',
+      //       component: './PatientMonitoring',
+      //     },
+      //   ],
+      // },
+      // AiOT
+      //
       // Support
       {
         path: '/support',
@@ -895,12 +917,14 @@ const _routes = [
             component: './support/teamviewer',
           },
           {
-            path: '/support/druglabel',
-            name: 'druglabel',
-            component: './support/druglabel',
+            path: '/support/printingtool',
+            name: 'printingtool',
+            component: './support/PrintingTool',
           },
         ],
       },
+      // Support
+      //
       {
         component: '404',
       },
@@ -912,18 +936,7 @@ const _routes = [
 
 const routes =
   process.env.NODE_ENV === 'production'
-    ? _routes.map((r, index) => {
-        if (index === 1) {
-          return {
-            ...r,
-            routes: [
-              devRoutes,
-              ...r.routes,
-            ],
-          }
-        }
-        return r
-      })
+    ? _routes
     : _routes.map((r, index) => {
         if (index === 1) {
           return {

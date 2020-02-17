@@ -37,6 +37,7 @@ fabric.Object.prototype.isValidCell = function () {
   return this.name && this.name.indexOf(cellPrefix) === 0
 }
 fabric.Object.prototype.isDefaultCell = function () {
+  // console.log(this.name)
   return (
     !this.name ||
     this.name.indexOf(cellPrefix) === 0 ||
@@ -61,7 +62,7 @@ export const lockConfig = {
   // selectable: false,
 }
 export const groupCfg = {
-  // selectable: false,
+  selectable: false,
 }
 export const addonGroupCfg = {
   ...groupCfg,
@@ -150,310 +151,17 @@ export const createRectangle = (cfg) => {
     ...cfg,
   })
 }
-// let currentPointer
-// const toggleSelect = ({ item, selected, config, values, dispatch, group }) => {
-//   debouncedAction(() => {
-//     // console.log(config, selected, values, item.name)
-
-//     const currentSelctedValue = selected.find(
-//       (o) => o.value === config.value && (o.target === item.name || !o.target),
-//     )
-//     dispatch({
-//       type: 'dentalChartComponent/toggleSelect',
-//       payload: {
-//         ...config,
-//         ...currentSelctedValue,
-//         toothIndex: Number(group.name),
-//         target: item.name,
-//         prevColor: item.isValidCell() ? item.item(0).fill : '',
-//       },
-//     })
-
-//     // if (currentSelctedValue) {
-//     //   item.set('opacity', unselectedOpactiy || 0.1)
-//     //   item.set('fill', 'white')
-//     //   if (shape) group.sendToBack(item)
-//     // } else {
-//     //   item.set('opacity', 1)
-//     //   if (shape) group.bringToFront(item)
-//     // }
-
-//     // item.set('fill', config.fill)
-
-//     // canvas.renderAll()
-//   })
-// }
-// const renderOutsideTopCell = (
-//   {
-//     addonShapeHandler,
-//     customizeHover = false,
-//     unselectedOpactiy = 0,
-//     ...config
-//   },
-//   { canvas, group, dispatch, values = [] },
-// ) => {
-//   console.log(config, values)
-//   const { value } = config
-
-//   let selected = values.filter((o) => o.value === value)
-//   // if (
-//   //   overlayShapeTypes.includes(value) &&
-//   //   values.find((o) => o.value !== value)
-//   // ) {
-//   //   dispatch()
-//   // }
-//   const name = `${modifierNamePrefix}${value}`
-//   const shape =
-//     typeof addonShapeHandler === 'function'
-//       ? addonShapeHandler({ selected, config })
-//       : undefined
-//   group.off('mouseup')
-
-//   group.on('mouseup', (e) => {
-//     console.log('gesture', e)
-//     if (e.target) {
-//       const item = group.object(value)
-
-//       if (
-//         item // &&
-//         // e.target.canvas // &&
-//         // checkIsValidElement(item, name, config.isValidElement)
-//       ) {
-//         toggleSelect({ item, selected, config, values, dispatch, group })
-//       }
-//     }
-//   })
-//   // console.log(shape)
-
-//   if (shape) {
-//     if (group.filter((o) => o.name === name).length === 0) {
-//       shape.set('name', name)
-//       group.add(shape)
-//       // if (selected.length === 0) shape.sendToBack()
-//     } else {
-//       // console.log(group.filter((o) => o.name === name))
-//       group.filter((o) => o.name === name)[0].bringToFront()
-//     }
-//   }
-//   console.log(selected)
-//   // const group = new fabric.Group(
-//   //   [
-//   //     shape,
-//   //   ],
-//   //   {
-//   //     ...groupCfg,
-//   //     name: 'selectedGroup',
-//   //   },
-//   // )
-//   // canvas.off('mouse:over')
-//   // canvas.off('mouse:out')
-//   // canvas.off('mouse:up')
-//   group.off('mouseover')
-//   group.off('mouseout')
-//   // if (selected.length === 0) {
-
-//   // }
-//   if (
-//     [
-//       'topcell',
-//       'bottomcell',
-//     ].includes(config.value)
-//   ) {
-//     group.on('mouseover', (e) => {
-//       console.log(e)
-//       if (selected.length === 0) {
-//         group.object(value).set('opacity', 1)
-//         canvas.renderAll()
-//       }
-//     })
-//     group.on('mouseout', (e) => {
-//       if (selected.length === 0) {
-//         group.object(value).set('opacity', unselectedOpactiy)
-//         canvas.renderAll()
-//       }
-//     })
-
-//     // canvas.on('mouse:over', (e) => {
-//     //   if (e.target) {
-//     //     const item = e.target
-
-//     //     if (item && item.name === name && selected.length === 0) {
-//     //       item.set('opacity', 1)
-//     //       item.set('fill', config.fill)
-
-//     //       canvas.renderAll()
-//     //     }
-//     //   }
-//     // })
-//     // canvas.on('mouse:out', (e) => {
-//     //   if (e.target) {
-//     //     const item = e.target
-//     //     if (item && item.name === name && selected.length === 0) {
-//     //       item.set('opacity', 0.1)
-//     //       item.set('fill', config.fill)
-
-//     //       canvas.renderAll()
-//     //     }
-//     //   }
-//     // })
-//   } else if (
-//     [
-//       'temporarydressing',
-//     ].includes(config.value)
-//   ) {
-//     // console.log(selected, config)
-//     group._objects.filter((o) => o.isValidCell()).map((sub) => {
-//       sub.off('mouseup')
-//       sub.on('mouseup', (e) => {
-//         console.log(e.subTargets[0])
-//         if (
-//           e.subTargets[0] instanceof fabric.Group &&
-//           e.subTargets[0].isValidCell()
-//         ) {
-//           toggleSelect({
-//             item: e.subTargets[0],
-//             selected,
-//             config,
-//             values,
-//             dispatch,
-//             group,
-//           })
-//         }
-//       })
-//       sub.on('dragover', (e) => {
-//         console.log('dragenter', e)
-//       })
-
-//       if (selected.find((o) => o.target === sub.name)) {
-//         sub.item(0).set('fill', config.fill)
-//       } else {
-//         sub.item(0).set('fill', 'white')
-
-//         sub.off('mouseover')
-//         sub.off('mouseout')
-
-//         let prevColor = null
-//         sub.on('mouseover', (e) => {
-//           if (e.target instanceof fabric.Group && e.target.isValidCell()) {
-//             const item = e.target.item(0)
-//             prevColor = item.get('fill')
-//             e.target.item(0).set('fill', config.fill)
-//             canvas.renderAll()
-//           }
-//         })
-//         sub.on('mouseout', (e) => {
-//           if (e.target instanceof fabric.Group && e.target.isValidCell()) {
-//             e.target.item(0).set('fill', prevColor)
-//             canvas.renderAll()
-//           }
-//         })
-//       }
-//     })
-
-//     group.on('mouseout', (e) => {
-//       group._objects.map((sub) => {
-//         if (sub instanceof fabric.Group && sub.isValidCell()) {
-//           if (!selected.find((o) => o.target === sub.name)) {
-//             sub.item(0).set('fill', 'white')
-//             canvas.renderAll()
-//           }
-//         }
-//       })
-//       canvas.renderAll()
-//     })
-//     // group.on('mouseover', (e) => {
-//     //   console.log(e)
-//     //   if (selected.length === 0) {
-//     //     // group.object(value).set('opacity', 1)
-//     //     canvas.renderAll()
-//     //   }
-//     // })
-//     // group.on('mouseout', (e) => {
-//     //   if (selected.length === 0) {
-//     //     // group.object(value).set('opacity', unselectedOpactiy)
-//     //     canvas.renderAll()
-//     //   }
-//     // })
-
-//     // canvas
-//     //   .getObjects()
-//     //   .filter((o) => o.name && o.name.indexOf(cellPrefix) === 0)
-//     //   .map((g) => {
-//     //     const item = g.item(0)
-//     //     if (item) {
-//     //       if (selected.find((m) => g.name === m.target)) {
-//     //         item.set('fill', config.fill)
-//     //       } else {
-//     //         item.set('fill', `white`)
-//     //       }
-//     //     }
-//     //   })
-
-//     // let colorBefore = null
-//     // canvas.on('mouse:over', (e) => {
-//     //   // console.log(e, e.target)
-//     //   if (e.target && e.target.item) {
-//     //     const item = e.target.item(0)
-
-//     //     if (item && !selected.find((o) => o.target === e.target.name)) {
-//     //       colorBefore = item.get('fill')
-//     //       item.set('fill', config.fill)
-//     //       // canvas.getObjects('group').map((o) => {
-//     //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 1)
-//     //       // })
-//     //       canvas.renderAll()
-//     //     }
-//     //   }
-//     // })
-
-//     // canvas.on('mouse:out', (e) => {
-//     //   if (e.target && e.target.item) {
-//     //     const item = e.target.item(0)
-//     //     if (item && !selected.find((o) => o.target === e.target.name)) {
-//     //       item.set('fill', colorBefore || 'white')
-//     //       // canvas.getObjects('group').map((o) => {
-//     //       //   if (o.name && o.name.indexOf(cellPrefix) === 0) o.set('opacity', 0.1)
-//     //       // })
-
-//     //       canvas.renderAll()
-//     //     }
-//     //   }
-//     // })
-//   } else if (overlayShapeTypes.includes(value)) {
-//     // group.on('mouseover', (e) => {
-//     //   if (selected.length === 0) {
-//     //     group.object(value).set('opacity', 1)
-//     //     canvas.renderAll()
-//     //   }
-//     // })
-//     // group.on('mouseout', (e) => {
-//     //   if (selected.length === 0) {
-//     //     group.object(value).set('opacity', unselectedOpactiy)
-//     //     canvas.renderAll()
-//     //   }
-//     // })
-//   }
-
-//   const item = group.object(value)
-//   if (item) {
-//     if (selected.length === 0) {
-//       group.sendToBack(item)
-//       item.set('opacity', unselectedOpactiy)
-//     } else {
-//       group.bringToFront(item)
-//       item.set('opacity', 1)
-//     }
-//   }
-
-//   const existOverlay = group.object(
-//     values.find((o) => overlayShapeTypes.includes(o.value)),
-//   )
-
-//   if (existOverlay) {
-//     existOverlay.set('opacity', 1)
-//     existOverlay.bringToFront()
-//   }
-// }
+export const createTriangle = (cfg) => {
+  return new fabric.Triangle({
+    ...sharedCfg,
+    width: baseWidth * 4,
+    height: baseHeight * 3,
+    name: 'replaceObject',
+    fill: '#ffffff',
+    opacity: 1,
+    ...cfg,
+  })
+}
 const sharedButtonConfig = {
   clear: ({ canvas, group, values = [] }) => {
     // canvas.remove()
@@ -469,42 +177,6 @@ const sharedButtonConfig = {
     group.filter((o) => !o.isDefaultCell()).map((sub) => {
       // sub.sendToBack()
     })
-    // console.log(values)
-    // canvas
-    //   .getObjects('group')
-    //   .filter((o) => {
-    //     console.log('group', o, values)
-    //     if (!o.name || o.name.indexOf(modifierNamePrefix) < 0) return false
-    //     if (
-    //       values.find(
-    //         (m) => o.name && o.name.replace(modifierNamePrefix, '') === m.value,
-    //       )
-    //     )
-    //       return false
-    //     if (
-    //       o.getObjects &&
-    //       values.find(
-    //         (m) =>
-    //           o
-    //             .getObjects()
-    //             .filter(
-    //               (n) =>
-    //                 n.name &&
-    //                 n.name.replace(modifierNamePrefix, '') === m.value,
-    //             ).length > 0,
-    //       )
-    //     ) {
-    //       return false
-    //     }
-
-    //     // if(canvas.name, value.toothIndex)
-    //     console.log(o, canvas.name, values)
-    //     return true
-    //   })
-    //   .map((o) => {
-    //     console.log(o)
-    //     canvas.remove(o)
-    //   })
   },
 }
 
@@ -515,7 +187,7 @@ export const buttonConfigs = [
     text: 'Clear',
     fixed: true,
     method: 4,
-    isDiagnosis: true,
+    isDisplayInDiagnosis: true,
   },
   {
     id: 2,
@@ -524,7 +196,7 @@ export const buttonConfigs = [
     fill: 'white',
     fixed: true,
     method: 4,
-    isDiagnosis: true,
+    isDisplayInDiagnosis: true,
     editMode: 'color',
     symbol: '',
   },
@@ -637,7 +309,6 @@ export const createToothShape = ({
   canvas,
   action,
 }) => {
-  // console.log(action)
   const cfg = {
     ...sharedCfg,
     top: baseHeight * 2,
@@ -672,11 +343,14 @@ export const createToothShape = ({
     // cornerStrokeColor: 'black',
     // cornerStyle: 'circle',
   }
+
   if (index) {
     cCfg.name = `${index}`
   }
   const _width = width || groupWidth
   const _height = height || groupHeight
+  // console.log(action, index, _width, _height, text, fill, image, baseHeight)
+
   // if (custom) {
   //   console.log(custom)
   //   return new fabric.Group(
@@ -686,15 +360,15 @@ export const createToothShape = ({
   //     cCfg,
   //   )
   // }
-  if (action && action.method === 'tooth' && !image) {
+  if (action && action.chartMethodTypeFK === 2 && !image) {
     // console.log(fill, symbol)
     return new fabric.Group(
       [
         createRectangle({
-          fill: action.fill,
+          fill: action.chartMethodColorBlock,
         }),
         createFont({
-          text: action.symbol,
+          text: action.chartMethodText,
           left: _width / 2 - _width / 8,
           top: _height / 2 - _height / 4,
           fontSize: _width / 2,
@@ -707,11 +381,9 @@ export const createToothShape = ({
     )
   }
   if (image) {
-    const data = image[0] || image
-    const { thumbnailData, content } = data
-    if (imageCache[action.value]) return imageCache[action.value]
-    fabric.Image.fromURL(thumbnailData, (img) => {
-      imageCache[action.value] = new fabric.Group(
+    if (imageCache[action.id]) return imageCache[action.id]
+    fabric.Image.fromURL(image, (img) => {
+      imageCache[action.id] = new fabric.Group(
         [
           img.set({
             left: 0,
@@ -727,7 +399,7 @@ export const createToothShape = ({
         },
       )
 
-      canvas.add(imageCache[action.value])
+      canvas.add(imageCache[action.id])
     })
     return
   }
@@ -741,7 +413,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.left,
-      fill: fill.left || 'white',
+      fill: fill.left,
     },
   )
 
@@ -756,7 +428,7 @@ export const createToothShape = ({
       ...cfg,
       top: baseHeight * 4,
       name: text.bottom,
-      fill: fill.bottom || 'white',
+      fill: fill.bottom,
     },
   )
 
@@ -770,7 +442,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.right,
-      fill: fill.right || 'white',
+      fill: fill.right,
     },
   )
 
@@ -786,7 +458,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.top,
-      fill: fill.top || 'white',
+      fill: fill.top,
     },
   )
 
@@ -795,7 +467,7 @@ export const createToothShape = ({
       polygon,
       createFont({
         text: text.left,
-        left: baseWidth / 2 - innerFontSize / 4,
+        left: baseWidth / 2 - innerFontSize / 3,
         top: baseHeight * 3.5 - innerFontSize / 2,
       }),
       createFont({
@@ -808,8 +480,9 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}left`,
       target: text.left,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
+      // opacity: 0.5,
       // left: 0 - groupWidth / 2,
       // originX: 'center',
       // originY: 'center',
@@ -833,7 +506,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}bottom`,
       target: text.bottom,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 4,
     },
   )
@@ -855,7 +528,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}right`,
       target: text.right,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -877,7 +550,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}top`,
       target: text.top,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -898,7 +571,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerLeft,
-        fill: fill.centerLeft || 'white',
+        fill: fill.centerLeft,
       },
     )
     const polygon6 = new fabric.Polygon( // center right
@@ -914,7 +587,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerRight,
-        fill: fill.centerRight || 'white',
+        fill: fill.centerRight,
       },
     )
     g5 = new fabric.Group(
@@ -933,10 +606,10 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerLeft,
         name: `${cellPrefix}centerLeft`,
-        fill: fill.centerLeft || 'white',
+        fill: fill.centerLeft,
       },
     )
     g6 = new fabric.Group(
@@ -955,10 +628,10 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerRight,
         name: `${cellPrefix}centerRight`,
-        fill: fill.centerRight || 'white',
+        fill: fill.centerRight,
       },
     )
   } else {
@@ -975,7 +648,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerfull,
-        fill: fill.centerfull || 'white',
+        fill: fill.centerfull,
       },
     )
     g7 = new fabric.Group(
@@ -994,12 +667,14 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerfull,
         name: `${cellPrefix}centerfull`,
       },
     )
   }
+
+  // console.log(fill, g1)
   let fixedItems = [
     // headerText,
     g1,
@@ -1013,7 +688,7 @@ export const createToothShape = ({
     fixedItems.push(g5)
     fixedItems.push(g6)
   }
-  if (action && action.method === 3) {
+  if (action && action.chartMethodTypeFK === 3) {
     fixedItems = []
     fixedItems.push(
       new fabric.Group(

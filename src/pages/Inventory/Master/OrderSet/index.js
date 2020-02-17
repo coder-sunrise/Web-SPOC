@@ -8,7 +8,7 @@ import FilterBar from './FilterBar'
 import Grid from '../Grid'
 
 const styles = () => ({})
-const Package = ({ dispatch, history, pack }) => {
+const OrderSet = ({ dispatch, history, orderSet }) => {
   const [
     tableParas,
     setTableParas,
@@ -48,22 +48,22 @@ const Package = ({ dispatch, history, pack }) => {
     if (list) {
       list.map((r) => {
         const {
-          medicationPackageItem,
-          consumablePackageItem,
-          vaccinationPackageItem,
-          servicePackageItem,
+          medicationOrderSetItem,
+          consumableOrderSetItem,
+          vaccinationOrderSetItem,
+          serviceOrderSetItem,
         } = r
         let sellingPrice = 0
-        medicationPackageItem.forEach((o) => {
+        medicationOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        consumablePackageItem.forEach((o) => {
+        consumableOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        vaccinationPackageItem.forEach((o) => {
+        vaccinationOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
-        servicePackageItem.forEach((o) => {
+        serviceOrderSetItem.forEach((o) => {
           sellingPrice += o.subTotal
         })
         return {
@@ -78,17 +78,17 @@ const Package = ({ dispatch, history, pack }) => {
 
   const gridProps = {
     ...filterProps,
-    pack,
-    namespace: 'package',
+    orderSet,
+    namespace: 'orderSet',
     // list: getPackList(pack.list),
-    list: pack.list || [],
+    list: orderSet.list || [],
     tableParas,
     colExtensions,
   }
 
   useEffect(() => {
     dispatch({
-      type: 'pack/query',
+      type: 'orderSet/query',
       payload: {
         sorting: [
           { columnName: 'effectiveEndDate', direction: 'desc' },
@@ -119,7 +119,7 @@ const Package = ({ dispatch, history, pack }) => {
 }
 export default compose(
   withStyles(styles),
-  connect(({ pack }) => ({
-    pack,
+  connect(({ orderSet }) => ({
+    orderSet,
   })),
-)(Package)
+)(OrderSet)

@@ -35,7 +35,7 @@ import Templates from './Templates'
 // utils
 import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
-import { CLINIC_SPECIALIST } from '@/utils/constants'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 // const _defaultLayout = [
 //   {
@@ -139,9 +139,10 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { clinicSpecialist = CLINIC_SPECIALIST.GP } = clinicInfo
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+
     this.pageDefaultWidgets = gpLayoutCfg
-    if (clinicSpecialist === CLINIC_SPECIALIST.DENTAL) {
+    if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
       this.pageDefaultWidgets = dentalLayoutCfg
     }
 
@@ -505,7 +506,7 @@ class Layout extends PureComponent {
     return ((this.props.height || window.innerHeight) - topHeight) / 6
   }
 
-  onAnchorClick = (id) => () => {
+  onAnchorClick = (id) => {
     const parentElement = document.getElementById('mainPanel-root')
     const element = document.getElementById(id)
     try {
@@ -637,17 +638,20 @@ class Layout extends PureComponent {
               top: headerHeight + 100,
               zIndex: 1000,
               borderRadius: 0,
+              marginBottom: 0,
               // backgroundColor: '#f0f8ff',
             }}
           >
             {state.currentLayout.widgets.map((id) => {
               const w = widgets.find((o) => o.id === id)
+              if (!w) return null
+              const onClick = () => this.onAnchorClick(w.id)
               return (
                 <Button
                   size='sm'
                   variant='outlined'
                   color='primary'
-                  onClick={this.onAnchorClick(w.id)}
+                  onClick={onClick}
                 >
                   {w.name}
                 </Button>

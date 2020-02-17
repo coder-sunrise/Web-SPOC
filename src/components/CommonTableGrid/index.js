@@ -94,6 +94,18 @@ const cellStyle = {
   },
 }
 
+const cellStyleWithFirstColumnCustomPadding = (customPadding) => {
+  return {
+    ...cellStyle,
+    cell: {
+      ...cellStyle.cell,
+      '&:first-child': {
+        paddingLeft: customPadding,
+      },
+    },
+  }
+}
+
 // console.log(colorManipulator)
 const styles = (theme) => ({
   tableCursorPointer: {
@@ -288,7 +300,7 @@ class CommonTableGrid extends PureComponent {
       const onSortEnd = ({ newIndex, oldIndex }) => {
         // console.log(newIndex, oldIndex)
         const rows=this.getData()
-        console.log(_.minBy(rows,(n)=>n.sortOrder))
+        // console.log(_.minBy(rows,(n)=>n.sortOrder))
         const newRows = arrayMove(rows, oldIndex, newIndex)
         // console.log(rows,newRows)
         if(onRowDrop)onRowDrop(newRows)
@@ -466,14 +478,22 @@ class CommonTableGrid extends PureComponent {
             borderRightWidth: 0,
           },
         },
-        TableCell: cellStyle,
+        TableCell: this.props.firstColumnCustomPadding
+          ? cellStyleWithFirstColumnCustomPadding(
+              this.props.firstColumnCustomPadding,
+            )
+          : cellStyle,
         EditCell: {
           cell: {
             padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
           },
         },
-        TableHeaderCell: cellStyle,
+        TableHeaderCell: this.props.firstColumnCustomPadding
+          ? cellStyleWithFirstColumnCustomPadding(
+              this.props.firstColumnCustomPadding,
+            )
+          : cellStyle,
         Table: {
           table: {
             // tableLayout: 'auto',

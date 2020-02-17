@@ -47,12 +47,15 @@ const Diagnosis = ({
   onChange,
   mode,
   dentalChartComponent,
+  codetable,
   global,
   ...props
 }) => {
-  const { data = [], pedoChart, surfaceLabel } = dentalChartComponent
-  const groups = _.groupBy(data, 'toothIndex')
+  const { data = [], isPedoChart, isSurfaceLabel } = dentalChartComponent
+  const { cttreatment = [] } = codetable
+  const groups = _.groupBy(data, 'toothNo')
   // console.log(groups)
+  // console.log(cttreatment)
   const [
     selected,
     setSelected,
@@ -83,13 +86,16 @@ const Diagnosis = ({
         {Object.keys(groups).map((k) => {
           const ary = groups[k]
 
-          const valueGroups = _.groupBy(_.orderBy(ary, 'timestamp'), 'value')
+          const valueGroups = _.groupBy(ary, 'id')
           const SortList = SortableContainer(List)
-          const items = Object.keys(valueGroups)
+          const items = Object.values(
+            _.orderBy(valueGroups, (o) => o[0].timestamp),
+          ).map((o) => o[0].id) // Object.keys(valueGroups).map((o) => Number(o))
+
           const onSortEnd = ({ newIndex, oldIndex }) => {
             if (newIndex === oldIndex) return
-            let currentItems = ary.filter((o) => o.value === items[oldIndex])
-            const existItems = ary.filter((o) => o.value === items[newIndex])
+            let currentItems = ary.filter((o) => o.id === items[oldIndex])
+            const existItems = ary.filter((o) => o.id === items[newIndex])
             currentItems = currentItems.map((o) => ({
               ...o,
               timestamp:
@@ -101,10 +107,11 @@ const Diagnosis = ({
                       return n.timestamp
                     }).timestamp - 1,
             }))
+            // console.log(currentItems, existItems)
             ary
               .filter(
                 (o) =>
-                  o.value !== currentItems[0].value &&
+                  o.id !== currentItems[0].id &&
                   o.timestamp < currentItems[0].timestamp,
               )
               .map((o) => {
@@ -113,7 +120,7 @@ const Diagnosis = ({
             ary
               .filter(
                 (o) =>
-                  o.value !== currentItems[0].value &&
+                  o.id !== currentItems[0].id &&
                   o.timestamp > currentItems[0].timestamp,
               )
               .map((o) => {
@@ -126,18 +133,19 @@ const Diagnosis = ({
                 data: [
                   ...data.filter(
                     (o) =>
-                      (o.toothIndex === Number(k) &&
-                        o.value !== items[oldIndex]) ||
-                      o.toothIndex !== Number(k),
+                      (o.toothNo === Number(k) && o.id !== items[oldIndex]) ||
+                      o.toothNo !== Number(k),
                   ),
                   ...currentItems,
                 ],
               },
             })
           }
+          // console.log(items)
           return (
             <SortList
               // lockToContainerEdges
+              key={k}
               lockAxis='y'
               distance={10}
               onSortEnd={onSortEnd}
@@ -147,13 +155,10 @@ const Diagnosis = ({
               }}
             >
               {items.map((j) => {
-                // console.log(j, valueGroups[j])
                 const subAry = valueGroups[j]
                 const v = subAry[0]
-                // console.log(v.info)
                 if (v.action.method !== 3)
                   v.info = subAry.map((o) => o.name).join(',')
-                // console.log(subAry)
                 if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
                   subAry.push({
                     subTarget: 'centerfull',
@@ -171,14 +176,15 @@ const Diagnosis = ({
                 //     })),
                 //   ),
                 // )
-                const { action = {}, subTarget, value } = v
-
+                const { action = {}, subTarget, id } = v
                 const SortableListItem = SortableElement(ListItem)
                 // console.log(items, v)
-                const idx = items.indexOf(value)
+                const idx = items.indexOf(id)
+                // console.log(v, items, k, idx, id)
 
                 return (
                   <SortableListItem
+                    key={id}
                     classes={{
                       root: classes.toothJournalItem,
                       secondaryAction: classes.toothJournalItemSecondaryAction,
@@ -186,11 +192,11 @@ const Diagnosis = ({
                     button
                     // selected={selectedIndex === 0}
                     onClick={() => {
-                      console.log(selected, v)
+                      // console.log(selected, v)
                       setSelected(
                         selected &&
-                        v.toothIndex === selected.toothIndex &&
-                        v.value === selected.value
+                        v.toothNo === selected.toothNo &&
+                        v.id === selected.id
                           ? undefined
                           : v,
                       )
@@ -198,8 +204,8 @@ const Diagnosis = ({
                     index={idx}
                     selected={
                       selected &&
-                      v.toothIndex === selected.toothIndex &&
-                      v.value === selected.value
+                      v.toothNo === selected.toothNo &&
+                      v.id === selected.id
                     }
                   >
                     <ListItemIcon
@@ -213,16 +219,18 @@ const Diagnosis = ({
                         paddingLeft={1}
                         paddingTop={1}
                         zoom={1 / 6}
-                        image={action.attachments}
+                        image={action.image}
                         action={action}
                         fill={getCellConfig(
                           subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action.fill,
+                            [o.subTarget.replace('cell_', '')]: o.action
+                              .chartMethodColorBlock,
                           })),
                         )}
                         symbol={getCellConfig(
                           subAry.map((o) => ({
-                            [o.subTarget.replace('cell_', '')]: o.action.symbol,
+                            [o.subTarget.replace('cell_', '')]: o.action
+                              .chartMethodText,
                           })),
                         )}
                         // name={row.text}
@@ -240,11 +248,11 @@ const Diagnosis = ({
                                 padding: theme.spacing(0.5, 0, 0.5, 1),
                               }}
                             >
-                              #{v.toothIndex}.&nbsp;
+                              #{v.toothNo}.&nbsp;
                               {moment(v.timestamp).format(dateFormatLong)}{' '}
                               -&nbsp;
-                              {action.text}
-                              {v.info && ` (${v.info})`}
+                              {action.displayValue}
+                              {v.info && ` (${v.info})`.replace('(tooth)', '')}
                             </div>
                           </GridItem>
                           <GridItem
@@ -253,10 +261,14 @@ const Diagnosis = ({
                               paddingTop: 2,
                             }}
                           >
-                            {v.action.isDiagnosis && (
+                            {!cttreatment.find(
+                              (m) => m.chartMethodFK === v.action.id,
+                            ) &&
+                            v.action.isDisplayInDiagnosis && (
                               <Tooltip title='Delete'>
                                 <IconButton
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation()
                                     dispatch({
                                       type:
                                         'dentalChartComponent/toggleMultiSelect',
@@ -293,9 +305,7 @@ const Diagnosis = ({
           rows={3}
           onChange={(v) => {
             const shapes = data.filter(
-              (o) =>
-                o.toothIndex === selected.toothIndex &&
-                o.value === selected.value,
+              (o) => o.toothNo === selected.toothNo && o.id === selected.id,
             )
             // console.log(v.target.value, selected.remark)
             if (v.target.value !== selected.remark) {

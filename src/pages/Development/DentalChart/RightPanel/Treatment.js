@@ -48,12 +48,11 @@ const Treatment = ({
   style,
   onChange,
   mode,
-  dentalChartSetup,
   global,
   codetable,
   ...props
 }) => {
-  const { data = [], list = [], pedoChart, surfaceLabel } = dentalChartSetup
+  const { ctchartmethod } = codetable
   const [
     search,
     setSearch,
@@ -114,14 +113,25 @@ const Treatment = ({
           labelField='text'
           onItemFocus={(item) => {
             if (!item.subItems) {
-              const action = list.find((o) => o.id === item.chartMethodFK)
+              const action = ctchartmethod.find(
+                (o) => o.id === item.chartMethodFK,
+              )
               // console.log(action)
 
               dispatch({
                 type: 'dentalChartComponent/updateState',
                 payload: {
                   mode: 'treatment',
-                  action,
+                  action: {
+                    ...action,
+                    dentalTreatmentFK: item.id,
+                  },
+                },
+              })
+              dispatch({
+                type: 'dentalChartTreatment/updateState',
+                payload: {
+                  entity: undefined,
                 },
               })
             }

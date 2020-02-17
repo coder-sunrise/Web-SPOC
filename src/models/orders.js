@@ -42,12 +42,10 @@ const initialState = {
     unitPrice: 0,
   },
   defaultConsumable: { quantity: 1 },
-  defaultPackage: {
-    packageItems: [],
+  defaultOrderSet: {
+    orderSetItems: [],
   },
-  defaultTreatment: {
-    quantity: 1,
-  },
+  defaultTreatment: {},
   // default: {
   //   corPrescriptionItemPrecaution: [
   //     {
@@ -165,6 +163,9 @@ export default createListViewModel({
       upsertRowState (state, { payload }) {
         let newRow
         let { rows, type } = state
+        if (payload.type) {
+          type = payload.type
+        }
         if (payload.uid) {
           rows = rows.map((row) => {
             const n =
@@ -203,7 +204,7 @@ export default createListViewModel({
         return {
           ...state,
           rows,
-          entity: { uid: getUniqueId(), packageItems: [] },
+          entity: { uid: getUniqueId(), orderSetItems: [] },
           // totalAfterAdj: undefined,
         }
       },

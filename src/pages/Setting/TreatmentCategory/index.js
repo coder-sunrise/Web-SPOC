@@ -22,7 +22,7 @@ const styles = (theme) => ({
 class TreatmentCategory extends PureComponent {
   state = {}
 
-  componentDidMount () {
+  componentDidMount() {
     this.props.dispatch({
       type: 'settingTreatmentCategory/query',
     })
@@ -37,7 +37,7 @@ class TreatmentCategory extends PureComponent {
     })
   }
 
-  render () {
+  render() {
     const { settingTreatmentCategory } = this.props
     const cfg = {
       toggleModal: this.toggleModal,
@@ -53,8 +53,8 @@ class TreatmentCategory extends PureComponent {
             settingTreatmentCategory.entity ? (
               'Edit Treatment Category'
             ) : (
-              'Add Treatment Category'
-            )
+                'Add Treatment Category'
+              )
           }
           maxWidth='md'
           bodyNoPadding

@@ -151,6 +151,17 @@ export const createRectangle = (cfg) => {
     ...cfg,
   })
 }
+export const createTriangle = (cfg) => {
+  return new fabric.Triangle({
+    ...sharedCfg,
+    width: baseWidth * 4,
+    height: baseHeight * 3,
+    name: 'replaceObject',
+    fill: '#ffffff',
+    opacity: 1,
+    ...cfg,
+  })
+}
 const sharedButtonConfig = {
   clear: ({ canvas, group, values = [] }) => {
     // canvas.remove()
@@ -402,7 +413,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.left,
-      fill: fill.left || 'white',
+      fill: fill.left,
     },
   )
 
@@ -417,7 +428,7 @@ export const createToothShape = ({
       ...cfg,
       top: baseHeight * 4,
       name: text.bottom,
-      fill: fill.bottom || 'white',
+      fill: fill.bottom,
     },
   )
 
@@ -431,7 +442,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.right,
-      fill: fill.right || 'white',
+      fill: fill.right,
     },
   )
 
@@ -447,7 +458,7 @@ export const createToothShape = ({
     {
       ...cfg,
       name: text.top,
-      fill: fill.top || 'white',
+      fill: fill.top,
     },
   )
 
@@ -469,8 +480,9 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}left`,
       target: text.left,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
+      // opacity: 0.5,
       // left: 0 - groupWidth / 2,
       // originX: 'center',
       // originY: 'center',
@@ -494,7 +506,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}bottom`,
       target: text.bottom,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 4,
     },
   )
@@ -516,7 +528,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}right`,
       target: text.right,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -538,7 +550,7 @@ export const createToothShape = ({
       ...groupCfg,
       name: `${cellPrefix}top`,
       target: text.top,
-      toothIndex: index,
+      toothNo: index,
       top: baseHeight * 2,
     },
   )
@@ -559,7 +571,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerLeft,
-        fill: fill.centerLeft || 'white',
+        fill: fill.centerLeft,
       },
     )
     const polygon6 = new fabric.Polygon( // center right
@@ -575,7 +587,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerRight,
-        fill: fill.centerRight || 'white',
+        fill: fill.centerRight,
       },
     )
     g5 = new fabric.Group(
@@ -594,10 +606,10 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerLeft,
         name: `${cellPrefix}centerLeft`,
-        fill: fill.centerLeft || 'white',
+        fill: fill.centerLeft,
       },
     )
     g6 = new fabric.Group(
@@ -616,10 +628,10 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerRight,
         name: `${cellPrefix}centerRight`,
-        fill: fill.centerRight || 'white',
+        fill: fill.centerRight,
       },
     )
   } else {
@@ -636,7 +648,7 @@ export const createToothShape = ({
         ...cfg,
         top: baseHeight * 3,
         name: text.centerfull,
-        fill: fill.centerfull || 'white',
+        fill: fill.centerfull,
       },
     )
     g7 = new fabric.Group(
@@ -655,12 +667,14 @@ export const createToothShape = ({
       ],
       {
         ...groupCfg,
-        toothIndex: index,
+        toothNo: index,
         target: text.centerfull,
         name: `${cellPrefix}centerfull`,
       },
     )
   }
+
+  // console.log(fill, g1)
   let fixedItems = [
     // headerText,
     g1,

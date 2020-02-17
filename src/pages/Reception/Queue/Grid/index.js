@@ -99,11 +99,6 @@ const Grid = ({
       payload: {
         id,
       },
-    }).then((response) => {
-      if (response === 204)
-        notification.success({
-          message: 'Visit Deleted',
-        })
     })
   }
 
@@ -448,11 +443,12 @@ const Grid = ({
             size='sm'
             TableProps={TableProps}
             rows={queueListingData}
+            firstColumnCustomPadding={10}
             columnExtensions={[
               ...QueueColumnExtensions,
               {
                 columnName: 'visitStatus',
-                width: 180,
+                width: 200,
                 render: (row) => (
                   <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
@@ -479,11 +475,12 @@ const Grid = ({
             size='sm'
             TableProps={TableProps}
             rows={queueListingData}
+            firstColumnCustomPadding={10}
             columnExtensions={[
               ...ApptColumnExtensions,
               {
                 columnName: 'visitStatus',
-                width: 180,
+                width: 200,
                 render: (row) => (
                   <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),

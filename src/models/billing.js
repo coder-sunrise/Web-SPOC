@@ -6,6 +6,7 @@ import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
 import * as service from '@/pages/Billing/services'
 import { unlock } from '@/services/dispense'
 import { query as queryPatient } from '@/services/patient'
+import { sendNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
   namespace: 'billing',
@@ -103,6 +104,9 @@ export default createFormViewModel({
             },
           })
           yield take('billing/query/@@end')
+          sendNotification('QueueListing', {
+            message: `Billing Updated`,
+          })
           return response
         }
         return false
@@ -159,6 +163,9 @@ export default createFormViewModel({
               visitID: undefined,
               patientID: undefined,
             },
+          })
+          sendNotification('QueueListing', {
+            message: 'Back To Dispense',
           })
           router.push(destinationUrl)
         }

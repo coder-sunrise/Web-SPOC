@@ -50,14 +50,14 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
     },
     whiteSpace: 'nowrap',
     overflow: 'hidden',
-    width: 200,
+    width: 195,
     border: '1px solid rgba(0, 0, 0, 0.38)',
   },
 }))(ToggleButtonGroup)
 
-export default function ButtonGroup (props) {
-  const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
-  const { rows } = dentalChartSetup
+export default function DiagnosisPanel (props) {
+  const { dispatch, classes, theme, codetable, ...restProps } = props
+  const { ctchartmethod = [] } = codetable
 
   const [
     selectedStyle,
@@ -67,10 +67,15 @@ export default function ButtonGroup (props) {
     openSettings,
     setOpenSettings,
   ] = React.useState(false)
-
+  const [
+    search,
+    setSearch,
+  ] = React.useState('')
   const handleAction = (event, v) => {
     setSelectedStyle(v)
-    const btn = rows.find((o) => o.value === v)
+
+    // console.log(v, list)
+    const btn = ctchartmethod.find((o) => o.id === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -78,7 +83,7 @@ export default function ButtonGroup (props) {
       },
     })
   }
-
+  // console.log(list)
   // const sharedCfg = {
   //   alt: '',
   //   style: {
@@ -93,10 +98,15 @@ export default function ButtonGroup (props) {
   // console.log(theme.props)
   return (
     <div>
-      <Paper elevation={0} className={classes.paper}>
+      <Paper className={classes.paper}>
         <GridContainer>
           <GridItem md={9}>
-            <TextField prefix={<Search />} />
+            <TextField
+              prefix={<Search />}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+            />
           </GridItem>
           <GridItem md={3} style={{ lineHeight: theme.props.singleRowHeight }}>
             <Tooltip title='Settings'>
@@ -125,45 +135,56 @@ export default function ButtonGroup (props) {
               exclusive
               onChange={handleAction}
             >
-              {rows.filter((o) => o.isDiagnosis && !o.isDeleted).map((row) => {
-                const { value, text } = row
-                return [
-                  <ToggleButton value={value}>
-                    <Tooth
-                      className={classes.buttonIcon}
-                      width={groupWidth / 5 + 2}
-                      height={groupHeight / 5 + 2}
-                      paddingLeft={1}
-                      paddingTop={1}
-                      zoom={1 / 5}
-                      image={row.attachments}
-                      action={row}
-                      fill={{
-                        left: row.fill,
-                        right: row.fill,
-                        top: row.fill,
-                        bottom: row.fill,
-                        centerfull: row.fill || 'white',
-                      }}
-                      symbol={{
-                        left: row.symbol,
-                        right: row.symbol,
-                        top: row.symbol,
-                        bottom: row.symbol,
-                        centerfull: row.symbol,
-                      }}
-                      name={row.text}
-                    />
-                    <span style={{ marginLeft: groupWidth / 5 + 20 }}>
-                      {text}
-                    </span>
-                  </ToggleButton>,
-                  // <Divider
-                  //   orientation='vertical'
-                  //   className={classes.divider}
-                  // />,
-                ]
-              })}
+              {ctchartmethod
+                .filter(
+                  (o) =>
+                    !!o &&
+                    o.isDisplayInDiagnosis &&
+                    !o.isDeleted &&
+                    (!search ||
+                      o.displayValue
+                        .toLowerCase()
+                        .indexOf(search.toLowerCase()) >= 0),
+                )
+                .map((row) => {
+                  const { id, displayValue } = row
+                  return [
+                    <ToggleButton value={id}>
+                      <Tooth
+                        className={classes.buttonIcon}
+                        width={groupWidth / 5 + 2}
+                        height={groupHeight / 5}
+                        paddingLeft={1}
+                        paddingTop={1}
+                        zoom={1 / 5}
+                        image={row.image}
+                        action={row}
+                        fill={{
+                          left: row.chartMethodColorBlock,
+                          right: row.chartMethodColorBlock,
+                          top: row.chartMethodColorBlock,
+                          bottom: row.chartMethodColorBlock,
+                          centerfull: row.chartMethodColorBlock || 'white',
+                        }}
+                        symbol={{
+                          left: row.chartMethodText,
+                          right: row.chartMethodText,
+                          top: row.chartMethodText,
+                          bottom: row.chartMethodText,
+                          centerfull: row.chartMethodText,
+                        }}
+                        name={displayValue}
+                      />
+                      <span style={{ marginLeft: groupWidth / 5 }}>
+                        {displayValue}
+                      </span>
+                    </ToggleButton>,
+                    // <Divider
+                    //   orientation='vertical'
+                    //   className={classes.divider}
+                    // />,
+                  ]
+                })}
             </StyledToggleButtonGroup>
           </GridItem>
         </GridContainer>
@@ -180,12 +201,7 @@ export default function ButtonGroup (props) {
         // showFooter
         confirmText='Save'
       >
-        <Setup
-          {...props}
-          // entity={entity}
-          // refreshedSchemeData={schemeData}
-          // handleOnClose={() => handleReplacementModalVisibility(false)}
-        />
+        <Setup {...props} />
       </CommonModal>
     </div>
   )

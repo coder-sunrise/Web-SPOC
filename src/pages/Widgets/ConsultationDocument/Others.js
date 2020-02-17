@@ -25,11 +25,17 @@ import {
   withFormikExtend,
   skeleton,
 } from '@/components'
+import { getClinicianProfile } from './utils'
 
 // @skeleton()
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    return consultationDocument.entity || consultationDocument.defaultOthers
+  mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const values = {
+      ...(consultationDocument.entity || consultationDocument.defaultOthers),
+      issuedByUserFK: clinicianProfile.userProfileFK,
+    }
+    return values
   },
   validationSchema: Yup.object().shape({
     issueDate: Yup.date().required(),

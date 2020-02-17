@@ -103,6 +103,7 @@ const Pricing = ({
                         id: 'inventory.master.pricing.lastCostPriceBefBonus',
                       })}
                       disabled={isEditMode()}
+                      precision={4}
                       {...args}
                     />
                   )
@@ -120,6 +121,7 @@ const Pricing = ({
                         id: 'inventory.master.pricing.lastCostPriceAftBonus',
                       })}
                       disabled={isEditMode()}
+                      precision={4}
                       {...args}
                     />
                   )
@@ -131,7 +133,7 @@ const Pricing = ({
                 name='averageCostPrice'
                 render={(args) => (
                   <NumberInput
-                    format='$0,0.0000'
+                    // format='$0,0.0000'
                     label={formatMessage({
                       id: 'inventory.master.pricing.averageCostPrice',
                     })}

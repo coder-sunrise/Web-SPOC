@@ -32,7 +32,6 @@ import {
 } from '@/components'
 import { groupWidth, groupHeight } from './variables'
 import Setup from './Setup/index'
-import Setup2 from './Setup/index2'
 
 import Tooth from './Tooth'
 
@@ -57,8 +56,8 @@ const StyledToggleButtonGroup = withStyles((theme) => ({
 }))(ToggleButtonGroup)
 
 export default function DiagnosisPanel (props) {
-  const { dispatch, classes, theme, dentalChartSetup, ...restProps } = props
-  const { list = [] } = dentalChartSetup
+  const { dispatch, classes, theme, codetable, ...restProps } = props
+  const { ctchartmethod = [] } = codetable
 
   const [
     selectedStyle,
@@ -76,7 +75,7 @@ export default function DiagnosisPanel (props) {
     setSelectedStyle(v)
 
     // console.log(v, list)
-    const btn = list.find((o) => o.id === v)
+    const btn = ctchartmethod.find((o) => o.id === v)
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
@@ -136,7 +135,7 @@ export default function DiagnosisPanel (props) {
               exclusive
               onChange={handleAction}
             >
-              {list
+              {ctchartmethod
                 .filter(
                   (o) =>
                     !!o &&
@@ -202,11 +201,7 @@ export default function DiagnosisPanel (props) {
         // showFooter
         confirmText='Save'
       >
-        <Setup2 {...props} />
-
-        {/* <div>
-          <Setup {...props} />
-        </div> */}
+        <Setup {...props} />
       </CommonModal>
     </div>
   )

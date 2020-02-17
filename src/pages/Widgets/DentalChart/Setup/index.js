@@ -8,7 +8,7 @@ import AttachMoney from '@material-ui/icons/AttachMoney'
 import History from '@material-ui/icons/History'
 import moment from 'moment'
 import Yup from '@/utils/yup'
-import { getUniqueId } from '@/utils/utils'
+import { getUniqueId, difference } from '@/utils/utils'
 
 import {
   Button,
@@ -28,6 +28,7 @@ import {
   DragableTableGrid,
   withFormikExtend,
   Switch,
+  notification,
 } from '@/components'
 import {
   strokeWidth,
@@ -50,11 +51,11 @@ import Legend from './Legend'
 
 const methods = [
   {
-    value: 'surface',
+    value: 1,
     name: 'Surface',
   },
   {
-    value: 'tooth',
+    value: 2,
     name: 'Tooth',
   },
   {
@@ -67,8 +68,8 @@ const methods = [
   },
 ]
 const rowSchema = Yup.object().shape({
-  text: Yup.string().required(),
-  method: Yup.string().required(),
+  displayValue: Yup.string().required(),
+  chartMethodTypeFK: Yup.number().required(),
 })
 
 const Setup = (props) => {
@@ -89,6 +90,7 @@ const Setup = (props) => {
     dentalChartSetup,
     values,
     setFieldValue,
+    setValues,
     footer,
     ...restProps
   } = props
@@ -96,8 +98,22 @@ const Setup = (props) => {
     mode,
     setMode,
   ] = useState('sort')
+  // console.log(restProps)
+  // useEffect(() => {
+  //   if (!values.rows || values.rows.Legend === 0)
+  //     dispatch({
+  //       type: 'dentalChartSetup/query',
+  //     }).then((response) => {
+  //       if (response.data)
+  //         setValues({
+  //           rows: response.data,
+  //         })
+  //       // console.log(list)
+  //     })
+  //   // console.log('did h')
+  // }, [])
   const handleCommitChanges = ({ rows, changed }) => {
-    // console.log(rows, changed)
+    console.log(rows, changed)
     setFieldValue('rows', rows)
   }
   // useState()
@@ -112,25 +128,35 @@ const Setup = (props) => {
       },
     },
     {
-      columnName: 'method',
+      columnName: 'chartMethodTypeFK',
       type: 'select',
       options: methods,
       isDisabled: (row) => {
-        return row.fixed
+        return !row.isUserMaintainable
       },
     },
     {
-      columnName: 'isDiagnosis',
+      columnName: 'isDisplayInDiagnosis',
       type: 'checkbox',
       align: 'center',
       isDisabled: (row) => {
-        return row.fixed || mode === 'sort'
+        return (
+          !row.isUserMaintainable ||
+          mode === 'sort' ||
+          row.chartMethodTypeFK === 3
+        )
       },
     },
     {
-      columnName: 'text',
+      columnName: 'code',
       isDisabled: (row) => {
-        return row.fixed
+        return !row.isUserMaintainable
+      },
+    },
+    {
+      columnName: 'displayValue',
+      isDisabled: (row) => {
+        return !row.isUserMaintainable
       },
     },
   ]
@@ -139,20 +165,22 @@ const Setup = (props) => {
   // }
   const tableProps = {
     size: 'sm',
-    rows: values.rows,
-    dataSource: values.rows,
+    rows: values.rows.filter((d) => !!d),
+    // dataSource: values.rows,
+    // type: 'dentalChartSetup',
+    // entity: dentalChartSetup,
     rowDragable: true,
     columns: [
       { name: 'code', title: 'Code' },
-      { name: 'method', title: 'Method' },
+      { name: 'chartMethodTypeFK', title: 'Method' },
       { name: 'legend', title: 'Legend' },
 
       {
-        name: 'text',
+        name: 'displayValue',
         title: 'Name',
       },
       {
-        name: 'isDiagnosis',
+        name: 'isDisplayInDiagnosis',
         title: 'Display in Diagnosis',
       },
     ],
@@ -174,13 +202,13 @@ const Setup = (props) => {
     EditingProps: {
       showAddCommand: true,
       isDeletable: (row) => {
-        return !row.fixed
+        return row.isUserMaintainable
       },
       // showDeleteCommand: false,
       onCommitChanges: handleCommitChanges,
       onAddedRowsChange: (rows) => {
         return rows.map((o) => {
-          return { value: getUniqueId(), ...o }
+          return { value: getUniqueId(), isUserMaintainable: true, ...o }
         })
       },
       // onEditingRowIdsChange: this.handleEditingRowIdsChange,
@@ -229,9 +257,10 @@ const Setup = (props) => {
   )
 }
 export default withFormikExtend({
-  mapPropsToValues: ({ dentalChartSetup }) => {
+  mapPropsToValues: ({ codetable }) => {
     return {
-      rows: dentalChartSetup.rows || buttonConfigs,
+      // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+      rows: codetable.ctchartmethod, // || buttonConfigs,
     }
   },
 
@@ -241,14 +270,61 @@ export default withFormikExtend({
 
   handleSubmit: (values, { props, resetForm }) => {
     // console.log(values)
-    const { dispatch, history, codetable, onConfirm } = props
-    dispatch({
-      type: 'dentalChartSetup/updateState',
-      payload: {
-        rows: values.rows,
-      },
-    })
-    localStorage.setItem('dentalChartSetup', JSON.stringify(values.rows))
+    const { dispatch, history, codetable, onConfirm, dentalChartSetup } = props
+    const { ctchartmethod } = codetable
+    // const list = [] // JSON.parse(localStorage.getItem('dentalChartSetup')) ||
+    // dispatch({
+    //   type: 'dentalChartSetup/updateState',
+    //   payload: {
+    //     list: values.rows,
+    //   },
+    // })
+
+    let diffs = difference(
+      values.rows.map(({ rowIndex, ...o }) => o),
+      ctchartmethod,
+    )
+    console.log(ctchartmethod, values.rows, diffs)
+    if (diffs.length !== 0) {
+      // console.log(diffs)
+      // const items =values.rows.filter(o=>!list.find(m=>m.id===o.id)).concat(values.rows.filter())
+      const updated = values.rows
+        .map((o, i) => {
+          if (o) {
+            return {
+              ...o,
+              sortOrder: i,
+            }
+          }
+        })
+        .filter((o, i) => diffs[i] && Object.values(diffs[i]).length)
+      dispatch({
+        type: 'dentalChartSetup/post',
+        payload: updated,
+      }).then((o) => {
+        // console.log(o)
+        if (o) {
+          notification.success({
+            message: 'Setting updated',
+          })
+          // dispatch({
+          //   type: 'dentalChartSetup/query',
+          //   payload: {
+          //     pagesize: 99999,
+          //   },
+          // })
+        }
+      })
+      // localStorage.setItem(
+      //   'dentalChartSetup',
+      //   JSON.stringify(
+      //     values.rows
+      //       .filter((o) => !diffs.find((d) => !!d && d.id === o.id))
+      //       .concat(diffs.filter((d) => !!d)),
+      //   ),
+      // )
+    }
+
     if (onConfirm) onConfirm()
   },
 

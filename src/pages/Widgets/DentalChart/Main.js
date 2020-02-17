@@ -42,15 +42,18 @@ import {
   selectablePrefix,
 } from './variables'
 
-import ButtonGroup from './ButtonGroup'
+import DiagnosisPanel from './DiagnosisPanel'
 import TreatmentForm from './TreatmentForm'
 import RightPanel from './RightPanel/index.js'
 import Chart from './Chart'
 import model from './models'
 import modelSetup from './models/setup'
+import modelTreatment from './models/treatment'
 
 window.g_app.replaceModel(model)
 window.g_app.replaceModel(modelSetup)
+window.g_app.replaceModel(modelTreatment)
+
 const styles = (theme) => ({
   paper: {
     display: 'flex',
@@ -112,12 +115,72 @@ const styles = (theme) => ({
 
 const groupWidth = baseWidth * 4 // + strokeWidth
 const groupHeight = baseHeight * 3 // + strokeWidth
-@connect(({ dentalChartComponent, dentalChartSetup, global }) => ({
-  dentalChartComponent,
-  dentalChartSetup,
-  global,
-}))
+@connect(
+  ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    orders,
+    codetable,
+    consultation,
+    global,
+  }) => ({
+    dentalChartComponent,
+    dentalChartSetup,
+    dentalChartTreatment,
+    orders,
+    codetable,
+    consultation,
+    global,
+  }),
+)
 class DentalChart extends React.Component {
+  constructor (props) {
+    super(props)
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctchartmethod' },
+    })
+    this.props.dispatch({
+      type: 'codetable/fetchCodes',
+      payload: { code: 'cttreatment' },
+    })
+  }
+
+  componentWillReceiveProps (np) {
+    // co/nsole.log(this.props.dentalChartComponent.data, np.consultation)
+    if (
+      this.props.dentalChartComponent.data.length === 0 &&
+      np.consultation.entity &&
+      np.consultation.entity.corDentalCharts[0]
+    ) {
+      const d = {
+        ...np.consultation.entity.corDentalCharts[0],
+        data: JSON.parse(np.consultation.entity.corDentalCharts[0].dentalChart),
+      }
+      delete d.dentalChart
+      this.props.dispatch({
+        type: 'dentalChartComponent/updateState',
+        payload: d,
+      })
+    }
+    // if (data.corDentalCharts && data.corDentalCharts[0]) {
+    //   yield put({
+    //     type: 'dentalChartComponent/updateState',
+    //     payload: {
+    //       ...data.corDentalCharts[0],
+    //       data: JSON.parse(data.corDentalCharts[0].dentalChart),
+    //     },
+    //   })
+    // }
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'dentalChartComponent/reset',
+    })
+  }
+
   render () {
     const {
       className,
@@ -145,7 +208,7 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <ButtonGroup {...this.props} />}
+            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>

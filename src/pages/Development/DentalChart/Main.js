@@ -134,8 +134,8 @@ class DentalChart extends React.Component {
   constructor (props) {
     super(props)
     this.props.dispatch({
-      type: 'dentalChartSetup/query',
-      pageSize: 99999,
+      type: 'codetable/fetchCodes',
+      payload: { code: 'ctchartmethod', force: true },
     })
   }
 

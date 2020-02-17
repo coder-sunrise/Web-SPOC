@@ -139,7 +139,14 @@ class FilterBar extends PureComponent {
                         ? transactionDates[1]
                         : undefined,
                       apiCriteria: {
+                        // searchValue: ExpenseType,
                         OnlyWithDeposit: showTransactionOnly,
+                        // startDate: transactionDates
+                        //   ? transactionDates[0]
+                        //   : undefined,
+                        // endDate: transactionDates
+                        //   ? transactionDates[1]
+                        //   : undefined,
                       },
                       group: [
                         {

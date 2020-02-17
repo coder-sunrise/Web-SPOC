@@ -16,13 +16,18 @@ import {
   ClinicianSelect,
 } from '@/components'
 import * as service from '@/services/common'
+import { getClinicianProfile } from './utils'
 
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    return (
-      consultationDocument.entity ||
-      consultationDocument.defaultMedicalCertificate
-    )
+  mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const values = {
+      ...(consultationDocument.entity ||
+        consultationDocument.defaultMedicalCertificate),
+      issuedByUserFK: clinicianProfile.userProfileFK,
+    }
+
+    return values
   },
   validationSchema: Yup.object().shape({
     mcIssueDate: Yup.date().required(),

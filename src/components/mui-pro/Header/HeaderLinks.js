@@ -29,6 +29,7 @@ import Person from '@material-ui/icons/Person'
 import Notifications from '@material-ui/icons/Notifications'
 import Link from '@material-ui/icons/Link'
 import LinkOff from '@material-ui/icons/LinkOff'
+import WifiOff from '@material-ui/icons/WifiOff'
 import Search from '@material-ui/icons/Search'
 
 // core components
@@ -36,7 +37,14 @@ import CustomInput from 'mui-pro-components/CustomInput'
 
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
 
-import { Badge, SizeContainer, TextField, Popper, Button } from '@/components'
+import {
+  Badge,
+  SizeContainer,
+  TextField,
+  Tooltip,
+  Popper,
+  Button,
+} from '@/components'
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -322,35 +330,24 @@ class HeaderLinks extends React.Component {
           <SizeContainer size='lg'>
             <div>
               {NotificationComponent()}
-              <Button justIcon color='transparent'>
-                {signalRConnected ? (
-                  <Badge
-                    ripple
-                    color='info'
-                    overlap='circle'
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    variant='dot'
-                  >
-                    <Link />
-                  </Badge>
-                ) : (
-                  <Badge
-                    ripple
-                    color='danger'
-                    overlap='circle'
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    variant='dot'
-                  >
-                    <LinkOff />
-                  </Badge>
-                )}
-              </Button>
+              {!signalRConnected && (
+                <Tooltip title='Real-time update signal is down. Please refresh manually.'>
+                  <Button justIcon color='transparent'>
+                    <Badge
+                      ripple
+                      color='danger'
+                      overlap='circle'
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      variant='dot'
+                    >
+                      <WifiOff />
+                    </Badge>
+                  </Button>
+                </Tooltip>
+              )}
               {/* <Button
                 justIcon
                 color='transparent'

@@ -82,14 +82,14 @@ export const INVOICE_ITEM_TYPE = {
   2: 'Consumable',
   3: 'Vaccination',
   4: 'Service',
-  5: 'Package',
+  5: 'OrderSet',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
   Medication: 1,
   Consumable: 2,
   Service: 3,
-  Package: 4,
+  OrderSet: 4,
 }
 
 export const INVOICE_ITEM_TYPE_BY_NAME = {
@@ -97,7 +97,7 @@ export const INVOICE_ITEM_TYPE_BY_NAME = {
   CONSUMABLE: 2,
   VACCINATION: 3,
   SERVICE: 4,
-  PACKAGE: 5,
+  ORDERSET: 5,
   MISC: 6,
 }
 
@@ -187,10 +187,20 @@ export const VISIT_TYPE = {
   BILL_FIRST: 3,
 }
 
-export const VISIT_TYPE_NAME = {
-  CONS: 'Consultation',
-  RETAIL: 'Retail',
-}
+export const VISIT_TYPE_NAME = [
+  {
+    visitPurposeFK: VISIT_TYPE.CONS,
+    displayName: 'CONSULTATION',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.RETAIL,
+    displayName: 'RETAIL',
+  },
+  {
+    visitPurposeFK: VISIT_TYPE.BILL_FIRST,
+    displayName: 'BILL-FIRST',
+  },
+]
 
 export const DEFAULT_PAYMENT_MODE_GIRO = {
   PAYMENT_FK: 5,
@@ -203,7 +213,7 @@ export const ORDER_TYPE_TAB = {
   SERVICE: '3',
   CONSUMABLE: '4',
   OPENPRECRIPTION: '5',
-  PACKAGE: '6',
+  ORDERSET: '6',
 }
 
 export const FILE_STATUS = {
@@ -212,21 +222,12 @@ export const FILE_STATUS = {
   ARCHIEVED: 3,
 }
 
-export const FILE_CATEGORY = {
-  VISITREG: 1,
-  CONSULTATION: 2,
-}
-
 export const SCRIBBLE_NOTE_TYPE = {
   CLINICALNOTES: 1,
   CHIEFCOMPLAINTS: 2,
   PLAN: 3,
 }
 
-export const CLINIC_SPECIALIST = {
-  GP: 'GP',
-  DENTAL: 'DENTAL',
-}
 export const SMS_STATUS = {
   SENT: 1,
   FAILED: 2,
@@ -261,4 +262,23 @@ export const CANNED_TEXT_TYPE = {
   ASSOCIATEDHISTORY: 3,
   INTRAORAL: 4,
   EXTRAORAL: 5,
+}
+
+export const CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicianNote',
+  2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+}
+
+export const CLINIC_TYPE = {
+  GP: 1,
+  DENTAL: 2,
+}
+
+export const FILE_CATEGORY = {
+  VISITREG: 1,
+  CONSULTATION: 2,
+  PATIENT: 3,
 }

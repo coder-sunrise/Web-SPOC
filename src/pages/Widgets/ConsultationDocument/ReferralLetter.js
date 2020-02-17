@@ -24,18 +24,24 @@ import {
   ButtonSelect,
   ClinicianSelect,
 } from '@/components'
+import { getClinicianProfile } from './utils'
 
 @withFormikExtend({
-  mapPropsToValues: ({ consultationDocument }) => {
-    return (
-      consultationDocument.entity || consultationDocument.defaultReferralLetter
-    )
+  mapPropsToValues: ({ consultationDocument, codetable, visitEntity }) => {
+    const clinicianProfile = getClinicianProfile(codetable, visitEntity)
+    const values = {
+      ...(consultationDocument.entity ||
+        consultationDocument.defaultReferralLetter),
+      referredByUserFK: clinicianProfile.userProfileFK,
+    }
+
+    return values
   },
   validationSchema: Yup.object().shape({
     referralDate: Yup.date().required(),
     referredByUserFK: Yup.number().required(),
     to: Yup.string().required(),
-    address: Yup.string().required(),
+    // address: Yup.string().required(),
     subject: Yup.string().required(),
     content: Yup.string().required(),
   }),

@@ -6,6 +6,7 @@ import ColorLens from '@material-ui/icons/ColorLens'
 import { withStyles } from '@material-ui/core'
 
 import { AttachmentWithThumbnail } from '@/components/_medisys'
+import { getUniqueId } from '@/utils/utils'
 
 import {
   GridContainer,
@@ -21,8 +22,36 @@ import { groupWidth, groupHeight } from '../variables'
 import Tooth from '../Tooth'
 
 const symbols = [
+  { name: 'x', value: 'x' },
+  { name: '#', value: '#' },
+  { name: '~', value: '~' },
+  { name: '+', value: '+' },
+  { name: '|', value: '|' },
+  { name: 'O', value: 'O' },
+  { name: 'P', value: 'P' },
+  { name: 'U', value: 'U' },
+  { name: 'W', value: 'W' },
+  { name: 'A', value: 'A' },
+  { name: 'B', value: 'B' },
+  { name: 'C', value: 'C' },
+  { name: 'Q', value: 'Q' },
+  { name: 'E', value: 'E' },
   { name: '$', value: '$' },
   { name: '%', value: '%' },
+  { name: '&', value: '&' },
+  { name: '/', value: '/' },
+  { name: '—', value: '—' },
+  { name: '⤾', value: '⤾' },
+  { name: '⤿', value: '⤿' },
+  { name: '⤸', value: '⤸' },
+  { name: '⤺', value: '⤺' },
+  { name: '⤻', value: '⤻' },
+  { name: '←', value: '←' },
+  { name: '→', value: '→' },
+  { name: '↑', value: '↑' },
+  { name: '↓', value: '↓' },
+  { name: '↖', value: '↖' },
+  { name: '↗', value: '↗' },
 ]
 
 const styles = (theme) => ({
@@ -33,107 +62,72 @@ const styles = (theme) => ({
 })
 
 const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
-  const { value, control = {}, validSchema, text, ...restProps } = columnConfig
-  const { method } = row
+  if (!row) return null
+  const { chartMethodTypeFK } = row
   // if (
   //   [
   //     4,
   //     3,
-  //   ].includes(method)
+  //   ].includes(chartMethodTypeFK)
   // )
   //   return null
-  const { onBlur, onFocus, autoFocus, ...props } = cellProps
   // console.log(restProps)
+  // console.log(row)
   const [
     mode,
     setMode,
-  ] = useState(row.editMode || 'color')
-  const [
-    color,
-    setColor,
-  ] = useState(row.fill)
-  const [
-    symbol,
-    setSymbol,
-  ] = useState(row.symbol)
+  ] = useState(row.image ? 'image' : 'color')
+  // console.log(chartMethodTypeFK, row.editMode, mode)
+  // if (chartMethodTypeFK === 1 && mode !== 'color') {
+  //   setMode('color')
+  // }
+  // const [
+  //   color,
+  //   setColor,
+  // ] = useState(row.chartMethodColorBlock)
+  // const [
+  //   symbol,
+  //   setSymbol,
+  // ] = useState(row.chartMethodText)
 
-  const [
-    attachments,
-    setAttachments,
-  ] = useState(row.attachments)
-  const [
-    blur,
-    setBlur,
-  ] = useState(false)
-  const debounceBlur = _.debounce(setBlur, 100, {
-    leading: false,
-    trailing: true,
-  })
+  // const [
+  //   blur,
+  //   setBlur,
+  // ] = useState(false)
+  // const debounceBlur = _.debounce(setBlur, 100, {
+  //   leading: false,
+  //   trailing: true,
+  // })
+  // useEffect(
+  //   () => {
+  //     if (chartMethodTypeFK === 4) return
+
+  //     if (mode === 'color') {
+  //       row.image = ''
+  //     } else if (mode === 'image') {
+  //       row.chartMethodColorBlock = ''
+  //       row.chartMethodText = ''
+  //       setSymbol(undefined)
+  //       setColor(undefined)
+  //     }
+  //   },
+  //   [
+  //     mode,
+  //   ],
+  // )
   useEffect(
     () => {
-      if (method === 4) return
-      if (mode === 'color') {
-        setAttachments([])
-        delete row.attachments
-      } else if (mode === 'image') {
-        delete row.symbol
-        delete row.color
-        setSymbol(undefined)
-        setColor(undefined)
+      // console.log('legend', chartMethodTypeFK)
+      if (chartMethodTypeFK === 1 && mode !== 'color') {
+        setMode('color')
       }
     },
     [
-      mode,
+      chartMethodTypeFK,
     ],
   )
-  const { commitChanges } = control
 
-  const handleUpdateAttachments = ({ added, deleted }) => {
-    // console.log({ added, deleted }, args)
-
-    let updated = [
-      ...(attachments || []),
-    ]
-    if (added)
-      updated = [
-        ...updated,
-        ...added.map((o) => {
-          const { id, ...resetProps } = o
-          return {
-            ...resetProps,
-            fileIndexFK: o.id,
-          }
-        }),
-      ]
-
-    if (deleted)
-      updated = updated.reduce((_attachments, item) => {
-        if (
-          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
-          (item.fileIndexFK === undefined && item.id === deleted)
-        )
-          return [
-            ..._attachments,
-            { ...item, isDeleted: true },
-          ]
-
-        return [
-          ..._attachments,
-          { ...item },
-        ]
-      }, [])
-
-    row.attachments = updated.map((o) => ({ thumbnailData: o.thumbnailData }))
-    setAttachments(updated)
-    commitChanges({
-      changed: {
-        [row.id]: {
-          attachments: updated,
-        },
-      },
-    })
-  }
-  // console.log(row.fill)
+  // console.log(row.chartMethodColorBlock)
   // console.log(row)
   if (viewOnly) {
     return (
@@ -144,37 +138,59 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         paddingTop={1}
         zoom={1 / 5}
         // custom={row.getShape}
-        image={row.attachments}
+        image={row.image}
         action={row}
         fill={{
-          left: row.fill,
-          right: row.fill,
-          top: row.fill,
-          bottom: row.fill,
-          centerfull: row.fill || 'white',
+          left: row.chartMethodColorBlock,
+          right: row.chartMethodColorBlock,
+          top: row.chartMethodColorBlock,
+          bottom: row.chartMethodColorBlock,
+          centerfull: row.chartMethodColorBlock || 'white',
         }}
         symbol={{
-          left: row.symbol,
-          right: row.symbol,
-          top: row.symbol,
-          bottom: row.symbol,
-          centerfull: row.symbol,
+          left: row.chartMethodText,
+          right: row.chartMethodText,
+          top: row.chartMethodText,
+          bottom: row.chartMethodText,
+          centerfull: row.chartMethodText,
         }}
         name={row.text}
       />
     )
   }
+  const { onBlur, onFocus, autoFocus, ...props } = cellProps
+  const { value, control = {}, validSchema, text, ...restProps } = columnConfig
+  const { commitChanges } = control
 
+  const handleUpdateAttachments = ({ added, deleted }) => {
+    const image = added
+      ? added.map(
+          (o) =>
+            `data:image/${o.thumbnail.fileExtension.replace('.', '')};base64,${o
+              .thumbnail.content}`,
+        )[0]
+      : ''
+    row.image = image
+    commitChanges({
+      changed: {
+        [row.id]: {
+          image,
+          chartMethodColorBlock: '',
+          chartMethodText: '',
+        },
+      },
+    })
+  }
   if (
     [
       4,
       3,
-    ].includes(method)
+    ].includes(chartMethodTypeFK)
   )
     return null
   return (
     <GridContainer>
-      {method === 'tooth' &&
+      {chartMethodTypeFK === 2 &&
       !viewOnly && (
         <GridItem xs={6}>
           <Switch
@@ -186,11 +202,16 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             unCheckedValue='color'
             onChange={(v) => {
               setMode(v)
+              if (v === 'color') {
+                row.chartMethodColorBlock = '#ffffff'
+                row.image = ''
+              } else {
+                row.chartMethodColorBlock = ''
+                row.chartMethodText = ''
+              }
               commitChanges({
                 changed: {
-                  [row.id]: {
-                    editMode: v,
-                  },
+                  [row.id]: row,
                 },
               })
             }}
@@ -204,14 +225,17 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             trigger='click'
             overlay={
               <SketchPicker
-                color={color}
+                color={row.chartMethodColorBlock}
                 onChangeComplete={(e) => {
-                  row.fill = e.hex
-                  setColor(e.hex)
+                  row.chartMethodColorBlock = e.hex
+                  row.image = ''
+
+                  // setColor(e.hex)
                   commitChanges({
                     changed: {
                       [row.id]: {
-                        fill: e.hex,
+                        chartMethodColorBlock: e.hex,
+                        image: '',
                       },
                     },
                   })
@@ -223,12 +247,16 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             <Button
               justIcon
               style={{
-                backgroundColor: color || 'transparent',
+                backgroundColor: row.chartMethodColorBlock || 'transparent',
                 minWidth: 60,
                 color: 'black',
               }}
             >
-              {symbol} &nbsp;
+              {
+                (symbols.find((o) => o.value === row.chartMethodText) || {})
+                  .name
+              }{' '}
+              &nbsp;
             </Button>
           </Popper>
         </GridItem>
@@ -237,18 +265,24 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         <GridItem xs={3}>
           <Select
             options={symbols}
-            value={symbol}
+            value={row.chartMethodText}
             {...restProps}
             text={viewOnly}
-            onChange={(v) => {
-              setSymbol(v)
+            onChange={(v, option = {}) => {
+              // console.log(v, option)
+              // setSymbol(v)
+              row.chartMethodText = option.name || ''
+              row.image = ''
               // row.apptDurationMinute = e
               // setEndTime(row)
               // validSchema(row)
               commitChanges({
                 changed: {
                   [row.id]: {
-                    symbol: v,
+                    chartMethodText: option.name || '',
+                    image: '',
+
+                    // symbol: v,
                   },
                 },
               })
@@ -270,12 +304,23 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             classes={{
               root: classes.attachmentContainer,
             }}
-            attachmentType='DentalChartMethod'
             simple
-            isReadOnly={!viewOnly}
+            local
+            isReadOnly={viewOnly}
             allowedMultiple={false}
             handleUpdateAttachments={handleUpdateAttachments}
-            attachments={attachments}
+            attachments={
+              row.image ? (
+                [
+                  {
+                    fileIndexFK: getUniqueId(),
+                    thumbnailData: row.image,
+                  },
+                ]
+              ) : (
+                []
+              )
+            }
             // isReadOnly={isReadOnly}
           />
         </GridItem>

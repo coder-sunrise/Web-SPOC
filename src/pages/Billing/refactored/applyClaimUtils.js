@@ -3,6 +3,8 @@ import numeral from 'numeral'
 import { roundTo, getUniqueId } from '@/utils/utils'
 import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
+const sumAll = (total, price) => total + price
+
 export const convertAmountToPercentOrCurrency = (type, amount) =>
   type.toLowerCase() === 'percentage' ? `${amount}%` : `$${amount.toFixed(2)}`
 
@@ -72,6 +74,7 @@ export const getApplicableClaimAmount = (
   invoicePayerItem,
   scheme,
   remainingCoverageMaxCap,
+  totalClaimableAmount,
 ) => {
   const {
     coPaymentByCategory,
@@ -147,6 +150,9 @@ export const getApplicableClaimAmount = (
   }
   if (returnClaimAmount > payableBalance) returnClaimAmount = payableBalance
 
+  if (returnClaimAmount > totalClaimableAmount)
+    returnClaimAmount = totalClaimableAmount
+
   return returnClaimAmount
 }
 
@@ -157,7 +163,17 @@ export const getInvoiceItemsWithClaimAmount = (
   shouldGenerateDummyID = false,
 ) => {
   if (!schemeConfig || _.isEmpty(schemeConfig)) return []
-  const { coverageMaxCap } = schemeConfig
+  const { coverageMaxCap, patientMinCoPaymentAmount = 0 } = schemeConfig
+
+  const totalInvoiceAmount = originalInvoiceItems
+    .map((item) => item.totalAfterGst - (item._claimedAmount || 0))
+    .reduce(sumAll, 0)
+
+  const totalClaimableAmount =
+    totalInvoiceAmount < patientMinCoPaymentAmount
+      ? 0
+      : totalInvoiceAmount - patientMinCoPaymentAmount
+
   const invoiceItems = originalInvoiceItems.reduce((result, item) => {
     if (
       item.notClaimableBySchemeIds.includes(schemeConfig.id) ||
@@ -177,13 +193,22 @@ export const getInvoiceItemsWithClaimAmount = (
     } = getCoverageAmountAndType(schemeConfig, item)
     const { invoiceItemTypeFK } = item
 
-    const remainingCoverageMaxCap =
-      coverageMaxCap - result.reduce((total, i) => total + i.claimAmount, 0)
+    const pastItemClaimedAmount = result.reduce(
+      (total, i) => total + i.claimAmount,
+      0,
+    )
+
+    const remainingCoverageMaxCap = coverageMaxCap - pastItemClaimedAmount
+    const remainingClaimableAmount =
+      totalClaimableAmount - pastItemClaimedAmount <= 0
+        ? 0
+        : totalClaimableAmount - pastItemClaimedAmount
 
     const _claimAmount = getApplicableClaimAmount(
       item,
       schemeConfig,
       remainingCoverageMaxCap,
+      remainingClaimableAmount,
     )
 
     if (existedItem)
@@ -322,14 +347,14 @@ export const validateClaimAmount = (schemeRow) => {
     consumableCoverageMaxCap,
     serviceCoverageMaxCap,
     vaccinationCoverageMaxCap,
-    packageCoverageMaxCap,
+    orderSetCoverageMaxCap,
 
     isCoverageMaxCapCheckRequired,
     isMedicationCoverageMaxCapCheckRequired,
     isConsumableCoverageMaxCapCheckRequired,
     isVaccinationCoverageMaxCapCheckRequired,
     isServiceCoverageMaxCapCheckRequired,
-    isPackageCoverageMaxCapCheckRequired,
+    isOrderSetCoverageMaxCapCheckRequired,
   } = schemeConfig
 
   const listOfLimits = []
@@ -343,17 +368,32 @@ export const validateClaimAmount = (schemeRow) => {
   )
 
   const totalPayable = invoicePayerItem.reduce(calculateTotalPaybable, 0)
+  const patientDistributedAmount =
+    totalClaimAmount > 0
+      ? totalPayable - totalClaimAmount
+      : patientMinCoPaymentAmount
 
   if (patientMinCoPaymentAmount > 0) {
     const amount =
       patientMinCoPaymentAmountType === 'ExactAmount'
         ? patientMinCoPaymentAmount
         : totalClaimAmount * (patientMinCoPaymentAmount / 100)
-
-    listOfLimits.push({
-      type: 'Amount after Patient Min. Payable',
-      value: totalPayable - amount,
-    })
+    if (patientDistributedAmount < patientMinCoPaymentAmount) {
+      invalidMessage.push(
+        `Current Patient Min. Payment Amount is: $${patientDistributedAmount.toFixed(
+          2,
+        )}`,
+      )
+      invalidMessage.push(
+        `Patient Min. Payment Amount must be at least: $${patientMinCoPaymentAmount.toFixed(
+          2,
+        )}`,
+      )
+    } else
+      listOfLimits.push({
+        type: 'Amount after Patient Min. Payable',
+        value: totalPayable - amount,
+      })
   }
   if (isCoverageMaxCapCheckRequired) {
     if (coverageMaxCap > 0)
@@ -365,7 +405,7 @@ export const validateClaimAmount = (schemeRow) => {
     const consumableTotalClaim = getItemTypeSubtotal(invoicePayerItem, 2)
     const vaccinationTotalClaim = getItemTypeSubtotal(invoicePayerItem, 3)
     const serviceTotalClaim = getItemTypeSubtotal(invoicePayerItem, 4)
-    const packageTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
+    const orderSetTotalClaim = getItemTypeSubtotal(invoicePayerItem, 5)
 
     if (
       isMedicationCoverageMaxCapCheckRequired &&
@@ -392,10 +432,20 @@ export const validateClaimAmount = (schemeRow) => {
       invalidMessage.push('Service total claim amount has exceed the max cap')
 
     if (
-      isPackageCoverageMaxCapCheckRequired &&
-      packageTotalClaim > packageCoverageMaxCap
+      isOrderSetCoverageMaxCapCheckRequired &&
+      orderSetTotalClaim > orderSetCoverageMaxCap
     )
-      invalidMessage.push('Package total claim amount has exceed the max cap')
+      invalidMessage.push('Order Set total claim amount has exceed the max cap')
+
+    const total =
+      medicationTotalClaim +
+      consumableTotalClaim +
+      vaccinationTotalClaim +
+      serviceTotalClaim +
+      orderSetTotalClaim
+
+    if (total <= 0)
+      invalidMessage.push('Total Claim Amount must be at least $0.01')
   }
 
   const maximumLimit = listOfLimits.reduce(
@@ -412,7 +462,6 @@ export const validateClaimAmount = (schemeRow) => {
     invalidMessage.push('Total claim amount has exceed the maximum limit:')
     invalidMessage.push(`${maximumLimit.type}: ${_v}`)
   }
-
   return invalidMessage
 }
 
@@ -479,7 +528,6 @@ export const updateInvoicePayerPayableBalance = (
       .filter((p) => !p.isCancelled)
       .reduce(flattenInvoicePayersInvoiceItemList, [])
       .reduce(computeInvoiceItemPrevClaimedAmount, [])
-    // console.log({ prevIndexInvoiceItemsWithSubtotal })
     // update payable balance according to the claimed amount
     const newInvoicePayerItem = payer.invoicePayerItem.map((item) => {
       const _existed = prevIndexInvoiceItemsWithSubtotal.find(

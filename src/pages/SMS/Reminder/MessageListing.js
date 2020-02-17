@@ -96,10 +96,11 @@ const MessageListing = ({
   ] = useState(1)
 
   const getSMSHistory = () => {
+    const phoneNum = `${recipient.countryCode}${recipient.patientContactNo}`
     dispatch({
       type: 'sms/querySMSHistory',
       payload: {
-        Recipient: parseInt(recipient.patientContactNo, 10),
+        Recipient: parseInt(phoneNum, 10),
         current: currentPage,
         pagesize: 10,
       },

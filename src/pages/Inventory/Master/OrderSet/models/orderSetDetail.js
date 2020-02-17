@@ -6,7 +6,7 @@ import { queryServiceCenter } from '../services'
 const { upsert } = service
 
 export default createFormViewModel({
-  namespace: 'packDetail',
+  namespace: 'orderSetDetail',
   config: {
     queryOnLoad: false,
   },
@@ -20,10 +20,10 @@ export default createFormViewModel({
           moment('2099-12-31T23:59:59').formatUTC(false),
         ],
         isOrderable: true,
-        servicePackageItem: [],
-        consumablePackageItem: [],
-        medicationPackageItem: [],
-        vaccinationPackageItem: [],
+        serviceOrderSetItem: [],
+        consumableOrderSetItem: [],
+        medicationOrderSetItem: [],
+        vaccinationOrderSetItem: [],
         isActive: true,
       },
       // entity: {},
