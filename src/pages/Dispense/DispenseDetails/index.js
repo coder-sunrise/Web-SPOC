@@ -79,6 +79,7 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  sendingJob,
   onReloadClick,
   onSaveClick,
   onEditOrderClick,
@@ -252,8 +253,9 @@ const DispenseDetails = ({
             onClick={() => {
               onPrint('Medications')
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Drug Label
           </Button>
           <Button
@@ -262,8 +264,9 @@ const DispenseDetails = ({
             onClick={() => {
               onPrint('Patient')
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
         </GridItem>
