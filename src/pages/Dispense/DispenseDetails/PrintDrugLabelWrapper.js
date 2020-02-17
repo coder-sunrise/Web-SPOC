@@ -25,7 +25,7 @@ class PrintDrugLabelWrapper extends React.Component {
       ],
       pendingJob: [],
     }
-    this.iswsConnect = false
+    this.isWsConnected = false
     this.wsConnection = null
     this.initializeWebSocket(true)
   }
@@ -72,6 +72,8 @@ class PrintDrugLabelWrapper extends React.Component {
   }
 
   prepareJobForWebSocket = (content) => {
+    // reset port number state to retry all attempt and set job content
+    // then initialize web socket connection
     this.setState(
       {
         socketPorts: [
@@ -211,10 +213,12 @@ class PrintDrugLabelWrapper extends React.Component {
     }))
   }
 
-  initializeWebSocket = (isFirstTime = false) => {
+  // will initialize web socket connection
+  // send job if there is any successful connection or already connected
+  initializeWebSocket = (isFirstLoad = false) => {
     const { socketPorts } = this.state
 
-    if (this.iswsConnect === false) {
+    if (this.isWsConnected === false) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
       const { printToolSocketURL = '' } = settings
       const [
@@ -222,13 +226,15 @@ class PrintDrugLabelWrapper extends React.Component {
         ip = '',
       ] = printToolSocketURL.split(':')
 
+      // attempt to connect to different port number
+      // abort early and clear job if no available port number left
       const socket = socketPorts.find((port) => !port.attempted)
       if (!socket) {
         this.setState({
           pendingJob: [],
         })
 
-        if (!isFirstTime)
+        if (!isFirstLoad)
           notification.error({
             message: `Medicloud printing tool is not running, please start it.`,
           })
@@ -237,18 +243,18 @@ class PrintDrugLabelWrapper extends React.Component {
 
       const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
 
-      if (wsUrl && !this.iswsConnect) {
+      if (wsUrl && !this.isWsConnected) {
         this.wsConnection = new window.WebSocket(wsUrl)
         this.wsConnection.onopen = () => {
-          this.iswsConnect = true
+          this.isWsConnected = true
           this.setSocketPortsState(socket)
           this.sendJobToWebSocket()
         }
 
         this.wsConnection.onclose = () => {
-          this.iswsConnect = false
+          this.isWsConnected = false
           this.setSocketPortsState(socket)
-          this.initializeWebSocket(isFirstTime)
+          this.initializeWebSocket(isFirstLoad)
         }
       }
     } else {
