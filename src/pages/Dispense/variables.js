@@ -455,7 +455,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 80,
     render: (r) => {
       const { type } = r
-      console.log({ type })
+
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
         return null
       return (
