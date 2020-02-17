@@ -104,7 +104,9 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           const payload = drugLabelList.map((drugLabel) => ({
             ReportId: drugLabelReportID,
             ReportData: JSON.stringify({
-              DrugLabelDetails: { ...drugLabel },
+              DrugLabelDetails: [
+                { ...drugLabel },
+              ],
               ReportContext: reportContext,
             }),
           }))
