@@ -5,7 +5,7 @@ import { notification } from '@/components'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // utils
 import { consultationDocumentTypes } from '@/utils/codes'
-import { getReportContext, postPDF, getPDF } from '@/services/report'
+import { getReportContext, getRawData } from '@/services/report'
 import {
   queryDrugLabelDetails,
   queryDrugLabelsDetails,
@@ -55,7 +55,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           return getDrugLabelDetails(o, row)
         }),
       )
-      return { payload: { DrugLabelDetails: drugLabelDetail } }
+      return { DrugLabelDetails: drugLabelDetail }
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,
@@ -74,7 +74,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           return getDrugLabelDetails(o, prescriptionItem)
         }),
       )
-      return { payload: { DrugLabelDetails: drugLabelDetail } }
+      return { DrugLabelDetails: drugLabelDetail }
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,
@@ -83,67 +83,75 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
   }
 
   const getPrintResult = async (type, row) => {
-    let printResult
-
     let drugLabelReportID = REPORT_ID.DRUG_LABEL_80MM_45MM
     let printingToolDrugLabelID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
     let patientLabelReportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
+    let printingToolPatientLabelID =
+      PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_80MM_45MM
 
-    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-    if (settings.labelPrinterSize === '8.9cmx3.6cm') {
-      // drugLabelReportID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_89MM_36MM
-      // patientLabelReportID = PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_89MM_36MM
-      drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
-      patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
-      printingToolDrugLabelID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
-    } else {
-      // drugLabelReportID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
-      // patientLabelReportID = PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_80MM_45MM
-    }
+    try {
+      let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+      if (settings.labelPrinterSize === '8.9cmx3.6cm') {
+        // drugLabelReportID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_89MM_36MM
+        // patientLabelReportID = PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_89MM_36MM
+        drugLabelReportID = REPORT_ID.DRUG_LABEL_89MM_36MM
+        patientLabelReportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
+        // TODO: hard coded printing tool report id
+        printingToolDrugLabelID = PRINTING_TOOL_REPORT_ID.DRUG_LABEL_80MM_45MM
+        printingToolPatientLabelID =
+          PRINTING_TOOL_REPORT_ID.PATIENT_LABEL_80MM_45MM
+      }
 
-    if (type === CONSTANTS.ALL_DRUG_LABEL) {
-      const { dispense, values } = restProps
-      const { prescription } = values
-      const reportContext = await getReportContext(drugLabelReportID)
-      const data = await generateDrugLablesPrintSource(
-        dispense ? dispense.visitID : values.id,
-        prescription,
-      )
-      if (data && data.payload) {
-        return {
-          ReportData: { ...data.payload, ReportContext: reportContext },
-          ReportID: printingToolDrugLabelID,
+      if (type === CONSTANTS.ALL_DRUG_LABEL) {
+        const { dispense, values } = restProps
+        const { prescription } = values
+        const reportContext = await getReportContext(drugLabelReportID)
+        const data = await generateDrugLablesPrintSource(
+          dispense ? dispense.visitID : values.id,
+          prescription,
+        )
+        if (data) {
+          return {
+            ReportId: printingToolDrugLabelID,
+            ReportData: { ...data, ReportContext: reportContext },
+          }
         }
       }
-    }
 
-    // if (type === CONSTANTS.DRUG_LABEL) {
-    //   let drugLableSource = await generateDrugLablePrintSource(row)
-    //   if (drugLableSource) {
-    //     printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
-    //   }
-    // } else if (type === CONSTANTS.ALL_DRUG_LABEL) {
-    //   const { dispense, values } = restProps
-    //   const { prescription } = values
-    //   let drugLableSource = await generateDrugLablesPrintSource(
-    //     dispense ? dispense.visitID : values.id,
-    //     prescription,
-    //   )
-    //   if (drugLableSource) {
-    //     printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
-    //   }
-    // } else if (type === CONSTANTS.PATIENT_LABEL) {
-    //   const { patient, values } = restProps
-    //   printResult = await getPDF(patientLabelReportID, {
-    //     patientId: patient ? patient.id : values.patientProfileFK,
-    //   })
-    // }
-    // return printResult
+      if (type === CONSTANTS.DRUG_LABEL) {
+        const reportContext = await getReportContext(drugLabelReportID)
+        const data = await generateDrugLablePrintSource(row)
+        if (data) {
+          return {
+            ReportId: printingToolDrugLabelID,
+            ReportData: { ...data, ReportContext: reportContext },
+          }
+        }
+      }
+
+      if (type === CONSTANTS.PATIENT_LABEL) {
+        const { patient, values } = restProps
+
+        const data = await getRawData(patientLabelReportID, {
+          patientId: patient ? patient.id : values.patientProfileFK,
+        })
+        return {
+          ReportId: printingToolPatientLabelID,
+          ReportData: {
+            ...data,
+          },
+        }
+      }
+    } catch (error) {
+      console.log({ error })
+    }
+    return null
   }
 
   const handleOnPrint = async ({ type, row }) => {
     if (withoutPrintPreview.includes(type)) {
       const printResult = await getPrintResult(type, row)
+      if (!printResult) return
       console.log({ printResult, stringified: JSON.stringify(printResult) })
 
       handlePrint(

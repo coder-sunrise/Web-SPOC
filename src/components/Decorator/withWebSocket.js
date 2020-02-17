@@ -60,13 +60,7 @@ const withWebSocket = () => (Component) => {
         this.wsConnection.readyState === 1 &&
         pendingJob.length === 1
       ) {
-        console.log('send job: ', { job: pendingJob[0] })
-
         this.wsConnection.send(pendingJob[0])
-        console.log({
-          readyState: this.wsConnection.readyState,
-          bufferedAmount: this.wsConnection.bufferedAmount,
-        })
       }
       this.setState({
         pendingJob: [],
@@ -85,7 +79,7 @@ const withWebSocket = () => (Component) => {
     }
 
     handlePrint = async (content) => {
-      console.log({ content })
+      // console.log({ content })
       // const pdfResult = await getPDF(reportID, payload)
       if (content) {
         // const base64Result = arrayBufferToBase64(pdfResult)
@@ -97,7 +91,6 @@ const withWebSocket = () => (Component) => {
     // send job if there is any successful connection or already connected
     initializeWebSocket = (isFirstLoad = false) => {
       const { socketPorts, isWsConnected } = this.state
-      console.log({ isWsConnected })
       if (isWsConnected === false) {
         console.log('initiate connection')
         let settings = JSON.parse(localStorage.getItem('clinicSettings'))
@@ -128,23 +121,15 @@ const withWebSocket = () => (Component) => {
         if (wsUrl && !isWsConnected) {
           this.wsConnection = new window.WebSocket(wsUrl)
           this.wsConnection.onopen = () => {
-            console.log('on open', this.wsConnection)
             // this.isWsConnected = true
             this.setState({
               isWsConnected: true,
-            })
-            console.log({
-              connectionState: this.wsConnection
-                ? this.wsConnection.readyState
-                : undefined,
-              wsConnection: this.wsConnection,
             })
             this.setSocketPortsState(socket)
             this.sendJobToWebSocket()
           }
 
-          this.wsConnection.onclose = (event) => {
-            console.log('on close', this.wsConnection, event)
+          this.wsConnection.onclose = () => {
             // this.isWsConnected = false
             this.setState({
               isWsConnected: false,
