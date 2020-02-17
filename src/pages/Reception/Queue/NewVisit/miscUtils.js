@@ -191,6 +191,10 @@ export const formikHandleSubmit = (
         message: 'Visit Created',
       })
       onConfirm()
+      sendNotification('QueueListing', {
+        message: `New visit created.`,
+        qid: payload.queueNo && parseFloat(payload.queueNo),
+      })
     } else {
       setSubmitting(false)
     }
