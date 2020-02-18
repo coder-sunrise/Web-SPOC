@@ -303,6 +303,11 @@ class AntdNumberInput extends React.PureComponent {
     ) {
       e.preventDefault()
     }
+
+    if (this.props.notAllowDashNEqual && (e.key === '-' || e.key === '=')) {
+      e.preventDefault()
+      return false
+    }
     if (e.keyCode === 8 && Number(this.state.value) === 0) {
       this.setState({
         value: '',
