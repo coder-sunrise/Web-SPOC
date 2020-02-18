@@ -454,7 +454,7 @@ class PaymentDetails extends Component {
                   payerType={payment.payerType}
                   payerTypeFK={payment.payerTypeFK}
                   payments={payment.paymentTxnList}
-                  totalPaid={payment.totalPaid}
+                  payerDistributedAmt={payment.payerDistributedAmt}
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}
