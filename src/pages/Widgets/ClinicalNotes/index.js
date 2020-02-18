@@ -22,7 +22,8 @@ import model from './models'
 import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
-import { fieldKey } from './config'
+import Authorized from '@/utils/Authorized'
+import { fieldKey, scribbleNoteTypeFieldKey } from './config'
 import { CLINIC_TYPE } from '@/utils/constants'
 
 const PREFIX = {
@@ -398,7 +399,6 @@ class ClinicalNotes extends Component {
 
   handleAddCannedText = (cannedText) => {
     const { cannedTextRow } = this.state
-    console.log({ cannedTextRow })
 
     const { consultation, clinicInfo } = this.props
     const fieldName = fieldKey[clinicInfo.clinicTypeFK]
@@ -424,6 +424,8 @@ class ClinicalNotes extends Component {
     const { fields = [] } = config
     const { consultation, clinicInfo } = this.props
     const fieldName = fieldKey[clinicInfo.clinicTypeFK]
+    const scrribleNoteTypeFieldKey =
+      scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
 
     const _prefix =
       clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
@@ -434,7 +436,9 @@ class ClinicalNotes extends Component {
     // const { corDoctorNote = [] } = entity
     const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
-      (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
+      (field) =>
+        field[scrribleNoteTypeFieldKey] ===
+        selectedData[scrribleNoteTypeFieldKey],
     )
 
     const prevData =
@@ -487,21 +491,25 @@ class ClinicalNotes extends Component {
             const { values } = form
 
             if (!values || !values.corScribbleNotes) return null
+            const scrribleNoteTypeFieldKey =
+              scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
 
             const payload = {
               entity: '',
               selectedIndex: '',
-              ...fields.reduce(
-                (_result, field) => ({
+              ...fields.reduce((_result, field) => {
+                const scribbles = values.corScribbleNotes.filter(
+                  (o) =>
+                    o.scribbleNoteTypeFK === field[scrribleNoteTypeFieldKey],
+                )
+
+                return {
                   ..._result,
                   [field.category]: {
-                    [field.scribbleField]: values.corScribbleNotes.filter(
-                      (o) => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
-                    ),
+                    [field.scribbleField]: scribbles,
                   },
-                }),
-                {},
-              ),
+                }
+              }, {}),
             }
 
             if (this.state.runOnce === false) {
@@ -524,62 +532,70 @@ class ClinicalNotes extends Component {
           expandIcon={<SolidExpandMore fontSize='large' />}
           defaultActive={defaultActive}
           mode='multiple'
-          collapses={contents.map((item) => {
-            const onCannedTextClick = () =>
-              this.handleCannedTextButtonClick(item)
-            const onSettingClick = () => this.openCannedText(item)
+          collapses={contents
+            .filter((item) => {
+              const accessRight = Authorized.check(item.authority)
+              if (accessRight && accessRight.rights === 'hidden') return false
+              return true
+            })
+            .map((item) => {
+              const onCannedTextClick = () =>
+                this.handleCannedTextButtonClick(item)
+              const onSettingClick = () => this.openCannedText(item)
 
-            const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-            return {
-              title: item.fieldTitle,
-              content: (
-                <div className={classes.editor}>
-                  <Field
-                    name={`${prefix}${item[fieldName]}`}
-                    render={(args) => {
-                      return (
-                        <div>
-                          <ScribbleNoteItem
-                            editorButtonStyle={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
-                            scribbleNoteUpdateState={
-                              this.scribbleNoteUpdateState
-                            }
-                            category={item.category}
-                            arrayName={item.scribbleField}
-                            categoryIndex={item.scribbleNoteTypeFK}
-                            scribbleNoteArray={
-                              scriblenotes[item.category][item.scribbleField]
-                            }
-                            gridItemWidth={this.state.width}
-                          />
+              const fieldName = fieldKey[clinicInfo.clinicTypeFK]
+              const scrribleNoteTypeFieldKey =
+                scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
+              return {
+                title: item.fieldTitle,
+                content: (
+                  <div className={classes.editor}>
+                    <Field
+                      name={`${prefix}${item[fieldName]}`}
+                      render={(args) => {
+                        return (
+                          <div>
+                            <ScribbleNoteItem
+                              editorButtonStyle={{
+                                position: 'absolute',
+                                zIndex: 1,
+                                left: 305,
+                                right: 0,
+                                top: 10,
+                              }}
+                              scribbleNoteUpdateState={
+                                this.scribbleNoteUpdateState
+                              }
+                              category={item.category}
+                              arrayName={item.scribbleField}
+                              categoryIndex={item[scrribleNoteTypeFieldKey]}
+                              scribbleNoteArray={
+                                scriblenotes[item.category][item.scribbleField]
+                              }
+                              gridItemWidth={this.state.width}
+                            />
 
-                          <CannedTextButton
-                            onSettingClick={onSettingClick}
-                            onCannedTextClick={onCannedTextClick}
-                            cannedTextTypeFK={item.cannedTextTypeFK}
-                            handleSelectCannedText={this.handleAddCannedText}
-                          />
+                            <CannedTextButton
+                              onSettingClick={onSettingClick}
+                              onCannedTextClick={onCannedTextClick}
+                              cannedTextTypeFK={item.cannedTextTypeFK}
+                              handleSelectCannedText={this.handleAddCannedText}
+                            />
 
-                          <RichEditor
-                            strongLabel
-                            onBlur={this.onEditorChange(item[fieldName])}
-                            // label='Chief Complaints'
-                            {...args}
-                          />
-                        </div>
-                      )
-                    }}
-                  />
-                </div>
-              ),
-            }
-          })}
+                            <RichEditor
+                              strongLabel
+                              onBlur={this.onEditorChange(item[fieldName])}
+                              // label='Chief Complaints'
+                              {...args}
+                            />
+                          </div>
+                        )
+                      }}
+                    />
+                  </div>
+                ),
+              }
+            })}
         />
 
         {config.hasAttachment && (
