@@ -12,6 +12,8 @@ import {
   commonDataReaderTransform,
 } from './utils'
 import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
@@ -150,6 +152,21 @@ export const axiosRequest = async (
     return response
   }
   return result
+}
+
+const logError = (showNotification, payload) => {
+  if (showNotification) {
+    notification.error({
+      ...payload,
+    })
+    const { plainString, requestId } = payload
+    sendNotification('ErrorLog', {
+      type: NOTIFICATION_TYPE.ERROR,
+      status: NOTIFICATION_STATUS.ERROR,
+      message: plainString,
+      requestId,
+    })
+  }
 }
 
 /**
@@ -390,25 +407,45 @@ const request = (
                 response.responseJSON.message ||
                 response.responseJSON.title
 
-              showNotification &&
-                notification.error({
-                  description,
-                  duration: 15,
-                })
+              // showNotification &&
+              //   notification.error({
+              //     description,
+              //     duration: 15,
+              //   })
+              logError(showNotification, {
+                description,
+                duration: 15,
+                plainString: description,
+                requestId: response.responseJSON.requestId,
+              })
             } else {
-              showNotification &&
-                notification.error({
-                  message: (
-                    <div>
-                      <h4>{errortext}</h4>
+              console.log('here')
+              logError(showNotification, {
+                message: (
+                  <div>
+                    <h4>{errortext}</h4>
 
-                      {JSON.stringify(
-                        returnObj.errors || returnObj.responseJSON,
-                      )}
-                    </div>
-                  ),
-                  duration: 15,
-                })
+                    {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
+                  </div>
+                ),
+                plainString: JSON.stringify(
+                  returnObj.errors || returnObj.responseJSON,
+                ),
+                duration: 15,
+              })
+              // showNotification &&
+              //   notification.error({
+              //     message: (
+              //       <div>
+              //         <h4>{errortext}</h4>
+
+              //         {JSON.stringify(
+              //           returnObj.errors || returnObj.responseJSON,
+              //         )}
+              //       </div>
+              //     ),
+              //     duration: 15,
+              //   })
             }
 
             // const error = new Error(errortext)

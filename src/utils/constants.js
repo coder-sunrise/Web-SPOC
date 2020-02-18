@@ -322,4 +322,10 @@ export const NUMBER_TYPE = {
 export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
+  ERROR: 3,
+}
+
+export const NOTIFICATION_STATUS = {
+  OK: 1,
+  ERROR: 2,
 }

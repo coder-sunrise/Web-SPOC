@@ -2,11 +2,11 @@ import React from 'react'
 import moment from 'moment'
 // material ui
 import { ListItem, ListItemText, withStyles } from '@material-ui/core'
-import { TITLE } from './constants'
+import { TITLE, COLOR } from './constants'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 const styles = () => ({
-  root: { maxHeight: 100 },
+  root: { maxHeight: 100, background: '#f0f8ff' },
   itemContainer: { display: 'flex' },
   messageText: { marginLeft: 10 },
   timestampText: {
@@ -18,19 +18,30 @@ const styles = () => ({
 
 const NotificationContent = ({ notification, classes }) => {
   let messageTitle = notification.type ? TITLE[notification.type] : ''
+  let backgroundColor = notification.type ? COLOR[notification.type] : ''
   if (notification.type === NOTIFICATION_TYPE.QUEUE) {
     const { queueNo = 'xx.x' } = notification
-    messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo}`
+    messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo} -`
   }
 
   return (
-    <div className={classes.root} key={notification.senderId}>
+    <div
+      className={classes.root}
+      style={{ backgroundColor }}
+      key={notification.senderId}
+    >
       <ListItem alignItems='flex-start'>
         <ListItemText
           primary={
-            <div className={classes.itemContainer}>
-              <b>{`${messageTitle} -`}</b>
-              <p className={classes.messageText}>{notification.message}</p>
+            <div>
+              <div className={classes.itemContainer}>
+                <b>{messageTitle}</b>
+                <p className={classes.messageText}>{notification.message}</p>
+              </div>
+              <div className={classes.itemContainer}>
+                <b>Request ID:&nbsp;</b>
+                <p>{notification.requestId}</p>
+              </div>
             </div>
           }
           secondary={

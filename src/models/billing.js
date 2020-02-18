@@ -1,12 +1,9 @@
 // import { queryFakeList, fakeSubmitForm } from '@/services/api'
 import router from 'umi/router'
 import { createFormViewModel } from 'medisys-model'
-import { notification } from '@/components'
-import { getRemovedUrl, getAppendUrl } from '@/utils/utils'
+import { getAppendUrl } from '@/utils/utils'
 import * as service from '@/pages/Billing/services'
 import { unlock } from '@/services/dispense'
-import { query as queryPatient } from '@/services/patient'
-import { sendNotification } from '@/utils/realtime'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 export default createFormViewModel({

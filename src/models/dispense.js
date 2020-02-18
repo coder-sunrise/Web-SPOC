@@ -1,11 +1,7 @@
 import router from 'umi/router'
 import _ from 'lodash'
-import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/dispense'
-import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import { sendNotification } from '@/utils/realtime'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
 
@@ -116,10 +112,7 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          // sendNotification('QueueListing', {
-          //   message: `Dispense started`,
-          //   qid: payload.qid,
-          // })
+
           sendQueueNotification({
             message: 'Ready for dispensing.',
             queueNo: payload.queueNo,
@@ -153,9 +146,6 @@ export default createFormViewModel({
 
         const response = yield call(service.remove, payload)
         if (response) {
-          // sendNotification('QueueListing', {
-          //   message: `Dispense Discarded`,
-          // })
           sendQueueNotification({
             message: 'Dispense discarded',
             queueNo: entity.queueNo,
@@ -177,9 +167,6 @@ export default createFormViewModel({
               toBillingPage: true,
             },
           })
-        // sendNotification('QueueListing', {
-        //   message: 'Dispense Finalized',
-        // })
         sendQueueNotification({
           message: 'Dispense finalized. Waiting for payment.',
           queueNo: entity.queueNo,
@@ -253,9 +240,6 @@ export default createFormViewModel({
         const response = yield call(service.removeAddOrderDetails, payload)
         if (response === 204) {
           notification.success({ message: 'Retail visit discarded' })
-          // sendNotification('QueueListing', {
-          //   message: 'Retail Visit Discarded',
-          // })
           sendQueueNotification({
             message: 'Retail visit discarded.',
             queueNo: entity.queueNo,
@@ -273,9 +257,6 @@ export default createFormViewModel({
         const response = yield call(service.removeBillFirstVisit, payload)
         if (response === 204) {
           notification.success({ message: 'Bill-First visit discarded' })
-          // sendNotification('QueueListing', {
-          //   message: 'Bill-First Visit Discarded',
-          // })
           sendQueueNotification({
             message: 'Bill-First visit discarded.',
             queueNo: entity.queueNo,

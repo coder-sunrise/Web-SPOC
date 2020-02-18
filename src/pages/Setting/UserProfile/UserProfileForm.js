@@ -30,6 +30,7 @@ import {
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
@@ -190,6 +191,8 @@ const styles = (theme) => ({
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
           code: 'clinicianprofile',
+          type: NOTIFICATION_TYPE.CODETABLE,
+          status: NOTIFICATION_STATUS.OK,
         })
         sessionStorage.removeItem('user')
         if (currentUser) {

@@ -1,15 +1,9 @@
 import router from 'umi/router'
 import _ from 'lodash'
-import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
-import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
-import {
-  consultationDocumentTypes,
-  orderTypes,
-  getServices,
-} from '@/utils/codes'
-import { sendNotification } from '@/utils/realtime'
+import { getUniqueId } from '@/utils/utils'
+import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 export default createFormViewModel({
