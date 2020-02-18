@@ -10,6 +10,7 @@ import Filterbar from './Filterbar'
 import Editor from './Editor'
 // utils
 import { applyFilter, columns, columnExtensions } from './utils'
+import { fieldKey } from '../config'
 
 const styles = (theme) => ({
   root: {
@@ -22,10 +23,20 @@ const styles = (theme) => ({
 })
 
 const defaultMaxHeight = 600
-const CannedText = ({ classes, dispatch, cannedText, user, height }) => {
+const CannedText = ({
+  classes,
+  dispatch,
+  clinicInfo,
+  cannedText,
+  user,
+  height,
+}) => {
   const { selectedNote } = cannedText
-  const list = cannedText[selectedNote.fieldName]
-  console.log({ list })
+
+  const fieldName = fieldKey[clinicInfo.clinicTypeFK]
+
+  const list = cannedText[selectedNote[fieldName]]
+  console.log({ cannedText, list })
   const [
     filter,
     setFilter,

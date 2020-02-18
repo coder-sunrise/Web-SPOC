@@ -60,6 +60,7 @@ export const generateData = () => {
 }
 
 export const applyFilter = (filter, rows) => {
+  console.log({ rows })
   let returnData = [
     ...rows,
   ]
