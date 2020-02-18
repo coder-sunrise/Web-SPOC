@@ -167,7 +167,11 @@ class Banner extends PureComponent {
     let isSaveToDb = true
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: { ...entity, patientCoPaymentSchemeFK, isSaveToDb },
+      payload: { ...entity,
+        patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId: entity.id,
+      },
     }).then((result) => {
       // console.log('result ==========', result)
       if (result) {
