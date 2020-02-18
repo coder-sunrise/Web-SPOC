@@ -21,6 +21,11 @@ const PaymentDetails = ({
     return null
   }
 
+  const getCreditCardType = (creditCardPayment) => {
+    if (creditCardPayment) return creditCardPayment.creditCardType
+    return '-'
+  }
+
   return (
     <Fragment>
       <GridContainer
@@ -33,7 +38,7 @@ const PaymentDetails = ({
         {paymentModeDetails.map((mode) => {
           const modeName =
             mode.paymentModeFK === PAYMENT_MODE.CREDIT_CARD
-              ? 'Credit Card (Visa/Master/AMEX/DINER)'
+              ? `Credit Card (${getCreditCardType(mode.creditCardPayment)})`
               : mode.paymentMode
           return (
             <GridContainer className={classes.container}>

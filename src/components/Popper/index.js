@@ -11,6 +11,7 @@ export default ({
   trigger = 'hover',
   disabled,
   disabledTransition,
+  placement,
   ...props
 }) => {
   if (disabled) return children
@@ -67,6 +68,7 @@ export default ({
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
         transition
+        placement={placement}
         // disablePortal
         onClose={() => {
           setAnchorEl(null)

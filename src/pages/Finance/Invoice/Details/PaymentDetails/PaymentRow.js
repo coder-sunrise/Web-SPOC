@@ -81,6 +81,12 @@ const PaymentRow = ({
     )
   }
 
+  const paymentTextStyle = {
+    textDecoration: hoveredRowId ? 'underline' : null,
+    padding: '5px 20px 5px 0px',
+    // padding: 5,
+  }
+
   return (
     <React.Fragment>
       <GridContainer
@@ -98,11 +104,11 @@ const PaymentRow = ({
                 [classes.pooperNav]: true,
               })}
               style={{
-                marginLeft: 380,
                 width: 450,
                 border: '1px solid',
               }}
               disabledTransition
+              placement='right'
               overlay={
                 <PaymentDetails
                   paymentModeDetails={invoicePaymentMode}
@@ -112,9 +118,7 @@ const PaymentRow = ({
               }
             >
               <span
-                style={
-                  id === hoveredRowId ? { textDecoration: 'underline' } : {}
-                }
+                style={paymentTextStyle}
                 onMouseOver={() => setHoveredRowId(id)}
                 onMouseOut={() => setHoveredRowId(null)}
                 onFocus={() => 0}
