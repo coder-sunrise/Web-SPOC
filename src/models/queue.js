@@ -8,6 +8,7 @@ import {
   StatusIndicator,
   VISIT_STATUS,
 } from '@/pages/Reception/Queue/variables'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -223,8 +224,9 @@ export default createListViewModel({
           yield put({
             type: 'refresh',
           })
-          sendNotification('QueueListing', {
-            message: 'Visit Deleted',
+          sendQueueNotification({
+            message: 'Visit deleted.',
+            queueNo: payload.queueNo,
           })
         }
         return result

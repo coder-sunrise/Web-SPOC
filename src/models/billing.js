@@ -7,6 +7,7 @@ import * as service from '@/pages/Billing/services'
 import { unlock } from '@/services/dispense'
 import { query as queryPatient } from '@/services/patient'
 import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 export default createFormViewModel({
   namespace: 'billing',
@@ -36,12 +37,12 @@ export default createFormViewModel({
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (location) => {
         const { query, pathname } = location
-        const { vid, v, pid } = query
+        const { vid, v, pid, qid } = query
 
         if (pathname === '/reception/queue/billing' && Number(vid)) {
           dispatch({
             type: 'initState',
-            payload: { visitID: Number(vid), pid: Number(pid), v },
+            payload: { visitID: Number(vid), pid: Number(pid), v, qid },
           })
         }
       })
@@ -67,6 +68,12 @@ export default createFormViewModel({
 
           yield take('queueLog/getCurrentActiveSessionInfo/@@end')
         }
+
+        if (payload.qid)
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: payload.qid, version: payload.v },
+          })
 
         yield put({
           type: 'updateState',
@@ -94,8 +101,13 @@ export default createFormViewModel({
           payload: restPayload,
         })
       },
-      *save ({ payload }, { call, put, take }) {
+      *save ({ payload }, { call, put, take, select }) {
         const response = yield call(service.save, payload)
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+        const { visitStatus } = payload
         if (response) {
           yield put({
             type: 'query',
@@ -104,9 +116,18 @@ export default createFormViewModel({
             },
           })
           yield take('billing/query/@@end')
-          sendNotification('QueueListing', {
-            message: `Billing Updated`,
-          })
+
+          if (visitStatus === 'COMPLETED') {
+            sendQueueNotification({
+              message: 'Visit completed.',
+              queueNo: entity.queueNo,
+            })
+          } else {
+            sendQueueNotification({
+              message: 'Billing updated.',
+              queueNo: entity.queueNo,
+            })
+          }
           return response
         }
         return false
@@ -135,6 +156,10 @@ export default createFormViewModel({
       },
       *backToDispense ({ payload }, { call, put, select, take }) {
         const billingState = yield select((state) => state.billing)
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
 
         const parameters = {
           v: Date.now(),
@@ -164,8 +189,10 @@ export default createFormViewModel({
               patientID: undefined,
             },
           })
-          sendNotification('QueueListing', {
-            message: 'Back To Dispense',
+
+          sendQueueNotification({
+            message: 'Invoice unlocked. Ready for dispensing.',
+            queueNo: entity.queueNo,
           })
           router.push(destinationUrl)
         }

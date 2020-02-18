@@ -309,3 +309,8 @@ export const NUMBER_TYPE = {
   WORK: 3,
   FAX: 4,
 }
+
+export const NOTIFICATION_TYPE = {
+  QUEUE: 1,
+  CODETABLE: 2,
+}

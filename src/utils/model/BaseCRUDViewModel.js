@@ -11,8 +11,8 @@ import {
 import update from 'immutability-helper'
 import { notification } from '@/components'
 import { sendNotification } from '@/utils/realtime'
-
 import { getUniqueGUID } from '@/utils/utils'
+import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 const { prefix, openPages } = cfg
 
@@ -264,7 +264,10 @@ export default class BaseCRUDViewModel {
           if (typeof codetable === 'function') {
             sendNotification('CodetableUpdated', codetable(newPayload))
           } else {
-            sendNotification('CodetableUpdated', codetable)
+            sendNotification('CodetableUpdated', {
+              ...codetable,
+              type: NOTIFICATION_TYPE.CODETABLE,
+            })
           }
         }
 

@@ -9,7 +9,6 @@ export default createBasicModel({
     // service,
     state: {
       signalRConnected: false,
-
       notifications: JSON.parse(sessionStorage.getItem('notifications')) || [],
     },
     setting: {},

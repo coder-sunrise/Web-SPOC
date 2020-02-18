@@ -1,4 +1,5 @@
 import { VISIT_STATUS } from '../variables'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { sendNotification } from '@/utils/realtime'
 
 const filterDeletedFiles = (item) => {
@@ -170,7 +171,7 @@ export const formikHandleSubmit = (
     },
   }
 
-  console.log({ payload })
+  // console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
@@ -187,14 +188,15 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      sendNotification('QueueListing', {
-        message: 'Visit Created',
-      })
       onConfirm()
-      sendNotification('QueueListing', {
-        message: `New visit created.`,
-        qid: payload.queueNo && parseFloat(payload.queueNo),
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
       })
+      // sendNotification('QueueListing', {
+      //   message: `New visit created.`,
+      //   qid: payload.queueNo && parseFloat(payload.queueNo),
+      // })
     } else {
       setSubmitting(false)
     }
