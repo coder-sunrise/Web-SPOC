@@ -59,15 +59,22 @@ const Stock = ({
     setStock,
   ] = useState(_.sortBy(values[objectType().stockProp], 'id'))
 
-  const changeIsDefault = (row) => {
-    stock.forEach((o) => {
-      if (o.id === row.id) {
-        o.isDefault = true
-      } else {
-        o.isDefault = false
+  const changeIsDefault = async (row) => {
+    const updatedStock = stock.map((batch) => {
+      if (batch.id === row.id) {
+        return {
+          ...batch,
+          isDefault: true,
+        }
+      }
+      return {
+        ...batch,
+        isDefault: false,
       }
     })
-    setStock(stock)
+
+    setStock(updatedStock)
+    await setFieldValue(objectType().stockProp, updatedStock)
 
     dispatch({
       // force current edit row components to update
@@ -91,7 +98,7 @@ const Stock = ({
     setStockQty(totalQty)
   }, [])
 
-  const handleDeleteStock = (row) => {
+  const handleDeleteStock = async (row) => {
     const { stock: remainingQty, isDefault } = row
     if (hasActiveSession) {
       notification.warning({
@@ -113,6 +120,20 @@ const Stock = ({
       })
       return
     }
+
+    const updatedRow = stock.map((batch) => {
+      if (batch.id === row.id) {
+        return {
+          ...batch,
+          isDeleted: true,
+        }
+      }
+      return {
+        ...batch,
+      }
+    })
+
+    await setFieldValue(objectType().stockProp, updatedRow)
 
     const deletedStock = stock.find((batch) => batch.id === row.id)
     deletedStock.isDeleted = true
