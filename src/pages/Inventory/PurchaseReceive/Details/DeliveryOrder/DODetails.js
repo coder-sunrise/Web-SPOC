@@ -459,7 +459,6 @@ class DODetails extends PureComponent {
 
   render () {
     const { props } = this
-    console.log(props)
 
     const {
       footer,
