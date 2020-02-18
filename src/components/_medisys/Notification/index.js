@@ -21,6 +21,12 @@ const styles = (theme) => ({
 })
 
 const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
+  const refreshQueueListing = () => {
+    dispatch({
+      type: 'queueLog/refresh',
+    })
+  }
+
   const overlay = (
     <div>
       <div className={classes.overlayRoot}>
@@ -33,9 +39,7 @@ const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
           simple
           color='primary'
           size='sm'
-          onClick={() => {
-            // this.forceUpdate()
-          }}
+          onClick={refreshQueueListing}
         >
           <Refresh />
           Refresh Q
