@@ -2,6 +2,8 @@ import React from 'react'
 import moment from 'moment'
 // material ui
 import { ListItem, ListItemText, withStyles } from '@material-ui/core'
+import { TITLE } from './constants'
+import { NOTIFICATION_TYPE } from '@/utils/constants'
 
 const styles = () => ({
   root: { maxHeight: 100 },
@@ -15,20 +17,19 @@ const styles = () => ({
 })
 
 const NotificationContent = ({ notification, classes }) => {
+  let messageTitle = notification.type ? TITLE[notification.type] : ''
+  if (notification.type === NOTIFICATION_TYPE.QUEUE) {
+    const { queueNo = 'xx.x' } = notification
+    messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo}`
+  }
+
   return (
     <div className={classes.root} key={notification.senderId}>
       <ListItem alignItems='flex-start'>
         <ListItemText
           primary={
             <div className={classes.itemContainer}>
-              <b>
-                {'Q. No. '.concat(
-                  (notification.qid &&
-                    typeof notification.qid === 'number' &&
-                    notification.qid.toString().concat('.0')) ||
-                    'xx.x',
-                )}
-              </b>
+              <b>{`${messageTitle} -`}</b>
               <p className={classes.messageText}>{notification.message}</p>
             </div>
           }

@@ -10,6 +10,7 @@ import {
   getServices,
 } from '@/utils/codes'
 import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 export default createFormViewModel({
   namespace: 'consultation',
@@ -119,18 +120,26 @@ export default createFormViewModel({
             },
           })
 
-          sendNotification('QueueListing', {
-            message: `Consultation started`,
-            qid: payload.qid,
+          // at this point visitRegistration state does not have any entity yet
+          // so get queueNo from payload instead of visitRegistration model
+          sendQueueNotification({
+            message: 'Consultation started.',
+            queueNo: payload.queueNo,
           })
         }
         return response
       },
-      *pause ({ payload }, { call, put }) {
+      *pause ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.pause, payload)
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation paused`,
+          sendQueueNotification({
+            message: 'Consultation paused.',
+            queueNo: entity.queueNo,
           })
 
           yield put({ type: 'closeModal' })
@@ -139,12 +148,17 @@ export default createFormViewModel({
       },
 
       *resume ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
         yield put({
           type: 'updateState',
           payload: {
             entity: undefined,
           },
         })
+
         const response = yield call(service.resume, payload.id)
         if (response) {
           yield put({
@@ -161,8 +175,9 @@ export default createFormViewModel({
               data: response,
             },
           })
-          sendNotification('QueueListing', {
-            message: `Consultation resumed`,
+          sendQueueNotification({
+            message: 'Consultation resumed.',
+            queueNo: entity.queueNo,
           })
         }
         return response
@@ -206,27 +221,39 @@ export default createFormViewModel({
         }
         return response
       },
-      *sign ({ payload }, { call, put }) {
+      *sign ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.sign, payload)
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation signed`,
+          sendQueueNotification({
+            message: 'Consultation signed-off.',
+            queueNo: entity.queueNo,
           })
           yield put({ type: 'closeModal' })
           // console.log('payload ', payload)
         }
         return response
       },
-      *discard ({ payload }, { call, put }) {
+      *discard ({ payload }, { call, put, select }) {
         // if (!payload) {
         //   yield put({ type: 'closeModal' })
         //   return null
         // }
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.remove, payload)
 
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Consultation discarded`,
+          sendQueueNotification({
+            message: 'Consultation discarded.',
+            queueNo: entity.queueNo,
           })
           // yield put({ type: 'closeModal', payload })
         }

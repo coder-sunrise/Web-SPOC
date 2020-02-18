@@ -93,11 +93,12 @@ const Grid = ({
     ],
   )
 
-  const deleteQueue = (id) => {
+  const deleteQueue = (id, queueNo) => {
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
       payload: {
         id,
+        queueNo,
       },
     })
   }
@@ -146,7 +147,7 @@ const Grid = ({
         openConfirmTitle: '',
         openConfirmText: 'Confirm',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onConfirmSave: () => deleteQueue(id),
+        onConfirmSave: () => deleteQueue(id, queueNo),
       },
     })
   }
@@ -169,6 +170,7 @@ const Grid = ({
               id: row.visitFK,
               version,
               qid: row.id,
+              queueNo: row.queueNo,
             },
           }).then((o) => {
             if (o)
@@ -185,6 +187,7 @@ const Grid = ({
           const parameters = {
             vid: row.visitFK,
             pid: row.patientProfileFK,
+            qid: row.id,
             v: version,
           }
           router.push(getAppendUrl(parameters, '/reception/queue/billing'))
@@ -213,6 +216,7 @@ const Grid = ({
                 id: row.visitFK,
                 version,
                 qid: row.id,
+                queueNo: row.queueNo,
               },
             }).then((o) => {
               if (o)
