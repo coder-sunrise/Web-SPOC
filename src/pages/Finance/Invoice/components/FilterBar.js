@@ -15,7 +15,6 @@ import {
   SizeContainer,
   TextField,
   Select,
-  Checkbox,
 } from '@/components'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
@@ -230,48 +229,6 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
               }}
             />
           </GridItem>
-          <GridContainer md={2}>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludePatientOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Patient'
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludeGovtOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Govt.'
-                    fullWidth
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4} style={{ marginTop: 30 }}>
-              <Field
-                name='isIncludeCorporateOS'
-                render={(args) => (
-                  <Checkbox
-                    simple
-                    label='Corporate'
-                    disabled={disabledOSOpts}
-                    {...args}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
         </GridContainer>
 
         <div className={classes.searchButton}>
@@ -339,13 +296,17 @@ export default withFormik({
       // combineCondition: 'and',
       lgteql_invoiceDate: invoiceStartDate || undefined,
       lsteql_invoiceDate: invoiceEndDate || undefined,
+      lgt_OutstandingBalance:
+        outstandingBalanceStatus === 'yes' && outstandingBalanceStatus !== 'all'
+          ? '0'
+          : undefined,
+      lsteql_OutstandingBalance:
+        outstandingBalanceStatus === 'no' && outstandingBalanceStatus !== 'all'
+          ? '0'
+          : undefined,
       apiCriteria: {
         SessionID,
         SessionType,
-        isIncludePatientOS,
-        isIncludeGovtOS,
-        isIncludeCorporateOS,
-        isHasOutstanding,
       },
       group: [
         {
@@ -355,11 +316,37 @@ export default withFormik({
           combineCondition: 'and',
         },
       ],
+      // apiCriteria: {
+      //   SessionID,
+      //   SessionType,
+      //   isIncludePatientOS,
+      //   isIncludeGovtOS,
+      //   isIncludeCorporateOS,
+      //   isHasOutstanding,
+      // },
+      // group: [
+      //   {
+      //     invoiceNo,
+      //     'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
+      //     'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
+      //     combineCondition: 'and',
+      //   },
+      // ],
     }
 
     dispatch({
       type: 'invoiceList/query',
       payload,
+    })
+
+    dispatch({
+      type: 'invoiceList/query',
+      payload: {
+        // keepFilter: false,
+        // combineCondition: 'and',
+        lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
+        lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
+      },
     })
   },
 })(FilterBar)
