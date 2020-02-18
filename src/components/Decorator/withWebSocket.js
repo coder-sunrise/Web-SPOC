@@ -122,6 +122,7 @@ const withWebSocket = () => (Component) => {
           this.wsConnection = new window.WebSocket(wsUrl)
           this.wsConnection.onopen = () => {
             // this.isWsConnected = true
+            console.log(`connected: ${socket.portNumber}`)
             this.setState({
               isWsConnected: true,
             })

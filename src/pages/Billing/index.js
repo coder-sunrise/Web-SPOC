@@ -20,7 +20,8 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+// import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 // import ApplyClaims from './components/ApplyClaims'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
