@@ -44,6 +44,7 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
+  statusTagClicked,
   mainDivHeight = 700,
 }) => {
   const [
@@ -154,6 +155,12 @@ const Grid = ({
 
   const onClick = useCallback(
     (row, id) => {
+      dispatch({
+        type: 'queueLog/updateState',
+        payload: {
+          statusTagClicked: true,
+        },
+      })
       switch (id) {
         case '0': // edit visit
         case '0.1': // view visit
@@ -324,6 +331,12 @@ const Grid = ({
         default:
           break
       }
+      dispatch({
+        type: 'queueLog/updateState',
+        payload: {
+          statusTagClicked: false,
+        },
+      })
     },
     [
       codetable.clinicianprofile,
@@ -454,7 +467,11 @@ const Grid = ({
                 columnName: 'visitStatus',
                 width: 200,
                 render: (row) => (
-                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
+                  <VisitStatusTag
+                    row={row}
+                    onClick={handleStatusTagClick}
+                    statusTagClicked={statusTagClicked}
+                  />
                 ),
               },
               {
@@ -486,7 +503,11 @@ const Grid = ({
                 columnName: 'visitStatus',
                 width: 200,
                 render: (row) => (
-                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
+                  <VisitStatusTag
+                    row={row}
+                    onClick={handleStatusTagClick}
+                    statusTagClicked={statusTagClicked}
+                  />
                 ),
               },
               {
@@ -534,6 +555,7 @@ export default connect(({ queueLog, global, loading, user, codetable }) => ({
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
+  statusTagClicked: queueLog.statusTagClicked,
   calendarEvents: queueLog.appointmentList || [],
   showingVisitRegistration: global.showVisitRegistration,
   queryingList:
