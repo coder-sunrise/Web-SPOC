@@ -101,20 +101,20 @@ const Stock = ({
   const handleDeleteStock = async (row) => {
     const { stock: remainingQty, isDefault } = row
     if (hasActiveSession) {
-      notification.warning({
+      notification.error({
         message:
           'There is an active session. End current session before deleting batch',
       })
       return
     }
     if (isDefault) {
-      notification.warning({
-        message: 'User is not allow to delete default batch',
+      notification.error({
+        message: 'Switch default batch no. to another record before deleting',
       })
       return
     }
     if (remainingQty > 0) {
-      notification.warning({
+      notification.error({
         message:
           'Please remove any stock count from adjustment before deleting batch',
       })
