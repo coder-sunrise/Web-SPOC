@@ -40,8 +40,8 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
       UOM: drugLabel.dispenseUOM,
       Quantity: drugLabel.dispensedQuanity,
       BatchNo: batchNo,
-      CurrentPage: drugLabel.currentPage,
-      TotalPage: drugLabel.totalPage,
+      CurrentPage: drugLabel.currentPage.toString(),
+      TotalPage: drugLabel.totalPage.toString(),
     }
   }
 

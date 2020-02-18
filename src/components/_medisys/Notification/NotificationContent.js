@@ -23,7 +23,7 @@ const NotificationContent = ({ notification, classes }) => {
     const { queueNo = 'xx.x' } = notification
     messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo} -`
   }
-
+  const isError = notification.type === NOTIFICATION_TYPE.ERROR
   return (
     <div
       className={classes.root}
@@ -38,10 +38,12 @@ const NotificationContent = ({ notification, classes }) => {
                 <b>{messageTitle}</b>
                 <p className={classes.messageText}>{notification.message}</p>
               </div>
-              <div className={classes.itemContainer}>
-                <b>Request ID:&nbsp;</b>
-                <p>{notification.requestId}</p>
-              </div>
+              {isError && (
+                <div className={classes.itemContainer}>
+                  <b>Request ID:&nbsp;</b>
+                  <p>{notification.requestId}</p>
+                </div>
+              )}
             </div>
           }
           secondary={
