@@ -10,6 +10,7 @@ export default ({
   overlay,
   trigger = 'hover',
   disabled,
+  disabledTransition,
   ...props
 }) => {
   if (disabled) return children
@@ -46,6 +47,19 @@ export default ({
   }
   // const { className, style, ...resetBtnProps } = children.props
 
+  const popperContainer = (
+    <Paper>
+      <ClickAwayListener
+        onClickAway={() => {
+          // console.log('onClickAway')
+          trigger !== 'hover' ? setAnchorEl(null) : undefined
+        }}
+      >
+        {overlay}
+      </ClickAwayListener>
+    </Paper>
+  )
+
   return (
     <span {...triggerProps}>
       {children}
@@ -68,20 +82,11 @@ export default ({
         style={{ zIndex: 1500 }}
         {...props}
       >
-        {({ TransitionProps, placement }) => (
-          <Grow {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener
-                onClickAway={() => {
-                  // console.log('onClickAway')
-                  trigger !== 'hover' ? setAnchorEl(null) : undefined
-                }}
-              >
-                {overlay}
-              </ClickAwayListener>
-            </Paper>
-          </Grow>
-        )}
+        {({ TransitionProps, placement }) => {
+          if (disabledTransition) return popperContainer
+
+          return <Grow {...TransitionProps}>{popperContainer}</Grow>
+        }}
       </Popper>
     </span>
   )

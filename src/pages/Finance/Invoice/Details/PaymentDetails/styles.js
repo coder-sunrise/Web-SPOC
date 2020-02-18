@@ -7,7 +7,6 @@ export default (theme) => ({
     margin: theme.spacing(1),
   },
   popupContainer: {
-    margin: theme.spacing(1),
     maxHeight: '30vh',
     overflow: 'scroll',
   },

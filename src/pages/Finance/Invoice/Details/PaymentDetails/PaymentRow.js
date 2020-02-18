@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 import classNames from 'classnames'
 // material ui
@@ -43,6 +43,11 @@ const PaymentRow = ({
     patientDepositTransaction,
     invoicePaymentMode,
   } = payment
+
+  const [
+    hoveredRowId,
+    setHoveredRowId,
+  ] = useState(null)
 
   let tooltipMsg = ''
   if (type === 'Payment') tooltipMsg = 'Print Receipt'
@@ -92,12 +97,31 @@ const PaymentRow = ({
                 [classes.pooperResponsive]: true,
                 [classes.pooperNav]: true,
               })}
-              style={{ marginLeft: 280, width: 450 }}
+              style={{
+                marginLeft: 380,
+                width: 450,
+                border: '1px solid',
+              }}
+              disabledTransition
               overlay={
-                <PaymentDetails paymentModeDetails={invoicePaymentMode} />
+                <PaymentDetails
+                  paymentModeDetails={invoicePaymentMode}
+                  setHoveredRowId={setHoveredRowId}
+                  id={id}
+                />
               }
             >
-              <span>{type}</span>
+              <span
+                style={
+                  id === hoveredRowId ? { textDecoration: 'underline' } : {}
+                }
+                onMouseOver={() => setHoveredRowId(id)}
+                onMouseOut={() => setHoveredRowId(null)}
+                onFocus={() => 0}
+                onBlur={() => 0}
+              >
+                {type}
+              </span>
             </Popper>
           ) : (
             <span>{type}</span>

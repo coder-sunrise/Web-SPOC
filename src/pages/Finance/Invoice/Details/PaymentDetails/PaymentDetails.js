@@ -6,10 +6,30 @@ import styles from './styles'
 import { PAYMENT_MODE } from '@/utils/constants'
 import { currencyFormatter } from '@/utils/utils'
 
-const PaymentDetails = ({ paymentModeDetails, classes }) => {
+const PaymentDetails = ({
+  paymentModeDetails,
+  classes,
+  setHoveredRowId,
+  id,
+}) => {
+  const creditCardNChequeNo = (mode) => {
+    const { paymentModeFK, chequePayment = {}, creditCardPayment = {} } = mode
+    if (paymentModeFK === PAYMENT_MODE.CREDIT_CARD)
+      return <p>Card No.: {creditCardPayment.creditCardNo || '-'}</p>
+    if (paymentModeFK === PAYMENT_MODE.CHEQUE)
+      return <p>Cheque No.: {chequePayment.chequeNo || '-'}</p>
+    return null
+  }
+
   return (
     <Fragment>
-      <GridContainer className={classes.popupContainer}>
+      <GridContainer
+        className={classes.popupContainer}
+        onMouseOver={() => setHoveredRowId(id)}
+        onMouseOut={() => setHoveredRowId(null)}
+        onFocus={() => 0}
+        onBlur={() => 0}
+      >
         {paymentModeDetails.map((mode) => {
           const modeName =
             mode.paymentModeFK === PAYMENT_MODE.CREDIT_CARD
@@ -22,13 +42,15 @@ const PaymentDetails = ({ paymentModeDetails, classes }) => {
                   <p>
                     <b>{modeName}</b>
                   </p>
-                  <p>Remarks</p>
                 </GridItem>
-                <GridItem xs={2}>
+                <GridItem xs={3}>
                   <p className={classes.currency}>
                     {mode.amt ? currencyFormatter(mode.amt) : 'N/A'}
                   </p>
-                  <p>{mode.remark || '-'}</p>
+                </GridItem>
+                <GridItem>
+                  {creditCardNChequeNo(mode)}
+                  <p>Remarks: {mode.remark || '-'}</p>
                 </GridItem>
               </GridItem>
             </GridContainer>
