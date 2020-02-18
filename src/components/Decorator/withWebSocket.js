@@ -25,12 +25,11 @@ const withWebSocket = () => (Component) => {
       }
       // this.isWsConnected = false
       this.wsConnection = null
-      console.log('initialize')
+
       this.initializeWebSocket(true)
     }
 
     componentWillUnmount () {
-      console.log('will unmount')
       if (this.wsConnection) this.wsConnection.close()
     }
 
@@ -92,7 +91,6 @@ const withWebSocket = () => (Component) => {
     initializeWebSocket = (isFirstLoad = false) => {
       const { socketPorts, isWsConnected } = this.state
       if (isWsConnected === false) {
-        console.log('initiate connection')
         let settings = JSON.parse(localStorage.getItem('clinicSettings'))
         const { printToolSocketURL = '' } = settings
         const [
