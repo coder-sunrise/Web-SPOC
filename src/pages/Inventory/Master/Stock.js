@@ -101,7 +101,7 @@ const Stock = ({
   const handleDeleteStock = async (row) => {
     const { stock: remainingQty, isDefault } = row
     if (hasActiveSession) {
-      notification.error({
+      notification.warning({
         message:
           'There is an active session. End current session before deleting batch',
       })
