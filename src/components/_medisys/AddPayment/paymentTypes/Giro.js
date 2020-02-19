@@ -11,7 +11,7 @@ import styles from '../styles'
 const Giro = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
   return (
     <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
-      <GridContainer justify='flex-end'>
+      <GridContainer>
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].amt`}
