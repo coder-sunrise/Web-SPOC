@@ -292,7 +292,7 @@ const CalendarView = ({
       <Event
         {...eventProps}
         // calendarView={calendarView}
-        handleMouseOver={handleEventMouseOver}
+        // handleMouseOver={handleEventMouseOver}
       />
     )
   }
