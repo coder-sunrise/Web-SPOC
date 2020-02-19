@@ -85,9 +85,9 @@ const text1l2 = {
   centerfull: 'i',
 }
 const text1r1 = {
-  left: 'd',
+  left: 'm',
   bottom: 'p',
-  right: 'm',
+  right: 'd',
   top: 'b',
   centerLeft: 'o',
   centerRight: 'o',
@@ -116,9 +116,9 @@ const text2l2 = {
   centerfull: 'i',
 }
 const text2r1 = {
-  left: 'd',
+  left: 'm',
   bottom: 'b',
-  right: 'm',
+  right: 'd',
   top: 'l',
   centerLeft: 'o',
   centerRight: 'o',
@@ -974,19 +974,21 @@ class Chart extends React.PureComponent {
 
   resize = (props) => {
     const { dentalChartComponent, global } = props || this.props
-    const width = this.divContainer.current.offsetWidth
+    setTimeout(() => {
+      const width = this.divContainer.current.offsetWidth
 
-    if (
-      width !== this.state.width ||
-      dentalChartComponent.isPedoChart !== this.state.isPedoChart
-    ) {
-      this.setState({
-        width,
-        isPedoChart: dentalChartComponent.isPedoChart,
-      })
-      this.canvas.setDimensions(this.getCanvasSize(props))
-      this.canvas.setZoom(width / 2200)
-    }
+      if (
+        width !== this.state.width ||
+        dentalChartComponent.isPedoChart !== this.state.isPedoChart
+      ) {
+        this.setState({
+          width,
+          isPedoChart: dentalChartComponent.isPedoChart,
+        })
+        this.canvas.setDimensions(this.getCanvasSize(props))
+        this.canvas.setZoom(width / 2200)
+      }
+    }, 1)
   }
 
   getCanvasSize = (props) => {
