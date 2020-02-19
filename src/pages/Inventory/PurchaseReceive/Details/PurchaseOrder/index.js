@@ -507,6 +507,7 @@ class Index extends Component {
       if (isWriteOff) return false
       return true
     }
+    const isCompletedOrCancelled = poStatus === 4 || poStatus === 6
     const currentGstValue = isGSTEnabled ? gstValue : undefined
     return (
       // <AuthorizedContext.Provider
@@ -520,6 +521,7 @@ class Index extends Component {
           isReadOnly={!isEditable()}
           isFinalize={isPOStatusFinalized(poStatus)}
           setFieldValue={setFieldValue}
+          isCompletedOrCancelled={isCompletedOrCancelled}
           {...this.props}
         />
         <AuthorizedContext.Provider
