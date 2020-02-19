@@ -140,13 +140,13 @@ class Billing extends Component {
     const { billing, history, dispatch } = this.props
     const { patientID } = billing
     const { query } = history.location
-    dispatch({
-      type: 'patient/query',
-      payload: {
-        id: patientID,
-        version: Date.now(),
-      },
-    })
+    // dispatch({
+    //   type: 'patient/query',
+    //   payload: {
+    //     id: patientID,
+    //     version: Date.now(),
+    //   },
+    // })
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {

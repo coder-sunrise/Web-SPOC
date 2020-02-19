@@ -34,6 +34,7 @@ export default createListViewModel({
     service,
     state: {
       list: [],
+      statusTagClicked: false,
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
       appointmentList: [],

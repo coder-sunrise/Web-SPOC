@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import classnames from 'classnames'
 import color from 'color'
 import { withStyles } from '@material-ui/core'
@@ -55,11 +55,7 @@ const styles = () => ({
   },
 })
 
-const VisitStatusTag = ({ classes, row, onClick }) => {
-  const [
-    hasClicked,
-    setHasClicked,
-  ] = useState(false)
+const VisitStatusTag = ({ classes, row, onClick, statusTagClicked }) => {
   const { visitStatus: value, visitPurposeFK } = row
 
   let colorTag = 'lightGrey'
@@ -68,13 +64,7 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
     (event) => {
       event.preventDefault()
       event.stopPropagation()
-
-      setHasClicked(true)
       onClick(row)
-
-      setTimeout(() => {
-        setHasClicked(false)
-      }, 3000)
     },
     [
       row,
@@ -121,7 +111,7 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
   return (
     <div
       className={classnames(cssClass)}
-      onClick={hasClicked ? undefined : handleClick}
+      onClick={statusTagClicked ? undefined : handleClick}
       onDoubleClick={handleDoubleClick}
     >
       <span>
