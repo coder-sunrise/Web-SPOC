@@ -358,6 +358,7 @@ class SystemSetting extends PureComponent {
               }
             })
           }}
+          autoFocus
           value={this.state.searchText}
         />
         <Accordion

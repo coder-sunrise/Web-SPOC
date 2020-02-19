@@ -52,7 +52,6 @@ const Detail = ({ orderSetDetail, dispatch, values, theme }) => {
                       label={formatMessage({
                         id: 'inventory.master.orderset.code',
                       })}
-                      disabled={!values.isActive}
                       {...args}
                     />
                   )

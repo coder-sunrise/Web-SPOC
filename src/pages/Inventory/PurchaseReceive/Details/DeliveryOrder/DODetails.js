@@ -186,10 +186,24 @@ class DODetails extends PureComponent {
     filterStockMedication: [], // medication
     filterStockVaccination: [], // vaccination
     filterStockConsumable: [], // consumable
+
+    itemType: podoOrderType,
   }
 
   componentDidMount = async () => {
     const { mode, dispatch, deliveryOrderDetails } = this.props
+    const {
+      purchaseOrderDetails: { purchaseOrderOutstandingItem },
+    } = deliveryOrderDetails
+
+    const osItemType = podoOrderType.filter((type) =>
+      purchaseOrderOutstandingItem.some((osItem) =>
+        Object.prototype.hasOwnProperty.call(osItem, type.prop),
+      ),
+    )
+
+    this.setState({ itemType: osItemType })
+
     podoOrderType.forEach((x) => {
       this.setState({
         [x.stateName]: deliveryOrderDetails[x.stateName],
@@ -445,6 +459,7 @@ class DODetails extends PureComponent {
 
   render () {
     const { props } = this
+
     const {
       footer,
       values,
@@ -488,13 +503,19 @@ class DODetails extends PureComponent {
         {
           columnName: 'type',
           type: 'select',
-          options: podoOrderType,
+          options: () => this.state.itemType,
           onChange: (e) => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
             }
           },
           isDisabled: (row) => row.id >= 0,
+          render: (row) => {
+            if (row.type) {
+              return podoOrderType.find((type) => type.value === row.type).name
+            }
+            return null
+          },
         },
         {
           columnName: 'code',

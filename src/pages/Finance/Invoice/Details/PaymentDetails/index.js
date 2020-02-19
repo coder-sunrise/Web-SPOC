@@ -378,9 +378,8 @@ class PaymentDetails extends Component {
         )
         if (company && company.statementInvoice.length > 0) {
           notification.warning({
-            message: `Invoice is already added to statement ${company
-              .statementInvoice[0]
-              .statementNo}. Please remove the invoice from statement before transfer`,
+            message: `Please remove the invoice from statement ${company
+              .statementInvoice[0].statementNo} before transfer. `,
           })
           return
         }
@@ -454,7 +453,7 @@ class PaymentDetails extends Component {
                   payerType={payment.payerType}
                   payerTypeFK={payment.payerTypeFK}
                   payments={payment.paymentTxnList}
-                  totalPaid={payment.totalPaid}
+                  payerDistributedAmt={payment.payerDistributedAmt}
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}

@@ -115,14 +115,8 @@ export const ApptColumnExtensions = [
   {
     columnName: 'appointmentTime',
     width: 180,
-    render: (row) => {
-      // const appointmentDate = moment(row.appointmentDate).format('MM DD YYYY')
-      const appointmentDate = moment(row.appointmentDate).format('DD MMM YYYY')
-      return DateFormatter({
-        value: `${appointmentDate} ${row.startTime}`,
-        format: 'DD MMM YYYY hh:mm A',
-      })
-    },
+    type: 'date',
+    showTime: true,
   },
 ]
 

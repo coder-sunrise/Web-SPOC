@@ -1,11 +1,8 @@
 import router from 'umi/router'
 import _ from 'lodash'
-import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/dispense'
-import { getRemovedUrl, getAppendUrl, getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
-import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 import { notification } from '@/components'
 
 export default createFormViewModel({
@@ -55,6 +52,7 @@ export default createFormViewModel({
               version: Number(query.v) || undefined,
               visitID: Number(query.vid),
               pid: Number(query.pid),
+              qid: Number(query.qid),
               // md2: query.md2,
             },
           })
@@ -63,7 +61,7 @@ export default createFormViewModel({
     },
     effects: {
       *initState ({ payload }, { all, put, select, take }) {
-        const { version, visitID, md2 } = payload
+        const { version, visitID, md2, qid } = payload
         const patientState = yield select((st) => st.patient)
 
         yield put({
@@ -87,6 +85,12 @@ export default createFormViewModel({
           yield take('patient/query/@@end')
         }
 
+        if (qid)
+          yield put({
+            type: 'visitRegistration/query',
+            payload: { id: payload.qid, version: payload.v },
+          })
+
         yield put({
           type: 'query',
           payload: {
@@ -108,8 +112,10 @@ export default createFormViewModel({
               version: payload.version,
             },
           })
-          sendNotification('QueueListing', {
-            message: `Dispense Started`,
+
+          sendQueueNotification({
+            message: 'Ready for dispensing.',
+            queueNo: payload.queueNo,
           })
         }
         return response
@@ -128,21 +134,31 @@ export default createFormViewModel({
         return response
       },
 
-      *save ({ payload }, { call, put }) {
+      *save ({ payload }, { call }) {
         const response = yield call(service.save, payload)
         return response
       },
-      *discard ({ payload }, { call, put }) {
-        const response = yield call(service.remove, payload)
+      *discard ({ payload }, { call, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
 
+        const response = yield call(service.remove, payload)
         if (response) {
-          sendNotification('QueueListing', {
-            message: `Dispense Discarded`,
+          sendQueueNotification({
+            message: 'Dispense discarded',
+            queueNo: entity.queueNo,
           })
         }
         return response
       },
-      *finalize ({ payload }, { call, put }) {
+      *finalize ({ payload }, { call, put, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.finalize, payload)
         if (response)
           yield put({
@@ -151,8 +167,9 @@ export default createFormViewModel({
               toBillingPage: true,
             },
           })
-        sendNotification('QueueListing', {
-          message: 'Dispense Finalized',
+        sendQueueNotification({
+          message: 'Dispense finalized. Waiting for payment.',
+          queueNo: entity.queueNo,
         })
         return response
       },
@@ -205,7 +222,7 @@ export default createFormViewModel({
         return false
       },
 
-      *saveAddOrderDetails ({ payload }, { call, put }) {
+      *saveAddOrderDetails ({ payload }, { call }) {
         const response = yield call(service.saveAddOrderDetails, payload)
         if (response === 204) {
           notification.success({ message: 'Saved' })
@@ -214,23 +231,35 @@ export default createFormViewModel({
         return false
       },
 
-      *removeAddOrderDetails ({ payload }, { call, put }) {
+      *removeAddOrderDetails ({ payload }, { call, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.removeAddOrderDetails, payload)
         if (response === 204) {
           notification.success({ message: 'Retail visit discarded' })
-          sendNotification('QueueListing', {
-            message: 'Retail Visit Discarded',
+          sendQueueNotification({
+            message: 'Retail visit discarded.',
+            queueNo: entity.queueNo,
           })
           return true
         }
         return false
       },
-      *discardBillOrder ({ payload }, { call, put }) {
+      *discardBillOrder ({ payload }, { call, select }) {
+        const visitRegistration = yield select(
+          (state) => state.visitRegistration,
+        )
+        const { entity } = visitRegistration
+
         const response = yield call(service.removeBillFirstVisit, payload)
         if (response === 204) {
           notification.success({ message: 'Bill-First visit discarded' })
-          sendNotification('QueueListing', {
-            message: 'Bill-First Visit Discarded',
+          sendQueueNotification({
+            message: 'Bill-First visit discarded.',
+            queueNo: entity.queueNo,
           })
           return true
         }

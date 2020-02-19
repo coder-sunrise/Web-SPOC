@@ -13,6 +13,7 @@ class DiagnosisGroupDetails extends PureComponent {
       }))
     }
     const FuncProps = {
+      pager: false,
       grouping: true,
       groupingConfig: {
         state: {
