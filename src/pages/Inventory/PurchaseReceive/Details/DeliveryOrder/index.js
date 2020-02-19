@@ -102,11 +102,11 @@ class index extends Component {
   onEditDeliveryOrderClicked = async (row) => {
     const { dispatch } = this.props
     await this.queryInventoryItem()
-    this.setState({ showDeliveryOrderDetails: true, mode: 'Edit' })
-    dispatch({
+    await dispatch({
       type: 'deliveryOrderDetails/queryDeliveryOrder',
       payload: { id: row.id },
     })
+    this.setState({ showDeliveryOrderDetails: true, mode: 'Edit' })
   }
 
   closeDODetailsModal = () =>
@@ -152,6 +152,7 @@ class index extends Component {
               bodyNoPadding
               onConfirm={this.closeDODetailsModal}
               onClose={this.closeDODetailsModal}
+              observe='deliveryOrderDetails'
             >
               <DODetails
                 refreshDeliveryOrder={this.refreshDeliveryOrder}
