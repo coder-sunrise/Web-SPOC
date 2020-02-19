@@ -208,6 +208,15 @@ class DODetails extends PureComponent {
     }
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+  }
+
   manuallyTriggerDirty = () => {
     this.props.dispatch({
       type: 'formik/updateState',
