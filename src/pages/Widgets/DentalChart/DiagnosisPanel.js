@@ -43,7 +43,7 @@ const styles = (theme) => {
     buttonIcon: {
       position: 'absolute',
       left: -1,
-      top: 0,
+      top: -1,
     },
     grouped: {
       fontSize: '0.75rem',

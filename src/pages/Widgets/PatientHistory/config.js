@@ -1,109 +1,11 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 
-export const gpWidgets = (props) => [
+export const widgets = (props) => [
   {
     id: '1',
     name: 'Clinical Notes',
-    component: Loadable({
-      loader: () => import('./ClinicalNotes'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: '2',
-    name: 'Chief Complaints',
-    component: Loadable({
-      loader: () => import('./ChiefComplaints'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: '3',
-    name: 'Plan',
-    component: Loadable({
-      loader: () => import('./Plan'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: '4',
-    name: 'Diagnosis',
-    component: Loadable({
-      loader: () => import('./Diagnosis'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: '5',
-    name: 'Orders',
-    component: Loadable({
-      loader: () => import('./Orders'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  {
-    id: '6',
-    name: 'Consultation Document',
-    component: Loadable({
-      loader: () => import('./ConsultationDocument'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-  // {
-  //   id: '6',
-  //   name: 'Result History',
-  //   component: Loadable({
-  //     loader: () => import('./ResultHistory'),
-  //     render: (loaded, p) => {
-  //       let Cmpnet = loaded.default
-  //       return <Cmpnet {...props} {...p} />
-  //     },
-  //     loading: Loading,
-  //   }),
-  // },
-  {
-    id: '7',
-    name: 'Invoice',
-    component: Loadable({
-      loader: () => import('./Invoice'),
-      render: (loaded, p) => {
-        let Cmpnet = loaded.default
-        return <Cmpnet {...props} {...p} />
-      },
-      loading: Loading,
-    }),
-  },
-]
-
-export const dentalWidgets = (props) => [
-  {
-    id: '1',
-    name: 'Clinical Notes',
+    authority: 'queue.consultation.clinicalnotes.clinicalnotes',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -116,6 +18,7 @@ export const dentalWidgets = (props) => [
   {
     id: '2',
     name: 'Chief Complaints',
+    authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -126,8 +29,22 @@ export const dentalWidgets = (props) => [
     }),
   },
   {
+    id: '11',
+    name: 'Plan',
+    authority: 'queue.consultation.clinicalnotes.plan',
+    component: Loadable({
+      loader: () => import('./Notes'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} fieldName='plan' />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: '3',
     name: 'Associated History',
+    authority: 'queue.consultation.clinicalnotes.associatedhistory',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -140,6 +57,7 @@ export const dentalWidgets = (props) => [
   {
     id: '4',
     name: 'Intra Oral',
+    authority: 'queue.consultation.clinicalnotes.intraoral',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -152,6 +70,7 @@ export const dentalWidgets = (props) => [
   {
     id: '5',
     name: 'Extra Oral',
+    authority: 'queue.consultation.clinicalnotes.extraoral',
     component: Loadable({
       loader: () => import('./Notes'),
       render: (loaded, p) => {
@@ -164,6 +83,7 @@ export const dentalWidgets = (props) => [
   {
     id: '6',
     name: 'Attachment',
+    authority: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('./Attachment'),
       render: (loaded, p) => {
@@ -176,6 +96,7 @@ export const dentalWidgets = (props) => [
   {
     id: '7',
     name: 'Orders',
+    authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Orders'),
       render: (loaded, p) => {
@@ -188,6 +109,7 @@ export const dentalWidgets = (props) => [
   {
     id: '9',
     name: 'Dental Chart',
+    authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
       loader: () => import('./DentalChart/index'),
       render: (loaded, p) => {
@@ -200,6 +122,7 @@ export const dentalWidgets = (props) => [
   {
     id: '10',
     name: 'Treatment',
+    authority: 'queue.consultation.widgets.dentalchart',
     component: Loadable({
       loader: () => import('./Treatment/index'),
       render: (loaded, p) => {
@@ -212,6 +135,7 @@ export const dentalWidgets = (props) => [
   {
     id: '8',
     name: 'Invoice',
+    authority: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('./Invoice'),
       render: (loaded, p) => {

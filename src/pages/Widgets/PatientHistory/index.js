@@ -20,11 +20,12 @@ import {
   withFormikExtend,
   Skeleton,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
+
 import Loading from '@/components/PageLoading/index'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
@@ -124,18 +125,23 @@ class PatientHistory extends Component {
 
   constructor (props) {
     super(props)
-    const { clinicInfo } = props
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-    // console.log(clinicInfo)
-    this.widgets = WidgetConfig.gpWidgets(props)
-    this.myRef = React.createRef()
-    switch (clinicTypeFK) {
-      case CLINIC_TYPE.DENTAL:
-        this.widgets = WidgetConfig.dentalWidgets(props)
-        break
-      default:
-        break
-    }
+    // const { clinicInfo } = props
+    // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    // // console.log(clinicInfo)
+    // this.widgets = WidgetConfig.gpWidgets(props)
+    // this.myRef = React.createRef()
+    // switch (clinicTypeFK) {
+    //   case CLINIC_TYPE.DENTAL:
+
+    //     break
+    //   default:
+    //     break
+    // }
+    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+      const { rights } = Authorized.check(o.authority)
+      // console.log(rights)
+      return rights !== 'hidden'
+    })
     this.state = {
       selectedItems: this.widgets.map((widget) => widget.id),
     }
