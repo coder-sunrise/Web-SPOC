@@ -633,7 +633,7 @@ class Layout extends PureComponent {
       },
     }
 
-    // console.log(this.props)
+    console.log({ currentLayout: state.currentLayout.widgets, widgets })
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>

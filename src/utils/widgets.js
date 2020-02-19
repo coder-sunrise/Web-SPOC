@@ -270,6 +270,21 @@ const widgets = [
       </Tooltip>
     ),
   },
+
+  {
+    id: '21',
+    name: 'Dental Chart',
+    accessRight: 'queue.consultation.widgets.dentalchart',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/DentalChart'),
+      loading: Loading,
+    }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
+  },
   {
     id: '8',
     name: 'Attachment',
@@ -289,36 +304,6 @@ const widgets = [
         padding: '0 5px',
       },
     },
-  },
-  // {
-  //   id: '1001',
-  //   name: 'Test Widget',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/TestWidget'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
-  {
-    id: '21',
-    name: 'Dental Chart',
-    accessRight: 'queue.consultation.widgets.dentalchart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChart'),
-      loading: Loading,
-    }),
-    onUnmount: () => {
-      window.g_app._store.dispatch({
-        type: 'dentalChartComponent/reset',
-      })
-    },
-    // layoutConfig: {
-    //   style: {
-    //     height: 'calc(100% - 36px)',
-    //   },
-    // },
   },
 ]
 
