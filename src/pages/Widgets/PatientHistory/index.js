@@ -129,7 +129,6 @@ class PatientHistory extends Component {
     // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     // // console.log(clinicInfo)
     // this.widgets = WidgetConfig.gpWidgets(props)
-    // this.myRef = React.createRef()
     // switch (clinicTypeFK) {
     //   case CLINIC_TYPE.DENTAL:
 
@@ -137,6 +136,8 @@ class PatientHistory extends Component {
     //   default:
     //     break
     // }
+    this.myRef = React.createRef()
+
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
       const { rights } = Authorized.check(o.authority)
       // console.log(rights)
