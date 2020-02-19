@@ -121,22 +121,10 @@ const Stock = ({
       return
     }
 
-    const updatedRow = stock.map((batch) => {
-      if (batch.id === row.id) {
-        return {
-          ...batch,
-          isDeleted: true,
-        }
-      }
-      return {
-        ...batch,
-      }
-    })
-
-    await setFieldValue(objectType().stockProp, updatedRow)
-
     const deletedStock = stock.find((batch) => batch.id === row.id)
     deletedStock.isDeleted = true
+    setStock(stock)
+    await setFieldValue(objectType().stockProp, stock)
 
     dispatch({
       // force current edit row components to update
