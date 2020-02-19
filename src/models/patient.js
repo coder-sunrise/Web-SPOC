@@ -169,7 +169,7 @@ export default createFormViewModel({
         const { history } = payload || { history: undefined }
 
         if (patientState.shouldQueryOnClose) {
-          yield put({ type: 'query' })
+          yield put({ type: 'patientSearch/query' })
           yield put({
             type: 'updateState',
             payload: {
@@ -228,9 +228,10 @@ export default createFormViewModel({
           }),
           yield put({
             type: 'updateState',
-            paylad: {
+            payload: {
               callback: undefined,
               default: defaultPatientEntity,
+              menuErrors: {},
             },
           }),
         ])

@@ -23,9 +23,6 @@ import Authorized from '@/utils/Authorized'
         moment().add(-1, 'month'),
         moment(),
       ],
-      isIncludePatientOS: true,
-      isIncludeGovtOS: true,
-      isIncludeCorporateOS: true,
     }
   },
 })

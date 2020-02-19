@@ -461,38 +461,6 @@ class ClinicalNotes extends Component {
               return null
             }}
           />
-
-          <Field
-            name={`${prefix}clinicianNote`}
-            render={(args) => {
-              return (
-                <div>
-                  <ScribbleNoteItem
-                    scribbleNoteUpdateState={this.scribbleNoteUpdateState}
-                    category='ClinicianNote'
-                    arrayName='notesScribbleArray'
-                    categoryIndex={2}
-                    scribbleNoteArray={
-                      scriblenotes.ClinicianNote.notesScribbleArray
-                    }
-                    gridItemWidth={this.state.width}
-                  />
-
-                  <RichEditor
-                    strongLabel
-                    autoFocus
-                    onBlur={this.onEditorChange('clinicianNote')}
-                    label='Clinical Notes'
-                    {...args}
-                  />
-                </div>
-              )
-            }}
-          />
-        </div>
-
-        <div className={classes.editor}>
-          {/* <h6>Clinical Notes</h6> */}
           <Field
             name={`${prefix}chiefComplaints`}
             render={(args) => {
@@ -513,6 +481,37 @@ class ClinicalNotes extends Component {
                     strongLabel
                     onBlur={this.onEditorChange('chiefComplaints')}
                     label='Chief Complaints'
+                    {...args}
+                  />
+                </div>
+              )
+            }}
+          />
+        </div>
+
+        <div className={classes.editor}>
+          {/* <h6>Clinical Notes</h6> */}
+          <Field
+            name={`${prefix}clinicianNote`}
+            render={(args) => {
+              return (
+                <div>
+                  <ScribbleNoteItem
+                    scribbleNoteUpdateState={this.scribbleNoteUpdateState}
+                    category='ClinicianNote'
+                    arrayName='notesScribbleArray'
+                    categoryIndex={2}
+                    scribbleNoteArray={
+                      scriblenotes.ClinicianNote.notesScribbleArray
+                    }
+                    gridItemWidth={this.state.width}
+                  />
+
+                  <RichEditor
+                    strongLabel
+                    autoFocus
+                    onBlur={this.onEditorChange('clinicianNote')}
+                    label='Clinical Examinations' // previous name was Clinical Notes
                     {...args}
                   />
                 </div>

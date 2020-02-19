@@ -85,7 +85,6 @@ const Detail = ({
                         id: 'inventory.master.medication.code',
                       })}
                       {...args}
-                      disabled={!props.values.isActive}
                     />
                   )
                 }}

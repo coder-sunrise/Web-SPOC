@@ -65,7 +65,6 @@ const Detail = ({ consumableDetail, dispatch, values, theme }) => {
                       label={formatMessage({
                         id: 'inventory.master.consumable.code',
                       })}
-                      disabled={!values.isActive}
                       {...args}
                     />
                   )
