@@ -130,14 +130,13 @@ class AntdNumberInput extends React.PureComponent {
     } = props
 
     // TODO: find a better way to config default currency precision
+
     const convertedPrecision = currency && precision === 1 ? 2 : precision
+    const v = defaultValue !== undefined ? defaultValue : value
+
     this.state = {
       value: roundTo(
-        Number(
-          field.value || field.value === 0
-            ? field.value
-            : defaultValue || value,
-        ),
+        Number(field.value || field.value === 0 ? field.value : v),
         convertedPrecision,
       ),
       convertedPrecision,
@@ -583,7 +582,7 @@ class AntdNumberInput extends React.PureComponent {
   UNSAFE_componentWillReceiveProps (nextProps) {
     const { field, value, min, defaultValue } = nextProps
     const { convertedPrecision: precision } = this.state
-    const v = value || defaultValue
+    const v = value !== undefined ? value : defaultValue
     if (field) {
       this.setState({
         value:
