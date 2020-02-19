@@ -296,10 +296,27 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue } = this.props
+    const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    this.upsertBilling()
+
+    // check if invoice is OVERPAID and prompt user for confirmation
+    const { invoice } = values
+    const { outstandingBalance = 0 } = invoice
+    if (outstandingBalance < 0) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Invoice is overpaid. Confirm to complete billing?',
+          onConfirmSave: this.upsertBilling,
+        },
+      })
+    }
+    return this.upsertBilling()
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {
