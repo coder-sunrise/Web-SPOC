@@ -200,11 +200,24 @@ class DODetails extends PureComponent {
       await dispatch({
         type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
       })
-      this.props.setFieldValue(
+      await this.props.setFieldValue(
         'deliveryOrderDate',
         this.props.values.deliveryOrderDate,
       )
+      this.manuallyTriggerDirty()
     }
+  }
+
+  manuallyTriggerDirty = () => {
+    this.props.dispatch({
+      type: 'formik/updateState',
+      payload: {
+        deliveryOrderDetails: {
+          displayName: 'deliveryOrderDetails',
+          dirty: true,
+        },
+      },
+    })
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -300,17 +313,17 @@ class DODetails extends PureComponent {
     // })
   }
 
-  onCommitChanges = ({ rows, deleted, changed }) => {
-    // console.log({ rows, changed })
-    const { dispatch, values } = this.props
+  onCommitChanges = async ({ rows, deleted, changed }) => {
+    const { dispatch, values, setFieldValue } = this.props
+
     if (deleted) {
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
     } else if (changed) {
       const existUid = Object.keys(changed)[0]
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
           uid: existUid,
@@ -320,7 +333,7 @@ class DODetails extends PureComponent {
         },
       })
     } else {
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
           gridRow: rows[0],
@@ -328,6 +341,7 @@ class DODetails extends PureComponent {
         },
       })
     }
+    setFieldValue('isDirty', true) // manually trigger dirty
 
     return rows
   }
