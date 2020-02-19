@@ -126,7 +126,7 @@ class PatientHistory extends Component {
     super(props)
     const { clinicInfo } = props
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-
+    // console.log(clinicInfo)
     this.widgets = WidgetConfig.gpWidgets(props)
     this.myRef = React.createRef()
     switch (clinicTypeFK) {
@@ -633,7 +633,7 @@ class PatientHistory extends Component {
     //   sortedPatientHistory,
     //   settings: settings.showConsultationVersioning,
     // })
-    console.log(this.myRef)
+    // console.log(this.myRef)
     return (
       <div {...cfg}>
         <CardContainer
@@ -654,7 +654,6 @@ class PatientHistory extends Component {
               <Accordion
                 defaultActive={0}
                 onChange={(event, p, expanded) => {
-                  console.log(event, p, expanded)
                   if (expanded) {
                     setTimeout(() => {
                       $(this.myRef.current)

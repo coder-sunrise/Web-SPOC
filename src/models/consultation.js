@@ -221,6 +221,7 @@ export default createFormViewModel({
         //   yield put({ type: 'closeModal' })
         //   return null
         // }
+
         const response = yield call(service.remove, payload)
 
         if (response) {

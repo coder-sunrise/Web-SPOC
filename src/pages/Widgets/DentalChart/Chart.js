@@ -990,7 +990,7 @@ class Chart extends React.PureComponent {
   }
 
   getCanvasSize = (props) => {
-    const { isPedoChart } = (props || this.props).dentalChartComponent
+    const { isPedoChart } = (props || this.props).dentalChartComponent || {}
 
     const width = this.divContainer.current.offsetWidth // - 4
     // console.log(isPedoChart, width)
@@ -1026,7 +1026,12 @@ class Chart extends React.PureComponent {
 
   renderCanvas = (props, force) => {
     const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
-    const { action, data, isPedoChart, isSurfaceLabel } = dentalChartComponent
+    const {
+      action,
+      data = [],
+      isPedoChart,
+      isSurfaceLabel,
+    } = dentalChartComponent
     if (!action || action.chartMethodTypeFK === 3 || force) {
       selectedTooth = []
       this.canvas._objects

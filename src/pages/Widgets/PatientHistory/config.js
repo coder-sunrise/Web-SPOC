@@ -186,6 +186,30 @@ export const dentalWidgets = (props) => [
     }),
   },
   {
+    id: '9',
+    name: 'Dental Chart',
+    component: Loadable({
+      loader: () => import('./DentalChart/index'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
+    id: '10',
+    name: 'Treatment',
+    component: Loadable({
+      loader: () => import('./Treatment/index'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: '8',
     name: 'Invoice',
     component: Loadable({

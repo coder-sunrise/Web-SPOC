@@ -28,15 +28,7 @@ const styles = (theme) => ({
     padding: 0,
     width: 0,
   },
-  groupBtnRoot: {
-    display: 'block',
-    marginBottom: theme.spacing(1),
-  },
-  groupBtnGrouped: {
-    '&:not(:first-child)': {
-      marginLeft: theme.spacing(0.5),
-    },
-  },
+
   toothJournal: {
     paddingTop: 0,
     paddingBottom: 0,
@@ -66,10 +58,6 @@ const styles = (theme) => ({
   attachmentContainer: {
     margin: 0,
     width: 'auto',
-  },
-  buttonIcon: {
-    position: 'absolute',
-    left: -1,
   },
 })
 
@@ -153,7 +141,9 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
+            {mode === 'diagnosis' && (
+              <DiagnosisPanel searchable {...this.props} />
+            )}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>
