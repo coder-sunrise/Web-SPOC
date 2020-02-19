@@ -159,7 +159,12 @@ export const axiosRequest = async (
  * @param  {object} [option] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-const request = (url, option, showNotification = true) => {
+const request = (
+  url,
+  option,
+  showNotification = true,
+  redirectToLoginAfterFail = true,
+) => {
   const options = {
     expirys: true,
     ...option,
@@ -334,17 +339,17 @@ const request = (url, option, showNotification = true) => {
             }
 
             let errorMsg = codeMessage[response.status]
-
-            if (
-              ((response.status === 400 && token === null) ||
-                response.status === 401) &&
-              url !== '/connect/token'
-            ) {
-              console.log('redirect')
-              window.g_app._store.dispatch({
-                type: 'login/logout',
-              })
-              return false
+            if (redirectToLoginAfterFail) {
+              if (
+                (response.status === 400 && token === null) ||
+                (response.status === 401 && url !== '/connect/token')
+              ) {
+                console.log('redirect')
+                window.g_app._store.dispatch({
+                  type: 'login/logout',
+                })
+                return false
+              }
             }
 
             if (s === 'timeout') {
