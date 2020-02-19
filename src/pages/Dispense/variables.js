@@ -422,7 +422,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.unitPrice} />
+      return <NumberInput text currency showZero value={row.unitPrice} />
     },
   },
   {
@@ -434,7 +434,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.adjAmt} />
+      return <NumberInput text currency showZero value={row.adjAmt} />
     },
   },
   {
@@ -446,7 +446,14 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+      return (
+        <NumberInput
+          text
+          currency
+          showZero
+          value={row.totalAfterItemAdjustment}
+        />
+      )
     },
   },
   {
