@@ -1769,8 +1769,7 @@ export const getInventoryItemV2 = (
           activeItem.totalCurrentReceivingQty -
           quantityReceivedFromOtherDOs
       } else {
-        remainingQuantity =
-          quantityReceived - activeItem.totalCurrentReceivingQty
+        remainingQuantity -= activeItem.totalCurrentReceivingQty
       }
 
       if (remainingQuantity === 0) {
