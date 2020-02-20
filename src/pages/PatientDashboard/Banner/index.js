@@ -164,10 +164,14 @@ class Banner extends PureComponent {
     const { currPatientCoPaymentSchemeFK, currentSchemeType } = this.state
     let patientCoPaymentSchemeFK = currPatientCoPaymentSchemeFK
     let oldSchemeTypeFK = currentSchemeType
-
+    let isSaveToDb = true
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: { ...entity, patientCoPaymentSchemeFK },
+      payload: { ...entity,
+        patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId: entity.id,
+      },
     }).then((result) => {
       // console.log('result ==========', result)
       if (result) {
@@ -491,7 +495,7 @@ class Banner extends PureComponent {
                 }
                 body={
                   <div>
-                    {entity.patientScheme.length &&
+                    {entity.patientScheme.length > 0 &&
                     entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                       .length > 0 ? (
                       entity.patientScheme

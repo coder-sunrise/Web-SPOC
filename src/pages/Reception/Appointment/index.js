@@ -8,7 +8,8 @@ import { CardContainer, CommonModal } from '@/components'
 // sub component
 import FilterBar from './components/FilterBar'
 import FuncCalendarView from './components/FuncCalendarView'
-import PopoverContent from './components/PopoverContent'
+import ApptPopover from './components/ApptPopover'
+import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
@@ -116,10 +117,24 @@ class Appointment extends React.PureComponent {
         lsteql_appointmentDate: endOfMonth,
       },
     })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+        filter: {
+          isActive: undefined,
+        },
+      },
+    })
 
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'doctorprofile' },
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {},
+      },
     }).then((response) => {
       response
 
@@ -129,6 +144,7 @@ class Appointment extends React.PureComponent {
 
       if (response) {
         resources = response
+          .filter((clinician) => clinician.clinicianProfile.isActive)
           .filter((_, index) => index < 5)
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
@@ -161,6 +177,30 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
+    })
+  }
+
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    // reset doctor profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+
+    // reset clinician profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+      },
     })
   }
 
@@ -444,7 +484,7 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        <Popover
+        {/* <Popover
           id='event-popup'
           className={classes.popover}
           open={showPopup}
@@ -459,13 +499,17 @@ class Appointment extends React.PureComponent {
             vertical: 'center',
             horizontal: 'left',
           }}
-          disableRestoreFocus
+          // disableRestoreFocus
         >
-          <PopoverContent
-            popoverEvent={popoverEvent}
-            calendarView={calendarView}
-          />
-        </Popover>
+          {popoverEvent.doctor ? (
+            <DoctorBlockPopover
+              popoverEvent={popoverEvent}
+              calendarView={calendarView}
+            />
+          ) : (
+            <ApptPopover popoverEvent={popoverEvent} />
+          )}
+        </Popover> */}
 
         <FilterBar
           loading={calendarLoading}

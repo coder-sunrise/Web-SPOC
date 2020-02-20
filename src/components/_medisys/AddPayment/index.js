@@ -221,20 +221,32 @@ class AddPayment extends Component {
     })
   }
 
+  getPopulateAmount = (paymentMode) => {
+    const { values, patient } = this.props
+    const amount = values.outstandingAfterPayment
+    const { id: type } = paymentMode
+    if (parseInt(type, 10) !== PAYMENT_MODE.DEPOSIT) return amount
+
+    const { patientDeposit } = patient
+
+    if (patientDeposit) {
+      const { balance = 0 } = patientDeposit
+      if (balance > values.outstandingAfterPayment) return amount
+      return balance
+    }
+  }
+
   onPaymentTypeClick = async (paymentMode) => {
     const { values, setFieldValue } = this.props
-    // const { currentTarget: { id: type } } = event
-    // const paymentMode = Object.keys(PAYMENT_MODE).find(
-    //   (mode) => PAYMENT_MODE[mode] === parseInt(type, 10),
-    // )
     const { id: type, displayValue } = paymentMode
-    const amount = values.outstandingAfterPayment
+    const amt = this.getPopulateAmount(paymentMode)
+
     const payment = {
       id: getLargestID(values.paymentList) + 1,
       displayValue,
       paymentModeFK: parseInt(type, 10),
       paymentMode: displayValue,
-      amt: parseInt(type, 10) === PAYMENT_MODE.DEPOSIT ? 0 : amount,
+      amt,
     }
 
     const newPaymentList = [

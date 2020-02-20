@@ -96,7 +96,7 @@ export default createFormViewModel({
         }
 
         const result = data.reduce(splitByCannedTextType, { ...restState })
-        console.log({ result })
+
         return { ...state, ...result }
       },
       setList (state, { payload }) {

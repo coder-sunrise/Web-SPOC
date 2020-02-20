@@ -11,7 +11,8 @@ import Yup from '@/utils/yup'
 import DeleteConfirmation from '@/pages/Finance/Invoice/components/modal/DeleteConfirmation'
 
 const purchaseOrderPaymentSchema = Yup.object().shape({
-  paymentModeFK: Yup.string().required(),
+  paymentModeFK: Yup.number().required(),
+  paymentDate: Yup.date().required(),
   paymentAmount: Yup.number()
     .min(0)
     .max(Yup.ref('outstandingAmt'), (e) => {
@@ -21,12 +22,7 @@ const purchaseOrderPaymentSchema = Yup.object().shape({
 })
 
 let commitCount = 1000 // uniqueNumber
-const Grid = ({
-  dispatch,
-  values,
-  setFieldValue,
-  recalculateOutstandingAmount,
-}) => {
+const Grid = ({ dispatch, values, setFieldValue, getTotalPaid }) => {
   const [
     creditCardTypeList,
     setCreditCardTypeList,
@@ -87,19 +83,26 @@ const Grid = ({
         let tempList = []
         paymentModeList.forEach((o) => {
           if (o.displayValue === 'Credit Card') {
-            let tempId = -99
+            // TODO: find a better way to do this
+            let tempId = 9999 // temp id for payment mode list - credit card type
             creditCardTypeList.forEach((i) => {
               tempList.push({
-                value: tempId - o.id,
+                value: tempId + o.id,
                 name: `${o.displayValue} (${i.name})`,
                 typeId: i.id,
                 type: i.name,
                 creditCardId: o.id,
+                creditCardTypeName: i.name,
+                paymentModeTypeName: o.displayValue,
               })
-              tempId -= 1
+              tempId += 1
             })
           } else {
-            tempList.push({ value: o.id, name: o.displayValue })
+            tempList.push({
+              value: o.id,
+              name: o.displayValue,
+              paymentModeTypeName: o.displayValue,
+            })
           }
         })
 
@@ -150,10 +153,14 @@ const Grid = ({
       {
         columnName: 'paymentDate',
         type: 'date',
+        restrictFromTo: [
+          values.purchaseOrderDetails &&
+            values.purchaseOrderDetails.purchaseOrderDate,
+          moment().formatUTC(),
+        ],
         format: dateFormatLong,
-        value: moment(),
-        disabled: true,
         compare: compareString,
+        isDisabled: (row) => row.id > 0,
       },
       {
         columnName: 'paymentModeFK',
@@ -166,6 +173,8 @@ const Grid = ({
           if (option) {
             row.typeId = option.typeId
             row.creditCardId = option.creditCardId || option.value
+            row.paymentModeTypeName = option.paymentModeTypeName
+            row.creditCardTypeName = option.creditCardTypeName
           }
         },
       },
@@ -191,7 +200,6 @@ const Grid = ({
   const voidPayment = (reason) => {
     deletedRow.isDeleted = true
     deletedRow.cancelReason = reason
-    recalculateOutstandingAmount('delete', deletedRow.paymentAmount)
     setFieldValue('purchaseOrderPayment', allRows)
     setShowDeleteConfirmation(false)
   }
@@ -206,7 +214,6 @@ const Grid = ({
         setShowDeleteConfirmation(true)
       } else {
         currentRow.isDeleted = true
-        recalculateOutstandingAmount('delete', currentRow.paymentAmount)
         const setRows = rows.filter(
           (o) => o.id > 0 || (o.isNew && !o.isDeleted),
         )
@@ -222,15 +229,15 @@ const Grid = ({
       if (rows[0].remark === undefined) {
         rows[0].remark = ''
       }
-      recalculateOutstandingAmount('add', rows[0].paymentAmount)
-      const activeRows = rows.filter((o) => o.isDeleted === false)
-      const paymentPaid = _.sumBy(activeRows, 'paymentAmount') || 0
 
       const newRows = rows.map((o) => {
         if (o.isNew && !o.isDeleted) {
+          const outstandingAmt =
+            values.invoiceAmount - getTotalPaid() + (o.paymentAmount || 0)
           return {
             ...o,
-            outstandingAmt: values.invoiceAmount - paymentPaid,
+            outstandingAmt,
+            paymentAmount: o.paymentAmount || outstandingAmt,
           }
         }
 
@@ -239,12 +246,22 @@ const Grid = ({
         }
       })
       setFieldValue('purchaseOrderPayment', newRows)
+      return newRows
     }
 
     return rows
   }
   const closeDeleteConfirmationModal = () => setShowDeleteConfirmation(false)
-
+  const onAddedRowsChange = (addedRows) => {
+    const outstandingAmt = values.invoiceAmount - getTotalPaid()
+    return addedRows.map((row) => ({
+      paymentDate: moment(),
+      outstandingAmt,
+      paymentAmount: outstandingAmt,
+      ...row,
+    }))
+  }
+  const isFullyPaid = values.invoiceAmount === getTotalPaid()
   return (
     <GridContainer>
       <EditableTableGrid
@@ -255,11 +272,11 @@ const Grid = ({
           pager: false,
         }}
         EditingProps={{
-          showAddCommand: values.currentOutstandingAmt > 0,
+          showAddCommand: !isFullyPaid,
           showEditCommand: false,
           showDeleteCommand: true,
           onCommitChanges,
-          // onAddedRowsChange: this.onAddedRowsChange,
+          onAddedRowsChange,
         }}
         {...tableParas}
       />

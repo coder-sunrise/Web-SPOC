@@ -17,7 +17,7 @@ const Cheque = ({
 }) => {
   return (
     <PaymentBase payment={payment} handleDeletePayment={handleDeletePayment}>
-      <GridContainer justify='flex-end'>
+      <GridContainer>
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].amt`}

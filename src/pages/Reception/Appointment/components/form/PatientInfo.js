@@ -31,6 +31,7 @@ const PatientInfoInput = ({
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
+
   const allowedToActualize = [
     1,
     5,
@@ -45,12 +46,11 @@ const PatientInfoInput = ({
             return (
               <TextField
                 {...args}
-                // autoFocus
+                autoFocus={!isEdit}
                 defaultValue={undefined}
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
-                loseFocusOnEnterPressed
               />
             )
           }}

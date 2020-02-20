@@ -1251,7 +1251,7 @@ export const fetchAndSaveCodeTable = async (
         { ...criteriaForTenantCodes, ...params },
         convertExcludeFields,
       )
-
+  // console.log({ code, params, body, criteriaForTenantCodes })
   const response = await request(`${url}${code}`, {
     method: 'GET',
     body,
@@ -1792,8 +1792,7 @@ export const getInventoryItemV2 = (
           activeItem.totalCurrentReceivingQty -
           quantityReceivedFromOtherDOs
       } else {
-        remainingQuantity =
-          quantityReceived - activeItem.totalCurrentReceivingQty
+        remainingQuantity -= activeItem.totalCurrentReceivingQty
       }
 
       if (remainingQuantity === 0) {

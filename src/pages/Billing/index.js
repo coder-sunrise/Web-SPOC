@@ -20,7 +20,8 @@ import {
 import { AddPayment, LoadingWrapper, ReportViewer } from '@/components/_medisys'
 // sub component
 import PatientBanner from '@/pages/PatientDashboard/Banner'
-import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+// import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
+import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 // import ApplyClaims from './components/ApplyClaims'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
@@ -135,9 +136,17 @@ class Billing extends Component {
     },
   }
 
-  componentDidMount () {
-    const { history, dispatch } = this.props
+  componentWillMount () {
+    const { billing, history, dispatch } = this.props
+    const { patientID } = billing
     const { query } = history.location
+    // dispatch({
+    //   type: 'patient/query',
+    //   payload: {
+    //     id: patientID,
+    //     version: Date.now(),
+    //   },
+    // })
     dispatch({
       type: 'codetable/fetchCodes',
       payload: {
@@ -287,10 +296,27 @@ class Billing extends Component {
   }
 
   onCompletePaymentClick = async () => {
-    const { setFieldValue } = this.props
+    const { dispatch, values, setFieldValue } = this.props
     await setFieldValue('mode', 'save')
     await setFieldValue('visitStatus', 'COMPLETED')
-    this.upsertBilling()
+
+    // check if invoice is OVERPAID and prompt user for confirmation
+    const { invoice } = values
+    const { outstandingBalance = 0 } = invoice
+    if (outstandingBalance < 0) {
+      return dispatch({
+        type: 'global/updateState',
+        payload: {
+          openConfirm: true,
+          openConfirmTitle: '',
+          openConfirmText: 'Confirm',
+          openConfirmContent:
+            'Invoice is overpaid. Confirm to complete billing?',
+          onConfirmSave: this.upsertBilling,
+        },
+      })
+    }
+    return this.upsertBilling()
   }
 
   onPrintReceiptClick = (invoicePaymentID) => {

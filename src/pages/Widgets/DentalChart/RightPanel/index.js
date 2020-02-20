@@ -82,7 +82,7 @@ const RightPanel = (props) => {
             gutter={0}
             style={{ lineHeight: theme.props.singleRowHeight }}
           >
-            <Tooltip title='History' placement='left'>
+            <Tooltip title='Chart History' placement='left'>
               <Button
                 size='sm'
                 onClick={() => {

@@ -1058,7 +1058,7 @@ const calculateAmount = (
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        rows.map((row) => row[totalField]).reduce(sumReducer, 0),
+        activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
       ),
       gst,
       total,
@@ -1099,7 +1099,7 @@ export const currencyFormatter = (value) =>
   numeral(value).format(`$${config.currencyFormat}`)
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
-const commonDataReaderTransform = (data, fieldName) => {
+const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   // console.log(commonDataReaderTransform)
   const { getClinic } = config
   const { systemTimeZoneInt = 0 } = getClinic() || {}
@@ -1115,7 +1115,7 @@ const commonDataReaderTransform = (data, fieldName) => {
       for (let field in data) {
         if (Object.prototype.hasOwnProperty.call(data, field)) {
           const v = data[field]
-          if (v === null || v === undefined) {
+          if (!keepNull && (v === null || v === undefined)) {
             delete data[field]
             continue
           }

@@ -144,6 +144,15 @@ export const REPORT_TYPE = {
   29: 'Payment Receipt',
 }
 
+export const REPORT_ID = {
+  DRUG_LABEL_80MM_45MM: 24,
+  DRUG_LABEL_89MM_36MM: 31,
+  PATIENT_LABEL_80MM_45MM: 27,
+  PATIENT_LABEL_89MM_36MM: 32,
+  PATIENT_LAB_LABEL_80MM_45MM: 33,
+  PATIENT_LAB_LABEL_89MM_36MM: 34,
+}
+
 export const INVOICE_STATUS = {
   PAID: 1,
   OVERPAID: 2,
@@ -174,6 +183,15 @@ export const COUNTRY_CODE = {
   4: '+63 Philippines',
   5: '+66 Thailand',
   6: '+81 Japan',
+}
+
+export const COUNTRY_CODE_NUMBER = {
+  1: '+65',
+  2: '+60',
+  3: '+62',
+  4: '+63',
+  5: '+66',
+  6: '+81',
 }
 
 export const ADD_ON_FEATURE = {
@@ -226,6 +244,11 @@ export const SCRIBBLE_NOTE_TYPE = {
   CLINICALNOTES: 1,
   CHIEFCOMPLAINTS: 2,
   PLAN: 3,
+  DENTALCLINICALNOTES: 4,
+  DENTALCOMPLAINTS: 5,
+  DENTALASSOCIATEHISTORY: 6,
+  DENTALINTRAORAL: 7,
+  DENTALEXTRAORAL: 8,
 }
 
 export const SMS_STATUS = {
@@ -262,6 +285,7 @@ export const CANNED_TEXT_TYPE = {
   ASSOCIATEDHISTORY: 3,
   INTRAORAL: 4,
   EXTRAORAL: 5,
+  PLAN: 6,
 }
 
 export const CANNED_TEXT_TYPE_FIELD = {
@@ -270,6 +294,7 @@ export const CANNED_TEXT_TYPE_FIELD = {
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',
+  6: 'plan',
 }
 
 export const CLINIC_TYPE = {
@@ -281,4 +306,31 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+}
+
+export const PURCHASE_ORDER_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  PARTIALREVD: 3,
+  CANCELLED: 4,
+  FULFILLED: 5,
+  COMPLETED: 6,
+}
+
+export const NUMBER_TYPE = {
+  MOBILE: 1,
+  HOME: 2,
+  WORK: 3,
+  FAX: 4,
+}
+
+export const NOTIFICATION_TYPE = {
+  QUEUE: 1,
+  CODETABLE: 2,
+  ERROR: 3,
+}
+
+export const NOTIFICATION_STATUS = {
+  OK: 1,
+  ERROR: 2,
 }

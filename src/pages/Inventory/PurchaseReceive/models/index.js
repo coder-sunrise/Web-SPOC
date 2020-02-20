@@ -14,8 +14,8 @@ export default createListViewModel({
       filterSearch: {
         isAllDateChecked: false,
         transactionDates: [
-          moment().format('YYYY-MM-01'),
-          moment(),
+          moment().startOf('month').formatUTC(),
+          moment().formatUTC(false),
         ],
       },
     },

@@ -33,6 +33,7 @@ import PatientHistoryDrawer from './PatientHistoryDrawer'
 import { control } from '@/components/Decorator'
 import Templates from './Templates'
 // utils
+import Authorized from '@/utils/Authorized'
 import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 import { CLINIC_TYPE } from '@/utils/constants'
@@ -147,7 +148,7 @@ class Layout extends PureComponent {
     }
 
     let defaultLayout
-    // console.log('userDefaultLayout', { userDefaultLayout })
+
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (true) {
@@ -381,7 +382,7 @@ class Layout extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
-    // console.log({ defaultWidgets })
+
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
     }
@@ -544,6 +545,7 @@ class Layout extends PureComponent {
       values,
       cestemplate,
       rights,
+      clinicInfo,
       onSaveLayout = (f) => f,
     } = props
     const widgetProps = {
@@ -631,8 +633,8 @@ class Layout extends PureComponent {
       },
     }
 
-    // console.log(this.props)
-
+    // console.log({ currentLayout: state.currentLayout.widgets, widgets })
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>
         {!this.state.fullScreenWidget && (
@@ -839,24 +841,26 @@ class Layout extends PureComponent {
                   </Fab>
                 </div>
               </Slide>
-              <Slide
-                direction='up'
-                in={this.state.mode === 'edit'}
-                mountOnEnter
-              >
-                <div style={{ display: 'inline-block' }}>
-                  <Fab
-                    color='secondary'
-                    className={classes.fab}
-                    style={{ marginRight: 8 }}
-                    variant='extended'
-                    size='small'
-                    onClick={this.togglePatientHistoryDrawer}
-                  >
-                    <Accessibility />&nbsp;Patient History
-                  </Fab>
-                </div>
-              </Slide>
+              {clinicTypeFK === CLINIC_TYPE.DENTAL && (
+                <Slide
+                  direction='up'
+                  in={this.state.mode === 'edit'}
+                  mountOnEnter
+                >
+                  <div style={{ display: 'inline-block' }}>
+                    <Fab
+                      color='secondary'
+                      className={classes.fab}
+                      style={{ marginRight: 8 }}
+                      variant='extended'
+                      size='small'
+                      onClick={this.togglePatientHistoryDrawer}
+                    >
+                      <Accessibility />&nbsp;Patient History
+                    </Fab>
+                  </div>
+                </Slide>
+              )}
             </div>
             <Drawer
               anchor='right'
@@ -890,7 +894,17 @@ class Layout extends PureComponent {
                     value={currentLayout.widgets}
                     valueField='id'
                     textField='name'
-                    options={widgets}
+                    options={widgets.filter((widget) => {
+                      const widgetAccessRight = Authorized.check(
+                        widget.accessRight,
+                      )
+                      if (
+                        widgetAccessRight &&
+                        widgetAccessRight.rights === 'hidden'
+                      )
+                        return false
+                      return true
+                    })}
                     onChange={(e, s) => {
                       // console.log(e)
                       // dispatch({

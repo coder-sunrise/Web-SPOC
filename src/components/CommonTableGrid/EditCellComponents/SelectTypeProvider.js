@@ -69,7 +69,7 @@ class SelectEditor extends PureComponent {
     // if (!commonCfg.error) commonCfg.open = true
 
     if (localFilter) commonCfg.options = commonCfg.options.filter(localFilter)
-    // console.log({ commonCfg, type })
+    // console.log(commonCfg)
     if (columnName) {
       if (type === 'select') {
         return (
@@ -161,7 +161,7 @@ class SelectTypeProvider extends React.Component {
         labelField = 'name'
       }
       o.compare = (a, b) => {
-        const codes = this.state[`${columnName}Option`]
+        const codes = this.state[`${columnName}Option`] || []
         const aa = codes.find((m) => m[valueField] === a)
         const bb = codes.find((m) => m[valueField] === b)
 

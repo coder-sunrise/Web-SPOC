@@ -1,35 +1,20 @@
 import Loadable from 'react-loadable'
-import { Menu, Dropdown } from 'antd'
-
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  MenuItem,
-  Popper,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Fab,
-  Slide,
-} from '@material-ui/core'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Clear from '@material-ui/icons/Clear'
+// material ui
 import Add from '@material-ui/icons/Add'
-import Edit from '@material-ui/icons/Edit'
-import Fullscreen from '@material-ui/icons/Fullscreen'
-import FullscreenExit from '@material-ui/icons/FullscreenExit'
-import CompareArrows from '@material-ui/icons/CompareArrows'
+// common components
 import Loading from '@/components/PageLoading/index'
-import { Tooltip, AuthorizedContext, IconButton, Button } from '@/components'
+import { Tooltip, AuthorizedContext, IconButton } from '@/components'
+// utils
+import { CLINIC_TYPE } from '@/utils/constants'
+
+const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
+const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
 const widgets = [
   {
     id: '1',
-    name: 'Clinical Notes',
+    name: clinicTypeFK === CLINIC_TYPE.GP ? 'Clinical Notes' : 'Dental Notes',
+    accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
       loading: Loading,
@@ -92,6 +77,7 @@ const widgets = [
   {
     id: '2',
     name: 'Diagnosis',
+    accessRight: 'queue.consultation.widgets.diagnosis',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Diagnosis'),
       loading: Loading,
@@ -136,6 +122,7 @@ const widgets = [
   {
     id: '3',
     name: 'Consultation Document',
+    accessRight: 'queue.consultation.widgets.consultationdocument',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ConsultationDocument'),
       loading: Loading,
@@ -181,6 +168,7 @@ const widgets = [
   {
     id: '4',
     name: 'Patient History',
+    accessRight: 'queue.consultation.widgets.patienthistory',
     component: Loadable({
       loader: () => import('@/pages/Widgets/PatientHistory'),
       render: (loaded, p) => {
@@ -200,6 +188,7 @@ const widgets = [
   {
     id: '5',
     name: 'Orders',
+    accessRight: 'queue.consultation.widgets.order',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Orders'),
       loading: Loading,
@@ -246,6 +235,7 @@ const widgets = [
   {
     id: '7',
     name: 'Vital Sign',
+    accessRight: 'queue.consultation.widgets.vitalsign',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VitalSign'),
       loading: Loading,
@@ -280,9 +270,25 @@ const widgets = [
       </Tooltip>
     ),
   },
+
+  {
+    id: '21',
+    name: 'Dental Chart',
+    accessRight: 'queue.consultation.widgets.dentalchart',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/DentalChart'),
+      loading: Loading,
+    }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
+  },
   {
     id: '8',
     name: 'Attachment',
+    accessRight: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Attachment'),
       loading: Loading,
@@ -298,35 +304,6 @@ const widgets = [
         padding: '0 5px',
       },
     },
-  },
-  // {
-  //   id: '1001',
-  //   name: 'Test Widget',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/TestWidget'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
-  {
-    id: '21',
-    name: 'Dental Chart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChart'),
-      loading: Loading,
-    }),
-    onUnmount: () => {
-      window.g_app._store.dispatch({
-        type: 'dentalChartComponent/reset',
-      })
-    },
-    // layoutConfig: {
-    //   style: {
-    //     height: 'calc(100% - 36px)',
-    //   },
-    // },
   },
 ]
 

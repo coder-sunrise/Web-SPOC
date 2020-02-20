@@ -20,7 +20,7 @@ import {
 import { orderTypes } from '@/utils/codes'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes }) => {
+export default ({ orders, dispatch, classes, from }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -103,6 +103,7 @@ export default ({ orders, dispatch, classes }) => {
           overflow: 'hidden',
           display: 'inline-block',
           textOverflow: 'ellipsis',
+          marginLeft: 20,
         }}
       >
         <Popconfirm
@@ -320,7 +321,7 @@ export default ({ orders, dispatch, classes }) => {
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {row.instruction}
+                  {row.instruction || row.remark || row.remarks || ''}
                 </div>
               </Tooltip>
             )
@@ -343,19 +344,14 @@ export default ({ orders, dispatch, classes }) => {
           //   )
           // },
         },
-        {
-          columnName: 'remark',
-          render: (r) => {
-            return r.remark || r.remarks || ''
-          },
-        },
+
         {
           columnName: 'actions',
           width: 70,
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
-            if (row.type === '7') return null
+            if (row.type === '7' && from !== 'ca') return null
             return (
               <div>
                 <Tooltip title='Edit'>

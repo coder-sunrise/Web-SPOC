@@ -229,6 +229,9 @@ const styles = (theme) => ({
       height: 50,
     },
   },
+  searchField: {
+    width: '20%',
+  },
 })
 
 const Authority = {
@@ -346,6 +349,7 @@ class SystemSetting extends PureComponent {
           }}
         /> */}
         <TextField
+          className={classes.searchField}
           prefix={<Search />}
           onChange={(e) => {
             this.setState(() => {
@@ -354,6 +358,7 @@ class SystemSetting extends PureComponent {
               }
             })
           }}
+          autoFocus
           value={this.state.searchText}
         />
         <Accordion

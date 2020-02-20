@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
+import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
 import Loadable from 'react-loadable'
@@ -19,11 +20,12 @@ import {
   withFormikExtend,
   Skeleton,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
+
 import Loading from '@/components/PageLoading/index'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
@@ -123,17 +125,24 @@ class PatientHistory extends Component {
 
   constructor (props) {
     super(props)
-    const { clinicInfo } = props
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    // const { clinicInfo } = props
+    // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    // // console.log(clinicInfo)
+    // this.widgets = WidgetConfig.gpWidgets(props)
+    // switch (clinicTypeFK) {
+    //   case CLINIC_TYPE.DENTAL:
 
-    this.widgets = WidgetConfig.gpWidgets(props)
-    switch (clinicTypeFK) {
-      case CLINIC_TYPE.DENTAL:
-        this.widgets = WidgetConfig.dentalWidgets(props)
-        break
-      default:
-        break
-    }
+    //     break
+    //   default:
+    //     break
+    // }
+    this.myRef = React.createRef()
+
+    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+      const { rights } = Authorized.check(o.authority)
+      // console.log(rights)
+      return rights !== 'hidden'
+    })
     this.state = {
       selectedItems: this.widgets.map((widget) => widget.id),
     }
@@ -202,7 +211,6 @@ class PatientHistory extends Component {
     } else {
       newArray = row.coHistory
     }
-
     return (
       <List
         component='nav'
@@ -210,6 +218,7 @@ class PatientHistory extends Component {
           root: this.props.classes.listRoot,
         }}
         disablePadding
+        onClick={() => {}}
       >
         {newArray.map((o) => {
           const _title = o.userTitle ? `${o.userTitle} ` : ''
@@ -631,6 +640,7 @@ class PatientHistory extends Component {
     //   sortedPatientHistory,
     //   settings: settings.showConsultationVersioning,
     // })
+    // console.log(this.myRef)
     return (
       <div {...cfg}>
         <CardContainer
@@ -647,26 +657,39 @@ class PatientHistory extends Component {
           settings.showConsultationVersioning === undefined ? (
             sortedPatientHistory.map((o) => this.getContent(o))
           ) : (
-            <Accordion
-              defaultActive={0}
-              collapses={sortedPatientHistory.map((o) => {
-                const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
-                const returnValue = {
-                  title: this.getTitle(o),
-                  content: this.getContent(o),
-                  hideExpendIcon: isRetailVisit,
-                }
-                if (isRetailVisit) {
+            <div ref={this.myRef}>
+              <Accordion
+                defaultActive={0}
+                onChange={(event, p, expanded) => {
+                  if (expanded) {
+                    setTimeout(() => {
+                      $(this.myRef.current)
+                        .find('div[aria-expanded=true]')
+                        .next()
+                        .find('div[role="button"]:eq(0)')
+                        .trigger('click')
+                    }, 1)
+                  }
+                }}
+                collapses={sortedPatientHistory.map((o) => {
+                  const isRetailVisit = o.visitPurposeFK === VISIT_TYPE.RETAIL
+                  const returnValue = {
+                    title: this.getTitle(o),
+                    content: this.getContent(o),
+                    hideExpendIcon: isRetailVisit,
+                  }
+                  if (isRetailVisit) {
+                    return {
+                      ...returnValue,
+                      onClickSummary: () => this.handleRetailVisitHistory(o),
+                    }
+                  }
                   return {
                     ...returnValue,
-                    onClickSummary: () => this.handleRetailVisitHistory(o),
                   }
-                }
-                return {
-                  ...returnValue,
-                }
-              })}
-            />
+                })}
+              />
+            </div>
           ) : (
             <p>No Visit Record Found</p>
           ) : (

@@ -46,6 +46,25 @@ class CodeSelect extends React.PureComponent {
     }
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (this.props.code !== nextProps.code) {
+      const { codetable, dispatch, code } = nextProps
+      const isExisted = codetable[code.toLowerCase()]
+      if (isExisted) {
+        return
+      }
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: nextProps.code.toLowerCase(),
+          temp: nextProps.temp,
+          force: nextProps.temp,
+          filter: nextProps.remoteFilter,
+        },
+      })
+    }
+  }
+
   render () {
     const { codetable, code, localFilter } = this.props
     const options =

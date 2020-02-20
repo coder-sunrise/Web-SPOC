@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -20,6 +20,7 @@ import {
   navigateDirtyCheck,
   roundTo,
 } from '@/utils/utils'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   actionDiv: {
@@ -42,6 +43,11 @@ const Detail = ({
   values,
   errors,
 }) => {
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+
   const detailProps = {
     consumableDetail,
     dispatch,
@@ -49,6 +55,7 @@ const Detail = ({
     setValues,
     values,
     errors,
+    hasActiveSession,
   }
   const stockProps = {
     consumableDetail,
@@ -56,7 +63,30 @@ const Detail = ({
     setFieldValue,
     dispatch,
     errors,
+    hasActiveSession,
   }
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    setHasActiveSession(data.length > 0)
+  }
+
+  useEffect(() => {
+    if (consumableDetail.currentId) {
+      checkHasActiveSession()
+      dispatch({
+        type: 'consumableDetail/query',
+        payload: {
+          id: consumableDetail.currentId,
+        },
+      })
+    }
+  }, [])
+
   return (
     <React.Fragment>
       {/* <NavPills
@@ -141,7 +171,10 @@ export default compose(
       }
     },
     validationSchema: Yup.object().shape({
-      // code: Yup.string().required(),
+      code: Yup.string().when('id', {
+        is: (id) => !!id,
+        then: Yup.string().trim().required(),
+      }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.string().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),

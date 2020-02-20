@@ -12,9 +12,12 @@ import {
   Checkbox,
   Button,
   DateRangePicker,
+  DatePicker,
   CodeSelect,
   ProgressButton,
 } from '@/components'
+// utils
+import { roundTo } from '@/utils/utils'
 
 const styles = () => ({
   container: {
@@ -33,18 +36,68 @@ const styles = () => ({
 @withFormik({
   mapPropsToValues: () => ({
     copayerFK: 'All Company',
-    statementDates: [
-      moment().subtract(1, 'months').startOf('month'),
-      moment().endOf('month'),
-    ],
-    statementDueDates: [
-      moment().subtract(1, 'months').startOf('month'),
-      moment().add(3, 'months').endOf('month'),
-    ],
+    statementStartDate: moment().subtract(1, 'months').startOf('month'),
+    statementEndDate: moment().endOf('month'),
+    dueStartDate: moment().subtract(1, 'months').startOf('month'),
+    dueEndDate: moment().add(3, 'months').endOf('month'),
+    // statementDates: [
+    //   moment().subtract(1, 'months').startOf('month'),
+    //   moment().endOf('month'),
+    // ],
+    // statementDueDates: [
+    //   moment().subtract(1, 'months').startOf('month'),
+    //   moment().add(3, 'months').endOf('month'),
+    // ],
   }),
   handleSubmit: (values, { setSubmitting, props }) => {
-    // submit statementNo, statementDate, statementDueDate and company
-    // back to parent component
+    const {
+      statementNo,
+      copayerFK,
+      isAllDateChecked,
+      isAllDueDateChecked,
+      // statementDates,
+      // statementDueDates,
+      statementStartDate,
+      statementEndDate,
+      dueStartDate,
+      dueEndDate,
+    } = values
+    let statementDateFrom
+    let statementDateTo
+    let statementDueDateFrom
+    let statementDueDateTo
+
+    if (!isAllDateChecked && statementStartDate && statementEndDate) {
+      // const [
+      //   fromDate,
+      //   toDate,
+      // ] = statementDates
+      statementDateFrom = statementStartDate
+      statementDateTo = statementEndDate
+    }
+
+    if (!isAllDueDateChecked && dueStartDate && dueEndDate) {
+      // const [
+      //   from,
+      //   to,
+      // ] = statementDueDates
+      statementDueDateFrom = dueStartDate
+      statementDueDateTo = dueEndDate
+    }
+    props.dispatch({
+      type: 'statement/query',
+      payload: {
+        statementNo,
+        copayerFK: typeof copayerFK === 'number' ? copayerFK : undefined,
+        lgteql_statementDate: statementDateFrom,
+        lsteql_statementDate: statementDateTo,
+        isCancelled: false,
+        apiCriteria: {
+          DueDateFrom: statementDueDateFrom,
+          DueDateTo: statementDueDateTo,
+        },
+      },
+    })
   },
 })
 class SearchBar extends PureComponent {
@@ -81,8 +134,15 @@ class SearchBar extends PureComponent {
   }
 
   render () {
-    const { classes, history, dispatch, values } = this.props
-
+    const { classes, history, dispatch, values, handleSubmit } = this.props
+    const {
+      statementStartDate,
+      statementEndDate,
+      dueStartDate,
+      dueEndDate,
+      isAllDateChecked,
+      isAllDueDateChecked,
+    } = values
     return (
       <GridContainer className={classes.container}>
         <GridItem container xs md={12}>
@@ -92,19 +152,50 @@ class SearchBar extends PureComponent {
               render={(args) => <TextField label='Statement No.' {...args} />}
             />
           </GridItem>
-          <GridItem md={6}>
+          <GridItem md={3}>
             <Field
-              name='statementDates'
-              render={(args) => {
-                return (
-                  <DateRangePicker
-                    disabled={values.isAllDateChecked}
-                    label='Statement From Date'
-                    label2='Statement To Date'
-                    {...args}
-                  />
-                )
-              }}
+              name='statementStartDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Statement From Date'
+                  disabled={isAllDateChecked}
+                  disabledDate={(d) => {
+                    const endDate = statementEndDate
+                      ? moment(statementEndDate)
+                      : undefined
+                    if (endDate) {
+                      const range = moment.duration(d.diff(endDate))
+                      const years = roundTo(range.asYears())
+                      return !d || d.isAfter(endDate) || years > 1.0
+                    }
+                    return !d
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='statementEndDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Statement To Date'
+                  disabled={isAllDateChecked}
+                  disabledDate={(d) => {
+                    const startDate = statementStartDate
+                      ? moment(statementStartDate)
+                      : undefined
+                    if (startDate) {
+                      const range = moment.duration(d.diff(startDate))
+                      const years = roundTo(range.asYears())
+                      return !d || d.isBefore(startDate) || years < -1.0
+                    }
+                    return !d
+                  }}
+                />
+              )}
             />
           </GridItem>
 
@@ -134,20 +225,48 @@ class SearchBar extends PureComponent {
               }}
             />
           </GridItem>
-
-          <GridItem md={6}>
+          <GridItem md={3}>
             <Field
-              name='statementDueDates'
-              render={(args) => {
-                return (
-                  <DateRangePicker
-                    disabled={values.isAllDueDateChecked}
-                    label='Statement Due From Date'
-                    label2='Statement Due To Date'
-                    {...args}
-                  />
-                )
-              }}
+              name='dueStartDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Statement Due From Date'
+                  disabled={isAllDueDateChecked}
+                  disabledDate={(d) => {
+                    const endDate = dueEndDate ? moment(dueEndDate) : undefined
+                    if (endDate) {
+                      const range = moment.duration(d.diff(endDate))
+                      const years = roundTo(range.asYears())
+                      return !d || d.isAfter(endDate) || years < -1.0
+                    }
+                    return !d
+                  }}
+                />
+              )}
+            />
+          </GridItem>
+          <GridItem md={3}>
+            <Field
+              name='dueEndDate'
+              render={(args) => (
+                <DatePicker
+                  {...args}
+                  label='Statement Due To Date'
+                  disabled={isAllDueDateChecked}
+                  disabledDate={(d) => {
+                    const startDate = dueStartDate
+                      ? moment(dueStartDate)
+                      : undefined
+                    if (startDate) {
+                      const range = moment.duration(d.diff(startDate))
+                      const years = roundTo(range.asYears())
+                      return !d || d.isBefore(startDate) || years > 1.0
+                    }
+                    return !d
+                  }}
+                />
+              )}
             />
           </GridItem>
 
@@ -161,57 +280,7 @@ class SearchBar extends PureComponent {
           </GridItem>
 
           <GridItem xs sm={6} md={6} lg={8}>
-            <ProgressButton
-              color='primary'
-              icon={<p />}
-              onClick={() => {
-                const {
-                  statementNo,
-                  copayerFK,
-                  isAllDateChecked,
-                  isAllDueDateChecked,
-                  statementDates,
-                  statementDueDates,
-                } = this.props.values
-                let statementDateFrom
-                let statementDateTo
-                let statementDueDateFrom
-                let statementDueDateTo
-
-                if (!isAllDateChecked && statementDates) {
-                  const [
-                    from,
-                    to,
-                  ] = statementDates
-                  statementDateFrom = from
-                  statementDateTo = to
-                }
-
-                if (!isAllDueDateChecked && statementDueDates) {
-                  const [
-                    from,
-                    to,
-                  ] = statementDueDates
-                  statementDueDateFrom = from
-                  statementDueDateTo = to
-                }
-                this.props.dispatch({
-                  type: 'statement/query',
-                  payload: {
-                    statementNo,
-                    copayerFK:
-                      typeof copayerFK === 'number' ? copayerFK : undefined,
-                    lgteql_statementDate: statementDateFrom,
-                    lsteql_statementDate: statementDateTo,
-                    isCancelled: false,
-                    apiCriteria: {
-                      DueDateFrom: statementDueDateFrom,
-                      DueDateTo: statementDueDateTo,
-                    },
-                  },
-                })
-              }}
-            >
+            <ProgressButton color='primary' icon={<p />} onClick={handleSubmit}>
               <Search />
               <FormattedMessage id='form.search' />
             </ProgressButton>

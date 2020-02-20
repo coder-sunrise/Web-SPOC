@@ -69,15 +69,15 @@ class UserProfile extends React.Component {
     })
   }
 
-  handleActionButtonClick = (event) => {
+  handleActionButtonClick = async (event) => {
     const { currentTarget } = event
     const { dispatch } = this.props
 
-    dispatch({
+    const response = await dispatch({
       type: 'settingUserProfile/fetchUserProfileByID',
       payload: { id: currentTarget.id },
     })
-    this.openModal()
+    if (response) this.openModal()
   }
 
   Cell = (row) => {
@@ -141,7 +141,7 @@ class UserProfile extends React.Component {
               render={(args) => (
                 <TextField
                   {...args}
-                  label='Name / Login Account'
+                  label='Login Account / Name'
                   autocomplete='off'
                 />
               )}

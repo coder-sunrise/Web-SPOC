@@ -1,6 +1,7 @@
 import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 import * as serviceQueue from '../services/queue'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 const convertServerRights = ({ accessRight, type, permission }) => {
   // const orgName = accessRight
@@ -67,7 +68,22 @@ const convertServerRights = ({ accessRight, type, permission }) => {
     ]
   }
 
-  return []
+  if (type === 'Field') {
+    return [
+      {
+        name,
+        rights,
+        // orgName,
+      },
+    ]
+  }
+  return [
+    {
+      name,
+      rights,
+      // orgName,
+    },
+  ]
 }
 
 const parseUserRights = (user) => {
@@ -117,8 +133,9 @@ export default {
         payload: response,
       })
     },
-    *fetchCurrent (_, { call, put }) {
+    *fetchCurrent (_, { select, call, put }) {
       let user = JSON.parse(sessionStorage.getItem('user'))
+      const clinicInfo = yield select((state) => state.clinicInfo)
       if (!user) {
         const response = yield call(queryCurrent)
         if (!response) {
@@ -129,6 +146,20 @@ export default {
           const accessRights = data.userClientAccessRightDto.reduce((a, b) => {
             return a.concat(convertServerRights(b))
           }, [])
+
+          if (
+            data.userProfileDetailDto &&
+            data.userProfileDetailDto.clinicianProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile &&
+            data.userProfileDetailDto.clinicianProfile.userProfile.userName ===
+              'demouser'
+          ) {
+            // for demo only, TODO: should have a better way to handle it
+            accessRights.push({
+              name: 'demorights',
+              rights: 'enable',
+            })
+          }
 
           user = {
             data: data.userProfileDetailDto,
