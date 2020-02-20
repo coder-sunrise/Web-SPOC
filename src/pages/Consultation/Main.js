@@ -675,14 +675,31 @@ class Main extends React.Component {
         ...v[p],
       ]
     })
-    if (v.corDoctorNote && v.corDoctorNote.length) {
-      if (exist.corDoctorNote && exist.corDoctorNote.length) {
-        exist.corDoctorNote[0].chiefComplaints = `${exist.corDoctorNote[0]
-          .chiefComplaints}<br/>${v.corDoctorNote[0].chiefComplaints}`
-        exist.corDoctorNote[0].clinicianNote = `${exist.corDoctorNote[0]
-          .clinicianNote}<br/>${v.corDoctorNote[0].clinicianNote}`
-        exist.corDoctorNote[0].plan = `${exist.corDoctorNote[0].plan}<br/>${v
-          .corDoctorNote[0].plan}`
+    if (v.corDoctorNote && v.corDoctorNote.length > 0) {
+      if (exist.corDoctorNote && exist.corDoctorNote.length > 0) {
+        const {
+          chiefComplaints = '',
+          clinicianNote = '',
+          plan = '',
+        } = exist.corDoctorNote[0]
+
+        if (chiefComplaints)
+          exist.corDoctorNote[0].chiefComplaints = `${chiefComplaints}<br/>${v
+            .corDoctorNote[0].chiefComplaints}`
+        else
+          exist.corDoctorNote[0].chiefComplaints =
+            v.corDoctorNote[0].chiefComplaints
+
+        if (clinicianNote)
+          exist.corDoctorNote[0].clinicianNote = `${clinicianNote}<br/>${v
+            .corDoctorNote[0].clinicianNote}`
+        else
+          exist.corDoctorNote[0].clinicianNote =
+            v.corDoctorNote[0].clinicianNote
+
+        if (plan)
+          exist.corDoctorNote[0].plan = `${plan}<br/>${v.corDoctorNote[0].plan}`
+        else exist.corDoctorNote[0].plan = v.corDoctorNote[0].plan
       } else {
         exist.corDoctorNote = [
           ...v.corDoctorNote,
@@ -748,6 +765,14 @@ class Main extends React.Component {
   //     },
   //   })
   // }
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+  }
 
   render () {
     const { props, state } = this
