@@ -254,6 +254,7 @@ export const SMS_STATUS_TEXT = {
   READ: 'Read',
   QUEUED: 'Queued',
   SENDING: 'Sending',
+  UNREAD: 'Unread',
 }
 
 export const CANNED_TEXT_TYPE = {

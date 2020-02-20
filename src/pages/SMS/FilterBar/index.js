@@ -16,6 +16,7 @@ import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
+import { formatDatesToUTC } from '@/utils/codes'
 
 const styles = (theme) => ({
   filterBar: {
@@ -86,10 +87,6 @@ export default compose(
       ],
       appointmentType: [],
 
-      lastVisitDate: [
-        moment().subtract(1, 'months'),
-        moment(),
-      ],
       pdpaConsent: [
         '1',
         '2',
@@ -106,7 +103,16 @@ export default compose(
         isExcludeReminderSent,
         doctor = [],
         appointmentType = [],
+
+        // patient
         pdpaConsent = [],
+        visitDate,
+        nationality,
+        noVisitDate,
+        dob,
+        ageFrom,
+        ageTo,
+        smsstatus,
       } = values
       const { dispatch, type, setSelectedRows } = props
 
@@ -169,26 +175,28 @@ export default compose(
         }
       } else {
         dispatchType = 'smsPatient'
-        let PDPAPhone = pdpaConsent.includes('1') // phone
-        let PDPAMessage = pdpaConsent.includes('2') // sms
-        let PDPAEmail = pdpaConsent.includes('3') // email
+        const pdpaphone = pdpaConsent.includes('1') // phone
+        const pdpamessage = pdpaConsent.includes('2') // sms
+        const pdpaemail = pdpaConsent.includes('3') // email
+        const formattedVisitDate = formatDatesToUTC(visitDate)
+        const formattedNoVisitDate = formatDatesToUTC(noVisitDate)
+        const formattedDOB = formatDatesToUTC(dob)
         payload = {
-          group: [
-            {
-              name: patientName,
-              patientAccountNo: patientName,
-              patientReferenceNo: patientName,
-              'ContactFkNavigation.contactNumber.number': patientName,
-              combineCondition: 'or',
-            },
-          ],
-          'in_PatientOutgoingSMS.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
-
           apiCriteria: {
-            // searchValue: patientName,
-            PDPAPhone,
-            PDPAMessage,
-            PDPAEmail,
+            searchValue: patientName,
+            visitdatefrom: formattedVisitDate[0],
+            visitdateto: formattedVisitDate[1],
+            nationality,
+            novisitdatefrom: formattedNoVisitDate[0],
+            novisitdateto: formattedNoVisitDate[1],
+            dobfrom: formattedDOB[0],
+            dobto: formattedDOB[1],
+            agefrom: ageFrom,
+            ageto: ageTo,
+            smsstatus,
+            pdpaphone,
+            pdpamessage,
+            pdpaemail,
           },
         }
       }

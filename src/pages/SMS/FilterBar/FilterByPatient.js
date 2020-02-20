@@ -14,6 +14,7 @@ import {
   GridContainer,
   CheckboxGroup,
   CodeSelect,
+  NumberInput,
 } from '@/components'
 import { smsStatus, messageStatus } from '@/utils/codes'
 
@@ -98,7 +99,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
 
       <GridItem md={4}>
         <FastField
-          name='lastVisitDate'
+          name='noVisitDate'
           render={(args) => (
             <DateRangePicker
               {...args}
@@ -110,33 +111,41 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
       </GridItem>
       <GridItem md={4}>
         <FastField
-          name='birthday'
+          name='dob'
           render={(args) => (
             <DateRangePicker {...args} label='Birthday From' label2='To' />
           )}
         />
       </GridItem>
-      <GridItem md={4}>
+      <GridItem md={2}>
         <FastField
-          name='age'
+          name='ageFrom'
           render={(args) => (
-            <DateRangePicker {...args} label='Age From' label2='To' />
+            <NumberInput {...args} label='Age From' precision={0} />
           )}
         />
       </GridItem>
 
       <GridItem md={2}>
+        <FastField
+          name='ageTo'
+          render={(args) => (
+            <NumberInput {...args} label='Age To' precision={0} />
+          )}
+        />
+      </GridItem>
+      {/* <GridItem md={2}>
         <FastField
           name='messageStatus'
           render={(args) => (
             <Select {...args} label='Message Status' options={messageStatus} />
           )}
         />
-      </GridItem>
+      </GridItem> */}
 
       <GridItem md={2}>
         <FastField
-          name='lastSMSSendStatus'
+          name='smsstatus'
           render={(args) => (
             <Select {...args} label='SMS Status' options={smsStatus} />
           )}
