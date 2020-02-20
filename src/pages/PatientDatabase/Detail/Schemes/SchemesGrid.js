@@ -57,21 +57,22 @@ class SchemesGrid extends PureComponent {
           columnName: 'schemeTypeFK',
           type: 'codeSelect',
           code: 'ctSchemeType',
-          options: (row) => {
-            const ctSchemeTypes = this.props.codetable[
-              ctSchemeType.toLowerCase()
-            ]
+          // options: (row) => {
+          //   const ctSchemeTypes =
+          //     this.props.codetable[ctSchemeType.toLowerCase()] || []
 
-            return ctSchemeTypes.filter((o) => {
-              const isMedisave =
-                [
-                  'MEDI500VISIT',
-                  'OPSCAN',
-                  'MEDI500VACCINATION',
-                ].indexOf(o.code) >= 0
-              return !isMedisave
-            })
-          },
+          //   console.log({ ctSchemeTypes })
+
+          //   return ctSchemeTypes.filter((o) => {
+          //     const isMedisave =
+          //       [
+          //         'MEDI500VISIT',
+          //         'OPSCAN',
+          //         'MEDI500VACCINATION',
+          //       ].indexOf(o.code) >= 0
+          //     return !isMedisave
+          //   })
+          // },
           sortingEnabled: false,
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
