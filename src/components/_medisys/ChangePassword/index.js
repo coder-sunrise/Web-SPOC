@@ -84,17 +84,6 @@ class ChangePassword extends React.PureComponent {
               name='currentPassword'
               render={(args) => (
                 <React.Fragment>
-                  {/*
-                    --- IMPORTANT ---
-                    do not remove below <input /> element
-                    it prevents all the other input from being
-                    autofill incorrectly by chrome
-                  */}
-                  <input
-                    className='visually-hidden'
-                    name='fake_username'
-                    value='fakefake'
-                  />
                   <TextField
                     {...args}
                     label='Current Password'
