@@ -52,7 +52,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const treatment =
       (codetable.cttreatment || [])
         .find((o) => o.id === action.dentalTreatmentFK) || {}
-    console.log(rest, this, treatment)
+    // console.log(rest, this, treatment)
 
     const existedTooths = []
     const otherTreatmentTooths = []

@@ -848,6 +848,18 @@ class Chart extends React.PureComponent {
 
                 if (selectedTooth.length === 1) {
                   if (selectedTooth[0].line !== group.line) return
+
+                  if (selectedTooth[0].name === group.name) {
+                    group
+                      .filter((o) => o.name === 'bridgeStartPoint')
+                      .map((o) => {
+                        group.remove(o)
+                      })
+                    this.canvas.renderAll()
+
+                    selectedTooth = []
+                    return
+                  }
                 }
                 selectedTooth.push(group)
               }
@@ -1097,6 +1109,7 @@ class Chart extends React.PureComponent {
       const toothItems = data.filter(
         (m) => m.toothNo === index && m.target === group.name, // && !m.hide,
       )
+      console.log(toothItems)
       _.orderBy(
         toothItems,
         [
@@ -1232,41 +1245,45 @@ class Chart extends React.PureComponent {
             o.nodes
           ) {
             // if (target) console.log(3, target, data, o)
-            if (o.toothNo === o.nodes[0]) {
+            if (o.nodes.includes(o.toothNo)) {
               const name = `bridgeLine${o.nodes[0]}-${o.nodes[1]}`
+              // console.log(this.canvas._objects.filter((m) => m.name === name))
+              if (
+                this.canvas._objects.filter((m) => m.name === name).length === 0
+              ) {
+                setTimeout(() => {
+                  const start = this.canvas._objects.find(
+                    (m) => Number(m.name) === o.nodes[0],
+                  )
+                  const end = this.canvas._objects.find(
+                    (m) => Number(m.name) === o.nodes[1],
+                  )
+                  // console.log(start, end)
+                  const line = createLine([
+                    start.translateX,
+                    start.translateY,
+                    end.translateX,
+                    end.translateY,
+                    // 10,
+                    // 10,
+                    // 30,
+                    // 30,
+                  ])
+                  // console.log(group, line)
 
-              setTimeout(() => {
-                const start = this.canvas._objects.find(
-                  (m) => Number(m.name) === o.nodes[0],
-                )
-                const end = this.canvas._objects.find(
-                  (m) => Number(m.name) === o.nodes[1],
-                )
-                // console.log(start, end)
-                const line = createLine([
-                  start.translateX,
-                  start.translateY,
-                  end.translateX,
-                  end.translateY,
-                  // 10,
-                  // 10,
-                  // 30,
-                  // 30,
-                ])
-                // console.log(group, line)
-
-                this.canvas.add(
-                  new fabric.Group(
-                    [
-                      line,
-                      // createCircle(),
-                    ],
-                    {
-                      name,
-                    },
-                  ),
-                )
-              }, 0)
+                  this.canvas.add(
+                    new fabric.Group(
+                      [
+                        line,
+                        // createCircle(),
+                      ],
+                      {
+                        name,
+                      },
+                    ),
+                  )
+                }, 0)
+              }
             }
           }
           if (target.render) {
