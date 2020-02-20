@@ -186,10 +186,24 @@ class DODetails extends PureComponent {
     filterStockMedication: [], // medication
     filterStockVaccination: [], // vaccination
     filterStockConsumable: [], // consumable
+
+    itemType: podoOrderType,
   }
 
   componentDidMount = async () => {
     const { mode, dispatch, deliveryOrderDetails } = this.props
+    const {
+      purchaseOrderDetails: { purchaseOrderOutstandingItem },
+    } = deliveryOrderDetails
+
+    const osItemType = podoOrderType.filter((type) =>
+      purchaseOrderOutstandingItem.some((osItem) =>
+        Object.prototype.hasOwnProperty.call(osItem, type.prop),
+      ),
+    )
+
+    this.setState({ itemType: osItemType })
+
     podoOrderType.forEach((x) => {
       this.setState({
         [x.stateName]: deliveryOrderDetails[x.stateName],
@@ -200,11 +214,33 @@ class DODetails extends PureComponent {
       await dispatch({
         type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
       })
-      this.props.setFieldValue(
+      await this.props.setFieldValue(
         'deliveryOrderDate',
         this.props.values.deliveryOrderDate,
       )
+      this.manuallyTriggerDirty()
     }
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
+  }
+
+  manuallyTriggerDirty = () => {
+    this.props.dispatch({
+      type: 'formik/updateState',
+      payload: {
+        deliveryOrderDetails: {
+          displayName: 'deliveryOrderDetails',
+          dirty: true,
+        },
+      },
+    })
   }
 
   handleOnOrderTypeChanged = async (e) => {
@@ -300,17 +336,17 @@ class DODetails extends PureComponent {
     // })
   }
 
-  onCommitChanges = ({ rows, deleted, changed }) => {
-    // console.log({ rows, changed })
-    const { dispatch, values } = this.props
+  onCommitChanges = async ({ rows, deleted, changed }) => {
+    const { dispatch, values, setFieldValue } = this.props
+
     if (deleted) {
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
     } else if (changed) {
       const existUid = Object.keys(changed)[0]
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
           uid: existUid,
@@ -320,7 +356,7 @@ class DODetails extends PureComponent {
         },
       })
     } else {
-      dispatch({
+      await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
           gridRow: rows[0],
@@ -328,6 +364,7 @@ class DODetails extends PureComponent {
         },
       })
     }
+    setFieldValue('isDirty', true) // manually trigger dirty
 
     return rows
   }
@@ -445,6 +482,7 @@ class DODetails extends PureComponent {
 
   render () {
     const { props } = this
+
     const {
       footer,
       values,
@@ -488,13 +526,19 @@ class DODetails extends PureComponent {
         {
           columnName: 'type',
           type: 'select',
-          options: podoOrderType,
+          options: () => this.state.itemType,
           onChange: (e) => {
             if (e.option) {
               this.handleOnOrderTypeChanged(e)
             }
           },
           isDisabled: (row) => row.id >= 0,
+          render: (row) => {
+            if (row.type) {
+              return podoOrderType.find((type) => type.value === row.type).name
+            }
+            return null
+          },
         },
         {
           columnName: 'code',

@@ -11,6 +11,7 @@ models.push(require('@/models/setting'))
 models.push(require('@/models/menu'))
 models.push(require('@/models/global'))
 models.push(require('@/models/user'))
+models.push(require('@/models/header'))
 
 models.forEach((model) => {
   initialState[model.default.namespace] = model.default.state

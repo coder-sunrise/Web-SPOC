@@ -148,7 +148,7 @@ class Layout extends PureComponent {
     }
 
     let defaultLayout
-    // console.log('userDefaultLayout', { userDefaultLayout })
+
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (true) {
@@ -382,7 +382,7 @@ class Layout extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
-    // console.log({ defaultWidgets })
+
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
     }
@@ -633,7 +633,7 @@ class Layout extends PureComponent {
       },
     }
 
-    // console.log(this.props)
+    // console.log({ currentLayout: state.currentLayout.widgets, widgets })
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>

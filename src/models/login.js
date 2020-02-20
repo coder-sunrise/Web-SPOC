@@ -38,8 +38,6 @@ export default createFormViewModel({
         }
       },
       *logout (_, { select, put }) {
-        const routing = yield select((st) => st.routing)
-
         yield put({
           type: 'global/reset',
         })
@@ -48,27 +46,6 @@ export default createFormViewModel({
         reloadAuthorized()
 
         yield put(routerRedux.push({ pathname: '/user/login' }))
-
-        // const redirect =
-        //   routing.location.pathname !== '/login'
-        //     ? routing.location.pathname + routing.location.search
-        //     : ''
-
-        // if (routing.location.pathname === '/login') {
-        //   yield put(routerRedux.push({ pathname: '/login' }))
-        // } else {
-        //   yield put(
-        //     routerRedux.push({
-        //       pathname: '/login',
-        //       search: stringify({
-        //         redirect,
-        //       }),
-        //     }),
-        //   )
-        // }
-        // yield put({
-        //   type: 'user/reset',
-        // })
         yield put({ type: 'RESET_APP_STATE' })
 
         // do not remove this line

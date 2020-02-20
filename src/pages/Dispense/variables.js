@@ -11,6 +11,7 @@ import {
   Checkbox,
   Select,
 } from '@/components'
+import CONSTANTS from './DispenseDetails/constants'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -209,7 +210,7 @@ export const PrescriptionColumnExtensions = (
           <Button
             color='primary'
             onClick={() => {
-              onPrint('Medication', row)
+              onPrint({ type: CONSTANTS.DRUG_LABEL, row })
             }}
             justIcon
           >
@@ -421,7 +422,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.unitPrice} />
+      return <NumberInput text currency showZero value={row.unitPrice} />
     },
   },
   {
@@ -433,7 +434,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.adjAmt} />
+      return <NumberInput text currency showZero value={row.adjAmt} />
     },
   },
   {
@@ -445,7 +446,14 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
       const { type } = row
       if (type !== 'Service' && type !== 'Consumable' && type !== 'Treatment')
         return 'N/A'
-      return <NumberInput text currency value={row.totalAfterItemAdjustment} />
+      return (
+        <NumberInput
+          text
+          currency
+          showZero
+          value={row.totalAfterItemAdjustment}
+        />
+      )
     },
   },
   {
@@ -454,6 +462,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
     width: 80,
     render: (r) => {
       const { type } = r
+
       if (type === 'Service' || type === 'Consumable' || type === 'Treatment')
         return null
       return (
@@ -462,7 +471,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
             color='primary'
             justIcon
             onClick={() => {
-              onPrint(type, r)
+              onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
             }}
           >
             <Print />

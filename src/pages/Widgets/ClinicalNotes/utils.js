@@ -1,36 +1,46 @@
 import { CLINIC_TYPE } from '@/utils/constants'
-import defaultConfigs, { dentalConfigs } from './config'
+// import defaultConfigs, { dentalConfigs } from './config'
+import { defaultConfigs, fieldKey, scribbleNoteTypeFieldKey } from './config'
 
 export const getConfig = (clinicInfo) => {
-  const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-  switch (clinicTypeFK) {
-    case CLINIC_TYPE.GP:
-      return defaultConfigs
-    case CLINIC_TYPE.DENTAL:
-      return dentalConfigs
-    default:
-      return defaultConfigs
-  }
+  // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+  // switch (clinicTypeFK) {
+  //   case CLINIC_TYPE.GP:
+  //     return defaultConfigs
+  //   case CLINIC_TYPE.DENTAL:
+  //     return dentalConfigs
+  //   default:
+  //     return defaultConfigs
+  // }
+  return defaultConfigs
 }
 
-export const getContent = (config) => {
+export const getContent = (config, clinicInfo) => {
+  const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
   const { fields } = config
+  const fieldName = fieldKey[clinicTypeFK]
+  const scrribleNoteTypeFieldKey =
+    scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
   return fields.map((field) => ({
     title: field.fieldTitle,
-    name: field.fieldName,
-    categoryIndex: field.scribbleNoteTypeFK,
+    name: field[fieldName],
+    categoryIndex: field[scrribleNoteTypeFieldKey],
     ...field,
   }))
 }
 
-export const getDefaultActivePanel = (entity, config, prefix) => {
+export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
   try {
+    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     const { fields } = config
+    const fieldName = fieldKey[clinicTypeFK]
+    const scrribleNoteTypeFieldKey =
+      scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
 
     const { corScribbleNotes = [] } = entity
     const notes = entity[prefix] || []
 
-    let defaultActive = fields.map((field) => field.index)
+    let defaultActive = []
 
     if (notes.length === 0 && corScribbleNotes.length === 0) return []
 
@@ -38,7 +48,7 @@ export const getDefaultActivePanel = (entity, config, prefix) => {
     if (notes.length > 0) {
       const doctorNote = { ...notes[0] }
       const panelWithData = fields.filter((field) => {
-        if (doctorNote[field.fieldName]) return true
+        if (doctorNote[field[fieldName]]) return true
         return false
       })
       defaultActive = panelWithData.map((i) => i.index)
@@ -48,7 +58,7 @@ export const getDefaultActivePanel = (entity, config, prefix) => {
     if (corScribbleNotes.length > 0) {
       const panelWithScribble = fields.filter((field) => {
         const data = corScribbleNotes.filter(
-          (sn) => sn.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
+          (sn) => sn.scribbleNoteTypeFK === field[scrribleNoteTypeFieldKey],
         )
         return data.length > 0
       })
@@ -62,7 +72,6 @@ export const getDefaultActivePanel = (entity, config, prefix) => {
     const result = [
       ...new Set(defaultActive),
     ]
-
     return result
   } catch (error) {
     console.error(error)

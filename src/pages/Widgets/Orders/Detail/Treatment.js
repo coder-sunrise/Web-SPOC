@@ -48,11 +48,12 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const { entity = {} } = orders
     const { rows } = orders
     // console.log(action, data, rows)
-    // console.log(rest, this)
 
     const treatment =
       (codetable.cttreatment || [])
         .find((o) => o.id === action.dentalTreatmentFK) || {}
+    console.log(rest, this, treatment)
+
     const existedTooths = []
     const otherTreatmentTooths = []
     rows
@@ -171,6 +172,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
   }),
   handleReset: () => {
     const { setValues, orders } = this.props
+
     setValues({
       ...orders.defaultTreatment,
       type: orders.type,
@@ -269,10 +271,10 @@ class Treatment extends PureComponent {
 
   changeTreatment = (option = {}) => {
     const { setFieldValue } = this.props
-
     const { sellingPrice } = option
 
     setFieldValue('unitPrice', sellingPrice)
+    setFieldValue('itemName', option.displayValue)
   }
 
   updateValueToStore = (vals) => {
@@ -317,6 +319,7 @@ class Treatment extends PureComponent {
       codetable = {},
       footer,
       handleSubmit,
+      handleReset,
       from,
     } = this.props
     // const {
@@ -391,7 +394,7 @@ class Treatment extends PureComponent {
                 )}
               />
             )}
-            <FastField
+            <Field
               name='treatmentFK'
               render={(args) => (
                 <Select
@@ -409,9 +412,9 @@ class Treatment extends PureComponent {
                   labelField='displayValue'
                   label='Treatment'
                   disabled={isDoctor}
-                  // onChange={(v, op) => {
-                  //   this.changeTreatment(op)
-                  // }}
+                  onChange={(v, op) => {
+                    this.changeTreatment(op)
+                  }}
                   {...args}
                 />
               )}
@@ -467,7 +470,7 @@ class Treatment extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
-          onReset: this.handleReset,
+          onReset: handleReset,
         })}
       </div>
     )

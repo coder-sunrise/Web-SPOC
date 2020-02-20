@@ -167,7 +167,11 @@ class Banner extends PureComponent {
     let isSaveToDb = true
     dispatch({
       type: 'patient/refreshChasBalance',
-      payload: { ...entity, patientCoPaymentSchemeFK, isSaveToDb },
+      payload: { ...entity,
+        patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId: entity.id,
+      },
     }).then((result) => {
       // console.log('result ==========', result)
       if (result) {
@@ -491,7 +495,7 @@ class Banner extends PureComponent {
                 }
                 body={
                   <div>
-                    {entity.patientScheme.length &&
+                    {entity.patientScheme.length > 0 &&
                     entity.patientScheme.filter((o) => o.schemeTypeFK <= 6)
                       .length > 0 ? (
                       entity.patientScheme

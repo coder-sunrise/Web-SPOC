@@ -143,7 +143,7 @@ const sendNotification = (type, data) => {
   data.sender = user.data.clinicianProfile.name
   data.senderId = user.data.id
   data.timestamp = Date.now()
-  data.qid = data.qid || 'xx.x'
+
   connection.invoke('SendNotification', type, data).catch((err) => {
     return console.error(err)
   })

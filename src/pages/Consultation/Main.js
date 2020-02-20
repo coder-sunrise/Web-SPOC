@@ -251,6 +251,15 @@ class Main extends React.Component {
     }, 500)
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
+  }
+
   shouldComponentUpdate = (nextProps) => {
     if (nextProps.values.id !== this.props.values.id) return true
     if (nextProps.consultation.version !== this.props.consultation.version)

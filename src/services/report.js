@@ -4,6 +4,13 @@ import { convertToQuery, commonDataWriterTransform } from '@/utils/utils'
 import { REPORT_TYPE } from '@/utils/constants'
 // static data
 // import { QueueListingDummyData } from '@/pages/Report/dummyData'
+const reportContextUrl = '/api/Reports/context'
+
+export const getReportContext = async (reportID) => {
+  return request(`${reportContextUrl}/${reportID}`, {
+    method: 'GET',
+  })
+}
 
 export const getRawData = async (reportID, payload) => {
   const baseRawDataURL = '/api/reports/datas'
@@ -27,7 +34,9 @@ export const getPDF = async (reportID, payload) => {
     },
     body: stringify({
       reportFormat: 'Pdf',
-      reportParameters: JSON.stringify({ ...commonDataWriterTransform(payload) }),
+      reportParameters: JSON.stringify({
+        ...commonDataWriterTransform(payload),
+      }),
     }),
   })
 }
@@ -55,7 +64,9 @@ export const getExcel = async (reportID, payload) => {
     },
     body: stringify({
       reportFormat: 'Excel',
-      reportParameters: JSON.stringify({ ...commonDataWriterTransform(payload) }),
+      reportParameters: JSON.stringify({
+        ...commonDataWriterTransform(payload),
+      }),
     }),
   })
 }
@@ -87,9 +98,12 @@ export const getPatientListingReport = async (payload) => {
   const url = '/api/reports/2'
   return request(url, {
     method: 'GET',
-    body: convertToQuery({ reportParameters: commonDataWriterTransform(payload) }, [
-      'reportParameters',
-    ]),
+    body: convertToQuery(
+      { reportParameters: commonDataWriterTransform(payload) },
+      [
+        'reportParameters',
+      ],
+    ),
   })
 }
 

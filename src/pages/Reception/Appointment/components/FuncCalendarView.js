@@ -58,7 +58,7 @@ const maxTime = new Date(
   today.getFullYear(),
   today.getMonth(),
   today.getDate(),
-  19,
+  21,
   0,
   0,
 )
@@ -292,7 +292,7 @@ const CalendarView = ({
       <Event
         {...eventProps}
         // calendarView={calendarView}
-        handleMouseOver={handleEventMouseOver}
+        // handleMouseOver={handleEventMouseOver}
       />
     )
   }

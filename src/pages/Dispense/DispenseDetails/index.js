@@ -32,6 +32,8 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import CONSTANTS from './constants'
+
 import { dangerColor } from '@/assets/jss'
 // const styles = (theme) => ({
 //   gridRow: {
@@ -79,6 +81,7 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  sendingJob,
   onReloadClick,
   onSaveClick,
   onEditOrderClick,
@@ -250,20 +253,22 @@ const DispenseDetails = ({
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Medications')
+              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Drug Label
           </Button>
           <Button
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Patient')
+              onPrint({ type: CONSTANTS.PATIENT_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
         </GridItem>
