@@ -137,7 +137,7 @@ class PatientHistory extends Component {
     this.widgets = [
       {
         id: '1',
-        name: 'Clinical Notes',
+        name: 'Clinical Examinations',
         component: Loadable({
           loader: () => import('./ClinicalNotes'),
           render: (loaded, p) => {
@@ -518,7 +518,7 @@ class PatientHistory extends Component {
                 mode='multiple'
                 // maxTagCount={4}
                 options={[
-                  { name: 'Clinical Notes', value: '1' },
+                  { name: 'Clinical Examinations', value: '1' },
                   { name: 'Chief Complaints', value: '2' },
                   { name: 'Plan', value: '3' },
                   { name: 'Diagnosis', value: '4' },
