@@ -59,7 +59,7 @@ class FilterBar extends PureComponent {
         <GridContainer>
           <GridItem xs sm={12} md={4}>
             <FastField
-              name='ExpenseType'
+              name='patientSearchValue'
               render={(args) => {
                 return (
                   <TextField
@@ -122,41 +122,26 @@ class FilterBar extends PureComponent {
                 color='primary'
                 onClick={() => {
                   const {
+                    patientSearchValue,
                     transactionDates,
-                    ExpenseType,
                     transactionOnly,
                   } = this.props.values
 
                   const showTransactionOnly = transactionOnly === true
-                  // console.log('showTransactionOnly', showTransactionOnly)
+
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[0]
-                        : undefined,
-                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate': transactionDates
-                        ? transactionDates[1]
-                        : undefined,
                       apiCriteria: {
-                        // searchValue: ExpenseType,
-                        OnlyWithDeposit: showTransactionOnly,
-                        // startDate: transactionDates
-                        //   ? transactionDates[0]
-                        //   : undefined,
-                        // endDate: transactionDates
-                        //   ? transactionDates[1]
-                        //   : undefined,
+                        searchValue: patientSearchValue || undefined,
+                        onlyWithDeposit: showTransactionOnly,
+                        startDate: transactionDates
+                          ? transactionDates[0]
+                          : undefined,
+                        endDate: transactionDates
+                          ? transactionDates[1]
+                          : undefined,
                       },
-                      group: [
-                        {
-                          'contactFkNavigation.contactNumber.number': ExpenseType,
-                          patientReferenceNo: ExpenseType,
-                          patientAccountNo: ExpenseType,
-                          name: ExpenseType,
-                          combineCondition: 'or',
-                        },
-                      ],
                     },
                   })
                 }}
