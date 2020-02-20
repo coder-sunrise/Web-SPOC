@@ -40,7 +40,7 @@ function CardContainer ({
         <h4
           style={{
             position: 'absolute',
-            top: -13,
+            top: -17,
             display: 'block',
             backgroundColor: 'inherit',
             left: 20,

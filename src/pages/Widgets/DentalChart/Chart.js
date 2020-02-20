@@ -975,18 +975,20 @@ class Chart extends React.PureComponent {
   resize = (props) => {
     const { dentalChartComponent, global } = props || this.props
     setTimeout(() => {
-      const width = this.divContainer.current.offsetWidth
+      if (this.divContainer && this.divContainer.current) {
+        const width = this.divContainer.current.offsetWidth
 
-      if (
-        width !== this.state.width ||
-        dentalChartComponent.isPedoChart !== this.state.isPedoChart
-      ) {
-        this.setState({
-          width,
-          isPedoChart: dentalChartComponent.isPedoChart,
-        })
-        this.canvas.setDimensions(this.getCanvasSize(props))
-        this.canvas.setZoom(width / 2200)
+        if (
+          width !== this.state.width ||
+          dentalChartComponent.isPedoChart !== this.state.isPedoChart
+        ) {
+          this.setState({
+            width,
+            isPedoChart: dentalChartComponent.isPedoChart,
+          })
+          this.canvas.setDimensions(this.getCanvasSize(props))
+          this.canvas.setZoom(width / 2200)
+        }
       }
     }, 1)
   }
