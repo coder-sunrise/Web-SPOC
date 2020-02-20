@@ -473,7 +473,7 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        <Popover
+        {/* <Popover
           id='event-popup'
           className={classes.popover}
           open={showPopup}
@@ -481,14 +481,14 @@ class Appointment extends React.PureComponent {
           onClose={this.handleClosePopover}
           placement='top-start'
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: 'center',
+            horizontal: 'right',
           }}
           transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
+            vertical: 'center',
+            horizontal: 'left',
           }}
-          disableRestoreFocus
+          // disableRestoreFocus
         >
           {popoverEvent.doctor ? (
             <DoctorBlockPopover
@@ -498,7 +498,7 @@ class Appointment extends React.PureComponent {
           ) : (
             <ApptPopover popoverEvent={popoverEvent} />
           )}
-        </Popover>
+        </Popover> */}
 
         <FilterBar
           loading={calendarLoading}
