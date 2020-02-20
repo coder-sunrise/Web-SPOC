@@ -136,6 +136,7 @@ export const mapPropsToValues = ({
     ? `${user.clinicianProfile.title} `
     : ''
   let values = {
+    search: '',
     patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,
     patientName: _patientName,
@@ -199,6 +200,7 @@ export const mapPropsToValues = ({
         : ''
       values = {
         ...restViewingAppointment,
+        search: '',
         patientContactNo,
         patientName,
         patientAccountNo,
