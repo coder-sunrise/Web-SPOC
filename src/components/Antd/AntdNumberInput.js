@@ -498,7 +498,13 @@ class AntdNumberInput extends React.PureComponent {
             }
           }
         }
-        if (!Number(v) && this.state.value === '' && v !== '-') return ''
+        if (
+          Number(v) !== 0 &&
+          !Number(v) &&
+          this.state.value === '' &&
+          v !== '-'
+        )
+          return ''
         // if (format && v !== '-') {
         //   if (format.lastIndexOf('.') > 0) {
         //     v = `${v}`.replace('.', '')
