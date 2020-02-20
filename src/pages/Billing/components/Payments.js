@@ -59,7 +59,6 @@ const Payments = ({
             size='sm'
             className={classes.printerButton}
             onClick={onPrintClick}
-            disabled={item.isCancelled}
           >
             <Print />
           </Button>
@@ -96,7 +95,6 @@ const Payments = ({
             }
             onCancelClick={handleCancelClick}
             onConfirmDelete={handleConfirmDelete}
-            disabled={item.isCancelled}
           />
         </GridItem>
 
