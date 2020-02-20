@@ -142,6 +142,7 @@ export const REPORT_TYPE = {
   26: 'Purchase Order',
   27: 'Patient Label',
   29: 'Payment Receipt',
+  37: 'Inventory Trending Report',
 }
 
 export const INVOICE_STATUS = {
