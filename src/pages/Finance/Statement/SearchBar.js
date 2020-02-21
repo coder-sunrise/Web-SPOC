@@ -11,13 +11,10 @@ import {
   TextField,
   Checkbox,
   Button,
-  DateRangePicker,
-  DatePicker,
   CodeSelect,
   ProgressButton,
 } from '@/components'
-// utils
-import { roundTo } from '@/utils/utils'
+import { FilterBarDate } from '@/components/_medisys'
 
 const styles = () => ({
   container: {
@@ -156,20 +153,14 @@ class SearchBar extends PureComponent {
             <Field
               name='statementStartDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
+                <FilterBarDate
+                  noTodayLimit
+                  args={args}
                   label='Statement From Date'
                   disabled={isAllDateChecked}
-                  disabledDate={(d) => {
-                    const endDate = statementEndDate
-                      ? moment(statementEndDate)
-                      : undefined
-                    if (endDate) {
-                      const range = moment.duration(d.diff(endDate))
-                      const years = roundTo(range.asYears())
-                      return !d || d.isAfter(endDate) || years > 1.0
-                    }
-                    return !d
+                  formValues={{
+                    startDate: statementStartDate,
+                    endDate: statementEndDate,
                   }}
                 />
               )}
@@ -179,20 +170,15 @@ class SearchBar extends PureComponent {
             <Field
               name='statementEndDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
+                <FilterBarDate
+                  isEndDate
+                  noTodayLimit
+                  args={args}
                   label='Statement To Date'
                   disabled={isAllDateChecked}
-                  disabledDate={(d) => {
-                    const startDate = statementStartDate
-                      ? moment(statementStartDate)
-                      : undefined
-                    if (startDate) {
-                      const range = moment.duration(d.diff(startDate))
-                      const years = roundTo(range.asYears())
-                      return !d || d.isBefore(startDate) || years < -1.0
-                    }
-                    return !d
+                  formValues={{
+                    startDate: statementStartDate,
+                    endDate: statementEndDate,
                   }}
                 />
               )}
@@ -229,19 +215,12 @@ class SearchBar extends PureComponent {
             <Field
               name='dueStartDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
+                <FilterBarDate
+                  noTodayLimit
+                  args={args}
                   label='Statement Due From Date'
                   disabled={isAllDueDateChecked}
-                  disabledDate={(d) => {
-                    const endDate = dueEndDate ? moment(dueEndDate) : undefined
-                    if (endDate) {
-                      const range = moment.duration(d.diff(endDate))
-                      const years = roundTo(range.asYears())
-                      return !d || d.isAfter(endDate) || years < -1.0
-                    }
-                    return !d
-                  }}
+                  formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
                 />
               )}
             />
@@ -250,21 +229,13 @@ class SearchBar extends PureComponent {
             <Field
               name='dueEndDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
-                  label='Statement Due To Date'
+                <FilterBarDate
+                  label='Statement Due End Date'
+                  isEndDate
+                  noTodayLimit
+                  args={args}
                   disabled={isAllDueDateChecked}
-                  disabledDate={(d) => {
-                    const startDate = dueStartDate
-                      ? moment(dueStartDate)
-                      : undefined
-                    if (startDate) {
-                      const range = moment.duration(d.diff(startDate))
-                      const years = roundTo(range.asYears())
-                      return !d || d.isBefore(startDate) || years > 1.0
-                    }
-                    return !d
-                  }}
+                  formValues={{ startDate: dueStartDate, endDate: dueEndDate }}
                 />
               )}
             />
