@@ -1,8 +1,9 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect } from 'react'
 import { formatMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
+import moment from 'moment'
 
 import {
   Button,
@@ -21,7 +22,12 @@ import {
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
 
-const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
+const FilterBar = ({
+  values,
+  handleSubmit,
+  handleAddAppointmentClick,
+  dispatch,
+}) => {
   const {
     filterByDoctor = [],
     filterByApptType = [],
@@ -36,11 +42,22 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
     filterByAppointmentStatus.length <= 1 ? 1 : 0
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: 'appointment/updateState',
+        payload: {
+          list: [],
+        },
+      })
+    }
+  }, [])
+
   return (
     <GridContainer>
       <GridItem md={6}>
         <FastField
-          name='search'
+          name='searchValue'
           render={(args) => (
             <TextField
               {...args}
@@ -58,14 +75,14 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
             <CodeSelect
               {...args}
               // allLabel='All Doctors'
-              disableAll
+              // disableAll
               // allValue={-99}
-              // allValueOption={{
-              //   clinicianProfile: {
-              //     name: 'All',
-              //     id: -99,
-              //   },
-              // }}
+              allValueOption={{
+                clinicianProfile: {
+                  name: 'All',
+                  id: -99,
+                },
+              }}
               allowClear={false}
               label='Filter by Doctor'
               mode='multiple'
@@ -79,7 +96,6 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
               labelField='clinicianProfile.name'
               valueField='clinicianProfile.id'
               maxTagCount={maxDoctorTagCount}
-              maxSelected={5}
               maxTagPlaceholder='doctors'
               renderDropdown={renderDropdown}
             />
@@ -115,7 +131,15 @@ const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
         <Field
           name='bookBy'
           render={(args) => {
-            return <ClinicianSelect label='Book By' {...args} />
+            return (
+              <ClinicianSelect
+                label='Book By'
+                noDefaultValue
+                mode='multiple'
+                maxTagPlaceholder='book by'
+                {...args}
+              />
+            )
           }}
         />
       </GridItem>
@@ -199,11 +223,39 @@ export default memo(
     enableReinitialize: true,
     handleSubmit: (values, { props }) => {
       const { dispatch } = props
-      const payload = {}
+      const {
+        filterByDoctor = [],
+        filterByRoomBlockGroup = [],
+        filterByApptType = [],
+        filterByAppointmentStatus = [],
+        bookBy = [],
+        bookOn,
+        searchValue,
+        apptDate,
+      } = values
+
       dispatch({
         type: 'appointment/query',
-        payload,
-      }).then((r) => {})
+        payload: {
+          apiCriteria: {
+            searchValue,
+            bookBy: bookBy.join() || undefined,
+            bookOn,
+            apptDateFrom:
+              apptDate && apptDate.length > 0
+                ? moment(apptDate[0]).formatUTC()
+                : undefined,
+            apptDateTo:
+              apptDate && apptDate.length > 0
+                ? moment(apptDate[1]).formatUTC(false)
+                : undefined,
+            doctor: filterByDoctor.join() || undefined,
+            room: filterByRoomBlockGroup.join() || undefined,
+            appType: filterByApptType.join() || undefined,
+            appStatus: filterByAppointmentStatus.join() || undefined,
+          },
+        },
+      })
     },
   })(FilterBar),
 )

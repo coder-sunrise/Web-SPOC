@@ -6,7 +6,7 @@ import CodeSelect from './CodeSelect'
 @connect(({ codetable, user }) => ({ codetable, user }))
 class ClinicianSelect extends React.PureComponent {
   render () {
-    const { field, form, codetable, user, label } = this.props
+    const { field, form, codetable, user, label, noDefaultValue } = this.props
     if (
       field &&
       !field.value &&
@@ -14,7 +14,9 @@ class ClinicianSelect extends React.PureComponent {
       user.data.clinicianProfile &&
       user.data.clinicianProfile.userProfileFK
     ) {
-      form.setFieldValue(field.name, user.data.clinicianProfile.userProfileFK)
+      if (!noDefaultValue) {
+        form.setFieldValue(field.name, user.data.clinicianProfile.userProfileFK)
+      }
     }
     return (
       <CodeSelect
