@@ -411,8 +411,8 @@ class DODetails extends PureComponent {
   }
 
   getItemOptions = (row, filteredStateName, stateName) => {
-    const { code, isNew } = row
-    if (code !== '') {
+    const { code, name, isNew } = row
+    if (code && name) {
       return this.state[stateName].filter((o) => o.value === code)
     }
     return isNew ? this.state[filteredStateName] : this.state[stateName]
@@ -456,26 +456,28 @@ class DODetails extends PureComponent {
       VaccinationItemList = [],
     } = this.props.deliveryOrderDetails
 
-    if (row.type === 1) {
-      return this.getOptions(
-        this.state.MedicationItemList,
-        MedicationItemList,
-        row,
-      )
-    }
-    if (row.type === 2) {
-      return this.getOptions(
-        this.state.ConsumableItemList,
-        ConsumableItemList,
-        row,
-      )
-    }
-    if (row.type === 3) {
-      return this.getOptions(
-        this.state.VaccinationItemList,
-        VaccinationItemList,
-        row,
-      )
+    if (row.code && row.name) {
+      if (row.type === 1) {
+        return this.getOptions(
+          this.state.MedicationItemList,
+          MedicationItemList,
+          row,
+        )
+      }
+      if (row.type === 2) {
+        return this.getOptions(
+          this.state.ConsumableItemList,
+          ConsumableItemList,
+          row,
+        )
+      }
+      if (row.type === 3) {
+        return this.getOptions(
+          this.state.VaccinationItemList,
+          VaccinationItemList,
+          row,
+        )
+      }
     }
 
     return []
