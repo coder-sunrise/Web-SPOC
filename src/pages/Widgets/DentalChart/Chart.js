@@ -1109,7 +1109,7 @@ class Chart extends React.PureComponent {
       const toothItems = data.filter(
         (m) => m.toothNo === index && m.target === group.name, // && !m.hide,
       )
-      console.log(toothItems)
+      // console.log(toothItems)
       _.orderBy(
         toothItems,
         [
