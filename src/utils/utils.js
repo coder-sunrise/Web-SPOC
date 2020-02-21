@@ -1109,7 +1109,7 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
     if (Array.isArray(data)) {
       if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
       data.forEach((element) => {
-        commonDataReaderTransform(element)
+        commonDataReaderTransform(element, fieldName, keepNull)
       })
     } else {
       for (let field in data) {
@@ -1126,12 +1126,16 @@ const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
               ])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
-                commonDataReaderTransform(data[field][subfield])
+                commonDataReaderTransform(
+                  data[field][subfield],
+                  fieldName,
+                  keepNull,
+                )
               }
             }
           }
           if (typeof v === 'object') {
-            commonDataReaderTransform(data[field])
+            commonDataReaderTransform(data[field], fieldName, keepNull)
           } else if (
             typeof v === 'string' &&
             regDate.test(v) &&

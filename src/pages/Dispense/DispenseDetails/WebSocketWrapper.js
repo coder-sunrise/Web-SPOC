@@ -11,7 +11,7 @@ import {
   queryDrugLabelsDetails,
 } from '@/services/dispense'
 import CONSTANTS from './constants'
-import { PRINTING_TOOL_REPORT_ID, REPORT_ID } from '@/utils/constants'
+import { REPORT_ID } from '@/utils/constants'
 
 const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
   const withoutPrintPreview = [

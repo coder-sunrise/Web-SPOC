@@ -17,6 +17,7 @@ export const getRawData = async (reportID, payload) => {
 
   return request(`${baseRawDataURL}/${reportID}`, {
     method: 'GET',
+    keepNull: true,
     body: {
       reportParameters: JSON.stringify({
         ...commonDataWriterTransform(payload),
