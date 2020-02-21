@@ -26,11 +26,7 @@ const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
   name: Yup.number().required(),
-  batchNo: Yup.array().when('expiryDate', {
-    is: (v) => v === undefined || v === '',
-    then: Yup.array().nullable(),
-    otherwise: Yup.array().required(),
-  }),
+  batchNo: Yup.string().required(),
   expiryDate: Yup.string().nullable(),
 
   // orderQty: Yup.number().required(),
@@ -265,6 +261,10 @@ class DODetails extends PureComponent {
     )
 
     if (osItem) {
+      const defaultBatch = this.getBatchStock(row).find(
+        (batch) => batch.isDefault,
+      )
+      if (defaultBatch) row.batchNo = defaultBatch.batchNo
       row.orderQuantity = osItem.orderQuantity
       row.bonusQuantity = osItem.bonusQuantity
       row.quantityReceived = osItem.quantityReceived
@@ -443,6 +443,44 @@ class DODetails extends PureComponent {
     return []
   }
 
+  getOptions = (stateItemList, storeItemList, row) => {
+    const stateArray = stateItemList
+    const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
+    return selectedArray.find((o) => o.itemFK === row.code).stock
+  }
+
+  getBatchStock = (row) => {
+    const {
+      MedicationItemList = [],
+      ConsumableItemList = [],
+      VaccinationItemList = [],
+    } = this.props.deliveryOrderDetails
+
+    if (row.type === 1) {
+      return this.getOptions(
+        this.state.MedicationItemList,
+        MedicationItemList,
+        row,
+      )
+    }
+    if (row.type === 2) {
+      return this.getOptions(
+        this.state.ConsumableItemList,
+        ConsumableItemList,
+        row,
+      )
+    }
+    if (row.type === 3) {
+      return this.getOptions(
+        this.state.VaccinationItemList,
+        VaccinationItemList,
+        row,
+      )
+    }
+
+    return []
+  }
+
   render () {
     const { props } = this
     const {
@@ -459,12 +497,6 @@ class DODetails extends PureComponent {
       VaccinationItemList = [],
     } = deliveryOrderDetails
     const { rows } = values
-
-    const getOptions = (stateItemList, storeItemList, row) => {
-      const stateArray = stateItemList
-      const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
-      return selectedArray.find((o) => o.itemFK === row.code).stock
-    }
 
     const tableParas = {
       columns: [
@@ -596,31 +628,7 @@ class DODetails extends PureComponent {
           maxSelected: 1,
           labelField: 'batchNo',
           disableAll: true,
-          options: (row) => {
-            if (row.type === 1) {
-              return getOptions(
-                this.state.MedicationItemList,
-                MedicationItemList,
-                row,
-              )
-            }
-
-            if (row.type === 2) {
-              return getOptions(
-                this.state.ConsumableItemList,
-                ConsumableItemList,
-                row,
-              )
-            }
-            if (row.type === 3) {
-              return getOptions(
-                this.state.VaccinationItemList,
-                VaccinationItemList,
-                row,
-              )
-            }
-            return []
-          },
+          options: this.getBatchStock,
           onChange: (e) => {
             // this.handleSelectedBatch(e)
           },
