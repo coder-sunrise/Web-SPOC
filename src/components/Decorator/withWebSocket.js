@@ -137,9 +137,9 @@ const withWebSocket = () => (Component) => {
             this.initializeWebSocket(isFirstLoad)
           }
 
-          this.wsConnection.onerror = (event) => {
-            console.log('WebSocket error: ', event)
-          }
+          // this.wsConnection.onerror = (event) => {
+          //   console.log('WebSocket error: ', event)
+          // }
         }
       } else {
         this.sendJobToWebSocket()
