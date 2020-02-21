@@ -103,6 +103,7 @@ const styles = (theme) => ({
 const Thumbnail = ({
   classes,
   index,
+  indexInAllAttachments,
   isReadOnly = false,
   simple,
   attachment,
@@ -256,7 +257,7 @@ const Thumbnail = ({
           <GridItem md={12}>
             <SizeContainer size='sm'>
               <FastField
-                name={`${fieldName}[${index}].remark`}
+                name={`${fieldName}[${indexInAllAttachments}].remark`}
                 render={(args) => (
                   <TextField
                     {...args}

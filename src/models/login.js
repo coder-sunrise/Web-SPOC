@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { createFormViewModel } from 'medisys-model'
-import { routerRedux } from 'dva/router'
+import router from 'umi/router'
 // services
 import * as service from '@/services/login'
 // utils
@@ -37,7 +37,7 @@ export default createFormViewModel({
           })
         }
       },
-      *logout (_, { select, put }) {
+      *logout (_, { put }) {
         yield put({
           type: 'global/reset',
         })
@@ -45,11 +45,10 @@ export default createFormViewModel({
         sessionStorage.clear()
         reloadAuthorized()
 
-        yield put(routerRedux.push({ pathname: '/user/login' }))
-        yield put({ type: 'RESET_APP_STATE' })
+        // yield put({ type: 'RESET_APP_STATE' })
+        router.push('/user/login')
+        window.location.reload(true)
 
-        // do not remove this line
-        console.log('logout log')
         return true
       },
     },
