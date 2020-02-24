@@ -117,6 +117,7 @@ export default {
   'menu.setting.newuserprofile': 'Add User Profile',
   'menu.setting.edituserprofile': 'Edit User Profile',
   'menu.setting.userrole': 'User Role',
+  'menu.setting.newuserrole': 'New',
   'menu.setting.revenuecategory': 'Revenue Category',
   'menu.setting.servicecenter': 'Service Center',
   'menu.setting.servicecentercategory': 'Service Center Category',
