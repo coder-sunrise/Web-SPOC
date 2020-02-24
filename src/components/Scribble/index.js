@@ -134,7 +134,7 @@ let temp = null
       thumbnail: values.thumbnail,
       temp,
     }
-    console.log({ payload })
+    // console.log({ payload })
     props.addScribble(payload)
     props.toggleScribbleModal()
   },

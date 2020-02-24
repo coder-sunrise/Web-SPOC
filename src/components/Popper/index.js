@@ -84,7 +84,7 @@ export default ({
         style={{ zIndex: 1500 }}
         {...props}
       >
-        {({ TransitionProps, placement }) => {
+        {({ TransitionProps, p }) => {
           if (disabledTransition) return popperContainer
 
           return <Grow {...TransitionProps}>{popperContainer}</Grow>

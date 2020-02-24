@@ -17,24 +17,21 @@ export const AccessRightConfig = {
       columnName: 'permission',
       type: 'select',
       align: 'center',
+      width: 150,
       sortingEnabled: false,
       render: (row) => {
         // console.log(row)
         return (
-          <GridContainer style={{ justifyContent: 'center' }}>
-            <GridItem md={6}>
-              <Select
-                value={row.permission}
-                options={[
-                  { name: 'ReadWrite', value: 0 },
-                  { name: 'ReadOnly', value: 1 },
-                  { name: 'Enabled', value: 2 },
-                  { name: 'Disabled', value: 3 },
-                  { name: 'Hidden', value: 4 },
-                ]}
-              />
-            </GridItem>
-          </GridContainer>
+          <Select
+            value={row.permission}
+            options={[
+              { name: 'ReadWrite', value: 0 },
+              { name: 'ReadOnly', value: 1 },
+              { name: 'Enabled', value: 2 },
+              { name: 'Disabled', value: 3 },
+              { name: 'Hidden', value: 4 },
+            ]}
+          />
         )
       },
     },

@@ -128,17 +128,7 @@ const CannedTextButton = ({
         </LoadingWrapper>
       }
     >
-      <Button
-        color='info'
-        style={{
-          position: 'absolute',
-          zIndex: 1,
-          left: 435,
-          right: 0,
-          top: 10,
-        }}
-        onClick={handleMainButtonClick}
-      >
+      <Button color='info' onClick={handleMainButtonClick}>
         Canned Text
       </Button>
     </Popover>

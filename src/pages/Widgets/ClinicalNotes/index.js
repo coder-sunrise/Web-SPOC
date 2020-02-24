@@ -242,13 +242,19 @@ class ClinicalNotes extends Component {
     const { category, arrayName, config } = this.state
     const { fields } = config
     let previousData = this.form.values.corScribbleNotes
-    const { clinicInfo } = this.props
-    const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-
+    // const { clinicInfo } = this.props
+    // const fieldName = fieldKey.category // [clinicInfo.clinicTypeFK]
+    // console.log(
+    //   fieldKey[clinicInfo.clinicTypeFK],
+    //   fieldKey,
+    //   fields,
+    //   fieldName,
+    //   scriblenotes,
+    // )
     const currentScribbleNoteData = fields.reduce(
       (result, field) => ({
         ...result,
-        [field[fieldName]]: scriblenotes[field[fieldName]][field.scribbleField],
+        [field.category]: scriblenotes[field.category][field.scribbleField],
       }),
       {},
     )
@@ -555,32 +561,39 @@ class ClinicalNotes extends Component {
                       render={(args) => {
                         return (
                           <div>
-                            <ScribbleNoteItem
-                              editorButtonStyle={{
+                            <div
+                              style={{
                                 position: 'absolute',
                                 zIndex: 1,
                                 left: 305,
                                 right: 0,
                                 top: 10,
                               }}
-                              scribbleNoteUpdateState={
-                                this.scribbleNoteUpdateState
-                              }
-                              category={item.category}
-                              arrayName={item.scribbleField}
-                              categoryIndex={item[scrribleNoteTypeFieldKey]}
-                              scribbleNoteArray={
-                                scriblenotes[item.category][item.scribbleField]
-                              }
-                              gridItemWidth={this.state.width}
-                            />
+                            >
+                              <ScribbleNoteItem
+                                scribbleNoteUpdateState={
+                                  this.scribbleNoteUpdateState
+                                }
+                                category={item.category}
+                                arrayName={item.scribbleField}
+                                categoryIndex={item[scrribleNoteTypeFieldKey]}
+                                scribbleNoteArray={
+                                  scriblenotes[item.category][
+                                    item.scribbleField
+                                  ]
+                                }
+                                gridItemWidth={this.state.width}
+                              />
 
-                            <CannedTextButton
-                              onSettingClick={onSettingClick}
-                              onCannedTextClick={onCannedTextClick}
-                              cannedTextTypeFK={item.cannedTextTypeFK}
-                              handleSelectCannedText={this.handleAddCannedText}
-                            />
+                              <CannedTextButton
+                                onSettingClick={onSettingClick}
+                                onCannedTextClick={onCannedTextClick}
+                                cannedTextTypeFK={item.cannedTextTypeFK}
+                                handleSelectCannedText={
+                                  this.handleAddCannedText
+                                }
+                              />
+                            </div>
 
                             <RichEditor
                               strongLabel
