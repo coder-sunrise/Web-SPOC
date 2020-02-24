@@ -194,7 +194,7 @@ class UserRole extends React.Component {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Button color='primary' onClick={this.toggleModal} disabled>
+            <Button color='primary' onClick={this.toggleModal}>
               <Add />
               Add New
             </Button>

@@ -20,6 +20,8 @@ import {
   Select,
   CommonTableGrid,
   ProgressButton,
+  CodeSelect,
+  SizeContainer,
 } from '@/components'
 
 // utils
@@ -42,6 +44,10 @@ const styles = (theme) => ({
   },
   indent: {
     paddingLeft: theme.spacing(2),
+  },
+  note: {
+    fontSize: 14,
+    fontStyle: 'italic',
   },
 })
 
@@ -87,7 +93,7 @@ const styles = (theme) => ({
 })
 class UserRoleDetail extends React.Component {
   state = {
-    gridConfig: { ...AccessRightConfig },
+    // gridConfig: { ...AccessRightConfig },
   }
 
   componentDidMount = () => {
@@ -128,134 +134,158 @@ class UserRoleDetail extends React.Component {
       moduleList,
       displayValueList,
     } = settingUserRole
-    const { gridConfig } = this.state
     const { params } = match
 
     return (
       <React.Fragment>
-        <GridContainer
-          alignItems='center'
-          justify='space-between'
-          className={classes.container}
-        >
-          <GridItem md={12} className={classes.verticalSpacing}>
-            <h4>User Role</h4>
-          </GridItem>
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={4}>
-              <FastField
-                name='code'
-                render={(args) => (
-                  <TextField label='Code' autoFocus {...args} />
-                )}
-              />
-            </GridItem>
-            <GridItem md={4}>
-              <FastField
-                name='effectiveDates'
-                render={(args) => (
-                  <DateRangePicker
-                    {...args}
-                    label='Effective Start Date'
-                    label2='Effective End Date'
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={4}>
-              <FastField
-                name='name'
-                render={(args) => (
-                  <TextField label='name' autoFocus {...args} />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={4}>
-              <FastField
-                name='description'
-                render={(args) => (
-                  <TextField label='description' autoFocus {...args} />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-
-          <GridItem md={12} className={classes.verticalSpacing}>
-            <h4>Access Right</h4>
-          </GridItem>
-          <GridContainer className={classes.indent} alignItems='center'>
-            <GridItem md={2}>
-              <Field
-                name='module'
-                render={(args) => (
-                  <Select {...args} label='Module' options={moduleList} />
-                )}
-              />
-            </GridItem>
-            <GridItem md={2}>
-              <Field
-                name='functionAccess'
-                render={(args) => (
-                  <Select
-                    {...args}
-                    label='Function Access'
-                    options={displayValueList}
-                  />
-                )}
-              />
-            </GridItem>
-
-            <GridItem md={2}>
-              <ProgressButton
-                icon={<Search />}
-                color='primary'
-                onClick={this.handleSearchClick}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
-            </GridItem>
-
-            <CommonTableGrid
-              rows={userRole.filteredAccessRight}
-              {...gridConfig}
-              onRowDoubleClick={this.handleDoubleClick}
-              FuncProps={{ pager: true }}
-            />
-          </GridContainer>
-        </GridContainer>
-        <GridItem
-          container
-          style={{
-            marginTop: 10,
-            marginBottom: 10,
-            justifyContent: 'center',
-          }}
-        >
-          <Button
-            color='danger'
-            onClick={navigateDirtyCheck({
-              onProceed: this.goBackToPreviousPage,
-            })}
+        <SizeContainer size='sm'>
+          <GridContainer
+            alignItems='center'
+            justify='space-between'
+            className={classes.container}
           >
-            Close
-          </Button>
-          <ProgressButton
-            color='primary'
-            // disabled={mode === 'Add' && this.state.selectedRows.length <= 0}
-            onClick={() => {
-              this.props.handleSubmit()
+            <GridItem md={12} className={classes.verticalSpacing}>
+              <h4>User Role</h4>
+            </GridItem>
+            <GridContainer className={classes.indent} alignItems='center'>
+              <GridItem md={4}>
+                <FastField
+                  name='code'
+                  render={(args) => (
+                    <TextField label='Code' autoFocus {...args} />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={4}>
+                <FastField
+                  name='effectiveDates'
+                  render={(args) => (
+                    <DateRangePicker
+                      {...args}
+                      label='Effective Start Date'
+                      label2='Effective End Date'
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridContainer className={classes.indent} alignItems='center'>
+              <GridItem md={4}>
+                <FastField
+                  name='name'
+                  render={(args) => (
+                    <TextField label='Name' autoFocus {...args} />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridContainer className={classes.indent} alignItems='center'>
+              <GridItem md={4}>
+                <FastField
+                  name='description'
+                  render={(args) => (
+                    <TextField label='Description' autoFocus {...args} />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+
+            <GridContainer className={classes.indent} alignItems='center'>
+              <GridItem md={4}>
+                <Field
+                  name='clinicRoleFK'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      label='Clinical Role'
+                      code='ltclinicalrole'
+                      onChange={(value) => {
+                        console.log(value)
+                      }}
+                    />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={8}>
+                <p className={classes.note}>
+                  You are not allowed to change clinical role after save.
+                </p>
+              </GridItem>
+            </GridContainer>
+
+            <GridItem md={12} className={classes.verticalSpacing}>
+              <h4>Access Right</h4>
+            </GridItem>
+            <GridContainer className={classes.indent} alignItems='center'>
+              <GridItem md={2}>
+                <Field
+                  name='module'
+                  render={(args) => (
+                    <Select {...args} label='Module' options={moduleList} />
+                  )}
+                />
+              </GridItem>
+              <GridItem md={2}>
+                <Field
+                  name='functionAccess'
+                  render={(args) => (
+                    <Select
+                      {...args}
+                      label='Function Access'
+                      options={displayValueList}
+                    />
+                  )}
+                />
+              </GridItem>
+
+              <GridItem md={2}>
+                <ProgressButton
+                  icon={<Search />}
+                  color='primary'
+                  onClick={this.handleSearchClick}
+                >
+                  <FormattedMessage id='form.search' />
+                </ProgressButton>
+              </GridItem>
+
+              <CommonTableGrid
+                rows={userRole.filteredAccessRight}
+                {...AccessRightConfig}
+                onRowDoubleClick={this.handleDoubleClick}
+                FuncProps={{ pager: true }}
+              />
+            </GridContainer>
+          </GridContainer>
+          <GridItem
+            container
+            style={{
+              marginTop: 10,
+              marginBottom: 10,
+              justifyContent: 'center',
             }}
-            disabled
           >
-            Save
-          </ProgressButton>
-        </GridItem>
+            <Button
+              color='danger'
+              onClick={navigateDirtyCheck({
+                onProceed: this.goBackToPreviousPage,
+              })}
+            >
+              Close
+            </Button>
+            <ProgressButton
+              color='primary'
+              // disabled={mode === 'Add' && this.state.selectedRows.length <= 0}
+              onClick={() => {
+                this.props.handleSubmit()
+              }}
+              disabled
+            >
+              Save
+            </ProgressButton>
+          </GridItem>
+        </SizeContainer>
       </React.Fragment>
     )
   }

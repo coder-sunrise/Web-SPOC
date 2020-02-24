@@ -18,6 +18,7 @@ export const AccessRightConfig = {
       type: 'select',
       align: 'center',
       sortingEnabled: false,
+      width: 250,
       render: (row) => {
         // console.log(row)
         return (
