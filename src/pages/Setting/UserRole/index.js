@@ -1,6 +1,7 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
-import { withFormik, FastField } from 'formik'
+import { withFormik, FastField, Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
@@ -21,6 +22,8 @@ import {
   TextField,
   Tooltip,
   ProgressButton,
+  withSettingBase,
+  CodeSelect,
 } from '@/components'
 // sub component
 import UserRoleForm from './UserRoleForm'
@@ -32,7 +35,8 @@ const styles = (theme) => ({
     marginBottom: theme.spacing(2),
   },
 })
-
+@connect(({ settingUserRole }) => ({ settingUserRole }))
+@withSettingBase({ modelName: 'settingUserRole' })
 @withFormik({
   mapPropsToValues: () => ({
     status: true,
@@ -45,32 +49,85 @@ class UserRole extends React.Component {
       status: '001',
     },
     showUserProfileForm: false,
+    gridConfig: {
+      ...UserRoleTableConfig,
+      columnExtensions: [
+        ...UserRoleTableConfig.columnExtensions,
+        {
+          columnName: 'action',
+          width: 90,
+          align: 'center',
+          render: (row) => this.Cell(row),
+        },
+      ],
+    },
+  }
+
+  genClinicalRoleList = () => {
+    const { settingUserRole } = this.props
+    this.props.dispatch({
+      type: 'settingUserRole/genList',
+      data: settingUserRole.list,
+      name: 'clinicalRoleName',
+    })
+  }
+
+  componentDidMount = async () => {
+    const { settingUserRole } = this.props
+    await this.props.dispatch({
+      type: 'settingUserRole/query',
+    })
+    this.genClinicalRoleList()
   }
 
   onTextFieldChange = (event, value) => {}
 
-  handleActionButtonClick = (row) => {
-    this.toggleModal()
+  handleActionButtonClick = () => {
+    this.props.history.push(`/setting/userrole/new`)
   }
 
-  Cell = ({ column, row, classes, ...props }) => {
-    if (column.name.toUpperCase() === 'ACTION') {
-      return (
-        <Table.Cell {...props}>
-          <Tooltip title='Edit user profile'>
-            <Button
-              justIcon
-              color='primary'
-              onClick={this.handleActionButtonClick}
-              id={row.loginAccount}
-            >
-              <Edit />
-            </Button>
-          </Tooltip>
-        </Table.Cell>
-      )
+  handleDoubleClick = (row) => {
+    this.props.history.push(`/setting/userrole/${row.id}`)
+  }
+
+  handleSearchClick = () => {
+    const { codeDisplayValue, clinicalRole, status } = this.props.values
+    let payload = {
+      group: [
+        {
+          code: codeDisplayValue,
+          Name: codeDisplayValue,
+          combineCondition: 'or',
+        },
+      ],
+      isActive: status,
     }
-    return <Table.Cell {...props} />
+    if (clinicalRole !== 0) {
+      payload = { ...payload, ClinicRoleFK: clinicalRole }
+    }
+    this.props.dispatch({
+      type: 'settingUserRole/query',
+      payload,
+    })
+  }
+
+  addNew = () => {
+    this.props.history.push(`/setting/userrole/new`)
+  }
+
+  Cell = (row) => {
+    return (
+      <Tooltip title='Edit User Profile' placement='bottom'>
+        <Button
+          justIcon
+          color='primary'
+          onClick={this.handleActionButtonClick}
+          id={row.id}
+        >
+          <Edit />
+        </Button>
+      </Tooltip>
+    )
   }
 
   TableCell = (p) => this.Cell({ ...p })
@@ -81,17 +138,37 @@ class UserRole extends React.Component {
   }
 
   render () {
-    const { classes } = this.props
+    const { classes, settingUserRole } = this.props
     const { filter, showUserProfileForm } = this.state
+    const { clinicalRoleNameList } = settingUserRole
     const ActionProps = { TableCellComponent: this.TableCell }
+
+    console.log(clinicalRoleNameList)
+
     return (
       <CardContainer hideHeader>
         <GridContainer>
           <GridItem md={4}>
-            <TextField
-              label='Code / Display Value'
-              value={filter.name}
-              onChange={this.onTextFieldChange}
+            <FastField
+              name='codeDisplayValue'
+              render={(args) => {
+                return <TextField label='Code / DisplayValue' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem md={2}>
+            <Field
+              name='clinicalRole'
+              render={(args) => (
+                <CodeSelect
+                  {...args}
+                  label='Clinical Role'
+                  code='ltclinicalrole'
+                  onChange={(value) => {
+                    console.log(value)
+                  }}
+                />
+              )}
             />
           </GridItem>
           <GridItem md={2}>
@@ -110,30 +187,38 @@ class UserRole extends React.Component {
             />
           </GridItem>
           <GridItem md={12} className={classes.verticalSpacing}>
-            <ProgressButton icon={<Search />} color='primary'>
+            <ProgressButton
+              icon={<Search />}
+              color='primary'
+              onClick={this.handleSearchClick}
+            >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Button color='primary' onClick={this.toggleModal}>
+            <Button color='primary' onClick={this.toggleModal} disabled>
               <Add />
               Add New
             </Button>
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
-              rows={dummyData}
-              {...UserRoleTableConfig}
-              ActionProps={ActionProps}
+              type='settingUserRole'
+              {...this.state.gridConfig}
+              onRowDoubleClick={this.handleDoubleClick}
+              FuncProps={{ pager: true }}
             />
           </GridItem>
+          <CommonModal
+            open={showUserProfileForm}
+            observe='RoomDetail'
+            title='New User Role'
+            maxWidth='md'
+            bodyNoPadding
+            onClose={this.toggleModal}
+            onConfirm={this.toggleModal}
+          >
+            <UserRoleForm />
+          </CommonModal>
         </GridContainer>
-        <CommonModal
-          title='Add User Role'
-          open={showUserProfileForm}
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-        >
-          <UserRoleForm />
-        </CommonModal>
       </CardContainer>
     )
   }
