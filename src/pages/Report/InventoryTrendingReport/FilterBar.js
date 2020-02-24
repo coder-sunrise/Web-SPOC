@@ -14,14 +14,7 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({
-  handleSubmit,
-  handleTypeChanged,
-  isSubmitting,
-  ...restProps
-}) => {
-  const { inventoryType = undefined, serviceItems = [] } = restProps
-
+const FilterBar = ({ handleSubmit, isSubmitting }) => {
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -64,13 +57,11 @@ const FilterBar = ({
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
-                      { name: 'Service', value: 'SERVICE' },
                     ]}
                     onChange={(e) => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
                       }
-                      handleTypeChanged(e)
                     }}
                   />
                 )
@@ -79,47 +70,22 @@ const FilterBar = ({
           </GridItem>
           <GridItem md={4} />
           <GridItem md={4}>
-            {inventoryType === 'SERVICE' ? (
-              <Field
-                name='items'
-                render={(args) => {
-                  const { form: fm } = args
-                  let maxTagCount = 0
-                  if (fm.values.items && fm.values.items.length === 1)
-                    maxTagCount = 1
-                  return (
-                    <Select
-                      {...args}
-                      allValue={-99}
-                      label='Item List'
-                      mode='multiple'
-                      options={serviceItems}
-                      valueField='value'
-                      labelField='name'
-                      maxTagCount={maxTagCount}
-                      temp
-                    />
-                  )
-                }}
-              />
-            ) : (
-              <Field
-                name='items'
-                render={(args) => {
-                  const { form } = args
-                  return (
-                    <CodeSelect
-                      {...args}
-                      label='Item List'
-                      mode='multiple'
-                      code={`inventory${form.values.inventoryType}`}
-                      labelField='displayValue'
-                      temp
-                    />
-                  )
-                }}
-              />
-            )}
+            <Field
+              name='items'
+              render={(args) => {
+                const { form } = args
+                return (
+                  <CodeSelect
+                    {...args}
+                    label='Item List'
+                    mode='multiple'
+                    code={`inventory${form.values.inventoryType}`}
+                    labelField='displayValue'
+                    temp
+                  />
+                )
+              }}
+            />
           </GridItem>
           <GridItem md={2}>
             <FastField
