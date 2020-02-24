@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react'
+import React, { memo } from 'react'
 import { formatMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
@@ -18,16 +18,12 @@ import {
   ClinicianSelect,
   DatePicker,
   Select,
+  reversedDateFormat,
 } from '@/components'
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
 
-const FilterBar = ({
-  values,
-  handleSubmit,
-  handleAddAppointmentClick,
-  dispatch,
-}) => {
+const FilterBar = ({ values, handleSubmit, handleAddAppointmentClick }) => {
   const {
     filterByDoctor = [],
     filterByApptType = [],
@@ -41,17 +37,6 @@ const FilterBar = ({
   const maxAppointmentStatusTagCount =
     filterByAppointmentStatus.length <= 1 ? 1 : 0
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
-
-  useEffect(() => {
-    return () => {
-      dispatch({
-        type: 'appointment/updateState',
-        payload: {
-          list: [],
-        },
-      })
-    }
-  }, [])
 
   return (
     <GridContainer>
@@ -209,7 +194,7 @@ const FilterBar = ({
           <Add />
           Add Appointment
         </Button>
-        <Button color='primary' size='sm'>
+        <Button color='primary' size='sm' onClick={() => window.print()}>
           <Print />
           Print
         </Button>
@@ -240,7 +225,9 @@ export default memo(
           apiCriteria: {
             searchValue,
             bookBy: bookBy.join() || undefined,
-            bookOn,
+            bookOn: bookOn
+              ? moment(bookOn).format(reversedDateFormat)
+              : undefined,
             apptDateFrom:
               apptDate && apptDate.length > 0
                 ? moment(apptDate[0]).formatUTC()

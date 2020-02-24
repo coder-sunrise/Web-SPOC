@@ -18,8 +18,8 @@ const styles = (theme) => ({
 })
 class Grid extends PureComponent {
   appointmentRow = (p) => {
-    const { classes } = this.props
-    const { row, children } = p
+    const { classes, handleSelectEvent } = this.props
+    const { row, children, tableRow } = p
     let newchildren = []
     const middleColumns = children.slice(3, 8)
 
@@ -49,23 +49,34 @@ class Grid extends PureComponent {
       newchildren.push(middleColumns)
     }
 
+    const selectedData = {
+      ...tableRow.row,
+      doctor: null,
+    }
+
     if (row.countNumber === 1) {
-      return <Table.Row {...p}>{newchildren}</Table.Row>
+      return (
+        <Table.Row {...p} onDoubleClick={() => handleSelectEvent(selectedData)}>
+          {newchildren}
+        </Table.Row>
+      )
     }
     return (
-      <Table.Row {...p} className={classes.subRow}>
+      <Table.Row
+        {...p}
+        className={classes.subRow}
+        onDoubleClick={() => handleSelectEvent(selectedData)}
+      >
         {newchildren}
       </Table.Row>
     )
   }
 
   render () {
-    const { handleSelectEvent } = this.props
     return (
       <CommonTableGrid
         style={{ marginTop: 10 }}
         type='appointment'
-        onRowDoubleClick={handleSelectEvent}
         columns={[
           { name: 'patientName', title: 'Patient' },
           { name: 'patientAccountNo', title: 'Account No.' },
@@ -80,49 +91,72 @@ class Grid extends PureComponent {
           { name: 'bookedByUser', title: 'Book By' },
           { name: 'bookOn', title: 'Book On' },
         ]}
-        FuncProps={{
-          pager: false,
-        }}
         columnExtensions={[
+          {
+            columnName: 'patientName',
+            sortingEnabled: false,
+            // sortBy: 'AppointmentGroupFKNavigation.patientName',
+          },
+          {
+            columnName: 'patientAccountNo',
+            sortingEnabled: false,
+            // sortBy: 'AppointmentGroupFKNavigation.PatientAccountNo',
+          },
+          {
+            columnName: 'patientContactNo',
+            sortBy: 'AppointmentGroupFKNavigation.patientContactNo',
+            // sortingEnabled: false,
+          },
           {
             columnName: 'appointmentDate',
             type: 'date',
           },
           {
             columnName: 'apptTime',
+            sortingEnabled: false,
             render: (row) =>
               moment(row.apptTime, timeFormat24HourWithSecond).format(
                 timeFormat,
               ),
           },
           {
-            columnName: 'bookOn',
-            type: 'date',
-          },
-          {
             columnName: 'doctor',
             type: 'codeSelect',
-
             code: 'doctorprofile',
             labelField: 'clinicianProfile.name',
             valueField: 'clinicianProfile.id',
+            sortingEnabled: false,
           },
           {
             columnName: 'roomFk',
             type: 'codeSelect',
             code: 'ctroom',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'duration',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'appointmentRemarks',
+            sortingEnabled: false,
           },
           {
             columnName: 'appointmentStatusFk',
             type: 'codeSelect',
             code: 'ltappointmentstatus',
+            sortBy: 'appointmentStatusFkNavigation.displayValue',
+          },
+          {
+            columnName: 'bookedByUser',
+            sortingEnabled: false,
+          },
+          {
+            columnName: 'bookOn',
+            type: 'date',
+            sortingEnabled: false,
           },
         ]}
-        // TableProps={{
-        //   pageSize: 100,
-        //   loading: false,
-        //   rowComponent: this.appointmentRow(),
-        // }}
         TableProps={{ rowComponent: this.appointmentRow }}
       />
     )

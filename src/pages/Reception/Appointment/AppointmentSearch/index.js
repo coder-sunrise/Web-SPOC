@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { connect } from 'dva'
 
 import FitlerBar from './FilterBar'
@@ -9,6 +9,23 @@ const AppointmentSearch = ({
   handleSelectEvent,
   handleAddAppointmentClick,
 }) => {
+  useEffect(() => {
+    return () => {
+      dispatch({
+        type: 'appointment/reset',
+      })
+      dispatch({
+        type: 'appointment/updateState',
+        payload: {
+          pagination: {
+            current: 1,
+            totalRecords: 0,
+          },
+        },
+      })
+    }
+  }, [])
+
   return (
     <Fragment>
       <FitlerBar
@@ -20,4 +37,4 @@ const AppointmentSearch = ({
   )
 }
 
-export default connect(({}) => ({}))(AppointmentSearch)
+export default connect()(AppointmentSearch)
