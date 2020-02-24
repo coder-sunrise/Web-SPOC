@@ -83,14 +83,20 @@ const FilterBar = ({
               <Field
                 name='items'
                 render={(args) => {
+                  const { form: fm } = args
+                  let maxTagCount = 0
+                  if (fm.values.items && fm.values.items.length === 1)
+                    maxTagCount = 1
                   return (
                     <Select
                       {...args}
+                      allValue={-99}
                       label='Item List'
                       mode='multiple'
                       options={serviceItems}
                       valueField='value'
                       labelField='name'
+                      maxTagCount={maxTagCount}
                       temp
                     />
                   )
