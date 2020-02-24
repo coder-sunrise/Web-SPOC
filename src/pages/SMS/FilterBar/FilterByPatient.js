@@ -145,7 +145,7 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
 
       <GridItem md={2}>
         <FastField
-          name='smsstatus'
+          name='lastSMSSendStatus'
           render={(args) => (
             <Select {...args} label='SMS Status' options={smsStatus} />
           )}

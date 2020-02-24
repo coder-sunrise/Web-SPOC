@@ -112,18 +112,25 @@ export default compose(
         dob,
         ageFrom,
         ageTo,
-        smsstatus,
       } = values
       const { dispatch, type, setSelectedRows } = props
 
       let payload = {}
       let dispatchType = ''
 
-      let smsStatusPayload
+      let smsStatusPayload = []
       if (lastSMSSendStatus === SMS_STATUS.SENT) {
-        smsStatusPayload = '1 | 3 | 5 | 6 | 7 | 8 | 9 | 10 | 11'
+        smsStatusPayload = [
+          SMS_STATUS.SENT,
+          SMS_STATUS.DELIVERED,
+          SMS_STATUS.SENDING,
+        ]
+        // smsStatusPayload = `${SMS_STATUS.SENT} | ${SMS_STATUS.DELIdVERED}`
       } else if (lastSMSSendStatus === SMS_STATUS.FAILED) {
-        smsStatusPayload = '2 | 4'
+        smsStatusPayload = [
+          SMS_STATUS.FAILED,
+          SMS_STATUS.UNDELIVERED,
+        ]
       }
 
       if (type === 'Appointment') {
@@ -168,7 +175,9 @@ export default compose(
           [apptStatusProperty]:
             appointmentStatus ||
             `${APPOINTMENT_STATUS.DRAFT}|${APPOINTMENT_STATUS.RESCHEDULED}|${APPOINTMENT_STATUS.SCHEDULED}`,
-          'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload,
+          'in_AppointmentReminders.PatientOutgoingSMSNavigation.OutgoingSMSFKNavigation.StatusFK': smsStatusPayload.join(
+            '|',
+          ),
           isReminderSent: isExcludeReminderSent ? false : undefined,
           [doctorProperty]: stringDoctors === 0 ? undefined : stringDoctors,
           [apptTypeProperty]: stringAppType === 0 ? undefined : stringAppType,
@@ -193,7 +202,7 @@ export default compose(
             dobto: formattedDOB[1],
             agefrom: ageFrom,
             ageto: ageTo,
-            smsstatus,
+            smsstatus: smsStatusPayload.join() || undefined,
             pdpaphone,
             pdpamessage,
             pdpaemail,
