@@ -984,6 +984,7 @@ class Scribble extends React.Component {
                   key={7}
                   value={Tools.Eraser}
                   onClick={() => {
+                    this._sketch._deleteSelectedObject()
                     this.setState({
                       tool: 'eraser',
                       eraserColor: true,
