@@ -14,13 +14,14 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting }) => {
-  const getItemListCode = (inventoryType) => {
-    if (inventoryType === 'SERVICE') {
-      return 'ctservice'
-    }
-    return `inventory${inventoryType}`
-  }
+const FilterBar = ({
+  handleSubmit,
+  handleTypeChanged,
+  isSubmitting,
+  ...restProps
+}) => {
+  const { inventoryType = undefined, serviceItems = [] } = restProps
+
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -68,22 +69,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     onChange={(e) => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
-                        // let payload = { code: e }
-                        // if (e === 'ctservice') {
-                        //   payload = {
-                        //     code: e,
-                        //     filter: {
-                        //       'serviceFKNavigation.IsActive': true,
-                        //       'serviceCenterFKNavigation.IsActive': true,
-                        //       combineCondition: 'and',
-                        //     },
-                        //   }
-                        // }
-                        // window.g_app._store.dispatch({
-                        //   type: 'codetable/fetchCodes',
-                        //   payload,
-                        // })
                       }
+                      handleTypeChanged(e)
                     }}
                   />
                 )
@@ -92,23 +79,41 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
           </GridItem>
           <GridItem md={4} />
           <GridItem md={4}>
-            <Field
-              name='items'
-              render={(args) => {
-                const { form } = args
-                // form.values.inventoryType
-                return (
-                  <CodeSelect
-                    {...args}
-                    label='Item List'
-                    mode='multiple'
-                    code={getItemListCode(form.values.inventoryType)}
-                    labelField='displayValue'
-                    temp
-                  />
-                )
-              }}
-            />
+            {inventoryType === 'SERVICE' ? (
+              <Field
+                name='items'
+                render={(args) => {
+                  return (
+                    <Select
+                      {...args}
+                      label='Item List'
+                      mode='multiple'
+                      options={serviceItems}
+                      valueField='value'
+                      labelField='name'
+                      temp
+                    />
+                  )
+                }}
+              />
+            ) : (
+              <Field
+                name='items'
+                render={(args) => {
+                  const { form } = args
+                  return (
+                    <CodeSelect
+                      {...args}
+                      label='Item List'
+                      mode='multiple'
+                      code={`inventory${form.values.inventoryType}`}
+                      labelField='displayValue'
+                      temp
+                    />
+                  )
+                }}
+              />
+            )}
           </GridItem>
           <GridItem md={2}>
             <FastField

@@ -9,6 +9,7 @@ import InventoryGroupDetails from './InventoryGroupDetails'
 import InventoryDetails from './InventoryDetails'
 import ReportBase from '../ReportBase'
 import { GridContainer, GridItem } from '@/components'
+import { getServices } from '@/utils/codes'
 
 const reportId = 37
 const fileName = 'Inventory Trending Report'
@@ -20,11 +21,41 @@ class InventoryTrendingReport extends ReportBase {
       ...this.state,
       reportId,
       fileName,
+      inventoryType: 'MEDICATION',
+      serviceItems: [],
     }
   }
 
   renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        handleTypeChanged={(e) => {
+          if (e === 'SERVICE') {
+            window.g_app._store
+              .dispatch({
+                type: 'codetable/fetchCodes',
+                payload: {
+                  code: 'ctservice',
+                  filter: {
+                    'serviceFKNavigation.IsActive': true,
+                    'serviceCenterFKNavigation.IsActive': true,
+                    combineCondition: 'and',
+                  },
+                },
+              })
+              .then((list) => {
+                const { services } = getServices(list)
+                this.setState({ serviceItems: services })
+              })
+          }
+
+          this.setState({ inventoryType: e })
+        }}
+        {...this.state}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {
