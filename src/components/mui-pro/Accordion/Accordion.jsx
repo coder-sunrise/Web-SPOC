@@ -47,7 +47,7 @@ class Accordion extends React.Component {
 
   static getDerivedStateFromProps (nextProps, preState) {
     const { active, mode, activedKeys } = nextProps
-    if (mode === 'multiple') {
+    if (mode === 'multiple' && !!activedKeys) {
       const equal = _.isEqual(activedKeys, preState.activedKeys)
       if (!equal) return { activedKeys }
     }
