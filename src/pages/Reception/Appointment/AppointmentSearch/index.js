@@ -8,8 +8,12 @@ const AppointmentSearch = ({
   dispatch,
   handleSelectEvent,
   handleAddAppointmentClick,
+  appointment,
 }) => {
   useEffect(() => {
+    dispatch({
+      type: 'appointment/query',
+    })
     return () => {
       dispatch({
         type: 'appointment/reset',
@@ -31,10 +35,13 @@ const AppointmentSearch = ({
       <FitlerBar
         dispatch={dispatch}
         handleAddAppointmentClick={handleAddAppointmentClick}
+        appointment={appointment}
       />
       <Grid handleSelectEvent={handleSelectEvent} />
     </Fragment>
   )
 }
 
-export default connect()(AppointmentSearch)
+export default connect(({ appointment }) => ({ appointment }))(
+  AppointmentSearch,
+)

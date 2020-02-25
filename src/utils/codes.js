@@ -204,6 +204,10 @@ const appointmentStatus = [
 
 const appointmentStatusReception = [
   {
+    name: 'Scheduled',
+    value: 1,
+  },
+  {
     name: 'Draft',
     value: 2,
   },

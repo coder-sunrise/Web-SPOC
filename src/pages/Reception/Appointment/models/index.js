@@ -35,7 +35,18 @@ export default createListViewModel({
     state: {
       default: {},
     },
-    effects: {},
+    effects: {
+      *queryAllAppointments ({ payload }, { call, put }) {
+        const response = yield call(service.queryList, payload)
+        yield put({
+          type: 'queryDone',
+          payload:
+            response.status === '200'
+              ? { ...response.data, forPrint: true }
+              : {},
+        })
+      },
+    },
     reducers: {
       queryOneDone (st, { payload }) {
         const { data } = payload
@@ -48,12 +59,13 @@ export default createListViewModel({
           entity: data,
         }
       },
-      queryDone (st, { payload }) {
-        const { data } = payload.data
 
+      queryDone (st, { payload }) {
+        const { forPrint, data } = payload
+        const list = forPrint ? data : data.data
         let formattedList = []
-        for (let i = 0; i < data.length; i++) {
-          const { appointment_Resources, ...restValues } = data[i]
+        for (let i = 0; i < list.length; i++) {
+          const { appointment_Resources, ...restValues } = list[i]
           const currentPatientAppts = appointment_Resources.map((appt, idx) => {
             const {
               roomFk,
@@ -92,10 +104,10 @@ export default createListViewModel({
             ...currentPatientAppts,
           ]
         }
-
+        const returnProperty = forPrint ? 'printList' : 'list'
         return {
           ...st,
-          list: formattedList,
+          [returnProperty]: formattedList,
         }
       },
     },

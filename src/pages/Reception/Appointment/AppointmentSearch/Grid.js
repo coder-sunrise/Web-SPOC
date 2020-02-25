@@ -94,18 +94,15 @@ class Grid extends PureComponent {
         columnExtensions={[
           {
             columnName: 'patientName',
-            sortingEnabled: false,
-            // sortBy: 'AppointmentGroupFKNavigation.patientName',
+            sortBy: 'name',
           },
           {
             columnName: 'patientAccountNo',
-            sortingEnabled: false,
-            // sortBy: 'AppointmentGroupFKNavigation.PatientAccountNo',
+            sortBy: 'patientAccountNo',
           },
           {
             columnName: 'patientContactNo',
-            sortBy: 'AppointmentGroupFKNavigation.patientContactNo',
-            // sortingEnabled: false,
+            sortBy: 'contactNumber',
           },
           {
             columnName: 'appointmentDate',
@@ -154,7 +151,6 @@ class Grid extends PureComponent {
           {
             columnName: 'bookOn',
             type: 'date',
-            sortingEnabled: false,
           },
         ]}
         TableProps={{ rowComponent: this.appointmentRow }}
