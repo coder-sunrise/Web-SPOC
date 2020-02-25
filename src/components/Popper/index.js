@@ -49,7 +49,7 @@ export default ({
   // const { className, style, ...resetBtnProps } = children.props
 
   const popperContainer = (
-    <Paper>
+    <Paper elevation={2}>
       <ClickAwayListener
         onClickAway={() => {
           // console.log('onClickAway')
