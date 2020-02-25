@@ -109,10 +109,12 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         pagesize: 9999,
-        combineCondition: 'and',
-        isCancelled: false,
-        lgteql_appointmentDate: startOfMonth,
-        lsteql_appointmentDate: endOfMonth,
+        apiCriteria:{
+          isCancelled: false,
+          apptDateFrom:startOfMonth,
+          apptDateTo:endOfMonth,
+        },
+
       },
     })
     dispatch({
