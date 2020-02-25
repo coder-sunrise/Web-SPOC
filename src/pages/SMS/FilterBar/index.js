@@ -125,7 +125,6 @@ export default compose(
           SMS_STATUS.DELIVERED,
           SMS_STATUS.SENDING,
         ]
-        // smsStatusPayload = `${SMS_STATUS.SENT} | ${SMS_STATUS.DELIdVERED}`
       } else if (lastSMSSendStatus === SMS_STATUS.FAILED) {
         smsStatusPayload = [
           SMS_STATUS.FAILED,
