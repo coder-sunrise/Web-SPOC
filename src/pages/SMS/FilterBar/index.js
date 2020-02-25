@@ -16,7 +16,7 @@ import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
-import { formatDatesToUTC } from '@/utils/codes'
+import { formatDatesToUTC } from '@/utils/dateUtils'
 
 const styles = (theme) => ({
   filterBar: {

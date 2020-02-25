@@ -1944,17 +1944,6 @@ export const groupByFKFunc = (array) => {
     .value()
 }
 
-export const formatDatesToUTC = (dates) => {
-  if (Array.isArray(dates) && dates.length > 0) {
-    return [
-      moment(dates[0]).formatUTC(),
-      moment(dates[1]).formatUTC(false),
-    ]
-  }
-
-  return []
-}
-
 module.exports = {
   // paymentMethods,
   // titles,
@@ -2010,6 +1999,5 @@ module.exports = {
   roundToPrecision,
   gstEnabled,
   groupByFKFunc,
-  formatDatesToUTC,
   ...module.exports,
 }
