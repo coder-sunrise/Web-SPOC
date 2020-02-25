@@ -759,6 +759,16 @@ const _routes = [
             component: './Setting/UserRole',
           },
           {
+            path: '/setting/userrole/new',
+            name: 'newuserrole',
+            component: './Setting/UserRole/Details',
+          },
+          {
+            path: '/setting/userrole/:id',
+            name: 'newuserrole',
+            component: './Setting/UserRole/Details',
+          },
+          {
             path: '/setting/revenuecategory',
             name: 'revenuecategory',
             component: './Setting/RevenueCategory',

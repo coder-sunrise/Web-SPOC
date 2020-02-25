@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import * as Yup from 'yup'
 // formik
 import { FastField, Field, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
@@ -8,17 +7,15 @@ import moment from 'moment'
 // common components
 import {
   ProgressButton,
-  DatePicker,
-  DateRangePicker,
   GridContainer,
   GridItem,
   SizeContainer,
   TextField,
   Select,
 } from '@/components'
+import { FilterBarDate } from '@/components/_medisys'
 import { getBizSession } from '@/services/queue'
 import { osBalanceStatus, sessionOptions } from '@/utils/codes'
-import { roundTo } from '@/utils/utils'
 
 const getBizSessionId = async () => {
   const bizSessionPayload = {
@@ -45,69 +42,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
     return unmount
   }, [])
 
-  // const onSearchClick = async () => {
-  //   const {
-  //     invoiceNo,
-  //     patientName,
-  //     patientAccountNo,
-  //     invoiceDates,
-  //     outstandingBalanceStatus,
-  //     session,
-  //   } = values
-  //   let SessionID
-  //   let SessionType
-  //   if (session === 'current') {
-  //     SessionID = await getBizSessionId()
-  //     SessionType = 'CurrentSession'
-  //   } else if (session === 'past') {
-  //     SessionID = await getBizSessionId()
-  //     SessionType = 'PastSession'
-  //   }
-
-  //   let { isIncludePatientOS, isIncludeGovtOS, isIncludeCorporateOS } = values
-  //   let isHasOutstanding
-  //   if (
-  //     outstandingBalanceStatus === undefined ||
-  //     outstandingBalanceStatus === 'all'
-  //   ) {
-  //     isIncludePatientOS = false
-  //     isIncludeGovtOS = false
-  //     isIncludeCorporateOS = false
-  //     isHasOutstanding = undefined
-  //   } else if (outstandingBalanceStatus === 'yes') {
-  //     isHasOutstanding = true
-  //   } else {
-  //     isHasOutstanding = false
-  //   }
-  //   dispatch({
-  //     type: 'invoiceList/query',
-  //     payload: {
-  //       // keepFilter: false,
-  //       // combineCondition: 'and',
-  //       lgteql_invoiceDate: invoiceDates ? invoiceDates[0] : undefined,
-  //       lsteql_invoiceDate: invoiceDates ? invoiceDates[1] : undefined,
-  //       apiCriteria: {
-  //         SessionID,
-  //         SessionType,
-  //         isIncludePatientOS,
-  //         isIncludeGovtOS,
-  //         isIncludeCorporateOS,
-  //         isHasOutstanding,
-  //       },
-  //       group: [
-  //         {
-  //           invoiceNo,
-  //           'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
-  //           'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-  //           combineCondition: 'and',
-  //         },
-  //       ],
-  //     },
-  //   })
-  // }
-
-  const { outstandingBalanceStatus, invoiceStartDate, invoiceEndDate } = values
-  const disabledOSOpts = outstandingBalanceStatus === undefined
+  const { invoiceStartDate, invoiceEndDate } = values
 
   return (
     <SizeContainer>
@@ -123,24 +58,12 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
             <Field
               name='invoiceStartDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
+                <FilterBarDate
+                  args={args}
                   label='Invoice Date From'
-                  disabledDate={(d) => {
-                    const endDate = invoiceEndDate
-                      ? moment(invoiceEndDate)
-                      : undefined
-                    if (endDate) {
-                      const range = moment.duration(d.diff(endDate))
-                      const years = roundTo(range.asYears())
-                      return (
-                        !d ||
-                        d.isAfter(moment()) ||
-                        d.isAfter(endDate) ||
-                        years < -1.0
-                      )
-                    }
-                    return !d || d.isAfter(moment())
+                  formValues={{
+                    startDate: invoiceStartDate,
+                    endDate: invoiceEndDate,
                   }}
                 />
               )}
@@ -150,45 +73,18 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
             <Field
               name='invoiceEndDate'
               render={(args) => (
-                <DatePicker
-                  {...args}
+                <FilterBarDate
+                  args={args}
                   label='Invoice Date To'
-                  disabledDate={(d) => {
-                    const startDate = invoiceStartDate
-                      ? moment(invoiceStartDate)
-                      : undefined
-                    if (startDate) {
-                      const range = moment.duration(d.diff(startDate))
-                      const years = roundTo(range.asYears())
-                      return (
-                        !d ||
-                        d.isAfter(moment()) ||
-                        d.isBefore(startDate) ||
-                        years > 1.0
-                      )
-                    }
-                    return !d || d.isAfter(moment())
+                  isEndDate
+                  formValues={{
+                    startDate: invoiceStartDate,
+                    endDate: invoiceEndDate,
                   }}
                 />
               )}
             />
           </GridItem>
-          {/* <GridItem xs={6} md={6}>
-            <FastField
-              name='invoiceDates'
-              render={(args) => {
-                return (
-                  <DateRangePicker
-                    label='Invoice Date From'
-                    label2='Invoice Date To'
-                    allowClear={false}
-                    disabledDate={(d) => !d || d.isAfter(moment().endOf('day'))}
-                    {...args}
-                  />
-                )
-              }}
-            />
-          </GridItem> */}
         </GridContainer>
         <GridContainer>
           <GridItem xs={6} md={3}>
@@ -275,25 +171,7 @@ export default withFormik({
       SessionType = 'PastSession'
     }
 
-    let { isIncludePatientOS, isIncludeGovtOS, isIncludeCorporateOS } = values
-    let isHasOutstanding
-    if (
-      outstandingBalanceStatus === undefined ||
-      outstandingBalanceStatus === 'all'
-    ) {
-      isIncludePatientOS = false
-      isIncludeGovtOS = false
-      isIncludeCorporateOS = false
-      isHasOutstanding = undefined
-    } else if (outstandingBalanceStatus === 'yes') {
-      isHasOutstanding = true
-    } else {
-      isHasOutstanding = false
-    }
-
     const payload = {
-      // keepFilter: false,
-      // combineCondition: 'and',
       lgteql_invoiceDate: invoiceStartDate || undefined,
       lsteql_invoiceDate: invoiceEndDate || undefined,
       lgt_OutstandingBalance:
@@ -316,22 +194,6 @@ export default withFormik({
           combineCondition: 'and',
         },
       ],
-      // apiCriteria: {
-      //   SessionID,
-      //   SessionType,
-      //   isIncludePatientOS,
-      //   isIncludeGovtOS,
-      //   isIncludeCorporateOS,
-      //   isHasOutstanding,
-      // },
-      // group: [
-      //   {
-      //     invoiceNo,
-      //     'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.Name': patientName,
-      //     'VisitInvoice.VisitFKNavigation.PatientProfileFkNavigation.PatientAccountNo': patientAccountNo,
-      //     combineCondition: 'and',
-      //   },
-      // ],
     }
 
     dispatch({

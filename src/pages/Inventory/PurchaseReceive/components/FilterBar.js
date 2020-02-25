@@ -17,13 +17,12 @@ import {
   Checkbox,
   CodeSelect,
   ProgressButton,
-  DateRangePicker,
   DatePicker,
   Tooltip,
   Field,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-import { roundTo } from '@/utils/utils'
+import { FilterBarDate } from '@/components/_medisys'
 
 // @connect(({ purchaseReceiveList }) => {
 //   return purchaseReceiveList.filterSearch
@@ -91,20 +90,13 @@ class FilterBar extends PureComponent {
           <Field
             name='transactionStartDate'
             render={(args) => (
-              <DatePicker
-                {...args}
+              <FilterBarDate
+                noTodayLimit
+                args={args}
                 label='Transaction Date From'
-                disabled={isAllDateChecked}
-                disabledDate={(d) => {
-                  const endDate = transactionEndDate
-                    ? moment(transactionEndDate)
-                    : undefined
-                  if (endDate) {
-                    const range = moment.duration(d.diff(endDate))
-                    const years = roundTo(range.asYears())
-                    return d.isAfter(endDate) || years < -1.0
-                  }
-                  return !d
+                formValues={{
+                  startDate: transactionStartDate,
+                  endDate: transactionEndDate,
                 }}
               />
             )}
@@ -114,20 +106,14 @@ class FilterBar extends PureComponent {
           <Field
             name='transactionEndDate'
             render={(args) => (
-              <DatePicker
-                {...args}
+              <FilterBarDate
+                noTodayLimit
+                isEndDate
+                args={args}
                 label='Transaction Date To'
-                disabled={isAllDateChecked}
-                disabledDate={(d) => {
-                  const startDate = transactionStartDate
-                    ? moment(transactionStartDate)
-                    : undefined
-                  if (startDate) {
-                    const range = moment.duration(d.diff(startDate))
-                    const years = roundTo(range.asYears())
-                    return d.isBefore(startDate) || years > 1.0
-                  }
-                  return !d
+                formValues={{
+                  startDate: transactionStartDate,
+                  endDate: transactionEndDate,
                 }}
               />
             )}

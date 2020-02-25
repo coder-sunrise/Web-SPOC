@@ -338,35 +338,28 @@ class Layout extends PureComponent {
     this.changeLayout(layout)
   }
 
+  promptRemoveWidgetConfirmation = (key) => {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Confirm to remove widgets?',
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => this.removeWidget(key),
+      },
+    })
+  }
+
   updateWidget = (ids, changes) => {
-    // console.log(ids, changes)
     const keys = Object.keys(changes)
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index]
-      // console.log(key)
       if (changes[key]) {
         this.addWidget(key)
       } else {
-        this.removeWidget(key)
+        this.promptRemoveWidgetConfirmation(key)
       }
     }
-    // const { currentLayout } = this.state
-    // const widgets = this.getDefaultLayout().widgets.filter(
-    //   (o) => ids.indexOf(o.id) >= 0,
-    // )
-    // console.log(widgets)
-    // const sizes = [
-    //   'lg',
-    //   'md',
-    //   'sm',
-    // ]
-    // const layout = {
-    //   widgets,
-    // }
-    // sizes.forEach((s) => {
-    //   layout[s] = currentLayout[s]
-    // })
-    // this.changeLayout(layout)
   }
 
   changeLayout = (layout) => {
