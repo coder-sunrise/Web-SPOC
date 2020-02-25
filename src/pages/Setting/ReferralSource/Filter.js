@@ -15,12 +15,27 @@ import {
 @withFormikExtend({
   mapPropsToValues: ({ settingReferralSource }) =>
     settingReferralSource.filter || {},
-  handleSubmit: () => {},
+  handleSubmit: (values, { props}) => {
+
+    const {  isActive, name, institution, department } = values
+
+    const payload = {
+      isActive,
+      name,
+      institution,
+      department,
+    }
+
+    props.dispatch({
+      type: 'settingReferralSource/query',
+      payload,
+    })
+  },
   displayName: 'ReferralSourceFilter',
 })
 class Filter extends PureComponent {
   render () {
-    const { classes } = this.props
+    const { classes,handleSubmit } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -56,22 +71,7 @@ class Filter extends PureComponent {
               <ProgressButton
                 color='primary'
                 icon={<Search />}
-                onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
-                  this.props.dispatch({
-                    type: 'settingReferralSource/query',
-                    payload: {
-                      isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
-                    },
-                  })
-                }}
+                onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
