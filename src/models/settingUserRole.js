@@ -12,6 +12,7 @@ export default createListViewModel({
       list: [],
       currentSelectedUserRole: {
         filteredAccessRight: [],
+        clientAccessRight: [],
       },
     },
     effects: {
@@ -38,6 +39,7 @@ export default createListViewModel({
         })
       },
     },
+
     reducers: {
       updateUserRole (state, { data }) {
         return {

@@ -111,10 +111,6 @@ class UserRole extends React.Component {
     })
   }
 
-  addNew = () => {
-    this.props.history.push(`/setting/userrole/new`)
-  }
-
   Cell = (row) => {
     return (
       <Tooltip title='Edit User Profile' placement='bottom'>
@@ -138,12 +134,10 @@ class UserRole extends React.Component {
   }
 
   render () {
-    const { classes, settingUserRole } = this.props
+    const { classes, settingUserRole, history } = this.props
     const { filter, showUserProfileForm } = this.state
     const { clinicalRoleNameList } = settingUserRole
     const ActionProps = { TableCellComponent: this.TableCell }
-
-    console.log(clinicalRoleNameList)
 
     return (
       <CardContainer hideHeader>
@@ -165,7 +159,7 @@ class UserRole extends React.Component {
                   label='Clinical Role'
                   code='ltclinicalrole'
                   onChange={(value) => {
-                    console.log(value)
+                    // console.log(value)
                   }}
                 />
               )}
@@ -216,7 +210,7 @@ class UserRole extends React.Component {
             onClose={this.toggleModal}
             onConfirm={this.toggleModal}
           >
-            <UserRoleForm />
+            <UserRoleForm history={history} />
           </CommonModal>
         </GridContainer>
       </CardContainer>
@@ -224,4 +218,4 @@ class UserRole extends React.Component {
   }
 }
 
-export default withStyles(styles, { name: 'UserProfile' })(UserRole)
+export default withStyles(styles, { name: 'UserRole' })(UserRole)
