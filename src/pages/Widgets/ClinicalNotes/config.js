@@ -20,7 +20,7 @@ export const defaultConfigs = {
       authority: 'queue.consultation.clinicalnotes.clinicalnotes',
       category: 'ClinicianNote',
       gpFieldName: 'clinicianNote',
-      dentalFieldName: 'clinicianNote',
+      dentalFieldName: 'clinicalNotes',
       fieldTitle: 'Clinical Notes',
       scribbleField: 'notesScribbleArray',
       gpScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
