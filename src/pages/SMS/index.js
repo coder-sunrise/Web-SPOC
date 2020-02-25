@@ -89,9 +89,9 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
 
     return {
       apiCriteria: {
-        PDPAPhone: true,
-        PDPAMessage: true,
-        PDPAEmail: true,
+        pdpaphone: true,
+        pdpamessage: true,
+        pdpaemail: true,
       },
     }
   }

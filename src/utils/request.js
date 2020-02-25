@@ -355,9 +355,9 @@ const request = (
             }
 
             let errorMsg = codeMessage[response.status]
-            const loginAndResetPasswordUrl = [
-              '/connect/token',
-            ]
+            // const loginAndResetPasswordUrl = [
+            //   '/connect/token',
+            // ]
             if (
               // (response.status === 400 && token === null) ||
               response.status === 401 &&
@@ -417,7 +417,7 @@ const request = (
                 requestId: response.responseJSON.requestId,
               })
             } else {
-              console.log('here')
+              // console.log('here')
               logError(showNotification, {
                 message: (
                   <div>
