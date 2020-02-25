@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { timeFormat } from '@/components'
 import { DoctorLabel } from '@/components/_medisys'
 
@@ -10,34 +11,11 @@ export const AppointmentDataColumn = [
   { name: 'appointmentTypeFK', title: 'Appointment Type' },
   { name: 'startTime', title: 'Time From' },
   { name: 'endTime', title: 'Appt Duration' },
-  // { name: 'endTime', title: 'Time To' },
   { name: 'roomFk', title: 'Room' },
   { name: 'isPrimaryClinician', title: 'Primary Doctor' },
 ]
 
 export const AppointmentDataColExtensions = [
-  // {
-  //   columnName: 'conflicts',
-  //   // type: 'error',
-  //   editingEnabled: false,
-  //   sortingEnabled: false,
-  //   disabled: true,
-  //   width: 60,
-  //   render: (row) => {
-  //     if (row.conflicts && row.conflicts.length > 0)
-  //       return <ErrorPopover errors={row.conflicts} />
-  //     return null
-  //   },
-  // },
-  // {
-  //   columnName: 'clinicianFK',
-  //   width: 200,
-  //   type: 'codeSelect',
-  //   code: 'clinicianprofile',
-  //   labelField: 'name',
-  //   valueField: 'id',
-  //   renderDropdown: (option) => <DoctorLabel doctor={option} />,
-  // },
   {
     columnName: 'clinicianFK',
     width: 150,
@@ -46,7 +24,7 @@ export const AppointmentDataColExtensions = [
     labelField: 'clinicianProfile.name',
     valueField: 'clinicianProfile.id',
     remoteFilter: {
-      'clinicianProfile.isActive': true,
+      'clinicianProfile.isActive': false,
     },
     renderDropdown: (option) => <DoctorLabel doctor={option} />,
   },
@@ -70,7 +48,21 @@ export const AppointmentDataColExtensions = [
     width: 110,
     format: timeFormat,
     allowClear: false,
-    // value: '00:00',
+    onChange: (props) => {
+      const { row } = props
+      const { apptDurationHour = 0, apptDurationMinute = 0 } = row
+      let { startTime } = row
+      let _endTime = row.endTime
+
+      if (startTime) {
+        const startMoment = moment(startTime, 'HH:mm A')
+        _endTime = startMoment
+          .add(apptDurationHour, 'hour')
+          .add(apptDurationMinute, 'minute')
+          .format('HH:mm')
+        row.endTime = _endTime
+      }
+    },
   },
   {
     columnName: 'roomFk',

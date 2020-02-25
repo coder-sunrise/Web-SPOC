@@ -6,7 +6,6 @@ import { FastField } from 'formik'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import Sdd from '../../Sdd'
-import { getBizSession } from '@/services/queue'
 import {
   CommonModal,
   CardContainer,
@@ -28,49 +27,10 @@ const Detail = ({
   dispatch,
   theme,
   setFieldValue,
+  hasActiveSession,
   ...props
 }) => {
   const field = vaccinationDetail.entity ? 'entity' : 'default'
-
-  const [
-    hasActiveSession,
-    setHasActiveSession,
-  ] = useState(true)
-  const checkHasActiveSession = async () => {
-    const bizSessionPayload = {
-      IsClinicSessionClosed: false,
-    }
-    const result = await getBizSession(bizSessionPayload)
-    const { data } = result.data
-    setHasActiveSession(data.length > 0)
-  }
-
-  useEffect(() => {
-    if (vaccinationDetail.currentId) {
-      dispatch({
-        type: 'vaccinationDetail/query',
-        payload: {
-          id: vaccinationDetail.currentId,
-        },
-      }).then((vac) => {
-        const { sddfk } = vac
-        if (sddfk) {
-          dispatch({
-            type: 'sddDetail/query',
-            payload: {
-              id: sddfk,
-            },
-          }).then((sdd) => {
-            const { data } = sdd
-            const { code, name } = data[0]
-            setFieldValue('sddCode', code)
-            setFieldValue('sddDescription', name)
-          })
-        }
-      })
-      checkHasActiveSession()
-    }
-  }, [])
 
   const [
     toggle,
@@ -118,7 +78,6 @@ const Detail = ({
                       label={formatMessage({
                         id: 'inventory.master.vaccination.code',
                       })}
-                      disabled={!props.values.isActive}
                       {...args}
                     />
                   )

@@ -17,6 +17,7 @@ export const AccessRightConfig = {
       columnName: 'permission',
       type: 'select',
       align: 'center',
+      width: 150,
       sortingEnabled: false,
       width: 250,
       render: (row) => {

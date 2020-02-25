@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -10,6 +10,7 @@ import {
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   actionDiv: {
@@ -35,12 +36,18 @@ const Detail = ({
 }) => {
   const { currentTab } = medication
 
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+
   const detailProps = {
     medicationDetail,
     dispatch,
     setFieldValue,
     showTransfer: true,
     values,
+    hasActiveSession,
     ...props,
   }
 
@@ -50,10 +57,22 @@ const Detail = ({
     setFieldValue,
     dispatch,
     errors: props.errors,
+    hasActiveSession,
+  }
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+
+    setHasActiveSession(data.length > 0)
   }
 
   useEffect(() => {
     if (medicationDetail.currentId) {
+      checkHasActiveSession()
       let tempCode
       let tempName
       dispatch({
@@ -202,7 +221,10 @@ export default compose(
       }
     },
     validationSchema: Yup.object().shape({
-      // code: Yup.string().required(),
+      code: Yup.string().when('id', {
+        is: (id) => !!id,
+        then: Yup.string().trim().required(),
+      }),
       displayValue: Yup.string().required(),
       revenueCategoryFK: Yup.number().required(),
       effectiveDates: Yup.array().of(Yup.date()).min(2).required(),

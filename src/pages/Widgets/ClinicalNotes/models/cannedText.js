@@ -1,11 +1,17 @@
 import { createFormViewModel } from 'medisys-model'
 // import * as service from '../services'
 import * as service from '../services/cannedText'
-import { CANNED_TEXT_TYPE_FIELD } from '@/utils/constants'
+import {
+  CANNED_TEXT_TYPE_FIELD,
+  DENTAL_CANNED_TEXT_TYPE_FIELD,
+  CLINIC_TYPE,
+} from '@/utils/constants'
+import { CANNEDTEXT_FIELD_KEY } from '../CannedText/utils'
 
 const defaultState = {
   clinicianNote: [],
   chiefComplaints: [],
+  complaints: [],
   plan: [],
   associatedHistory: [],
   intraOral: [],
@@ -33,6 +39,7 @@ export default createFormViewModel({
     effects: {
       *queryAll (_, { select, call, put, all }) {
         const cannedTextState = yield select((st) => st.cannedText)
+        const clinicInfo = yield select((state) => state.clinicInfo)
         const queries = cannedTextState.cannedTextTypes
           .filter((types) => !!types)
           .map((types) => call(service.query, types))
@@ -44,6 +51,7 @@ export default createFormViewModel({
               type: 'queryDone',
               payload: {
                 data: response.data,
+                clinicTypeFK: clinicInfo.clinicTypeFK,
               },
             }),
           )
@@ -66,24 +74,17 @@ export default createFormViewModel({
       },
       queryDone (state, { payload }) {
         const { data } = payload
+        const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo')) || {
+          clinicTypeFK: CLINIC_TYPE.GP,
+        }
+        const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
         const { fields, selectedNote, ...restState } = state
         const splitByCannedTextType = (_result, cannedText) => {
-          const field = CANNED_TEXT_TYPE_FIELD[cannedText.cannedTextTypeFK]
+          const fkField = CANNEDTEXT_FIELD_KEY[clinicTypeFK]
+
+          const field = fkField[cannedText.cannedTextTypeFK]
           const currentField = _result[field] || []
           let rest = {}
-          // if (cannedText.isShared) {
-          //   const insertIntoOtherFields = (merged, eachField) => ({
-          //     ...merged,
-          //     [eachField]: [
-          //       ...(_result[eachField] || [])
-          //         .filter((item) => item.id !== cannedText.id),
-          //       cannedText,
-          //     ],
-          //   })
-          //   rest = fields.reduce(insertIntoOtherFields, {
-          //     ...restState,
-          //   })
-          // }
 
           return {
             ..._result,
@@ -96,7 +97,6 @@ export default createFormViewModel({
         }
 
         const result = data.reduce(splitByCannedTextType, { ...restState })
-        console.log({ result })
         return { ...state, ...result }
       },
       setList (state, { payload }) {

@@ -41,13 +41,17 @@ class PatientInfoSideBanner extends PureComponent {
     }
   }
 
-  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
+   refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK) => {
     const { dispatch, entity, setValues } = this.props
+    const isSaveToDb = true
+
     dispatch({
       type: 'patient/refreshChasBalance',
       payload: {
         ...entity,
         patientCoPaymentSchemeFK,
+        isSaveToDb,
+        patientProfileId:entity.id,
       },
     }).then((result) => {
       if (result) {
@@ -104,6 +108,7 @@ class PatientInfoSideBanner extends PureComponent {
             },
           })
         }
+
       }
     })
   }
@@ -115,26 +120,35 @@ class PatientInfoSideBanner extends PureComponent {
     ) {
       return { ...this.state.refreshedSchemeData }
     }
-    // Scheme Balance
-    const balance =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].balance
-    // Patient Acute Visit Patient Balance
-    const acuteVPBal =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
-    // Patient Acute Visit Clinic Balance
-    const acuteVCBal =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
 
-    const chronicStatus =
-      schemeData.patientSchemeBalance.length <= 0
-        ? undefined
-        : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+    let balance =''
+    let acuteVPBal =''
+    let acuteVCBal =''
+    let chronicStatus =''
+
+    if(!schemeData.isNew){
+      // Scheme Balance
+      balance =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].balance
+      // Patient Acute Visit Patient Balance
+      acuteVPBal =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].acuteVisitPatientBalance
+      // Patient Acute Visit Clinic Balance
+      acuteVCBal =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].acuteVisitClinicBalance
+
+      chronicStatus =
+        schemeData.patientSchemeBalance.length <= 0
+          ? undefined
+          : schemeData.patientSchemeBalance[0].chronicBalanceStatusCode
+    }
+
 
     return {
       balance,
@@ -215,7 +229,7 @@ class PatientInfoSideBanner extends PureComponent {
           className={classes.schemeContainer}
           style={{ maxHeight: height - 455 - 20 }}
         >
-          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6).map((o) => {
+          {entity.patientScheme.filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted).map((o) => {
             const schemeData = this.getSchemeDetails(o)
 
             return (

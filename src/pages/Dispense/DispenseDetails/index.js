@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { compose } from 'redux'
 // material ui
@@ -32,6 +32,8 @@ import {
 import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import CONSTANTS from './constants'
+
 import { dangerColor } from '@/assets/jss'
 // const styles = (theme) => ({
 //   gridRow: {
@@ -79,6 +81,7 @@ const DispenseDetails = ({
   dispatch,
   viewOnly = false,
   onPrint,
+  sendingJob,
   onReloadClick,
   onSaveClick,
   onEditOrderClick,
@@ -87,23 +90,40 @@ const DispenseDetails = ({
   dispense,
   history,
 }) => {
+  const [
+    loading,
+    setLoading,
+  ] = useState(false)
   useEffect(() => {
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventorymedication',
-        force: true,
-        temp: true,
-      },
-    })
-    dispatch({
-      type: 'codetable/fetchCodes',
-      payload: {
-        code: 'inventoryconsumable',
-        force: true,
-        temp: true,
-      },
-    })
+    const getCodeTables = async () => {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventorymedication',
+          force: true,
+          temp: true,
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryconsumable',
+          force: true,
+          temp: true,
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+          force: true,
+          temp: true,
+        },
+      })
+      setLoading(false)
+    }
+    setLoading(true)
+    getCodeTables()
   }, [])
 
   const {
@@ -233,20 +253,22 @@ const DispenseDetails = ({
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Medications')
+              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Drug Label
           </Button>
           <Button
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Patient')
+              onPrint({ type: CONSTANTS.PATIENT_LABEL })
             }}
+            disabled={sendingJob}
           >
-            <Print />
+            {sendingJob ? <Refresh className='spin-custom' /> : <Print />}
             Patient Label
           </Button>
         </GridItem>
@@ -290,6 +312,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Edit />}
                 onClick={onEditOrderClick}
+                disabled={loading}
               >
                 Add Order
               </ProgressButton>

@@ -36,8 +36,9 @@ const Diagnosis = ({
   ...props
 }) => {
   const { data = [], selected } = dentalChartComponent
-  const groups = _.groupBy(data, 'toothNo')
+  // console.log(data)
 
+  const groups = Object.values(_.groupBy(data, 'toothNo'))
   return (
     <div>
       <div
@@ -48,17 +49,26 @@ const Diagnosis = ({
         }}
       >
         <h4>Tooth Journal</h4>
-        {Object.keys(groups).map((k) => {
+        {groups.map((k) => {
+          const cfg = {
+            theme,
+            dispatch,
+            data,
+            classes,
+            index: k[0].toothNo,
+            selected,
+          }
+
           return (
-            <SortItem
-              theme={theme}
-              dispatch={dispatch}
-              item={groups[k]}
-              data={data}
-              classes={classes}
-              index={k}
-              selected={selected}
-            />
+            <React.Fragment>
+              {k.find((o) => o.target.indexOf('top') > 0) && (
+                <SortItem {...cfg} item={k.filter((o) => o.name === 'root')} />
+              )}
+              <SortItem {...cfg} item={k.filter((o) => o.name !== 'root')} />
+              {k.find((o) => o.target.indexOf('bottom') > 0) && (
+                <SortItem {...cfg} item={k.filter((o) => o.name === 'root')} />
+              )}
+            </React.Fragment>
           )
         })}
       </div>

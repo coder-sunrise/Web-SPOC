@@ -144,8 +144,14 @@ const ApplyClaims = ({
     incrementCommitCount()
   }
 
-  const handleSchemeChange = (value, index, invoicePayerList, invoiceItems) => {
-    const flattenSchemes = claimableSchemes.reduce(
+  const handleSchemeChange = (
+    value,
+    index,
+    invoicePayerList,
+    invoiceItems,
+    allSchemes,
+  ) => {
+    const flattenSchemes = allSchemes.reduce(
       (schemes, cs) => [
         ...schemes,
         ...cs.map((item) => ({ ...item })),
@@ -259,6 +265,7 @@ const ApplyClaims = ({
           _invoicePayer,
         ],
         invoice.invoiceItems,
+        claimableSchemes,
       )
     } else {
       setInitialState([])
@@ -300,7 +307,15 @@ const ApplyClaims = ({
   }
 
   const resetClaims = useCallback(
-    () => {
+    async () => {
+      const response = await dispatch({
+        type: 'billing/query',
+        payload: { id: values.visitId },
+      })
+
+      // abort early if failed to reset bill
+      if (!response) return
+
       const _newTempInvoicePayer = tempInvoicePayer.map((i) => ({
         ...i,
         _isDeleted: true,
@@ -309,11 +324,11 @@ const ApplyClaims = ({
         _isConfirmed: true,
         _isEditing: false,
       }))
-
-      if (claimableSchemes.length > 0) {
+      const { claimableSchemes: refreshedClaimableSchemes } = response
+      if (refreshedClaimableSchemes.length > 0) {
         const _invoicePayer = {
           ...defaultInvoicePayer,
-          claimableSchemes: claimableSchemes[0],
+          claimableSchemes: refreshedClaimableSchemes[0],
           payerTypeFK: INVOICE_PAYER_TYPE.SCHEME,
         }
         const newTempInvoicePayer = [
@@ -327,6 +342,7 @@ const ApplyClaims = ({
           newTempInvoicePayer.length - 1,
           newTempInvoicePayer,
           invoice.invoiceItems,
+          refreshedClaimableSchemes,
         )
       } else {
         setCurEditInvoicePayerBackup(undefined)
@@ -580,6 +596,8 @@ const ApplyClaims = ({
         invoicePayer.claimableSchemes[nestedIndex].id,
         newTempInvoicePayer.length - 1,
         newTempInvoicePayer,
+        undefined,
+        claimableSchemes,
       )
     }
     return setTempInvoicePayer(newTempInvoicePayer)

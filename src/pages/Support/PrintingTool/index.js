@@ -21,7 +21,6 @@ class PrintingTool extends PureComponent {
                 downloadPrintingTool('SEMRPrintingTool')
               }}
               color='primary'
-              variant='outlined'
             >
               <span>Download</span>
             </Button>

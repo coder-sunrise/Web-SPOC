@@ -85,9 +85,9 @@ const text1l2 = {
   centerfull: 'i',
 }
 const text1r1 = {
-  left: 'd',
+  left: 'm',
   bottom: 'p',
-  right: 'm',
+  right: 'd',
   top: 'b',
   centerLeft: 'o',
   centerRight: 'o',
@@ -116,9 +116,9 @@ const text2l2 = {
   centerfull: 'i',
 }
 const text2r1 = {
-  left: 'd',
+  left: 'm',
   bottom: 'b',
-  right: 'm',
+  right: 'd',
   top: 'l',
   centerLeft: 'o',
   centerRight: 'o',
@@ -848,6 +848,18 @@ class Chart extends React.PureComponent {
 
                 if (selectedTooth.length === 1) {
                   if (selectedTooth[0].line !== group.line) return
+
+                  if (selectedTooth[0].name === group.name) {
+                    group
+                      .filter((o) => o.name === 'bridgeStartPoint')
+                      .map((o) => {
+                        group.remove(o)
+                      })
+                    this.canvas.renderAll()
+
+                    selectedTooth = []
+                    return
+                  }
                 }
                 selectedTooth.push(group)
               }
@@ -974,23 +986,27 @@ class Chart extends React.PureComponent {
 
   resize = (props) => {
     const { dentalChartComponent, global } = props || this.props
-    const width = this.divContainer.current.offsetWidth
+    setTimeout(() => {
+      if (this.divContainer && this.divContainer.current) {
+        const width = this.divContainer.current.offsetWidth
 
-    if (
-      width !== this.state.width ||
-      dentalChartComponent.isPedoChart !== this.state.isPedoChart
-    ) {
-      this.setState({
-        width,
-        isPedoChart: dentalChartComponent.isPedoChart,
-      })
-      this.canvas.setDimensions(this.getCanvasSize(props))
-      this.canvas.setZoom(width / 2200)
-    }
+        if (
+          width !== this.state.width ||
+          dentalChartComponent.isPedoChart !== this.state.isPedoChart
+        ) {
+          this.setState({
+            width,
+            isPedoChart: dentalChartComponent.isPedoChart,
+          })
+          this.canvas.setDimensions(this.getCanvasSize(props))
+          this.canvas.setZoom(width / 2200)
+        }
+      }
+    }, 1)
   }
 
   getCanvasSize = (props) => {
-    const { isPedoChart } = (props || this.props).dentalChartComponent
+    const { isPedoChart } = (props || this.props).dentalChartComponent || {}
 
     const width = this.divContainer.current.offsetWidth // - 4
     // console.log(isPedoChart, width)
@@ -1026,7 +1042,12 @@ class Chart extends React.PureComponent {
 
   renderCanvas = (props, force) => {
     const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
-    const { action, data, isPedoChart, isSurfaceLabel } = dentalChartComponent
+    const {
+      action,
+      data = [],
+      isPedoChart,
+      isSurfaceLabel,
+    } = dentalChartComponent
     if (!action || action.chartMethodTypeFK === 3 || force) {
       selectedTooth = []
       this.canvas._objects
@@ -1088,6 +1109,7 @@ class Chart extends React.PureComponent {
       const toothItems = data.filter(
         (m) => m.toothNo === index && m.target === group.name, // && !m.hide,
       )
+      // console.log(toothItems)
       _.orderBy(
         toothItems,
         [
@@ -1161,6 +1183,12 @@ class Chart extends React.PureComponent {
               4,
             ].includes(target.chartMethodTypeFK)
           ) {
+            let offset = innerFontSize
+            if (o.subTarget === 'cell_outsidebottom') {
+              offset *= 1.8
+            } else if (o.subTarget === 'cell_outsidetop') {
+              offset *= 0.2
+            }
             let shape = new fabric.Group([
               o.subTarget === 'tooth'
                 ? createRectangle({
@@ -1171,9 +1199,9 @@ class Chart extends React.PureComponent {
                   }).rotate(isUpperSection(index) ? 0 : 180),
               createFont({
                 text: target.chartMethodText || '',
-                left: groupWidth / 2 - innerFontSize / 1.8,
-                top: groupHeight / 2 - innerFontSize,
-                fontSize: innerFontSize * 2,
+                left: groupWidth / 3 - innerFontSize / 3,
+                top: groupHeight / 3 - offset,
+                fontSize: innerFontSize * 4,
               }),
             ])
             const d = new fabric.Group(
@@ -1217,41 +1245,45 @@ class Chart extends React.PureComponent {
             o.nodes
           ) {
             // if (target) console.log(3, target, data, o)
-            if (o.toothNo === o.nodes[0]) {
+            if (o.nodes.includes(o.toothNo)) {
               const name = `bridgeLine${o.nodes[0]}-${o.nodes[1]}`
+              // console.log(this.canvas._objects.filter((m) => m.name === name))
+              if (
+                this.canvas._objects.filter((m) => m.name === name).length === 0
+              ) {
+                setTimeout(() => {
+                  const start = this.canvas._objects.find(
+                    (m) => Number(m.name) === o.nodes[0],
+                  )
+                  const end = this.canvas._objects.find(
+                    (m) => Number(m.name) === o.nodes[1],
+                  )
+                  // console.log(start, end)
+                  const line = createLine([
+                    start.translateX,
+                    start.translateY,
+                    end.translateX,
+                    end.translateY,
+                    // 10,
+                    // 10,
+                    // 30,
+                    // 30,
+                  ])
+                  // console.log(group, line)
 
-              setTimeout(() => {
-                const start = this.canvas._objects.find(
-                  (m) => Number(m.name) === o.nodes[0],
-                )
-                const end = this.canvas._objects.find(
-                  (m) => Number(m.name) === o.nodes[1],
-                )
-                // console.log(start, end)
-                const line = createLine([
-                  start.translateX,
-                  start.translateY,
-                  end.translateX,
-                  end.translateY,
-                  // 10,
-                  // 10,
-                  // 30,
-                  // 30,
-                ])
-                // console.log(group, line)
-
-                this.canvas.add(
-                  new fabric.Group(
-                    [
-                      line,
-                      // createCircle(),
-                    ],
-                    {
-                      name,
-                    },
-                  ),
-                )
-              }, 0)
+                  this.canvas.add(
+                    new fabric.Group(
+                      [
+                        line,
+                        // createCircle(),
+                      ],
+                      {
+                        name,
+                      },
+                    ),
+                  )
+                }, 0)
+              }
             }
           }
           if (target.render) {
@@ -1403,7 +1435,7 @@ class Chart extends React.PureComponent {
         ref={this.divContainer}
         style={{ width: '100%', position: 'relative', ...style }}
       >
-        <Tooltip title='Save to local'>
+        <Tooltip title='Export chart to image'>
           <Button
             justIcon
             color='primary'

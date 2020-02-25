@@ -118,20 +118,22 @@ const History = (props) => {
                     label='Previous Visit Date'
                     dropdownMatchSelectWidth={false}
                     // value={selected}
-                    options={list.map(
-                      ({
-                        id,
-                        visitPurposeName,
-                        visitDate,
-                        userName = '',
-                        userTitle = '',
-                      }) => ({
-                        value: id,
-                        name: `${visitPurposeName} (${moment(visitDate).format(
-                          dateFormatLong,
-                        )}) ${userTitle} ${userName}`,
-                      }),
-                    )}
+                    options={list
+                      .filter((o) => o.coHistory && o.coHistory.length)
+                      .map(
+                        ({
+                          id,
+                          visitPurposeName,
+                          visitDate,
+                          userName = '',
+                          userTitle = '',
+                        }) => ({
+                          value: id,
+                          name: `${visitPurposeName} (${moment(
+                            visitDate,
+                          ).format(dateFormatLong)}) ${userTitle} ${userName}`,
+                        }),
+                      )}
                     onChange={(v, op) => {
                       const item = list.find((o) => o.id === v)
                       if (item && item.coHistory[0]) {

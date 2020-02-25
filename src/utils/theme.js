@@ -100,6 +100,13 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+  MuiExpansionPanel: {
+    root: {
+      '&$expanded': {
+        marginTop: 0,
+      },
+    },
+  },
   NavPills: {
     contentWrapper: {
       marginLeft: 1,

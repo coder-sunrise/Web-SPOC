@@ -8,7 +8,8 @@ import Settings from '@material-ui/icons/Settings'
 import { primaryColor } from 'mui-pro-jss'
 import { Button, Popover, Tooltip } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
-import { CANNED_TEXT_TYPE_FIELD } from '@/utils/constants'
+import { CLINIC_TYPE } from '@/utils/constants'
+import { CANNEDTEXT_FIELD_KEY } from './utils'
 
 const styles = (theme) => ({
   item: {
@@ -58,6 +59,7 @@ const ListItem = ({ classes, title, onClick }) => {
 const CannedTextButton = ({
   dispatch,
   classes,
+  clinicInfo,
   cannedText,
   cannedTextTypeFK,
   onSettingClick,
@@ -69,14 +71,18 @@ const CannedTextButton = ({
     show,
     setShow,
   ] = useState(false)
+  const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+  const fkField = CANNEDTEXT_FIELD_KEY[clinicTypeFK]
+  const field = fkField[cannedTextTypeFK]
 
-  const field = CANNED_TEXT_TYPE_FIELD[cannedTextTypeFK]
+  // const field = CANNED_TEXT_TYPE_FIELD[cannedTextTypeFK]
   const list = cannedText[field] || []
+  // console.log({ field, list, fkField })
 
   const toggleVisibleChange = () => setShow(!show)
 
   const handleMainButtonClick = () => {
-    if (cannedTextTypeFK) {
+    if (cannedTextTypeFK && !show) {
       dispatch({
         type: 'cannedText/query',
         payload: cannedTextTypeFK,
@@ -128,25 +134,16 @@ const CannedTextButton = ({
         </LoadingWrapper>
       }
     >
-      <Button
-        color='info'
-        style={{
-          position: 'absolute',
-          zIndex: 1,
-          left: 435,
-          right: 0,
-          top: 10,
-        }}
-        onClick={handleMainButtonClick}
-      >
+      <Button color='info' onClick={handleMainButtonClick}>
         Canned Text
       </Button>
     </Popover>
   )
 }
 
-const Connected = connect(({ cannedText, loading }) => ({
+const Connected = connect(({ cannedText, loading, clinicInfo }) => ({
   cannedText,
+  clinicInfo,
   loading: loading.effects['cannedText/query'],
 }))(CannedTextButton)
 

@@ -58,7 +58,7 @@ const maxTime = new Date(
   today.getFullYear(),
   today.getMonth(),
   today.getDate(),
-  19,
+  21,
   0,
   0,
 )
@@ -292,7 +292,7 @@ const CalendarView = ({
       <Event
         {...eventProps}
         // calendarView={calendarView}
-        handleMouseOver={handleEventMouseOver}
+        // handleMouseOver={handleEventMouseOver}
       />
     )
   }
@@ -303,9 +303,9 @@ const CalendarView = ({
         return calendarEvents.reduce((events, appointment) => {
           const { appointment_Resources: apptResources = [] } = appointment
 
-          const firstApptRes = apptResources.find(
-            (item) => item.sortOrder === 0,
-          )
+          // TODO: need to fix sortOrder calculation, should exclude deleted appointments when calculating sortOrder
+          const firstApptRes =
+            apptResources.length >= 1 ? apptResources[0] : undefined
 
           const firstClinicianFK =
             firstApptRes !== undefined ? firstApptRes.clinicianFK : undefined
@@ -335,6 +335,9 @@ const CalendarView = ({
           isEnableRecurrence,
           appointment_Resources: apptResources,
           appointmentRemarks,
+          appointmentStatusFk,
+          bookedByUser,
+          createDate,
         } = appointment
 
         const apptEvents = apptResources.map((item) => ({
@@ -346,6 +349,9 @@ const CalendarView = ({
           patientContactNo,
           isEnableRecurrence,
           appointmentRemarks,
+          appointmentStatusFk,
+          bookedByUser,
+          createDate,
           start: moment(
             `${appointmentDate} ${item.startTime}`,
             `${serverDateFormat} HH:mm`,

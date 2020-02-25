@@ -209,7 +209,11 @@ class RadioTypeProvider extends PureComponent {
     super(props)
     this.RadioEditor = (columns, text) => (editorProps) => {
       return (
-        <RadioEditor editMode columnExtensions={columns} {...editorProps} />
+        <RadioEditor
+          editMode={!text}
+          columnExtensions={columns}
+          {...editorProps}
+        />
       )
     }
   }

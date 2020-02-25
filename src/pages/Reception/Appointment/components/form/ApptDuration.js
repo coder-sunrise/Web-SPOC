@@ -29,7 +29,6 @@ const minuteOptions = [
   { name: '55 MINS', value: 55 },
 ]
 const setEndTime = (row) => {
-  // console.log('setEndTime')
   const { startTime, apptDurationHour = 0, apptDurationMinute = 0 } = row
   if (startTime) {
     const startMoment = moment(startTime, 'HH:mm')
@@ -38,15 +37,11 @@ const setEndTime = (row) => {
       .add(apptDurationMinute, 'minute')
       .format('HH:mm')
   } else row.endTime = undefined
-
-  // console.log(row)
 }
 
 const ApptDuration = ({ row, columnConfig, cellProps }) => {
   const { value, control, validSchema, ...restProps } = columnConfig
-
   const { onBlur, onFocus, autoFocus, ...props } = cellProps
-  // console.log(restProps, props)
   const [
     blur,
     setBlur,

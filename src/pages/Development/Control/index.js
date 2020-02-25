@@ -501,7 +501,7 @@ class ControlTest extends PureComponent {
             <FastField
               name='numberField'
               render={(args) => {
-                return <NumberInput currency label='Number' {...args} />
+                return <NumberInput format='0,0' label='Number' {...args} />
               }}
             />
           </GridItem>

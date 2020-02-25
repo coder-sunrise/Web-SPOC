@@ -17,3 +17,14 @@ export const formatDateToText = (value = undefined, parseFormat) => {
 
 export const calculateAgeFromDOB = (dob) =>
   Math.floor(moment.duration(moment().diff(dob)).asYears())
+
+export const formatDatesToUTC = (dates) => {
+  if (Array.isArray(dates) && dates.length > 0) {
+    return [
+      moment(dates[0]).formatUTC(),
+      moment(dates[1]).formatUTC(false),
+    ]
+  }
+
+  return []
+}
