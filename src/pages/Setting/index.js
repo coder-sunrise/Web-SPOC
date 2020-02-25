@@ -197,22 +197,13 @@ class SystemSetting extends PureComponent {
 
     return (
       <CardContainer hideHeader>
-        <div>
-          <TextField
-            className={classes.searchField}
-            prefix={<Search />}
-            onChange={this.onSearchTextChange}
-            autoFocus
-            value={searchText}
-          />
-          <Button
-            onClick={this.clearSearchText}
-            size='sm'
-            style={{ marginLeft: 8 }}
-          >
-            Clear search
-          </Button>
-        </div>
+        <TextField
+          className={classes.searchField}
+          prefix={<Search />}
+          onChange={this.onSearchTextChange}
+          autoFocus
+          value={searchText}
+        />
         <Accordion
           defaultActive={0}
           mode={isMultiple ? 'multiple' : 'default'}

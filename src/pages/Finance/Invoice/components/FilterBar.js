@@ -32,10 +32,11 @@ const getBizSessionId = async () => {
 const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
   const { invoiceStartDate, invoiceEndDate } = values
 
-  const handleReset = () => {
-    dispatch({
+  const handleReset = async () => {
+    await dispatch({
       type: 'invoiceList/resetFilter',
     })
+    handleSubmit()
   }
 
   return (
