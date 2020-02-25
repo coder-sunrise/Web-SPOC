@@ -6,6 +6,7 @@ export default {
   'sms.from': 'From',
   'sms.to': 'To',
   'sms.search': 'Search',
+  'sms.postCardLabel': 'Post Card Label',
   'sms.doctor': 'Doctor',
   'sms.appointment.status': 'Appointment Status',
   'sms.appointment.exclude': 'Exclude appointment that had sent SMS before',
