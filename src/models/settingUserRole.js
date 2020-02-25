@@ -1,4 +1,5 @@
 import { createListViewModel } from 'medisys-model'
+import moment from 'moment'
 import * as service from '@/pages/Setting/UserRole/services'
 
 export default createListViewModel({
@@ -11,18 +12,20 @@ export default createListViewModel({
     state: {
       list: [],
       currentSelectedUserRole: {
+        isEdit: false,
         filteredAccessRight: [],
-        clientAccessRight: [],
+        effectiveStartDate: moment().formatUTC(),
+        effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
       },
     },
     effects: {
       *fetchUserRoleByID ({ payload }, { call, put }) {
         const response = yield call(service.getUserRoleById, payload)
+        const { isEdit } = payload
         const { data = {}, status } = response
         const nameList = [
           'module',
           'displayValue',
-          'permission',
         ]
         for (let i = 0; i < nameList.length; i++) {
           yield put({
@@ -35,7 +38,46 @@ export default createListViewModel({
         }
         return yield put({
           type: 'updateUserRole',
-          data: { ...data },
+          data: { ...data, isEdit },
+        })
+      },
+      *fetchDefaultAccessRight ({ payload }, { call, put }) {
+        const response = yield call(service.getAccessRight)
+        const { data = [], status } = response
+        const nameList = [
+          'module',
+          'displayValue',
+        ]
+
+        for (let i = 0; i < nameList.length; i++) {
+          yield put({
+            type: 'genList',
+            data: [
+              ...data,
+            ],
+            name: nameList[i],
+          })
+        }
+        console.log(data)
+        const resultData = []
+        data.map((d) => {
+          const permission =
+            (d.type === 'Module' && 'ReadOnly') ||
+            (d.type === 'Action' && 'Disabled') ||
+            (d.type === 'Field' && 'ReadOnly') ||
+            'Hidden'
+          return resultData.push({
+            permission: d.permission || permission,
+            ...d,
+          })
+        })
+
+        console.log(resultData)
+        return yield put({
+          type: 'loadAccessRight',
+          data: [
+            ...resultData,
+          ],
         })
       },
     },
@@ -50,8 +92,19 @@ export default createListViewModel({
           },
         }
       },
+      loadAccessRight (state, { data }) {
+        return {
+          ...state,
+          currentSelectedUserRole: {
+            effectiveStartDate:
+              state.currentSelectedUserRole.effectiveStartDate,
+            effectiveEndDate: state.currentSelectedUserRole.effectiveEndDate,
+            filteredAccessRight: data,
+            roleClientAccessRight: data,
+          },
+        }
+      },
       filter (state, { criteria }) {
-        console.log(criteria)
         const accessRight = [
           ...state.currentSelectedUserRole.roleClientAccessRight,
         ]
@@ -69,6 +122,9 @@ export default createListViewModel({
             filteredAccessRight: result,
           },
         }
+      },
+      genEffectiveDate (state) {
+        return { ...state }
       },
       genList (state, { name, data }) {
         let set = new Set()

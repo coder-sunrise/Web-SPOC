@@ -37,10 +37,14 @@ export const AccessRightConfig = {
                     { name: 'Disabled', value: 3 },
                     { name: 'Hidden', value: 4 },
                   ]) ||
-                  (row.type === 'Field' && [
+                  ((row.type === 'Field' && [
                     { name: 'ReadWrite', value: 0 },
                     { name: 'ReadOnly', value: 1 },
                     { name: 'Hidden', value: 4 },
+                  ]) || [
+                    { name: 'ReadWrite', value: 0 },
+                    { name: 'ReadOnly', value: 1 },
+                    { name: 'Enabled', value: 2 },
                   ])
                 }
               />

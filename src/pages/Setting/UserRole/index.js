@@ -57,7 +57,20 @@ class UserRole extends React.Component {
           columnName: 'action',
           width: 90,
           align: 'center',
-          render: (row) => this.Cell(row),
+          render: (row) => {
+            return (
+              <Tooltip title='Edit User Role' placement='bottom'>
+                <Button
+                  justIcon
+                  color='primary'
+                  onClick={() => this.editRow(row)}
+                  id={row.id}
+                >
+                  <Edit />
+                </Button>
+              </Tooltip>
+            )
+          },
         },
       ],
     },
@@ -82,8 +95,8 @@ class UserRole extends React.Component {
 
   onTextFieldChange = (event, value) => {}
 
-  handleActionButtonClick = () => {
-    this.props.history.push(`/setting/userrole/new`)
+  editRow = (row) => {
+    this.props.history.push(`/setting/userrole/${row.id}`)
   }
 
   handleDoubleClick = (row) => {
@@ -111,23 +124,6 @@ class UserRole extends React.Component {
     })
   }
 
-  Cell = (row) => {
-    return (
-      <Tooltip title='Edit User Profile' placement='bottom'>
-        <Button
-          justIcon
-          color='primary'
-          onClick={this.handleActionButtonClick}
-          id={row.id}
-        >
-          <Edit />
-        </Button>
-      </Tooltip>
-    )
-  }
-
-  TableCell = (p) => this.Cell({ ...p })
-
   toggleModal = () => {
     const { showUserProfileForm } = this.state
     this.setState({ showUserProfileForm: !showUserProfileForm })
@@ -137,7 +133,7 @@ class UserRole extends React.Component {
     const { classes, settingUserRole, history } = this.props
     const { filter, showUserProfileForm } = this.state
     const { clinicalRoleNameList } = settingUserRole
-    const ActionProps = { TableCellComponent: this.TableCell }
+    // const ActionProps = { TableCellComponent: this.TableCell }
 
     return (
       <CardContainer hideHeader>

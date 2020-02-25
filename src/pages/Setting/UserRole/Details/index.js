@@ -39,9 +39,6 @@ const styles = (theme) => ({
     },
     // marginBottom: theme.spacing(1),
   },
-  isDoctorCheck: {
-    paddingTop: `${theme.spacing(2)}px !important`,
-  },
   indent: {
     paddingLeft: theme.spacing(2),
   },
@@ -59,7 +56,6 @@ const styles = (theme) => ({
   enableReinitialize: true,
   mapPropsToValues: (props) => {
     const { userRole } = props
-    console.log(props)
     return {
       ...userRole,
       effectiveDates: [
@@ -72,20 +68,36 @@ const styles = (theme) => ({
     code: Yup.string().required(),
     name: Yup.string().required(),
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    description: Yup.string(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
-    const { dispatch, onConfirm } = props
-    console.log(values)
+    const { dispatch, onConfirm, history } = props
+    const {
+      effectiveDates,
+      filteredAccessRight,
+      isEdit,
+      ...restValues
+    } = values
+    if (!isEdit) {
+      const { roleClientAccessRight } = restValues
+      const newClientAccessRight = []
+      roleClientAccessRight.map((d) => {
+        const { id, ...data } = d
+        return newClientAccessRight.push(data)
+      })
+      delete restValues.id
+      delete restValues.concurrencyToken
+      restValues.isUserMaintainable = true
+      restValues.roleClientAccessRight = newClientAccessRight
+    }
     dispatch({
       type: 'settingUserRole/upsert',
-      payload: values,
+      payload: restValues,
     }).then((r) => {
       if (r) {
         resetForm()
         if (onConfirm) onConfirm()
-        dispatch({
-          type: 'settingUserRole/query',
-        })
+        history.push('/setting/userrole')
       }
     })
   },
@@ -98,12 +110,29 @@ class UserRoleDetail extends React.Component {
 
   componentDidMount = () => {
     const rowId = this.props.match.params.id
-    this.props.dispatch({
-      type: 'settingUserRole/fetchUserRoleByID',
-      payload: {
-        id: rowId || 1,
-      },
-    })
+    if (rowId) {
+      this.props.dispatch({
+        type: 'settingUserRole/fetchUserRoleByID',
+        payload: {
+          id: rowId,
+          isEdit: true,
+        },
+      })
+    } else if (this.props.location.state) {
+      const newId = this.props.location.state.id
+      this.props.dispatch({
+        type: 'settingUserRole/fetchUserRoleByID',
+        payload: {
+          id: newId,
+          isEdit: false,
+        },
+      })
+    } else {
+      this.props.dispatch({
+        type: 'settingUserRole/fetchDefaultAccessRight',
+        payload: { isEdit: false },
+      })
+    }
   }
 
   handleSearchClick = () => {
@@ -135,6 +164,7 @@ class UserRoleDetail extends React.Component {
       displayValueList,
     } = settingUserRole
     const { params } = match
+    const { isEdit } = currentSelectedUserRole
 
     return (
       <React.Fragment>
@@ -151,9 +181,11 @@ class UserRoleDetail extends React.Component {
               <GridItem md={4}>
                 <FastField
                   name='code'
-                  render={(args) => (
-                    <TextField label='Code' autoFocus {...args} />
-                  )}
+                  render={(args) => {
+                    return (
+                      <TextField label='Code' disabled={isEdit} {...args} />
+                    )
+                  }}
                 />
               </GridItem>
               <GridItem md={4}>
@@ -174,9 +206,7 @@ class UserRoleDetail extends React.Component {
               <GridItem md={4}>
                 <FastField
                   name='name'
-                  render={(args) => (
-                    <TextField label='Name' autoFocus {...args} />
-                  )}
+                  render={(args) => <TextField label='Name' {...args} />}
                 />
               </GridItem>
             </GridContainer>
@@ -185,9 +215,7 @@ class UserRoleDetail extends React.Component {
               <GridItem md={4}>
                 <FastField
                   name='description'
-                  render={(args) => (
-                    <TextField label='Description' autoFocus {...args} />
-                  )}
+                  render={(args) => <TextField label='Description' {...args} />}
                 />
               </GridItem>
             </GridContainer>
@@ -201,9 +229,7 @@ class UserRoleDetail extends React.Component {
                       {...args}
                       label='Clinical Role'
                       code='ltclinicalrole'
-                      onChange={(value) => {
-                        console.log(value)
-                      }}
+                      disabled={isEdit}
                     />
                   )}
                 />
@@ -280,7 +306,6 @@ class UserRoleDetail extends React.Component {
               onClick={() => {
                 this.props.handleSubmit()
               }}
-              disabled
             >
               Save
             </ProgressButton>

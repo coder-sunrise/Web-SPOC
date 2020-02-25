@@ -58,6 +58,8 @@ class UserRoleForm extends React.PureComponent {
     const { selectedValue } = this.state
     if (selectedValue) {
       this.props.history.push(`/setting/userrole/new`, { id: selectedValue })
+    } else {
+      this.props.history.push(`/setting/userrole/new`)
     }
   }
 
