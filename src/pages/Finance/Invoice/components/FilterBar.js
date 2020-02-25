@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 // formik
 import { FastField, Field, withFormik } from 'formik'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
-import moment from 'moment'
 // common components
 import {
+  Button,
   ProgressButton,
   GridContainer,
   GridItem,
@@ -30,19 +30,13 @@ const getBizSessionId = async () => {
 }
 
 const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
-  const unmount = () =>
-    dispatch({
-      type: 'invoiceList/updateState',
-      payload: {
-        filter: {},
-      },
-    })
-
-  useEffect(() => {
-    return unmount
-  }, [])
-
   const { invoiceStartDate, invoiceEndDate } = values
+
+  const handleReset = () => {
+    dispatch({
+      type: 'invoiceList/resetFilter',
+    })
+  }
 
   return (
     <SizeContainer>
@@ -135,6 +129,7 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
           >
             <FormattedMessage id='form.search' />
           </ProgressButton>
+          <Button onClick={handleReset}>Reset</Button>
           {/* <i>Double click on record to view invoice</i> */}
         </div>
       </React.Fragment>
@@ -143,13 +138,8 @@ const FilterBar = ({ classes, dispatch, values, handleSubmit }) => {
 }
 
 export default withFormik({
-  mapPropsToValues: () => ({
-    invoiceStartDate: moment().add(-1, 'month'),
-    invoiceEndDate: moment(),
-    isIncludePatientOS: true,
-    isIncludeGovtOS: true,
-    isIncludeCorporateOS: true,
-  }),
+  enableReinitialize: true,
+  mapPropsToValues: ({ invoiceList }) => ({ ...invoiceList.filterValues }),
   handleSubmit: async (values, { props }) => {
     const { dispatch } = props
     const {
@@ -199,6 +189,14 @@ export default withFormik({
     dispatch({
       type: 'invoiceList/query',
       payload,
+    })
+    dispatch({
+      type: 'invoiceList/updateState',
+      payload: {
+        filterValues: {
+          ...values,
+        },
+      },
     })
   },
 })(FilterBar)
