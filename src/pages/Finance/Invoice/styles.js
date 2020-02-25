@@ -5,7 +5,6 @@ export default (theme) => ({
     marginRight: theme.spacing(1),
     marginBottom: theme.spacing(2),
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
     '& > i': {
       fontWeight: 100,

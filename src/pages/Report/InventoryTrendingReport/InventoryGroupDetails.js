@@ -30,15 +30,33 @@ class InventoryGroupDetails extends PureComponent {
       { name: 'inventoryItem', title: 'Item' },
       { name: 'patientCount', title: 'Patients' },
       { name: 'visitCount', title: 'Visits' },
-      { name: 'totalQuantity', title: 'Total Dispense Quantity' },
+      {
+        name: 'totalQuantity',
+        title: 'Total Dispense Quantity',
+      },
     ]
     const InventoryGroupDetailsExtensions = [
       { columnName: 'groupName', sortingEnabled: false },
       { columnName: 'inventoryType', sortingEnabled: false },
       { columnName: 'inventoryItem', sortingEnabled: false },
-      { columnName: 'patientCount', sortingEnabled: false },
-      { columnName: 'visitCount', sortingEnabled: false },
-      { columnName: 'totalQuantity', sortingEnabled: false },
+      {
+        columnName: 'patientCount',
+        sortingEnabled: false,
+        type: 'number',
+        precision: 0,
+      },
+      {
+        columnName: 'visitCount',
+        sortingEnabled: false,
+        type: 'number',
+        precision: 0,
+      },
+      {
+        columnName: 'totalQuantity',
+        sortingEnabled: false,
+        type: 'number',
+        precision: 0,
+      },
     ]
 
     return (

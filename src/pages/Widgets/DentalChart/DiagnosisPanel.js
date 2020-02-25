@@ -57,7 +57,7 @@ const styles = (theme) => {
       '&:first-child': {
         borderRadius: Number(theme.shape.borderRadius),
       },
-      height: 34,
+      height: 33,
       lineHeight: 1,
       // whiteSpace: 'nowrap',
       paddingLeft: 37,

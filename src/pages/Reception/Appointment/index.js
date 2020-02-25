@@ -13,6 +13,7 @@ import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
+import AppointmentSearch from './AppointmentSearch'
 // settings
 import {
   defaultColorOpts,
@@ -86,6 +87,7 @@ class Appointment extends React.PureComponent {
     showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
+    showSearchAppointmentModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: null,
@@ -445,6 +447,14 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  toggleSearchAppointmentModal = () => {
+    this.setState((prevState) => {
+      return {
+        showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
+      }
+    })
+  }
+
   render () {
     const { calendar: CalendarModel, classes, calendarLoading } = this.props
     const {
@@ -460,6 +470,7 @@ class Appointment extends React.PureComponent {
       filter,
       selectedAppointmentFK,
       primaryClinicianFK,
+      showSearchAppointmentModal,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -509,6 +520,7 @@ class Appointment extends React.PureComponent {
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
+          toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
         />
         <Authorized authority='appointment.appointmentdetails'>
           <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
@@ -563,6 +575,18 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           <SeriesConfirmation onConfirmClick={this.editSeriesConfirmation} />
+        </CommonModal>
+
+        <CommonModal
+          open={showSearchAppointmentModal}
+          title='Appointment Search'
+          onClose={this.toggleSearchAppointmentModal}
+          maxWidth='xl'
+        >
+          <AppointmentSearch
+            handleSelectEvent={this.onSelectEvent}
+            handleAddAppointmentClick={this.handleAddAppointmentClick}
+          />
         </CommonModal>
       </CardContainer>
     )

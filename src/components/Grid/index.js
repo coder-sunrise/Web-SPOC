@@ -100,11 +100,12 @@ export function QtyFormatter ({ value }) {
 // }
 const dateFormatLong = 'DD MMM YYYY'
 const dateFormat = 'DD-MM-YYYY'
+const reversedDateFormat = 'YYYY-MM-DD'
 const dateFormatWithTime = 'DD-MM-YYYY HH:mm:ss'
 const dateFormatLongWithTime = 'DD MMM YYYY HH:mm:ss'
 const dateFormatLongWithTimeNoSec = 'DD MMM YYYY, HH:mm A'
 const dateFormatLongWithTimeNoSec12h = 'DD MMM YYYY hh:mm A'
-// const timeFormat = 'HH:mm:ss'
+const timeFormatWithSecond = 'hh:mm:ss'
 const timeFormatWithoutSecond = 'HH:mm'
 const fullDateTime = 'DD-MM-YYYY hh:mm A'
 const serverDateFormat = 'YYYY-MM-DD'
@@ -199,6 +200,7 @@ module.exports = {
   currencyFormat,
   qtyFormat,
   dateFormat,
+  reversedDateFormat,
   dateFormatWithTime,
   dateFormatLongWithTime,
   dateFormatLongWithTimeNoSec,
@@ -209,6 +211,7 @@ module.exports = {
   serverDateFormat,
   serverDateTimeFormatFull,
   timeFormat,
+  timeFormatWithSecond,
   timeFormatWithoutSecond,
   timeFormat24HourWithSecond,
   timeFormat24Hour,

@@ -202,6 +202,33 @@ const appointmentStatus = [
   },
 ]
 
+const appointmentStatusReception = [
+  {
+    name: 'Scheduled',
+    value: 1,
+  },
+  {
+    name: 'Draft',
+    value: 2,
+  },
+  {
+    name: 'Cancelled',
+    value: 3,
+  },
+  {
+    name: 'Turned Up',
+    value: 4,
+  },
+  {
+    name: 'Rescheduled',
+    value: 5,
+  },
+  {
+    name: 'No Show',
+    value: 6,
+  },
+]
+
 const gstEnabled = [
   { value: false, name: 'No' },
   { value: true, name: 'Yes' },
@@ -1983,6 +2010,7 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
+  appointmentStatusReception,
   messageStatus,
   smsStatus,
   // country,

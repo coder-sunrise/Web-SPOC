@@ -38,6 +38,11 @@ const menuData = [
     url: '/report/sessionsummary',
   },
   {
+    title: 'Admin',
+    text: 'Patient Listing Report',
+    url: '/report/patientlisting',
+  },
+  {
     title: 'Finance',
     text: 'Payment Collection Report',
     url: '/report/paymentcollection',
@@ -56,11 +61,6 @@ const menuData = [
     title: 'Finance',
     text: 'Sales Listing Report',
     url: '/report/saleslistingreport',
-  },
-  {
-    title: 'Finance',
-    text: 'Patient Listing Report',
-    url: '/report/patientlisting',
   },
   {
     title: 'Finance',

@@ -236,6 +236,19 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
+                  if (
+                    mode === 'integrated' &&
+                    selectedSubRow &&
+                    selectedSubRow.id === o.id
+                  ) {
+                    this.props.dispatch({
+                      type: 'patientHistory/updateState',
+                      payload: {
+                        selectedSubRow: undefined,
+                      },
+                    })
+                    return
+                  }
                   if (isRetailVisit) {
                     this.handleRetailVisitHistory(row)
                   } else

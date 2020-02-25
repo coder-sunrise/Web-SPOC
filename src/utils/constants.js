@@ -301,6 +301,15 @@ export const CANNED_TEXT_TYPE_FIELD = {
   6: 'plan',
 }
 
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
 export const CLINIC_TYPE = {
   GP: 1,
   DENTAL: 2,

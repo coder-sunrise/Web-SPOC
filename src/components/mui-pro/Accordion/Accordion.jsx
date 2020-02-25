@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import color from 'color'
+import _ from 'lodash'
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
 import ExpansionPanel from '@material-ui/core/ExpansionPanel'
@@ -45,7 +46,11 @@ class Accordion extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { active } = nextProps
+    const { active, mode, activedKeys } = nextProps
+    if (mode === 'multiple' && !!activedKeys) {
+      const equal = _.isEqual(activedKeys, preState.activedKeys)
+      if (!equal) return { activedKeys }
+    }
     if (active >= 0 && active !== preState.active) {
       return {
         active,

@@ -2,6 +2,7 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '../services'
 import { notification } from '@/components'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 
 let companyTypes = [
   { id: 1, name: 'copayer' },
@@ -16,10 +17,14 @@ export default createListViewModel({
         ? {
             message: 'Copayer updated',
             code: 'ctcopayer',
+            type: NOTIFICATION_TYPE.CODETABLE,
+            status: NOTIFICATION_STATUS.OK,
           }
         : {
             message: 'Supplier updated',
             code: 'ctsupplier',
+            type: NOTIFICATION_TYPE.CODETABLE,
+            status: NOTIFICATION_STATUS.OK,
           },
   },
   param: {
