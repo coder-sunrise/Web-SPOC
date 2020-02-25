@@ -1,17 +1,17 @@
 import React from 'react'
 import classnames from 'classnames'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 // common components
 import { Button } from '@/components'
 // sub components
 import NotificationContent from './NotificationContent'
 
-const styles = () => ({
+const styles = (theme) => ({
   root: {
-    width: '100%',
-    minWidth: 400,
-    maxWidth: 500,
+    // width: '100%',
+    // minWidth: 400,
+    // maxWidth: 500,
   },
   emptyRoot: {
     minHeight: 290,
@@ -20,31 +20,41 @@ const styles = () => ({
     justifyContent: 'center',
   },
   listRoot: {
-    maxHeight: 290,
+    maxHeight: '70vh',
     overflowY: 'auto',
   },
   footer: {
-    height: 50,
-    display: 'flex',
-    justifyContent: 'center',
-    borderTop: 'solid 1px #DCDCDC',
+    textAlign: 'center',
+    padding: theme.spacing(),
+    // display: 'flex',
+    // justifyContent: 'center',
+    // borderTop: 'solid 1px #DCDCDC',
   },
   buttonLink: { margin: 'auto' },
 })
 
-const NotificationList = ({ dispatch, notifications = [], classes }) => {
+const NotificationList = ({ dispatch, notifications = [], classes, type }) => {
   const clearNotification = () => {
     dispatch({
-      type: 'header/clearNotifications',
+      type: 'header/clearNotification',
+      payload: {
+        type,
+      },
     })
   }
-
+  const readNotification = () => {
+    dispatch({
+      type: 'header/readNotification',
+      payload: {
+        type,
+      },
+    })
+  }
   const rootClass = classnames({
     [classes.root]: true,
     [classes.listRoot]: notifications.length > 0,
     [classes.emptyRoot]: notifications.length === 0,
   })
-
   if (notifications.length > 0) {
     const sorted = notifications.sort(
       (a, b) => (a.timestamp < b.timestamp ? 1 : -1),
@@ -53,18 +63,27 @@ const NotificationList = ({ dispatch, notifications = [], classes }) => {
     return (
       <div>
         <div className={rootClass}>
-          {sorted.map((n) => <NotificationContent notification={n} />)}
+          {sorted.map((n) => (
+            <NotificationContent notification={n} dispatch={dispatch} />
+          ))}
         </div>
+        <Divider />
         <div className={classes.footer}>
           <Button
             className={classes.buttonLink}
             link
-            simple
             size='sm'
-            color='primary'
+            onClick={readNotification}
+          >
+            Make all as read
+          </Button>
+          <Button
+            className={classes.buttonLink}
+            link
+            size='sm'
             onClick={clearNotification}
           >
-            Clear notifications
+            Clear
           </Button>
         </div>
       </div>

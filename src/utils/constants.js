@@ -278,6 +278,7 @@ export const SMS_STATUS_TEXT = {
   READ: 'Read',
   QUEUED: 'Queued',
   SENDING: 'Sending',
+  UNREAD: 'Unread',
 }
 
 export const CANNED_TEXT_TYPE = {
@@ -292,6 +293,15 @@ export const CANNED_TEXT_TYPE = {
 export const CANNED_TEXT_TYPE_FIELD = {
   1: 'clinicianNote',
   2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',

@@ -180,7 +180,7 @@ const request = (
   url,
   option,
   showNotification = true,
-  redirectToLoginAfterFail = true,
+  // redirectToLoginAfterFail = true,
 ) => {
   const options = {
     expirys: true,
@@ -355,17 +355,18 @@ const request = (
             }
 
             let errorMsg = codeMessage[response.status]
-
-            if (redirectToLoginAfterFail) {
-              if (
-                (response.status === 400 && token === null) ||
-                (response.status === 401 && url !== '/connect/token')
-              ) {
-                window.g_app._store.dispatch({
-                  type: 'login/logout',
-                })
-                return false
-              }
+            // const loginAndResetPasswordUrl = [
+            //   '/connect/token',
+            // ]
+            if (
+              // (response.status === 400 && token === null) ||
+              response.status === 401 &&
+              url !== '/connect/token'
+            ) {
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
             }
 
             if (s === 'timeout') {
@@ -416,7 +417,7 @@ const request = (
                 requestId: response.responseJSON.requestId,
               })
             } else {
-              console.log('here')
+              // console.log('here')
               logError(showNotification, {
                 message: (
                   <div>
