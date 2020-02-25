@@ -58,11 +58,6 @@ const Grid = ({
   ] = useState(columnsExtensions)
 
   const [
-    selectedRow,
-    setSelectedRow,
-  ] = useState([])
-
-  const [
     recipient,
     setRecipient,
   ] = useState()
@@ -139,6 +134,8 @@ const Grid = ({
     type,
     dispatch,
     setSelectedRows,
+    selectedRows,
+    smsPatient,
   }
 
   return (
