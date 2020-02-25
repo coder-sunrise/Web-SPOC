@@ -189,4 +189,9 @@ export const menuData = [
     text: 'Supplier',
     url: '/setting/company/2',
   },
+  {
+    title: 'Contact',
+    text: 'Referral Source',
+    url: '/setting/referralsource',
+  },
 ]
