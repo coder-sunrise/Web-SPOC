@@ -69,6 +69,7 @@ const updateData = (data, payload) => {
       ...payload,
       timestamp: Date.now(),
       date: moment().format(dateFormatLong),
+      key: payload.id + payload.target,
       // id: getUniqueId(),
     })
   }
@@ -121,6 +122,20 @@ export default createFormViewModel({
           data: state.data.filter(
             (o) => o.action && o.action.dentalTreatmentFK !== payload.id,
           ),
+        }
+      },
+      sortItems (state, { payload }) {
+        const { index, oldIndex, currentItems, items } = payload
+        return {
+          ...state,
+          data: [
+            ...state.data.filter(
+              (o) =>
+                (o.toothNo === Number(index) && o.key !== items[oldIndex]) ||
+                o.toothNo !== Number(index),
+            ),
+            ...currentItems,
+          ],
         }
       },
     },

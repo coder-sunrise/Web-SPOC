@@ -134,13 +134,15 @@ export const createToothShape = ({
   image,
   canvas,
   action,
+  target = {
+    subTarget: 'tooth',
+  },
 }) => {
   const cfg = {
     ...sharedCfg,
     top: baseHeight * 2,
     // strokeUniform: true,
   }
-
   const cCfg = {
     ...groupCfg,
     ...lockConfig,
@@ -171,18 +173,38 @@ export const createToothShape = ({
   }
   const _width = width || groupWidth
   const _height = height || groupHeight
+  if (
+    action &&
+    (action.chartMethodTypeFK === 2 ||
+      (action.chartMethodTypeFK === 1 &&
+        target.subTarget.indexOf('outside') >= 0)) &&
+    !image
+  ) {
+    let offset = _height / 3
+    if (target.subTarget === 'cell_outsidebottom') {
+      offset *= 1.2
+    } else if (target.subTarget === 'cell_outsidetop') {
+      offset *= 0.8
+    }
 
-  if (action && action.chartMethodTypeFK === 2 && !image) {
     return new fabric.Group(
       [
-        createRectangle({
-          fill: action.chartMethodColorBlock,
-        }),
+        // createRectangle({
+        //   fill: action.chartMethodColorBlock,
+        // }),
+
+        target.subTarget === 'tooth'
+          ? createRectangle({
+              fill: action.chartMethodColorBlock,
+            })
+          : createTriangle({
+              fill: action.chartMethodColorBlock,
+            }).rotate(target.subTarget.indexOf('top') >= 0 ? 0 : 180),
         createFont({
           text: action.chartMethodText,
-          left: _width / 2 - _width / 8,
-          top: _height / 2 - _height / 4,
-          fontSize: _width / 2,
+          left: _width / 2 - _width / 5,
+          top: _height / 2 - offset,
+          fontSize: _width / 1.5,
         }),
       ],
       {

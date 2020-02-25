@@ -8,6 +8,7 @@ class ClinicianSelect extends React.PureComponent {
   render () {
     const { field, form, codetable, user, label } = this.props
     if (
+      field &&
       !field.value &&
       user.data &&
       user.data.clinicianProfile &&

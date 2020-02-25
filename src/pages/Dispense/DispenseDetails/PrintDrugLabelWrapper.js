@@ -10,13 +10,25 @@ import {
   queryDrugLabelDetails,
   queryDrugLabelsDetails,
 } from '@/services/dispense'
+import CONSTANTS from './constants'
 
+const defaultSocketPortsState = [
+  { portNumber: 7182, attempted: false },
+  { portNumber: 7183, attempted: false },
+  { portNumber: 7184, attempted: false },
+]
 class PrintDrugLabelWrapper extends React.Component {
   constructor (props) {
     super(props)
-    this.iswsConnect = false
+    this.state = {
+      socketPorts: [
+        ...defaultSocketPortsState,
+      ],
+      pendingJob: [],
+    }
+    this.isWsConnected = false
     this.wsConnection = null
-    this.connectWebSocket()
+    this.initializeWebSocket(true)
   }
 
   componentWillUnmount () {
@@ -36,12 +48,12 @@ class PrintDrugLabelWrapper extends React.Component {
       patientLabelReportID = 27
     }
 
-    if (type === 'Medication') {
+    if (type === CONSTANTS.DRUG_LABEL) {
       let drugLableSource = await this.generateDrugLablePrintSource(row)
       if (drugLableSource) {
         printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
-    } else if (type === 'Medications') {
+    } else if (type === CONSTANTS.ALL_DRUG_LABEL) {
       const { dispense, values } = this.props
       const { prescription } = values
       let drugLableSource = await this.generateDrugLablesPrintSource(
@@ -51,7 +63,7 @@ class PrintDrugLabelWrapper extends React.Component {
       if (drugLableSource) {
         printResult = await postPDF(drugLabelReportID, drugLableSource.payload)
       }
-    } else if (type === 'Patient') {
+    } else if (type === CONSTANTS.PATIENT_LABEL) {
       const { patient, values } = this.props
       printResult = await getPDF(patientLabelReportID, {
         patientId: patient ? patient.id : values.patientProfileFK,
@@ -60,21 +72,52 @@ class PrintDrugLabelWrapper extends React.Component {
     return printResult
   }
 
-  handleOnPrint = async (type, row = {}) => {
-    if (type === 'Medication' || type === 'Medications' || type === 'Patient') {
-      this.connectWebSocket()
+  prepareJobForWebSocket = (content) => {
+    // reset port number state to retry all attempt and set job content
+    // then initialize web socket connection
+    this.setState(
+      {
+        socketPorts: [
+          ...defaultSocketPortsState,
+        ],
+        pendingJob: [
+          content,
+        ],
+      },
+      () => {
+        this.initializeWebSocket(false)
+      },
+    )
+  }
 
+  sendJobToWebSocket = () => {
+    const { pendingJob } = this.state
+
+    if (
+      this.wsConnection &&
+      this.wsConnection.readyState === 1 &&
+      pendingJob.length === 1
+    ) {
+      this.wsConnection.send(`["${pendingJob[0]}"]`)
+    }
+    this.setState({
+      pendingJob: [],
+    })
+  }
+
+  handleOnPrint = async ({ type, row = {} }) => {
+    const withoutPrintPreview = [
+      CONSTANTS.ALL_DRUG_LABEL,
+      CONSTANTS.DRUG_LABEL,
+      CONSTANTS.PATIENT_LABEL,
+    ]
+    console.log({ type, row })
+    if (withoutPrintPreview.includes(type)) {
       let printResult = await this.getPrintResult(type, row)
 
       if (printResult) {
         const base64Result = arrayBufferToBase64(printResult)
-        if (this.iswsConnect === true) {
-          this.wsConnection.send(`["${base64Result}"]`)
-        } else {
-          notification.error({
-            message: `Medicloud printing tool is not running, please start it.`,
-          })
-        }
+        this.prepareJobForWebSocket(base64Result)
       }
     } else {
       const documentType = consultationDocumentTypes.find(
@@ -166,25 +209,79 @@ class PrintDrugLabelWrapper extends React.Component {
     }
   }
 
-  connectWebSocket () {
-    if (this.iswsConnect === false) {
+  setSocketPortsState = (socket) => {
+    this.setState((preState) => ({
+      socketPorts: preState.socketPorts.map(
+        (port) =>
+          port.portNumber === socket.portNumber
+            ? { ...port, attempted: true }
+            : { ...port },
+      ),
+    }))
+  }
+
+  // will initialize web socket connection
+  // send job if there is any successful connection or already connected
+  initializeWebSocket = (isFirstLoad = false) => {
+    const { socketPorts } = this.state
+    console.log({ isWsConnected: this.isWsConnected })
+    if (this.isWsConnected === false) {
       let settings = JSON.parse(localStorage.getItem('clinicSettings'))
-      if (settings.printToolSocketURL) {
-        this.wsConnection = new window.WebSocket(settings.printToolSocketURL)
+      const { printToolSocketURL = '' } = settings
+      const [
+        prefix = '',
+        ip = '',
+      ] = printToolSocketURL.split(':')
+
+      // attempt to connect to different port number
+      // abort early and clear job if no available port number left
+      const socket = socketPorts.find((port) => !port.attempted)
+      if (!socket) {
+        this.setState({
+          pendingJob: [],
+        })
+
+        if (!isFirstLoad)
+          notification.error({
+            message: `Medicloud printing tool is not running, please start it.`,
+          })
+        return
+      }
+
+      const wsUrl = `${prefix}:${ip}:${socket.portNumber}`
+
+      if (wsUrl && !this.isWsConnected) {
+        this.wsConnection = new window.WebSocket(wsUrl)
         this.wsConnection.onopen = () => {
-          this.iswsConnect = true
+          console.log('on open')
+          this.isWsConnected = true
+          this.setSocketPortsState(socket)
+          this.sendJobToWebSocket()
         }
 
         this.wsConnection.onclose = () => {
-          this.iswsConnect = false
+          console.log('on close')
+          this.isWsConnected = false
+          this.setSocketPortsState(socket)
+          this.initializeWebSocket(isFirstLoad)
         }
       }
+    } else {
+      this.sendJobToWebSocket()
     }
   }
 
   render () {
     const { onPrint, ...restProps } = this.props
-    return <DispenseDetails {...restProps} onPrint={this.handleOnPrint} />
+    const { pendingJob = [] } = this.state
+
+    return (
+      <DispenseDetails
+        {...restProps}
+        onPrint={this.handleOnPrint}
+        sendingJob={pendingJob.length > 0}
+      />
+    )
   }
 }
 

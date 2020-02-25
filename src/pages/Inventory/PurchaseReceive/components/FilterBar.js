@@ -1,10 +1,14 @@
 import React, { PureComponent } from 'react'
+import moment from 'moment'
 import { connect } from 'dva'
+// umi
+import { formatMessage, FormattedMessage } from 'umi/locale'
+// formik
 import { FastField, withFormik } from 'formik'
+// material ui
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
-import moment from 'moment'
-import { formatMessage, FormattedMessage } from 'umi/locale'
+// common components
 import {
   GridContainer,
   GridItem,
@@ -13,16 +17,21 @@ import {
   Checkbox,
   CodeSelect,
   ProgressButton,
-  DateRangePicker,
+  DatePicker,
   Tooltip,
   Field,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
+import { FilterBarDate } from '@/components/_medisys'
 
-@connect(({ purchaseReceiveList }) => {
-  return purchaseReceiveList.filterSearch
-})
+// @connect(({ purchaseReceiveList }) => {
+//   return purchaseReceiveList.filterSearch
+// })
 @withFormik({
+  mapPropsToValues: () => ({
+    transactionStartDate: moment().startOf('month').formatUTC(),
+    transactionEndDate: moment().formatUTC(false),
+  }),
   handleSubmit: () => {},
   displayName: 'PurchaseReceiveFilter',
 })
@@ -34,6 +43,12 @@ class FilterBar extends PureComponent {
       values,
       actions: { handleNavigate },
     } = this.props
+
+    const {
+      transactionStartDate,
+      transactionEndDate,
+      isAllDateChecked,
+    } = values
 
     return (
       <GridContainer>
@@ -52,7 +67,7 @@ class FilterBar extends PureComponent {
             }}
           />
         </GridItem>
-        <GridItem md={6}>
+        {/* <GridItem md={6}>
           <Field
             name='transactionDates'
             render={(args) => {
@@ -69,6 +84,39 @@ class FilterBar extends PureComponent {
                 />
               )
             }}
+          />
+        </GridItem> */}
+        <GridItem md={3}>
+          <Field
+            name='transactionStartDate'
+            render={(args) => (
+              <FilterBarDate
+                noTodayLimit
+                args={args}
+                label='Transaction Date From'
+                formValues={{
+                  startDate: transactionStartDate,
+                  endDate: transactionEndDate,
+                }}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem md={3}>
+          <Field
+            name='transactionEndDate'
+            render={(args) => (
+              <FilterBarDate
+                noTodayLimit
+                isEndDate
+                args={args}
+                label='Transaction Date To'
+                formValues={{
+                  startDate: transactionStartDate,
+                  endDate: transactionEndDate,
+                }}
+              />
+            )}
           />
         </GridItem>
         <GridItem xs sm={6} md={3}>
@@ -155,24 +203,22 @@ class FilterBar extends PureComponent {
                   purchaseOrderNo,
                   invoiceStatusFK,
                   purchaseOrderStatusFK,
-                  transactionDates,
+                  // transactionDates,
                   supplierFK,
                   isAllDateChecked,
                 } = values
 
-                const fromToDates = (index) => {
-                  if (transactionDates && !isAllDateChecked)
-                    return transactionDates[index]
-                  return undefined
-                }
-
-                console.log(transactionDates)
+                // const fromToDates = (index) => {
+                //   if (transactionDates && !isAllDateChecked)
+                //     return transactionDates[index]
+                //   return undefined
+                // }
 
                 dispatch({
                   type: 'purchaseReceiveList/query',
                   payload: {
-                    lgteql_purchaseOrderDate: fromToDates(0),
-                    lsteql_purchaseOrderDate: fromToDates(1),
+                    lgteql_purchaseOrderDate: transactionStartDate || undefined,
+                    lsteql_purchaseOrderDate: transactionEndDate || undefined,
                     purchaseOrderNo,
                     invoiceStatusFK,
                     purchaseOrderStatusFK,

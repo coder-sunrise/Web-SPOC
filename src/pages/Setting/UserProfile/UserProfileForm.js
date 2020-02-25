@@ -30,6 +30,7 @@ import {
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
 import { constructUserProfile } from './utils'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
@@ -190,6 +191,8 @@ const styles = (theme) => ({
         sendNotification('CodetableUpdated', {
           message: 'User profiles updated',
           code: 'clinicianprofile',
+          type: NOTIFICATION_TYPE.CODETABLE,
+          status: NOTIFICATION_STATUS.OK,
         })
         sessionStorage.removeItem('user')
         if (currentUser) {
@@ -389,13 +392,19 @@ class UserProfileForm extends React.PureComponent {
                   <TextField
                     value={values.userProfile.userName}
                     label='Username'
+                    autocomplete='off'
                     disabled
                   />
                 ) : (
                   <FastField
                     name='userProfile.userName'
                     render={(args) => (
-                      <TextField {...args} label='Username' autoFocus />
+                      <TextField
+                        {...args}
+                        label='Username'
+                        autocomplete='off'
+                        autoFocus
+                      />
                     )}
                   />
                 )}

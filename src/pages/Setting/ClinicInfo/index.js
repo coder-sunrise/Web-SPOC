@@ -210,7 +210,7 @@ class ClinicInfo extends PureComponent {
           <GridItem md={3}>
             <FastField
               name='contact.mobileContactNumber.number'
-              render={(args) => <MobileNumberInput {...args} />}
+              render={(args) => <TextField label='Contact No.' {...args} />}
             />
           </GridItem>
         </GridContainer>

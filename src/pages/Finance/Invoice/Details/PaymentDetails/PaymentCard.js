@@ -48,7 +48,7 @@ const PaymentCard = ({
   payerType = '',
   payerTypeFK = PayerType.PATIENT,
   payments = [],
-  totalPaid,
+  payerDistributedAmt,
   outstanding,
   invoicePayerFK,
   readOnly,
@@ -120,7 +120,10 @@ const PaymentCard = ({
           justify='center'
           alignItems='flex-end'
         >
-          <PaymentSummary totalPaid={totalPaid} outstanding={outstanding} />
+          <PaymentSummary
+            payerDistributedAmt={payerDistributedAmt}
+            outstanding={outstanding}
+          />
         </GridItem>
         <GridItem />
       </GridContainer>

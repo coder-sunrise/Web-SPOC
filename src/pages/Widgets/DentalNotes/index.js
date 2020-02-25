@@ -229,10 +229,10 @@ class DentalNotes extends Component {
     const { scriblenotes, dispatch } = this.props
     const { category, arrayName } = this.state
     let previousData = this.form.values.corScribbleNotes
-    let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
-    let chiefComplaintsArray =
-      scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
-    let planArray = scriblenotes.Plan.planScribbleArray
+    // let clinicianArray = scriblenotes.ClinicianNote.notesScribbleArray
+    // let chiefComplaintsArray =
+    //   scriblenotes.ChiefComplaints.chiefComplaintsScribbleArray
+    // let planArray = scriblenotes.Plan.planScribbleArray
     const tempArrayItems = [
       ...scriblenotes[category][arrayName],
     ]
@@ -475,13 +475,6 @@ class DentalNotes extends Component {
                       return (
                         <div>
                           <ScribbleNoteItem
-                            editorButtonStyle={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
                             scribbleNoteUpdateState={
                               this.scribbleNoteUpdateState
                             }
@@ -519,13 +512,6 @@ class DentalNotes extends Component {
                       return (
                         <div>
                           <ScribbleNoteItem
-                            editorButtonStyle={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
                             scribbleNoteUpdateState={
                               this.scribbleNoteUpdateState
                             }
@@ -564,13 +550,6 @@ class DentalNotes extends Component {
                       return (
                         <div>
                           <ScribbleNoteItem
-                            editorButtonStyle={{
-                              position: 'absolute',
-                              zIndex: 1,
-                              left: 305,
-                              right: 0,
-                              top: 10,
-                            }}
                             scribbleNoteUpdateState={
                               this.scribbleNoteUpdateState
                             }

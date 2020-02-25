@@ -86,7 +86,6 @@ class History {
       } else if (mainObject.id === 'move') {
         const movingObject = JSON.stringify(mainObject.__originalState)
         const movingJsonObject = JSON.parse(movingObject)
-
         delete movingJsonObject.left
         delete movingJsonObject.top
         delete movingJsonObject.scaleX
@@ -95,7 +94,6 @@ class History {
         delete movingJsonObject.left
         delete movingJsonObject.height
         delete movingJsonObject.width
-        delete movingJsonObject.text
         delete movingJsonObject.angle
 
         for (let i = 0; i < this.saveLayerList.length; i++) {
@@ -108,7 +106,6 @@ class History {
           delete layerContent.left
           delete layerContent.height
           delete layerContent.width
-          delete layerContent.text
           delete layerContent.angle
 
           if (
@@ -118,8 +115,6 @@ class History {
           }
         }
       } else if (mainObject.id !== 'pan' || mainObject.id === null) {
-        // this.redoList = []
-
         this.originalList.push(obj)
         this.saveLayerList.push({
           layerType: mainObject.type,

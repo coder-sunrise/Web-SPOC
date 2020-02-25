@@ -113,6 +113,11 @@ const menuData = [
     url: '/report/lowstockconsumablesreport',
   },
   {
+    title: 'Inventory',
+    text: 'Inventory Trending Report',
+    url: '/report/inventorytrendingreport',
+  },
+  {
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',
@@ -154,7 +159,7 @@ class Report extends React.Component {
               .filter((m) => {
                 return (
                   m.text.toLocaleLowerCase().indexOf(this.state.searchText) >=
-                  0 || !this.state.searchText
+                    0 || !this.state.searchText
                 )
               })
               .map((item) => {

@@ -20,6 +20,15 @@ export default createFormViewModel({
       Plan: {
         planScribbleArray: [],
       },
+      AssociatedHistory: {
+        associatedHistoryScribbleArray: [],
+      },
+      IntraOral: {
+        intraOralScribbleArray: [],
+      },
+      ExtraOral: {
+        extraOralScribbleArray: [],
+      },
       default: {
         scribleNotes: 'Test notes',
       },

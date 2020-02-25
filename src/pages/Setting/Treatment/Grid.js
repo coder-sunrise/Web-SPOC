@@ -34,7 +34,7 @@ class Grid extends PureComponent {
       },
       {
         columnName: 'chartMethodDisplayValue',
-        sortBy: 'chartMethodDisplayValue',
+        sortBy: 'chartMethod.displayValue',
         render: (row) => {
           const { chartMethod } = row
           if (chartMethod) {

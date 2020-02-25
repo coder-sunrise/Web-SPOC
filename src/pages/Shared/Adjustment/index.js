@@ -1,41 +1,22 @@
-import React, { Component, PureComponent, useState } from 'react'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
+import React, { PureComponent } from 'react'
+import { withFormik, Field, FastField } from 'formik'
 import { connect } from 'dva'
 import { isNumber } from 'util'
-import { withStyles, Divider, Paper } from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
-import { formatMessage } from 'umi/locale'
+import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
 import { calculateAdjustAmount } from '@/utils/utils'
 
 import {
-  Button,
-  CommonHeader,
-  CommonModal,
-  NavPills,
-  PictureUpload,
+  Danger,
   GridContainer,
   GridItem,
-  Card,
-  CardAvatar,
-  CardBody,
   TextField,
-  notification,
-  Select,
-  CodeSelect,
-  DatePicker,
-  RadioGroup,
-  ProgressButton,
-  CardContainer,
-  confirm,
-  Checkbox,
-  Popover,
   Switch,
   NumberInput,
   Snackbar,
 } from '@/components'
 
-const styles = (theme) => ({})
+const styles = () => ({})
 @connect(({ global }) => ({
   global,
 }))
@@ -127,15 +108,28 @@ const styles = (theme) => ({})
   displayName: 'GlobalAdjustment',
 })
 class Adjustment extends PureComponent {
+  state = {
+    showError: false,
+  }
+
   getFinalAmount = ({ value } = {}) => {
     const { values, setFieldValue } = this.props
     const { isExactAmount, isMinus, adjustment, initialAmout = 0 } = values
+    const finalAmount = calculateAdjustAmount(
+      isExactAmount,
+      initialAmout,
+      value || adjustment,
+    ).amount
 
-    setFieldValue(
-      'finalAmount',
-      calculateAdjustAmount(isExactAmount, initialAmout, value || adjustment)
-        .amount,
-    )
+    if (finalAmount < 0) {
+      this.showError()
+    } else setFieldValue('finalAmount', finalAmount)
+  }
+
+  showError = () => {
+    this.setState({
+      showError: true,
+    })
   }
 
   onConditionChange = (v) => {
@@ -164,7 +158,7 @@ class Adjustment extends PureComponent {
       isMinus,
       showAmountPreview = true,
     } = openAdjustmentConfig
-
+    const { showError } = this.state
     return (
       <div>
         <div style={{ margin: theme.spacing(1) }}>
@@ -250,6 +244,18 @@ class Adjustment extends PureComponent {
                 }}
               />
             </GridItem>
+            <GridItem md={1} />
+            <GridItem md={11}>
+              {showError && (
+                <Danger>
+                  <p>
+                    <b>
+                      Adding this adjustment will result in overpaid invoice.
+                    </b>
+                  </p>
+                </Danger>
+              )}
+            </GridItem>
             {showRemark && (
               <GridItem xs={12}>
                 <FastField
@@ -291,7 +297,7 @@ class Adjustment extends PureComponent {
           footer({
             onConfirm: props.handleSubmit,
             confirmProps: {
-              disabled: false,
+              disabled: showError,
             },
           })}
       </div>

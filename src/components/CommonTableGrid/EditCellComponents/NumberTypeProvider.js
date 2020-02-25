@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { isNumber } from 'util'
 import numeral from 'numeral'
 import { withStyles } from '@material-ui/core'
-
 import {
   NumberInput,
   NumberTypeProvider as NumberTypeProviderOrg,
@@ -60,13 +59,12 @@ class NumberEditor extends PureComponent {
     })
   }
 
-  renderComponent = ({ currency, type, editMode, ...commonCfg }) => {
+  renderComponent = ({ currency, type, editMode, value, ...commonCfg }) => {
     if (editMode) {
       commonCfg.onChange = this._onChange
       commonCfg.onBlur = this.props.onBlur
       commonCfg.onFocus = this.props.onFocus
       commonCfg.onKeyDown = this.props.onKeyDown
-
       commonCfg.autoFocus = true
       commonCfg.debounceDuration = 0
       commonCfg.preventDefaultKeyDownEvent = true
@@ -80,6 +78,8 @@ class NumberEditor extends PureComponent {
         display: 'inline-block',
       }
     }
+    commonCfg.defaultValue = value
+
     commonCfg.currency = currency || type === 'currency'
     return <NumberInput {...commonCfg} />
   }
@@ -89,56 +89,56 @@ class NumberEditor extends PureComponent {
   }
 }
 
-const NumberFormatter = (columnExtensions) =>
-  React.memo(
-    (props) => {
-      const {
-        column: { name: columnName },
-        value,
-        onValueChange,
-        classes,
-        text = false,
-      } = props
-      if (value === undefined) return null
-      if (!isNumber(value)) return value
-      let { color = 'darkblue' } = props
-      const cfg =
-        columnExtensions.find(
-          ({ columnName: currentColumnName }) =>
-            currentColumnName === columnName,
-        ) || {}
-      const { type, format, ...restProps } = cfg
-      if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
-        color = 'red'
+// const NumberFormatter = (columnExtensions) =>
+//   React.memo(
+//     (props) => {
+//       const {
+//         column: { name: columnName },
+//         value,
+//         onValueChange,
+//         classes,
+//         text = false,
+//       } = props
+//       if (value === undefined) return null
+//       if (!isNumber(value)) return value
+//       let { color = 'darkblue' } = props
+//       const cfg =
+//         columnExtensions.find(
+//           ({ columnName: currentColumnName }) =>
+//             currentColumnName === columnName,
+//         ) || {}
+//       const { type, format, ...restProps } = cfg
+//       if (color === 'darkblue' && value && `${value}`.indexOf('-') === 0)
+//         color = 'red'
 
-      if (cfg && (cfg.currency || type === 'currency')) {
-        if (text) return numeral(value).format(format || currencyFormat)
-        return (
-          <b style={{ color }}>
-            {value >= 0 ? (
-              <React.Fragment>
-                {currencySymbol}
-                {numeral(value).format(format || currencyFormat)}
-              </React.Fragment>
-            ) : (
-              <React.Fragment>
-                ({currencySymbol}
-                {numeral(Math.abs(value)).format(format || currencyFormat)})
-              </React.Fragment>
-            )}
-          </b>
-        )
-      }
-      if (text) return numeral(value).format(format || qtyFormat)
-      return (
-        <b style={{ color }}>{numeral(value).format(format || qtyFormat)}</b>
-      )
-    },
-    (prevProps, nextProps) => {
-      // console.log(prevProps === nextProps, prevProps.value === nextProps.value)
-      return prevProps === nextProps || prevProps.value === nextProps.value
-    },
-  )
+//       if (cfg && (cfg.currency || type === 'currency')) {
+//         if (text) return numeral(value).format(format || currencyFormat)
+//         return (
+//           <b style={{ color }}>
+//             {value >= 0 ? (
+//               <React.Fragment>
+//                 {currencySymbol}
+//                 {numeral(value).format(format || currencyFormat)}
+//               </React.Fragment>
+//             ) : (
+//               <React.Fragment>
+//                 ({currencySymbol}
+//                 {numeral(Math.abs(value)).format(format || currencyFormat)})
+//               </React.Fragment>
+//             )}
+//           </b>
+//         )
+//       }
+//       if (text) return numeral(value).format(format || qtyFormat)
+//       return (
+//         <b style={{ color }}>{numeral(value).format(format || qtyFormat)}</b>
+//       )
+//     },
+//     (prevProps, nextProps) => {
+//       // console.log(prevProps === nextProps, prevProps.value === nextProps.value)
+//       return prevProps === nextProps || prevProps.value === nextProps.value
+//     },
+//   )
 
 class NumberTypeProvider extends React.Component {
   static propTypes = {

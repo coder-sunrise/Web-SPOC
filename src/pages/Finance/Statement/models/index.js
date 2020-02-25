@@ -44,7 +44,9 @@ export default createListViewModel({
             type: 'queryOneDone',
             payload: res,
           })
+          return true
         }
+        return false
       },
 
       *extractAsSingle ({ payload }, { call, put }) {

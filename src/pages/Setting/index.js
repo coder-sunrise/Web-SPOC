@@ -175,6 +175,11 @@ const menuData = [
     url: '/setting/userprofile',
   },
   {
+    title: 'System User',
+    text: 'Role',
+    url: '/setting/userrole',
+  },
+  {
     title: 'Print Setup',
     text: 'Printout Setting',
     url: '/setting/printoutsetting',
@@ -233,6 +238,9 @@ const styles = (theme) => ({
       width: 50,
       height: 50,
     },
+  },
+  searchField: {
+    width: '20%',
   },
 })
 
@@ -351,6 +359,7 @@ class SystemSetting extends PureComponent {
           }}
         /> */}
         <TextField
+          className={classes.searchField}
           prefix={<Search />}
           onChange={(e) => {
             this.setState(() => {
@@ -359,6 +368,7 @@ class SystemSetting extends PureComponent {
               }
             })
           }}
+          autoFocus
           value={this.state.searchText}
         />
         <Accordion

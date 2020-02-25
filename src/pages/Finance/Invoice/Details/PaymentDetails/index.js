@@ -365,15 +365,34 @@ class PaymentDetails extends Component {
   }
 
   onTransferClick = (invoicePayerFK) => {
-    const { dispatch } = this.props
+    const { dispatch, invoiceDetail } = this.props
     dispatch({
-      type: 'invoicePayment/updateState',
+      type: 'invoicePayment/query',
       payload: {
-        invoicePayerFK,
+        id: invoiceDetail.currentId,
       },
-    })
+    }).then((response) => {
+      if (response.length > 0) {
+        const company = response.find(
+          (o) => o.payerTypeFK === INVOICE_PAYER_TYPE.COMPANY,
+        )
+        if (company && company.statementInvoice.length > 0) {
+          notification.warning({
+            message: `Please remove the invoice from statement ${company
+              .statementInvoice[0].statementNo} before transfer. `,
+          })
+          return
+        }
 
-    this.setState({ showAddTransfer: true })
+        dispatch({
+          type: 'invoicePayment/updateState',
+          payload: {
+            invoicePayerFK,
+          },
+        })
+        this.setState({ showAddTransfer: true })
+      }
+    })
   }
 
   render () {
@@ -434,7 +453,7 @@ class PaymentDetails extends Component {
                   payerType={payment.payerType}
                   payerTypeFK={payment.payerTypeFK}
                   payments={payment.paymentTxnList}
-                  totalPaid={payment.totalPaid}
+                  payerDistributedAmt={payment.payerDistributedAmt}
                   outstanding={payment.outStanding}
                   invoicePayerFK={payment.id}
                   actions={paymentActionsProps}

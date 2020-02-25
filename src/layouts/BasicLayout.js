@@ -35,6 +35,7 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import image from 'assets/img/sidebar-2.jpg'
 // import logo from 'assets/img/logo-white.svg'
 import logo from 'assets/img/logo/logo_blue.png'
+// import logo from 'assets/img/logo/nscmh-logo-2.png'
 import withStyles from '@material-ui/core/styles/withStyles'
 import appStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/dashboardStyle.jsx'
 import Header from 'mui-pro-components/Header'
@@ -112,7 +113,7 @@ const query = {
 }
 
 const refreshTokenTimer = 10 * 60 * 1000
-const sessionTimeoutTimer = 15 * 60 * 1000
+const sessionTimeoutTimer = 30 * 60 * 1000
 // const sessionTimeoutTimer = 2500
 
 class BasicLayout extends React.PureComponent {
@@ -131,22 +132,37 @@ class BasicLayout extends React.PureComponent {
     this.initUserData()
     initStream()
 
-    let sessionTimeOutTimer = null
+    let sessionTimeOutInterval = null
     this.refreshTokenInterval = null
 
     const resetSessionTimeOut = (e) => {
       // console.log(e)
-      clearTimeout(sessionTimeOutTimer)
-      sessionTimeOutTimer = setTimeout(() => {
-        dispatch({
-          type: 'global/updateAppState',
-          payload: {
-            showSessionTimeout: true,
-          },
-        })
+      clearTimeout(sessionTimeOutInterval)
+      const now = Date.now()
+      localStorage.setItem('lastActiveTime', now)
+      sessionTimeOutInterval = setInterval(() => {
+        if (
+          Number(localStorage.getItem('lastActiveTime')) <=
+          Date.now() - sessionTimeoutTimer
+        ) {
+          if (localStorage.getItem('token')) {
+            dispatch({
+              type: 'global/updateAppState',
+              payload: {
+                showSessionTimeout: true,
+              },
+            })
+            clearInterval(sessionTimeOutInterval)
+          } else {
+            window.location.reload()
+          }
+        }
       }, sessionTimeoutTimer)
     }
-    const debouncedRST = _.debounce(resetSessionTimeOut, 10000)
+    const debouncedRST = _.debounce(resetSessionTimeOut, 10000, {
+      leading: true,
+      trailing: false,
+    })
     $(document).on('click', debouncedRST)
     $(document).on('keydown', debouncedRST)
 
@@ -154,50 +170,9 @@ class BasicLayout extends React.PureComponent {
     this.refreshToken()
   }
 
-  // componentDidMount () {
-  //   const {
-  //     dispatch,
-  //     route: { routes, authority },
-  //   } = this.props
-
-  //   dispatch({
-  //     type: 'user/fetchCurrent',
-  //   })
-  //   dispatch({
-  //     type: 'setting/getSetting',
-  //   })
-  //   dispatch({
-  //     type: 'menu/getMenuData',
-  //     payload: { routes, authority },
-  //   })
-  // }
-
-  // componentDidUpdate (preProps) {
-  //   // After changing to phone mode,
-  //   // if collapsed is true, you need to click twice to display
-  //   this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-  //   const { collapsed, isMobile } = this.props
-  //   if (isMobile && !preProps.isMobile && !collapsed) {
-  //     this.handleMenuCollapse(false)
-  //   }
-  // }
-
   componentDidMount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps = new PerfectScrollbar(this.refs.mainPanel, {
-    //     suppressScrollX: true,
-    //     suppressScrollY: false,
-    //   })
-    //   document.body.style.overflow = "hidden"
-    // }
-
-    // check token, logout if token not exist
-    // const accessToken = localStorage.getItem('token')
-    // !accessToken && router.push('/login')
-
     window.addEventListener('resize', this.resize)
     this.resize()
-    // const { dispatch, route: { routes, authority } } = this.props
   }
 
   componentDidUpdate (e) {
@@ -207,20 +182,9 @@ class BasicLayout extends React.PureComponent {
         this.setState({ mobileOpen: false })
       }
     }
-
-    // After changing to phone mode,
-    // if collapsed is true, you need to click twice to display
-    // this.breadcrumbNameMap = this.getBreadcrumbNameMap()
-    // const { collapsed, isMobile } = this.props
-    // if (isMobile && !preProps.isMobile && !collapsed) {
-    //   this.handleMenuCollapse(false)
-    // }
   }
 
   componentWillUnmount () {
-    // if (navigator.platform.indexOf("Win") > -1) {
-    //   ps.destroy()
-    // }
     window.removeEventListener('resize', this.resize)
     clearInterval(this.refreshTokenInterval)
   }

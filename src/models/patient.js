@@ -169,7 +169,7 @@ export default createFormViewModel({
         const { history } = payload || { history: undefined }
 
         if (patientState.shouldQueryOnClose) {
-          yield put({ type: 'query' })
+          yield put({ type: 'patientSearch/query' })
           yield put({
             type: 'updateState',
             payload: {
@@ -226,11 +226,13 @@ export default createFormViewModel({
               currentPatientId: null,
             },
           }),
+          // reset patient model state to default state
           yield put({
             type: 'updateState',
-            paylad: {
+            payload: {
               callback: undefined,
               default: defaultPatientEntity,
+              menuErrors: {},
             },
           }),
         ])
@@ -265,12 +267,13 @@ export default createFormViewModel({
       //   return yield call(service.upsert, payload)
       // },
       *refreshChasBalance ({ payload }, { call }) {
-        const { patientAccountNo, patientCoPaymentSchemeFK } = payload
+        const { patientAccountNo, patientCoPaymentSchemeFK, isSaveToDb = false,patientProfileId } = payload
         const newPayload = {
           patientNric: patientAccountNo,
           patientCoPaymentSchemeFK,
           year: moment().year(),
-          isSaveToDb: true,
+          isSaveToDb,
+          patientProfileId,
         }
 
         const response = yield call(service.requestChasBalance, newPayload)

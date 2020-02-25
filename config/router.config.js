@@ -562,7 +562,7 @@ const _routes = [
           },
           {
             path: '/report/chasclaimreport',
-            name: 'viewreport',
+            name: 'chasClaimReport',
             component: './Report/ChasClaimReport',
           },
           {
@@ -604,6 +604,11 @@ const _routes = [
             path: '/report/sessionsummary/:id',
             name: 'viewreport',
             component: './Report/SessionSummary/Details',
+          },
+          {
+            path: '/report/inventorytrendingreport',
+            name: 'inventorytrendingreport',
+            component: './Report/InventoryTrendingReport',
           },
         ],
       },
@@ -752,6 +757,16 @@ const _routes = [
             path: '/setting/userrole',
             name: 'userrole',
             component: './Setting/UserRole',
+          },
+          {
+            path: '/setting/userrole/new',
+            name: 'newuserrole',
+            component: './Setting/UserRole/Details',
+          },
+          {
+            path: '/setting/userrole/:id',
+            name: 'newuserrole',
+            component: './Setting/UserRole/Details',
           },
           {
             path: '/setting/revenuecategory',

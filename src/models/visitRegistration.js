@@ -27,6 +27,7 @@ export default createFormViewModel({
     service,
     state: {
       entity: {
+        queueNo: '',
         visit: {
           visitRemarks: undefined,
         },
