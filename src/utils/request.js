@@ -355,9 +355,7 @@ const request = (
             }
 
             let errorMsg = codeMessage[response.status]
-            const loginAndResetPasswordUrl = [
-              '/connect/token',
-            ]
+
             if (redirectToLoginAfterFail) {
               if (
                 (response.status === 400 && token === null) ||
