@@ -167,7 +167,7 @@ const Thumbnail = ({
   }
 
   useEffect(getThumbnail, [
-    attachment,
+    attachment.id,
   ])
 
   const handleConfirmDelete = () => {
