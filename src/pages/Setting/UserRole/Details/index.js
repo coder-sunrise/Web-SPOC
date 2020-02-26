@@ -78,6 +78,7 @@ const styles = (theme) => ({
       isEdit,
       ...restValues
     } = values
+    restValues.roleClientAccessRight = filteredAccessRight
     if (!isEdit) {
       const { roleClientAccessRight } = restValues
       const newClientAccessRight = []
@@ -165,6 +166,8 @@ class UserRoleDetail extends React.Component {
     } = settingUserRole
     const { params } = match
     const { isEdit } = currentSelectedUserRole
+
+    console.log(this.props)
 
     return (
       <React.Fragment>
