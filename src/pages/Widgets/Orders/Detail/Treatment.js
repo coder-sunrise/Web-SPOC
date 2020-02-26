@@ -58,7 +58,10 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const otherTreatmentTooths = []
     rows
       .filter(
-        (o) => o.type === '7' && o.treatmentFK === action.dentalTreatmentFK,
+        (o) =>
+          !o.isDeleted &&
+          o.type === '7' &&
+          o.treatmentFK === action.dentalTreatmentFK,
       )
       .forEach((r) => {
         let matches = (r.itemNotes || '').matchAll(rangeReg)

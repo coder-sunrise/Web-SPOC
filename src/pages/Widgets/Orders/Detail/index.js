@@ -6,6 +6,7 @@ import { Divider, withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import {
   Button,
+  ProgressButton,
   GridContainer,
   GridItem,
   notification,
@@ -106,9 +107,9 @@ class Details extends PureComponent {
           >
             Discard
           </Button>
-          <Button color='primary' onClick={onSave}>
+          <ProgressButton color='primary' onClick={onSave} icon={null}>
             {!entity ? 'Add' : 'Save'}
-          </Button>
+          </ProgressButton>
         </div>
       </React.Fragment>
     )
