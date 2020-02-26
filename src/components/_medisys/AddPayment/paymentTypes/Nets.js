@@ -29,7 +29,14 @@ const Nets = ({ payment, index, handleDeletePayment, handleAmountChange }) => {
         <GridItem md={6}>
           <FastField
             name={`paymentList[${index}].netsPayment.refNo`}
-            render={(args) => <TextField label='Referrence No.' {...args} />}
+            render={(args) => (
+              <TextField
+                label='Referrence No.'
+                {...args}
+                maxLength={25}
+                inputProps={{ maxLength: 25 }}
+              />
+            )}
           />
         </GridItem>
         <GridItem md={6}>

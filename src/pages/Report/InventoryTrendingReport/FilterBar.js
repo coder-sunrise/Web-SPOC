@@ -15,12 +15,6 @@ import {
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
 const FilterBar = ({ handleSubmit, isSubmitting }) => {
-  const getItemListCode = (inventoryType) => {
-    if (inventoryType === 'SERVICE') {
-      return 'ctservice'
-    }
-    return `inventory${inventoryType}`
-  }
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -63,26 +57,10 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
-                      { name: 'Service', value: 'SERVICE' },
                     ]}
                     onChange={(e) => {
                       if (e) {
                         fm.setFieldValue('items', undefined)
-                        // let payload = { code: e }
-                        // if (e === 'ctservice') {
-                        //   payload = {
-                        //     code: e,
-                        //     filter: {
-                        //       'serviceFKNavigation.IsActive': true,
-                        //       'serviceCenterFKNavigation.IsActive': true,
-                        //       combineCondition: 'and',
-                        //     },
-                        //   }
-                        // }
-                        // window.g_app._store.dispatch({
-                        //   type: 'codetable/fetchCodes',
-                        //   payload,
-                        // })
                       }
                     }}
                   />
@@ -96,13 +74,12 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               name='items'
               render={(args) => {
                 const { form } = args
-                // form.values.inventoryType
                 return (
                   <CodeSelect
                     {...args}
                     label='Item List'
                     mode='multiple'
-                    code={getItemListCode(form.values.inventoryType)}
+                    code={`inventory${form.values.inventoryType}`}
                     labelField='displayValue'
                     temp
                   />

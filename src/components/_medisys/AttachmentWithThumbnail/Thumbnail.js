@@ -167,7 +167,7 @@ const Thumbnail = ({
   }
 
   useEffect(getThumbnail, [
-    attachment,
+    attachment.id,
   ])
 
   const handleConfirmDelete = () => {
@@ -257,7 +257,7 @@ const Thumbnail = ({
           <GridItem md={12}>
             <SizeContainer size='sm'>
               <FastField
-                name={`${fieldName}[${indexInAllAttachments}].remark`}
+                name={`${fieldName}[${indexInAllAttachments}].remarks`}
                 render={(args) => (
                   <TextField
                     {...args}

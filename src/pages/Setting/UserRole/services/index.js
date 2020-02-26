@@ -3,12 +3,15 @@ import request from '@/utils/request'
 
 const url = '/api/Role'
 
-// export const getRoles = () => service.queryList(apiURL, { pagesize: 999 })
-
-// export const getRoleByID = (id) => request(`${apiURL}/${id}`, { method: 'GET' })
-
 export const getUserRoleById = async ({ id }) => {
   const response = await request(`${url}/${id}`, {
+    method: 'GET',
+  })
+  return response
+}
+
+export const getAccessRight = async () => {
+  const response = await request('/api/ClientAccessRight', {
     method: 'GET',
   })
   return response

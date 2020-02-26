@@ -152,6 +152,8 @@ export const REPORT_ID = {
   PATIENT_LABEL_89MM_36MM: 32,
   PATIENT_LAB_LABEL_80MM_45MM: 33,
   PATIENT_LAB_LABEL_89MM_36MM: 34,
+  POST_CARD_LABEL_80MM_45MM: 35,
+  POST_CARD_LABEL_89MM_36MM: 36,
 }
 
 export const INVOICE_STATUS = {
@@ -293,6 +295,15 @@ export const CANNED_TEXT_TYPE = {
 export const CANNED_TEXT_TYPE_FIELD = {
   1: 'clinicianNote',
   2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',
