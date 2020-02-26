@@ -107,12 +107,14 @@ const styles = (theme) => ({
 class UserRoleDetail extends React.Component {
   state = {
     // gridConfig: { ...AccessRightConfig },
+    moduleList: [],
+    displayValueList: [],
   }
 
-  componentDidMount = () => {
+  componentDidMount = async () => {
     const rowId = this.props.match.params.id
     if (rowId) {
-      this.props.dispatch({
+      await this.props.dispatch({
         type: 'settingUserRole/fetchUserRoleByID',
         payload: {
           id: rowId,
@@ -121,7 +123,7 @@ class UserRoleDetail extends React.Component {
       })
     } else if (this.props.location.state) {
       const newId = this.props.location.state.id
-      this.props.dispatch({
+      await this.props.dispatch({
         type: 'settingUserRole/fetchUserRoleByID',
         payload: {
           id: newId,
@@ -129,11 +131,13 @@ class UserRoleDetail extends React.Component {
         },
       })
     } else {
-      this.props.dispatch({
+      await this.props.dispatch({
         type: 'settingUserRole/fetchDefaultAccessRight',
         payload: { isEdit: false },
       })
     }
+    const { moduleList, displayValueList } = this.props.settingUserRole
+    this.setState({ moduleList, displayValueList })
   }
 
   handleSearchClick = () => {
@@ -157,17 +161,27 @@ class UserRoleDetail extends React.Component {
     history.goBack()
   }
 
+  onSelectFilter = (e, type, tarType) => {
+    const { roleClientAccessRight } = this.props.userRole
+    let filteredList = roleClientAccessRight
+    let result = []
+    if (e) {
+      filteredList = roleClientAccessRight.filter((r) => r[type] === e)
+      filteredList.map((f) => {
+        return result.push({ name: f[tarType], value: f[tarType] })
+      })
+    } else {
+      result = this.props.settingUserRole[tarType.concat('List')]
+    }
+    this.setState({ [tarType.concat('List')]: result })
+  }
+
   render () {
     const { classes, match, settingUserRole, userRole } = this.props
-    const {
-      currentSelectedUserRole,
-      moduleList,
-      displayValueList,
-    } = settingUserRole
+    const { currentSelectedUserRole } = settingUserRole
+    const { moduleList, displayValueList } = this.state
     const { params } = match
     const { isEdit } = currentSelectedUserRole
-
-    console.log(this.props)
 
     return (
       <React.Fragment>
@@ -252,7 +266,13 @@ class UserRoleDetail extends React.Component {
                 <Field
                   name='module'
                   render={(args) => (
-                    <Select {...args} label='Module' options={moduleList} />
+                    <Select
+                      {...args}
+                      label='Module'
+                      options={moduleList}
+                      onChange={(e) =>
+                        this.onSelectFilter(e, 'module', 'displayValue')}
+                    />
                   )}
                 />
               </GridItem>
@@ -264,6 +284,8 @@ class UserRoleDetail extends React.Component {
                       {...args}
                       label='Function Access'
                       options={displayValueList}
+                      onChange={(e) =>
+                        this.onSelectFilter(e, 'displayValue', 'module')}
                     />
                   )}
                 />
