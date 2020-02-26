@@ -72,24 +72,16 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    const {
-      effectiveDates,
-      filteredAccessRight,
-      isEdit,
-      ...restValues
-    } = values
+    let { effectiveDates, filteredAccessRight, isEdit, ...restValues } = values
     restValues.roleClientAccessRight = filteredAccessRight
     if (!isEdit) {
-      const { roleClientAccessRight } = restValues
-      const newClientAccessRight = []
-      roleClientAccessRight.map((d) => {
+      restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
         const { id, ...data } = d
-        return newClientAccessRight.push(data)
+        return data
       })
-      delete restValues.id
-      delete restValues.concurrencyToken
+      const { id, concurrencyToken, ...tempValue } = restValues
+      restValues = tempValue
       restValues.isUserMaintainable = true
-      restValues.roleClientAccessRight = newClientAccessRight
     }
     dispatch({
       type: 'settingUserRole/upsert',
@@ -106,15 +98,16 @@ const styles = (theme) => ({
 })
 class UserRoleDetail extends React.Component {
   state = {
-    // gridConfig: { ...AccessRightConfig },
-    moduleList: [],
-    displayValueList: [],
+    filter: {
+      module: undefined,
+      displayValue: undefined,
+    },
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     const rowId = this.props.match.params.id
     if (rowId) {
-      await this.props.dispatch({
+      this.props.dispatch({
         type: 'settingUserRole/fetchUserRoleByID',
         payload: {
           id: rowId,
@@ -123,7 +116,7 @@ class UserRoleDetail extends React.Component {
       })
     } else if (this.props.location.state) {
       const newId = this.props.location.state.id
-      await this.props.dispatch({
+      this.props.dispatch({
         type: 'settingUserRole/fetchUserRoleByID',
         payload: {
           id: newId,
@@ -131,13 +124,11 @@ class UserRoleDetail extends React.Component {
         },
       })
     } else {
-      await this.props.dispatch({
+      this.props.dispatch({
         type: 'settingUserRole/fetchDefaultAccessRight',
         payload: { isEdit: false },
       })
     }
-    const { moduleList, displayValueList } = this.props.settingUserRole
-    this.setState({ moduleList, displayValueList })
   }
 
   handleSearchClick = () => {
@@ -155,31 +146,71 @@ class UserRoleDetail extends React.Component {
     })
   }
 
+  moduleList = () => {
+    const { roleClientAccessRight } = this.props.userRole
+    let { moduleList } = this.props.settingUserRole
+    const { displayValue } = this.state.filter
+    let filteredList = roleClientAccessRight
+    if (displayValue) {
+      moduleList = roleClientAccessRight
+        .filter((r) => r.displayValue === displayValue)
+        .map((f) => {
+          return { name: f.module, value: f.module }
+        })
+    }
+    return [
+      ...new Set(moduleList),
+    ]
+  }
+
+  displayValueList = () => {
+    const { roleClientAccessRight } = this.props.userRole
+    let { displayValueList } = this.props.settingUserRole
+    const { module } = this.state.filter
+    let filteredList = roleClientAccessRight
+    if (module) {
+      displayValueList = roleClientAccessRight
+        .filter((r) => r.module === module)
+        .map((f) => {
+          return { name: f.displayValue, value: f.displayValue }
+        })
+    }
+    return [
+      ...new Set(displayValueList),
+    ]
+  }
+
+  onSelectModule = (e) =>
+    this.setState((prev) => {
+      return {
+        ...prev,
+        filter: {
+          ...prev.filter,
+          module: e,
+        },
+      }
+    })
+
+  onSelectDisplayValue = (e) =>
+    this.setState((prev) => {
+      return {
+        ...prev,
+        filter: {
+          ...prev.filter,
+          displayValue: e,
+        },
+      }
+    })
+
   goBackToPreviousPage = () => {
     const { history, resetForm } = this.props
     resetForm()
     history.goBack()
   }
 
-  onSelectFilter = (e, type, tarType) => {
-    const { roleClientAccessRight } = this.props.userRole
-    let filteredList = roleClientAccessRight
-    let result = []
-    if (e) {
-      filteredList = roleClientAccessRight.filter((r) => r[type] === e)
-      filteredList.map((f) => {
-        return result.push({ name: f[tarType], value: f[tarType] })
-      })
-    } else {
-      result = this.props.settingUserRole[tarType.concat('List')]
-    }
-    this.setState({ [tarType.concat('List')]: result })
-  }
-
   render () {
     const { classes, match, settingUserRole, userRole } = this.props
     const { currentSelectedUserRole } = settingUserRole
-    const { moduleList, displayValueList } = this.state
     const { params } = match
     const { isEdit } = currentSelectedUserRole
 
@@ -269,9 +300,8 @@ class UserRoleDetail extends React.Component {
                     <Select
                       {...args}
                       label='Module'
-                      options={moduleList}
-                      onChange={(e) =>
-                        this.onSelectFilter(e, 'module', 'displayValue')}
+                      options={this.moduleList()}
+                      onChange={this.onSelectModule}
                     />
                   )}
                 />
@@ -283,9 +313,8 @@ class UserRoleDetail extends React.Component {
                     <Select
                       {...args}
                       label='Function Access'
-                      options={displayValueList}
-                      onChange={(e) =>
-                        this.onSelectFilter(e, 'displayValue', 'module')}
+                      options={this.displayValueList()}
+                      onChange={this.onSelectDisplayValue}
                     />
                   )}
                 />
@@ -327,7 +356,6 @@ class UserRoleDetail extends React.Component {
             </Button>
             <ProgressButton
               color='primary'
-              // disabled={mode === 'Add' && this.state.selectedRows.length <= 0}
               onClick={() => {
                 this.props.handleSubmit()
               }}

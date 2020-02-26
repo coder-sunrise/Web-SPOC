@@ -26,7 +26,6 @@ const permissionList = {
 
 const permissionOption = ({ type, permission }) => {
   // console.log(type)
-  const result = []
   const baseType = [
     'Module',
     'Action',
@@ -40,8 +39,8 @@ const permissionOption = ({ type, permission }) => {
       }
     }
   }
-  permissionList[type].map((p) => {
-    return result.push({ name: p, value: p })
+  let result = permissionList[type].map((p) => {
+    return { name: p, value: p }
   })
   return result
 }
@@ -61,6 +60,7 @@ export const AccessRightConfig = {
       sortingEnabled: false,
       render: (row) => {
         // console.log('row', row)
+        // console.log(row.rowIndex)
         return (
           <GridContainer style={{ justifyContent: 'center' }}>
             <GridItem md={6}>
