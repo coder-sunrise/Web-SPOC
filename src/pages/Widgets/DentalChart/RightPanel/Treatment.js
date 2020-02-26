@@ -242,6 +242,7 @@ export default React.memo(
   ) => {
     return (
       codetable.cttreatment === codetableNext.cttreatment &&
+      codetable.ctchartmethod === codetableNext.ctchartmethod &&
       dentalChartComponent.action === dentalChartComponentNext.action
     )
   },
