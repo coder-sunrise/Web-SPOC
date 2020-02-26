@@ -17,6 +17,8 @@ import {
 } from '@/components'
 // variable
 import { Authority, menuData } from './variables'
+// utils
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   baseBtn: {
@@ -52,6 +54,13 @@ const styles = () => ({
   },
 })
 
+const filterByAccessRight = (m) => {
+  const accessRight = Authorized.check(m.authority)
+
+  if (accessRight && accessRight.rights === 'hidden') return false
+  return true
+}
+
 @connect(({ systemSetting, global, user }) => ({
   systemSetting,
   global,
@@ -68,6 +77,7 @@ class SystemSetting extends PureComponent {
 
     const { filterValues } = systemSetting
     const { searchText } = filterValues
+
     return Object.keys(this.group).map((o) => {
       return {
         authority: Authority[o],
@@ -77,6 +87,7 @@ class SystemSetting extends PureComponent {
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
             {this.group[o]
+              .filter(filterByAccessRight)
               .filter((m) => {
                 return (
                   m.text.toLocaleLowerCase().indexOf(searchText) >= 0 ||
@@ -213,6 +224,7 @@ class SystemSetting extends PureComponent {
             const accessRight = accessRights.find(
               (menuItem) => menuItem.name === item.authority,
             )
+
             const canAccess =
               accessRight === undefined
                 ? true

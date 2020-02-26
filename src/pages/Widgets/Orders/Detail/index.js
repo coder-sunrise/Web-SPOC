@@ -98,7 +98,8 @@ class Details extends PureComponent {
                 //   // force current edit row components to update
                 //   type: 'global/incrementCommitCount',
                 // })
-              } else if (onReset) {
+              }
+              if (onReset) {
                 onReset()
               }
             }}

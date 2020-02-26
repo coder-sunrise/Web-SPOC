@@ -26,6 +26,10 @@ const styles = () => ({
     '&:not(:last-child)': {
       borderBottom: `1px solid rgba(0, 0, 0, 0.12)`,
     },
+    '&.Mui-disabled': {
+      opacity: 1,
+      backgroundColor: 'white',
+    },
   },
   icon: {
     minWidth: 38,
