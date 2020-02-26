@@ -303,7 +303,6 @@ const AttachmentWithThumbnail = ({
               indexInAllAttachments = attachments.findIndex(
                 (item) => item.fileIndexFK === attachment.fileIndexFK,
               )
-            console.log({ indexInAllAttachments })
             return (
               <Thumbnail
                 index={index}
