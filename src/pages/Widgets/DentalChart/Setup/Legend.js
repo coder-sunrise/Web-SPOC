@@ -84,8 +84,8 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
   if (viewOnly) {
     return (
       <Tooth
-        width={groupWidth / 5 + 2}
-        height={groupHeight / 5 + 2}
+        width={groupWidth / 5}
+        height={groupHeight / 5}
         paddingLeft={1}
         paddingTop={1}
         zoom={1 / 5}
