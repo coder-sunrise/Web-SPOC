@@ -93,10 +93,10 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
         image={row.image}
         action={row}
         fill={{
-          left: row.chartMethodColorBlock,
-          right: row.chartMethodColorBlock,
-          top: row.chartMethodColorBlock,
-          bottom: row.chartMethodColorBlock,
+          left: row.chartMethodColorBlock || 'white',
+          right: row.chartMethodColorBlock || 'white',
+          top: row.chartMethodColorBlock || 'white',
+          bottom: row.chartMethodColorBlock || 'white',
           centerfull: row.chartMethodColorBlock || 'white',
         }}
         symbol={{

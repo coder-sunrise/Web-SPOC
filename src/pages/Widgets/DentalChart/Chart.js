@@ -46,6 +46,7 @@ import {
   createRectangle,
   createCircle,
   createLine,
+  isToothCrossed,
 } from './variables'
 
 const { fabric } = require('fabric')
@@ -871,9 +872,14 @@ class Chart extends React.PureComponent {
                 const items = this.canvas
                   .getObjects('group')
                   .filter((n) =>
-                    this.isToothCrossed(n, selectedTooth[0], selectedTooth[1]),
+                    isToothCrossed(
+                      n.name,
+                      selectedTooth[0].name,
+                      selectedTooth[1].name,
+                    ),
                   )
                 if (items.length < 2) return
+                // console.log(items)
                 this.toggleMultiSelect(
                   items.map((g) => ({
                     group: g,
@@ -1382,6 +1388,7 @@ class Chart extends React.PureComponent {
   }
 
   isToothCrossed = (n, start, end) => {
+    con
     const startChar1 = start.name.substring(0, 1)
     const endChar1 = end.name.substring(0, 1)
     if (!n.name || !Number(n.name)) return false

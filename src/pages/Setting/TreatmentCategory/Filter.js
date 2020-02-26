@@ -76,7 +76,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingServiceCategory/updateState',
+                    type: 'settingTreatmentCategory/updateState',
                     payload: {
                       entity: undefined,
                     },
