@@ -349,7 +349,6 @@ const request = (
         if (response) {
           try {
             updateLoadingState()
-
             let returnObj = {
               title: codeMessage[response.status],
             }
@@ -463,6 +462,7 @@ const request = (
             // msg = payload.message || statusText
           } catch (error) {
             console.error(error)
+            const errorMsg = error ? error.toString() : ''
             const exception = { success: false, status, errorMsg, payload }
             throw exception
           }
