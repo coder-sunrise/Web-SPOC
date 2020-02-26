@@ -22,7 +22,7 @@ const PostCardLabelBtn = ({
   const handleClick = () => {
     const { list = [] } = smsPatient
     const { labelPrinterSize } = clinicSettings
-    let reportID = REPORT_ID.POST_CARD_LABEL_89MM_36MM
+    let reportID = REPORT_ID.POST_CARD_LABEL_80MM_45MM
 
     if (labelPrinterSize === '8.9cmx3.6cm') {
       reportID = REPORT_ID.POST_CARD_LABEL_89MM_36MM
