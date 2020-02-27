@@ -11,6 +11,7 @@ import {
   Checkbox,
   Select,
 } from '@/components'
+import CONSTANTS from './DispenseDetails/constants'
 
 export const tableConfig = {
   FuncProps: { pager: false },
@@ -209,7 +210,7 @@ export const PrescriptionColumnExtensions = (
           <Button
             color='primary'
             onClick={() => {
-              onPrint('Medication', row)
+              onPrint({ type: CONSTANTS.DRUG_LABEL, row })
             }}
             justIcon
           >
@@ -458,7 +459,7 @@ export const OtherOrdersColumnExtensions = (viewOnly = false, onPrint) => [
             color='primary'
             justIcon
             onClick={() => {
-              onPrint(type, r)
+              onPrint({ type: CONSTANTS.DOCUMENTS, row: r })
             }}
           >
             <Print />

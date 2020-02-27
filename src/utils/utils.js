@@ -1099,7 +1099,7 @@ export const currencyFormatter = (value) =>
   numeral(value).format(`$${config.currencyFormat}`)
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
-const commonDataReaderTransform = (data, fieldName) => {
+const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   // console.log(commonDataReaderTransform)
   const { getClinic } = config
   const { systemTimeZoneInt = 0 } = getClinic() || {}
@@ -1109,13 +1109,13 @@ const commonDataReaderTransform = (data, fieldName) => {
     if (Array.isArray(data)) {
       if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
       data.forEach((element) => {
-        commonDataReaderTransform(element)
+        commonDataReaderTransform(element, fieldName, keepNull)
       })
     } else {
       for (let field in data) {
         if (Object.prototype.hasOwnProperty.call(data, field)) {
           const v = data[field]
-          if (v === null || v === undefined) {
+          if (!keepNull && (v === null || v === undefined)) {
             delete data[field]
             continue
           }
@@ -1126,12 +1126,16 @@ const commonDataReaderTransform = (data, fieldName) => {
               ])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
-                commonDataReaderTransform(data[field][subfield])
+                commonDataReaderTransform(
+                  data[field][subfield],
+                  fieldName,
+                  keepNull,
+                )
               }
             }
           }
           if (typeof v === 'object') {
-            commonDataReaderTransform(data[field])
+            commonDataReaderTransform(data[field], fieldName, keepNull)
           } else if (
             typeof v === 'string' &&
             regDate.test(v) &&
@@ -1199,6 +1203,14 @@ const locationQueryParameters = () => {
   }, {})
   return params
 }
+
+export const convertToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve(reader.result.split(',')[1])
+    reader.onerror = (error) => reject(error)
+  })
 
 module.exports = {
   ...cdrssUtil,
