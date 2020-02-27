@@ -144,6 +144,7 @@ export default {
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
+  'menu.setting.referralsource': 'Referral Source',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

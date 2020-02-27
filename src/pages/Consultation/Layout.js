@@ -27,6 +27,8 @@ import {
   IconButton,
   CustomInputWrapper,
   Fab,
+  GridContainer,
+  GridItem,
 } from '@/components'
 // sub components
 import PatientHistoryDrawer from './PatientHistoryDrawer'
@@ -644,21 +646,30 @@ class Layout extends PureComponent {
               // backgroundColor: '#f0f8ff',
             }}
           >
-            {state.currentLayout.widgets.map((id) => {
-              const w = widgets.find((o) => o.id === id)
-              if (!w) return null
-              const onClick = () => this.onAnchorClick(w.id)
-              return (
-                <Button
-                  size='sm'
-                  variant='outlined'
-                  color='primary'
-                  onClick={onClick}
-                >
-                  {w.name}
+            <GridContainer justify='space-between'>
+              <GridItem md={10}>
+                {state.currentLayout.widgets.map((id) => {
+                  const w = widgets.find((o) => o.id === id)
+                  if (!w) return null
+                  const onClick = () => this.onAnchorClick(w.id)
+                  return (
+                    <Button size='sm' color='primary' onClick={onClick}>
+                      {w.name}
+                    </Button>
+                  )
+                })}
+              </GridItem>
+              <GridItem md={2} style={{ textAlign: 'right' }}>
+                <Button size='sm' onClick={this.toggleDrawer}>
+                  <Settings />
+                  Widgets
                 </Button>
-              )
-            })}
+                <Button size='sm' onClick={this.togglePatientHistoryDrawer}>
+                  <Accessibility />
+                  History
+                </Button>
+              </GridItem>
+            </GridContainer>
           </CardContainer>
         )}
         {true && (
@@ -815,7 +826,7 @@ class Layout extends PureComponent {
         )}
         {!state.fullScreenWidget && (
           <React.Fragment>
-            <div className={classes.fabContainer}>
+            {/* <div className={classes.fabContainer}>
               <Slide
                 direction='up'
                 in={this.state.mode === 'edit'}
@@ -854,7 +865,7 @@ class Layout extends PureComponent {
                   </div>
                 </Slide>
               )}
-            </div>
+            </div> */}
             <Drawer
               anchor='right'
               open={this.state.openPatientHistoryDrawer}

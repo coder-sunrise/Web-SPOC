@@ -1,11 +1,10 @@
-import React, { PureComponent, useEffect } from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 
 import { getBizSession } from '@/services/queue'
 
-import Yup from '@/utils/yup'
 import {
   currenciesList,
   currencyRoundingList,
@@ -22,6 +21,7 @@ import {
   Button,
   Switch,
   WarningSnackbar,
+  CodeSelect,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -40,9 +40,18 @@ const styles = (theme) => ({
       clinicSettings.entity &&
       clinicSettings.entity.showConsultationVersioning
     ) {
-      const { showConsultationVersioning } = clinicSettings.entity
+      const { showConsultationVersioning, autoRefresh, defaultVisitType } = clinicSettings.entity
+
       return {
         ...clinicSettings.entity,
+        defaultVisitType:{
+          ...defaultVisitType,
+          settingValue: Number(defaultVisitType.settingValue),
+        },
+        autoRefresh:{
+          ...autoRefresh,
+          settingValue: autoRefresh.settingValue === 'true',
+        },
         showConsultationVersioning: {
           ...showConsultationVersioning,
           settingValue: showConsultationVersioning.settingValue === 'true',
@@ -58,6 +67,8 @@ const styles = (theme) => ({
       currencyRounding,
       currencyRoundingToTheClosest,
       showConsultationVersioning,
+      autoRefresh,
+      defaultVisitType,
     } = values
 
     const payload = [
@@ -73,8 +84,14 @@ const styles = (theme) => ({
       {
         ...showConsultationVersioning,
       },
+      {
+        ...autoRefresh,
+      },
+      {
+        ...defaultVisitType,
+      },
     ]
-    const { dispatch, onConfirm, history } = props
+    const { dispatch, history } = props
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -185,19 +202,6 @@ class GeneralSetting extends PureComponent {
           </GridContainer>
 
           <GridContainer>
-            {/* <GridItem md={3}>
-              <Field
-                name='.settingValue'
-                render={(args) => (
-                  <Select
-                    label='To The Closest'
-                    options={currencyRoundingToTheClosest}
-                    {...args}
-                    disabled={!!hasActiveSession}
-                  />
-                )}
-              />
-            </GridItem> */}
             <GridItem md={3}>
               <Field
                 name='showConsultationVersioning.settingValue'
@@ -205,6 +209,35 @@ class GeneralSetting extends PureComponent {
                   <Switch
                     label='Show Consultation Versioning'
                     {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoRefresh.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Queue Listing Auto Refresh'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='defaultVisitType.settingValue'
+                render={(args) => (
+                  <CodeSelect
+                    label='Default Visit Type'
+                    {...args}
+                    code='ctvisitpurpose'
                     disabled={!!hasActiveSession}
                   />
                 )}

@@ -20,6 +20,7 @@ const AddOrder = ({
   handleSubmit,
   dispatch,
   dispense,
+  height,
   codetable: { ctservice, inventoryconsumable, inventorymedication },
   visitType,
 }) => {
@@ -167,11 +168,13 @@ const AddOrder = ({
     if (visitType === VISIT_TYPE.RETAIL)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
-
+  console.log(height)
   return (
     <React.Fragment>
       <SizeContainer size='sm'>
-        <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
+          <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        </div>
       </SizeContainer>
       {footer &&
         footer({

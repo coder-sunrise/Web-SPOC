@@ -27,6 +27,7 @@ export const defaultConfigs = {
       dentalScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.DENTALCLINICALNOTES,
       cannedTextTypeFK: CANNED_TEXT_TYPE.CLINICALNOTES,
       index: 0,
+      height: 390,
     },
     {
       authority: 'queue.consultation.clinicalnotes.chiefcomplaints',

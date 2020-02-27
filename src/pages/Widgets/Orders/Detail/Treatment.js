@@ -58,7 +58,10 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const otherTreatmentTooths = []
     rows
       .filter(
-        (o) => o.type === '7' && o.treatmentFK === action.dentalTreatmentFK,
+        (o) =>
+          !o.isDeleted &&
+          o.type === '7' &&
+          o.treatmentFK === action.dentalTreatmentFK,
       )
       .forEach((r) => {
         let matches = (r.itemNotes || '').matchAll(rangeReg)
@@ -106,6 +109,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 
     let groupsAry = []
     let quantity
+    console.log(groupsAry)
     if (treatment.id) {
       let groups = _.groupBy(dataFiltered, 'toothNo')
       groupsAry = Object.keys(groups).map((k) => {
@@ -170,14 +174,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     unitPrice: Yup.number().required(),
     treatmentFK: Yup.number().required(),
   }),
-  handleReset: () => {
-    const { setValues, orders } = this.props
 
-    setValues({
-      ...orders.defaultTreatment,
-      type: orders.type,
-    })
-  },
   handleSubmit: async (values, { props, onConfirm }) => {
     const { dispatch, orders, currentType, getNextSequence } = props
 
@@ -240,6 +237,26 @@ class Treatment extends PureComponent {
           },
         })
       }
+  }
+
+  handleReset = () => {
+    const { setValues, orders, dispatch, values } = this.props
+    // console.log(values)
+    if (!values.uid)
+      dispatch({
+        type: 'dentalChartComponent/deleteTreatment',
+        payload: values,
+      })
+    dispatch({
+      type: 'dentalChartComponent/updateState',
+      payload: {
+        action: undefined,
+      },
+    })
+    setValues({
+      ...orders.defaultTreatment,
+      type: orders.type,
+    })
   }
 
   setTotalPrice = () => {
@@ -470,7 +487,7 @@ class Treatment extends PureComponent {
         </GridContainer>
         {footer({
           onSave: handleSubmit,
-          onReset: handleReset,
+          onReset: this.handleReset,
         })}
       </div>
     )

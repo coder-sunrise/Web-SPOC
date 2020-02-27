@@ -159,6 +159,42 @@ class ControlTest extends PureComponent {
   constructor (props) {
     super(props)
     this.container = React.createRef()
+
+    const title = 'Simple Title'
+    const options = {
+      body: 'Simple piece of body text.\nSecond line of body text :)',
+    }
+    // registration.showNotification(title, options)
+
+    //   navigator.serviceWorker.getRegistration().then((reg) => {
+    //     console.log(reg)
+    //     let options = {
+    //       body: 'Here is a notification body!',
+    //       icon: 'images/example.png',
+    //       vibrate: [
+    //         100,
+    //         50,
+    //         100,
+    //       ],
+    //       data: {
+    //         dateOfArrival: Date.now(),
+    //         primaryKey: 1,
+    //       },
+    //       actions: [
+    //         {
+    //           action: 'explore',
+    //           title: 'Explore this new world',
+    //           icon: 'images/checkmark.png',
+    //         },
+    //         {
+    //           action: 'close',
+    //           title: 'Close notification',
+    //           icon: 'images/xmark.png',
+    //         },
+    //       ],
+    //     }
+    //     reg.showNotification('Hello world!', options)
+    //   })
   }
 
   state = {
@@ -199,7 +235,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
-    console.log(this.props)
+    console.log(Notification, Notification.permission)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)

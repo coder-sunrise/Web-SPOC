@@ -42,10 +42,10 @@ const methods = [
     value: 3,
     name: 'Bridging',
   },
-  {
-    value: 4,
-    name: 'NA',
-  },
+  // {
+  //   value: 4,
+  //   name: 'NA',
+  // },
 ]
 const rowSchema = Yup.object().shape({
   displayValue: Yup.string().required(),

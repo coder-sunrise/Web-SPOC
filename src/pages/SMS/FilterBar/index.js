@@ -15,6 +15,7 @@ import { GridContainer, GridItem, ProgressButton, Button } from '@/components'
 // sub components
 import FilterByAppointment from './FilterByAppointment'
 import FilterByPatient from './FilterByPatient'
+import PostCardLabelBtn from './PostCardLabelBtn'
 import { APPOINTMENT_STATUS, SMS_STATUS } from '@/utils/constants'
 import { formatDatesToUTC } from '@/utils/dateUtils'
 
@@ -39,12 +40,15 @@ const FilterBar = ({
   dispatch,
   handleSubmit,
   setFieldValue,
+  selectedRows,
+  smsPatient,
 }) => {
   const props = {
     values,
     type,
     dispatch,
     setFieldValue,
+    selectedRows,
   }
 
   return (
@@ -67,9 +71,7 @@ const FilterBar = ({
             <FormattedMessage id='sms.search' />
           </ProgressButton>
           {type !== 'Appointment' && (
-            <Button variant='contained' color='primary' onClick={handleSubmit}>
-              <Print /> <FormattedMessage id='sms.postCardLabel' />
-            </Button>
+            <PostCardLabelBtn {...props} smsPatient={smsPatient} />
           )}
         </div>
       </GridItem>

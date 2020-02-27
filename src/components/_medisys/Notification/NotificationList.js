@@ -1,8 +1,10 @@
+import color from 'color'
 import React from 'react'
 import classnames from 'classnames'
 // material ui
 import { withStyles, Divider } from '@material-ui/core'
 // common components
+import { hoverColor } from 'mui-pro-jss'
 import { Button } from '@/components'
 // sub components
 import NotificationContent from './NotificationContent'
@@ -22,6 +24,7 @@ const styles = (theme) => ({
   listRoot: {
     maxHeight: '70vh',
     overflowY: 'auto',
+    backgroundColor: color(hoverColor).lighten(0.05).hex(),
   },
   footer: {
     textAlign: 'center',

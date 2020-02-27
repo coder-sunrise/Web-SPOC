@@ -487,6 +487,8 @@ class ClinicalNotes extends Component {
       clinicInfo,
     )
 
+    console.log({ defaultActive })
+
     return (
       <div>
         <FieldArray
@@ -599,6 +601,7 @@ class ClinicalNotes extends Component {
                               strongLabel
                               onBlur={this.onEditorChange(item[fieldName])}
                               // label='Chief Complaints'
+                              height={item.height}
                               {...args}
                             />
                           </div>

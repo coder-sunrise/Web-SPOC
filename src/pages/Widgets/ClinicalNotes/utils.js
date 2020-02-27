@@ -40,9 +40,12 @@ export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
     const { corScribbleNotes = [] } = entity
     const notes = entity[prefix] || []
 
-    let defaultActive = []
+    let defaultActive = [
+      0,
+    ]
 
-    if (notes.length === 0 && corScribbleNotes.length === 0) return []
+    if (notes.length === 0 && corScribbleNotes.length === 0)
+      return defaultActive
 
     // check if panel contains doctor notes
     if (notes.length > 0) {
@@ -72,6 +75,7 @@ export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
     const result = [
       ...new Set(defaultActive),
     ]
+    console.log({ result })
     return result
   } catch (error) {
     console.error(error)

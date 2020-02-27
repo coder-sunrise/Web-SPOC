@@ -31,7 +31,7 @@ class InventoryDetails extends PureComponent {
       summaryConfig: {
         state: {
           totalItems: [
-            { columnName: 'quantity', type: 'sum' },
+            { columnName: 'quantity', type: 'sum', precision: 0 },
           ],
         },
         integrated: {
@@ -59,7 +59,12 @@ class InventoryDetails extends PureComponent {
       { columnName: 'doctorName', sortingEnabled: false },
       { columnName: 'patientName', sortingEnabled: false },
       { columnName: 'genderAge', sortingEnabled: false },
-      { columnName: 'quantity', sortingEnabled: false },
+      {
+        columnName: 'quantity',
+        sortingEnabled: false,
+        type: 'number',
+        precision: 0,
+      },
     ]
 
     return (

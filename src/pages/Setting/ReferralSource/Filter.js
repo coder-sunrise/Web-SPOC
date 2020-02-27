@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
 import Add from '@material-ui/icons/Add'
-import { status } from '@/utils/codes'
 import {
   withFormikExtend,
   FastField,
@@ -11,36 +10,56 @@ import {
   Button,
   TextField,
   ProgressButton,
-  Select,
 } from '@/components'
 
-// for what use
 @withFormikExtend({
-  mapPropsToValues: ({ settingTreatmentCategory }) =>
-    settingTreatmentCategory.filter || {},
-  handleSubmit: () => {},
-  // displayName: 'ServiceCenterFilter', to determine
+  mapPropsToValues: ({ settingReferralSource }) =>
+    settingReferralSource.filter || {},
+  handleSubmit: (values, { props}) => {
+
+    const {  isActive, name, institution, department } = values
+
+    const payload = {
+      isActive,
+      name,
+      institution,
+      department,
+    }
+
+    props.dispatch({
+      type: 'settingReferralSource/query',
+      payload,
+    })
+  },
+  displayName: 'ReferralSourceFilter',
 })
 class Filter extends PureComponent {
   render () {
-    // console.log({ props: this.props.values })
-    const { classes } = this.props
+    const { classes,handleSubmit } = this.props
     return (
       <div className={classes.filterBar}>
         <GridContainer>
           <GridItem xs={6} md={3}>
             <FastField
-              name='codeDisplayValue'
+              name='name'
               render={(args) => {
-                return <TextField label='Code / Display Value' {...args} />
+                return <TextField label='Name' {...args} />
               }}
             />
           </GridItem>
-          <GridItem xs={6} md={2}>
+          <GridItem xs={6} md={3}>
             <FastField
-              name='isActive'
+              name='institution'
               render={(args) => {
-                return <Select label='Status' options={status} {...args} />
+                return <TextField label='Institution' {...args} />
+              }}
+            />
+          </GridItem>
+          <GridItem xs={6} md={3}>
+            <FastField
+              name='department'
+              render={(args) => {
+                return <TextField label='Department' {...args} />
               }}
             />
           </GridItem>
@@ -52,22 +71,7 @@ class Filter extends PureComponent {
               <ProgressButton
                 color='primary'
                 icon={<Search />}
-                onClick={() => {
-                  const { codeDisplayValue, isActive } = this.props.values
-                  this.props.dispatch({
-                    type: 'settingTreatmentCategory/query',
-                    payload: {
-                      isActive,
-                      group: [
-                        {
-                          code: codeDisplayValue,
-                          displayValue: codeDisplayValue,
-                          combineCondition: 'or',
-                        },
-                      ],
-                    },
-                  })
-                }}
+                onClick={handleSubmit}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
@@ -76,7 +80,7 @@ class Filter extends PureComponent {
                 color='primary'
                 onClick={() => {
                   this.props.dispatch({
-                    type: 'settingTreatmentCategory/updateState',
+                    type: 'settingReferralSource/updateState',
                     payload: {
                       entity: undefined,
                     },

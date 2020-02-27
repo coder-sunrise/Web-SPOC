@@ -144,7 +144,9 @@ class PatientHistory extends Component {
       return rights !== 'hidden'
     })
     this.state = {
-      selectedItems: this.widgets.map((widget) => widget.id),
+      selectedItems: localStorage.getItem('patientHistoryWidgets')
+        ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
+        : this.widgets.map((widget) => widget.id),
     }
   }
 
@@ -190,6 +192,7 @@ class PatientHistory extends Component {
     this.setState({
       selectedItems: val,
     })
+    localStorage.setItem('patientHistoryWidgets', JSON.stringify(val))
   }
 
   getContent = (row) => {
@@ -437,7 +440,7 @@ class PatientHistory extends Component {
       >
         {!isRetailVisit && (
           <GridContainer gutter={0} alignItems='center'>
-            <GridItem md={2}>
+            <GridItem md={4}>
               <Select
                 // simple
                 value={this.state.selectedItems}
@@ -518,7 +521,7 @@ class PatientHistory extends Component {
                 )}
               </GridItem>
             </Authorized>
-            <GridItem md={7} style={{ textAlign: 'right' }}>
+            <GridItem md={5} style={{ textAlign: 'right' }}>
               Updated Date:&nbsp;
               {patientHistory.selectedSubRow.signOffDate && (
                 <DatePicker

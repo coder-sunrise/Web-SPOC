@@ -343,7 +343,7 @@ class CommonModal extends React.PureComponent {
               className={`${classes.modalBody} ${bodyNoPadding
                 ? classes.modalBodyNoPadding
                 : classes.modalBodyPadding}`}
-              style={{ maxHeight: this.state.height }}
+              style={{ maxHeight: this.footer ? 'auto' : this.state.height }}
             >
               {/* !overrideLoading && loading.global ? (
                 <Loading
