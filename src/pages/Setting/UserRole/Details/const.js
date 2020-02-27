@@ -1,10 +1,49 @@
-import { FastField } from 'formik'
+import { FastField, Field } from 'formik'
 import {
   GridContainer,
   GridItem,
   Select,
   EditableTableGrid,
 } from '@/components'
+
+const permissionList = {
+  Module: [
+    'ReadWrite',
+    'ReadOnly',
+    'Hidden',
+  ],
+  Action: [
+    'Enabled',
+    'Disabled',
+    'Hidden',
+  ],
+  Field: [
+    'ReadWrite',
+    'ReadOnly',
+    'Hidden',
+  ],
+}
+
+const permissionOption = ({ type, permission }) => {
+  // console.log(type)
+  const baseType = [
+    'Module',
+    'Action',
+    'Field',
+  ]
+  if (baseType.indexOf(type) < 0) {
+    for (let i = 0; i < baseType.length; i++) {
+      if (permissionList[baseType[i]].indexOf(permission) >= 0) {
+        type = baseType[i]
+        break
+      }
+    }
+  }
+  let result = permissionList[type].map((p) => {
+    return { name: p, value: p }
+  })
+  return result
+}
 
 export const AccessRightConfig = {
   columns: [
@@ -17,37 +56,27 @@ export const AccessRightConfig = {
       columnName: 'permission',
       type: 'select',
       align: 'center',
-      width: 150,
-      sortingEnabled: false,
       width: 250,
+      sortingEnabled: false,
       render: (row) => {
-        console.log('row', row)
+        // console.log('row', row)
+        // console.log(row.rowIndex)
         return (
           <GridContainer style={{ justifyContent: 'center' }}>
             <GridItem md={6}>
-              <Select
-                value={row.permission}
-                options={
-                  (row.type === 'Module' && [
-                    { name: 'ReadWrite', value: 0 },
-                    { name: 'ReadOnly', value: 1 },
-                    { name: 'Enabled', value: 2 },
-                  ]) ||
-                  (row.type === 'Action' && [
-                    { name: 'Enabled', value: 2 },
-                    { name: 'Disabled', value: 3 },
-                    { name: 'Hidden', value: 4 },
-                  ]) ||
-                  ((row.type === 'Field' && [
-                    { name: 'ReadWrite', value: 0 },
-                    { name: 'ReadOnly', value: 1 },
-                    { name: 'Hidden', value: 4 },
-                  ]) || [
-                    { name: 'ReadWrite', value: 0 },
-                    { name: 'ReadOnly', value: 1 },
-                    { name: 'Enabled', value: 2 },
-                  ])
-                }
+              <Field
+                name={`filteredAccessRight[${row.rowIndex}].permission`}
+                render={(args) => (
+                  <Select
+                    // value={row.permission}
+                    {...args}
+                    options={permissionOption(row)}
+                    onChange={(e) => {
+                      console.log(row.permission)
+                      console.log(e)
+                    }}
+                  />
+                )}
               />
             </GridItem>
           </GridContainer>
