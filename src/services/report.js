@@ -14,7 +14,6 @@ export const getReportContext = async (reportID) => {
 
 export const getRawData = async (reportID, payload) => {
   const baseRawDataURL = '/api/reports/datas'
-
   return request(`${baseRawDataURL}/${reportID}`, {
     method: 'GET',
     keepNull: true,

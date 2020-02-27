@@ -519,7 +519,12 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-
+    const isEditable = (poItem) => {
+      if ((poItem && poStatus !== 1) || poStatus > 1) return false
+      if (isWriteOff) return false
+      return true
+    }
+    const isCompletedOrCancelled = poStatus === 4 || poStatus === 6
     const currentGstValue = isGSTEnabled ? gstValue : undefined
     return (
       <React.Fragment>
@@ -527,6 +532,7 @@ class Index extends Component {
           isReadOnly={!this.isEditable(poStatus, isWriteOff)}
           isFinalize={isPOStatusFinalized(poStatus)}
           setFieldValue={setFieldValue}
+          isCompletedOrCancelled={isCompletedOrCancelled}
           {...this.props}
         />
         <AuthorizedContext.Provider

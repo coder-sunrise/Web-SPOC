@@ -12,31 +12,16 @@ import {
   EditableTableGrid,
   Field,
 } from '@/components'
-import {
-  podoOrderType,
-  getInventoryItem,
-  getInventoryItemV2,
-  getInventoryItemList,
-} from '@/utils/codes'
-import AuthorizedContext from '@/components/Context/Authorized'
-
+import { podoOrderType, getInventoryItemV2 } from '@/utils/codes'
+import { INVENTORY_TYPE } from '@/utils/constants'
 // let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
   type: Yup.number().required(),
   code: Yup.number().required(),
   name: Yup.number().required(),
-  batchNo: Yup.array().when('expiryDate', {
-    is: (v) => v === undefined || v === '',
-    then: Yup.array().nullable(),
-    otherwise: Yup.array().required(),
-  }),
+  batchNo: Yup.string().required(),
   expiryDate: Yup.string().nullable(),
-
-  // orderQty: Yup.number().required(),
-  // bonusQty: Yup.number().required(),
-  // quantityReceived: Yup.number().min(0).required(),
-  // totalBonusReceived: Yup.number().min(0).required(),
   currentReceivingQty: Yup.number()
     .min(0, 'Current Receiving Quantity must be greater than or equal to 0')
     .max(Yup.ref('maxCurrentReceivingQty'), (e) => {
@@ -45,17 +30,6 @@ const receivingDetailsSchema = Yup.object().shape({
         : e.max}`
     })
     .required(),
-  // currentReceivingBonusQty: Yup.number()
-  //   .min(
-  //     0,
-  //     'Current Receiving Bonus Quantity must be greater than or equal to 0',
-  //   )
-  //   .max(Yup.ref('maxCurrentReceivingBonusQty'), (e) => {
-  //     return `Current Receiving Bonus Quantity must be less than or equal to ${e.max.toFixed(
-  //       1,
-  //     )}`
-  //   })
-  //   .required(),
 })
 
 @withFormikExtend({
@@ -74,8 +48,6 @@ const receivingDetailsSchema = Yup.object().shape({
   }),
   handleSubmit: (values, { props }) => {
     const { rows, ...restValues } = values
-    // console.log('handleSubmit1', values)
-    // console.log('handleSubmit2', restValues)
     const {
       deliveryOrderDetails,
       refreshDeliveryOrder,
@@ -88,15 +60,15 @@ const receivingDetailsSchema = Yup.object().shape({
       if (!v.id || v.id <= 0) {
         let itemFKName = ''
         switch (v.type) {
-          case 1: {
+          case INVENTORY_TYPE.MEDICATION: {
             itemFKName = 'inventoryMedicationFK'
             break
           }
-          case 2: {
+          case INVENTORY_TYPE.CONSUMABLE: {
             itemFKName = 'inventoryConsumableFK'
             break
           }
-          case 3: {
+          case INVENTORY_TYPE.VACCINATION: {
             itemFKName = 'inventoryVaccinationFK'
             break
           }
@@ -301,6 +273,10 @@ class DODetails extends PureComponent {
     )
 
     if (osItem) {
+      const defaultBatch = this.getBatchStock(row).find(
+        (batch) => batch.isDefault,
+      )
+      if (defaultBatch) row.batchNo = defaultBatch.batchNo
       row.orderQuantity = osItem.orderQuantity
       row.bonusQuantity = osItem.bonusQuantity
       row.quantityReceived = osItem.quantityReceived
@@ -448,29 +424,29 @@ class DODetails extends PureComponent {
   }
 
   getItemOptions = (row, filteredStateName, stateName) => {
-    const { code, isNew } = row
-    if (code !== '') {
+    const { code, name, isNew } = row
+    if (code && name) {
       return this.state[stateName].filter((o) => o.value === code)
     }
     return isNew ? this.state[filteredStateName] : this.state[stateName]
   }
 
   rowOptions = (row) => {
-    if (row.type === 1) {
+    if (row.type === INVENTORY_TYPE.MEDICATION) {
       return this.getItemOptions(
         row,
         'filterMedicationItemList',
         'MedicationItemList',
       )
     }
-    if (row.type === 2) {
+    if (row.type === INVENTORY_TYPE.CONSUMABLE) {
       return this.getItemOptions(
         row,
         'filterConsumableItemList',
         'ConsumableItemList',
       )
     }
-    if (row.type === 3) {
+    if (row.type === INVENTORY_TYPE.VACCINATION) {
       return this.getItemOptions(
         row,
         'filterVaccinationItemList',
@@ -480,29 +456,50 @@ class DODetails extends PureComponent {
     return []
   }
 
-  render () {
-    const { props } = this
+  getOptions = (stateItemList, storeItemList, row) => {
+    const stateArray = stateItemList
+    const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
+    return selectedArray.find((o) => o.itemFK === row.code).stock
+  }
 
-    const {
-      footer,
-      values,
-      theme,
-      errors,
-      classes,
-      deliveryOrderDetails,
-    } = props
+  getBatchStock = (row) => {
     const {
       MedicationItemList = [],
       ConsumableItemList = [],
       VaccinationItemList = [],
-    } = deliveryOrderDetails
-    const { rows } = values
+    } = this.props.deliveryOrderDetails
 
-    const getOptions = (stateItemList, storeItemList, row) => {
-      const stateArray = stateItemList
-      const selectedArray = stateArray.length <= 0 ? storeItemList : stateArray
-      return selectedArray.find((o) => o.itemFK === row.code).stock
+    if (row.code && row.name) {
+      if (row.type === INVENTORY_TYPE.MEDICATION) {
+        return this.getOptions(
+          this.state.MedicationItemList,
+          MedicationItemList,
+          row,
+        )
+      }
+      if (row.type === INVENTORY_TYPE.CONSUMABLE) {
+        return this.getOptions(
+          this.state.ConsumableItemList,
+          ConsumableItemList,
+          row,
+        )
+      }
+      if (row.type === INVENTORY_TYPE.VACCINATION) {
+        return this.getOptions(
+          this.state.VaccinationItemList,
+          VaccinationItemList,
+          row,
+        )
+      }
     }
+
+    return []
+  }
+
+  render () {
+    const { props } = this
+    const { footer, values, theme, errors, classes } = props
+    const { rows } = values
 
     const tableParas = {
       columns: [
@@ -574,13 +571,13 @@ class DODetails extends PureComponent {
           labelField: 'uom',
           disabled: true,
           options: (row) => {
-            if (row.type === 1) {
+            if (row.type === INVENTORY_TYPE.MEDICATION) {
               return this.state.MedicationItemList
             }
-            if (row.type === 2) {
+            if (row.type === INVENTORY_TYPE.CONSUMABLE) {
               return this.state.ConsumableItemList
             }
-            if (row.type === 3) {
+            if (row.type === INVENTORY_TYPE.VACCINATION) {
               return this.state.VaccinationItemList
             }
             return []
@@ -640,31 +637,7 @@ class DODetails extends PureComponent {
           maxSelected: 1,
           labelField: 'batchNo',
           disableAll: true,
-          options: (row) => {
-            if (row.type === 1) {
-              return getOptions(
-                this.state.MedicationItemList,
-                MedicationItemList,
-                row,
-              )
-            }
-
-            if (row.type === 2) {
-              return getOptions(
-                this.state.ConsumableItemList,
-                ConsumableItemList,
-                row,
-              )
-            }
-            if (row.type === 3) {
-              return getOptions(
-                this.state.VaccinationItemList,
-                VaccinationItemList,
-                row,
-              )
-            }
-            return []
-          },
+          options: this.getBatchStock,
           onChange: (e) => {
             // this.handleSelectedBatch(e)
           },
@@ -764,7 +737,6 @@ class DODetails extends PureComponent {
               getRowId={(r) => r.uid}
               rows={rows}
               schema={receivingDetailsSchema}
-              // schema={receivingDetailsSchema}
               FuncProps={{
                 // edit: isEditable,
                 pager: false,

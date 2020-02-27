@@ -163,7 +163,7 @@ class Layout extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-
+    // console.log(defaultLayout)
     this.widgetMenu = (
       <Menu>
         {widgets.map((o) => {
@@ -888,11 +888,22 @@ class Layout extends PureComponent {
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <div style={{ width: 260 }}>
+              <div style={{ width: 360, position: 'relative' }}>
+                <h5
+                  style={{
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    position: 'absolute',
+                    top: 8,
+                    left: 16,
+                  }}
+                >
+                  Manage Widgets
+                </h5>
                 <SizeContainer size='sm'>
                   <CheckboxGroup
                     className={classes.fabDiv}
-                    label='Manage Widgets'
+                    label=''
                     vertical
                     strongLabel
                     value={currentLayout.widgets}
@@ -942,14 +953,36 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
+                    <h5
+                      style={{
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        position: 'absolute',
+                      }}
+                    >
+                      Manage Layout
+                    </h5>
                     <CustomInputWrapper
-                      label='My Layout'
+                      label=''
                       style={{ paddingTop: 25 }}
                       strongLabel
                       labelProps={{
                         shrink: true,
                       }}
                     >
+                      <ul>
+                        <li>
+                          <p>
+                            Save current consultation layout as my favourite.
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            System will use favourite layout for new
+                            consultation.
+                          </p>
+                        </li>
+                      </ul>
                       <ProgressButton
                         onClick={() => {
                           onSaveLayout(this.state.currentLayout)

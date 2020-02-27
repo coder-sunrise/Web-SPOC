@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import _ from 'lodash'
 import axios from 'axios'
 import { connect } from 'dva'
@@ -123,7 +123,15 @@ class Address extends Component {
 
   render () {
     const searchBtnUid = getUniqueId()
-    const { addressIndex, classes, theme, values, style, propName } = this.props
+    const {
+      addressIndex,
+      classes,
+      theme,
+      values,
+      style,
+      propName,
+      hideCheckBox,
+    } = this.props
     // console.log(values, propName)
     const v = Object.byString(values, propName)
     // console.log(v)
@@ -151,38 +159,47 @@ class Address extends Component {
       <div style={style}>
         {isArray && (
           <GridContainer>
-            <GridItem xs={6} md={2}>
-              <Field
-                name={`${prefix}isMailing`}
-                render={(args) => (
-                  <Checkbox
-                    label='Mailing Address'
-                    inputLabel=' '
-                    disabled={
-                      !!addresses.find((o) => o.isMailing && !o.isDeleted) &&
-                      !addresses[addressIndex].isMailing
-                    }
-                    {...args}
+            {hideCheckBox ? (
+              <GridItem xs={6} md={5} />
+            ) : (
+              <Fragment>
+                <GridItem xs={6} md={2}>
+                  <Field
+                    name={`${prefix}isMailing`}
+                    render={(args) => (
+                      <Checkbox
+                        label='Mailing Address'
+                        inputLabel=' '
+                        disabled={
+                          !!addresses.find(
+                            (o) => o.isMailing && !o.isDeleted,
+                          ) && !addresses[addressIndex].isMailing
+                        }
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </GridItem>
-            <GridItem xs={6} md={3}>
-              <Field
-                name={`${prefix}isPrimary`}
-                render={(args) => (
-                  <Checkbox
-                    label='Primary Address'
-                    inputLabel=' '
-                    disabled={
-                      !!addresses.find((o) => o.isPrimary && !o.isDeleted) &&
-                      !addresses[addressIndex].isPrimary
-                    }
-                    {...args}
+                </GridItem>
+                <GridItem xs={6} md={3}>
+                  <Field
+                    name={`${prefix}isPrimary`}
+                    render={(args) => (
+                      <Checkbox
+                        label='Primary Address'
+                        inputLabel=' '
+                        disabled={
+                          !!addresses.find(
+                            (o) => o.isPrimary && !o.isDeleted,
+                          ) && !addresses[addressIndex].isPrimary
+                        }
+                        {...args}
+                      />
+                    )}
                   />
-                )}
-              />
-            </GridItem>
+                </GridItem>
+              </Fragment>
+            )}
+
             <GridItem xs={6} md={5}>
               <FastField
                 name={`${prefix}postcode`}
