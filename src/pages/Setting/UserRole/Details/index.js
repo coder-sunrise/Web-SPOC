@@ -147,36 +147,38 @@ class UserRoleDetail extends React.Component {
   }
 
   moduleList = () => {
-    const { roleClientAccessRight } = this.props.userRole
-    let { moduleList } = this.props.settingUserRole
+    const { userRole, settingUserRole } = this.props
+    const { roleClientAccessRight } = userRole
+    let { moduleList } = settingUserRole
     const { displayValue } = this.state.filter
-    let filteredList = roleClientAccessRight
+    let result = moduleList
     if (displayValue) {
-      moduleList = roleClientAccessRight
+      result = roleClientAccessRight
         .filter((r) => r.displayValue === displayValue)
         .map((f) => {
           return { name: f.module, value: f.module }
         })
     }
     return [
-      ...new Set(moduleList),
+      ...new Set(result),
     ]
   }
 
   displayValueList = () => {
-    const { roleClientAccessRight } = this.props.userRole
-    let { displayValueList } = this.props.settingUserRole
+    const { userRole, settingUserRole } = this.props
+    const { roleClientAccessRight } = userRole
+    let { displayValueList } = settingUserRole
     const { module } = this.state.filter
-    let filteredList = roleClientAccessRight
+    let result = displayValueList
     if (module) {
-      displayValueList = roleClientAccessRight
+      result = roleClientAccessRight
         .filter((r) => r.module === module)
         .map((f) => {
           return { name: f.displayValue, value: f.displayValue }
         })
     }
     return [
-      ...new Set(displayValueList),
+      ...new Set(result),
     ]
   }
 
