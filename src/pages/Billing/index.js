@@ -140,13 +140,6 @@ class Billing extends Component {
     const { patientID } = billing
     const { query } = history.location
     dispatch({
-      type: 'patient/query',
-      payload: {
-        id: patientID,
-        version: Date.now(),
-      },
-    })
-    dispatch({
       type: 'codetable/fetchCodes',
       payload: {
         code: 'copaymentscheme',

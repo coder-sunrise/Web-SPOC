@@ -50,11 +50,15 @@ export default createFormViewModel({
       *initState ({ payload }, { select, put, take }) {
         const patientState = yield select((st) => st.patient)
         const queueLogState = yield select((st) => st.queueLog)
-        if (!patientState.entity || patientState.entity.id !== payload.pid) {
+        if (
+          payload.id &&
+          (!patientState.entity || patientState.entity.id !== payload.pid)
+        ) {
           yield put({
             type: 'patient/query',
             payload: {
               id: payload.pid,
+              version: Date.now(), // to query to latest patient info
             },
           })
           yield take('patient/query/@@end')
