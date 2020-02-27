@@ -45,50 +45,52 @@ const permissionOption = ({ type, permission }) => {
   return result
 }
 
-export const AccessRightConfig = {
-  columns: [
-    { name: 'module', title: 'Module' },
-    { name: 'displayValue', title: 'Function Access' },
-    { name: 'permission', title: 'Accessbility' },
-  ],
-  columnExtensions: [
-    {
-      columnName: 'permission',
-      type: 'select',
-      align: 'center',
-      width: 250,
-      sortingEnabled: false,
-      render: (row) => {
-        // console.log('row', row)
-        // console.log(row.rowIndex)
-        return (
-          <GridContainer style={{ justifyContent: 'center' }}>
-            <GridItem md={6}>
-              <Field
-                name={`filteredAccessRight[${row.rowIndex}].permission`}
-                render={(args) => (
-                  <Select
-                    // value={row.permission}
-                    {...args}
-                    options={permissionOption(row)}
-                    onChange={(e) => {
-                      console.log(row.permission)
-                      console.log(e)
-                    }}
-                  />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
-        )
+export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
+  return {
+    columns: [
+      { name: 'module', title: 'Module' },
+      { name: 'displayValue', title: 'Function Access' },
+      { name: 'permission', title: 'Accessbility' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'permission',
+        type: 'select',
+        align: 'center',
+        width: 250,
+        sortingEnabled: false,
+        render: (row) => {
+          // console.log('row', row)
+          // console.log(row.rowIndex)
+          return (
+            <GridContainer style={{ justifyContent: 'center' }}>
+              <GridItem md={6}>
+                <Field
+                  name={`filteredAccessRight[${row.rowIndex}].permission`}
+                  render={(args) => (
+                    <Select
+                      // value={row.permission}
+                      {...args}
+                      options={permissionOption(row)}
+                      onChange={(e) => {
+                        console.log(row.permission)
+                        console.log(e)
+                      }}
+                      disabled={isEdit && !isUserMaintainable}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          )
+        },
       },
+    ],
+    FuncProps: {
+      pager: false,
     },
-  ],
-  FuncProps: {
-    pager: false,
-  },
+  }
 }
-
 const generateDummyData = () => {
   let data = []
   for (let i = 0; i < 5; i++) {

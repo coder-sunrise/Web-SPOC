@@ -27,15 +27,6 @@ export default createListViewModel({
           'module',
           'displayValue',
         ]
-        for (let i = 0; i < nameList.length; i++) {
-          yield put({
-            type: 'genList',
-            data: [
-              ...data.roleClientAccessRight,
-            ],
-            name: nameList[i],
-          })
-        }
         return yield put({
           type: 'updateUserRole',
           data: { ...data, isEdit },
@@ -49,16 +40,6 @@ export default createListViewModel({
           'displayValue',
         ]
 
-        for (let i = 0; i < nameList.length; i++) {
-          yield put({
-            type: 'genList',
-            data: [
-              ...data,
-            ],
-            name: nameList[i],
-          })
-        }
-        console.log(data)
         const resultData = []
         data.map((d) => {
           const permission =
@@ -72,7 +53,6 @@ export default createListViewModel({
           })
         })
 
-        console.log(resultData)
         return yield put({
           type: 'loadAccessRight',
           data: [
@@ -96,6 +76,7 @@ export default createListViewModel({
         return {
           ...state,
           currentSelectedUserRole: {
+            isUserMaintainable: true,
             effectiveStartDate:
               state.currentSelectedUserRole.effectiveStartDate,
             effectiveEndDate: state.currentSelectedUserRole.effectiveEndDate,
@@ -121,31 +102,6 @@ export default createListViewModel({
             ...state.currentSelectedUserRole,
             filteredAccessRight: result,
           },
-        }
-      },
-      genEffectiveDate (state) {
-        return { ...state }
-      },
-      genList (state, { name, data }) {
-        let set = new Set()
-        let result = []
-        data.map((d) => {
-          return set.add(d[name])
-        })
-        let list = [
-          ...set,
-        ]
-        list.map((s) => {
-          return result.push({
-            name: s,
-            value: s,
-          })
-        })
-        return {
-          ...state,
-          [name.concat('List')]: [
-            ...result,
-          ],
         }
       },
     },
