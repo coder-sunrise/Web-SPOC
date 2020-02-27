@@ -66,7 +66,7 @@ class FilterBar extends PureComponent {
         <GridContainer>
           <GridItem xs sm={12} md={4}>
             <FastField
-              name='ExpenseType'
+              name='patientSearchValue'
               render={(args) => {
                 return (
                   <TextField
@@ -144,29 +144,22 @@ class FilterBar extends PureComponent {
                 variant='contained'
                 color='primary'
                 onClick={() => {
-                  const { ExpenseType, transactionOnly } = this.props.values
+                  const {
+                    patientSearchValue,
+                    transactionOnly,
+                  } = this.props.values
 
                   const showTransactionOnly = transactionOnly === true
-                  // console.log('showTransactionOnly', showTransactionOnly)
+
                   this.props.dispatch({
                     type: 'deposit/query',
                     payload: {
-                      'lgteql_PatientDeposit.PatientDepositTransaction.TransactionDate':
-                        transactionStartDate || undefined,
-                      'lsteql_PatientDeposit.PatientDepositTransaction.TransactionDate':
-                        transactionEndDate || undefined,
                       apiCriteria: {
-                        OnlyWithDeposit: showTransactionOnly,
+                        searchValue: patientSearchValue || undefined,
+                        onlyWithDeposit: showTransactionOnly,
+                        startDate: transactionStartDate || undefined,
+                        endDate: transactionEndDate || undefined,
                       },
-                      group: [
-                        {
-                          'contactFkNavigation.contactNumber.number': ExpenseType,
-                          patientReferenceNo: ExpenseType,
-                          patientAccountNo: ExpenseType,
-                          name: ExpenseType,
-                          combineCondition: 'or',
-                        },
-                      ],
                     },
                   })
                 }}
