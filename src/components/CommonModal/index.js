@@ -109,7 +109,6 @@ class CommonModal extends React.PureComponent {
     confirmBtnText = 'Confirm',
     extraButtons,
   }) => {
-    console.log(this.myRef)
     const {
       loading,
       global,
@@ -272,7 +271,6 @@ class CommonModal extends React.PureComponent {
     //     suppressScrollY: false,
     //   })
     // }
-    console.log(this.myRef)
 
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
