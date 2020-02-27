@@ -161,7 +161,7 @@ export const menuData = [
   },
   {
     title: 'System User',
-    text: 'Role',
+    text: 'Role & Access Right',
     url: '/setting/userrole',
   },
   {

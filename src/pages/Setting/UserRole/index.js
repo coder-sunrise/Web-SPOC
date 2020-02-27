@@ -142,7 +142,7 @@ class UserRole extends React.Component {
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code / DisplayValue' {...args} />
+                return <TextField label='Code / Name' {...args} />
               }}
             />
           </GridItem>
