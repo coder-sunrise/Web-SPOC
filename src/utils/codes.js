@@ -1526,6 +1526,7 @@ export const InventoryTypes = [
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
+    field: 'inventoryMedication',
   },
   {
     value: 2,
@@ -1533,6 +1534,7 @@ export const InventoryTypes = [
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
+    field: 'inventoryConsumable',
   },
   {
     value: 3,
@@ -1540,6 +1542,7 @@ export const InventoryTypes = [
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
+    field: 'inventoryVaccination',
   },
   {
     value: 4,
