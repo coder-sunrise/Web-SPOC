@@ -116,22 +116,6 @@ const VisitInfoCard = ({
             )}
           />
         </GridItem>
-        <GridItem xs md={8}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={(args) => (
-              <TextField
-                {...args}
-                disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
-        </GridItem>
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.roomFK']}
@@ -143,6 +127,37 @@ const VisitInfoCard = ({
                 })}
                 code='ctRoom'
                 {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.visitOrderTemplateFK']}
+            render={(args) => (
+              <CodeSelect
+                disabled={isReadOnly}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitOrderTemplate',
+                })}
+                code='ctVisitOrderTemplate'
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={12}>
+          <Field
+            name={FormField['visit.visitRemarks']}
+            render={(args) => (
+              <TextField
+                {...args}
+                disabled={isReadOnly}
+                multiline
+                rowsMax={3}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitRemarks',
+                })}
               />
             )}
           />
