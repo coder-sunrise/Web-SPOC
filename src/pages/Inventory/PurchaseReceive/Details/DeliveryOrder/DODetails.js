@@ -201,6 +201,9 @@ class DODetails extends PureComponent {
         disableSave: false,
       },
     })
+    this.props.dispatch({
+      type: 'deliveryOrderDetails/reset',
+    })
   }
 
   manuallyTriggerDirty = () => {
