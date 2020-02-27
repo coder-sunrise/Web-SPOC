@@ -179,7 +179,11 @@ const Stock = ({
         align: 'center',
         render: (row) => (
           <p className={row.isDeleted && classes.isDeleted}>
-            {moment(row.expiryDate).format(serverDateFormat)}
+            {row.expiryDate ? (
+              moment(row.expiryDate).format(serverDateFormat)
+            ) : (
+              '-'
+            )}
           </p>
         ),
       },

@@ -487,8 +487,6 @@ class ClinicalNotes extends Component {
       clinicInfo,
     )
 
-    // console.log({ defaultActive })
-
     return (
       <div>
         <FieldArray

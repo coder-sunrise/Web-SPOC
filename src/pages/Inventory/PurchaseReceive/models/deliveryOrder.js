@@ -355,6 +355,16 @@ export default createFormViewModel({
 
         return { ...state, entity: { ...state.entity, rows } }
       },
+
+      reset (state, { payload }) {
+        return {
+          ...state,
+          entity: {
+            ...state.entity,
+            rows: [],
+          },
+        }
+      },
     },
   },
 })

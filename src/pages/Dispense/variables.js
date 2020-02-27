@@ -143,6 +143,13 @@ export const PrescriptionColumnExtensions = (
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
       )
+      console.log('medication', {
+        row,
+        currentItem,
+        inventorymedication: inventorymedication.sort(
+          (a, b) => (a.id > b.id ? 1 : -1),
+        ),
+      })
       let batchNoOptions = []
       if (currentItem) {
         batchNoOptions = currentItem.medicationStock
@@ -257,7 +264,12 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = (viewOnly = false) => [
+export const VaccinationColumnExtensions = (
+  viewOnly = false,
+  onPrint,
+  inventoryvaccination = [],
+  handleSelectedBatch,
+) => [
   {
     columnName: 'name',
     render: (row) => {
@@ -300,12 +312,33 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
     columnName: 'batchNo',
     width: 150,
     render: (row) => {
+      console.log({ row })
+      // const currentItem = inventoryvaccination.find(
+      //   (o) => o.id === row.inventoryMedicationFK,
+      // )
+      // let batchNoOptions = []
+      // if (currentItem) {
+      //   batchNoOptions = currentItem.medicationStock
+      // }
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
           render={(args) => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
+              // <Select
+              //   simple
+              //   options={batchNoOptions}
+              //   // mode='tags'
+              //   // valueField='id'
+              //   valueField='batchNo'
+              //   labelField='batchNo'
+              //   maxSelected={1}
+              //   disableAll
+              //   disabled={viewOnly}
+              //   onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
+              //   {...restProps}
+              // />
               <TextField
                 simple
                 text={viewOnly}

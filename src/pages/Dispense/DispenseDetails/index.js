@@ -138,7 +138,7 @@ const DispenseDetails = ({
   }
   const { invoiceItem = [], invoiceAdjustment = [], totalPayment } = invoice
 
-  const { inventorymedication } = codetable
+  const { inventorymedication, inventoryvaccination } = codetable
 
   const handleSelectedBatch = (e, op = {}, row) => {
     // console.log({ e, op, row })
@@ -360,7 +360,12 @@ const DispenseDetails = ({
               title='Vaccination'
               idPrefix='vaccination'
               columns={VaccinationColumn}
-              colExtensions={VaccinationColumnExtensions(viewOnly)}
+              colExtensions={VaccinationColumnExtensions(
+                viewOnly,
+                null,
+                inventoryvaccination,
+                handleSelectedBatch,
+              )}
               data={vaccination}
               visitPurposeFK={visitPurposeFK}
             />

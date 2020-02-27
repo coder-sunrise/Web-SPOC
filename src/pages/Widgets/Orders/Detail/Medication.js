@@ -211,23 +211,6 @@ class Medication extends PureComponent {
     )
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === this.props.type)
-      if (
-        (!this.props.global.openAdjustment &&
-          nextProps.global.openAdjustment) ||
-        nextProps.orders.shouldPushToState
-      ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
-      }
-  }
-
   calculateQuantity = (medication) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
     let currentMedicaiton = medication
@@ -491,6 +474,49 @@ class Medication extends PureComponent {
       visitPurposeFK: orders.visitPurposeFK,
       drugCode: orders.type === '5' ? 'MISC' : undefined,
     })
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '1' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventorymedication = [] } = codetable
+      const { inventoryMedicationFK } = nextValues
+      const medication = inventorymedication.find(
+        (item) => item.id === inventoryMedicationFK,
+      )
+
+      if (medication)
+        this.setState({
+          selectedMedication: medication,
+        })
+      else
+        this.setState({
+          selectedMedication: {
+            medicationStock: [],
+          },
+        })
+    }
   }
 
   render () {
