@@ -51,7 +51,7 @@ export default createFormViewModel({
         const patientState = yield select((st) => st.patient)
         const queueLogState = yield select((st) => st.queueLog)
         if (
-          payload.id &&
+          payload.pid &&
           (!patientState.entity || patientState.entity.id !== payload.pid)
         ) {
           yield put({
