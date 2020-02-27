@@ -276,7 +276,11 @@ class DODetails extends PureComponent {
       const defaultBatch = this.getBatchStock(row).find(
         (batch) => batch.isDefault,
       )
-      if (defaultBatch) row.batchNo = defaultBatch.batchNo
+      if (defaultBatch) {
+        row.batchNo = defaultBatch.batchNo
+        row.batchNoId = defaultBatch.id
+        row.expiryDate = defaultBatch.expiryDate
+      }
       row.orderQuantity = osItem.orderQuantity
       row.bonusQuantity = osItem.bonusQuantity
       row.quantityReceived = osItem.quantityReceived
@@ -294,22 +298,18 @@ class DODetails extends PureComponent {
   }
 
   handleSelectedBatch = (e) => {
-    // console.log('handleSelectedBatch', e)
     const { option, row, val } = e
-    if (val) {
+
+    if (option.length > 0) {
+      const { expiryDate, id, batchNo } = option[0]
+      row.batchNo = batchNo
+      row.expiryDate = expiryDate
+      row.batchNoId = id
+    } else {
       row.batchNo = val[0]
+      row.batchNoId = undefined
+      row.expiryDate = undefined
     }
-    if (option) {
-      const { expiryDate, stock, value, batchNo } = option
-      row.batchNo = value
-    }
-    // this.props.dispatch({
-    //   // force current edit row components to update
-    //   type: 'global/updateState',
-    //   payload: {
-    //     commitCount: (commitCount += 1),
-    //   },
-    // })
   }
 
   onCommitChanges = async ({ rows, deleted, changed }) => {
@@ -636,10 +636,11 @@ class DODetails extends PureComponent {
           mode: 'tags',
           maxSelected: 1,
           labelField: 'batchNo',
+          valueField: 'batchNo',
           disableAll: true,
           options: this.getBatchStock,
           onChange: (e) => {
-            // this.handleSelectedBatch(e)
+            this.handleSelectedBatch(e)
           },
           render: (row) => {
             return <TextField text value={row.batchNo} />
@@ -649,7 +650,7 @@ class DODetails extends PureComponent {
         {
           columnName: 'expiryDate',
           type: 'date',
-          isDisabled: (row) => row.id >= 0,
+          isDisabled: (row) => row.id >= 0 || row.batchNoId,
         },
       ],
       onRowDoubleClick: undefined,
