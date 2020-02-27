@@ -636,7 +636,7 @@ class ControlTest extends PureComponent {
         }}
         title={this.title}
       >
-        <GridContainer>
+        {/* <GridContainer>
           <GridItem xs={0} md={8} />
           <GridItem xs={12} md={4}>
             <AmountSummary
@@ -648,8 +648,27 @@ class ControlTest extends PureComponent {
               ]}
             />
           </GridItem>
-        </GridContainer>
-
+        </GridContainer> */}
+        <div>
+          <Button
+            onClick={() => {
+              console.log(initValues)
+              props.resetForm(initValues)
+              // notification.error({
+              //   // icon: WarningIcon,
+              //   icon: null,
+              //   duration: 0,
+              //   placement: 'bottomRight',
+              //   message: 'Notification Title',
+              //   // description:
+              //   //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
+              // })
+            }}
+          >
+            Reset
+          </Button>
+          <ProgressButton onClick={props.handleSubmit} />
+        </div>
         <SizeContainer size='lg'>{testComponents}</SizeContainer>
         {testComponents}
         <SizeContainer size='sm'>{testComponents}</SizeContainer>

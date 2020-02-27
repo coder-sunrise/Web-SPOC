@@ -372,7 +372,6 @@ class RichEditor extends React.PureComponent {
         },
       }
     }
-    console.log({ cfg: this.editorCfg })
     return (
       <div style={{ width: '100%', height: 'auto' }} {...props}>
         <Editor

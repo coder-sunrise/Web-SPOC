@@ -14,7 +14,11 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import Add from '@material-ui/icons/Add'
 import CommandComponent from './CommandComponent'
-import { getGlobalVariable, getUniqueNumericId } from '@/utils/utils'
+import {
+  getGlobalVariable,
+  getUniqueNumericId,
+  difference,
+} from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index'
 import EditPlugin from './EditPlugin'
@@ -45,6 +49,7 @@ class EditableTableGrid extends React.Component {
     }
     this.gridId = `edit-${uniqueGid++}`
     // console.log(this.gridId)
+    // console.log('edit created', window.$tempGridRow[this.gridId])
   }
 
   // static getDerivedStateFromProps (nextProps, preState) {
@@ -62,12 +67,54 @@ class EditableTableGrid extends React.Component {
   // }
 
   // componentWillReceiveProps (nextProps) {
-  //   const { EditingProps = {}, rows, errors = [] } = nextProps
-  //   if (!_.isEqual(rows, this.props.rows)) {
-  //     const cells = this.getErrorCells(nextProps)
-  //     console.log(cells)
+  //   // dectect if datasource changed outside grid, reset grid data cache
+  //   if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+  //     if (
+  //       !_.isEqual(
+  //         nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //         this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       )
+  //     ) {
+  //       if (
+  //         !_.isEqual(
+  //           Object.values(window.$tempGridRow[this.gridId]).map(
+  //             ({ _errors, rowIndex, ...o }, i) => o,
+  //           ),
+  //           nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //         )
+  //       ) {
+  //         window.$tempGridRow[this.gridId] = []
+  //       }
+  //     }
   //   }
   // }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    if (!_.isEqual(this.state, nextState)) {
+      return true
+    }
+    if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+      const propEqual = _.isEqual(
+        nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+        this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+      )
+      if (!propEqual) return true
+
+      const cacheEqual = _.isEqual(
+        Object.values(window.$tempGridRow[this.gridId]).map(
+          ({ _errors, rowIndex, ...o }, i) => o,
+        ),
+        nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+      )
+
+      if (!cacheEqual) {
+        // dectect if datasource changed outside grid, reset grid data cache
+        window.$tempGridRow[this.gridId] = []
+      }
+      return !cacheEqual
+    }
+    return true
+  }
 
   getErrorCells = (props) => {
     const { getRowId } = props || this.props
@@ -93,7 +140,6 @@ class EditableTableGrid extends React.Component {
   }
 
   _onEditingCellsChange = (editingCells) => {
-
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
@@ -330,12 +376,10 @@ class EditableTableGrid extends React.Component {
     })
     // window.$tempGridRow[this.gridId]={}
     if (updatedRows && Array.isArray(updatedRows)) {
-
       // Fix schema validation which will gone when delete,
       // thus skip when deleted to avoid the
       // existing error validation being cleared (PO grid)
-      if(added||changed)
-      {
+      if (added || changed) {
         window.$tempGridRow[this.gridId] = {}
       }
       updatedRows.forEach((r) => {
@@ -453,6 +497,7 @@ class EditableTableGrid extends React.Component {
   // }
 
   render () {
+    // console.log('redner',this.gridId)
     const {
       theme,
       columnExtensions = [],

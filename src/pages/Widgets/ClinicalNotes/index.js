@@ -487,8 +487,6 @@ class ClinicalNotes extends Component {
       clinicInfo,
     )
 
-    console.log({ defaultActive })
-
     return (
       <div>
         <FieldArray
@@ -598,6 +596,7 @@ class ClinicalNotes extends Component {
                             </div>
 
                             <RichEditor
+                              style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item[fieldName])}
                               // label='Chief Complaints'

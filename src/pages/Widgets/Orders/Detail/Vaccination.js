@@ -58,29 +58,31 @@ let i = 0
   displayName: 'OrderPage',
 })
 class Vaccination extends PureComponent {
-  state = {
-    selectedVaccination: {
-      vaccinationStock: [],
-    },
-    batchNo: '',
-    expiryDate: '',
-  }
+  // state = {
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === this.props.type)
-      if (
-        (!this.props.global.openAdjustment &&
-          nextProps.global.openAdjustment) ||
-        nextProps.orders.shouldPushToState
-      ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
-      }
+  // }
+
+  constructor (props) {
+    super(props)
+
+    const { codetable, values } = this.props
+    const { inventoryvaccination = [] } = codetable
+    const { inventoryVaccinationFK } = values
+
+    let selectedVaccination = {
+      vaccinationStock: [],
+    }
+    const vaccination = inventoryVaccinationFK
+      ? inventoryvaccination.find((item) => item.id === inventoryVaccinationFK)
+      : undefined
+
+    if (vaccination) selectedVaccination = vaccination
+
+    this.state = {
+      selectedVaccination,
+      batchNo: '',
+      expiryDate: '',
+    }
   }
 
   changeVaccination = (v, op = {}) => {
@@ -225,6 +227,50 @@ class Vaccination extends PureComponent {
       ...orders.defaultService,
       type: orders.type,
     })
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '2' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventoryvaccination = [] } = codetable
+      const { inventoryVaccinationFK } = nextValues
+      const vaccination = inventoryvaccination.find(
+        (item) => item.id === inventoryVaccinationFK,
+      )
+
+      if (vaccination)
+        this.setState({
+          selectedVaccination: vaccination,
+        })
+      else
+        this.setState({
+          selectedVaccination: {
+            vaccinationStock: [],
+          },
+        })
+    }
   }
 
   render () {

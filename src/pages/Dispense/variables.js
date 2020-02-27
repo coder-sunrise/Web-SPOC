@@ -143,6 +143,13 @@ export const PrescriptionColumnExtensions = (
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
       )
+      console.log('medication', {
+        row,
+        currentItem,
+        inventorymedication: inventorymedication.sort(
+          (a, b) => (a.id > b.id ? 1 : -1),
+        ),
+      })
       let batchNoOptions = []
       if (currentItem) {
         batchNoOptions = currentItem.medicationStock
