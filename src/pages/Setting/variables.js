@@ -178,6 +178,12 @@ export const menuData = [
     url: '/setting/treatmentcategory',
   },
   {
+    authority: 'settings.clinicsetting.visitordertemplate',
+    title: 'Clinic Setting',
+    text: 'Visit Order Template',
+    url: '/setting/visitordertemplate',
+  },
+  {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',
     text: 'System User',
