@@ -288,7 +288,7 @@ const request = (
         console.timeEnd(newUrl)
 
         if (typeof response === 'object') {
-          commonDataReaderTransform(response)
+          commonDataReaderTransform(response, null, options.keepNull)
         }
         const { options: opts = {} } = options
         // console.log(response, s, xhr)

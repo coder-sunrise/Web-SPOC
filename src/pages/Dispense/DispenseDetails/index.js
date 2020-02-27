@@ -32,6 +32,8 @@ import AmountSummary from '@/pages/Shared/AmountSummary'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
 import { dangerColor } from '@/assets/jss'
+import CONSTANTS from './constants'
+
 // const styles = (theme) => ({
 //   gridRow: {
 //     margin: `${theme.spacing.unit}px 0px`,
@@ -249,7 +251,7 @@ const DispenseDetails = ({
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Medications')
+              onPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
             }}
           >
             <Print />
@@ -259,7 +261,7 @@ const DispenseDetails = ({
             color='primary'
             size='sm'
             onClick={() => {
-              onPrint('Patient')
+              onPrint({ type: CONSTANTS.PATIENT_LABEL })
             }}
           >
             <Print />
