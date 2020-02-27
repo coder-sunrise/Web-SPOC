@@ -75,7 +75,7 @@ export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
     const result = [
       ...new Set(defaultActive),
     ]
-    console.log({ result })
+    // console.log({ result })
     return result
   } catch (error) {
     console.error(error)
