@@ -132,13 +132,14 @@ class UserRoleDetail extends React.Component {
   }
 
   handleSearchClick = () => {
-    const { module, functionAccess } = this.props.values
+    const { filter } = this.state
+    const { module, displayValue } = filter
     let criteria = {}
     if (module) {
       criteria = { ...criteria, module }
     }
-    if (functionAccess) {
-      criteria = { ...criteria, displayValue: functionAccess }
+    if (displayValue) {
+      criteria = { ...criteria, displayValue }
     }
     this.props.dispatch({
       type: 'settingUserRole/filter',
@@ -212,6 +213,7 @@ class UserRoleDetail extends React.Component {
 
   render () {
     const { classes, match, settingUserRole, userRole } = this.props
+    const { filter } = this.state
     const { currentSelectedUserRole } = settingUserRole
     const { params } = match
     const { isEdit } = currentSelectedUserRole
@@ -296,29 +298,19 @@ class UserRoleDetail extends React.Component {
             </GridItem>
             <GridContainer className={classes.indent} alignItems='center'>
               <GridItem md={2}>
-                <Field
-                  name='module'
-                  render={(args) => (
-                    <Select
-                      {...args}
-                      label='Module'
-                      options={this.moduleList()}
-                      onChange={this.onSelectModule}
-                    />
-                  )}
+                <Select
+                  value={filter.module}
+                  label='Module'
+                  options={this.moduleList()}
+                  onChange={this.onSelectModule}
                 />
               </GridItem>
               <GridItem md={2}>
-                <Field
-                  name='functionAccess'
-                  render={(args) => (
-                    <Select
-                      {...args}
-                      label='Function Access'
-                      options={this.displayValueList()}
-                      onChange={this.onSelectDisplayValue}
-                    />
-                  )}
+                <Select
+                  value={filter.displayValue}
+                  label='Function Access'
+                  options={this.displayValueList()}
+                  onChange={this.onSelectDisplayValue}
                 />
               </GridItem>
 
