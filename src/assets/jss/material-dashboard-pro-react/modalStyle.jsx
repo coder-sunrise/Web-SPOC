@@ -80,7 +80,7 @@ const modalStyle = (theme) => {
     modalBody: {
       position: 'relative',
       overflow: 'hidden',
-      overflowY: 'auto',
+      overflowY: 'hidden',
       boxSizing: 'border-box',
     },
     modalBodyPadding: {

@@ -199,9 +199,13 @@ class AntdSelect extends React.PureComponent {
   }
 
   componentDidMount () {
-    if (this.state.value && this.props.query && this.state.data.length === 0) {
+    if (
+      this.state.value &&
+      this.state.value.length &&
+      this.props.query &&
+      this.state.data.length === 0
+    ) {
       // for remote datasouce, get the selected value by default
-      // console.log(this.state.value)
       this.fetchData(this.state.value)
     }
   }
@@ -454,7 +458,6 @@ class AntdSelect extends React.PureComponent {
   }
 
   fetchData = async (value) => {
-    // console.log('fetching data', value)
     this.setState((prevState) => {
       return { data: [], fetching: true, fetchId: ++prevState.fetchId }
     })
@@ -639,6 +642,12 @@ class AntdSelect extends React.PureComponent {
       )
     }
     // console.log(classes.selectContainer, classes.className)
+    // console.log(
+    //   this.state.fetchId,
+    //   this.state.fetchId === 0,
+    //   autoComplete,
+    //   query,
+    // )
     const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
       <div
