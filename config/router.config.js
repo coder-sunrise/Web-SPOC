@@ -765,7 +765,7 @@ const _routes = [
           },
           {
             path: '/setting/userrole/:id',
-            name: 'newuserrole',
+            name: 'edituserrole',
             component: './Setting/UserRole/Details',
           },
           {
