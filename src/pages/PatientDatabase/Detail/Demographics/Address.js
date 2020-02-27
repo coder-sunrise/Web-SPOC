@@ -31,8 +31,9 @@ import { getUniqueId } from '@/utils/utils'
 //   handleSubmit: () => {},
 //   displayName: 'streetAddressFilter',
 // })
-@connect(({ streetAddress }) => ({
+@connect(({ streetAddress, codetable }) => ({
   streetAddress,
+  codetable,
 }))
 class Address extends Component {
   state = {
@@ -48,7 +49,13 @@ class Address extends Component {
   handleAddressType = (e) => {}
 
   handleGetAddress = () => {
-    const { values, addressIndex, setFieldValue, setValues } = this.props
+    const {
+      values,
+      addressIndex,
+      setFieldValue,
+      setValues,
+      codetable,
+    } = this.props
     let prefix = this.getPrefix()
 
     const postcode = Object.byString(values, `${prefix}postcode`)
@@ -56,7 +63,8 @@ class Address extends Component {
       ? (setFieldValue(`${prefix}postcode`, ''),
         setFieldValue(`${prefix}blockNo`, ''),
         setFieldValue(`${prefix}buildingName`, ''),
-        setFieldValue(`${prefix}street`, ''))
+        setFieldValue(`${prefix}street`, ''),
+        setFieldValue(`${prefix}countryFK`, ''))
       : this.props
           .dispatch({
             type: 'streetAddress/fetchAddress',
@@ -67,6 +75,8 @@ class Address extends Component {
           .then((o) => {
             const { data } = o
             if (data.length > 0) {
+              const { ctcountry } = codetable
+              const country = ctcountry.find((c) => c.code === 'SG')
               const { postalCode, blkHseNo, building, street } = data[0]
               const { contactAddress } = values.contact
               const newContactAddress = {
@@ -75,6 +85,7 @@ class Address extends Component {
                 blockNo: blkHseNo,
                 buildingName: building,
                 street,
+                countryFK: country.id,
               }
 
               let contactAddressArray = values.contact.contactAddress.map(
@@ -95,6 +106,7 @@ class Address extends Component {
               setFieldValue(`${prefix}blockNo`, blkHseNo)
               setFieldValue(`${prefix}buildingName`, building)
               setFieldValue(`${prefix}street`, street)
+              setFieldValue(`${prefix}countryFK`, country.id)
             }
           })
   }
