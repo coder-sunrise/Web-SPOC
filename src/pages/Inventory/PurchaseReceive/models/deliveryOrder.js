@@ -169,10 +169,8 @@ export default createFormViewModel({
               batchNo,
             }
           }
-
           return o
         })
-
         return {
           ...state,
           entity: {
@@ -180,7 +178,11 @@ export default createFormViewModel({
             // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
-            rows: newOSItem,
+            rows: newOSItem.map((o) => ({
+              currentReceivingBonusQty: undefined,
+              expiryDate: undefined,
+              ...o,
+            })),
           },
         }
       },
