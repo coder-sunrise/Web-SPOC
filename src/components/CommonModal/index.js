@@ -9,7 +9,8 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 import Close from '@material-ui/icons/Close'
-import Slide from '@material-ui/core/Slide'
+// import Slide from '@material-ui/core/Slide'
+import Fade from '@material-ui/core/Fade'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
@@ -19,7 +20,7 @@ import { LoadingWrapper } from '@/components/_medisys'
 import { confirmBeforeReload } from '@/utils/utils'
 
 function Transition (props) {
-  return <Slide direction='up' {...props} />
+  return <Fade {...props} />
 }
 function getContainerHeight (props) {
   return (
