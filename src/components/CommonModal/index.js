@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
@@ -114,6 +114,7 @@ class CommonModal extends React.PureComponent {
       classes,
       authority,
       confirmText,
+      isInformType,
       cancelText,
     } = this.props
     // console.log('footer', this.props)
@@ -125,39 +126,52 @@ class CommonModal extends React.PureComponent {
           className={classes.modalFooter}
           style={{ justifyContent: align }}
         >
-          {onReset && (
+          {isInformType ? (
             <Button
-              key='reset'
-              // hideIfNoEditRights
-              aria-label='Reset'
-              color='danger'
-              onClick={onReset}
-              style={{ left: 0, position: 'absolute' }}
-            >
-              Reset
-            </Button>
-          )}
-          <Button
-            onClick={this.onClose}
-            color='danger'
-            authority='none'
-            // disabled={loading.global}
-            {...cancelProps}
-          >
-            {cancelText || 'Close'}
-          </Button>
-          {extraButtons}
-          {onConfirm && (
-            <ProgressButton
+              onClick={this.onClose}
               color='primary'
-              // hideIfNoEditRights
-              onClick={onConfirm}
-              icon={null}
-              {...confirmProps}
-              // disabled={disabled || loading.global || global.disableSave}
+              authority='none'
+              {...cancelProps}
             >
-              {confirmText || confirmBtnText}
-            </ProgressButton>
+              Ok
+            </Button>
+          ) : (
+            <Fragment>
+              {onReset && (
+                <Button
+                  key='reset'
+                  // hideIfNoEditRights
+                  aria-label='Reset'
+                  color='danger'
+                  onClick={onReset}
+                  style={{ left: 0, position: 'absolute' }}
+                >
+                  Reset
+                </Button>
+              )}
+              <Button
+                onClick={this.onClose}
+                color='danger'
+                authority='none'
+                // disabled={loading.global}
+                {...cancelProps}
+              >
+                {cancelText || 'Close'}
+              </Button>
+              {extraButtons}
+              {onConfirm && (
+                <ProgressButton
+                  color='primary'
+                  // hideIfNoEditRights
+                  onClick={onConfirm}
+                  icon={null}
+                  {...confirmProps}
+                  // disabled={disabled || loading.global || global.disableSave}
+                >
+                  {confirmText || confirmBtnText}
+                </ProgressButton>
+              )}
+            </Fragment>
           )}
         </DialogActions>
       </SizeContainer>
