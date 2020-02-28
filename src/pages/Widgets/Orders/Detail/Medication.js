@@ -404,12 +404,7 @@ class Medication extends PureComponent {
         })
     }
     setFieldValue('costPrice', op.averageCostPrice || 0)
-    const { corPrescriptionItemInstruction = [] } = values
     setFieldValue('corPrescriptionItemInstruction', [
-      ...corPrescriptionItemInstruction.map((i) => ({
-        ...i,
-        isDeleted: true,
-      })),
       {
         sequence: 0,
         stepdose: 'AND',
@@ -810,6 +805,7 @@ class Medication extends PureComponent {
                   if (!values || !values.corPrescriptionItemPrecaution)
                     return null
                   return values.corPrescriptionItemPrecaution.map((val, i) => {
+                    if (val && val.isDeleted) return null
                     return (
                       <div key={i}>
                         <GridContainer>
