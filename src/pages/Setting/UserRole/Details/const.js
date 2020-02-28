@@ -64,7 +64,7 @@ export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
           // console.log(row.rowIndex)
           return (
             <GridContainer style={{ justifyContent: 'center' }}>
-              <GridItem md={6}>
+              <GridItem md={8}>
                 <Field
                   name={`filteredAccessRight[${row.rowIndex}].permission`}
                   render={(args) => (
