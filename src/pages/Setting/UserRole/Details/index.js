@@ -7,6 +7,7 @@ import Main from './Main'
 }))
 class UserRoleDetail extends React.Component {
   componentDidMount = () => {
+    this.updateState()
     const rowId = this.props.match.params.id
     if (rowId) {
       this.props.dispatch({
@@ -31,6 +32,19 @@ class UserRoleDetail extends React.Component {
         payload: { isEdit: false },
       })
     }
+  }
+
+  componentWillUnmount = () => {
+    this.updateState()
+  }
+
+  updateState = async () => {
+    await this.props.dispatch({
+      type: 'settingUserRole/updateState',
+      payload: {
+        currentSelectedUserRole: undefined,
+      },
+    })
   }
 
   render () {

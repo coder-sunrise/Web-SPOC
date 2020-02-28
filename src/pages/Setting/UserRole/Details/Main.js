@@ -101,15 +101,6 @@ class Main extends React.Component {
     },
   }
 
-  componentWillUnmount () {
-    this.props.dispatch({
-      type: 'settingUserRole/updateState',
-      payload: {
-        currentSelectedUserRole: undefined,
-      },
-    })
-  }
-
   handleSearchClick = () => {
     const { filter } = this.state
     const { module, displayValue } = filter
