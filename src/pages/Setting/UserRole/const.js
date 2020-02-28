@@ -11,6 +11,10 @@ export const UserRoleTableConfig = {
   ],
   columnExtensions: [
     {
+      columnName: 'clinicalRoleName',
+      sortBy: 'ClinicRoleFKNavigation.displayValue',
+    },
+    {
       columnName: 'status',
       type: 'select',
       options: status,
