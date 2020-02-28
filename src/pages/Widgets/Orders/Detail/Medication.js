@@ -375,7 +375,7 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue, disableEdit } = this.props
+    const { setFieldValue, disableEdit, values } = this.props
 
     let defaultBatch
     if (op.medicationStock) {
