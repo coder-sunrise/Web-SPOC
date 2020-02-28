@@ -53,11 +53,15 @@ class Grid extends PureComponent {
     const { list } = settingVisitOrderTemplate
 
     dispatch({
-      type: 'settingVisitOrderTemplate/updateState',
+      type: 'settingVisitOrderTemplate/queryOne',
       payload: {
-        showModal: true,
         entity: list.find((o) => o.id === row.id),
       },
+    }).then(() => {
+      dispatch({
+        type: 'settingVisitOrderTemplate/updateState',
+        showModal: true,
+      })
     })
   }
 

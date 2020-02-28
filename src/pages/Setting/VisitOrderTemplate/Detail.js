@@ -9,6 +9,7 @@ import {
   DateRangePicker,
 } from '@/components'
 import { InventoryItemList } from '@/components/_medisys'
+import { visitOrderTemplateItemTypes } from '@/utils/codes'
 
 @withFormikExtend({
   mapPropsToValues: ({ settingVisitOrderTemplate }) =>
@@ -19,16 +20,38 @@ import { InventoryItemList } from '@/components/_medisys'
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
-    const { effectiveDates, ...restValues } = values
+    const { effectiveDates, rows, ...restValues } = values
     const { dispatch, onConfirm } = props
+
+    let itemTypesArray = []
+    visitOrderTemplateItemTypes.forEach((type) => {
+      const currentTypeRows = rows.filter((row) => row.type === type.id)
+      const updatedRows = currentTypeRows.map((row) => {
+        return {
+          ...row,
+          [type.dtoName]: {
+            ...row,
+          },
+        }
+      })
+      itemTypesArray = [
+        ...itemTypesArray,
+        ...updatedRows,
+      ]
+    })
+
+    const payload = {
+      ...restValues,
+      visitOrderTemplateItemDtos: itemTypesArray,
+      effectiveStartDate: effectiveDates[0],
+      effectiveEndDate: effectiveDates[1],
+    }
+
+    // console.log(payload)
 
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',
-      payload: {
-        ...restValues,
-        effectiveStartDate: effectiveDates[0],
-        effectiveEndDate: effectiveDates[1],
-      },
+      payload,
     }).then((r) => {
       if (r) {
         if (onConfirm) onConfirm()
@@ -42,7 +65,7 @@ import { InventoryItemList } from '@/components/_medisys'
 })
 class Detail extends PureComponent {
   render () {
-    const { theme, footer, values, handleSubmit, setFieldValue } = this.props
+    const { theme, footer, values, handleSubmit } = this.props
     return (
       <Fragment>
         <div style={{ margin: theme.spacing(1) }}>
@@ -76,7 +99,6 @@ class Detail extends PureComponent {
                 render={(args) => {
                   return (
                     <DateRangePicker
-                      // showTime
                       label='Effective Start Date'
                       label2='End Date'
                       {...args}
@@ -103,14 +125,10 @@ class Detail extends PureComponent {
           </GridContainer>
 
           <InventoryItemList {...this.props} includeOrderSet />
-
-          {values.showSubmmittedData && (
-            <pre>{JSON.stringify(values, null, 2)}</pre>
-          )}
         </div>
         {footer &&
           footer({
-            onConfirm: () => setFieldValue('showSubmmittedData', values),
+            onConfirm: handleSubmit,
             confirmBtnText: 'Save',
             confirmProps: {
               disabled: false,

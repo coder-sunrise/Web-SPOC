@@ -1,6 +1,9 @@
 import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
+import _ from 'lodash'
 import * as service from '../services'
+import { visitOrderTemplateItemTypes } from '@/utils/codes'
+import { getUniqueId } from '@/utils/utils'
 
 export default createListViewModel({
   namespace: 'settingVisitOrderTemplate',
@@ -26,14 +29,41 @@ export default createListViewModel({
     effects: {},
     reducers: {
       queryOneDone (st, { payload }) {
-        const { data } = payload
-        data.effectiveDates = [
-          data.effectiveStartDate,
-          data.effectiveEndDate,
-        ]
+        const {
+          effectiveStartDate,
+          effectiveEndDate,
+          visitOrderTemplateItemDtos,
+          ...restValues
+        } = payload.data
+
+        let itemTypesRows = []
+        visitOrderTemplateItemTypes.forEach((type) => {
+          const currentItems = visitOrderTemplateItemDtos.filter(
+            (itemType) => itemType.inventoryItemTypeFK === type.id,
+          )
+          itemTypesRows = [
+            ...itemTypesRows,
+            ...currentItems.map((item) => {
+              return {
+                uid: getUniqueId(),
+                type: item.inventoryItemTypeFK,
+                itemFK: item[type.dtoName][type.itemFKName],
+                ...item,
+              }
+            }),
+          ]
+        })
+
         return {
           ...st,
-          entity: data,
+          entity: {
+            ...restValues,
+            rows: _.sortBy(itemTypesRows, 'sortOrder'),
+            effectiveDates: [
+              effectiveStartDate,
+              effectiveEndDate,
+            ],
+          },
         }
       },
       queryDone (st, { payload }) {
