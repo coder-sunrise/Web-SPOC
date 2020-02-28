@@ -108,6 +108,14 @@ const DispenseDetails = ({
       await dispatch({
         type: 'codetable/fetchCodes',
         payload: {
+          code: 'inventoryvaccination',
+          force: true,
+          temp: true,
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
           code: 'inventoryconsumable',
           force: true,
           temp: true,
@@ -143,23 +151,19 @@ const DispenseDetails = ({
   const handleSelectedBatch = (e, op = {}, row) => {
     // console.log({ e, op, row })
     if (op && op.length > 0) {
-      // const currentItem = inventorymedication.find(
-      //   (o) => o.id === row.inventoryMedicationFK,
-      // )
-      // let batchNoOptions = []
-      // if (currentItem) {
-      //   batchNoOptions = currentItem.medicationStock
-      // }
-      // const batchNo = batchNoOptions.find(
-      //   (item) => parseInt(item.id, 10) === parseInt(e[0], 10),
-      // )
-
       const { expiryDate } = op[0]
-
-      // setFieldValue(`prescription[${row.rowIndex}]batchNo`, batchNo.batchNo)
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, expiryDate)
     } else {
       setFieldValue(`prescription[${row.rowIndex}]expiryDate`, undefined)
+    }
+  }
+
+  const handleSelectVaccinationBatch = (e, op = {}, row) => {
+    if (op && op.length > 0) {
+      const { expiryDate } = op[0]
+      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, expiryDate)
+    } else {
+      setFieldValue(`vaccination[${row.rowIndex}]expiryDate`, undefined)
     }
   }
 
@@ -362,9 +366,8 @@ const DispenseDetails = ({
               columns={VaccinationColumn}
               colExtensions={VaccinationColumnExtensions(
                 viewOnly,
-                null,
                 inventoryvaccination,
-                handleSelectedBatch,
+                handleSelectVaccinationBatch,
               )}
               data={vaccination}
               visitPurposeFK={visitPurposeFK}

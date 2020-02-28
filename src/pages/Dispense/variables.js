@@ -266,9 +266,8 @@ export const VaccinationColumn = [
 
 export const VaccinationColumnExtensions = (
   viewOnly = false,
-  onPrint,
   inventoryvaccination = [],
-  handleSelectedBatch,
+  handleSelectedBatch = () => {},
 ) => [
   {
     columnName: 'name',
@@ -312,40 +311,42 @@ export const VaccinationColumnExtensions = (
     columnName: 'batchNo',
     width: 150,
     render: (row) => {
-      console.log({ row })
-      // const currentItem = inventoryvaccination.find(
-      //   (o) => o.id === row.inventoryMedicationFK,
-      // )
-      // let batchNoOptions = []
-      // if (currentItem) {
-      //   batchNoOptions = currentItem.medicationStock
-      // }
+      const currentItem = inventoryvaccination.find(
+        (o) => o.id === row.inventoryVaccinationFK,
+      )
+      let batchNoOptions = []
+      if (currentItem) {
+        batchNoOptions = currentItem.vaccinationStock
+      }
+
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
           render={(args) => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
-              // <Select
-              //   simple
-              //   options={batchNoOptions}
-              //   // mode='tags'
-              //   // valueField='id'
-              //   valueField='batchNo'
-              //   labelField='batchNo'
-              //   maxSelected={1}
-              //   disableAll
-              //   disabled={viewOnly}
-              //   onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
-              //   {...restProps}
-              // />
-              <TextField
+              <Select
                 simple
-                text={viewOnly}
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
                 disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
                 {...restProps}
               />
             )
+            // return (
+            //   <TextField
+            //     simple
+            //     text={viewOnly}
+            //     disabled={viewOnly}
+            //     {...restProps}
+            //   />
+            // )
           }}
         />
       )
