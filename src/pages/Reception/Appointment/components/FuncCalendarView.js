@@ -58,8 +58,8 @@ const maxTime = new Date(
   today.getFullYear(),
   today.getMonth(),
   today.getDate(),
-  19,
-  0,
+  21,
+  30,
   0,
 )
 
