@@ -1973,6 +1973,29 @@ export const groupByFKFunc = (array) => {
     .value()
 }
 
+export const visitOrderTemplateItemTypes = [
+  {
+    id: 1,
+    dtoName: 'visitOrderTemplateMedicationItemDto',
+    itemFKName: 'inventoryMedicationFK',
+  },
+  {
+    id: 2,
+    dtoName: 'visitOrderTemplateConsumableItemDto',
+    itemFKName: 'inventoryConsumableFK',
+  },
+  {
+    id: 3,
+    dtoName: 'visitOrderTemplateVaccinationItemDto',
+    itemFKName: 'inventoryVaccinationFK',
+  },
+  {
+    id: 4,
+    dtoName: 'visitOrderTemplateServiceItemDto',
+    itemFKName: 'serviceCenterServiceFK',
+  },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,

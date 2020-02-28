@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react'
 import Delete from '@material-ui/icons/Delete'
-import _ from 'lodash'
 import {
   Field,
   FastField,
@@ -19,6 +18,7 @@ import {
 } from '@/components'
 import { getUniqueId, currencyFormatter } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
+import { ITEM_TYPE } from '@/utils/constants'
 
 const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
@@ -61,13 +61,27 @@ class InventoryItemList extends React.Component {
     setFieldValue('rows', newRows)
 
     // Reset field
-    setFieldValue('tempSelectedItem', '')
-    setFieldValue('tempSelectedItemFK', '')
-    setFieldValue('tempSelectedItemSellingPrice', '')
-    setFieldValue('tempSelectedItemTotalPrice', '')
+    setFieldValue('tempSelectedItem', undefined)
+    setFieldValue('tempSelectedItemFK', undefined)
     dispatch({
       type: 'global/incrementCommitCount',
     })
+  }
+
+  dislayExistingItem = (array, fieldName) => {
+    if (array.length > 0) {
+      return (
+        <Fragment>
+          {array.map((item) => (
+            <li>
+              <b>{item[fieldName]}</b>
+            </li>
+          ))}
+        </Fragment>
+      )
+    }
+
+    return null
   }
 
   showConfirmationBox = (existingItemArray, newItemArray) => {
@@ -95,42 +109,10 @@ class InventoryItemList extends React.Component {
         additionalInfo: (
           <div>
             <ul style={{ listStylePosition: 'inside' }}>
-              {medicationArray.length > 0 && (
-                <Fragment>
-                  {medicationArray.map((item) => (
-                    <li>
-                      <b>{item.medicationName}</b>
-                    </li>
-                  ))}
-                </Fragment>
-              )}
-              {consumableArray.length > 0 && (
-                <Fragment>
-                  {consumableArray.map((item) => (
-                    <li>
-                      <b>{item.consumableName}</b>
-                    </li>
-                  ))}
-                </Fragment>
-              )}
-              {vaccinationArray.length > 0 && (
-                <Fragment>
-                  {vaccinationArray.map((item) => (
-                    <li>
-                      <b>{item.vaccinationName}</b>
-                    </li>
-                  ))}
-                </Fragment>
-              )}
-              {serviceArray.length > 0 && (
-                <Fragment>
-                  {serviceArray.map((item) => (
-                    <li>
-                      <b>{item.serviceName}</b>
-                    </li>
-                  ))}
-                </Fragment>
-              )}
+              {this.dislayExistingItem(medicationArray, 'medicationName')}
+              {this.dislayExistingItem(consumableArray, 'consumableName')}
+              {this.dislayExistingItem(vaccinationArray, 'vaccinationName')}
+              {this.dislayExistingItem(serviceArray, 'serviceName')}
             </ul>
           </div>
         ),
@@ -151,12 +133,21 @@ class InventoryItemList extends React.Component {
         uid: getUniqueId(),
         type: itemFieldName.value,
         [itemFieldName.itemFKName]:
-          item.type === 4 ? item.serviceCenterServiceFK : typeFieldName.id,
+          item.type === ITEM_TYPE.SERVICE
+            ? item.serviceCenterServiceFK
+            : typeFieldName.id,
         itemFK:
-          item.type === 4 ? item.serviceCenterServiceFK : typeFieldName.id,
+          item.type === ITEM_TYPE.SERVICE
+            ? item.serviceCenterServiceFK
+            : typeFieldName.id,
         unitPrice:
-          item.type === 4 ? item.unitPrice : typeFieldName.sellingPrice,
-        name: item.type === 4 ? item.serviceName : typeFieldName.displayValue,
+          item.type === ITEM_TYPE.SERVICE
+            ? item.unitPrice
+            : typeFieldName.sellingPrice,
+        name:
+          item.type === ITEM_TYPE.SERVICE
+            ? item.serviceName
+            : typeFieldName.displayValue,
         itemValueType: 'ExactAmount',
         itemValue: 0,
         quantity: item.quantity,
@@ -189,7 +180,7 @@ class InventoryItemList extends React.Component {
         type,
       }
     })
-    console.log({ updatedItemArray })
+    // console.log({ updatedItemArray })
 
     return [
       existingItem,
@@ -200,20 +191,14 @@ class InventoryItemList extends React.Component {
   onClickAdd = (type) => {
     const { currentTab } = this.state
     const { values } = this.props
-    const {
-      tempSelectedItem,
-      rows,
-      tempSelectedItemFK,
-      tempSelectedItemSellingPrice,
-      tempSelectedItemName,
-    } = values
+    const { tempSelectedItem, rows, tempSelectedItemFK } = values
     if (tempSelectedItemFK === undefined) return
-    console.log(tempSelectedItem, rows, currentTab)
+    // console.log(tempSelectedItem, rows, currentTab)
 
     let itemFieldName
     let existingItem = []
     let newItem = []
-    if (currentTab === 5) {
+    if (currentTab === ITEM_TYPE.ORDERSET) {
       const {
         medicationOrderSetItem,
         consumableOrderSetItem,
@@ -228,7 +213,7 @@ class InventoryItemList extends React.Component {
         medicationOrderSetItem,
         'inventoryMedicationFK',
         rows,
-        1,
+        ITEM_TYPE.MEDICATION,
       )
 
       existingItem.push(...existingMedicationItem)
@@ -241,7 +226,7 @@ class InventoryItemList extends React.Component {
         consumableOrderSetItem,
         'inventoryConsumableFK',
         rows,
-        2,
+        ITEM_TYPE.CONSUMABLE,
       )
 
       existingItem.push(...existingConsumableItem)
@@ -254,7 +239,7 @@ class InventoryItemList extends React.Component {
         vaccinationOrderSetItem,
         'inventoryVaccinationFK',
         rows,
-        3,
+        ITEM_TYPE.VACCINATION,
       )
 
       existingItem.push(...existingVaccinationItem)
@@ -267,13 +252,13 @@ class InventoryItemList extends React.Component {
         serviceOrderSetItem,
         'serviceCenterServiceFK',
         rows,
-        4,
+        ITEM_TYPE.SERVICE,
       )
 
       existingItem.push(...existingServiceItem)
       newItem.push(...newServiceItem.filter((item) => item !== null))
 
-      console.log({ existingItem, newItem })
+      // console.log({ existingItem, newItem })
 
       if (existingItem.length > 0) {
         this.showConfirmationBox(existingItem, newItem)
@@ -297,8 +282,11 @@ class InventoryItemList extends React.Component {
         type: itemFieldName.value,
         [itemFieldName.itemFKName]: tempSelectedItemFK,
         itemFK: tempSelectedItemFK,
-        unitPrice: tempSelectedItemSellingPrice,
-        name: tempSelectedItemName,
+        unitPrice:
+          itemFieldName.value === ITEM_TYPE.SERVICE
+            ? tempSelectedItem.unitPrice
+            : tempSelectedItem.sellingPrice,
+        name: tempSelectedItem.displayValue,
         itemValueType: 'ExactAmount',
         quantity: 1,
         itemValue: 0,
@@ -309,19 +297,9 @@ class InventoryItemList extends React.Component {
 
   onItemSelect = (e, option, type) => {
     const { setFieldValue } = this.props
-    console.log(e, option, type)
-    setFieldValue('tempSelectedItemName', option.displayValue)
-    setFieldValue('tempSelectedItem', option)
-    if (e && type !== 'ctservice') {
-      const { sellingPrice, totalPrice } = option
-      // console.log('onItemSelect', option)
-      setFieldValue('tempSelectedItemSellingPrice', sellingPrice)
-      setFieldValue('tempSelectedItemTotalPrice', totalPrice)
-    }
-
-    if (e && type === 'ctservice') {
-      const { unitPrice } = option
-      setFieldValue('tempSelectedItemSellingPrice', unitPrice)
+    // console.log(e, option, type)
+    if (option) {
+      setFieldValue('tempSelectedItem', option)
     }
   }
 
@@ -396,22 +374,22 @@ class InventoryItemList extends React.Component {
   getOptions = () => {
     const commonOptions = [
       {
-        id: 1,
+        id: ITEM_TYPE.MEDICATION,
         name: 'Medication',
         content: this.addContent('inventorymedication'),
       },
       {
-        id: 2,
+        id: ITEM_TYPE.CONSUMABLE,
         name: 'Consumable',
         content: this.addContent('inventoryconsumable'),
       },
       {
-        id: 3,
+        id: ITEM_TYPE.VACCINATION,
         name: 'Vaccination',
         content: this.addContent('inventoryvaccination'),
       },
       {
-        id: 4,
+        id: ITEM_TYPE.SERVICE,
         name: 'Service',
         content: this.addContent('ctservice'),
       },
@@ -421,7 +399,7 @@ class InventoryItemList extends React.Component {
       return [
         ...commonOptions,
         {
-          id: 5,
+          id: ITEM_TYPE.ORDERSET,
           name: 'Order Set',
           content: this.addContent('inventoryorderset'),
         },
