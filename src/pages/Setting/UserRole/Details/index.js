@@ -1,10 +1,9 @@
 import React from 'react'
 import _ from 'lodash'
 import * as Yup from 'yup'
-import moment from 'moment'
 import { connect } from 'dva'
 // formik
-import { FastField, Field } from 'formik'
+import { Field } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
@@ -12,7 +11,6 @@ import Search from '@material-ui/icons/Search'
 // common component
 import {
   Button,
-  DateRangePicker,
   GridContainer,
   GridItem,
   TextField,
@@ -23,11 +21,11 @@ import {
   CodeSelect,
   SizeContainer,
 } from '@/components'
-import { LoadingWrapper } from '@/components/_medisys'
+import { LoadingWrapper, FilterBarDate } from '@/components/_medisys'
 
 // utils
 import { navigateDirtyCheck } from '@/utils/utils'
-import { dummyData, AccessRightConfig } from './const'
+import { AccessRightConfig } from './const'
 
 const styles = (theme) => ({
   container: {
@@ -59,21 +57,18 @@ const styles = (theme) => ({
     const { userRole } = props
     return {
       ...userRole,
-      effectiveDates: [
-        moment(userRole.effectiveStartDate).formatUTC(),
-        moment(userRole.effectiveEndDate).formatUTC(),
-      ],
     }
   },
   validationSchema: Yup.object().shape({
     code: Yup.string().required(),
     name: Yup.string().required(),
-    effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
+    effectiveStartDate: Yup.date().required(),
+    effectiveEndDate: Yup.date().required(),
     description: Yup.string(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { effectiveDates, filteredAccessRight, isEdit, ...restValues } = values
+    let { filteredAccessRight, isEdit, ...restValues } = values
     restValues.roleClientAccessRight = filteredAccessRight
     if (!isEdit) {
       restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
@@ -239,7 +234,7 @@ class UserRoleDetail extends React.Component {
                 <h4>User Role</h4>
               </GridItem>
               <GridContainer className={classes.indent} alignItems='center'>
-                <GridItem md={4}>
+                <GridItem md={3}>
                   <Field
                     name='code'
                     render={(args) => {
@@ -249,14 +244,26 @@ class UserRoleDetail extends React.Component {
                     }}
                   />
                 </GridItem>
-                <GridItem md={4}>
+                <GridItem md={3}>
                   <Field
-                    name='effectiveDates'
+                    name='effectiveStartDate'
                     render={(args) => (
-                      <DateRangePicker
-                        {...args}
+                      <FilterBarDate
+                        args={args}
                         label='Effective Start Date'
-                        label2='Effective End Date'
+                        disabled={isEdit && !isUserMaintainable}
+                      />
+                    )}
+                  />
+                </GridItem>
+                <GridItem md={3}>
+                  <Field
+                    name='effectiveEndDate'
+                    render={(args) => (
+                      <FilterBarDate
+                        args={args}
+                        label='Effective End Date'
+                        isEndDate
                         disabled={isEdit && !isUserMaintainable}
                       />
                     )}
@@ -265,7 +272,7 @@ class UserRoleDetail extends React.Component {
               </GridContainer>
 
               <GridContainer className={classes.indent} alignItems='center'>
-                <GridItem md={4}>
+                <GridItem md={3}>
                   <Field
                     name='name'
                     render={(args) => (
@@ -280,7 +287,7 @@ class UserRoleDetail extends React.Component {
               </GridContainer>
 
               <GridContainer className={classes.indent} alignItems='center'>
-                <GridItem md={4}>
+                <GridItem md={3}>
                   <Field
                     name='description'
                     render={(args) => (
@@ -295,7 +302,7 @@ class UserRoleDetail extends React.Component {
               </GridContainer>
 
               <GridContainer className={classes.indent} alignItems='center'>
-                <GridItem md={4}>
+                <GridItem md={3}>
                   <Field
                     name='clinicRoleFK'
                     render={(args) => (

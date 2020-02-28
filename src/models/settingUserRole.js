@@ -2,6 +2,11 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '@/pages/Setting/UserRole/services'
 
+const defaultDates = {
+  effectiveStartDate: moment().formatUTC(),
+  effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+}
+
 export default createListViewModel({
   namespace: 'settingUserRole',
   config: {
@@ -14,8 +19,7 @@ export default createListViewModel({
       currentSelectedUserRole: {
         isEdit: false,
         filteredAccessRight: [],
-        effectiveStartDate: moment().formatUTC(),
-        effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+        ...defaultDates,
       },
     },
     effects: {
@@ -77,11 +81,9 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             isUserMaintainable: true,
-            effectiveStartDate:
-              state.currentSelectedUserRole.effectiveStartDate,
-            effectiveEndDate: state.currentSelectedUserRole.effectiveEndDate,
             filteredAccessRight: data,
             roleClientAccessRight: data,
+            ...defaultDates,
           },
         }
       },
