@@ -2,6 +2,11 @@ import { createListViewModel } from 'medisys-model'
 import moment from 'moment'
 import * as service from '@/pages/Setting/UserRole/services'
 
+const defaultDates = {
+  effectiveStartDate: moment().formatUTC(),
+  effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+}
+
 export default createListViewModel({
   namespace: 'settingUserRole',
   config: {
@@ -14,8 +19,7 @@ export default createListViewModel({
       currentSelectedUserRole: {
         isEdit: false,
         filteredAccessRight: [],
-        effectiveStartDate: moment().formatUTC(),
-        effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+        ...defaultDates,
       },
     },
     effects: {
@@ -27,15 +31,6 @@ export default createListViewModel({
           'module',
           'displayValue',
         ]
-        for (let i = 0; i < nameList.length; i++) {
-          yield put({
-            type: 'genList',
-            data: [
-              ...data.roleClientAccessRight,
-            ],
-            name: nameList[i],
-          })
-        }
         return yield put({
           type: 'updateUserRole',
           data: { ...data, isEdit },
@@ -49,16 +44,6 @@ export default createListViewModel({
           'displayValue',
         ]
 
-        for (let i = 0; i < nameList.length; i++) {
-          yield put({
-            type: 'genList',
-            data: [
-              ...data,
-            ],
-            name: nameList[i],
-          })
-        }
-        console.log(data)
         const resultData = []
         data.map((d) => {
           const permission =
@@ -72,7 +57,6 @@ export default createListViewModel({
           })
         })
 
-        console.log(resultData)
         return yield put({
           type: 'loadAccessRight',
           data: [
@@ -96,11 +80,10 @@ export default createListViewModel({
         return {
           ...state,
           currentSelectedUserRole: {
-            effectiveStartDate:
-              state.currentSelectedUserRole.effectiveStartDate,
-            effectiveEndDate: state.currentSelectedUserRole.effectiveEndDate,
+            isUserMaintainable: true,
             filteredAccessRight: data,
             roleClientAccessRight: data,
+            ...defaultDates,
           },
         }
       },
@@ -121,31 +104,6 @@ export default createListViewModel({
             ...state.currentSelectedUserRole,
             filteredAccessRight: result,
           },
-        }
-      },
-      genEffectiveDate (state) {
-        return { ...state }
-      },
-      genList (state, { name, data }) {
-        let set = new Set()
-        let result = []
-        data.map((d) => {
-          return set.add(d[name])
-        })
-        let list = [
-          ...set,
-        ]
-        list.map((s) => {
-          return result.push({
-            name: s,
-            value: s,
-          })
-        })
-        return {
-          ...state,
-          [name.concat('List')]: [
-            ...result,
-          ],
         }
       },
     },
