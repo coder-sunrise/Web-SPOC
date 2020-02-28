@@ -109,7 +109,6 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
 
     let groupsAry = []
     let quantity
-    console.log(groupsAry)
     if (treatment.id) {
       let groups = _.groupBy(dataFiltered, 'toothNo')
       groupsAry = Object.keys(groups).map((k) => {

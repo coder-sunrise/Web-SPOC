@@ -4,6 +4,7 @@ import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import Settings from '@material-ui/icons/Settings'
 import Search from '@material-ui/icons/Search'
+import Clear from '@material-ui/icons/Clear'
 import Divider from '@material-ui/core/Divider'
 import Paper from '@material-ui/core/Paper'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -118,7 +119,9 @@ const DiagnosisPanel = (props) => {
           {searchable && (
             <GridItem md={9}>
               <TextField
+                value={search}
                 prefix={<Search />}
+                suffix={search && <Clear onClick={() => setSearch('')} />}
                 onChange={(e) => {
                   setSearch(e.target.value)
                 }}

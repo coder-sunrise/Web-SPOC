@@ -23,6 +23,7 @@ const Treatment = ({
   mode,
   global,
   codetable,
+  orders,
   dentalChartComponent,
   ...props
 }) => {
@@ -112,6 +113,7 @@ const Treatment = ({
       action,
     ],
   )
+
   return (
     <div>
       <div
@@ -174,12 +176,19 @@ const Treatment = ({
                             },
                           })
 
+                          const { rows = [] } = orders
+                          const treatmentOrder = rows.find(
+                            (m) => m.type === '7' && m.treatmentFK === o.id,
+                          )
+
                           dispatch({
                             type: 'orders/updateState',
                             payload: {
                               type: '7',
+                              entity: treatmentOrder,
                             },
                           })
+
                           setSelected(o.id)
                         }}
                       >
@@ -191,9 +200,11 @@ const Treatment = ({
                               <Tooth
                                 width={24}
                                 height={24}
-                                zoom={1 / 7}
+                                zoom={0.19}
                                 image={o.action.image}
                                 action={o.action}
+                                paddingLeft={0}
+                                paddingTop={0}
                                 fill={{
                                   left:
                                     o.action.chartMethodColorBlock || 'white',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Paper } from '@material-ui/core'
-
+import Search from '@material-ui/icons/Search'
+import Clear from '@material-ui/icons/Clear'
 import _ from 'lodash'
 import moment from 'moment'
 import Yup from '@/utils/yup'
@@ -79,6 +80,10 @@ const Setup = (props) => {
     mode,
     setMode,
   ] = useState('sort')
+  const [
+    search,
+    setSearch,
+  ] = React.useState('')
   const handleCommitChanges = ({ rows, changed }) => {
     // console.log(rows, changed)
     setFieldValue('rows', rows)
@@ -127,15 +132,20 @@ const Setup = (props) => {
       },
     },
   ]
+  // console.log(values.rows)
   const tableProps = {
     size: 'sm',
-    rows: values.rows.filter((d) => !!d),
+    rows: values.rows.filter(
+      (d) =>
+        !!d &&
+        (!search ||
+          d.displayValue.toUpperCase().indexOf(search.toUpperCase()) >= 0),
+    ),
     rowDragable: true,
     columns: [
       { name: 'code', title: 'Code' },
       { name: 'chartMethodTypeFK', title: 'Method' },
       { name: 'legend', title: 'Legend' },
-
       {
         name: 'displayValue',
         title: 'Name',
@@ -163,22 +173,27 @@ const Setup = (props) => {
       },
       // showDeleteCommand: false,
       onCommitChanges: handleCommitChanges,
+
       onAddedRowsChange: (rows) => {
         return rows.map((o) => {
           return { value: getUniqueId(), isUserMaintainable: true, ...o }
         })
       },
     },
+    onRowDoubleClick: () => {
+      setMode('edit')
+    },
     onRowDrop: (rows) => {
       setFieldValue('rows', rows)
     },
     schema: rowSchema,
   }
+  console.log(height)
   return (
     <div>
       <Paper elevation={0}>
         <GridContainer style={{ height: 'auto' }}>
-          <GridItem xs={12}>
+          <GridItem xs={3}>
             <Switch
               value={mode}
               onOffMode={false}
@@ -191,7 +206,18 @@ const Setup = (props) => {
               }}
             />
           </GridItem>
-          <GridItem xs={12}>
+          <GridItem xs={6}>
+            <TextField
+              value={search}
+              prefix={<Search />}
+              suffix={search && <Clear onClick={() => setSearch('')} />}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+            />
+          </GridItem>
+
+          <GridItem xs={12} style={{ height: height - 112, overflow: 'auto' }}>
             {/* <DragableTableGrid {...tableProps} /> */}
 
             {mode === 'edit' ? (
