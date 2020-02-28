@@ -170,7 +170,7 @@ class Medication extends PureComponent {
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
-    const { theme, values } = this.props
+    const { theme, values, setFieldValue } = this.props
     const activeRows = values[prop].filter((item) => !item.isDeleted) || []
     return (
       <GridItem
@@ -185,7 +185,7 @@ class Medication extends PureComponent {
           <Popconfirm
             title='Are you sure delete this item?'
             onConfirm={() => {
-              values[prop][i].isDeleted = true
+              setFieldValue(`${prop}[${i}].isDeleted`, true)
               // arrayHelpers.remove(i)
               setTimeout(() => {
                 this.calculateQuantity()
