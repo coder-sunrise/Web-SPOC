@@ -92,18 +92,15 @@ import { calculateAdjustAmount } from '@/utils/utils'
     const getInstruction = (instructions) => {
       let instruction = ''
       let nextStepdose = ''
-      const filterDeletedInstructions = instructions
-        ? instructions.filter((item) => !item.isDeleted)
-        : undefined
-      if (filterDeletedInstructions) {
-        for (let index = 0; index < filterDeletedInstructions.length; index++) {
-          let item = filterDeletedInstructions[index]
+      if (instructions) {
+        for (let index = 0; index < instructions.length; index++) {
+          let item = instructions[index]
           if (instruction !== '') {
             instruction += ' '
           }
 
-          if (index < filterDeletedInstructions.length - 1) {
-            nextStepdose = ` ${filterDeletedInstructions[index + 1].stepdose}`
+          if (index < instructions.length - 1) {
+            nextStepdose = ` ${instructions[index + 1].stepdose}`
           } else {
             nextStepdose = ''
           }
@@ -170,8 +167,7 @@ class Medication extends PureComponent {
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
-    const { theme, values, setFieldValue } = this.props
-    const activeRows = values[prop].filter((item) => !item.isDeleted) || []
+    const { theme, values } = this.props
     return (
       <GridItem
         xs={2}
@@ -185,8 +181,7 @@ class Medication extends PureComponent {
           <Popconfirm
             title='Are you sure delete this item?'
             onConfirm={() => {
-              setFieldValue(`${prop}[${i}].isDeleted`, true)
-              // arrayHelpers.remove(i)
+              arrayHelpers.remove(i)
               setTimeout(() => {
                 this.calculateQuantity()
               }, 1)
@@ -199,7 +194,7 @@ class Medication extends PureComponent {
             </Button>
           </Popconfirm>
         )}
-        {activeRows.length < 3 && (
+        {values[prop].length < 3 && (
           <Button
             justIcon
             color='info'
@@ -242,9 +237,7 @@ class Medication extends PureComponent {
     if (currentMedicaiton && currentMedicaiton.dispensingQuantity && !dirty) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
-      const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
-        (item) => !item.isDeleted,
-      )
+      const prescriptionItem = form.values.corPrescriptionItemInstruction
       const dosageUsageList = codetable.ctmedicationdosage
       const medicationFrequencyList = codetable.ctmedicationfrequency
 
@@ -392,7 +385,7 @@ class Medication extends PureComponent {
   }
 
   changeMedication = (v, op = {}) => {
-    const { setFieldValue, disableEdit, values } = this.props
+    const { setFieldValue, disableEdit } = this.props
 
     let defaultBatch
     if (op.medicationStock) {
@@ -404,12 +397,7 @@ class Medication extends PureComponent {
         })
     }
     setFieldValue('costPrice', op.averageCostPrice || 0)
-    const { corPrescriptionItemInstruction = [] } = values
     setFieldValue('corPrescriptionItemInstruction', [
-      ...corPrescriptionItemInstruction.map((i) => ({
-        ...i,
-        isDeleted: true,
-      })),
       {
         sequence: 0,
         stepdose: 'AND',
@@ -523,7 +511,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-
     return (
       <div>
         <GridContainer>
@@ -584,7 +571,6 @@ class Medication extends PureComponent {
                 if (!values || !values.corPrescriptionItemInstruction)
                   return null
                 return values.corPrescriptionItemInstruction.map((val, i) => {
-                  if (val && val.isDeleted) return null
                   return (
                     <div key={i}>
                       <GridContainer>
@@ -625,17 +611,14 @@ class Medication extends PureComponent {
                                       bottom: 4,
                                     }}
                                   >
-                                    {val.sequence + 1}.
+                                    {i + 1}.
                                   </span>
                                   <CodeSelect
                                     label={formatMessage({
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{
-                                      marginLeft: 15,
-                                      paddingRight: 15,
-                                    }}
+                                    style={{ marginLeft: 15, paddingRight: 15 }}
                                     code='ctMedicationUsage'
                                     onChange={(v, op = {}) => {
                                       setFieldValue(
@@ -782,7 +765,7 @@ class Medication extends PureComponent {
                             // drugFrequencyFK: 1,
                             // duration: 1,
                             stepdose: 'AND',
-                            sequence: val.sequence + 1,
+                            sequence: i + 1,
                           },
                         )}
                       </GridContainer>
