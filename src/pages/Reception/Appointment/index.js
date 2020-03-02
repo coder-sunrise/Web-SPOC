@@ -111,12 +111,11 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         pagesize: 9999,
-        apiCriteria:{
+        apiCriteria: {
           isCancelled: false,
-          apptDateFrom:startOfMonth,
-          apptDateTo:endOfMonth,
+          apptDateFrom: startOfMonth,
+          apptDateTo: endOfMonth,
         },
-
       },
     })
     dispatch({
@@ -547,13 +546,15 @@ class Appointment extends React.PureComponent {
           overrideLoading
           observe='AppointmentForm'
         >
-          <Form
-            history={this.props.history}
-            resources={resources}
-            selectedAppointmentID={selectedAppointmentFK}
-            selectedSlot={selectedSlot}
-            // calendarEvents={calendarEvents}
-          />
+          {showAppointmentForm && (
+            <Form
+              history={this.props.history}
+              resources={resources}
+              selectedAppointmentID={selectedAppointmentFK}
+              selectedSlot={selectedSlot}
+              // calendarEvents={calendarEvents}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}
