@@ -44,11 +44,7 @@ class FilterBar extends PureComponent {
       actions: { handleNavigate },
     } = this.props
 
-    const {
-      transactionStartDate,
-      transactionEndDate,
-      isAllDateChecked,
-    } = values
+    const { transactionStartDate, transactionEndDate } = values
 
     return (
       <GridContainer>
@@ -217,8 +213,12 @@ class FilterBar extends PureComponent {
                 dispatch({
                   type: 'purchaseReceiveList/query',
                   payload: {
-                    lgteql_purchaseOrderDate: transactionStartDate || undefined,
-                    lsteql_purchaseOrderDate: transactionEndDate || undefined,
+                    lgteql_purchaseOrderDate: isAllDateChecked
+                      ? undefined
+                      : transactionStartDate,
+                    lsteql_purchaseOrderDate: isAllDateChecked
+                      ? undefined
+                      : transactionEndDate,
                     purchaseOrderNo,
                     invoiceStatusFK,
                     purchaseOrderStatusFK,
