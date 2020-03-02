@@ -143,6 +143,13 @@ export const PrescriptionColumnExtensions = (
       const currentItem = inventorymedication.find(
         (o) => o.id === row.inventoryMedicationFK,
       )
+      console.log('medication', {
+        row,
+        currentItem,
+        inventorymedication: inventorymedication.sort(
+          (a, b) => (a.id > b.id ? 1 : -1),
+        ),
+      })
       let batchNoOptions = []
       if (currentItem) {
         batchNoOptions = currentItem.medicationStock
@@ -257,7 +264,11 @@ export const VaccinationColumn = [
   },
 ]
 
-export const VaccinationColumnExtensions = (viewOnly = false) => [
+export const VaccinationColumnExtensions = (
+  viewOnly = false,
+  inventoryvaccination = [],
+  handleSelectedBatch = () => {},
+) => [
   {
     columnName: 'name',
     render: (row) => {
@@ -300,19 +311,42 @@ export const VaccinationColumnExtensions = (viewOnly = false) => [
     columnName: 'batchNo',
     width: 150,
     render: (row) => {
+      const currentItem = inventoryvaccination.find(
+        (o) => o.id === row.inventoryVaccinationFK,
+      )
+      let batchNoOptions = []
+      if (currentItem) {
+        batchNoOptions = currentItem.vaccinationStock
+      }
+
       return (
         <FastField
           name={`vaccination[${row.rowIndex}]batchNo`}
           render={(args) => {
             const restProps = viewOnly ? { value: row.batchNo } : { ...args }
             return (
-              <TextField
+              <Select
                 simple
-                text={viewOnly}
+                options={batchNoOptions}
+                mode='tags'
+                // valueField='id'
+                valueField='batchNo'
+                labelField='batchNo'
+                maxSelected={1}
+                disableAll
                 disabled={viewOnly}
+                onChange={(e, op = {}) => handleSelectedBatch(e, op, row)}
                 {...restProps}
               />
             )
+            // return (
+            //   <TextField
+            //     simple
+            //     text={viewOnly}
+            //     disabled={viewOnly}
+            //     {...restProps}
+            //   />
+            // )
           }}
         />
       )

@@ -52,7 +52,7 @@ export default createFormViewModel({
             type: 'patient/query',
             payload: {
               id: payload.pid,
-              version: Date.now(),
+              version: Date.now(), // to query to latest patient info
             },
           })
           yield take('patient/query/@@end')

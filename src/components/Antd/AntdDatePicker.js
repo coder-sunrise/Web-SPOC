@@ -131,11 +131,13 @@ class AntdDatePicker extends PureComponent {
     if (field) {
       this.setState({
         value: field.value === undefined ? '' : field.value,
+        shrink: !!field.value,
       })
     } else if (value) {
       if (typeof value === 'string' || moment.isMoment(value)) {
         this.setState({
           value,
+          shrink: !!value,
         })
       }
     } else {

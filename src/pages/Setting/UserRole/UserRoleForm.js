@@ -3,6 +3,7 @@ import React from 'react'
 import { withFormik } from 'formik'
 // material ui
 import { Divider, withStyles } from '@material-ui/core'
+import { withRouter } from 'react-router'
 // common component
 import {
   GridContainer,
@@ -121,4 +122,4 @@ class UserRoleForm extends React.PureComponent {
 export default withFormik({
   mapPropsToValues: () => ({}),
   handleSubmit: () => {},
-})(withStyles(styles, { name: 'UserRoleForm' })(UserRoleForm))
+})(withStyles(styles, { name: 'UserRoleForm' })(withRouter(UserRoleForm)))

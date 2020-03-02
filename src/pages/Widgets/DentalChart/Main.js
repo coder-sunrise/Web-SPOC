@@ -59,6 +59,9 @@ const styles = (theme) => ({
     margin: 0,
     width: 'auto',
   },
+  treatmentListItem: {
+    padding: 0,
+  },
 })
 
 @connect(

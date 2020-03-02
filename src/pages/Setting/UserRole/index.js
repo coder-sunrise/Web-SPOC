@@ -59,7 +59,7 @@ class UserRole extends React.Component {
           align: 'center',
           render: (row) => {
             return (
-              <Tooltip title='Edit User Role' placement='bottom'>
+              <Tooltip title='Edit Role & Access Right' placement='bottom'>
                 <Button
                   justIcon
                   color='primary'
@@ -85,22 +85,18 @@ class UserRole extends React.Component {
     })
   }
 
-  componentDidMount = async () => {
-    const { settingUserRole } = this.props
-    await this.props.dispatch({
+  componentDidMount = () => {
+    this.props.dispatch({
       type: 'settingUserRole/query',
     })
-    this.genClinicalRoleList()
   }
-
-  onTextFieldChange = (event, value) => {}
 
   editRow = (row) => {
     this.props.history.push(`/setting/userrole/${row.id}`)
   }
 
   handleDoubleClick = (row) => {
-    this.props.history.push(`/setting/userrole/${row.id}`)
+    this.editRow(row)
   }
 
   handleSearchClick = () => {
@@ -133,7 +129,6 @@ class UserRole extends React.Component {
     const { classes, settingUserRole, history } = this.props
     const { filter, showUserProfileForm } = this.state
     const { clinicalRoleNameList } = settingUserRole
-    // const ActionProps = { TableCellComponent: this.TableCell }
 
     return (
       <CardContainer hideHeader>
@@ -142,7 +137,7 @@ class UserRole extends React.Component {
             <FastField
               name='codeDisplayValue'
               render={(args) => {
-                return <TextField label='Code / DisplayValue' {...args} />
+                return <TextField label='Code / Name' {...args} />
               }}
             />
           </GridItem>
@@ -206,7 +201,7 @@ class UserRole extends React.Component {
             onClose={this.toggleModal}
             onConfirm={this.toggleModal}
           >
-            <UserRoleForm history={history} />
+            <UserRoleForm />
           </CommonModal>
         </GridContainer>
       </CardContainer>

@@ -4,6 +4,7 @@ import _ from 'lodash'
 import * as service from '../services'
 import { getUniqueId } from '@/utils/utils'
 import { dateFormatLong } from '@/components'
+import { isToothCrossed } from '../variables'
 
 const updateData = (data, payload) => {
   const {
@@ -111,17 +112,36 @@ export default createFormViewModel({
         }
       },
       toggleSelect (state, { payload }) {
+        // console.log(payload)
+        const data = updateData(_.cloneDeep(state.data), payload)
+        const selected = data.find((o) => o.key === payload.id + payload.target)
+        // console.log(selected)
         return {
           ...state,
-          data: updateData(_.cloneDeep(state.data), payload),
+          data,
+          selected,
+          lastClicked: selected ? payload.id + payload.target : undefined,
         }
       },
       deleteTreatment (state, { payload }) {
+        const { itemNotes, treatmentFK } = payload
+
         return {
           ...state,
-          data: state.data.filter(
-            (o) => o.action && o.action.dentalTreatmentFK !== payload.id,
-          ),
+          data: state.data.filter((o) => {
+            if (!o.action) return false
+            if (o.action.dentalTreatmentFK !== treatmentFK) return true
+
+            if (!o.nodes && itemNotes.indexOf(`#${o.toothNo}`) < 0) return true
+
+            if (
+              o.nodes &&
+              itemNotes.indexOf(`#${o.nodes[0]} - ${o.nodes[1]}`) < 0
+            )
+              return true
+
+            return false
+          }),
         }
       },
       sortItems (state, { payload }) {

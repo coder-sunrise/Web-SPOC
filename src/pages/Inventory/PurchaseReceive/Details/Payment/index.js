@@ -168,18 +168,10 @@ class index extends PureComponent {
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
     const isEditable = isPOStatusFinalized(poStatus)
-    const allowEdit = () => {
-      if (
-        (poStatus === 6 && invoiceAmount === this.getTotalPaid()) ||
-        isWriteOff
-      )
-        return false
-      return true
-    }
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: allowEdit() ? 'enable' : 'disable',
+          rights: !isWriteOff ? 'enable' : 'disable',
         }}
       >
         <GridContainer>

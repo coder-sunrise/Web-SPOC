@@ -143,9 +143,7 @@ const TreatmentGrid = (props) => {
                 })
                 dispatch({
                   type: 'dentalChartComponent/deleteTreatment',
-                  payload: {
-                    id: row.treatmentFK,
-                  },
+                  payload: row,
                 })
               }}
             >
@@ -166,6 +164,7 @@ const TreatmentGrid = (props) => {
   const tableProps = {
     size: 'sm',
     rows: orders.rows.filter((o) => !o.isDeleted && o.type === '7'),
+    getRowId: (r) => r.uid,
     columns: [
       // { name: 'code', title: 'Code' },
       { name: 'treatmentFK', title: 'Treatment' },

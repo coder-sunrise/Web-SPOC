@@ -69,7 +69,7 @@ class RegularButton extends React.PureComponent {
         {...rest}
         classes={muiClasses}
         className={btnClasses}
-        tabIndex={-1}
+        // tabIndex={-1}
       >
         {children}
       </Button>

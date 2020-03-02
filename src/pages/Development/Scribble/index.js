@@ -41,11 +41,11 @@ function _arrayBufferToBase64 (buffer) {
 }
 
 function dataURLtoFile (dataurl, filename) {
-  var arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n)
+  let arr = dataurl.split(',')
+  let mime = arr[0].match(/:(.*?);/)[1]
+  let bstr = atob(arr[1])
+  let n = bstr.length
+  let u8arr = new Uint8Array(n)
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n)
   }
@@ -103,7 +103,7 @@ class Scribble extends React.Component {
         'lena',
       )
       .then((result) => {
-        console.log({ result })
+        // console.log({ result })
         editorInstance.ui.resizeEditor({
           imageSize: {
             oldWidth: result.oldWidth,
@@ -229,7 +229,7 @@ class Scribble extends React.Component {
     const { action, pdfData, numPages, pageNumber, loadedPdf } = this.state
     const { classes } = this.props
 
-    //Usage example:
+    // Usage example:
     // var file =
     //   pdfData !== '' ? dataURLtoFile(pdfData, 'Queue Listing Report.pdf') : ''
     // console.log(file)

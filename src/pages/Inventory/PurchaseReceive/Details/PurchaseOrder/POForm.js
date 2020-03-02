@@ -18,7 +18,12 @@ import AuthorizedContext from '@/components/Context/Authorized'
 
 const prefix = 'purchaseOrder'
 
-const POForm = ({ setFieldValue, isReadOnly = false, isFinalize }) => {
+const POForm = ({
+  setFieldValue,
+  isReadOnly = false,
+  isFinalize,
+  isCompletedOrCancelled,
+}) => {
   const setSupplierDetails = (opts) => {
     let conPerson
     let faxNo
@@ -101,7 +106,7 @@ const POForm = ({ setFieldValue, isReadOnly = false, isFinalize }) => {
                 render={(args) => {
                   return (
                     <DatePicker
-                      disabled={isReadOnly}
+                      disabled={isCompletedOrCancelled}
                       label={formatMessage({
                         id: 'inventory.pr.detail.pod.expectedDeliveryDate',
                       })}
@@ -140,7 +145,7 @@ const POForm = ({ setFieldValue, isReadOnly = false, isFinalize }) => {
                       })}
                       multiline
                       rowsMax={4}
-                      disabled={isReadOnly}
+                      disabled={isCompletedOrCancelled}
                       {...args}
                     />
                   )

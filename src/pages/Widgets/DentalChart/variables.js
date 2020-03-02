@@ -236,6 +236,7 @@ export const createToothShape = ({
     })
     return
   }
+  // console.log(fill, symbol, text)
   const polygon = new fabric.Polygon( // left
     [
       { x: 0, y: 0 },
@@ -390,7 +391,7 @@ export const createToothShape = ({
   let g5
   let g6
   let g7
-  if (!fill.centerfull && !text.centerfull) {
+  if (!fill.centerfull && !text.centerfull && !symbol.centerfull) {
     const polygon5 = new fabric.Polygon( // center left
       [
         { x: baseWidth, y: baseHeight },
@@ -540,4 +541,29 @@ export const createToothShape = ({
     )
   }
   return new fabric.Group(fixedItems.filter((o) => !width && !!o), cCfg)
+}
+
+export const isToothCrossed = (target, start, end) => {
+  const startChar1 = start.substring(0, 1)
+  const endChar1 = end.substring(0, 1)
+  if (!target || !Number(target)) return false
+  if (startChar1 === endChar1) {
+    return (
+      (Number(target) >= Number(start) && Number(target) <= Number(end)) ||
+      (Number(target) >= Number(end) && Number(target) <= Number(start))
+    )
+  }
+  if (target.substring(0, 1) === startChar1) {
+    return (
+      Number(target) > Number(`${startChar1}0`) &&
+      Number(target) <= Number(start)
+    )
+  }
+  if (target.substring(0, 1) === endChar1) {
+    return (
+      Number(target) > Number(`${endChar1}0`) && Number(target) <= Number(end)
+    )
+  }
+
+  return false
 }

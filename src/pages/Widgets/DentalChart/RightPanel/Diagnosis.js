@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import _ from 'lodash'
+import $ from 'jquery'
 
 import moment from 'moment'
 import {
@@ -35,17 +36,39 @@ const Diagnosis = ({
   global,
   ...props
 }) => {
-  const { data = [], selected } = dentalChartComponent
-  // console.log(data)
+  const { data = [], selected, lastClicked } = dentalChartComponent
 
+  // console.log(data)
+  const myRef = useRef(null)
   const groups = Object.values(_.groupBy(data, 'toothNo'))
+
+  useEffect(
+    () => {
+      const target = $(`div[uid='${lastClicked}']`).parent()
+      if (myRef.current && target.length > 0) {
+        const v = $(myRef.current).scrollTop() + target.position().top
+        $(myRef.current).animate(
+          {
+            scrollTop: v,
+          },
+          0,
+        )
+      }
+    },
+    [
+      selected,
+    ],
+  )
   return (
     <div>
       <div
+        ref={myRef}
         style={{
-          height: selected ? 300 : 'auto',
+          // height: selected ? 300 : 'auto',
+          height: '50vh',
           overflowY: 'auto',
           overflowX: 'hidden',
+          position: 'relative',
         }}
       >
         <h4>Tooth Journal</h4>
@@ -74,7 +97,7 @@ const Diagnosis = ({
       </div>
       {selected && (
         <OutlinedTextField
-          autoFocus
+          // autoFocus
           label='Remarks'
           multiline
           maxLength={2000}
@@ -102,4 +125,17 @@ const Diagnosis = ({
   )
 }
 
+// export default React.memo(
+//   Diagnosis,
+//   (
+//     { dentalChartComponent },
+//     { dentalChartComponent: dentalChartComponentNext },
+//   ) => {
+//     console.log(dentalChartComponent, dentalChartComponent)
+//     return _.isEqual(
+//       dentalChartComponent.selected,
+//       dentalChartComponentNext.selected,
+//     )
+//   },
+// )
 export default Diagnosis

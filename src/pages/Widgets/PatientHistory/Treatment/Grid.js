@@ -41,10 +41,10 @@ export default ({ current, codetable, dentalChartComponent }) => {
                 image={action.image}
                 action={action}
                 fill={{
-                  left: action.chartMethodColorBlock,
-                  right: action.chartMethodColorBlock,
-                  top: action.chartMethodColorBlock,
-                  bottom: action.chartMethodColorBlock,
+                  left: action.chartMethodColorBlock || 'white',
+                  right: action.chartMethodColorBlock || 'white',
+                  top: action.chartMethodColorBlock || 'white',
+                  bottom: action.chartMethodColorBlock || 'white',
                   centerfull: action.chartMethodColorBlock || 'white',
                 }}
                 symbol={{

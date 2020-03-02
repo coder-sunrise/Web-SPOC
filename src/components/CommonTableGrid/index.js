@@ -174,11 +174,19 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   const startIndex = pagerConfig.current
     ? pagerConfig.pagesize * (pagerConfig.current - 1)
     : 0
+
+  // console.log(
+  //   pagerConfig.current,
+  //   pagerConfig.pagesize,
+  //   pagerConfig.current - 1,
+  //   startIndex,
+  // )
   // console.log(startIndex)
   // console.log(rows)
   return rows.map((o, i) => {
+    // console.log(o, startIndex + i)
     return {
-      rowIndex: startIndex + i,
+      rowIndex: rows.length > pagerConfig.pagesize ? i : startIndex + i,
       ...o,
     }
   })
@@ -217,7 +225,7 @@ class CommonTableGrid extends PureComponent {
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
-    this.isScrollable = !!pHeight
+    // this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
     const cls = classNames({
       [classes.tableStriped]: oddEven,
@@ -227,9 +235,10 @@ class CommonTableGrid extends PureComponent {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
     }
-
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
+      // console.log(this.isScrollable, height, isScrollable)
+
       const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
@@ -1222,7 +1231,7 @@ class CommonTableGrid extends PureComponent {
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
               <TableBase
-                // height={height}
+                height={height}
                 rowComponent={this.TableRow}
                 bodyComponent={this.TableBody}
                 {...tableProps}
