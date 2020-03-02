@@ -170,7 +170,8 @@ class Medication extends PureComponent {
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
-    const { theme, values } = this.props
+    const { theme, values, setFieldValue } = this.props
+    const activeRows = values[prop].filter((item) => !item.isDeleted) || []
     return (
       <GridItem
         xs={2}
@@ -180,11 +181,12 @@ class Medication extends PureComponent {
           textAlign: 'center',
         }}
       >
-        {values[prop].length > 1 && (
+        {activeRows.length > 1 && (
           <Popconfirm
             title='Are you sure delete this item?'
             onConfirm={() => {
-              arrayHelpers.remove(i)
+              setFieldValue(`${prop}[${i}].isDeleted`, true)
+              // arrayHelpers.remove(i)
               setTimeout(() => {
                 this.calculateQuantity()
               }, 1)
@@ -197,7 +199,7 @@ class Medication extends PureComponent {
             </Button>
           </Popconfirm>
         )}
-        {values[prop].length < 3 && (
+        {activeRows.length < 3 && (
           <Button
             justIcon
             color='info'
@@ -223,7 +225,9 @@ class Medication extends PureComponent {
     if (currentMedicaiton && currentMedicaiton.dispensingQuantity && !dirty) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
-      const prescriptionItem = form.values.corPrescriptionItemInstruction
+      const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
+        (item) => !item.isDeleted,
+      )
       const dosageUsageList = codetable.ctmedicationdosage
       const medicationFrequencyList = codetable.ctmedicationfrequency
 
@@ -665,7 +669,10 @@ class Medication extends PureComponent {
                                       id: 'inventory.master.setting.usage',
                                     })}
                                     allowClear={false}
-                                    style={{ marginLeft: 15, paddingRight: 15 }}
+                                    style={{
+                                      marginLeft: 15,
+                                      paddingRight: 15,
+                                    }}
                                     code='ctMedicationUsage'
                                     onChange={(v, op = {}) => {
                                       setFieldValue(
@@ -812,7 +819,7 @@ class Medication extends PureComponent {
                             // drugFrequencyFK: 1,
                             // duration: 1,
                             stepdose: 'AND',
-                            sequence: i + 1,
+                            sequence: val.sequence + 1,
                           },
                         )}
                       </GridContainer>
