@@ -186,7 +186,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 14,
-        text: text1l2,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -241,7 +241,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 24,
-        text: text1r2,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -475,7 +475,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 44,
-        text: text2l2,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
@@ -522,7 +522,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 34,
-        text: text2r2,
+        text: text2r1,
         bottom: true,
         line: 3,
       },

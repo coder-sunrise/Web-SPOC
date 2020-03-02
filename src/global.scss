@@ -41,7 +41,9 @@
     transform: rotate(359deg);
   }
 }
-
+html {
+  scroll-behavior: smooth;
+}
 .spin-custom {
   -webkit-animation: spin 1000ms infinite linear;
   animation: spin 1000ms infinite linear;

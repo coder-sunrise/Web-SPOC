@@ -236,6 +236,7 @@ export const createToothShape = ({
     })
     return
   }
+  // console.log(fill, symbol, text)
   const polygon = new fabric.Polygon( // left
     [
       { x: 0, y: 0 },
@@ -390,7 +391,7 @@ export const createToothShape = ({
   let g5
   let g6
   let g7
-  if (!fill.centerfull && !text.centerfull) {
+  if (!fill.centerfull && !text.centerfull && !symbol.centerfull) {
     const polygon5 = new fabric.Polygon( // center left
       [
         { x: baseWidth, y: baseHeight },
