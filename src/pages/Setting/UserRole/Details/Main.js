@@ -9,6 +9,7 @@ import { Field } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
+import moment from 'moment'
 // common component
 import {
   Button,
@@ -21,6 +22,7 @@ import {
   ProgressButton,
   CodeSelect,
   SizeContainer,
+  DatePicker,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 
@@ -69,9 +71,9 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { filteredAccessRight, isEdit, ...restValues } = values
+    let { filteredAccessRight, ...restValues } = values
     restValues.roleClientAccessRight = filteredAccessRight
-    if (!isEdit) {
+    if (!values.id) {
       restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
         const { id, ...data } = d
         return data
@@ -80,6 +82,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
+    console.log('restValues', restValues)
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -184,9 +187,19 @@ class Main extends React.Component {
   }
 
   render () {
-    const { classes, userRole } = this.props
+    const { classes, userRole, values } = this.props
     const { filter } = this.state
-    const { isEdit, isUserMaintainable } = userRole
+    const {
+      id,
+      isUserMaintainable,
+      effectiveStartDate,
+      effectiveEndDate,
+    } = values
+
+    const isEdit = !!id
+    console.log({ values })
+    console.log('start', effectiveStartDate)
+    console.log('end', effectiveEndDate)
 
     return (
       <React.Fragment>
@@ -214,10 +227,14 @@ class Main extends React.Component {
                 <Field
                   name='effectiveStartDate'
                   render={(args) => (
-                    <FilterBarDate
-                      args={args}
+                    <DatePicker
+                      {...args}
                       label='Effective Start Date'
                       disabled={isEdit && !isUserMaintainable}
+                      restrictFromTo={[
+                        moment('0000-01-01').formatUTC(),
+                        effectiveEndDate,
+                      ]}
                     />
                   )}
                 />
@@ -226,11 +243,15 @@ class Main extends React.Component {
                 <Field
                   name='effectiveEndDate'
                   render={(args) => (
-                    <FilterBarDate
-                      args={args}
+                    <DatePicker
+                      {...args}
                       label='Effective End Date'
-                      isEndDate
                       disabled={isEdit && !isUserMaintainable}
+                      restrictFromTo={[
+                        effectiveStartDate,
+                        moment('2099-12-31').formatUTC(false),
+                      ]}
+                      endDay
                     />
                   )}
                 />
