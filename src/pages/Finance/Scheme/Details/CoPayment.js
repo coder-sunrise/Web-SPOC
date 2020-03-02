@@ -11,7 +11,6 @@ import {
 } from '@/components'
 
 const CoPayment = ({ values, theme, classes, setFieldValue }) => {
-  console.log({ values })
   const CPNumber = (label, type, radType) => (args) => {
     return (
       <NumberInput
