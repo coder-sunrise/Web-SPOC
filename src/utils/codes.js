@@ -1538,7 +1538,7 @@ export const InventoryTypes = [
   },
   {
     value: 3,
-    name: 'Vaccine',
+    name: 'Vaccination',
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
