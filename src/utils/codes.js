@@ -1522,7 +1522,7 @@ export const podoOrderType = [
 export const InventoryTypes = [
   {
     value: 1,
-    name: 'Medications',
+    name: 'Medication',
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
@@ -1530,7 +1530,7 @@ export const InventoryTypes = [
   },
   {
     value: 2,
-    name: 'Comsumables',
+    name: 'Consumable',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
@@ -1538,7 +1538,7 @@ export const InventoryTypes = [
   },
   {
     value: 3,
-    name: 'Vaccines',
+    name: 'Vaccine',
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
@@ -1546,14 +1546,15 @@ export const InventoryTypes = [
   },
   {
     value: 4,
-    name: 'Services',
+    name: 'Service',
     prop: 'serviceValueDto',
     itemFKName: 'serviceCenterServiceFK',
     ctName: 'ctservice',
+    field: 'service',
   },
   {
     value: 5,
-    name: 'OrderSets',
+    name: 'OrderSet',
     prop: 'orderSetValueDto',
     itemFKName: 'inventoryOrderSetFK',
     ctName: 'inventoryorderset',

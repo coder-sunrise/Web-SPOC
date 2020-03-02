@@ -177,12 +177,7 @@ export const menuData = [
     // icon: <FolderOpen />,
     url: '/setting/treatmentcategory',
   },
-  {
-    authority: 'settings.clinicsetting.visitordertemplate',
-    title: 'Clinic Setting',
-    text: 'Visit Order Template',
-    url: '/setting/visitordertemplate',
-  },
+
   {
     authority: 'settings.systemuser.systemuser',
     title: 'System User',
@@ -211,6 +206,12 @@ export const menuData = [
     title: 'Templates',
     text: 'Document Template',
     url: '/setting/documenttemplate',
+  },
+  {
+    authority: 'settings.templates.visitordertemplate',
+    title: 'Templates',
+    text: 'Visit Order Template',
+    url: '/setting/visitordertemplate',
   },
   // {
   //   title: 'Contact',

@@ -144,10 +144,9 @@ class InventoryItemList extends React.Component {
           item.type === ITEM_TYPE.SERVICE
             ? item.unitPrice
             : typeFieldName.sellingPrice,
-        name:
-          item.type === ITEM_TYPE.SERVICE
-            ? item.serviceName
-            : typeFieldName.displayValue,
+        code: typeFieldName.code,
+        name: typeFieldName.displayValue,
+
         itemValueType: 'ExactAmount',
         itemValue: 0,
         quantity: item.quantity,
@@ -286,6 +285,7 @@ class InventoryItemList extends React.Component {
           itemFieldName.value === ITEM_TYPE.SERVICE
             ? tempSelectedItem.unitPrice
             : tempSelectedItem.sellingPrice,
+        code: tempSelectedItem.code,
         name: tempSelectedItem.displayValue,
         itemValueType: 'ExactAmount',
         quantity: 1,
@@ -353,10 +353,15 @@ class InventoryItemList extends React.Component {
 
   onDeleteClick = (row) => {
     const { values, setFieldValue, dispatch } = this.props
-    const newRows = values.rows.map(
-      (item) =>
-        item.itemFK === row.itemFK ? { ...item, isDeleted: true } : { ...item },
-    )
+    const newRows = values.rows.map((item) => {
+      if (item.itemFK === row.itemFK && item.type === row.type) {
+        return {
+          ...item,
+          isDeleted: true,
+        }
+      }
+      return { ...item }
+    })
     setFieldValue('rows', newRows)
     dispatch({
       type: 'global/incrementCommitCount',

@@ -1,4 +1,5 @@
 import React, { PureComponent, Fragment } from 'react'
+import _ from 'lodash'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -20,17 +21,34 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
     effectiveDates: Yup.array().of(Yup.date()).min(2).required(),
   }),
   handleSubmit: (values, { props }) => {
-    const { effectiveDates, rows, ...restValues } = values
+    const { effectiveDates, rows, tempSelectedItem, ...restValues } = values
     const { dispatch, onConfirm } = props
 
+    const maxSortOrderObj = _.maxBy(rows, 'sortOrder') || {}
+    let maxSortOrder = maxSortOrderObj.sortOrder || 0
+    const assignedSortOrderArray = rows.map((row) => {
+      if (!row.sortOrder) maxSortOrder += 1
+
+      return {
+        ...row,
+        sortOrder: row.sortOrder || maxSortOrder,
+      }
+    })
     let itemTypesArray = []
     visitOrderTemplateItemTypes.forEach((type) => {
-      const currentTypeRows = rows.filter((row) => row.type === type.id)
+      const currentTypeRows = assignedSortOrderArray.filter(
+        (row) => row.type === type.id,
+      )
       const updatedRows = currentTypeRows.map((row) => {
         return {
           ...row,
+          inventoryItemTypeFK: type.id,
+          inventoryItemCode: row.code,
+          inventoryItemName: row.name,
           [type.dtoName]: {
-            ...row,
+            ...row[type.dtoName],
+            [type.itemFKName]: row.itemFK,
+            isDeleted: row.isDeleted || false,
           },
         }
       })
@@ -46,9 +64,6 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
       effectiveStartDate: effectiveDates[0],
       effectiveEndDate: effectiveDates[1],
     }
-
-    // console.log(payload)
-
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',
       payload,
@@ -64,6 +79,12 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
   displayName: 'VisitOrderTemplateDetail',
 })
 class Detail extends PureComponent {
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'settingVisitOrderTemplate/reset',
+    })
+  }
+
   render () {
     const { theme, footer, values, handleSubmit } = this.props
     return (

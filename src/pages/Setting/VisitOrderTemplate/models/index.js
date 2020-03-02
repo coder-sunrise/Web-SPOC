@@ -28,6 +28,15 @@ export default createListViewModel({
     },
     effects: {},
     reducers: {
+      reset (st) {
+        return {
+          ...st,
+          default: {
+            ...st.default,
+            rows: [],
+          },
+        }
+      },
       queryOneDone (st, { payload }) {
         const {
           effectiveStartDate,
@@ -38,16 +47,18 @@ export default createListViewModel({
 
         let itemTypesRows = []
         visitOrderTemplateItemTypes.forEach((type) => {
-          const currentItems = visitOrderTemplateItemDtos.filter(
+          const currentTypeItems = visitOrderTemplateItemDtos.filter(
             (itemType) => itemType.inventoryItemTypeFK === type.id,
           )
           itemTypesRows = [
             ...itemTypesRows,
-            ...currentItems.map((item) => {
+            ...currentTypeItems.map((item) => {
               return {
                 uid: getUniqueId(),
                 type: item.inventoryItemTypeFK,
                 itemFK: item[type.dtoName][type.itemFKName],
+                name: item.inventoryItemName,
+                code: item.inventoryItemCode,
                 ...item,
               }
             }),
