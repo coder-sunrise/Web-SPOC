@@ -25,15 +25,16 @@ export default createListViewModel({
       *fetchUserRoleByID ({ payload }, { call, put }) {
         const response = yield call(service.getUserRoleById, payload)
         const { isEdit } = payload
-        const { data = {}, status } = response
+        let { data = {}, status } = response
         const nameList = [
           'module',
           'displayValue',
         ]
+        const { id, ...result } = data
         if (!isEdit) {
-          delete data.id
+          data = result
         }
-        console.log('data', data)
+        // console.log('data', data)
 
         return yield put({
           type: 'updateUserRole',
