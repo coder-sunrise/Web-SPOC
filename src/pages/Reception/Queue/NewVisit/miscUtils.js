@@ -21,6 +21,7 @@ const mapAttachmentToUploadInput = (
         fileName,
         attachmentType,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
@@ -87,7 +88,7 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
-    if(clinicSettings){
+    if (clinicSettings) {
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
     }
 
