@@ -171,13 +171,18 @@ class AntdDatePicker extends PureComponent {
     // if (date) {
     //   date.utcOffset()
     // }
-    const { form, field, onChange, showTime } = this.props
+    const { form, field, onChange, showTime, endDay } = this.props
     // eslint-disable-next-line no-nested-ternary
-    const v = date
+    let v = date
       ? showTime
         ? moment(date).formatUTC(false)
         : moment(date.set({ hour: 0, minute: 0, second: 0 })).formatUTC()
       : ''
+    if (endDay) {
+      v = moment(date.set({ hour: 23, minute: 59, second: 59 })).formatUTC(
+        false,
+      )
+    }
     if (form && field) {
       form.setFieldValue(field.name, v)
     }

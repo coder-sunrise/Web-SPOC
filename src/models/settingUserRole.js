@@ -17,7 +17,6 @@ export default createListViewModel({
     state: {
       list: [],
       currentSelectedUserRole: {
-        isEdit: false,
         filteredAccessRight: [],
         ...defaultDates,
       },
@@ -31,9 +30,14 @@ export default createListViewModel({
           'module',
           'displayValue',
         ]
+        if (!isEdit) {
+          delete data.id
+        }
+        console.log('data', data)
+
         return yield put({
           type: 'updateUserRole',
-          data: { ...data, isEdit },
+          data: { ...data },
         })
       },
       *fetchDefaultAccessRight ({ payload }, { call, put }) {
