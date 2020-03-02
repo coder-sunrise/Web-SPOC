@@ -140,7 +140,7 @@ const VisitInfoCard = ({
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitOrderTemplate',
                 })}
-                code='ctVisitOrderTemplate'
+                code='visitOrderTemplate'
                 {...args}
               />
             )}
