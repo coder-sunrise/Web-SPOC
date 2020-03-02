@@ -53,23 +53,7 @@ const { fabric } = require('fabric')
 
 let selectedTooth = []
 const imageCache = {}
-const styles = (theme) => ({
-  paper: {
-    display: 'flex',
-    border: `1px solid ${theme.palette.divider}`,
-    flexWrap: 'wrap',
-  },
-  divider: {
-    alignSelf: 'stretch',
-    height: 'auto',
-    margin: theme.spacing(1, 0.5),
-    padding: 0,
-    width: 0,
-  },
-  groupBtns: {
-    display: 'block',
-  },
-})
+
 const text1l1 = {
   left: 'd',
   bottom: 'p',
@@ -1479,4 +1463,4 @@ class Chart extends React.PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Chart)
+export default Chart

@@ -137,8 +137,9 @@ const Setup = (props) => {
     size: 'sm',
     rows: values.rows.filter(
       (d) =>
-        !!d &&
-        (!search ||
+        !search ||
+        (!!d &&
+          !!d.displayValue &&
           d.displayValue.toUpperCase().indexOf(search.toUpperCase()) >= 0),
     ),
     rowDragable: true,
@@ -188,7 +189,7 @@ const Setup = (props) => {
     },
     schema: rowSchema,
   }
-  console.log(height)
+  // console.log(height)
   return (
     <div>
       <Paper elevation={0}>

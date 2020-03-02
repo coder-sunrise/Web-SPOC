@@ -62,6 +62,46 @@ const styles = (theme) => ({
   treatmentListItem: {
     padding: 0,
   },
+
+  groupBtns: {
+    display: 'block',
+  },
+
+  groupBtnRoot: {
+    '&.Mui-disabled': {
+      color: 'inherit',
+    },
+  },
+  groupBtnGroupRoot: {
+    display: 'block',
+    marginBottom: theme.spacing(1),
+  },
+  buttonIcon: {
+    position: 'absolute',
+    left: -1,
+    top: -1,
+  },
+  grouped: {
+    fontSize: '0.75rem',
+    margin: theme.spacing(0.25, 0, 0.25, 0.5),
+    // border: 'none',
+    '&:not(:first-child)': {
+      marginLeft: theme.spacing(0.5),
+      borderRadius: Number(theme.shape.borderRadius),
+      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
+    },
+    '&:first-child': {
+      borderRadius: Number(theme.shape.borderRadius),
+    },
+    height: 33,
+    lineHeight: 1,
+    // whiteSpace: 'nowrap',
+    paddingLeft: 37,
+    overflow: 'hidden',
+    width: 194,
+    border: '1px solid rgba(0, 0, 0, 0.38)',
+    // borderRadius: '8px',
+  },
 })
 
 @connect(

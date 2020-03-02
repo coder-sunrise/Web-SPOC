@@ -71,7 +71,7 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import { LoadingWrapper } from '@/components/_medisys'
 
-window.$tempGridRow = {}
+if (!window.$tempGridRow) window.$tempGridRow = {}
 
 const DragHandle = SortableHandle(({ style }) => (
   <Tooltip title='Drag'>
@@ -1114,7 +1114,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-
+    const rowData = this.getData()
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -1136,7 +1136,7 @@ class CommonTableGrid extends PureComponent {
           ) */}
           <LoadingWrapper loading={_loading} linear text='Loading...'>
             <DevGrid
-              rows={this.getData()} // this.state.data ||
+              rows={rowData} // this.state.data ||
               columns={newColumns}
               getRowId={getRowId}
               rootComponent={Root}

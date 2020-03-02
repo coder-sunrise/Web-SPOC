@@ -28,6 +28,7 @@ import Authorized from '@/utils/Authorized'
 let uniqueGid = 0
 
 const styles = (theme) => ({})
+window.$tempGridRow = {}
 
 class EditableTableGrid extends React.Component {
   static defaultProps = {
@@ -94,22 +95,31 @@ class EditableTableGrid extends React.Component {
       return true
     }
     if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+      // console.log(nextProps.rows, this.props.rows)
       const propEqual = _.isEqual(
         nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
         this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
       )
       if (!propEqual) return true
-
-      const cacheEqual = _.isEqual(
-        Object.values(window.$tempGridRow[this.gridId]).map(
-          ({ _errors, rowIndex, ...o }, i) => o,
-        ),
-        nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-      )
+      const cacheEqual = !window.$tempGridRow[this.gridId]
+        ? false
+        : _.isEqual(
+            Object.values(window.$tempGridRow[this.gridId]).map(
+              ({ _errors, rowIndex, ...o }, i) => o,
+            ),
+            nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+          )
 
       if (!cacheEqual) {
         // dectect if datasource changed outside grid, reset grid data cache
-        window.$tempGridRow[this.gridId] = []
+        window.$tempGridRow[
+          this.gridId
+        ] = nextProps.rows.reduce((ary, item) => {
+          return {
+            ...ary,
+            [item[nextProps.getRowId(item)]]: item,
+          }
+        }, {})
       }
       return !cacheEqual
     }
@@ -122,7 +132,6 @@ class EditableTableGrid extends React.Component {
     const errorRows = Object.values(window.$tempGridRow[this.gridId]).filter(
       (o) => o._errors && o._errors.length && !o.isDeleted,
     )
-
     const errorCells = []
     errorRows.forEach((r) => {
       const { _errors } = r
@@ -288,7 +297,6 @@ class EditableTableGrid extends React.Component {
         window.$tempGridRow[this.gridId] = {}
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       // console.log(tempNewData)
-
       newRows = added
         .map((o) => {
           const id = getUniqueNumericId()
@@ -308,7 +316,7 @@ class EditableTableGrid extends React.Component {
     }
 
     if (changed) {
-      newRows = newRows.map((row) => {
+      newRows = newRows.filter((o) => !!o).map((row) => {
         const n = changed[getRowId(row)]
           ? {
               ...row,
@@ -404,6 +412,7 @@ class EditableTableGrid extends React.Component {
     } = this.props
     const { pagerConfig = {}, pager = true, addNewLabelName } = FuncProps
     const { containerExtraComponent } = pagerConfig
+    console.log(this.state.errorCells)
     return (
       <React.Fragment>
         {showAddCommand && (
