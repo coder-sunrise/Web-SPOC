@@ -73,7 +73,6 @@ const styles = (theme) => ({
     const { dispatch, onConfirm, history } = props
     let { filteredAccessRight, ...restValues } = values
     restValues.roleClientAccessRight = filteredAccessRight
-    console.log('hello')
     if (!values.id) {
       restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
         const { id, ...data } = d
