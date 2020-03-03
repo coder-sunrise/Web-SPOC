@@ -30,7 +30,7 @@ let uniqueGid = 0
 const styles = (theme) => ({})
 window.$tempGridRow = {}
 
-class EditableTableGrid extends React.Component {
+class EditableTableGrid extends PureComponent {
   static defaultProps = {
     EditingProps: {},
     getRowId: (r) => r.id,
@@ -67,64 +67,97 @@ class EditableTableGrid extends React.Component {
   //   return null
   // }
 
-  // componentWillReceiveProps (nextProps) {
-  //   // dectect if datasource changed outside grid, reset grid data cache
+  componentWillReceiveProps (nextProps) {
+    // dectect if datasource changed outside grid, reset grid data cache
+    if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
+      if (
+        !_.isEqual(
+          nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+          this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+        )
+      ) {
+        if (
+          !_.isEqual(
+            Object.values(window.$tempGridRow[this.gridId] || {}).map(
+              ({ _errors, rowIndex, ...o }, i) => o,
+            ),
+            nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+          )
+        ) {
+          window.$tempGridRow[
+            this.gridId
+          ] = nextProps.rows.reduce((ary, item) => {
+            return {
+              ...ary,
+              [item[nextProps.getRowId(item)]]: item,
+            }
+          }, {})
+        }
+      }
+    }
+  }
+
+  // shouldComponentUpdate (nextProps, nextState) {
+  //   if (!_.isEqual(this.state, nextState)) {
+  //     return true
+  //   }
   //   if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
-  //     if (
-  //       !_.isEqual(
-  //         nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //         this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-  //       )
-  //     ) {
-  //       if (
-  //         !_.isEqual(
+  //     // console.log(nextProps.rows, this.props.rows)
+  //     const propEqual = _.isEqual(
+  //       nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //     )
+  //     if (!propEqual) return true
+  //     const cacheEqual = !window.$tempGridRow[this.gridId]
+  //       ? false
+  //       : _.isEqual(
   //           Object.values(window.$tempGridRow[this.gridId]).map(
   //             ({ _errors, rowIndex, ...o }, i) => o,
   //           ),
   //           nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
   //         )
-  //       ) {
-  //         window.$tempGridRow[this.gridId] = []
-  //       }
+
+  //     if (!cacheEqual) {
+  //       // dectect if datasource changed outside grid, reset grid data cache
+  //       window.$tempGridRow[
+  //         this.gridId
+  //       ] = nextProps.rows.reduce((ary, item) => {
+
+  //         return {
+  //           ...ary,
+
+  //           [item[nextProps.getRowId(item)]]: item
+  //         }
+  //       }, {})
+  //       return true
+  //       // console.log(
+  //       //   window.$tempGridRow[this.gridId],
+  //       //   Object.values(window.$tempGridRow[this.gridId] || []).map(
+  //       //     ({ _errors, rowIndex, ...o }, i) => o,
+  //       //   ),
+  //       //   nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       //   difference(
+  //       //     Object.values(window.$tempGridRow[this.gridId] || []).map(
+  //       //       ({ _errors, rowIndex, ...o }, i) => o,
+  //       //     ),
+  //       //     nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
+  //       //   ),
+  //       // )
   //     }
+  //     if (
+  //       cacheEqual &&
+  //       Object.values(window.$tempGridRow[this.gridId]).find(
+  //         (o) => !o._errors || o._errors.length > 0,
+  //       )
+  //     ) {
+  //       // console.log(window.$tempGridRow[this.gridId])
+  //       console.log('1', this.props, nextProps)
+  //       return true
+  //     }
+  //     return !cacheEqual
   //   }
+  //   return true
   // }
-
-  shouldComponentUpdate (nextProps, nextState) {
-    if (!_.isEqual(this.state, nextState)) {
-      return true
-    }
-    if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
-      // console.log(nextProps.rows, this.props.rows)
-      const propEqual = _.isEqual(
-        nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-        this.props.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-      )
-      if (!propEqual) return true
-      const cacheEqual = !window.$tempGridRow[this.gridId]
-        ? false
-        : _.isEqual(
-            Object.values(window.$tempGridRow[this.gridId]).map(
-              ({ _errors, rowIndex, ...o }, i) => o,
-            ),
-            nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
-          )
-
-      if (!cacheEqual) {
-        // dectect if datasource changed outside grid, reset grid data cache
-        window.$tempGridRow[
-          this.gridId
-        ] = nextProps.rows.reduce((ary, item) => {
-          return {
-            ...ary,
-            [item[nextProps.getRowId(item)]]: item,
-          }
-        }, {})
-      }
-      return !cacheEqual
-    }
-    return true
-  }
 
   getErrorCells = (props) => {
     const { getRowId } = props || this.props
@@ -300,18 +333,19 @@ class EditableTableGrid extends React.Component {
       newRows = added
         .map((o) => {
           const id = getUniqueNumericId()
-          window.$tempGridRow[this.gridId][id] = {
+          window.$tempGridRow[this.gridId][getRowId(o)] = {
             id,
             isNew: true,
             ...tempNewData,
             ...o,
           }
-          return window.$tempGridRow[this.gridId][id]
+          return window.$tempGridRow[this.gridId][getRowId(o)]
         })
         .concat(newRows)
       // this.setState({
       //   addedRows: [],
       // })
+
       delete window.$tempGridRow[this.gridId][undefined]
     }
 
@@ -412,7 +446,7 @@ class EditableTableGrid extends React.Component {
     } = this.props
     const { pagerConfig = {}, pager = true, addNewLabelName } = FuncProps
     const { containerExtraComponent } = pagerConfig
-    console.log(this.state.errorCells)
+    // console.log(this.state.errorCells)
     return (
       <React.Fragment>
         {showAddCommand && (

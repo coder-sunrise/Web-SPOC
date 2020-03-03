@@ -22,6 +22,7 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+
 import classNames from 'classnames'
 import { connect } from 'dva'
 import { Getter, PluginContainer } from '@devexpress/dx-react-core'
@@ -57,6 +58,7 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import { getUniqueId, difference } from '@/utils/utils'
 import { smallTheme, defaultTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -174,7 +176,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   const startIndex = pagerConfig.current
     ? pagerConfig.pagesize * (pagerConfig.current - 1)
     : 0
-
+  // console.log(pagerConfig)
   // console.log(
   //   pagerConfig.current,
   //   pagerConfig.pagesize,
@@ -201,6 +203,7 @@ class CommonTableGrid extends PureComponent {
       current: 1,
       pagesize: 10,
     },
+    rows: [],
   }
 
   static defaultProps = {
@@ -535,7 +538,13 @@ class CommonTableGrid extends PureComponent {
     // console.log(props.query, ' c grid')
   }
 
+  // shouldComponentUpdate (nextProps) {
+  //   console.log(difference(nextProps, this.props))
+  //   return true
+  // }
+
   static getDerivedStateFromProps (nextProps, preState) {
+    // console.log(JSON.stringify(nextProps))
     const { entity, type, columnExtensions } = nextProps
     // console.log(nextProps)
     let _entity = entity
@@ -566,9 +575,35 @@ class CommonTableGrid extends PureComponent {
         entity: _entity,
       }
     }
-    if (nextProps.rows && nextProps.rows !== preState.rows) {
-      return {
-        rows: nextProps.rows,
+    // console.log(nextProps.rows)
+    if (nextProps.rows) {
+      if (
+        // if user add new row from 2nd page, move the new row to current page
+        nextProps.rows.length &&
+        nextProps.rows[0].isNew &&
+        preState.pagination.current > 1
+      ) {
+        const newRow = nextProps.rows[0]
+        const newRows = _.cloneDeep(nextProps.rows)
+        newRows.splice(0, 1)
+        newRows.splice(
+          (preState.pagination.current - 1) * preState.pagination.pagesize,
+          0,
+          newRow,
+        )
+        // console.log(newRows)
+        return {
+          rows: newRows,
+        }
+      }
+      // if(rows.)
+      // console.log(v, preState)
+
+      if (nextProps.rows !== preState.rows) {
+        // console.log(nextProps.rows !== preState.rows)
+        return {
+          rows: nextProps.rows,
+        }
       }
     }
 
@@ -861,12 +896,12 @@ class CommonTableGrid extends PureComponent {
   }
 
   getData = () => {
-    const { rows = [], showIsDeleted } = this.props
-    if (showIsDeleted) return rows
+    const { showIsDeleted } = this.props
+    const { rows = [] } = this.state
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list
-        : rows.filter((o) => !o.isDeleted),
+        : rows.filter((o) => !o.isDeleted || showIsDeleted),
       this.state.pagination,
     )
   }
@@ -882,7 +917,6 @@ class CommonTableGrid extends PureComponent {
       ],
       columns = [],
       type,
-      rows = [],
       TableCell = DefaultTableCell,
       filteringColExtensions = [],
       defaultSorting = [],
@@ -966,7 +1000,7 @@ class CommonTableGrid extends PureComponent {
     //   sort,
     //   sortConfig,
     // )
-    // console.log(this.state)
+    // console.log(this.state, this.props)
     const { TableBase } = this
     const actionColDefaultCfg = {
       columnName: 'action',
