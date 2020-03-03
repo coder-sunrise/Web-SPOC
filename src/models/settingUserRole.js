@@ -51,11 +51,7 @@ export default createListViewModel({
 
         const resultData = []
         data.map((d) => {
-          const permission =
-            (d.type === 'Module' && 'ReadOnly') ||
-            (d.type === 'Action' && 'Disabled') ||
-            (d.type === 'Field' && 'ReadOnly') ||
-            'Hidden'
+          const permission = 'Hidden'
           return resultData.push({
             permission: d.permission || permission,
             ...d,
