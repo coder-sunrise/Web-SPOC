@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
@@ -115,7 +115,6 @@ class CommonModal extends React.PureComponent {
       classes,
       authority,
       confirmText,
-      isInformType,
       cancelText,
     } = this.props
     // console.log('footer', this.props)
@@ -128,53 +127,41 @@ class CommonModal extends React.PureComponent {
             className={classes.modalFooter}
             style={{ justifyContent: align }}
           >
-            {isInformType ? (
+            {/* <TextField autoFocus /> */}
+            {onReset && (
               <Button
-                onClick={this.onClose}
-                color='primary'
-                authority='none'
-                {...cancelProps}
+                key='reset'
+                // hideIfNoEditRights
+                aria-label='Reset'
+                color='danger'
+                onClick={onReset}
+                style={{ left: 0, position: 'absolute' }}
+                tabIndex='-2'
               >
-                Ok
+                Reset
               </Button>
-            ) : (
-              <Fragment>
-                {onReset && (
-                  <Button
-                    key='reset'
-                    // hideIfNoEditRights
-                    aria-label='Reset'
-                    color='danger'
-                    onClick={onReset}
-                    style={{ left: 0, position: 'absolute' }}
-                    tabIndex='-2'
-                  >
-                    Reset
-                  </Button>
-                )}
-                <Button
-                  onClick={this.onClose}
-                  color='danger'
-                  authority='none'
-                  // disabled={loading.global}
-                  {...cancelProps}
-                >
-                  {cancelText || 'Close'}
-                </Button>
-                {extraButtons}
-                {onConfirm && (
-                  <ProgressButton
-                    color='primary'
-                    // hideIfNoEditRights
-                    onClick={onConfirm}
-                    icon={null}
-                    {...confirmProps}
-                    // disabled={disabled || loading.global || global.disableSave}
-                  >
-                    {confirmText || confirmBtnText}
-                  </ProgressButton>
-                )}
-              </Fragment>
+            )}
+            <Button
+              onClick={this.onClose}
+              color='danger'
+              authority='none'
+              // disabled={loading.global}
+              {...cancelProps}
+            >
+              {cancelText || 'Close'}
+            </Button>
+            {extraButtons}
+            {onConfirm && (
+              <ProgressButton
+                color='primary'
+                // hideIfNoEditRights
+                onClick={onConfirm}
+                icon={null}
+                {...confirmProps}
+                // disabled={disabled || loading.global || global.disableSave}
+              >
+                {confirmText || confirmBtnText}
+              </ProgressButton>
             )}
           </DialogActions>
         </div>

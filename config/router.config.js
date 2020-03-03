@@ -883,11 +883,6 @@ const _routes = [
             name: 'referralsource',
             component: './Setting/ReferralSource',
           },
-          {
-            path: '/setting/visitordertemplate',
-            name: 'visitordertemplate',
-            component: './Setting/VisitOrderTemplate',
-          },
         ],
       },
       // Settings

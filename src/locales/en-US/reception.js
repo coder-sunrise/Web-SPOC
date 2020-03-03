@@ -127,8 +127,6 @@ export default {
   'reception.queue.visitRegistration.visitRemarks': 'Visit Remarks',
   'reception.queue.visitRegistration.attachment': 'Attachment',
   'reception.queue.visitRegistration.room': 'Room',
-  'reception.queue.visitRegistration.visitOrderTemplate':
-    'Visit Order Template',
 
   'reception.queue.visitRegistration.vitalSign': 'Vital Sign',
   'reception.queue.visitRegistration.temperature': 'Temperature',
