@@ -4,6 +4,7 @@ import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
 import moment from 'moment'
+import Yup from '@/utils/yup'
 import {
   Button,
   GridContainer,
@@ -27,11 +28,57 @@ import {
 } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
 
+const createPayload = values => {
+  const {
+    filterByDoctor = [],
+    filterByRoomBlockGroup = [],
+    filterByApptType = [],
+    filterByAppointmentStatus = [],
+    bookBy = [],
+    bookOn,
+    searchValue,
+    apptDate,
+    isPrint,
+  } = values
+
+  const commonPayload = {
+    bookBy: bookBy.join() || undefined,
+    bookOn: bookOn ? moment(bookOn).format(reversedDateFormat) : undefined,
+    apptDateFrom:
+      apptDate && apptDate.length > 0
+        ? moment(apptDate[0]).formatUTC()
+        : undefined,
+    apptDateTo:
+      apptDate && apptDate.length > 0
+        ? moment(apptDate[1]).formatUTC(false)
+        : undefined,
+    doctor: filterByDoctor.join() || undefined,
+    room: filterByRoomBlockGroup.join() || undefined,
+  }
+
+  if (isPrint) {
+    return {
+      ...commonPayload,
+      SearchText: searchValue || undefined,
+      ApptType: filterByApptType || undefined,
+      AapptStatus: filterByAppointmentStatus || undefined,
+    }
+  }
+
+  return {
+    ...commonPayload,
+    searchValue: searchValue || undefined,
+    appType: filterByApptType.join() || undefined,
+    appStatus: filterByAppointmentStatus.join() || undefined,
+  }
+}
+
 const FilterBar = ({
   values,
   handleSubmit,
   handleAddAppointmentClick,
-  appointment,
+  setFieldValue,
+  ...restValues
 }) => {
   const {
     filterByDoctor = [],
@@ -40,19 +87,19 @@ const FilterBar = ({
     filterByAppointmentStatus = [],
   } = values
 
-  const [
-    showReport,
-    setShowReport,
-  ] = useState(false)
+  const [showReport, setShowReport] = useState(false)
 
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
   const maxAppointmentStatusTagCount =
     filterByAppointmentStatus.length <= 1 ? 1 : 0
-  const renderDropdown = (option) => <DoctorLabel doctor={option} />
+  const renderDropdown = option => <DoctorLabel doctor={option} />
 
-  const toggleReport = () => setShowReport(!showReport)
+  const toggleReport = () => {
+    if (!values.searchValue) return
+    setShowReport(!showReport)
+  }
 
   return (
     <Fragment>
@@ -60,7 +107,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='searchValue'
-            render={(args) => (
+            render={args => (
               <TextField
                 {...args}
                 label={formatMessage({
@@ -73,7 +120,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByDoctor'
-            render={(args) => (
+            render={args => (
               <CodeSelect
                 {...args}
                 // allLabel='All Doctors'
@@ -107,7 +154,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='apptDate'
-            render={(args) => (
+            render={args => (
               <DateRangePicker label='Appt Date From' label2='To' {...args} />
             )}
           />
@@ -115,7 +162,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='filterByRoomBlockGroup'
-            render={(args) => {
+            render={args => {
               return (
                 <CodeSelect
                   label='Room'
@@ -132,7 +179,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='bookBy'
-            render={(args) => {
+            render={args => {
               return (
                 <ClinicianSelect
                   label='Book By'
@@ -149,7 +196,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByApptType'
-            render={(args) => (
+            render={args => (
               <CodeSelect
                 {...args}
                 mode='multiple'
@@ -158,7 +205,7 @@ const FilterBar = ({
                 label='Appt Type'
                 code='ctappointmenttype'
                 labelField='displayValue'
-                renderDropdown={(option) => (
+                renderDropdown={option => (
                   <AppointmentTypeLabel
                     color={option.tagColorHex}
                     label={option.displayValue}
@@ -180,13 +227,13 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='bookOn'
-            render={(args) => <DatePicker label='Book On' {...args} />}
+            render={args => <DatePicker label='Book On' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
             name='filterByAppointmentStatus'
-            render={(args) => {
+            render={args => {
               return (
                 <Select
                   label={formatMessage({
@@ -203,7 +250,14 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Button color='primary' size='sm' onClick={handleSubmit}>
+          <Button
+            color='primary'
+            size='sm'
+            onClick={async () => {
+              await setFieldValue('isPrint', false)
+              handleSubmit()
+            }}
+          >
             <Search />
             Search
           </Button>
@@ -211,7 +265,14 @@ const FilterBar = ({
             <Add />
             Add Appointment
           </Button>
-          <Button color='primary' size='sm' onClick={toggleReport}>
+          <Button
+            color='primary'
+            size='sm'
+            onClick={async () => {
+              await setFieldValue('isPrint', true)
+              toggleReport()
+            }}
+          >
             <Print />
             Print
           </Button>
@@ -228,8 +289,7 @@ const FilterBar = ({
           showTopDivider={false}
           reportID={38}
           reportParameters={{
-            SearchText: values.searchValue,
-            SortColumn: 'BookOn desc',
+            ...createPayload(values),
           }}
         />
       </CommonModal>
@@ -239,39 +299,20 @@ const FilterBar = ({
 
 export default memo(
   withFormikExtend({
+    validationSchema: Yup.object().shape({
+      searchValue: Yup.string().when('isPrint', {
+        is: v => v === true,
+        then: Yup.string().required(),
+      }),
+    }),
     handleSubmit: (values, { props }) => {
       const { dispatch } = props
-      const {
-        filterByDoctor = [],
-        filterByRoomBlockGroup = [],
-        filterByApptType = [],
-        filterByAppointmentStatus = [],
-        bookBy = [],
-        bookOn,
-        searchValue,
-        apptDate,
-      } = values
+
       dispatch({
         type: `appointment/query`,
         payload: {
           apiCriteria: {
-            searchValue: searchValue || undefined,
-            bookBy: bookBy.join() || undefined,
-            bookOn: bookOn
-              ? moment(bookOn).format(reversedDateFormat)
-              : undefined,
-            apptDateFrom:
-              apptDate && apptDate.length > 0
-                ? moment(apptDate[0]).formatUTC()
-                : undefined,
-            apptDateTo:
-              apptDate && apptDate.length > 0
-                ? moment(apptDate[1]).formatUTC(false)
-                : undefined,
-            doctor: filterByDoctor.join() || undefined,
-            room: filterByRoomBlockGroup.join() || undefined,
-            appType: filterByApptType.join() || undefined,
-            appStatus: filterByAppointmentStatus.join() || undefined,
+            ...createPayload(values),
           },
         },
       })
