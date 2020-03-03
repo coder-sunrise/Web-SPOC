@@ -247,8 +247,10 @@ class CommonModal extends React.PureComponent {
   }
 
   onEntered = (el) => {
-    if (el.setActive) el.setActive()
-    if (el.focus) el.focus()
+    if (this.props.autoFocus) {
+      if (el.setActive) el.setActive()
+      if (el.focus) el.focus()
+    }
   }
 
   render () {
