@@ -201,7 +201,8 @@ class AntdSelect extends React.PureComponent {
   componentDidMount () {
     if (
       this.state.value &&
-      this.state.value.length &&
+      ((Array.isArray(this.state.value) && this.state.value.length > 0) ||
+        !!this.state.value) &&
       this.props.query &&
       this.state.data.length === 0
     ) {
