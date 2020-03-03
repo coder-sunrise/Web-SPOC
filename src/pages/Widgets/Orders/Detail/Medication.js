@@ -476,6 +476,24 @@ class Medication extends PureComponent {
     })
   }
 
+  filterOptions = (input = '', option) => {
+    let match = false
+    try {
+      const lowerCaseInput = input.toLowerCase()
+
+      const { props } = option
+      const { code, name, displayValue } = props.data
+      let title = name ? name.toLowerCase() : displayValue.toLowerCase()
+      match =
+        code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+        title.toLowerCase().indexOf(lowerCaseInput) >= 0
+    } catch (error) {
+      console.log(error)
+      match = false
+    }
+    return match
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -532,6 +550,7 @@ class Medication extends PureComponent {
       setDisable,
     } = this.props
     const commonSelectProps = {
+      handleFilter: this.filterOptions,
       dropdownMatchSelectWidth: false,
       dropdownStyle: {
         width: 300,
