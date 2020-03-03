@@ -77,9 +77,9 @@ import { calculateAdjustAmount } from '@/utils/utils'
         dosageFK: Yup.number().required(),
         prescribeUOMFK: Yup.number().required(),
         drugFrequencyFK: Yup.number().required(),
-        duration: Yup.number()
-          .min(1, 'Duration must be greater than or equal to 1')
-          .required(),
+        duration: Yup.number(),
+        // .min(1, 'Duration must be greater than or equal to 1')
+        // .required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
@@ -108,6 +108,10 @@ import { calculateAdjustAmount } from '@/utils/utils'
             nextStepdose = ''
           }
 
+          const itemDuration = item.duration
+            ? ` For ${item.duration} day(s)`
+            : ''
+
           instruction += `${item.usageMethodDisplayValue
             ? item.usageMethodDisplayValue
             : ''} ${item.dosageDisplayValue
@@ -116,9 +120,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
             ? item.prescribeUOMDisplayValue
             : ''} ${item.drugFrequencyDisplayValue
             ? item.drugFrequencyDisplayValue
-            : ''} For ${item.duration
-            ? item.duration
-            : ''} day(s)${nextStepdose}`
+            : ''}${itemDuration}${nextStepdose}`
         }
       }
       return instruction
@@ -794,7 +796,6 @@ class Medication extends PureComponent {
                                   label={formatMessage({
                                     id: 'inventory.master.setting.duration',
                                   })}
-                                  allowEmpty={false}
                                   formatter={(v) =>
                                     `${v} Day${v > 1 ? 's' : ''}`}
                                   step={1}
