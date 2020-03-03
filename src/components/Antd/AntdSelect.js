@@ -329,7 +329,12 @@ class AntdSelect extends React.PureComponent {
 
   handleFilter = (input, option) => {
     // console.log(input, option, option.props.children, this.props.labelField)
+    const { handleFilter } = this.props
     let match = false
+
+    if (handleFilter && typeof handleFilter === 'function') {
+      return handleFilter(input, option)
+    }
     try {
       if (Array.isArray(option.props.children)) {
         // return (
