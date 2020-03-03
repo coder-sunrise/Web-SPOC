@@ -2,7 +2,7 @@ import React from 'react'
 import CoPayment from './CoPayment'
 import CoverageCap from './CoverageCap'
 // import ItemList from './ItemList'
-import { InventoryItemList } from '@/components/_medisys'
+import ItemList from './new_ItemList'
 
 import {
   Field,
@@ -88,7 +88,13 @@ const Setting = (props) => {
             </FieldSet>
           </GridItem>
         </GridContainer>
-        <InventoryItemList {...props} setFieldValue={setFieldValue} />
+        <ItemList
+          {...props}
+          // values={values}
+          CPSwitch={CPSwitch}
+          CPNumber={CPNumber}
+          setFieldValue={setFieldValue}
+        />
       </SizeContainer>
     </div>
   )
