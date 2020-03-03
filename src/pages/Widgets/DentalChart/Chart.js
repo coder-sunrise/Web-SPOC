@@ -1041,7 +1041,7 @@ class Chart extends React.PureComponent {
   }
 
   renderCanvas = (props) => {
-    const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
+    const { dentalChartComponent, dispatch, readOnly } = props
     const {
       action,
       data = [],

@@ -4,6 +4,7 @@ import Search from '@material-ui/icons/Search'
 import Clear from '@material-ui/icons/Clear'
 import _ from 'lodash'
 import { compose } from 'redux'
+import { connect } from 'dva'
 
 import moment from 'moment'
 import Yup from '@/utils/yup'
@@ -78,10 +79,8 @@ const SetupBase = (props) => {
     codetable,
     ...restProps
   } = props
-  const [
-    mode,
-    setMode,
-  ] = useState('sort')
+
+  const { mode } = dentalChartSetup
   const [
     search,
     setSearch,
@@ -183,8 +182,19 @@ const SetupBase = (props) => {
         })
       },
     },
+    FuncProps: {
+      pager: true,
+      pagerDefaultState: {
+        pagesize: 50,
+      },
+    },
     onRowDoubleClick: () => {
-      setMode('edit')
+      dispatch({
+        type: 'dentalChartSetup/updateState',
+        payload: {
+          mode: 'edit',
+        },
+      })
     },
     onRowDrop: (rows) => {
       setFieldValue('rows', rows)
@@ -205,7 +215,12 @@ const SetupBase = (props) => {
               unCheckedChildren='Sort'
               unCheckedValue='sort'
               onChange={(v) => {
-                setMode(v)
+                dispatch({
+                  type: 'dentalChartSetup/updateState',
+                  payload: {
+                    mode: v,
+                  },
+                })
               }}
             />
           </GridItem>
@@ -235,6 +250,22 @@ const SetupBase = (props) => {
             align: 'center',
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
+            extraButtons: (
+              <Button
+                color='primary'
+                style={{ float: 'left' }}
+                onClick={() => {
+                  dispatch({
+                    type: 'dentalChartSetup/updateState',
+                    payload: {
+                      mode: mode === 'edit' ? 'sort' : 'edit',
+                    },
+                  })
+                }}
+              >
+                {mode === 'edit' ? 'Edit Mode' : 'Sort Mode'}
+              </Button>
+            ),
           })}
       </Paper>
     </div>
@@ -242,6 +273,9 @@ const SetupBase = (props) => {
 }
 
 const Setup = compose(
+  connect(({ dentalChartSetup }) => ({
+    dentalChartSetup,
+  })),
   withFormikExtend({
     mapPropsToValues: ({ codetable }) => {
       return {
@@ -276,10 +310,15 @@ const Setup = compose(
           type: 'dentalChartSetup/post',
           payload: updated,
         }).then((o) => {
-          // console.log(o)
           if (o) {
             notification.success({
               message: 'Setting updated',
+            })
+            dispatch({
+              type: 'dentalChartComponent/updateState',
+              payload: {
+                action: undefined,
+              },
             })
             if (onConfirm) onConfirm()
           }

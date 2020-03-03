@@ -198,14 +198,6 @@ let uniqueGid = 0
   return { loading, global }
 })
 class CommonTableGrid extends PureComponent {
-  state = {
-    pagination: {
-      current: 1,
-      pagesize: 10,
-    },
-    rows: [],
-  }
-
   static defaultProps = {
     columnExtensions: [],
   }
@@ -225,11 +217,22 @@ class CommonTableGrid extends PureComponent {
       onRowDrop,
       editableGrid,
       getRowId = (row) => (row.Id ? row.Id : row.id),
+      FuncProps = {},
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
     // this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
+    const { pagerDefaultState = {} } = FuncProps
+    this.state = {
+      pagination: {
+        current: 1,
+        pagesize: 10,
+        ...pagerDefaultState,
+      },
+      rows: [],
+    }
+
     const cls = classNames({
       [classes.tableStriped]: oddEven,
       [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
@@ -987,7 +990,6 @@ class CommonTableGrid extends PureComponent {
       pagerConfig.containerComponent = containerComponent
     }
     // console.log('index', rows)
-    // console.log(this.props)
     // console.log(
     //   filter,
     //   grouping,

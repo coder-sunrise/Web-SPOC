@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+
 import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import Settings from '@material-ui/icons/Settings'
@@ -40,6 +41,7 @@ const DiagnosisPanel = (props) => {
     paperProps,
     viewOnly,
     chartmethods,
+    dentalChartComponent,
     ...restProps
   } = props
 
@@ -72,6 +74,14 @@ const DiagnosisPanel = (props) => {
       },
     })
   }
+  useEffect(
+    () => {
+      if (!dentalChartComponent.action) setSelectedStyle(undefined)
+    },
+    [
+      dentalChartComponent.action,
+    ],
+  )
   return (
     <div>
       <Paper className={classes.paper} {...paperProps}>
@@ -197,7 +207,16 @@ const DiagnosisPanel = (props) => {
 }
 export default React.memo(
   DiagnosisPanel,
-  ({ codetable }, { codetable: codetableNext }) => {
-    return codetable.ctchartmethod === codetableNext.ctchartmethod
+  (
+    { codetable, dentalChartComponent },
+    {
+      codetable: codetableNext,
+      dentalChartComponent: dentalChartComponentNext,
+    },
+  ) => {
+    return (
+      codetable.ctchartmethod === codetableNext.ctchartmethod &&
+      dentalChartComponent.action === dentalChartComponentNext.action
+    )
   },
 )

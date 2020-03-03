@@ -119,7 +119,6 @@ class CommonModal extends React.PureComponent {
     } = this.props
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
-
     return (
       <SizeContainer size='md'>
         <div ref={this.myRef} a='1'>

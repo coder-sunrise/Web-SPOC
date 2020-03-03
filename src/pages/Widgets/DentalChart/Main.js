@@ -105,16 +105,8 @@ const styles = (theme) => ({
 })
 
 @connect(
-  ({
+  ({ dentalChartComponent, orders, codetable, consultation, global }) => ({
     dentalChartComponent,
-    dentalChartSetup,
-    orders,
-    codetable,
-    consultation,
-    global,
-  }) => ({
-    dentalChartComponent,
-    dentalChartSetup,
     orders,
     codetable,
     consultation,
