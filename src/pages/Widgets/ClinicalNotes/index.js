@@ -544,7 +544,7 @@ class ClinicalNotes extends Component {
               if (accessRight && accessRight.rights === 'hidden') return false
               return true
             })
-            .map((item) => {
+            .map((item, index) => {
               const onCannedTextClick = () =>
                 this.handleCannedTextButtonClick(item)
               const onSettingClick = () => this.openCannedText(item)
@@ -596,6 +596,7 @@ class ClinicalNotes extends Component {
                             </div>
 
                             <RichEditor
+                              autoFocus={index === 0}
                               style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item[fieldName])}
