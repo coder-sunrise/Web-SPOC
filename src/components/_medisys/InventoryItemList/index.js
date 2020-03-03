@@ -491,7 +491,7 @@ class InventoryItemList extends React.Component {
               <Field
                 name={`rows[${index}].quantity`}
                 render={(args) => (
-                  <NumberInput {...args} min={1} precision={0} />
+                  <NumberInput {...args} min={1} precision={0} positiveOnly />
                 )}
               />
             )
@@ -506,7 +506,9 @@ class InventoryItemList extends React.Component {
             return (
               <Field
                 name={`rows[${index}].unitPrice`}
-                render={(args) => <NumberInput {...args} currency />}
+                render={(args) => (
+                  <NumberInput {...args} currency positiveOnly />
+                )}
               />
             )
           },
