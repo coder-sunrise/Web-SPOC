@@ -27,12 +27,15 @@ const styles = (theme) => ({
 })
 class UserRoleForm extends React.PureComponent {
   state = {
-    showSelectField: false,
     selectFieldOption: [],
     selectedValue: undefined,
   }
 
-  onSwitchClick = async (e) => {
+  componentDidMount = () => {
+    this.getSelectOptions()
+  }
+
+  getSelectOptions = async () => {
     const response = await request('/api/Role', {
       method: 'GET',
     })
@@ -45,7 +48,6 @@ class UserRoleForm extends React.PureComponent {
         }
       })
       this.setState({
-        showSelectField: e.target.value,
         selectFieldOption: option,
       })
     }
@@ -59,62 +61,48 @@ class UserRoleForm extends React.PureComponent {
     const { selectedValue } = this.state
     if (selectedValue) {
       this.props.history.push(`/setting/userrole/new`, { id: selectedValue })
-    } else {
-      this.props.history.push(`/setting/userrole/new`)
     }
   }
 
   render () {
-    const { classes, footer, handleSubmit, history } = this.props
-    const { showSelectField, selectFieldOption, selectedValue } = this.state
+    const { classes, footer } = this.props
+    const { selectFieldOption, selectedValue } = this.state
+    console.log(selectFieldOption)
     return (
-      <React.Fragment>
-        <div className={classes.verticalSpacing}>
-          <GridContainer>
-            <GridItem md={4} />
-            <GridItem md={4} className={classes.verticalSpacing}>
-              <Field
-                name='createNewRole'
-                render={(args) => (
-                  <Checkbox
-                    label='Creating new from existing?'
-                    onChange={this.onSwitchClick}
-                    {...args}
+      <div>
+        {selectFieldOption.length !== 0 && (
+          <React.Fragment>
+            <div className={classes.verticalSpacing}>
+              <GridContainer>
+                <GridItem md={4} />
+                <GridItem md={4} className={classes.verticalSpacing}>
+                  <FastField
+                    name='status'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        label='Existing Role'
+                        options={selectFieldOption}
+                        onChange={this.onSelect}
+                      />
+                    )}
                   />
-                )}
-              />
-            </GridItem>
-          </GridContainer>
+                </GridItem>
+              </GridContainer>
+            </div>
 
-          {showSelectField && (
-            <GridContainer>
-              <GridItem md={4} />
-              <GridItem md={4} className={classes.verticalSpacing}>
-                <FastField
-                  name='status'
-                  render={(args) => (
-                    <Select
-                      {...args}
-                      options={selectFieldOption}
-                      onChange={this.onSelect}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-          )}
-        </div>
-
-        <GridItem md={4} />
-        {footer &&
-          footer({
-            confirmBtnText: 'Add New',
-            onConfirm: this.handleClickAddNew,
-            confirmProps: {
-              disabled: showSelectField && !selectedValue,
-            },
-          })}
-      </React.Fragment>
+            <GridItem md={4} />
+            {footer &&
+              footer({
+                confirmBtnText: 'Add New',
+                onConfirm: this.handleClickAddNew,
+                confirmProps: {
+                  disabled: !selectedValue,
+                },
+              })}
+          </React.Fragment>
+        )}
+      </div>
     )
   }
 }

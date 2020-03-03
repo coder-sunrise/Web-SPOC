@@ -1,9 +1,15 @@
 import React from 'react'
 import { connect } from 'dva'
+import classNames from 'classnames'
 // formik
 import { withFormik, FastField, Field } from 'formik'
 // material ui
-import { withStyles } from '@material-ui/core'
+import {
+  withStyles,
+  MenuList,
+  ClickAwayListener,
+  MenuItem,
+} from '@material-ui/core'
 import Edit from '@material-ui/icons/Edit'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
@@ -24,6 +30,7 @@ import {
   ProgressButton,
   withSettingBase,
   CodeSelect,
+  Popper,
 } from '@/components'
 // sub component
 import UserRoleForm from './UserRoleForm'
@@ -44,10 +51,7 @@ const styles = (theme) => ({
 })
 class UserRole extends React.Component {
   state = {
-    filter: {
-      name: '',
-      status: '001',
-    },
+    openPopper: false,
     showUserProfileForm: false,
     gridConfig: {
       ...UserRoleTableConfig,
@@ -123,15 +127,35 @@ class UserRole extends React.Component {
     })
   }
 
+  handleAddNew = () => {
+    this.setState({ openPopper: true })
+  }
+
+  handleClickPopper = (i) => {
+    switch (i) {
+      case 1:
+      default:
+        this.props.history.push(`/setting/userrole/new`)
+        break
+      case 2:
+        this.toggleModal()
+        this.closePopper()
+        break
+    }
+  }
+
+  closePopper = () => {
+    this.setState({ openPopper: false })
+  }
+
   toggleModal = () => {
     const { showUserProfileForm } = this.state
     this.setState({ showUserProfileForm: !showUserProfileForm })
   }
 
   render () {
-    const { classes, settingUserRole, history } = this.props
-    const { filter, showUserProfileForm } = this.state
-    const { clinicalRoleNameList } = settingUserRole
+    const { classes } = this.props
+    const { showUserProfileForm, openPopper } = this.state
 
     return (
       <CardContainer hideHeader>
@@ -182,10 +206,32 @@ class UserRole extends React.Component {
             >
               <FormattedMessage id='form.search' />
             </ProgressButton>
-            <Button color='primary' onClick={this.toggleModal}>
-              <Add />
-              Add New
-            </Button>
+
+            <Popper
+              open={openPopper}
+              transition
+              className={classNames({
+                [classes.pooperResponsive]: true,
+                [classes.pooperNav]: true,
+              })}
+              overlay={
+                <ClickAwayListener onClickAway={this.closePopper}>
+                  <MenuList role='menu'>
+                    <MenuItem onClick={() => this.handleClickPopper(1)}>
+                      Add New
+                    </MenuItem>
+                    <MenuItem onClick={() => this.handleClickPopper(2)}>
+                      Add From Existing
+                    </MenuItem>
+                  </MenuList>
+                </ClickAwayListener>
+              }
+            >
+              <Button color='primary' onClick={this.handleAddNew}>
+                <Add />
+                Add New
+              </Button>
+            </Popper>
           </GridItem>
           <GridItem md={12}>
             <CommonTableGrid
@@ -198,7 +244,7 @@ class UserRole extends React.Component {
           <CommonModal
             open={showUserProfileForm}
             observe='RoomDetail'
-            title='New User Role'
+            title='Add From Existing'
             maxWidth='md'
             bodyNoPadding
             onClose={this.toggleModal}
