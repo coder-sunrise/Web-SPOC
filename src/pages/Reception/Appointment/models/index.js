@@ -35,18 +35,7 @@ export default createListViewModel({
     state: {
       default: {},
     },
-    effects: {
-      *queryAllAppointments ({ payload }, { call, put }) {
-        const response = yield call(service.queryList, payload)
-        yield put({
-          type: 'queryDone',
-          payload:
-            response.status === '200'
-              ? { ...response.data, forPrint: true }
-              : {},
-        })
-      },
-    },
+    effects: {},
     reducers: {
       queryOneDone (st, { payload }) {
         const { data } = payload

@@ -4,7 +4,6 @@ import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
 import moment from 'moment'
-import ReactToPrint from 'react-to-print'
 import {
   Button,
   GridContainer,
@@ -19,17 +18,20 @@ import {
   DatePicker,
   Select,
   reversedDateFormat,
+  CommonModal,
 } from '@/components'
-import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
+import {
+  AppointmentTypeLabel,
+  DoctorLabel,
+  ReportViewer,
+} from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
-import AppointmentPrintPreview from './AppointmentPrintPreview'
 
 const FilterBar = ({
   values,
   handleSubmit,
   handleAddAppointmentClick,
   appointment,
-  setFieldValue,
 }) => {
   const {
     filterByDoctor = [],
@@ -38,6 +40,11 @@ const FilterBar = ({
     filterByAppointmentStatus = [],
   } = values
 
+  const [
+    showReport,
+    setShowReport,
+  ] = useState(false)
+
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
@@ -45,13 +52,7 @@ const FilterBar = ({
     filterByAppointmentStatus.length <= 1 ? 1 : 0
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
-  const componentRef = useRef()
-
-  const getAllRelatedAppt = async () => {
-    await setFieldValue('print', true)
-    await handleSubmit()
-    await new Promise((r, j) => setTimeout(r, 3000))
-  }
+  const toggleReport = () => setShowReport(!showReport)
 
   return (
     <Fragment>
@@ -202,14 +203,7 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Button
-            color='primary'
-            size='sm'
-            onClick={async () => {
-              await setFieldValue('print', undefined)
-              handleSubmit()
-            }}
-          >
+          <Button color='primary' size='sm' onClick={handleSubmit}>
             <Search />
             Search
           </Button>
@@ -217,23 +211,28 @@ const FilterBar = ({
             <Add />
             Add Appointment
           </Button>
-
-          {/* <ReactToPrint
-            trigger={() => (
-              <Button color='primary' size='sm'>
-                <Print /> Print
-              </Button>
-            )}
-            content={() => componentRef.current}
-            onBeforeGetContent={getAllRelatedAppt}
-            copyStyles={false}
-          /> */}
+          <Button color='primary' size='sm' onClick={toggleReport}>
+            <Print />
+            Print
+          </Button>
         </GridItem>
       </GridContainer>
 
-      <div style={{ display: 'none' }}>
-        <AppointmentPrintPreview appointment={appointment} ref={componentRef} />
-      </div>
+      <CommonModal
+        open={showReport}
+        onClose={toggleReport}
+        title='Appointment'
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={38}
+          reportParameters={{
+            SearchText: values.searchValue,
+            SortColumn: 'BookOn desc',
+          }}
+        />
+      </CommonModal>
     </Fragment>
   )
 }
@@ -251,13 +250,10 @@ export default memo(
         bookOn,
         searchValue,
         apptDate,
-        print,
       } = values
-      const query = print ? 'queryAllAppointments' : 'query'
       dispatch({
-        type: `appointment/${query}`,
+        type: `appointment/query`,
         payload: {
-          pagesize: print ? 9999 : 10,
           apiCriteria: {
             searchValue: searchValue || undefined,
             bookBy: bookBy.join() || undefined,
