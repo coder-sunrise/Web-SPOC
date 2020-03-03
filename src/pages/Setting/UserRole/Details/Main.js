@@ -197,7 +197,9 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    console.log({ values })
+    console.log(this.props)
+    // console.log(JSON.stringify(this.props.values))
+
     console.log('start', effectiveStartDate)
     console.log('end', effectiveEndDate)
 
