@@ -103,11 +103,23 @@ const DiagnosisSelect = ({
 
     return response
   }
+  const selected = ctDiagnosis.find(
+    (diagnosis) => diagnosis.id === props.field.value,
+  )
+
+  let showPrefix = false
+  if (selected) {
+    showPrefix =
+      selected.isChasAcuteClaimable ||
+      selected.isChasChronicClaimable ||
+      selected.isHazeClaimable
+  }
 
   return (
     <div style={{ position: 'relative' }}>
       <Select
         label={label || 'Diagnosis'}
+        prefix={showPrefix ? <AttachMoney className={classes.money} /> : null}
         options={ctDiagnosis}
         valueField='id'
         labelField='displayvalue'
