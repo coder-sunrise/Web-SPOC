@@ -34,7 +34,7 @@ const STYLES = () => {
         // borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
       },
       '& .ant-select-selection': {
-        paddingRight: 16,
+        paddingRight: 22,
         background: 'none',
       },
       // '& .ant-select-selection-selected-value': {
