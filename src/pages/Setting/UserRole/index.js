@@ -88,6 +88,9 @@ class UserRole extends React.Component {
   componentDidMount = () => {
     this.props.dispatch({
       type: 'settingUserRole/query',
+      payload: {
+        isActive: this.props.values.status,
+      },
     })
   }
 
