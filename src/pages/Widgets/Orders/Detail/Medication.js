@@ -551,7 +551,6 @@ class Medication extends PureComponent {
         width: 300,
       },
     }
-    console.log({ values })
     return (
       <div>
         <GridContainer>
@@ -619,7 +618,7 @@ class Medication extends PureComponent {
                   const i = values.corPrescriptionItemInstruction.findIndex(
                     (item) => _.isEqual(item, val),
                   )
-                  console.log({ index: i, activeIndex, val })
+
                   return (
                     <div key={i}>
                       <GridContainer>
