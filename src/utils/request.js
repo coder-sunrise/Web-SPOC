@@ -160,12 +160,35 @@ const logError = (showNotification, payload) => {
       ...payload,
     })
     const { plainString, requestId } = payload
-    sendNotification('ErrorLog', {
-      type: NOTIFICATION_TYPE.ERROR,
-      status: NOTIFICATION_STATUS.ERROR,
-      message: plainString,
-      requestId,
-    })
+    const { dispatch, getState } = window.g_app._store
+
+    if (getState) {
+      const {
+        user = {
+          data: {
+            clinicianProfile: {
+              name: '',
+            },
+          },
+        },
+      } = getState()
+      const notificationPayload = {
+        type: NOTIFICATION_TYPE.ERROR,
+        status: NOTIFICATION_STATUS.ERROR,
+        message: plainString,
+        requestId,
+        sender: user.data.clinicianProfile.name,
+        senderId: user.data.id,
+        timestamp: Date.now(),
+      }
+
+      if (dispatch) {
+        dispatch({
+          type: 'header/appendNotification',
+          payload: notificationPayload,
+        })
+      }
+    }
   }
 }
 

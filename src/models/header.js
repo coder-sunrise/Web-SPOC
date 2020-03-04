@@ -43,5 +43,14 @@ export default createBasicModel({
         }
       },
     },
+    appendNotification (state, { payload = {} }) {
+      return {
+        ...state,
+        notification: [
+          ...state.notification,
+          payload,
+        ],
+      }
+    },
   },
 })
