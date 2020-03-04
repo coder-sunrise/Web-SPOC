@@ -37,7 +37,10 @@ const Diagnosis = ({
   ...props
 }) => {
   const { data = [], selected, lastClicked } = dentalChartComponent
-
+  const [
+    shapes,
+    setShapes,
+  ] = useState([])
   // console.log(data)
   const myRef = useRef(null)
   const groups = Object.values(_.groupBy(data, 'toothNo'))
@@ -54,11 +57,19 @@ const Diagnosis = ({
           0,
         )
       }
+      setShapes(
+        selected
+          ? data.filter(
+              (o) => o.toothNo === selected.toothNo && o.id === selected.id,
+            )
+          : [],
+      )
     },
     [
       selected,
     ],
   )
+
   return (
     <div>
       <div
@@ -102,12 +113,9 @@ const Diagnosis = ({
           multiline
           maxLength={2000}
           rowsMax={3}
-          value={selected.remark}
+          value={shapes.length > 0 ? shapes[0].remark : ''}
           rows={3}
           onChange={(v) => {
-            const shapes = data.filter(
-              (o) => o.toothNo === selected.toothNo && o.id === selected.id,
-            )
             if (v.target.value !== selected.remark) {
               dispatch({
                 type: 'dentalChartComponent/toggleMultiSelect',

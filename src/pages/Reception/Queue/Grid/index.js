@@ -331,12 +331,14 @@ const Grid = ({
         default:
           break
       }
-      dispatch({
-        type: 'queueLog/updateState',
-        payload: {
-          statusTagClicked: false,
-        },
-      })
+      setTimeout(() => {
+        dispatch({
+          type: 'queueLog/updateState',
+          payload: {
+            statusTagClicked: false,
+          },
+        })
+      }, 3000)
     },
     [
       codetable.clinicianprofile,
@@ -436,6 +438,7 @@ const Grid = ({
         })
         return
       }
+
       onClick(row, id)
     }
 
@@ -467,11 +470,7 @@ const Grid = ({
                 columnName: 'visitStatus',
                 width: 200,
                 render: (row) => (
-                  <VisitStatusTag
-                    row={row}
-                    onClick={handleStatusTagClick}
-                    statusTagClicked={statusTagClicked}
-                  />
+                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
               },
               {

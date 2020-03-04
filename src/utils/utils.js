@@ -310,15 +310,22 @@ const maxReducer = (p, n) => {
 
 export function difference (object, base) {
   function changes (o, b = {}) {
-    return lodash.transform(o, (result, value, key) => {
-      // console.log(value, b, key)
-      if (!lodash.isEqual(value, b[key])) {
-        result[key] =
+    const v = lodash.transform(o, (result, value, key) => {
+      // console.log(value, b, key, result, o, React.isValidElement(o))
+      if (_.isFunction(value) || React.isValidElement(value)) {
+        // result[key] = {}
+      } else if (!lodash.isEqual(value, b[key])) {
+        // console.log(value, b, key, result, o, React.isValidElement(o))
+        const r =
           lodash.isObject(value) && lodash.isObject(b[key])
             ? changes(value, b[key])
             : value
+        // console.log(r)
+        result[key] = r
       }
     })
+    // console.log(v)
+    return v
   }
   return changes(object, base)
 }

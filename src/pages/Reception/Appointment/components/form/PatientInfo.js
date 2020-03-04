@@ -15,6 +15,7 @@ import {
   ProgressButton,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -33,8 +34,8 @@ const PatientInfoInput = ({
     patientProfileFK !== undefined && patientProfileFK !== null
 
   const allowedToActualize = [
-    1,
-    5,
+    APPOINTMENT_STATUS.SCHEDULED,
+    APPOINTMENT_STATUS.RESCHEDULED,
   ].includes(appointmentStatusFK)
 
   return (

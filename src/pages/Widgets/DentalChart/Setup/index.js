@@ -3,6 +3,9 @@ import { Paper } from '@material-ui/core'
 import Search from '@material-ui/icons/Search'
 import Clear from '@material-ui/icons/Clear'
 import _ from 'lodash'
+import { compose } from 'redux'
+import { connect } from 'dva'
+
 import moment from 'moment'
 import Yup from '@/utils/yup'
 import { getUniqueId, difference } from '@/utils/utils'
@@ -53,7 +56,7 @@ const rowSchema = Yup.object().shape({
   chartMethodTypeFK: Yup.number().required(),
 })
 
-const Setup = (props) => {
+const SetupBase = (props) => {
   const {
     dispatch,
     theme,
@@ -76,10 +79,8 @@ const Setup = (props) => {
     codetable,
     ...restProps
   } = props
-  const [
-    mode,
-    setMode,
-  ] = useState('sort')
+
+  const { mode } = dentalChartSetup
   const [
     search,
     setSearch,
@@ -137,8 +138,9 @@ const Setup = (props) => {
     size: 'sm',
     rows: values.rows.filter(
       (d) =>
-        !!d &&
-        (!search ||
+        !search ||
+        (!!d &&
+          !!d.displayValue &&
           d.displayValue.toUpperCase().indexOf(search.toUpperCase()) >= 0),
     ),
     rowDragable: true,
@@ -180,15 +182,26 @@ const Setup = (props) => {
         })
       },
     },
+    FuncProps: {
+      pager: true,
+      pagerDefaultState: {
+        pagesize: 50,
+      },
+    },
     onRowDoubleClick: () => {
-      setMode('edit')
+      dispatch({
+        type: 'dentalChartSetup/updateState',
+        payload: {
+          mode: 'edit',
+        },
+      })
     },
     onRowDrop: (rows) => {
       setFieldValue('rows', rows)
     },
     schema: rowSchema,
   }
-  console.log(height)
+  // console.log(tableProps)
   return (
     <div>
       <Paper elevation={0}>
@@ -202,7 +215,12 @@ const Setup = (props) => {
               unCheckedChildren='Sort'
               unCheckedValue='sort'
               onChange={(v) => {
-                setMode(v)
+                dispatch({
+                  type: 'dentalChartSetup/updateState',
+                  payload: {
+                    mode: v,
+                  },
+                })
               }}
             />
           </GridItem>
@@ -232,55 +250,89 @@ const Setup = (props) => {
             align: 'center',
             onConfirm: props.handleSubmit,
             confirmBtnText: 'Save',
+            extraButtons: (
+              <Button
+                color='primary'
+                style={{ float: 'left' }}
+                onClick={() => {
+                  dispatch({
+                    type: 'dentalChartSetup/updateState',
+                    payload: {
+                      mode: mode === 'edit' ? 'sort' : 'edit',
+                    },
+                  })
+                }}
+              >
+                {mode === 'edit' ? 'Edit Mode' : 'Sort Mode'}
+              </Button>
+            ),
           })}
       </Paper>
     </div>
   )
 }
-export default withFormikExtend({
-  mapPropsToValues: ({ codetable }) => {
-    return {
-      rows: codetable.ctchartmethod,
-    }
-  },
 
-  validationSchema: Yup.object().shape({
-    rows: Yup.array().of(rowSchema),
-  }),
+const Setup = compose(
+  connect(({ dentalChartSetup }) => ({
+    dentalChartSetup,
+  })),
+  withFormikExtend({
+    mapPropsToValues: ({ codetable }) => {
+      return {
+        rows: codetable.ctchartmethod,
+      }
+    },
 
-  handleSubmit: (values, { props }) => {
-    const { dispatch, codetable, onConfirm } = props
-    const { ctchartmethod } = codetable
+    validationSchema: Yup.object().shape({
+      rows: Yup.array().of(rowSchema),
+    }),
 
-    let diffs = difference(
-      values.rows.map(({ rowIndex, ...o }) => o),
-      ctchartmethod,
-    )
-    if (diffs.length !== 0) {
-      const updated = values.rows
-        .map((o, i) => {
-          if (o) {
-            return {
-              ...o,
-              sortOrder: i,
+    handleSubmit: (values, { props }) => {
+      const { dispatch, codetable, onConfirm } = props
+      const { ctchartmethod } = codetable
+
+      let diffs = difference(
+        values.rows.map(({ rowIndex, ...o }) => o),
+        ctchartmethod,
+      )
+      if (diffs.length !== 0) {
+        const updated = values.rows
+          .map((o, i) => {
+            if (o) {
+              return {
+                ...o,
+                sortOrder: i,
+              }
             }
+          })
+          .filter((o, i) => diffs[i] && Object.values(diffs[i]).length)
+        dispatch({
+          type: 'dentalChartSetup/post',
+          payload: updated,
+        }).then((o) => {
+          if (o) {
+            notification.success({
+              message: 'Setting updated',
+            })
+            dispatch({
+              type: 'dentalChartComponent/updateState',
+              payload: {
+                action: undefined,
+              },
+            })
+            if (onConfirm) onConfirm()
           }
         })
-        .filter((o, i) => diffs[i] && Object.values(diffs[i]).length)
-      dispatch({
-        type: 'dentalChartSetup/post',
-        payload: updated,
-      }).then((o) => {
-        // console.log(o)
-        if (o) {
-          notification.success({
-            message: 'Setting updated',
-          })
-          if (onConfirm) onConfirm()
-        }
-      })
-    }
-  },
+      } else if (onConfirm) onConfirm()
+    },
 
-  displayName: 'DentalChartMethodSetup',
-})(Setup)
+    displayName: 'DentalChartMethodSetup',
+  }),
+)(SetupBase)
+
+// export default React.memo(Setup, (props, propsNext) => {
+//   console.log(difference(props, propsNext))
+//   return _.isEqual(props, propsNext)
+// })
+
+export default Setup

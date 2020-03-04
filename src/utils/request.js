@@ -351,6 +351,9 @@ const request = (
             updateLoadingState()
             let returnObj = {
               title: codeMessage[response.status],
+              requestId: response.responseJSON
+                ? response.responseJSON.requestId
+                : '',
             }
 
             let errorMsg = codeMessage[response.status]
@@ -429,6 +432,7 @@ const request = (
                   returnObj.errors || returnObj.responseJSON,
                 ),
                 duration: 15,
+                requestId: returnObj.requestId,
               })
               // showNotification &&
               //   notification.error({

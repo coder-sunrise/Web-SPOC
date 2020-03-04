@@ -17,7 +17,6 @@ export default createListViewModel({
     state: {
       list: [],
       currentSelectedUserRole: {
-        isEdit: false,
         filteredAccessRight: [],
         ...defaultDates,
       },
@@ -26,14 +25,20 @@ export default createListViewModel({
       *fetchUserRoleByID ({ payload }, { call, put }) {
         const response = yield call(service.getUserRoleById, payload)
         const { isEdit } = payload
-        const { data = {}, status } = response
+        let { data = {}, status } = response
         const nameList = [
           'module',
           'displayValue',
         ]
+        const { id, ...result } = data
+        if (!isEdit) {
+          data = result
+        }
+        // console.log('data', data)
+
         return yield put({
           type: 'updateUserRole',
-          data: { ...data, isEdit },
+          data: { ...data },
         })
       },
       *fetchDefaultAccessRight ({ payload }, { call, put }) {

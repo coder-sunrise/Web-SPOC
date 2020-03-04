@@ -9,6 +9,7 @@ import { Field } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
+import moment from 'moment'
 // common component
 import {
   Button,
@@ -21,6 +22,7 @@ import {
   ProgressButton,
   CodeSelect,
   SizeContainer,
+  DatePicker,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
 
@@ -43,7 +45,7 @@ const styles = (theme) => ({
     paddingLeft: theme.spacing(2),
   },
   note: {
-    fontSize: 14,
+    fontSize: '0.9rem',
     fontStyle: 'italic',
   },
 })
@@ -69,9 +71,9 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { filteredAccessRight, isEdit, ...restValues } = values
+    let { filteredAccessRight, ...restValues } = values
     restValues.roleClientAccessRight = filteredAccessRight
-    if (!isEdit) {
+    if (!values.id) {
       restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
         const { id, ...data } = d
         return data
@@ -80,6 +82,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
+    console.log('restValues', restValues)
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -184,176 +187,192 @@ class Main extends React.Component {
   }
 
   render () {
-    const { classes, userRole } = this.props
+    const { classes, values } = this.props
     const { filter } = this.state
-    const { isEdit, isUserMaintainable } = userRole
+    const {
+      id,
+      isUserMaintainable,
+      effectiveStartDate,
+      effectiveEndDate,
+    } = values
+
+    const isEdit = !!id
+    console.log({ values })
+    console.log('start', effectiveStartDate)
+    console.log('end', effectiveEndDate)
 
     return (
       <React.Fragment>
-        <SizeContainer size='sm'>
-          <GridContainer
-            alignItems='center'
-            justify='space-between'
-            className={classes.container}
-          >
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>User Role</h4>
+        <GridContainer
+          alignItems='center'
+          justify='space-between'
+          className={classes.container}
+        >
+          <GridItem md={12} className={classes.verticalSpacing}>
+            <h4>User Role</h4>
+          </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='code'
+                render={(args) => {
+                  return <TextField label='Code' disabled={isEdit} {...args} />
+                }}
+              />
             </GridItem>
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='code'
-                  render={(args) => {
-                    return (
-                      <TextField label='Code' disabled={isEdit} {...args} />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <Field
-                  name='effectiveStartDate'
-                  render={(args) => (
-                    <FilterBarDate
-                      args={args}
-                      label='Effective Start Date'
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <Field
-                  name='effectiveEndDate'
-                  render={(args) => (
-                    <FilterBarDate
-                      args={args}
-                      label='Effective End Date'
-                      isEndDate
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='name'
-                  render={(args) => (
-                    <TextField
-                      label='Name'
-                      {...args}
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='description'
-                  render={(args) => (
-                    <TextField
-                      label='Description'
-                      {...args}
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='clinicRoleFK'
-                  render={(args) => (
-                    <CodeSelect
-                      {...args}
-                      label='Clinical Role'
-                      code='ltclinicalrole'
-                      disabled={isEdit}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={8}>
-                <p className={classes.note}>
-                  You are not allowed to change clinical role after save.
-                </p>
-              </GridItem>
-            </GridContainer>
-
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>Access Right</h4>
+            <GridItem md={3}>
+              <Field
+                name='effectiveStartDate'
+                render={(args) => (
+                  <DatePicker
+                    {...args}
+                    label='Effective Start Date'
+                    disabled={isEdit && !isUserMaintainable}
+                    restrictFromTo={[
+                      moment('0000-01-01').formatUTC(),
+                      effectiveEndDate,
+                    ]}
+                  />
+                )}
+              />
             </GridItem>
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={2}>
-                <Select
-                  value={filter.module}
-                  label='Module'
-                  options={this.moduleList()}
-                  onChange={this.onSelectModule}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <Select
-                  value={filter.displayValue}
-                  label='Function Access'
-                  options={this.displayValueList()}
-                  onChange={this.onSelectDisplayValue}
-                />
-              </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='effectiveEndDate'
+                render={(args) => (
+                  <DatePicker
+                    {...args}
+                    label='Effective End Date'
+                    disabled={isEdit && !isUserMaintainable}
+                    restrictFromTo={[
+                      effectiveStartDate,
+                      moment('2099-12-31').formatUTC(false),
+                    ]}
+                    endDay
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
 
-              <GridItem md={2}>
-                <ProgressButton
-                  icon={<Search />}
-                  color='primary'
-                  onClick={this.handleSearchClick}
-                >
-                  <FormattedMessage id='form.search' />
-                </ProgressButton>
-              </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='name'
+                render={(args) => (
+                  <TextField
+                    label='Name'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
 
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='description'
+                render={(args) => (
+                  <TextField
+                    label='Description'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='clinicRoleFK'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    label='Clinical Role'
+                    code='ltclinicalrole'
+                    disabled={isEdit}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={8}>
+              <p className={classes.note}>
+                You are not allowed to change clinical role after save.
+              </p>
+            </GridItem>
+          </GridContainer>
+
+          <GridItem md={12} className={classes.verticalSpacing}>
+            <h4>Access Right</h4>
+          </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={2}>
+              <Select
+                value={filter.module}
+                label='Module'
+                options={this.moduleList()}
+                onChange={this.onSelectModule}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <Select
+                value={filter.displayValue}
+                label='Function Access'
+                options={this.displayValueList()}
+                onChange={this.onSelectDisplayValue}
+              />
+            </GridItem>
+
+            <GridItem md={2}>
+              <ProgressButton
+                icon={<Search />}
+                color='primary'
+                onClick={this.handleSearchClick}
+              >
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+            </GridItem>
+
+            <SizeContainer size='sm'>
               <CommonTableGrid
-                rows={userRole.filteredAccessRight}
+                rows={values.filteredAccessRight}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
                 onRowDoubleClick={this.handleDoubleClick}
                 FuncProps={{ pager: true }}
               />
-            </GridContainer>
+            </SizeContainer>
           </GridContainer>
-          <GridItem
-            container
-            style={{
-              marginTop: 10,
-              marginBottom: 10,
-              justifyContent: 'center',
-            }}
+        </GridContainer>
+        <GridItem
+          container
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            justifyContent: 'center',
+          }}
+        >
+          <Button
+            color='danger'
+            onClick={navigateDirtyCheck({
+              onProceed: this.goBackToPreviousPage,
+            })}
           >
-            <Button
-              color='danger'
-              onClick={navigateDirtyCheck({
-                onProceed: this.goBackToPreviousPage,
-              })}
-            >
-              Close
-            </Button>
-            <ProgressButton
-              color='primary'
-              onClick={() => {
-                this.props.handleSubmit()
-              }}
-              disabled={isEdit && !isUserMaintainable}
-            >
-              Save
-            </ProgressButton>
-          </GridItem>
-        </SizeContainer>
+            Close
+          </Button>
+          <ProgressButton
+            color='primary'
+            onClick={() => {
+              this.props.handleSubmit()
+            }}
+            disabled={isEdit && !isUserMaintainable}
+          >
+            Save
+          </ProgressButton>
+        </GridItem>
       </React.Fragment>
     )
   }
