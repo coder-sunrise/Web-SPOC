@@ -637,8 +637,8 @@ export const updateCellValue = (
         },
       )
 
-      if (element)
-        $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+      // if (element)
+      //   $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       return []
       // row._$error = false
@@ -1219,6 +1219,13 @@ export const convertToBase64 = (file) =>
     reader.onerror = (error) => reject(error)
   })
 
+const enableTableForceRender = (duration = 1000) => {
+  window._forceTableUpdate = true
+  setTimeout(() => {
+    window._forceTableUpdate = false
+  }, duration)
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1249,6 +1256,7 @@ module.exports = {
   commonDataReaderTransform,
   commonDataWriterTransform,
   locationQueryParameters,
+  enableTableForceRender,
   // toUTC,
   // toLocal,
 }

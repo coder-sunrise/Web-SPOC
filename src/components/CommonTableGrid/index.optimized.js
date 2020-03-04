@@ -63,6 +63,8 @@ import RangeDateTypeProvider from './EditCellComponents/RangeDateTypeProvider'
 import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import CheckboxTypeProvider from './EditCellComponents/CheckboxTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
+import CustomTypeProvider from './EditCellComponents/CustomTypeProvider'
+
 import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
@@ -78,18 +80,6 @@ const cellStyle = {
     // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
     borderLeft: '1px solid rgba(0, 0, 0, 0.12)',
   },
-}
-
-const cellStyleWithFirstColumnCustomPadding = (customPadding) => {
-  return {
-    ...cellStyle,
-    cell: {
-      ...cellStyle.cell,
-      '&:first-child': {
-        paddingLeft: customPadding,
-      },
-    },
-  }
 }
 
 // console.log(colorManipulator)
@@ -179,13 +169,6 @@ let uniqueGid = 0
   return { loading, global }
 })
 class CommonTableGrid extends PureComponent {
-  state = {
-    pagination: {
-      current: 1,
-      pagesize: 10,
-    },
-  }
-
   static defaultProps = {
     columnExtensions: [],
   }
@@ -202,11 +185,21 @@ class CommonTableGrid extends PureComponent {
       onRowDrop,
       editableGrid,
       getRowId = (row) => (row.Id ? row.Id : row.id),
+      FuncProps = {},
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
     this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
+    const { pagerDefaultState = {} } = FuncProps
+    this.state = {
+      pagination: {
+        current: 1,
+        pagesize: 10,
+        ...pagerDefaultState,
+      },
+      rows: [],
+    }
     const cls = classNames({
       [classes.tableStriped]: oddEven,
       [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
@@ -429,22 +422,14 @@ class CommonTableGrid extends PureComponent {
             borderRightWidth: 0,
           },
         },
-        TableCell: this.props.firstColumnCustomPadding
-          ? cellStyleWithFirstColumnCustomPadding(
-              this.props.firstColumnCustomPadding,
-            )
-          : cellStyle,
+        TableCell: cellStyle,
         EditCell: {
           cell: {
             padding: '7px 8px 7px 8px',
             ...cellStyle.cell,
           },
         },
-        TableHeaderCell: this.props.firstColumnCustomPadding
-          ? cellStyleWithFirstColumnCustomPadding(
-              this.props.firstColumnCustomPadding,
-            )
-          : cellStyle,
+        TableHeaderCell: cellStyle,
         Table: {
           table: {
             // tableLayout: 'auto',
@@ -499,6 +484,7 @@ class CommonTableGrid extends PureComponent {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
+    // console.log(JSON.stringify(nextProps))
     const { entity, type, columnExtensions } = nextProps
     // console.log(nextProps)
     let _entity = entity
@@ -529,9 +515,35 @@ class CommonTableGrid extends PureComponent {
         entity: _entity,
       }
     }
-    if (nextProps.rows && nextProps.rows !== preState.rows) {
-      return {
-        rows: nextProps.rows,
+    // console.log(nextProps.rows)
+    if (nextProps.rows) {
+      if (
+        // if user add new row from 2nd page, move the new row to current page
+        nextProps.rows.length &&
+        nextProps.rows[0].isNew &&
+        preState.pagination.current > 1
+      ) {
+        const newRow = nextProps.rows[0]
+        const newRows = _.cloneDeep(nextProps.rows)
+        newRows.splice(0, 1)
+        newRows.splice(
+          (preState.pagination.current - 1) * preState.pagination.pagesize,
+          0,
+          newRow,
+        )
+        // console.log(newRows)
+        return {
+          rows: newRows,
+        }
+      }
+      // if(rows.)
+      // console.log(v, preState)
+
+      if (nextProps.rows !== preState.rows) {
+        // console.log(nextProps.rows !== preState.rows)
+        return {
+          rows: nextProps.rows,
+        }
       }
     }
 
@@ -667,11 +679,18 @@ class CommonTableGrid extends PureComponent {
   // }
 
   Row = (p) => {
-    return <TableRow {...this.props} {...p} />
+    const { classes, ...restProps } = this.props
+
+    return <TableRow {...restProps} {...p} />
   }
 
   Cell = (p) => {
-    return <TableCell {...this.props} {...p} />
+    const { classes, rows = [], ...restProps } = this.props
+    // console.log(restProps, p)
+    const row = rows.find(
+      (o) => this.props.getRowId(o) === this.props.getRowId(p.row),
+    )
+    return <TableCell {...restProps} {...p} row={row || p.row} />
   }
 
   getChildRows = (row, rootRows) => {
@@ -690,11 +709,12 @@ class CommonTableGrid extends PureComponent {
   }
 
   getData = () => {
-    const { rows = [] } = this.props
+    const { showIsDeleted } = this.props
+    const { rows = [] } = this.state
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list
-        : rows.filter((o) => !o.isDeleted),
+        : rows.filter((o) => !o.isDeleted || showIsDeleted),
       this.state.pagination,
     )
   }
@@ -710,8 +730,6 @@ class CommonTableGrid extends PureComponent {
       ],
       columns = [],
       type,
-      rows = [],
-      filteringColExtensions = [],
       defaultSorting = [],
       height = undefined,
       rightColumns = [],
@@ -919,7 +937,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
-
+    const rowData = this.getData()
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
@@ -941,7 +959,7 @@ class CommonTableGrid extends PureComponent {
           ) */}
           <LoadingWrapper loading={_loading} linear text='Loading...'>
             <DevGrid
-              rows={this.getData()} // this.state.data ||
+              rows={rowData} // this.state.data ||
               columns={newColumns}
               getRowId={getRowId}
               rootComponent={Root}
@@ -1029,6 +1047,7 @@ class CommonTableGrid extends PureComponent {
               <DateTypeProvider {...cellComponentConfig} />
               <RangeDateTypeProvider {...cellComponentConfig} />
               <TimeTypeProvider {...cellComponentConfig} />
+              <CustomTypeProvider {...cellComponentConfig} />
               {/* 
               
 

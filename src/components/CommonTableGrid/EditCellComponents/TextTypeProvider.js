@@ -115,56 +115,56 @@ class TextEditorBase extends PureComponent {
   }
 }
 
-const TextFormatter = (columnExtensions) =>
-  React.memo(
-    (props) => {
-      const { column: { name: columnName }, value, row } = props
-      const cfg =
-        columnExtensions.find(
-          ({ columnName: currentColumnName }) =>
-            currentColumnName === columnName,
-        ) || {}
-      const { type, render, onClick, ...restProps } = cfg
-      if (render) {
-        return render(row)
-      }
-      // console.log('TextFormatter', props)
-      if (type === 'link') {
-        return (
-          <Tooltip title={value} enterDelay={750}>
-            <a
-              onClick={(e) => {
-                e.preventDefault()
-                if (onClick) onClick(row)
-              }}
-              href={cfg.link || '#'}
-            >
-              {value}
-            </a>
-          </Tooltip>
-        )
-      }
-      return (
-        (
-          <Tooltip title={value} enterDelay={750}>
-            <span>{value}</span>
-          </Tooltip>
-        ) || ''
-      )
-    },
-    (prevProps, nextProps) => {
-      const { column: { name: columnName }, value, row } = nextProps
-      const cfg =
-        columnExtensions.find(
-          ({ columnName: currentColumnName }) =>
-            currentColumnName === columnName,
-        ) || {}
-      return (
-        (prevProps === nextProps || prevProps.value === nextProps.value) &&
-        typeof cfg.render !== 'function'
-      )
-    },
-  )
+// const TextFormatter = (columnExtensions) =>
+//   React.memo(
+//     (props) => {
+//       const { column: { name: columnName }, value, row } = props
+//       const cfg =
+//         columnExtensions.find(
+//           ({ columnName: currentColumnName }) =>
+//             currentColumnName === columnName,
+//         ) || {}
+//       const { type, render, onClick, ...restProps } = cfg
+//       if (render) {
+//         return render(row)
+//       }
+//       // console.log('TextFormatter', props)
+//       if (type === 'link') {
+//         return (
+//           <Tooltip title={value} enterDelay={750}>
+//             <a
+//               onClick={(e) => {
+//                 e.preventDefault()
+//                 if (onClick) onClick(row)
+//               }}
+//               href={cfg.link || '#'}
+//             >
+//               {value}
+//             </a>
+//           </Tooltip>
+//         )
+//       }
+//       return (
+//         (
+//           <Tooltip title={value} enterDelay={750}>
+//             <span>{value}</span>
+//           </Tooltip>
+//         ) || ''
+//       )
+//     },
+//     (prevProps, nextProps) => {
+//       const { column: { name: columnName }, value, row } = nextProps
+//       const cfg =
+//         columnExtensions.find(
+//           ({ columnName: currentColumnName }) =>
+//             currentColumnName === columnName,
+//         ) || {}
+//       return (
+//         (prevProps === nextProps || prevProps.value === nextProps.value) &&
+//         typeof cfg.render !== 'function'
+//       )
+//     },
+//   )
 
 export const TextEditor = withStyles(styles)(TextEditorBase)
 
@@ -194,6 +194,7 @@ class TextTypeProvider extends React.Component {
           'select',
           'date',
           'action',
+          'custom,',
         ].indexOf(o.type) < 0,
     )
     // .filter(
@@ -225,7 +226,6 @@ class TextTypeProvider extends React.Component {
   }
 
   shouldComponentUpdate = (nextProps, nextState) => {
-    // console.log(nextProps)
     return (
       this.props.editingRowIds !== nextProps.editingRowIds ||
       this.props.commitCount !== nextProps.commitCount

@@ -26,7 +26,9 @@ export { default as CommonModal } from './CommonModal'
 export CommonHeader from './CommonHeader'
 export CommonTableGrid from './CommonTableGrid'
 export Tooltip from './CommonToolTip'
-export EditableTableGrid from './CommonTableGrid/EditableTableGrid'
+export EditableTableGrid from './CommonTableGrid/FastEditableTableGrid'
+export FastEditableTableGrid from './CommonTableGrid/FastEditableTableGrid'
+
 export DragableTableGrid from './CommonTableGrid/DragableTableGrid'
 export NumberTypeProvider2 from './CommonTableGrid/EditCellComponents/NumberTypeProvider'
 
