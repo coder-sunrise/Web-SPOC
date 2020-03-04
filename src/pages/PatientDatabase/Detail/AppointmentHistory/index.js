@@ -140,25 +140,28 @@ class AppointmentHistory extends PureComponent {
       sorting: [
         { columnName: 'appointmentDate', direction: 'asc' },
       ],
-      'AppointmentGroupFKNavigation.patientProfileFK': patientId,
     }
     const [
       previous,
       future,
     ] = await Promise.all([
       queryAppointments({
-        in_appointmentStatusFk: [
-          APPOINTMENT_STATUS.CANCELLED,
-          APPOINTMENT_STATUS.TURNEDUP,
-          APPOINTMENT_STATUS.NOSHOW,
-        ].join('|'),
+        apiCriteria:{
+          appStatus:[
+            APPOINTMENT_STATUS.CANCELLED,
+            APPOINTMENT_STATUS.TURNEDUP,
+            APPOINTMENT_STATUS.NOSHOW].join(),
+          patientProfileId: patientId,
+        },
         ...commonParams,
       }),
       queryAppointments({
-        in_appointmentStatusFk: [
+        apiCriteria:{
+          appStatus: [
           APPOINTMENT_STATUS.SCHEDULED,
-          APPOINTMENT_STATUS.RESCHEDULED,
-        ].join('|'),
+          APPOINTMENT_STATUS.RESCHEDULED].join(),
+          patientProfileId: patientId,
+        },
         ...commonParams,
       }),
     ])

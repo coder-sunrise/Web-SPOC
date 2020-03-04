@@ -77,7 +77,13 @@ const convertServerRights = ({ accessRight, type, permission }) => {
       },
     ]
   }
-  return []
+  return [
+    {
+      name,
+      rights,
+      // orgName,
+    },
+  ]
 }
 
 const parseUserRights = (user) => {
@@ -140,47 +146,6 @@ export default {
           const accessRights = data.userClientAccessRightDto.reduce((a, b) => {
             return a.concat(convertServerRights(b))
           }, [])
-
-          if (clinicInfo && clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL) {
-            // temporary use this for demo
-
-            accessRights.push({
-              name: 'queue.registervisit.vitalsign',
-              rights: 'hidden',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.clinicalnotes',
-              rights: 'enable',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.diagnosis',
-              rights: 'hidden',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.consultationdocument',
-              rights: 'hidden',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.patienthistory',
-              rights: 'hidden',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.order',
-              rights: 'enable',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.vitalsign',
-              rights: 'hidden',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.attachment',
-              rights: 'enable',
-            })
-            accessRights.push({
-              name: 'queue.consultation.widgets.dentalchart',
-              rights: 'enable',
-            })
-          }
 
           if (
             data.userProfileDetailDto &&

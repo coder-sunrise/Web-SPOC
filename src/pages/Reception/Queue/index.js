@@ -387,10 +387,6 @@ class Queue extends React.Component {
     )
   }
 
-  sendNotification = () => {
-    SendNotification({ test: '123' })
-  }
-
   setSearch = (v) => {
     this.setState({
       search: v,

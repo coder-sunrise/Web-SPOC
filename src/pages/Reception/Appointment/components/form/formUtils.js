@@ -136,6 +136,7 @@ export const mapPropsToValues = ({
     ? `${user.clinicianProfile.title} `
     : ''
   let values = {
+    search: '',
     patientProfileFK: _patientProfileFK,
     patientContactNo: _patientContactNo,
     patientName: _patientName,
@@ -199,6 +200,7 @@ export const mapPropsToValues = ({
         : ''
       values = {
         ...restViewingAppointment,
+        search: '',
         patientContactNo,
         patientName,
         patientAccountNo,
@@ -220,11 +222,14 @@ export const mapPropsToValues = ({
           ...appointment,
           appointments_Resources: appointment.appointments_Resources.map(
             (item) => {
+              const { clinicianFK } = item
+              const cp = clinicianProfiles.find((_cp) => _cp.id === clinicianFK)
               const startTime = moment(item.startTime, 'HH:mm:ss')
               const endTime = moment(item.endTime, 'HH:mm:ss')
               const { hour, minute } = calculateDuration(startTime, endTime)
               return {
                 ...item,
+                clinicianFK: cp && cp.isActive ? clinicianFK : undefined,
                 startTime: startTime.format('HH:mm'),
                 endTime: endTime.format('HH:mm'),
                 apptDurationHour: hour,

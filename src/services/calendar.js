@@ -45,7 +45,6 @@ export const query = (payload) => {
 }
 
 export const queryList = (params) => {
-  console.log({ params })
   return commonService.queryList(url, {
     pagesize: 9999,
     ...params,

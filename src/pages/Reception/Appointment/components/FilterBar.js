@@ -36,6 +36,7 @@ const FilterBar = ({
   onDoctorEventClick,
   onAddAppointmentClick,
   handleUpdateFilter,
+  toggleSearchAppointmentModal,
   values,
 }) => {
   const onFilterClick = () => handleUpdateFilter(values)
@@ -86,6 +87,7 @@ const FilterBar = ({
                 remoteFilter={{
                   'clinicianProfile.isActive': true,
                 }}
+                localFilter={(option) => option.clinicianProfile.isActive}
                 code='doctorprofile'
                 labelField='clinicianProfile.name'
                 valueField='clinicianProfile.id'
@@ -128,13 +130,23 @@ const FilterBar = ({
             )}
           />
         </GridItem>
-        <GridItem md={2}>
+        <GridItem md={1}>
           <ProgressButton
             icon={<Search />}
             color='primary'
             onClick={onFilterClick}
           >
             Filter
+          </ProgressButton>
+        </GridItem>
+
+        <GridItem md={3}>
+          <ProgressButton
+            icon={<Search />}
+            color='primary'
+            onClick={toggleSearchAppointmentModal}
+          >
+            Search Appointment
           </ProgressButton>
         </GridItem>
 

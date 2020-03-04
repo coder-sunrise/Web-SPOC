@@ -4,7 +4,8 @@ import router from 'umi/router'
 import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
-import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
+// import DispenseDetails from './DispenseDetails/PrintDrugLabelWrapper'
+import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
 // utils
 import {

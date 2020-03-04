@@ -90,6 +90,7 @@ class GlobalModalContainer extends PureComponent {
         openConfirmTitle: null,
         openConfirmContent: null,
         onConfirmDiscard: null,
+        onConfirmSave: null,
         // onConfirm: null,
         openConfirmText: 'Confirm',
       },
@@ -268,6 +269,7 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          autoFocus
           open={global.openConfirm}
           title={global.openConfirmTitle}
           cancelText='Cancel'

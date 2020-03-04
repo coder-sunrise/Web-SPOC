@@ -8,6 +8,7 @@ import {
   StatusIndicator,
   VISIT_STATUS,
 } from '@/pages/Reception/Queue/variables'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const InitialSessionInfo = {
   isClinicSessionClosed: true,
@@ -19,6 +20,11 @@ const InitialSessionInfo = {
   sessionCloseDate: '',
 }
 
+const combineDateTime = (date, time) => {
+  const appointmentDate = date.split('T')[0]
+  return `${appointmentDate}T${time}`
+}
+
 export default createListViewModel({
   namespace: 'queueLog',
   config: {
@@ -28,6 +34,7 @@ export default createListViewModel({
     service,
     state: {
       list: [],
+      statusTagClicked: false,
       sessionInfo: { ...InitialSessionInfo },
       patientList: [],
       appointmentList: [],
@@ -208,6 +215,10 @@ export default createListViewModel({
                 appointmentList: data.map((item) => ({
                   ...item,
                   visitStatus: VISIT_STATUS.UPCOMING_APPT,
+                  appointmentTime: combineDateTime(
+                    item.appointmentDate,
+                    item.startTime,
+                  ),
                 })),
               },
             })
@@ -223,8 +234,9 @@ export default createListViewModel({
           yield put({
             type: 'refresh',
           })
-          sendNotification('QueueListing', {
-            message: 'Visit Deleted',
+          sendQueueNotification({
+            message: 'Visit deleted.',
+            queueNo: payload.queueNo,
           })
         }
         return result

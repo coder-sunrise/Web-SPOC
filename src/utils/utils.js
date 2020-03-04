@@ -310,15 +310,22 @@ const maxReducer = (p, n) => {
 
 export function difference (object, base) {
   function changes (o, b = {}) {
-    return lodash.transform(o, (result, value, key) => {
-      // console.log(value, b, key)
-      if (!lodash.isEqual(value, b[key])) {
-        result[key] =
+    const v = lodash.transform(o, (result, value, key) => {
+      // console.log(value, b, key, result, o, React.isValidElement(o))
+      if (_.isFunction(value) || React.isValidElement(value)) {
+        // result[key] = {}
+      } else if (!lodash.isEqual(value, b[key])) {
+        // console.log(value, b, key, result, o, React.isValidElement(o))
+        const r =
           lodash.isObject(value) && lodash.isObject(b[key])
             ? changes(value, b[key])
             : value
+        // console.log(r)
+        result[key] = r
       }
     })
+    // console.log(v)
+    return v
   }
   return changes(object, base)
 }
@@ -1099,7 +1106,7 @@ export const currencyFormatter = (value) =>
   numeral(value).format(`$${config.currencyFormat}`)
 
 const regDate = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/s
-const commonDataReaderTransform = (data, fieldName) => {
+const commonDataReaderTransform = (data, fieldName, keepNull = false) => {
   // console.log(commonDataReaderTransform)
   const { getClinic } = config
   const { systemTimeZoneInt = 0 } = getClinic() || {}
@@ -1109,13 +1116,13 @@ const commonDataReaderTransform = (data, fieldName) => {
     if (Array.isArray(data)) {
       if (fieldName) data = data.sort((a, b) => a[fieldName] - b[fieldName])
       data.forEach((element) => {
-        commonDataReaderTransform(element)
+        commonDataReaderTransform(element, fieldName, keepNull)
       })
     } else {
       for (let field in data) {
         if (Object.prototype.hasOwnProperty.call(data, field)) {
           const v = data[field]
-          if (v === null || v === undefined) {
+          if (!keepNull && (v === null || v === undefined)) {
             delete data[field]
             continue
           }
@@ -1126,12 +1133,16 @@ const commonDataReaderTransform = (data, fieldName) => {
               ])
             for (let subfield in v) {
               if (Object.prototype.hasOwnProperty.call(v, subfield)) {
-                commonDataReaderTransform(data[field][subfield])
+                commonDataReaderTransform(
+                  data[field][subfield],
+                  fieldName,
+                  keepNull,
+                )
               }
             }
           }
           if (typeof v === 'object') {
-            commonDataReaderTransform(data[field])
+            commonDataReaderTransform(data[field], fieldName, keepNull)
           } else if (
             typeof v === 'string' &&
             regDate.test(v) &&

@@ -142,6 +142,18 @@ export const REPORT_TYPE = {
   26: 'Purchase Order',
   27: 'Patient Label',
   29: 'Payment Receipt',
+  37: 'Inventory Trending Report',
+}
+
+export const REPORT_ID = {
+  DRUG_LABEL_80MM_45MM: 24,
+  DRUG_LABEL_89MM_36MM: 31,
+  PATIENT_LABEL_80MM_45MM: 27,
+  PATIENT_LABEL_89MM_36MM: 32,
+  PATIENT_LAB_LABEL_80MM_45MM: 33,
+  PATIENT_LAB_LABEL_89MM_36MM: 34,
+  POST_CARD_LABEL_80MM_45MM: 35,
+  POST_CARD_LABEL_89MM_36MM: 36,
 }
 
 export const INVOICE_STATUS = {
@@ -235,6 +247,11 @@ export const SCRIBBLE_NOTE_TYPE = {
   CLINICALNOTES: 1,
   CHIEFCOMPLAINTS: 2,
   PLAN: 3,
+  DENTALCLINICALNOTES: 4,
+  DENTALCOMPLAINTS: 5,
+  DENTALASSOCIATEHISTORY: 6,
+  DENTALINTRAORAL: 7,
+  DENTALEXTRAORAL: 8,
 }
 
 export const SMS_STATUS = {
@@ -263,6 +280,7 @@ export const SMS_STATUS_TEXT = {
   READ: 'Read',
   QUEUED: 'Queued',
   SENDING: 'Sending',
+  UNREAD: 'Unread',
 }
 
 export const CANNED_TEXT_TYPE = {
@@ -277,6 +295,15 @@ export const CANNED_TEXT_TYPE = {
 export const CANNED_TEXT_TYPE_FIELD = {
   1: 'clinicianNote',
   2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
   3: 'associatedHistory',
   4: 'intraOral',
   5: 'extraOral',
@@ -308,4 +335,15 @@ export const NUMBER_TYPE = {
   HOME: 2,
   WORK: 3,
   FAX: 4,
+}
+
+export const NOTIFICATION_TYPE = {
+  QUEUE: 1,
+  CODETABLE: 2,
+  ERROR: 3,
+}
+
+export const NOTIFICATION_STATUS = {
+  OK: 1,
+  ERROR: 2,
 }

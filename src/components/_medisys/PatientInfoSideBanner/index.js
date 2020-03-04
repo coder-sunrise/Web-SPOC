@@ -51,6 +51,7 @@ class PatientInfoSideBanner extends PureComponent {
         ...entity,
         patientCoPaymentSchemeFK,
         isSaveToDb,
+        patientProfileId:entity.id,
       },
     }).then((result) => {
       if (result) {

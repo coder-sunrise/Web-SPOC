@@ -27,6 +27,8 @@ import {
   IconButton,
   CustomInputWrapper,
   Fab,
+  GridContainer,
+  GridItem,
 } from '@/components'
 // sub components
 import PatientHistoryDrawer from './PatientHistoryDrawer'
@@ -148,7 +150,7 @@ class Layout extends PureComponent {
     }
 
     let defaultLayout
-    // console.log('userDefaultLayout', { userDefaultLayout })
+
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
     } else if (true) {
@@ -161,7 +163,7 @@ class Layout extends PureComponent {
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
     }
-
+    // console.log(defaultLayout)
     this.widgetMenu = (
       <Menu>
         {widgets.map((o) => {
@@ -338,35 +340,28 @@ class Layout extends PureComponent {
     this.changeLayout(layout)
   }
 
+  promptRemoveWidgetConfirmation = (key) => {
+    this.props.dispatch({
+      type: 'global/updateState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: 'Confirm to remove widgets?',
+        openConfirmText: 'Confirm',
+        onConfirmSave: () => this.removeWidget(key),
+      },
+    })
+  }
+
   updateWidget = (ids, changes) => {
-    // console.log(ids, changes)
     const keys = Object.keys(changes)
     for (let index = 0; index < keys.length; index++) {
       const key = keys[index]
-      // console.log(key)
       if (changes[key]) {
         this.addWidget(key)
       } else {
-        this.removeWidget(key)
+        this.promptRemoveWidgetConfirmation(key)
       }
     }
-    // const { currentLayout } = this.state
-    // const widgets = this.getDefaultLayout().widgets.filter(
-    //   (o) => ids.indexOf(o.id) >= 0,
-    // )
-    // console.log(widgets)
-    // const sizes = [
-    //   'lg',
-    //   'md',
-    //   'sm',
-    // ]
-    // const layout = {
-    //   widgets,
-    // }
-    // sizes.forEach((s) => {
-    //   layout[s] = currentLayout[s]
-    // })
-    // this.changeLayout(layout)
   }
 
   changeLayout = (layout) => {
@@ -382,7 +377,7 @@ class Layout extends PureComponent {
 
   getDefaultLayout = () => {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
-    // console.log({ defaultWidgets })
+
     const r = {
       widgets: defaultWidgets.map((o) => o.id),
     }
@@ -633,7 +628,7 @@ class Layout extends PureComponent {
       },
     }
 
-    // console.log(this.props)
+    // console.log({ currentLayout: state.currentLayout.widgets, widgets })
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     return (
       <div>
@@ -651,21 +646,30 @@ class Layout extends PureComponent {
               // backgroundColor: '#f0f8ff',
             }}
           >
-            {state.currentLayout.widgets.map((id) => {
-              const w = widgets.find((o) => o.id === id)
-              if (!w) return null
-              const onClick = () => this.onAnchorClick(w.id)
-              return (
-                <Button
-                  size='sm'
-                  variant='outlined'
-                  color='primary'
-                  onClick={onClick}
-                >
-                  {w.name}
+            <GridContainer justify='space-between'>
+              <GridItem md={10}>
+                {state.currentLayout.widgets.map((id) => {
+                  const w = widgets.find((o) => o.id === id)
+                  if (!w) return null
+                  const onClick = () => this.onAnchorClick(w.id)
+                  return (
+                    <Button size='sm' color='primary' onClick={onClick}>
+                      {w.name}
+                    </Button>
+                  )
+                })}
+              </GridItem>
+              <GridItem md={2} style={{ textAlign: 'right' }}>
+                <Button size='sm' onClick={this.toggleDrawer}>
+                  <Settings />
+                  Widgets
                 </Button>
-              )
-            })}
+                <Button size='sm' onClick={this.togglePatientHistoryDrawer}>
+                  <Accessibility />
+                  History
+                </Button>
+              </GridItem>
+            </GridContainer>
           </CardContainer>
         )}
         {true && (
@@ -822,7 +826,7 @@ class Layout extends PureComponent {
         )}
         {!state.fullScreenWidget && (
           <React.Fragment>
-            <div className={classes.fabContainer}>
+            {/* <div className={classes.fabContainer}>
               <Slide
                 direction='up'
                 in={this.state.mode === 'edit'}
@@ -861,7 +865,7 @@ class Layout extends PureComponent {
                   </div>
                 </Slide>
               )}
-            </div>
+            </div> */}
             <Drawer
               anchor='right'
               open={this.state.openPatientHistoryDrawer}
@@ -884,11 +888,22 @@ class Layout extends PureComponent {
               open={this.state.openDraw}
               onClose={this.toggleDrawer}
             >
-              <div style={{ width: 260 }}>
+              <div style={{ width: 360, position: 'relative' }}>
+                <h5
+                  style={{
+                    fontWeight: 500,
+                    lineHeight: 1.3,
+                    position: 'absolute',
+                    top: 8,
+                    left: 16,
+                  }}
+                >
+                  Manage Widgets
+                </h5>
                 <SizeContainer size='sm'>
                   <CheckboxGroup
                     className={classes.fabDiv}
-                    label='Manage Widgets'
+                    label=''
                     vertical
                     strongLabel
                     value={currentLayout.widgets}
@@ -938,14 +953,36 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
+                    <h5
+                      style={{
+                        fontWeight: 500,
+                        lineHeight: 1.3,
+                        position: 'absolute',
+                      }}
+                    >
+                      Manage Layout
+                    </h5>
                     <CustomInputWrapper
-                      label='My Layout'
+                      label=''
                       style={{ paddingTop: 25 }}
                       strongLabel
                       labelProps={{
                         shrink: true,
                       }}
                     >
+                      <ul>
+                        <li>
+                          <p>
+                            Save current consultation layout as my favourite.
+                          </p>
+                        </li>
+                        <li>
+                          <p>
+                            System will use favourite layout for new
+                            consultation.
+                          </p>
+                        </li>
+                      </ul>
                       <ProgressButton
                         onClick={() => {
                           onSaveLayout(this.state.currentLayout)

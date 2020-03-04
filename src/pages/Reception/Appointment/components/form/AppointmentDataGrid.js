@@ -1,12 +1,10 @@
 import React from 'react'
 import { connect } from 'dva'
-import * as Yup from 'yup'
 import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
 import { EditableTableGrid, dateFormat } from '@/components'
-import { getUniqueNumericId } from '@/utils/utils'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import {
   AppointmentDataColExtensions,
@@ -14,18 +12,6 @@ import {
 } from './variables'
 import ErrorPopover from './ErrorPopover'
 import AuthorizedContext from '@/components/Context/Authorized'
-
-// const validationSchema = Yup.object().shape({
-//   startTime: Yup.string().required(),
-//   endTime: Yup.string().required(),
-//   apptDurationHour: Yup.number().required(),
-//   apptDurationMinute: Yup.number().required(),
-//   // appointmentDuration: Yup.string().required(),
-//   // endTime: Yup.string()
-//   //   .laterThan(Yup.ref('startTime'), 'Time To must be later than Time From')
-//   //   .required(),
-//   clinicianFK: Yup.string().required(),
-// })
 
 const styles = () => ({
   container: {

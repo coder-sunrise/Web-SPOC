@@ -13,6 +13,7 @@ import DoctorBlockPopover from './components/DoctorBlockPopover'
 import Form from './components/form'
 import DoctorBlockForm from './components/form/DoctorBlock'
 import SeriesConfirmation from './SeriesConfirmation'
+import AppointmentSearch from './AppointmentSearch'
 // settings
 import {
   defaultColorOpts,
@@ -86,6 +87,7 @@ class Appointment extends React.PureComponent {
     showPopup: false,
     showAppointmentForm: false,
     showDoctorEventModal: false,
+    showSearchAppointmentModal: false,
     popupAnchor: null,
     popoverEvent: { ...InitialPopoverEvent },
     resources: null,
@@ -109,16 +111,31 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         pagesize: 9999,
-        combineCondition: 'and',
-        isCancelled: false,
-        lgteql_appointmentDate: startOfMonth,
-        lsteql_appointmentDate: endOfMonth,
+        apiCriteria: {
+          isCancelled: false,
+          apptDateFrom: startOfMonth,
+          apptDateTo: endOfMonth,
+        },
+      },
+    })
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+        filter: {
+          isActive: undefined,
+        },
       },
     })
 
     dispatch({
       type: 'codetable/fetchCodes',
-      payload: { code: 'doctorprofile' },
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {},
+      },
     }).then((response) => {
       response
 
@@ -128,6 +145,7 @@ class Appointment extends React.PureComponent {
 
       if (response) {
         resources = response
+          .filter((clinician) => clinician.clinicianProfile.isActive)
           .filter((_, index) => index < 5)
           .map((clinician) => ({
             clinicianFK: clinician.clinicianProfile.id,
@@ -160,6 +178,30 @@ class Appointment extends React.PureComponent {
     dispatch({
       type: 'calendar/setCurrentViewDate',
       payload: moment().toDate(),
+    })
+  }
+
+  componentWillUnmount () {
+    const { dispatch } = this.props
+    // reset doctor profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        force: true,
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+
+    // reset clinician profile codetable
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+        force: true,
+      },
     })
   }
 
@@ -404,6 +446,14 @@ class Appointment extends React.PureComponent {
     })
   }
 
+  toggleSearchAppointmentModal = () => {
+    this.setState((prevState) => {
+      return {
+        showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
+      }
+    })
+  }
+
   render () {
     const { calendar: CalendarModel, classes, calendarLoading } = this.props
     const {
@@ -419,6 +469,7 @@ class Appointment extends React.PureComponent {
       filter,
       selectedAppointmentFK,
       primaryClinicianFK,
+      showSearchAppointmentModal,
     } = this.state
 
     const { currentViewAppointment, mode, calendarView } = CalendarModel
@@ -434,7 +485,7 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        <Popover
+        {/* <Popover
           id='event-popup'
           className={classes.popover}
           open={showPopup}
@@ -442,14 +493,14 @@ class Appointment extends React.PureComponent {
           onClose={this.handleClosePopover}
           placement='top-start'
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: 'center',
+            horizontal: 'right',
           }}
           transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
+            vertical: 'center',
+            horizontal: 'left',
           }}
-          disableRestoreFocus
+          // disableRestoreFocus
         >
           {popoverEvent.doctor ? (
             <DoctorBlockPopover
@@ -459,7 +510,7 @@ class Appointment extends React.PureComponent {
           ) : (
             <ApptPopover popoverEvent={popoverEvent} />
           )}
-        </Popover>
+        </Popover> */}
 
         <FilterBar
           loading={calendarLoading}
@@ -468,6 +519,7 @@ class Appointment extends React.PureComponent {
           handleUpdateFilter={this.onFilterUpdate}
           onDoctorEventClick={this.handleDoctorEventClick}
           onAddAppointmentClick={this.handleAddAppointmentClick}
+          toggleSearchAppointmentModal={this.toggleSearchAppointmentModal}
         />
         <Authorized authority='appointment.appointmentdetails'>
           <div style={{ marginTop: 16, minHeight: '80vh', height: '100%' }}>
@@ -494,13 +546,15 @@ class Appointment extends React.PureComponent {
           overrideLoading
           observe='AppointmentForm'
         >
-          <Form
-            history={this.props.history}
-            resources={resources}
-            selectedAppointmentID={selectedAppointmentFK}
-            selectedSlot={selectedSlot}
-            // calendarEvents={calendarEvents}
-          />
+          {showAppointmentForm && (
+            <Form
+              history={this.props.history}
+              resources={resources}
+              selectedAppointmentID={selectedAppointmentFK}
+              selectedSlot={selectedSlot}
+              // calendarEvents={calendarEvents}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}
@@ -522,6 +576,18 @@ class Appointment extends React.PureComponent {
           maxWidth='sm'
         >
           <SeriesConfirmation onConfirmClick={this.editSeriesConfirmation} />
+        </CommonModal>
+
+        <CommonModal
+          open={showSearchAppointmentModal}
+          title='Appointment Search'
+          onClose={this.toggleSearchAppointmentModal}
+          maxWidth='xl'
+        >
+          <AppointmentSearch
+            handleSelectEvent={this.onSelectEvent}
+            handleAddAppointmentClick={this.handleAddAppointmentClick}
+          />
         </CommonModal>
       </CardContainer>
     )

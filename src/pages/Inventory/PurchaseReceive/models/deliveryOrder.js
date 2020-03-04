@@ -131,12 +131,16 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
           if (ConsumableItemList.length > 0 && o.type === 2) {
@@ -146,12 +150,17 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
           if (VaccinationItemList.length > 0 && o.type === 3) {
@@ -161,18 +170,20 @@ export default createFormViewModel({
                 f.stock &&
                 f.stock.length > 0,
             )
-            const defaultStock = m.stock.find((s) => s.isDefault === true)
-            const batchNo = defaultStock.batchNo || o.batchNo
+            const { id, batchNo, expiryDate } = m.stock.find(
+              (s) => s.isDefault === true,
+            )
+
             return {
               ...o,
               id: undefined,
               batchNo,
+              batchNoId: id,
+              expiryDate,
             }
           }
-
           return o
         })
-
         return {
           ...state,
           entity: {
@@ -180,7 +191,11 @@ export default createFormViewModel({
             // deliveryOrderNo,
             deliveryOrderDate: moment(),
             remark: '',
-            rows: newOSItem,
+            rows: newOSItem.map((o) => ({
+              currentReceivingBonusQty: undefined,
+              expiryDate: undefined,
+              ...o,
+            })),
           },
         }
       },
@@ -339,6 +354,16 @@ export default createFormViewModel({
         // let newRows = rows.filter((v) => v.uid !== payload)
 
         return { ...state, entity: { ...state.entity, rows } }
+      },
+
+      reset (state, { payload }) {
+        return {
+          ...state,
+          entity: {
+            ...state.entity,
+            rows: [],
+          },
+        }
       },
     },
   },

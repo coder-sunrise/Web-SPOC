@@ -28,15 +28,7 @@ const styles = (theme) => ({
     padding: 0,
     width: 0,
   },
-  groupBtnRoot: {
-    display: 'block',
-    marginBottom: theme.spacing(1),
-  },
-  groupBtnGrouped: {
-    '&:not(:first-child)': {
-      marginLeft: theme.spacing(0.5),
-    },
-  },
+
   toothJournal: {
     paddingTop: 0,
     paddingBottom: 0,
@@ -67,23 +59,54 @@ const styles = (theme) => ({
     margin: 0,
     width: 'auto',
   },
+  treatmentListItem: {
+    padding: 0,
+  },
+
+  groupBtns: {
+    display: 'block',
+  },
+
+  groupBtnRoot: {
+    '&.Mui-disabled': {
+      color: 'inherit',
+    },
+  },
+  groupBtnGroupRoot: {
+    display: 'block',
+    marginBottom: theme.spacing(1),
+  },
   buttonIcon: {
     position: 'absolute',
     left: -1,
+    top: -1,
+  },
+  grouped: {
+    fontSize: '0.75rem',
+    margin: theme.spacing(0.25, 0, 0.25, 0.5),
+    // border: 'none',
+    '&:not(:first-child)': {
+      marginLeft: theme.spacing(0.5),
+      borderRadius: Number(theme.shape.borderRadius),
+      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
+    },
+    '&:first-child': {
+      borderRadius: Number(theme.shape.borderRadius),
+    },
+    height: 33,
+    lineHeight: 1,
+    // whiteSpace: 'nowrap',
+    paddingLeft: 37,
+    overflow: 'hidden',
+    width: 194,
+    border: '1px solid rgba(0, 0, 0, 0.38)',
+    // borderRadius: '8px',
   },
 })
 
 @connect(
-  ({
+  ({ dentalChartComponent, orders, codetable, consultation, global }) => ({
     dentalChartComponent,
-    dentalChartSetup,
-    orders,
-    codetable,
-    consultation,
-    global,
-  }) => ({
-    dentalChartComponent,
-    dentalChartSetup,
     orders,
     codetable,
     consultation,
@@ -153,7 +176,9 @@ class DentalChart extends React.Component {
             <div style={{ marginBottom: theme.spacing(1) }}>
               <Chart {...this.props} />
             </div>
-            {mode === 'diagnosis' && <DiagnosisPanel {...this.props} />}
+            {mode === 'diagnosis' && (
+              <DiagnosisPanel searchable {...this.props} />
+            )}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>
           <GridItem md={4}>

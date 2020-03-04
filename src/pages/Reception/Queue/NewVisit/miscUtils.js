@@ -1,5 +1,5 @@
 import { VISIT_STATUS } from '../variables'
-import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -21,6 +21,7 @@ const mapAttachmentToUploadInput = (
         fileName,
         attachmentType,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
@@ -39,11 +40,13 @@ export const formikMapPropsToValues = ({
   visitRegistration,
   doctorProfiles,
   history,
+  clinicSettings,
 }) => {
   try {
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
+    let visitPurposeFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -85,9 +88,13 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
+    if (clinicSettings) {
+      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+    }
+
     return {
       queueNo: qNo,
-      visitPurposeFK: 1,
+      visitPurposeFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
@@ -170,7 +177,7 @@ export const formikHandleSubmit = (
     },
   }
 
-  console.log({ payload })
+  // console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
@@ -187,10 +194,11 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      sendNotification('QueueListing', {
-        message: 'Visit Created',
-      })
       onConfirm()
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
+      })
     } else {
       setSubmitting(false)
     }

@@ -160,11 +160,8 @@ const schemaDemographic = {
 }
 
 const pecValidationSchema = Yup.object().shape({
-  accountNoTypeFK: Yup.string().required(),
-  accountNo: Yup.string().NRIC().required(),
   // remark: Yup.string().required(),
   name: Yup.string().required(),
-  relationshipFK: Yup.number().required(),
 })
 const schemaEmergencyContact = {
   patientEmergencyContact: Yup.array()

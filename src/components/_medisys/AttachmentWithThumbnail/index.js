@@ -296,9 +296,17 @@ const AttachmentWithThumbnail = ({
       <CardContainer hideHeader styles={cardStyles}>
         <GridContainer>
           {fileAttachments.map((attachment, index) => {
+            let indexInAllAttachments = attachments.findIndex(
+              (item) => item.id === attachment.id,
+            )
+            if (attachment.fileIndexFK)
+              indexInAllAttachments = attachments.findIndex(
+                (item) => item.fileIndexFK === attachment.fileIndexFK,
+              )
             return (
               <Thumbnail
                 index={index}
+                indexInAllAttachments={indexInAllAttachments}
                 attachment={attachment}
                 {...commonProps}
               />

@@ -105,6 +105,7 @@ const RightPanel = (props) => {
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'diagnosis',
+                      action: undefined,
                     },
                   })
                 } else {
@@ -112,6 +113,7 @@ const RightPanel = (props) => {
                     type: 'dentalChartComponent/updateState',
                     payload: {
                       mode: 'treatment',
+                      action: undefined,
                     },
                   })
                 }

@@ -66,7 +66,7 @@ const Summary = ({ reportDatas }) => {
     },
   }
   return (
-    <GridContainer md={6}>
+    <GridContainer md={6} style={{ marginBottom: 8 }}>
       <GridItem md={12}>
         <NumberInput
           prefix='Total Cash Rounding:'

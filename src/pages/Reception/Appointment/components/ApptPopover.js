@@ -17,7 +17,7 @@ import { primaryColor } from '@/assets/jss'
 
 const styles = (theme) => ({
   root: {
-    width: '500px',
+    width: '530px',
     textAlign: 'left',
     padding: theme.spacing(1),
   },

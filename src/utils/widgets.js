@@ -1,35 +1,19 @@
 import Loadable from 'react-loadable'
-import { Menu, Dropdown } from 'antd'
-
-import {
-  FormControl,
-  InputLabel,
-  Input,
-  Paper,
-  withStyles,
-  MenuItem,
-  Popper,
-  Fade,
-  ClickAwayListener,
-  Divider,
-  Fab,
-  Slide,
-} from '@material-ui/core'
-import MoreHoriz from '@material-ui/icons/MoreHoriz'
-import MoreVert from '@material-ui/icons/MoreVert'
-import Clear from '@material-ui/icons/Clear'
+// material ui
 import Add from '@material-ui/icons/Add'
-import Edit from '@material-ui/icons/Edit'
-import Fullscreen from '@material-ui/icons/Fullscreen'
-import FullscreenExit from '@material-ui/icons/FullscreenExit'
-import CompareArrows from '@material-ui/icons/CompareArrows'
+// common components
 import Loading from '@/components/PageLoading/index'
-import { Tooltip, AuthorizedContext, IconButton, Button } from '@/components'
+import { Tooltip, AuthorizedContext, IconButton } from '@/components'
+// utils
+import { CLINIC_TYPE } from '@/utils/constants'
+
+const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
+const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
 
 const widgets = [
   {
     id: '1',
-    name: 'Clinical Notes',
+    name: clinicTypeFK === CLINIC_TYPE.GP ? 'Clinical Notes' : 'Dental Notes',
     accessRight: 'queue.consultation.widgets.clinicalnotes',
     component: Loadable({
       loader: () => import('@/pages/Widgets/ClinicalNotes'),
@@ -286,6 +270,21 @@ const widgets = [
       </Tooltip>
     ),
   },
+
+  {
+    id: '21',
+    name: 'Dental Chart',
+    accessRight: 'queue.consultation.widgets.dentalchart',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/DentalChart'),
+      loading: Loading,
+    }),
+    onUnmount: () => {
+      window.g_app._store.dispatch({
+        type: 'dentalChartComponent/reset',
+      })
+    },
+  },
   {
     id: '8',
     name: 'Attachment',
@@ -305,36 +304,6 @@ const widgets = [
         padding: '0 5px',
       },
     },
-  },
-  // {
-  //   id: '1001',
-  //   name: 'Test Widget',
-  //   component: Loadable({
-  //     loader: () => import('@/pages/Widgets/TestWidget'),
-  //     loading: Loading,
-  //   }),
-  //   layoutConfig: {
-  //     style: {},
-  //   },
-  // },
-  {
-    id: '21',
-    name: 'Dental Chart',
-    accessRight: 'queue.consultation.widgets.dentalchart',
-    component: Loadable({
-      loader: () => import('@/pages/Widgets/DentalChart'),
-      loading: Loading,
-    }),
-    onUnmount: () => {
-      window.g_app._store.dispatch({
-        type: 'dentalChartComponent/reset',
-      })
-    },
-    // layoutConfig: {
-    //   style: {
-    //     height: 'calc(100% - 36px)',
-    //   },
-    // },
   },
 ]
 
