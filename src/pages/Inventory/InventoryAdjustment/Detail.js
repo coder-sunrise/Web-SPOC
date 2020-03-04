@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import { withStyles } from '@material-ui/core'
 import Yup from '@/utils/yup'
-import { enableTableForceRender } from '@/utils/utils'
 import { INVENTORY_TYPE, INVENTORY_ADJUSTMENT_STATUS } from '@/utils/constants'
 import {
   inventoryAdjustmentStatus,
@@ -461,7 +460,6 @@ class Detail extends PureComponent {
         setValues({ ...values, inventoryAdjustmentItems: newList })
       }
     }
-    enableTableForceRender(5000)
   }
 
   initializeStateItemList = async () => {
@@ -937,6 +935,7 @@ class Detail extends PureComponent {
             )}
             <EditableTableGrid
               style={{ marginTop: 10 }}
+              forceRenderDuration={5000}
               FuncProps={{
                 edit: isEditable,
                 pager: true,

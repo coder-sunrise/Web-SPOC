@@ -171,6 +171,7 @@ let uniqueGid = 0
 class CommonTableGrid extends PureComponent {
   static defaultProps = {
     columnExtensions: [],
+    getRowId: (row) => (row.Id ? row.Id : row.id),
   }
 
   constructor (props) {
@@ -184,7 +185,7 @@ class CommonTableGrid extends PureComponent {
       height: pHeight,
       onRowDrop,
       editableGrid,
-      getRowId = (row) => (row.Id ? row.Id : row.id),
+      getRowId,
       FuncProps = {},
     } = props
     // console.log(props)
@@ -741,7 +742,7 @@ class CommonTableGrid extends PureComponent {
       selection = [],
       errors = [],
       query,
-      getRowId = (row) => (row.Id ? row.Id : row.id),
+      getRowId,
       onSelectionChange = (f) => f,
       FuncProps = {},
       TableProps = {},

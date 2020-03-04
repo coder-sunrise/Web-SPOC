@@ -436,6 +436,7 @@ class Grid extends PureComponent {
             getRowId={(r) => r.uid}
             rows={rows}
             schema={purchaseOrderDetailsSchema}
+            forceRenderDuration={5000}
             FuncProps={{
               edit: isEditable,
               pager: false,

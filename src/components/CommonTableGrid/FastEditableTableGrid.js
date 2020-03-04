@@ -18,6 +18,7 @@ import {
   getGlobalVariable,
   getUniqueNumericId,
   difference,
+  enableTableForceRender,
 } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
 import CommonTableGrid from './index.optimized'
@@ -67,6 +68,12 @@ class EditableTableGrid extends PureComponent {
 
   //   return null
   // }
+
+  componentDidMount () {
+    // console.log('componentDidMount')
+    const { forceRenderDuration } = this.props
+    if (forceRenderDuration) enableTableForceRender(forceRenderDuration)
+  }
 
   componentWillReceiveProps (nextProps) {
     // dectect if datasource changed outside grid, reset grid data cache
@@ -547,10 +554,6 @@ class EditableTableGrid extends PureComponent {
   //       },
   //     })
   //   }
-  // }
-
-  // componentDidMount () {
-  //   console.log('componentDidMount')
   // }
 
   // componentDidUpdate () {

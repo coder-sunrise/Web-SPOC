@@ -117,6 +117,7 @@ class TableCell extends React.Component {
       getRowId,
       classes: clses,
       onClick,
+      onContextMenu,
       ...restProps
     } = this.props
     // console.log(restProps.row)
