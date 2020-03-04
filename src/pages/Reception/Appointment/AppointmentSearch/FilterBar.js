@@ -42,7 +42,6 @@ const createPayload = (values) => {
   } = values
 
   const commonPayload = {
-    bookBy: bookBy.join() || undefined,
     bookOn: bookOn ? moment(bookOn).format(reversedDateFormat) : undefined,
     apptDateFrom:
       apptDate && apptDate.length > 0
@@ -52,13 +51,14 @@ const createPayload = (values) => {
       apptDate && apptDate.length > 0
         ? moment(apptDate[1]).formatUTC(false)
         : undefined,
-    doctor: filterByDoctor.join() || undefined,
-    room: filterByRoomBlockGroup.join() || undefined,
   }
 
   if (isPrint) {
     return {
       ...commonPayload,
+      bookBy: bookBy.length > 0 ? bookBy : undefined,
+      doctor: filterByDoctor.length > 0 ? filterByDoctor : undefined,
+      room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
       SearchText: searchValue || undefined,
       ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
       AapptStatus:
@@ -70,6 +70,9 @@ const createPayload = (values) => {
 
   return {
     ...commonPayload,
+    bookBy: bookBy.join() || undefined,
+    doctor: filterByDoctor.join() || undefined,
+    room: filterByRoomBlockGroup.join() || undefined,
     searchValue: searchValue || undefined,
     appType: filterByApptType.join() || undefined,
     appStatus: filterByAppointmentStatus.join() || undefined,
