@@ -28,7 +28,7 @@ import {
 } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
 
-const createPayload = values => {
+const createPayload = (values) => {
   const {
     filterByDoctor = [],
     filterByRoomBlockGroup = [],
@@ -60,8 +60,11 @@ const createPayload = values => {
     return {
       ...commonPayload,
       SearchText: searchValue || undefined,
-      ApptType: filterByApptType || undefined,
-      AapptStatus: filterByAppointmentStatus || undefined,
+      ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
+      AapptStatus:
+        filterByAppointmentStatus.length > 0
+          ? filterByAppointmentStatus
+          : undefined,
     }
   }
 
@@ -87,14 +90,17 @@ const FilterBar = ({
     filterByAppointmentStatus = [],
   } = values
 
-  const [showReport, setShowReport] = useState(false)
+  const [
+    showReport,
+    setShowReport,
+  ] = useState(false)
 
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
   const maxAppointmentStatusTagCount =
     filterByAppointmentStatus.length <= 1 ? 1 : 0
-  const renderDropdown = option => <DoctorLabel doctor={option} />
+  const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
   const toggleReport = () => {
     if (!values.searchValue) return
@@ -107,7 +113,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='searchValue'
-            render={args => (
+            render={(args) => (
               <TextField
                 {...args}
                 label={formatMessage({
@@ -120,7 +126,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByDoctor'
-            render={args => (
+            render={(args) => (
               <CodeSelect
                 {...args}
                 // allLabel='All Doctors'
@@ -154,7 +160,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='apptDate'
-            render={args => (
+            render={(args) => (
               <DateRangePicker label='Appt Date From' label2='To' {...args} />
             )}
           />
@@ -162,7 +168,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='filterByRoomBlockGroup'
-            render={args => {
+            render={(args) => {
               return (
                 <CodeSelect
                   label='Room'
@@ -179,7 +185,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='bookBy'
-            render={args => {
+            render={(args) => {
               return (
                 <ClinicianSelect
                   label='Book By'
@@ -196,7 +202,7 @@ const FilterBar = ({
         <GridItem md={6}>
           <Field
             name='filterByApptType'
-            render={args => (
+            render={(args) => (
               <CodeSelect
                 {...args}
                 mode='multiple'
@@ -205,7 +211,7 @@ const FilterBar = ({
                 label='Appt Type'
                 code='ctappointmenttype'
                 labelField='displayValue'
-                renderDropdown={option => (
+                renderDropdown={(option) => (
                   <AppointmentTypeLabel
                     color={option.tagColorHex}
                     label={option.displayValue}
@@ -227,13 +233,13 @@ const FilterBar = ({
         <GridItem md={6}>
           <FastField
             name='bookOn'
-            render={args => <DatePicker label='Book On' {...args} />}
+            render={(args) => <DatePicker label='Book On' {...args} />}
           />
         </GridItem>
         <GridItem md={6}>
           <FastField
             name='filterByAppointmentStatus'
-            render={args => {
+            render={(args) => {
               return (
                 <Select
                   label={formatMessage({
@@ -301,7 +307,7 @@ export default memo(
   withFormikExtend({
     validationSchema: Yup.object().shape({
       searchValue: Yup.string().when('isPrint', {
-        is: v => v === true,
+        is: (v) => v === true,
         then: Yup.string().required(),
       }),
     }),
