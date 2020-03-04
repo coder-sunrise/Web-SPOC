@@ -42,15 +42,15 @@ export default createBasicModel({
           notifications: list,
         }
       },
-    },
-    appendNotification (state, { payload = {} }) {
-      return {
-        ...state,
-        notification: [
-          ...state.notification,
-          payload,
-        ],
-      }
+      appendNotification (state, { payload = {} }) {
+        return {
+          ...state,
+          notifications: [
+            ...state.notifications,
+            payload,
+          ],
+        }
+      },
     },
   },
 })
