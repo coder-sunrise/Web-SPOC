@@ -86,7 +86,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
-    // console.log({ restValues })
+
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -127,7 +127,7 @@ class Main extends React.Component {
       .filter((m) => {
         return !displayValue || m.displayValue === displayValue
       })
-    // console.log({ restValues })
+
     this.props.dispatch({
       type: 'settingUserRole/updateState',
       payload: {
