@@ -102,7 +102,6 @@ const styles = (theme) => ({
 
 const Thumbnail = ({
   classes,
-  index,
   indexInAllAttachments,
   isReadOnly = false,
   simple,
