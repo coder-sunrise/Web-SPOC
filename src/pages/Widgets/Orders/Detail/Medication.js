@@ -130,6 +130,21 @@ import { calculateAdjustAmount } from '@/utils/utils'
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
       (i) => i.medicationPrecautionFK !== undefined || !i.isDeleted,
     )
+
+    const activeInstruction = values.corPrescriptionItemInstruction.filter(
+      (item) => !item.isDeleted,
+    )
+
+    // reorder and overwrite sequence
+    corPrescriptionItemPrecaution.forEach((item, index) => {
+      item.sequence = index + 1
+    })
+
+    // reorder and overwrite sequence
+    activeInstruction.forEach((item, index) => {
+      item.sequence = index + 1
+    })
+
     const data = {
       sequence: getNextSequence(),
       ...values,
@@ -138,6 +153,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       subject: currentType.getSubject(values),
       isDeleted: false,
     }
+
     dispatch({
       type: 'orders/upsertRow',
       payload: data,
