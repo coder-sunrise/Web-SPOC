@@ -36,7 +36,7 @@ const CannedText = ({
   const fieldName = fieldKey[clinicInfo.clinicTypeFK]
 
   const list = cannedText[selectedNote[fieldName]]
-  console.log({ cannedText, list })
+  console.log({ cannedText, list, fieldName })
   const [
     filter,
     setFilter,

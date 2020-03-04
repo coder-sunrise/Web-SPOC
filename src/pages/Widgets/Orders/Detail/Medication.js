@@ -211,23 +211,6 @@ class Medication extends PureComponent {
     )
   }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === this.props.type)
-      if (
-        (!this.props.global.openAdjustment &&
-          nextProps.global.openAdjustment) ||
-        nextProps.orders.shouldPushToState
-      ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
-      }
-  }
-
   calculateQuantity = (medication) => {
     const { codetable, setFieldValue, values, disableEdit, dirty } = this.props
     let currentMedicaiton = medication
@@ -493,6 +476,67 @@ class Medication extends PureComponent {
     })
   }
 
+  filterOptions = (input = '', option) => {
+    let match = false
+    try {
+      const lowerCaseInput = input.toLowerCase()
+
+      const { props } = option
+      const { code, name, displayValue } = props.data
+      let title = name ? name.toLowerCase() : displayValue.toLowerCase()
+      match =
+        code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+        title.toLowerCase().indexOf(lowerCaseInput) >= 0
+    } catch (error) {
+      console.log(error)
+      match = false
+    }
+    return match
+  }
+
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '1' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventorymedication = [] } = codetable
+      const { inventoryMedicationFK } = nextValues
+      const medication = inventorymedication.find(
+        (item) => item.id === inventoryMedicationFK,
+      )
+
+      if (medication)
+        this.setState({
+          selectedMedication: medication,
+        })
+      else
+        this.setState({
+          selectedMedication: {
+            medicationStock: [],
+          },
+        })
+    }
+  }
+
   render () {
     const {
       theme,
@@ -506,6 +550,7 @@ class Medication extends PureComponent {
       setDisable,
     } = this.props
     const commonSelectProps = {
+      handleFilter: this.filterOptions,
       dropdownMatchSelectWidth: false,
       dropdownStyle: {
         width: 300,

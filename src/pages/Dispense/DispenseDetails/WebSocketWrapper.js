@@ -11,7 +11,7 @@ import {
   queryDrugLabelsDetails,
 } from '@/services/dispense'
 import CONSTANTS from './constants'
-import { PRINTING_TOOL_REPORT_ID, REPORT_ID } from '@/utils/constants'
+import { REPORT_ID } from '@/utils/constants'
 
 const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
   const withoutPrintPreview = [
@@ -55,7 +55,7 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
           return getDrugLabelDetails(o, row)
         }),
       )
-      return { DrugLabelDetails: drugLabelDetail }
+      return drugLabelDetail
     }
     notification.warn({
       message: `No prescription found. Add prescription to print drug label.`,
@@ -116,17 +116,20 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
 
       if (type === CONSTANTS.DRUG_LABEL) {
         const reportContext = await getReportContext(drugLabelReportID)
-        const data = await generateDrugLablePrintSource(row)
-        if (data) {
-          return [
-            {
+        const drugLabel = await generateDrugLablePrintSource(row)
+        if (drugLabel) {
+          const payload = drugLabel.map((details) => {
+            return {
               ReportId: drugLabelReportID,
               ReportData: JSON.stringify({
-                ...data,
+                DrugLabelDetails: [
+                  { ...details },
+                ],
                 ReportContext: reportContext,
               }),
-            },
-          ]
+            }
+          })
+          return payload
         }
       }
 
@@ -155,7 +158,6 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     if (withoutPrintPreview.includes(type)) {
       const printResult = await getPrintResult(type, row)
       if (!printResult) return
-
       handlePrint(JSON.stringify(printResult))
     } else {
       const documentType = consultationDocumentTypes.find(

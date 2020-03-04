@@ -146,6 +146,7 @@ const SortItem = ({
         return (
           <SortableListItem
             key={key}
+            uid={key}
             classes={{
               root: classes.toothJournalItem,
               secondaryAction: classes.toothJournalItemSecondaryAction,

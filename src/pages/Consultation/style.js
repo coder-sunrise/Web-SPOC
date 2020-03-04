@@ -109,6 +109,7 @@ const styles = (theme) => ({
   },
   fabDiv: {
     margin: theme.spacing(2),
+    position: 'relative',
   },
 })
 

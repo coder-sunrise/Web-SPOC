@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, memo } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
 import color from 'color'
 import { withStyles } from '@material-ui/core'
 // variables
@@ -125,4 +126,8 @@ const VisitStatusTag = ({ classes, row, onClick, statusTagClicked }) => {
   )
 }
 
-export default withStyles(styles, { name: 'VisitStatusTag' })(VisitStatusTag)
+const Connect = connect(({ queueLog }) => ({
+  statusTagClicked: queueLog.statusTagClicked,
+}))(VisitStatusTag)
+
+export default memo(withStyles(styles, { name: 'VisitStatusTag' })(Connect))

@@ -92,7 +92,6 @@ class CheckboxEditorBase extends PureComponent {
     // if (_checkboxSelectedMap[columnName]) {
     //   commonCfg.checked = _checkboxSelectedMap[columnName] === row.id
     // }
-    // console.log(commonCfg, row)
     return (
       <Checkbox
         checked={value}

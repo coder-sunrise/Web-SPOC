@@ -72,8 +72,11 @@ import Contact from './Contact'
           ),
         }),
       }),
+      gstValue: Yup.number().when('isGSTEnabled', {
+        is: (v) => v,
+        then: Yup.number().required().moreThan(0),
+      }),
     }),
-
   handleSubmit: (values, { props, resetForm }) => {
     const { effectiveDates, ...restValues } = values
 
@@ -261,6 +264,7 @@ class Detail extends PureComponent {
                         suffix='%'
                         format='0.00'
                         precision={2}
+                        notAllowDashNEqual
                       />
                     )}
                   />

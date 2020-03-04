@@ -1,6 +1,4 @@
 import { createBasicModel } from 'medisys-model'
-import { queryNotices } from '@/services/api'
-import { notification } from '@/components'
 
 export default createBasicModel({
   namespace: 'header',
@@ -15,9 +13,34 @@ export default createBasicModel({
     subscriptions: ({ dispatch, history }) => {},
     effects: {},
     reducers: {
-      clearNotifications (state) {
-        sessionStorage.removeItem('notifications')
-        return { ...state, notifications: [] }
+      clearNotification (state, { payload = {} }) {
+        const { notification = {}, type } = payload
+        const { timestamp } = notification
+        const list = state.notifications.filter((o) => {
+          return !timestamp && !type
+            ? false
+            : timestamp !== o.timestamp && type !== o.type
+        })
+        sessionStorage.setItem('notifications', JSON.stringify(list))
+
+        return { ...state, notifications: list }
+      },
+      readNotification (state, { payload = {} }) {
+        const { notification = {}, type } = payload
+        const { timestamp } = notification
+        const list = state.notifications.map((o) => ({
+          ...o,
+          read:
+            o.read || (!timestamp && !type)
+              ? true
+              : timestamp === o.timestamp || type === o.type,
+        }))
+        sessionStorage.setItem('notifications', JSON.stringify(list))
+
+        return {
+          ...state,
+          notifications: list,
+        }
       },
     },
   },

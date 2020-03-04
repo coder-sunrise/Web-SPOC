@@ -7,23 +7,24 @@ import SchemesGrid from './SchemesGrid'
 import CHASCardReplacement from '@/components/_medisys/SchemePopover/CHASCardReplacement'
 import { locationQueryParameters } from '@/utils/utils'
 
-
 const styles = () => ({})
 class Schemes extends PureComponent {
-
   state = {
-    showReplacementModal : false,
-    refreshedSchemeData :{},
+    showReplacementModal: false,
+    refreshedSchemeData: {},
   }
 
   handleReplacementModalVisibility = (show = false) => {
-
     this.setState({
-      showReplacementModal:show,
+      showReplacementModal: show,
     })
   }
 
-  prepareReplacementModel = (result,oldSchemeTypeFK,patientCoPaymentSchemeFK) =>{
+  prepareReplacementModel = (
+    result,
+    oldSchemeTypeFK,
+    patientCoPaymentSchemeFK,
+  ) => {
     const {
       balance,
       schemeTypeFk,
@@ -64,13 +65,12 @@ class Schemes extends PureComponent {
         },
       })
     }
-
   }
 
   createNewScheme = (result, values) => {
-    let newPatientScheme ={}
+    let newPatientScheme = {}
     newPatientScheme.isNew = true
-    newPatientScheme.validRange =[]
+    newPatientScheme.validRange = []
     newPatientScheme.validFrom = result.validFrom
     newPatientScheme.validTo = result.validTo
     newPatientScheme.validRange.push(result.validFrom)
@@ -81,10 +81,13 @@ class Schemes extends PureComponent {
     values.patientScheme.push(newPatientScheme)
   }
 
-  refreshChasBalance = (patientCoPaymentSchemeFK, oldSchemeTypeFK, isSaveToDb) => {
-
+  refreshChasBalance = (
+    patientCoPaymentSchemeFK,
+    oldSchemeTypeFK,
+    isSaveToDb,
+  ) => {
     const { values, dispatch } = this.props
-    const{ patientAccountNo,id } = values
+    const { patientAccountNo, id } = values
 
     dispatch({
       type: 'patient/refreshChasBalance',
@@ -92,22 +95,25 @@ class Schemes extends PureComponent {
         patientAccountNo,
         patientCoPaymentSchemeFK,
         isSaveToDb,
-        patientProfileId:id,
+        patientProfileId: id,
       },
     }).then((result) => {
-
-      this.prepareReplacementModel(result,oldSchemeTypeFK,patientCoPaymentSchemeFK)
+      this.prepareReplacementModel(
+        result,
+        oldSchemeTypeFK,
+        patientCoPaymentSchemeFK,
+      )
 
       if (result && result.schemeTypeFk) {
-
-        let chasScheme = values.patientScheme.filter(x=>x.schemeTypeFK <= 6 && !x.isDeleted)
+        let chasScheme = values.patientScheme.filter(
+          (x) => x.schemeTypeFK <= 6 && !x.isDeleted,
+        )
         let isNewChasScheme = false
 
-        if(chasScheme && chasScheme.length > 0) {
-
+        if (chasScheme && chasScheme.length > 0) {
           let chasSchemeObject = chasScheme[0]
 
-          if(chasSchemeObject.schemeTypeFK === result.schemeTypeFk){
+          if (chasSchemeObject.schemeTypeFK === result.schemeTypeFk) {
             // If same scheme type , update valid from and to date
             chasSchemeObject.validFrom = result.validFrom
             chasSchemeObject.validTo = result.validTo
@@ -115,32 +121,31 @@ class Schemes extends PureComponent {
             chasSchemeObject.validRange.push(result.validFrom)
             chasSchemeObject.validRange.push(result.validTo)
 
-            if(chasSchemeObject._errors && chasSchemeObject._errors.length > 0) {
+            if (
+              chasSchemeObject._errors &&
+              chasSchemeObject._errors.length > 0
+            ) {
               const errorsLength = chasSchemeObject._errors.length
-              chasSchemeObject._errors.splice(0,errorsLength)
+              chasSchemeObject._errors.splice(0, errorsLength)
             }
-
-          }
-          else {
+          } else {
             // Delete old chas Scheme and allow add new Scheme
             chasScheme[0].isDeleted = true
             isNewChasScheme = true
           }
-
-        }else{
+        } else {
           // No chas scheme , allow add new Scheme
           isNewChasScheme = true
         }
 
-        if(isNewChasScheme){
+        if (isNewChasScheme) {
           // Add a new Scheme to Grid
-          this.createNewScheme(result,values)
+          this.createNewScheme(result, values)
         }
-
-      }else{
-
-        let ChasScheme = values.patientScheme.filter(x=>x.schemeTypeFK <= 6 && !x.isDeleted)
-
+      } else {
+        let ChasScheme = values.patientScheme.filter(
+          (x) => x.schemeTypeFK <= 6 && !x.isDeleted,
+        )
       }
 
       dispatch({
@@ -149,7 +154,6 @@ class Schemes extends PureComponent {
           patientScheme: values.patientScheme,
         },
       })
-
     })
   }
 
@@ -175,13 +179,14 @@ class Schemes extends PureComponent {
     const isCreatingPatient = params.new
     let isSaveToDb = !isCreatingPatient
 
-    const SchemeData = patientScheme.filter((o) => o.schemeTypeFK <= 6 && !o.isDeleted)
+    const SchemeData = patientScheme.filter(
+      (o) => o.schemeTypeFK <= 6 && !o.isDeleted,
+    )
     let tempPatientCoPaymentSchemeFK = 0
     let tempSchemeTypeFK = 0
 
-    if(SchemeData && SchemeData[0])
-    {
-      const { patientCoPaymentSchemeFK, schemeTypeFK}   = SchemeData[0]
+    if (SchemeData && SchemeData[0]) {
+      const { patientCoPaymentSchemeFK, schemeTypeFK } = SchemeData[0]
 
       tempPatientCoPaymentSchemeFK = SchemeData[0].id
 
@@ -192,19 +197,28 @@ class Schemes extends PureComponent {
       <div>
         <div>
           <GridContainer>
-            <GridItem md={4}>
-              <h4>
-                Schemes
-              </h4>
+            <GridItem md={6}>
+              <h4>Schemes</h4>
             </GridItem>
-            <GridItem md={4} />
-            <GridItem md={3} style={{ color: 'red' }}>
-              {this.state.refreshedSchemeData && !this.state.refreshedSchemeData.isSuccessful?(this.state.refreshedSchemeData.statusDescription):''}
+            <GridItem md={4} style={{ color: 'red' }}>
+              {this.state.refreshedSchemeData &&
+              !this.state.refreshedSchemeData.isSuccessful ? (
+                this.state.refreshedSchemeData.statusDescription
+              ) : (
+                ''
+              )}
             </GridItem>
-            <GridItem md={1}>
-              <Button color='primary'
+            <GridItem md={2}>
+              <Button
+                color='primary'
                 size='sm'
-                onClick={() => this.refreshChasBalance(tempPatientCoPaymentSchemeFK, tempSchemeTypeFK,isSaveToDb)}
+                style={{ float: 'right' }}
+                onClick={() =>
+                  this.refreshChasBalance(
+                    tempPatientCoPaymentSchemeFK,
+                    tempSchemeTypeFK,
+                    isSaveToDb,
+                  )}
                 disabled={disableSave}
               >
                 Get CHAS
@@ -247,13 +261,8 @@ class Schemes extends PureComponent {
           {...restProps}
         /> */}
       </div>
-
-
     )
   }
-
-
-
 }
 
 export default withStyles(styles, { withTheme: true })(Schemes)

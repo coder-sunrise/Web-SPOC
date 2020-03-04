@@ -21,6 +21,7 @@ const mapAttachmentToUploadInput = (
         fileName,
         attachmentType,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
@@ -39,11 +40,13 @@ export const formikMapPropsToValues = ({
   visitRegistration,
   doctorProfiles,
   history,
+  clinicSettings,
 }) => {
   try {
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
+    let visitPurposeFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -85,9 +88,13 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
+    if (clinicSettings) {
+      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+    }
+
     return {
       queueNo: qNo,
-      visitPurposeFK: 1,
+      visitPurposeFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,

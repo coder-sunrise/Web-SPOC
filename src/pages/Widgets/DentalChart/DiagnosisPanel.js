@@ -1,9 +1,11 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+
 import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import Settings from '@material-ui/icons/Settings'
 import Search from '@material-ui/icons/Search'
+import Clear from '@material-ui/icons/Clear'
 import Divider from '@material-ui/core/Divider'
 import Paper from '@material-ui/core/Paper'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -29,32 +31,24 @@ import {
 import Setup from './Setup/index'
 import Tooth from './Tooth'
 
-const useStyles = makeStyles((theme) => ({}))
-
-const StyledToggleButtonGroup = withStyles((theme) => ({
-  grouped: {
-    margin: theme.spacing(0.25, 0, 0.25, 0.5),
-    // border: 'none',
-    '&:not(:first-child)': {
-      borderRadius: theme.shape.borderRadius,
-      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
-    },
-    '&:first-child': {
-      borderRadius: theme.shape.borderRadius,
-    },
-    height: 34,
-    lineHeight: 1,
-    // whiteSpace: 'nowrap',
-    paddingLeft: 37,
-    overflow: 'hidden',
-    width: 194,
-    border: '1px solid rgba(0, 0, 0, 0.38)',
-  },
-}))(ToggleButtonGroup)
-
 const DiagnosisPanel = (props) => {
-  const { dispatch, classes, theme, codetable, ...restProps } = props
-  const { ctchartmethod } = codetable
+  const {
+    dispatch,
+    classes,
+    theme,
+    codetable,
+    searchable,
+    paperProps,
+    viewOnly,
+    chartmethods,
+    dentalChartComponent,
+    ...restProps
+  } = props
+
+  let { ctchartmethod } = codetable
+  if (chartmethods) {
+    ctchartmethod = chartmethods
+  }
   if (!ctchartmethod) return <Skeleton height={120} />
   const [
     selectedStyle,
@@ -80,39 +74,56 @@ const DiagnosisPanel = (props) => {
       },
     })
   }
+  useEffect(
+    () => {
+      if (!dentalChartComponent.action) setSelectedStyle(undefined)
+    },
+    [
+      dentalChartComponent.action,
+    ],
+  )
   return (
     <div>
-      <Paper className={classes.paper}>
+      <Paper className={classes.paper} {...paperProps}>
         <GridContainer>
-          <GridItem md={9}>
-            <TextField
-              prefix={<Search />}
-              onChange={(e) => {
-                setSearch(e.target.value)
-              }}
-            />
-          </GridItem>
-          <GridItem md={3} style={{ lineHeight: theme.props.singleRowHeight }}>
-            <Tooltip title='Chart Method'>
-              <Button
-                // style={{ margin: `${theme.spacing(1)}px 0` }}
-
-                size='sm'
-                onClick={(e) => {
-                  setOpenSettings(!openSettings)
+          {searchable && (
+            <GridItem md={9}>
+              <TextField
+                value={search}
+                prefix={<Search />}
+                suffix={search && <Clear onClick={() => setSearch('')} />}
+                onChange={(e) => {
+                  setSearch(e.target.value)
                 }}
-                justIcon
-                color='primary'
-              >
-                <Settings />
-              </Button>
-            </Tooltip>
-          </GridItem>
+              />
+            </GridItem>
+          )}
+          {searchable && (
+            <GridItem
+              md={3}
+              style={{ lineHeight: theme.props.singleRowHeight }}
+            >
+              <Tooltip title='Chart Method'>
+                <Button
+                  // style={{ margin: `${theme.spacing(1)}px 0` }}
+
+                  size='sm'
+                  onClick={(e) => {
+                    setOpenSettings(!openSettings)
+                  }}
+                  justIcon
+                  color='primary'
+                >
+                  <Settings />
+                </Button>
+              </Tooltip>
+            </GridItem>
+          )}
           <GridItem md={12} gutter={theme.spacing(0.5)}>
-            <StyledToggleButtonGroup
+            <ToggleButtonGroup
               classes={{
-                root: classes.groupBtnRoot,
-                grouped: classes.groupBtnGrouped,
+                root: classes.groupBtnGroupRoot,
+                grouped: classes.grouped,
               }}
               size='small'
               value={selectedStyle}
@@ -133,7 +144,14 @@ const DiagnosisPanel = (props) => {
                 .map((row) => {
                   const { id, displayValue } = row
                   return (
-                    <ToggleButton value={id} key={id}>
+                    <ToggleButton
+                      value={id}
+                      key={id}
+                      disabled={viewOnly}
+                      classes={{
+                        root: classes.groupBtnRoot,
+                      }}
+                    >
                       <Tooth
                         className={classes.buttonIcon}
                         width={35}
@@ -144,10 +162,10 @@ const DiagnosisPanel = (props) => {
                         image={row.image}
                         action={row}
                         fill={{
-                          left: row.chartMethodColorBlock,
-                          right: row.chartMethodColorBlock,
-                          top: row.chartMethodColorBlock,
-                          bottom: row.chartMethodColorBlock,
+                          left: row.chartMethodColorBlock || 'white',
+                          right: row.chartMethodColorBlock || 'white',
+                          top: row.chartMethodColorBlock || 'white',
+                          bottom: row.chartMethodColorBlock || 'white',
                           centerfull: row.chartMethodColorBlock || 'white',
                         }}
                         symbol={{
@@ -166,7 +184,7 @@ const DiagnosisPanel = (props) => {
                     </ToggleButton>
                   )
                 })}
-            </StyledToggleButtonGroup>
+            </ToggleButtonGroup>
           </GridItem>
         </GridContainer>
       </Paper>
@@ -187,10 +205,18 @@ const DiagnosisPanel = (props) => {
     </div>
   )
 }
-
 export default React.memo(
   DiagnosisPanel,
-  ({ codetable }, { codetable: codetableNext }) => {
-    return codetable.ctchartmethod === codetableNext.ctchartmethod
+  (
+    { codetable, dentalChartComponent },
+    {
+      codetable: codetableNext,
+      dentalChartComponent: dentalChartComponentNext,
+    },
+  ) => {
+    return (
+      codetable.ctchartmethod === codetableNext.ctchartmethod &&
+      dentalChartComponent.action === dentalChartComponentNext.action
+    )
   },
 )

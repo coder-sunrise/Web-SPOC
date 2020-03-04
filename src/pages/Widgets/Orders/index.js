@@ -62,6 +62,8 @@ class Orders extends PureComponent {
     const { dispatch, status } = this.props
 
     const codeTableNameArray = [
+      'inventorymedication',
+      'inventoryvaccination',
       'ctMedicationUsage',
       'ctMedicationDosage',
       'ctMedicationUnitOfMeasurement',

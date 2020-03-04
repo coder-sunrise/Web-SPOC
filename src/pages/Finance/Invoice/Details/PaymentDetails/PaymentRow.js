@@ -41,8 +41,12 @@ const PaymentRow = ({
     reason,
     isCancelled,
     patientDepositTransaction,
-    invoicePaymentMode,
+    invoicePaymentMode = [],
   } = payment
+
+  const sortedInvoicePaymentModes = [
+    ...invoicePaymentMode,
+  ].sort((a, b) => (a.id > b.id ? 1 : -1))
 
   const [
     hoveredRowId,
@@ -84,6 +88,7 @@ const PaymentRow = ({
   const paymentTextStyle = {
     textDecoration: hoveredRowId ? 'underline' : null,
     padding: '5px 20px 5px 0px',
+    cursor: 'default',
     // padding: 5,
   }
 
@@ -111,7 +116,7 @@ const PaymentRow = ({
               placement='right'
               overlay={
                 <PaymentDetails
-                  paymentModeDetails={invoicePaymentMode}
+                  paymentModeDetails={sortedInvoicePaymentModes}
                   setHoveredRowId={setHoveredRowId}
                   id={id}
                 />

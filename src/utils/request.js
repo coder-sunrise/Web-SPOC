@@ -180,7 +180,7 @@ const request = (
   url,
   option,
   showNotification = true,
-  redirectToLoginAfterFail = true,
+  // redirectToLoginAfterFail = true,
 ) => {
   const options = {
     expirys: true,
@@ -303,9 +303,8 @@ const request = (
       .then((response, s, xhr) => {
         // console.log(response, s, xhr)
         console.timeEnd(newUrl)
-
         if (typeof response === 'object') {
-          commonDataReaderTransform(response)
+          commonDataReaderTransform(response, null, options.keepNull)
         }
         const { options: opts = {} } = options
         // console.log(response, s, xhr)
@@ -350,25 +349,26 @@ const request = (
         if (response) {
           try {
             updateLoadingState()
-
             let returnObj = {
               title: codeMessage[response.status],
+              requestId: response.responseJSON
+                ? response.responseJSON.requestId
+                : '',
             }
 
             let errorMsg = codeMessage[response.status]
-            const loginAndResetPasswordUrl = [
-              '/connect/token',
-            ]
-            if (redirectToLoginAfterFail) {
-              if (
-                (response.status === 400 && token === null) ||
-                (response.status === 401 && url !== '/connect/token')
-              ) {
-                window.g_app._store.dispatch({
-                  type: 'login/logout',
-                })
-                return false
-              }
+            // const loginAndResetPasswordUrl = [
+            //   '/connect/token',
+            // ]
+            if (
+              // (response.status === 400 && token === null) ||
+              response.status === 401 &&
+              url !== '/connect/token'
+            ) {
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
             }
 
             if (s === 'timeout') {
@@ -419,7 +419,7 @@ const request = (
                 requestId: response.responseJSON.requestId,
               })
             } else {
-              console.log('here')
+              // console.log('here')
               logError(showNotification, {
                 message: (
                   <div>
@@ -432,6 +432,7 @@ const request = (
                   returnObj.errors || returnObj.responseJSON,
                 ),
                 duration: 15,
+                requestId: returnObj.requestId,
               })
               // showNotification &&
               //   notification.error({
@@ -465,6 +466,7 @@ const request = (
             // msg = payload.message || statusText
           } catch (error) {
             console.error(error)
+            const errorMsg = error ? error.toString() : ''
             const exception = { success: false, status, errorMsg, payload }
             throw exception
           }

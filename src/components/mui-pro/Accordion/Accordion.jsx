@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import _ from 'lodash'
 import color from 'color'
 // @material-ui/core components
 import withStyles from '@material-ui/core/styles/withStyles'
@@ -35,7 +36,11 @@ class Accordion extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      active: props.defaultActive,
+      active: Array.isArray(props.defaultActive)
+        ? props.defaultActive
+        : [
+            props.defaultActive,
+          ],
       activedKeys: Array.isArray(props.defaultActive)
         ? props.defaultActive
         : [
@@ -45,12 +50,24 @@ class Accordion extends React.Component {
   }
 
   static getDerivedStateFromProps (nextProps, preState) {
-    const { active } = nextProps
-    if (active >= 0 && active !== preState.active) {
-      return {
-        active,
-      }
+    const { active, activedKeys, mode } = nextProps
+    const val = {}
+
+    if (
+      mode === 'default' &&
+      active !== undefined &&
+      !_.isEqual(active, preState.active)
+    ) {
+      val.active = active
     }
+    if (
+      mode === 'multiple' &&
+      activedKeys !== undefined &&
+      !_.isEqual(activedKeys, preState.activedKeys)
+    ) {
+      val.activedKeys = activedKeys
+    }
+    if (!_.isEmpty(val)) return val
     return null
   }
 
@@ -89,10 +106,11 @@ class Accordion extends React.Component {
       [classes.expansionPanelSummaryExpandIcon]: true,
       [classes.expandIconAtLeft]: leftIcon,
     })
-
+    // console.log(this.state)
     return (
       <div className={classes.root}>
-        {collapses.map((prop, key) => {
+        {collapses.map((prop, i) => {
+          const key = i
           return (
             <ExpansionPanel
               expanded={
@@ -137,8 +155,8 @@ class Accordion extends React.Component {
 }
 
 Accordion.defaultProps = {
-  active: -1,
-  activedKeys: [],
+  // active: -1,
+  // activedKeys: [],
 }
 
 Accordion.propTypes = {

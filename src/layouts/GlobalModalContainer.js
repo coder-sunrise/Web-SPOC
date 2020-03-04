@@ -269,6 +269,7 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          autoFocus
           open={global.openConfirm}
           title={global.openConfirmTitle}
           cancelText='Cancel'

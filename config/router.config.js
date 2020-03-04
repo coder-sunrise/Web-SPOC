@@ -605,6 +605,11 @@ const _routes = [
             name: 'viewreport',
             component: './Report/SessionSummary/Details',
           },
+          {
+            path: '/report/inventorytrendingreport',
+            name: 'inventorytrendingreport',
+            component: './Report/InventoryTrendingReport',
+          },
         ],
       },
       // Report
@@ -754,6 +759,16 @@ const _routes = [
             component: './Setting/UserRole',
           },
           {
+            path: '/setting/userrole/new',
+            name: 'newuserrole',
+            component: './Setting/UserRole/Details',
+          },
+          {
+            path: '/setting/userrole/:id',
+            name: 'edituserrole',
+            component: './Setting/UserRole/Details',
+          },
+          {
             path: '/setting/revenuecategory',
             name: 'revenuecategory',
             component: './Setting/RevenueCategory',
@@ -863,6 +878,11 @@ const _routes = [
             name: 'appointmenttype',
             component: './Setting/AppointmentType',
           },
+          {
+            path: '/setting/referralsource',
+            name: 'referralsource',
+            component: './Setting/ReferralSource',
+          },
         ],
       },
       // Settings
@@ -926,16 +946,16 @@ const routes =
   process.env.NODE_ENV === 'production'
     ? _routes
     : _routes.map((r, index) => {
-      if (index === 1) {
-        return {
-          ...r,
-          routes: [
-            devRoutes,
-            ...r.routes,
-          ],
+        if (index === 1) {
+          return {
+            ...r,
+            routes: [
+              devRoutes,
+              ...r.routes,
+            ],
+          }
         }
-      }
-      return r
-    })
+        return r
+      })
 
 export default routes

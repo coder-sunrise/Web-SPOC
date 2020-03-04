@@ -13,6 +13,8 @@ import {
   Select,
   GridContainer,
   CheckboxGroup,
+  CodeSelect,
+  NumberInput,
 } from '@/components'
 import { smsStatus, messageStatus } from '@/utils/codes'
 
@@ -38,31 +40,26 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem>
-      {/* <GridItem md={4}>
+      <GridItem md={4}>
         <FastField
-          name='lastVisitDate'
+          name='visitDate'
           render={(args) => (
-            <DateRangePicker
-              {...args}
-              label='Last Visit Date From'
-              label2='To'
-              onChange={(e) => {
-                if (e.length === 0) setFieldValue('lastVisitDate', undefined)
-              }}
-            />
-          )}
-        />
-      </GridItem> */}
-      {/* <GridItem md={4} /> */}
-      <GridItem md={2}>
-        <FastField
-          name='lastSMSSendStatus'
-          render={(args) => (
-            <Select {...args} label='SMS Status' options={smsStatus} />
+            <DateRangePicker {...args} label='Visit Date From' label2='To' />
           )}
         />
       </GridItem>
-      <GridItem xs={3}>
+      <GridItem md={4} />
+
+      <GridItem md={2}>
+        <FastField
+          name='nationality'
+          render={(args) => (
+            <CodeSelect {...args} label='Nationlity' code='ctnationality' />
+          )}
+        />
+      </GridItem>
+      <GridItem md={2} />
+      <GridItem xs={8}>
         <FastField
           name='pdpaConsent'
           render={(args) => (
@@ -98,29 +95,45 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
             />
           )}
         />
-        {/* <GridContainer>
-          <GridItem xs={5} className={classes.checkbox}>
-            <FastField
-              name='phoneCall'
-              render={(args) => <Checkbox label='Phone Call' {...args} />}
-            />
-          </GridItem>
-          <GridItem xs={5} className={classes.checkbox}>
-            <FastField
-              name='textMessage'
-              render={(args) => <Checkbox label='Text Message' {...args} />}
-            />
-          </GridItem>
-          <GridItem xs={2} className={classes.checkbox}>
-            <FastField
-              name='email'
-              render={(args) => <Checkbox label='Email' {...args} />}
-            />
-          </GridItem>
-        </GridContainer> */}
       </GridItem>
-      <GridItem md={6} />
 
+      <GridItem md={4}>
+        <FastField
+          name='noVisitDate'
+          render={(args) => (
+            <DateRangePicker
+              {...args}
+              label='No Visit Since From'
+              label2='To'
+            />
+          )}
+        />
+      </GridItem>
+      <GridItem md={4}>
+        <FastField
+          name='dob'
+          render={(args) => (
+            <DateRangePicker {...args} label='Birthday From' label2='To' />
+          )}
+        />
+      </GridItem>
+      <GridItem md={2}>
+        <FastField
+          name='ageFrom'
+          render={(args) => (
+            <NumberInput {...args} label='Age From' precision={0} />
+          )}
+        />
+      </GridItem>
+
+      <GridItem md={2}>
+        <FastField
+          name='ageTo'
+          render={(args) => (
+            <NumberInput {...args} label='Age To' precision={0} />
+          )}
+        />
+      </GridItem>
       {/* <GridItem md={2}>
         <FastField
           name='messageStatus'
@@ -129,6 +142,15 @@ const FilterByPatient = ({ classes, setFieldValue }) => {
           )}
         />
       </GridItem> */}
+
+      <GridItem md={2}>
+        <FastField
+          name='lastSMSSendStatus'
+          render={(args) => (
+            <Select {...args} label='SMS Status' options={smsStatus} />
+          )}
+        />
+      </GridItem>
     </React.Fragment>
   )
 }

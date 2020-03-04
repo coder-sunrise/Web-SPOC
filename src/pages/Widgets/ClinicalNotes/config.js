@@ -17,18 +17,6 @@ export const scribbleNoteTypeFieldKey = {
 export const defaultConfigs = {
   fields: [
     {
-      authority: 'queue.consultation.clinicalnotes.clinicalnotes',
-      category: 'ClinicianNote',
-      gpFieldName: 'clinicianNote',
-      dentalFieldName: 'clinicianNote',
-      fieldTitle: 'Clinical Notes',
-      scribbleField: 'notesScribbleArray',
-      gpScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
-      dentalScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.DENTALCLINICALNOTES,
-      cannedTextTypeFK: CANNED_TEXT_TYPE.CLINICALNOTES,
-      index: 0,
-    },
-    {
       authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
       category: 'ChiefComplaints',
       gpFieldName: 'chiefComplaints',
@@ -38,6 +26,19 @@ export const defaultConfigs = {
       gpScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS,
       dentalScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.DENTALCOMPLAINTS,
       cannedTextTypeFK: CANNED_TEXT_TYPE.CHIEFCOMPLAINTS,
+      height: 390,
+      index: 0,
+    },
+    {
+      authority: 'queue.consultation.clinicalnotes.clinicalnotes',
+      category: 'ClinicianNote',
+      gpFieldName: 'clinicianNote',
+      dentalFieldName: 'clinicalNotes',
+      fieldTitle: 'Clinical Notes',
+      scribbleField: 'notesScribbleArray',
+      gpScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CLINICALNOTES,
+      dentalScribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.DENTALCLINICALNOTES,
+      cannedTextTypeFK: CANNED_TEXT_TYPE.CLINICALNOTES,
       index: 1,
     },
     {

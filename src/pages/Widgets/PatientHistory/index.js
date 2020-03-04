@@ -20,11 +20,12 @@ import {
   withFormikExtend,
   Skeleton,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
+
 import Loading from '@/components/PageLoading/index'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
 import * as WidgetConfig from './config'
 
@@ -124,20 +125,28 @@ class PatientHistory extends Component {
 
   constructor (props) {
     super(props)
-    const { clinicInfo } = props
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    // const { clinicInfo } = props
+    // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    // // console.log(clinicInfo)
+    // this.widgets = WidgetConfig.gpWidgets(props)
+    // switch (clinicTypeFK) {
+    //   case CLINIC_TYPE.DENTAL:
 
-    this.widgets = WidgetConfig.gpWidgets(props)
+    //     break
+    //   default:
+    //     break
+    // }
     this.myRef = React.createRef()
-    switch (clinicTypeFK) {
-      case CLINIC_TYPE.DENTAL:
-        this.widgets = WidgetConfig.dentalWidgets(props)
-        break
-      default:
-        break
-    }
+
+    this.widgets = WidgetConfig.widgets(props).filter((o) => {
+      const accessRight = Authorized.check(o.authority)
+      // console.log(rights)
+      return accessRight && accessRight.rights !== 'hidden'
+    })
     this.state = {
-      selectedItems: this.widgets.map((widget) => widget.id),
+      selectedItems: localStorage.getItem('patientHistoryWidgets')
+        ? JSON.parse(localStorage.getItem('patientHistoryWidgets'))
+        : this.widgets.map((widget) => widget.id),
     }
   }
 
@@ -183,6 +192,7 @@ class PatientHistory extends Component {
     this.setState({
       selectedItems: val,
     })
+    localStorage.setItem('patientHistoryWidgets', JSON.stringify(val))
   }
 
   getContent = (row) => {
@@ -229,6 +239,19 @@ class PatientHistory extends Component {
                 disableGutters
                 button
                 onClick={() => {
+                  if (
+                    mode === 'integrated' &&
+                    selectedSubRow &&
+                    selectedSubRow.id === o.id
+                  ) {
+                    this.props.dispatch({
+                      type: 'patientHistory/updateState',
+                      payload: {
+                        selectedSubRow: undefined,
+                      },
+                    })
+                    return
+                  }
                   if (isRetailVisit) {
                     this.handleRetailVisitHistory(row)
                   } else
@@ -417,7 +440,7 @@ class PatientHistory extends Component {
       >
         {!isRetailVisit && (
           <GridContainer gutter={0} alignItems='center'>
-            <GridItem md={2}>
+            <GridItem md={4}>
               <Select
                 // simple
                 value={this.state.selectedItems}
@@ -498,7 +521,7 @@ class PatientHistory extends Component {
                 )}
               </GridItem>
             </Authorized>
-            <GridItem md={7} style={{ textAlign: 'right' }}>
+            <GridItem md={5} style={{ textAlign: 'right' }}>
               Updated Date:&nbsp;
               {patientHistory.selectedSubRow.signOffDate && (
                 <DatePicker
@@ -633,7 +656,7 @@ class PatientHistory extends Component {
     //   sortedPatientHistory,
     //   settings: settings.showConsultationVersioning,
     // })
-    console.log(this.myRef)
+    // console.log(this.myRef)
     return (
       <div {...cfg}>
         <CardContainer
@@ -654,7 +677,6 @@ class PatientHistory extends Component {
               <Accordion
                 defaultActive={0}
                 onChange={(event, p, expanded) => {
-                  console.log(event, p, expanded)
                   if (expanded) {
                     setTimeout(() => {
                       $(this.myRef.current)

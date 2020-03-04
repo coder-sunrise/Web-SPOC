@@ -60,6 +60,7 @@ module.exports = {
   queryDrugLabelDetails: async (visitInvoiceDrugId) => {
     const r = await request(`${url}/DrugLabel/${visitInvoiceDrugId}`, {
       method: 'GET',
+      keepNull: true,
     })
     return r
   },
@@ -67,6 +68,7 @@ module.exports = {
   queryDrugLabelsDetails: async (visitId) => {
     const r = await request(`${url}/DrugLabelByVisitID/${visitId}`, {
       method: 'GET',
+      keepNull: true,
     })
     return r
   },

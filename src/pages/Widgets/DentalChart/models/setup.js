@@ -9,7 +9,9 @@ export default createListViewModel({
   config: {},
   param: {
     service,
-    state: {},
+    state: {
+      mode: 'sort',
+    },
     subscriptions: ({ dispatch, history }) => {},
     effects: {
       *post ({ payload }, { call, put }) {

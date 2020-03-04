@@ -22,6 +22,7 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+
 import classNames from 'classnames'
 import { connect } from 'dva'
 import { Getter, PluginContainer } from '@devexpress/dx-react-core'
@@ -57,6 +58,7 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import { getUniqueId, difference } from '@/utils/utils'
 import { smallTheme, defaultTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -71,7 +73,7 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import { LoadingWrapper } from '@/components/_medisys'
 
-window.$tempGridRow = {}
+if (!window.$tempGridRow) window.$tempGridRow = {}
 
 const DragHandle = SortableHandle(({ style }) => (
   <Tooltip title='Drag'>
@@ -85,7 +87,6 @@ const DragHandle = SortableHandle(({ style }) => (
     </span>
   </Tooltip>
 ))
-
 
 const cellStyle = {
   cell: {
@@ -146,18 +147,18 @@ const styles = (theme) => ({
     // justifyContent: 'center',
     // alignItems: 'center',
     '& > span': {
-      cursor: 'move'
-    }
+      cursor: 'move',
+    },
   },
   sortableContainer: {
     zIndex: 10000,
-    '& > *':{
+    '& > *': {
       // backgroundColor:'black',
-      width:'100%',
-      '& > *':{
-        minWidth:200
-      }
-    }
+      width: '100%',
+      '& > *': {
+        minWidth: 200,
+      },
+    },
   },
 })
 
@@ -175,11 +176,19 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   const startIndex = pagerConfig.current
     ? pagerConfig.pagesize * (pagerConfig.current - 1)
     : 0
+  // console.log(pagerConfig)
+  // console.log(
+  //   pagerConfig.current,
+  //   pagerConfig.pagesize,
+  //   pagerConfig.current - 1,
+  //   startIndex,
+  // )
   // console.log(startIndex)
   // console.log(rows)
   return rows.map((o, i) => {
+    // console.log(o, startIndex + i)
     return {
-      rowIndex: startIndex + i,
+      rowIndex: rows.length > pagerConfig.pagesize ? i : startIndex + i,
       ...o,
     }
   })
@@ -189,13 +198,6 @@ let uniqueGid = 0
   return { loading, global }
 })
 class CommonTableGrid extends PureComponent {
-  state = {
-    pagination: {
-      current: 1,
-      pagesize: 10,
-    },
-  }
-
   static defaultProps = {
     columnExtensions: [],
   }
@@ -214,23 +216,35 @@ class CommonTableGrid extends PureComponent {
       height: pHeight,
       onRowDrop,
       editableGrid,
-      getRowId= (row) => (row.Id ? row.Id : row.id)
+      getRowId = (row) => (row.Id ? row.Id : row.id),
+      FuncProps = {},
     } = props
     // console.log(props)
     this.gridId = `view-${uniqueGid++}`
-    this.isScrollable = !!pHeight
+    // this.isScrollable = !!pHeight
     // this.myRef = React.createRef()
+    const { pagerDefaultState = {} } = FuncProps
+    this.state = {
+      pagination: {
+        current: 1,
+        pagesize: 10,
+        ...pagerDefaultState,
+      },
+      rows: [],
+    }
+
     const cls = classNames({
-      [ classes.tableStriped ]: oddEven,
-      [ classes.tableCursorPointer ]: onRowDoubleClick !== undefined,
+      [classes.tableStriped]: oddEven,
+      [classes.tableCursorPointer]: onRowDoubleClick !== undefined,
     })
     const TableComponent = ({ ...restProps }) => {
       // console.log('TableComponent', restProps)
       return <Table.Table {...restProps} className={cls} />
     }
-
     this.TableBase = ({ height, scrollable, dispatch, ...restProps }) => {
       const isScrollable = !!height
+      // console.log(this.isScrollable, height, isScrollable)
+
       const dragCfg = {}
       // if(rowDragable){
       //   dragCfg.rowComponent=({ row, ...restProps }) => {
@@ -247,7 +261,7 @@ class CommonTableGrid extends PureComponent {
         />
       ) : (
         <Table tableComponent={TableComponent} {...restProps} />
-        )
+      )
     }
 
     const tableRowRender = ({ row, tableRow, ...restProps }) => {
@@ -267,8 +281,8 @@ class CommonTableGrid extends PureComponent {
             typeof rowMoveable === 'function' && rowMoveable(row) ? (
               'moveable'
             ) : (
-                ''
-              )
+              ''
+            )
           }
         />
       )
@@ -278,20 +292,20 @@ class CommonTableGrid extends PureComponent {
 
     if (!editableGrid && rowDragable) {
       this.TableRow = (rowProps) => {
-        const {tableRow}= rowProps
-        const {row}=tableRow
+        const { tableRow } = rowProps
+        const { row } = tableRow
         // console.log(rowProps)
-        const index =this.getData().map((i) => i.id).indexOf(getRowId(row))
+        const index = this.getData().map((i) => i.id).indexOf(getRowId(row))
         const DragableRow = SortableElement(tableRowRender)
         return <DragableRow {...rowProps} index={index} />
       }
       const onSortEnd = ({ newIndex, oldIndex }) => {
         // console.log(newIndex, oldIndex)
-        const rows=this.getData()
+        const rows = this.getData()
         // console.log(_.minBy(rows,(n)=>n.sortOrder))
         const newRows = arrayMove(rows, oldIndex, newIndex)
         // console.log(rows,newRows)
-        if(onRowDrop)onRowDrop(newRows)
+        if (onRowDrop) onRowDrop(newRows)
         // const newRows = arrayMove(dataSource, oldIndex, newIndex)
         // onRowDrop(newRows)
         // dispatch({
@@ -519,7 +533,7 @@ class CommonTableGrid extends PureComponent {
             },
           },
         },
-        ...sizeConfig[ size ],
+        ...sizeConfig[size],
       },
     })
     // console.log(this.theme)
@@ -527,12 +541,18 @@ class CommonTableGrid extends PureComponent {
     // console.log(props.query, ' c grid')
   }
 
+  // shouldComponentUpdate (nextProps) {
+  //   console.log(difference(nextProps, this.props))
+  //   return true
+  // }
+
   static getDerivedStateFromProps (nextProps, preState) {
+    // console.log(JSON.stringify(nextProps))
     const { entity, type, columnExtensions } = nextProps
     // console.log(nextProps)
     let _entity = entity
     if (type) {
-      _entity = window.g_app._store.getState()[ type ]
+      _entity = window.g_app._store.getState()[type]
     }
 
     if (
@@ -558,9 +578,35 @@ class CommonTableGrid extends PureComponent {
         entity: _entity,
       }
     }
-    if (nextProps.rows && nextProps.rows !== preState.rows) {
-      return {
-        rows: nextProps.rows,
+    // console.log(nextProps.rows)
+    if (nextProps.rows) {
+      if (
+        // if user add new row from 2nd page, move the new row to current page
+        nextProps.rows.length &&
+        nextProps.rows[0].isNew &&
+        preState.pagination.current > 1
+      ) {
+        const newRow = nextProps.rows[0]
+        const newRows = _.cloneDeep(nextProps.rows)
+        newRows.splice(0, 1)
+        newRows.splice(
+          (preState.pagination.current - 1) * preState.pagination.pagesize,
+          0,
+          newRow,
+        )
+        // console.log(newRows)
+        return {
+          rows: newRows,
+        }
+      }
+      // if(rows.)
+      // console.log(v, preState)
+
+      if (nextProps.rows !== preState.rows) {
+        // console.log(nextProps.rows !== preState.rows)
+        return {
+          rows: nextProps.rows,
+        }
       }
     }
 
@@ -741,7 +787,12 @@ class CommonTableGrid extends PureComponent {
   // }
 
   Cell = (p) => {
-    const { columnExtensions = [], extraState, getRowId, classes: clses } = this.props
+    const {
+      columnExtensions = [],
+      extraState,
+      getRowId,
+      classes: clses,
+    } = this.props
     const { classes, onClick, ...restProps } = p
     const { column, row } = restProps
     // const { cellEditingDisabled } = column
@@ -754,8 +805,8 @@ class CommonTableGrid extends PureComponent {
     if (extraState) {
       const colCfg =
         columnExtensions.find((o) => o.columnName === column.name) || {}
-      const latestRow = window.$tempGridRow[ this.gridId ]
-        ? window.$tempGridRow[ this.gridId ][ getRowId(row) ] || row
+      const latestRow = window.$tempGridRow[this.gridId]
+        ? window.$tempGridRow[this.gridId][getRowId(row)] || row
         : row
       // try {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
@@ -820,11 +871,13 @@ class CommonTableGrid extends PureComponent {
         )
       }
       if (column.name === 'rowDrag') {
-        return <Table.Cell {...restProps}>
-          <div className={clses.dragCellContainer}>
-            <DragHandle />
-          </div>
-        </Table.Cell>
+        return (
+          <Table.Cell {...restProps}>
+            <div className={clses.dragCellContainer}>
+              <DragHandle />
+            </div>
+          </Table.Cell>
+        )
       }
     }
     return <Table.Cell {...cfg} {...restProps} />
@@ -845,13 +898,13 @@ class CommonTableGrid extends PureComponent {
     return childRows.length ? childRows : null
   }
 
-  getData =()=>{
-    const { rows=[],showIsDeleted}=this.props
-    if(showIsDeleted) return rows
+  getData = () => {
+    const { showIsDeleted } = this.props
+    const { rows = [] } = this.state
     return getIndexedRows(
       this.state.entity
         ? this.state.entity.list
-        : rows.filter((o) => !o.isDeleted),
+        : rows.filter((o) => !o.isDeleted || showIsDeleted),
       this.state.pagination,
     )
   }
@@ -867,7 +920,6 @@ class CommonTableGrid extends PureComponent {
       ],
       columns = [],
       type,
-      rows = [],
       TableCell = DefaultTableCell,
       filteringColExtensions = [],
       defaultSorting = [],
@@ -938,7 +990,6 @@ class CommonTableGrid extends PureComponent {
       pagerConfig.containerComponent = containerComponent
     }
     // console.log('index', rows)
-    // console.log(this.props)
     // console.log(
     //   filter,
     //   grouping,
@@ -951,7 +1002,7 @@ class CommonTableGrid extends PureComponent {
     //   sort,
     //   sortConfig,
     // )
-    // console.log(this.state)
+    // console.log(this.state, this.props)
     const { TableBase } = this
     const actionColDefaultCfg = {
       columnName: 'action',
@@ -1074,12 +1125,16 @@ class CommonTableGrid extends PureComponent {
     let newColumns = columns
     let newLeftCols = leftColumns
 
-    if (!editableGrid && rowDragable && !newColumns.find((o) => o.name === 'rowDrag')) {
+    if (
+      !editableGrid &&
+      rowDragable &&
+      !newColumns.find((o) => o.name === 'rowDrag')
+    ) {
       newLeftCols = [
         'rowDrag',
       ].concat(newLeftCols)
       newColumns.unshift({ name: 'rowDrag', title: ' ' })
-    }    
+    }
     if (rowMoveable && !newColumns.find((o) => o.name === 'rowMove')) {
       newLeftCols = [
         'rowMove',
@@ -1094,14 +1149,14 @@ class CommonTableGrid extends PureComponent {
     }
     // console.log(window.$tempGridRow)
     // console.log(this.state.entity.list)
-    const _loading = type ? loading.effects[ `${type}/query` ] : false
-
+    const _loading = type ? loading.effects[`${type}/query`] : false
+    const rowData = this.getData()
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
           className={classNames({
-            [ classes.paperContainer ]: true,
-            [ this.props.className ]: true,
+            [classes.paperContainer]: true,
+            [this.props.className]: true,
             'medisys-table': true,
           })}
           style={{
@@ -1117,7 +1172,7 @@ class CommonTableGrid extends PureComponent {
           ) */}
           <LoadingWrapper loading={_loading} linear text='Loading...'>
             <DevGrid
-              rows={this.getData()} // this.state.data ||
+              rows={rowData} // this.state.data ||
               columns={newColumns}
               getRowId={getRowId}
               rootComponent={Root}
@@ -1142,8 +1197,8 @@ class CommonTableGrid extends PureComponent {
                       if (this.state.entity) {
                         const { sorting = [] } = this.state.entity.pagination
                         if (
-                          sorting[ i ] &&
-                          o.columnName !== sorting[ i ].columnName
+                          sorting[i] &&
+                          o.columnName !== sorting[i].columnName
                         )
                           o.direction = o.direction === 'asc' ? 'desc' : 'asc'
                       }
@@ -1182,15 +1237,15 @@ class CommonTableGrid extends PureComponent {
               )}
               {/* <IntegratedFiltering /> */}
               {sort &&
-                !type && (
-                  <IntegratedSorting columnExtensions={columnExtensions} />
-                )}
+              !type && (
+                <IntegratedSorting columnExtensions={columnExtensions} />
+              )}
               {summary && <IntegratedSummary {...summaryConfig.integrated} />}
               {pager && !this.state.entity && <IntegratedPaging />}
               {pager &&
-                this.state.entity && (
-                  <CustomPaging totalCount={this.state.pagination.totalRecords} />
-                )}
+              this.state.entity && (
+                <CustomPaging totalCount={this.state.pagination.totalRecords} />
+              )}
               {selectable && (
                 // <IntegratedSelection />
                 <PatchedIntegratedSelection
@@ -1212,7 +1267,7 @@ class CommonTableGrid extends PureComponent {
               {grouping && <DragDropProvider />}
               {tree && <CustomTreeData getChildRows={this.getChildRows} />}
               <TableBase
-                // height={height}
+                height={height}
                 rowComponent={this.TableRow}
                 bodyComponent={this.TableBody}
                 {...tableProps}
@@ -1247,9 +1302,9 @@ class CommonTableGrid extends PureComponent {
               )}
               {grouping && groupingConfig.showToolbar && <Toolbar />}
               {grouping &&
-                groupingConfig.showToolbar && (
-                  <GroupingPanel showSortingControls />
-                )}
+              groupingConfig.showToolbar && (
+                <GroupingPanel showSortingControls />
+              )}
               {summary && (
                 <TableSummaryRow
                   itemComponent={(p) => {
@@ -1270,12 +1325,12 @@ class CommonTableGrid extends PureComponent {
                   rightColumns.length > 0 ? (
                     rightColumns
                   ) : (
-                      [
-                        'action',
-                        'Action',
-                        'editCommand',
-                      ]
-                    )
+                    [
+                      'action',
+                      'Action',
+                      'editCommand',
+                    ]
+                  )
                 }
                 leftColumns={newLeftCols}
               />

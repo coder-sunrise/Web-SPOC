@@ -1,15 +1,16 @@
 import React from 'react'
 import classnames from 'classnames'
 // material ui
-import { withStyles } from '@material-ui/core'
+import { withStyles, Divider } from '@material-ui/core'
 import Notifications from '@material-ui/icons/Notifications'
 import Refresh from '@material-ui/icons/Refresh'
 // common components
-import { Badge, Popper, Button } from '@/components'
+import { Badge, Popper, Button, Tabs, IconButton } from '@/components'
 // sub components
 import NotificationList from './NotificationList'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
+import { TYPES } from './constants'
 
 const styles = (theme) => ({
   ...customDropdownStyle(theme),
@@ -20,7 +21,12 @@ const styles = (theme) => ({
   },
 })
 
-const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
+const NotificationComponent = ({
+  notifications = [],
+  dispatch,
+  classes,
+  theme,
+}) => {
   const refreshQueueListing = () => {
     dispatch({
       type: 'queueLog/refresh',
@@ -28,24 +34,36 @@ const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
   }
 
   const overlay = (
-    <div>
-      <div className={classes.overlayRoot}>
-        <p style={{ margin: 'auto auto auto 15px', fontSize: 16 }}>
-          Notifications
-        </p>
-        <Button
-          link
-          noUnderline
-          simple
-          color='primary'
-          size='sm'
-          onClick={refreshQueueListing}
-        >
-          <Refresh />
-          Refresh Q
-        </Button>
-      </div>
-      <NotificationList notifications={notifications} dispatch={dispatch} />
+    <div style={{ position: 'relative', width: 600 }}>
+      <Tabs
+        type='line'
+        // style={{ marginTop: 20 }}
+        // activeKey={active}
+        // defaultActivekey='1'
+        // onChange={(e) => setActive(e)}
+        options={TYPES.map((o) => {
+          const list = notifications.filter((m) => !o.id || m.type === o.id)
+          return {
+            ...o,
+            name: `${o.name} ${list.filter((m) => !m.read).length > 0
+              ? `(${list.filter((m) => !m.read).length})`
+              : ''}`,
+            content: (
+              <NotificationList
+                notifications={list}
+                dispatch={dispatch}
+                type={o.id}
+              />
+            ),
+          }
+        })}
+      />
+      <IconButton
+        style={{ top: 12, right: 12, position: 'absolute' }}
+        onClick={refreshQueueListing}
+      >
+        <Refresh />
+      </IconButton>
     </div>
   )
 
@@ -59,7 +77,7 @@ const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
       overlay={overlay}
     >
       <Badge
-        badgeContent={notifications.length}
+        badgeContent={notifications.filter((o) => !o.read).length}
         color='primary'
         anchorOrigin={{
           vertical: 'top',
@@ -74,6 +92,7 @@ const NotificationComponent = ({ notifications = [], dispatch, classes }) => {
   )
 }
 
-export default withStyles(styles, { name: 'NotificationComponent' })(
-  NotificationComponent,
-)
+export default withStyles(styles, {
+  withTheme: true,
+  name: 'NotificationComponent',
+})(NotificationComponent)

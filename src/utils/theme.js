@@ -102,8 +102,14 @@ const sharedOverrides = {
   // },
   MuiExpansionPanel: {
     root: {
-      '&$expanded': {
-        marginTop: 0,
+      '&.Mui-expanded': {
+        margin: 0,
+        marginTop: '8px !important',
+
+        // marginTop: 'inherit',
+        // '&:first-child': {
+        //   marginTop: '8px !important',
+        // },
       },
     },
   },

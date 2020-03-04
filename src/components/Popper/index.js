@@ -49,7 +49,7 @@ export default ({
   // const { className, style, ...resetBtnProps } = children.props
 
   const popperContainer = (
-    <Paper>
+    <Paper elevation={2}>
       <ClickAwayListener
         onClickAway={() => {
           // console.log('onClickAway')
@@ -84,7 +84,7 @@ export default ({
         style={{ zIndex: 1500 }}
         {...props}
       >
-        {({ TransitionProps, placement }) => {
+        {({ TransitionProps, p }) => {
           if (disabledTransition) return popperContainer
 
           return <Grow {...TransitionProps}>{popperContainer}</Grow>

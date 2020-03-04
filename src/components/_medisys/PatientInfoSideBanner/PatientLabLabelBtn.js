@@ -9,10 +9,8 @@ import { Button, SizeContainer } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // services
-import { getPDF, getRawData } from '@/services/report'
+import { getRawData } from '@/services/report'
 
-const labLabelReport = 33
-const labLabelReport89mm = 34
 const PatientLabLabelButton = ({
   handlePrint,
   patientId,

@@ -111,13 +111,14 @@ const DiagnosisItem = ({
   return (
     <Paper elevation={4} className={classes.diagnosisRow}>
       <GridContainer style={{ marginTop: theme.spacing(1) }}>
-        <GridItem xs={6}>
+        <GridItem xs={6} style={{ paddingRight: 35 }}>
           <Field
             name={`corDiagnosis[${index}].diagnosisFK`}
             render={(args) => (
               <DiagnosisSelect
                 onChange={onDiagnosisChange}
                 onDataSouceChange={onDataSouceChange}
+                filterStyle={{ position: 'absolute', bottom: 2, right: -35 }}
                 {...args}
               />
             )}

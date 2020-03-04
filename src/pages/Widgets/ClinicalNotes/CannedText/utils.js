@@ -2,6 +2,16 @@ import { EditorState, ContentState } from 'draft-js'
 import htmlToDraft from 'html-to-draftjs'
 import { Checkbox } from '@/components'
 import { htmlDecodeByRegExp } from '@/utils/utils'
+import {
+  CANNED_TEXT_TYPE_FIELD,
+  DENTAL_CANNED_TEXT_TYPE_FIELD,
+  CLINIC_TYPE,
+} from '@/utils/constants'
+
+export const CANNEDTEXT_FIELD_KEY = {
+  [CLINIC_TYPE.GP]: CANNED_TEXT_TYPE_FIELD,
+  [CLINIC_TYPE.DENTAL]: DENTAL_CANNED_TEXT_TYPE_FIELD,
+}
 
 export const columns = [
   { name: 'drag', title: ' ' },
@@ -60,7 +70,6 @@ export const generateData = () => {
 }
 
 export const applyFilter = (filter, rows) => {
-  console.log({ rows })
   let returnData = [
     ...rows,
   ]

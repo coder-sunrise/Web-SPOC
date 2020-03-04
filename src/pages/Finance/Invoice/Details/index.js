@@ -17,7 +17,12 @@ import InvoiceContent from './Content'
   name: 'invoiceDetail',
   enableReinitialize: true,
   mapPropsToValues: ({ invoiceDetail }) => {
-    return invoiceDetail.entity || invoiceDetail.default
+    const values = invoiceDetail.entity || invoiceDetail.default
+
+    return {
+      ...values,
+      totalPayment: values.invoiceTotalAftGST - values.outstandingBalance,
+    }
   },
 })
 class InvoiceDetails extends Component {

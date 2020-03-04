@@ -5,13 +5,19 @@ import ErrorPage from '@/pages/500'
 class ErrorBoundary extends React.Component {
   constructor (props) {
     super(props)
-    this.state = { hasError: false, error: null, errorInfo: null, count: 0 }
-
-    // console.log('ErrorBoundary')
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError (error) {
     // Update state so the next render will show the fallback UI.
+    console.group('error boundary')
+    console.log({
+      type: typeof error,
+      stack: error.stack,
+      url: window.location.pathname,
+      params: window.location.search,
+    })
+    console.groupEnd('error boundary')
     return { hasError: true, error, url: window.location.href }
   }
 
@@ -24,9 +30,10 @@ class ErrorBoundary extends React.Component {
   // componentDidCatch (error, errorInfo) {
   //   // Catch errors in any components below and re-render with error message
   //   // You can also log error messages to an error reporting service here
-  //   console.error(error)
-  //   console.error(errorInfo)
-
+  //   console.group('componentDidCatch')
+  //   console.log(error)
+  //   console.log(errorInfo)
+  //   console.groupEnd('componentDidCatch')
   //   // if (process.env.NODE_ENV === 'development') {
   //   //   this.setState((prevError) => {
   //   //     errorCount += 1

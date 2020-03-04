@@ -157,7 +157,7 @@ export default createListViewModel({
 
     reducers: {
       reset () {
-        console.log('order reset')
+        // console.log('order reset')
         return { ...initialState }
       },
       upsertRowState (state, { payload }) {

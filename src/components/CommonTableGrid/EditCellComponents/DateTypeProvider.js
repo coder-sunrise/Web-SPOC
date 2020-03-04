@@ -42,10 +42,9 @@ class DateEditorBase extends PureComponent {
       commonCfg.onChange = this._onChange
       commonCfg.onBlur = (e) => {
         this.isFocused = false
-
         setTimeout(() => {
           if (!this.isFocused) this.props.onBlur(e)
-        }, 1)
+        }, 150)
       }
       commonCfg.onFocus = () => {
         this.isFocused = true

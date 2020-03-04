@@ -34,6 +34,7 @@ const STYLES = () => {
         // borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
       },
       '& .ant-select-selection': {
+        paddingRight: 22,
         background: 'none',
       },
       // '& .ant-select-selection-selected-value': {
@@ -198,9 +199,14 @@ class AntdSelect extends React.PureComponent {
   }
 
   componentDidMount () {
-    if (this.state.value && this.props.query && this.state.data.length === 0) {
+    if (
+      this.state.value &&
+      ((Array.isArray(this.state.value) && this.state.value.length > 0) ||
+        !!this.state.value) &&
+      this.props.query &&
+      this.state.data.length === 0
+    ) {
       // for remote datasouce, get the selected value by default
-      // console.log(this.state.value)
       this.fetchData(this.state.value)
     }
   }
@@ -323,7 +329,12 @@ class AntdSelect extends React.PureComponent {
 
   handleFilter = (input, option) => {
     // console.log(input, option, option.props.children, this.props.labelField)
+    const { handleFilter } = this.props
     let match = false
+
+    if (handleFilter && typeof handleFilter === 'function') {
+      return handleFilter(input, option)
+    }
     try {
       if (Array.isArray(option.props.children)) {
         // return (
@@ -453,7 +464,6 @@ class AntdSelect extends React.PureComponent {
   }
 
   fetchData = async (value) => {
-    // console.log('fetching data', value)
     this.setState((prevState) => {
       return { data: [], fetching: true, fetchId: ++prevState.fetchId }
     })
@@ -638,6 +648,12 @@ class AntdSelect extends React.PureComponent {
       )
     }
     // console.log(classes.selectContainer, classes.className)
+    // console.log(
+    //   this.state.fetchId,
+    //   this.state.fetchId === 0,
+    //   autoComplete,
+    //   query,
+    // )
     const customTagPlaceholder = maxTagPlaceholder || 'options'
     return (
       <div
