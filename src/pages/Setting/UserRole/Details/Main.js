@@ -24,7 +24,6 @@ import {
   SizeContainer,
   DatePicker,
 } from '@/components'
-import { FilterBarDate } from '@/components/_medisys'
 
 // utils
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -71,10 +70,15 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = filteredAccessRight
+    let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight.map((r) => {
+      const data = filteredAccessRight.filter((m) => {
+        return m.clientAccessRightFK === r.clientAccessRightFK
+      })
+      return data.length === 0 ? r : data[0]
+    })
     if (!values.id) {
-      restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
+      restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
         return data
       })
@@ -82,7 +86,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
-    console.log('restValues', restValues)
+
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -104,19 +108,31 @@ class Main extends React.Component {
     },
   }
 
-  handleSearchClick = () => {
+  handleSearchClick = async () => {
     const { filter } = this.state
     const { module, displayValue } = filter
-    let criteria = {}
-    if (module) {
-      criteria = { ...criteria, module }
-    }
-    if (displayValue) {
-      criteria = { ...criteria, displayValue }
-    }
+    const { values } = this.props
+    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
+      const data = filteredAccessRight.filter((m) => {
+        return m.clientAccessRightFK === d.clientAccessRightFK
+      })
+      return data.length === 0 ? d : data[0]
+    })
+
+    restValues.filteredAccessRight = restValues.roleClientAccessRight
+      .filter((m) => {
+        return !module || m.module === module
+      })
+      .filter((m) => {
+        return !displayValue || m.displayValue === displayValue
+      })
+
     this.props.dispatch({
-      type: 'settingUserRole/filter',
-      criteria,
+      type: 'settingUserRole/updateState',
+      payload: {
+        currentSelectedUserRole: restValues,
+      },
     })
   }
 
@@ -197,11 +213,6 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    console.log(this.props)
-    // console.log(JSON.stringify(this.props.values))
-
-    console.log('start', effectiveStartDate)
-    console.log('end', effectiveEndDate)
 
     return (
       <React.Fragment>
