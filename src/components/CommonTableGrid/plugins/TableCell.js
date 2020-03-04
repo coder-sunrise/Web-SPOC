@@ -118,6 +118,16 @@ class TableCell extends React.Component {
       classes: clses,
       onClick,
       onContextMenu,
+      height,
+      rows,
+      columns,
+      schema,
+      EditProps,
+      FuncProps,
+      theme,
+      loading,
+      global,
+      children,
       ...restProps
     } = this.props
     // console.log(restProps.row)
@@ -169,11 +179,11 @@ class TableCell extends React.Component {
         }
 
         if (!this.props.rowMoveable || !this.props.rowMoveable(row))
-          return <Table.Cell {...restProps} />
+          return <Table.Cell>{children}</Table.Cell>
 
         return (
           <Table.Cell
-            {...restProps}
+            // {...restProps}
             // {...cfg}
             editingEnabled={false}
             className='td-move-cell'
@@ -200,7 +210,7 @@ class TableCell extends React.Component {
       }
       if (column.name === 'rowDrag') {
         return (
-          <Table.Cell {...restProps}>
+          <Table.Cell>
             <div className={clses.dragCellContainer}>
               <DragHandle />
             </div>
@@ -208,7 +218,7 @@ class TableCell extends React.Component {
         )
       }
     }
-    return <Table.Cell {...cfg} {...restProps} />
+    return <Table.Cell {...cfg}>{children}</Table.Cell>
   }
 }
 

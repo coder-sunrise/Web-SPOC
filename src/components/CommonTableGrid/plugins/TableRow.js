@@ -54,12 +54,13 @@ class TableRow extends React.Component {
       row,
       tableRow,
       rowSelectionEnabled,
+      children,
       ...restProps
     } = this.props
-    // console.log(2)
+    // console.log(restProps)
     return (
       <Table.Row
-        {...restProps}
+        // {...restProps}
         onDoubleClick={(event) => {
           onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}
@@ -76,7 +77,9 @@ class TableRow extends React.Component {
             ''
           )
         }
-      />
+      >
+        {children}
+      </Table.Row>
     )
   }
 }
