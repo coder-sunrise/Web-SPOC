@@ -315,7 +315,7 @@ class Medication extends PureComponent {
   setInstruction = (index = 0) => {
     const { setFieldValue, codetable, values } = this.props
     const { selectedMedication } = this.state
-    let op
+    let op = selectedMedication
 
     if (!selectedMedication || !selectedMedication.id) {
       op = codetable.inventorymedication.find(
@@ -618,10 +618,7 @@ class Medication extends PureComponent {
                 return activeRows.map((val, activeIndex) => {
                   if (val && val.isDeleted) return null
                   const i = values.corPrescriptionItemInstruction.findIndex(
-                    (item) =>
-                      !val.id
-                        ? _.isEqual(item, val)
-                        : item.sequence === val.sequence,
+                    (item) => _.isEqual(item, val),
                   )
 
                   return (
@@ -820,7 +817,7 @@ class Medication extends PureComponent {
                             // drugFrequencyFK: 1,
                             // duration: 1,
                             stepdose: 'AND',
-                            sequence: val.sequence + 1,
+                            sequence: activeRows.length + 1,
                           },
                         )}
                       </GridContainer>
@@ -923,7 +920,7 @@ class Medication extends PureComponent {
                               drugFrequencyFK: '1',
                               day: 1,
                               precaution: '1',
-                              sequence: val.sequence + 1,
+                              sequence: activeRows.length + 1,
                             },
                           )}
                         </GridContainer>
