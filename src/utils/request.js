@@ -351,7 +351,9 @@ const request = (
             updateLoadingState()
             let returnObj = {
               title: codeMessage[response.status],
-              requestId: response.responseJSON.requestId,
+              requestId: response.responseJSON
+                ? response.responseJSON.requestId
+                : '',
             }
 
             let errorMsg = codeMessage[response.status]
