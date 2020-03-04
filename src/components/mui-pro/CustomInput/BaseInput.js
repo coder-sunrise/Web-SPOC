@@ -120,6 +120,7 @@ class BaseInput extends React.PureComponent {
       negative,
       text,
       inActive,
+      defaultCurrencyFontColor,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -148,7 +149,7 @@ class BaseInput extends React.PureComponent {
       [classes.textInput]: !!text,
       [classes.whiteUnderline]: white,
       [classes.currency]: text && currency,
-      [classes.negativeCurrency]: text && negative,
+      [classes.negativeCurrency]: text && negative && !defaultCurrencyFontColor,
       [classes.inActive]: text && inActive,
     })
 

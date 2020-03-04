@@ -30,19 +30,35 @@ const DragHandle = SortableHandle(({ style }) => (
 class TableCell extends React.Component {
   shouldComponentUpdate (nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
-    // console.log(nextProps.row === this.props.row)
+    // console.log(row === this.props.row)
+
+    if (window._forceTableUpdate) {
+      return true
+    }
+
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
     const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
+    // console.log(extraCellConfig, columnExtensions)
+    if (
+      window._forceTableRowUpdate &&
+      window._forceTableRowUpdate.includes(getRowId(row))
+    ) {
+      // console.log(4, row)
+      return true
+    }
+
     // console.log(orgConfig, extraCellConfig, nextProps)
     if (
       extraCellConfig &&
       extraCellConfig.editingCells &&
       extraCellConfig.editingCells.find(
-        (o) => o.rowId === getRowId(nextProps.row), // &&
+        (o) => o.rowId === getRowId(row), // &&
         // o.columnName === nextProps.column.name,
       )
     ) {
+      // console.log(3, row)
+
       return true
     }
 
@@ -53,8 +69,10 @@ class TableCell extends React.Component {
         (o) => o.rowId === getRowId(this.props.row), // &&
         // o.columnName === nextProps.column.name,
       )
-    )
+    ) {
+      // console.log(2, row)
       return true
+    }
 
     if (nextProps.column) {
       const col =
@@ -64,18 +82,27 @@ class TableCell extends React.Component {
         // typeof col.options === 'function' ||
         row._errors &&
         row._errors.find((o) => o.params.path === nextProps.column.name)
-      )
+      ) {
+        // console.log(1, row)
+
         return true
+      }
+
+      if (col.observeFields) {
+        const changedFields = col.observeFields.map((o) => row[o] !== orgRow[o])
+        if (changedFields.filter((o) => o).length > 0) return true
+      }
+
+      // console.log(col, row)
     }
     // if (!_.isEqual(orgRow._errors, row._errors)) return true
     // if (this.editing === true) {
     //   this.editing = false
     //   return true
     // }
-
     return false
     // if (nextProps.extraCellConfig) return true
-    // return nextProps.row !== this.props.row
+    // return row !== this.props.row
   }
 
   moveRow = (row, direction) => () => {
@@ -90,6 +117,7 @@ class TableCell extends React.Component {
       getRowId,
       classes: clses,
       onClick,
+      onContextMenu,
       ...restProps
     } = this.props
     // console.log(restProps.row)

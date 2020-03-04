@@ -112,9 +112,15 @@ export default createFormViewModel({
         }
       },
       toggleSelect (state, { payload }) {
+        // console.log(payload)
+        const data = updateData(_.cloneDeep(state.data), payload)
+        const selected = data.find((o) => o.key === payload.id + payload.target)
+        // console.log(selected)
         return {
           ...state,
-          data: updateData(_.cloneDeep(state.data), payload),
+          data,
+          selected,
+          lastClicked: selected ? payload.id + payload.target : undefined,
         }
       },
       deleteTreatment (state, { payload }) {

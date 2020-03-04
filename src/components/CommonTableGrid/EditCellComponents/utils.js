@@ -162,7 +162,7 @@ function getCommonRender (cb) {
   const cfg = getCommonConfig.call(this)
   const { render, error, row, isReactComponent } = cfg
   // console.log(row, this.props.row)
-
+  // console.log('getCommonRender', row, this.props.row)
   if (render) {
     if (isReactComponent) {
       const Cmpt = render

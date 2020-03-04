@@ -18,9 +18,10 @@ import {
   getGlobalVariable,
   getUniqueNumericId,
   difference,
+  enableTableForceRender,
 } from '@/utils/utils'
 import CustomTableEditRow from './CustomTableEditRow'
-import CommonTableGrid from './index'
+import CommonTableGrid from './index.optimized'
 import EditPlugin from './EditPlugin'
 import { Button } from '@/components'
 import Authorized from '@/utils/Authorized'
@@ -34,6 +35,7 @@ class EditableTableGrid extends PureComponent {
   static defaultProps = {
     EditingProps: {},
     getRowId: (r) => r.id,
+    idField: 'id',
   }
 
   constructor (props) {
@@ -67,6 +69,12 @@ class EditableTableGrid extends PureComponent {
   //   return null
   // }
 
+  componentDidMount () {
+    // console.log('componentDidMount')
+    const { forceRenderDuration } = this.props
+    if (forceRenderDuration) enableTableForceRender(forceRenderDuration)
+  }
+
   componentWillReceiveProps (nextProps) {
     // dectect if datasource changed outside grid, reset grid data cache
     if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {
@@ -84,14 +92,31 @@ class EditableTableGrid extends PureComponent {
             nextProps.rows.map(({ _errors, rowIndex, ...o }, i) => o),
           )
         ) {
-          window.$tempGridRow[
-            this.gridId
-          ] = nextProps.rows.reduce((ary, item) => {
+          const { schema, getRowId } = nextProps
+
+          let { rows } = nextProps
+          if (schema)
+            rows = rows.map((o) => {
+              try {
+                schema.validateSync(o, {
+                  abortEarly: false,
+                })
+              } catch (error) {
+                o._errors = error.inner
+              }
+              return o
+            })
+          window.$tempGridRow[this.gridId] = rows.reduce((ary, item) => {
             return {
               ...ary,
-              [item[nextProps.getRowId(item)]]: item,
+              [getRowId(item)]: item,
             }
           }, {})
+          // console.log(
+          //   window.$tempGridRow[this.gridId],
+          //   nextProps.rows,
+          //   this.props.rows,
+          // )
         }
       }
     }
@@ -330,18 +355,17 @@ class EditableTableGrid extends PureComponent {
         window.$tempGridRow[this.gridId] = {}
       const tempNewData = window.$tempGridRow[this.gridId][undefined] || {}
       // console.log(tempNewData)
-      newRows = added
-        .map((o) => {
-          const id = getUniqueNumericId()
-          window.$tempGridRow[this.gridId][getRowId(o)] = {
-            id,
-            isNew: true,
-            ...tempNewData,
-            ...o,
-          }
-          return window.$tempGridRow[this.gridId][getRowId(o)]
-        })
-        .concat(newRows)
+      added = added.map((o) => {
+        const id = getUniqueNumericId()
+        window.$tempGridRow[this.gridId][getRowId(o)] = {
+          id,
+          isNew: true,
+          ...tempNewData,
+          ...o,
+        }
+        return window.$tempGridRow[this.gridId][getRowId(o)]
+      })
+      newRows = added.concat(newRows)
       // this.setState({
       //   addedRows: [],
       // })
@@ -416,6 +440,7 @@ class EditableTableGrid extends PureComponent {
       changed,
       deleted,
     })
+    // console.log(rows, newRows, updatedRows)
     // window.$tempGridRow[this.gridId]={}
     if (updatedRows && Array.isArray(updatedRows)) {
       // Fix schema validation which will gone when delete,
@@ -529,10 +554,6 @@ class EditableTableGrid extends PureComponent {
   //       },
   //     })
   //   }
-  // }
-
-  // componentDidMount () {
-  //   console.log('componentDidMount')
   // }
 
   // componentDidUpdate () {

@@ -374,7 +374,12 @@ class AddNewStatement extends PureComponent {
                   render={(args) => {
                     if (values.adminChargeValueType === 'ExactAmount') {
                       return (
-                        <NumberInput currency label='Admin Charge' {...args} />
+                        <NumberInput
+                          currency
+                          label='Admin Charge'
+                          precision={2}
+                          {...args}
+                        />
                       )
                     }
                     return (
@@ -382,6 +387,7 @@ class AddNewStatement extends PureComponent {
                         percentage
                         label='Admin Charge'
                         max={100}
+                        precision={2}
                         {...args}
                       />
                     )

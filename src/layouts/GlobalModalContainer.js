@@ -93,6 +93,9 @@ class GlobalModalContainer extends PureComponent {
         onConfirmSave: null,
         // onConfirm: null,
         openConfirmText: 'Confirm',
+        alignContent: undefined,
+        additionalInfo: undefined,
+        isInformType: undefined,
       },
     })
   }
@@ -269,11 +272,13 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          autoFocus
           open={global.openConfirm}
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
           confirmText={global.openConfirmText || 'Confirm'}
+          isInformType={global.isInformType}
           footProps={{
             extraButtons: global.onConfirmDiscard ? (
               <Button
@@ -302,8 +307,9 @@ class GlobalModalContainer extends PureComponent {
           }}
           showFooter
         >
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: global.alignContent || 'center' }}>
             <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+            {global.additionalInfo}
           </div>
         </CommonModal>
 

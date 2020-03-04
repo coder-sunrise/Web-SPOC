@@ -196,9 +196,6 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    // console.log({ values })
-    // console.log('start', effectiveStartDate)
-    // console.log('end', effectiveEndDate)
 
     return (
       <React.Fragment>

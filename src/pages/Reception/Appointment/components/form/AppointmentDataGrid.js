@@ -4,7 +4,7 @@ import moment from 'moment'
 // material ui
 import { withStyles } from '@material-ui/core'
 // common component
-import { EditableTableGrid, dateFormat } from '@/components'
+import { FastEditableTableGrid, dateFormat } from '@/components'
 import { AppointmentTypeLabel } from '@/components/_medisys'
 import {
   AppointmentDataColExtensions,
@@ -181,7 +181,7 @@ class AppointmentDataGrid extends React.Component {
         <AuthorizedContext.Provider
           value={{ rights: disabled ? 'disable' : 'enable' }}
         >
-          <EditableTableGrid
+          <FastEditableTableGrid
             rows={data}
             disabled={disabled}
             columns={AppointmentDataColumn}

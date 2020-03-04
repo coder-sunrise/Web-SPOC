@@ -107,6 +107,14 @@ export const INVENTORY_TYPE = {
   VACCINATION: 3,
 }
 
+export const ITEM_TYPE = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+  SERVICE: 4,
+  ORDERSET: 5,
+}
+
 export const INVENTORY_ADJUSTMENT_STATUS = {
   DRAFT: 1,
   FINALIZED: 2,

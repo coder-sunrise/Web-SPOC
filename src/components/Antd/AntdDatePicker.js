@@ -100,6 +100,7 @@ class AntdDatePicker extends PureComponent {
       parser,
       local,
       showTime,
+      endDay,
       dateOnly,
     } = props
     const v =
@@ -117,8 +118,12 @@ class AntdDatePicker extends PureComponent {
           showTime
             ? moment(this.state.value).formatUTC(false)
             : moment(this.state.value)
-                .set({ hour: 0, minute: 0, second: 0 })
-                .formatUTC(),
+                .set(
+                  endDay
+                    ? { hour: 23, minute: 59, second: 59 }
+                    : { hour: 0, minute: 0, second: 0 },
+                )
+                .formatUTC(false),
         )
       }, 1)
     }

@@ -53,23 +53,7 @@ const { fabric } = require('fabric')
 
 let selectedTooth = []
 const imageCache = {}
-const styles = (theme) => ({
-  paper: {
-    display: 'flex',
-    border: `1px solid ${theme.palette.divider}`,
-    flexWrap: 'wrap',
-  },
-  divider: {
-    alignSelf: 'stretch',
-    height: 'auto',
-    margin: theme.spacing(1, 0.5),
-    padding: 0,
-    width: 0,
-  },
-  groupBtns: {
-    display: 'block',
-  },
-})
+
 const text1l1 = {
   left: 'd',
   bottom: 'p',
@@ -186,7 +170,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 14,
-        text: text1l2,
+        text: text1l1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -241,7 +225,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 24,
-        text: text1r2,
+        text: text1r1,
         top: true,
         line: 0,
         posAjustTop: baseHeight * 4,
@@ -475,7 +459,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 44,
-        text: text2l2,
+        text: text2l1,
         bottom: true,
         line: 3,
       },
@@ -522,7 +506,7 @@ class Chart extends React.PureComponent {
       },
       {
         index: 34,
-        text: text2r2,
+        text: text2r1,
         bottom: true,
         line: 3,
       },
@@ -564,6 +548,91 @@ class Chart extends React.PureComponent {
   }
 
   componentDidMount () {
+    this.createCanvas()
+  }
+
+  componentWillReceiveProps (nextProps) {
+    const { dentalChartComponent, global } = nextProps
+    const { selected, ...restPropsNext } = dentalChartComponent
+    const { selected: a, ...restProps } = this.props.dentalChartComponent
+
+    if (!_.isEqual(restPropsNext, restProps)) {
+      // console.log(
+      //   difference(dentalChartComponent, this.props.dentalChartComponent),
+      // )
+      if (
+        dentalChartComponent.isPedoChart !==
+        this.props.dentalChartComponent.isPedoChart
+      ) {
+        this.canvas.dispose()
+        this.createCanvas(nextProps)
+      } else {
+        this.renderCanvas(nextProps)
+      }
+    }
+    this.resize(nextProps)
+  }
+
+  resize = (props) => {
+    const { dentalChartComponent, global } = props || this.props
+    setTimeout(() => {
+      if (this.divContainer && this.divContainer.current) {
+        const width = this.divContainer.current.offsetWidth
+
+        if (
+          width !== this.state.width ||
+          dentalChartComponent.isPedoChart !== this.state.isPedoChart
+        ) {
+          this.setState({
+            width,
+            isPedoChart: dentalChartComponent.isPedoChart,
+          })
+          this.canvas.setDimensions(this.getCanvasSize(props))
+          this.canvas.setZoom(width / 2200)
+        }
+      }
+    }, 1)
+  }
+
+  getCanvasSize = (props) => {
+    const { isPedoChart } = (props || this.props).dentalChartComponent || {}
+
+    const width = this.divContainer.current.offsetWidth // - 4
+    // console.log(isPedoChart, width)
+    return {
+      width,
+      // height: Math.floor(width / 2.3), // isPedoChart ? Math.floor(width / 2.3) : Math.floor(width / 3.3),
+      height: isPedoChart ? Math.floor(width / 2.3) : Math.floor(width / 3.3),
+    }
+  }
+
+  addGroup = ({
+    text = [],
+    index,
+    line = 0,
+    order,
+    left = 0,
+    posAjustTop = 0,
+    height,
+    width,
+  }) => {
+    this.canvas.add(
+      createToothShape({
+        text,
+        index,
+        order,
+        width,
+        height,
+        left,
+        line,
+        posAjustTop,
+      }),
+    )
+  }
+
+  createCanvas = (props) => {
+    let ps = props || this.props
+    // console.log('createCanvas')
     const width = this.divContainer.current.offsetWidth
     const canvas = new fabric.Canvas(this._canvasContainer.current, {
       // preserveObjectStacking: true,
@@ -580,8 +649,8 @@ class Chart extends React.PureComponent {
     canvas.hoverCursor = 'default'
 
     this.canvas = canvas
-    const { data = [] } = this.props.dentalChartComponent
-    const { readOnly } = this.props
+    const { data = [] } = ps.dentalChartComponent
+    const { readOnly } = ps
     const groups = _.groupBy(this.configs, 'line')
     Object.keys(groups).forEach((k) => {
       groups[k].map((o, order) => {
@@ -591,7 +660,7 @@ class Chart extends React.PureComponent {
           order,
           line: k,
           values: data.filter((m) => m.toothNo === o.index),
-          ...this.props,
+          ...ps,
         })
       })
     })
@@ -753,7 +822,6 @@ class Chart extends React.PureComponent {
           )
 
           g12.on('mousedown', (e) => {
-            // console.log('g12 mousedown')
             const { action } = this.props.dentalChartComponent
             if (action && action.chartMethodTypeFK !== 3)
               this.toggleSelect({
@@ -969,92 +1037,18 @@ class Chart extends React.PureComponent {
         }
       }, 1)
     })
-    this.renderCanvas(this.props)
+    this.renderCanvas(ps)
   }
 
-  componentWillReceiveProps (nextProps) {
-    const { dentalChartComponent, global } = nextProps
-    const { selected, ...restPropsNext } = dentalChartComponent
-    const { selected: a, ...restProps } = this.props.dentalChartComponent
-
-    if (!_.isEqual(restPropsNext, restProps)) {
-      // console.log(
-      //   difference(dentalChartComponent, this.props.dentalChartComponent),
-      // )
-      this.renderCanvas(
-        nextProps,
-        dentalChartComponent.isPedoChart !==
-          this.props.dentalChartComponent.isPedoChart,
-      )
-    }
-    this.resize(nextProps)
-  }
-
-  resize = (props) => {
-    const { dentalChartComponent, global } = props || this.props
-    setTimeout(() => {
-      if (this.divContainer && this.divContainer.current) {
-        const width = this.divContainer.current.offsetWidth
-
-        if (
-          width !== this.state.width ||
-          dentalChartComponent.isPedoChart !== this.state.isPedoChart
-        ) {
-          this.setState({
-            width,
-            isPedoChart: dentalChartComponent.isPedoChart,
-          })
-          this.canvas.setDimensions(this.getCanvasSize(props))
-          this.canvas.setZoom(width / 2200)
-        }
-      }
-    }, 1)
-  }
-
-  getCanvasSize = (props) => {
-    const { isPedoChart } = (props || this.props).dentalChartComponent || {}
-
-    const width = this.divContainer.current.offsetWidth // - 4
-    // console.log(isPedoChart, width)
-    return {
-      width,
-      height: isPedoChart ? Math.floor(width / 2.3) : Math.floor(width / 3.3),
-    }
-  }
-
-  addGroup = ({
-    text = [],
-    index,
-    line = 0,
-    order,
-    left = 0,
-    posAjustTop = 0,
-    height,
-    width,
-  }) => {
-    this.canvas.add(
-      createToothShape({
-        text,
-        index,
-        order,
-        width,
-        height,
-        left,
-        line,
-        posAjustTop,
-      }),
-    )
-  }
-
-  renderCanvas = (props, force) => {
-    const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
+  renderCanvas = (props) => {
+    const { dentalChartComponent, dispatch, readOnly } = props
     const {
       action,
       data = [],
       isPedoChart,
       isSurfaceLabel,
     } = dentalChartComponent
-    if (!action || action.chartMethodTypeFK === 3 || force) {
+    if (!action || action.chartMethodTypeFK === 3) {
       selectedTooth = []
       this.canvas._objects
         .filter((d) => d.name && d.name.indexOf('bridgeLine') === 0)
@@ -1352,6 +1346,7 @@ class Chart extends React.PureComponent {
   }
 
   toggleMultiSelect = (ary) => {
+    if (!ary || ary.length === 0) return
     const { dentalChartComponent, readOnly } = this.props
     if (readOnly) return
     const { action } = dentalChartComponent
@@ -1388,7 +1383,6 @@ class Chart extends React.PureComponent {
   }
 
   isToothCrossed = (n, start, end) => {
-    con
     const startChar1 = start.name.substring(0, 1)
     const endChar1 = end.name.substring(0, 1)
     if (!n.name || !Number(n.name)) return false
@@ -1469,4 +1463,4 @@ class Chart extends React.PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Chart)
+export default Chart

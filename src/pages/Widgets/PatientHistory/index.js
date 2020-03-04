@@ -139,9 +139,9 @@ class PatientHistory extends Component {
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
-      const { rights } = Authorized.check(o.authority)
+      const accessRight = Authorized.check(o.authority)
       // console.log(rights)
-      return rights !== 'hidden'
+      return accessRight && accessRight.rights !== 'hidden'
     })
     this.state = {
       selectedItems: localStorage.getItem('patientHistoryWidgets')

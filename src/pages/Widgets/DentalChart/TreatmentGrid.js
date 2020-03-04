@@ -46,7 +46,6 @@ const TreatmentGrid = (props) => {
     onDataSouceChange,
     dentalChartComponent,
     height,
-    dentalChartSetup,
     orders,
     codetable,
     values,
