@@ -395,6 +395,7 @@ export const createToothShape = ({
   let g5
   let g6
   let g7
+
   if (!fill.centerfull && !text.centerfull && !symbol.centerfull) {
     const polygon5 = new fabric.Polygon( // center left
       [
@@ -568,6 +569,19 @@ export const isToothCrossed = (target, start, end) => {
       Number(target) > Number(`${endChar1}0`) && Number(target) <= Number(end)
     )
   }
+
+  return false
+}
+
+export const isToothDoubleCenterCell = (target) => {
+  if (target <= 18 && target >= 14) return true
+  if (target <= 28 && target >= 24) return true
+  if (target <= 38 && target >= 34) return true
+  if (target <= 48 && target >= 44) return true
+  if (target <= 55 && target >= 54) return true
+  if (target <= 65 && target >= 64) return true
+  if (target <= 75 && target >= 74) return true
+  if (target <= 85 && target >= 84) return true
 
   return false
 }
