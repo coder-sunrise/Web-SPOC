@@ -203,6 +203,7 @@ class NewVisit extends PureComponent {
       visitRegistration: { errorState },
       values,
       isSubmitting,
+      dispatch,
     } = this.props
 
     const height = getHeight(this.props.height)
@@ -267,6 +268,7 @@ class NewVisit extends PureComponent {
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                         visitType={values.visitPurposeFK}
+                        dispatch={dispatch}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>

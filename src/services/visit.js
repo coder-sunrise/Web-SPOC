@@ -3,6 +3,7 @@ import * as service from '@/services/common'
 
 const patientApiUrl = '/api/patient'
 const queueApiUrl = '/api/queue'
+const visitOrderTemplateUrl = '/api/visitOrderTemplate'
 
 // export async function fetchPatientInfoByPatientID (patientID) {
 //   // const entities = await request(`/api/fake_patientInfo?patientID=${patientID}`)
@@ -37,5 +38,8 @@ export const saveVisit = async (visitInfo) => {
   const response = await axiosRequest(`/api/queue/${id}`, options)
   return response
 }
+
+export const queryVisitOrderTemplate = (params) =>
+  service.queryList(visitOrderTemplateUrl, params)
 
 export const upsert = (payload) => service.upsert(queueApiUrl, payload)
