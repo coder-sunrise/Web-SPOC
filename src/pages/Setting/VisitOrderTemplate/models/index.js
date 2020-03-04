@@ -8,10 +8,7 @@ import { getUniqueId } from '@/utils/utils'
 export default createListViewModel({
   namespace: 'settingVisitOrderTemplate',
   config: {
-    codetable: {
-      message: 'Visit Order Template updated',
-      code: 'ctvisitordertemplate',
-    },
+    queryOnLoad: false,
   },
   param: {
     service,
