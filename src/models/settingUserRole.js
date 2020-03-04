@@ -92,25 +92,25 @@ export default createListViewModel({
           },
         }
       },
-      filter (state, { criteria }) {
-        const accessRight = [
-          ...state.currentSelectedUserRole.roleClientAccessRight,
-        ]
-        let result = accessRight
-        // eslint-disable-next-line guard-for-in
-        for (let key in criteria) {
-          result = accessRight.filter((el) => {
-            return el[key] === criteria[key]
-          })
-        }
-        return {
-          ...state,
-          currentSelectedUserRole: {
-            ...state.currentSelectedUserRole,
-            filteredAccessRight: result,
-          },
-        }
-      },
+      // filter (state, { criteria }) {
+      //   const accessRight = [
+      //     ...state.currentSelectedUserRole.roleClientAccessRight,
+      //   ]
+      //   let result = accessRight
+      //   // eslint-disable-next-line guard-for-in
+      //   for (let key in criteria) {
+      //     result = accessRight.filter((el) => {
+      //       return el[key] === criteria[key]
+      //     })
+      //   }
+      //   return {
+      //     ...state,
+      //     currentSelectedUserRole: {
+      //       ...state.currentSelectedUserRole,
+      //       filteredAccessRight: result,
+      //     },
+      //   }
+      // },
     },
   },
 })
