@@ -62,6 +62,7 @@ const styles = (theme) => ({
 })
 
 const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
+  // console.log(row)
   if (!row) return null
   const { chartMethodTypeFK } = row
 
@@ -179,9 +180,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
               <SketchPicker
                 color={row.chartMethodColorBlock}
                 onChangeComplete={(e) => {
-                  row.chartMethodColorBlock = e.hex
-                  row.image = ''
-
                   // setColor(e.hex)
                   commitChanges({
                     changed: {
@@ -221,9 +219,6 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
             {...restProps}
             text={viewOnly}
             onChange={(v, option = {}) => {
-              row.chartMethodText = option.name || ''
-              row.image = ''
-
               commitChanges({
                 changed: {
                   [row.id]: {

@@ -7,9 +7,18 @@ class TableRow extends React.Component {
   shouldComponentUpdate (nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
     // console.log(nextProps.row === this.props.row)
+    if (window._forceTableUpdate) {
+      return true
+    }
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
     const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
+
+    if (
+      window._forceTableRowUpdate &&
+      window._forceTableRowUpdate.includes(getRowId(nextProps.row))
+    )
+      return true
 
     if (
       extraCellConfig &&
@@ -32,6 +41,7 @@ class TableRow extends React.Component {
     // }
 
     if (!_.isEqual(orgRow._errors, row._errors)) return true
+    // if (!_.isEqual(orgRow, row)) return true
     return false
   }
 

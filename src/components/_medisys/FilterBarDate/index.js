@@ -5,6 +5,8 @@ import { DatePicker } from '@/components'
 // utils
 import { roundTo } from '@/utils/utils'
 
+const timeCfg = { hour: 0, minute: 0, second: 0 }
+
 const FilterBarDate = ({
   label = 'Date',
   formValues = {
@@ -39,28 +41,35 @@ const FilterBarDate = ({
   const defaultDisabledDate = (d) => {
     const restrictAfterToday = noTodayLimit ? false : d.isAfter(moment())
     if (!d) return true
+    const dCopy = moment(d).set(timeCfg)
 
     if (isEndDate && formValues.startDate) {
       const startDate = formValues.startDate
-        ? moment(formValues.startDate)
+        ? moment(formValues.startDate).set(timeCfg)
         : undefined
-      const range = moment.duration(d.diff(startDate))
-      const years = roundTo(range.asYears())
 
-      return restrictAfterToday || d.isBefore(startDate) || years > 1.0
+      const diffInYearsString = dCopy.diff(startDate, 'years', true).toFixed(4)
+      const diffInYears = parseFloat(diffInYearsString)
+
+      return restrictAfterToday || d.isBefore(startDate) || diffInYears > 1.0
     }
 
     if (!isEndDate && formValues.endDate) {
       const endDate = formValues.endDate
-        ? moment(formValues.endDate)
+        ? moment(formValues.endDate).set(timeCfg)
         : undefined
-      const range = moment.duration(d.diff(endDate))
-      const years = roundTo(range.asYears())
+
+      const diffInYearsString = dCopy.diff(endDate, 'years', true).toFixed(4)
+      const diffInYears = parseFloat(diffInYearsString)
       if (d.isSame(moment())) {
         return false
       }
 
-      return restrictAfterToday || d.isAfter(formValues.endDate) || years < -1.0
+      return (
+        restrictAfterToday ||
+        d.isAfter(formValues.endDate) ||
+        diffInYears < -1.0
+      )
     }
     return !d || d.isAfter(moment())
   }
