@@ -69,12 +69,6 @@ class EditableTableGrid extends PureComponent {
   //   return null
   // }
 
-  componentDidMount () {
-    // console.log('componentDidMount')
-    const { forceRenderDuration } = this.props
-    if (forceRenderDuration) enableTableForceRender(forceRenderDuration)
-  }
-
   componentWillReceiveProps (nextProps) {
     // dectect if datasource changed outside grid, reset grid data cache
     if (Array.isArray(nextProps.rows) && Array.isArray(this.props.rows)) {

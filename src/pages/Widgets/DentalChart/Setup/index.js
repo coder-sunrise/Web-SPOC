@@ -172,7 +172,7 @@ const SetupBase = (props) => {
     columnExtensions,
 
     EditingProps: {
-      showAddCommand: true,
+      showAddCommand: !search,
       isDeletable: (row) => {
         return row.isUserMaintainable
       },
@@ -295,7 +295,7 @@ const Setup = compose(
     },
 
     validationSchema: Yup.object().shape({
-      rows: Yup.array().of(rowSchema),
+      rows: Yup.array().compact((v) => v.isDeleted).of(rowSchema),
     }),
 
     handleSubmit: (values, { props }) => {
@@ -303,11 +303,14 @@ const Setup = compose(
       const { ctchartmethod } = codetable
 
       let diffs = difference(
-        values.rows.map(({ rowIndex, ...o }) => o),
+        values.rows
+          .filter((o) => !o.isDeleted || !o.isNew)
+          .map(({ rowIndex, ...o }) => o),
         ctchartmethod,
       )
       if (diffs.length !== 0) {
         const updated = values.rows
+          .filter((o) => !o.isDeleted || !o.isNew)
           .map((o, i) => {
             if (o) {
               return {

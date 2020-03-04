@@ -78,7 +78,6 @@ class CodeSelect extends React.PureComponent {
     ) {
       selectProps = { ...this.props, maxTagCount: this.state.maxTagCount }
     }
-    console.log(filteredOptions)
     return (
       <Select
         options={filteredOptions || []}

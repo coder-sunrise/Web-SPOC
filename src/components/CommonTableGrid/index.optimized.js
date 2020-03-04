@@ -70,7 +70,7 @@ import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import TableRow from './plugins/TableRow'
 import TableCell from './plugins/TableCell'
-
+import { enableTableForceRender } from '@/utils/utils'
 import { LoadingWrapper } from '@/components/_medisys'
 
 window.$tempGridRow = {}
@@ -551,20 +551,11 @@ class CommonTableGrid extends PureComponent {
     return null
   }
 
-  // componentDidMount () {
-  //   watchForElementChange({
-  //     container: this.myRef.current,
-  //     selector: 'tr.grid-new-row',
-  //     config: {
-  //       // subtree: true,
-  //       childList: true,
-  //     },
-  //     ongoing: true,
-  //     callback: (mutation) => {
-  //       console.log(mutation)
-  //     },
-  //   })
-  // }
+  componentDidMount () {
+    // console.log('componentDidMount')
+    const { forceRenderDuration = 1000 } = this.props
+    enableTableForceRender(forceRenderDuration)
+  }
 
   // shouldComponentUpdate = (nextProps, nextState) => {
   //   const { values, nameDateFrom, nameDateTo } = this.props
@@ -686,7 +677,7 @@ class CommonTableGrid extends PureComponent {
   }
 
   Cell = (p) => {
-    const { classes, rows = [], ...restProps } = this.props
+    const { rows = [], ...restProps } = this.props
     // console.log(restProps, p)
     const row = rows.find(
       (o) => this.props.getRowId(o) === this.props.getRowId(p.row),
