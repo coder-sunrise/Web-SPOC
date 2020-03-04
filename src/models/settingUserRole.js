@@ -52,7 +52,7 @@ export default createListViewModel({
         data.map((d) => {
           const permission =
             (d.type === 'Module' && 'ReadWrite') ||
-            (d.type === 'Action' && 'Enable') ||
+            (d.type === 'Action' && 'Enabled') ||
             (d.type === 'Field' && 'ReadWrite') ||
             'ReadWrite'
           return resultData.push({
