@@ -446,7 +446,27 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  toggleSearchAppointmentModal = () => {
+  queryCodetables = async () => {
+    const { dispatch } = this.props
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctroom',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ltappointmentstatus',
+        },
+      }),
+    ])
+  }
+
+  toggleSearchAppointmentModal = async () => {
+    await this.queryCodetables()
+
     this.setState((prevState) => {
       return {
         showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
