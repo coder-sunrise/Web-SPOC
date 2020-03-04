@@ -176,9 +176,6 @@ class UserRole extends React.Component {
                   {...args}
                   label='Clinical Role'
                   code='ltclinicalrole'
-                  onChange={(value) => {
-                    // console.log(value)
-                  }}
                 />
               )}
             />

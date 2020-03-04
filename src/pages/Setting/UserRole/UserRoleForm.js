@@ -2,17 +2,10 @@ import React from 'react'
 // formik
 import { withFormik } from 'formik'
 // material ui
-import { Divider, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import { withRouter } from 'react-router'
 // common component
-import {
-  GridContainer,
-  GridItem,
-  FastField,
-  Select,
-  Field,
-  Checkbox,
-} from '@/components'
+import { GridContainer, GridItem, FastField, Select } from '@/components'
 // sub components
 import request from '@/utils/request'
 
@@ -67,7 +60,6 @@ class UserRoleForm extends React.PureComponent {
   render () {
     const { classes, footer } = this.props
     const { selectFieldOption, selectedValue } = this.state
-    console.log(selectFieldOption)
     return (
       <div>
         {selectFieldOption.length !== 0 && (

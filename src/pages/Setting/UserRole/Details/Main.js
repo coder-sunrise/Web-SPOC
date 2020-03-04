@@ -24,7 +24,6 @@ import {
   SizeContainer,
   DatePicker,
 } from '@/components'
-import { FilterBarDate } from '@/components/_medisys'
 
 // utils
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -82,7 +81,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
-    console.log('restValues', restValues)
+    // console.log('restValues', restValues)
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -197,9 +196,9 @@ class Main extends React.Component {
     } = values
 
     const isEdit = !!id
-    console.log({ values })
-    console.log('start', effectiveStartDate)
-    console.log('end', effectiveEndDate)
+    // console.log({ values })
+    // console.log('start', effectiveStartDate)
+    // console.log('end', effectiveEndDate)
 
     return (
       <React.Fragment>
