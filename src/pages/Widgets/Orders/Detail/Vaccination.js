@@ -32,9 +32,6 @@ let i = 0
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
-    usageMethodFK: Yup.number().required(),
-    dosageFK: Yup.number().required(),
-    uomfk: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props, onConfirm, resetForm }) => {
