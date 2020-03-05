@@ -110,7 +110,6 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
-              isInitialLoading: payload.isInitialLoading,
             },
           })
 

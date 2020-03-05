@@ -6,6 +6,11 @@ import { getUniqueId } from '@/utils/utils'
 import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
+const getSequence = (sequence, maxSeq) => {
+  if (sequence === 0) return sequence
+  return sequence || maxSeq
+}
+
 export default createFormViewModel({
   namespace: 'consultation',
   config: {},
@@ -363,7 +368,7 @@ export default createFormViewModel({
                   type: p.value,
                   subject: p.getSubject ? p.getSubject(o) : '',
                   ...o,
-                  sequence: o.sequence || maxSeq,
+                  sequence: getSequence(o.sequence, maxSeq),
                   instruction: o.instruction || o.itemNotes,
                 }
 

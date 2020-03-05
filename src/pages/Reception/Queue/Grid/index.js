@@ -181,12 +181,11 @@ const Grid = ({
               version,
               qid: row.id,
               queueNo: row.queueNo,
-              isInitialLoading,
             },
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+                `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 
