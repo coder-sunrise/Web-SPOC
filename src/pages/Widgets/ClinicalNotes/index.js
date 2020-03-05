@@ -541,7 +541,11 @@ class ClinicalNotes extends Component {
           collapses={contents
             .filter((item) => {
               const accessRight = Authorized.check(item.authority)
-              if (accessRight && accessRight.rights === 'hidden') return false
+              if (
+                !accessRight ||
+                (accessRight && accessRight.rights === 'hidden')
+              )
+                return false
               return true
             })
             .map((item, index) => {

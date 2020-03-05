@@ -166,58 +166,69 @@ class Layout extends PureComponent {
     // console.log(defaultLayout)
     this.widgetMenu = (
       <Menu>
-        {widgets.map((o) => {
-          const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
+        {widgets
+          .filter((widget) => {
+            const widgetAccessRight = Authorized.check(widget.accessRight)
+            if (!widgetAccessRight) return false
+            const shouldShow =
+              widgetAccessRight && widgetAccessRight.rights !== 'hidden'
 
-          return (
-            <Menu.Item
-              key={o.id}
-              disabled={cfg.static}
-              onClick={(e) => {
-                // console.log(this.state.currentLayout)
-                // console.log(e.domEvent.target)
-                // console.log(this.state.replaceWidget)
-                if (e.key === this.state.replaceWidget) return false
-                const layout = _.cloneDeep(this.state.currentLayout)
-                for (let index = 0; index < sizes.length; index++) {
-                  const breakpoint = sizes[index]
-                  if (layout[breakpoint]) {
-                    const target = layout[breakpoint].find((m) => m.i === e.key)
-                    let starter = layout[breakpoint].find(
-                      (m) => m.i === this.state.replaceWidget,
-                    )
-                    if (target) {
-                      target.i = this.state.replaceWidget
-                      starter.i = e.key
-                    } else {
-                      starter.i = e.key
-                      if (
-                        layout.widgets.find(
-                          (m) => m === this.state.replaceWidget,
-                        )
+            return shouldShow
+          })
+          .map((o) => {
+            const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
+
+            return (
+              <Menu.Item
+                key={o.id}
+                disabled={cfg.static}
+                onClick={(e) => {
+                  // console.log(this.state.currentLayout)
+                  // console.log(e.domEvent.target)
+                  // console.log(this.state.replaceWidget)
+                  if (e.key === this.state.replaceWidget) return false
+                  const layout = _.cloneDeep(this.state.currentLayout)
+                  for (let index = 0; index < sizes.length; index++) {
+                    const breakpoint = sizes[index]
+                    if (layout[breakpoint]) {
+                      const target = layout[breakpoint].find(
+                        (m) => m.i === e.key,
                       )
-                        layout.widgets = _.reject(
-                          layout.widgets,
-                          (m) => m === this.state.replaceWidget,
+                      let starter = layout[breakpoint].find(
+                        (m) => m.i === this.state.replaceWidget,
+                      )
+                      if (target) {
+                        target.i = this.state.replaceWidget
+                        starter.i = e.key
+                      } else {
+                        starter.i = e.key
+                        if (
+                          layout.widgets.find(
+                            (m) => m === this.state.replaceWidget,
+                          )
                         )
+                          layout.widgets = _.reject(
+                            layout.widgets,
+                            (m) => m === this.state.replaceWidget,
+                          )
 
-                      if (!layout.widgets.find((m) => m === e.key)) {
-                        layout.widgets.push(e.key)
+                        if (!layout.widgets.find((m) => m === e.key)) {
+                          layout.widgets.push(e.key)
+                        }
+                        // layout[breakpoint]=_.reject(layout[breakpoint])
                       }
-                      // layout[breakpoint]=_.reject(layout[breakpoint])
-                    }
 
-                    // console.log(target, starter)
+                      // console.log(target, starter)
+                    }
                   }
-                }
-                // console.log(layout)
-                this.changeLayout(layout)
-              }}
-            >
-              {o.name}
-            </Menu.Item>
-          )
-        })}
+                  // console.log(layout)
+                  this.changeLayout(layout)
+                }}
+              >
+                {o.name}
+              </Menu.Item>
+            )
+          })}
       </Menu>
     )
 
@@ -913,12 +924,12 @@ class Layout extends PureComponent {
                       const widgetAccessRight = Authorized.check(
                         widget.accessRight,
                       )
-                      if (
+                      if (!widgetAccessRight) return false
+                      const shouldShow =
                         widgetAccessRight &&
-                        widgetAccessRight.rights === 'hidden'
-                      )
-                        return false
-                      return true
+                        widgetAccessRight.rights !== 'hidden'
+
+                      return shouldShow
                     })}
                     onChange={(e, s) => {
                       // console.log(e)

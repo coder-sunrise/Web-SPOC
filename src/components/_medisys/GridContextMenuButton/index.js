@@ -71,7 +71,13 @@ const GridContextMenuButton = ({
           index,
         ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
-          const { rights } = Authorized.check(authority)
+
+          const accessRight = Authorized.check(authority)
+          if (!accessRight) return null
+
+          const hideByAccessRight = accessRight.rights === 'hidden'
+          const disabledByAccessRight = accessRight.rights === 'disable'
+
           const menu = (
             <Menu.Item
               key={id}
@@ -79,14 +85,14 @@ const GridContextMenuButton = ({
               onContextMenu={(event) => {
                 event.preventDefault()
               }}
-              disabled={disabled || rights === 'disable'}
+              disabled={disabled || disabledByAccessRight}
             >
               <Icon className={classes.icon} />
               <span>{label}</span>
             </Menu.Item>
           )
           // eslint-disable-next-line no-nested-ternary
-          return hidden || rights === 'hidden' ? null : menu
+          return hidden || hideByAccessRight ? null : menu
         },
       )}
     </Menu>
