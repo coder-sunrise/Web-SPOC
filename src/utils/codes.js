@@ -981,7 +981,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    accessRight: 'queue.consultation.order.openPrescription',
+    accessRight: 'queue.consultation.order.openprescription',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
     component: (props) => <Medication openPrescription {...props} />,
@@ -989,7 +989,7 @@ const orderTypes = [
   {
     name: 'Order Set',
     value: '6',
-    accessRight: 'queue.consultation.order.orderSet',
+    accessRight: 'queue.consultation.order.orderset',
     component: (props) => <OrderSet {...props} />,
   },
   {

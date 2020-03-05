@@ -142,9 +142,8 @@ class Main extends Component {
     })
     const isEmptyDispense = otherOrder.length === 0 && prescription.length === 0
     const noClinicalObjectRecord = !values.clinicalObjectRecordFK
-    const { rights: editOrderRights } = Authorized.check(
-      'queue.dispense.editorder',
-    )
+
+    const accessRights = Authorized.check('queue.dispense.editorder')
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
       this.setState(
@@ -161,7 +160,8 @@ class Main extends Component {
     }
 
     if (
-      editOrderRights !== 'hidden' &&
+      accessRights &&
+      accessRights.rights !== 'hidden' &&
       visitPurposeFK === VISIT_TYPE.BILL_FIRST &&
       isEmptyDispense &&
       noClinicalObjectRecord &&
