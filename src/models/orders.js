@@ -231,7 +231,6 @@ export default createListViewModel({
             isDeleted: true,
           }))
         }
-
         const amount = calculateAmount(tempRows, finalAdjustments)
         // console.log(tempRows, finalAdjustments, amount)
         return {

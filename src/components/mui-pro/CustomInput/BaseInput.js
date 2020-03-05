@@ -121,6 +121,7 @@ class BaseInput extends React.PureComponent {
       text,
       inActive,
       defaultCurrencyFontColor,
+      extraClasses,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -157,17 +158,18 @@ class BaseInput extends React.PureComponent {
     const marginTop = classNames({
       [inputRootCustomClasses]: inputRootCustomClasses !== undefined,
     })
-    const inputClasses = classNames({
-      [classes.input]: true,
-      [classes.whiteInput]: white,
-      [classes.text]: !!text,
-    })
+    // console.log(extraClasses, classes, this.props)
     return {
-      input: inputClasses,
+      input: classNames({
+        [classes.input]: true,
+        [classes.whiteInput]: white,
+        [classes.text]: !!text,
+      }),
       root: marginTop,
       disabled: classes.disabled,
       underline: underlineClasses,
       multiline: classes.multiline,
+      ...extraClasses,
     }
   }
 
@@ -363,8 +365,9 @@ class BaseInput extends React.PureComponent {
         error={error}
         help={help}
       >
-        {(typeof children === 'function'
-          ? children({
+        {() => {
+          if (typeof children === 'function')
+            return children({
               getClass: this.getClass,
               error,
               help,
@@ -376,20 +379,24 @@ class BaseInput extends React.PureComponent {
               ...props,
               inputProps,
             })
-          : false) || (
-          <Input
-            id={inputIdPrefix + inputIdCounter}
-            classes={this.getClass(classes)}
-            inputRef={this.getRef}
-            {...cfg}
-            inputProps={inputProps}
-            {...resetProps}
-            // {...inputProps}
-            // onBlur={() => {
-            //   console.log(123)
-            // }}
-          />
-        )}
+
+          // delete inputProps.className
+          // console.log(inputProps)
+          return (
+            <Input
+              id={inputIdPrefix + inputIdCounter}
+              classes={this.getClass(classes)}
+              inputRef={this.getRef}
+              {...cfg}
+              inputProps={inputProps}
+              {...resetProps}
+              // {...inputProps}
+              // onBlur={() => {
+              //   console.log(123)
+              // }}
+            />
+          )
+        }}
       </CustomInputWrapper>
     )
     return element

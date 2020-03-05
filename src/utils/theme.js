@@ -289,7 +289,7 @@ export const defaultTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 6px',
-        padding: 1,
+        padding: '0px 0px 1px 3px',
       },
     },
     MuiFormControl: {
@@ -718,7 +718,7 @@ export const largeTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 8px',
-        padding: 1,
+        padding: '0px 3px',
       },
     },
     MuiFormControl: {

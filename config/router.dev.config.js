@@ -45,6 +45,12 @@ const devRoutes = {
       mini: 'CT',
       component: './Development/CannedText',
     },
+    {
+      path: '/development/masonry',
+      name: 'Masonry',
+      mini: 'M',
+      component: './Development/Masonry',
+    },
   ],
 }
 
