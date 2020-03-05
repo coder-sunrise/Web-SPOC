@@ -10,6 +10,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Tooth from '../Tooth'
+import { isToothDoubleCenterCell } from '../variables'
 import {
   Button,
   GridContainer,
@@ -131,13 +132,30 @@ const SortItem = ({
         const v = subAry[0]
         if (v.action.method !== 3) v.info = subAry.map((o) => o.name).join(',')
         if (!subAry.find((o) => o.subTarget.indexOf('center') >= 0)) {
-          subAry.push({
-            subTarget: 'centerfull',
-            action: {
-              fill: 'white',
-              symbol: '',
-            },
-          })
+          if (isToothDoubleCenterCell(v.toothNo)) {
+            subAry.push({
+              subTarget: 'cell_centerleft',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+            subAry.push({
+              subTarget: 'cell_centerright',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+          } else {
+            subAry.push({
+              subTarget: 'cell_centerfull',
+              action: {
+                chartMethodColorBlock: 'transparent',
+                chartMethodText: '',
+              },
+            })
+          }
         }
         const { action = {}, subTarget, key } = v
         const SortableListItem = SortableElement(ListItem)

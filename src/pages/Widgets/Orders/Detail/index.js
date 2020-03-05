@@ -221,7 +221,10 @@ class Details extends PureComponent {
                   .filter((o) => {
                     const accessRight = Authorized.check(o.accessRight)
 
-                    if (accessRight && accessRight.rights === 'hidden')
+                    if (
+                      !accessRight ||
+                      (accessRight && accessRight.rights === 'hidden')
+                    )
                       return false
                     return true
                   })

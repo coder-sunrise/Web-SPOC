@@ -72,14 +72,11 @@ import { calculateAdjustAmount } from '@/utils/utils'
     // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
-        // usageMethodFK: Yup.number().required(),
-        // dosageFK: Yup.number().required(),
-        // prescribeUOMFK: Yup.number().required(),
-        // drugFrequencyFK: Yup.number().required(),
         duration: Yup.number().min(
           1,
           'Duration must be greater than or equal to 1',
         ),
+
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),

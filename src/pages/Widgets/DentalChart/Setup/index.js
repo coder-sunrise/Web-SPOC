@@ -23,7 +23,7 @@ import {
   Select,
   ButtonSelect,
   Tabs,
-  EditableTableGrid,
+  FastEditableTableGrid,
   CommonTableGrid,
   DragableTableGrid,
   withFormikExtend,
@@ -85,15 +85,27 @@ const SetupBase = (props) => {
     search,
     setSearch,
   ] = React.useState('')
-  const handleCommitChanges = ({ rows, changed }) => {
-    // console.log(rows, changed)
-    setFieldValue('rows', rows)
+  const handleCommitChanges = ({ rows, changed, added = [] }) => {
+    setFieldValue(
+      'rows',
+      added.concat(
+        values.rows.map((o) => ({
+          ...o,
+          ...rows.find((m) => m.id === o.id),
+        })),
+      ),
+    )
   }
   // useState()
   const columnExtensions = [
     {
       width: 400,
       columnName: 'legend',
+      observeFields: [
+        'chartMethodText',
+        'chartMethodColorBlock',
+        'image',
+      ],
       isReactComponent: true,
       type: 'custom',
       render: (p) => {
@@ -160,7 +172,7 @@ const SetupBase = (props) => {
     columnExtensions,
 
     EditingProps: {
-      showAddCommand: true,
+      showAddCommand: !search,
       isDeletable: (row) => {
         return row.isUserMaintainable
       },
@@ -201,7 +213,6 @@ const SetupBase = (props) => {
     },
     schema: rowSchema,
   }
-  // console.log(tableProps)
   return (
     <div>
       <Paper elevation={0}>
@@ -239,7 +250,7 @@ const SetupBase = (props) => {
             {/* <DragableTableGrid {...tableProps} /> */}
 
             {mode === 'edit' ? (
-              <EditableTableGrid {...tableProps} />
+              <FastEditableTableGrid {...tableProps} />
             ) : (
               <CommonTableGrid {...tableProps} />
             )}
@@ -284,7 +295,7 @@ const Setup = compose(
     },
 
     validationSchema: Yup.object().shape({
-      rows: Yup.array().of(rowSchema),
+      rows: Yup.array().compact((v) => v.isDeleted).of(rowSchema),
     }),
 
     handleSubmit: (values, { props }) => {
@@ -292,11 +303,14 @@ const Setup = compose(
       const { ctchartmethod } = codetable
 
       let diffs = difference(
-        values.rows.map(({ rowIndex, ...o }) => o),
+        values.rows
+          .filter((o) => !o.isDeleted || !o.isNew)
+          .map(({ rowIndex, ...o }) => o),
         ctchartmethod,
       )
       if (diffs.length !== 0) {
         const updated = values.rows
+          .filter((o) => !o.isDeleted || !o.isNew)
           .map((o, i) => {
             if (o) {
               return {

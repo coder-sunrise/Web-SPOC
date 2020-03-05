@@ -935,6 +935,7 @@ class Detail extends PureComponent {
             )}
             <EditableTableGrid
               style={{ marginTop: 10 }}
+              forceRenderDuration={5000}
               FuncProps={{
                 edit: isEditable,
                 pager: true,

@@ -66,8 +66,12 @@ const NotificationList = ({ dispatch, notifications = [], classes, type }) => {
     return (
       <div>
         <div className={rootClass}>
-          {sorted.map((n) => (
-            <NotificationContent notification={n} dispatch={dispatch} />
+          {sorted.map((n, index) => (
+            <NotificationContent
+              key={`notification-${index}`}
+              notification={n}
+              dispatch={dispatch}
+            />
           ))}
         </div>
         <Divider />

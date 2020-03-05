@@ -162,13 +162,15 @@ function getCommonRender (cb) {
   const cfg = getCommonConfig.call(this)
   const { render, error, row, isReactComponent } = cfg
   // console.log(row, this.props.row)
-
+  // console.log('getCommonRender', row, this.props.row)
   if (render) {
     if (isReactComponent) {
       const Cmpt = render
       return <Cmpt row={row} columnConfig={cfg} cellProps={this.props} />
     }
-    if (!editMode && !error) return render(row, { ...cfg }, this.props)
+    if (!editMode && !error) {
+      return render(row, { ...cfg }, this.props)
+    }
   }
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>
