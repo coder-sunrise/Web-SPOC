@@ -65,7 +65,7 @@ class TableRow extends React.Component {
     } = this.props
     return (
       <Table.Row
-        {...restProps}
+        // {...restProps}
         onDoubleClick={(event) => {
           onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}

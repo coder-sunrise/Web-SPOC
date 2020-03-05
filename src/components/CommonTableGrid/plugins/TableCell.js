@@ -45,7 +45,7 @@ class TableCell extends React.Component {
       row,
       forceRender,
     } = nextProps
-    if (forceRender === 0) return true
+    if (forceRender) return true
     // console.log(extraCellConfig, columnExtensions)
     if (
       window._forceTableRowUpdate &&
@@ -138,12 +138,15 @@ class TableCell extends React.Component {
       leftColumns,
       style,
       className,
+      colSpan,
+      column,
+      row,
+      tableColumn,
       ...restProps
     } = this.props
 
     // console.log(restProps.row)
     // return null
-    const { column, row } = restProps
     // const { cellEditingDisabled } = column
     // console.log(p2)
     // return null
@@ -153,6 +156,10 @@ class TableCell extends React.Component {
       leftColumns,
       style,
       className,
+      colSpan,
+      column,
+      row,
+      tableColumn,
     }
     if (extraState) {
       const colCfg =
@@ -232,6 +239,7 @@ class TableCell extends React.Component {
         )
       }
     }
+    // console.log(cfg, this.props)
     return <Table.Cell {...cfg}>{children}</Table.Cell>
   }
 }
