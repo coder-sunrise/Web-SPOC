@@ -240,7 +240,8 @@ class Medication extends PureComponent {
     if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
-    if (currentMedicaiton && currentMedicaiton.dispensingQuantity && !dirty) {
+
+    if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
       newTotalQuantity = currentMedicaiton.dispensingQuantity
     } else {
       const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
