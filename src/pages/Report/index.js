@@ -118,6 +118,11 @@ const menuData = [
     url: '/report/inventorytrendingreport',
   },
   {
+    title: 'Inventory',
+    text: 'Inventory Listing Report',
+    url: '/report/inventorylistingreport',
+  },
+  {
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',
