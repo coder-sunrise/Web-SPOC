@@ -11,6 +11,7 @@ import {
   VISIT_TYPE,
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
+  CLINIC_TYPE,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
 
@@ -25,6 +26,7 @@ const AddOrder = ({
   codetable: { ctservice, inventoryconsumable, inventorymedication },
   visitType,
   location,
+  clinicInfo,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
@@ -146,7 +148,8 @@ const AddOrder = ({
       )
 
       const isVaccinationExist = newRows.filter((row) => !row.type)
-      if (isVaccinationExist.length > 0) {
+      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+      if (clinicTypeFK === CLINIC_TYPE.GP && isVaccinationExist.length > 0) {
         dispatch({
           type: 'global/updateAppState',
           payload: {
@@ -226,11 +229,12 @@ const AddOrder = ({
 export default compose(
   withRouter,
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders, codetable, consultation }) => ({
+  connect(({ dispense, orders, codetable, consultation, clinicInfo }) => ({
     dispense,
     orders,
     consultation,
     codetable,
+    clinicInfo,
   })),
   withFormikExtend({
     handleSubmit: (values, { props }) => {
