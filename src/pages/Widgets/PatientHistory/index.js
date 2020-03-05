@@ -141,7 +141,7 @@ class PatientHistory extends Component {
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
       const accessRight = Authorized.check(o.authority)
       // console.log(rights)
-      return accessRight && accessRight.rights !== 'hidden'
+      return !accessRight || (accessRight && accessRight.rights !== 'hidden')
     })
     this.state = {
       selectedItems: localStorage.getItem('patientHistoryWidgets')

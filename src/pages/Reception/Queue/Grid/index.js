@@ -432,7 +432,12 @@ const Grid = ({
 
     if (contextMenuOption) {
       const authority = Authorized.check(contextMenuOption.authority)
-      if (authority.rights === 'disable' || authority.rights === 'hidden') {
+
+      if (
+        !authority ||
+        authority.rights === 'disable' ||
+        authority.rights === 'hidden'
+      ) {
         notification.error({
           message: 'Unauthorized Access',
         })
