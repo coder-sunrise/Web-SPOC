@@ -464,6 +464,7 @@ const Grid = ({
             TableProps={TableProps}
             rows={queueListingData}
             firstColumnCustomPadding={10}
+            forceRender
             columnExtensions={[
               ...QueueColumnExtensions,
               {

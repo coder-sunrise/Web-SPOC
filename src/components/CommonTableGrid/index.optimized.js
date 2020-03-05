@@ -553,8 +553,8 @@ class CommonTableGrid extends PureComponent {
 
   componentDidMount () {
     // console.log('componentDidMount')
-    const { forceRenderDuration = 1000 } = this.props
-    enableTableForceRender(forceRenderDuration)
+    const { forceRenderDuration = 1000, forceRender } = this.props
+    if (!forceRender) enableTableForceRender(forceRenderDuration)
   }
 
   // shouldComponentUpdate = (nextProps, nextState) => {

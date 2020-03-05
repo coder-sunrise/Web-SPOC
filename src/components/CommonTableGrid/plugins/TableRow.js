@@ -12,8 +12,14 @@ class TableRow extends React.Component {
     }
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
-    const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
-
+    const {
+      getRowId,
+      extraCellConfig,
+      columnExtensions = [],
+      row,
+      forceRender,
+    } = nextProps
+    if (forceRender) return true
     if (
       window._forceTableRowUpdate &&
       window._forceTableRowUpdate.includes(getRowId(nextProps.row))
@@ -57,10 +63,9 @@ class TableRow extends React.Component {
       children,
       ...restProps
     } = this.props
-    // console.log(restProps)
     return (
       <Table.Row
-        // {...restProps}
+        {...restProps}
         onDoubleClick={(event) => {
           onRowDoubleClick && onRowDoubleClick(row || tableRow.row, event)
         }}

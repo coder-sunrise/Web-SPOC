@@ -38,7 +38,14 @@ class TableCell extends React.Component {
 
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
-    const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
+    const {
+      getRowId,
+      extraCellConfig,
+      columnExtensions = [],
+      row,
+      forceRender,
+    } = nextProps
+    if (forceRender === 0) return true
     // console.log(extraCellConfig, columnExtensions)
     if (
       window._forceTableRowUpdate &&
@@ -128,8 +135,12 @@ class TableCell extends React.Component {
       loading,
       global,
       children,
+      leftColumns,
+      style,
+      className,
       ...restProps
     } = this.props
+
     // console.log(restProps.row)
     // return null
     const { column, row } = restProps
@@ -139,6 +150,9 @@ class TableCell extends React.Component {
     // console.log(restProps)
     let cfg = {
       // tabIndex: 0,
+      leftColumns,
+      style,
+      className,
     }
     if (extraState) {
       const colCfg =
