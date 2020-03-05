@@ -91,6 +91,7 @@ export default {
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
+  'menu.report.inventorylistingreport': 'Inventory Listing Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
