@@ -170,6 +170,9 @@ const Grid = ({
           break
         case '1': {
           // dispense
+          const isInitialLoading =
+            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+            row.visitStatus === 'WAITING'
           const version = Date.now()
           dispatch({
             type: `dispense/start`,
@@ -178,6 +181,7 @@ const Grid = ({
               version,
               qid: row.id,
               queueNo: row.queueNo,
+              isInitialLoading,
             },
           }).then((o) => {
             if (o)

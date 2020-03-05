@@ -366,7 +366,27 @@ export default createFormViewModel({
                   sequence: o.sequence || maxSeq,
                   instruction: o.instruction || o.itemNotes,
                 }
-                return p.convert ? p.convert(d) : d
+
+                let newObj = {
+                  ...d,
+                }
+                let instructionArray = []
+                if (d.corPrescriptionItemInstruction) {
+                  instructionArray = d.corPrescriptionItemInstruction.map(
+                    (instruction) => {
+                      return {
+                        ...instruction,
+                        stepdose: instruction.stepdose || 'AND',
+                      }
+                    },
+                  )
+                  newObj = {
+                    ...newObj,
+                    corPrescriptionItemInstruction: instructionArray,
+                  }
+                }
+
+                return p.convert ? p.convert(newObj) : newObj
               }),
             )
           })

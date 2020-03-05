@@ -11,7 +11,7 @@ import {
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
 } from '@/utils/constants'
-import { roundTo } from '@/utils/utils'
+import { roundTo, getUniqueId } from '@/utils/utils'
 
 const styles = () => ({})
 
@@ -29,6 +29,7 @@ const AddOrder = ({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
+        isInitialLoading: dispense.isInitialLoading,
       },
     })
 
@@ -141,10 +142,44 @@ const AddOrder = ({
       const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map(
         assignRetailAdjustmentIdToOrderAdjustmentUid,
       )
+
+      const isVaccinationExist = newRows.filter((row) => !row.type)
+      if (isVaccinationExist.length > 0) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: `Vaccination item(s) will not be added.`,
+            alignContent: 'left',
+            isInformType: true,
+            additionalInfo: (
+              <div>
+                <ul style={{ listStylePosition: 'inside' }}>
+                  {isVaccinationExist.map((item) => (
+                    <li>
+                      <b>{item.subject}</b>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+            onConfirmSave: () => {},
+          },
+        })
+      }
+
+      const rowsWithoutVaccination = newRows
+        .filter((row) => row.type)
+        .map((row) => {
+          return {
+            ...row,
+            uid: getUniqueId(),
+          }
+        })
       dispatch({
         type: 'orders/updateState',
         payload: {
-          rows: newRows,
+          rows: rowsWithoutVaccination,
           finalAdjustments: newRetailInvoiceAdjustment,
           isGSTInclusive: r.isGSTInclusive,
           gstValue: r.gstValue,
@@ -168,7 +203,6 @@ const AddOrder = ({
     if (visitType === VISIT_TYPE.RETAIL)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
-  console.log(height)
   return (
     <React.Fragment>
       <SizeContainer size='sm'>
@@ -398,6 +432,7 @@ export default compose(
               break
             }
             case ORDER_TYPE_TAB.SERVICE: {
+              const { retailService, ...restValues } = o
               obj = {
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
@@ -409,7 +444,7 @@ export default compose(
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
                   retailService: {
                     unitPrice: o.total,
-                    ...o,
+                    ...restValues,
                   },
                 },
               }
@@ -466,12 +501,19 @@ export default compose(
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
+
         dispatch({
           type: 'dispense/saveAddOrderDetails',
           payload,
         }).then((r) => {
           if (r) {
             if (onConfirm) onConfirm()
+            dispatch({
+              type: 'dispense/updateState',
+              payload: {
+                isInitialLoading: false,
+              },
+            })
             onReloadClick()
           }
         })

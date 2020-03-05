@@ -110,6 +110,7 @@ export default createFormViewModel({
             payload: {
               entity: response,
               version: payload.version,
+              isInitialLoading: payload.isInitialLoading,
             },
           })
 
@@ -207,10 +208,10 @@ export default createFormViewModel({
       },
 
       *queryAddOrderDetails ({ payload }, { call, put }) {
-        const response = yield call(
-          service.queryAddOrderDetails,
-          payload.invoiceId,
-        )
+        const response = yield call(service.queryAddOrderDetails, {
+          invoiceId: payload.invoiceId,
+          isInitialLoading: payload.isInitialLoading,
+        })
 
         if (response.status === '200') {
           yield put({
