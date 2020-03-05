@@ -80,7 +80,10 @@ const Contact = (props) => {
                 //   precision={0}
                 //   {...args}
                 // />
-                <MobileNumberInput {...args} label='Contact Number' />
+                <MobileNumberInput
+                  {...args}
+                  label={isReferral ? 'Mobile Number' : 'Contact Number'}
+                />
               )}
             />
           </GridItem>
