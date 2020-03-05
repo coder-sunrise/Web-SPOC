@@ -34,12 +34,16 @@ class UserRoleForm extends React.PureComponent {
     })
     const { data } = response
     if (data) {
-      const option = data.data.map((d) => {
-        return {
-          name: d.name,
-          value: d.id,
-        }
-      })
+      const option = data.data
+        .filter((m) => {
+          return m.isActive
+        })
+        .map((d) => {
+          return {
+            name: d.name,
+            value: d.id,
+          }
+        })
       this.setState({
         selectFieldOption: option,
       })
