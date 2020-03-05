@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import router from 'umi/router'
 // common component
+import { connect } from 'dva'
+import { formatMessage } from 'umi/locale'
 import { withFormikExtend, notification, CommonModal } from '@/components'
 // sub component
 // import DispenseDetails from './DispenseDetails'
@@ -129,6 +131,10 @@ const constructPayload = (values) => {
   },
   displayName: 'DispensePage',
 })
+@connect(({ orders, formik }) => ({
+  orders,
+  formik,
+}))
 class Main extends Component {
   state = {
     showOrderModal: false,
@@ -287,11 +293,35 @@ class Main extends Component {
     reloadDispense(this.props, 'refresh')
   }
 
-  handleCloseAddOrder = () => {
-    const { dispatch, consultation, values } = this.props
-    const { visitPurposeFK } = values
+  showConfirmationBox = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: formatMessage({
+          id: 'app.general.leave-without-save',
+        }),
+        onConfirmSave: () => {
+          this.handleOrderModal()
+        },
+      },
+    })
+  }
 
-    if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
+  handleCloseAddOrder = () => {
+    const {
+      dispatch,
+      consultation,
+      values,
+      orders: { rows },
+      formik,
+    } = this.props
+    const { visitPurposeFK } = values
+    const newOrderRows = rows.filter((row) => !row.id && !row.isDeleted)
+    if (formik.OrderPage && !formik.OrderPage.dirty && newOrderRows.length > 0)
+      this.showConfirmationBox()
+    else if (visitPurposeFK === VISIT_TYPE.BILL_FIRST) {
       dispatch({
         type: 'consultation/discard',
         payload: {

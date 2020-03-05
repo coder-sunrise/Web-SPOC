@@ -111,7 +111,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, referralBy = [], ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,

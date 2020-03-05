@@ -47,7 +47,7 @@ class TableRow extends React.Component {
     // }
 
     if (!_.isEqual(orgRow._errors, row._errors)) return true
-    // if (!_.isEqual(orgRow, row)) return true
+    if (!_.isEqual(orgRow, row)) return true
     return false
   }
 
