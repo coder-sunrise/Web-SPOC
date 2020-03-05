@@ -140,10 +140,7 @@ class InventoryItemList extends React.Component {
           item.type === ITEM_TYPE.SERVICE
             ? item.serviceCenterServiceFK
             : typeFieldName.id,
-        unitPrice:
-          item.type === ITEM_TYPE.SERVICE
-            ? item.unitPrice
-            : typeFieldName.sellingPrice,
+        unitPrice: item.unitPrice,
         code: typeFieldName.code,
         name: typeFieldName.displayValue,
 
