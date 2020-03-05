@@ -159,7 +159,7 @@ const getIndexedRows = (rows = [], pagerConfig = {}) => {
   // console.log(rows)
   return rows.map((o, i) => {
     return {
-      rowIndex: startIndex + i,
+      rowIndex: rows.length > pagerConfig.pagesize ? i : startIndex + i,
       ...o,
     }
   })
