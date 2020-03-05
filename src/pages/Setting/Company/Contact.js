@@ -11,6 +11,8 @@ import { MobileNumberInput } from '@/components/_medisys'
 
 const Contact = (props) => {
   const { theme, type } = props
+  const isCopayer = type === 'copayer'
+  const isReferral = type === 'referral'
   return (
     <React.Fragment>
       <div
@@ -54,7 +56,7 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {type === 'copayer' || type === 'referral' ? (
+            {isCopayer || isReferral ? (
               []
             ) : (
               <FastField
@@ -66,7 +68,7 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          <GridItem md={type === 'copayer' || type === 'referral' ? 12 : 6}>
+          <GridItem md={isCopayer || isReferral ? 12 : 6}>
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
@@ -83,7 +85,7 @@ const Contact = (props) => {
             />
           </GridItem>
           <GridItem md={6}>
-            {type === 'copayer' ? (
+            {isCopayer ? (
               []
             ) : (
               <FastField
@@ -104,7 +106,7 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {type === 'copayer' ? (
+            {isCopayer ? (
               []
             ) : (
               <FastField
@@ -124,7 +126,7 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          {type === 'copayer' ? (
+          {isCopayer ? (
             <GridContainer>
               <GridItem md={6}>
                 <FastField
