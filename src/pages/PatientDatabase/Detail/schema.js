@@ -219,13 +219,15 @@ const schemaSchemes = {
           is: (val) => {
             const st = schemeTypes.find((o) => o.id === val)
             if (!st) return false
-            return (
+            const notMedisaveOrPhpc =
               [
                 'MEDI500VISUT',
                 'FLEXIMEDI',
                 'OPSCAN',
               ].indexOf(st.code) < 0 && !st.code.startsWith('PHPC')
-            )
+
+            const isCorporate = st.id === 15
+            return notMedisaveOrPhpc && !isCorporate
           }, // val === undefined,
           then: Yup.array().of(Yup.date()).required().min(2),
           // otherwise: null,
