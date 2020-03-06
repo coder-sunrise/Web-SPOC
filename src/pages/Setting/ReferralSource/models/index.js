@@ -5,10 +5,7 @@ import * as service from '../services'
 export default createListViewModel({
   namespace: 'settingReferralSource',
   config: {
-    codetable: {
-      message: 'Referral source updated',
-      code: 'ctreferralsource',
-    },
+    queryOnLoad: false,
   },
   param: {
     service,

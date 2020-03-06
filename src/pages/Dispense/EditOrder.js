@@ -59,6 +59,15 @@ class EditOrder extends Component {
     }, 500)
   }
 
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: `dispense/updateState`,
+      payload: {
+        editingOrder: false,
+      },
+    })
+  }
+
   makePayment = () => {
     const { dispatch, dispense } = this.props
     const { patientInfo } = dispense

@@ -312,6 +312,11 @@ export default ({ orders, dispatch, classes, from }) => {
         {
           columnName: 'description',
           width: 260,
+          observeFields: [
+            'instruction',
+            'remark',
+            'remarks',
+          ],
           render: (row) => {
             return (
               <Tooltip title={row.instruction}>

@@ -2,7 +2,13 @@ import { connect } from 'dva'
 import React, { useEffect, useState } from 'react'
 import Chart from '@/pages/Widgets/DentalChart/Chart'
 
-import { CommonTableGrid, Select, Skeleton } from '@/components'
+import {
+  CommonTableGrid,
+  Select,
+  Skeleton,
+  GridContainer,
+  GridItem,
+} from '@/components'
 import Grid from './Grid'
 // @connect(({ codetable }) => ({ codetable }))
 const DiagnosisPanel = (props) => {
@@ -43,13 +49,20 @@ const DiagnosisPanel = (props) => {
     data: dentalChartData.filter((o) => o.action.dentalTreatmentFK),
   }
   return (
-    <div>
-      <Chart readOnly dentalChartComponent={dentalChartComponent} {...props} />
-
-      <div style={{ marginTop: 8 }}>
-        <Grid {...props} dentalChartComponent={dentalChartComponent} />
-      </div>
-    </div>
+    <GridContainer gutter={0}>
+      <GridItem xs={12}>
+        <Chart
+          readOnly
+          dentalChartComponent={dentalChartComponent}
+          {...props}
+        />
+      </GridItem>
+      <GridItem xs={12}>
+        <div style={{ marginTop: 8 }}>
+          <Grid {...props} dentalChartComponent={dentalChartComponent} />
+        </div>
+      </GridItem>
+    </GridContainer>
   )
 }
 

@@ -13,7 +13,14 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+import { Action } from '@devexpress/dx-react-core'
 
+const actionCols = [
+  'actions',
+  'action',
+  'Action',
+  'editCommand',
+]
 const DragHandle = SortableHandle(({ style }) => (
   <Tooltip title='Drag'>
     <span
@@ -101,8 +108,10 @@ class TableCell extends React.Component {
         if (changedFields.filter((o) => o).length > 0) return true
       }
 
-      // console.log(col, row)
+      //
     }
+    if (nextProps.column && actionCols.includes(nextProps.column.name))
+      return true
     // if (!_.isEqual(orgRow._errors, row._errors)) return true
     // if (this.editing === true) {
     //   this.editing = false

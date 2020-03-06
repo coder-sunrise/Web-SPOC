@@ -66,42 +66,6 @@ const styles = (theme) => ({
   groupBtns: {
     display: 'block',
   },
-
-  groupBtnRoot: {
-    '&.Mui-disabled': {
-      color: 'inherit',
-    },
-  },
-  groupBtnGroupRoot: {
-    display: 'block',
-    marginBottom: theme.spacing(1),
-  },
-  buttonIcon: {
-    position: 'absolute',
-    left: -1,
-    top: -1,
-  },
-  grouped: {
-    fontSize: '0.75rem',
-    margin: theme.spacing(0.25, 0, 0.25, 0.5),
-    // border: 'none',
-    '&:not(:first-child)': {
-      marginLeft: theme.spacing(0.5),
-      borderRadius: Number(theme.shape.borderRadius),
-      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
-    },
-    '&:first-child': {
-      borderRadius: Number(theme.shape.borderRadius),
-    },
-    height: 33,
-    lineHeight: 1,
-    // whiteSpace: 'nowrap',
-    paddingLeft: 37,
-    overflow: 'hidden',
-    width: 194,
-    border: '1px solid rgba(0, 0, 0, 0.38)',
-    // borderRadius: '8px',
-  },
 })
 
 @connect(
@@ -157,7 +121,6 @@ class DentalChart extends React.Component {
       index,
       arrayHelpers,
       diagnosises,
-      classes,
       form,
       field,
       style,
@@ -168,6 +131,7 @@ class DentalChart extends React.Component {
       dispatch,
       ...props
     } = this.props
+    const { classes, ...restProps } = this.props
     const { mode } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
@@ -177,7 +141,7 @@ class DentalChart extends React.Component {
               <Chart {...this.props} />
             </div>
             {mode === 'diagnosis' && (
-              <DiagnosisPanel searchable {...this.props} />
+              <DiagnosisPanel searchable {...restProps} />
             )}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>

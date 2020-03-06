@@ -36,7 +36,9 @@ export default (props) => {
           chartmethods={ctchartmethod.filter(
             (o) =>
               o.isDisplayInDiagnosis &&
-              dentalChartData.find((m) => m.id === o.id),
+              dentalChartData.find(
+                (m) => m.action && !m.action.dentalTreatmentFK && m.id === o.id,
+              ),
           )}
           {...props}
           paperProps={{ elevation: 0 }}
