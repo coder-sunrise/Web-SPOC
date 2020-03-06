@@ -146,6 +146,9 @@ class Detail extends PureComponent {
           </GridContainer>
 
           <InventoryItemList {...this.props} includeOrderSet />
+          <p style={{ marginTop: 10 }}>
+            * Inactive item(s) will not be added in the order list.
+          </p>
         </div>
         {footer &&
           footer({
