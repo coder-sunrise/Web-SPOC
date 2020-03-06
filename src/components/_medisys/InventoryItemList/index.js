@@ -19,6 +19,7 @@ import {
 import { getUniqueId, currencyFormatter } from '@/utils/utils'
 import { InventoryTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
@@ -373,42 +374,63 @@ class InventoryItemList extends React.Component {
     })
   }
 
+  filterTabOnAccessRight = (tabs) => {
+    return tabs.filter((o) => {
+      const accessRight = Authorized.check(o.accessRight)
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return false
+      return true
+    })
+  }
+
   getOptions = () => {
     const commonOptions = [
       {
         id: ITEM_TYPE.MEDICATION,
         name: 'Medication',
         content: this.addContent('inventorymedication'),
+        accessRight: 'settings.templates.visitordertemplate.medication',
       },
       {
         id: ITEM_TYPE.CONSUMABLE,
         name: 'Consumable',
         content: this.addContent('inventoryconsumable'),
+        accessRight: 'settings.templates.visitordertemplate.consumable',
       },
       {
         id: ITEM_TYPE.VACCINATION,
         name: 'Vaccination',
         content: this.addContent('inventoryvaccination'),
+        accessRight: 'settings.templates.visitordertemplate.vaccination',
       },
       {
         id: ITEM_TYPE.SERVICE,
         name: 'Service',
         content: this.addContent('ctservice'),
+        accessRight: 'settings.templates.visitordertemplate.service',
       },
     ]
 
     if (this.props.includeOrderSet) {
-      return [
+      return this.filterTabOnAccessRight([
         ...commonOptions,
         {
           id: ITEM_TYPE.ORDERSET,
           name: 'Order Set',
           content: this.addContent('inventoryorderset'),
+          accessRight: 'settings.templates.visitordertemplate.orderset',
         },
-      ]
+      ])
     }
 
-    return commonOptions
+    const removedAccessRightOptions = commonOptions.map((option) => {
+      const { accessRight, ...restFields } = option
+      return {
+        ...restFields,
+      }
+    })
+
+    return removedAccessRightOptions
   }
 
   getColumns = () => {
