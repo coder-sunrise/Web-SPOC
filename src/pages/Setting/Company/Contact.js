@@ -108,7 +108,7 @@ const Contact = (props) => {
             )}
           </GridItem>
 
-          {isCopayer && (
+          {(isCopayer || isReferral) && (
             <GridContainer>
               <GridItem md={6}>
                 <FastField
@@ -116,12 +116,14 @@ const Contact = (props) => {
                   render={(args) => <TextField label='Email' {...args} />}
                 />
               </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='contact.contactWebsite.website'
-                  render={(args) => <TextField label='URL' {...args} />}
-                />
-              </GridItem>
+              {isCopayer && (
+                <GridItem md={6}>
+                  <FastField
+                    name='contact.contactWebsite.website'
+                    render={(args) => <TextField label='URL' {...args} />}
+                  />
+                </GridItem>
+              )}
             </GridContainer>
           )}
         </GridContainer>
