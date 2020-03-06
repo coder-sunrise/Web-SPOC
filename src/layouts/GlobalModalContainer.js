@@ -89,6 +89,7 @@ class GlobalModalContainer extends PureComponent {
         openConfirm: false,
         openConfirmTitle: null,
         openConfirmContent: null,
+        additionalInfo: null,
         onConfirmDiscard: null,
         // onConfirm: null,
         openConfirmText: 'Confirm',
@@ -303,6 +304,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <div style={{ textAlign: 'center' }}>
             <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
+            {global.additionalInfo}
           </div>
         </CommonModal>
 
