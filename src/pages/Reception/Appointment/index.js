@@ -505,33 +505,6 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        {/* <Popover
-          id='event-popup'
-          className={classes.popover}
-          open={showPopup}
-          anchorEl={popupAnchor}
-          onClose={this.handleClosePopover}
-          placement='top-start'
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'left',
-          }}
-          // disableRestoreFocus
-        >
-          {popoverEvent.doctor ? (
-            <DoctorBlockPopover
-              popoverEvent={popoverEvent}
-              calendarView={calendarView}
-            />
-          ) : (
-            <ApptPopover popoverEvent={popoverEvent} />
-          )}
-        </Popover> */}
-
         <FilterBar
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
