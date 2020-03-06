@@ -56,9 +56,8 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {isCopayer || isReferral ? (
-              []
-            ) : (
+            {!isCopayer &&
+            !isReferral && (
               <FastField
                 name='contactPerson'
                 render={(args) => (
@@ -88,20 +87,10 @@ const Contact = (props) => {
             />
           </GridItem>
           <GridItem md={6}>
-            {isCopayer ? (
-              []
-            ) : (
+            {!isCopayer && (
               <FastField
                 name='contact.officeContactNumber.number'
                 render={(args) => (
-                  // <NumberInput
-                  //   label='Office Number'
-                  //   maxLength='15'
-                  //   min='0'
-                  //   max='999999999999999'
-                  //   precision={0}
-                  //   {...args}
-                  // />
                   <MobileNumberInput {...args} label='Office Number' />
                 )}
               />
@@ -109,27 +98,17 @@ const Contact = (props) => {
           </GridItem>
 
           <GridItem md={6}>
-            {isCopayer ? (
-              []
-            ) : (
+            {!isCopayer && (
               <FastField
                 name='contact.faxContactNumber.number'
                 render={(args) => (
-                  // <NumberInput
-                  //   label='Fax Number'
-                  //   maxLength='15'
-                  //   min='0'
-                  //   max='999999999999999'
-                  //   precision={0}
-                  //   {...args}
-                  // />
                   <MobileNumberInput {...args} label='Fax Number' />
                 )}
               />
             )}
           </GridItem>
 
-          {isCopayer ? (
+          {isCopayer && (
             <GridContainer>
               <GridItem md={6}>
                 <FastField
@@ -144,8 +123,6 @@ const Contact = (props) => {
                 />
               </GridItem>
             </GridContainer>
-          ) : (
-            <GridContainer />
           )}
         </GridContainer>
       </div>
