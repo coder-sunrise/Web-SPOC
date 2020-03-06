@@ -68,6 +68,7 @@ const styles = (theme) => ({
     effectiveStartDate: Yup.date().required(),
     effectiveEndDate: Yup.date().required(),
     description: Yup.string(),
+    clinicRoleFK: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
