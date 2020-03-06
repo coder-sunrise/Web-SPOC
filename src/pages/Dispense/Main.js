@@ -294,7 +294,7 @@ class Main extends Component {
   }
 
   showConfirmationBox = () => {
-    const { dispatch } = this.props
+    const { dispatch, history } = this.props
     dispatch({
       type: 'global/updateAppState',
       payload: {
@@ -303,6 +303,13 @@ class Main extends Component {
           id: 'app.general.leave-without-save',
         }),
         onConfirmSave: () => {
+          history.push({
+            pathname: history.location.pathname,
+            query: {
+              ...history.location.query,
+              isInitialLoading: false,
+            },
+          })
           this.handleOrderModal()
         },
       },
