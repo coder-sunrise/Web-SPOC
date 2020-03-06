@@ -67,6 +67,16 @@ export default createListViewModel({
           ],
         })
       },
+      *fetchActiveUsers ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.getActiveUsers)
+          const { data } = response
+          return data
+        } catch (error) {
+          console.log(error)
+          return false
+        }
+      },
     },
 
     reducers: {
