@@ -252,7 +252,7 @@ class Layout extends PureComponent {
 
     this.state.currentLayout.widgets.map((id) => {
       const w = widgets.find((o) => o.id === id)
-      if (w.onUnmount) w.onUnmount()
+      if (w && w.onUnmount) w.onUnmount()
     })
   }
 

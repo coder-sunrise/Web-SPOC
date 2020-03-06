@@ -672,7 +672,6 @@ class CommonTableGrid extends PureComponent {
 
   Row = (p) => {
     const { classes, ...restProps } = this.props
-
     return <TableRow {...restProps} {...p} />
   }
 
@@ -930,6 +929,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
     const rowData = this.getData()
+    // console.log(rowData, this.state)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper
