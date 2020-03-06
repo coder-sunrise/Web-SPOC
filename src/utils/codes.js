@@ -1979,21 +1979,25 @@ export const visitOrderTemplateItemTypes = [
     id: 1,
     dtoName: 'visitOrderTemplateMedicationItemDto',
     itemFKName: 'inventoryMedicationFK',
+    keyName: 'inventoryMedication',
   },
   {
     id: 2,
     dtoName: 'visitOrderTemplateConsumableItemDto',
     itemFKName: 'inventoryConsumableFK',
+    keyName: 'inventoryConsumable',
   },
   {
     id: 3,
     dtoName: 'visitOrderTemplateVaccinationItemDto',
     itemFKName: 'inventoryVaccinationFK',
+    keyName: 'inventoryVaccination',
   },
   {
     id: 4,
     dtoName: 'visitOrderTemplateServiceItemDto',
     itemFKName: 'serviceCenterServiceFK',
+    keyName: 'service',
   },
 ]
 

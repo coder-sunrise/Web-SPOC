@@ -17,8 +17,9 @@ import {
   SizeContainer,
 } from '@/components'
 import { getUniqueId, currencyFormatter } from '@/utils/utils'
-import { InventoryTypes } from '@/utils/codes'
+import { InventoryTypes, visitOrderTemplateItemTypes } from '@/utils/codes'
 import { ITEM_TYPE } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 
 const CPSwitch = (label) => (args) => {
   if (!args.field.value) {
@@ -104,7 +105,7 @@ class InventoryItemList extends React.Component {
       type: 'global/updateAppState',
       payload: {
         openConfirm: true,
-        openConfirmContent: `Order set item(s) are already in the list and will not be added.`,
+        openConfirmContent: `Order set item(s) will not be added. Item(s) are either already in the list or has been deactivated.`,
         alignContent: 'left',
         additionalInfo: (
           <div>
@@ -154,20 +155,21 @@ class InventoryItemList extends React.Component {
     })
   }
 
-  checkOrderSetItemIsExisted = (
-    orderSetItemArray,
-    fieldName,
-    existingRows,
-    type,
-  ) => {
+  checkOrderSetItemIsExisted = (orderSetItemArray, existingRows, type) => {
     let existingItem = []
-
+    // console.log({ orderSetItemArray })
     const filteredRows = existingRows
       .filter((row) => !row.isDeleted && row.type === type)
       .map((row) => row.itemFK)
 
     const updatedItemArray = orderSetItemArray.map((row) => {
-      if (filteredRows.includes(row[fieldName])) {
+      const currentType = visitOrderTemplateItemTypes.find(
+        (itemType) => itemType.id === type,
+      )
+      if (
+        filteredRows.includes(row[currentType.itemFKName]) ||
+        !row[currentType.keyName].isActive
+      ) {
         existingItem.push(row)
         return null
       }
@@ -207,7 +209,6 @@ class InventoryItemList extends React.Component {
         newMedicationItem,
       ] = this.checkOrderSetItemIsExisted(
         medicationOrderSetItem,
-        'inventoryMedicationFK',
         rows,
         ITEM_TYPE.MEDICATION,
       )
@@ -220,7 +221,6 @@ class InventoryItemList extends React.Component {
         newConsumableItem,
       ] = this.checkOrderSetItemIsExisted(
         consumableOrderSetItem,
-        'inventoryConsumableFK',
         rows,
         ITEM_TYPE.CONSUMABLE,
       )
@@ -233,7 +233,6 @@ class InventoryItemList extends React.Component {
         newVaccinationItem,
       ] = this.checkOrderSetItemIsExisted(
         vaccinationOrderSetItem,
-        'inventoryVaccinationFK',
         rows,
         ITEM_TYPE.VACCINATION,
       )
@@ -246,7 +245,6 @@ class InventoryItemList extends React.Component {
         newServiceItem,
       ] = this.checkOrderSetItemIsExisted(
         serviceOrderSetItem,
-        'serviceCenterServiceFK',
         rows,
         ITEM_TYPE.SERVICE,
       )
@@ -373,42 +371,63 @@ class InventoryItemList extends React.Component {
     })
   }
 
+  filterTabOnAccessRight = (tabs) => {
+    return tabs.filter((o) => {
+      const accessRight = Authorized.check(o.accessRight)
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return false
+      return true
+    })
+  }
+
   getOptions = () => {
     const commonOptions = [
       {
         id: ITEM_TYPE.MEDICATION,
         name: 'Medication',
         content: this.addContent('inventorymedication'),
+        accessRight: 'settings.templates.visitordertemplate.medication',
       },
       {
         id: ITEM_TYPE.CONSUMABLE,
         name: 'Consumable',
         content: this.addContent('inventoryconsumable'),
+        accessRight: 'settings.templates.visitordertemplate.consumable',
       },
       {
         id: ITEM_TYPE.VACCINATION,
         name: 'Vaccination',
         content: this.addContent('inventoryvaccination'),
+        accessRight: 'settings.templates.visitordertemplate.vaccination',
       },
       {
         id: ITEM_TYPE.SERVICE,
         name: 'Service',
         content: this.addContent('ctservice'),
+        accessRight: 'settings.templates.visitordertemplate.service',
       },
     ]
 
     if (this.props.includeOrderSet) {
-      return [
+      return this.filterTabOnAccessRight([
         ...commonOptions,
         {
           id: ITEM_TYPE.ORDERSET,
           name: 'Order Set',
           content: this.addContent('inventoryorderset'),
+          accessRight: 'settings.templates.visitordertemplate.orderset',
         },
-      ]
+      ])
     }
 
-    return commonOptions
+    const removedAccessRightOptions = commonOptions.map((option) => {
+      const { accessRight, ...restFields } = option
+      return {
+        ...restFields,
+      }
+    })
+
+    return removedAccessRightOptions
   }
 
   getColumns = () => {
@@ -444,6 +463,9 @@ class InventoryItemList extends React.Component {
         columnName: 'type',
         type: 'select',
         options: InventoryTypes,
+        render: (row) =>
+          `${InventoryTypes.find((type) => type.value === row.type)
+            .name} ${!row.isActive && '(Inactive)'}`,
       },
       {
         columnName: 'itemFK',
