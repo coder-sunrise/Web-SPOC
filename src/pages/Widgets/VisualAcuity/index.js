@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import { Editor } from 'react-draft-wysiwyg'
 import { connect } from 'dva'
-import { withFormik, Formik, Form, Field, FastField, FieldArray } from 'formik'
 import { withStyles, Divider, Paper } from '@material-ui/core'
-import DeleteIcon from '@material-ui/icons/Delete'
+import { AttachmentWithThumbnail } from '@/components/_medisys'
+
 import Yup from '@/utils/yup'
 
 import {
@@ -29,6 +29,9 @@ import {
   Switch,
   Checkbox,
   OutlinedTextField,
+  withFormikExtend,
+  Field,
+  FastField,
 } from '@/components'
 
 import model from './models'
@@ -72,7 +75,7 @@ const styles = (theme) => ({
 @connect(({ visualAcuity }) => ({
   visualAcuity,
 }))
-@withFormik({
+@withFormikExtend({
   // mapPropsToValues: ({ visualAcuity }) => {
   //   console.log(visualAcuity)
   //   return visualAcuity.entity ? visualAcuity.entity : visualAcuity.default
@@ -97,9 +100,41 @@ const styles = (theme) => ({
   displayName: 'VisualAcuity',
 })
 class VisualAcuity extends Component {
+  handleUpdateAttachments = ({ added, deleted }) => {
+    console.log(added, deleted)
+    const { values: { visitAttachment = [] }, setFieldValue } = this.props
+    let updated = [
+      ...visitAttachment,
+    ]
+
+    if (added)
+      updated = [
+        ...updated,
+        ...added,
+      ]
+
+    if (deleted)
+      updated = updated.reduce((attachments, item) => {
+        if (
+          (item.fileIndexFK !== undefined && item.fileIndexFK === deleted) ||
+          (item.fileIndexFK === undefined && item.id === deleted)
+        )
+          return [
+            ...attachments,
+            { ...item, isDeleted: true },
+          ]
+
+        return [
+          ...attachments,
+          { ...item },
+        ]
+      }, [])
+    setFieldValue('visitAttachment', updated)
+  }
+
   render () {
     const { state, props } = this
-    const { theme, classes } = props
+    const { theme, classes, values } = props
     const cfg = {
       extraClasses: {
         root: classes.inputRoot,
@@ -107,7 +142,7 @@ class VisualAcuity extends Component {
       simple: true,
     }
     return (
-      <div style={{ minWidth: 800 }}>
+      <div style={{ minWidth: 700 }}>
         <table className={classes.table}>
           <colgroup>
             <col width='20%' />
@@ -370,7 +405,7 @@ class VisualAcuity extends Component {
                 return (
                   <OutlinedTextField
                     label='Remarks'
-                    rows={4}
+                    rows={3}
                     multiline
                     {...args}
                   />
@@ -378,8 +413,15 @@ class VisualAcuity extends Component {
               }}
             />
           </GridItem>
+          <GridItem xs={12}>
+            <AttachmentWithThumbnail
+              label='Auto-ref Result'
+              attachmentType='Visit'
+              handleUpdateAttachments={this.handleUpdateAttachments}
+              attachments={values.visitAttachment}
+            />
+          </GridItem>
         </GridContainer>
-        <Divider light />
       </div>
     )
   }

@@ -981,7 +981,21 @@ class Layout extends PureComponent {
                         shrink: true,
                       }}
                     >
-                      <ul>
+                      <ProgressButton
+                        style={{ margin: theme.spacing(1, 0) }}
+                        onClick={() => {
+                          onSaveLayout(this.state.currentLayout)
+                        }}
+                      >
+                        Save as My Favourite
+                      </ProgressButton>
+                      <ul
+                        style={{
+                          listStyle: 'square',
+                          paddingLeft: 16,
+                          fontSize: 'smaller',
+                        }}
+                      >
                         <li>
                           <p>
                             Save current consultation layout as my favourite.
@@ -994,13 +1008,6 @@ class Layout extends PureComponent {
                           </p>
                         </li>
                       </ul>
-                      <ProgressButton
-                        onClick={() => {
-                          onSaveLayout(this.state.currentLayout)
-                        }}
-                      >
-                        Save as My Favourite
-                      </ProgressButton>
                     </CustomInputWrapper>
                   </div>
                 </SizeContainer>
