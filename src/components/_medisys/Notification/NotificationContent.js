@@ -84,7 +84,7 @@ const NotificationContent = ({ notification, classes, dispatch }) => {
         primary={
           <div>
             <div className={classes.itemContainer}>
-              <span>{messageTitle}</span>
+              <span>{messageTitle}&nbsp;</span>
               <p className={classes.messageText}>{notification.message}</p>
             </div>
             {isError && (
