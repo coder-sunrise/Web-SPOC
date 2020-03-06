@@ -853,13 +853,13 @@ class CommonTableGrid extends PureComponent {
     // console.log(errors, columnExtensions)
 
     const tableProps = {
-      ...TableProps,
-      columnExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
       rowComponent: this.TableRow,
-    }
+      columnExtensions,
 
+      ...TableProps,
+    }
     columnExtensions.forEach((c) => {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
