@@ -25,6 +25,20 @@ class PrintingTool extends PureComponent {
               <span>Download</span>
             </Button>
           </GridItem>
+          <GridItem xs={12} md={12} style={{ marginTop: 20 }}>
+            <span>
+              Click{' '}
+              <a
+                style={{ textDecoration: 'underline' }}
+                onClick={() => {
+                  downloadPrintingTool('LabelPrinterSetup')
+                }}
+              >
+                here
+              </a>{' '}
+              to download printing tool installation guide
+            </span>
+          </GridItem>
         </GridContainer>
       </CardContainer>
     )

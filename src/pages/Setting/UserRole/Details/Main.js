@@ -26,6 +26,7 @@ import {
 } from '@/components'
 
 // utils
+import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { AccessRightConfig } from './const'
 
@@ -106,6 +107,60 @@ class Main extends React.Component {
       module: undefined,
       displayValue: undefined,
     },
+    hasUser: true,
+    hasActiveSession: true,
+    isActive: false,
+  }
+
+  componentDidMount = () => {
+    this.setIsActive()
+    this.checkHasUser()
+    this.checkHasActiveSession()
+  }
+
+  setIsActive = () => {
+    const { effectiveStartDate, effectiveEndDate } = this.props.userRole
+    if (effectiveStartDate && effectiveEndDate) {
+      this.setState({
+        isActive:
+          moment(effectiveStartDate) <= moment() &&
+          moment() <= moment(effectiveEndDate),
+      })
+    }
+  }
+
+  checkHasUser = async () => {
+    const { userRole } = this.props
+    if (userRole.id) {
+      this.props
+        .dispatch({
+          type: 'settingUserRole/fetchActiveUsers',
+        })
+        .then((response) => {
+          const result = response.data.filter((m) => {
+            return m.userProfile.role.id === userRole.id
+          })
+          this.setState({ hasUser: result.length > 0 })
+        })
+    }
+  }
+
+  checkHasActiveSession = async () => {
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   handleSearchClick = async () => {
@@ -204,7 +259,7 @@ class Main extends React.Component {
 
   render () {
     const { classes, values } = this.props
-    const { filter } = this.state
+    const { filter, hasUser, hasActiveSession, isActive } = this.state
     const {
       id,
       isUserMaintainable,
@@ -240,7 +295,11 @@ class Main extends React.Component {
                   <DatePicker
                     {...args}
                     label='Effective Start Date'
-                    disabled={isEdit && !isUserMaintainable}
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
                     restrictFromTo={[
                       moment('0000-01-01').formatUTC(),
                       effectiveEndDate,
@@ -256,7 +315,11 @@ class Main extends React.Component {
                   <DatePicker
                     {...args}
                     label='Effective End Date'
-                    disabled={isEdit && !isUserMaintainable}
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
                     restrictFromTo={[
                       effectiveStartDate,
                       moment('2099-12-31').formatUTC(false),
