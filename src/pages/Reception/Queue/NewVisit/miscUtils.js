@@ -92,6 +92,12 @@ export const formikMapPropsToValues = ({
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
     }
 
+    const { visitOrderTemplateFK } = visitEntries
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(visitEntries.visitOrderTemplateFK)
+
     return {
       queueNo: qNo,
       visitPurposeFK,
@@ -100,6 +106,9 @@ export const formikMapPropsToValues = ({
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      visitOrderTemplateFK: isVisitOrderTemplateActive
+        ? visitOrderTemplateFK
+        : undefined,
     }
   } catch (error) {
     console.log({ error })
