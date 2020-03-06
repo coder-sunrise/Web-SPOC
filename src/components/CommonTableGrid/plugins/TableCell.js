@@ -35,7 +35,6 @@ class TableCell extends React.Component {
     if (window._forceTableUpdate) {
       return true
     }
-
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
     const {
@@ -94,6 +93,8 @@ class TableCell extends React.Component {
 
         return true
       }
+
+      if (nextProps.value !== this.props.value) return true
 
       if (col.observeFields) {
         const changedFields = col.observeFields.map((o) => row[o] !== orgRow[o])
