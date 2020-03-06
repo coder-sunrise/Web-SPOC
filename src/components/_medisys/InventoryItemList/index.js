@@ -157,7 +157,7 @@ class InventoryItemList extends React.Component {
 
   checkOrderSetItemIsExisted = (orderSetItemArray, existingRows, type) => {
     let existingItem = []
-    console.log({ orderSetItemArray })
+    // console.log({ orderSetItemArray })
     const filteredRows = existingRows
       .filter((row) => !row.isDeleted && row.type === type)
       .map((row) => row.itemFK)
