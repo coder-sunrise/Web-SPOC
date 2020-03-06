@@ -282,6 +282,7 @@ class NewVisit extends PureComponent {
                         isReadOnly={isRetail || isReadOnly}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
+                        dispatch={dispatch}
                       />
                     </GridItem>
                   </React.Fragment>

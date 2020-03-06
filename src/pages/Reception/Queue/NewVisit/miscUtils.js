@@ -111,7 +111,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,
@@ -174,6 +180,7 @@ export const formikHandleSubmit = (
       referralPerson: null,
       referralDate: null,
       ...restValues, // override using formik values
+      referralBy: referralBy.length > 0 ? referralBy[0] : null,
     },
   }
 

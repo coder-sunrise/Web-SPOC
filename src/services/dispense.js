@@ -73,10 +73,14 @@ module.exports = {
     return r
   },
 
-  queryAddOrderDetails: async (invoiceId) => {
-    const r = await request(`${url}/retailOrder/${invoiceId}`, {
-      method: 'GET',
-    })
+  queryAddOrderDetails: async ({ invoiceId, isInitialLoading }) => {
+    const r = await request(
+      `${url}/retailOrder/${invoiceId}?isInitialLoading=${isInitialLoading ||
+        false}`,
+      {
+        method: 'GET',
+      },
+    )
     return r
   },
   saveAddOrderDetails: async (params) => {

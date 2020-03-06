@@ -170,6 +170,9 @@ const Grid = ({
           break
         case '1': {
           // dispense
+          const isInitialLoading =
+            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+            row.visitStatus === 'WAITING'
           const version = Date.now()
           dispatch({
             type: `dispense/start`,
@@ -182,7 +185,7 @@ const Grid = ({
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+                `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 

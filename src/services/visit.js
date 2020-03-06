@@ -42,4 +42,9 @@ export const saveVisit = async (visitInfo) => {
 export const queryVisitOrderTemplate = (params) =>
   service.queryList(visitOrderTemplateUrl, params)
 
+export const queryReferralList = async () => {
+  const response = await axiosRequest(`/api/ReferralSource`)
+  return response
+}
+
 export const upsert = (payload) => service.upsert(queueApiUrl, payload)

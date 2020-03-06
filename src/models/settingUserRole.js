@@ -26,27 +26,26 @@ export default createListViewModel({
         const response = yield call(service.getUserRoleById, payload)
         const { isEdit } = payload
         let { data = {}, status } = response
-        const nameList = [
-          'module',
-          'displayValue',
-        ]
         const { id, ...result } = data
-        if (!isEdit) {
-          data = result
+
+        if (isEdit) {
+          return yield put({
+            type: 'updateUserRole',
+            data: { ...data },
+          })
         }
 
+        data = result
         return yield put({
-          type: 'updateUserRole',
-          data: { ...data },
+          type: 'loadAccessRight',
+          data: [
+            ...data.roleClientAccessRight,
+          ],
         })
       },
       *fetchDefaultAccessRight ({ payload }, { call, put }) {
         const response = yield call(service.getAccessRight)
         const { data = [], status } = response
-        const nameList = [
-          'module',
-          'displayValue',
-        ]
 
         const resultData = []
         data.map((d) => {
