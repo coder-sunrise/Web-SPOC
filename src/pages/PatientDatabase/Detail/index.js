@@ -397,8 +397,10 @@ class PatientDetail extends PureComponent {
           openConfirm: true,
           openConfirmTitle: '',
           openConfirmText: 'OK',
-          openConfirmContent:
-            'Duplicate Account No. found. OK to continue or Cancel to make changes',
+          openConfirmContent: 'Duplicated Account No. found.',
+          additionalInfo: (
+            <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
+          ),
           onConfirmSave: handleSubmit,
         },
       })
