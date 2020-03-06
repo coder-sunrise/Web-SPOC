@@ -28,7 +28,7 @@ export const menuData = [
     url: '/setting/generalsetting',
   },
   {
-    authority: 'settings.clinicsetting.generalsetting',
+    authority: 'settings.clinicsetting.setting',
     title: 'Clinic Setting',
     text: 'Service',
     url: '/setting/service',
