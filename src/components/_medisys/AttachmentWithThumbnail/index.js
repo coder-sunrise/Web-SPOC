@@ -273,7 +273,7 @@ const AttachmentWithThumbnail = ({
       color='rose'
       size='sm'
       onClick={onUploadClick}
-      disabled={uploading || global.disableSave}
+      disabled={isReadOnly || uploading || global.disableSave}
       className={classes.uploadBtn}
     >
       <AttachFile /> Upload
