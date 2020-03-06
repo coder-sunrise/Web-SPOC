@@ -381,15 +381,16 @@ class PatientDetail extends PureComponent {
     })
 
     const { data } = response
+
     let shouldPromptSaveConfirmation = false
     if (data) {
-      if (data.length === 1)
-        shouldPromptSaveConfirmation = data[0].id !== values.id
-      else if (data.length > 1) {
-        shouldPromptSaveConfirmation = true
+      const { totalRecords, data: patientList } = data
+      shouldPromptSaveConfirmation = totalRecords > 1
+
+      if (totalRecords === 1) {
+        shouldPromptSaveConfirmation = patientList[0].id !== values.id
       }
     }
-
     if (shouldPromptSaveConfirmation) {
       return dispatch({
         type: 'global/updateAppState',
@@ -397,26 +398,14 @@ class PatientDetail extends PureComponent {
           openConfirm: true,
           openConfirmTitle: '',
           openConfirmText: 'OK',
-          openConfirmContent:
-            'Duplicate Account No. found. OK to continue or Cancel to make changes',
+          openConfirmContent: 'Duplicated Account No. found.',
+          additionalInfo: (
+            <h3 style={{ marginTop: 0 }}>Do you wish to proceed?</h3>
+          ),
           onConfirmSave: handleSubmit,
         },
       })
     }
-
-    // if (data && data.totalRecords > 0) {
-    //   return dispatch({
-    //     type: 'global/updateAppState',
-    //     payload: {
-    //       openConfirm: true,
-    //       openConfirmTitle: '',
-    //       openConfirmText: 'OK',
-    //       openConfirmContent:
-    //         'Duplicate Account No. found. OK to continue or Cancel to make changes',
-    //       onConfirmSave: handleSubmit,
-    //     },
-    //   })
-    // }
     return handleSubmit()
   }
 
