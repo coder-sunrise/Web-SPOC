@@ -140,7 +140,7 @@ class Main extends Component {
     showOrderModal: false,
   }
 
-  componentDidMount () {
+  componentDidMount = async () => {
     const { dispatch, values, dispense } = this.props
     const { otherOrder = [], prescription = [], visitPurposeFK } = values
     dispatch({
@@ -152,6 +152,18 @@ class Main extends Component {
     const accessRights = Authorized.check('queue.dispense.editorder')
 
     if (visitPurposeFK === VISIT_TYPE.RETAIL && isEmptyDispense) {
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctservice',
+        },
+      })
+      await dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'inventoryconsumable',
+        },
+      })
       this.setState(
         (prevState) => {
           return {
