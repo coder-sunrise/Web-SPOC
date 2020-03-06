@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import {
   FastField,
   GridContainer,
@@ -55,19 +55,19 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          <GridItem md={6}>
-            {!isCopayer &&
-            !isReferral && (
+          {!isCopayer &&
+          !isReferral && (
+            <GridItem md={6}>
               <FastField
                 name='contactPerson'
                 render={(args) => (
                   <TextField label='Contact Person' {...args} />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
-          <GridItem md={isCopayer || isReferral ? 12 : 6}>
+          <GridItem md={6}>
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
@@ -86,30 +86,31 @@ const Contact = (props) => {
               )}
             />
           </GridItem>
-          <GridItem md={6}>
-            {!isCopayer && (
+
+          {!isCopayer && (
+            <GridItem md={6}>
               <FastField
                 name='contact.officeContactNumber.number'
                 render={(args) => (
                   <MobileNumberInput {...args} label='Office Number' />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
-          <GridItem md={6}>
-            {!isCopayer && (
+          {!isCopayer && (
+            <GridItem md={6}>
               <FastField
                 name='contact.faxContactNumber.number'
                 render={(args) => (
                   <MobileNumberInput {...args} label='Fax Number' />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
           {(isCopayer || isReferral) && (
-            <GridContainer>
+            <Fragment>
               <GridItem md={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
@@ -124,7 +125,7 @@ const Contact = (props) => {
                   />
                 </GridItem>
               )}
-            </GridContainer>
+            </Fragment>
           )}
         </GridContainer>
       </div>
