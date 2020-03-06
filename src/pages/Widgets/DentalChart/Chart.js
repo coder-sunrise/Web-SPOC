@@ -1434,7 +1434,12 @@ class Chart extends React.PureComponent {
     return (
       <div
         ref={this.divContainer}
-        style={{ width: '100%', position: 'relative', ...style }}
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          ...style,
+        }}
       >
         <Tooltip title='Export chart to image'>
           <Button
@@ -1455,7 +1460,7 @@ class Chart extends React.PureComponent {
             <CloudDownload />
           </Button>
         </Tooltip>
-        <Paper className={classes.paper}>
+        <Paper className={classes ? classes.paper : ''}>
           <canvas id={this.id} ref={this._canvasContainer} />
         </Paper>
       </div>

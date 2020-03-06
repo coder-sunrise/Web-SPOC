@@ -75,8 +75,7 @@ const Diagnosis = ({
       <div
         ref={myRef}
         style={{
-          // height: selected ? 300 : 'auto',
-          height: '50vh',
+          height: selected ? '50vh' : 'auto',
           overflowY: 'auto',
           overflowX: 'hidden',
           position: 'relative',
