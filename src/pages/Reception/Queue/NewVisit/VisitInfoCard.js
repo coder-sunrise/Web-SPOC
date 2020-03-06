@@ -50,7 +50,7 @@ const VisitInfoCard = ({
   handleUpdateAttachments,
   existingQNo,
   visitType,
-  dispatch,
+  visitOrderTemplateOptions,
 }) => {
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
@@ -58,33 +58,6 @@ const VisitInfoCard = ({
       return 'Queue No. already existed in current queue list'
     return ''
   }
-
-  const [
-    visitOrderTemplateOptions,
-    setVisitOrderTemplateOptions,
-  ] = useState([])
-  useEffect(() => {
-    dispatch({
-      type: 'visitRegistration/getVisitOrderTemplateList',
-      payload: {
-        pagesize: 9999,
-      },
-    }).then((response) => {
-      if (response) {
-        const { data } = response
-        const templateOptions = data
-          .filter((template) => template.isActive)
-          .map((template) => {
-            return {
-              ...template,
-              value: template.id,
-              name: template.displayValue,
-            }
-          })
-        setVisitOrderTemplateOptions(templateOptions)
-      }
-    })
-  }, [])
 
   return (
     <CommonCard title='Visit Information'>
