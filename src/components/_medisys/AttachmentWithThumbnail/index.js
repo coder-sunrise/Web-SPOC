@@ -283,6 +283,7 @@ const AttachmentWithThumbnail = ({
   if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null
 
   const commonProps = {
+    dispatch,
     isReadOnly,
     simple,
     size: thumbnailSize,
