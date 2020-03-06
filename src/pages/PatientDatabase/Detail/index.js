@@ -329,7 +329,7 @@ class PatientDetail extends PureComponent {
   // }
 
   componentWillUnmount () {
-    const {dispatch} = this.props
+    const { dispatch } = this.props
     const menuErrors = {}
     dispatch({
       type: 'patient/updateState',
@@ -383,13 +383,13 @@ class PatientDetail extends PureComponent {
     const { data } = response
     let shouldPromptSaveConfirmation = false
     if (data) {
-      if (data.length === 1)
-        shouldPromptSaveConfirmation = data[0].id !== values.id
-      else if (data.length > 1) {
-        shouldPromptSaveConfirmation = true
+      const { totalRecords, data: patientList } = data
+      shouldPromptSaveConfirmation = totalRecords > 1
+
+      if (totalRecords === 1) {
+        shouldPromptSaveConfirmation = patientList[0].id !== values.id
       }
     }
-
     if (shouldPromptSaveConfirmation) {
       return dispatch({
         type: 'global/updateAppState',
@@ -403,20 +403,6 @@ class PatientDetail extends PureComponent {
         },
       })
     }
-
-    // if (data && data.totalRecords > 0) {
-    //   return dispatch({
-    //     type: 'global/updateAppState',
-    //     payload: {
-    //       openConfirm: true,
-    //       openConfirmTitle: '',
-    //       openConfirmText: 'OK',
-    //       openConfirmContent:
-    //         'Duplicate Account No. found. OK to continue or Cancel to make changes',
-    //       onConfirmSave: handleSubmit,
-    //     },
-    //   })
-    // }
     return handleSubmit()
   }
 
