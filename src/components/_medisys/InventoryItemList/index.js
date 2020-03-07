@@ -465,7 +465,9 @@ class InventoryItemList extends React.Component {
         options: InventoryTypes,
         render: (row) =>
           `${InventoryTypes.find((type) => type.value === row.type)
-            .name} ${row.isActive ? '' : '(Inactive)'}`,
+            .name} ${row.isActive || row.isActive === undefined
+            ? ''
+            : '(Inactive)'}`,
       },
       {
         columnName: 'itemFK',
