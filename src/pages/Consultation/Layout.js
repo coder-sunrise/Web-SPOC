@@ -252,7 +252,7 @@ class Layout extends PureComponent {
 
     this.state.currentLayout.widgets.map((id) => {
       const w = widgets.find((o) => o.id === id)
-      if (w.onUnmount) w.onUnmount()
+      if (w && w.onUnmount) w.onUnmount()
     })
   }
 
@@ -671,11 +671,15 @@ class Layout extends PureComponent {
                 })}
               </GridItem>
               <GridItem md={2} style={{ textAlign: 'right' }}>
-                <Button size='sm' onClick={this.toggleDrawer}>
+                <Button size='sm' color='info' onClick={this.toggleDrawer}>
                   <Settings />
                   Widgets
                 </Button>
-                <Button size='sm' onClick={this.togglePatientHistoryDrawer}>
+                <Button
+                  size='sm'
+                  color='info'
+                  onClick={this.togglePatientHistoryDrawer}
+                >
                   <Accessibility />
                   History
                 </Button>

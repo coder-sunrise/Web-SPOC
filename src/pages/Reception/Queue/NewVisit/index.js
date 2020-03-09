@@ -96,6 +96,35 @@ const getHeight = (propsHeight) => {
   handleSubmit: formikHandleSubmit,
 })
 class NewVisit extends PureComponent {
+  componentDidMount = async () => {
+    const { dispatch } = this.props
+    const response = await dispatch({
+      type: 'visitRegistration/getVisitOrderTemplateList',
+      payload: {
+        pagesize: 9999,
+      },
+    })
+    if (response) {
+      const { data } = response
+      const templateOptions = data
+        .filter((template) => template.isActive)
+        .map((template) => {
+          return {
+            ...template,
+            value: template.id,
+            name: template.displayValue,
+          }
+        })
+
+      dispatch({
+        type: 'visitRegistration/updateState',
+        payload: {
+          visitOrderTemplateOptions: templateOptions,
+        },
+      })
+    }
+  }
+
   componentWillUnmount () {
     // call file index API METHOD='DELETE'
     // for Attachments where fileStatus === 'Uploaded' but not 'Confirmed'
@@ -200,7 +229,7 @@ class NewVisit extends PureComponent {
       footer,
       queueLog: { list = [] } = { list: [] },
       loading,
-      visitRegistration: { errorState },
+      visitRegistration: { errorState, visitOrderTemplateOptions },
       values,
       isSubmitting,
       dispatch,
@@ -269,6 +298,7 @@ class NewVisit extends PureComponent {
                         attachments={values.visitAttachment}
                         visitType={values.visitPurposeFK}
                         dispatch={dispatch}
+                        visitOrderTemplateOptions={visitOrderTemplateOptions}
                       />
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>

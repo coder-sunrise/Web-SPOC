@@ -63,9 +63,14 @@ const AddOrder = ({
               innerLayerConcurrencyToken:
                 o.retailVisitInvoiceDrug.concurrencyToken,
               ...restValues,
-              corPrescriptionItemInstruction:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemInstruction,
+              corPrescriptionItemInstruction: o.retailVisitInvoiceDrug.retailPrescriptionItem.retailPrescriptionItemInstruction.map(
+                (instruction) => {
+                  return {
+                    ...instruction,
+                    stepdose: instruction.stepdose || 'AND',
+                  }
+                },
+              ),
               corPrescriptionItemPrecaution:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemPrecaution,

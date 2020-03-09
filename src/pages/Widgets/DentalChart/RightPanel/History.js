@@ -182,6 +182,7 @@ const History = (props) => {
                   // style={{ width: '70%', margin: '0 auto' }}
                   dentalChartComponent={selected}
                   readOnly
+                  classes={classes}
                 />
               )}
             </GridItem>

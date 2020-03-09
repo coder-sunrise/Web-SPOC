@@ -672,7 +672,6 @@ class CommonTableGrid extends PureComponent {
 
   Row = (p) => {
     const { classes, ...restProps } = this.props
-
     return <TableRow {...restProps} {...p} />
   }
 
@@ -854,13 +853,13 @@ class CommonTableGrid extends PureComponent {
     // console.log(errors, columnExtensions)
 
     const tableProps = {
-      ...TableProps,
-      columnExtensions,
       cellComponent:
         (this.props.ActionProps || {}).TableCellComponent || this.Cell,
       rowComponent: this.TableRow,
-    }
+      columnExtensions,
 
+      ...TableProps,
+    }
     columnExtensions.forEach((c) => {
       c.validationSchema = schema
       c.gridId = gridId || this.gridId
@@ -930,6 +929,7 @@ class CommonTableGrid extends PureComponent {
     // console.log(this.state.entity.list)
     const _loading = type ? loading.effects[`${type}/query`] : false
     const rowData = this.getData()
+    // console.log(rowData, this.state)
     return (
       <MuiThemeProvider theme={this.theme}>
         <Paper

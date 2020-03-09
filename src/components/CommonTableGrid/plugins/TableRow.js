@@ -45,8 +45,7 @@ class TableRow extends React.Component {
     // if (columnExtensions.find((o) => typeof o.options === 'function')) {
     //   return true
     // }
-
-    if (!_.isEqual(orgRow._errors, row._errors)) return true
+    if (orgRow && row && !_.isEqual(orgRow._errors, row._errors)) return true
     if (!_.isEqual(orgRow, row)) return true
     return false
   }

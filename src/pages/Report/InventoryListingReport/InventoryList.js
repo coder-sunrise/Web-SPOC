@@ -1,14 +1,10 @@
 import React, { PureComponent } from 'react'
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
+import { Table } from '@devexpress/dx-react-grid-material-ui'
 import { ReportDataGrid } from '@/components/_medisys'
-import {
-  IntegratedSummary,
-} from '@devexpress/dx-react-grid'
-import {
-  Table,
-} from '@devexpress/dx-react-grid-material-ui'
 
 class InventoryList extends PureComponent {
-  render() {
+  render () {
     let listData = []
     const { reportDatas } = this.props
     if (!reportDatas) return null
@@ -21,10 +17,11 @@ class InventoryList extends PureComponent {
     const SummaryRow = (p) => {
       const { children } = p
       let countCol = children.find((c) => {
+        if (c.props.tableColumn.column) return false
         return c.props.tableColumn.column.name === 'stock'
       })
-      console.log({countCol});
-      
+      // console.log({ countCol })
+
       if (countCol) {
         const newChildren = [
           {
@@ -32,10 +29,10 @@ class InventoryList extends PureComponent {
             props: {
               ...countCol.props,
               colSpan: 9,
-              tableColumn:{
+              tableColumn: {
                 ...countCol.props.tableColumn,
-                align:'left',
-              }
+                align: 'left',
+              },
             },
             key: 1111,
           },

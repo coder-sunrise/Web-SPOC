@@ -178,7 +178,10 @@ const Treatment = ({
 
                           const { rows = [] } = orders
                           const treatmentOrder = rows.find(
-                            (m) => m.type === '7' && m.treatmentFK === o.id,
+                            (m) =>
+                              m.type === '7' &&
+                              m.treatmentFK === o.id &&
+                              !m.isDeleted,
                           )
 
                           dispatch({

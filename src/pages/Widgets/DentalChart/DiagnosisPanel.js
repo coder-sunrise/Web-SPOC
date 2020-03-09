@@ -31,6 +31,46 @@ import {
 import Setup from './Setup/index'
 import Tooth from './Tooth'
 
+const styles = (theme) => ({
+  paper: {},
+
+  groupBtnRoot: {
+    '&.Mui-disabled': {
+      color: 'inherit',
+    },
+  },
+  groupBtnGroupRoot: {
+    display: 'block',
+    marginBottom: theme.spacing(1),
+  },
+  buttonIcon: {
+    position: 'absolute',
+    left: -1,
+    top: -1,
+  },
+  grouped: {
+    fontSize: '0.75rem',
+    margin: theme.spacing(0.25, 0, 0.25, 0.5),
+    // border: 'none',
+    '&:not(:first-child)': {
+      marginLeft: theme.spacing(0.5),
+      borderRadius: Number(theme.shape.borderRadius),
+      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
+    },
+    '&:first-child': {
+      borderRadius: Number(theme.shape.borderRadius),
+    },
+    height: 33,
+    lineHeight: 1,
+    // whiteSpace: 'nowrap',
+    paddingLeft: 37,
+    overflow: 'hidden',
+    width: 194,
+    border: '1px solid rgba(0, 0, 0, 0.38)',
+    // borderRadius: '8px',
+  },
+})
+
 const DiagnosisPanel = (props) => {
   const {
     dispatch,
@@ -41,7 +81,7 @@ const DiagnosisPanel = (props) => {
     paperProps,
     viewOnly,
     chartmethods,
-    dentalChartComponent,
+    dentalChartComponent = {},
     ...restProps
   } = props
 
@@ -206,12 +246,12 @@ const DiagnosisPanel = (props) => {
   )
 }
 export default React.memo(
-  DiagnosisPanel,
+  withStyles(styles, { withTheme: true })(DiagnosisPanel),
   (
-    { codetable, dentalChartComponent },
+    { codetable, dentalChartComponent = {} },
     {
       codetable: codetableNext,
-      dentalChartComponent: dentalChartComponentNext,
+      dentalChartComponent: dentalChartComponentNext = {},
     },
   ) => {
     return (

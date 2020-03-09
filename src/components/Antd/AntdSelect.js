@@ -270,7 +270,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
-          shrink: v !== undefined,
+          shrink: v !== undefined && v.length > 0,
         })
       }
     } else if (value !== undefined) {

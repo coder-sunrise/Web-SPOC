@@ -56,6 +56,7 @@ export default createListViewModel({
                 itemFK: item[type.dtoName][type.itemFKName],
                 name: item.inventoryItemName,
                 code: item.inventoryItemCode,
+                isActive: item[type.dtoName].isActive,
                 ...item,
               }
             }),

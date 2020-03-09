@@ -241,11 +241,11 @@ class Treatment extends PureComponent {
   handleReset = () => {
     const { setValues, orders, dispatch, values } = this.props
     // console.log(values)
-    if (!values.uid)
-      dispatch({
-        type: 'dentalChartComponent/deleteTreatment',
-        payload: values,
-      })
+    // if (!values.uid)
+    dispatch({
+      type: 'dentalChartComponent/deleteTreatment',
+      payload: values,
+    })
     dispatch({
       type: 'dentalChartComponent/updateState',
       payload: {
