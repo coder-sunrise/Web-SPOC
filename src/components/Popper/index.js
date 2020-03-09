@@ -12,6 +12,7 @@ export default ({
   disabled,
   disabledTransition,
   placement,
+  stopOnClickPropagation = false,
   ...props
 }) => {
   if (disabled) return children
@@ -32,7 +33,10 @@ export default ({
         ? (event) => {
             setAnchorEl(event.currentTarget)
           }
-        : null,
+        : (event) => {
+            // stop bubbling
+            if (stopOnClickPropagation) event.stopPropagation()
+          },
     onMouseEnter:
       trigger === 'hover'
         ? (event) => {
