@@ -463,11 +463,20 @@ class InventoryItemList extends React.Component {
         columnName: 'type',
         type: 'select',
         options: InventoryTypes,
-        render: (row) =>
-          `${InventoryTypes.find((type) => type.value === row.type)
-            .name} ${row.isActive || row.isActive === undefined
-            ? ''
-            : '(Inactive)'}`,
+        render: (row) => {
+          const itemType = `${InventoryTypes.find(
+            (type) => type.value === row.type,
+          ).name}`
+
+          return (
+            <span>
+              {itemType} <br />
+              {`${row.isActive || row.isActive === undefined
+                ? ''
+                : '(Inactive)'}`}
+            </span>
+          )
+        },
       },
       {
         columnName: 'itemFK',
