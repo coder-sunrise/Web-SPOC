@@ -158,6 +158,7 @@ class DetailsHeader extends PureComponent {
                   {...cfg}
                   {...amountProps}
                   {...args}
+                  defaultCurrencyFontColor
                 />
               )}
             />

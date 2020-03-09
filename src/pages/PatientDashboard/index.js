@@ -37,8 +37,6 @@ import {
   ProgressButton,
 } from '@/components'
 
-import avatar from '@/assets/img/faces/marc.jpg'
-
 import Loading from '@/components/PageLoading/index'
 import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
@@ -140,6 +138,7 @@ class PatientDashboard extends PureComponent {
         type: `consultation/start`,
         payload: {
           id: this.props.visitRegistration.entity.visit.id,
+          queueNo: this.props.visitRegistration.entity.visit.queueNo,
           version,
         },
       })

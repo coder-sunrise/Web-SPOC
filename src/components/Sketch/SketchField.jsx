@@ -169,26 +169,17 @@ class SketchField extends PureComponent {
 
   getAllLayerData = () => {
     let canvas = this._fc
-    let filterList = this._history.getSaveLayerList()
-    let objects = canvas.getObjects()
-    let exist = false
+    const DefaultFilterList = this._history.getSaveLayerList()
+    const objects = canvas.getObjects()
+    let FilteredObjectList = []
 
-    for (let i = 0; i < filterList.length; i++) {
-      for (let a = 0; a < objects.length; a++) {
-        if (
-          filterList[i].layerContent ===
-          JSON.stringify(objects[a].__originalState)
-        ) {
-          exist = true
-        }
-      }
-      if (exist === false) {
-        filterList.splice(i, 1)
-      }
-      exist = false
-    }
+    FilteredObjectList = DefaultFilterList.filter(({ layerContent }) =>
+      objects.find(
+        (item) => JSON.stringify(item.__originalState) === layerContent,
+      ),
+    )
 
-    return filterList
+    return FilteredObjectList
   }
 
   initializeData = (data) => {
@@ -284,13 +275,27 @@ class SketchField extends PureComponent {
     const canvas = this._fc
     let result = false
     let obj = canvas.getActiveObject()
+
     if (obj) {
-      obj.set({
-        id: 'delete',
-        removeObject: true,
-      })
-      canvas.remove(obj)
-      result = true
+      if (canvas.getActiveObject().type === 'activeSelection') {
+        obj._objects.forEach(function (object, key) {
+          object.set({
+            id: 'delete',
+            removeObject: true,
+          })
+          canvas.remove(object)
+        })
+
+        result = true
+      } else {
+        obj.set({
+          id: 'delete',
+          removeObject: true,
+        })
+        canvas.remove(obj)
+        result = true
+      }
+      canvas.discardActiveObject()
     }
     return result
   }
@@ -939,15 +944,26 @@ class SketchField extends PureComponent {
   downloadImage = () => {
     let canvas = this._fc
     // let url = canvas.toDataURL('image/png')
+
+    const result = canvas.toDataURL()
     let link = document.createElement('a')
     link.download = 'drawing.png'
-    link.href = canvas.toDataURL()
+    link.href = result
 
     // canvas.toDataURL().set({
     //   id: 'template',
     // })
 
     link.click()
+  }
+
+  exportToImageDataUrl = () => {
+    const canvas = this._fc
+    const sizeLimit = 500
+    const shouldResize = canvas.width > sizeLimit || canvas.height > sizeLimit
+
+    const result = canvas.toDataURL()
+    return result
   }
 
   addText = (text, color, options = {}) => {

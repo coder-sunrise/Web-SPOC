@@ -52,7 +52,7 @@ class AntdSwitch extends React.PureComponent {
       value:
         form && field
           ? field.value === checkedValue
-          : props.value || props.defaultValue,
+          : (props.value || props.defaultValue) === checkedValue,
     }
   }
 
@@ -89,7 +89,6 @@ class AntdSwitch extends React.PureComponent {
   getComponent = ({ inputRef, ...props }) => {
     const {
       classes,
-      defaultValue,
       onChange,
       style,
       form,
@@ -119,7 +118,6 @@ class AntdSwitch extends React.PureComponent {
               : classes.switchUnchecked,
           )}
           onChange={this.handleValueChange}
-          defaultValue={defaultValue}
           checkedChildren='Yes'
           unCheckedChildren='No'
           {...cfg}

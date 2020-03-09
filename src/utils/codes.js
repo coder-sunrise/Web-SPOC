@@ -17,6 +17,7 @@ import Vaccination from '@/pages/Widgets/Orders/Detail/Vaccination'
 import Service from '@/pages/Widgets/Orders/Detail/Service'
 import Consumable from '@/pages/Widgets/Orders/Detail/Consumable'
 import OrderSet from '@/pages/Widgets/Orders/Detail/OrderSet'
+import Treatment from '@/pages/Widgets/Orders/Detail/Treatment'
 import { calculateAgeFromDOB } from '@/utils/dateUtils'
 
 const status = [
@@ -198,6 +199,33 @@ const appointmentStatus = [
   {
     name: 'Rescheduled',
     value: 5,
+  },
+]
+
+const appointmentStatusReception = [
+  {
+    name: 'Scheduled',
+    value: 1,
+  },
+  {
+    name: 'Draft',
+    value: 2,
+  },
+  {
+    name: 'Cancelled',
+    value: 3,
+  },
+  {
+    name: 'Turned Up',
+    value: 4,
+  },
+  {
+    name: 'Rescheduled',
+    value: 5,
+  },
+  {
+    name: 'No Show',
+    value: 6,
   },
 ]
 
@@ -918,6 +946,7 @@ const orderTypes = [
     name: 'Medication',
     value: '1',
     prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.medication',
     filter: (r) => !!r.inventoryMedicationFK,
     getSubject: (r) => {
       return r.drugName
@@ -928,6 +957,7 @@ const orderTypes = [
     name: 'Vaccination',
     value: '2',
     prop: 'corVaccinationItem',
+    accessRight: 'queue.consultation.order.vaccination',
     getSubject: (r) => r.vaccinationName,
     component: (props) => <Vaccination {...props} />,
   },
@@ -935,6 +965,7 @@ const orderTypes = [
     name: 'Service',
     value: '3',
     prop: 'corService',
+    accessRight: 'queue.consultation.order.service',
     getSubject: (r) => r.serviceName,
     component: (props) => <Service {...props} />,
   },
@@ -942,6 +973,7 @@ const orderTypes = [
     name: 'Consumable',
     value: '4',
     prop: 'corConsumable',
+    accessRight: 'queue.consultation.order.consumable',
     getSubject: (r) => r.consumableName,
     component: (props) => <Consumable {...props} />,
   },
@@ -949,6 +981,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
+    accessRight: 'queue.consultation.order.openprescription',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
     component: (props) => <Medication openPrescription {...props} />,
@@ -956,7 +989,16 @@ const orderTypes = [
   {
     name: 'Order Set',
     value: '6',
+    accessRight: 'queue.consultation.order.orderset',
     component: (props) => <OrderSet {...props} />,
+  },
+  {
+    name: 'Treatment',
+    value: '7',
+    prop: 'corDentalTreatments',
+    accessRight: 'queue.consultation.order.treatment',
+    getSubject: (r) => r.itemName,
+    component: (props) => <Treatment {...props} />,
   },
 ]
 const buttonTypes = [
@@ -1146,6 +1188,18 @@ const tenantCodesMap = new Map([
   ],
   [
     'ctmedicationprecaution',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'cttreatment',
+    {
+      ...defaultParams,
+    },
+  ],
+  [
+    'ctchartmethod',
     {
       ...defaultParams,
     },
@@ -1472,6 +1526,7 @@ export const InventoryTypes = [
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
+    field: 'inventoryMedication',
   },
   {
     value: 2,
@@ -1479,6 +1534,7 @@ export const InventoryTypes = [
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
+    field: 'inventoryConsumable',
   },
   {
     value: 3,
@@ -1486,6 +1542,7 @@ export const InventoryTypes = [
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
+    field: 'inventoryVaccination',
   },
   {
     value: 4,
@@ -1493,6 +1550,7 @@ export const InventoryTypes = [
     prop: 'serviceValueDto',
     itemFKName: 'serviceCenterServiceFK',
     ctName: 'ctservice',
+    field: 'service',
   },
   {
     value: 5,
@@ -1917,6 +1975,33 @@ export const groupByFKFunc = (array) => {
     .value()
 }
 
+export const visitOrderTemplateItemTypes = [
+  {
+    id: 1,
+    dtoName: 'visitOrderTemplateMedicationItemDto',
+    itemFKName: 'inventoryMedicationFK',
+    keyName: 'inventoryMedication',
+  },
+  {
+    id: 2,
+    dtoName: 'visitOrderTemplateConsumableItemDto',
+    itemFKName: 'inventoryConsumableFK',
+    keyName: 'inventoryConsumable',
+  },
+  {
+    id: 3,
+    dtoName: 'visitOrderTemplateVaccinationItemDto',
+    itemFKName: 'inventoryVaccinationFK',
+    keyName: 'inventoryVaccination',
+  },
+  {
+    id: 4,
+    dtoName: 'visitOrderTemplateServiceItemDto',
+    itemFKName: 'serviceCenterServiceFK',
+    keyName: 'service',
+  },
+]
+
 module.exports = {
   // paymentMethods,
   // titles,
@@ -1957,6 +2042,7 @@ module.exports = {
   currencyRoundingList,
   currencyRoundingToTheClosestList,
   coPayerType,
+  appointmentStatusReception,
   messageStatus,
   smsStatus,
   // country,

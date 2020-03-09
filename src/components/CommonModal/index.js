@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
@@ -9,24 +9,26 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 import Close from '@material-ui/icons/Close'
-import Slide from '@material-ui/core/Slide'
+// import Slide from '@material-ui/core/Slide'
+import Fade from '@material-ui/core/Fade'
 import { withStyles } from '@material-ui/core/styles'
 import Button from 'mui-pro-components/CustomButtons'
 import notificationsStyle from 'mui-pro-jss/material-dashboard-pro-react/views/notificationsStyle.jsx'
 import Loading from '@/components/PageLoading/index'
-import { SizeContainer, ProgressButton, Tooltip } from '@/components'
+import { SizeContainer, ProgressButton, Tooltip, TextField } from '@/components'
 import { LoadingWrapper } from '@/components/_medisys'
 import { confirmBeforeReload } from '@/utils/utils'
 
 function Transition (props) {
-  return <Slide direction='up' {...props} />
+  return <Fade {...props} />
 }
 function getContainerHeight (props) {
   return (
     window.innerHeight -
-    44 -
-    (props.showFooter ? 63 : 0) -
-    (props.bodyNoPadding ? -16 : 0)
+    58 -
+    (props.showFooter ? 54 : 0) -
+    (props.bodyNoPadding ? -16 : 0) -
+    (props.maxWidth === 'lg' ? 63 : 0)
   )
 }
 
@@ -113,52 +115,68 @@ class CommonModal extends React.PureComponent {
       classes,
       authority,
       confirmText,
+      isInformType,
       cancelText,
     } = this.props
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
-
     return (
       <SizeContainer size='md'>
-        <DialogActions
-          className={classes.modalFooter}
-          style={{ justifyContent: align }}
-        >
-          {onReset && (
-            <Button
-              key='reset'
-              // hideIfNoEditRights
-              aria-label='Reset'
-              color='danger'
-              onClick={onReset}
-              style={{ left: 0, position: 'absolute' }}
-            >
-              Reset
-            </Button>
-          )}
-          <Button
-            onClick={this.onClose}
-            color='danger'
-            authority='none'
-            // disabled={loading.global}
-            {...cancelProps}
+        <div ref={this.myRef} a='1'>
+          <DialogActions
+            className={classes.modalFooter}
+            style={{ justifyContent: align }}
           >
-            {cancelText || 'Close'}
-          </Button>
-          {extraButtons}
-          {onConfirm && (
-            <ProgressButton
-              color='primary'
-              // hideIfNoEditRights
-              onClick={onConfirm}
-              icon={null}
-              {...confirmProps}
-              // disabled={disabled || loading.global || global.disableSave}
-            >
-              {confirmText || confirmBtnText}
-            </ProgressButton>
-          )}
-        </DialogActions>
+            {isInformType ? (
+              <Button
+                onClick={this.onClose}
+                color='primary'
+                authority='none'
+                {...cancelProps}
+              >
+                Ok
+              </Button>
+            ) : (
+              <Fragment>
+                {onReset && (
+                  <Button
+                    key='reset'
+                    // hideIfNoEditRights
+                    aria-label='Reset'
+                    color='danger'
+                    onClick={onReset}
+                    style={{ left: 0, position: 'absolute' }}
+                    tabIndex='-2'
+                  >
+                    Reset
+                  </Button>
+                )}
+                <Button
+                  onClick={this.onClose}
+                  color='danger'
+                  authority='none'
+                  // disabled={loading.global}
+                  {...cancelProps}
+                >
+                  {cancelText || 'Close'}
+                </Button>
+                {extraButtons}
+                {onConfirm && (
+                  <ProgressButton
+                    color='primary'
+                    // hideIfNoEditRights
+                    onClick={onConfirm}
+                    icon={null}
+                    {...confirmProps}
+                    // disabled={disabled || loading.global || global.disableSave}
+                  >
+                    {confirmText || confirmBtnText}
+                  </ProgressButton>
+                )}
+              </Fragment>
+            )}
+          </DialogActions>
+        </div>
       </SizeContainer>
     )
   }
@@ -227,6 +245,13 @@ class CommonModal extends React.PureComponent {
     })
   }
 
+  onEntered = (el) => {
+    if (this.props.autoFocus) {
+      if (el.setActive) el.setActive()
+      if (el.focus) el.focus()
+    }
+  }
+
   render () {
     const {
       classes,
@@ -260,6 +285,7 @@ class CommonModal extends React.PureComponent {
     //     suppressScrollY: false,
     //   })
     // }
+
     const childrenWithProps = React.Children.map(children, (child) =>
       React.cloneElement(child, {
         onConfirm: this.onConfirm,
@@ -295,6 +321,7 @@ class CommonModal extends React.PureComponent {
           aria-labelledby='classic-modal-slide-title'
           aria-describedby='classic-modal-slide-description'
           style={{ overflow: 'hidden' }}
+          onEntered={this.onEntered}
           // onEscapeKeyDown={!displayCloseIcon && this.onClose}
           {...cfg}
         >
@@ -342,7 +369,7 @@ class CommonModal extends React.PureComponent {
               className={`${classes.modalBody} ${bodyNoPadding
                 ? classes.modalBodyNoPadding
                 : classes.modalBodyPadding}`}
-              style={{ maxHeight: this.state.height }}
+              style={{ maxHeight: this.footer ? 'auto' : this.state.height }}
             >
               {/* !overrideLoading && loading.global ? (
                 <Loading
@@ -373,7 +400,11 @@ class CommonModal extends React.PureComponent {
             })}
         </Dialog>
 
-        <Dialog open={this.state.openConfirm} maxWidth='sm'>
+        <Dialog
+          open={this.state.openConfirm}
+          maxWidth='sm'
+          onEntered={this.onEntered}
+        >
           <DialogContent>
             <h3>
               <FormattedMessage id='app.general.leave-without-save' />

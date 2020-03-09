@@ -60,6 +60,7 @@ export default ({
         aria-controls='customized-menu'
         aria-haspopup='true'
         color={color}
+        disabled={options.length === 0}
         {...props}
       >
         {children}

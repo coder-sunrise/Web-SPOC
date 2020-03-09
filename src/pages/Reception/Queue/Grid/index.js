@@ -44,6 +44,7 @@ const Grid = ({
   onRegisterPatientClick,
   onViewPatientProfileClick,
   handleActualizeAppointment,
+  statusTagClicked,
   mainDivHeight = 700,
 }) => {
   const [
@@ -93,11 +94,12 @@ const Grid = ({
     ],
   )
 
-  const deleteQueue = (id) => {
+  const deleteQueue = (id, queueNo) => {
     dispatch({
       type: 'queueLog/deleteQueueByQueueID',
       payload: {
         id,
+        queueNo,
       },
     })
   }
@@ -146,13 +148,19 @@ const Grid = ({
         openConfirmTitle: '',
         openConfirmText: 'Confirm',
         openConfirmContent: `Are you sure want to delete this visit (Q No.: ${queueNo})?`,
-        onConfirmSave: () => deleteQueue(id),
+        onConfirmSave: () => deleteQueue(id, queueNo),
       },
     })
   }
 
   const onClick = useCallback(
     (row, id) => {
+      dispatch({
+        type: 'queueLog/updateState',
+        payload: {
+          statusTagClicked: true,
+        },
+      })
       switch (id) {
         case '0': // edit visit
         case '0.1': // view visit
@@ -162,17 +170,22 @@ const Grid = ({
           break
         case '1': {
           // dispense
+          const isInitialLoading =
+            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+            row.visitStatus === 'WAITING'
           const version = Date.now()
           dispatch({
             type: `dispense/start`,
             payload: {
               id: row.visitFK,
               version,
+              qid: row.id,
+              queueNo: row.queueNo,
             },
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+                `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 
@@ -184,6 +197,7 @@ const Grid = ({
           const parameters = {
             vid: row.visitFK,
             pid: row.patientProfileFK,
+            qid: row.id,
             v: version,
           }
           router.push(getAppendUrl(parameters, '/reception/queue/billing'))
@@ -211,6 +225,8 @@ const Grid = ({
               payload: {
                 id: row.visitFK,
                 version,
+                qid: row.id,
+                queueNo: row.queueNo,
               },
             }).then((o) => {
               if (o)
@@ -318,6 +334,14 @@ const Grid = ({
         default:
           break
       }
+      setTimeout(() => {
+        dispatch({
+          type: 'queueLog/updateState',
+          payload: {
+            statusTagClicked: false,
+          },
+        })
+      }, 3000)
     },
     [
       codetable.clinicianprofile,
@@ -411,12 +435,18 @@ const Grid = ({
 
     if (contextMenuOption) {
       const authority = Authorized.check(contextMenuOption.authority)
-      if (authority.rights === 'disable' || authority.rights === 'hidden') {
+
+      if (
+        !authority ||
+        authority.rights === 'disable' ||
+        authority.rights === 'hidden'
+      ) {
         notification.error({
           message: 'Unauthorized Access',
         })
         return
       }
+
       onClick(row, id)
     }
 
@@ -442,6 +472,7 @@ const Grid = ({
             TableProps={TableProps}
             rows={queueListingData}
             firstColumnCustomPadding={10}
+            forceRender
             columnExtensions={[
               ...QueueColumnExtensions,
               {
@@ -480,7 +511,11 @@ const Grid = ({
                 columnName: 'visitStatus',
                 width: 200,
                 render: (row) => (
-                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
+                  <VisitStatusTag
+                    row={row}
+                    onClick={handleStatusTagClick}
+                    statusTagClicked={statusTagClicked}
+                  />
                 ),
               },
               {
@@ -528,6 +563,7 @@ export default connect(({ queueLog, global, loading, user, codetable }) => ({
   filter: queueLog.currentFilter,
   selfOnly: queueLog.selfOnly,
   queueList: queueLog.list || [],
+  statusTagClicked: queueLog.statusTagClicked,
   calendarEvents: queueLog.appointmentList || [],
   showingVisitRegistration: global.showVisitRegistration,
   queryingList:

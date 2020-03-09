@@ -84,24 +84,13 @@ class ChangePassword extends React.PureComponent {
               name='currentPassword'
               render={(args) => (
                 <React.Fragment>
-                  {/*
-                    --- IMPORTANT ---
-                    do not remove below <input /> element
-                    it prevents all the other input from being
-                    autofill incorrectly by chrome
-                  */}
-                  <input
-                    className='visually-hidden'
-                    name='fake_username'
-                    value=''
-                  />
                   <TextField
-                    autoFocus
                     {...args}
                     label='Current Password'
                     type='password'
+                    autocomplete='off'
                     inputProps={{
-                      autoComplete: 'nope',
+                      autoComplete: 'off',
                     }}
                   />
                 </React.Fragment>
@@ -117,7 +106,7 @@ class ChangePassword extends React.PureComponent {
                   label='New Password'
                   type='password'
                   inputProps={{
-                    autoComplete: 'new-password',
+                    autoComplete: 'off',
                   }}
                 />
               )}
@@ -132,7 +121,7 @@ class ChangePassword extends React.PureComponent {
                   label='Confirm Password'
                   type='password'
                   inputProps={{
-                    autoComplete: 'new-password',
+                    autoComplete: 'off',
                   }}
                 />
               )}

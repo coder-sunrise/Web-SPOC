@@ -192,6 +192,7 @@ const discardConsultation = ({
 // @skeleton()
 @connect(
   ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -200,6 +201,7 @@ const discardConsultation = ({
     formik,
     cestemplate,
   }) => ({
+    clinicInfo,
     consultation,
     global,
     consultationDocument,
@@ -247,6 +249,15 @@ class Main extends React.Component {
     setTimeout(() => {
       this.props.setFieldValue('fakeField', 'setdirty')
     }, 500)
+  }
+
+  componentWillUnmount () {
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity: undefined,
+      },
+    })
   }
 
   shouldComponentUpdate = (nextProps) => {
@@ -804,7 +815,7 @@ class Main extends React.Component {
           : rights,
     }
     // console.log(matches)
-
+    // console.log('main', { values })
     return (
       <div className={classes.root}>
         <PatientBanner extraCmt={this.getExtraComponent()} {...this.props} />

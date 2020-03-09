@@ -51,6 +51,7 @@ const CreditCard = ({
                 max={9999}
                 inputProps={{ maxLength: 4 }}
                 maxLength={4}
+                precision={0}
                 label='Card No.'
                 {...args}
               />

@@ -120,6 +120,8 @@ class BaseInput extends React.PureComponent {
       negative,
       text,
       inActive,
+      defaultCurrencyFontColor,
+      extraClasses,
     } = this.props
     let { error, help } = this.props
     // if (field && form) {
@@ -148,7 +150,7 @@ class BaseInput extends React.PureComponent {
       [classes.textInput]: !!text,
       [classes.whiteUnderline]: white,
       [classes.currency]: text && currency,
-      [classes.negativeCurrency]: text && negative,
+      [classes.negativeCurrency]: text && negative && !defaultCurrencyFontColor,
       [classes.inActive]: text && inActive,
     })
 
@@ -156,17 +158,18 @@ class BaseInput extends React.PureComponent {
     const marginTop = classNames({
       [inputRootCustomClasses]: inputRootCustomClasses !== undefined,
     })
-    const inputClasses = classNames({
-      [classes.input]: true,
-      [classes.whiteInput]: white,
-      [classes.text]: !!text,
-    })
+    // console.log(extraClasses, classes, this.props)
     return {
-      input: inputClasses,
+      input: classNames({
+        [classes.input]: true,
+        [classes.whiteInput]: white,
+        [classes.text]: !!text,
+      }),
       root: marginTop,
       disabled: classes.disabled,
       underline: underlineClasses,
       multiline: classes.multiline,
+      ...extraClasses,
     }
   }
 
@@ -229,11 +232,10 @@ class BaseInput extends React.PureComponent {
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
     // }
-
     const { rowsMax, ...resetProps } = inputProps
     const cfg = {
-      fullWidth: fullWidth || !text,
-      readOnly:readonly,
+      fullWidth: fullWidth !== undefined ? fullWidth : !text,
+      readOnly: readonly,
     }
     const adornmentClasses = classNames({
       [classes.adornment]: true,
@@ -307,7 +309,7 @@ class BaseInput extends React.PureComponent {
             }
             enterDelay={0}
           >
-            <Error color='error' style={{ cursor: 'pointer' }} />
+            <Error color='error' style={{ cursor: 'pointer', top: 0 }} />
           </Tooltip>
         </InputAdornment>
       )
@@ -363,8 +365,9 @@ class BaseInput extends React.PureComponent {
         error={error}
         help={help}
       >
-        {(typeof children === 'function'
-          ? children({
+        {() => {
+          if (typeof children === 'function')
+            return children({
               getClass: this.getClass,
               error,
               help,
@@ -376,20 +379,24 @@ class BaseInput extends React.PureComponent {
               ...props,
               inputProps,
             })
-          : false) || (
-          <Input
-            id={inputIdPrefix + inputIdCounter}
-            classes={this.getClass(classes)}
-            inputRef={this.getRef}
-            {...cfg}
-            inputProps={inputProps}
-            {...resetProps}
-            // {...inputProps}
-            // onBlur={() => {
-            //   console.log(123)
-            // }}
-          />
-        )}
+
+          // delete inputProps.className
+          // console.log(inputProps)
+          return (
+            <Input
+              id={inputIdPrefix + inputIdCounter}
+              classes={this.getClass(classes)}
+              inputRef={this.getRef}
+              {...cfg}
+              inputProps={inputProps}
+              {...resetProps}
+              // {...inputProps}
+              // onBlur={() => {
+              //   console.log(123)
+              // }}
+            />
+          )
+        }}
       </CustomInputWrapper>
     )
     return element

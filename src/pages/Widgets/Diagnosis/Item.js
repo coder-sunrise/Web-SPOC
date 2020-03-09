@@ -118,6 +118,7 @@ const DiagnosisItem = ({
               <DiagnosisSelect
                 onChange={onDiagnosisChange}
                 onDataSouceChange={onDataSouceChange}
+                filterStyle={{ position: 'absolute', bottom: 2, right: -35 }}
                 {...args}
               />
             )}

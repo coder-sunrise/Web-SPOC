@@ -49,7 +49,7 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
 
     if (target.value === 'sub') {
       setFieldValue('overalCoPaymentValue', undefined)
-      setFieldValue('overalCoPaymentValueType', 'ExactAmount')
+      setFieldValue('overalCoPaymentValueType', 'Percentage')
       setFieldValue('itemGroupValueDto.consumableGroupValue.itemGroupValue', 0)
       setFieldValue(
         'itemGroupValueDto.consumableGroupValue.groupValueType',
@@ -82,7 +82,8 @@ const CoPayment = ({ values, theme, classes, setFieldValue }) => {
     }
 
     if (target.value === 'all') {
-      setFieldValue('overalCoPaymentValue', 0)
+      setFieldValue('overalCoPaymentValue', 100)
+      setFieldValue('overalCoPaymentValueType', 'Percentage')
 
       if (!values.id) setFieldValue('itemGroupValueDto', {})
       else {

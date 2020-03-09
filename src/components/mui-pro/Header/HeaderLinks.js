@@ -1,40 +1,24 @@
+/* eslint-disable guard-for-in */
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-// import { Manager, Target, Popper } from "react-popper";
 // dva
 import { connect } from 'dva'
+// antd
 import { Divider } from 'antd'
-// @material-ui/core components
+// @material-ui
 import withStyles from '@material-ui/core/styles/withStyles'
 import MenuItem from '@material-ui/core/MenuItem'
 import MenuList from '@material-ui/core/MenuList'
-import ClickAwayListener from '@material-ui/core/ClickAwayListener'
-import Paper from '@material-ui/core/Paper'
-import Grow from '@material-ui/core/Grow'
-import Hidden from '@material-ui/core/Hidden'
-
-// @material-ui/icons
 import Person from '@material-ui/icons/Person'
-import Notifications from '@material-ui/icons/Notifications'
-import Link from '@material-ui/icons/Link'
-import LinkOff from '@material-ui/icons/LinkOff'
 import WifiOff from '@material-ui/icons/WifiOff'
-import Search from '@material-ui/icons/Search'
-
-// core components
-import CustomInput from 'mui-pro-components/CustomInput'
-
+// assets
 import headerLinksStyle from 'mui-pro-jss/material-dashboard-pro-react/components/headerLinksStyle'
-
-import {
-  Badge,
-  SizeContainer,
-  TextField,
-  Tooltip,
-  Popper,
-  Button,
-} from '@/components'
+// common components
+import { Badge, SizeContainer, Popper, Button, Tooltip } from '@/components'
+// subcomponents
+import { Notification } from '@/components/_medisys'
+// utils
 import { updateAPIType } from '@/utils/request'
 import { navigateDirtyCheck } from '@/utils/utils'
 
@@ -104,12 +88,9 @@ class HeaderLinks extends React.Component {
 
   render () {
     const { classes, rtlActive, user, clinicInfo, header } = this.props
-    const { openNotification, openAccount, openDomain, title } = this.state
+    const { openAccount } = this.state
     const { signalRConnected, notifications } = header
-    // console.log(openNotification, openAccount)
-    const searchButton = `${classes.top} ${classes.searchButton} ${classNames({
-      [classes.searchRTL]: rtlActive,
-    })}`
+
     const dropdownItem = classNames(
       classes.dropdownItem,
       classes.primaryHover,
@@ -137,18 +118,10 @@ class HeaderLinks extends React.Component {
         <div className={managerClasses}>
           <SizeContainer size='lg'>
             <div>
-              {/*  <Badge
-                badgeContent={notifications.length}
-                color='primary'
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-              >
-                <Button justIcon color='transparent'>
-                  <Notifications fontSize='large' />
-                </Button>
-              </Badge> */}
+              <Notification
+                dispatch={this.props.dispatch}
+                notifications={notifications}
+              />
               {!signalRConnected && (
                 <Tooltip title='Real-time update signal is down. Please refresh manually.'>
                   <Button justIcon color='transparent'>
@@ -167,25 +140,6 @@ class HeaderLinks extends React.Component {
                   </Button>
                 </Tooltip>
               )}
-
-              {/* <Button
-                justIcon
-                color='transparent'
-                aria-label='Person'
-                aria-haspopup='true'
-                aria-owns={openAccount ? 'menu-list' : null}
-                onClick={this.handleClick('Account')}
-                className={classes.buttonLink}
-                buttonRef={(node) => {
-                  this.anchorElAccount = node
-                }}
-              >
-                <Person />
-                <span className={classes.username}>
-                  {userTitle} {name}
-                </span>
-              </Button> */}
-
               <Popper
                 className={classNames({
                   [classes.pooperResponsive]: true,
@@ -235,16 +189,8 @@ class HeaderLinks extends React.Component {
               <div className={classes.clinicShortCode}>
                 <span>{clinicShortCode}</span>
               </div>
-              {/* <Divider type='vertical' style={{ background: '#999' }} />
-            <div className={classes.clinicShortCode}>
-              <span>{clinicShortCode}</span>
-            </div> */}
             </div>
           </SizeContainer>
-          {/* 
-          <Button color='transparent' justIcon className={classes.buttonLink}>
-            
-          </Button> */}
         </div>
       </div>
     )

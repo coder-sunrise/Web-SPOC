@@ -17,6 +17,21 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
       }
     }
   })
+  const { dentalChartComponent } = window.g_app._store.getState()
+  // console.log('dentalChartComponent', dentalChartComponent)
+
+  if (dentalChartComponent) {
+    const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
+    values.corDentalCharts = [
+      {
+        ...(values.corDentalCharts || [])[0],
+        isPedoChart,
+        isSurfaceLabel,
+        dentalChart: JSON.stringify(data),
+      },
+    ]
+    // values.corDentalCharts = data.map(o=>)
+  }
   return {
     ...values,
     isGSTInclusive,

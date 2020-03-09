@@ -90,6 +90,8 @@ export default {
   'menu.report.lowStockMedicationReport': 'Low Stock Medication Report',
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
+  'menu.report.inventorytrendingreport': 'Inventory Trending Report',
+  'menu.report.inventorylistingreport': 'Inventory Listing Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
@@ -101,6 +103,8 @@ export default {
   'menu.setting.setting': 'Setting',
   'menu.setting.clinicinfo': 'Clinic Information',
   'menu.setting.service': 'Service',
+  'menu.setting.treatment': 'Treatment',
+  'menu.setting.treatmentcategory': 'Treatment Category',
   'menu.setting.room': 'Room',
   'menu.setting.roomblock': 'Room Block',
   'menu.setting.clinicbreakhour': 'Clinic Break Hour',
@@ -113,7 +117,9 @@ export default {
   'menu.setting.userprofile': 'User Profile',
   'menu.setting.newuserprofile': 'Add User Profile',
   'menu.setting.edituserprofile': 'Edit User Profile',
-  'menu.setting.userrole': 'User Role',
+  'menu.setting.userrole': 'Role & Access Right',
+  'menu.setting.newuserrole': 'Add Role',
+  'menu.setting.edituserrole': 'Edit Role',
   'menu.setting.revenuecategory': 'Revenue Category',
   'menu.setting.servicecenter': 'Service Center',
   'menu.setting.servicecentercategory': 'Service Center Category',
@@ -139,6 +145,8 @@ export default {
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
+  'menu.setting.referralsource': 'Referral Source',
+  'menu.setting.visitordertemplate': 'Visit Order Template',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',
@@ -157,4 +165,5 @@ export default {
   'menu.support.printingtool': 'Printing Tool',
 
   'menu.wardmanagement': 'Ward Management',
+  'menu.patient-monitoring': 'Patient Monitoring',
 }

@@ -3,7 +3,14 @@ import color from 'color'
 
 import primaryColor from '@material-ui/core/colors/indigo'
 import secondaryColor from '@material-ui/core/colors/blueGrey'
-import { standardRowHeight, smallRowHeight, largeRowHeight } from 'assets/jss'
+import {
+  standardRowHeight,
+  smallRowHeight,
+  largeRowHeight,
+  smallSingleRowHeight,
+  standardSingleRowHeight,
+  largeSingleRowHeight,
+} from 'assets/jss'
 import {
   // primaryColor,
   // secondaryColor,
@@ -44,13 +51,24 @@ const largetButton = {
 }
 
 const defaultColor = 'rgba(0, 0, 0, 0.54)'
-
+const sharedToggleButtonGroup = {
+  grouped: {
+    // height: 'initial',
+    lineHeight: 1.5,
+  },
+  sizeSmall: {
+    height: 'auto',
+  },
+}
 const sharedFormControlLabel = {
   label: {
     fontSize: 'inherit',
     fontWeight: 'inherit',
     lineHeight: 'inherit',
     letterSpacing: 'inherit',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
   },
   labelPlacementStart: {
     marginLeft: 0,
@@ -82,6 +100,19 @@ const sharedOverrides = {
   //     zIndex: 1,
   //   },
   // },
+  MuiExpansionPanel: {
+    root: {
+      '&.Mui-expanded': {
+        margin: 0,
+        marginTop: '8px !important',
+
+        // marginTop: 'inherit',
+        // '&:first-child': {
+        //   marginTop: '8px !important',
+        // },
+      },
+    },
+  },
   NavPills: {
     contentWrapper: {
       marginLeft: 1,
@@ -230,15 +261,23 @@ export const defaultTheme = createMuiTheme({
   },
   props: {
     rowHeight: standardRowHeight,
+    singleRowHeight: standardSingleRowHeight,
     size: 'md',
   },
   overrides: {
     ...sharedOverrides,
-
+    MuiToggleButtonGroup: {
+      ...sharedToggleButtonGroup,
+      groupedSizeSmall: {
+        padding: '5px 6px',
+        fontSize: defaultFontSize,
+      },
+    },
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
         marginLeft: -10,
+        width: '100%',
       },
     },
     MuiSvgIcon: {
@@ -250,7 +289,7 @@ export const defaultTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 6px',
-        padding: 1,
+        padding: '0px 0px 1px 3px',
       },
     },
     MuiFormControl: {
@@ -267,6 +306,7 @@ export const defaultTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: defaultFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -375,6 +415,10 @@ export const defaultTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         position: 'relative',
         top: 3,
+        '& > svg': {
+          top: 3,
+          position: 'relative',
+        },
       },
     },
     MuiCircularProgress: {
@@ -424,6 +468,13 @@ export const defaultTheme = createMuiTheme({
         },
       },
     },
+
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+      },
+    },
   },
 })
 
@@ -433,15 +484,28 @@ export const smallTheme = createMuiTheme({
   },
   props: {
     rowHeight: smallRowHeight,
+    singleRowHeight: smallSingleRowHeight,
     size: 'sm',
   },
   overrides: {
     ...sharedOverrides,
-
+    MuiToggleButtonGroup: {
+      ...sharedToggleButtonGroup,
+      groupedSizeSmall: {
+        padding: '2px 6px',
+        fontSize: smallFontSize,
+      },
+    },
+    MuiToggleButton: {
+      sizeSmall: {
+        height: 26,
+      },
+    },
     MuiFormControlLabel: {
       ...sharedFormControlLabel,
       root: {
         marginLeft: -7,
+        width: '100%',
       },
     },
     MuiSvgIcon: {
@@ -465,6 +529,7 @@ export const smallTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: smallFontSize,
         '&.Mui-disabled': {
           color: 'inherit',
@@ -566,6 +631,10 @@ export const smallTheme = createMuiTheme({
         ...sharedInputAdornmentRoot,
         top: 3,
         position: 'relative',
+        '& > svg': {
+          top: 3,
+          position: 'relative',
+        },
       },
     },
     MuiCircularProgress: {
@@ -607,6 +676,17 @@ export const smallTheme = createMuiTheme({
         },
       },
     },
+    MuiChip: {
+      root: {
+        borderRadius: 4,
+        padding: 2,
+        height: 'auto',
+      },
+      deleteIcon: {
+        width: 16,
+        height: 16,
+      },
+    },
   },
 })
 
@@ -616,6 +696,7 @@ export const largeTheme = createMuiTheme({
   },
   props: {
     rowHeight: largeRowHeight,
+    singleRowHeight: largeSingleRowHeight,
     size: 'lg',
   },
   overrides: {
@@ -625,6 +706,7 @@ export const largeTheme = createMuiTheme({
       ...sharedFormControlLabel,
       root: {
         marginLeft: -12,
+        width: '100%',
       },
     },
     MuiSvgIcon: {
@@ -636,7 +718,7 @@ export const largeTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 8px',
-        padding: 1,
+        padding: '0px 3px',
       },
     },
     MuiFormControl: {
@@ -648,6 +730,7 @@ export const largeTheme = createMuiTheme({
     MuiInputBase: {
       root: {
         alignItems: 'start',
+        cursor: 'inherit',
         fontSize: largeFontSize,
         '&.Mui-disabled': {
           color: 'inherit',

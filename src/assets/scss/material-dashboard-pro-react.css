@@ -559,7 +559,7 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 .rdt.rdtOpen .rdtPicker {
   opacity: 1;
   visibility: visible;
-  margin-top: 5px; 
+  margin-top: 5px;
 }
 .rdt input.form-control {
   border: 0;

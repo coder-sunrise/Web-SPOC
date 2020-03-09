@@ -12,6 +12,12 @@ import {
 } from '@material-ui/core'
 import { control } from '@/components/Decorator'
 
+const styles = () => ({
+  root: {
+    width: 'unset !important',
+  },
+})
+
 @control()
 class Checkbox extends React.Component {
   state = {
@@ -90,6 +96,9 @@ class Checkbox extends React.Component {
       >
         <FormControlLabel
           style={notCentered ? style : null}
+          classes={{
+            root: classes.root,
+          }}
           control={
             isSwitch ? (
               <Switch
@@ -122,7 +131,13 @@ class Checkbox extends React.Component {
   }
 
   render () {
-    const { label, inputLabel, mode = 'input', ...restProps } = this.props
+    const {
+      label,
+      inputLabel,
+      mode = 'input',
+      classes,
+      ...restProps
+    } = this.props
     const { simple } = restProps
 
     return (
@@ -142,4 +157,4 @@ class Checkbox extends React.Component {
 
 Checkbox.propTypes = {}
 
-export default Checkbox
+export default withStyles(styles)(Checkbox)

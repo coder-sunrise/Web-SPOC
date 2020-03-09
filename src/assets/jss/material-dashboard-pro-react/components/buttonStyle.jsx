@@ -107,6 +107,11 @@ const buttonStyle = {
     '&:hover:not($simple):not($link):not($transparent)': {
       backgroundColor: color(grayColor).darken(0.2).hex(),
     },
+    '& > span': {
+      '& > svg': {
+        marginRight: 4,
+      },
+    },
   },
   login: {
     boxShadow:
@@ -564,6 +569,11 @@ const buttonStyle = {
     // width: '41px',
     '& .fab,& .fas,& .far,& .fal,& svg,& .material-icons': {
       marginRight: '0px',
+    },
+    '& > span': {
+      '& > svg': {
+        marginRight: 0,
+      },
     },
     '&$lg': {
       height: '57px',

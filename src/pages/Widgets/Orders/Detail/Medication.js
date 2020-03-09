@@ -73,13 +73,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
-        usageMethodFK: Yup.number().required(),
-        dosageFK: Yup.number().required(),
         prescribeUOMFK: Yup.number().required(),
-        drugFrequencyFK: Yup.number().required(),
-        duration: Yup.number(),
-        // .min(1, 'Duration must be greater than or equal to 1')
-        // .required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
@@ -534,6 +528,24 @@ class Medication extends PureComponent {
     })
   }
 
+  filterOptions = (input = '', option) => {
+    let match = false
+    try {
+      const lowerCaseInput = input.toLowerCase()
+
+      const { props } = option
+      const { code, name, displayValue } = props.data
+      let title = name ? name.toLowerCase() : displayValue.toLowerCase()
+      match =
+        code.toLowerCase().indexOf(lowerCaseInput) >= 0 ||
+        title.toLowerCase().indexOf(lowerCaseInput) >= 0
+    } catch (error) {
+      console.log(error)
+      match = false
+    }
+    return match
+  }
+
   UNSAFE_componentWillReceiveProps (nextProps) {
     if (nextProps.orders.type === this.props.type)
       if (
@@ -549,6 +561,32 @@ class Medication extends PureComponent {
           },
         })
       }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '1' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventorymedication = [] } = codetable
+      const { inventoryMedicationFK } = nextValues
+      const medication = inventorymedication.find(
+        (item) => item.id === inventoryMedicationFK,
+      )
+
+      if (medication)
+        this.setState({
+          selectedMedication: medication,
+        })
+      else
+        this.setState({
+          selectedMedication: {
+            medicationStock: [],
+          },
+        })
+    }
   }
 
   render () {
@@ -565,6 +603,7 @@ class Medication extends PureComponent {
     } = this.props
 
     const commonSelectProps = {
+      handleFilter: this.filterOptions,
       dropdownMatchSelectWidth: false,
       dropdownStyle: {
         width: 300,
@@ -1104,8 +1143,8 @@ class Medication extends PureComponent {
               }}
             />
           </GridItem>
-          {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
-            <GridItem xs={12}>
+          <GridItem xs={12}>
+            {values.visitPurposeFK !== VISIT_TYPE.RETAIL ? (
               <FastField
                 name='isExternalPrescription'
                 render={(args) => {
@@ -1118,6 +1157,7 @@ class Medication extends PureComponent {
                     <Checkbox
                       label='External Prescription'
                       labelPlacement='start'
+                      // fullWidth={false}
                       {...args}
                       onChange={(e) => {
                         if (e.target.value) {
@@ -1148,10 +1188,10 @@ class Medication extends PureComponent {
                   )
                 }}
               />
-            </GridItem>
-          ) : (
-            ''
-          )}
+            ) : (
+              ''
+            )}
+          </GridItem>
         </GridContainer>
         {footer({
           onSave: handleSubmit,

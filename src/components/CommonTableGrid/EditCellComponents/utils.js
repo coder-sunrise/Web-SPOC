@@ -45,8 +45,8 @@ function onComponentChange (args, config) {
   const {
     columnExtensions,
     column: { name: columnName },
-    value,
     onValueChange,
+    value,
     row,
   } = this.props
   const cfg =
@@ -63,6 +63,7 @@ function onComponentChange (args, config) {
     getRowId,
     ...restProps
   } = cfg
+  if (value === Object.values(args)[0]) return
   let errors = updateCellValue(this.props, null, Object.values(args)[0])
 
   const latestRow = window.$tempGridRow[gridId]
@@ -161,14 +162,15 @@ function getCommonRender (cb) {
   const cfg = getCommonConfig.call(this)
   const { render, error, row, isReactComponent } = cfg
   // console.log(row, this.props.row)
-  // console.log(value, cfg)
-
+  // console.log('getCommonRender', row, this.props.row)
   if (render) {
     if (isReactComponent) {
       const Cmpt = render
       return <Cmpt row={row} columnConfig={cfg} cellProps={this.props} />
     }
-    if (!editMode && !error) return render(row, { ...cfg }, this.props)
+    if (!editMode && !error) {
+      return render(row, { ...cfg }, this.props)
+    }
   }
   if (typeof value === 'object' && React.isValidElement(value)) {
     return <span>{value}</span>

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
-import { EditableTableGrid, GridContainer, GridItem } from '@/components'
+import { FastEditableTableGrid, GridContainer, GridItem } from '@/components'
 import {
   podoOrderType,
   getInventoryItem,
@@ -18,9 +18,6 @@ const purchaseOrderDetailsSchema = Yup.object().shape({
   orderQuantity: Yup.number()
     .min(1, 'Order Quantity must be greater than or equal to 1')
     .required(),
-  // bonusReceived: Yup.number()
-  //   .min(0, 'Bonus Quantity nust be greater than or equal to 0')
-  //   .required(),
 })
 
 class Grid extends PureComponent {
@@ -435,10 +432,11 @@ class Grid extends PureComponent {
     return (
       <GridContainer style={{ paddingRight: 20 }}>
         <GridItem xs={4} md={12}>
-          <EditableTableGrid
+          <FastEditableTableGrid
             getRowId={(r) => r.uid}
             rows={rows}
             schema={purchaseOrderDetailsSchema}
+            forceRenderDuration={5000}
             FuncProps={{
               edit: isEditable,
               pager: false,

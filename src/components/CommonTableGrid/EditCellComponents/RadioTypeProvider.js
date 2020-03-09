@@ -67,7 +67,10 @@ class RadioEditorBase extends PureComponent {
       value: checked ? checkedValue : uncheckedValue,
       checked,
     })
-
+    window._forceTableUpdate = true
+    setTimeout(() => {
+      window._forceTableUpdate = false
+    }, 100)
     // if (editMode) {
     //   if (checked) {
     //     _radioSelectedMap[columnName] = row.id

@@ -7,8 +7,15 @@ import ErrorOutline from '@material-ui/icons/ErrorOutline'
 import Cached from '@material-ui/icons/Cached'
 // big calendar
 import BigCalendar from 'react-big-calendar'
+// common components
+import { Popper } from '@/components'
+import ApptPopover from './ApptPopover'
+import DoctorBlockPopover from './DoctorBlockPopover'
+// assets
+import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 
 const style = (theme) => ({
+  ...customDropdownStyle(theme),
   blockDiv: {
     display: 'block',
   },
@@ -68,7 +75,7 @@ class Event extends React.PureComponent {
     !patientAccountNo ? '' : `(${patientAccountNo})`
 
   render () {
-    const { event, classes, calendarView } = this.props
+    const { event, classes, calendarView, handleMouseOver } = this.props
     const { doctor, hasConflict, isEnableRecurrence, patientProfile } = event
     let { patientName, patientAccountNo, patientContactNo } = event
     if (patientProfile) {
@@ -105,48 +112,41 @@ class Event extends React.PureComponent {
       [classes.otherViewEvent]: true,
     })
 
-    // console.log({ calendarView })
-
-    return calendarView === BigCalendar.Views.MONTH ? (
-      <div
-        className={monthViewClass}
-        onMouseEnter={this._handleMouseEnter}
-        onMouseLeave={this._handleMouseLeave}
+    return (
+      <Popper
+        stopOnClickPropagation
+        className={classnames({
+          [classes.pooperResponsive]: true,
+          [classes.pooperNav]: true,
+        })}
+        overlay={
+          event.isDoctorBlock ? (
+            <DoctorBlockPopover popoverEvent={event} />
+          ) : (
+            <ApptPopover popoverEvent={event} />
+          )
+        }
       >
-        <span>
-          {title} {accountNo}
-        </span>
-        {hasConflict && <ErrorOutline className={classes.icon} />}
-        {isEnableRecurrence && <Cached />}
-      </div>
-    ) : (
-      <div
-        className={otherViewClass}
-        onMouseEnter={this._handleMouseEnter}
-        onMouseLeave={this._handleMouseLeave}
-      >
-        <div className={classes.title}>
-          <span>{title ? title.toUpperCase() : ''}</span>
-          {/* <div className={classes.icons}>
-            {hasConflict && <ErrorOutline />}
+        {calendarView === BigCalendar.Views.MONTH ? (
+          <div className={monthViewClass}>
+            <span>
+              {title} {accountNo}
+            </span>
+            {hasConflict && <ErrorOutline className={classes.icon} />}
             {isEnableRecurrence && <Cached />}
-            {appointmentStatusFk === '2' && <Draft />}
-          </div> */}
-        </div>
-        <span className={classes.blockDiv}>
-          {subtitle ? subtitle.toUpperCase() : ''}
-        </span>
-      </div>
+          </div>
+        ) : (
+          <div className={otherViewClass}>
+            <div className={classes.title}>
+              <span>{title ? title.toUpperCase() : ''}</span>
+            </div>
+            <span className={classes.blockDiv}>
+              {subtitle ? subtitle.toUpperCase() : ''}
+            </span>
+          </div>
+        )}
+      </Popper>
     )
-    // return (
-    //   <div
-    //     className={classes.monthViewEvent}
-    //     onMouseEnter={this._handleMouseEnter}
-    //     onMouseLeave={this._handleMouseLeave}
-    //   >
-    //     {title} (S1234567D)
-    //   </div>
-    // )
   }
 }
 

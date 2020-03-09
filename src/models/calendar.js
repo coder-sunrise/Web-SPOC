@@ -190,7 +190,7 @@ export default createListViewModel({
               currentAppointment,
             ]
           } else {
-            /* 
+            /*
               update all other recurrences
               - appointmentStatusFK
               - appointmentRemarks
@@ -364,8 +364,10 @@ export default createListViewModel({
       },
       *getCalendarList ({ payload }, { call, put }) {
         const result = yield call(service.queryList, {
-          ...payload,
-          isCancelled: false,
+          apiCriteria:{
+            ...payload,
+            isCancelled: false,
+          },
         })
         const { status, data } = result
         if (status === '200' && data.data) {
@@ -491,17 +493,10 @@ export default createListViewModel({
           .endOf(calendarView)
           .add(offSet, 'hours')
           .formatUTC()
-        // console.log({ start, targetDate })
-        const getCalendarListPayload = isDayView
-          ? {
-              combineCondition: 'and',
-              lgteql_appointmentDate: start,
-              lsteql_appointmentDate: end,
-            }
-          : {
-              combineCondition: 'and',
-              lgteql_appointmentDate: start,
-              lsteql_appointmentDate: end,
+
+        const getCalendarListPayload = {
+            apptDateFrom:start,
+            apptDateTo:end,
             }
 
         yield all([

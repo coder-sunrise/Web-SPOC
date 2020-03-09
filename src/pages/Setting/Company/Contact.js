@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import {
   FastField,
   GridContainer,
@@ -11,6 +11,8 @@ import { MobileNumberInput } from '@/components/_medisys'
 
 const Contact = (props) => {
   const { theme, type } = props
+  const isCopayer = type === 'copayer'
+  const isReferral = type === 'referral'
   return (
     <React.Fragment>
       <div
@@ -34,7 +36,7 @@ const Contact = (props) => {
             <FastField
               name='contact.contactAddress[0].street'
               render={(args) => (
-                <TextField label='Address' multiline autoFocus {...args} />
+                <TextField label='Address' multiline {...args} />
               )}
             />
           </GridItem>
@@ -53,20 +55,19 @@ const Contact = (props) => {
             />
           </GridItem>
 
-          <GridItem md={6}>
-            {type === 'copayer' ? (
-              []
-            ) : (
+          {!isCopayer &&
+          !isReferral && (
+            <GridItem md={6}>
               <FastField
                 name='contactPerson'
                 render={(args) => (
                   <TextField label='Contact Person' {...args} />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
-          <GridItem md={type === 'copayer' ? 12 : 6}>
+          <GridItem md={6}>
             <FastField
               name='contact.mobileContactNumber.number'
               render={(args) => (
@@ -78,69 +79,53 @@ const Contact = (props) => {
                 //   precision={0}
                 //   {...args}
                 // />
-                <MobileNumberInput {...args} label='Contact Number' />
+                <MobileNumberInput
+                  {...args}
+                  label={isReferral ? 'Mobile Number' : 'Contact Number'}
+                />
               )}
             />
           </GridItem>
-          <GridItem md={6}>
-            {type === 'copayer' ? (
-              []
-            ) : (
+
+          {!isCopayer && (
+            <GridItem md={6}>
               <FastField
                 name='contact.officeContactNumber.number'
                 render={(args) => (
-                  // <NumberInput
-                  //   label='Office Number'
-                  //   maxLength='15'
-                  //   min='0'
-                  //   max='999999999999999'
-                  //   precision={0}
-                  //   {...args}
-                  // />
                   <MobileNumberInput {...args} label='Office Number' />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
-          <GridItem md={6}>
-            {type === 'copayer' ? (
-              []
-            ) : (
+          {!isCopayer && (
+            <GridItem md={6}>
               <FastField
                 name='contact.faxContactNumber.number'
                 render={(args) => (
-                  // <NumberInput
-                  //   label='Fax Number'
-                  //   maxLength='15'
-                  //   min='0'
-                  //   max='999999999999999'
-                  //   precision={0}
-                  //   {...args}
-                  // />
                   <MobileNumberInput {...args} label='Fax Number' />
                 )}
               />
-            )}
-          </GridItem>
+            </GridItem>
+          )}
 
-          {type === 'copayer' ? (
-            <GridContainer>
+          {(isCopayer || isReferral) && (
+            <Fragment>
               <GridItem md={6}>
                 <FastField
                   name='contact.contactEmailAddress.emailAddress'
                   render={(args) => <TextField label='Email' {...args} />}
                 />
               </GridItem>
-              <GridItem md={6}>
-                <FastField
-                  name='contact.contactWebsite.website'
-                  render={(args) => <TextField label='URL' {...args} />}
-                />
-              </GridItem>
-            </GridContainer>
-          ) : (
-            <GridContainer />
+              {isCopayer && (
+                <GridItem md={6}>
+                  <FastField
+                    name='contact.contactWebsite.website'
+                    render={(args) => <TextField label='URL' {...args} />}
+                  />
+                </GridItem>
+              )}
+            </Fragment>
           )}
         </GridContainer>
       </div>
