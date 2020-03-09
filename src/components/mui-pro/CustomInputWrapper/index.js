@@ -55,6 +55,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     help,
     fullWidth,
     children,
+    hiddenOverflow,
     simple = false,
     size = 'medium',
     strongLabel,
@@ -77,7 +78,7 @@ function CustomInputWrapper ({ classes, theme, ...props }) {
     [classes.simple]: simple,
     [classes.textControl]: !!text,
     [classes.strongLabel]: !!strongLabel,
-
+    [classes.hiddenOverflow]: !!hiddenOverflow,
     // [classes.medium]: size === 'default' || size === 'medium' || size === 'md',
     // [classes.small]: size === 'small' || size === 'sm',
     // [classes.large]: size === 'large' || size === 'lg',
