@@ -484,11 +484,18 @@ class ClinicalNotes extends Component {
     const { entity = {} } = consultation
 
     const { fields } = config
+    const panels = contents.filter((item) => {
+      const accessRight = Authorized.check(item.authority)
+      if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+        return false
+      return true
+    })
     const defaultActive = getDefaultActivePanel(
       entity,
       config,
       _prefix,
       clinicInfo,
+      panels,
     )
 
     return (
@@ -542,84 +549,70 @@ class ClinicalNotes extends Component {
           expandIcon={<SolidExpandMore fontSize='large' />}
           defaultActive={defaultActive}
           mode='multiple'
-          collapses={contents
-            .filter((item) => {
-              const accessRight = Authorized.check(item.authority)
-              if (
-                !accessRight ||
-                (accessRight && accessRight.rights === 'hidden')
-              )
-                return false
-              return true
-            })
-            .map((item, index) => {
-              const onCannedTextClick = () =>
-                this.handleCannedTextButtonClick(item)
-              const onSettingClick = () => this.openCannedText(item)
+          collapses={panels.map((item, index) => {
+            const onCannedTextClick = () =>
+              this.handleCannedTextButtonClick(item)
+            const onSettingClick = () => this.openCannedText(item)
 
-              const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-              const scrribleNoteTypeFieldKey =
-                scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
-              return {
-                title: item.fieldTitle,
-                content: (
-                  <div className={classes.editor}>
-                    <Field
-                      name={`${prefix}${item[fieldName]}`}
-                      render={(args) => {
-                        return (
-                          <div>
-                            <div
-                              style={{
-                                position: 'absolute',
-                                zIndex: 1,
-                                left: 305,
-                                right: 0,
-                                top: 10,
-                              }}
-                            >
-                              <ScribbleNoteItem
-                                scribbleNoteUpdateState={
-                                  this.scribbleNoteUpdateState
-                                }
-                                category={item.category}
-                                arrayName={item.scribbleField}
-                                categoryIndex={item[scrribleNoteTypeFieldKey]}
-                                scribbleNoteArray={
-                                  scriblenotes[item.category][
-                                    item.scribbleField
-                                  ]
-                                }
-                                gridItemWidth={this.state.width}
-                              />
+            const fieldName = fieldKey[clinicInfo.clinicTypeFK]
+            const scrribleNoteTypeFieldKey =
+              scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
+            return {
+              title: item.fieldTitle,
+              content: (
+                <div className={classes.editor}>
+                  <Field
+                    name={`${prefix}${item[fieldName]}`}
+                    render={(args) => {
+                      return (
+                        <div>
+                          <div
+                            style={{
+                              position: 'absolute',
+                              zIndex: 1,
+                              left: 305,
+                              right: 0,
+                              top: 10,
+                            }}
+                          >
+                            <ScribbleNoteItem
+                              scribbleNoteUpdateState={
+                                this.scribbleNoteUpdateState
+                              }
+                              category={item.category}
+                              arrayName={item.scribbleField}
+                              categoryIndex={item[scrribleNoteTypeFieldKey]}
+                              scribbleNoteArray={
+                                scriblenotes[item.category][item.scribbleField]
+                              }
+                              gridItemWidth={this.state.width}
+                            />
 
-                              <CannedTextButton
-                                onSettingClick={onSettingClick}
-                                onCannedTextClick={onCannedTextClick}
-                                cannedTextTypeFK={item.cannedTextTypeFK}
-                                handleSelectCannedText={
-                                  this.handleAddCannedText
-                                }
-                              />
-                            </div>
-
-                            <RichEditor
-                              autoFocus={index === 0}
-                              style={{ marginBottom: 0 }}
-                              strongLabel
-                              onBlur={this.onEditorChange(item[fieldName])}
-                              // label='Chief Complaints'
-                              height={item.height}
-                              {...args}
+                            <CannedTextButton
+                              onSettingClick={onSettingClick}
+                              onCannedTextClick={onCannedTextClick}
+                              cannedTextTypeFK={item.cannedTextTypeFK}
+                              handleSelectCannedText={this.handleAddCannedText}
                             />
                           </div>
-                        )
-                      }}
-                    />
-                  </div>
-                ),
-              }
-            })}
+
+                          <RichEditor
+                            autoFocus={index === 0}
+                            style={{ marginBottom: 0 }}
+                            strongLabel
+                            onBlur={this.onEditorChange(item[fieldName])}
+                            // label='Chief Complaints'
+                            height={item.height}
+                            {...args}
+                          />
+                        </div>
+                      )
+                    }}
+                  />
+                </div>
+              ),
+            }
+          })}
         />
 
         {config.hasAttachment && (
