@@ -381,6 +381,7 @@ class PatientDetail extends PureComponent {
     })
 
     const { data } = response
+
     let shouldPromptSaveConfirmation = false
     if (data) {
       const { totalRecords, data: patientList } = data
