@@ -528,7 +528,7 @@ class InventoryItemList extends React.Component {
               <Field
                 name={`rows[${index}].unitPrice`}
                 render={(args) => (
-                  <NumberInput {...args} currency positiveOnly />
+                  <NumberInput {...args} currency positiveOnly min={0} />
                 )}
               />
             )
