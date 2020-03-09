@@ -536,6 +536,10 @@ class InventoryItemList extends React.Component {
         },
         {
           columnName: 'amount',
+          observeFields: [
+            'quantity',
+            'unitPrice',
+          ],
           type: 'currency',
           render: (row) => {
             return (
