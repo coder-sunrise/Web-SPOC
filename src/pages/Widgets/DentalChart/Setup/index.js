@@ -52,6 +52,7 @@ const methods = [
   // },
 ]
 const rowSchema = Yup.object().shape({
+  code: Yup.string().required(),
   displayValue: Yup.string().required(),
   chartMethodTypeFK: Yup.number().required(),
 })

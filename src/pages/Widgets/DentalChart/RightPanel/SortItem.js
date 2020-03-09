@@ -182,6 +182,11 @@ const SortItem = ({
                       : v,
                 },
               })
+
+              window._tempDisableEvent = true
+              setTimeout(() => {
+                window._tempDisableEvent = false
+              }, 2000)
             }}
             index={idx}
             selected={
@@ -254,6 +259,12 @@ const SortItem = ({
                                 ...o,
                                 deleted: true,
                               })),
+                            })
+                            dispatch({
+                              type: 'dentalChartComponent/updateState',
+                              payload: {
+                                selected: undefined,
+                              },
                             })
                           }}
                         >
