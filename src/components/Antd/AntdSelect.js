@@ -733,6 +733,9 @@ class AntdSelect extends React.PureComponent {
       // )
       labelProps.shrink =
         (value && value.length > 0) || this.state.shrink || this.state.focus
+      if (labelProps.shrink === undefined) {
+        labelProps.shrink = false
+      }
     }
     // console.log(value && value.length > 0, this.state.shrink, this.state.focus)
     return (
