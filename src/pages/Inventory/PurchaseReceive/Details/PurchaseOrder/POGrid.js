@@ -128,7 +128,7 @@ class Grid extends PureComponent {
     row.codeString = option.code
     row.nameString = option.name
     row.unitOfMeasurement = option.uom
-    row.unitPrice = option.sellingPrice
+    row.unitPrice = option.lastCostPriceBefBonus
     row.uom = option.value
     row.orderQuantity = 0
     row.bonusReceived = 0
@@ -179,8 +179,8 @@ class Grid extends PureComponent {
         if (onClickColumn === 'type') {
           // type logic here
         } else if (onClickColumn === 'item') {
-          tempUnitPrice = selectedItem.sellingPrice
-          tempTotalPrice = selectedItem.sellingPrice
+          tempUnitPrice = selectedItem.lastCostPriceBefBonus
+          tempTotalPrice = selectedItem.lastCostPriceBefBonus
         } else {
           tempTotalQty = calcTotalQty() || 0
           tempTotalPrice = calcTotalPrice() || tempUnitPrice

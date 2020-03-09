@@ -114,6 +114,7 @@ class Event extends React.PureComponent {
 
     return (
       <Popper
+        stopOnClickPropagation
         className={classnames({
           [classes.pooperResponsive]: true,
           [classes.pooperNav]: true,

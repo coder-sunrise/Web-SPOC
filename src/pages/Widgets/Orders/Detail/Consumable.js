@@ -30,12 +30,18 @@ import LowStockInfo from './LowStockInfo'
 
   handleSubmit: (values, { props, onConfirm }) => {
     const { dispatch, currentType, getNextSequence } = props
-
+    var batchNo = values.batchNo
+    if (batchNo instanceof Array) {
+      if (batchNo && batchNo.length > 0) {
+        batchNo = batchNo[0]
+      }
+    }
     const data = {
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,
+      batchNo,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -286,12 +292,20 @@ class Consumable extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
                     label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedConsumable.consumableStock}
                     onChange={(e, op = {}) => {
-                      setFieldValue('expiryDate', op.expiryDate)
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
                     }}
                     disabled={disableEdit}
                     {...args}
