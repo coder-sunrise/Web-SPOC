@@ -4,6 +4,7 @@ import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
 import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
 import InventoryType from './InventoryType'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({
   displayDiv: {
@@ -912,40 +913,48 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <InventoryType
-            title='Medication'
-            inventoryTypeProps={medicationProps}
-            schema={medicationSchema}
-            rows={medicationRows}
-            editingProps={medicationEditingProps}
-          />
+          <Authorized authority='inventorymaster.orderset.medication'>
+            <InventoryType
+              title='Medication'
+              inventoryTypeProps={medicationProps}
+              schema={medicationSchema}
+              rows={medicationRows}
+              editingProps={medicationEditingProps}
+            />
+          </Authorized>
 
-          <InventoryType
-            title='Consumable'
-            inventoryTypeProps={consumableProps}
-            schema={consumableSchema}
-            rows={consumableRows}
-            editingProps={consumableEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <Authorized authority='inventorymaster.orderset.consumable'>
+            <InventoryType
+              title='Consumable'
+              inventoryTypeProps={consumableProps}
+              schema={consumableSchema}
+              rows={consumableRows}
+              editingProps={consumableEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
 
-          <InventoryType
-            title='Vaccination'
-            inventoryTypeProps={vaccinationProps}
-            schema={vaccinationSchema}
-            rows={vaccinationRows}
-            editingProps={vaccinationEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <Authorized authority='inventorymaster.orderset.vaccination'>
+            <InventoryType
+              title='Vaccination'
+              inventoryTypeProps={vaccinationProps}
+              schema={vaccinationSchema}
+              rows={vaccinationRows}
+              editingProps={vaccinationEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
 
-          <InventoryType
-            title='Service'
-            inventoryTypeProps={serviceProps}
-            schema={serviceSchema}
-            rows={serviceRows}
-            editingProps={serviceEditingProps}
-            style={{ marginTop: 15 }}
-          />
+          <Authorized authority='inventorymaster.orderset.service'>
+            <InventoryType
+              title='Service'
+              inventoryTypeProps={serviceProps}
+              schema={serviceSchema}
+              rows={serviceRows}
+              editingProps={serviceEditingProps}
+              style={{ marginTop: 15 }}
+            />
+          </Authorized>
         </GridContainer>
       </CardContainer>
     </div>
