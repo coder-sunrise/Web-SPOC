@@ -37,7 +37,6 @@ import {
   CommonModal,
   withFormik,
 } from '@/components'
-import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 
 import schema from './schema'
