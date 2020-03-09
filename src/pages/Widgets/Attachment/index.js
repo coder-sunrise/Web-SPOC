@@ -223,6 +223,7 @@ class Attachment extends Component {
     } = this.state
     const { dispatch } = this.props
     const commonProps = {
+      dispatch,
       fieldName: 'corAttachment',
       onClickAttachment: this.handleClickAttachment,
     }
