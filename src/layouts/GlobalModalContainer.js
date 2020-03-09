@@ -90,7 +90,6 @@ class GlobalModalContainer extends PureComponent {
         openConfirm: false,
         openConfirmTitle: null,
         openConfirmContent: null,
-        additionalInfo: null,
         onConfirmDiscard: null,
         onConfirmSave: null,
         // onConfirm: null,
