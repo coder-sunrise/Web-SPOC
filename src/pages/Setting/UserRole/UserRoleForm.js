@@ -1,87 +1,109 @@
 import React from 'react'
-import * as Yup from 'yup'
 // formik
-import { FastField, withFormik } from 'formik'
+import { withFormik } from 'formik'
 // material ui
-import { Divider, withStyles } from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
+import { withRouter } from 'react-router'
 // common component
-import {
-  CodeSelect,
-  DatePicker,
-  GridContainer,
-  GridItem,
-  Select,
-  TextField,
-} from '@/components'
+import { GridContainer, GridItem, FastField, Select } from '@/components'
 // sub components
-import AccessRight from './AccessRight'
+import request from '@/utils/request'
 
 const styles = (theme) => ({
   verticalSpacing: {
-    marginTop: theme.spacing(2),
+    // marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
     '& > h4': {
       fontWeight: 500,
     },
   },
 })
+class UserRoleForm extends React.PureComponent {
+  state = {
+    selectFieldOption: [],
+    selectedValue: undefined,
+  }
 
-const UserRoleForm = ({ classes, footer, handleSubmit, ...props }) => {
-  return (
-    <React.Fragment>
-      <GridContainer>
-        <GridItem md={12} className={classes.verticalSpacing}>
-          <h4>User Role</h4>
-          <Divider />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='name'
-            render={(args) => <TextField autoFocus {...args} label='Name' />}
-          />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='effectiveStartDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective Start Date' />
-            )}
-          />
-        </GridItem>
-        <GridItem md={4} />
-        <GridItem md={4}>
-          <FastField
-            name='description'
-            render={(args) => <TextField {...args} label='Description' />}
-          />
-        </GridItem>
-        <GridItem md={4}>
-          <FastField
-            name='effectiveEndDate'
-            render={(args) => (
-              <DatePicker {...args} label='Effective End Date' />
-            )}
-          />
-        </GridItem>
-        <GridItem md={4} />
+  componentDidMount = () => {
+    this.getSelectOptions()
+  }
 
-        <GridItem md={12} className={classes.verticalSpacing}>
-          <h4>Access Right</h4>
-          <Divider />
-        </GridItem>
-        <GridItem md={12}>
-          <AccessRight />
-        </GridItem>
-      </GridContainer>
-      {footer &&
-        footer({
-          confirmBtnText: 'Save',
-          onConfirm: handleSubmit,
-        })}
-    </React.Fragment>
-  )
+  getSelectOptions = async () => {
+    const response = await request('/api/Role', {
+      method: 'GET',
+    })
+    const { data } = response
+    if (data) {
+      const option = data.data
+        .filter((m) => {
+          return m.isActive
+        })
+        .map((d) => {
+          return {
+            name: d.name,
+            value: d.id,
+          }
+        })
+      this.setState({
+        selectFieldOption: option,
+      })
+    }
+  }
+
+  onSelect = (value) => {
+    this.setState({ selectedValue: value })
+  }
+
+  handleClickAddNew = () => {
+    const { selectedValue } = this.state
+    if (selectedValue) {
+      this.props.history.push(`/setting/userrole/new`, { id: selectedValue })
+    }
+  }
+
+  render () {
+    const { classes, footer } = this.props
+    const { selectFieldOption, selectedValue } = this.state
+    return (
+      <div>
+        {selectFieldOption.length !== 0 && (
+          <React.Fragment>
+            <div className={classes.verticalSpacing}>
+              <GridContainer>
+                <GridItem md={4} />
+                <GridItem md={4} className={classes.verticalSpacing}>
+                  <FastField
+                    name='status'
+                    render={(args) => (
+                      <Select
+                        {...args}
+                        label='Existing Role'
+                        options={selectFieldOption}
+                        onChange={this.onSelect}
+                      />
+                    )}
+                  />
+                </GridItem>
+              </GridContainer>
+            </div>
+
+            <GridItem md={4} />
+            {footer &&
+              footer({
+                confirmBtnText: 'Add New',
+                onConfirm: this.handleClickAddNew,
+                confirmProps: {
+                  disabled: !selectedValue,
+                },
+              })}
+          </React.Fragment>
+        )}
+      </div>
+    )
+  }
 }
 
 export default withFormik({
   mapPropsToValues: () => ({}),
   handleSubmit: () => {},
-})(withStyles(styles, { name: 'UserProfileForm' })(UserRoleForm))
+})(withStyles(styles, { name: 'UserRoleForm' })(withRouter(UserRoleForm)))

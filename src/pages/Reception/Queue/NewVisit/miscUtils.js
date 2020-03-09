@@ -1,5 +1,5 @@
 import { VISIT_STATUS } from '../variables'
-import { sendNotification } from '@/utils/realtime'
+import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
 
 const filterDeletedFiles = (item) => {
   // filter out not yet confirmed files
@@ -9,22 +9,25 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  { fileIndexFK, fileName, attachmentType, isDeleted, ...rest },
+  { fileIndexFK, fileName, attachmentType, isDeleted, thumbnail, ...rest },
   index,
 ) =>
   !fileIndexFK
     ? {
         // file status === uploaded, only 4 info needed for API
         fileIndexFK: rest.id,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         sortOrder: index,
         fileName,
         attachmentType,
         isDeleted,
+        remarks: rest.remarks,
       }
     : {
         // file status === confirmed, need to provide full object for API
         ...rest,
         fileIndexFK,
+        thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         fileName,
         attachmentType,
         isDeleted,
@@ -37,11 +40,13 @@ export const formikMapPropsToValues = ({
   visitRegistration,
   doctorProfiles,
   history,
+  clinicSettings,
 }) => {
   try {
     let qNo = 0.0
     let doctorProfile
     let doctorProfileFK
+    let visitPurposeFK
     if (clinicInfo) {
       // doctorProfile = doctorProfiles.find(
       //   (item) => item.doctorMCRNo === clinicInfo.primaryMCRNO,
@@ -83,14 +88,27 @@ export const formikMapPropsToValues = ({
       doctorProfileFK = doctorProfile ? doctorProfile.id : doctorProfileFK
     }
 
+    if (clinicSettings) {
+      visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
+    }
+
+    const { visitOrderTemplateFK } = visitEntries
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(visitEntries.visitOrderTemplateFK)
+
     return {
       queueNo: qNo,
-      visitPurposeFK: 1,
+      visitPurposeFK,
       roomFK,
       visitStatus: VISIT_STATUS.WAITING,
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      visitOrderTemplateFK: isVisitOrderTemplateActive
+        ? visitOrderTemplateFK
+        : undefined,
     }
   } catch (error) {
     console.log({ error })
@@ -102,7 +120,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,
@@ -165,9 +189,11 @@ export const formikHandleSubmit = (
       referralPerson: null,
       referralDate: null,
       ...restValues, // override using formik values
+      referralBy: referralBy.length > 0 ? referralBy[0] : null,
     },
   }
 
+  // console.log({ payload })
   dispatch({
     type: 'visitRegistration/upsert',
     payload,
@@ -184,10 +210,11 @@ export const formikHandleSubmit = (
           type: 'queueLog/refresh',
         })
 
-      sendNotification('QueueListing', {
-        message: 'Visit Created',
-      })
       onConfirm()
+      sendQueueNotification({
+        message: 'New visit created.',
+        queueNo: payload && payload.queueNo,
+      })
     } else {
       setSubmitting(false)
     }

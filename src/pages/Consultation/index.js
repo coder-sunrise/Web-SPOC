@@ -1,4 +1,4 @@
-import React, { PureComponent, Suspense } from 'react'
+import React from 'react'
 import { connect } from 'dva'
 import Main from './Main'
 

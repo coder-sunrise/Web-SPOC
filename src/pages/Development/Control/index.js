@@ -159,6 +159,42 @@ class ControlTest extends PureComponent {
   constructor (props) {
     super(props)
     this.container = React.createRef()
+
+    const title = 'Simple Title'
+    const options = {
+      body: 'Simple piece of body text.\nSecond line of body text :)',
+    }
+    // registration.showNotification(title, options)
+
+    //   navigator.serviceWorker.getRegistration().then((reg) => {
+    //     console.log(reg)
+    //     let options = {
+    //       body: 'Here is a notification body!',
+    //       icon: 'images/example.png',
+    //       vibrate: [
+    //         100,
+    //         50,
+    //         100,
+    //       ],
+    //       data: {
+    //         dateOfArrival: Date.now(),
+    //         primaryKey: 1,
+    //       },
+    //       actions: [
+    //         {
+    //           action: 'explore',
+    //           title: 'Explore this new world',
+    //           icon: 'images/checkmark.png',
+    //         },
+    //         {
+    //           action: 'close',
+    //           title: 'Close notification',
+    //           icon: 'images/xmark.png',
+    //         },
+    //       ],
+    //     }
+    //     reg.showNotification('Hello world!', options)
+    //   })
   }
 
   state = {
@@ -199,7 +235,7 @@ class ControlTest extends PureComponent {
   render () {
     const { props, state } = this
     const { classes, theme, ...resetProps } = this.props
-    console.log(this.props)
+    console.log(Notification, Notification.permission)
     const testConfig = {
       onFocus: (e) => {
         console.log(1)
@@ -501,7 +537,7 @@ class ControlTest extends PureComponent {
             <FastField
               name='numberField'
               render={(args) => {
-                return <NumberInput currency label='Number' {...args} />
+                return <NumberInput format='0,0' label='Number' {...args} />
               }}
             />
           </GridItem>
@@ -600,7 +636,7 @@ class ControlTest extends PureComponent {
         }}
         title={this.title}
       >
-        <GridContainer>
+        {/* <GridContainer>
           <GridItem xs={0} md={8} />
           <GridItem xs={12} md={4}>
             <AmountSummary
@@ -612,8 +648,27 @@ class ControlTest extends PureComponent {
               ]}
             />
           </GridItem>
-        </GridContainer>
-
+        </GridContainer> */}
+        <div>
+          <Button
+            onClick={() => {
+              console.log(initValues)
+              props.resetForm(initValues)
+              // notification.error({
+              //   // icon: WarningIcon,
+              //   icon: null,
+              //   duration: 0,
+              //   placement: 'bottomRight',
+              //   message: 'Notification Title',
+              //   // description:
+              //   //   'test test testtest d sd sd d test test test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d testtest test testtest d sd sd d test',
+              // })
+            }}
+          >
+            Reset
+          </Button>
+          <ProgressButton onClick={props.handleSubmit} />
+        </div>
         <SizeContainer size='lg'>{testComponents}</SizeContainer>
         {testComponents}
         <SizeContainer size='sm'>{testComponents}</SizeContainer>

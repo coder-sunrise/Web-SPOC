@@ -20,7 +20,7 @@ import {
 import { orderTypes } from '@/utils/codes'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes }) => {
+export default ({ orders, dispatch, classes, from }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -53,10 +53,11 @@ export default ({ orders, dispatch, classes }) => {
         // },
       },
     })
-    dispatch({
-      // force current edit row components to update
-      type: 'global/incrementCommitCount',
-    })
+
+    // dispatch({
+    //   // force current edit row components to update
+    //   type: 'global/incrementCommitCount',
+    // })
   }
   // console.log(total, summary)
   const addAdjustment = () => {
@@ -311,6 +312,11 @@ export default ({ orders, dispatch, classes }) => {
         {
           columnName: 'description',
           width: 260,
+          observeFields: [
+            'instruction',
+            'remark',
+            'remarks',
+          ],
           render: (row) => {
             return (
               <Tooltip title={row.instruction}>
@@ -320,7 +326,7 @@ export default ({ orders, dispatch, classes }) => {
                     whiteSpace: 'pre-wrap',
                   }}
                 >
-                  {row.instruction}
+                  {row.instruction || row.remark || row.remarks || ''}
                 </div>
               </Tooltip>
             )
@@ -343,18 +349,14 @@ export default ({ orders, dispatch, classes }) => {
           //   )
           // },
         },
-        {
-          columnName: 'remark',
-          render: (r) => {
-            return r.remark || r.remarks || ''
-          },
-        },
+
         {
           columnName: 'actions',
           width: 70,
           align: 'center',
           sortingEnabled: false,
           render: (row) => {
+            if (row.type === '7' && from !== 'ca') return null
             return (
               <div>
                 <Tooltip title='Edit'>
@@ -379,6 +381,12 @@ export default ({ orders, dispatch, classes }) => {
                       type: 'orders/deleteRow',
                       payload: {
                         uid: row.uid,
+                      },
+                    })
+                    dispatch({
+                      type: 'orders/updateState',
+                      payload: {
+                        entity: undefined,
                       },
                     })
                     // let commitCount = 1000 // uniqueNumber

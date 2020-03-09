@@ -3,10 +3,7 @@ import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import AttachMoney from '@material-ui/icons/AttachMoney'
 import FilterList from '@material-ui/icons/FilterList'
-import {
-  Select,
-  ButtonSelect,
-} from '@/components'
+import { Select, ButtonSelect } from '@/components'
 import { queryList } from '@/services/common'
 
 const styles = (theme) => ({
@@ -40,21 +37,18 @@ const DiagnosisSelect = ({
   style,
   label,
   onDataSouceChange,
+  filterStyle = { position: 'absolute', bottom: 8, right: 0 },
   ...props
 }) => {
   let selectProps = props
   const initMaxTagCount =
-    props.field &&
-      props.field.value &&
-      props.field.value.length === 1
-      ? 1
-      : 0
+    props.field && props.field.value && props.field.value.length === 1 ? 1 : 0
   const [
     maxTagCount,
     setMaxTagCount,
-  ] = useState(props.maxTagCount !== undefined
-    ? props.maxTagCount
-    : initMaxTagCount)
+  ] = useState(
+    props.maxTagCount !== undefined ? props.maxTagCount : initMaxTagCount,
+  )
   if (
     props.maxTagCount === undefined &&
     props.mode &&
@@ -109,11 +103,23 @@ const DiagnosisSelect = ({
 
     return response
   }
+  const selected = ctDiagnosis.find(
+    (diagnosis) => diagnosis.id === props.field.value,
+  )
+
+  let showPrefix = false
+  if (selected) {
+    showPrefix =
+      selected.isChasAcuteClaimable ||
+      selected.isChasChronicClaimable ||
+      selected.isHazeClaimable
+  }
 
   return (
     <div style={{ position: 'relative' }}>
       <Select
         label={label || 'Diagnosis'}
+        prefix={showPrefix ? <AttachMoney className={classes.money} /> : null}
         options={ctDiagnosis}
         valueField='id'
         labelField='displayvalue'
@@ -161,7 +167,7 @@ const DiagnosisSelect = ({
         valueField='value'
         value={diagnosisFilter}
         justIcon
-        style={{ position: 'absolute', bottom: 2, right: -35 }}
+        style={filterStyle}
         onChange={(v, option) => {
           if (v !== diagnosisFilter) setDiagnosisFilter(v)
         }}

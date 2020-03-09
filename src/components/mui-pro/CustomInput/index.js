@@ -28,7 +28,7 @@ class TextField extends React.PureComponent {
   validationCount = 0
 
   static defaultProps = {
-    autocomplete: 'nope',
+    autocomplete: 'off',
     debounceDuration: 1000,
     useLeading: true,
   }
@@ -227,6 +227,7 @@ class TextField extends React.PureComponent {
       value,
       uppercase,
       lowercase,
+      text,
       maxLength,
     } = props
     const { field, form, ...resetProps } = props
@@ -234,7 +235,9 @@ class TextField extends React.PureComponent {
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
     // }
-    const cfg = {}
+    const cfg = {
+      hiddenOverflow: !text,
+    }
     if (field && form) {
       cfg.value = state.value
       cfg.name = field.name

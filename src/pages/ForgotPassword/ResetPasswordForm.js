@@ -1,6 +1,5 @@
 import React from 'react'
 import * as Yup from 'yup'
-import color from 'color'
 import classnames from 'classnames'
 // formik
 import { withFormik, FastField } from 'formik'

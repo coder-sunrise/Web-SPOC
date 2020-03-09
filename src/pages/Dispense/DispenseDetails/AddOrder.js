@@ -3,6 +3,7 @@ import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import { withRouter } from 'react-router-dom'
 import Order from '../../Widgets/Orders'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
@@ -10,8 +11,9 @@ import {
   VISIT_TYPE,
   INVOICE_ITEM_TYPE_BY_NAME,
   ORDER_TYPE_TAB,
+  CLINIC_TYPE,
 } from '@/utils/constants'
-import { roundTo } from '@/utils/utils'
+import { roundTo, getUniqueId } from '@/utils/utils'
 
 const styles = () => ({})
 
@@ -20,14 +22,18 @@ const AddOrder = ({
   handleSubmit,
   dispatch,
   dispense,
+  height,
   codetable: { ctservice, inventoryconsumable, inventorymedication },
   visitType,
+  location,
+  clinicInfo,
 }) => {
   const displayExistingOrders = async (id, servicesList) => {
     const r = await dispatch({
       type: 'dispense/queryAddOrderDetails',
       payload: {
         invoiceId: id,
+        isInitialLoading: location.query.isInitialLoading,
       },
     })
 
@@ -57,9 +63,14 @@ const AddOrder = ({
               innerLayerConcurrencyToken:
                 o.retailVisitInvoiceDrug.concurrencyToken,
               ...restValues,
-              corPrescriptionItemInstruction:
-                o.retailVisitInvoiceDrug.retailPrescriptionItem
-                  .retailPrescriptionItemInstruction,
+              corPrescriptionItemInstruction: o.retailVisitInvoiceDrug.retailPrescriptionItem.retailPrescriptionItemInstruction.map(
+                (instruction) => {
+                  return {
+                    ...instruction,
+                    stepdose: instruction.stepdose || 'AND',
+                  }
+                },
+              ),
               corPrescriptionItemPrecaution:
                 o.retailVisitInvoiceDrug.retailPrescriptionItem
                   .retailPrescriptionItemPrecaution,
@@ -140,10 +151,45 @@ const AddOrder = ({
       const newRetailInvoiceAdjustment = retailInvoiceAdjustment.map(
         assignRetailAdjustmentIdToOrderAdjustmentUid,
       )
+
+      const isVaccinationExist = newRows.filter((row) => !row.type)
+      const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+      if (clinicTypeFK === CLINIC_TYPE.GP && isVaccinationExist.length > 0) {
+        dispatch({
+          type: 'global/updateAppState',
+          payload: {
+            openConfirm: true,
+            openConfirmContent: `Vaccination item(s) will not be added.`,
+            alignContent: 'left',
+            isInformType: true,
+            additionalInfo: (
+              <div>
+                <ul style={{ listStylePosition: 'inside' }}>
+                  {isVaccinationExist.map((item) => (
+                    <li>
+                      <b>{item.subject}</b>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ),
+            onConfirmSave: () => {},
+          },
+        })
+      }
+
+      const rowsWithoutVaccination = newRows
+        .filter((row) => row.type)
+        .map((row) => {
+          return {
+            ...row,
+            uid: getUniqueId(),
+          }
+        })
       dispatch({
         type: 'orders/updateState',
         payload: {
-          rows: newRows,
+          rows: rowsWithoutVaccination,
           finalAdjustments: newRetailInvoiceAdjustment,
           isGSTInclusive: r.isGSTInclusive,
           gstValue: r.gstValue,
@@ -167,11 +213,12 @@ const AddOrder = ({
     if (visitType === VISIT_TYPE.RETAIL)
       displayExistingOrders(invoice.id, ctservice)
   }, [])
-
   return (
     <React.Fragment>
       <SizeContainer size='sm'>
-        <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        <div style={{ maxHeight: height - 128, overflow: 'auto' }}>
+          <Order fromDispense={visitType === VISIT_TYPE.RETAIL} />
+        </div>
       </SizeContainer>
       {footer &&
         footer({
@@ -185,12 +232,14 @@ const AddOrder = ({
   )
 }
 export default compose(
+  withRouter,
   withStyles(styles, { withTheme: true }),
-  connect(({ dispense, orders, codetable, consultation }) => ({
+  connect(({ dispense, orders, codetable, consultation, clinicInfo }) => ({
     dispense,
     orders,
     consultation,
     codetable,
+    clinicInfo,
   })),
   withFormikExtend({
     handleSubmit: (values, { props }) => {
@@ -203,6 +252,7 @@ export default compose(
         onReloadClick,
         codetable: { inventoryconsumable },
         visitType,
+        history,
       } = props
       const { rows, summary, finalAdjustments } = orders
       const { addOrderDetails } = dispense
@@ -395,6 +445,7 @@ export default compose(
               break
             }
             case ORDER_TYPE_TAB.SERVICE: {
+              const { retailService, ...restValues } = o
               obj = {
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
@@ -404,9 +455,10 @@ export default compose(
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
                   serviceCenterServiceFK: o.serviceCenterServiceFK,
+                  isDeleted: restValues.isDeleted,
                   retailService: {
                     unitPrice: o.total,
-                    ...o,
+                    ...restValues,
                   },
                 },
               }
@@ -416,6 +468,7 @@ export default compose(
               const { uom } = inventoryconsumable.find(
                 (c) => c.id === o.inventoryConsumableFK,
               )
+              const { retailConsumable, ...restValues } = o
               obj = {
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.CONSUMABLE,
                 itemCode: o.consumableCode,
@@ -427,11 +480,12 @@ export default compose(
                   inventoryConsumableFK: o.inventoryConsumableFK,
                   expiryDate: o.expiryDate,
                   batchNo: o.batchNo,
+                  isDeleted: restValues.isDeleted,
                   retailConsumable: {
                     unitOfMeasurement: uom.name,
                     unitofMeasurementFK: uom.id,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
-                    ...o,
+                    ...restValues,
                   },
                 },
               }
@@ -463,12 +517,20 @@ export default compose(
           retailInvoiceItem,
           retailInvoiceAdjustment: finalAdjustments,
         }
+
         dispatch({
           type: 'dispense/saveAddOrderDetails',
           payload,
         }).then((r) => {
           if (r) {
             if (onConfirm) onConfirm()
+            history.push({
+              pathname: history.location.pathname,
+              query: {
+                ...history.location.query,
+                isInitialLoading: false,
+              },
+            })
             onReloadClick()
           }
         })

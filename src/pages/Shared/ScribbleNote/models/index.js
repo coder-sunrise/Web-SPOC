@@ -20,6 +20,15 @@ export default createFormViewModel({
       Plan: {
         planScribbleArray: [],
       },
+      AssociatedHistory: {
+        associatedHistoryScribbleArray: [],
+      },
+      IntraOral: {
+        intraOralScribbleArray: [],
+      },
+      ExtraOral: {
+        extraOralScribbleArray: [],
+      },
       default: {
         scribleNotes: 'Test notes',
       },
@@ -35,21 +44,21 @@ export default createFormViewModel({
       },
     },
     reducers: {
-      queryDone (st, { payload }) {
-        const { data } = payload
-        return {
-          ...st,
-          list: data.data.map((o) => {
-            return {
-              ...o,
-              effectiveDates: [
-                o.effectiveStartDate,
-                o.effectiveEndDate,
-              ],
-            }
-          }),
-        }
-      },
+      // queryDone (st, { payload }) {
+      //   const { data } = payload
+      //   return {
+      //     ...st,
+      //     list: data.data.map((o) => {
+      //       return {
+      //         ...o,
+      //         effectiveDates: [
+      //           o.effectiveStartDate,
+      //           o.effectiveEndDate,
+      //         ],
+      //       }
+      //     }),
+      //   }
+      // },
     },
   },
 })

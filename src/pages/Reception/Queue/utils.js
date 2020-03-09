@@ -1,8 +1,7 @@
 import moment from 'moment'
-import { dateFormatLong, timeFormat } from '@/components'
 import { filterMap } from './variables'
-
-const dateTimeFormat = `${dateFormatLong} ${timeFormat}`
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 
 export const formatAppointmentTimes = (values = []) =>
   values.map((value) => moment(value, 'HH:mm:ss').format('hh:mm A'))
@@ -43,4 +42,12 @@ export const todayOnly = (event) => {
     today: today.formatUTC(),
   })
   return today.diff(eventDate, 'days') === 0
+}
+
+export const sendQueueNotification = (data) => {
+  sendNotification('QueueListing', {
+    type: NOTIFICATION_TYPE.QUEUE,
+    status: NOTIFICATION_STATUS.OK,
+    ...data,
+  })
 }

@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, memo } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
 import color from 'color'
 import { withStyles } from '@material-ui/core'
 // variables
@@ -55,20 +56,26 @@ const styles = () => ({
   },
 })
 
-const VisitStatusTag = ({ classes, row, onClick }) => {
+const VisitStatusTag = ({ classes, row, onClick, statusTagClicked }) => {
   const { visitStatus: value, visitPurposeFK } = row
 
   let colorTag = 'lightGrey'
 
   const handleClick = useCallback(
-    () => {
-      // if (value.toUpperCase() === VISIT_STATUS.UPCOMING_APPT) return
+    (event) => {
+      event.preventDefault()
+      event.stopPropagation()
       onClick(row)
     },
     [
       row,
     ],
   )
+
+  const handleDoubleClick = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
 
   switch (value.toUpperCase()) {
     case VISIT_STATUS.WAITING:
@@ -103,7 +110,11 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
   )
 
   return (
-    <div className={classnames(cssClass)} onClick={handleClick}>
+    <div
+      className={classnames(cssClass)}
+      onClick={statusTagClicked ? undefined : handleClick}
+      onDoubleClick={handleDoubleClick}
+    >
       <span>
         {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
           `${value} (${visitType.displayName})`
@@ -115,4 +126,8 @@ const VisitStatusTag = ({ classes, row, onClick }) => {
   )
 }
 
-export default withStyles(styles, { name: 'VisitStatusTag' })(VisitStatusTag)
+const Connect = connect(({ queueLog }) => ({
+  statusTagClicked: queueLog.statusTagClicked,
+}))(VisitStatusTag)
+
+export default memo(withStyles(styles, { name: 'VisitStatusTag' })(Connect))

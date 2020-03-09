@@ -5,21 +5,18 @@ class LowStockList extends PureComponent {
   render () {
     let listData = []
     const { reportDatas } = this.props
-    if (!reportDatas)
-      return null
+    if (!reportDatas) return null
     if (reportDatas && reportDatas.LowStockMedicationDetails) {
-      listData = reportDatas.LowStockMedicationDetails.map(
-        (item, index) => ({
-          ...item,
-          id: `LowStockMedicationDetails-${index}-${item.code}`,
-        }),
-      )
+      listData = reportDatas.LowStockMedicationDetails.map((item, index) => ({
+        ...item,
+        id: `LowStockMedicationDetails-${index}-${item.code}`,
+      }))
     }
 
     const LowStockMedicationDetailsCols = [
       { name: 'code', title: 'Code' },
       { name: 'name', title: 'Name' },
-      { name: 'stock', title: 'Stock' },
+      { name: 'stock', title: 'Current Stock' },
       { name: 'threshold', title: 'Threshold' },
       { name: 'uom', title: 'Uom' },
       { name: 'supplier', title: 'Supplier' },

@@ -107,6 +107,14 @@ export const INVENTORY_TYPE = {
   VACCINATION: 3,
 }
 
+export const ITEM_TYPE = {
+  MEDICATION: 1,
+  CONSUMABLE: 2,
+  VACCINATION: 3,
+  SERVICE: 4,
+  ORDERSET: 5,
+}
+
 export const INVENTORY_ADJUSTMENT_STATUS = {
   DRAFT: 1,
   FINALIZED: 2,
@@ -142,6 +150,7 @@ export const REPORT_TYPE = {
   26: 'Purchase Order',
   27: 'Patient Label',
   29: 'Payment Receipt',
+  37: 'Inventory Trending Report',
 }
 
 export const REPORT_ID = {
@@ -187,6 +196,15 @@ export const COUNTRY_CODE = {
   6: '+81 Japan',
 }
 
+export const COUNTRY_CODE_NUMBER = {
+  1: '+65',
+  2: '+60',
+  3: '+62',
+  4: '+63',
+  5: '+66',
+  6: '+81',
+}
+
 export const ADD_ON_FEATURE = {
   SMS: 1,
   MIMS: 2,
@@ -227,6 +245,23 @@ export const ORDER_TYPE_TAB = {
   ORDERSET: '6',
 }
 
+export const FILE_STATUS = {
+  UPLOADED: 1,
+  CONFIRMED: 2,
+  ARCHIEVED: 3,
+}
+
+export const SCRIBBLE_NOTE_TYPE = {
+  CLINICALNOTES: 1,
+  CHIEFCOMPLAINTS: 2,
+  PLAN: 3,
+  DENTALCLINICALNOTES: 4,
+  DENTALCOMPLAINTS: 5,
+  DENTALASSOCIATEHISTORY: 6,
+  DENTALINTRAORAL: 7,
+  DENTALEXTRAORAL: 8,
+}
+
 export const SMS_STATUS = {
   SENT: 1,
   FAILED: 2,
@@ -253,16 +288,70 @@ export const SMS_STATUS_TEXT = {
   READ: 'Read',
   QUEUED: 'Queued',
   SENDING: 'Sending',
+  UNREAD: 'Unread',
 }
 
-export const FILE_STATUS = {
-  UPLOADED: 1,
-  CONFIRMED: 2,
-  ARCHIEVED: 3,
+export const CANNED_TEXT_TYPE = {
+  CLINICALNOTES: 1,
+  CHIEFCOMPLAINTS: 2,
+  ASSOCIATEDHISTORY: 3,
+  INTRAORAL: 4,
+  EXTRAORAL: 5,
+  PLAN: 6,
+}
+
+export const CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicianNote',
+  2: 'chiefComplaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const DENTAL_CANNED_TEXT_TYPE_FIELD = {
+  1: 'clinicalNotes',
+  2: 'complaints',
+  3: 'associatedHistory',
+  4: 'intraOral',
+  5: 'extraOral',
+  6: 'plan',
+}
+
+export const CLINIC_TYPE = {
+  GP: 1,
+  DENTAL: 2,
 }
 
 export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+}
+
+export const PURCHASE_ORDER_STATUS = {
+  DRAFT: 1,
+  FINALIZED: 2,
+  PARTIALREVD: 3,
+  CANCELLED: 4,
+  FULFILLED: 5,
+  COMPLETED: 6,
+}
+
+export const NUMBER_TYPE = {
+  MOBILE: 1,
+  HOME: 2,
+  WORK: 3,
+  FAX: 4,
+}
+
+export const NOTIFICATION_TYPE = {
+  QUEUE: 1,
+  CODETABLE: 2,
+  ERROR: 3,
+}
+
+export const NOTIFICATION_STATUS = {
+  OK: 1,
+  ERROR: 2,
 }

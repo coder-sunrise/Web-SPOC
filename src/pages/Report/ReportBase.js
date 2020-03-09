@@ -16,7 +16,7 @@ const defaultState = {
 }
 
 export default class ReportBase extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...defaultState,
@@ -46,7 +46,8 @@ export default class ReportBase extends React.Component {
     return params
   }
 
-  getReportDatas = async (params) => await getRawData(this.state.reportId, { ...params })
+  getReportDatas = async (params) =>
+    await getRawData(this.state.reportId, { ...params })
 
   onSubmitClick = async () => {
     if (this.props.validateForm) {
@@ -113,7 +114,7 @@ export default class ReportBase extends React.Component {
             {this.renderFilterBar(this.onSubmitClick, this.state.isSubmitting)}
           </GridItem>
           <GridItem md={12}>
-            {this.state.isDisplayReportLayout ?
+            {this.state.isDisplayReportLayout ? (
               <ReportLayoutWrapper
                 height={height}
                 loading={this.state.isLoading}
@@ -124,8 +125,9 @@ export default class ReportBase extends React.Component {
               >
                 {this.renderContent(this.state.reportDatas)}
               </ReportLayoutWrapper>
-              : this.renderContent(this.state.reportDatas)
-            }
+            ) : (
+              this.renderContent(this.state.reportDatas)
+            )}
           </GridItem>
         </GridContainer>
       </Card>

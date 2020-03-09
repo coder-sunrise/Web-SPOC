@@ -115,6 +115,7 @@ export default createFormViewModel({
         const patient = yield select((state) => state.patient)
         if (
           !newPatient &&
+          Number(currentId) &&
           (patient.version !== version ||
             (patient.entity && patient.entity.id !== currentId))
         ) {
@@ -226,6 +227,7 @@ export default createFormViewModel({
               currentPatientId: null,
             },
           }),
+          // reset patient model state to default state
           yield put({
             type: 'updateState',
             payload: {
@@ -266,12 +268,18 @@ export default createFormViewModel({
       //   return yield call(service.upsert, payload)
       // },
       *refreshChasBalance ({ payload }, { call }) {
-        const { patientAccountNo, patientCoPaymentSchemeFK } = payload
+        const {
+          patientAccountNo,
+          patientCoPaymentSchemeFK,
+          isSaveToDb = false,
+          patientProfileId,
+        } = payload
         const newPayload = {
           patientNric: patientAccountNo,
           patientCoPaymentSchemeFK,
           year: moment().year(),
-          isSaveToDb: true,
+          isSaveToDb,
+          patientProfileId,
         }
 
         const response = yield call(service.requestChasBalance, newPayload)

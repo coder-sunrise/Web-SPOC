@@ -46,29 +46,36 @@ import LowStockInfo from './LowStockInfo'
   displayName: 'OrderPage',
 })
 class Consumable extends PureComponent {
-  state = {
-    selectedConsumable: {
-      consumableStock: [],
-    },
-    batchNo: '',
-    expiryDate: '',
-  }
+  // state = {
+  //   selectedConsumable: {
+  //     consumableStock: [],
+  //   },
+  //   batchNo: '',
+  //   expiryDate: '',
+  // }
 
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.orders.type === this.props.type)
-      if (
-        (!this.props.global.openAdjustment &&
-          nextProps.global.openAdjustment) ||
-        nextProps.orders.shouldPushToState
-      ) {
-        nextProps.dispatch({
-          type: 'orders/updateState',
-          payload: {
-            entity: nextProps.values,
-            shouldPushToState: false,
-          },
-        })
-      }
+  constructor (props) {
+    super(props)
+
+    let selectedConsumable = {
+      consumableStock: [],
+    }
+
+    const { codetable, values } = this.props
+    const { inventoryconsumable = [] } = codetable
+    const { inventoryConsumableFK } = values
+
+    const consumable = inventoryConsumableFK
+      ? inventoryconsumable.find((item) => item.id === inventoryConsumableFK)
+      : undefined
+
+    if (consumable) selectedConsumable = consumable
+    console.log({ consumable })
+    this.state = {
+      selectedConsumable,
+      batchNo: '',
+      expiryDate: '',
+    }
   }
 
   changeConsumable = (v, op = {}) => {
@@ -83,6 +90,9 @@ class Consumable extends PureComponent {
           expiryDate: defaultBatch.expiryDate,
         })
     }
+    this.setState({
+      selectedConsumable: op,
+    })
     if (disableEdit === false) {
       setFieldValue('batchNo', defaultBatch ? defaultBatch.batchNo : undefined)
       setFieldValue(
@@ -131,6 +141,51 @@ class Consumable extends PureComponent {
     })
   }
 
+  UNSAFE_componentWillReceiveProps (nextProps) {
+    if (nextProps.orders.type === this.props.type)
+      if (
+        (!this.props.global.openAdjustment &&
+          nextProps.global.openAdjustment) ||
+        nextProps.orders.shouldPushToState
+      ) {
+        nextProps.dispatch({
+          type: 'orders/updateState',
+          payload: {
+            entity: nextProps.values,
+            shouldPushToState: false,
+          },
+        })
+      }
+
+    const { values: nextValues } = nextProps
+    const { values: currentValues } = this.props
+
+    if (
+      !!nextValues.id &&
+      nextValues.id !== currentValues.id &&
+      nextValues.type === '4' // type === 'Medication'
+    ) {
+      const { codetable } = this.props
+      const { inventoryconsumable = [] } = codetable
+      const { inventoryConsumableFK } = nextValues
+
+      const consumable = inventoryConsumableFK
+        ? inventoryconsumable.find((item) => item.id === inventoryConsumableFK)
+        : undefined
+      console.log({ consumable })
+      if (consumable)
+        this.setState({
+          selectedConsumable: consumable,
+        })
+      else
+        this.setState({
+          selectedConsumable: {
+            consumableStock: [],
+          },
+        })
+    }
+  }
+
   render () {
     const {
       theme,
@@ -141,6 +196,7 @@ class Consumable extends PureComponent {
       classes,
       disableEdit,
     } = this.props
+
     return (
       <div>
         <GridContainer>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core/styles'
 import { compose } from 'redux'
@@ -10,6 +10,7 @@ import {
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { VaccinationDetailOption } from './variables'
 import Yup from '@/utils/yup'
+import { getBizSession } from '@/services/queue'
 
 const styles = () => ({
   actionDiv: {
@@ -29,11 +30,17 @@ const Detail = ({
   setFieldValue,
   ...props
 }) => {
+  const [
+    hasActiveSession,
+    setHasActiveSession,
+  ] = useState(true)
+
   const detailProps = {
     vaccinationDetail,
     dispatch,
     setFieldValue,
     showTransfer: false,
+    hasActiveSession,
     ...props,
   }
 
@@ -43,7 +50,45 @@ const Detail = ({
     setFieldValue,
     dispatch,
     errors: props.errors,
+    hasActiveSession,
   }
+
+  const checkHasActiveSession = async () => {
+    const bizSessionPayload = {
+      IsClinicSessionClosed: false,
+    }
+    const result = await getBizSession(bizSessionPayload)
+    const { data } = result.data
+    setHasActiveSession(data.length > 0)
+  }
+
+  useEffect(() => {
+    if (vaccinationDetail.currentId) {
+      checkHasActiveSession()
+      dispatch({
+        type: 'vaccinationDetail/query',
+        payload: {
+          id: vaccinationDetail.currentId,
+        },
+      }).then((vac) => {
+        const { sddfk } = vac
+        if (sddfk) {
+          dispatch({
+            type: 'sddDetail/query',
+            payload: {
+              id: sddfk,
+            },
+          }).then((sdd) => {
+            const { data } = sdd
+            const { code, name } = data[0]
+            setFieldValue('sddCode', code)
+            setFieldValue('sddDescription', name)
+          })
+        }
+      })
+    }
+  }, [])
+
   return (
     <React.Fragment>
       {/* <NavPills

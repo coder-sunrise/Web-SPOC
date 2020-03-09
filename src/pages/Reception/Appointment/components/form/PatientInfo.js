@@ -15,6 +15,7 @@ import {
   ProgressButton,
 } from '@/components'
 import { MobileNumberInput } from '@/components/_medisys'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import style from './style'
 
 const PatientInfoInput = ({
@@ -31,9 +32,10 @@ const PatientInfoInput = ({
 }) => {
   const isRegisteredPatient =
     patientProfileFK !== undefined && patientProfileFK !== null
+
   const allowedToActualize = [
-    1,
-    5,
+    APPOINTMENT_STATUS.SCHEDULED,
+    APPOINTMENT_STATUS.RESCHEDULED,
   ].includes(appointmentStatusFK)
 
   return (
@@ -45,12 +47,11 @@ const PatientInfoInput = ({
             return (
               <TextField
                 {...args}
-                // autoFocus
+                autoFocus={!isEdit}
                 defaultValue={undefined}
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
-                loseFocusOnEnterPressed
               />
             )
           }}

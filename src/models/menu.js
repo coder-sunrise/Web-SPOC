@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import { formatMessage } from 'umi/locale'
 import update from 'immutability-helper'
 import Authorized from '@/utils/Authorized'
+import { CLINIC_TYPE } from '@/utils/constants'
 
 const { check } = Authorized
 
@@ -71,12 +72,19 @@ const filterMenuData = (menuData) => {
       // make dom
       // console.log(item)
       const ItemDom = getSubMenu(item)
+
       const data = check(item.authority, ItemDom)
       return data
     })
     .filter((item) => item)
   // console.log(filtered)
   return filtered
+}
+
+const filterBySpecialist = (specialist = CLINIC_TYPE.GP, menus) => {
+  return menus.filter(
+    (menu) => menu.specialist && menu.specialist.includes(specialist),
+  )
 }
 
 export default {
@@ -88,9 +96,13 @@ export default {
   },
 
   effects: {
-    *getMenuData ({ payload }, { put }) {
+    *getMenuData ({ payload }, { put, select }) {
       const { routes, authority } = payload
+      const clinicInfo = yield select((st) => st.clinicInfo)
+      const { clinicTypeFK = CLINIC_TYPE.DENTAL } = clinicInfo
       const menus = filterMenuData(memoizeOneFormatter(routes, authority))
+      // const clinicMenus = filterBySpecialist(clinicTypeFK, menus)
+
       yield put({
         type: 'save',
         payload: menus,

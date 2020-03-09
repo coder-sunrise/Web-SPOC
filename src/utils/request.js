@@ -12,6 +12,8 @@ import {
   commonDataReaderTransform,
 } from './utils'
 import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
+import { sendNotification } from '@/utils/realtime'
+import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
 // export const baseUrl = 'http://localhost:9300'
 // export const baseUrl = 'http://localhost/SEMR_V2'
@@ -152,6 +154,44 @@ export const axiosRequest = async (
   return result
 }
 
+const logError = (showNotification, payload) => {
+  if (showNotification) {
+    notification.error({
+      ...payload,
+    })
+    const { plainString, requestId } = payload
+    const { dispatch, getState } = window.g_app._store
+
+    if (getState) {
+      const {
+        user = {
+          data: {
+            clinicianProfile: {
+              name: '',
+            },
+          },
+        },
+      } = getState()
+      const notificationPayload = {
+        type: NOTIFICATION_TYPE.ERROR,
+        status: NOTIFICATION_STATUS.ERROR,
+        message: plainString,
+        requestId,
+        sender: user.data.clinicianProfile.name,
+        senderId: user.data.id,
+        timestamp: Date.now(),
+      }
+
+      if (dispatch) {
+        dispatch({
+          type: 'header/appendNotification',
+          payload: notificationPayload,
+        })
+      }
+    }
+  }
+}
+
 /**
  * Requests a URL, returning a promise.
  *
@@ -163,7 +203,7 @@ const request = (
   url,
   option,
   showNotification = true,
-  redirectToLoginAfterFail = true,
+  // redirectToLoginAfterFail = true,
 ) => {
   const options = {
     expirys: true,
@@ -286,7 +326,6 @@ const request = (
       .then((response, s, xhr) => {
         // console.log(response, s, xhr)
         console.timeEnd(newUrl)
-
         if (typeof response === 'object') {
           commonDataReaderTransform(response, null, options.keepNull)
         }
@@ -333,23 +372,26 @@ const request = (
         if (response) {
           try {
             updateLoadingState()
-
             let returnObj = {
               title: codeMessage[response.status],
+              requestId: response.responseJSON
+                ? response.responseJSON.requestId
+                : '',
             }
 
             let errorMsg = codeMessage[response.status]
-            if (redirectToLoginAfterFail) {
-              if (
-                (response.status === 400 && token === null) ||
-                (response.status === 401 && url !== '/connect/token')
-              ) {
-                console.log('redirect')
-                window.g_app._store.dispatch({
-                  type: 'login/logout',
-                })
-                return false
-              }
+            // const loginAndResetPasswordUrl = [
+            //   '/connect/token',
+            // ]
+            if (
+              // (response.status === 400 && token === null) ||
+              response.status === 401 &&
+              url !== '/connect/token'
+            ) {
+              window.g_app._store.dispatch({
+                type: 'login/logout',
+              })
+              return false
             }
 
             if (s === 'timeout') {
@@ -388,25 +430,46 @@ const request = (
                 response.responseJSON.message ||
                 response.responseJSON.title
 
-              showNotification &&
-                notification.error({
-                  description,
-                  duration: 15,
-                })
+              // showNotification &&
+              //   notification.error({
+              //     description,
+              //     duration: 15,
+              //   })
+              logError(showNotification, {
+                description,
+                duration: 15,
+                plainString: description,
+                requestId: response.responseJSON.requestId,
+              })
             } else {
-              showNotification &&
-                notification.error({
-                  message: (
-                    <div>
-                      <h4>{errortext}</h4>
+              // console.log('here')
+              logError(showNotification, {
+                message: (
+                  <div>
+                    <h4>{errortext}</h4>
 
-                      {JSON.stringify(
-                        returnObj.errors || returnObj.responseJSON,
-                      )}
-                    </div>
-                  ),
-                  duration: 15,
-                })
+                    {JSON.stringify(returnObj.errors || returnObj.responseJSON)}
+                  </div>
+                ),
+                plainString: JSON.stringify(
+                  returnObj.errors || returnObj.responseJSON,
+                ),
+                duration: 15,
+                requestId: returnObj.requestId,
+              })
+              // showNotification &&
+              //   notification.error({
+              //     message: (
+              //       <div>
+              //         <h4>{errortext}</h4>
+
+              //         {JSON.stringify(
+              //           returnObj.errors || returnObj.responseJSON,
+              //         )}
+              //       </div>
+              //     ),
+              //     duration: 15,
+              //   })
             }
 
             // const error = new Error(errortext)
@@ -426,6 +489,7 @@ const request = (
             // msg = payload.message || statusText
           } catch (error) {
             console.error(error)
+            const errorMsg = error ? error.toString() : ''
             const exception = { success: false, status, errorMsg, payload }
             throw exception
           }

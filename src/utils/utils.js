@@ -310,15 +310,22 @@ const maxReducer = (p, n) => {
 
 export function difference (object, base) {
   function changes (o, b = {}) {
-    return lodash.transform(o, (result, value, key) => {
-      // console.log(value, b, key)
-      if (!lodash.isEqual(value, b[key])) {
-        result[key] =
+    const v = lodash.transform(o, (result, value, key) => {
+      // console.log(value, b, key, result, o, React.isValidElement(o))
+      if (_.isFunction(value) || React.isValidElement(value)) {
+        // result[key] = {}
+      } else if (!lodash.isEqual(value, b[key])) {
+        // console.log(value, b, key, result, o, React.isValidElement(o))
+        const r =
           lodash.isObject(value) && lodash.isObject(b[key])
             ? changes(value, b[key])
             : value
+        // console.log(r)
+        result[key] = r
       }
     })
+    // console.log(v)
+    return v
   }
   return changes(object, base)
 }
@@ -630,8 +637,8 @@ export const updateCellValue = (
         },
       )
 
-      if (element)
-        $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
+      // if (element)
+      //   $(element).parents('tr').find('.grid-commit').removeAttr('disabled')
 
       return []
       // row._$error = false
@@ -1058,7 +1065,7 @@ const calculateAmount = (
       .sort(sortAdjustment),
     summary: {
       subTotal: roundTo(
-        rows.map((row) => row[totalField]).reduce(sumReducer, 0),
+        activeRows.map((row) => row[totalField]).reduce(sumReducer, 0),
       ),
       gst,
       total,
@@ -1212,6 +1219,13 @@ export const convertToBase64 = (file) =>
     reader.onerror = (error) => reject(error)
   })
 
+const enableTableForceRender = (duration = 1000) => {
+  window._forceTableUpdate = true
+  setTimeout(() => {
+    window._forceTableUpdate = false
+  }, duration)
+}
+
 module.exports = {
   ...cdrssUtil,
   ...module.exports,
@@ -1242,6 +1256,7 @@ module.exports = {
   commonDataReaderTransform,
   commonDataWriterTransform,
   locationQueryParameters,
+  enableTableForceRender,
   // toUTC,
   // toLocal,
 }

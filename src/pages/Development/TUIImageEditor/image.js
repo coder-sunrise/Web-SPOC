@@ -169,7 +169,10 @@ $(document).ready(function () {
 
   function base64ToBlob (data) {
     var mimeString = ''
-    var raw, uInt8Array, i, rawLength
+    var raw
+    var uInt8Array
+    var i
+    var rawLength
 
     raw = data.replace(rImageType, (header, imageType) => {
       mimeString = imageType
@@ -244,7 +247,9 @@ $(document).ready(function () {
   }
 
   function setShapeToolbar (obj) {
-    var strokeColor, fillColor, isTransparent
+    var strokeColor
+    var fillColor
+    var isTransparent
     var colorType = $selectColorType.val()
 
     if (colorType === 'stroke') {
@@ -469,9 +474,9 @@ $(document).ready(function () {
 
   $inputRotationRange.on('mousedown', () => {
     var changeAngle = function () {
-      imageEditor.setAngle(parseInt($inputRotationRange.val(), 10))[
-        'catch'
-      ](() => {})
+      imageEditor
+        .setAngle(parseInt($inputRotationRange.val(), 10))
+        .catch(() => {})
     }
     $(document).on('mousemove', changeAngle)
     $(document).on('mouseup', function stopChangingAngle () {
@@ -481,9 +486,9 @@ $(document).ready(function () {
   })
 
   $inputRotationRange.on('change', () => {
-    imageEditor.setAngle(parseInt($inputRotationRange.val(), 10))[
-      'catch'
-    ](() => {})
+    imageEditor
+      .setAngle(parseInt($inputRotationRange.val(), 10))
+      .catch(() => {})
   })
 
   $inputBrushWidthRange.on('change', function () {
@@ -507,7 +512,9 @@ $(document).ready(function () {
   $btnDownload.on('click', () => {
     var imageName = imageEditor.getImageName()
     var dataURL = imageEditor.toDataURL()
-    var blob, type, w
+    var blob
+    var type
+    var w
 
     if (supportingFileAPI) {
       blob = base64ToBlob(dataURL)

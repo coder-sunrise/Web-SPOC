@@ -244,6 +244,11 @@ class AntdNumberInput extends React.PureComponent {
   handleKeyDown = (e) => {
     const v = e.target.value
     // console.log(e.keyCode)
+    if (this.props.positiveOnly && e.key === '-') {
+      e.preventDefault()
+      return false
+    }
+
     if (
       (e.shiftKey &&
         ![

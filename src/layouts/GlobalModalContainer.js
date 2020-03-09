@@ -5,6 +5,7 @@ import {
   ChangePassword,
   SessionTimeout,
   CustomConfirm,
+  ImageViewer,
 } from '@/components/_medisys'
 import { CommonModal, Button } from '@/components'
 import PatientDetail from '@/pages/PatientDatabase/Detail'
@@ -89,10 +90,13 @@ class GlobalModalContainer extends PureComponent {
         openConfirm: false,
         openConfirmTitle: null,
         openConfirmContent: null,
-        additionalInfo: null,
         onConfirmDiscard: null,
+        onConfirmSave: null,
         // onConfirm: null,
         openConfirmText: 'Confirm',
+        alignContent: undefined,
+        additionalInfo: undefined,
+        isInformType: undefined,
       },
     })
   }
@@ -101,17 +105,6 @@ class GlobalModalContainer extends PureComponent {
     const { global, report, dispatch, loggedInUserID, classes } = this.props
     return (
       <div>
-        {/* <SimpleModal
-          title={`Are you sure to void the Payment ${this.state
-            .currentItemCode} ?`}
-          open={this.state.openModal}
-          status={this.props.status}
-          onCancel={() => this.hideAlert()}
-          onConfirm={() => {
-            this.props.handleSubmit()
-          }}
-        /> */}
-
         <CommonModal
           title='Change Password'
           open={global.showChangePasswordModal}
@@ -136,63 +129,7 @@ class GlobalModalContainer extends PureComponent {
         >
           <ChangePassword userID={loggedInUserID} />
         </CommonModal>
-        {/* <CommonModal
-          open={global.showDispensePanel}
-          title='Dispensing'
-          observe={[
-            'DispensePage',
-            'ConsultationDocumentList',
-          ]}
-          authority='dispense'
-          bodyNoPadding
-          onClose={() => {
-            dispatch({
-              type: 'dispense/closeModal',
-            })
-          }}
-          fullScreen
-          showFooter={false}
-        >
-          {global.showDispensePanel && <Dispense />}
-        </CommonModal> 
-        <CommonModal
-          open={global.showConsultationPanel}
-          title='Consultation'
-          observe={[
-            'ConsultationPage',
-            'OrderPage',
-          ]}
-          authority='consultation'
-          bodyNoPadding
-          onClose={() => {
-            dispatch({
-              type: 'consultation/closeModal',
-            })
-          }}
-          fullScreen
-          displayCloseIcon={false}
-          showFooter={false}
-        >
-          {global.showConsultationPanel && <Consultation {...this.props} />}
-        </CommonModal>
 
-        <CommonModal
-          open={global.showBillingPanel}
-          title='Billing'
-          observe='BillingForm'
-          authority='billing'
-          bodyNoPadding
-          onClose={() => {
-            dispatch({
-              type: 'billing/closeModal',
-            })
-          }}
-          fullScreen
-          showFooter={false}
-          overrideLoading
-        >
-          {global.showBillingPanel && <Billing />}
-        </CommonModal> */}
         <CommonModal
           open={global.showPatientInfoPanel}
           title='Patient Profile'
@@ -220,7 +157,6 @@ class GlobalModalContainer extends PureComponent {
           showFooter={false}
         >
           {global.showPatientInfoPanel && <PatientDetail {...this.props} />}
-          {/* {global.currentPatientId} */}
         </CommonModal>
 
         <CommonModal
@@ -269,11 +205,13 @@ class GlobalModalContainer extends PureComponent {
         </CommonModal>
 
         <CommonModal
+          autoFocus
           open={global.openConfirm}
           title={global.openConfirmTitle}
           cancelText='Cancel'
           maxWidth='sm'
           confirmText={global.openConfirmText || 'Confirm'}
+          isInformType={global.isInformType}
           footProps={{
             extraButtons: global.onConfirmDiscard ? (
               <Button
@@ -302,7 +240,7 @@ class GlobalModalContainer extends PureComponent {
           }}
           showFooter
         >
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: global.alignContent || 'center' }}>
             <h3>{global.openConfirmContent || 'Confirm to proceed?'}</h3>
             {global.additionalInfo}
           </div>
@@ -339,6 +277,7 @@ class GlobalModalContainer extends PureComponent {
           <Adjustment />
         </CommonModal>
         {report.reportTypeID && <ReportModal />}
+        <ImageViewer />
         <CustomConfirm />
       </div>
     )
