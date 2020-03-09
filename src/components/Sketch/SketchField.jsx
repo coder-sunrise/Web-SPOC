@@ -169,26 +169,17 @@ class SketchField extends PureComponent {
 
   getAllLayerData = () => {
     let canvas = this._fc
-    let filterList = this._history.getSaveLayerList()
-    let objects = canvas.getObjects()
-    let exist = false
+    const DefaultFilterList = this._history.getSaveLayerList()
+    const objects = canvas.getObjects()
+    let FilteredObjectList = []
 
-    for (let i = 0; i < filterList.length; i++) {
-      for (let a = 0; a < objects.length; a++) {
-        if (
-          filterList[i].layerContent ===
-          JSON.stringify(objects[a].__originalState)
-        ) {
-          exist = true
-        }
-      }
-      if (exist === false) {
-        filterList.splice(i, 1)
-      }
-      exist = false
-    }
+    FilteredObjectList = DefaultFilterList.filter(({ layerContent }) =>
+      objects.find(
+        (item) => JSON.stringify(item.__originalState) === layerContent,
+      ),
+    )
 
-    return filterList
+    return FilteredObjectList
   }
 
   initializeData = (data) => {
