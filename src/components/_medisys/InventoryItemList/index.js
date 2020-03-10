@@ -550,10 +550,6 @@ class InventoryItemList extends React.Component {
             'unitPrice',
           ],
           type: 'currency',
-          observeFields: [
-            'quantity',
-            'unitPrice',
-          ],
           render: (row) => {
             return (
               <p
