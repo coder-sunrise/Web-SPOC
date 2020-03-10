@@ -19,6 +19,7 @@ import {
   DatePicker,
   Select,
   reversedDateFormat,
+  ProgressButton,
 } from '@/components'
 import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
@@ -65,6 +66,7 @@ const FilterBar = ({
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
+                autoFocus
               />
             )}
           />
@@ -202,7 +204,8 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Button
+          <ProgressButton
+            icon={null}
             color='primary'
             size='sm'
             onClick={async () => {
@@ -212,7 +215,7 @@ const FilterBar = ({
           >
             <Search />
             Search
-          </Button>
+          </ProgressButton>
           <Button color='primary' size='sm' onClick={handleAddAppointmentClick}>
             <Add />
             Add Appointment
