@@ -53,8 +53,8 @@ class Grid extends PureComponent {
         onRowDoubleClick={this.editRow}
         columns={[
           { name: 'name', title: 'Name' },
-          { name: 'mobileNum', title: 'Mobile No.' },
-          { name: 'officeNum', title: 'Office No.' },
+          { name: 'mobileNo', title: 'Mobile No.' },
+          { name: 'officeNo', title: 'Office No.' },
           { name: 'institution', title: 'Institution' },
           { name: 'department', title: 'Department' },
           { name: 'address', title: 'Address' },
