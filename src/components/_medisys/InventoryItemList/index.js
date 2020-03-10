@@ -57,8 +57,10 @@ class InventoryItemList extends React.Component {
 
   addItemToRows = (obj) => {
     const { setFieldValue, values, dispatch } = this.props
-    const newRows = values.rows
-    newRows.push(obj)
+    const newRows = [
+      ...values.rows,
+      obj,
+    ]
     setFieldValue('rows', newRows)
 
     // Reset field
