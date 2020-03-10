@@ -162,11 +162,11 @@ const Legend = ({ row, columnConfig, cellProps, viewOnly, classes }) => {
                 row.chartMethodColorBlock = ''
                 row.chartMethodText = ''
               }
-              commitChanges({
-                changed: {
-                  [row.id]: row,
-                },
-              })
+              // commitChanges({
+              //   changed: {
+              //     [row.id]: row,
+              //   },
+              // })
             }}
           />
         </GridItem>

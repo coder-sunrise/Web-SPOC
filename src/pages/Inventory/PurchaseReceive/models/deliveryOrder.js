@@ -290,8 +290,9 @@ export default createFormViewModel({
       },
 
       upsertRow (state, { payload }) {
-        let { rows } = state.entity
+        let rows = _.cloneDeep(state.entity.rows)
         const { gridRows, gridRow, remark } = payload
+
         if (payload.uid) {
           rows = gridRows.map((o) => {
             let itemFK

@@ -169,7 +169,7 @@ function getCommonRender (cb) {
       return <Cmpt row={row} columnConfig={cfg} cellProps={this.props} />
     }
     if (!editMode && !error) {
-      return render(row, { ...cfg }, this.props)
+      return <span>{render(row, { ...cfg }, this.props)}</span>
     }
   }
   if (typeof value === 'object' && React.isValidElement(value)) {

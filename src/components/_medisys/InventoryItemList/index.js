@@ -108,7 +108,7 @@ class InventoryItemList extends React.Component {
         openConfirmContent: `Order set item(s) will not be added. Item(s) are either already in the list or has been deactivated.`,
         alignContent: 'left',
         additionalInfo: (
-          <div>
+          <div style={{ fontSize: '1.3em' }}>
             <ul style={{ listStylePosition: 'inside' }}>
               {this.dislayExistingItem(medicationArray, 'medicationName')}
               {this.dislayExistingItem(consumableArray, 'consumableName')}
@@ -463,11 +463,20 @@ class InventoryItemList extends React.Component {
         columnName: 'type',
         type: 'select',
         options: InventoryTypes,
-        render: (row) =>
-          `${InventoryTypes.find((type) => type.value === row.type)
-            .name} ${row.isActive || row.isActive === undefined
-            ? ''
-            : '(Inactive)'}`,
+        render: (row) => {
+          const itemType = `${InventoryTypes.find(
+            (type) => type.value === row.type,
+          ).name}`
+
+          return (
+            <span>
+              {itemType} <br />
+              {`${row.isActive || row.isActive === undefined
+                ? ''
+                : '(Inactive)'}`}
+            </span>
+          )
+        },
       },
       {
         columnName: 'itemFK',
@@ -541,6 +550,10 @@ class InventoryItemList extends React.Component {
             'unitPrice',
           ],
           type: 'currency',
+          observeFields: [
+            'quantity',
+            'unitPrice',
+          ],
           render: (row) => {
             return (
               <p

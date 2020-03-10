@@ -111,6 +111,7 @@ const DiagnosisPanel = (props) => {
       type: 'dentalChartComponent/updateState',
       payload: {
         action: btn,
+        selected: undefined,
       },
     })
   }

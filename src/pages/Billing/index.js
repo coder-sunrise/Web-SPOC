@@ -23,6 +23,8 @@ import PatientBanner from '@/pages/PatientDashboard/Banner'
 // import DispenseDetails from '@/pages/Dispense/DispenseDetails/PrintDrugLabelWrapper'
 import DispenseDetails from '@/pages/Dispense/DispenseDetails/WebSocketWrapper'
 // import ApplyClaims from './components/ApplyClaims'
+import { roundTo } from '@/utils/utils'
+import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 import ApplyClaims from './refactored/newApplyClaims'
 import InvoiceSummary from './components/InvoiceSummary'
 import SchemeValidationPrompt from './components/SchemeValidationPrompt'
@@ -31,8 +33,6 @@ import {
   constructPayload,
   validateApplySchemesWithPatientSchemes,
 } from './utils'
-import { roundTo } from '@/utils/utils'
-import { INVOICE_PAYER_TYPE } from '@/utils/constants'
 
 // window.g_app.replaceModel(model)
 
@@ -164,6 +164,12 @@ class Billing extends Component {
   componentWillUnmount () {
     this.props.dispatch({
       type: 'billing/updateState',
+      payload: {
+        entity: null,
+      },
+    })
+    this.props.dispatch({
+      type: 'dispense/updateState',
       payload: {
         entity: null,
       },

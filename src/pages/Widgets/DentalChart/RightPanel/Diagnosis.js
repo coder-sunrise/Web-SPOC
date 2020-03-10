@@ -21,8 +21,10 @@ import {
   IconButton,
   dateFormatLong,
 } from '@/components'
+
 import SortItem from './SortItem'
 
+let currentScroll = 0
 const Diagnosis = ({
   dispatch,
   theme,
@@ -36,26 +38,50 @@ const Diagnosis = ({
   global,
   ...props
 }) => {
-  const { data = [], selected, lastClicked } = dentalChartComponent
+  const { data = [], selected } = dentalChartComponent
   const [
     shapes,
     setShapes,
+  ] = useState([])
+  const [
+    height,
+    setHeight,
   ] = useState([])
   // console.log(data)
   const myRef = useRef(null)
   const groups = Object.values(_.groupBy(data, 'toothNo'))
 
+  useEffect(() => {
+    // console.log(
+    //   $(myRef.current).closest('.journalContainer'),
+    //   $(myRef.current).closest('.journalContainer').height(),
+    // )
+    const containerHeight = $(myRef.current)
+      .closest('.journalContainer')
+      .height()
+    if (containerHeight) {
+      setHeight(containerHeight - 77)
+    }
+    $(myRef.current).on('scroll', (e) => {
+      // console.log(
+      //   $(e.target).offset(),
+      //   $(e.target).scrollTop(),
+      //   $(myRef.current).scrollTop(),
+      // )
+      currentScroll = $(e.target).scrollTop()
+    })
+  }, [])
+
   useEffect(
     () => {
-      const target = $(`div[uid='${lastClicked}']`).parent()
-      if (myRef.current && target.length > 0) {
-        const v = $(myRef.current).scrollTop() + target.position().top
-        $(myRef.current).animate(
-          {
-            scrollTop: v,
-          },
-          0,
-        )
+      $(myRef.current).animate(
+        {
+          scrollTop: currentScroll,
+        },
+        0,
+      )
+      if (!selected) {
+        return
       }
       setShapes(
         selected
@@ -64,18 +90,39 @@ const Diagnosis = ({
             )
           : [],
       )
+      if (window._tempDisableEvent) {
+        return
+      }
+
+      const target = $(`div[uid='${selected.id}${selected.target}']`).parent()
+      if (myRef.current && target.length > 0) {
+        const v = $(myRef.current).scrollTop() + target.position().top
+        // console.log(
+        //   $(myRef.current).scrollTop(),
+        //   target.position().top,
+        //   v,
+        //   v - target.position().top,
+        // )
+
+        $(myRef.current).animate(
+          {
+            scrollTop: v,
+          },
+          0,
+        )
+      }
     },
     [
       selected,
     ],
   )
-
+  // console.log(selected, shapes)
   return (
     <div>
       <div
         ref={myRef}
         style={{
-          height: selected ? '50vh' : 'auto',
+          height: selected ? height - 120 : height,
           overflowY: 'auto',
           overflowX: 'hidden',
           position: 'relative',
@@ -132,17 +179,4 @@ const Diagnosis = ({
   )
 }
 
-// export default React.memo(
-//   Diagnosis,
-//   (
-//     { dentalChartComponent },
-//     { dentalChartComponent: dentalChartComponentNext },
-//   ) => {
-//     console.log(dentalChartComponent, dentalChartComponent)
-//     return _.isEqual(
-//       dentalChartComponent.selected,
-//       dentalChartComponentNext.selected,
-//     )
-//   },
-// )
 export default Diagnosis

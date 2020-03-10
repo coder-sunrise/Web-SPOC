@@ -517,6 +517,7 @@ export const smallTheme = createMuiTheme({
     PrivateSwitchBase: {
       root: {
         margin: '0px 4px',
+        padding: 0,
         paddingLeft: 1,
       },
     },

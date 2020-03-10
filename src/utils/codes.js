@@ -1196,6 +1196,7 @@ const tenantCodesMap = new Map([
     'cttreatment',
     {
       ...defaultParams,
+      isActive: undefined,
     },
   ],
   [
@@ -1895,6 +1896,7 @@ export const getInventoryItemList = (
       stock: x[stockName],
       uom: x.dispensingUOM ? x.dispensingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
+      lastCostPriceBefBonus: x.lastCostPriceBefBonus,
       [itemFKName]: x.id,
       stateName,
       itemFK: x.id,

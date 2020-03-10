@@ -37,7 +37,6 @@ import {
   CommonModal,
   withFormik,
 } from '@/components'
-import avatar from '@/assets/img/faces/marc.jpg'
 import Authorized from '@/utils/Authorized'
 
 import schema from './schema'
@@ -381,6 +380,7 @@ class PatientDetail extends PureComponent {
     })
 
     const { data } = response
+
     let shouldPromptSaveConfirmation = false
     if (data) {
       const { totalRecords, data: patientList } = data

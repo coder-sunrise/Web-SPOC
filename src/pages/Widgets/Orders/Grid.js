@@ -20,7 +20,7 @@ import {
 import { orderTypes } from '@/utils/codes'
 
 // console.log(orderTypes)
-export default ({ orders, dispatch, classes, from }) => {
+export default ({ orders, dispatch, classes, from, codetable }) => {
   const { rows, summary, finalAdjustments, isGSTInclusive, gstValue } = orders
   const { total, gst, totalWithGST } = summary
   const [
@@ -53,6 +53,20 @@ export default ({ orders, dispatch, classes, from }) => {
         // },
       },
     })
+    if (row.type === '7') {
+      const treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.isActive && o.id === row.treatmentFK) || {}
+      const action = (codetable.ctchartmethod || [])
+        .find((o) => o.id === treatment.chartMethodFK)
+      dispatch({
+        type: 'dentalChartComponent/updateState',
+        payload: {
+          mode: 'treatment',
+          action,
+        },
+      })
+    }
 
     // dispatch({
     //   // force current edit row components to update
