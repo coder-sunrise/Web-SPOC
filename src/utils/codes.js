@@ -1083,6 +1083,7 @@ const tenantCodesMap = new Map([
     {
       ...defaultParams,
       isActive: undefined,
+      'ServiceFKNavigation.isActive': true,
       sorting: [
         { columnName: 'serviceFKNavigation.displayValue', direction: 'asc' },
       ],

@@ -29,7 +29,13 @@ export const getContent = (config, clinicInfo) => {
   }))
 }
 
-export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
+export const getDefaultActivePanel = (
+  entity,
+  config,
+  prefix,
+  clinicInfo,
+  panels,
+) => {
   try {
     const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     const { fields } = config
@@ -54,7 +60,10 @@ export const getDefaultActivePanel = (entity, config, prefix, clinicInfo) => {
         if (doctorNote[field[fieldName]]) return true
         return false
       })
-      defaultActive = panelWithData.map((i) => i.index)
+
+      defaultActive = panelWithData.map((i) =>
+        panels.findIndex((field) => field.index === i.index),
+      )
     }
 
     // check if panel contains scribble notes

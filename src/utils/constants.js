@@ -83,6 +83,8 @@ export const INVOICE_ITEM_TYPE = {
   3: 'Vaccination',
   4: 'Service',
   5: 'OrderSet',
+  6: 'Misc',
+  7: 'Treatment',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
