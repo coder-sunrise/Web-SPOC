@@ -55,8 +55,8 @@ export default ({ orders, dispatch, classes, from, codetable }) => {
     })
     if (row.type === '7') {
       const treatment =
-        (codetable.cttreatment || []).find((o) => o.id === row.treatmentFK) ||
-        {}
+        (codetable.cttreatment || [])
+          .find((o) => o.isActive && o.id === row.treatmentFK) || {}
       const action = (codetable.ctchartmethod || [])
         .find((o) => o.id === treatment.chartMethodFK)
       dispatch({

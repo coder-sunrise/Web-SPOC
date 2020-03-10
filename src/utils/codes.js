@@ -1196,6 +1196,7 @@ const tenantCodesMap = new Map([
     'cttreatment',
     {
       ...defaultParams,
+      isActive: undefined,
     },
   ],
   [
