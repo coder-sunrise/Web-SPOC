@@ -108,7 +108,7 @@ class InventoryItemList extends React.Component {
         openConfirmContent: `Order set item(s) will not be added. Item(s) are either already in the list or has been deactivated.`,
         alignContent: 'left',
         additionalInfo: (
-          <div>
+          <div style={{ fontSize: '1.3em' }}>
             <ul style={{ listStylePosition: 'inside' }}>
               {this.dislayExistingItem(medicationArray, 'medicationName')}
               {this.dislayExistingItem(consumableArray, 'consumableName')}
