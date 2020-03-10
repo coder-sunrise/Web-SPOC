@@ -33,7 +33,6 @@ const RightPanel = (props) => {
     style,
     onChange,
     value,
-    mode,
     onDataSouceChange,
     dentalChartComponent,
     height,
@@ -98,7 +97,7 @@ const RightPanel = (props) => {
           <GridItem xs={12}>
             <Tabs
               // style={{ marginTop: 20 }}
-              defaultActiveKey='0'
+              activeKey={dentalChartComponent.mode === 'diagnosis' ? '1' : '2'}
               onChange={(tabId) => {
                 if (tabId === '1') {
                   dispatch({

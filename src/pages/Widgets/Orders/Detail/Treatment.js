@@ -31,16 +31,17 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     orders,
     ...rest
   }) => {
-    if (
-      orders.entity &&
-      orders.entity.treatmentFK &&
-      _.isEmpty(dentalChartComponent)
-    ) {
-      const treatment = (codetable.cttreatment || [])
-        .find((o) => o.id === orders.entity.treatmentFK)
-      return {
-        ...orders.entity,
-        treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
+    if (orders.entity) {
+      if (orders.entity.treatmentFK && _.isEmpty(dentalChartComponent)) {
+        const treatment = (codetable.cttreatment || [])
+          .find((o) => o.id === orders.entity.treatmentFK)
+        return {
+          ...orders.entity,
+          treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
+        }
+      }
+      if (orders.entity.type !== '7') {
+        return {}
       }
     }
     // console.log(dentalChartComponent, dentalChartTreatment)
@@ -49,9 +50,18 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     const { rows } = orders
     // console.log(action, data, rows)
 
-    const treatment =
-      (codetable.cttreatment || [])
-        .find((o) => o.id === action.dentalTreatmentFK) || {}
+    let treatment
+
+    if (orders.entity) {
+      treatment = (codetable.cttreatment || [])
+        .find((o) => o.id === orders.entity.treatmentFK)
+    }
+
+    if (!treatment) {
+      treatment =
+        (codetable.cttreatment || [])
+          .find((o) => o.id === action.dentalTreatmentFK) || {}
+    }
     // console.log(rest, this, treatment)
 
     const existedTooths = []
@@ -108,8 +118,8 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     // console.log(dataFiltered)
 
     let groupsAry = []
-    let quantity
-    if (treatment.id) {
+    let quantity = orders.entity ? orders.entity.quantity : undefined
+    if (treatment.id && treatment.chartMethod) {
       let groups = _.groupBy(dataFiltered, 'toothNo')
       groupsAry = Object.keys(groups).map((k) => {
         return {
