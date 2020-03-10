@@ -192,7 +192,7 @@ export default createFormViewModel({
             deliveryOrderDate: moment(),
             remark: '',
             rows: newOSItem.map((o) => ({
-              currentReceivingBonusQty: undefined,
+              currentReceivingBonusQty: 0,
               expiryDate: undefined,
               ...o,
             })),
