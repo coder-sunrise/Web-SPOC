@@ -43,7 +43,9 @@ const Contact = (props) => {
           <GridItem md={6}>
             <FastField
               name='contact.contactAddress[0].postcode'
-              render={(args) => <TextField label='Postal Code' {...args} />}
+              render={(args) => (
+                <TextField label='Postal Code' maxLength={10} {...args} />
+              )}
             />
           </GridItem>
           <GridItem md={6}>
