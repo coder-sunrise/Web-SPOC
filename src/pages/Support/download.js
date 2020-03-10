@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-const url = '/api/files/printingtoollink'
+const url = '/api/files/downloadlink'
 
-export const getFileByFileID = async key => {
+export const getFileByFileID = async (key) => {
   const response = await request(`${url}?key=${key}`, {
     method: 'GET',
   })
