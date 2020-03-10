@@ -181,7 +181,7 @@ class DODetails extends PureComponent {
         [x.stateName]: deliveryOrderDetails[x.stateName],
       })
     })
-    await this.props.refreshDeliveryOrder()
+    // await this.props.refreshDeliveryOrder()
     if (mode === 'Add') {
       await dispatch({
         type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
