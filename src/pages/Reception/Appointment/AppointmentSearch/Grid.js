@@ -142,7 +142,7 @@ class Grid extends PureComponent {
             columnName: 'appointmentStatusFk',
             type: 'codeSelect',
             code: 'ltappointmentstatus',
-            sortBy: 'appointmentStatusFkNavigation.displayValue',
+            sortBy: 'status',
           },
           {
             columnName: 'bookedByUser',
