@@ -19,7 +19,7 @@ import {
   DatePicker,
   Select,
   reversedDateFormat,
-  CommonModal,
+  ProgressButton,
 } from '@/components'
 import {
   AppointmentTypeLabel,
@@ -122,6 +122,7 @@ const FilterBar = ({
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
+                autoFocus
               />
             )}
           />
@@ -259,7 +260,8 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Button
+          <ProgressButton
+            icon={null}
             color='primary'
             size='sm'
             onClick={async () => {
@@ -269,7 +271,7 @@ const FilterBar = ({
           >
             <Search />
             Search
-          </Button>
+          </ProgressButton>
           <Button color='primary' size='sm' onClick={handleAddAppointmentClick}>
             <Add />
             Add Appointment

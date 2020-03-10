@@ -181,7 +181,7 @@ class DODetails extends PureComponent {
         [x.stateName]: deliveryOrderDetails[x.stateName],
       })
     })
-    await this.props.refreshDeliveryOrder()
+    // await this.props.refreshDeliveryOrder()
     if (mode === 'Add') {
       await dispatch({
         type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
@@ -315,7 +315,7 @@ class DODetails extends PureComponent {
     }
   }
 
-  onCommitChanges = async ({ rows, deleted, changed }) => {
+  onCommitChanges = async ({ rows, deleted, changed, added }) => {
     const { dispatch, values, setFieldValue } = this.props
 
     if (deleted) {
@@ -323,107 +323,20 @@ class DODetails extends PureComponent {
         type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
-    } else if (changed) {
-      const existUid = Object.keys(changed)[0]
-      await dispatch({
-        type: 'deliveryOrderDetails/upsertRow',
-        payload: {
-          uid: existUid,
-          ...changed[existUid],
-          gridRows: rows,
-          remark: values.remark,
-        },
-      })
     } else {
       await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
-          gridRow: rows[0],
+          uid: changed ? Object.keys(changed)[0] : undefined,
+          gridRows: rows,
+          gridRow: added ? added[0] : undefined,
           remark: values.remark,
         },
       })
     }
     setFieldValue('isDirty', true) // manually trigger dirty
 
-    return rows
-  }
-
-  onAddedRowsChange = (addedRows) => {
-    let newAddedRows = addedRows
-    if (addedRows.length > 0) {
-      if (!addedRows.isFocused) {
-        const { onClickColumn, selectedItem } = this.state
-        let tempRow = addedRows[0]
-        let tempOrderQty = tempRow.orderQuantity
-        let tempBonusQty = tempRow.bonusQuantity
-        let tempQuantityReceived = tempRow.quantityReceived
-        let tempTotalBonusReceived = tempRow.totalBonusReceived
-        let tempCurrentReceivingQty = tempRow.currentReceivingQty
-        let tempCurrentReceivingBonusQty = tempRow.currentReceivingBonusQty
-
-        if (onClickColumn === 'type') {
-          // Handle type changed
-        } else if (onClickColumn === 'item') {
-          const { deliveryOrderDetails } = this.props
-          const { purchaseOrderDetails } = deliveryOrderDetails
-          const { purchaseOrderOutstandingItem } = purchaseOrderDetails
-          let osItem = purchaseOrderOutstandingItem.filter(
-            (x) => x.code === selectedItem.value,
-          )[0]
-
-          this.setState({ onClickColumn: undefined })
-          return addedRows.map((row) => ({
-            ...row,
-            // itemFK: selectedItem.value,
-            // orderQuantity: osItem.orderQuantity,
-            // bonusQuantity: osItem.bonusQuantity,
-            // quantityReceived: osItem.quantityReceived,
-            // totalBonusReceived: osItem.totalBonusReceived,
-            // currentReceivingQty: osItem.orderQuantity - osItem.quantityReceived,
-            // currentReceivingBonusQty:
-            //   osItem.bonusQuantity - osItem.bonusReceived,
-          }))
-        } else {
-          tempCurrentReceivingQty =
-            tempOrderQty - tempQuantityReceived < tempCurrentReceivingQty
-              ? ''
-              : tempCurrentReceivingQty
-          tempCurrentReceivingBonusQty =
-            tempBonusQty - tempTotalBonusReceived < tempCurrentReceivingBonusQty
-              ? ''
-              : tempCurrentReceivingBonusQty
-          // this.forceUpdate()
-        }
-
-        this.setState({ onClickColumn: undefined })
-
-        newAddedRows = addedRows.map((row) => ({
-          ...row,
-          // orderQuantity: tempOrderQty,
-          // bonusQuantity: tempBonusQty,
-          // quantityReceived: tempQuantityReceived,
-          // totalBonusReceived: tempTotalBonusReceived,
-          // itemFK: selectedItem.value,
-
-          // currentReceivingQty: tempCurrentReceivingQty,
-          // currentReceivingBonusQty: tempCurrentReceivingBonusQty,
-        }))
-      } else {
-        // Initialize new generated row
-        this.setState({ onClickColumn: undefined })
-        newAddedRows = addedRows.map((row) => ({
-          ...row,
-          // orderQuantity: 0,
-          // bonusQuantity: 0,
-          // quantityReceived: 0,
-          // totalBonusReceived: 0,
-          // currentReceivingQty: 0,
-          // currentReceivingBonusQty: 0,
-          isFocused: true,
-        }))
-      }
-    }
-    return newAddedRows
+    // return rows
   }
 
   getItemOptions = (row, filteredStateName, stateName) => {
@@ -748,7 +661,6 @@ class DODetails extends PureComponent {
               EditingProps={{
                 showAddCommand: true,
                 onCommitChanges: this.onCommitChanges,
-                onAddedRowsChange: this.onAddedRowsChange,
               }}
               {...tableParas}
             />

@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { connect } from 'dva'
 import { compose } from 'redux'
 import { withRouter } from 'react-router-dom'
-import Order from '../../Widgets/Orders'
 import { SizeContainer, withFormikExtend } from '@/components'
 import { convertToConsultation } from '@/pages/Consultation/utils'
 import {
@@ -14,6 +13,7 @@ import {
   CLINIC_TYPE,
 } from '@/utils/constants'
 import { roundTo, getUniqueId } from '@/utils/utils'
+import Order from '../../Widgets/Orders'
 
 const styles = () => ({})
 
@@ -159,11 +159,15 @@ const AddOrder = ({
           type: 'global/updateAppState',
           payload: {
             openConfirm: true,
-            openConfirmContent: `Vaccination item(s) will not be added.`,
+            openConfirmContent: (
+              <p style={{ fontWeight: 400 }}>
+                Vaccination item(s) will not be added.
+              </p>
+            ),
             alignContent: 'left',
             isInformType: true,
             additionalInfo: (
-              <div>
+              <div style={{ fontSize: '1.3em' }}>
                 <ul style={{ listStylePosition: 'inside' }}>
                   {isVaccinationExist.map((item) => (
                     <li>

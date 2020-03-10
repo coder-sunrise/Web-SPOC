@@ -118,10 +118,6 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'doctor',
-            type: 'codeSelect',
-            code: 'doctorprofile',
-            labelField: 'clinicianProfile.name',
-            valueField: 'clinicianProfile.id',
             sortingEnabled: false,
           },
           {
@@ -142,7 +138,7 @@ class Grid extends PureComponent {
             columnName: 'appointmentStatusFk',
             type: 'codeSelect',
             code: 'ltappointmentstatus',
-            sortBy: 'appointmentStatusFkNavigation.displayValue',
+            sortBy: 'status',
           },
           {
             columnName: 'bookedByUser',

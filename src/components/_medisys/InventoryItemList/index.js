@@ -57,8 +57,10 @@ class InventoryItemList extends React.Component {
 
   addItemToRows = (obj) => {
     const { setFieldValue, values, dispatch } = this.props
-    const newRows = values.rows
-    newRows.push(obj)
+    const newRows = [
+      ...values.rows,
+      obj,
+    ]
     setFieldValue('rows', newRows)
 
     // Reset field
@@ -108,7 +110,7 @@ class InventoryItemList extends React.Component {
         openConfirmContent: `Order set item(s) will not be added. Item(s) are either already in the list or has been deactivated.`,
         alignContent: 'left',
         additionalInfo: (
-          <div>
+          <div style={{ fontSize: '1.3em' }}>
             <ul style={{ listStylePosition: 'inside' }}>
               {this.dislayExistingItem(medicationArray, 'medicationName')}
               {this.dislayExistingItem(consumableArray, 'consumableName')}
@@ -514,6 +516,7 @@ class InventoryItemList extends React.Component {
         {
           columnName: 'quantity',
           type: 'number',
+          align: 'left',
           render: (row) => {
             const { rows = [] } = values
             const index = rows.map((i) => i.uid).indexOf(row.uid)
@@ -530,6 +533,7 @@ class InventoryItemList extends React.Component {
         {
           columnName: 'unitPrice',
           type: 'currency',
+          align: 'left',
           render: (row) => {
             const { rows = [] } = values
             const index = rows.map((i) => i.uid).indexOf(row.uid)
@@ -550,10 +554,6 @@ class InventoryItemList extends React.Component {
             'unitPrice',
           ],
           type: 'currency',
-          observeFields: [
-            'quantity',
-            'unitPrice',
-          ],
           render: (row) => {
             return (
               <p

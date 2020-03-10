@@ -1,6 +1,7 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 
 import Edit from '@material-ui/icons/Edit'
+import Delete from '@material-ui/icons/Delete'
 import { CommonTableGrid, Button, Tooltip } from '@/components'
 import { status } from '@/utils/codes'
 
@@ -19,6 +20,31 @@ class Grid extends PureComponent {
     })
   }
 
+  deleteRow = async (row, e) => {
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'global/updateAppState',
+      payload: {
+        openConfirm: true,
+        openConfirmContent: `Are you sure want to delete referral source ${row.name} ?`,
+        onConfirmSave: async () => {
+          await dispatch({
+            type: 'settingReferralSource/deleteReferralSource',
+            payload: {
+              ...row,
+              isDeleted: true,
+            },
+          }).then(() => {
+            dispatch({
+              type: 'settingReferralSource/query',
+            })
+          })
+        },
+      },
+    })
+  }
+
   render () {
     return (
       <CommonTableGrid
@@ -27,8 +53,8 @@ class Grid extends PureComponent {
         onRowDoubleClick={this.editRow}
         columns={[
           { name: 'name', title: 'Name' },
-          { name: 'mobileNum', title: 'Mobile No.' },
-          { name: 'officeNum', title: 'Office No.' },
+          { name: 'mobileNo', title: 'Mobile No.' },
+          { name: 'officeNo', title: 'Office No.' },
           { name: 'institution', title: 'Institution' },
           { name: 'department', title: 'Department' },
           { name: 'address', title: 'Address' },
@@ -62,19 +88,32 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Tooltip title='Edit Referral Source' placement='bottom'>
-                  <Button
-                    size='sm'
-                    onClick={() => {
-                      this.editRow(row)
-                    }}
-                    justIcon
-                    color='primary'
-                    style={{ marginRight: 0 }}
-                  >
-                    <Edit />
-                  </Button>
-                </Tooltip>
+                <Fragment>
+                  <Tooltip title='Edit Referral Source' placement='bottom'>
+                    <Button
+                      size='sm'
+                      onClick={() => {
+                        this.editRow(row)
+                      }}
+                      justIcon
+                      color='primary'
+                    >
+                      <Edit />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip title='Delete Referral Source'>
+                    <Button
+                      size='sm'
+                      onClick={() => {
+                        this.deleteRow(row)
+                      }}
+                      justIcon
+                      color='danger'
+                    >
+                      <Delete />
+                    </Button>
+                  </Tooltip>
+                </Fragment>
               )
             },
           },

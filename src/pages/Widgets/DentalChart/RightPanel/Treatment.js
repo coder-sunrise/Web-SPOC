@@ -55,7 +55,7 @@ const Treatment = ({
         _.groupBy(
           cttreatment.filter(
             (o) =>
-              !o.isDisplayInDiagnosis &&
+              o.isActive &&
               (!search ||
                 o.displayValue.toUpperCase().indexOf(search.toUpperCase()) >=
                   0),
