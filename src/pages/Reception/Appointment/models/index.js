@@ -72,6 +72,8 @@ export default createListViewModel({
               apptTime: startTime,
               doctor: clinicianFK,
               duration: calculateDuration(startTime, endTime),
+              patientName: `${restValues.salutation ||
+                ''} ${restValues.patientName}`,
             }
 
             if (idx === 0) {
