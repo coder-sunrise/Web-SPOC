@@ -138,7 +138,12 @@ import { calculateAdjustAmount } from '@/utils/utils'
     activeInstruction.forEach((item, index) => {
       item.sequence = index + 1
     })
-
+    var batchNo = values.batchNo
+    if (batchNo instanceof Array) {
+      if (batchNo && batchNo.length > 0) {
+        batchNo = batchNo[0]
+      }
+    }
     const data = {
       sequence: getNextSequence(),
       ...values,
@@ -146,6 +151,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
       instruction,
       subject: currentType.getSubject(values),
       isDeleted: false,
+      batchNo,
     }
 
     dispatch({
@@ -1100,12 +1106,20 @@ class Medication extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
                     label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedMedication.medicationStock}
                     onChange={(e, op = {}) => {
-                      setFieldValue('expiryDate', op.expiryDate)
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
                     }}
                     disabled={disableEdit}
                     {...args}

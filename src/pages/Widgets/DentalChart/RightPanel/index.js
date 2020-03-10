@@ -46,7 +46,7 @@ const RightPanel = (props) => {
   ] = React.useState(false)
   return (
     <Paper className={classes.paper}>
-      <div style={{ width: '100%' }}>
+      <div style={{ width: '100%' }} className='journalContainer'>
         <GridContainer style={{ height: 'auto' }}>
           <GridItem xs={5}>
             <Checkbox

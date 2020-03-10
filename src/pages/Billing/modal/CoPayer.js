@@ -162,6 +162,7 @@ class CoPayer extends Component {
                 ...item,
                 disabled: !selectedRows.includes(item.id),
               }))}
+              forceRender
               columns={CoPayerColumns}
               columnExtensions={CoPayerColExtensions}
               selection={selectedRows}
