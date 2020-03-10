@@ -514,6 +514,7 @@ class InventoryItemList extends React.Component {
         {
           columnName: 'quantity',
           type: 'number',
+          align: 'left',
           render: (row) => {
             const { rows = [] } = values
             const index = rows.map((i) => i.uid).indexOf(row.uid)
@@ -530,6 +531,7 @@ class InventoryItemList extends React.Component {
         {
           columnName: 'unitPrice',
           type: 'currency',
+          align: 'left',
           render: (row) => {
             const { rows = [] } = values
             const index = rows.map((i) => i.uid).indexOf(row.uid)
