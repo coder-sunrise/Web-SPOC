@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { withStyles } from '@material-ui/core'
 // formik
 import { Field } from 'formik'
@@ -12,6 +12,7 @@ import {
   CommonCard,
   GridItem,
   CodeSelect,
+  Select,
 } from '@/components'
 // medisys components
 import {
@@ -49,6 +50,7 @@ const VisitInfoCard = ({
   handleUpdateAttachments,
   existingQNo,
   visitType,
+  visitOrderTemplateOptions,
 }) => {
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
@@ -56,6 +58,7 @@ const VisitInfoCard = ({
       return 'Queue No. already existed in current queue list'
     return ''
   }
+
   return (
     <CommonCard title='Visit Information'>
       <GridContainer alignItems='center'>
@@ -116,22 +119,6 @@ const VisitInfoCard = ({
             )}
           />
         </GridItem>
-        <GridItem xs md={8}>
-          <Field
-            name={FormField['visit.visitRemarks']}
-            render={(args) => (
-              <TextField
-                {...args}
-                disabled={isReadOnly}
-                multiline
-                rowsMax={3}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitRemarks',
-                })}
-              />
-            )}
-          />
-        </GridItem>
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.roomFK']}
@@ -143,6 +130,37 @@ const VisitInfoCard = ({
                 })}
                 code='ctRoom'
                 {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.visitOrderTemplateFK']}
+            render={(args) => (
+              <Select
+                disabled={isReadOnly}
+                options={visitOrderTemplateOptions}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitOrderTemplate',
+                })}
+                {...args}
+              />
+            )}
+          />
+        </GridItem>
+        <GridItem xs md={12}>
+          <Field
+            name={FormField['visit.visitRemarks']}
+            render={(args) => (
+              <TextField
+                {...args}
+                disabled={isReadOnly}
+                multiline
+                rowsMax={3}
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitRemarks',
+                })}
               />
             )}
           />

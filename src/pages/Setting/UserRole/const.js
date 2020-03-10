@@ -6,7 +6,7 @@ export const UserRoleTableConfig = {
     { name: 'name', title: 'Name' },
     { name: 'description', title: 'Description' },
     { name: 'clinicalRoleName', title: 'Clinical Role' },
-    { name: 'status', title: 'Status' },
+    { name: 'isActive', title: 'Status' },
     { name: 'action', title: 'Action' },
   ],
   columnExtensions: [
@@ -15,19 +15,19 @@ export const UserRoleTableConfig = {
       sortBy: 'ClinicRoleFKNavigation.displayValue',
     },
     {
-      columnName: 'status',
+      columnName: 'isActive',
       type: 'select',
       options: status,
       align: 'center',
       sortingEnabled: false,
-      render: (row) => {
-        // console.log(row)
-        return (
-          <span style={{ color: row.status === 'Active' ? 'green' : 'red' }}>
-            {row.status}
-          </span>
-        )
-      },
+      // render: (row) => {
+      //   // console.log(row)
+      //   return (
+      //     <span style={{ color: row.status === 'Active' ? 'green' : 'red' }}>
+      //       {row.status}
+      //     </span>
+      //   )
+      // },
     },
   ],
   FuncProps: {

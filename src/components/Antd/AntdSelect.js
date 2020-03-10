@@ -34,7 +34,7 @@ const STYLES = () => {
         // borderBottom: '1px solid rgba(0, 0, 0, 0.4)',
       },
       '& .ant-select-selection': {
-        paddingRight: 16,
+        paddingRight: 22,
         background: 'none',
       },
       // '& .ant-select-selection-selected-value': {
@@ -201,7 +201,8 @@ class AntdSelect extends React.PureComponent {
   componentDidMount () {
     if (
       this.state.value &&
-      this.state.value.length &&
+      ((Array.isArray(this.state.value) && this.state.value.length > 0) ||
+        !!this.state.value) &&
       this.props.query &&
       this.state.data.length === 0
     ) {
@@ -269,7 +270,7 @@ class AntdSelect extends React.PureComponent {
       if (!_.isEqual(v, this.state.value)) {
         this.setState({
           value: v,
-          shrink: v !== undefined,
+          shrink: v !== undefined && v.length > 0,
         })
       }
     } else if (value !== undefined) {
@@ -328,7 +329,12 @@ class AntdSelect extends React.PureComponent {
 
   handleFilter = (input, option) => {
     // console.log(input, option, option.props.children, this.props.labelField)
+    const { handleFilter } = this.props
     let match = false
+
+    if (handleFilter && typeof handleFilter === 'function') {
+      return handleFilter(input, option)
+    }
     try {
       if (Array.isArray(option.props.children)) {
         // return (
@@ -727,6 +733,9 @@ class AntdSelect extends React.PureComponent {
       // )
       labelProps.shrink =
         (value && value.length > 0) || this.state.shrink || this.state.focus
+      if (labelProps.shrink === undefined) {
+        labelProps.shrink = false
+      }
     }
     // console.log(value && value.length > 0, this.state.shrink, this.state.focus)
     return (

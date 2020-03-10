@@ -62,19 +62,15 @@ const styles = (theme) => ({
   treatmentListItem: {
     padding: 0,
   },
+
+  groupBtns: {
+    display: 'block',
+  },
 })
 
 @connect(
-  ({
+  ({ dentalChartComponent, orders, codetable, consultation, global }) => ({
     dentalChartComponent,
-    dentalChartSetup,
-    orders,
-    codetable,
-    consultation,
-    global,
-  }) => ({
-    dentalChartComponent,
-    dentalChartSetup,
     orders,
     codetable,
     consultation,
@@ -125,7 +121,6 @@ class DentalChart extends React.Component {
       index,
       arrayHelpers,
       diagnosises,
-      classes,
       form,
       field,
       style,
@@ -136,6 +131,7 @@ class DentalChart extends React.Component {
       dispatch,
       ...props
     } = this.props
+    const { classes, ...restProps } = this.props
     const { mode } = dentalChartComponent
     return (
       <div className={className} style={{ padding: `${theme.spacing(1)}px 0` }}>
@@ -145,7 +141,7 @@ class DentalChart extends React.Component {
               <Chart {...this.props} />
             </div>
             {mode === 'diagnosis' && (
-              <DiagnosisPanel searchable {...this.props} />
+              <DiagnosisPanel searchable {...restProps} />
             )}
             {mode === 'treatment' && <TreatmentForm {...this.props} />}
           </GridItem>

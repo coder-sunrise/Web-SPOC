@@ -10,6 +10,7 @@ import { AttachmentWithThumbnail } from '@/components/_medisys'
 import Thumbnail from '@/components/_medisys/AttachmentWithThumbnail/Thumbnail'
 import ScribbleNote from '@/pages/Shared/ScribbleNote/ScribbleNote'
 import ScribbleThumbnail from './ScribbleThumbnail'
+import EmptyList from './EmptyList'
 // services
 import { deleteFileByFileID, downloadAttachment } from '@/services/file'
 import { navigateDirtyCheck } from '@/utils/utils'
@@ -129,7 +130,10 @@ class Attachment extends Component {
         ]
       }, [])
 
-    form.setFieldValue('corAttachment', updated)
+    form.setFieldValue(
+      'corAttachment',
+      updated.map((item, index) => ({ ...item, sortOrder: index + 1 })),
+    )
 
     // set local state
     const {
@@ -272,63 +276,119 @@ class Attachment extends Component {
                   {
                     title: 'Consultation Attachment',
                     content: (
-                      <div>
-                        {clinicalNotesAttachment
-                          .filter((attachment) => !attachment.isDeleted)
-                          .map(
-                            (attachment, index) =>
-                              attachment.isScribbleNote ? (
-                                <ScribbleThumbnail
-                                  key={`attachment-${index}`}
-                                  attachment={attachment}
-                                  dispatch={dispatch}
-                                  onClick={this.handleScribbleThumbnailClick}
-                                  onInsertClick={this.handleInsertClick}
-                                />
-                              ) : (
+                      <div style={{ width: '100%' }}>
+                        {clinicalNotesAttachment.filter(
+                          (attachment) => !attachment.isDeleted,
+                        ).length === 0 ? (
+                          <EmptyList />
+                        ) : (
+                          clinicalNotesAttachment
+                            .filter((attachment) => !attachment.isDeleted)
+                            .map((attachment, index) => {
+                              let indexInAllAttachments = attachments.findIndex(
+                                (item) => item.id === attachment.id,
+                              )
+                              if (attachment.fileIndexFK)
+                                indexInAllAttachments = attachments.findIndex(
+                                  (item) =>
+                                    item.fileIndexFK === attachment.fileIndexFK,
+                                )
+                              return (
                                 <Thumbnail
                                   key={`attachment-${index}`}
                                   attachment={attachment}
                                   onConfirmDelete={onDeleteClick}
-                                  index={attachment.index}
+                                  indexInAllAttachments={indexInAllAttachments}
                                   {...commonProps}
                                 />
-                              ),
-                          )}
+                              )
+                              // return attachment.isScribbleNote ? (
+                              //   <ScribbleThumbnail
+                              //     key={`attachment-${index}`}
+                              //     attachment={attachment}
+                              //     dispatch={dispatch}
+                              //     onClick={this.handleScribbleThumbnailClick}
+                              //     onInsertClick={this.handleInsertClick}
+                              //   />
+                              // ) : (
+                              //   <Thumbnail
+                              //     key={`attachment-${index}`}
+                              //     attachment={attachment}
+                              //     onConfirmDelete={onDeleteClick}
+                              //     indexInAllAttachments={indexInAllAttachments}
+                              //     {...commonProps}
+                              //   />
+                              // )
+                            })
+                        )}
                       </div>
                     ),
                   },
                   {
                     title: 'Visit Attachment',
                     content: (
-                      <div>
-                        {visitAttachment
-                          .filter((attachment) => !attachment.isDeleted)
-                          .map((attachment, index) => (
-                            <Thumbnail
-                              key={`attachment-${index}`}
-                              attachment={attachment}
-                              onConfirmDelete={onDeleteClick}
-                              {...commonProps}
-                            />
-                          ))}
+                      <div style={{ width: '100%' }}>
+                        {visitAttachment.filter(
+                          (attachment) => !attachment.isDeleted,
+                        ).length === 0 ? (
+                          <EmptyList />
+                        ) : (
+                          visitAttachment
+                            .filter((attachment) => !attachment.isDeleted)
+                            .map((attachment, index) => {
+                              let indexInAllAttachments = attachments.findIndex(
+                                (item) => item.id === attachment.id,
+                              )
+                              if (attachment.fileIndexFK)
+                                indexInAllAttachments = attachments.findIndex(
+                                  (item) =>
+                                    item.fileIndexFK === attachment.fileIndexFK,
+                                )
+                              return (
+                                <Thumbnail
+                                  key={`attachment-${index}`}
+                                  attachment={attachment}
+                                  onConfirmDelete={onDeleteClick}
+                                  indexInAllAttachments={indexInAllAttachments}
+                                  {...commonProps}
+                                />
+                              )
+                            })
+                        )}
                       </div>
                     ),
                   },
                   {
                     title: 'Referral Attachment',
                     content: (
-                      <div>
-                        {referralAttachment
-                          .filter((attachment) => !attachment.isDeleted)
-                          .map((attachment, index) => (
-                            <Thumbnail
-                              key={`attachment-${index}`}
-                              attachment={attachment}
-                              onConfirmDelete={onDeleteClick}
-                              {...commonProps}
-                            />
-                          ))}
+                      <div style={{ width: '100%' }}>
+                        {referralAttachment.filter(
+                          (attachment) => !attachment.isDeleted,
+                        ).length === 0 ? (
+                          <EmptyList />
+                        ) : (
+                          referralAttachment
+                            .filter((attachment) => !attachment.isDeleted)
+                            .map((attachment, index) => {
+                              let indexInAllAttachments = attachments.findIndex(
+                                (item) => item.id === attachment.id,
+                              )
+                              if (attachment.fileIndexFK)
+                                indexInAllAttachments = attachments.findIndex(
+                                  (item) =>
+                                    item.fileIndexFK === attachment.fileIndexFK,
+                                )
+                              return (
+                                <Thumbnail
+                                  key={`attachment-${index}`}
+                                  attachment={attachment}
+                                  onConfirmDelete={onDeleteClick}
+                                  indexInAllAttachments={indexInAllAttachments}
+                                  {...commonProps}
+                                />
+                              )
+                            })
+                        )}
                       </div>
                     ),
                   },

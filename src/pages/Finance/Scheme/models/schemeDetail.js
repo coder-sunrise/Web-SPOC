@@ -28,7 +28,7 @@ export default createFormViewModel({
         itemGroupMaxCapacityDtoRdoValue: 'all',
         itemGroupValueDtoRdoValue: 'all',
         patientMinCoPaymentAmountType: 'ExactAmount',
-        overalCoPaymentValueType: 'ExactAmount',
+        overalCoPaymentValueType: 'Percentage',
         patientMinCoPaymentAmount: 0,
         // coverageMaxCap: 0,
         itemGroupMaxCapacityDto: {
@@ -48,7 +48,7 @@ export default createFormViewModel({
           //   maxCapValue: 0,
           // },
         },
-        overalCoPaymentValue: 0,
+        overalCoPaymentValue: 100,
         itemGroupValueDto: {
           // consumableGroupValue: {
           //   itemGroupValue: 0,

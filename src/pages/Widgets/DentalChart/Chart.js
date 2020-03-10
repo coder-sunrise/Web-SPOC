@@ -53,23 +53,7 @@ const { fabric } = require('fabric')
 
 let selectedTooth = []
 const imageCache = {}
-const styles = (theme) => ({
-  paper: {
-    display: 'flex',
-    border: `1px solid ${theme.palette.divider}`,
-    flexWrap: 'wrap',
-  },
-  divider: {
-    alignSelf: 'stretch',
-    height: 'auto',
-    margin: theme.spacing(1, 0.5),
-    padding: 0,
-    width: 0,
-  },
-  groupBtns: {
-    display: 'block',
-  },
-})
+
 const text1l1 = {
   left: 'd',
   bottom: 'p',
@@ -1057,7 +1041,7 @@ class Chart extends React.PureComponent {
   }
 
   renderCanvas = (props) => {
-    const { dentalChartComponent, dentalChartSetup, dispatch, readOnly } = props
+    const { dentalChartComponent, dispatch, readOnly } = props
     const {
       action,
       data = [],
@@ -1450,7 +1434,12 @@ class Chart extends React.PureComponent {
     return (
       <div
         ref={this.divContainer}
-        style={{ width: '100%', position: 'relative', ...style }}
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'relative',
+          ...style,
+        }}
       >
         <Tooltip title='Export chart to image'>
           <Button
@@ -1471,7 +1460,7 @@ class Chart extends React.PureComponent {
             <CloudDownload />
           </Button>
         </Tooltip>
-        <Paper className={classes.paper}>
+        <Paper className={classes ? classes.paper : ''}>
           <canvas id={this.id} ref={this._canvasContainer} />
         </Paper>
       </div>
@@ -1479,4 +1468,4 @@ class Chart extends React.PureComponent {
   }
 }
 
-export default withStyles(styles, { withTheme: true })(Chart)
+export default Chart

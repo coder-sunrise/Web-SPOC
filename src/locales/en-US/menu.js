@@ -91,6 +91,7 @@ export default {
   'menu.report.depositTransactionReport': 'Deposit Transaction Report',
   'menu.report.creditNoteListingReport': 'Credit Note Listing Report',
   'menu.report.inventorytrendingreport': 'Inventory Trending Report',
+  'menu.report.inventorylistingreport': 'Inventory Listing Report',
   'menu.communication': 'Communication',
   'menu.communication.sms': 'SMS',
   'menu.queue': 'Queue',
@@ -145,6 +146,7 @@ export default {
   'menu.setting.paymentmode': 'Payment Mode',
   'menu.setting.appointmenttype': 'Appointment Type',
   'menu.setting.referralsource': 'Referral Source',
+  'menu.setting.visitordertemplate': 'Visit Order Template',
 
   'menu.report': 'Report',
   'menu.report.report': 'Report',

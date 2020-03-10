@@ -170,6 +170,9 @@ const Grid = ({
           break
         case '1': {
           // dispense
+          const isInitialLoading =
+            row.visitPurposeFK === VISIT_TYPE.RETAIL &&
+            row.visitStatus === 'WAITING'
           const version = Date.now()
           dispatch({
             type: `dispense/start`,
@@ -182,7 +185,7 @@ const Grid = ({
           }).then((o) => {
             if (o)
               router.push(
-                `/reception/queue/dispense?qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
+                `/reception/queue/dispense?isInitialLoading=${isInitialLoading}&qid=${row.id}&vid=${row.visitFK}&v=${version}&pid=${row.patientProfileFK}`,
               )
           })
 
@@ -331,12 +334,14 @@ const Grid = ({
         default:
           break
       }
-      dispatch({
-        type: 'queueLog/updateState',
-        payload: {
-          statusTagClicked: false,
-        },
-      })
+      setTimeout(() => {
+        dispatch({
+          type: 'queueLog/updateState',
+          payload: {
+            statusTagClicked: false,
+          },
+        })
+      }, 3000)
     },
     [
       codetable.clinicianprofile,
@@ -430,12 +435,18 @@ const Grid = ({
 
     if (contextMenuOption) {
       const authority = Authorized.check(contextMenuOption.authority)
-      if (authority.rights === 'disable' || authority.rights === 'hidden') {
+
+      if (
+        !authority ||
+        authority.rights === 'disable' ||
+        authority.rights === 'hidden'
+      ) {
         notification.error({
           message: 'Unauthorized Access',
         })
         return
       }
+
       onClick(row, id)
     }
 
@@ -461,17 +472,14 @@ const Grid = ({
             TableProps={TableProps}
             rows={queueListingData}
             firstColumnCustomPadding={10}
+            forceRender
             columnExtensions={[
               ...QueueColumnExtensions,
               {
                 columnName: 'visitStatus',
                 width: 200,
                 render: (row) => (
-                  <VisitStatusTag
-                    row={row}
-                    onClick={handleStatusTagClick}
-                    statusTagClicked={statusTagClicked}
-                  />
+                  <VisitStatusTag row={row} onClick={handleStatusTagClick} />
                 ),
               },
               {

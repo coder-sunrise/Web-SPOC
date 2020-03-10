@@ -57,7 +57,8 @@ const styles = () => ({
 const filterByAccessRight = (m) => {
   const accessRight = Authorized.check(m.authority)
 
-  if (accessRight && accessRight.rights === 'hidden') return false
+  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+    return false
   return true
 }
 

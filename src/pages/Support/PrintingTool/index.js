@@ -5,7 +5,7 @@ import { downloadPrintingTool } from '../download'
 import { GridContainer, CardContainer, GridItem, Button } from '@/components'
 
 class PrintingTool extends PureComponent {
-  render () {
+  render() {
     return (
       <CardContainer hideHeader>
         <GridContainer>
@@ -18,12 +18,32 @@ class PrintingTool extends PureComponent {
           <GridItem xs={12} md={12} style={{ marginTop: 20 }}>
             <Button
               onClick={() => {
-                downloadPrintingTool('SEMRPrintingTool')
+                downloadPrintingTool(
+                  'SEMRPrintingTool',
+                  'PrintingToolDownloadLinkSection',
+                )
               }}
               color='primary'
             >
               <span>Download</span>
             </Button>
+          </GridItem>
+          <GridItem xs={12} md={12} style={{ marginTop: 20 }}>
+            <span>
+              Click{' '}
+              <a
+                style={{ textDecoration: 'underline' }}
+                onClick={() => {
+                  downloadPrintingTool(
+                    'LabelPrinterSetup',
+                    'LabelPrinterDownloadLinkSection',
+                  )
+                }}
+              >
+                here
+              </a>{' '}
+              to download printing tool installation guide
+            </span>
           </GridItem>
         </GridContainer>
       </CardContainer>

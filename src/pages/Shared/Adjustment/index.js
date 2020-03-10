@@ -123,7 +123,16 @@ class Adjustment extends PureComponent {
 
     if (finalAmount < 0) {
       this.showError()
-    } else setFieldValue('finalAmount', finalAmount)
+    } else {
+      setFieldValue('finalAmount', finalAmount)
+      this.hideError()
+    }
+  }
+
+  hideError = () => {
+    this.setState({
+      showError: false,
+    })
   }
 
   showError = () => {

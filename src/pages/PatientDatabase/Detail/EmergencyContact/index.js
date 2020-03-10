@@ -3,7 +3,7 @@ import _ from 'lodash'
 import Loadable from 'react-loadable'
 import Add from '@material-ui/icons/Add'
 import {
-  EditableTableGrid,
+  FastEditableTableGrid,
   Button,
   CommonModal,
   notification,
@@ -235,7 +235,7 @@ class EmergencyContact extends PureComponent {
 
     return (
       <div>
-        <EditableTableGrid
+        <FastEditableTableGrid
           rows={values.patientEmergencyContact}
           schema={schema}
           // showRowNumber

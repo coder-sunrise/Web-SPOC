@@ -96,40 +96,40 @@ class SelectEditor extends PureComponent {
   }
 }
 
-const SelectDisplay = (columnExtensions, state) => ({
-  value,
-  column: { name: columnName },
-  row,
-  ...restProps
-}) => {
-  const cfg =
-    columnExtensions.find(
-      ({ columnName: currentColumnName }) => currentColumnName === columnName,
-    ) || {}
+// const SelectDisplay = (columnExtensions, state) => ({
+//   value,
+//   column: { name: columnName },
+//   row,
+//   ...restProps
+// }) => {
+//   const cfg =
+//     columnExtensions.find(
+//       ({ columnName: currentColumnName }) => currentColumnName === columnName,
+//     ) || {}
 
-  if (value === undefined) return ''
-  const v =
-    (typeof cfg.options === 'function'
-      ? cfg.options(row)
-      : cfg.options || state[`${columnName}Option`] || []).find(
-      (o) => o.value === value || o.id === value,
-    ) || {}
+//   if (value === undefined) return ''
+//   const v =
+//     (typeof cfg.options === 'function'
+//       ? cfg.options(row)
+//       : cfg.options || state[`${columnName}Option`] || []).find(
+//       (o) => o.value === value || o.id === value,
+//     ) || {}
 
-  const { labelField = 'name', render } = cfg
+//   const { labelField = 'name', render } = cfg
 
-  const label = Object.byString(v, labelField)
-  const vEl = v ? (
-    <Tooltip title={label} enterDelay={750}>
-      <span style={{ color: v.color || 'inherit' }}>{label}</span>
-    </Tooltip>
-  ) : (
-    ''
-  )
+//   const label = Object.byString(v, labelField)
+//   const vEl = v ? (
+//     <Tooltip title={label} enterDelay={750}>
+//       <span style={{ color: v.color || 'inherit' }}>{label}</span>
+//     </Tooltip>
+//   ) : (
+//     ''
+//   )
 
-  if (render) return render(row)
+//   if (render) return render(row)
 
-  return vEl
-}
+//   return vEl
+// }
 
 @connect(({ codetable }) => ({ codetable }))
 class SelectTypeProvider extends React.Component {

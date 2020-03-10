@@ -46,7 +46,6 @@ const TreatmentGrid = (props) => {
     onDataSouceChange,
     dentalChartComponent,
     height,
-    dentalChartSetup,
     orders,
     codetable,
     values,
@@ -55,10 +54,10 @@ const TreatmentGrid = (props) => {
     ...restProps
   } = props
 
-  const [
-    mode,
-    setMode,
-  ] = useState('sort')
+  // const [
+  //   mode,
+  //   setMode,
+  // ] = useState('sort')
   const handleCommitChanges = ({ rows, changed }) => {
     // console.log(rows, changed)
     setFieldValue('rows', rows)

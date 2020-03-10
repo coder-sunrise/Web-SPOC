@@ -131,7 +131,13 @@ class Checkbox extends React.Component {
   }
 
   render () {
-    const { label, inputLabel, mode = 'input', ...restProps } = this.props
+    const {
+      label,
+      inputLabel,
+      mode = 'input',
+      classes,
+      ...restProps
+    } = this.props
     const { simple } = restProps
 
     return (

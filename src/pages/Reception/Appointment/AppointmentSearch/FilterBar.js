@@ -4,7 +4,7 @@ import Search from '@material-ui/icons/Search'
 import Print from '@material-ui/icons/Print'
 import Add from '@material-ui/icons/Add'
 import moment from 'moment'
-import ReactToPrint from 'react-to-print'
+import Yup from '@/utils/yup'
 import {
   Button,
   GridContainer,
@@ -21,16 +21,70 @@ import {
   reversedDateFormat,
   ProgressButton,
 } from '@/components'
-import { AppointmentTypeLabel, DoctorLabel } from '@/components/_medisys'
+import {
+  AppointmentTypeLabel,
+  DoctorLabel,
+  ReportViewer,
+} from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
-import AppointmentPrintPreview from './AppointmentPrintPreview'
+
+const createPayload = (values) => {
+  const {
+    filterByDoctor = [],
+    filterByRoomBlockGroup = [],
+    filterByApptType = [],
+    filterByAppointmentStatus = [],
+    bookBy = [],
+    bookOn,
+    searchValue,
+    apptDate,
+    isPrint,
+  } = values
+
+  const commonPayload = {
+    bookOn: bookOn ? moment(bookOn).format(reversedDateFormat) : undefined,
+    apptDateFrom:
+      apptDate && apptDate.length > 0
+        ? moment(apptDate[0]).formatUTC()
+        : undefined,
+    apptDateTo:
+      apptDate && apptDate.length > 0
+        ? moment(apptDate[1]).formatUTC(false)
+        : undefined,
+  }
+
+  if (isPrint) {
+    return {
+      ...commonPayload,
+      bookBy: bookBy.length > 0 ? bookBy : undefined,
+      doctor: filterByDoctor.length > 0 ? filterByDoctor : undefined,
+      room: filterByRoomBlockGroup > 0 ? filterByRoomBlockGroup : undefined,
+      SearchText: searchValue || undefined,
+      ApptType: filterByApptType.length > 0 ? filterByApptType : undefined,
+      AapptStatus:
+        filterByAppointmentStatus.length > 0
+          ? filterByAppointmentStatus
+          : undefined,
+    }
+  }
+
+  return {
+    ...commonPayload,
+    bookBy: bookBy.join() || undefined,
+    doctor: filterByDoctor.join() || undefined,
+    room: filterByRoomBlockGroup.join() || undefined,
+    searchValue: searchValue || undefined,
+    appType: filterByApptType.join() || undefined,
+    appStatus: filterByAppointmentStatus.join() || undefined,
+  }
+}
 
 const FilterBar = ({
   values,
   handleSubmit,
   handleAddAppointmentClick,
-  appointment,
   setFieldValue,
+  ...restValues
 }) => {
   const {
     filterByDoctor = [],
@@ -39,6 +93,11 @@ const FilterBar = ({
     filterByAppointmentStatus = [],
   } = values
 
+  const [
+    showReport,
+    setShowReport,
+  ] = useState(false)
+
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxApptTypeTagCount = filterByApptType.length <= 1 ? 1 : 0
   const maxRoomBlockGroupTagCount = filterByRoomBlockGroup.length <= 1 ? 1 : 0
@@ -46,12 +105,9 @@ const FilterBar = ({
     filterByAppointmentStatus.length <= 1 ? 1 : 0
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
-  const componentRef = useRef()
-
-  const getAllRelatedAppt = async () => {
-    await setFieldValue('print', true)
-    await handleSubmit()
-    await new Promise((r, j) => setTimeout(r, 3000))
+  const toggleReport = () => {
+    if (!values.searchValue) return
+    setShowReport(!showReport)
   }
 
   return (
@@ -209,7 +265,7 @@ const FilterBar = ({
             color='primary'
             size='sm'
             onClick={async () => {
-              await setFieldValue('print', undefined)
+              await setFieldValue('isPrint', false)
               handleSubmit()
             }}
           >
@@ -220,65 +276,54 @@ const FilterBar = ({
             <Add />
             Add Appointment
           </Button>
-
-          {/* <ReactToPrint
-            trigger={() => (
-              <Button color='primary' size='sm'>
-                <Print /> Print
-              </Button>
-            )}
-            content={() => componentRef.current}
-            onBeforeGetContent={getAllRelatedAppt}
-            copyStyles={false}
-          /> */}
+          <Button
+            color='primary'
+            size='sm'
+            onClick={async () => {
+              await setFieldValue('isPrint', true)
+              toggleReport()
+            }}
+          >
+            <Print />
+            Print
+          </Button>
         </GridItem>
       </GridContainer>
 
-      <div style={{ display: 'none' }}>
-        <AppointmentPrintPreview appointment={appointment} ref={componentRef} />
-      </div>
+      <CommonModal
+        open={showReport}
+        onClose={toggleReport}
+        title='Appointment'
+        maxWidth='lg'
+      >
+        <ReportViewer
+          showTopDivider={false}
+          reportID={38}
+          reportParameters={{
+            ...createPayload(values),
+          }}
+        />
+      </CommonModal>
     </Fragment>
   )
 }
 
 export default memo(
   withFormikExtend({
+    validationSchema: Yup.object().shape({
+      searchValue: Yup.string().when('isPrint', {
+        is: (v) => v === true,
+        then: Yup.string().required(),
+      }),
+    }),
     handleSubmit: (values, { props }) => {
       const { dispatch } = props
-      const {
-        filterByDoctor = [],
-        filterByRoomBlockGroup = [],
-        filterByApptType = [],
-        filterByAppointmentStatus = [],
-        bookBy = [],
-        bookOn,
-        searchValue,
-        apptDate,
-        print,
-      } = values
-      const query = print ? 'queryAllAppointments' : 'query'
+
       dispatch({
-        type: `appointment/${query}`,
+        type: `appointment/query`,
         payload: {
-          pagesize: print ? 9999 : 10,
           apiCriteria: {
-            searchValue: searchValue || undefined,
-            bookBy: bookBy.join() || undefined,
-            bookOn: bookOn
-              ? moment(bookOn).format(reversedDateFormat)
-              : undefined,
-            apptDateFrom:
-              apptDate && apptDate.length > 0
-                ? moment(apptDate[0]).formatUTC()
-                : undefined,
-            apptDateTo:
-              apptDate && apptDate.length > 0
-                ? moment(apptDate[1]).formatUTC(false)
-                : undefined,
-            doctor: filterByDoctor.join() || undefined,
-            room: filterByRoomBlockGroup.join() || undefined,
-            appType: filterByApptType.join() || undefined,
-            appStatus: filterByAppointmentStatus.join() || undefined,
+            ...createPayload(values),
           },
         },
       })

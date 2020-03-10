@@ -273,7 +273,7 @@ const AttachmentWithThumbnail = ({
       color='rose'
       size='sm'
       onClick={onUploadClick}
-      disabled={uploading || global.disableSave}
+      disabled={isReadOnly || uploading || global.disableSave}
       className={classes.uploadBtn}
     >
       <AttachFile /> Upload
@@ -283,6 +283,7 @@ const AttachmentWithThumbnail = ({
   if (!allowedMultiple && fileAttachments.length >= 1) UploadButton = null
 
   const commonProps = {
+    dispatch,
     isReadOnly,
     simple,
     size: thumbnailSize,

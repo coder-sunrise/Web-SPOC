@@ -92,6 +92,12 @@ export const formikMapPropsToValues = ({
       visitPurposeFK = Number(clinicSettings.settings.defaultVisitType)
     }
 
+    const { visitOrderTemplateFK } = visitEntries
+    const isVisitOrderTemplateActive = (visitRegistration.visitOrderTemplateOptions ||
+      [])
+      .map((option) => option.id)
+      .includes(visitEntries.visitOrderTemplateFK)
+
     return {
       queueNo: qNo,
       visitPurposeFK,
@@ -100,6 +106,9 @@ export const formikMapPropsToValues = ({
       // doctorProfileFK: doctorProfile ? doctorProfile.id : undefined,
       doctorProfileFK,
       ...visitEntries,
+      visitOrderTemplateFK: isVisitOrderTemplateActive
+        ? visitOrderTemplateFK
+        : undefined,
     }
   } catch (error) {
     console.log({ error })
@@ -111,7 +120,13 @@ export const formikHandleSubmit = (
   values,
   { props, resetForm, setSubmitting },
 ) => {
-  const { queueNo, visitAttachment, ...restValues } = values
+  const {
+    queueNo,
+    visitAttachment,
+    referralBy = [],
+    visitOrderTemplate,
+    ...restValues
+  } = values
   const {
     history,
     dispatch,
@@ -174,6 +189,7 @@ export const formikHandleSubmit = (
       referralPerson: null,
       referralDate: null,
       ...restValues, // override using formik values
+      referralBy: referralBy.length > 0 ? referralBy[0] : null,
     },
   }
 

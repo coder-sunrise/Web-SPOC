@@ -1,10 +1,5 @@
-import { FastField, Field } from 'formik'
-import {
-  GridContainer,
-  GridItem,
-  Select,
-  EditableTableGrid,
-} from '@/components'
+import { Field } from 'formik'
+import { GridContainer, GridItem, Select } from '@/components'
 
 const permissionList = {
   Module: [
@@ -25,7 +20,6 @@ const permissionList = {
 }
 
 const permissionOption = ({ type, permission }) => {
-  // console.log(type)
   const baseType = [
     'Module',
     'Action',
@@ -60,8 +54,6 @@ export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
         width: 250,
         sortingEnabled: false,
         render: (row) => {
-          // console.log('row', row)
-          // console.log(row.rowIndex)
           return (
             <GridContainer style={{ justifyContent: 'center' }}>
               <GridItem md={8}>
@@ -72,10 +64,6 @@ export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
                       // value={row.permission}
                       {...args}
                       options={permissionOption(row)}
-                      onChange={(e) => {
-                        console.log(row.permission)
-                        console.log(e)
-                      }}
                       disabled={isEdit && !isUserMaintainable}
                     />
                   )}

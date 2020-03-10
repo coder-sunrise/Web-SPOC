@@ -13,7 +13,14 @@ import {
   SortableElement,
   arrayMove,
 } from 'react-sortable-hoc'
+import { Action } from '@devexpress/dx-react-core'
 
+const actionCols = [
+  'actions',
+  'action',
+  'Action',
+  'editCommand',
+]
 const DragHandle = SortableHandle(({ style }) => (
   <Tooltip title='Drag'>
     <span
@@ -30,19 +37,41 @@ const DragHandle = SortableHandle(({ style }) => (
 class TableCell extends React.Component {
   shouldComponentUpdate (nextProps) {
     // console.log(nextProps.extraCellConfig, this.props.extraCellConfig)
-    // console.log(nextProps.row === this.props.row)
+    // console.log(row === this.props.row)
+
+    if (window._forceTableUpdate) {
+      return true
+    }
     const { extraCellConfig: orgConfig, row: orgRow } = this.props
 
-    const { getRowId, extraCellConfig, columnExtensions = [], row } = nextProps
+    const {
+      getRowId,
+      extraCellConfig,
+      columnExtensions = [],
+      row,
+      forceRender,
+    } = nextProps
+    if (forceRender) return true
+    // console.log(extraCellConfig, columnExtensions)
+    if (
+      window._forceTableRowUpdate &&
+      window._forceTableRowUpdate.includes(getRowId(row))
+    ) {
+      // console.log(4, row)
+      return true
+    }
+
     // console.log(orgConfig, extraCellConfig, nextProps)
     if (
       extraCellConfig &&
       extraCellConfig.editingCells &&
       extraCellConfig.editingCells.find(
-        (o) => o.rowId === getRowId(nextProps.row), // &&
+        (o) => o.rowId === getRowId(row), // &&
         // o.columnName === nextProps.column.name,
       )
     ) {
+      // console.log(3, row)
+
       return true
     }
 
@@ -53,8 +82,10 @@ class TableCell extends React.Component {
         (o) => o.rowId === getRowId(this.props.row), // &&
         // o.columnName === nextProps.column.name,
       )
-    )
+    ) {
+      // console.log(2, row)
       return true
+    }
 
     if (nextProps.column) {
       const col =
@@ -64,18 +95,31 @@ class TableCell extends React.Component {
         // typeof col.options === 'function' ||
         row._errors &&
         row._errors.find((o) => o.params.path === nextProps.column.name)
-      )
+      ) {
+        // console.log(1, row)
+
         return true
+      }
+
+      if (nextProps.value !== this.props.value) return true
+
+      if (col.observeFields) {
+        const changedFields = col.observeFields.map((o) => row[o] !== orgRow[o])
+        if (changedFields.filter((o) => o).length > 0) return true
+      }
+
+      //
     }
+    if (nextProps.column && actionCols.includes(nextProps.column.name))
+      return true
     // if (!_.isEqual(orgRow._errors, row._errors)) return true
     // if (this.editing === true) {
     //   this.editing = false
     //   return true
     // }
-
     return false
     // if (nextProps.extraCellConfig) return true
-    // return nextProps.row !== this.props.row
+    // return row !== this.props.row
   }
 
   moveRow = (row, direction) => () => {
@@ -90,17 +134,44 @@ class TableCell extends React.Component {
       getRowId,
       classes: clses,
       onClick,
+      onContextMenu,
+      height,
+      rows,
+      columns,
+      schema,
+      EditProps,
+      FuncProps,
+      theme,
+      loading,
+      global,
+      children,
+      leftColumns,
+      style,
+      className,
+      colSpan,
+      rowSpan,
+      column,
+      row,
+      tableColumn,
       ...restProps
     } = this.props
+
     // console.log(restProps.row)
     // return null
-    const { column, row } = restProps
     // const { cellEditingDisabled } = column
     // console.log(p2)
     // return null
     // console.log(restProps)
     let cfg = {
       // tabIndex: 0,
+      leftColumns,
+      style,
+      className,
+      colSpan,
+      rowSpan,
+      column,
+      row,
+      tableColumn,
     }
     if (extraState) {
       const colCfg =
@@ -141,11 +212,11 @@ class TableCell extends React.Component {
         }
 
         if (!this.props.rowMoveable || !this.props.rowMoveable(row))
-          return <Table.Cell {...restProps} />
+          return <Table.Cell>{children}</Table.Cell>
 
         return (
           <Table.Cell
-            {...restProps}
+            // {...restProps}
             // {...cfg}
             editingEnabled={false}
             className='td-move-cell'
@@ -172,7 +243,7 @@ class TableCell extends React.Component {
       }
       if (column.name === 'rowDrag') {
         return (
-          <Table.Cell {...restProps}>
+          <Table.Cell>
             <div className={clses.dragCellContainer}>
               <DragHandle />
             </div>
@@ -180,7 +251,8 @@ class TableCell extends React.Component {
         )
       }
     }
-    return <Table.Cell {...cfg} {...restProps} />
+    // console.log(cfg, this.props)
+    return <Table.Cell {...cfg}>{children}</Table.Cell>
   }
 }
 

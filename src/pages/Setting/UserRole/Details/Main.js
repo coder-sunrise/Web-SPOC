@@ -9,6 +9,7 @@ import { Field } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { FormattedMessage } from 'umi/locale'
 import Search from '@material-ui/icons/Search'
+import moment from 'moment'
 // common component
 import {
   Button,
@@ -21,10 +22,11 @@ import {
   ProgressButton,
   CodeSelect,
   SizeContainer,
+  DatePicker,
 } from '@/components'
-import { FilterBarDate } from '@/components/_medisys'
 
 // utils
+import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { AccessRightConfig } from './const'
 
@@ -43,7 +45,7 @@ const styles = (theme) => ({
     paddingLeft: theme.spacing(2),
   },
   note: {
-    fontSize: 14,
+    fontSize: '0.9rem',
     fontStyle: 'italic',
   },
 })
@@ -66,13 +68,19 @@ const styles = (theme) => ({
     effectiveStartDate: Yup.date().required(),
     effectiveEndDate: Yup.date().required(),
     description: Yup.string(),
+    clinicRoleFK: Yup.string().required(),
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { filteredAccessRight, isEdit, ...restValues } = values
-    restValues.roleClientAccessRight = filteredAccessRight
-    if (!isEdit) {
-      restValues.roleClientAccessRight = filteredAccessRight.map((d) => {
+    let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight.map((r) => {
+      const data = filteredAccessRight.filter((m) => {
+        return m.clientAccessRightFK === r.clientAccessRightFK
+      })
+      return data.length === 0 ? r : data[0]
+    })
+    if (!values.id) {
+      restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
         return data
       })
@@ -80,6 +88,7 @@ const styles = (theme) => ({
       restValues = tempValue
       restValues.isUserMaintainable = true
     }
+
     dispatch({
       type: 'settingUserRole/upsert',
       payload: restValues,
@@ -99,21 +108,87 @@ class Main extends React.Component {
       module: undefined,
       displayValue: undefined,
     },
+    hasUser: true,
+    hasActiveSession: true,
+    isActive: false,
   }
 
-  handleSearchClick = () => {
+  componentDidMount = () => {
+    this.setIsActive()
+    this.checkHasUser()
+    this.checkHasActiveSession()
+  }
+
+  setIsActive = () => {
+    const { effectiveStartDate, effectiveEndDate } = this.props.userRole
+    if (effectiveStartDate && effectiveEndDate) {
+      this.setState({
+        isActive:
+          moment(effectiveStartDate) <= moment() &&
+          moment() <= moment(effectiveEndDate),
+      })
+    }
+  }
+
+  checkHasUser = async () => {
+    const { userRole } = this.props
+    if (userRole.id) {
+      this.props
+        .dispatch({
+          type: 'settingUserRole/fetchActiveUsers',
+        })
+        .then((response) => {
+          const result = response.data.filter((m) => {
+            return m.userProfile.role.id === userRole.id
+          })
+          this.setState({ hasUser: result.length > 0 })
+        })
+    }
+  }
+
+  checkHasActiveSession = async () => {
+    try {
+      const bizSessionPayload = {
+        IsClinicSessionClosed: false,
+      }
+      const result = await getBizSession(bizSessionPayload)
+      const { data } = result.data
+
+      this.setState(() => {
+        return {
+          hasActiveSession: data.length > 0,
+        }
+      })
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
+  handleSearchClick = async () => {
     const { filter } = this.state
     const { module, displayValue } = filter
-    let criteria = {}
-    if (module) {
-      criteria = { ...criteria, module }
-    }
-    if (displayValue) {
-      criteria = { ...criteria, displayValue }
-    }
+    const { values } = this.props
+    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
+      const data = filteredAccessRight.filter((m) => {
+        return m.clientAccessRightFK === d.clientAccessRightFK
+      })
+      return data.length === 0 ? d : data[0]
+    })
+
+    restValues.filteredAccessRight = restValues.roleClientAccessRight
+      .filter((m) => {
+        return !module || m.module === module
+      })
+      .filter((m) => {
+        return !displayValue || m.displayValue === displayValue
+      })
+
     this.props.dispatch({
-      type: 'settingUserRole/filter',
-      criteria,
+      type: 'settingUserRole/updateState',
+      payload: {
+        currentSelectedUserRole: restValues,
+      },
     })
   }
 
@@ -184,176 +259,197 @@ class Main extends React.Component {
   }
 
   render () {
-    const { classes, userRole } = this.props
-    const { filter } = this.state
-    const { isEdit, isUserMaintainable } = userRole
+    const { classes, values } = this.props
+    const { filter, hasUser, hasActiveSession, isActive } = this.state
+    const {
+      id,
+      isUserMaintainable,
+      effectiveStartDate,
+      effectiveEndDate,
+    } = values
+
+    const isEdit = !!id
 
     return (
       <React.Fragment>
-        <SizeContainer size='sm'>
-          <GridContainer
-            alignItems='center'
-            justify='space-between'
-            className={classes.container}
-          >
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>User Role</h4>
+        <GridContainer
+          alignItems='center'
+          justify='space-between'
+          className={classes.container}
+        >
+          <GridItem md={12} className={classes.verticalSpacing}>
+            <h4>User Role</h4>
+          </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='code'
+                render={(args) => {
+                  return <TextField label='Code' disabled={isEdit} {...args} />
+                }}
+              />
             </GridItem>
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='code'
-                  render={(args) => {
-                    return (
-                      <TextField label='Code' disabled={isEdit} {...args} />
-                    )
-                  }}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <Field
-                  name='effectiveStartDate'
-                  render={(args) => (
-                    <FilterBarDate
-                      args={args}
-                      label='Effective Start Date'
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={3}>
-                <Field
-                  name='effectiveEndDate'
-                  render={(args) => (
-                    <FilterBarDate
-                      args={args}
-                      label='Effective End Date'
-                      isEndDate
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='name'
-                  render={(args) => (
-                    <TextField
-                      label='Name'
-                      {...args}
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='description'
-                  render={(args) => (
-                    <TextField
-                      label='Description'
-                      {...args}
-                      disabled={isEdit && !isUserMaintainable}
-                    />
-                  )}
-                />
-              </GridItem>
-            </GridContainer>
-
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={3}>
-                <Field
-                  name='clinicRoleFK'
-                  render={(args) => (
-                    <CodeSelect
-                      {...args}
-                      label='Clinical Role'
-                      code='ltclinicalrole'
-                      disabled={isEdit}
-                    />
-                  )}
-                />
-              </GridItem>
-              <GridItem md={8}>
-                <p className={classes.note}>
-                  You are not allowed to change clinical role after save.
-                </p>
-              </GridItem>
-            </GridContainer>
-
-            <GridItem md={12} className={classes.verticalSpacing}>
-              <h4>Access Right</h4>
+            <GridItem md={3}>
+              <Field
+                name='effectiveStartDate'
+                render={(args) => (
+                  <DatePicker
+                    {...args}
+                    label='Effective Start Date'
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
+                    restrictFromTo={[
+                      moment('0000-01-01').formatUTC(),
+                      effectiveEndDate,
+                    ]}
+                  />
+                )}
+              />
             </GridItem>
-            <GridContainer className={classes.indent} alignItems='center'>
-              <GridItem md={2}>
-                <Select
-                  value={filter.module}
-                  label='Module'
-                  options={this.moduleList()}
-                  onChange={this.onSelectModule}
-                />
-              </GridItem>
-              <GridItem md={2}>
-                <Select
-                  value={filter.displayValue}
-                  label='Function Access'
-                  options={this.displayValueList()}
-                  onChange={this.onSelectDisplayValue}
-                />
-              </GridItem>
+            <GridItem md={3}>
+              <Field
+                name='effectiveEndDate'
+                render={(args) => (
+                  <DatePicker
+                    {...args}
+                    label='Effective End Date'
+                    disabled={
+                      isEdit &&
+                      (!isUserMaintainable ||
+                        (isActive && (hasUser || hasActiveSession)))
+                    }
+                    restrictFromTo={[
+                      effectiveStartDate,
+                      moment('2099-12-31').formatUTC(false),
+                    ]}
+                    endDay
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
 
-              <GridItem md={2}>
-                <ProgressButton
-                  icon={<Search />}
-                  color='primary'
-                  onClick={this.handleSearchClick}
-                >
-                  <FormattedMessage id='form.search' />
-                </ProgressButton>
-              </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='name'
+                render={(args) => (
+                  <TextField
+                    label='Name'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
 
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='description'
+                render={(args) => (
+                  <TextField
+                    label='Description'
+                    {...args}
+                    disabled={isEdit && !isUserMaintainable}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={3}>
+              <Field
+                name='clinicRoleFK'
+                render={(args) => (
+                  <CodeSelect
+                    {...args}
+                    label='Clinical Role'
+                    code='ltclinicalrole'
+                    disabled={isEdit}
+                  />
+                )}
+              />
+            </GridItem>
+            <GridItem md={8}>
+              <p className={classes.note}>
+                You are not allowed to change clinical role after save.
+              </p>
+            </GridItem>
+          </GridContainer>
+
+          <GridItem md={12} className={classes.verticalSpacing}>
+            <h4>Access Right</h4>
+          </GridItem>
+          <GridContainer className={classes.indent} alignItems='center'>
+            <GridItem md={2}>
+              <Select
+                value={filter.module}
+                label='Module'
+                options={this.moduleList()}
+                onChange={this.onSelectModule}
+              />
+            </GridItem>
+            <GridItem md={2}>
+              <Select
+                value={filter.displayValue}
+                label='Function Access'
+                options={this.displayValueList()}
+                onChange={this.onSelectDisplayValue}
+              />
+            </GridItem>
+
+            <GridItem md={2}>
+              <ProgressButton
+                icon={<Search />}
+                color='primary'
+                onClick={this.handleSearchClick}
+              >
+                <FormattedMessage id='form.search' />
+              </ProgressButton>
+            </GridItem>
+
+            <SizeContainer size='sm'>
               <CommonTableGrid
-                rows={userRole.filteredAccessRight}
+                rows={values.filteredAccessRight}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
                 onRowDoubleClick={this.handleDoubleClick}
                 FuncProps={{ pager: true }}
               />
-            </GridContainer>
+            </SizeContainer>
           </GridContainer>
-          <GridItem
-            container
-            style={{
-              marginTop: 10,
-              marginBottom: 10,
-              justifyContent: 'center',
-            }}
+        </GridContainer>
+        <GridItem
+          container
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            justifyContent: 'center',
+          }}
+        >
+          <Button
+            color='danger'
+            onClick={navigateDirtyCheck({
+              onProceed: this.goBackToPreviousPage,
+            })}
           >
-            <Button
-              color='danger'
-              onClick={navigateDirtyCheck({
-                onProceed: this.goBackToPreviousPage,
-              })}
-            >
-              Close
-            </Button>
-            <ProgressButton
-              color='primary'
-              onClick={() => {
-                this.props.handleSubmit()
-              }}
-              disabled={isEdit && !isUserMaintainable}
-            >
-              Save
-            </ProgressButton>
-          </GridItem>
-        </SizeContainer>
+            Close
+          </Button>
+          <ProgressButton
+            color='primary'
+            onClick={() => {
+              this.props.handleSubmit()
+            }}
+            disabled={isEdit && !isUserMaintainable}
+          >
+            Save
+          </ProgressButton>
+        </GridItem>
       </React.Fragment>
     )
   }

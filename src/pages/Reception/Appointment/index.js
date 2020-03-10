@@ -111,12 +111,11 @@ class Appointment extends React.PureComponent {
       type: 'calendar/query',
       payload: {
         pagesize: 9999,
-        apiCriteria:{
+        apiCriteria: {
           isCancelled: false,
-          apptDateFrom:startOfMonth,
-          apptDateTo:endOfMonth,
+          apptDateFrom: startOfMonth,
+          apptDateTo: endOfMonth,
         },
-
       },
     })
     dispatch({
@@ -447,7 +446,27 @@ class Appointment extends React.PureComponent {
     })
   }
 
-  toggleSearchAppointmentModal = () => {
+  queryCodetables = async () => {
+    const { dispatch } = this.props
+    await Promise.all([
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ctroom',
+        },
+      }),
+      dispatch({
+        type: 'codetable/fetchCodes',
+        payload: {
+          code: 'ltappointmentstatus',
+        },
+      }),
+    ])
+  }
+
+  toggleSearchAppointmentModal = async () => {
+    await this.queryCodetables()
+
     this.setState((prevState) => {
       return {
         showSearchAppointmentModal: !prevState.showSearchAppointmentModal,
@@ -486,33 +505,6 @@ class Appointment extends React.PureComponent {
 
     return (
       <CardContainer hideHeader size='sm'>
-        {/* <Popover
-          id='event-popup'
-          className={classes.popover}
-          open={showPopup}
-          anchorEl={popupAnchor}
-          onClose={this.handleClosePopover}
-          placement='top-start'
-          anchorOrigin={{
-            vertical: 'center',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'center',
-            horizontal: 'left',
-          }}
-          // disableRestoreFocus
-        >
-          {popoverEvent.doctor ? (
-            <DoctorBlockPopover
-              popoverEvent={popoverEvent}
-              calendarView={calendarView}
-            />
-          ) : (
-            <ApptPopover popoverEvent={popoverEvent} />
-          )}
-        </Popover> */}
-
         <FilterBar
           loading={calendarLoading}
           filterByDoctor={filter.filterByDoctor}
@@ -547,13 +539,15 @@ class Appointment extends React.PureComponent {
           overrideLoading
           observe='AppointmentForm'
         >
-          <Form
-            history={this.props.history}
-            resources={resources}
-            selectedAppointmentID={selectedAppointmentFK}
-            selectedSlot={selectedSlot}
-            // calendarEvents={calendarEvents}
-          />
+          {showAppointmentForm && (
+            <Form
+              history={this.props.history}
+              resources={resources}
+              selectedAppointmentID={selectedAppointmentFK}
+              selectedSlot={selectedSlot}
+              // calendarEvents={calendarEvents}
+            />
+          )}
         </CommonModal>
         <CommonModal
           open={showDoctorEventModal}

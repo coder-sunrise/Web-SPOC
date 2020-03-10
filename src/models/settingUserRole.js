@@ -17,7 +17,6 @@ export default createListViewModel({
     state: {
       list: [],
       currentSelectedUserRole: {
-        isEdit: false,
         filteredAccessRight: [],
         ...defaultDates,
       },
@@ -26,31 +25,35 @@ export default createListViewModel({
       *fetchUserRoleByID ({ payload }, { call, put }) {
         const response = yield call(service.getUserRoleById, payload)
         const { isEdit } = payload
-        const { data = {}, status } = response
-        const nameList = [
-          'module',
-          'displayValue',
-        ]
+        let { data = {}, status } = response
+        const { id, ...result } = data
+
+        if (isEdit) {
+          return yield put({
+            type: 'updateUserRole',
+            data: { ...data },
+          })
+        }
+
+        data = result
         return yield put({
-          type: 'updateUserRole',
-          data: { ...data, isEdit },
+          type: 'loadAccessRight',
+          data: [
+            ...data.roleClientAccessRight,
+          ],
         })
       },
       *fetchDefaultAccessRight ({ payload }, { call, put }) {
         const response = yield call(service.getAccessRight)
         const { data = [], status } = response
-        const nameList = [
-          'module',
-          'displayValue',
-        ]
 
         const resultData = []
         data.map((d) => {
           const permission =
-            (d.type === 'Module' && 'ReadOnly') ||
-            (d.type === 'Action' && 'Disabled') ||
-            (d.type === 'Field' && 'ReadOnly') ||
-            'Hidden'
+            (d.type === 'Module' && 'ReadWrite') ||
+            (d.type === 'Action' && 'Enabled') ||
+            (d.type === 'Field' && 'ReadWrite') ||
+            'ReadWrite'
           return resultData.push({
             permission: d.permission || permission,
             ...d,
@@ -63,6 +66,16 @@ export default createListViewModel({
             ...resultData,
           ],
         })
+      },
+      *fetchActiveUsers ({ payload }, { call, put }) {
+        try {
+          const response = yield call(service.getActiveUsers)
+          const { data } = response
+          return data
+        } catch (error) {
+          console.log(error)
+          return false
+        }
       },
     },
 
@@ -84,25 +97,6 @@ export default createListViewModel({
             filteredAccessRight: data,
             roleClientAccessRight: data,
             ...defaultDates,
-          },
-        }
-      },
-      filter (state, { criteria }) {
-        const accessRight = [
-          ...state.currentSelectedUserRole.roleClientAccessRight,
-        ]
-        let result = accessRight
-        // eslint-disable-next-line guard-for-in
-        for (let key in criteria) {
-          result = accessRight.filter((el) => {
-            return el[key] === criteria[key]
-          })
-        }
-        return {
-          ...state,
-          currentSelectedUserRole: {
-            ...state.currentSelectedUserRole,
-            filteredAccessRight: result,
           },
         }
       },

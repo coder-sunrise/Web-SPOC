@@ -4,14 +4,10 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
-import Edit from '@material-ui/icons/Edit'
-import Delete from '@material-ui/icons/Delete'
 // common components
 import {
-  Button,
   GridContainer,
   GridItem,
-  OutlinedTextField,
   SizeContainer,
   TextField,
   Tooltip,
@@ -19,6 +15,7 @@ import {
 import { DeleteWithPopover, LoadingWrapper } from '@/components/_medisys'
 // utils
 import {
+  imageFileExtensions,
   pdfFileExtensions,
   excelFileExtensions,
   wordFileExtensions,
@@ -102,7 +99,7 @@ const styles = (theme) => ({
 
 const Thumbnail = ({
   classes,
-  index,
+  dispatch,
   indexInAllAttachments,
   isReadOnly = false,
   simple,
@@ -174,7 +171,21 @@ const Thumbnail = ({
     onConfirmDelete(fileIndexFK, id)
   }
 
-  const handleAttachmentClicked = () => onClickAttachment(attachment)
+  const handleAttachmentClicked = () => {
+    if (!attachment) return
+    if (imageFileExtensions.includes(attachment.fileExtension)) {
+      // show image preview
+      dispatch({
+        type: 'imageViewer/updateState',
+        payload: {
+          attachment,
+        },
+      })
+      return
+    }
+
+    onClickAttachment(attachment)
+  }
 
   const simpleThumbnailClass = classnames({
     [classes.simpleRoot]: true,

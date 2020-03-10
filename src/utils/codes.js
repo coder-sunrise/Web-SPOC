@@ -981,7 +981,7 @@ const orderTypes = [
     name: 'Open Prescription',
     value: '5',
     prop: 'corPrescriptionItem',
-    accessRight: 'queue.consultation.order.openPrescription',
+    accessRight: 'queue.consultation.order.openprescription',
     filter: (r) => !r.inventoryMedicationFK,
     getSubject: (r) => r.drugName,
     component: (props) => <Medication openPrescription {...props} />,
@@ -989,7 +989,7 @@ const orderTypes = [
   {
     name: 'Order Set',
     value: '6',
-    accessRight: 'queue.consultation.order.orderSet',
+    accessRight: 'queue.consultation.order.orderset',
     component: (props) => <OrderSet {...props} />,
   },
   {
@@ -1196,6 +1196,7 @@ const tenantCodesMap = new Map([
     'cttreatment',
     {
       ...defaultParams,
+      isActive: undefined,
     },
   ],
   [
@@ -1522,35 +1523,39 @@ export const podoOrderType = [
 export const InventoryTypes = [
   {
     value: 1,
-    name: 'Medications',
+    name: 'Medication',
     prop: 'medicationValueDto',
     itemFKName: 'inventoryMedicationFK',
     ctName: 'inventorymedication',
+    field: 'inventoryMedication',
   },
   {
     value: 2,
-    name: 'Comsumables',
+    name: 'Consumable',
     prop: 'consumableValueDto',
     itemFKName: 'inventoryConsumableFK',
     ctName: 'inventoryconsumable',
+    field: 'inventoryConsumable',
   },
   {
     value: 3,
-    name: 'Vaccines',
+    name: 'Vaccination',
     prop: 'vaccinationValueDto',
     itemFKName: 'inventoryVaccinationFK',
     ctName: 'inventoryvaccination',
+    field: 'inventoryVaccination',
   },
   {
     value: 4,
-    name: 'Services',
+    name: 'Service',
     prop: 'serviceValueDto',
     itemFKName: 'serviceCenterServiceFK',
     ctName: 'ctservice',
+    field: 'service',
   },
   {
     value: 5,
-    name: 'OrderSets',
+    name: 'OrderSet',
     prop: 'orderSetValueDto',
     itemFKName: 'inventoryOrderSetFK',
     ctName: 'inventoryorderset',
@@ -1891,6 +1896,7 @@ export const getInventoryItemList = (
       stock: x[stockName],
       uom: x.dispensingUOM ? x.dispensingUOM.name : x.uom.name,
       sellingPrice: x.sellingPrice,
+      lastCostPriceBefBonus: x.lastCostPriceBefBonus,
       [itemFKName]: x.id,
       stateName,
       itemFK: x.id,
@@ -1969,6 +1975,33 @@ export const groupByFKFunc = (array) => {
     }))
     .value()
 }
+
+export const visitOrderTemplateItemTypes = [
+  {
+    id: 1,
+    dtoName: 'visitOrderTemplateMedicationItemDto',
+    itemFKName: 'inventoryMedicationFK',
+    keyName: 'inventoryMedication',
+  },
+  {
+    id: 2,
+    dtoName: 'visitOrderTemplateConsumableItemDto',
+    itemFKName: 'inventoryConsumableFK',
+    keyName: 'inventoryConsumable',
+  },
+  {
+    id: 3,
+    dtoName: 'visitOrderTemplateVaccinationItemDto',
+    itemFKName: 'inventoryVaccinationFK',
+    keyName: 'inventoryVaccination',
+  },
+  {
+    id: 4,
+    dtoName: 'visitOrderTemplateServiceItemDto',
+    itemFKName: 'serviceCenterServiceFK',
+    keyName: 'service',
+  },
+]
 
 module.exports = {
   // paymentMethods,

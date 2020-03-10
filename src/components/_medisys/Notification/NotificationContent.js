@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
 // material ui
 import {
@@ -7,6 +7,7 @@ import {
   ListItemIcon,
   withStyles,
 } from '@material-ui/core'
+import { Button } from '@/components'
 import { TITLE, COLOR, ICONS } from './constants'
 import { NOTIFICATION_TYPE } from '@/utils/constants'
 
@@ -34,9 +35,16 @@ const styles = () => ({
   icon: {
     minWidth: 38,
   },
+  copyBtn: {
+    paddingTop: '0px !important',
+  },
 })
 
 const NotificationContent = ({ notification, classes, dispatch }) => {
+  const [
+    copied,
+    setCopied,
+  ] = useState(false)
   let messageTitle = notification.type ? TITLE[notification.type] : ''
   // let backgroundColor = notification.type ? COLOR[notification.type] : ''
   const icon = ICONS[notification.type] || Object.values(ICONS)[0]
@@ -45,12 +53,23 @@ const NotificationContent = ({ notification, classes, dispatch }) => {
     messageTitle = `${TITLE[NOTIFICATION_TYPE.QUEUE]} ${queueNo} -`
   }
   const isError = notification.type === NOTIFICATION_TYPE.ERROR
+
+  const handleCopyRequestID = () => {
+    let temporaryInput = document.createElement('INPUT')
+    document.body.appendChild(temporaryInput)
+    temporaryInput.setAttribute('value', notification.requestId)
+    temporaryInput.select()
+    document.execCommand('copy')
+    document.body.removeChild(temporaryInput)
+    setCopied(true)
+  }
+
   return (
     <ListItem
       button
       alignItems='flex-start'
       className={classes.itemRoot}
-      disabled={notification.read}
+      disabled={!isError && notification.read}
       onClick={() => {
         dispatch({
           type: 'header/readNotification',
@@ -65,13 +84,22 @@ const NotificationContent = ({ notification, classes, dispatch }) => {
         primary={
           <div>
             <div className={classes.itemContainer}>
-              <span>{messageTitle}</span>
+              <span>{messageTitle}&nbsp;</span>
               <p className={classes.messageText}>{notification.message}</p>
             </div>
             {isError && (
               <div className={classes.itemContainer}>
                 <span>Request ID:&nbsp;</span>
                 <p>{notification.requestId}</p>
+                <Button
+                  size='sm'
+                  link
+                  color='primary'
+                  onClick={handleCopyRequestID}
+                  className={classes.copyBtn}
+                >
+                  {copied ? 'Copied' : 'Copy Request ID'}
+                </Button>
               </div>
             )}
           </div>

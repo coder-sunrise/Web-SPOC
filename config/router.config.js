@@ -610,6 +610,11 @@ const _routes = [
             name: 'inventorytrendingreport',
             component: './Report/InventoryTrendingReport',
           },
+          {
+            path: '/report/inventorylistingreport',
+            name: 'inventorylistingreport',
+            component: './Report/InventoryListingReport',
+          },
         ],
       },
       // Report
@@ -882,6 +887,11 @@ const _routes = [
             path: '/setting/referralsource',
             name: 'referralsource',
             component: './Setting/ReferralSource',
+          },
+          {
+            path: '/setting/visitordertemplate',
+            name: 'visitordertemplate',
+            component: './Setting/VisitOrderTemplate',
           },
         ],
       },

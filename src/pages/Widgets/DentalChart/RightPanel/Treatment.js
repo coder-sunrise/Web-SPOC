@@ -55,7 +55,7 @@ const Treatment = ({
         _.groupBy(
           cttreatment.filter(
             (o) =>
-              !o.isDisplayInDiagnosis &&
+              o.isActive &&
               (!search ||
                 o.displayValue.toUpperCase().indexOf(search.toUpperCase()) >=
                   0),
@@ -178,7 +178,10 @@ const Treatment = ({
 
                           const { rows = [] } = orders
                           const treatmentOrder = rows.find(
-                            (m) => m.type === '7' && m.treatmentFK === o.id,
+                            (m) =>
+                              m.type === '7' &&
+                              m.treatmentFK === o.id &&
+                              !m.isDeleted,
                           )
 
                           dispatch({

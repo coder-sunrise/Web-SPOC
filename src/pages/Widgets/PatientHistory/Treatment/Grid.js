@@ -10,6 +10,7 @@ export default ({ current, codetable, dentalChartComponent }) => {
     <CommonTableGrid
       size='sm'
       rows={current.orders.filter((o) => o.type === 'Treatment') || []}
+      forceRender
       columns={[
         { name: 'legend', title: 'Image' },
         { name: 'name', title: 'Treatment' },

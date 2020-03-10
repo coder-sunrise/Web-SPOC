@@ -10,6 +10,7 @@ import BigCalendar from 'react-big-calendar'
 // common components
 import { Popper } from '@/components'
 import ApptPopover from './ApptPopover'
+import DoctorBlockPopover from './DoctorBlockPopover'
 // assets
 import customDropdownStyle from '@/assets/jss/material-dashboard-pro-react/components/customDropdownStyle'
 
@@ -113,11 +114,18 @@ class Event extends React.PureComponent {
 
     return (
       <Popper
+        stopOnClickPropagation
         className={classnames({
           [classes.pooperResponsive]: true,
           [classes.pooperNav]: true,
         })}
-        overlay={<ApptPopover popoverEvent={event} />}
+        overlay={
+          event.isDoctorBlock ? (
+            <DoctorBlockPopover popoverEvent={event} />
+          ) : (
+            <ApptPopover popoverEvent={event} />
+          )
+        }
       >
         {calendarView === BigCalendar.Views.MONTH ? (
           <div className={monthViewClass}>
@@ -139,60 +147,6 @@ class Event extends React.PureComponent {
         )}
       </Popper>
     )
-    // {
-    //   /* <Popover
-    //       id='event-popup'
-    //       className={classes.popover}
-    //       open={showPopup}
-    //       anchorEl={popupAnchor}
-    //       onClose={this.handleClosePopover}
-    //       placement='top-start'
-    //       anchorOrigin={{
-    //         vertical: 'center',
-    //         horizontal: 'right',
-    //       }}
-    //       transformOrigin={{
-    //         vertical: 'center',
-    //         horizontal: 'left',
-    //       }}
-    //       // disableRestoreFocus
-    //     >
-    //       {popoverEvent.doctor ? (
-    //         <DoctorBlockPopover
-    //           popoverEvent={popoverEvent}
-    //           calendarView={calendarView}
-    //         />
-    //       ) : (
-    //         <ApptPopover popoverEvent={popoverEvent} />
-    //       )}
-    //     </Popover> */
-    // }
-    // return calendarView === BigCalendar.Views.MONTH ? (
-    //   <div
-    //     className={monthViewClass}
-    //     onMouseEnter={this._handleMouseEnter}
-    //     onMouseLeave={this._handleMouseLeave}
-    //   >
-    //     <span>
-    //       {title} {accountNo}
-    //     </span>
-    //     {hasConflict && <ErrorOutline className={classes.icon} />}
-    //     {isEnableRecurrence && <Cached />}
-    //   </div>
-    // ) : (
-    //   <div
-    //     className={otherViewClass}
-    //     onMouseEnter={this._handleMouseEnter}
-    //     onMouseLeave={this._handleMouseLeave}
-    //   >
-    //     <div className={classes.title}>
-    //       <span>{title ? title.toUpperCase() : ''}</span>
-    //     </div>
-    //     <span className={classes.blockDiv}>
-    //       {subtitle ? subtitle.toUpperCase() : ''}
-    //     </span>
-    //   </div>
-    // )
   }
 }
 

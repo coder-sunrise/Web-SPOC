@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { connect } from 'dva'
@@ -115,11 +115,11 @@ class CommonModal extends React.PureComponent {
       classes,
       authority,
       confirmText,
+      isInformType,
       cancelText,
     } = this.props
     // console.log('footer', this.props)
     const { disabled = false } = confirmProps
-
     return (
       <SizeContainer size='md'>
         <div ref={this.myRef} a='1'>
@@ -127,41 +127,53 @@ class CommonModal extends React.PureComponent {
             className={classes.modalFooter}
             style={{ justifyContent: align }}
           >
-            {/* <TextField autoFocus /> */}
-            {onReset && (
+            {isInformType ? (
               <Button
-                key='reset'
-                // hideIfNoEditRights
-                aria-label='Reset'
-                color='danger'
-                onClick={onReset}
-                style={{ left: 0, position: 'absolute' }}
-                tabIndex='-2'
-              >
-                Reset
-              </Button>
-            )}
-            <Button
-              onClick={this.onClose}
-              color='danger'
-              authority='none'
-              // disabled={loading.global}
-              {...cancelProps}
-            >
-              {cancelText || 'Close'}
-            </Button>
-            {extraButtons}
-            {onConfirm && (
-              <ProgressButton
+                onClick={this.onClose}
                 color='primary'
-                // hideIfNoEditRights
-                onClick={onConfirm}
-                icon={null}
-                {...confirmProps}
-                // disabled={disabled || loading.global || global.disableSave}
+                authority='none'
+                {...cancelProps}
               >
-                {confirmText || confirmBtnText}
-              </ProgressButton>
+                Ok
+              </Button>
+            ) : (
+              <Fragment>
+                {onReset && (
+                  <Button
+                    key='reset'
+                    // hideIfNoEditRights
+                    aria-label='Reset'
+                    color='danger'
+                    onClick={onReset}
+                    style={{ left: 0, position: 'absolute' }}
+                    tabIndex='-2'
+                  >
+                    Reset
+                  </Button>
+                )}
+                <Button
+                  onClick={this.onClose}
+                  color='danger'
+                  authority='none'
+                  // disabled={loading.global}
+                  {...cancelProps}
+                >
+                  {cancelText || 'Close'}
+                </Button>
+                {extraButtons}
+                {onConfirm && (
+                  <ProgressButton
+                    color='primary'
+                    // hideIfNoEditRights
+                    onClick={onConfirm}
+                    icon={null}
+                    {...confirmProps}
+                    // disabled={disabled || loading.global || global.disableSave}
+                  >
+                    {confirmText || confirmBtnText}
+                  </ProgressButton>
+                )}
+              </Fragment>
             )}
           </DialogActions>
         </div>
@@ -234,8 +246,10 @@ class CommonModal extends React.PureComponent {
   }
 
   onEntered = (el) => {
-    if (el.setActive) el.setActive()
-    if (el.focus) el.focus()
+    if (this.props.autoFocus) {
+      if (el.setActive) el.setActive()
+      if (el.focus) el.focus()
+    }
   }
 
   render () {

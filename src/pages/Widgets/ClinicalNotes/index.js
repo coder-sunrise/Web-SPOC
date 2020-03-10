@@ -366,13 +366,16 @@ class ClinicalNotes extends Component {
   }
 
   onEditorChange = (type) => (v) => {
-    const { entity } = this.props.consultation
-    entity.corDoctorNote = [
-      {
-        ...entity.corDoctorNote[0],
-        [type]: v,
-      },
+    const { consultation, clinicInfo } = this.props
+    const { entity } = consultation
+
+    const _prefix =
+      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
+    const prefix = `${_prefix}`
+    entity[prefix] = [
+      { ...entity[prefix][0], [type]: v },
     ]
+
     this.props.dispatch({
       type: 'consultation/updateState',
       payload: {
@@ -409,9 +412,9 @@ class ClinicalNotes extends Component {
     const { consultation, clinicInfo } = this.props
     const fieldName = fieldKey[clinicInfo.clinicTypeFK]
 
-    const _prefix =
+    const prefix =
       clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
-    const prefix = `${_prefix}[0]`
+
     const { entity } = consultation
     const { text } = cannedText
 
@@ -422,7 +425,8 @@ class ClinicalNotes extends Component {
     const value = `${prevData || ''}${text}`
 
     this.onEditorChange(cannedTextRow[fieldName])(value)
-    this.form.setFieldValue(`${prefix}${cannedTextRow[fieldName]}`, value)
+    const name = `${prefix}[0][${cannedTextRow[fieldName]}]`
+    this.form.setFieldValue(name, value)
   }
 
   insertIntoClinicalNote = (dataUrl) => {
@@ -541,10 +545,14 @@ class ClinicalNotes extends Component {
           collapses={contents
             .filter((item) => {
               const accessRight = Authorized.check(item.authority)
-              if (accessRight && accessRight.rights === 'hidden') return false
+              if (
+                !accessRight ||
+                (accessRight && accessRight.rights === 'hidden')
+              )
+                return false
               return true
             })
-            .map((item) => {
+            .map((item, index) => {
               const onCannedTextClick = () =>
                 this.handleCannedTextButtonClick(item)
               const onSettingClick = () => this.openCannedText(item)
@@ -596,6 +604,7 @@ class ClinicalNotes extends Component {
                             </div>
 
                             <RichEditor
+                              autoFocus={index === 0}
                               style={{ marginBottom: 0 }}
                               strongLabel
                               onBlur={this.onEditorChange(item[fieldName])}

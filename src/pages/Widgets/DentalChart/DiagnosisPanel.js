@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/alt-text */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+
 import _ from 'lodash'
 import { makeStyles, withStyles } from '@material-ui/core/styles'
 import Settings from '@material-ui/icons/Settings'
@@ -30,45 +31,45 @@ import {
 import Setup from './Setup/index'
 import Tooth from './Tooth'
 
-const styles = (theme) => {
-  return {
-    groupBtnRoot: {
-      '&.Mui-disabled': {
-        color: 'inherit',
-      },
+const styles = (theme) => ({
+  paper: {},
+
+  groupBtnRoot: {
+    '&.Mui-disabled': {
+      color: 'inherit',
     },
-    groupBtnGroupRoot: {
-      display: 'block',
-      marginBottom: theme.spacing(1),
+  },
+  groupBtnGroupRoot: {
+    display: 'block',
+    marginBottom: theme.spacing(1),
+  },
+  buttonIcon: {
+    position: 'absolute',
+    left: -1,
+    top: -1,
+  },
+  grouped: {
+    fontSize: '0.75rem',
+    margin: theme.spacing(0.25, 0, 0.25, 0.5),
+    // border: 'none',
+    '&:not(:first-child)': {
+      marginLeft: theme.spacing(0.5),
+      borderRadius: Number(theme.shape.borderRadius),
+      borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
     },
-    buttonIcon: {
-      position: 'absolute',
-      left: -1,
-      top: -1,
+    '&:first-child': {
+      borderRadius: Number(theme.shape.borderRadius),
     },
-    grouped: {
-      fontSize: '0.75rem',
-      margin: theme.spacing(0.25, 0, 0.25, 0.5),
-      // border: 'none',
-      '&:not(:first-child)': {
-        marginLeft: theme.spacing(0.5),
-        borderRadius: Number(theme.shape.borderRadius),
-        borderLeft: '1px solid rgba(0, 0, 0, 0.38)',
-      },
-      '&:first-child': {
-        borderRadius: Number(theme.shape.borderRadius),
-      },
-      height: 33,
-      lineHeight: 1,
-      // whiteSpace: 'nowrap',
-      paddingLeft: 37,
-      overflow: 'hidden',
-      width: 194,
-      border: '1px solid rgba(0, 0, 0, 0.38)',
-      // borderRadius: '8px',
-    },
-  }
-}
+    height: 33,
+    lineHeight: 1,
+    // whiteSpace: 'nowrap',
+    paddingLeft: 37,
+    overflow: 'hidden',
+    width: 194,
+    border: '1px solid rgba(0, 0, 0, 0.38)',
+    // borderRadius: '8px',
+  },
+})
 
 const DiagnosisPanel = (props) => {
   const {
@@ -80,6 +81,7 @@ const DiagnosisPanel = (props) => {
     paperProps,
     viewOnly,
     chartmethods,
+    dentalChartComponent = {},
     ...restProps
   } = props
 
@@ -109,9 +111,18 @@ const DiagnosisPanel = (props) => {
       type: 'dentalChartComponent/updateState',
       payload: {
         action: btn,
+        selected: undefined,
       },
     })
   }
+  useEffect(
+    () => {
+      if (!dentalChartComponent.action) setSelectedStyle(undefined)
+    },
+    [
+      dentalChartComponent.action,
+    ],
+  )
   return (
     <div>
       <Paper className={classes.paper} {...paperProps}>
@@ -237,7 +248,16 @@ const DiagnosisPanel = (props) => {
 }
 export default React.memo(
   withStyles(styles, { withTheme: true })(DiagnosisPanel),
-  ({ codetable }, { codetable: codetableNext }) => {
-    return codetable.ctchartmethod === codetableNext.ctchartmethod
+  (
+    { codetable, dentalChartComponent = {} },
+    {
+      codetable: codetableNext,
+      dentalChartComponent: dentalChartComponentNext = {},
+    },
+  ) => {
+    return (
+      codetable.ctchartmethod === codetableNext.ctchartmethod &&
+      dentalChartComponent.action === dentalChartComponentNext.action
+    )
   },
 )

@@ -210,7 +210,7 @@ export default createListViewModel({
       },
 
       deleteRow (state, { payload }) {
-        let { finalAdjustments, rows } = state
+        let { finalAdjustments, rows, isGSTInclusive, gstValue } = state
         let tempRows = [
           ...rows,
         ]
@@ -232,7 +232,10 @@ export default createListViewModel({
           }))
         }
 
-        const amount = calculateAmount(tempRows, finalAdjustments)
+        const amount = calculateAmount(tempRows, finalAdjustments, {
+          isGSTInclusive,
+          gstValue,
+        })
         // console.log(tempRows, finalAdjustments, amount)
         return {
           ...state,

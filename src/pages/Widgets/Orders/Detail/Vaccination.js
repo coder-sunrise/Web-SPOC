@@ -32,19 +32,23 @@ let i = 0
     totalPrice: Yup.number().required(),
     vaccinationGivenDate: Yup.date().required(),
     quantity: Yup.number().required(),
-    usageMethodFK: Yup.number().required(),
-    dosageFK: Yup.number().required(),
-    uomfk: Yup.number().required(),
   }),
 
   handleSubmit: (values, { props, onConfirm, resetForm }) => {
     const { dispatch, orders, currentType, getNextSequence } = props
     const { rows } = orders
+    var batchNo = values.batchNo
+    if (batchNo instanceof Array) {
+      if (batchNo && batchNo.length > 0) {
+        batchNo = batchNo[0]
+      }
+    }
     const data = {
       sequence: getNextSequence(),
       ...values,
       subject: currentType.getSubject(values),
       isDeleted: false,
+      batchNo,
     }
     dispatch({
       type: 'orders/upsertRow',
@@ -449,12 +453,20 @@ class Vaccination extends PureComponent {
               render={(args) => {
                 return (
                   <CodeSelect
+                    mode='tags'
+                    maxSelected={1}
+                    disableAll
                     label='Batch No.'
                     labelField='batchNo'
                     valueField='batchNo'
                     options={this.state.selectedVaccination.vaccinationStock}
                     onChange={(e, op = {}) => {
-                      setFieldValue('expiryDate', op.expiryDate)
+                      if (op && op.length > 0) {
+                        const { expiryDate } = op[0]
+                        setFieldValue(`expiryDate`, expiryDate)
+                      } else {
+                        setFieldValue(`expiryDate`, undefined)
+                      }
                     }}
                     disabled={disableEdit}
                     {...args}
