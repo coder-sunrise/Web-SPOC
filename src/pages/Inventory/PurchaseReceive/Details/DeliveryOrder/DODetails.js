@@ -323,13 +323,22 @@ class DODetails extends PureComponent {
         type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
-    } else {
+    } else if (changed) {
+      const existUid = Object.keys(changed)[0]
       await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
-          uid: changed ? Object.keys(changed)[0] : undefined,
+          uid: existUid,
+          ...changed[existUid],
           gridRows: rows,
-          gridRow: added ? added[0] : undefined,
+          remark: values.remark,
+        },
+      })
+    } else if (added) {
+      await dispatch({
+        type: 'deliveryOrderDetails/upsertRow',
+        payload: {
+          gridRow: added[0],
           remark: values.remark,
         },
       })
@@ -337,6 +346,38 @@ class DODetails extends PureComponent {
     setFieldValue('isDirty', true) // manually trigger dirty
 
     // return rows
+  }
+
+  onAddedRowsChange = (addedRows) => {
+    let newAddedRows = addedRows
+    if (addedRows.length > 0) {
+      if (!addedRows.isFocused) {
+        const { onClickColumn, selectedItem } = this.state
+
+        if (onClickColumn === 'type') {
+          // Handle type changed
+        } else if (onClickColumn === 'item') {
+          this.setState({ onClickColumn: undefined })
+          return addedRows.map((row) => ({
+            ...row,
+          }))
+        }
+
+        this.setState({ onClickColumn: undefined })
+
+        newAddedRows = addedRows.map((row) => ({
+          ...row,
+        }))
+      } else {
+        // Initialize new generated row
+        this.setState({ onClickColumn: undefined })
+        newAddedRows = addedRows.map((row) => ({
+          ...row,
+          isFocused: true,
+        }))
+      }
+    }
+    return newAddedRows
   }
 
   getItemOptions = (row, filteredStateName, stateName) => {
@@ -661,6 +702,7 @@ class DODetails extends PureComponent {
               EditingProps={{
                 showAddCommand: true,
                 onCommitChanges: this.onCommitChanges,
+                onAddedRowsChange: this.onAddedRowsChange,
               }}
               {...tableParas}
             />
