@@ -59,9 +59,10 @@ export default createListViewModel({
             const {
               roomFk,
               startTime,
-              clinicianFK,
               endTime,
               appointmentFK,
+              clinicianName,
+              clinicianTitle,
             } = appt
 
             const commonValues = {
@@ -70,7 +71,7 @@ export default createListViewModel({
               roomFk,
               appointmentFK,
               apptTime: startTime,
-              doctor: clinicianFK,
+              doctor: `${clinicianTitle || ''} ${clinicianName}`,
               duration: calculateDuration(startTime, endTime),
               patientName: `${restValues.salutation ||
                 ''} ${restValues.patientName}`,

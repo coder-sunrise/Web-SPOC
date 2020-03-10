@@ -118,10 +118,6 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'doctor',
-            type: 'codeSelect',
-            code: 'doctorprofile',
-            labelField: 'clinicianProfile.name',
-            valueField: 'clinicianProfile.id',
             sortingEnabled: false,
           },
           {
