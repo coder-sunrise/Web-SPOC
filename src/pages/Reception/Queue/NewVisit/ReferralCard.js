@@ -39,7 +39,6 @@ class ReferralCard extends PureComponent {
     if (e && e[0]) {
       const data = this.state.referralData.filter((m) => m.name === e[0])
       if (data.length > 0) {
-        console.log(data[0].institution)
         const { setFieldValue } = this.props
         setFieldValue('referralInstitution', data[0].institution)
       }
