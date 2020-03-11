@@ -91,50 +91,6 @@ const DispenseDetails = ({
   dispense,
   history,
 }) => {
-  const [
-    loading,
-    setLoading,
-  ] = useState(false)
-  useEffect(() => {
-    const getCodeTables = async () => {
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventorymedication',
-          force: true,
-          temp: true,
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventoryvaccination',
-          force: true,
-          temp: true,
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'inventoryconsumable',
-          force: true,
-          temp: true,
-        },
-      })
-      await dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'ctservice',
-          force: true,
-          temp: true,
-        },
-      })
-      setLoading(false)
-    }
-    setLoading(true)
-    getCodeTables()
-  }, [])
-
   const {
     prescription,
     vaccination,
@@ -317,7 +273,7 @@ const DispenseDetails = ({
                 size='sm'
                 icon={<Edit />}
                 onClick={onEditOrderClick}
-                disabled={loading}
+                disabled={!dispense.queryCodeTablesDone}
               >
                 Add Order
               </ProgressButton>
