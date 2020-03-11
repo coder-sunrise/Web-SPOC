@@ -73,12 +73,14 @@ const styles = (theme) => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
     let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight.map((r) => {
-      const data = filteredAccessRight.filter((m) => {
-        return m.clientAccessRightFK === r.clientAccessRightFK
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .filter((a) => a.clinicRoleBitValue >= 2 ** (values.clinicRoleFK - 1))
+      .map((r) => {
+        const data = filteredAccessRight.filter((m) => {
+          return m.clientAccessRightFK === r.clientAccessRightFK
+        })
+        return data.length === 0 ? r : data[0]
       })
-      return data.length === 0 ? r : data[0]
-    })
     if (!values.id) {
       restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
@@ -258,6 +260,12 @@ class Main extends React.Component {
     history.goBack()
   }
 
+  filterAccessByRole = (accessRights, roleFK) => {
+    return !roleFK
+      ? accessRights
+      : accessRights.filter((a) => a.clinicRoleBitValue >= 2 ** (roleFK - 1))
+  }
+
   render () {
     const { classes, values } = this.props
     const { filter, hasUser, hasActiveSession, isActive } = this.state
@@ -266,6 +274,8 @@ class Main extends React.Component {
       isUserMaintainable,
       effectiveStartDate,
       effectiveEndDate,
+      filteredAccessRight,
+      clinicRoleFK,
     } = values
 
     const isEdit = !!id
@@ -416,7 +426,10 @@ class Main extends React.Component {
 
             <SizeContainer size='sm'>
               <CommonTableGrid
-                rows={values.filteredAccessRight}
+                rows={this.filterAccessByRole(
+                  filteredAccessRight,
+                  clinicRoleFK,
+                )}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
                 onRowDoubleClick={this.handleDoubleClick}
                 FuncProps={{ pager: true }}
