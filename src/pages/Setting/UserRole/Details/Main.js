@@ -73,12 +73,18 @@ const styles = (theme) => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
     let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight.map((r) => {
-      const data = filteredAccessRight.filter((m) => {
-        return m.clientAccessRightFK === r.clientAccessRightFK
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .filter(
+        (m) =>
+          !values.clinicRoleFK ||
+          m.clinicRoleBitValue >= 2 ** (values.clinicRoleFK - 1),
+      )
+      .map((r) => {
+        const data = filteredAccessRight.filter((m) => {
+          return m.clientAccessRightFK === r.clientAccessRightFK
+        })
+        return data.length === 0 ? r : data[0]
       })
-      return data.length === 0 ? r : data[0]
-    })
     if (!values.id) {
       restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
@@ -164,7 +170,7 @@ class Main extends React.Component {
     }
   }
 
-  handleSearchClick = async () => {
+  handleSearch = async (e) => {
     const { filter } = this.state
     const { module, displayValue } = filter
     const { values } = this.props
@@ -177,12 +183,24 @@ class Main extends React.Component {
     })
 
     restValues.filteredAccessRight = restValues.roleClientAccessRight
+      .filter(
+        (m) =>
+          // if (e) {
+          //   if (typeof e === 'number') return m.clinicRoleBitValue >= 2 ** (e - 1)
+          // }
+          // return true
+          typeof e !== 'number' || m.clinicRoleBitValue >= 2 ** (e - 1),
+      )
       .filter((m) => {
         return !module || m.module === module
       })
       .filter((m) => {
         return !displayValue || m.displayValue === displayValue
       })
+
+    if (typeof e === 'number') {
+      restValues.clinicRoleFK = e
+    }
 
     this.props.dispatch({
       type: 'settingUserRole/updateState',
@@ -266,6 +284,7 @@ class Main extends React.Component {
       isUserMaintainable,
       effectiveStartDate,
       effectiveEndDate,
+      filteredAccessRight,
     } = values
 
     const isEdit = !!id
@@ -372,6 +391,7 @@ class Main extends React.Component {
                     label='Clinical Role'
                     code='ltclinicalrole'
                     disabled={isEdit}
+                    onChange={this.handleSearch}
                   />
                 )}
               />
@@ -408,7 +428,7 @@ class Main extends React.Component {
               <ProgressButton
                 icon={<Search />}
                 color='primary'
-                onClick={this.handleSearchClick}
+                onClick={this.handleSearch}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
@@ -416,9 +436,8 @@ class Main extends React.Component {
 
             <SizeContainer size='sm'>
               <CommonTableGrid
-                rows={values.filteredAccessRight}
+                rows={filteredAccessRight}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
-                onRowDoubleClick={this.handleDoubleClick}
                 FuncProps={{ pager: true }}
               />
             </SizeContainer>

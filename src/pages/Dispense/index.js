@@ -35,6 +35,10 @@ import { LoadingWrapper } from '@/components/_medisys'
   }),
 )
 class Dispense extends PureComponent {
+  componentDidMount () {
+    this.getCodeTables()
+  }
+
   componentWillUnmount () {
     const { dispatch } = this.props
     dispatch({
@@ -79,6 +83,49 @@ class Dispense extends PureComponent {
         </h4>
       </GridContainer>
     )
+  }
+
+  getCodeTables = async () => {
+    const { dispatch } = this.props
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventorymedication',
+        force: true,
+        temp: true,
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryvaccination',
+        force: true,
+        temp: true,
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'inventoryconsumable',
+        force: true,
+        temp: true,
+      },
+    })
+    await dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'ctservice',
+        force: true,
+        temp: true,
+      },
+    })
+
+    dispatch({
+      type: 'dispense/updateState',
+      payload: {
+        queryCodeTablesDone: true,
+      },
+    })
   }
 
   render () {

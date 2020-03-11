@@ -35,11 +35,15 @@ class ReferralCard extends PureComponent {
       })
   }
 
-  handleSelect = (e) => {
+  onReferralByAndInstitutionChange = (e) => {
+    const { values, setFieldValue } = this.props
+    const { referralBy, referralInstitution, referralDate } = values
+    if (referralBy && referralInstitution && !referralDate) {
+      setFieldValue('referralDate', moment().formatUTC())
+    }
     if (e && e[0]) {
       const data = this.state.referralData.filter((m) => m.name === e[0])
       if (data.length > 0) {
-        const { setFieldValue } = this.props
         setFieldValue('referralInstitution', data[0].institution)
       }
     }
@@ -68,7 +72,7 @@ class ReferralCard extends PureComponent {
                   maxSelected={1}
                   disableAll
                   disabled={isReadOnly}
-                  onChange={this.handleSelect}
+                  onChange={this.onReferralByAndInstitutionChange}
                 />
               )}
             />
@@ -94,6 +98,7 @@ class ReferralCard extends PureComponent {
                 <TextField
                   label='Institution'
                   disabled={isReadOnly}
+                  onChange={this.onReferralByAndInstitutionChange}
                   {...args}
                 />
               )}

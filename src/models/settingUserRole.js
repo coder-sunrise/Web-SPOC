@@ -85,7 +85,11 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             ...data,
-            filteredAccessRight: data.roleClientAccessRight,
+            filteredAccessRight: data.roleClientAccessRight.filter(
+              (m) =>
+                !data.clinicRoleFK ||
+                m.clinicRoleBitValue >= 2 ** (data.clinicRoleFK - 1),
+            ),
           },
         }
       },
