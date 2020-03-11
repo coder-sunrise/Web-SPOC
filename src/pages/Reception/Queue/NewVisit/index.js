@@ -233,6 +233,7 @@ class NewVisit extends PureComponent {
       values,
       isSubmitting,
       dispatch,
+      setFieldValue,
     } = this.props
 
     const height = getHeight(this.props.height)
@@ -313,6 +314,8 @@ class NewVisit extends PureComponent {
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}
                         dispatch={dispatch}
+                        values={values}
+                        setFieldValue={setFieldValue}
                       />
                     </GridItem>
                   </React.Fragment>
