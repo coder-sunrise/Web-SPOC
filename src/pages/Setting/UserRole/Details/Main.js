@@ -183,12 +183,14 @@ class Main extends React.Component {
     })
 
     restValues.filteredAccessRight = restValues.roleClientAccessRight
-      .filter((m) => {
-        if (e) {
-          if (typeof e === 'number') return m.clinicRoleBitValue >= 2 ** (e - 1)
-        }
-        return true
-      })
+      .filter(
+        (m) =>
+          // if (e) {
+          //   if (typeof e === 'number') return m.clinicRoleBitValue >= 2 ** (e - 1)
+          // }
+          // return true
+          typeof e !== 'number' || m.clinicRoleBitValue >= 2 ** (e - 1),
+      )
       .filter((m) => {
         return !module || m.module === module
       })
