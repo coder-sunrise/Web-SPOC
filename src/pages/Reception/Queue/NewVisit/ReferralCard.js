@@ -16,6 +16,7 @@ import FormField from './formField'
 
 class ReferralCard extends PureComponent {
   state = {
+    referralData: [],
     referralList: [],
   }
 
@@ -26,13 +27,23 @@ class ReferralCard extends PureComponent {
       })
       .then((response) => {
         if (response) {
-          // console.log(response)
           const result = response.data.map((m) => {
             return { name: m.name, value: m.name }
           })
-          this.setState({ referralList: result })
+          this.setState({ referralData: response.data, referralList: result })
         }
       })
+  }
+
+  handleSelect = (e) => {
+    if (e && e[0]) {
+      const data = this.state.referralData.filter((m) => m.name === e[0])
+      if (data.length > 0) {
+        console.log(data[0].institution)
+        const { setFieldValue } = this.props
+        setFieldValue('referralInstitution', data[0].institution)
+      }
+    }
   }
 
   render () {
@@ -58,6 +69,7 @@ class ReferralCard extends PureComponent {
                   maxSelected={1}
                   disableAll
                   disabled={isReadOnly}
+                  onChange={this.handleSelect}
                 />
               )}
             />
