@@ -291,9 +291,32 @@ const widgets = [
     accessRight: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('@/pages/Widgets/Attachment'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...p} mainType='ClinicalNotes' />
+      },
       loading: Loading,
     }),
     model: 'attachment',
+    associatedProps: [
+      'corAttachment',
+    ],
+    layoutConfig: {
+      minW: 12,
+      minH: 10,
+      style: {
+        padding: '0 5px',
+      },
+    },
+  },
+  {
+    id: '9',
+    name: 'Visual Acuity Test',
+    accessRight: 'queue.consultation.widgets.attachment',
+    component: Loadable({
+      loader: () => import('@/pages/Widgets/VisualAcuity'),
+      loading: Loading,
+    }),
     associatedProps: [
       'corAttachment',
     ],

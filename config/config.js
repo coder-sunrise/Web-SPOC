@@ -25,12 +25,14 @@ const plugins = [
         loadingComponent: './components/PageLoading/index',
       },
       // pwa: {},
-      // pwa: {
-      //   workboxPluginMode: 'InjectManifest',
-      //   workboxOptions: {
-      //     importWorkboxFrom: 'local',
-      //   },
-      // },
+      pwa: defaultSettings.pwa
+        ? {
+            workboxPluginMode: 'InjectManifest',
+            workboxOptions: {
+              importWorkboxFrom: 'local',
+            },
+          }
+        : false, // default close dll, because issue https://github.com/ant-design/ant-design-pro/issues/4665
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
