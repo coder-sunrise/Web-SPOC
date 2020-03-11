@@ -72,6 +72,7 @@ const VisitInfoCard = ({
                   id: 'reception.queue.visitRegistration.visitType',
                 })}
                 code='ctvisitpurpose'
+                allowClear={false}
                 {...args}
               />
             )}
