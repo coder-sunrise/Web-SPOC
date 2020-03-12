@@ -436,6 +436,7 @@ class Main extends React.Component {
 
             <SizeContainer size='sm'>
               <CommonTableGrid
+                forceRender
                 rows={filteredAccessRight}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
                 FuncProps={{ pager: true }}
