@@ -55,12 +55,21 @@ class InventoryItemList extends React.Component {
     currentTab: 1,
   }
 
-  addItemToRows = (obj) => {
+  addItemToRows = (newRow) => {
     const { setFieldValue, values, dispatch } = this.props
-    const newRows = [
-      ...values.rows,
-      obj,
-    ]
+    let newRows = []
+    if (Array.isArray(newRow)) {
+      newRows = [
+        ...values.rows,
+        ...newRow,
+      ]
+    } else {
+      newRows = [
+        ...values.rows,
+        newRow,
+      ]
+    }
+
     setFieldValue('rows', newRows)
 
     // Reset field
@@ -127,12 +136,12 @@ class InventoryItemList extends React.Component {
   }
 
   addOrderSetItemToRows = (newItemArray) => {
-    newItemArray.map((item) => {
+    const newItems = newItemArray.map((item) => {
       const itemFieldName = InventoryTypes.filter(
         (x) => x.value === item.type,
       )[0]
       const typeFieldName = item[itemFieldName.field]
-      let newItemRow = {
+      const newItemRow = {
         uid: getUniqueId(),
         type: itemFieldName.value,
         [itemFieldName.itemFKName]:
@@ -152,9 +161,9 @@ class InventoryItemList extends React.Component {
         quantity: item.quantity,
       }
 
-      this.addItemToRows(newItemRow)
-      return item
+      return newItemRow
     })
+    this.addItemToRows(newItems)
   }
 
   checkOrderSetItemIsExisted = (orderSetItemArray, existingRows, type) => {
@@ -627,6 +636,7 @@ class InventoryItemList extends React.Component {
           <CommonTableGrid
             rows={values.rows}
             // {...tableConfigs}
+            forceRender
             getRowId={(r) => r.uid}
             columns={this.getColumns()}
             columnExtensions={this.getColumnsExtensions(values)}
