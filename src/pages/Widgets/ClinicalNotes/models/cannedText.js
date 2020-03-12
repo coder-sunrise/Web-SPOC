@@ -10,6 +10,7 @@ import { CANNEDTEXT_FIELD_KEY } from '../CannedText/utils'
 
 const defaultState = {
   clinicianNote: [],
+  clinicalNotes: [],
   chiefComplaints: [],
   complaints: [],
   plan: [],
