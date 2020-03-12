@@ -121,13 +121,15 @@ const Attachment = ({
       fileName: file.name,
       fileSize: file.size,
       fileExtension: getFileExtension(file.name),
-      fileCategoryFK: fileCategoryFK,
+      fileCategoryFK,
       content: base64,
       // isConfirmed: false,
-      fileStatusFK: fileStatusFK,
+      fileStatusFK,
       attachmentType,
     }
-    const uploaded = await uploadFile(uploadObject)
+    const uploaded = await uploadFile([
+      uploadObject,
+    ])
 
     return { ...uploaded, attachmentType }
   }
