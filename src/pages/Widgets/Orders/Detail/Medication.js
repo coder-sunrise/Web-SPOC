@@ -39,14 +39,8 @@ import { calculateAdjustAmount } from '@/utils/utils'
     if (type === '5') {
       v.drugCode = 'MISC'
     }
-    if (
-      !v.corPrescriptionItemPrecaution ||
-      !v.corPrescriptionItemPrecaution[0]
-    ) {
-      v.corPrescriptionItemPrecaution = [
-        {},
-      ]
-    }
+    v.corPrescriptionItemPrecaution = v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0] ? v.corPrescriptionItemPrecaution : [{}]
+
     return v
   },
   enableReinitialize: true,
@@ -205,10 +199,11 @@ class Medication extends PureComponent {
             title='Are you sure delete this item?'
             onConfirm={() => {
               setFieldValue(`${prop}[${i}].isDeleted`, true)
-              // arrayHelpers.remove(i)
-              setTimeout(() => {
-                this.calculateQuantity()
-              }, 1)
+              if(prop === 'corPrescriptionItemInstruction'){
+                setTimeout(() => {
+                  this.calculateQuantity()
+                }, 1)
+              }
             }}
             // okText='Yes'
             // cancelText='No'
@@ -236,21 +231,20 @@ class Medication extends PureComponent {
   }
 
   calculateQuantity = (medication) => {
-    const { codetable, setFieldValue, disableEdit, dirty } = this.props
-    let currentMedicaiton = medication
-    if (!currentMedicaiton) currentMedicaiton = this.state.selectedMedication
+    const { codetable, setFieldValue, disableEdit } = this.props
+    let currentMedication = medication || this.state.selectedMedication
+
     const { form } = this.descriptionArrayHelpers
     let newTotalQuantity = 0
 
-    if (currentMedicaiton && currentMedicaiton.dispensingQuantity) {
-      newTotalQuantity = currentMedicaiton.dispensingQuantity
+    if (currentMedication && currentMedication.dispensingQuantity) {
+      newTotalQuantity = currentMedication.dispensingQuantity
     } else {
       const prescriptionItem = form.values.corPrescriptionItemInstruction.filter(
         (item) => !item.isDeleted,
       )
       const dosageUsageList = codetable.ctmedicationdosage
       const medicationFrequencyList = codetable.ctmedicationfrequency
-
       for (let i = 0; i < prescriptionItem.length; i++) {
         if (
           prescriptionItem[i].dosageFK &&
@@ -273,7 +267,7 @@ class Medication extends PureComponent {
       }
 
       newTotalQuantity = Math.ceil(newTotalQuantity * 10) / 10 || 0
-      const { prescriptionToDispenseConversion } = currentMedicaiton
+      const { prescriptionToDispenseConversion } = currentMedication
       if (prescriptionToDispenseConversion)
         newTotalQuantity = Math.ceil(
           newTotalQuantity / prescriptionToDispenseConversion,
@@ -282,27 +276,21 @@ class Medication extends PureComponent {
     setFieldValue(`quantity`, newTotalQuantity)
 
     if (disableEdit === false) {
-      if (currentMedicaiton.sellingPrice) {
-        setFieldValue('unitPrice', currentMedicaiton.sellingPrice)
-        setFieldValue(
-          'totalPrice',
-          currentMedicaiton.sellingPrice * newTotalQuantity,
-        )
-        this.updateTotalPrice(currentMedicaiton.sellingPrice * newTotalQuantity)
+      if (currentMedication.sellingPrice) {
+        setFieldValue('unitPrice', currentMedication.sellingPrice)
+        this.updateTotalPrice(currentMedication.sellingPrice * newTotalQuantity)
       } else {
         setFieldValue('unitPrice', undefined)
-        setFieldValue('totalPrice', undefined)
         this.updateTotalPrice(undefined)
       }
     }
   }
 
   setTotalPrice = () => {
-    const { setFieldValue, values, disableEdit } = this.props
+    const { values, disableEdit } = this.props
     if (disableEdit === false) {
       if (values.unitPrice) {
         const total = (values.quantity || 0) * values.unitPrice
-        setFieldValue('totalPrice', total)
         this.updateTotalPrice(total)
       }
     }
@@ -517,9 +505,11 @@ class Medication extends PureComponent {
         v,
         adjValue,
       )
+      this.props.setFieldValue('totalPrice', v)
       this.props.setFieldValue('totalAfterItemAdjustment', adjustment.amount)
       this.props.setFieldValue('adjAmount', adjustment.adjAmount)
     } else {
+      this.props.setFieldValue('totalPrice', v)
       this.props.setFieldValue('totalAfterItemAdjustment', undefined)
       this.props.setFieldValue('adjAmount', undefined)
     }
