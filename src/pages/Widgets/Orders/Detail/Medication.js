@@ -123,11 +123,11 @@ import { calculateAdjustAmount } from '@/utils/utils'
 
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
-      (i) => i.medicationPrecautionFK !== undefined || !i.isDeleted,
+      (i) => i.medicationPrecautionFK !== undefined && !i.isDeleted,
     )
 
     const activeInstruction = values.corPrescriptionItemInstruction.filter(
-      (item) => !item.isDeleted,
+      (item) => !item.isDeleted
     )
 
     // reorder and overwrite sequence
@@ -174,18 +174,6 @@ class Medication extends PureComponent {
   }
 
   componentDidMount () {
-    // this.props
-    //   .dispatch({
-    //     type: 'orders/getStockDetails',
-    //     payload: {
-    //       id: 1,
-    //     },
-    //   })
-    //   .then((v) => {
-    //     if (v) {
-    //       this.setState({ stockList: v.data })
-    //     }
-    //   })
   }
 
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
@@ -196,7 +184,6 @@ class Medication extends PureComponent {
         xs={2}
         gutter={theme.spacing(1)}
         style={{
-          // lineHeight: theme.props.rowHeight,
           textAlign: 'center',
         }}
       >
@@ -210,8 +197,6 @@ class Medication extends PureComponent {
                 this.calculateQuantity()
               }, 1)
             }}
-            // okText='Yes'
-            // cancelText='No'
           >
             <Button justIcon color='danger'>
               <Delete />
@@ -1012,13 +997,6 @@ class Medication extends PureComponent {
                       setTimeout(() => {
                         this.setTotalPrice()
                       }, 1)
-                      // if (disableEdit === false) {
-                      //   if (values.unitPrice) {
-                      //     const total = e.target.value * values.unitPrice
-                      //     setFieldValue('totalPrice', total)
-                      //     this.updateTotalPrice(total)
-                      //   }
-                      // }
                     }}
                     {...args}
                   />
@@ -1057,18 +1035,7 @@ class Medication extends PureComponent {
                   <NumberInput
                     label='Total'
                     onChange={(e) => {
-                      // this.props.setFieldValue(
-                      //   'totalAfterItemAdjustment',
-                      //   e.target.value,
-                      // )
                       this.updateTotalPrice(e.target.value)
-                      // this.props.dispatch({
-                      //   type: 'orders/updateState',
-                      //   payload: {
-                      //     totalPrice: e.target.value,
-                      //     totalAfterItemAdjustment: undefined,
-                      //   },
-                      // })
                     }}
                     disabled={disableEdit}
                     currency
