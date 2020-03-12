@@ -87,11 +87,11 @@ export default createListViewModel({
       },
       *batchFetch ({ payload }, { all, call, put }) {
         const { codes } = payload
-        console.time('batch fetch')
+        // console.time('batch fetch')
         const responses = yield all(
           codes.map((code) => put({ type: 'fetchCodes', payload: { code } })),
         )
-        console.timeEnd('batch fetch')
+        // console.timeEnd('batch fetch')
         return responses
       },
     },

@@ -39,6 +39,7 @@ const ImageViewer = ({
   dispatch,
   imageViewer,
   mainDivHeight = 700,
+  ...restProps
 }) => {
   const { attachment } = imageViewer
   const [
@@ -113,7 +114,6 @@ const ImageViewer = ({
     [classes.imageFixedSize]: !showOriginal,
     [classes.imageOriginalSize]: showOriginal,
   })
-
   return (
     <React.Fragment>
       {imageContent && (
@@ -129,12 +129,12 @@ const ImageViewer = ({
               <Download />Download
             </Button>
             <Button color='primary' onClick={onShowOriginalClick}>
-              Show Original
+              {showOriginal ? 'Auto Fit' : 'Show Original'}
             </Button>
           </div>
           <div
             className={classes.imageContainer}
-            style={{ maxHeight: mainDivHeight - 190 }}
+            style={{ maxHeight: mainDivHeight - 160 }}
           >
             <img
               className={imageClass}

@@ -9,7 +9,6 @@ import { CLINIC_TYPE } from '@/utils/constants'
 
 const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo') || {})
 const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-
 const widgets = [
   {
     id: '1',
@@ -90,7 +89,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
     // toolbarAddon: (
@@ -318,7 +317,7 @@ const widgets = [
       loading: Loading,
     }),
     associatedProps: [
-      'corAttachment',
+      'corEyeVisualAcuityTest',
     ],
     layoutConfig: {
       minW: 12,

@@ -39,17 +39,17 @@ const attchementTypes = [
     id: 4,
     type: 'VisualAcuity',
     name: 'Visual Acuity Test',
-    accessRight: '',
+    accessRight: '2',
   },
 ]
 
-@connect()
+@connect(({ consultation }) => ({
+  consultation,
+}))
 class Attachment extends Component {
   state = {
     runOnce: false,
     showScribbleModal: false,
-    selectedScribbleNoteData: undefined,
-    corAttachment: undefined,
     activedKeys: undefined,
     types: attchementTypes.filter((o) => o.accessRight),
   }
@@ -59,6 +59,7 @@ class Attachment extends Component {
   }
 
   handleUpdateAttachments = ({ added, deleted }) => {
+    console.log(this)
     const { form, field } = this
     const { types, activedKeys } = this.state
     let updated = [
@@ -118,8 +119,14 @@ class Attachment extends Component {
       updated.map((item, index) => ({ ...item, sortOrder: index + 1 })),
     )
 
-    this.setState({
-      corAttachment: updated,
+    const { consultation } = this.props
+    const { entity } = consultation
+    entity.corAttachment = updated
+    this.props.dispatch({
+      type: 'consultation/updateState',
+      payload: {
+        entity,
+      },
     })
   }
 
@@ -202,8 +209,10 @@ class Attachment extends Component {
   }
 
   render () {
-    const { corAttachment, types } = this.state
-
+    const { types } = this.state
+    const { consultation } = this.props
+    const { entity } = consultation
+    const { corAttachment } = entity
     return (
       <div>
         <FastField
@@ -218,7 +227,6 @@ class Attachment extends Component {
             if (!this.state.runOnce) {
               this.setState({
                 runOnce: true,
-                corAttachment: form.values.corAttachment || [],
               })
             }
             return null

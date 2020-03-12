@@ -25,14 +25,12 @@ const plugins = [
         loadingComponent: './components/PageLoading/index',
       },
       // pwa: {},
-      pwa: defaultSettings.pwa
-        ? {
-            workboxPluginMode: 'InjectManifest',
-            workboxOptions: {
-              importWorkboxFrom: 'local',
-            },
-          }
-        : false, // default close dll, because issue https://github.com/ant-design/ant-design-pro/issues/4665
+      // pwa: {
+      //   workboxPluginMode: 'InjectManifest',
+      //   workboxOptions: {
+      //     importWorkboxFrom: 'local',
+      //   },
+      // },
       ...(!process.env.TEST && os.platform() === 'darwin'
         ? {
             dll: {
@@ -61,13 +59,12 @@ export default {
   },
   define: {
     APP_TYPE: process.env.APP_TYPE || '',
-    'process.env.client_env': 'development',
+    'process.env.client_env': 'uat',
     'process.env.client_secret':
       '20e392d2ea9bfa76f2a9cb26c31a34d675ad81281a31f89ed5d572de8da0b9e7',
-    // 'process.env.url': 'http://localhost:9500',
-    'process.env.url': 'https://semr2dev2010.emr.com.sg',
+    'process.env.url': 'https://semr2uat2010.emr.com.sg',
     'process.env.signalrUrl':
-      'https://semr2dev2010-websocket.emr.com.sg/notificationHub',
+      'https://semr2uat2010-websocket.emr.com.sg/notificationHub',
   },
   // 路由配置
   routes: pageRoutes,
@@ -95,7 +92,7 @@ export default {
   },
   proxy: {
     '/api/': {
-      target: 'https://semr2dev2010.emr.com.sg/api/',
+      target: 'https://semr2uat2010.emr.com.sg/api/',
       changeOrigin: true,
     },
   },

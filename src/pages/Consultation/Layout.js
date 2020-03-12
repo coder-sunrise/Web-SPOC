@@ -40,83 +40,13 @@ import { widgets } from '@/utils/widgets'
 import gpLayoutCfg, { dentalLayoutCfg } from './layoutConfigs'
 import { CLINIC_TYPE } from '@/utils/constants'
 
-// const _defaultLayout = [
-//   {
-//     id: '1',
-//     config: {
-//       lg: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-//       md: { x: 0, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-//       sm: { x: 0, y: 0, w: 6, h: 6, minH: 3, minW: 6 },
-//       xs: { x: 0, y: 0, w: 4, h: 6, minH: 3, minW: 4 },
-//       xxs: { x: 0, y: 0, w: 2, h: 6, minH: 3, minW: 2 },
-//     },
-//   },
-//   {
-//     id: '4',
-//     config: {
-//       lg: { x: 6, y: 0, w: 6, h: 6, minH: 3, minW: 4 },
-//       md: { x: 5, y: 0, w: 5, h: 6, minH: 3, minW: 3 },
-//       sm: { x: 0, y: 6, w: 6, h: 6, minH: 3, minW: 6 },
-//       xs: { x: 0, y: 6, w: 4, h: 6, minH: 3, minW: 4 },
-//       xxs: { x: 0, y: 6, w: 2, h: 6, minH: 3, minW: 2 },
-//     },
-//   },
-//   {
-//     id: '2',
-//     config: {
-//       lg: { x: 0, y: 12, w: 6, h: 3, minH: 2, minW: 4 },
-//       md: { x: 0, y: 12, w: 5, h: 3, minH: 2, minW: 3 },
-//       sm: { x: 0, y: 12, w: 6, h: 2, minH: 2, minW: 6 },
-//       xs: { x: 0, y: 12, w: 4, h: 2, minH: 2, minW: 4 },
-//       xxs: { x: 0, y: 12, w: 2, h: 2, minH: 2, minW: 2 },
-//     },
-//   },
-//   {
-//     id: '7',
-//     config: {
-//       lg: { x: 0, y: 15, w: 6, h: 3, minH: 2, minW: 4 },
-//       md: { x: 0, y: 15, w: 5, h: 36, minH: 2, minW: 3 },
-//       sm: { x: 0, y: 14, w: 6, h: 2, minH: 2, minW: 6 },
-//       xs: { x: 0, y: 14, w: 4, h: 2, minH: 2, minW: 4 },
-//       xxs: { x: 0, y: 14, w: 2, h: 2, minH: 2, minW: 2 },
-//     },
-//   },
-//   {
-//     id: '3',
-//     config: {
-//       lg: { x: 0, y: 18, w: 12, h: 3, minH: 3, minW: 6 },
-//       md: { x: 0, y: 18, w: 10, h: 3, minH: 3, minW: 5 },
-//       sm: { x: 0, y: 18, w: 6, h: 3, minH: 3, minW: 6 },
-//       xs: { x: 0, y: 18, w: 4, h: 3, minH: 3, minW: 4 },
-//       xxs: { x: 0, y: 18, w: 2, h: 3, minH: 3, minW: 2 },
-//     },
-//   },
-
-//   {
-//     id: '5',
-//     config: {
-//       lg: { x: 6, y: 12, w: 6, h: 6, minH: 3, minW: 4 },
-//       md: { x: 5, y: 12, w: 5, h: 6, minH: 3, minW: 3 },
-//       sm: { x: 0, y: 26, w: 6, h: 6, minH: 3, minW: 6 },
-//       xs: { x: 0, y: 26, w: 4, h: 6, minH: 3, minW: 4 },
-//       xxs: { x: 0, y: 26, w: 2, h: 6, minH: 3, minW: 2 },
-//     },
-//   },
-
-//   // {
-//   //   id: '1002',
-//   //   config: {
-//   //     lg: { x: 0, y: 12, w: 12, h: 6, minH: 3, minW: 6 },
-//   //     md: { x: 0, y: 12, w: 10, h: 6, minH: 3, minW: 5 },
-//   //   },
-//   // },
-// ]
+// console.log(JSON.stringify(dentalLayoutCfg))
 const breakpoints = { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }
 const sizes = Object.keys(breakpoints)
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
 
-let lasActivedWidget = null
+let lastActivedWidget = null
 
 const { Link } = Anchor
 // @connect(({ cestemplate }) => ({
@@ -142,12 +72,9 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+    const { defaultConsultationTemplate } = clinicInfo
 
-    this.pageDefaultWidgets = gpLayoutCfg
-    if (clinicTypeFK === CLINIC_TYPE.DENTAL) {
-      this.pageDefaultWidgets = dentalLayoutCfg
-    }
+    this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
 
     let defaultLayout
 
@@ -390,7 +317,15 @@ class Layout extends PureComponent {
     const defaultWidgets = _.cloneDeep(this.pageDefaultWidgets)
 
     const r = {
-      widgets: defaultWidgets.map((o) => o.id),
+      widgets: defaultWidgets
+        .filter((o) => {
+          const w = widgets.find((m) => m.id === o.id)
+          if (!w) return false
+          const widgetAccessRight = Authorized.check(w.accessRight)
+          // console.log(widgetAccessRight, w)
+          return !!widgetAccessRight
+        })
+        .map((o) => o.id),
     }
     sizes.forEach((s) => {
       r[s] = defaultWidgets.map((o) => ({
@@ -461,15 +396,18 @@ class Layout extends PureComponent {
     // console.log($(e.target).parent('.widget-container')[0])
     // elevation[cfg.id] = 3
     // this.setState({ elevation })
-    // if (lasActivedWidgetId === id) return
-    if (lasActivedWidget) {
-      lasActivedWidget.css('overflowY', 'hidden')
-      lasActivedWidget.css('overflowX', 'hidden')
+    // if (lastActivedWidgetId === id) return
+    if (lastActivedWidget) {
+      lastActivedWidget.css('overflowY', 'hidden')
+      lastActivedWidget.css('overflowX', 'hidden')
     }
-    lasActivedWidget = $($(e.target).parents('.widget-container')[0])
-    if (lasActivedWidget.length > 0) {
-      lasActivedWidget.css('overflowY', 'auto')
-      lasActivedWidget.css('overflowX', 'hidden')
+    const t = $(e.target)
+    lastActivedWidget = t.hasClass('widget-container')
+      ? t
+      : $(t.parents('.widget-container')[0])
+    if (lastActivedWidget.length > 0) {
+      lastActivedWidget.css('overflowY', 'auto')
+      lastActivedWidget.css('overflowX', 'hidden')
     }
   }
 
@@ -556,7 +494,7 @@ class Layout extends PureComponent {
     } = props
     const widgetProps = {
       status: 'consultation',
-      parentProps: props,
+      // parentProps: props,
       rights,
     }
     // console.log(state.currentLayout)
