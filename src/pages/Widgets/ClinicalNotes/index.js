@@ -615,11 +615,6 @@ class ClinicalNotes extends Component {
           })}
         />
 
-        {config.hasAttachment && (
-          <div style={{ marginTop: theme.spacing(1) }}>
-            <UploadAttachment updateAttachments={this.updateAttachments} />
-          </div>
-        )}
         <div
           style={{
             marginTop: theme.spacing(1),

@@ -280,7 +280,7 @@ const DiagnosisItem = ({
             render={(args) => {
               return (
                 <DatePicker
-                  label='Order Date'
+                  label='Onset Date'
                   allowClear={false}
                   {...args}
                   onChange={(value) => {
