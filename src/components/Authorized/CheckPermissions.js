@@ -25,6 +25,7 @@ const checkSinglePermission = (
       (o) =>
         [
           'enable',
+          'enabled',
           'readwrite',
         ].indexOf(o.rights) >= 0,
     )
@@ -93,7 +94,6 @@ const checkPermissions = (
   // )
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
-
   if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {
     return typeof target === 'function' && type !== 'decorator'
       ? target({
@@ -113,6 +113,7 @@ const checkPermissions = (
           (o) =>
             [
               'enable',
+              'enabled',
               'readwrite',
             ].indexOf(o.rights) >= 0,
         )

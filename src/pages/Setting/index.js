@@ -56,7 +56,6 @@ const styles = () => ({
 
 const filterByAccessRight = (m) => {
   const accessRight = Authorized.check(m.authority)
-
   if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
     return false
   return true
@@ -78,7 +77,6 @@ class SystemSetting extends PureComponent {
 
     const { filterValues } = systemSetting
     const { searchText } = filterValues
-
     return Object.keys(this.group).map((o) => {
       return {
         authority: Authority[o],
@@ -225,17 +223,14 @@ class SystemSetting extends PureComponent {
             const accessRight = accessRights.find(
               (menuItem) => menuItem.name === item.authority,
             )
-
-            const canAccess =
-              accessRight === undefined
-                ? true
-                : accessRight.rights === 'readwrite'
+            const hide =
+              !accessRight || (accessRights && accessRights === 'hidden')
+            if (hide) return false
             return (
-              canAccess &&
-              (!searchText ||
-                item.items.find(
-                  (m) => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
-                ))
+              !searchText ||
+              item.items.find(
+                (m) => m.text.toLocaleLowerCase().indexOf(searchText) >= 0,
+              )
             )
           })}
         />
