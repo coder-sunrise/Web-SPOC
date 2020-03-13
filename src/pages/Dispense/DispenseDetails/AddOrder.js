@@ -263,10 +263,16 @@ export default compose(
       const { addOrderDetails } = dispense
       if (visitType === VISIT_TYPE.RETAIL) {
         const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = (
-          o,
-        ) => {
+          existingInstructionsIDArray,
+        ) => (instruction) => {
+          if (existingInstructionsIDArray.includes(instruction.id)) {
+            return {
+              ...instruction,
+            }
+          }
+
           return {
-            ...o,
+            ...instruction,
             id: undefined,
             concurrencyToken: undefined,
           }
@@ -340,58 +346,36 @@ export default compose(
           return returnedPrecautionsArray
         }
 
-        const medicationIntructionsArray = (
+        const medicationInstructionsArray = (
           corPrescriptionItemInstruction,
           retailPrescriptionItemInstruction,
           itemIsDeleted,
         ) => {
-          // const compareCriteria = [
-          //   'dosageFK',
-          //   'drugFrequencyFK',
-          //   'duration',
-          //   'prescribeUOMFK',
-          //   'stepdose',
-          //   'usageMethodFK',
-          // ]
-          const compareCriteria =
-            'dosageFK drugFrequencyFK duration prescribeUOMFK stepdose usageMethodFK'
-
-          const combinedOldNewInstructions = _.intersectionBy(
+          const combinedOldNewInstructions = _.intersectionWith(
             corPrescriptionItemInstruction,
             retailPrescriptionItemInstruction,
-            compareCriteria,
+            _.isEqual,
           )
 
-          const newAddedIntructions = _.differenceBy(
+          const newAddedInstructions = _.differenceWith(
             corPrescriptionItemInstruction,
-            combinedOldNewInstructions,
-            compareCriteria,
-          )
-
-          const unwantedItem = _.xor(
             retailPrescriptionItemInstruction,
-            combinedOldNewInstructions,
+            _.isEqual,
           )
 
-          const formatNewAddedInstructions = newAddedIntructions.map(
-            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+          const instructionIDArray = retailPrescriptionItemInstruction.map(
+            (instruction) => instruction.id,
           )
 
-          let deleteUnwantedItem = []
-          if (combinedOldNewInstructions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemInstruction.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          } else {
-            deleteUnwantedItem = unwantedItem.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          }
+          const formatNewAddedInstructions = newAddedInstructions.map(
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions(
+              instructionIDArray,
+            ),
+          )
 
           const returnedInstructionsArray = [
             ...combinedOldNewInstructions,
             ...formatNewAddedInstructions,
-            ...deleteUnwantedItem,
           ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedInstructionsArray
@@ -437,7 +421,7 @@ export default compose(
                     ...restO,
                     isDeleted: o.isDeleted,
                     unitPrice: roundTo(o.totalPrice / o.quantity),
-                    retailPrescriptionItemInstruction: medicationIntructionsArray(
+                    retailPrescriptionItemInstruction: medicationInstructionsArray(
                       corPrescriptionItemInstruction,
                       retailPrescriptionItemInstruction,
                       o.isDeleted,
