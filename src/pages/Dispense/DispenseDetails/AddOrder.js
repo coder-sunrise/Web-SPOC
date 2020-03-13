@@ -263,16 +263,16 @@ export default compose(
       const { addOrderDetails } = dispense
       if (visitType === VISIT_TYPE.RETAIL) {
         const removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions = (
-          existingInstructionsIDArray,
-        ) => (instruction) => {
-          if (existingInstructionsIDArray.includes(instruction.id)) {
+          existingIDArray,
+        ) => (instructionOrPrecaution) => {
+          if (existingIDArray.includes(instructionOrPrecaution.id)) {
             return {
-              ...instruction,
+              ...instructionOrPrecaution,
             }
           }
 
           return {
-            ...instruction,
+            ...instructionOrPrecaution,
             id: undefined,
             concurrencyToken: undefined,
           }
@@ -299,48 +299,31 @@ export default compose(
           retailPrescriptionItemPrecaution,
           itemIsDeleted,
         ) => {
-          const combinedOldNewPrecautions = _.intersectionBy(
+          const combinedOldNewPrecautions = _.intersectionWith(
             corPrescriptionItemPrecaution,
             retailPrescriptionItemPrecaution,
-            'medicationPrecautionFK',
+            _.isEqual,
           )
 
-          const newAddedPrecautions = _.differenceBy(
+          const newAddedPrecautions = _.differenceWith(
             corPrescriptionItemPrecaution,
             combinedOldNewPrecautions,
-            'medicationPrecautionFK',
+            _.isEqual,
           )
 
-          // const unwantedItem = _.differenceBy(
-          //   retailPrescriptionItemPrecaution,
-          //   combinedOldNewPrecautions,
-          //   'medicationPrecautionFK',
-          // )
-
-          const unwantedItem = _.xor(
-            retailPrescriptionItemPrecaution,
-            combinedOldNewPrecautions,
+          const precautionsIDArray = retailPrescriptionItemPrecaution.map(
+            (precaution) => precaution.id,
           )
 
           const formatNewAddedPrecautions = newAddedPrecautions.map(
-            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions,
+            removeIdAndConcurrencyTokenForNewPrecautionsOrInstructions(
+              precautionsIDArray,
+            ),
           )
-
-          let deleteUnwantedItem = []
-          if (combinedOldNewPrecautions.length <= 0) {
-            deleteUnwantedItem = retailPrescriptionItemPrecaution.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          } else {
-            deleteUnwantedItem = unwantedItem.map(
-              setIsDeletedToUnwantedPrecautionsOrInstructions,
-            )
-          }
 
           const returnedPrecautionsArray = [
             ...combinedOldNewPrecautions,
             ...formatNewAddedPrecautions,
-            ...deleteUnwantedItem,
           ].map((o) => setIsDeletedIfWholeItemIsDeleted(o, itemIsDeleted))
 
           return returnedPrecautionsArray
