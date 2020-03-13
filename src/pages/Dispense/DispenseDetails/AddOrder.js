@@ -64,7 +64,9 @@ const AddOrder = ({
             }
 
             obj = {
-              type: o.invoiceItemTypeFK.toString(),
+              type: o.retailVisitInvoiceDrug.inventoryMedicationFK
+                ? o.invoiceItemTypeFK.toString()
+                : ORDER_TYPE_TAB.OPENPRECRIPTION,
               ...o.retailVisitInvoiceDrug,
               innerLayerId: o.retailVisitInvoiceDrug.id,
               innerLayerConcurrencyToken:
