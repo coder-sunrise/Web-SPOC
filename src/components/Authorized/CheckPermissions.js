@@ -24,6 +24,7 @@ const checkSinglePermission = (
     match = r.find(
       (o) =>
         [
+          'enabled',
           'enable',
           'enabled',
           'readwrite',
@@ -112,6 +113,7 @@ const checkPermissions = (
         match = r.find(
           (o) =>
             [
+              'enabled',
               'enable',
               'enabled',
               'readwrite',

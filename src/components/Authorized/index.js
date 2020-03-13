@@ -25,6 +25,7 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
       (o) =>
         // o.name.endsWith('.edit') &&
         [
+          'enabled',
           'enable',
           'readwrite',
         ].indexOf(o.rights) >= 0,
