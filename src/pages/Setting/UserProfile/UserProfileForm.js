@@ -604,7 +604,6 @@ class UserProfileForm extends React.PureComponent {
                         code='role'
                         disabled={isMyAccount}
                         onChange={this.onRoleChange}
-                        localFilter={(a) => a.isActive}
                       />
                     )}
                   />

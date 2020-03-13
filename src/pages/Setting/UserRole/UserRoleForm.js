@@ -59,7 +59,6 @@ class UserRoleForm extends React.PureComponent {
                       label='Existing Role'
                       code='role'
                       onChange={this.onSelect}
-                      localFilter={(a) => a.isActive}
                     />
                   )}
                 />
