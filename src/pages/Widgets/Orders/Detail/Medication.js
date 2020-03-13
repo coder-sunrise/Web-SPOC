@@ -46,15 +46,15 @@ import { calculateAdjustAmount } from '@/utils/utils'
     //         {},
     //       ]
     let sequence = 0
-    const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution||[]).map(
-      (precaution) => {
+    const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution ||
+      [])
+      .map((precaution) => {
         sequence += 1
         return {
           ...precaution,
           sequence,
         }
-      },
-    )
+      })
 
     return {
       ...v,
@@ -91,7 +91,6 @@ import { calculateAdjustAmount } from '@/utils/utils'
     // ),
     corPrescriptionItemInstruction: Yup.array().of(
       Yup.object().shape({
-        prescribeUOMFK: Yup.number().required(),
         sequence: Yup.number().required(),
         stepdose: Yup.string().required(),
       }),
