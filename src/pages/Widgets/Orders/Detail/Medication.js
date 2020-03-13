@@ -46,7 +46,7 @@ import { calculateAdjustAmount } from '@/utils/utils'
     //         {},
     //       ]
     let sequence = 0
-    const newCorPrescriptionItemPrecaution = v.corPrescriptionItemPrecaution.map(
+    const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution||[]).map(
       (precaution) => {
         sequence += 1
         return {
