@@ -54,7 +54,7 @@ class Attachment extends Component {
     types: attchementTypes.filter((o) => !o.accessRight),
   }
 
-  handleClickAttachment = (attachment) => {\
+  handleClickAttachment = (attachment) => {
     downloadAttachment(attachment)
   }
 
