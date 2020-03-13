@@ -8,7 +8,7 @@ const permissionList = {
     'Hidden',
   ],
   Action: [
-    'Enabled',
+    'Enable',
     'Disabled',
     'Hidden',
   ],
