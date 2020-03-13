@@ -50,12 +50,19 @@ const AddOrder = ({
               ...restValues
             } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
-            const medicationItem = inventorymedication.find(
-              (medication) =>
-                medication.id ===
-                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
-                medication.isActive,
-            )
+            let medicationItem
+            if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
+              medicationItem = inventorymedication.find(
+                (medication) =>
+                  medication.id ===
+                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  medication.isActive,
+              )
+            } else {
+              // for open prescription item
+              medicationItem = true
+            }
+
             obj = {
               type: o.invoiceItemTypeFK.toString(),
               ...o.retailVisitInvoiceDrug,
