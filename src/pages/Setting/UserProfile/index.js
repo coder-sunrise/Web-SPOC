@@ -179,6 +179,7 @@ class UserProfile extends React.Component {
             <CommonTableGrid
               type='settingUserProfile'
               {...this.state.gridConfig}
+              forceRender
               onRowDoubleClick={this.handleDoubleClick}
             />
           </GridItem>
