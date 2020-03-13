@@ -369,9 +369,11 @@ export default compose(
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
             case ORDER_TYPE_TAB.OPENPRECRIPTION: {
-              const { revenueCategory } = inventorymedication.find(
+              let revenueCategory
+              const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
               )
+              revenueCategory = medication ? medication.revenueCategory : {}
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
