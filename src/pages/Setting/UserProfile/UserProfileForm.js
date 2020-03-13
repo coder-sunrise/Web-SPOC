@@ -220,7 +220,6 @@ class UserProfileForm extends React.PureComponent {
     showChangePassword: false,
     showPrimaryClinicianChanges: false,
     canEditDoctorMCR: false,
-    selectFieldOption: [],
   }
 
   toggleChangePasswordModal = () => {
@@ -364,7 +363,6 @@ class UserProfileForm extends React.PureComponent {
       showPrimaryClinicianChanges,
       showActiveSessionWarning,
       isValidating,
-      selectFieldOption,
     } = this.state
     const isEdit = values.id !== undefined
     const isMyAccount = isEdit

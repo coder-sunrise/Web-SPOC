@@ -5,7 +5,13 @@ import { withFormik } from 'formik'
 import { withStyles } from '@material-ui/core'
 import { withRouter } from 'react-router'
 // common component
-import { GridContainer, GridItem, FastField, Select } from '@/components'
+import {
+  GridContainer,
+  GridItem,
+  FastField,
+  Select,
+  CodeSelect,
+} from '@/components'
 // sub components
 import request from '@/utils/request'
 import { convertToQuery } from '@/utils/utils'
@@ -21,31 +27,7 @@ const styles = (theme) => ({
 })
 class UserRoleForm extends React.PureComponent {
   state = {
-    selectFieldOption: [],
     selectedValue: undefined,
-  }
-
-  componentDidMount = () => {
-    this.getSelectOptions()
-  }
-
-  getSelectOptions = async () => {
-    const response = await request('/api/Role', {
-      method: 'GET',
-      body: convertToQuery({ isActive: true }),
-    })
-    const { data } = response
-    if (data) {
-      const option = data.data.map((d) => {
-        return {
-          name: d.name,
-          value: d.id,
-        }
-      })
-      this.setState({
-        selectFieldOption: option,
-      })
-    }
   }
 
   onSelect = (value) => {
@@ -61,41 +43,40 @@ class UserRoleForm extends React.PureComponent {
 
   render () {
     const { classes, footer } = this.props
-    const { selectFieldOption, selectedValue } = this.state
+    const { selectedValue } = this.state
     return (
       <div>
-        {selectFieldOption.length !== 0 && (
-          <React.Fragment>
-            <div className={classes.verticalSpacing}>
-              <GridContainer>
-                <GridItem md={4} />
-                <GridItem md={4} className={classes.verticalSpacing}>
-                  <FastField
-                    name='status'
-                    render={(args) => (
-                      <Select
-                        {...args}
-                        label='Existing Role'
-                        options={selectFieldOption}
-                        onChange={this.onSelect}
-                      />
-                    )}
-                  />
-                </GridItem>
-              </GridContainer>
-            </div>
+        <React.Fragment>
+          <div className={classes.verticalSpacing}>
+            <GridContainer>
+              <GridItem md={4} />
+              <GridItem md={4} className={classes.verticalSpacing}>
+                <FastField
+                  name='role'
+                  render={(args) => (
+                    <CodeSelect
+                      {...args}
+                      label='Existing Role'
+                      code='role'
+                      onChange={this.onSelect}
+                      localFilter={(a) => a.isActive}
+                    />
+                  )}
+                />
+              </GridItem>
+            </GridContainer>
+          </div>
 
-            <GridItem md={4} />
-            {footer &&
-              footer({
-                confirmBtnText: 'Add New',
-                onConfirm: this.handleClickAddNew,
-                confirmProps: {
-                  disabled: !selectedValue,
-                },
-              })}
-          </React.Fragment>
-        )}
+          <GridItem md={4} />
+          {footer &&
+            footer({
+              confirmBtnText: 'Add New',
+              onConfirm: this.handleClickAddNew,
+              confirmProps: {
+                disabled: !selectedValue,
+              },
+            })}
+        </React.Fragment>
       </div>
     )
   }
