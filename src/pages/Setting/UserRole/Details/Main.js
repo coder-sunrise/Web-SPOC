@@ -145,7 +145,7 @@ class Main extends React.Component {
         })
         .then((response) => {
           const result = response.data.filter((m) => {
-            return m.userProfile.role.id === userRole.id
+            return m.userProfile.role.clinicRoleFK === userRole.clinicRoleFK
           })
           this.setState({ hasUser: result.length > 0 })
         })
@@ -436,6 +436,7 @@ class Main extends React.Component {
 
             <SizeContainer size='sm'>
               <CommonTableGrid
+                forceRender
                 rows={filteredAccessRight}
                 {...AccessRightConfig({ isEdit, isUserMaintainable })}
                 FuncProps={{ pager: true }}

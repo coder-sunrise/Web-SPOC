@@ -133,6 +133,7 @@ const AddOrder = ({
           outerLayerConcurrencyToken: o.concurrencyToken,
           subject: o.itemName,
           uid: o.id,
+          revenueCategoryFK: o.revenueCategoryFK,
           ...obj,
         }
       }
@@ -254,7 +255,7 @@ export default compose(
         onConfirm,
         dispense,
         onReloadClick,
-        codetable: { inventoryconsumable },
+        codetable: { inventoryconsumable, inventorymedication, ctservice },
         visitType,
         history,
       } = props
@@ -401,6 +402,9 @@ export default compose(
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
             case ORDER_TYPE_TAB.OPENPRECRIPTION: {
+              const { revenueCategory } = inventorymedication.find(
+                (c) => c.id === o.inventoryMedicationFK,
+              )
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
@@ -418,6 +422,7 @@ export default compose(
                 unitPrice: o.unitPrice,
                 quantity: o.quantity,
                 subTotal: roundTo(o.totalPrice),
+                itemRevenueCategoryFK: revenueCategory.id,
                 // "adjType": "string",
                 // "adjValue": 0,
                 retailVisitInvoiceDrug: {
@@ -450,11 +455,17 @@ export default compose(
             }
             case ORDER_TYPE_TAB.SERVICE: {
               const { retailService, ...restValues } = o
+              const { revenueCategoryFK } = ctservice.find(
+                (c) => c.serviceCenter_ServiceId === o.serviceCenterServiceFK,
+              )
               obj = {
                 itemCode: o.serviceCode,
                 itemName: o.serviceName,
                 subTotal: roundTo(o.total),
                 invoiceItemTypeFK: INVOICE_ITEM_TYPE_BY_NAME.SERVICE,
+                unitPrice: o.unitPrice,
+                quantity: o.quantity,
+                itemRevenueCategoryFK: revenueCategoryFK,
                 retailVisitInvoiceService: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -469,7 +480,7 @@ export default compose(
               break
             }
             case ORDER_TYPE_TAB.CONSUMABLE: {
-              const { uom } = inventoryconsumable.find(
+              const { uom, revenueCategory } = inventoryconsumable.find(
                 (c) => c.id === o.inventoryConsumableFK,
               )
               const { retailConsumable, ...restValues } = o
@@ -478,6 +489,9 @@ export default compose(
                 itemCode: o.consumableCode,
                 itemName: o.consumableName,
                 subTotal: roundTo(o.totalPrice),
+                unitPrice: o.unitPrice,
+                quantity: o.quantity,
+                itemRevenueCategoryFK: revenueCategory.id,
                 retailVisitInvoiceConsumable: {
                   id: o.innerLayerId,
                   concurrencyToken: o.innerLayerConcurrencyToken,
@@ -510,6 +524,7 @@ export default compose(
             gstAmount: o.gstAmount,
             isDeleted: o.isDeleted,
             ...obj,
+            revenueCategoryFK: o.revenueCategoryFK || obj.itemRevenueCategoryFK,
           }
         }
 
