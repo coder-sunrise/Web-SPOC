@@ -8,6 +8,7 @@ import { withRouter } from 'react-router'
 import { GridContainer, GridItem, FastField, Select } from '@/components'
 // sub components
 import request from '@/utils/request'
+import { convertToQuery } from '@/utils/utils'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -31,19 +32,16 @@ class UserRoleForm extends React.PureComponent {
   getSelectOptions = async () => {
     const response = await request('/api/Role', {
       method: 'GET',
+      body: convertToQuery({ isActive: true }),
     })
     const { data } = response
     if (data) {
-      const option = data.data
-        .filter((m) => {
-          return m.isActive
-        })
-        .map((d) => {
-          return {
-            name: d.name,
-            value: d.id,
-          }
-        })
+      const option = data.data.map((d) => {
+        return {
+          name: d.name,
+          value: d.id,
+        }
+      })
       this.setState({
         selectFieldOption: option,
       })

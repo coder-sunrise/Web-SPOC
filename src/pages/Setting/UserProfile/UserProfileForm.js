@@ -33,6 +33,7 @@ import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
 import request from '@/utils/request'
+import { convertToQuery } from '@/utils/utils'
 import { constructUserProfile } from './utils'
 import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 
@@ -229,22 +230,12 @@ class UserProfileForm extends React.PureComponent {
   getSelectOptions = async () => {
     const response = await request('/api/Role', {
       method: 'GET',
+      body: convertToQuery({ isActive: true }),
     })
     const { data } = response
     if (data) {
-      const option = data.data
-        .filter((m) => {
-          return m.isActive
-        })
-        .map((d) => {
-          return {
-            name: d.name,
-            value: d.id,
-            id: d.id,
-          }
-        })
       this.setState({
-        selectFieldOption: option,
+        selectFieldOption: data.data,
       })
     }
   }
@@ -629,6 +620,7 @@ class UserProfileForm extends React.PureComponent {
                       <CodeSelect
                         {...args}
                         label='Role'
+                        code='role'
                         options={selectFieldOption}
                         disabled={isMyAccount}
                         onChange={this.onRoleChange}
