@@ -68,7 +68,7 @@ export default createListViewModel({
         if (ctcode !== undefined) {
           if (codetableState[ctcode] === undefined || payload.force) {
             const response = yield call(getCodes, payload)
-            if (response.length > 0) {
+            if (Array.isArray(response)) {
               yield put({
                 type: 'saveCodetable',
                 payload: {

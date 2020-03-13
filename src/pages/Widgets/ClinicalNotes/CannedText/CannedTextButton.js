@@ -71,6 +71,7 @@ const CannedTextButton = ({
     show,
     setShow,
   ] = useState(false)
+  return null
   const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
   const fkField = CANNEDTEXT_FIELD_KEY[clinicTypeFK]
   const field = fkField[cannedTextTypeFK]

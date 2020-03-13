@@ -482,16 +482,14 @@ class Layout extends PureComponent {
   render () {
     const { state, props } = this
     const { currentLayout } = state
+    const { classes, ...restProps } = props
     const {
-      classes,
       theme,
       height,
-      values,
-      cestemplate,
       rights,
       clinicInfo,
       onSaveLayout = (f) => f,
-    } = props
+    } = restProps
     const widgetProps = {
       status: 'consultation',
       // parentProps: props,
@@ -902,7 +900,7 @@ class Layout extends PureComponent {
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
-                    <Templates {...this.props} />
+                    <Templates {...restProps} />
                   </div>
                   <Divider light />
                   <div className={classes.fabDiv}>
