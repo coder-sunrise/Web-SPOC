@@ -27,13 +27,14 @@ import {
   LoadingWrapper,
   MobileNumberInput,
 } from '@/components/_medisys'
-import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 // utils
-import { constructUserProfile } from './utils'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS } from '@/utils/constants'
 import { sendNotification } from '@/utils/realtime'
 import * as queueServices from '@/services/queue'
 import * as clinicServices from '@/services/clinicInfo'
+import request from '@/utils/request'
+import { constructUserProfile } from './utils'
+import PrimaryClinicianChanges from './PrimaryClinicianChanges'
 
 const styles = (theme) => ({
   container: {
@@ -218,6 +219,34 @@ class UserProfileForm extends React.PureComponent {
     showChangePassword: false,
     showPrimaryClinicianChanges: false,
     canEditDoctorMCR: false,
+    selectFieldOption: [],
+  }
+
+  componentDidMount = () => {
+    this.getSelectOptions()
+  }
+
+  getSelectOptions = async () => {
+    const response = await request('/api/Role', {
+      method: 'GET',
+    })
+    const { data } = response
+    if (data) {
+      const option = data.data
+        .filter((m) => {
+          return m.isActive
+        })
+        .map((d) => {
+          return {
+            name: d.name,
+            value: d.id,
+            id: d.id,
+          }
+        })
+      this.setState({
+        selectFieldOption: option,
+      })
+    }
   }
 
   toggleChangePasswordModal = () => {
@@ -361,6 +390,7 @@ class UserProfileForm extends React.PureComponent {
       showPrimaryClinicianChanges,
       showActiveSessionWarning,
       isValidating,
+      selectFieldOption,
     } = this.state
     const isEdit = values.id !== undefined
     const isMyAccount = isEdit
@@ -599,7 +629,7 @@ class UserProfileForm extends React.PureComponent {
                       <CodeSelect
                         {...args}
                         label='Role'
-                        code='role'
+                        options={selectFieldOption}
                         disabled={isMyAccount}
                         onChange={this.onRoleChange}
                       />
