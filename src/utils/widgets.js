@@ -311,7 +311,7 @@ const widgets = [
   {
     id: '9',
     name: 'Visual Acuity Test',
-    accessRight: 'queue.consultation.widgets.attachment',
+    accessRight: 'queue.consultation.widgets.visual',
     component: Loadable({
       loader: () => import('@/pages/Widgets/VisualAcuity'),
       loading: Loading,

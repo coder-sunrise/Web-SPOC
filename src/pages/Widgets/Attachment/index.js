@@ -21,19 +21,19 @@ const attchementTypes = [
     id: 1,
     type: 'ClinicalNotes',
     name: 'Consultation Attachment',
-    accessRight: '1',
+    accessRight: '',
   },
   {
     id: 2,
     type: 'VisitReferral',
     name: 'Referral Attachment',
-    accessRight: '1',
+    accessRight: '',
   },
   {
     id: 3,
     type: 'Visit',
     name: 'Visit Attachment',
-    accessRight: '1',
+    accessRight: '',
   },
   {
     id: 4,
@@ -51,10 +51,10 @@ class Attachment extends Component {
     runOnce: false,
     showScribbleModal: false,
     activedKeys: undefined,
-    types: attchementTypes.filter((o) => o.accessRight),
+    types: attchementTypes.filter((o) => !o.accessRight),
   }
 
-  handleClickAttachment = (attachment) => {
+  handleClickAttachment = (attachment) => {\
     downloadAttachment(attachment)
   }
 
