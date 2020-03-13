@@ -545,7 +545,7 @@ class Billing extends Component {
               }}
             />
           </GridItem>
-          <GridItem md={4}>
+          <GridItem md={4} style={{ paddingRight: 0 }}>
             <React.Fragment>
               <div className={classes.paymentButton}>
                 <Button
