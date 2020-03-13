@@ -173,7 +173,7 @@ export default {
         }
         sessionStorage.setItem('user', JSON.stringify(user))
       }
-
+      console.log({ accessRight: JSON.stringify(user.accessRights) })
       yield put({
         type: 'saveCurrentUser',
         payload: user,
