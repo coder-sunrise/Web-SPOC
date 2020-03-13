@@ -66,7 +66,7 @@ const AddOrder = ({
             obj = {
               type: o.retailVisitInvoiceDrug.inventoryMedicationFK
                 ? o.invoiceItemTypeFK.toString()
-                : ORDER_TYPE_TAB.OPENPRECRIPTION,
+                : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
               innerLayerId: o.retailVisitInvoiceDrug.id,
               innerLayerConcurrencyToken:
@@ -377,7 +377,7 @@ export default compose(
           let obj
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
-            case ORDER_TYPE_TAB.OPENPRECRIPTION: {
+            case ORDER_TYPE_TAB.OPENPRESCRIPTION: {
               let revenueCategory
               const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
