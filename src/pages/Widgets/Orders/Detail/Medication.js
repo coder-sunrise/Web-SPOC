@@ -39,9 +39,32 @@ import { calculateAdjustAmount } from '@/utils/utils'
     if (type === '5') {
       v.drugCode = 'MISC'
     }
-    v.corPrescriptionItemPrecaution = v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0] ? v.corPrescriptionItemPrecaution : [{}]
+    // v.corPrescriptionItemPrecaution =
+    //   v.corPrescriptionItemPrecaution && v.corPrescriptionItemPrecaution[0]
+    //     ? v.corPrescriptionItemPrecaution
+    //     : [
+    //         {},
+    //       ]
+    let sequence = 0
+    const newCorPrescriptionItemPrecaution = (v.corPrescriptionItemPrecaution||[]).map(
+      (precaution) => {
+        sequence += 1
+        return {
+          ...precaution,
+          sequence,
+        }
+      },
+    )
 
-    return v
+    return {
+      ...v,
+      corPrescriptionItemPrecaution:
+        newCorPrescriptionItemPrecaution.length > 0
+          ? newCorPrescriptionItemPrecaution
+          : [
+              {},
+            ],
+    }
   },
   enableReinitialize: true,
 
@@ -116,24 +139,28 @@ import { calculateAdjustAmount } from '@/utils/utils'
     }
 
     const instruction = getInstruction(values.corPrescriptionItemInstruction)
+    // const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
+    //   (i) => i.medicationPrecautionFK !== undefined,
+    // )
+
     const corPrescriptionItemPrecaution = values.corPrescriptionItemPrecaution.filter(
-      (i) => i.medicationPrecautionFK !== undefined && !i.isDeleted,
+      (i) => i.medicationPrecautionFK !== undefined,
     )
 
     const activeInstruction = values.corPrescriptionItemInstruction.filter(
-      (item) => !item.isDeleted
+      (item) => !item.isDeleted,
     )
 
     // reorder and overwrite sequence
     corPrescriptionItemPrecaution.forEach((item, index) => {
-      item.sequence = index + 1
+      if (!item.isDeleted) item.sequence = index + 1
     })
 
     // reorder and overwrite sequence
     activeInstruction.forEach((item, index) => {
       item.sequence = index + 1
     })
-    var batchNo = values.batchNo
+    let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
@@ -167,9 +194,6 @@ class Medication extends PureComponent {
     expiryDate: '',
   }
 
-  componentDidMount () {
-  }
-
   getActionItem = (i, arrayHelpers, prop, tooltip, defaultValue) => {
     const { theme, values, setFieldValue } = this.props
     const activeRows = values[prop].filter((item) => !item.isDeleted) || []
@@ -186,7 +210,7 @@ class Medication extends PureComponent {
             title='Are you sure delete this item?'
             onConfirm={() => {
               setFieldValue(`${prop}[${i}].isDeleted`, true)
-              if(prop === 'corPrescriptionItemInstruction'){
+              if (prop === 'corPrescriptionItemInstruction') {
                 setTimeout(() => {
                   this.calculateQuantity()
                 }, 1)
@@ -885,15 +909,31 @@ class Medication extends PureComponent {
                   const activeRows = values.corPrescriptionItemPrecaution.filter(
                     (val) => !val.isDeleted,
                   )
+
+                  const maxSeq = _.maxBy(
+                    values.corPrescriptionItemPrecaution,
+                    'sequence',
+                  )
+
+                  let newMaxSeq = maxSeq
+                    ? maxSeq.sequence + 1
+                    : values.corPrescriptionItemPrecaution.length + 1
+
                   return activeRows.map((val, activeIndex) => {
                     if (val && val.isDeleted) return null
-
                     const i = values.corPrescriptionItemPrecaution.findIndex(
-                      (item) =>
-                        !val.id
-                          ? _.isEqual(item, val)
-                          : item.sequence === val.sequence,
+                      (cor) =>
+                        val.id
+                          ? cor.id === val.id
+                          : val.sequence === cor.sequence,
                     )
+
+                    // const i = values.corPrescriptionItemPrecaution.findIndex(
+                    //   (item) =>
+                    //     !val.id
+                    //       ? _.isEqual(item, val)
+                    //       : item.sequence === val.sequence,
+                    // )
 
                     return (
                       <div key={i}>
@@ -934,10 +974,10 @@ class Medication extends PureComponent {
                                           `corPrescriptionItemPrecaution[${i}].precautionCode`,
                                           option.code,
                                         )
-                                        setFieldValue(
-                                          `corPrescriptionItemPrecaution[${i}].sequence`,
-                                          i,
-                                        )
+                                        // setFieldValue(
+                                        //   `corPrescriptionItemPrecaution[${i}].sequence`,
+                                        //   i,
+                                        // )
                                       }}
                                       {...args}
                                     />
@@ -958,7 +998,7 @@ class Medication extends PureComponent {
                               drugFrequencyFK: '1',
                               day: 1,
                               precaution: '1',
-                              sequence: activeRows.length + 1,
+                              sequence: newMaxSeq,
                             },
                           )}
                         </GridContainer>
