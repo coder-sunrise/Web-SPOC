@@ -435,6 +435,13 @@ export default createFormViewModel({
           }
         })
 
+        yield put({
+          type: 'visualAcuity/updateState',
+          payload: {
+            entity: data.corEyeVisualAcuityTest,
+          },
+        })
+
         // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
         //   data.corDiagnosis.forEach((cd) => {
         //     cd.complication = cd.corComplication.map((o) => o.complicationFK)

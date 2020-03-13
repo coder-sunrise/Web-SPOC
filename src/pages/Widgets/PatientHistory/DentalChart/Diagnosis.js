@@ -8,7 +8,12 @@ export default (props) => {
   const { ctchartmethod } = codetable
   const { entity } = patientHistory
 
-  if (!ctchartmethod || !entity || !entity.dentalChart[0]) {
+  if (
+    !ctchartmethod ||
+    !entity ||
+    !entity.dentalChart ||
+    !entity.dentalChart[0]
+  ) {
     return (
       <React.Fragment>
         <Skeleton variant='rect' height={300} style={{ marginBottom: 8 }} />

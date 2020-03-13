@@ -807,7 +807,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-
+    // console.log(values)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

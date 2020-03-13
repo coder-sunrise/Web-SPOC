@@ -73,7 +73,7 @@ class Accordion extends React.Component {
 
   handleChange = (p) => (event, expanded) => {
     const { props } = this
-    const { onChange } = props
+    const { onChange, onExpend } = props
 
     this.setState((prevState) => {
       let keys = prevState.activedKeys
@@ -82,13 +82,14 @@ class Accordion extends React.Component {
       } else {
         keys = keys.filter((o) => o !== p.key)
       }
+      if (onExpend) onExpend(keys)
+      if (onChange) onChange(event, p, expanded)
+
       return {
         active: expanded ? p.key : -1,
         activedKeys: keys,
       }
     })
-
-    if (onChange) onChange(event, p, expanded)
   }
 
   render () {

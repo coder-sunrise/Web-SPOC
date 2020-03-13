@@ -4,6 +4,8 @@ import classnames from 'classnames'
 import { FastField } from 'formik'
 // material ui
 import { withStyles } from '@material-ui/core'
+import { compose } from 'redux'
+import { connect } from 'dva'
 // common components
 import {
   GridContainer,
@@ -117,6 +119,7 @@ const Thumbnail = ({
     id,
     thumbnailIndexFK,
     thumbnail = { id: undefined },
+    useImageViewer = true,
   } = attachment
 
   const [
@@ -173,7 +176,10 @@ const Thumbnail = ({
 
   const handleAttachmentClicked = () => {
     if (!attachment) return
-    if (imageFileExtensions.includes(attachment.fileExtension)) {
+    if (
+      useImageViewer &&
+      imageFileExtensions.includes(attachment.fileExtension)
+    ) {
       // show image preview
       dispatch({
         type: 'imageViewer/updateState',
@@ -286,4 +292,9 @@ const Thumbnail = ({
   )
 }
 
-export default withStyles(styles, { name: 'Thumbnail' })(Thumbnail)
+export default compose(
+  withStyles(styles, { name: 'Thumbnail' }),
+  connect(({ imageViewer }) => ({
+    imageViewer,
+  })),
+)(Thumbnail)

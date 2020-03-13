@@ -175,9 +175,9 @@ class EditOrder extends Component {
             </h5>
             <ConsultationDocument
               forDispense
-              parentProps={{
-                values: consultation.entity,
-              }}
+              // parentProps={{
+              //   values: consultation.entity,
+              // }}
               onCancel={this.cancelOrder}
               onSave={this.signOrder}
             />

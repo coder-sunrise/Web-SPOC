@@ -7,6 +7,14 @@ const defaultDates = {
   effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
 }
 
+const compare = (a, b) => {
+  const f = a.module.localeCompare(b.module)
+  if (f !== 0) return f
+  return a.clientAccessRightFK
+    .toString()
+    .localeCompare(b.clientAccessRightFK.toString())
+}
+
 export default createListViewModel({
   namespace: 'settingUserRole',
   config: {
@@ -47,17 +55,16 @@ export default createListViewModel({
         const response = yield call(service.getAccessRight)
         const { data = [], status } = response
 
-        const resultData = []
-        data.map((d) => {
+        const resultData = data.map((d) => {
           const permission =
             (d.type === 'Module' && 'ReadWrite') ||
-            (d.type === 'Action' && 'Enabled') ||
+            (d.type === 'Action' && 'Enable') ||
             (d.type === 'Field' && 'ReadWrite') ||
             'ReadWrite'
-          return resultData.push({
+          return {
             permission: d.permission || permission,
             ...d,
-          })
+          }
         })
 
         return yield put({
@@ -85,11 +92,13 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             ...data,
-            filteredAccessRight: data.roleClientAccessRight.filter(
-              (m) =>
-                !data.clinicRoleFK ||
-                m.clinicRoleBitValue >= 2 ** (data.clinicRoleFK - 1),
-            ),
+            filteredAccessRight: data.roleClientAccessRight
+              .filter(
+                (m) =>
+                  !data.clinicRoleFK ||
+                  m.clinicRoleBitValue >= 2 ** (data.clinicRoleFK - 1),
+              )
+              .sort(compare),
           },
         }
       },
@@ -98,8 +107,8 @@ export default createListViewModel({
           ...state,
           currentSelectedUserRole: {
             isUserMaintainable: true,
-            filteredAccessRight: data,
-            roleClientAccessRight: data,
+            filteredAccessRight: data.sort(compare),
+            roleClientAccessRight: data.sort(compare),
             ...defaultDates,
           },
         }
