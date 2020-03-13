@@ -223,23 +223,6 @@ class UserProfileForm extends React.PureComponent {
     selectFieldOption: [],
   }
 
-  componentDidMount = () => {
-    this.getSelectOptions()
-  }
-
-  getSelectOptions = async () => {
-    const response = await request('/api/Role', {
-      method: 'GET',
-      body: convertToQuery({ isActive: true }),
-    })
-    const { data } = response
-    if (data) {
-      this.setState({
-        selectFieldOption: data.data,
-      })
-    }
-  }
-
   toggleChangePasswordModal = () => {
     this.setState((preState) => ({
       showChangePassword: !preState.showChangePassword,
@@ -621,9 +604,9 @@ class UserProfileForm extends React.PureComponent {
                         {...args}
                         label='Role'
                         code='role'
-                        options={selectFieldOption}
                         disabled={isMyAccount}
                         onChange={this.onRoleChange}
+                        localFilter={(a) => a.isActive}
                       />
                     )}
                   />
