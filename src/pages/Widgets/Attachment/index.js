@@ -54,12 +54,11 @@ class Attachment extends Component {
     types: attchementTypes.filter((o) => !o.accessRight),
   }
 
-  handleClickAttachment = (attachment) => {\
+  handleClickAttachment = (attachment) => {
     downloadAttachment(attachment)
   }
 
   handleUpdateAttachments = ({ added, deleted }) => {
-    console.log(this)
     const { form, field } = this
     const { types, activedKeys } = this.state
     let updated = [
