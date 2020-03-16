@@ -1,6 +1,20 @@
 import Loadable from 'react-loadable'
 import Loading from '@/components/PageLoading/index'
 
+export const WIDGETS_ID = {
+  CLINICAL_NOTE: '1',
+  CHIEF_COMPLAINTS: '2',
+  PLAN: '3',
+  ASSOCIATED_HISTORY: '3',
+  INTRA_ORAL: '4',
+  EXTRA_ORAL: '5',
+  ATTACHMENT: '6',
+  ORDERS: '7',
+  INVOICE: '8',
+  DENTAL_CHART: '9',
+  TREATMENT: '10',
+}
+
 export const widgets = (props) => [
   {
     id: '1',

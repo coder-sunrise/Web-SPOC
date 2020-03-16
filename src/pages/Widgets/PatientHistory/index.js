@@ -537,8 +537,17 @@ class PatientHistory extends Component {
             rights: 'disable',
           }}
         >
-          {visitPurposeFK === VISIT_TYPE.RETAIL ? (
-            this.widgets.filter((o) => o.id === '7').map((o) => {
+          {this.widgets
+            .filter((_widget) => {
+              if (visitPurposeFK === VISIT_TYPE.RETAIL) {
+                return _widget.id === WidgetConfig.WIDGETS_ID.INVOICE
+              }
+              return (
+                this.state.selectedItems.indexOf('0') >= 0 ||
+                this.state.selectedItems.indexOf(_widget.id) >= 0
+              )
+            })
+            .map((o) => {
               const Widget = o.component
               return (
                 <div>
@@ -550,48 +559,7 @@ class PatientHistory extends Component {
                   />
                 </div>
               )
-            })
-          ) : (
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
-                const Widget = o.component
-                return (
-                  <div>
-                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                    <Widget
-                      current={entity || {}}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  </div>
-                )
-              })
-          )}
-          {/* {entity &&
-            this.widgets
-              .filter(
-                (o) =>
-                  this.state.selectedItems.indexOf('0') >= 0 ||
-                  this.state.selectedItems.indexOf(o.id) >= 0,
-              )
-              .map((o) => {
-                const Widget = o.component
-                return (
-                  <div>
-                    <h5 style={{ fontWeight: 500 }}>{o.name}</h5>
-                    <Widget
-                      current={entity || {}}
-                      {...this.props}
-                      setFieldValue={this.props.setFieldValue}
-                    />
-                  </div>
-                )
-              })} */}
+            })}
         </AuthorizedContext.Provider>
       </CardContainer>
     )
