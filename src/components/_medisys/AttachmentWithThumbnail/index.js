@@ -274,7 +274,7 @@ const AttachmentWithThumbnail = ({
       size='sm'
       onClick={onUploadClick}
       disabled={isReadOnly || uploading || global.disableSave}
-      className={classes.uploadBtn}
+      className={fileAttachments.length >= 1 ? classes.uploadBtn : ''}
     >
       <AttachFile /> Upload
     </Button>

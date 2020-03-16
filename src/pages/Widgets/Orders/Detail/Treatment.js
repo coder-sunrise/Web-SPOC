@@ -40,7 +40,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
           treatmentCategoryFK: treatment ? treatment.treatmentCategoryFK : null,
         }
       }
-      if (orders.entity.type !== '7') {
+      if (orders.type !== '7') {
         return {}
       }
     }
