@@ -42,6 +42,19 @@ export const widgets = (props) => [
     }),
   },
   {
+    id: '12',
+    name: 'Diagnosis',
+    authority: 'queue.consultation.widgets.diagnosis',
+    component: Loadable({
+      loader: () => import('./Diagnosis'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return <Cmpnet {...props} {...p} />
+      },
+      loading: Loading,
+    }),
+  },
+  {
     id: '3',
     name: 'Associated History',
     authority: 'queue.consultation.clinicalnotes.associatedhistory',
