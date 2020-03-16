@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import classnames from 'classnames'
 // moment
 import moment from 'moment'
@@ -7,9 +7,19 @@ import { Calendar } from 'antd'
 // big calendar
 import BigCalendar from 'react-big-calendar'
 // material ui
-import { Popover, withStyles } from '@material-ui/core'
+import {
+  Popover,
+  withStyles,
+  Popper,
+  Paper,
+  Grow,
+  ClickAwayListener,
+} from '@material-ui/core'
 import ArrowLeft from '@material-ui/icons/ArrowLeft'
 import ArrowRight from '@material-ui/icons/ArrowRight'
+import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
+import { getUniqueId } from '@/utils/utils'
+
 // components
 import { Button, GridContainer, GridItem, Tooltip } from '@/components'
 
@@ -27,6 +37,14 @@ const styles = () => ({
   dateButton: {
     fontSize: '1.5rem',
     paddingBottom: '8px !important',
+  },
+
+  listItem: {
+    padding: 3,
+    '&:hover': {
+      backgroundColor: '#14bace',
+      color: 'white',
+    },
   },
 })
 
@@ -52,6 +70,7 @@ class CalendarToolbar extends React.PureComponent {
   state = {
     showDateOverlay: false,
     anchor: null,
+    showNextModal: false,
   }
 
   onDateButtonClick = (event) => {
@@ -97,88 +116,191 @@ class CalendarToolbar extends React.PureComponent {
     currentTarget && handleViewChange(currentTarget.id)
   }
 
+  handleNextModal = () => {
+    this.setState((prevState) => {
+      return {
+        showNextModal: !prevState.showNextModal,
+      }
+    })
+  }
+
+  renderColumn = (header, renderType) => {
+    return (
+      <div style={{ margin: 0 }}>
+        <b>{header}</b>
+        <ul
+          style={{
+            listStyle: 'none',
+            padding: 0,
+            cursor: 'pointer',
+            marginTop: 10,
+          }}
+        >
+          {this.renderList(1, 7, renderType)}
+        </ul>
+      </div>
+    )
+  }
+
+  renderList = (startIndex, endIndex, renderType) => {
+    const { classes } = this.props
+    let elements = []
+
+    for (let index = startIndex; index <= endIndex; index++) {
+      const element = (
+        <li
+          id={getUniqueId()}
+          className={classes.listItem}
+          onClick={() => this.props.handleSelectedValue(index, renderType)}
+        >
+          {index}
+        </li>
+      )
+      elements = [
+        ...elements,
+        element,
+      ]
+    }
+    return elements
+  }
+
   render () {
     const { classes, label, view, displayDate } = this.props
-    const { showDateOverlay, anchor } = this.state
-
+    const { showDateOverlay, anchor, showNextModal } = this.state
     return (
-      <GridContainer className={classnames(classes.container)}>
-        <GridItem xs md={2}>
-          <Tooltip title='Jump to today' placement='bottom'>
-            <Button color='info' onClick={this.returnToday}>
-              Today
-            </Button>
-          </Tooltip>
-        </GridItem>
-        <GridItem xs md={8} container justify='center'>
-          <Tooltip title={`Previous ${view}`}>
-            <Button
-              justIcon
-              color='info'
-              // variant='outlined'
-              onClick={this.subtractDate}
-            >
-              <ArrowLeft />
-            </Button>
-          </Tooltip>
-          <Button
-            color='info'
-            // variant='outlined'
-            size='lg'
-            className={classnames(classes.dateButton)}
-            onClick={this.onDateButtonClick}
-          >
-            {label}
-          </Button>
-          <Tooltip title={`Next ${view}`}>
-            <Button
-              justIcon
-              color='info'
-              // variant='outlined'
-              onClick={this.addDate}
-            >
-              <ArrowRight />
-            </Button>
-          </Tooltip>
-          <Popover
-            id='react-datetime'
-            open={showDateOverlay}
-            anchorEl={anchor}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
-            }}
-            onClose={this.onDateOverlayClose}
-            // style={{ width: 500, height: 500 }}
-          >
-            <div style={{ width: 400, height: '100%' }}>
-              <Calendar
-                fullscreen={false}
-                defaultValue={moment(displayDate)}
-                onSelect={this.onDateChange}
-              />
-            </div>
-          </Popover>
-        </GridItem>
-        <GridItem xs md={2} container justify='flex-end'>
-          <div className={classnames(classes.btnContainer)}>
-            {CalendarViews.map((cv) => (
-              <Button
-                simple={view !== cv}
-                color='info'
-                id={cv}
-                onClick={this.handleClick}
-              >
-                {cv}
+      <Fragment>
+        <GridContainer className={classnames(classes.container)}>
+          <GridItem xs md={1}>
+            <Tooltip title='Jump to today' placement='bottom'>
+              <Button color='info' onClick={this.returnToday}>
+                Today
               </Button>
-            ))}
-          </div>
-        </GridItem>
-      </GridContainer>
+            </Tooltip>
+          </GridItem>
+          <GridItem xs md={1}>
+            <Tooltip title='Jump to selected day/month/year' placement='bottom'>
+              <Button
+                color='info'
+                onClick={this.handleNextModal}
+                buttonRef={(node) => {
+                  this.anchorElAccount = node
+                }}
+              >
+                Next
+                <ArrowDropDown style={{ margin: 0, marginLeft: 5 }} />
+              </Button>
+            </Tooltip>
+          </GridItem>
+          <GridItem xs md={8} container justify='center'>
+            <Tooltip title={`Previous ${view}`}>
+              <Button
+                justIcon
+                color='info'
+                // variant='outlined'
+                onClick={this.subtractDate}
+              >
+                <ArrowLeft />
+              </Button>
+            </Tooltip>
+            <Button
+              color='info'
+              // variant='outlined'
+              size='lg'
+              className={classnames(classes.dateButton)}
+              onClick={this.onDateButtonClick}
+            >
+              {label}
+            </Button>
+            <Tooltip title={`Next ${view}`}>
+              <Button
+                justIcon
+                color='info'
+                // variant='outlined'
+                onClick={this.addDate}
+              >
+                <ArrowRight />
+              </Button>
+            </Tooltip>
+            <Popover
+              id='react-datetime'
+              open={showDateOverlay}
+              anchorEl={anchor}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              onClose={this.onDateOverlayClose}
+              // style={{ width: 500, height: 500 }}
+            >
+              <div style={{ width: 400, height: '100%' }}>
+                <Calendar
+                  fullscreen={false}
+                  defaultValue={moment(displayDate)}
+                  onSelect={this.onDateChange}
+                />
+              </div>
+            </Popover>
+          </GridItem>
+          <GridItem xs md={2} container justify='flex-end'>
+            <div className={classnames(classes.btnContainer)}>
+              {CalendarViews.map((cv) => (
+                <Button
+                  simple={view !== cv}
+                  color='info'
+                  id={cv}
+                  onClick={this.handleClick}
+                >
+                  {cv}
+                </Button>
+              ))}
+            </div>
+          </GridItem>
+        </GridContainer>
+        <Popper
+          open={showNextModal}
+          anchorEl={this.anchorElAccount}
+          transition
+          disablePortal
+          placement='bottom-end'
+          style={{
+            zIndex: 999,
+            left: '200px !important',
+            width: 300,
+            marginLeft: 80,
+          }}
+        >
+          {({ TransitionProps, placement }) => (
+            <Grow
+              {...TransitionProps}
+              id='menu-list'
+              style={{ transformOrigin: '0 0 -30' }}
+            >
+              <Paper className={classes.dropdown}>
+                <ClickAwayListener onClickAway={this.handleNextModal}>
+                  <div style={{ padding: 10, fontSize: '0.9vw' }}>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3, 1fr)',
+                        gridGap: 20,
+                        textAlign: 'center',
+                      }}
+                    >
+                      {this.renderColumn('Day', 'days')}
+                      {this.renderColumn('Month', 'months')}
+                      {this.renderColumn('Year', 'days')}
+                    </div>
+                  </div>
+                </ClickAwayListener>
+              </Paper>
+            </Grow>
+          )}
+        </Popper>
+      </Fragment>
     )
   }
 }

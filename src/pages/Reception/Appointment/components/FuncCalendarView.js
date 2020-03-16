@@ -277,6 +277,15 @@ const CalendarView = ({
     // }
   }
 
+  const _jumpToSelectedValue = (value, type) => {
+    const desiredDate = moment().add(value, type)
+
+    dispatch({
+      type: 'calendar/navigateCalendar',
+      payload: { date: desiredDate },
+    })
+  }
+
   const Toolbar = (toolbarProps) => {
     return (
       <CalendarToolbar
@@ -284,6 +293,7 @@ const CalendarView = ({
         displayDate={displayDate}
         handleViewChange={_onViewChange}
         handleDateChange={_jumpToDate}
+        handleSelectedValue={_jumpToSelectedValue}
       />
     )
   }
