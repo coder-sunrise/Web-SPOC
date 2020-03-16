@@ -70,10 +70,9 @@ const reloadDispense = (props, effect = 'query') => {
   })
 }
 
-const constructPayload = (values) => {
-  const _values = {
-    ...values,
-    prescription: values.prescription.map((o) => {
+const ConvertBatchNoArrayToText = (array) =>{
+  if(array){
+    return array.map((o) => {
       const item = { ...o }
       if (item.batchNo instanceof Array) {
         if (item.batchNo && item.batchNo.length > 0) {
@@ -84,9 +83,18 @@ const constructPayload = (values) => {
         }
       }
       return item
-    }),
+    })
   }
-  // values.prescription.forEach()
+
+  return array
+}
+
+const constructPayload = (values) => {
+  const _values = {
+    ...values,
+    prescription: ConvertBatchNoArrayToText(values.prescription),
+    vaccination: ConvertBatchNoArrayToText(values.vaccination),
+  }
   return _values
 }
 
