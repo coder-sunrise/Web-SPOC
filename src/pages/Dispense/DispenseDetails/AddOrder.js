@@ -50,14 +50,23 @@ const AddOrder = ({
               ...restValues
             } = o.retailVisitInvoiceDrug.retailPrescriptionItem
 
-            const medicationItem = inventorymedication.find(
-              (medication) =>
-                medication.id ===
-                  o.retailVisitInvoiceDrug.inventoryMedicationFK &&
-                medication.isActive,
-            )
+            let medicationItem
+            if (o.retailVisitInvoiceDrug.inventoryMedicationFK) {
+              medicationItem = inventorymedication.find(
+                (medication) =>
+                  medication.id ===
+                    o.retailVisitInvoiceDrug.inventoryMedicationFK &&
+                  medication.isActive,
+              )
+            } else {
+              // for open prescription item
+              medicationItem = true
+            }
+
             obj = {
-              type: o.invoiceItemTypeFK.toString(),
+              type: o.retailVisitInvoiceDrug.inventoryMedicationFK
+                ? o.invoiceItemTypeFK.toString()
+                : ORDER_TYPE_TAB.OPENPRESCRIPTION,
               ...o.retailVisitInvoiceDrug,
               innerLayerId: o.retailVisitInvoiceDrug.id,
               innerLayerConcurrencyToken:
@@ -368,10 +377,12 @@ export default compose(
           let obj
           switch (o.type) {
             case ORDER_TYPE_TAB.MEDICATION:
-            case ORDER_TYPE_TAB.OPENPRECRIPTION: {
-              const { revenueCategory } = inventorymedication.find(
+            case ORDER_TYPE_TAB.OPENPRESCRIPTION: {
+              let revenueCategory
+              const medication = inventorymedication.find(
                 (c) => c.id === o.inventoryMedicationFK,
               )
+              revenueCategory = medication ? medication.revenueCategory : {}
               const {
                 corPrescriptionItemInstruction,
                 corPrescriptionItemPrecaution,
