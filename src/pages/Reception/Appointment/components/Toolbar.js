@@ -42,6 +42,7 @@ const styles = () => ({
 
   listItem: {
     padding: 3,
+    transition: '0.3s',
     '&:hover': {
       backgroundColor: '#14bace',
       color: 'white',
@@ -191,7 +192,7 @@ class CalendarToolbar extends React.PureComponent {
                   this.anchorElAccount = node
                 }}
               >
-                Next
+                Go to
                 <ArrowDropDown style={{ margin: 0, marginLeft: 5 }} />
               </Button>
             </Tooltip>
