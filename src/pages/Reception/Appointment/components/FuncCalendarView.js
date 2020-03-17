@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { connect } from 'dva'
 // moment
 import moment from 'moment'
@@ -290,13 +290,13 @@ const CalendarView = ({
     return (
       <CalendarToolbar
         {...toolbarProps}
-        displayDate={displayDate}
         handleViewChange={_onViewChange}
         handleDateChange={_jumpToDate}
         handleSelectedValue={_jumpToSelectedValue}
       />
     )
   }
+
   const EventComponent = (eventProps) => {
     return (
       <Event

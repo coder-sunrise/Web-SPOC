@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react'
 import classnames from 'classnames'
+import { connect } from 'dva'
 // moment
 import moment from 'moment'
 // react-datetime
@@ -66,6 +67,9 @@ const DATE_NAVIGATOR_ACTION = {
   BACK_TO_TODAY: 'today',
 }
 
+@connect(({ calendar }) => ({
+  displayDate: calendar.currentViewDate,
+}))
 class CalendarToolbar extends React.PureComponent {
   state = {
     showDateOverlay: false,
@@ -167,6 +171,7 @@ class CalendarToolbar extends React.PureComponent {
   render () {
     const { classes, label, view, displayDate } = this.props
     const { showDateOverlay, anchor, showNextModal } = this.state
+
     return (
       <Fragment>
         <GridContainer className={classnames(classes.container)}>
@@ -292,7 +297,7 @@ class CalendarToolbar extends React.PureComponent {
                     >
                       {this.renderColumn('Day', 'days')}
                       {this.renderColumn('Month', 'months')}
-                      {this.renderColumn('Year', 'days')}
+                      {this.renderColumn('Year', 'years')}
                     </div>
                   </div>
                 </ClickAwayListener>
