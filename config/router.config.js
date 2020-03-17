@@ -699,6 +699,11 @@ const _routes = [
             component: './Setting/ClinicInfo',
           },
           {
+            path: '/setting/queuedisplaysetup',
+            name: 'queuedisplaysetup',
+            component: './Setting/QueueDisplaySetup',
+          },
+          {
             path: '/setting/service',
             name: 'service',
             component: './Setting/Service',

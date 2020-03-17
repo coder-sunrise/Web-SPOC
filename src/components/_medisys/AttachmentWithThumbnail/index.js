@@ -31,6 +31,7 @@ const AttachmentWithThumbnail = ({
   label,
   handleUpdateAttachments,
   isReadOnly,
+  disableUpload,
   buttonOnly = false,
   attachments = [],
   filterTypes = [],
@@ -43,6 +44,8 @@ const AttachmentWithThumbnail = ({
     width: 64,
   },
   renderBody = undefined,
+  maxFilesAllowUpload,
+  restrictFileTypes = [],
 }) => {
   const fileAttachments = attachments.filter(
     (attachment) =>
@@ -111,6 +114,17 @@ const AttachmentWithThumbnail = ({
       thumbnailData,
       isbase64: true,
     }
+  }
+
+  const stopUploading = (reason) => {
+    setErrorText(reason)
+    setUploading(false)
+    dispatch({
+      type: 'global/updateState',
+      payload: {
+        disableSave: false,
+      },
+    })
   }
 
   const mapToFileDto = async (file) => {
@@ -194,6 +208,26 @@ const AttachmentWithThumbnail = ({
         ...files,
       ]
 
+      const currentFilesLength = filesArray.length + attachments.length
+
+      if (maxFilesAllowUpload && currentFilesLength > maxFilesAllowUpload) {
+        stopUploading(`Cannot upload more than ${maxFilesAllowUpload} files`)
+        return
+      }
+
+      if (restrictFileTypes.length > 0) {
+        const invalidFileExist = filesArray.some(
+          (file) => !restrictFileTypes.includes(file.type),
+        )
+
+        if (invalidFileExist) {
+          stopUploading(
+            `Only the file types (${restrictFileTypes.toString()}) are allowed`,
+          )
+          return
+        }
+      }
+
       filesArray &&
         filesArray.forEach((o) => {
           totalFilesSize += o.size
@@ -205,14 +239,7 @@ const AttachmentWithThumbnail = ({
       })
 
       if (totalFilesSize > maxUploadSize) {
-        setErrorText('Cannot upload more than 30MB')
-        setUploading(false)
-        dispatch({
-          type: 'global/updateState',
-          payload: {
-            disableSave: false,
-          },
-        })
+        stopUploading('Cannot upload more than 30MB')
         return
       }
 
@@ -273,7 +300,7 @@ const AttachmentWithThumbnail = ({
       color='rose'
       size='sm'
       onClick={onUploadClick}
-      disabled={isReadOnly || uploading || global.disableSave}
+      disabled={isReadOnly || uploading || global.disableSave || disableUpload}
       className={classes.uploadBtn}
     >
       <AttachFile /> Upload

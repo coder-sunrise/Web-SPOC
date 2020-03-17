@@ -141,6 +141,7 @@ export default {
   'menu.setting.clinicoperationhour': 'Clinic Operation Hour',
   'menu.setting.gstsetup': 'GST Setup',
   'menu.setting.generalsetting': 'General Setting',
+  'menu.setting.queuedisplaysetup': 'Queue Display Setup',
   'menu.finance.copayer': 'Co-Payer',
   'menu.setting.supplier': 'Supplier',
   'menu.setting.paymentmode': 'Payment Mode',
