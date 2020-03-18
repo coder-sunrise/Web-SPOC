@@ -15,33 +15,7 @@ import EmptyList from './EmptyList'
 // services
 import { deleteFileByFileID, downloadAttachment } from '@/services/file'
 import { navigateDirtyCheck } from '@/utils/utils'
-
-const attchementTypes = [
-  {
-    id: 1,
-    type: 'ClinicalNotes',
-    name: 'Consultation Attachment',
-    accessRight: '',
-  },
-  {
-    id: 2,
-    type: 'VisitReferral',
-    name: 'Referral Attachment',
-    accessRight: '',
-  },
-  {
-    id: 3,
-    type: 'Visit',
-    name: 'Visit Attachment',
-    accessRight: '',
-  },
-  {
-    id: 4,
-    type: 'VisualAcuity',
-    name: 'Visual Acuity Test',
-    accessRight: '2',
-  },
-]
+import { corAttchementTypes } from '@/utils/codes'
 
 @connect(({ consultation }) => ({
   consultation,
@@ -51,7 +25,7 @@ class Attachment extends Component {
     runOnce: false,
     showScribbleModal: false,
     activedKeys: undefined,
-    types: attchementTypes.filter((o) => !o.accessRight),
+    types: corAttchementTypes.filter((o) => !o.accessRight),
   }
 
   handleClickAttachment = (attachment) => {

@@ -44,7 +44,6 @@ import {
   CheckboxGroup,
   ProgressButton,
   Checkbox,
-  NumberFormatter,
   confirm,
   SizeContainer,
   Popconfirm,
@@ -56,7 +55,6 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'

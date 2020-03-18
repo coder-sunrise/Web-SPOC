@@ -100,7 +100,7 @@ class Attachment extends Component {
         {list
           .filter(
             (attachment) =>
-              attachment.attachmentType === 'VisualAcuity' &&
+              attachment.attachmentType === 'EyeVisualAcuity' &&
               !attachment.isDeleted,
           )
           .map((attachment, index) => {
@@ -151,7 +151,7 @@ class Attachment extends Component {
           <AttachmentWithThumbnail
             attachments={corAttachment}
             buttonOnly
-            attachmentType='VisualAcuity'
+            attachmentType='EyeVisualAcuity'
             handleUpdateAttachments={this.handleUpdateAttachments}
             renderBody={(attachments) => {
               return this.getContent(attachments)

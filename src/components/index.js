@@ -48,7 +48,7 @@ export SimpleAlert from './SimpleAlert'
 export SimpleModal from './SimpleModal'
 export confirm from './SimpleModal/confirm'
 
-export * from './Grid'
+export * from '@/utils/format'
 
 export OutlinedTextField from './OutlinedTextField'
 

@@ -11,7 +11,7 @@ import {
   GridItem,
   EditableTableGrid,
 } from '@/components'
-import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
+import { podoOrderType, inventoryItemList, getServices } from '@/utils/codes'
 
 const styles = () => ({
   displayDiv: {
@@ -198,7 +198,7 @@ const InventoryTypeListing = ({
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
+        const { inventoryItemList } = inventoryItemList(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)

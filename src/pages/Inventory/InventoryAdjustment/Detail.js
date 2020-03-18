@@ -6,9 +6,9 @@ import { INVENTORY_TYPE, INVENTORY_ADJUSTMENT_STATUS } from '@/utils/constants'
 import {
   inventoryAdjustmentStatus,
   podoOrderType,
-  getInventoryItemList,
-  fetchAndSaveCodeTable,
+  inventoryItemList,
 } from '@/utils/codes'
+import { fetchAndSaveCodeTable } from '@/utils/codetable'
 import {
   withFormikExtend,
   FastField,
@@ -477,7 +477,7 @@ class Detail extends PureComponent {
       fetchAndSaveCodeTable(x.ctName, {
         isActive: excludeInactiveCodes(),
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(
+        const { inventoryItemList } = inventoryItemList(
           list,
           x.itemFKName,
           x.stateName,

@@ -2,12 +2,8 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { FastEditableTableGrid, GridContainer, GridItem } from '@/components'
-import {
-  podoOrderType,
-  getInventoryItem,
-  getInventoryItemList,
-  fetchAndSaveCodeTable,
-} from '@/utils/codes'
+import { podoOrderType, getInventoryItem } from '@/utils/codes'
+import { fetchAndSaveCodeTable } from '@/utils/codetable'
 
 // let commitCount = 2200 // uniqueNumber
 
@@ -58,7 +54,7 @@ class Grid extends PureComponent {
         // excludeInactiveCodes: false,
         isActive: excludeInactiveCodes(),
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(
+        const { inventoryItemList } = inventoryItemList(
           list,
           x.itemFKName,
           x.stateName,

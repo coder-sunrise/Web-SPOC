@@ -16,7 +16,7 @@ import DODetails from './DODetails'
 import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { podoOrderType, getInventoryItemList } from '@/utils/codes'
+import { podoOrderType, inventoryItemList } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -81,7 +81,7 @@ class index extends Component {
 
     inventoryList = await Promise.all(inventoryList)
     for (let i = 0; i < podoOrderType.length; i++) {
-      const { inventoryItemList } = getInventoryItemList(
+      const { inventoryItemList } = inventoryItemList(
         inventoryList[i],
         podoOrderType[i].itemFKName,
         podoOrderType[i].stateName,

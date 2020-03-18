@@ -3,7 +3,7 @@ import { connect } from 'dva'
 import _ from 'lodash'
 import { EditableTableGrid, notification } from '@/components'
 
-import { getCodes } from '@/utils/codes'
+import { getCodes } from '@/utils/codetable'
 
 // let schemeTypes = []
 // getCodes('ctSchemeType').then((codetableData) => {

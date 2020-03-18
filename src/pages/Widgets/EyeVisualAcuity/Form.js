@@ -96,7 +96,7 @@ const styles = (theme) => ({
   }),
 
   handleSubmit: () => {},
-  displayName: 'VisualAcuity',
+  displayName: 'EyeVisualAcuity',
 })
 class Form extends Component {
   handleUpdateAttachments = ({ added, deleted }) => {

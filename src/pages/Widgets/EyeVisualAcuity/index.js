@@ -36,7 +36,7 @@ import {
 import Attachment from './Attachment'
 import Form from './Form'
 
-class VisualAcuity extends Component {
+class EyeVisualAcuity extends Component {
   handleUpdateAttachments = ({ added, deleted }) => {
     console.log(added, deleted)
     const { values: { visitAttachment = [] }, setFieldValue } = this.props
@@ -79,4 +79,4 @@ class VisualAcuity extends Component {
   }
 }
 
-export default VisualAcuity
+export default EyeVisualAcuity

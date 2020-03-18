@@ -518,7 +518,7 @@ export const smallTheme = createMuiTheme({
       root: {
         margin: '0px 4px',
         padding: 0,
-        paddingLeft: 1,
+        paddingLeft: 2,
       },
     },
     MuiFormControl: {

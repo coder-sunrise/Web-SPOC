@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import { getCodes, getAllCodes } from '@/utils/codes'
+import { getCodes, getAllCodes } from '@/utils/codetable'
 import { subscribeNotification } from '@/utils/realtime'
 
 export default createListViewModel({

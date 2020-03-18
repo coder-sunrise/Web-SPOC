@@ -14,7 +14,6 @@ import {
   deleteFileByFileID,
 } from '@/services/file'
 // utils
-import { getCodes } from '@/utils/codes'
 import AttachmentChipWithPopover from './AttachmentChipWithPopover'
 import { FILE_CATEGORY, FILE_STATUS } from '@/utils/constants'
 
@@ -127,6 +126,7 @@ const Attachment = ({
       fileStatusFK,
       attachmentType,
     }
+    console.log(uploadObject)
     const uploaded = await uploadFile([
       uploadObject,
     ])

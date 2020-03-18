@@ -7,11 +7,7 @@ import { DataTypeProvider } from '@devexpress/dx-react-grid'
 
 import { updateGlobalVariable, updateCellValue } from '@/utils/utils'
 
-import {
-  DatePicker,
-  DateTypeProvider as DateTypeProviderOrg,
-  dateFormatLong,
-} from '@/components'
+import { DatePicker } from '@/components'
 
 import {
   onComponentDidMount,

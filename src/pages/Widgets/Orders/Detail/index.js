@@ -15,7 +15,7 @@ import {
 import { currencySymbol } from '@/utils/config'
 // import Others from './Others'
 // utils
-import { orderTypes } from '@/utils/codes'
+import { orderTypes } from '@/pages/Consultation/utils'
 import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({

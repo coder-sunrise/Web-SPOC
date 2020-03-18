@@ -65,7 +65,7 @@ const Detail = ({
   //           code: x.ctName,
   //         },
   //       }).then((list) => {
-  //         const { inventoryItemList } = getInventoryItemList(list)
+  //         const { inventoryItemList } = inventoryItemList(list)
   //         console.log(x.stateName)
   //         switch (x.stateName) {
   //           case 'ConsumableItemList': {

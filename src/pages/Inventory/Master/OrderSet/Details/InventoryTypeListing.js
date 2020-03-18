@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
-import { podoOrderType, getInventoryItemList, getServices } from '@/utils/codes'
+import { podoOrderType } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
+
 import InventoryType from './InventoryType'
 import Authorized from '@/utils/Authorized'
 
@@ -160,7 +162,7 @@ const InventoryTypeListing = ({
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = getInventoryItemList(list)
+        const { inventoryItemList } = inventoryItemList(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)

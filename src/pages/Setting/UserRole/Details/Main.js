@@ -423,6 +423,7 @@ class Main extends React.Component {
                 value={filter.displayValue}
                 label='Function Access'
                 options={this.displayValueList()}
+                dropdownMatchSelectWidth={false}
                 onChange={this.onSelectDisplayValue}
               />
             </GridItem>

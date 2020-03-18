@@ -17,7 +17,11 @@ import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
 import { getThumbnail } from './utils'
 import styles from './styles'
+import codes from '@/utils/codes'
+import config from '@/utils/config'
+import test from '@/utils/test'
 
+console.log(codes, config, getThumbnail, test)
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
 const getFileExtension = (filename) => {
@@ -44,6 +48,10 @@ const AttachmentWithThumbnail = ({
   },
   renderBody = undefined,
 }) => {
+  const type = codes
+    ? codes.corAttchementTypes.find((o) => o.type === attachmentType) || {}
+    : {}
+
   const fileAttachments = attachments.filter(
     (attachment) =>
       (!attachmentType ||
@@ -68,50 +76,6 @@ const AttachmentWithThumbnail = ({
     downloading,
     setDownlaoding,
   ] = useState(false)
-
-  const mapFileToUploadObject = async (file) => {
-    // file type and file size validation
-    const base64 = await convertToBase64(file)
-    const fileStatusFK = FILE_STATUS.UPLOADED
-    const fileExtension = getFileExtension(file.name)
-
-    let thumbnailData
-    if (
-      [
-        'jpg',
-        'jpeg',
-        'png',
-      ].includes(fileExtension)
-    ) {
-      const imgEle = document.createElement('img')
-      imgEle.src = `data:image/${fileExtension};base64,${base64}`
-      await setTimeout(() => {
-        // wait for 1 milli second for img to set src successfully
-      }, 100)
-      const thumbnail = getThumbnail(imgEle, thumbnailSize)
-      thumbnailData = thumbnail.toDataURL(`image/png`)
-    }
-
-    const uploadObject = {
-      fileName: file.name,
-      fileSize: file.size,
-      fileCategoryFK: FILE_CATEGORY.VISITREG,
-      content: base64,
-      fileExtension,
-      thumbnailData,
-      fileStatusFK,
-      attachmentType,
-    }
-    const uploaded = local ? {} : await uploadFile(uploadObject)
-
-    return {
-      ...uploaded,
-      attachmentType,
-      content: base64,
-      thumbnailData,
-      isbase64: true,
-    }
-  }
 
   const mapToFileDto = async (file) => {
     // file type and file size validation
@@ -154,6 +118,7 @@ const AttachmentWithThumbnail = ({
       fileExtension,
       fileStatusFK,
       attachmentType,
+      // attachmentTypeFK: type.id,
     }
 
     return originalFile
@@ -221,7 +186,7 @@ const AttachmentWithThumbnail = ({
       )
 
       const uploadResponse = await uploadFile(selectedFiles)
-
+      console.log(uploadResponse)
       let uploadedAttachment = []
       if (uploadResponse) {
         uploadedAttachment = mapUploadResponseToAttachmentDto(

@@ -19,7 +19,6 @@ import {
   Select,
   ButtonSelect,
 } from '@/components'
-import { fetchAndSaveCodeTable } from '@/utils/codes'
 import { queryList } from '@/services/common'
 import { DiagnosisSelect } from '@/components/_medisys'
 
