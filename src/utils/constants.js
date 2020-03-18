@@ -357,3 +357,12 @@ export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
 }
+
+export const PATH_TO_ACCESS_NAME = {
+  setting: 'settings',
+  'claim-submission': 'claimsubmission',
+  'finance/invoice': 'finance/invoicepayment',
+  'inventory/master': 'inventory/inventorymaster',
+  'inventory/pr': 'inventory/purchasingandreceiving',
+  patientdb: 'patientdatabase',
+}

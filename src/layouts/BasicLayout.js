@@ -18,6 +18,7 @@ import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
+import { PATH_TO_ACCESS_NAME } from '@/utils/constants'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -49,11 +50,13 @@ import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
+import { notification } from '@/components'
+import SiderMenu from '@/components/SiderMenu'
+import { getAuthority } from '@/utils/authority'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
+import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
@@ -122,6 +125,7 @@ class BasicLayout extends React.PureComponent {
     this.state = {
       mobileOpen: false,
       authorized: false,
+      accessable: false,
     }
     // this.resize = this.resize.bind(this)
     this.resize = _.debounce(this.resize, 500, {
@@ -171,12 +175,14 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount () {
+    // console.log(getAuthority())
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
   componentDidUpdate (e) {
     if (e.history.location.pathname !== e.location.pathname) {
+      this.updateAuthority(e.history.location.pathname)
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
         this.setState({ mobileOpen: false })
@@ -203,6 +209,7 @@ class BasicLayout extends React.PureComponent {
    */
   getBreadcrumbNameMap (menus) {
     // console.log('getBreadcrumbNameMap')
+    // console.log({ menus })
     const routerMap = {}
     const flattenMenuData = (data) => {
       data.forEach((menuItem) => {
@@ -261,8 +268,27 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
+  updateAuthority = (pathname) => {
+    console.log(pathname)
+    console.log(getAuthority())
+
+    const authority = getAuthority()
+    const accessRight = authority.find(
+      (a) => a.name === this.pathAccessNameMap(pathname.substring(1)),
+    )
+    this.setState({
+      accessable: !accessRight || accessRight.rights === 'readwrite',
+    })
+    console.log(accessRight)
+  }
+
+  pathAccessNameMap = (pathname) => {
+    const accessName = PATH_TO_ACCESS_NAME[pathname]
+    return accessName || pathname
+  }
+
   initUserData = async () => {
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch, route: { routes, authority }, location } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -292,6 +318,8 @@ class BasicLayout extends React.PureComponent {
     const user = await dispatch({
       type: 'user/fetchCurrent',
     })
+
+    this.updateAuthority(location.pathname)
 
     if (!user) return
     reloadAuthorized()
@@ -418,6 +446,14 @@ class BasicLayout extends React.PureComponent {
   //   return <SettingDrawer />
   // };
 
+  renderChild = () => {
+    const { children } = this.props
+    const { authorized, accessable } = this.state
+    if (!accessable) return <Exception type='404' />
+    if (!authorized) return <Loading />
+    return children
+  }
+
   render () {
     const { classes, loading, theme, ...props } = this.props
     // console.log(props.collapsed)
@@ -515,11 +551,7 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {this.state.authorized ? (
-                                    children
-                                  ) : (
-                                    <Loading />
-                                  )}
+                                  {this.renderChild()}
                                 </div>
                               </div>
                             </ErrorBoundary>
