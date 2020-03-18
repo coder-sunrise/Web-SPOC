@@ -22,7 +22,7 @@ import {
   poSubmitAction,
   getPurchaseOrderStatusFK,
   isPOStatusFulfilled,
-  isPOStatusFinalized,
+  isPOStatusFinalizedFulFilledPartialReceived,
   enableSaveButton,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
@@ -530,7 +530,7 @@ class Index extends Component {
       <React.Fragment>
         <POForm
           isReadOnly={!this.isEditable(poStatus, isWriteOff)}
-          isFinalize={isPOStatusFinalized(poStatus)}
+          isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
           setFieldValue={setFieldValue}
           isCompletedOrCancelled={isCompletedOrCancelled}
           {...this.props}
