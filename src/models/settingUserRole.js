@@ -10,9 +10,7 @@ const defaultDates = {
 const compare = (a, b) => {
   const f = a.module.localeCompare(b.module)
   if (f !== 0) return f
-  return a.clientAccessRightFK
-    .toString()
-    .localeCompare(b.clientAccessRightFK.toString())
+  return a.sortOrder - b.sortOrder
 }
 
 export default createListViewModel({
