@@ -175,7 +175,6 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount () {
-    // console.log(getAuthority())
     window.addEventListener('resize', this.resize)
     this.resize()
   }
@@ -209,7 +208,6 @@ class BasicLayout extends React.PureComponent {
    */
   getBreadcrumbNameMap (menus) {
     // console.log('getBreadcrumbNameMap')
-    // console.log({ menus })
     const routerMap = {}
     const flattenMenuData = (data) => {
       data.forEach((menuItem) => {
@@ -269,9 +267,6 @@ class BasicLayout extends React.PureComponent {
   }
 
   updateAuthority = (pathname) => {
-    console.log(pathname)
-    console.log(getAuthority())
-
     const authority = getAuthority()
     const accessRight = authority.find(
       (a) => a.name === this.pathAccessNameMap(pathname.substring(1)),
@@ -279,7 +274,6 @@ class BasicLayout extends React.PureComponent {
     this.setState({
       accessable: !accessRight || accessRight.rights === 'readwrite',
     })
-    console.log(accessRight)
   }
 
   pathAccessNameMap = (pathname) => {
