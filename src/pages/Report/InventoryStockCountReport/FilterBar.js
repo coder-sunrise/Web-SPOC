@@ -29,7 +29,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
             <Field
               name='inventoryType'
               render={(args) => {
-                const { form: fm } = args
                 return (
                   <Select
                     {...args}
@@ -39,11 +38,6 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                       { name: 'Consumable', value: 'CONSUMABLE' },
                       { name: 'Vaccination', value: 'VACCINATION' },
                     ]}
-                    onChange={(e) => {
-                      if (e) {
-                        fm.setFieldValue('items', undefined)
-                      }
-                    }}
                   />
                 )
               }}
