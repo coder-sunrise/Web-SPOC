@@ -18,7 +18,6 @@ import cx from 'classnames'
 import pathToRegexp from 'path-to-regexp'
 import Media from 'react-media'
 import { formatMessage } from 'umi/locale'
-import { PATH_TO_ACCESS_NAME } from '@/utils/constants'
 
 // import { ToastComponent } from '@syncfusion/ej2-react-notifications'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
@@ -268,17 +267,17 @@ class BasicLayout extends React.PureComponent {
 
   updateAuthority = (pathname) => {
     const authority = getAuthority()
-    const accessRight = authority.find(
-      (a) => a.name === this.pathAccessNameMap(pathname.substring(1)),
-    )
-    this.setState({
-      accessable: !accessRight || accessRight.rights === 'readwrite',
-    })
-  }
-
-  pathAccessNameMap = (pathname) => {
-    const accessName = PATH_TO_ACCESS_NAME[pathname]
-    return accessName || pathname
+    const currRouterData = this.matchParamsPath(pathname)
+    if (currRouterData && currRouterData.authority) {
+      const accessRight = authority.find(
+        (a) => a.name === currRouterData.authority[0],
+      )
+      this.setState({
+        accessable: !accessRight || accessRight.rights === 'readwrite',
+      })
+    } else {
+      this.setState({ accessable: false })
+    }
   }
 
   initUserData = async () => {
@@ -313,15 +312,12 @@ class BasicLayout extends React.PureComponent {
       type: 'user/fetchCurrent',
     })
 
-    this.updateAuthority(location.pathname)
-
     if (!user) return
     reloadAuthorized()
     await dispatch({
       type: 'codetable/fetchAllCachedCodetable',
     })
 
-    // console.log(routes, authority)
     const menus = await dispatch({
       type: 'menu/getMenuData',
       payload: { routes, authority },
@@ -337,6 +333,8 @@ class BasicLayout extends React.PureComponent {
     this.setState({
       authorized: true,
     })
+
+    this.updateAuthority(location.pathname)
   }
 
   matchParamsPath = (pathname) => {
@@ -350,6 +348,7 @@ class BasicLayout extends React.PureComponent {
 
   getPageTitle = (pathname) => {
     const currRouterData = this.matchParamsPath(pathname)
+    console.log('currRouterData', currRouterData)
 
     if (!currRouterData) {
       return defaultSettings.appTitle
