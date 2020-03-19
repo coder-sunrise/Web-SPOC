@@ -266,8 +266,14 @@ class BasicLayout extends React.PureComponent {
   }
 
   updateAuthority = (pathname) => {
+    const { route: { routes } } = this.props
     const authority = getAuthority()
-    const currRouterData = this.matchParamsPath(pathname)
+    let routerData = []
+    routes.forEach((e) => {
+      routerData.push(e)
+      Array.prototype.push.apply(routerData, e.routes)
+    })
+    const currRouterData = routerData.find((e) => e.path === pathname)
     if (currRouterData && currRouterData.authority) {
       const accessRight = authority.find(
         (a) => a.name === currRouterData.authority[0],
@@ -276,7 +282,7 @@ class BasicLayout extends React.PureComponent {
         accessable: !accessRight || accessRight.rights === 'readwrite',
       })
     } else {
-      this.setState({ accessable: false })
+      this.setState({ accessable: true })
     }
   }
 
@@ -348,8 +354,6 @@ class BasicLayout extends React.PureComponent {
 
   getPageTitle = (pathname) => {
     const currRouterData = this.matchParamsPath(pathname)
-    console.log('currRouterData', currRouterData)
-
     if (!currRouterData) {
       return defaultSettings.appTitle
     }
