@@ -36,7 +36,9 @@ const InventoryStockCountReportWithFormik = withFormik({
     inventoryType: Yup.string().required(),
   }),
   mapPropsToValues: () => ({
-    inventoryType: 'MEDICATION',
+    inventoryType: [
+      'MEDICATION',
+    ],
   }),
 })(InventoryStockCountReport)
 

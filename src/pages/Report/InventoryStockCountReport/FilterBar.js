@@ -33,6 +33,8 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   <Select
                     {...args}
                     label='Inventory Type'
+                    mode='multiple'
+                    maxTagCount={1}
                     options={[
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
