@@ -326,7 +326,7 @@ const widgets = [
               dispatch,
               consultation,
             }) => {
-              console.log(updated, form, dispatch, consultation)
+              // console.log(updated, form, dispatch, consultation)
               form.setFieldValue('corAttachment', updated)
               const { entity } = consultation
               entity.corAttachment = updated
