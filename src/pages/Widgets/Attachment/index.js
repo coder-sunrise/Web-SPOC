@@ -25,7 +25,7 @@ class Attachment extends Component {
     runOnce: false,
     showScribbleModal: false,
     activedKeys: undefined,
-    types: corAttchementTypes.filter((o) => !o.accessRight),
+    types: corAttchementTypes, // .filter((o) => !o.accessRight),
   }
 
   handleClickAttachment = (attachment) => {

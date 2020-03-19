@@ -17,11 +17,8 @@ import { convertToBase64 } from '@/utils/utils'
 import { FILE_STATUS, FILE_CATEGORY } from '@/utils/constants'
 import { getThumbnail } from './utils'
 import styles from './styles'
-import codes from '@/utils/codes'
-import config from '@/utils/config'
-import test from '@/utils/test'
+import { corAttchementTypes } from '@/utils/codes'
 
-console.log(codes, config, getThumbnail, test)
 const allowedFiles = '.png, .jpg, .jpeg, .xls, .xlsx, .doc, .docx, .pdf'
 
 const getFileExtension = (filename) => {
@@ -48,9 +45,7 @@ const AttachmentWithThumbnail = ({
   },
   renderBody = undefined,
 }) => {
-  const type = codes
-    ? codes.corAttchementTypes.find((o) => o.type === attachmentType) || {}
-    : {}
+  const type = corAttchementTypes.find((o) => o.type === attachmentType) || {}
 
   const fileAttachments = attachments.filter(
     (attachment) =>
@@ -118,7 +113,7 @@ const AttachmentWithThumbnail = ({
       fileExtension,
       fileStatusFK,
       attachmentType,
-      // attachmentTypeFK: type.id,
+      attachmentTypeFK: type.id,
     }
 
     return originalFile
@@ -186,7 +181,7 @@ const AttachmentWithThumbnail = ({
       )
 
       const uploadResponse = await uploadFile(selectedFiles)
-      console.log(uploadResponse)
+
       let uploadedAttachment = []
       if (uploadResponse) {
         uploadedAttachment = mapUploadResponseToAttachmentDto(

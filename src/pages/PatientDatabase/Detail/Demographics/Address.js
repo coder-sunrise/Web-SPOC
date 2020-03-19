@@ -217,7 +217,7 @@ class Address extends Component {
                 name={`${prefix}postcode`}
                 render={(args) => (
                   <TextField
-                    label='Postal Code'
+                    label={`Postal Code ${prefix}postcode`}
                     // onChange={this.handleOnChange}
                     inputProps={{
                       maxLength: 10,

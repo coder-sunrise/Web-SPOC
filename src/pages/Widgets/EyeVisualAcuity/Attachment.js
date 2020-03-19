@@ -126,9 +126,10 @@ class Attachment extends Component {
   }
 
   render () {
-    const { consultation } = this.props
-    const { entity } = consultation
-    const { corAttachment } = entity
+    const { consultation = {} } = this.props
+    const { entity = {} } = consultation
+    console.log(entity)
+    const { corAttachment } = entity || {}
     return (
       <div>
         <FastField

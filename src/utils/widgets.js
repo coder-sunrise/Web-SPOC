@@ -314,6 +314,15 @@ const widgets = [
     accessRight: 'queue.consultation.widgets.attachment',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
+      render: (loaded, p) => {
+        let Cmpnet = loaded.default
+        return (
+          <Cmpnet
+            {...p}
+            prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+          />
+        )
+      },
       loading: Loading,
     }),
     associatedProps: [

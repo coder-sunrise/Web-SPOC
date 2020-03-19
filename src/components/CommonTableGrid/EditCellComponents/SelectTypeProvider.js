@@ -7,7 +7,6 @@ import PropTypes from 'prop-types'
 import { withStyles, Tooltip } from '@material-ui/core'
 import { DataTypeProvider } from '@devexpress/dx-react-grid'
 import { CodeSelect, Select, TextField } from '@/components'
-import { checkShouldRefresh } from '@/utils/codes'
 
 import {
   updateGlobalVariable,

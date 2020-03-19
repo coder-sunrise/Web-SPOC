@@ -11,7 +11,7 @@ import {
   commonDataWriterTransform,
   commonDataReaderTransform,
 } from './utils'
-import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codes'
+import { checkIsCodetableAPI, refreshCodetable } from '@/utils/codetable'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_STATUS, NOTIFICATION_TYPE } from '@/utils/constants'
 
@@ -533,7 +533,7 @@ const request = (
     //     }
     //   }
     // })
-    console.log({ r })
+    // console.log({ r })
     return r
   } catch (error) {
     console.log(error)

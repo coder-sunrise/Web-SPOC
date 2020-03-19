@@ -199,7 +199,7 @@ const convertExcludeFields = [
   'refresh',
 ]
 
-export const fetchAndSaveCodeTable = async (
+const fetchAndSaveCodeTable = async (
   code,
   params,
   refresh = false,
@@ -259,7 +259,7 @@ export const fetchAndSaveCodeTable = async (
   return []
 }
 
-export const getAllCodes = async () => {
+const getAllCodes = async () => {
   const lastLoginDate = localStorage.getItem('_lastLogin')
   const parsedLastLoginDate = moment(lastLoginDate)
   await db.open()
@@ -289,7 +289,7 @@ export const getAllCodes = async () => {
   return ct || []
 }
 
-export const getCodes = async (payload) => {
+const getCodes = async (payload) => {
   let ctcode
   let params
   let multiply = 1
@@ -347,7 +347,7 @@ export const getCodes = async (payload) => {
   return result
 }
 
-export const checkShouldRefresh = async (payload) => {
+const checkShouldRefresh = async (payload) => {
   try {
     const { code, filter } = payload
 
@@ -366,7 +366,7 @@ export const checkShouldRefresh = async (payload) => {
   return false
 }
 
-export const refreshCodetable = async (url) => {
+const refreshCodetable = async (url) => {
   try {
     const paths = url.split('/')
     const code = paths[2]
@@ -379,7 +379,7 @@ export const refreshCodetable = async (url) => {
   }
 }
 
-export const checkIsCodetableAPI = (url) => {
+const checkIsCodetableAPI = (url) => {
   try {
     const paths = url.split('/')
 
@@ -396,7 +396,7 @@ export const checkIsCodetableAPI = (url) => {
   return false
 }
 
-export const getTenantCodes = async (tenantCode) => {
+const getTenantCodes = async (tenantCode) => {
   // todo: paging
   const response = await request(`/api/${tenantCode}`, { method: 'GET' })
   const { status: statusCode, data } = response
@@ -406,7 +406,7 @@ export const getTenantCodes = async (tenantCode) => {
   return {}
 }
 
-export const getServices = (data) => {
+const getServices = (data) => {
   // eslint-disable-next-line compat/compat
   const services = _.orderBy(
     Object.values(_.groupBy(data, 'serviceId')).map((o) => {
@@ -462,5 +462,10 @@ module.exports = {
   getCodes,
   getServices,
   fetchAndSaveCodeTable,
+  checkIsCodetableAPI,
+  getTenantCodes,
+  getAllCodes,
+  checkShouldRefresh,
+  refreshCodetable,
   ...module.exports,
 }

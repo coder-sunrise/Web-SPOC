@@ -85,8 +85,6 @@ const convertToConsultation = (values, { consultationDocument, orders }) => {
     }
   })
   const { dentalChartComponent } = window.g_app._store.getState()
-  // console.log('dentalChartComponent', dentalChartComponent)
-
   if (dentalChartComponent) {
     const { isPedoChart, isSurfaceLabel, data } = dentalChartComponent
     values.corDentalCharts = [

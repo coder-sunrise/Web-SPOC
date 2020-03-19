@@ -16,6 +16,8 @@ import PatientInfoCard from './PatientInfoCard'
 import VisitInfoCard from './VisitInfoCard'
 import VitalSignCard from './VitalSignCard'
 import ReferralCard from './ReferralCard'
+import EyeVisualAcuityCard from './EyeVisualAcuityCard'
+
 // import ParticipantCard from './ParticipantCard'
 import VisitValidationSchema from './validationScheme'
 import FormFieldName from './formField'
@@ -310,6 +312,16 @@ class NewVisit extends PureComponent {
                     </GridItem>
                     <GridItem xs md={12} className={classes.row}>
                       <ReferralCard
+                        isReadOnly={isRetail || isReadOnly}
+                        handleUpdateAttachments={this.updateAttachments}
+                        attachments={values.visitAttachment}
+                        dispatch={dispatch}
+                        values={values}
+                        setFieldValue={setFieldValue}
+                      />
+                    </GridItem>
+                    <GridItem xs md={12} className={classes.row}>
+                      <EyeVisualAcuityCard
                         isReadOnly={isRetail || isReadOnly}
                         handleUpdateAttachments={this.updateAttachments}
                         attachments={values.visitAttachment}

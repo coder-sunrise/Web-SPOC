@@ -11,7 +11,8 @@ import {
   GridItem,
   EditableTableGrid,
 } from '@/components'
-import { podoOrderType, inventoryItemList, getServices } from '@/utils/codes'
+import { podoOrderType } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
 
 const styles = () => ({
   displayDiv: {
