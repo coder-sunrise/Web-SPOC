@@ -143,12 +143,12 @@ const schemaDemographic = {
   // dialect: Yup.string().required(),
   // contact.mobileContactNumber.number:Yup.string().render(),
   contact: Yup.object().shape({
-    contactAddress: Yup.array().compact((v) => v.isDeleted).of(
-      Yup.object().shape({
-        postcode: Yup.number().required(),
-        countryFK: Yup.string().required(),
-      }),
-    ),
+    // contactAddress: Yup.array().compact((v) => v.isDeleted).of(
+    //   Yup.object().shape({
+    //     postcode: Yup.number().required(),
+    //     countryFK: Yup.string().required(),
+    //   }),
+    // ),
     contactEmailAddress: Yup.object().shape({
       emailAddress: Yup.string().email(),
     }),

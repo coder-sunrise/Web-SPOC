@@ -320,6 +320,23 @@ const widgets = [
           <Cmpnet
             {...p}
             prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+            handleUpdateAttachments={({
+              updated,
+              form,
+              dispatch,
+              consultation,
+            }) => {
+              console.log(updated, form, dispatch, consultation)
+              form.setFieldValue('corAttachment', updated)
+              const { entity } = consultation
+              entity.corAttachment = updated
+              dispatch({
+                type: 'consultation/updateState',
+                payload: {
+                  entity,
+                },
+              })
+            }}
           />
         )
       },
@@ -332,7 +349,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
   },

@@ -12,12 +12,12 @@ const url = '/api/files'
 //   "IsConfirmed": "false"
 // }
 export const uploadFile = async (payload) => {
-  console.log(payload)
+  // console.log(payload)
   const response = await request(url, {
     method: 'POST',
     data: JSON.stringify(payload),
   })
-  console.log(response)
+  // console.log(response)
   return response
 }
 

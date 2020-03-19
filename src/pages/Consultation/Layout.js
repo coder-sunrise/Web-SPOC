@@ -26,7 +26,7 @@ import {
   Popconfirm,
   IconButton,
   CustomInputWrapper,
-  Fab,
+  notification,
   GridContainer,
   GridItem,
 } from '@/components'
@@ -72,20 +72,26 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { defaultConsultationTemplate } = clinicInfo
-
+    const { defaultConsultationTemplate = '[]' } = clinicInfo
+    // console.log(defaultConsultationTemplate)
+    if (defaultConsultationTemplate === '[]') {
+      notification.warn({
+        message: 'Clinic do not have default template configuration',
+      })
+    }
     this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
 
     let defaultLayout
 
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
-    } else if (true) {
+    } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
-    } else {
-      defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
+    //  else {
+    //   defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
+    // }
     // console.log(defaultLayout)
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()

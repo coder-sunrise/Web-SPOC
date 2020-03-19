@@ -67,7 +67,7 @@ const VisitInfoCard = ({
             name={FormField['visit.visitType']}
             render={(args) => (
               <CodeSelect
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitType',
                 })}
@@ -83,7 +83,7 @@ const VisitInfoCard = ({
             name={FormField['visit.doctorProfileFk']}
             render={(args) => (
               <DoctorProfileSelect
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 label={
                   visitType === VISIT_TYPE.RETAIL ? (
                     formatMessage({
@@ -108,7 +108,7 @@ const VisitInfoCard = ({
               <NumberInput
                 {...args}
                 format='0.0'
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.queueNo',
                 })}
@@ -125,7 +125,7 @@ const VisitInfoCard = ({
             name={FormField['visit.roomFK']}
             render={(args) => (
               <CodeSelect
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.room',
                 })}
@@ -140,7 +140,7 @@ const VisitInfoCard = ({
             name={FormField['visit.visitOrderTemplateFK']}
             render={(args) => (
               <Select
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 options={visitOrderTemplateOptions}
                 label={formatMessage({
                   id: 'reception.queue.visitRegistration.visitOrderTemplate',
@@ -156,7 +156,7 @@ const VisitInfoCard = ({
             render={(args) => (
               <TextField
                 {...args}
-                disabled={isReadOnly}
+                // disabled={isReadOnly}
                 multiline
                 rowsMax={3}
                 label={formatMessage({

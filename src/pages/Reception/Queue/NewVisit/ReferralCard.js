@@ -61,7 +61,7 @@ class ReferralCard extends PureComponent {
               render={(args) => (
                 // <TextField
                 //   {...args}
-                //   disabled={isReadOnly}
+                //   //disabled={isReadOnly}
                 //   label='Referred By'
                 // />
                 <Select
@@ -71,7 +71,7 @@ class ReferralCard extends PureComponent {
                   mode='tags'
                   maxSelected={1}
                   disableAll
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   onChange={this.onReferralByAndInstitutionChange}
                 />
               )}
@@ -84,7 +84,7 @@ class ReferralCard extends PureComponent {
                 <DatePicker
                   {...args}
                   disabledDate={(d) => !d || d.isAfter(moment())}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label='Referral Date'
                 />
               )}
@@ -97,7 +97,7 @@ class ReferralCard extends PureComponent {
               render={(args) => (
                 <TextField
                   label='Institution'
-                  disabled={isReadOnly}
+                  // //disabled={isReadOnly}
                   onChange={this.onReferralByAndInstitutionChange}
                   {...args}
                 />

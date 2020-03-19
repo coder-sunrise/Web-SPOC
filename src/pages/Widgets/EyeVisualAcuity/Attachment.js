@@ -58,24 +58,16 @@ class Attachment extends Component {
         ]
       }, [])
     updated = updated.map((item, index) => ({ ...item, sortOrder: index + 1 }))
-    form.setFieldValue('corAttachment', updated)
 
-    // updated.filter(o=>)
-
-    // console.log(updated)
-    // this.setState({
-    //   corAttachment: updated,
-    // })
-
-    const { consultation } = this.props
-    const { entity } = consultation
-    entity.corAttachment = updated
-    this.props.dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        entity,
-      },
-    })
+    const { handleUpdateAttachments } = this.props
+    if (handleUpdateAttachments)
+      handleUpdateAttachments({
+        ...this.props,
+        updated,
+        form,
+        added,
+        deleted,
+      })
   }
 
   handleDeleteAttachment = (fileIndexFK, id) => {
@@ -126,10 +118,13 @@ class Attachment extends Component {
   }
 
   render () {
-    const { consultation = {} } = this.props
-    const { entity = {} } = consultation
-    console.log(entity)
-    const { corAttachment } = entity || {}
+    const { consultation = {}, attachments } = this.props
+    // console.log(attachments)
+    const { entity } = consultation
+    let _attachment = attachments
+    if (!_attachment && entity) {
+      _attachment = entity.corAttachment
+    }
     return (
       <div>
         <FastField
@@ -148,17 +143,16 @@ class Attachment extends Component {
           }}
         />
 
-        {corAttachment && (
-          <AttachmentWithThumbnail
-            attachments={corAttachment}
-            buttonOnly
-            attachmentType='EyeVisualAcuity'
-            handleUpdateAttachments={this.handleUpdateAttachments}
-            renderBody={(attachments) => {
-              return this.getContent(attachments)
-            }}
-          />
-        )}
+        <AttachmentWithThumbnail
+          attachments={_attachment || []}
+          buttonOnly
+          attachmentType='EyeVisualAcuity'
+          handleUpdateAttachments={this.handleUpdateAttachments}
+          renderBody={(list) => {
+            // console.log(list)
+            return this.getContent(list)
+          }}
+        />
       </div>
     )
   }
