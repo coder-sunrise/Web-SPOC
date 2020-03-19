@@ -274,13 +274,35 @@ class BasicLayout extends React.PureComponent {
       Array.prototype.push.apply(routerData, e.routes)
     })
     const currRouterData = routerData.find((e) => e.path === pathname)
+    console.log({ currRouterData })
+    authority.forEach((e) => console.log(e))
+    // console.log(currRouterData)
+    // console.log({ routerData })
+    // authority.forEach((e) => {
+    //   const result = routerData.find((a) => {
+    //     if (a.authority) return a.authority[0] === e.name
+    //     return true
+    //   })
+    //   if (result.path !== '/development') {
+    //     console.log(e)
+    //   }
+    // })
+    // console.log('hello')
     if (currRouterData && currRouterData.authority) {
       const accessRight = authority.find(
         (a) => a.name === currRouterData.authority[0],
       )
       this.setState({
-        accessable: !accessRight || accessRight.rights === 'readwrite',
+        accessable:
+          !accessRight ||
+          [
+            'readwrite',
+            'readonly',
+            'enable',
+            'disable',
+          ].includes(accessRight.rights),
       })
+      console.log(accessRight.rights)
     } else {
       this.setState({ accessable: true })
     }
@@ -446,8 +468,8 @@ class BasicLayout extends React.PureComponent {
   renderChild = () => {
     const { children } = this.props
     const { authorized, accessable } = this.state
-    if (!accessable) return <Exception type='404' />
     if (!authorized) return <Loading />
+    if (!accessable) return <Exception type='404' />
     return children
   }
 
