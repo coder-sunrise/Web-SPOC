@@ -454,7 +454,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 168 // 168 = nav header height + patient banner height + anchor height
+    const topHeight = (this.props.height ? 0 : headerHeight) + 158 // 168 = nav header height + patient banner height + anchor height
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,
