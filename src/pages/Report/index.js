@@ -119,6 +119,11 @@ const menuData = [
   },
   {
     title: 'Inventory',
+    text: 'Inventory Count Stock Report',
+    url: '/report/inventorystockcountreport',
+  },
+  {
+    title: 'Inventory',
     text: 'Inventory Listing Report',
     url: '/report/inventorylistingreport',
   },
