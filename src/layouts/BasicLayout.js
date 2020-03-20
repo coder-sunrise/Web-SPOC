@@ -49,11 +49,13 @@ import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
+import { notification } from '@/components'
+import SiderMenu from '@/components/SiderMenu'
+import { getAuthority } from '@/utils/authority'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
+import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
@@ -122,6 +124,8 @@ class BasicLayout extends React.PureComponent {
     this.state = {
       mobileOpen: false,
       authorized: false,
+      accessable: false,
+      routesData: undefined,
     }
     // this.resize = this.resize.bind(this)
     this.resize = _.debounce(this.resize, 500, {
@@ -171,12 +175,14 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount () {
+    this.redirectToAccessable()
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
   componentDidUpdate (e) {
     if (e.history.location.pathname !== e.location.pathname) {
+      this.updateAuthority(e.history.location.pathname)
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
         this.setState({ mobileOpen: false })
@@ -261,8 +267,92 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
+  getAllRoutesData = () => {
+    if (!this.state.routesData) {
+      const { route: { routes } } = this.props
+      let routerData = []
+      routes.forEach((e) => {
+        routerData.push(e)
+        Array.prototype.push.apply(routerData, e.routes)
+      })
+      const filteredRouterData = routerData.filter(
+        (e) =>
+          e.path &&
+          e.component &&
+          !e.path.includes('/development') &&
+          e.path !== '/',
+      )
+      this.setState({ routesData: filteredRouterData })
+      return filteredRouterData
+    }
+    return this.state.routesData
+  }
+
+  getRouteData = (pathname) => {
+    const routesData = this.getAllRoutesData()
+    const routeData = routesData.find((e) => e.path === pathname)
+    return routeData
+  }
+
+  updateAuthority = (pathname) => {
+    const paths = pathname.split('/')
+    const lastEle = paths.slice(-1)
+    const isLastEleNum = Number(lastEle[0])
+    let parsedPath = pathname
+
+    if (!Number.isNaN(isLastEleNum)) {
+      parsedPath = `${paths
+        .filter((_p, index) => index < paths.length - 1)
+        .join('/')}/:id`
+    }
+
+    this.setState({
+      accessable: this.isAccessable(this.getRouteData(parsedPath)),
+    })
+  }
+
+  redirectToAccessable = () => {
+    const { location } = this.props
+    const routerData = this.getAllRoutesData()
+    let actualPathName = location.pathname
+
+    if (!this.isAccessable(this.getRouteData(actualPathName))) {
+      for (let i = 0; i < routerData.length; i++) {
+        if (this.isAccessable(routerData[i])) {
+          actualPathName = routerData[i].path
+          break
+        }
+      }
+    }
+    if (actualPathName !== location.pathname) {
+      this.props.history.push(actualPathName)
+    } else {
+      this.updateAuthority(location.pathname)
+    }
+  }
+
+  isAccessable = (routeData) => {
+    const authority = getAuthority()
+    if (routeData && routeData.authority) {
+      const accessRight = authority.find(
+        (a) => a.name === routeData.authority[0],
+      )
+      console.log({ accessRight, routeData })
+      return (
+        accessRight &&
+        [
+          'readwrite',
+          'readonly',
+          'enable',
+          'disable',
+        ].includes(accessRight.rights)
+      )
+    }
+    return false
+  }
+
   initUserData = async () => {
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch, route: { routes, authority }, location } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -299,7 +389,6 @@ class BasicLayout extends React.PureComponent {
       type: 'codetable/fetchAllCachedCodetable',
     })
 
-    // console.log(routes, authority)
     const menus = await dispatch({
       type: 'menu/getMenuData',
       payload: { routes, authority },
@@ -328,7 +417,6 @@ class BasicLayout extends React.PureComponent {
 
   getPageTitle = (pathname) => {
     const currRouterData = this.matchParamsPath(pathname)
-
     if (!currRouterData) {
       return defaultSettings.appTitle
     }
@@ -417,6 +505,14 @@ class BasicLayout extends React.PureComponent {
   //   }
   //   return <SettingDrawer />
   // };
+
+  renderChild = () => {
+    const { children } = this.props
+    const { authorized, accessable } = this.state
+    if (!authorized) return <Loading />
+    if (!accessable) return <Exception type='404' />
+    return children
+  }
 
   render () {
     const { classes, loading, theme, ...props } = this.props
@@ -515,11 +611,7 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {this.state.authorized ? (
-                                    children
-                                  ) : (
-                                    <Loading />
-                                  )}
+                                  {this.renderChild()}
                                 </div>
                               </div>
                             </ErrorBoundary>
