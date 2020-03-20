@@ -164,7 +164,6 @@ class NewVisit extends PureComponent {
   }
 
   updateAttachments = ({ added, deleted }) => {
-    console.log(added)
     const { values: { visitAttachment = [] }, setFieldValue } = this.props
     let updated = [
       ...visitAttachment,
