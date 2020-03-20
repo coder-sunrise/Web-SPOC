@@ -102,7 +102,7 @@ const Filterbar = ({
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </Authorized>
-        {user.clinicanProfile.userProfile.role.clinicRoleFK === 1 && (
+        {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox
               label='Visit assign to me only'
