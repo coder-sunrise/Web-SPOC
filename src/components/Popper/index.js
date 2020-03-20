@@ -33,10 +33,7 @@ export default ({
         ? (event) => {
             setAnchorEl(event.currentTarget)
           }
-        : (event) => {
-            // stop bubbling
-            if (stopOnClickPropagation) event.stopPropagation()
-          },
+        : null,
     onMouseEnter:
       trigger === 'hover'
         ? (event) => {
@@ -60,7 +57,13 @@ export default ({
           trigger !== 'hover' ? setAnchorEl(null) : undefined
         }}
       >
-        {overlay}
+        <div
+          onClick={(event) => {
+            if (stopOnClickPropagation) event.stopPropagation()
+          }}
+        >
+          {overlay}
+        </div>
       </ClickAwayListener>
     </Paper>
   )
