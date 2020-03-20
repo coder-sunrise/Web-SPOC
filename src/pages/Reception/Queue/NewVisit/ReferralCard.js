@@ -112,6 +112,7 @@ class ReferralCard extends PureComponent {
               handleUpdateAttachments={handleUpdateAttachments}
               attachments={attachments}
               isReadOnly={isReadOnly}
+              fieldName='visitAttachment'
             />
           </GridItem>
         </GridContainer>

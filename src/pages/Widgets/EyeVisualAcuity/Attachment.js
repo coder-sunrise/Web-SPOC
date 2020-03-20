@@ -81,10 +81,6 @@ class Attachment extends Component {
   }
 
   getContent = (list = []) => {
-    const commonProps = {
-      fieldName: 'corAttachment',
-      onClickAttachment: this.handleClickAttachment,
-    }
     const onDeleteClick = this.handleDeleteAttachment
     if (list.length === 0) return null
     return (
@@ -109,7 +105,8 @@ class Attachment extends Component {
                 attachment={attachment}
                 onConfirmDelete={onDeleteClick}
                 indexInAllAttachments={indexInAllAttachments}
-                {...commonProps}
+                onClickAttachment={this.handleClickAttachment}
+                fieldName={this.props.attachmentsFieldName}
               />
             )
           })}
@@ -118,7 +115,7 @@ class Attachment extends Component {
   }
 
   render () {
-    const { consultation = {}, attachments } = this.props
+    const { consultation = {}, attachments, attachmentsFieldName } = this.props
     // console.log(attachments)
     const { entity } = consultation
     let _attachment = attachments
@@ -128,7 +125,7 @@ class Attachment extends Component {
     return (
       <div>
         <FastField
-          name='corAttachment'
+          name={attachmentsFieldName}
           render={(args) => {
             const { form, field } = args
             // console.log(form, field)

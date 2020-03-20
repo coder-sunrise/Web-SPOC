@@ -4,9 +4,9 @@ import React, { PureComponent } from 'react'
 import { CommonCard } from '@/components'
 import EyeVisualAcuity from '@/pages/Widgets/EyeVisualAcuity'
 
-class ReferralCard extends PureComponent {
+class EyeVisualAcuityCard extends PureComponent {
   render () {
-    const { attachments, handleUpdateAttachments, isReadOnly } = this.props
+    const { attachments, handleUpdateAttachments } = this.props
 
     return (
       <CommonCard title='Eye Visual Acuity Test'>
@@ -14,10 +14,11 @@ class ReferralCard extends PureComponent {
           prefix='visitEyeVisualAcuityTest.visitEyeVisualAcuityTestForm'
           attachments={attachments}
           handleUpdateAttachments={handleUpdateAttachments}
+          attachmentsFieldName='visitAttachment'
         />
       </CommonCard>
     )
   }
 }
 
-export default ReferralCard
+export default EyeVisualAcuityCard

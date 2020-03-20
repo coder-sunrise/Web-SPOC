@@ -320,6 +320,7 @@ const widgets = [
           <Cmpnet
             {...p}
             prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+            attachmentsFieldName='corAttachment'
             handleUpdateAttachments={({
               updated,
               form,
