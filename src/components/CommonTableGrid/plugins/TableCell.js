@@ -152,6 +152,7 @@ class TableCell extends React.Component {
       rowSpan,
       column,
       row,
+      authorize,
       tableColumn,
       ...restProps
     } = this.props
@@ -173,6 +174,8 @@ class TableCell extends React.Component {
       row,
       tableColumn,
     }
+    // console.log(this.props, cfg)
+
     if (extraState) {
       const colCfg =
         columnExtensions.find((o) => o.columnName === column.name) || {}
@@ -182,6 +185,10 @@ class TableCell extends React.Component {
       // try {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
+      // console.log(this.props.authorize)
+      if (authorize && authorize.rights === 'disable') {
+        return <Table.Cell {...cfg}>{children}</Table.Cell>
+      }
       if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
         if (
           ![

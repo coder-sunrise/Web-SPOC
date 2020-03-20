@@ -915,7 +915,7 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
+          {/* <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
             <InventoryType
               title='Medication'
               inventoryTypeProps={medicationProps}
@@ -945,7 +945,7 @@ const InventoryTypeListing = ({
               editingProps={vaccinationEditingProps}
               style={{ marginTop: 15 }}
             />
-          </AuthorizationWrapper>
+          </AuthorizationWrapper> */}
 
           <AuthorizationWrapper authority='inventorymaster.orderset.service'>
             <InventoryType

@@ -64,7 +64,7 @@ class Address extends Component {
         setFieldValue(`${prefix}blockNo`, ''),
         setFieldValue(`${prefix}buildingName`, ''),
         setFieldValue(`${prefix}street`, ''),
-        setFieldValue(`${prefix}countryFK`, ''))
+        setFieldValue(`${prefix}countryFK`, undefined))
       : this.props
           .dispatch({
             type: 'streetAddress/fetchAddress',
@@ -144,7 +144,6 @@ class Address extends Component {
       propName,
       hideCheckBox,
     } = this.props
-    // console.log(values, propName)
     const v = Object.byString(values, propName)
     // console.log(v)
     let addresses = v
