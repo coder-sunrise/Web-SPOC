@@ -282,7 +282,6 @@ class BasicLayout extends React.PureComponent {
           !e.path.includes('/development') &&
           e.path !== '/',
       )
-      console.log({ filteredRouterData })
       this.setState({ routesData: filteredRouterData })
       return filteredRouterData
     }
@@ -296,10 +295,19 @@ class BasicLayout extends React.PureComponent {
   }
 
   updateAuthority = (pathname) => {
-    console.log(this.isAccessable(this.getRouteData(pathname)))
-    console.log(this.getRouteData(pathname))
+    const paths = pathname.split('/')
+    const lastEle = paths.slice(-1)
+    const isLastEleNum = Number(lastEle[0])
+    let parsedPath = pathname
+
+    if (!Number.isNaN(isLastEleNum)) {
+      parsedPath = `${paths
+        .filter((_p, index) => index < paths.length - 1)
+        .join('/')}/:id`
+    }
+
     this.setState({
-      accessable: this.isAccessable(this.getRouteData(pathname)),
+      accessable: this.isAccessable(this.getRouteData(parsedPath)),
     })
   }
 
@@ -307,7 +315,7 @@ class BasicLayout extends React.PureComponent {
     const { location } = this.props
     const routerData = this.getAllRoutesData()
     let actualPathName = location.pathname
-    console.log({ routerData })
+
     if (!this.isAccessable(this.getRouteData(actualPathName))) {
       for (let i = 0; i < routerData.length; i++) {
         if (this.isAccessable(routerData[i])) {
@@ -325,13 +333,11 @@ class BasicLayout extends React.PureComponent {
 
   isAccessable = (routeData) => {
     const authority = getAuthority()
-    console.log({ routeData })
     if (routeData && routeData.authority) {
       const accessRight = authority.find(
         (a) => a.name === routeData.authority[0],
       )
-      console.log(accessRight)
-      console.log({ authority })
+      console.log({ accessRight, routeData })
       return (
         accessRight &&
         [
