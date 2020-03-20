@@ -7,7 +7,6 @@ import { GridContainer, withFormikExtend, ProgressButton } from '@/components'
 import Header from './Header'
 import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { isPOStatusFinalized } from '../../variables'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
 
@@ -160,14 +159,11 @@ class index extends PureComponent {
   }
 
   render () {
-    const { purchaseOrderDetails, values } = this.props
-    const { invoiceAmount } = values
+    const { purchaseOrderDetails } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
-    const poStatus = po ? po.purchaseOrderStatusFK : 1
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = isPOStatusFinalized(poStatus)
     return (
       <AuthorizedContext.Provider
         value={{
@@ -176,11 +172,7 @@ class index extends PureComponent {
       >
         <GridContainer>
           <Header {...this.props} />
-          <Grid
-            {...this.props}
-            isEditable={isEditable}
-            getTotalPaid={this.getTotalPaid}
-          />
+          <Grid {...this.props} getTotalPaid={this.getTotalPaid} />
         </GridContainer>
 
         <div style={{ textAlign: 'center' }}>

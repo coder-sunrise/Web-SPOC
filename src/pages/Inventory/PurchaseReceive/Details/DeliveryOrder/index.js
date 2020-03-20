@@ -13,7 +13,7 @@ import {
 } from '@/components'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
-import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
+import { isPOStatusFulfilled } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { podoOrderType, inventoryItemList } from '@/utils/codes'

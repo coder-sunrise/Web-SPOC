@@ -108,11 +108,11 @@ export const isInvoiceReadOnly = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const isPOStatusFinalized = (status) => {
+export const isPOStatusFinalizedFulFilledPartialReceived = (status) => {
   const allowedStatus = [
-    // 'Finalized',
-    2,
-    3,
+    2, // Finalized
+    3, // Partial Received
+    5, // Fulfilled
   ]
   return allowedStatus.indexOf(status) > -1
 }
