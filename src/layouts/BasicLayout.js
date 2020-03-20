@@ -278,7 +278,7 @@ class BasicLayout extends React.PureComponent {
       }
       return canAccess || path === pathname
     }, false)
-    console.log({ isAccessible })
+
     if (isAccessible) return true
 
     const [
