@@ -63,6 +63,16 @@ const _routes = [
             ],
           },
           {
+            path: '/reception/appointment',
+            name: 'appointment',
+            mini: 'AP',
+            component: './Reception/Appointment',
+            authority: [
+              'reception/appointment',
+              // { name: 'reception/appointment' },
+            ],
+          },
+          {
             path: '/reception/queue/consultation',
             name: 'consultation',
             observe: 'ConsultationPage',
@@ -92,16 +102,6 @@ const _routes = [
             component: './Billing',
             authority: [
               'reception/queue',
-            ],
-          },
-          {
-            path: '/reception/appointment',
-            name: 'appointment',
-            mini: 'AP',
-            component: './Reception/Appointment',
-            authority: [
-              'reception/appointment',
-              // { name: 'reception/appointment' },
             ],
           },
           {
@@ -1181,4 +1181,4 @@ const routes =
         return r
       })
 
-export default routes
+export default _routes

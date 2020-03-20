@@ -175,14 +175,12 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount () {
-    this.redirectToAccessable()
     window.addEventListener('resize', this.resize)
     this.resize()
   }
 
   componentDidUpdate (e) {
     if (e.history.location.pathname !== e.location.pathname) {
-      this.updateAuthority(e.history.location.pathname)
       if (window.mainPanel) window.mainPanel.scrollTop = 0
       if (this.state.mobileOpen) {
         this.setState({ mobileOpen: false })
@@ -267,87 +265,29 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  getAllRoutesData = () => {
-    if (!this.state.routesData) {
-      const { route: { routes } } = this.props
-      let routerData = []
-      routes.forEach((e) => {
-        routerData.push(e)
-        Array.prototype.push.apply(routerData, e.routes)
-      })
-      const filteredRouterData = routerData.filter(
-        (e) =>
-          e.path &&
-          e.component &&
-          !e.path.includes('/development') &&
-          e.path !== '/',
-      )
-      this.setState({ routesData: filteredRouterData })
-      return filteredRouterData
-    }
-    return this.state.routesData
-  }
-
-  getRouteData = (pathname) => {
-    const routesData = this.getAllRoutesData()
-    const routeData = routesData.find((e) => e.path === pathname)
-    return routeData
-  }
-
-  updateAuthority = (pathname) => {
-    const paths = pathname.split('/')
-    const lastEle = paths.slice(-1)
-    const isLastEleNum = Number(lastEle[0])
-    let parsedPath = pathname
-
-    if (!Number.isNaN(isLastEleNum)) {
-      parsedPath = `${paths
-        .filter((_p, index) => index < paths.length - 1)
-        .join('/')}/:id`
-    }
-
-    this.setState({
-      accessable: this.isAccessable(this.getRouteData(parsedPath)),
-    })
-  }
-
   redirectToAccessable = () => {
-    const { location } = this.props
-    const routerData = this.getAllRoutesData()
-    let actualPathName = location.pathname
+    const _cloned = _.cloneDeep(this.menus)
 
-    if (!this.isAccessable(this.getRouteData(actualPathName))) {
-      for (let i = 0; i < routerData.length; i++) {
-        if (this.isAccessable(routerData[i])) {
-          actualPathName = routerData[i].path
-          break
-        }
+    const [
+      firstMenu,
+    ] = _cloned
+
+    // check if menu has any sub menu
+    // redirect to first accessible sub menu
+    if (firstMenu.children && Array.isArray(firstMenu.children)) {
+      const [
+        firstChildren,
+      ] =
+        firstMenu.children || []
+      if (firstChildren && firstChildren.path) {
+        return this.props.history.push(firstChildren.path)
       }
     }
-    if (actualPathName !== location.pathname) {
-      this.props.history.push(actualPathName)
-    } else {
-      this.updateAuthority(location.pathname)
-    }
-  }
 
-  isAccessable = (routeData) => {
-    const authority = getAuthority()
-    if (routeData && routeData.authority) {
-      const accessRight = authority.find(
-        (a) => a.name === routeData.authority[0],
-      )
-      console.log({ accessRight, routeData })
-      return (
-        accessRight &&
-        [
-          'readwrite',
-          'readonly',
-          'enable',
-          'disable',
-        ].includes(accessRight.rights)
-      )
+    if (firstMenu && firstMenu.path) {
+      return this.props.history.push(firstMenu.path)
     }
+
     return false
   }
 
@@ -400,6 +340,7 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
     this.getPageTitle = memoizeOne(this.getPageTitle)
     this.menus = menus
+    this.redirectToAccessable()
 
     this.setState({
       authorized: true,
@@ -508,9 +449,9 @@ class BasicLayout extends React.PureComponent {
 
   renderChild = () => {
     const { children } = this.props
-    const { authorized, accessable } = this.state
+    const { authorized } = this.state
     if (!authorized) return <Loading />
-    if (!accessable) return <Exception type='404' />
+
     return children
   }
 
