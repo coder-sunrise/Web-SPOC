@@ -29,8 +29,8 @@ import {
 // utils
 import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck } from '@/utils/utils'
-import { AccessRightConfig } from './const'
-import Prompt from './prompt'
+import { AccessRightConfig } from './Const'
+import Prompt from './Prompt'
 
 const styles = (theme) => ({
   container: {
