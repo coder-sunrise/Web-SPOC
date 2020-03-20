@@ -21,6 +21,7 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { getBizSession } from '@/services/queue'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   actionDiv: {
@@ -64,6 +65,7 @@ const Detail = ({
     dispatch,
     errors,
     hasActiveSession,
+    authority: 'inventorymaster.consumable',
   }
 
   const checkHasActiveSession = async () => {
@@ -120,25 +122,28 @@ const Detail = ({
           },
         ]}
       /> */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={ConsumableDetailOption(detailProps, stockProps)}
-      />
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck({
-            redirectUrl: '/inventory/master?t=1',
-          })}
-        >
-          Close
-        </Button>
-        <ProgressButton
-          submitKey='consumableDetail/submit'
-          onClick={handleSubmit}
+      <AuthorizationWrapper authority='inventorymaster.consumable'>
+        <Tabs
+          style={{ marginTop: 20 }}
+          defaultActiveKey='0'
+          options={ConsumableDetailOption(detailProps, stockProps)}
         />
-      </div>
+        <div className={classes.actionDiv}>
+          <Button
+            color='danger'
+            authority='none'
+            onClick={navigateDirtyCheck({
+              redirectUrl: '/inventory/master?t=1',
+            })}
+          >
+            Close
+          </Button>
+          <ProgressButton
+            submitKey='consumableDetail/submit'
+            onClick={handleSubmit}
+          />
+        </div>
+      </AuthorizationWrapper>
     </React.Fragment>
   )
 }

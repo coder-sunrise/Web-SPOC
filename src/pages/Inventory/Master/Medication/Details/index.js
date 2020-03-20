@@ -11,6 +11,7 @@ import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
 import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   actionDiv: {
@@ -58,6 +59,7 @@ const Detail = ({
     dispatch,
     errors: props.errors,
     hasActiveSession,
+    authority: 'inventorymaster.medication',
   }
 
   const checkHasActiveSession = async () => {
@@ -151,26 +153,29 @@ const Detail = ({
 
         
       > */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={MedicationDetailOption(detailProps, stockProps)}
-      />
-      {/* </CardContainer> */}
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck({
-            redirectUrl: '/inventory/master?t=0',
-          })}
-        >
-          Close
-        </Button>
-        <ProgressButton
-          submitKey='medicationDetail/submit'
-          onClick={handleSubmit}
+      <AuthorizationWrapper authority='inventorymaster.medication'>
+        <Tabs
+          style={{ marginTop: 20 }}
+          defaultActiveKey='0'
+          options={MedicationDetailOption(detailProps, stockProps)}
         />
-      </div>
+        {/* </CardContainer> */}
+        <div className={classes.actionDiv}>
+          <Button
+            authority='none'
+            color='danger'
+            onClick={navigateDirtyCheck({
+              redirectUrl: '/inventory/master?t=0',
+            })}
+          >
+            Close
+          </Button>
+          <ProgressButton
+            submitKey='medicationDetail/submit'
+            onClick={handleSubmit}
+          />
+        </div>
+      </AuthorizationWrapper>
     </React.Fragment>
   )
 }
