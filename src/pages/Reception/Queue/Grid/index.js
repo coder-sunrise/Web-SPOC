@@ -74,7 +74,7 @@ const Grid = ({
 
       if (!doctorProfile) {
         notification.error({
-          message: 'Unauthorized Access',
+          message: 'Current user is not authorized to access',
         })
         return false
       }
@@ -442,7 +442,7 @@ const Grid = ({
         authority.rights === 'hidden'
       ) {
         notification.error({
-          message: 'Unauthorized Access',
+          message: 'Current user is not authorized to access',
         })
         return
       }
