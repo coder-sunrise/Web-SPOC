@@ -88,19 +88,20 @@ const Filterbar = ({
             Create Visit
           </ProgressButton>
         </Authorized>
-        <Button
-          icon={null}
-          color='primary'
-          size='sm'
-          onClick={toggleNewPatient}
-          disabled={loading.global}
-        >
-          <Hidden mdDown>
-            <PersonAdd />
-          </Hidden>
-          <FormattedMessage id='reception.queue.createPatient' />
-        </Button>
-
+        <Authorized authority='patientdatabase.newpatient'>
+          <Button
+            icon={null}
+            color='primary'
+            size='sm'
+            onClick={toggleNewPatient}
+            disabled={loading.global}
+          >
+            <Hidden mdDown>
+              <PersonAdd />
+            </Hidden>
+            <FormattedMessage id='reception.queue.createPatient' />
+          </Button>
+        </Authorized>
         {shouldShowSelfOnlyCheckbox.includes(
           user.clinicianProfile.userProfile.role.id,
         ) && (
