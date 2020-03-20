@@ -29,6 +29,7 @@ const InventoryType = ({
         {...inventoryTypeProps}
         schema={schema}
         rows={rows}
+        forceRender
         onRowDoubleClick={undefined}
         FuncProps={{
           pager: false,
