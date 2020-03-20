@@ -6,7 +6,7 @@ import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
 
 import InventoryType from './InventoryType'
-import AuthorizationWrapper from './AuthorizationWrapper'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   displayDiv: {
