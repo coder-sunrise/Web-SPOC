@@ -6,7 +6,7 @@ import { INVENTORY_TYPE, INVENTORY_ADJUSTMENT_STATUS } from '@/utils/constants'
 import {
   inventoryAdjustmentStatus,
   podoOrderType,
-  inventoryItemList,
+  inventoryItemListing,
 } from '@/utils/codes'
 import { fetchAndSaveCodeTable } from '@/utils/codetable'
 import {
@@ -477,7 +477,7 @@ class Detail extends PureComponent {
       fetchAndSaveCodeTable(x.ctName, {
         isActive: excludeInactiveCodes(),
       }).then((list) => {
-        const { inventoryItemList } = inventoryItemList(
+        const { inventoryItemList } = inventoryItemListing(
           list,
           x.itemFKName,
           x.stateName,
