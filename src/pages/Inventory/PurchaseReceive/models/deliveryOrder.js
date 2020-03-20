@@ -4,7 +4,6 @@ import _ from 'lodash'
 import * as service from '../services/deliveryOrder'
 import { podoOrderType, groupByFKFunc } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
 
 const InitialPurchaseOrder = {
   purchaseOrder: {

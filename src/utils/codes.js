@@ -869,7 +869,7 @@ export const getInventoryItemV2 = (
   }
 }
 
-export const inventoryItemList = (
+export const inventoryItemListing = (
   list,
   itemFKName = undefined,
   stateName = undefined,

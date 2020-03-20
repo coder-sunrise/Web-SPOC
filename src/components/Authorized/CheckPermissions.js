@@ -24,7 +24,6 @@ const checkSinglePermission = (
     match = r.find(
       (o) =>
         [
-          'enabled',
           'enable',
           'enabled',
           'readwrite',
@@ -46,6 +45,25 @@ const checkSinglePermission = (
         ? target(match)
         : null
     }
+
+    match = r.find(
+      (o) =>
+        [
+          'readonly',
+        ].indexOf(o.rights) >= 0,
+    )
+    if (match) {
+      if (typeof target === 'object') return target
+      // eslint-disable-next-line no-nested-ternary
+      return typeof target === 'function' && type !== 'decorator'
+        ? target(match)
+        : type !== 'decorator'
+          ? React.cloneElement(target, {
+              disabled: true,
+            })
+          : 'disabled'
+    }
+
     match = r.find(
       (o) =>
         [
@@ -60,7 +78,7 @@ const checkSinglePermission = (
           ? React.cloneElement(target, {
               disabled: true,
             })
-          : 'disable'
+          : 'disabled'
     }
 
     return null
@@ -113,7 +131,6 @@ const checkPermissions = (
         match = r.find(
           (o) =>
             [
-              'enabled',
               'enable',
               'enabled',
               'readwrite',

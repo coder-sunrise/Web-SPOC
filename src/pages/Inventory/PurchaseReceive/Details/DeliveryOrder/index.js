@@ -13,10 +13,10 @@ import {
 } from '@/components'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
-import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
+import { isPOStatusFulfilled } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { podoOrderType, inventoryItemList } from '@/utils/codes'
+import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -81,7 +81,7 @@ class index extends Component {
 
     inventoryList = await Promise.all(inventoryList)
     for (let i = 0; i < podoOrderType.length; i++) {
-      const { inventoryItemList } = inventoryItemList(
+      const { inventoryItemList } = inventoryItemListing(
         inventoryList[i],
         podoOrderType[i].itemFKName,
         podoOrderType[i].stateName,

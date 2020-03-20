@@ -49,11 +49,13 @@ import defaultSettings from '@/defaultSettings'
 
 // import Footer from './Footer'
 // import Header from './Header'
+import { notification } from '@/components'
+import SiderMenu from '@/components/SiderMenu'
+import { getAuthority } from '@/utils/authority'
 import Context from './MenuContext'
 import ErrorBoundary from './ErrorBoundary'
 import Exception403 from '../pages/Exception/403'
-import { notification } from '@/components'
-import SiderMenu from '@/components/SiderMenu'
+import Exception from '../components/Exception'
 import GlobalModalContainer from './GlobalModalContainer'
 
 initClinicSettings()
@@ -122,6 +124,8 @@ class BasicLayout extends React.PureComponent {
     this.state = {
       mobileOpen: false,
       authorized: false,
+      accessable: false,
+      routesData: undefined,
     }
     // this.resize = this.resize.bind(this)
     this.resize = _.debounce(this.resize, 500, {
@@ -261,8 +265,33 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
+  redirectToAccessable = () => {
+    const _cloned = _.cloneDeep(this.menus)
+
+    const [
+      firstMenu,
+    ] = _cloned
+
+    // check if menu has any sub menu
+    // redirect to first accessible sub menu
+    if (firstMenu.children && Array.isArray(firstMenu.children)) {
+      const [
+        firstChildren,
+      ] = firstMenu.children
+      if (firstChildren && typeof firstChildren.path === 'string') {
+        return this.props.history.push(firstChildren.path)
+      }
+    }
+
+    if (firstMenu && typeof firstMenu.path === 'string') {
+      return this.props.history.push(firstMenu.path)
+    }
+
+    return this.props.history.push('/not-found')
+  }
+
   initUserData = async () => {
-    const { dispatch, route: { routes, authority } } = this.props
+    const { dispatch, route: { routes, authority }, location } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
     if (!shouldProceed) {
       // system version is lower than db, should do a refresh
@@ -299,7 +328,6 @@ class BasicLayout extends React.PureComponent {
       type: 'codetable/fetchAllCachedCodetable',
     })
 
-    // console.log(routes, authority)
     const menus = await dispatch({
       type: 'menu/getMenuData',
       payload: { routes, authority },
@@ -311,6 +339,7 @@ class BasicLayout extends React.PureComponent {
     this.matchParamsPath = memoizeOne(this.matchParamsPath, isEqual)
     this.getPageTitle = memoizeOne(this.getPageTitle)
     this.menus = menus
+    this.redirectToAccessable()
 
     this.setState({
       authorized: true,
@@ -328,7 +357,6 @@ class BasicLayout extends React.PureComponent {
 
   getPageTitle = (pathname) => {
     const currRouterData = this.matchParamsPath(pathname)
-
     if (!currRouterData) {
       return defaultSettings.appTitle
     }
@@ -417,6 +445,14 @@ class BasicLayout extends React.PureComponent {
   //   }
   //   return <SettingDrawer />
   // };
+
+  renderChild = () => {
+    const { children } = this.props
+    const { authorized } = this.state
+    if (!authorized) return <Loading />
+
+    return children
+  }
 
   render () {
     const { classes, loading, theme, ...props } = this.props
@@ -515,11 +551,7 @@ class BasicLayout extends React.PureComponent {
                             <ErrorBoundary>
                               <div className={classes.content}>
                                 <div className={classes.container}>
-                                  {this.state.authorized ? (
-                                    children
-                                  ) : (
-                                    <Loading />
-                                  )}
+                                  {this.renderChild()}
                                 </div>
                               </div>
                             </ErrorBoundary>
