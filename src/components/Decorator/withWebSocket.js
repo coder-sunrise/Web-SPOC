@@ -81,6 +81,9 @@ const withWebSocket = () => (Component) => {
       // console.log({ content })
       // const pdfResult = await getPDF(reportID, payload)
       if (content) {
+        notification.success({
+          message: `Job sent to the printer.`,
+        })
         // const base64Result = arrayBufferToBase64(pdfResult)
         this.prepareJobForWebSocket(content)
       }
