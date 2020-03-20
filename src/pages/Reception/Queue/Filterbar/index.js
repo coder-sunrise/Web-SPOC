@@ -102,9 +102,7 @@ const Filterbar = ({
             <FormattedMessage id='reception.queue.createPatient' />
           </Button>
         </Authorized>
-        {shouldShowSelfOnlyCheckbox.includes(
-          user.clinicianProfile.userProfile.role.id,
-        ) && (
+        {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox
               label='Visit assign to me only'
