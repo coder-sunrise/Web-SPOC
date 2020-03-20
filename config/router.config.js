@@ -24,6 +24,9 @@ const _routes = [
   {
     path: '/',
     component: '../layouts/BasicLayout',
+    authority: [
+      'reception/queue',
+    ],
     // Routes: [
     //   'src/pages/Authorized',
     // ],

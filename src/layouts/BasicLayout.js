@@ -125,6 +125,7 @@ class BasicLayout extends React.PureComponent {
       mobileOpen: false,
       authorized: false,
       accessable: false,
+      routesData: undefined,
     }
     // this.resize = this.resize.bind(this)
     this.resize = _.debounce(this.resize, 500, {
@@ -174,6 +175,7 @@ class BasicLayout extends React.PureComponent {
   }
 
   componentDidMount () {
+    this.redirectToAccessable()
     window.addEventListener('resize', this.resize)
     this.resize()
   }
@@ -265,47 +267,79 @@ class BasicLayout extends React.PureComponent {
     }
   }
 
-  updateAuthority = (pathname) => {
-    const { route: { routes } } = this.props
-    const authority = getAuthority()
-    let routerData = []
-    routes.forEach((e) => {
-      routerData.push(e)
-      Array.prototype.push.apply(routerData, e.routes)
-    })
-    const currRouterData = routerData.find((e) => e.path === pathname)
-    console.log({ currRouterData })
-    authority.forEach((e) => console.log(e))
-    // console.log(currRouterData)
-    // console.log({ routerData })
-    // authority.forEach((e) => {
-    //   const result = routerData.find((a) => {
-    //     if (a.authority) return a.authority[0] === e.name
-    //     return true
-    //   })
-    //   if (result.path !== '/development') {
-    //     console.log(e)
-    //   }
-    // })
-    // console.log('hello')
-    if (currRouterData && currRouterData.authority) {
-      const accessRight = authority.find(
-        (a) => a.name === currRouterData.authority[0],
-      )
-      this.setState({
-        accessable:
-          !accessRight ||
-          [
-            'readwrite',
-            'readonly',
-            'enable',
-            'disable',
-          ].includes(accessRight.rights),
+  getAllRoutesData = () => {
+    if (!this.state.routesData) {
+      console.log('hi')
+      const { route: { routes } } = this.props
+      let routerData = []
+      routes.forEach((e) => {
+        routerData.push(e)
+        Array.prototype.push.apply(routerData, e.routes)
       })
-      console.log(accessRight.rights)
-    } else {
-      this.setState({ accessable: true })
+      const filteredRouterData = routerData.filter(
+        (e) =>
+          e.path &&
+          e.component &&
+          !e.path.includes('/development') &&
+          e.path !== '/',
+      )
+      console.log({ filteredRouterData })
+      this.setState({ routesData: filteredRouterData })
+      return filteredRouterData
     }
+    return this.state.routesData
+  }
+
+  getRouteData = (pathname) => {
+    const routesData = this.getAllRoutesData()
+    const routeData = routesData.find((e) => e.path === pathname)
+    return routeData
+  }
+
+  updateAuthority = (pathname) => {
+    this.setState({
+      accessable: this.isAccessable(this.getRouteData(pathname)),
+    })
+  }
+
+  redirectToAccessable = () => {
+    const { location } = this.props
+    const routerData = this.getAllRoutesData()
+    let actualPathName = location.pathname
+    console.log({ routerData })
+    if (!this.isAccessable(this.getRouteData(actualPathName))) {
+      for (let i = 0; i < routerData.length; i++) {
+        if (this.isAccessable(routerData[i])) {
+          actualPathName = routerData[i].path
+          break
+        }
+      }
+    }
+    if (actualPathName !== location.pathname) {
+      this.props.history.push(actualPathName)
+    } else {
+      this.updateAuthority(location.pathname)
+    }
+  }
+
+  isAccessable = (routeData) => {
+    const authority = getAuthority()
+    console.log({ routeData })
+    if (routeData && routeData.authority) {
+      const accessRight = authority.find(
+        (a) => a.name === routeData.authority[0],
+      )
+      return (
+        !accessRight ||
+        [
+          'readwrite',
+          'readonly',
+          'enable',
+          'disable',
+        ].includes(accessRight.rights)
+      )
+    }
+    return true
   }
 
   initUserData = async () => {
@@ -361,8 +395,6 @@ class BasicLayout extends React.PureComponent {
     this.setState({
       authorized: true,
     })
-
-    this.updateAuthority(location.pathname)
   }
 
   matchParamsPath = (pathname) => {
