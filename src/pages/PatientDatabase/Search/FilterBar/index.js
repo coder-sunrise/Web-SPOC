@@ -48,77 +48,64 @@ class FilterBar extends PureComponent {
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem md={12} lg={3} style={{ position: 'relative' }}>
-            <FastField
-              name='search'
-              render={(args) => {
-                return (
-                  <TextField
-                    autoFocus={!simple}
-                    label={formatMessage({
-                      id: 'reception.queue.patientSearchPlaceholder',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-            {/* <div className={classes.tansactionCheck}>
+          <Authorized authority='patientdatabase/searchpatient'>
+            <GridItem md={12} lg={3} style={{ position: 'relative' }}>
               <FastField
-                name='isExactSearch'
+                name='search'
                 render={(args) => {
                   return (
-                    <Tooltip
-                      title={formatMessage({
-                        id: 'patient.search.exact',
+                    <TextField
+                      autoFocus={!simple}
+                      label={formatMessage({
+                        id: 'reception.queue.patientSearchPlaceholder',
                       })}
-                      placement='bottom'
-                    >
-                      <Checkbox simple {...args} />
-                    </Tooltip>
+                      {...args}
+                    />
                   )
                 }}
               />
-            </div> */}
-          </GridItem>
+            </GridItem>
+          </Authorized>
           <GridItem md={12} lg={5}>
             <div className={classes.filterBtn}>
-              <ProgressButton
-                variant='contained'
-                color='primary'
-                icon={<Search />}
-                onClick={() => {
-                  // console.log(this.props.values)
-                  // this.props.dispatch({
-                  //   type: 'patientSearch/updateFilter',
-                  //   payload: this.props.values,
-                  // })
-                  const { search } = this.props.values
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
-                  this.props.dispatch({
-                    type: 'patientSearch/query',
-                    payload: {
-                      // group: [
-                      //   {
-                      //     // [`${prefix}patientReferenceNo`]: search,
-                      //     [`${prefix}name`]: search,
-                      //     [`${prefix}patientAccountNo`]: search,
-                      //     [`${prefix}patientReferenceNo`]: search,
-                      //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
-                      //     combineCondition: 'or',
-                      //   },
-                      // ],
-                      apiCriteria: {
-                        searchValue: search,
+              <Authorized authority='patientdatabase/searchpatient'>
+                <ProgressButton
+                  variant='contained'
+                  color='primary'
+                  icon={<Search />}
+                  onClick={() => {
+                    // console.log(this.props.values)
+                    // this.props.dispatch({
+                    //   type: 'patientSearch/updateFilter',
+                    //   payload: this.props.values,
+                    // })
+                    const { search } = this.props.values
+                    const prefix = this.props.values.isExactSearch
+                      ? 'eql_'
+                      : 'like_'
+                    this.props.dispatch({
+                      type: 'patientSearch/query',
+                      payload: {
+                        // group: [
+                        //   {
+                        //     // [`${prefix}patientReferenceNo`]: search,
+                        //     [`${prefix}name`]: search,
+                        //     [`${prefix}patientAccountNo`]: search,
+                        //     [`${prefix}patientReferenceNo`]: search,
+                        //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
+                        //     combineCondition: 'or',
+                        //   },
+                        // ],
+                        apiCriteria: {
+                          searchValue: search,
+                        },
                       },
-                    },
-                  })
-                }}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
+                    })
+                  }}
+                >
+                  <FormattedMessage id='form.search' />
+                </ProgressButton>
+              </Authorized>
               <Authorized authority='patientdatabase.newpatient'>
                 {!disableAdd && (
                   <Button
