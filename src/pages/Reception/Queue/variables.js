@@ -109,6 +109,7 @@ export const ContextMenuOptions = [
     label: 'Patient Profile',
     Icon: Person,
     disabled: false,
+    authority: 'patientdatabase.patientprofiledetails',
   },
   {
     id: 4,
