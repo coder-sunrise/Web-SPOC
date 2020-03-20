@@ -3,6 +3,7 @@ import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import Duplicate from '@material-ui/icons/FileCopy'
 import Print from '@material-ui/icons/Print'
+import Authorized from '@/utils/Authorized'
 
 export const poSubmitAction = {
   SAVE: 1,
@@ -157,6 +158,15 @@ export const PurchaseReceiveGridCol = [
   { name: 'action', title: 'Action' },
 ]
 
+const checkCreateAuthority = () => {
+  const accessRight = Authorized.check(
+    'purchasingandreceiving.newpurchasingandreceiving',
+  )
+  if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
+    return true
+  return false
+}
+
 export const ContextMenuOptions = (row) => {
   return [
     {
@@ -169,7 +179,8 @@ export const ContextMenuOptions = (row) => {
       id: 1,
       label: 'Duplicate PO',
       Icon: Duplicate,
-      disabled: isDuplicatePOAllowed(row.purchaseOrderStatus),
+      disabled:
+        isDuplicatePOAllowed(row.purchaseOrderStatus) || checkCreateAuthority(),
     },
     { isDivider: true },
     {
