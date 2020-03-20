@@ -153,8 +153,24 @@ const Grid = ({
     })
   }
 
+  const canAccess = (id) => {
+    const menuOpt = ContextMenuOptions.find(
+      (item) => item.id === parseInt(id, 10),
+    )
+    const accessRight = Authorized.check(menuOpt.authority)
+
+    return accessRight && accessRight.rights === 'enable'
+  }
+
   const onClick = useCallback(
     (row, id) => {
+      const hasAccess = canAccess(id)
+      if (!hasAccess) {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
       dispatch({
         type: 'queueLog/updateState',
         payload: {
@@ -429,28 +445,7 @@ const Grid = ({
         break
     }
 
-    const contextMenuOption = id
-      ? ContextMenuOptions.find((item) => item.id === parseInt(id, 10))
-      : null
-
-    if (contextMenuOption) {
-      const authority = Authorized.check(contextMenuOption.authority)
-
-      if (
-        !authority ||
-        authority.rights === 'disable' ||
-        authority.rights === 'hidden'
-      ) {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
-        return
-      }
-
-      onClick(row, id)
-    }
-
-    // if (id) onClick(row, id)
+    onClick(row, id)
   }
 
   const isLoading = showingVisitRegistration ? false : queryingList
