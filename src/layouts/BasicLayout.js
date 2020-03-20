@@ -273,10 +273,12 @@ class BasicLayout extends React.PureComponent {
     const isAccessible = _cloned.reduce((canAccess, _menu) => {
       const { children, path } = _menu
       if (Array.isArray(children)) {
-        const valid = children.find((child) => child.path === pathname)
+        const valid = children.find(
+          (child) => child.path.toLowerCase() === pathname.toLowerCase(),
+        )
         return canAccess || !!valid
       }
-      return canAccess || path === pathname
+      return canAccess || path.toLowerCase() === pathname.toLowerCase()
     }, false)
 
     if (isAccessible) return true
