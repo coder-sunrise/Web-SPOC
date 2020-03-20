@@ -277,18 +277,17 @@ class BasicLayout extends React.PureComponent {
     if (firstMenu.children && Array.isArray(firstMenu.children)) {
       const [
         firstChildren,
-      ] =
-        firstMenu.children || []
-      if (firstChildren && firstChildren.path) {
+      ] = firstMenu.children
+      if (firstChildren && typeof firstChildren.path === 'string') {
         return this.props.history.push(firstChildren.path)
       }
     }
 
-    if (firstMenu && firstMenu.path) {
+    if (firstMenu && typeof firstMenu.path === 'string') {
       return this.props.history.push(firstMenu.path)
     }
 
-    return false
+    return this.props.history.push('/not-found')
   }
 
   initUserData = async () => {
