@@ -269,7 +269,6 @@ class BasicLayout extends React.PureComponent {
 
   getAllRoutesData = () => {
     if (!this.state.routesData) {
-      console.log('hi')
       const { route: { routes } } = this.props
       let routerData = []
       routes.forEach((e) => {
@@ -297,6 +296,8 @@ class BasicLayout extends React.PureComponent {
   }
 
   updateAuthority = (pathname) => {
+    console.log(this.isAccessable(this.getRouteData(pathname)))
+    console.log(this.getRouteData(pathname))
     this.setState({
       accessable: this.isAccessable(this.getRouteData(pathname)),
     })
@@ -329,8 +330,10 @@ class BasicLayout extends React.PureComponent {
       const accessRight = authority.find(
         (a) => a.name === routeData.authority[0],
       )
+      console.log(accessRight)
+      console.log({ authority })
       return (
-        !accessRight ||
+        accessRight &&
         [
           'readwrite',
           'readonly',
@@ -339,7 +342,7 @@ class BasicLayout extends React.PureComponent {
         ].includes(accessRight.rights)
       )
     }
-    return true
+    return false
   }
 
   initUserData = async () => {
