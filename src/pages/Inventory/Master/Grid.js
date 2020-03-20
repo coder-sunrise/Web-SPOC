@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Edit from '@material-ui/icons/Edit'
 
-import { Button, CommonTableGrid, Tooltip } from '@/components'
+import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
 
 const Grid = ({
@@ -14,17 +14,28 @@ const Grid = ({
   columnWidths,
   list,
 }) => {
+  const viewEditDetailAuthority = 'inventorymaster.inventoryitemdetails'
+
   const showDetail = (row, vmode) => () =>
     history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
 
-  const handleDoubleClick = (row) =>
+  const handleDoubleClick = (row) => {
+    const accessRight = Authorized.check(viewEditDetailAuthority)
+    if (!accessRight || (accessRight && accessRight.rights !== 'enable')) {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
+
     history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
+  }
 
   const Cell = ({ column, row, classes, ...p }) => {
     if (column.name === 'action') {
       return (
         <Table.Cell {...p}>
-          <Authorized authority='inventorymaster.inventoryitemdetails'>
+          <Authorized authority={viewEditDetailAuthority}>
             <Tooltip
               title={`Edit ${namespace.charAt(0).toUpperCase() +
                 namespace.slice(1)}`}
