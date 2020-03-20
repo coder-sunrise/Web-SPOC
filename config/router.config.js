@@ -1159,6 +1159,11 @@ const _routes = [
       {
         component: '404',
       },
+      {
+        hideInMenu: true,
+        path: '/not-found',
+        component: '404',
+      },
     ],
   },
   // Main routes
