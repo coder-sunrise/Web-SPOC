@@ -39,7 +39,11 @@ const permissionOption = ({ type, permission }) => {
   return result
 }
 
-export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
+export const AccessRightConfig = ({
+  isEdit,
+  isUserMaintainable = false,
+  onConfirmChangeRight,
+}) => {
   return {
     columns: [
       { name: 'module', title: 'Module' },
@@ -65,6 +69,7 @@ export const AccessRightConfig = ({ isEdit, isUserMaintainable = false }) => {
                       {...args}
                       options={permissionOption(row)}
                       disabled={isEdit && !isUserMaintainable}
+                      onChange={(e) => onConfirmChangeRight(e, row)}
                     />
                   )}
                 />
