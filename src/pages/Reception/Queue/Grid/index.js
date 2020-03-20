@@ -158,7 +158,7 @@ const Grid = ({
       (item) => item.id === parseInt(id, 10),
     )
     const accessRight = Authorized.check(menuOpt.authority)
-    console.log({ accessRight })
+
     return accessRight && accessRight.rights === 'enable'
   }
 
