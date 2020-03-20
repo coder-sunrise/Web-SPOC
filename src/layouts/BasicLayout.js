@@ -266,7 +266,20 @@ class BasicLayout extends React.PureComponent {
   }
 
   redirectToAccessable = () => {
+    const { location } = this.props.history
+    const { pathname } = location
     const _cloned = _.cloneDeep(this.menus)
+
+    const isAccessible = _cloned.reduce((canAccess, _menu) => {
+      const { children, path } = _menu
+      if (Array.isArray(children)) {
+        const valid = children.find((childPath) => childPath === pathname)
+        return canAccess || valid
+      }
+      return canAccess || path === pathname
+    }, false)
+
+    if (isAccessible) return true
 
     const [
       firstMenu,
