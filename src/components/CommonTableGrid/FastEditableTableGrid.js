@@ -456,7 +456,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   getAddRowComponent = (selector = '.medisys-table') => {
-    const { theme, FuncProps = {} } = this.props
+    const { theme, FuncProps = {}, disable } = this.props
     const {
       EditingProps: {
         showAddCommand = false,
@@ -469,41 +469,48 @@ class EditableTableGrid extends PureComponent {
     const { containerExtraComponent } = pagerConfig
     // console.log(this.state.errorCells)
     return (
-      <React.Fragment>
-        {showAddCommand && (
-          <Button
-            // hideIfNoEditRights
-            onClick={(e) => {
-              this._onCommitChanges({
-                added: this._onAddedRowsChange([
-                  {},
-                ]),
-              })
-              // setTimeout(() => {
-              //   window.g_app._store.dispatch({
-              //     type: 'global/updateState',
-              //     payload: {
-              //       disableSave: true,
-              //     },
-              //   })
-              // }, 1)
+      <Authorized.Context.Consumer>
+        {(matches) => {
+          return (
+            <React.Fragment>
+              {showAddCommand &&
+              matches.rights !== 'disable' && (
+                <Button
+                  // hideIfNoEditRights
+                  onClick={(e) => {
+                    this._onCommitChanges({
+                      added: this._onAddedRowsChange([
+                        {},
+                      ]),
+                    })
+                    // setTimeout(() => {
+                    //   window.g_app._store.dispatch({
+                    //     type: 'global/updateState',
+                    //     payload: {
+                    //       disableSave: true,
+                    //     },
+                    //   })
+                    // }, 1)
 
-              // $(e.target)
-              //   .parents(selector)
-              //   .find('.medisys-table-add')
-              //   .trigger('click')
-            }}
-            color='primary'
-            link
-            disabled={this.state.errorCells.length > 0}
-            {...addCommandProps}
-          >
-            <Add />
-            {addNewLabelName || 'New'}
-          </Button>
-        )}
-        {containerExtraComponent}
-      </React.Fragment>
+                    // $(e.target)
+                    //   .parents(selector)
+                    //   .find('.medisys-table-add')
+                    //   .trigger('click')
+                  }}
+                  color='primary'
+                  link
+                  disabled={this.state.errorCells.length > 0}
+                  {...addCommandProps}
+                >
+                  <Add />
+                  {addNewLabelName || 'New'}
+                </Button>
+              )}
+              {containerExtraComponent}
+            </React.Fragment>
+          )
+        }}
+      </Authorized.Context.Consumer>
     )
   }
 

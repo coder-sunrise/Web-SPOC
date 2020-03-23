@@ -170,7 +170,7 @@ class TableCell extends React.Component {
       style,
       className,
       colSpan,
-      classes,
+      // classes,
       rowSpan,
       column,
       row,

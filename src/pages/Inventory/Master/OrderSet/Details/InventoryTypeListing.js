@@ -930,7 +930,7 @@ const InventoryTypeListing = ({
               editingProps={medicationEditingProps}
             />
           </Authorized>
-
+          {/* 
           <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
               title='Consumable'
@@ -961,7 +961,7 @@ const InventoryTypeListing = ({
               editingProps={serviceEditingProps}
               style={{ marginTop: 15 }}
             />
-          </Authorized>
+          </Authorized> */}
         </GridContainer>
       </CardContainer>
     </div>

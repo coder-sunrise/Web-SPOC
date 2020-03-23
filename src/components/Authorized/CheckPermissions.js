@@ -1,6 +1,7 @@
 import React from 'react'
 import PromiseRender from './PromiseRender'
 import { CURRENT } from './renderAuthorize'
+import Authorized from '@/utils/Authorized'
 
 function isPromise (obj) {
   return (
@@ -50,36 +51,43 @@ const checkSinglePermission = (
       (o) =>
         [
           'readonly',
-        ].indexOf(o.rights) >= 0,
-    )
-    if (match) {
-      if (typeof target === 'object') return target
-      // eslint-disable-next-line no-nested-ternary
-      return typeof target === 'function' && type !== 'decorator'
-        ? target(match)
-        : type !== 'decorator'
-          ? React.cloneElement(target, {
-              disabled: true,
-            })
-          : 'disabled'
-    }
-
-    match = r.find(
-      (o) =>
-        [
           'disable',
         ].indexOf(o.rights) >= 0,
     )
     if (match) {
+      match.rights
+      if (typeof target === 'object' && !React.isValidElement(target))
+        return target
       // eslint-disable-next-line no-nested-ternary
-      return typeof target === 'function' && type !== 'decorator'
-        ? target(match)
-        : type !== 'decorator'
-          ? React.cloneElement(target, {
-              disabled: true,
-            })
-          : 'disabled'
+      return typeof target === 'function' && type !== 'decorator' ? (
+        target(match)
+      ) : type !== 'decorator' ? (
+        <Authorized.Context.Provider value={{ ...match, rights: 'disable' }}>
+          {React.cloneElement(target, {
+            disabled: true,
+          })}
+        </Authorized.Context.Provider>
+      ) : (
+        'disabled'
+      )
     }
+
+    // match = r.find(
+    //   (o) =>
+    //     [
+    //       'disable',
+    //     ].indexOf(o.rights) >= 0,
+    // )
+    // if (match) {
+    //   // eslint-disable-next-line no-nested-ternary
+    //   return typeof target === 'function' && type !== 'decorator'
+    //     ? target(match)
+    //     : type !== 'decorator'
+    //       ? React.cloneElement(target, {
+    //           disabled: true,
+    //         })
+    //       : 'disabled'
+    // }
 
     return null
   }
