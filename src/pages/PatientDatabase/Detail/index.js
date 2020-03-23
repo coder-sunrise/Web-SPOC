@@ -479,7 +479,7 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <Authorized.Context.Provider value={this.state.moduleAccessRight}>
+      <Authorized authority='patientdatabase.patientprofiledetails'>
         <GridContainer>
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
@@ -608,7 +608,7 @@ class PatientDetail extends PureComponent {
             </div>
           </GridItem>
         </GridContainer>
-      </Authorized.Context.Provider>
+      </Authorized>
     )
   }
 }

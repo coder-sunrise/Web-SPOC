@@ -54,6 +54,7 @@ import {
   VirtualTable,
   TableTreeColumn,
 } from '@devexpress/dx-react-grid-material-ui'
+import { control } from '@/components/Decorator'
 import { smallTheme, defaultTheme } from '@/utils/theme'
 import NumberTypeProvider from './EditCellComponents/NumberTypeProvider'
 import TextTypeProvider from './EditCellComponents/TextTypeProvider'
@@ -64,8 +65,6 @@ import RadioTypeProvider from './EditCellComponents/RadioTypeProvider'
 import CheckboxTypeProvider from './EditCellComponents/CheckboxTypeProvider'
 import TimeTypeProvider from './EditCellComponents/TimeTypeProvider'
 import CustomTypeProvider from './EditCellComponents/CustomTypeProvider'
-
-import RowErrorTypeProvider from './EditCellComponents/RowErrorTypeProvider'
 import PatchedTableSelection from './plugins/PatchedTableSelection'
 import PatchedIntegratedSelection from './plugins/PatchedIntegratedSelection'
 import TableRow from './plugins/TableRow'
@@ -168,6 +167,7 @@ let uniqueGid = 0
 @connect(({ loading, global }) => {
   return { loading, global }
 })
+@control()
 class CommonTableGrid extends PureComponent {
   static defaultProps = {
     columnExtensions: [],

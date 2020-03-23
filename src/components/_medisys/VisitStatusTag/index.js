@@ -120,17 +120,17 @@ const VisitStatusTag = (props) => {
     <Authorized.Context.Consumer>
       {(matches) => {
         const { rights } = matches
-        const isReadOnly = rights === 'readonly'
+        const isDisable = rights === 'disable'
         return Authorized.generalCheck(
           matches,
           props,
           <div
             className={classnames({
               ...cssClass,
-              [classes.readonly]: isReadOnly,
+              [classes.readonly]: isDisable,
             })}
-            onClick={statusTagClicked || isReadOnly ? undefined : handleClick}
-            onDoubleClick={!isReadOnly || handleDoubleClick}
+            onClick={statusTagClicked || isDisable ? undefined : handleClick}
+            onDoubleClick={!isDisable || handleDoubleClick}
           >
             <span>
               {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
