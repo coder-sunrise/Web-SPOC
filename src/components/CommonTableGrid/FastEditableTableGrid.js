@@ -206,7 +206,6 @@ class EditableTableGrid extends PureComponent {
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
-      console.log(global.disableSave, errorCells)
       if (window.$tempGridRow[this.gridId] && errorCells.length) {
         if (!global.disableSave)
           window.g_app._store.dispatch({
