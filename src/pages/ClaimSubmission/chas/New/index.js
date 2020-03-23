@@ -12,12 +12,13 @@ import {
   GridContainer,
   GridItem,
   notification,
-  CardContainer, Tooltip,
+  CardContainer,
+  Tooltip,
 } from '@/components'
 // sub components
+import Authorized from '@/utils/Authorized'
 import BaseSearchBar from '../../common/BaseSearchBar'
 import TableGrid from '../../common/TableGrid'
-import Authorized from '@/utils/Authorized'
 // variables
 import { NewCHASColumnExtensions, NewCHASColumns } from './variables'
 
@@ -52,19 +53,20 @@ class NewCHAS extends React.Component {
 
   onRefreshClicked = () => {
     const { selectedRows } = this.state
-    this.props.dispatch({
-      type: 'claimSubmissionNew/refreshPatientDetails',
-      payload:{claimIds: selectedRows},
-    }).then((r)=>{
-      if(!r){
-        this.refreshDataGrid()
-      }
-    })
+    this.props
+      .dispatch({
+        type: 'claimSubmissionNew/refreshPatientDetails',
+        payload: { claimIds: selectedRows },
+      })
+      .then((r) => {
+        if (!r) {
+          this.refreshDataGrid()
+        }
+      })
   }
 
   handleSelectionChange = (selection) =>
     this.setState({ selectedRows: selection })
-
 
   refreshDataGrid = () => {
     this.props.dispatch({
@@ -159,10 +161,12 @@ class NewCHAS extends React.Component {
             </GridItem>
 
             <GridItem md={4} className={classes.buttonGroup}>
-              <Tooltip placement='bottom-start'
+              <Tooltip
+                placement='bottom-start'
                 title={formatMessage({
-                    id: 'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
-                  })}
+                  id:
+                    'claimsubmission.invoiceClaim.refreshPatientDetail.tooltips',
+                })}
               >
                 <div style={{ display: 'inline-block' }}>
                   <ProgressButton

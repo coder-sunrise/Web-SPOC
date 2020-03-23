@@ -5,6 +5,7 @@ import { Badge, withStyles } from '@material-ui/core'
 import Note from '@material-ui/icons/EventNote'
 // common components
 import { Button, GridContainer, GridItem } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   container: {
@@ -42,33 +43,36 @@ class ClaimSubmission extends PureComponent {
   render () {
     const { classes, claimSubmission } = this.props
     const { invoiceClaimCount } = claimSubmission
+    const accessRight = Authorized.check('claimsubmission')
 
     return (
       <GridContainer className={classes.container}>
         <GridItem md={12} container>
-          {invoiceClaimCount.map((scheme) => {
-            return (
-              <GridItem md={2}>
-                <Badge
-                  badgeContent={scheme.count}
-                  color='error'
-                  className={classes.badge}
-                >
-                  <Button
-                    fullWidth
-                    bigview
-                    color='primary'
-                    variant='outlined'
-                    onClick={this.navigate}
-                    id={scheme.schemeType}
+          <Authorized.Context.Provider value={accessRight}>
+            {invoiceClaimCount.map((scheme) => {
+              return (
+                <GridItem md={2}>
+                  <Badge
+                    badgeContent={scheme.count}
+                    color='error'
+                    className={classes.badge}
                   >
-                    <Note />
-                    {scheme.schemeType}
-                  </Button>
-                </Badge>
-              </GridItem>
-            )
-          })}
+                    <Button
+                      fullWidth
+                      bigview
+                      color='primary'
+                      variant='outlined'
+                      onClick={this.navigate}
+                      id={scheme.schemeType}
+                    >
+                      <Note />
+                      {scheme.schemeType}
+                    </Button>
+                  </Badge>
+                </GridItem>
+              )
+            })}
+          </Authorized.Context.Provider>
         </GridItem>
 
         {/* <GridItem md={2}>
