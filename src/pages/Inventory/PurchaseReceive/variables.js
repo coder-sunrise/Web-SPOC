@@ -158,29 +158,26 @@ export const PurchaseReceiveGridCol = [
   { name: 'action', title: 'Action' },
 ]
 
-const checkCreateAuthority = () => {
+export const ContextMenuOptions = (row) => {
   const accessRight = Authorized.check(
     'purchasingandreceiving.newpurchasingandreceiving',
   )
-  if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
-    return true
-  return false
-}
 
-export const ContextMenuOptions = (row) => {
-  return [
+  const menuOptions = [
     {
       id: 0,
-      label: 'Edit',
+      label: `Edit`,
       Icon: Edit,
       disabled: false,
+      width: 130,
     },
     {
       id: 1,
       label: 'Duplicate PO',
       Icon: Duplicate,
       disabled:
-        isDuplicatePOAllowed(row.purchaseOrderStatus) || checkCreateAuthority(),
+        isDuplicatePOAllowed(row.purchaseOrderStatus) ||
+        accessRight.rights !== 'enable',
     },
     { isDivider: true },
     {
@@ -188,8 +185,14 @@ export const ContextMenuOptions = (row) => {
       label: 'Print',
       Icon: Print,
       disabled: false,
+      width: 130,
     },
   ]
+
+  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+    return menuOptions.filter((option) => option.id !== 1)
+
+  return menuOptions
 }
 
 export const amountProps = {
