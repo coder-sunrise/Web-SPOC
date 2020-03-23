@@ -10,11 +10,11 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import MarkunreadIcon from '@material-ui/icons/Markunread'
 // common components
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import MessageListing from './Reminder/MessageListing'
 
 import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
+import MessageListing from './Reminder/MessageListing'
 import FilterBar from './FilterBar'
 
 const styles = (theme) => ({
@@ -100,21 +100,22 @@ const Grid = ({
       // },
     ]
     const options = defaultContextMenuOptions
+    const accessRight = Authorized.check('sms.viewsms')
 
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
-          <Authorized authority='sms.viewsms'>
-            <Tooltip title='More Actions' placement='bottom'>
-              <div style={{ display: 'inline-block' }}>
+          <Tooltip title='More Actions' placement='bottom'>
+            <div style={{ display: 'inline-block' }}>
+              <Authorized.Context.Provider value={accessRight}>
                 <GridButton
                   row={tableProps.row}
                   contextMenuOptions={options}
                   onClick={handleMenuItemClick}
                 />
-              </div>
-            </Tooltip>
-          </Authorized>
+              </Authorized.Context.Provider>
+            </div>
+          </Tooltip>
         </Table.Cell>
       )
     }
