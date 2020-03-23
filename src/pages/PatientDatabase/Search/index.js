@@ -11,10 +11,12 @@ import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 
+const { Secured } = Authorized
 @connect(({ patientSearch }) => ({
   patientSearch,
 }))
 @compare('patientSearch')
+@Secured('patientdatabase/searchpatient')
 class PatientSearch extends PureComponent {
   constructor (props) {
     super(props)
@@ -64,7 +66,8 @@ class PatientSearch extends PureComponent {
   }
 
   componentDidMount () {
-    if (!this.props.disableQueryOnLoad) {
+    console.log({ rights: this.props.rights })
+    if (!this.props.disableQueryOnLoad && this.props.rights === 'enable') {
       this.props.dispatch({
         type: 'patientSearch/query',
         payload: {

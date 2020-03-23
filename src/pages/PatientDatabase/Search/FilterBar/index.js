@@ -44,7 +44,7 @@ const styles = (theme) => ({
 class FilterBar extends PureComponent {
   render () {
     const { classes, dispatch, disableAdd, simple } = this.props
-    const moduleAccessRight = Authorized.check('patientdatabase')
+
     return (
       <div className={classes.filterBar}>
         <GridContainer>
@@ -106,31 +106,29 @@ class FilterBar extends PureComponent {
                   <FormattedMessage id='form.search' />
                 </ProgressButton>
               </Authorized>
-              <Authorized.Context.Provider value={moduleAccessRight}>
-                <Authorized authority='patientdatabase.newpatient'>
-                  {!disableAdd && (
-                    <Button
-                      variant='contained'
-                      color='primary'
-                      onClick={() => {
-                        dispatch({
-                          type: 'patient/updateState',
-                          payload: {
-                            entity: undefined,
-                            version: undefined,
-                          },
-                        })
-                        dispatch({
-                          type: 'patient/openPatientModal',
-                        })
-                      }}
-                    >
-                      <PersonAdd />
-                      <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
-                    </Button>
-                  )}
-                </Authorized>
-              </Authorized.Context.Provider>
+              <Authorized authority='patientdatabase.newpatient'>
+                {!disableAdd && (
+                  <Button
+                    variant='contained'
+                    color='primary'
+                    onClick={() => {
+                      dispatch({
+                        type: 'patient/updateState',
+                        payload: {
+                          entity: undefined,
+                          version: undefined,
+                        },
+                      })
+                      dispatch({
+                        type: 'patient/openPatientModal',
+                      })
+                    }}
+                  >
+                    <PersonAdd />
+                    <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
+                  </Button>
+                )}
+              </Authorized>
             </div>
           </GridItem>
         </GridContainer>

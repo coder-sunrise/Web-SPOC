@@ -50,7 +50,7 @@ const styles = (theme) => ({
   },
 })
 
-const ContextMenu = ({ show, row, handleClick, classes }) => {
+const ContextMenu = ({ row, handleClick, classes }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -110,12 +110,13 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
       const moduleAccessRight = Authorized.check('reception/queue')
-      const isReadOnly = moduleAccessRight.rights === 'readonly'
+      const isDisabled = moduleAccessRight.rights === 'disable'
+
       switch (opt.id) {
-        case 0: // view visit
-          return { ...opt, hidden: !isStatusWaiting }
-        case 0.1: // edit visit
-          return { ...opt, hidden: isStatusWaiting, disabled: isReadOnly }
+        case 0: // edit visit
+          return { ...opt, hidden: !isStatusWaiting, disabled: isDisabled }
+        case 0.1: // view visit
+          return { ...opt, hidden: isStatusWaiting }
         case 1: // dispense
           return {
             ...opt,
@@ -124,26 +125,26 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
         case 1.1: // billing
           return {
             ...opt,
-            disabled: !enableBilling || isReadOnly,
+            disabled: !enableBilling || isDisabled,
           }
         case 2: // delete visit
-          return { ...opt, disabled: !isStatusWaiting || isReadOnly }
+          return { ...opt, disabled: !isStatusWaiting || isDisabled }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress || isReadOnly,
+            disabled: isStatusInProgress || isDisabled,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress || isReadOnly,
+            disabled: !isStatusInProgress || isDisabled,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted || isReadOnly,
+            disabled: !isStatusCompleted || isDisabled,
             hidden: hideEditConsultation,
           }
         default:
