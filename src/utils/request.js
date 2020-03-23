@@ -106,7 +106,7 @@ export const axiosRequest = async (
         ...headers,
       },
     }
-    const apiUrl = baseUrl + url
+    const apiUrl = dynamicURL + url
 
     result = await axios({
       url: apiUrl,
