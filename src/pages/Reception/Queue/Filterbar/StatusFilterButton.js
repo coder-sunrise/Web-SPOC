@@ -61,6 +61,7 @@ const StatusFilterButton = ({
   dispatch,
   classes,
   appointments = [],
+  isReadOnly = false,
   queueLog: { currentFilter, list },
 }) => {
   const [
@@ -100,7 +101,7 @@ const StatusFilterButton = ({
         elevation={6}
         className={classnames(classes.container)}
         id={StatusIndicator.ALL}
-        onClick={onButtonClick}
+        onClick={!isReadOnly && onButtonClick}
       >
         <h4
           className={classnames([
@@ -130,7 +131,7 @@ const StatusFilterButton = ({
         elevation={6}
         className={classnames(classes.container)}
         id={StatusIndicator.WAITING}
-        onClick={onButtonClick}
+        onClick={!isReadOnly && onButtonClick}
       >
         <h4
           className={classnames([
@@ -161,7 +162,7 @@ const StatusFilterButton = ({
         elevation={6}
         className={classnames(classes.container)}
         id={StatusIndicator.IN_PROGRESS}
-        onClick={onButtonClick}
+        onClick={!isReadOnly && onButtonClick}
       >
         <h4
           className={classnames([
@@ -195,7 +196,7 @@ const StatusFilterButton = ({
         elevation={6}
         className={classnames(classes.container)}
         id={StatusIndicator.COMPLETED}
-        onClick={onButtonClick}
+        onClick={!isReadOnly && onButtonClick}
       >
         <h4
           className={classnames([
@@ -230,7 +231,7 @@ const StatusFilterButton = ({
           [classes.rightEnd]: true,
         })}
         id={StatusIndicator.APPOINTMENT}
-        onClick={onButtonClick}
+        onClick={!isReadOnly && onButtonClick}
       >
         <h4
           className={classnames([

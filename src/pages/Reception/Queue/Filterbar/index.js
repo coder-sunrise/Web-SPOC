@@ -32,16 +32,17 @@ const shouldShowSelfOnlyCheckbox = [
   USER_ROLE.DOCTOR_OWNER,
 ]
 
-const Filterbar = ({
-  classes,
-  dispatch,
-  toggleNewPatient,
-  handleSubmit,
-  selfOnly,
-  user,
-  setSearch,
-  loading,
-}) => {
+const Filterbar = (props) => {
+  const {
+    classes,
+    dispatch,
+    toggleNewPatient,
+    handleSubmit,
+    selfOnly,
+    user,
+    setSearch,
+    loading,
+  } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
   return (
@@ -123,7 +124,16 @@ const Filterbar = ({
         alignItems='center'
         style={{ paddingRight: 0 }}
       >
-        <StatusFilterButton />
+        <Authorized.Context.Consumer>
+          {(matches) => {
+            const isReadOnly = matches.rights === 'readonly'
+            return Authorized.generalCheck(
+              matches,
+              props,
+              <StatusFilterButton isReadOnly />,
+            )
+          }}
+        </Authorized.Context.Consumer>
       </GridItem>
     </GridContainer>
   )
