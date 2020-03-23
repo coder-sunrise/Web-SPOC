@@ -152,7 +152,6 @@ class Main extends React.Component {
           const result = response.data.filter((m) => {
             return m.userProfile.role.id === userRole.id
           })
-          console.log('num', result.length)
           this.setState({ hasUser: result.length > 0 })
         })
     }
