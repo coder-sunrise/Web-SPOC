@@ -7,7 +7,6 @@ import RepeatIcon from '@material-ui/icons/Repeat'
 import { Button } from '@/components'
 // constants variables
 import { PayerType } from './variables'
-import Authorized from '@/utils/Authorized'
 
 const PaymentActions = ({
   handleAddPayment,
@@ -19,7 +18,6 @@ const PaymentActions = ({
   invoicePayerFK,
   companyFK,
   readOnly,
-  hasActiveSession,
 }) => {
   const ButtonProps = {
     icon: true,
