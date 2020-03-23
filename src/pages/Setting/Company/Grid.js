@@ -33,6 +33,7 @@ class Grid extends PureComponent {
     const { settingCompany, route } = this.props
     const { name } = route
     const { companyType } = settingCompany
+    const accessRight = Authorized.check('copayer.copayerdetails')
 
     return (
       <CommonTableGrid
@@ -206,7 +207,7 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Authorized authority='scheme.schemedetails'>
+                <Authorized.Context.Provider value={accessRight}>
                   <Tooltip
                     title={
                       companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
@@ -225,7 +226,7 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                </Authorized>
+                </Authorized.Context.Provider>
               )
             },
           },

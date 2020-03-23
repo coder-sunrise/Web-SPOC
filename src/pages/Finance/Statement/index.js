@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 // material ui
@@ -170,43 +170,41 @@ class Statement extends PureComponent {
               width: 130,
               render: (row) => {
                 return (
-                  <React.Fragment>
-                    <Authorized authority='statement.statementdetails'>
-                      <React.Fragment>
-                        <Tooltip title='Edit Statement'>
-                          <Button
-                            size='sm'
-                            onClick={() => {
-                              editRow(row)
-                            }}
-                            justIcon
-                            color='primary'
-                          >
-                            <Edit />
+                  <Authorized authority='statement.statementdetails'>
+                    <Fragment>
+                      <Tooltip title='Edit Statement'>
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            editRow(row)
+                          }}
+                          justIcon
+                          color='primary'
+                        >
+                          <Edit />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title='Delete Statement'>
+                        <Button
+                          size='sm'
+                          onClick={() => {
+                            this.cancelStatement(row)
+                          }}
+                          justIcon
+                          color='danger'
+                        >
+                          <Delete />
+                        </Button>
+                      </Tooltip>
+                      <PrintStatementReport id={row ? row.id : null}>
+                        <Tooltip title='Print Statement'>
+                          <Button size='sm' justIcon color='primary'>
+                            <Print />
                           </Button>
                         </Tooltip>
-                        <Tooltip title='Delete Statement'>
-                          <Button
-                            size='sm'
-                            onClick={() => {
-                              this.cancelStatement(row)
-                            }}
-                            justIcon
-                            color='danger'
-                          >
-                            <Delete />
-                          </Button>
-                        </Tooltip>
-                        <PrintStatementReport id={row ? row.id : null}>
-                          <Tooltip title='Print Statement'>
-                            <Button size='sm' justIcon color='primary'>
-                              <Print />
-                            </Button>
-                          </Tooltip>
-                        </PrintStatementReport>
-                      </React.Fragment>
-                    </Authorized>
-                  </React.Fragment>
+                      </PrintStatementReport>
+                    </Fragment>
+                  </Authorized>
                 )
               },
             },

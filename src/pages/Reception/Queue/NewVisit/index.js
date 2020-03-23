@@ -268,7 +268,7 @@ class NewVisit extends PureComponent {
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
-
+    console.log({ rights })
     return (
       <React.Fragment>
         <LoadingWrapper
@@ -298,7 +298,8 @@ class NewVisit extends PureComponent {
                     <Authorized.Context.Provider
                       value={{
                         rights:
-                          rights === 'readwrite' && isReadOnly
+                          (rights === 'readwrite' || rights === 'enable') &&
+                          isReadOnly
                             ? 'disable'
                             : rights,
                       }}

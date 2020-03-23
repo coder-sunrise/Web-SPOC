@@ -10,11 +10,11 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import MarkunreadIcon from '@material-ui/icons/Markunread'
 // common components
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import MessageListing from './Reminder/MessageListing'
 
 import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
+import MessageListing from './Reminder/MessageListing'
 import FilterBar from './FilterBar'
 
 const styles = (theme) => ({
@@ -100,21 +100,22 @@ const Grid = ({
       // },
     ]
     const options = defaultContextMenuOptions
+    const viewAccessRight = Authorized.check('sms.viewsms')
 
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
-          <Authorized authority='sms.viewsms'>
-            <Tooltip title='More Actions' placement='bottom'>
-              <div style={{ display: 'inline-block' }}>
+          <Tooltip title='More Actions' placement='bottom'>
+            <div style={{ display: 'inline-block' }}>
+              <Authorized.Context.Provider value={viewAccessRight}>
                 <GridButton
                   row={tableProps.row}
                   contextMenuOptions={options}
                   onClick={handleMenuItemClick}
                 />
-              </div>
-            </Tooltip>
-          </Authorized>
+              </Authorized.Context.Provider>
+            </div>
+          </Tooltip>
         </Table.Cell>
       )
     }
@@ -138,33 +139,39 @@ const Grid = ({
     smsPatient,
   }
 
+  const menuAccessRight = Authorized.check('communication/sms')
+
   return (
     <React.Fragment>
       <FilterBar {...filterBarProps} />
-      <CommonTableGrid
-        type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
-        onSelectionChange={handleSelectionChange}
-        selection={selectedRows}
-        columnExtensions={colExtensions}
-        ActionProps={{ TableCellComponent: Cell }}
-        FuncProps={{
-          selectable: true,
-          selectConfig: {
-            showSelectAll: true,
-            rowSelectionEnabled: () => true,
-          },
-        }}
-        {...tableParas}
-      />
-      <CommonModal
-        open={showMessageModal}
-        title='Send SMS'
-        observe='Sms'
-        onClose={() => setShowMessageModal(false)}
-        onConfirm={() => setShowMessageModal(false)}
-      >
-        {showMessageModal ? <MessageListing {...messageListingProps} /> : null}
-      </CommonModal>
+      <Authorized.Context.Provider value={menuAccessRight}>
+        <CommonTableGrid
+          type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
+          onSelectionChange={handleSelectionChange}
+          selection={selectedRows}
+          columnExtensions={colExtensions}
+          ActionProps={{ TableCellComponent: Cell }}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: true,
+              rowSelectionEnabled: () => true,
+            },
+          }}
+          {...tableParas}
+        />
+        <CommonModal
+          open={showMessageModal}
+          title='Send SMS'
+          observe='Sms'
+          onClose={() => setShowMessageModal(false)}
+          onConfirm={() => setShowMessageModal(false)}
+        >
+          {showMessageModal ? (
+            <MessageListing {...messageListingProps} />
+          ) : null}
+        </CommonModal>
+      </Authorized.Context.Provider>
     </React.Fragment>
   )
 }
