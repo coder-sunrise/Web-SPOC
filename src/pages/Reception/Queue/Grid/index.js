@@ -159,7 +159,10 @@ const Grid = ({
     )
     const accessRight = Authorized.check(menuOpt.authority)
 
-    return accessRight && accessRight.rights === 'enable'
+    return (
+      accessRight &&
+      (accessRight.rights === 'enable' || accessRight.rights === 'readwrite')
+    )
   }
 
   const onClick = useCallback(
