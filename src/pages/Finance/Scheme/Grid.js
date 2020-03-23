@@ -5,7 +5,8 @@ import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 
-const Grid = ({ history }) => {
+const { Secured } = Authorized
+const Grid = ({ history, disabled }) => {
   const [
     tableParas,
   ] = useState({
@@ -22,8 +23,7 @@ const Grid = ({ history }) => {
     leftColumns: [],
   })
   const editRow = (row, e) => {
-    const accessRight = Authorized.check('scheme.schemedetails')
-    if (!accessRight || accessRight.rights !== 'enable') {
+    if (disabled) {
       notification.error({
         message: 'Current user is not authorized to access',
       })
@@ -73,19 +73,17 @@ const Grid = ({ history }) => {
               <Search />
             </Button>
           </Tooltip> */
-        <Authorized authority='scheme.schemedetails'>
-          <Tooltip title='Edit' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={() => editRow(row)}
-              justIcon
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Edit />
-            </Button>
-          </Tooltip>
-        </Authorized>
+        <Tooltip title='Edit' placement='bottom'>
+          <Button
+            size='sm'
+            onClick={() => editRow(row)}
+            justIcon
+            color='primary'
+            style={{ marginRight: 5 }}
+          >
+            <Edit />
+          </Button>
+        </Tooltip>
       ),
     },
     // {
@@ -122,4 +120,4 @@ const Grid = ({ history }) => {
     </React.Fragment>
   )
 }
-export default Grid
+export default Secured('scheme.schemedetails')(Grid)
