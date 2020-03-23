@@ -5,7 +5,6 @@ import { Paper, Tooltip, IconButton } from '@material-ui/core'
 import ArrowDropDown from '@material-ui/icons/ArrowDropDown'
 import ArrowDropUp from '@material-ui/icons/ArrowDropUp'
 import ReOrder from '@material-ui/icons/Reorder'
-
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import {
   SortableContainer,
@@ -14,6 +13,11 @@ import {
   arrayMove,
 } from 'react-sortable-hoc'
 import { Action } from '@devexpress/dx-react-core'
+import {
+  getGlobalVariable,
+  getUniqueNumericId,
+  difference,
+} from '@/utils/utils'
 
 const actionCols = [
   'actions',
@@ -152,27 +156,27 @@ class TableCell extends React.Component {
       rowSpan,
       column,
       row,
+      authorize,
+      align,
       tableColumn,
+      classes,
+
       ...restProps
     } = this.props
 
-    // console.log(restProps.row)
-    // return null
-    // const { cellEditingDisabled } = column
-    // console.log(p2)
-    // return null
-    // console.log(restProps)
     let cfg = {
       // tabIndex: 0,
       leftColumns,
       style,
       className,
       colSpan,
+      // classes,
       rowSpan,
       column,
       row,
       tableColumn,
     }
+
     if (extraState) {
       const colCfg =
         columnExtensions.find((o) => o.columnName === column.name) || {}
@@ -182,7 +186,14 @@ class TableCell extends React.Component {
       // try {
       //   console.log(!colCfg, !colCfg.isDisabled, !colCfg.isDisabled(latestRow))
       // } catch (error) {}
-      if (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) {
+      // console.log(this.props.authorize)
+      if (authorize && authorize.rights === 'disable') {
+        return <Table.Cell {...cfg}>{children}</Table.Cell>
+      }
+      if (
+        (!colCfg.isDisabled || !colCfg.isDisabled(latestRow)) &&
+        !colCfg.disabled
+      ) {
         if (
           ![
             'radio',
@@ -190,16 +201,10 @@ class TableCell extends React.Component {
             'custom',
           ].includes(colCfg.type)
         ) {
-          cfg = {
-            tabIndex: 0,
-            onFocus: onClick,
-            // onBlur: () => {
-            //   console.log(111)
-            // },
-          }
+          cfg.tabIndex = 0
+          cfg.onFocus = onClick
         }
       }
-      if (colCfg && colCfg.disabled) cfg = {}
     }
 
     if (column) {
@@ -251,7 +256,6 @@ class TableCell extends React.Component {
         )
       }
     }
-    // console.log(cfg, this.props)
     return <Table.Cell {...cfg}>{children}</Table.Cell>
   }
 }

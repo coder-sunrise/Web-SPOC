@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 // common components
+import { IntegratedSummary } from '@devexpress/dx-react-grid'
 import { GridItem, EditableTableGrid, NumberInput } from '@/components'
 
 const InventoryType = ({
@@ -33,10 +34,26 @@ const InventoryType = ({
         onRowDoubleClick={undefined}
         FuncProps={{
           pager: false,
+          summary: true,
+          summaryConfig: {
+            state: {
+              totalItems: [
+                { columnName: 'subTotal', type: 'sum' },
+              ],
+            },
+            integrated: {
+              calculator: IntegratedSummary.defaultCalculator,
+            },
+            row: {
+              messages: {
+                sum: 'Total',
+              },
+            },
+          },
         }}
         EditingProps={{ ...editingProps }}
       />
-      <div
+      {/* <div
         style={{
           position: 'absolute',
           width: 150,
@@ -49,7 +66,7 @@ const InventoryType = ({
           Sub Total:&nbsp;
         </span>
         <NumberInput text currency value={subtotal} />
-      </div>
+      </div> */}
     </GridItem>
   )
 }
