@@ -19,10 +19,11 @@ export const isComponentClass = (component) => {
 // Authorized  render is already instantiated, children is no instantiated
 // Secured is not instantiated
 
-const checkIsInstantiation = (matches, target) => {
+const checkIsInstantiation = (matches, target, error) => {
   if (isComponentClass(matches)) {
     return matches
   }
+  if (matches.rights === 'hidden') return error
   if (isComponentClass(target)) {
     const Target = target
     return (props) => (
@@ -123,14 +124,10 @@ const authorize = (authority, error) => {
   }
   // console.log('authority', authority)
   return function decideAuthority (target) {
-    const rights = CheckPermissions(
-      authority,
-      target,
-      classError || Exception403,
-      'decorator',
-    )
+    const error = classError || Exception403
+    const rights = CheckPermissions(authority, target, error, 'decorator')
     // console.log(rights, target)
-    return checkIsInstantiation(rights, target)
+    return checkIsInstantiation(rights, target, error)
   }
 }
 
