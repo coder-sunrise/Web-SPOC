@@ -23,15 +23,7 @@ class PatientSearch extends PureComponent {
     // console.log(this)
 
     const showPatient = (row) => {
-      const accessRight = Authorized.check(
-        'patientdatabase.patientprofiledetails',
-      )
-      if (accessRight)
-        if (
-          !this.props.history ||
-          (accessRight && accessRight.rights !== 'enable')
-        )
-          return
+      if (!this.props.history || this.props.rights === 'disable') return
       this.props.history.push(
         getAppendUrl({
           md: 'pt',
@@ -66,8 +58,7 @@ class PatientSearch extends PureComponent {
   }
 
   componentDidMount () {
-    console.log({ rights: this.props.rights })
-    if (!this.props.disableQueryOnLoad && this.props.rights === 'enable') {
+    if (!this.props.disableQueryOnLoad) {
       this.props.dispatch({
         type: 'patientSearch/query',
         payload: {

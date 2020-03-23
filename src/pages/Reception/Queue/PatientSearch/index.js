@@ -25,6 +25,8 @@ const styles = () => ({
   },
 })
 
+const { Secured } = Authorized
+
 @connect(({ loading }) => ({ loading }))
 class PatientSearch extends PureComponent {
   state = {

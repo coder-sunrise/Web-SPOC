@@ -20,21 +20,14 @@ import {
 // sub component
 import StatusFilterButton from './StatusFilterButton'
 import Authorized from '@/utils/Authorized'
-import { USER_ROLE } from '@/utils/constants'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
   switch: { display: 'inline-block', minWidth: '200px' },
 })
 
-const shouldShowSelfOnlyCheckbox = [
-  USER_ROLE.DOCTOR,
-  USER_ROLE.DOCTOR_OWNER,
-]
-
 const Filterbar = (props) => {
   const {
-    accessRight,
     classes,
     dispatch,
     toggleNewPatient,

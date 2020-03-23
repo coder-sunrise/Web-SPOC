@@ -50,7 +50,9 @@ const styles = (theme) => ({
   },
 })
 
-const ContextMenu = ({ row, handleClick, classes }) => {
+const { Secured } = Authorized
+
+const ContextMenu = ({ row, handleClick, classes, rights }) => {
   const isStatusWaiting = row.visitStatus === VISIT_STATUS.WAITING
   const isStatusInProgress = filterMap[StatusIndicator.IN_PROGRESS].includes(
     row.visitStatus,
@@ -109,8 +111,7 @@ const ContextMenu = ({ row, handleClick, classes }) => {
 
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
-      const moduleAccessRight = Authorized.check('reception/queue')
-      const isDisabled = moduleAccessRight.rights === 'disable'
+      const isDisabled = rights === 'disable'
 
       switch (opt.id) {
         case 0: // edit visit
@@ -188,6 +189,8 @@ const ContextMenu = ({ row, handleClick, classes }) => {
   return MenuItemsOverlay
 }
 
+const SecuredContextMenu = Secured('reception/queue')(ContextMenu)
+
 export default withStyles(styles, { name: 'QueueListingContextMenu' })(
-  ContextMenu,
+  SecuredContextMenu,
 )
