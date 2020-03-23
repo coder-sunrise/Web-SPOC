@@ -7,6 +7,7 @@ import RepeatIcon from '@material-ui/icons/Repeat'
 import { Button } from '@/components'
 // constants variables
 import { PayerType } from './variables'
+import Authorized from '@/utils/Authorized'
 
 const PaymentActions = ({
   handleAddPayment,
@@ -27,7 +28,15 @@ const PaymentActions = ({
     size: 'sm',
   }
   return (
-    <React.Fragment>
+    <div>
+      <Button
+        onClick={() => handleAddPayment(invoicePayerFK)}
+        // disabled={!handleAddPayment || readOnly}
+        {...ButtonProps}
+      >
+        <Add />
+        Add Payment
+      </Button>
       <Button
         onClick={() => handleAddPayment(invoicePayerFK)}
         disabled={!handleAddPayment || readOnly}
@@ -75,7 +84,7 @@ const PaymentActions = ({
         <Printer />
         Print Invoice
       </Button>
-    </React.Fragment>
+    </div>
   )
 }
 

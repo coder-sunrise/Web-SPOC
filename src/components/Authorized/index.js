@@ -46,7 +46,10 @@ Authorized.generalCheck = (matches, props, component, disabledComponent) => {
   }
   if (!props.hideIfNoEditRights) {
     if (buttonTypes.indexOf(component.type.displayName) >= 0) {
-      return null
+      // return null
+      return React.cloneElement(component, {
+        disabled: true,
+      })
     }
     if (disabledComponent) {
       if (typeof disabledComponent === 'function') {
