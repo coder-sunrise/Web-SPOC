@@ -100,14 +100,14 @@ const Grid = ({
       // },
     ]
     const options = defaultContextMenuOptions
-    const accessRight = Authorized.check('sms.viewsms')
+    const viewAccessRight = Authorized.check('sms.viewsms')
 
     if (tableProps.column.name === 'Action') {
       return (
         <Table.Cell {...tableProps}>
           <Tooltip title='More Actions' placement='bottom'>
             <div style={{ display: 'inline-block' }}>
-              <Authorized.Context.Provider value={accessRight}>
+              <Authorized.Context.Provider value={viewAccessRight}>
                 <GridButton
                   row={tableProps.row}
                   contextMenuOptions={options}
@@ -139,33 +139,39 @@ const Grid = ({
     smsPatient,
   }
 
+  const menuAccessRight = Authorized.check('communication/sms')
+
   return (
     <React.Fragment>
       <FilterBar {...filterBarProps} />
-      <CommonTableGrid
-        type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
-        onSelectionChange={handleSelectionChange}
-        selection={selectedRows}
-        columnExtensions={colExtensions}
-        ActionProps={{ TableCellComponent: Cell }}
-        FuncProps={{
-          selectable: true,
-          selectConfig: {
-            showSelectAll: true,
-            rowSelectionEnabled: () => true,
-          },
-        }}
-        {...tableParas}
-      />
-      <CommonModal
-        open={showMessageModal}
-        title='Send SMS'
-        observe='Sms'
-        onClose={() => setShowMessageModal(false)}
-        onConfirm={() => setShowMessageModal(false)}
-      >
-        {showMessageModal ? <MessageListing {...messageListingProps} /> : null}
-      </CommonModal>
+      <Authorized.Context.Provider value={menuAccessRight}>
+        <CommonTableGrid
+          type={type === 'Appointment' ? 'smsAppointment' : 'smsPatient'}
+          onSelectionChange={handleSelectionChange}
+          selection={selectedRows}
+          columnExtensions={colExtensions}
+          ActionProps={{ TableCellComponent: Cell }}
+          FuncProps={{
+            selectable: true,
+            selectConfig: {
+              showSelectAll: true,
+              rowSelectionEnabled: () => true,
+            },
+          }}
+          {...tableParas}
+        />
+        <CommonModal
+          open={showMessageModal}
+          title='Send SMS'
+          observe='Sms'
+          onClose={() => setShowMessageModal(false)}
+          onConfirm={() => setShowMessageModal(false)}
+        >
+          {showMessageModal ? (
+            <MessageListing {...messageListingProps} />
+          ) : null}
+        </CommonModal>
+      </Authorized.Context.Provider>
     </React.Fragment>
   )
 }
