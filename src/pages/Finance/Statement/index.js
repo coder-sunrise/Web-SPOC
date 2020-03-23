@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 // material ui
@@ -170,8 +170,8 @@ class Statement extends PureComponent {
               width: 130,
               render: (row) => {
                 return (
-                  <React.Fragment>
-                    <Authorized authority='statement.statementdetails'>
+                  <Authorized authority='statement.statementdetails'>
+                    <Fragment>
                       <Tooltip title='Edit Statement'>
                         <Button
                           size='sm'
@@ -203,8 +203,8 @@ class Statement extends PureComponent {
                           </Button>
                         </Tooltip>
                       </PrintStatementReport>
-                    </Authorized>
-                  </React.Fragment>
+                    </Fragment>
+                  </Authorized>
                 )
               },
             },

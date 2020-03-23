@@ -74,12 +74,7 @@ const Filterbar = (props) => {
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={4}>
-        <Authorized
-          authority={[
-            'reception/queue',
-            'queue.registervisit',
-          ]}
-        >
+        <Authorized authority='queue.registervisit'>
           <ProgressButton
             variant='contained'
             color='primary'
@@ -95,12 +90,7 @@ const Filterbar = (props) => {
             Create Visit
           </ProgressButton>
         </Authorized>
-        <Authorized
-          authority={[
-            'reception/queue',
-            'patientdatabase.newpatient',
-          ]}
-        >
+        <Authorized authority='patientdatabase.newpatient'>
           <Button
             icon={null}
             color='primary'
