@@ -488,7 +488,7 @@ const _routes = [
             mini: 'CP',
             component: './Setting/Company',
             authority: [
-              'finance/scheme',
+              'finance/copayer',
             ],
           },
         ],

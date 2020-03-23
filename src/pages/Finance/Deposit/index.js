@@ -5,6 +5,7 @@ import moment from 'moment'
 import { compare } from '@/layouts'
 
 import { CardContainer } from '@/components'
+import Authorized from '@/utils/Authorized'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
 
@@ -39,13 +40,16 @@ class Deposit extends PureComponent {
   render () {
     const { props } = this
     const { classes, ...restProps } = props
+    const accessRight = Authorized.check('finance/deposit')
     return (
       <CardContainer hideHeader>
         <FilterBar
           queryDepositListing={this.queryDepositListing}
           {...restProps}
         />
-        <Grid {...restProps} />
+        <Authorized.Context.Provider value={accessRight}>
+          <Grid {...restProps} />
+        </Authorized.Context.Provider>
       </CardContainer>
     )
   }

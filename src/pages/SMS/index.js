@@ -5,9 +5,10 @@ import { compose } from 'redux'
 import moment from 'moment'
 import { connect } from 'dva'
 import { CardContainer, Danger, Tabs } from '@/components'
+import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
+import Authorized from '@/utils/Authorized'
 import New from './New'
 import { SmsOption } from './variables'
-import { ADD_ON_FEATURE, APPOINTMENT_STATUS } from '@/utils/constants'
 
 const styles = {
   sendBar: {
@@ -77,6 +78,8 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
   const contentClass = classnames({
     [classes.blur]: showWarning,
   })
+
+  const accessRight = Authorized.check('communication')
 
   const defaultSearchQuery = (type) => {
     if (type === 'Appointment') {
@@ -156,33 +159,35 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
   }, [])
   return (
     <div>
-      <CardContainer hideHeader>
-        {showWarning && (
-          <React.Fragment>
-            <div className={classes.overlay}> </div>
-            <div className={classes.warningContent}>
-              <CardContainer hideHeader>
-                <Danger>
-                  <h4>
-                    To configure and use SMS feature, please contact system
-                    administrator for assistant.
-                  </h4>
-                </Danger>
-              </CardContainer>
+      <Authorized.Context.Provider value={accessRight}>
+        <CardContainer hideHeader>
+          {showWarning && (
+            <React.Fragment>
+              <div className={classes.overlay}> </div>
+              <div className={classes.warningContent}>
+                <CardContainer hideHeader>
+                  <Danger>
+                    <h4>
+                      To configure and use SMS feature, please contact system
+                      administrator for assistant.
+                    </h4>
+                  </Danger>
+                </CardContainer>
+              </div>
+            </React.Fragment>
+          )}
+          <div className={contentClass}>
+            <Tabs
+              defaultActiveKey='0'
+              options={SmsOption(gridProps)}
+              onChange={(e) => setCurrentTab(e)}
+            />
+            <div className={classes.sendBar}>
+              <New {...newMessageProps} />
             </div>
-          </React.Fragment>
-        )}
-        <div className={contentClass}>
-          <Tabs
-            defaultActiveKey='0'
-            options={SmsOption(gridProps)}
-            onChange={(e) => setCurrentTab(e)}
-          />
-          <div className={classes.sendBar}>
-            <New {...newMessageProps} />
           </div>
-        </div>
-      </CardContainer>
+        </CardContainer>
+      </Authorized.Context.Provider>
     </div>
   )
 }
