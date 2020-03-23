@@ -682,7 +682,16 @@ class EditableTableGrid extends PureComponent {
                 // showEditCommand={showEditCommand}
                 showDeleteCommand={showDeleteCommand}
                 commandComponent={CommandComponent}
-                // width={0}
+                width={
+                  [
+                    'readonly',
+                    'disable',
+                  ].includes(matches.rights) ? (
+                    0
+                  ) : (
+                    'auto'
+                  )
+                }
                 cellComponent={(cellProps) => {
                   const { children, ...p } = cellProps
                   return (
@@ -718,7 +727,7 @@ class EditableTableGrid extends PureComponent {
             ...cfg,
             ...props,
           }
-
+          // console.log(matches)
           return Authorized.generalCheck(
             matches,
             this.props,
