@@ -169,13 +169,14 @@ class EditableTableGrid extends PureComponent {
     errorRows.forEach((r) => {
       const { _errors } = r
       const rowId = getRowId(r)
-      _errors.forEach((e) => {
-        const { path } = e
-        errorCells.push({
-          rowId,
-          columnName: path,
+      if (rowId)
+        _errors.forEach((e) => {
+          const { path } = e
+          errorCells.push({
+            rowId,
+            columnName: path,
+          })
         })
-      })
     })
     // console.log(errorCells)
     return errorCells

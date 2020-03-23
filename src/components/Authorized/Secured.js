@@ -9,40 +9,89 @@ import Authorized from '@/utils/Authorized'
  */
 const Exception403 = () => <Exception type='403' />
 
-// Determine whether the incoming component has been instantiated
+export const isComponentClass = (component) => {
+  if (!component) return false
+  const proto = Object.getPrototypeOf(component)
+  if (proto === React.Component || proto === Function.prototype) return true
+  return isComponentClass(proto)
+} // Determine whether the incoming component has been instantiated
 // AuthorizedRoute is already instantiated
 // Authorized  render is already instantiated, children is no instantiated
 // Secured is not instantiated
-const checkIsInstantiation = (target, orgTarget) => {
-  if (target === null) return () => <div />
-  // if (typeof target === 'string') {
-  //   const disabledComponet = (Component) => {
-  //     console.log(Component)
-  //     console.log(Component)
-  //     class test extends React.Component {
-  //       render () {
-  //         return orgTarget
-  //       }
-  //     }
-  //     return test
-  //   }
-  //   if (!React.isValidElement(orgTarget)) {
-  //     return disabledComponet
-  //   }
-  //   return () => orgTarget
-  //   console.log(disabledComponet)
-  //   return disabledComponet
-  // }
-  // return (
-  //   <Authorized.Context.Provider value={{ rights: target }}>
-  //     {orgTarget}
-  //   </Authorized.Context.Provider>
-  // )
-  if (!React.isValidElement(target)) {
-    return target
+
+const checkIsInstantiation = (matches, target) => {
+  if (isComponentClass(matches)) {
+    return matches
   }
+  if (isComponentClass(target)) {
+    const Target = target
+    return (props) => (
+      <Authorized.Context.Provider value={matches}>
+        <Target
+          disabled={matches.rights === 'disable'}
+          rights={matches.rights}
+          {...props}
+        />
+      </Authorized.Context.Provider>
+    )
+  }
+
+  if (React.isValidElement(target)) {
+    return (props) => (
+      <Authorized.Context.Provider value={matches}>
+        {React.cloneElement(target, {
+          disabled: matches.rights === 'disable',
+          rights: matches.rights,
+          ...props,
+        })}
+      </Authorized.Context.Provider>
+    )
+  }
+
   return () => target
 }
+
+// // Determine whether the incoming component has been instantiated
+// // AuthorizedRoute is already instantiated
+// // Authorized  render is already instantiated, children is no instantiated
+// // Secured is not instantiated
+// const checkIsInstantiation = (target, orgTarget) => {
+//   console.log(target)
+//   console.log(orgTarget)
+
+//   if (target === null) return () => <div />
+//   // if (typeof target === 'string') {
+//   //   const disabledComponet = (Component) => {
+//   //     console.log(Component)
+//   //     console.log(Component)
+//   //     class test extends React.Component {
+//   //       render () {
+//   //         return orgTarget
+//   //       }
+//   //     }
+//   //     return test
+//   //   }
+//   //   if (!React.isValidElement(orgTarget)) {
+//   //     return disabledComponet
+//   //   }
+//   //   return () => orgTarget
+//   //   console.log(disabledComponet)
+//   //   return disabledComponet
+//   // }
+//   // return (
+//   //   <Authorized.Context.Provider value={{ rights: target }}>
+//   //     {orgTarget}
+//   //   </Authorized.Context.Provider>
+//   // )
+//   if (!React.isValidElement(target)) {
+//     return (
+//       <Authorized.Context.Provider value={{ rights: 'disable' }}>
+//         {orgTarget}
+//       </Authorized.Context.Provider>
+//     )
+//   }
+//   return () => target({ a: 1 })
+// }
 
 /**
  * 用于判断是否拥有权限访问此view权限
@@ -74,14 +123,14 @@ const authorize = (authority, error) => {
   }
   // console.log('authority', authority)
   return function decideAuthority (target) {
-    const component = CheckPermissions(
+    const rights = CheckPermissions(
       authority,
       target,
       classError || Exception403,
       'decorator',
     )
-    // console.log(component)
-    return checkIsInstantiation(component, target)
+    // console.log(rights, target)
+    return checkIsInstantiation(rights, target)
   }
 }
 
