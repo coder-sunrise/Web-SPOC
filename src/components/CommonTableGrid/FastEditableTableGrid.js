@@ -189,13 +189,14 @@ class EditableTableGrid extends PureComponent {
     errorRows.forEach((r) => {
       const { _errors } = r
       const rowId = getRowId(r)
-      _errors.forEach((e) => {
-        const { path } = e
-        errorCells.push({
-          rowId,
-          columnName: path,
+      if (rowId)
+        _errors.forEach((e) => {
+          const { path } = e
+          errorCells.push({
+            rowId,
+            columnName: path,
+          })
         })
-      })
     })
     // console.log(errorCells)
     return errorCells
@@ -205,6 +206,7 @@ class EditableTableGrid extends PureComponent {
     setTimeout(() => {
       const errorCells = this.getErrorCells()
       const { global } = window.g_app._store.getState()
+      console.log(global.disableSave, errorCells)
       if (window.$tempGridRow[this.gridId] && errorCells.length) {
         if (!global.disableSave)
           window.g_app._store.dispatch({
