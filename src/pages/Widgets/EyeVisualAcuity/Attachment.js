@@ -58,24 +58,16 @@ class Attachment extends Component {
         ]
       }, [])
     updated = updated.map((item, index) => ({ ...item, sortOrder: index + 1 }))
-    form.setFieldValue('corAttachment', updated)
 
-    // updated.filter(o=>)
-
-    // console.log(updated)
-    // this.setState({
-    //   corAttachment: updated,
-    // })
-
-    const { consultation } = this.props
-    const { entity } = consultation
-    entity.corAttachment = updated
-    this.props.dispatch({
-      type: 'consultation/updateState',
-      payload: {
-        entity,
-      },
-    })
+    const { handleUpdateAttachments } = this.props
+    if (handleUpdateAttachments)
+      handleUpdateAttachments({
+        ...this.props,
+        updated,
+        form,
+        added,
+        deleted,
+      })
   }
 
   handleDeleteAttachment = (fileIndexFK, id) => {
@@ -89,10 +81,6 @@ class Attachment extends Component {
   }
 
   getContent = (list = []) => {
-    const commonProps = {
-      fieldName: 'corAttachment',
-      onClickAttachment: this.handleClickAttachment,
-    }
     const onDeleteClick = this.handleDeleteAttachment
     if (list.length === 0) return null
     return (
@@ -117,7 +105,8 @@ class Attachment extends Component {
                 attachment={attachment}
                 onConfirmDelete={onDeleteClick}
                 indexInAllAttachments={indexInAllAttachments}
-                {...commonProps}
+                onClickAttachment={this.handleClickAttachment}
+                fieldName={this.props.attachmentsFieldName}
               />
             )
           })}
@@ -126,14 +115,17 @@ class Attachment extends Component {
   }
 
   render () {
-    const { consultation = {} } = this.props
-    const { entity = {} } = consultation
-    console.log(entity)
-    const { corAttachment } = entity || {}
+    const { consultation = {}, attachments, attachmentsFieldName } = this.props
+    // console.log(attachments)
+    const { entity } = consultation
+    let _attachment = attachments
+    if (!_attachment && entity) {
+      _attachment = entity.corAttachment
+    }
     return (
       <div>
         <FastField
-          name='corAttachment'
+          name={attachmentsFieldName}
           render={(args) => {
             const { form, field } = args
             // console.log(form, field)
@@ -148,17 +140,16 @@ class Attachment extends Component {
           }}
         />
 
-        {corAttachment && (
-          <AttachmentWithThumbnail
-            attachments={corAttachment}
-            buttonOnly
-            attachmentType='EyeVisualAcuity'
-            handleUpdateAttachments={this.handleUpdateAttachments}
-            renderBody={(attachments) => {
-              return this.getContent(attachments)
-            }}
-          />
-        )}
+        <AttachmentWithThumbnail
+          attachments={_attachment || []}
+          buttonOnly
+          attachmentType='EyeVisualAcuity'
+          handleUpdateAttachments={this.handleUpdateAttachments}
+          renderBody={(list) => {
+            // console.log(list)
+            return this.getContent(list)
+          }}
+        />
       </div>
     )
   }

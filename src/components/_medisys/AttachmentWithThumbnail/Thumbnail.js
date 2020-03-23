@@ -108,8 +108,8 @@ const Thumbnail = ({
   attachment,
   onConfirmDelete,
   onClickAttachment,
-  noBorder,
-  fieldName = 'visitAttachment',
+  noBorder = true,
+  fieldName,
   size = { width: 64, height: 64 },
 }) => {
   const {
@@ -242,7 +242,7 @@ const Thumbnail = ({
       </div>
     )
   }
-
+  // console.log(`${fieldName}[${indexInAllAttachments}].remarks`)
   return (
     <div className={thumbnailClass}>
       <LoadingWrapper loading={loadingThumbnail}>

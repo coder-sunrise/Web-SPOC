@@ -3,6 +3,7 @@ import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import Duplicate from '@material-ui/icons/FileCopy'
 import Print from '@material-ui/icons/Print'
+import Authorized from '@/utils/Authorized'
 
 export const poSubmitAction = {
   SAVE: 1,
@@ -108,11 +109,11 @@ export const isInvoiceReadOnly = (status) => {
   return allowedStatus.indexOf(status) > -1
 }
 
-export const isPOStatusFinalized = (status) => {
+export const isPOStatusFinalizedFulFilledPartialReceived = (status) => {
   const allowedStatus = [
-    // 'Finalized',
-    2,
-    3,
+    2, // Finalized
+    3, // Partial Received
+    5, // Fulfilled
   ]
   return allowedStatus.indexOf(status) > -1
 }
@@ -158,18 +159,25 @@ export const PurchaseReceiveGridCol = [
 ]
 
 export const ContextMenuOptions = (row) => {
-  return [
+  const accessRight = Authorized.check(
+    'purchasingandreceiving.newpurchasingandreceiving',
+  )
+
+  const menuOptions = [
     {
       id: 0,
-      label: 'Edit',
+      label: `Edit`,
       Icon: Edit,
       disabled: false,
+      width: 130,
     },
     {
       id: 1,
       label: 'Duplicate PO',
       Icon: Duplicate,
-      disabled: isDuplicatePOAllowed(row.purchaseOrderStatus),
+      disabled:
+        isDuplicatePOAllowed(row.purchaseOrderStatus) ||
+        accessRight.rights !== 'enable',
     },
     { isDivider: true },
     {
@@ -177,8 +185,14 @@ export const ContextMenuOptions = (row) => {
       label: 'Print',
       Icon: Print,
       disabled: false,
+      width: 130,
     },
   ]
+
+  if (!accessRight || (accessRight && accessRight.rights === 'hidden'))
+    return menuOptions.filter((option) => option.id !== 1)
+
+  return menuOptions
 }
 
 export const amountProps = {
@@ -351,3 +365,17 @@ export const fakePodoPaymentData = [
     remarks: 'Paid',
   },
 ]
+
+export const getAccessRight = (
+  authorityUrl = 'purchasingandreceiving.purchasingandreceivingdetails',
+) => {
+  const accessRight = Authorized.check(authorityUrl)
+
+  let allowAccess = false
+
+  if (!accessRight || accessRight.rights === 'hidden') return null
+  if (accessRight.rights === 'readwrite' || accessRight.rights === 'enable')
+    allowAccess = true
+
+  return allowAccess
+}

@@ -13,10 +13,10 @@ import {
 } from '@/components'
 import DOGrid from './DOGrid'
 import DODetails from './DODetails'
-import { isPOStatusFinalized, isPOStatusFulfilled } from '../../variables'
+import { isPOStatusFulfilled, getAccessRight } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
-import { podoOrderType, inventoryItemList } from '@/utils/codes'
+import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -81,7 +81,7 @@ class index extends Component {
 
     inventoryList = await Promise.all(inventoryList)
     for (let i = 0; i < podoOrderType.length; i++) {
-      const { inventoryItemList } = inventoryItemList(
+      const { inventoryItemList } = inventoryItemListing(
         inventoryList[i],
         podoOrderType[i].itemFKName,
         podoOrderType[i].stateName,
@@ -128,56 +128,56 @@ class index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: isEditable() ? 'enable' : 'disable',
+          rights: isEditable() || getAccessRight() ? 'enable' : 'disable',
           // rights: 'disable',
         }}
       >
-        <div>
-          <GridContainer>
-            <GridItem xs={12} md={12}>
-              <h4 style={{ fontWeight: 'bold' }}>
-                {formatMessage({
-                  id: 'inventory.pr.detail.dod.do',
-                })}
-              </h4>
-            </GridItem>
-            <DOGrid
-              onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
+        <GridContainer>
+          <GridItem xs={12} md={12}>
+            <h4 style={{ fontWeight: 'bold' }}>
+              {formatMessage({
+                id: 'inventory.pr.detail.dod.do',
+              })}
+            </h4>
+          </GridItem>
+          <DOGrid
+            onEditDeliveryOrderClicked={this.onEditDeliveryOrderClicked}
+            {...this.props}
+          />
+          <CommonModal
+            open={showDeliveryOrderDetails}
+            title='Delivery Order Details'
+            maxWidth='xl'
+            bodyNoPadding
+            onConfirm={this.closeDODetailsModal}
+            onClose={this.closeDODetailsModal}
+            observe='deliveryOrderDetails'
+          >
+            <DODetails
+              refreshDeliveryOrder={this.refreshDeliveryOrder}
               {...this.props}
+              mode={mode}
+              isEditable={isEditable()}
+              allowAccess={getAccessRight()}
             />
-            <CommonModal
-              open={showDeliveryOrderDetails}
-              title='Delivery Order Details'
-              maxWidth='xl'
-              bodyNoPadding
-              onConfirm={this.closeDODetailsModal}
-              onClose={this.closeDODetailsModal}
-              observe='deliveryOrderDetails'
+          </CommonModal>
+          {!isPOStatusFulfilled(poStatus) ? (
+            <Button
+              disabled={isEditable() === false || getAccessRight() === false}
+              onClick={this.onAddDeliveryOrderClicked}
+              // hideIfNoEditRights
+              color='info'
+              link
             >
-              <DODetails
-                refreshDeliveryOrder={this.refreshDeliveryOrder}
-                {...this.props}
-                mode={mode}
-              />
-            </CommonModal>
-            {!isPOStatusFulfilled(poStatus) ? (
-              <Button
-                // disabled={isPOStatusFulfilled(poStatus)}
-                onClick={this.onAddDeliveryOrderClicked}
-                // hideIfNoEditRights
-                color='info'
-                link
-              >
-                <Add />
-                {formatMessage({
-                  id: 'inventory.pr.detail.dod.addDeliveryOrder',
-                })}
-              </Button>
-            ) : (
-              ''
-            )}
-          </GridContainer>
-        </div>
+              <Add />
+              {formatMessage({
+                id: 'inventory.pr.detail.dod.addDeliveryOrder',
+              })}
+            </Button>
+          ) : (
+            ''
+          )}
+        </GridContainer>
       </AuthorizedContext.Provider>
     )
   }

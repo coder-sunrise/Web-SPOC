@@ -41,7 +41,7 @@ class EyeVisualAcuity extends React.PureComponent {
     return (
       <div style={{ minWidth: 700 }}>
         <Form {...this.props} />
-        <Attachment />
+        <Attachment {...this.props} />
       </div>
     )
   }

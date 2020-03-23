@@ -1,8 +1,7 @@
 export default {
   title: {
     fontWeight: 400,
-    marginTop: 8,
-    marginBottom: 8,
+    padding: '0 8px',
   },
   divider: {
     marginBottom: 8,

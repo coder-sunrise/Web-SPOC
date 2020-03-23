@@ -311,7 +311,7 @@ const widgets = [
   {
     id: '9',
     name: 'Visual Acuity Test',
-    accessRight: 'queue.consultation.widgets.attachment',
+    accessRight: 'queue.consultation.widgets.eyevisualacuity',
     component: Loadable({
       loader: () => import('@/pages/Widgets/EyeVisualAcuity'),
       render: (loaded, p) => {
@@ -320,6 +320,24 @@ const widgets = [
           <Cmpnet
             {...p}
             prefix='corEyeVisualAcuityTest.eyeVisualAcuityTestForms'
+            attachmentsFieldName='corAttachment'
+            handleUpdateAttachments={({
+              updated,
+              form,
+              dispatch,
+              consultation,
+            }) => {
+              // console.log(updated, form, dispatch, consultation)
+              form.setFieldValue('corAttachment', updated)
+              const { entity } = consultation
+              entity.corAttachment = updated
+              dispatch({
+                type: 'consultation/updateState',
+                payload: {
+                  entity,
+                },
+              })
+            }}
           />
         )
       },
@@ -332,7 +350,7 @@ const widgets = [
       minW: 12,
       minH: 10,
       style: {
-        padding: '0 5px',
+        padding: 5,
       },
     },
   },

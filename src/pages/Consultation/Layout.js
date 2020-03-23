@@ -26,7 +26,7 @@ import {
   Popconfirm,
   IconButton,
   CustomInputWrapper,
-  Fab,
+  notification,
   GridContainer,
   GridItem,
 } from '@/components'
@@ -72,20 +72,28 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { defaultConsultationTemplate } = clinicInfo
-
-    this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
+    let { defaultConsultationTemplate = '[]' } = clinicInfo
+    // console.log(defaultConsultationTemplate)
+    if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
+      notification.warn({
+        message: 'Clinic do not have default template configuration',
+      })
+      this.pageDefaultWidgets = []
+    } else {
+      this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
+    }
 
     let defaultLayout
 
     if (userDefaultLayout && userDefaultLayout.consultationTemplate) {
       defaultLayout = JSON.parse(userDefaultLayout.consultationTemplate)
-    } else if (true) {
+    } else {
       // disable local setting(!localStorage.getItem('consultationLayout')) {
       defaultLayout = this.getDefaultLayout()
-    } else {
-      defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
     }
+    //  else {
+    //   defaultLayout = JSON.parse(localStorage.getItem('consultationLayout'))
+    // }
     // console.log(defaultLayout)
     if (!defaultLayout.widgets) {
       defaultLayout = this.getDefaultLayout()
@@ -448,7 +456,7 @@ class Layout extends PureComponent {
   // }
 
   getLayoutRowHeight = () => {
-    const topHeight = (this.props.height ? 0 : headerHeight) + 168 // 168 = nav header height + patient banner height + anchor height
+    const topHeight = (this.props.height ? 0 : headerHeight) + 158 // 168 = nav header height + patient banner height + anchor height
     // console.log(
     //   this.props,
     //   (this.props.height || window.innerHeight - topHeight) / 6,

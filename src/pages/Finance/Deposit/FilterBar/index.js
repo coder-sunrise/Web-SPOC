@@ -18,6 +18,7 @@ import {
   ProgressButton,
 } from '@/components'
 import { FilterBarDate } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   filterBar: {
@@ -167,27 +168,28 @@ class FilterBar extends PureComponent {
                 <Search />
                 <FormattedMessage id='form.search' />
               </ProgressButton>
-
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={() => {
-                  this.props.dispatch({
-                    type: 'patient/openPatientModal',
-                    payload: {
-                      callback: () => {
-                        this.props.dispatch({
-                          type: 'patient/closePatientModal',
-                        })
-                        queryDepositListing()
+              <Authorized authority='patientdatabase.newpatient'>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={() => {
+                    this.props.dispatch({
+                      type: 'patient/openPatientModal',
+                      payload: {
+                        callback: () => {
+                          this.props.dispatch({
+                            type: 'patient/closePatientModal',
+                          })
+                          queryDepositListing()
+                        },
                       },
-                    },
-                  })
-                }}
-              >
-                <PersonAdd />
-                <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
-              </Button>
+                    })
+                  }}
+                >
+                  <PersonAdd />
+                  <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
+                </Button>
+              </Authorized>
             </div>
           </GridItem>
         </GridContainer>

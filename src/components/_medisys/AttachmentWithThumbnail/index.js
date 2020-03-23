@@ -39,6 +39,7 @@ const AttachmentWithThumbnail = ({
   simple = false,
   local = false,
   attachmentType = '',
+  fieldName,
   thumbnailSize = {
     height: 64,
     width: 64,
@@ -250,6 +251,7 @@ const AttachmentWithThumbnail = ({
     onConfirmDelete: onDelete,
     onClickAttachment: onClick,
     noBorder: simple && !allowedMultiple,
+    fieldName,
   }
 
   let Body =

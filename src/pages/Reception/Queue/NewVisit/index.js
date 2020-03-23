@@ -28,6 +28,7 @@ import { formikMapPropsToValues, formikHandleSubmit } from './miscUtils'
 import { VISIT_STATUS } from '../variables'
 import { VISIT_TYPE } from '@/utils/constants'
 import { locationQueryParameters } from '@/utils/utils'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   gridContainer: {
@@ -235,6 +236,7 @@ class NewVisit extends PureComponent {
       values,
       isSubmitting,
       dispatch,
+      rights,
       setFieldValue,
     } = this.props
 
@@ -293,49 +295,68 @@ class NewVisit extends PureComponent {
               <ErrorWrapper errorState={errorState} errorKey='visitInfo'>
                 <SizeContainer size='sm'>
                   <React.Fragment>
-                    <GridItem xs md={12} className={classes.row}>
-                      <VisitInfoCard
-                        isReadOnly={isReadOnly}
-                        existingQNo={existingQNo}
-                        handleUpdateAttachments={this.updateAttachments}
-                        attachments={values.visitAttachment}
-                        visitType={values.visitPurposeFK}
-                        dispatch={dispatch}
-                        visitOrderTemplateOptions={visitOrderTemplateOptions}
-                      />
-                    </GridItem>
-                    <GridItem xs md={12} className={classes.row}>
-                      <VitalSignCard
-                        isReadOnly={isReadOnly}
-                        handleCalculateBMI={this.calculateBMI}
-                      />
-                    </GridItem>
-                    <GridItem xs md={12} className={classes.row}>
-                      <ReferralCard
-                        isReadOnly={isRetail || isReadOnly}
-                        handleUpdateAttachments={this.updateAttachments}
-                        attachments={values.visitAttachment}
-                        dispatch={dispatch}
-                        values={values}
-                        setFieldValue={setFieldValue}
-                      />
-                    </GridItem>
-                    <GridItem xs md={12} className={classes.row}>
-                      <EyeVisualAcuityCard
-                        isReadOnly={isRetail || isReadOnly}
-                        handleUpdateAttachments={this.updateAttachments}
-                        attachments={values.visitAttachment}
-                        dispatch={dispatch}
-                        values={values}
-                        setFieldValue={setFieldValue}
-                      />
-                    </GridItem>
+                    <Authorized.Context.Provider
+                      value={{
+                        rights:
+                          rights === 'readwrite' && isReadOnly
+                            ? 'disable'
+                            : rights,
+                      }}
+                    >
+                      <GridItem xs={12} className={classes.row}>
+                        <VisitInfoCard
+                          // isReadOnly={isReadOnly}
+                          existingQNo={existingQNo}
+                          handleUpdateAttachments={this.updateAttachments}
+                          attachments={values.visitAttachment}
+                          visitType={values.visitPurposeFK}
+                          dispatch={dispatch}
+                          visitOrderTemplateOptions={visitOrderTemplateOptions}
+                        />
+                      </GridItem>
+                    </Authorized.Context.Provider>
+                    <Authorized.Context.Provider
+                      value={{
+                        rights:
+                          rights === 'readwrite' && (isReadOnly || isRetail)
+                            ? 'disable'
+                            : rights,
+                      }}
+                    >
+                      <React.Fragment>
+                        <GridItem xs={12} className={classes.row}>
+                          <VitalSignCard
+                            // isReadOnly={isReadOnly}
+                            handleCalculateBMI={this.calculateBMI}
+                          />
+                        </GridItem>
+                        <GridItem xs={12} className={classes.row}>
+                          <ReferralCard
+                            // isReadOnly={isRetail || isReadOnly}
+                            handleUpdateAttachments={this.updateAttachments}
+                            attachments={values.visitAttachment}
+                            dispatch={dispatch}
+                            values={values}
+                            setFieldValue={setFieldValue}
+                          />
+                        </GridItem>
+                        <Authorized authority='queue.consultation.widgets.eyevisualacuity'>
+                          <GridItem xs={12} className={classes.row}>
+                            <EyeVisualAcuityCard
+                              // isReadOnly={isRetail || isReadOnly}
+                              handleUpdateAttachments={this.updateAttachments}
+                              attachments={values.visitAttachment}
+                            />
+                          </GridItem>
+                        </Authorized>
+                      </React.Fragment>
+                    </Authorized.Context.Provider>
                   </React.Fragment>
                 </SizeContainer>
               </ErrorWrapper>
               {/*
-                <GridItem xs md={12} container>
-                  <GridItem xs md={12} className={classes.cardContent}>
+                <GridItem xs={12} container>
+                  <GridItem xs={12} className={classes.cardContent}>
                     <ParticipantCard />
                   </GridItem>
                 </GridItem>

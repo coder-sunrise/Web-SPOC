@@ -61,21 +61,25 @@ const FormFooter = ({
           {ButtonText.CHECK}
         </Button>
         {(isNew || isDraft) && (
+          <Authorized authority='appointment.newappointment'>
+            <Button
+              disabled={disabled}
+              onClick={handleSaveDraftClick}
+              color='primary'
+            >
+              {ButtonText.DRAFT}
+            </Button>
+          </Authorized>
+        )}
+        <Authorized authority='appointment.newappointment'>
           <Button
-            disabled={disabled}
-            onClick={handleSaveDraftClick}
+            disabled={disabled || isTurnedUp}
+            onClick={handleConfirmClick}
             color='primary'
           >
-            {ButtonText.DRAFT}
+            {confirmBtnText}
           </Button>
-        )}
-        <Button
-          disabled={disabled || isTurnedUp}
-          onClick={handleConfirmClick}
-          color='primary'
-        >
-          {confirmBtnText}
-        </Button>
+        </Authorized>
       </div>
     </SizeContainer>
   )

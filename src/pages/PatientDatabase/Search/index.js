@@ -7,6 +7,7 @@ import { compare } from '@/layouts'
 import { CardContainer, Button, Tooltip } from '@/components'
 import FilterBar from './FilterBar'
 import Grid from './Grid'
+import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 
@@ -20,7 +21,15 @@ class PatientSearch extends PureComponent {
     // console.log(this)
 
     const showPatient = (row) => {
-      if (!this.props.history) return
+      const accessRight = Authorized.check(
+        'patientdatabase.patientprofiledetails',
+      )
+      if (accessRight)
+        if (
+          !this.props.history ||
+          (accessRight && accessRight.rights !== 'enable')
+        )
+          return
       this.props.history.push(
         getAppendUrl({
           md: 'pt',

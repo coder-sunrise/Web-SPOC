@@ -18,7 +18,6 @@ class VitalSignCard extends PureComponent {
     const { handleCalculateBMI, isReadOnly = false } = this.props
     return (
       <CommonCard
-        size='sm'
         title={
           <FormattedMessage id='reception.queue.visitRegistration.vitalSign' />
         }
@@ -31,7 +30,7 @@ class VitalSignCard extends PureComponent {
                 <NumberInput
                   {...args}
                   format='0.0'
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.temperature',
                   })}
@@ -48,7 +47,7 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label='Blood Pressure SYS'
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
@@ -63,7 +62,7 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label='Blood Pressure DIA'
                   suffix={formatMessage({
                     id: 'reception.queue.visitRegistration.mmhg',
@@ -78,7 +77,7 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.heartRate',
                   })}
@@ -95,7 +94,7 @@ class VitalSignCard extends PureComponent {
               render={(args) => (
                 <NumberInput
                   {...args}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   format='0.0'
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.weight',
@@ -119,7 +118,7 @@ class VitalSignCard extends PureComponent {
                 <NumberInput
                   {...args}
                   precision={0}
-                  disabled={isReadOnly}
+                  // disabled={isReadOnly}
                   label={formatMessage({
                     id: 'reception.queue.visitRegistration.height',
                   })}

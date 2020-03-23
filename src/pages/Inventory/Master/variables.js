@@ -20,25 +20,25 @@ const addContent = (type, props) => {
 export const InventoryMasterOption = (props) => {
   const Tabs = [
     {
-      id: 0,
+      id: '0',
       name: 'Medication',
       authority: 'inventorymaster.medication',
       content: addContent(1, props),
     },
     {
-      id: 1,
+      id: '1',
       name: 'Consumable',
       authority: 'inventorymaster.consumable',
       content: addContent(2, props),
     },
     {
-      id: 2,
+      id: '2',
       name: 'Vaccination',
       authority: 'inventorymaster.vaccination',
       content: addContent(3, props),
     },
     {
-      id: 3,
+      id: '3',
       name: 'Order Set',
       authority: 'inventorymaster.orderset',
       content: addContent(4, props),

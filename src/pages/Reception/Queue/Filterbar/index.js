@@ -32,16 +32,18 @@ const shouldShowSelfOnlyCheckbox = [
   USER_ROLE.DOCTOR_OWNER,
 ]
 
-const Filterbar = ({
-  classes,
-  dispatch,
-  toggleNewPatient,
-  handleSubmit,
-  selfOnly,
-  user,
-  setSearch,
-  loading,
-}) => {
+const Filterbar = (props) => {
+  const {
+    accessRight,
+    classes,
+    dispatch,
+    toggleNewPatient,
+    handleSubmit,
+    selfOnly,
+    user,
+    setSearch,
+    loading,
+  } = props
   const onSwitchClick = () => dispatch({ type: 'queueLog/toggleSelfOnly' })
 
   return (
@@ -72,38 +74,39 @@ const Filterbar = ({
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={4}>
-        <Authorized authority='queue.registervisit'>
-          <ProgressButton
-            variant='contained'
-            color='primary'
-            icon={
+        <Authorized.Context.Provider value={accessRight}>
+          <Authorized authority='queue.registervisit'>
+            <ProgressButton
+              variant='contained'
+              color='primary'
+              icon={
+                <Hidden mdDown>
+                  <Search />
+                </Hidden>
+              }
+              onClick={handleSubmit}
+              size='sm'
+              submitKey='patientSearch/query'
+            >
+              Create Visit
+            </ProgressButton>
+          </Authorized>
+          <Authorized authority='patientdatabase.newpatient'>
+            <Button
+              icon={null}
+              color='primary'
+              size='sm'
+              onClick={toggleNewPatient}
+              disabled={loading.global}
+            >
               <Hidden mdDown>
-                <Search />
+                <PersonAdd />
               </Hidden>
-            }
-            onClick={handleSubmit}
-            size='sm'
-            submitKey='patientSearch/query'
-          >
-            Create Visit
-          </ProgressButton>
-        </Authorized>
-        <Button
-          icon={null}
-          color='primary'
-          size='sm'
-          onClick={toggleNewPatient}
-          disabled={loading.global}
-        >
-          <Hidden mdDown>
-            <PersonAdd />
-          </Hidden>
-          <FormattedMessage id='reception.queue.createPatient' />
-        </Button>
-
-        {shouldShowSelfOnlyCheckbox.includes(
-          user.clinicianProfile.userProfile.role.id,
-        ) && (
+              <FormattedMessage id='reception.queue.createPatient' />
+            </Button>
+          </Authorized>
+        </Authorized.Context.Provider>
+        {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox
               label='Visit assign to me only'

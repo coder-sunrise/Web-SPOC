@@ -2,7 +2,11 @@ import React, { PureComponent } from 'react'
 import _ from 'lodash'
 import Yup from '@/utils/yup'
 import { FastEditableTableGrid, GridContainer, GridItem } from '@/components'
-import { podoOrderType, getInventoryItem } from '@/utils/codes'
+import {
+  podoOrderType,
+  getInventoryItem,
+  inventoryItemListing,
+} from '@/utils/codes'
 import { fetchAndSaveCodeTable } from '@/utils/codetable'
 
 // let commitCount = 2200 // uniqueNumber
@@ -54,7 +58,7 @@ class Grid extends PureComponent {
         // excludeInactiveCodes: false,
         isActive: excludeInactiveCodes(),
       }).then((list) => {
-        const { inventoryItemList } = inventoryItemList(
+        const { inventoryItemList } = inventoryItemListing(
           list,
           x.itemFKName,
           x.stateName,
@@ -434,13 +438,12 @@ class Grid extends PureComponent {
             schema={purchaseOrderDetailsSchema}
             forceRenderDuration={5000}
             FuncProps={{
-              edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: isEditable,
-              showDeleteCommand: isEditable,
+              // showEditCommand: isEditable,
+              // showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges(values),
               onAddedRowsChange: this.onAddedRowsChange,
             }}

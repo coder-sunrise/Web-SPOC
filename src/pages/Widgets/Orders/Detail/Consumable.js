@@ -30,7 +30,7 @@ import LowStockInfo from './LowStockInfo'
 
   handleSubmit: (values, { props, onConfirm }) => {
     const { dispatch, currentType, getNextSequence } = props
-    var batchNo = values.batchNo
+    let { batchNo } = values
     if (batchNo instanceof Array) {
       if (batchNo && batchNo.length > 0) {
         batchNo = batchNo[0]
@@ -76,7 +76,7 @@ class Consumable extends PureComponent {
       : undefined
 
     if (consumable) selectedConsumable = consumable
-    console.log({ consumable })
+    // console.log({ consumable })
     this.state = {
       selectedConsumable,
       batchNo: '',
@@ -178,7 +178,7 @@ class Consumable extends PureComponent {
       const consumable = inventoryConsumableFK
         ? inventoryconsumable.find((item) => item.id === inventoryConsumableFK)
         : undefined
-      console.log({ consumable })
+      // console.log({ consumable })
       if (consumable)
         this.setState({
           selectedConsumable: consumable,

@@ -50,15 +50,22 @@ const styles = (theme) => ({
     },
   },
   inputRoot: {
-    paddingLeft: 10,
+    paddingLeft: 2,
     paddingRight: 5,
     '&:before': {
-      right: 30,
-      left: 10,
+      // right: 30,
+      // left: 10,
+      left: 2,
+      right: 16,
     },
     '&:after': {
-      right: 30,
-      left: 10,
+      // right: 30,
+      // left: 10,
+      left: 2,
+      right: 16,
+    },
+    '& > input': {
+      textAlign: 'center',
     },
   },
   inputSpecs: {
@@ -124,6 +131,7 @@ class Form extends React.PureComponent {
       },
       simple: true,
     }
+
     return (
       <div style={{ minWidth: 700 }}>
         <FieldArray
@@ -139,10 +147,10 @@ class Form extends React.PureComponent {
             //   this.addDiagnosis()
             // }
 
-            console.log(values)
+            // console.log(values)
             if (!ary || ary.length === 0) {
               const accessRight = Authorized.check(
-                'queue.consultation.widgets.attachment',
+                'queue.consultation.widgets.eyevisualacuity',
               )
               if (rights === 'enable' || accessRight.rights === 'enable') {
                 this.addForm()
@@ -155,7 +163,12 @@ class Form extends React.PureComponent {
               <div>
                 {ary.map((val, i) => {
                   const _prefix = `${prefix}[${i}].`
-
+                  const noSpecsCfg = {
+                    simple: true,
+                    disabled:
+                      Object.byString(form.values, `${_prefix}isNoSpec`) ===
+                      true,
+                  }
                   return (
                     <React.Fragment>
                       <table className={classes.table}>
@@ -177,9 +190,10 @@ class Form extends React.PureComponent {
                                 direction='column'
                                 justify='flex-start'
                                 alignItems='flex-start'
+                                style={{ minWidth: 235 }}
                               >
                                 <FastField
-                                  name={`${_prefix}type`}
+                                  name={`${_prefix}isAided`}
                                   render={(args) => {
                                     return (
                                       <Switch
@@ -193,7 +207,7 @@ class Form extends React.PureComponent {
                                   }}
                                 />
                                 <FastField
-                                  name={`${_prefix}name`}
+                                  name={`${_prefix}isOwnSpecs`}
                                   render={(args) => {
                                     return (
                                       <Checkbox label='Own Specs' {...args} />
@@ -202,25 +216,39 @@ class Form extends React.PureComponent {
                                 />
                                 <div style={{ position: 'relative' }}>
                                   <FastField
-                                    name={`${_prefix}description`}
+                                    name={`${_prefix}isRefractionOn`}
                                     render={(args) => {
                                       return (
                                         <Checkbox
                                           label='Refraction On'
+                                          onChange={(e) => {
+                                            if (e.target.value === false) {
+                                              args.form.setFieldValue(
+                                                `${_prefix}refractionOnRemarks`,
+                                                '',
+                                              )
+                                            }
+                                          }}
                                           {...args}
                                         />
                                       )
                                     }}
                                   />
-                                  <FastField
-                                    name={`${_prefix}description2`}
+                                  <Field
+                                    name={`${_prefix}refractionOnRemarks`}
                                     render={(args) => {
                                       return (
                                         <TextField
+                                          disabled={
+                                            Object.byString(
+                                              args.form.values,
+                                              `${_prefix}isRefractionOn`,
+                                            ) !== true
+                                          }
                                           style={{
                                             position: 'absolute',
                                             bottom: 8,
-                                            left: 150,
+                                            left: 115,
                                           }}
                                           simple
                                           {...args}
@@ -241,6 +269,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='/N'
+                                        suffixProps={{ style: { right: -5 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -255,6 +284,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='@'
+                                        suffixProps={{ style: { right: -5 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -269,6 +299,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='cm'
+                                        suffixProps={{ style: { right: -10 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -288,6 +319,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='/N'
+                                        suffixProps={{ style: { right: -5 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -302,6 +334,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='@'
+                                        suffixProps={{ style: { right: -5 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -316,6 +349,7 @@ class Form extends React.PureComponent {
                                     return (
                                       <TextField
                                         suffix='cm'
+                                        suffixProps={{ style: { right: -10 } }}
                                         {...cfg}
                                         {...args}
                                       />
@@ -341,12 +375,55 @@ class Form extends React.PureComponent {
                                   name={`${_prefix}isNoSpec`}
                                   render={(args) => {
                                     return (
-                                      <Checkbox label='No Specs' {...args} />
+                                      <Checkbox
+                                        label='No Specs'
+                                        onChange={(e) => {
+                                          if (e.target.value === true) {
+                                            args.form.setFieldValue(
+                                              `${_prefix}specsAge`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specSphereOD`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specCylinderOS`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specCylinderOD`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specAxisOD`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specAxisOS`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specVaOS`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specSphereOS`,
+                                              '',
+                                            )
+                                            args.form.setFieldValue(
+                                              `${_prefix}specVaOD`,
+                                              '',
+                                            )
+                                          }
+                                        }}
+                                        {...args}
+                                      />
                                     )
                                   }}
                                 />
                                 <TextField value='Specs Rx' text />
-                                <FastField
+                                <Field
                                   name={`${_prefix}specsAge`}
                                   render={(args) => {
                                     return (
@@ -357,6 +434,7 @@ class Form extends React.PureComponent {
                                         prefix='Specs Age'
                                         suffix='yrs'
                                         simple
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -368,13 +446,14 @@ class Form extends React.PureComponent {
                           <td>
                             <GridContainer gutter={0}>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specSphereOD`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='/'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -382,13 +461,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specCylinderOD`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='X'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -396,13 +476,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specAxisOD`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='('
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -410,13 +491,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specVaOD`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix=')'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -428,13 +510,14 @@ class Form extends React.PureComponent {
                           <td>
                             <GridContainer gutter={0}>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specSphereOS`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='/'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -442,13 +525,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specCylinderOS`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='X'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -456,13 +540,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specAxisOS`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix='('
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -470,13 +555,14 @@ class Form extends React.PureComponent {
                                 />
                               </GridItem>
                               <GridItem xs={3}>
-                                <FastField
+                                <Field
                                   name={`${_prefix}specVaOS`}
                                   render={(args) => {
                                     return (
                                       <TextField
                                         suffix=')'
                                         {...cfg}
+                                        {...noSpecsCfg}
                                         {...args}
                                       />
                                     )
@@ -487,7 +573,10 @@ class Form extends React.PureComponent {
                           </td>
                         </tr>
                       </table>
-                      <GridContainer gutter={0}>
+                      <GridContainer
+                        gutter={0}
+                        style={{ marginTop: theme.spacing(1) }}
+                      >
                         <GridItem xs={12}>
                           <FastField
                             name={`${_prefix}chiefComplain`}

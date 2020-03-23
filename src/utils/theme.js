@@ -591,7 +591,12 @@ export const smallTheme = createMuiTheme({
         //   marginRight: 27,
         // },
         '& .ant-select-selection--multiple > ul > li, .ant-select-selection--multiple .ant-select-selection__rendered > ul > li': {
-          top: -4,
+          // top: -4,
+          height: 18,
+          // margin-top: 3px;
+          lineHeight: '18px',
+          fontSize: 'smaller',
+          padding: '0 18px 0 5px',
         },
       },
       input: {
@@ -625,6 +630,7 @@ export const smallTheme = createMuiTheme({
         transform: 'translate(0, 3px) scale(0.8)',
         fontWeight: 'inherit',
         width: '126%',
+        lineHeight: '20px',
       },
     },
     MuiInputAdornment: {

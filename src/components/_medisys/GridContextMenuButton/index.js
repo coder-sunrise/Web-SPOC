@@ -67,7 +67,7 @@ const GridContextMenuButton = ({
     >
       {contextMenuOptions.map(
         (
-          { disabled, label, Icon, id, isDivider, hidden, authority },
+          { disabled, label, Icon, id, isDivider, hidden, authority, ...rest },
           index,
         ) => {
           if (isDivider) return <Menu.Divider key={`divider-${index}`} />
@@ -86,6 +86,7 @@ const GridContextMenuButton = ({
                 event.preventDefault()
               }}
               disabled={disabled || disabledByAccessRight}
+              style={{ width: rest.width || '100%' }}
             >
               <Icon className={classes.icon} />
               <span>{label}</span>

@@ -24,6 +24,7 @@ import {
   Button,
 } from '@/components'
 import { inventoryAdjustmentStatus } from '@/utils/codes'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) =>
@@ -157,79 +158,81 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Button
-                color='primary'
-                icon={null}
-                onClick={() => {
-                  const { inventoryAdjustment } = this.props
-                  this.props.dispatch({
-                    type: 'inventoryAdjustment/updateState',
-                    payload: {
-                      entity: undefined,
-                      default: {
-                        ...inventoryAdjustment.default,
-                        stockList: undefined,
+              <AuthorizationWrapper authority='inventoryadjustment.newinventoryadjustment'>
+                <Button
+                  color='primary'
+                  icon={null}
+                  onClick={() => {
+                    const { inventoryAdjustment } = this.props
+                    this.props.dispatch({
+                      type: 'inventoryAdjustment/updateState',
+                      payload: {
+                        entity: undefined,
+                        default: {
+                          ...inventoryAdjustment.default,
+                          stockList: undefined,
+                        },
                       },
-                    },
-                  })
-                  this.props.toggleModal()
-                }}
-              >
-                <Add />
-                Add New
-              </Button>
-              <Button
-                color='primary'
-                icon={null}
-                onClick={this.handleToggle}
-                buttonRef={(node) => {
-                  this.anchorElAccount = node
-                }}
-              >
-                Mass Adjustment
-              </Button>
-              <Popper
-                open={open}
-                anchorEl={this.anchorElAccount}
-                transition
-                disablePortal
-                placement='bottom-end'
-                style={{
-                  zIndex: 1,
-                  width: 185,
-                  left: -63,
-                }}
-              >
-                {({ TransitionProps, placement }) => (
-                  <Grow
-                    {...TransitionProps}
-                    id='menu-list'
-                    style={{ transformOrigin: '0 0 -30' }}
-                  >
-                    <Paper className={classes.dropdown}>
-                      <ClickAwayListener onClickAway={this.handleToggle}>
-                        <MenuList role='menu'>
-                          <MenuItem
-                            onClick={() => this.handleMassAdjustment(1)}
-                          >
-                            Medication
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => this.handleMassAdjustment(2)}
-                          >
-                            Consumable
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => this.handleMassAdjustment(3)}
-                          >
-                            Vaccination
-                          </MenuItem>
-                        </MenuList>
-                      </ClickAwayListener>
-                    </Paper>
-                  </Grow>
-                )}
-              </Popper>
+                    })
+                    this.props.toggleModal()
+                  }}
+                >
+                  <Add />
+                  Add New
+                </Button>
+                <Button
+                  color='primary'
+                  icon={null}
+                  onClick={this.handleToggle}
+                  buttonRef={(node) => {
+                    this.anchorElAccount = node
+                  }}
+                >
+                  Mass Adjustment
+                </Button>
+                <Popper
+                  open={open}
+                  anchorEl={this.anchorElAccount}
+                  transition
+                  disablePortal
+                  placement='bottom-end'
+                  style={{
+                    zIndex: 1,
+                    width: 185,
+                    left: -63,
+                  }}
+                >
+                  {({ TransitionProps, placement }) => (
+                    <Grow
+                      {...TransitionProps}
+                      id='menu-list'
+                      style={{ transformOrigin: '0 0 -30' }}
+                    >
+                      <Paper className={classes.dropdown}>
+                        <ClickAwayListener onClickAway={this.handleToggle}>
+                          <MenuList role='menu'>
+                            <MenuItem
+                              onClick={() => this.handleMassAdjustment(1)}
+                            >
+                              Medication
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => this.handleMassAdjustment(2)}
+                            >
+                              Consumable
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => this.handleMassAdjustment(3)}
+                            >
+                              Vaccination
+                            </MenuItem>
+                          </MenuList>
+                        </ClickAwayListener>
+                      </Paper>
+                    </Grow>
+                  )}
+                </Popper>
+              </AuthorizationWrapper>
             </div>
           </GridItem>
         </GridContainer>

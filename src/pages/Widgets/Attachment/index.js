@@ -16,6 +16,7 @@ import EmptyList from './EmptyList'
 import { deleteFileByFileID, downloadAttachment } from '@/services/file'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { corAttchementTypes } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 @connect(({ consultation }) => ({
   consultation,
@@ -25,7 +26,9 @@ class Attachment extends Component {
     runOnce: false,
     showScribbleModal: false,
     activedKeys: undefined,
-    types: corAttchementTypes, // .filter((o) => !o.accessRight),
+    types: corAttchementTypes.filter(
+      (o) => !o.accessRight || Authorized.check(o.accessRight),
+    ),
   }
 
   handleClickAttachment = (attachment) => {

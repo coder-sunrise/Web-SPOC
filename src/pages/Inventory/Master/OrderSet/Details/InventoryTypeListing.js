@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { withStyles } from '@material-ui/core/styles'
 import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
-import { podoOrderType } from '@/utils/codes'
+import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
 
 import InventoryType from './InventoryType'
-import Authorized from '@/utils/Authorized'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 const styles = () => ({
   displayDiv: {
@@ -162,7 +162,7 @@ const InventoryTypeListing = ({
           code: x.ctName,
         },
       }).then((list) => {
-        const { inventoryItemList } = inventoryItemList(list)
+        const { inventoryItemList } = inventoryItemListing(list)
         switch (x.stateName) {
           case 'ConsumableItemList': {
             return setConsumableList(inventoryItemList)
@@ -915,7 +915,7 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <Authorized authority='inventorymaster.orderset.medication'>
+          <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
             <InventoryType
               title='Medication'
               inventoryTypeProps={medicationProps}
@@ -923,9 +923,9 @@ const InventoryTypeListing = ({
               rows={medicationRows}
               editingProps={medicationEditingProps}
             />
-          </Authorized>
+          </AuthorizationWrapper>
 
-          <Authorized authority='inventorymaster.orderset.consumable'>
+          <AuthorizationWrapper authority='inventorymaster.orderset.consumable'>
             <InventoryType
               title='Consumable'
               inventoryTypeProps={consumableProps}
@@ -934,9 +934,9 @@ const InventoryTypeListing = ({
               editingProps={consumableEditingProps}
               style={{ marginTop: 15 }}
             />
-          </Authorized>
+          </AuthorizationWrapper>
 
-          <Authorized authority='inventorymaster.orderset.vaccination'>
+          <AuthorizationWrapper authority='inventorymaster.orderset.vaccination'>
             <InventoryType
               title='Vaccination'
               inventoryTypeProps={vaccinationProps}
@@ -945,9 +945,9 @@ const InventoryTypeListing = ({
               editingProps={vaccinationEditingProps}
               style={{ marginTop: 15 }}
             />
-          </Authorized>
+          </AuthorizationWrapper>
 
-          <Authorized authority='inventorymaster.orderset.service'>
+          <AuthorizationWrapper authority='inventorymaster.orderset.service'>
             <InventoryType
               title='Service'
               inventoryTypeProps={serviceProps}
@@ -956,7 +956,7 @@ const InventoryTypeListing = ({
               editingProps={serviceEditingProps}
               style={{ marginTop: 15 }}
             />
-          </Authorized>
+          </AuthorizationWrapper>
         </GridContainer>
       </CardContainer>
     </div>
