@@ -74,7 +74,7 @@ class Layout extends PureComponent {
 
     const { defaultConsultationTemplate = '[]' } = clinicInfo
     // console.log(defaultConsultationTemplate)
-    if (defaultConsultationTemplate === '[]') {
+    if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
       notification.warn({
         message: 'Clinic do not have default template configuration',
       })
