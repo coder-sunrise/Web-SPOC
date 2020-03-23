@@ -5,37 +5,38 @@ import Edit from '@material-ui/icons/Edit'
 import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-const Grid = ({
-  dispatch,
-  namespace,
-  history,
-  tableParas,
-  colExtensions,
-  columnWidths,
-  list,
-}) => {
-  const viewEditDetailAuthority = 'inventorymaster.inventoryitemdetails'
+const { Secured } = Authorized
+@Secured('inventorymaster.inventoryitemdetails')
+class Grid extends React.Component {
+  render () {
+    const {
+      dispatch,
+      namespace,
+      history,
+      tableParas,
+      colExtensions,
+      columnWidths,
+      list,
+      disabled,
+    } = this.props
+    const showDetail = (row, vmode) => () =>
+      history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
 
-  const showDetail = (row, vmode) => () =>
-    history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
+    const handleDoubleClick = (row) => {
+      if (disabled) {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
 
-  const handleDoubleClick = (row) => {
-    const accessRight = Authorized.check(viewEditDetailAuthority)
-    if (!accessRight || (accessRight && accessRight.rights !== 'enable')) {
-      notification.error({
-        message: 'Current user is not authorized to access',
-      })
-      return
+      history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
     }
 
-    history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
-  }
-
-  const Cell = ({ column, row, classes, ...p }) => {
-    if (column.name === 'action') {
-      return (
-        <Table.Cell {...p}>
-          <Authorized authority={viewEditDetailAuthority}>
+    const Cell = ({ column, row, classes, ...p }) => {
+      if (column.name === 'action') {
+        return (
+          <Table.Cell {...p}>
             <Tooltip
               title={`Edit ${namespace.charAt(0).toUpperCase() +
                 namespace.slice(1)}`}
@@ -51,18 +52,16 @@ const Grid = ({
                 <Edit />
               </Button>
             </Tooltip>
-          </Authorized>
-        </Table.Cell>
-      )
+          </Table.Cell>
+        )
+      }
+      return <Table.Cell {...p} />
     }
-    return <Table.Cell {...p} />
-  }
-  const TableCell = (p) => Cell({ ...p, dispatch })
+    const TableCell = (p) => Cell({ ...p, dispatch })
 
-  const ActionProps = { TableCellComponent: TableCell }
+    const ActionProps = { TableCellComponent: TableCell }
 
-  return (
-    <React.Fragment>
+    return (
       <CommonTableGrid
         type={`${namespace}`}
         rows={list}
@@ -73,7 +72,8 @@ const Grid = ({
         FuncProps={{ pager: true }}
         {...tableParas}
       />
-    </React.Fragment>
-  )
+    )
+  }
 }
+
 export default Grid

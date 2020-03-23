@@ -172,37 +172,39 @@ class Statement extends PureComponent {
                 return (
                   <React.Fragment>
                     <Authorized authority='statement.statementdetails'>
-                      <Tooltip title='Edit Statement'>
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            editRow(row)
-                          }}
-                          justIcon
-                          color='primary'
-                        >
-                          <Edit />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title='Delete Statement'>
-                        <Button
-                          size='sm'
-                          onClick={() => {
-                            this.cancelStatement(row)
-                          }}
-                          justIcon
-                          color='danger'
-                        >
-                          <Delete />
-                        </Button>
-                      </Tooltip>
-                      <PrintStatementReport id={row ? row.id : null}>
-                        <Tooltip title='Print Statement'>
-                          <Button size='sm' justIcon color='primary'>
-                            <Print />
+                      <React.Fragment>
+                        <Tooltip title='Edit Statement'>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              editRow(row)
+                            }}
+                            justIcon
+                            color='primary'
+                          >
+                            <Edit />
                           </Button>
                         </Tooltip>
-                      </PrintStatementReport>
+                        <Tooltip title='Delete Statement'>
+                          <Button
+                            size='sm'
+                            onClick={() => {
+                              this.cancelStatement(row)
+                            }}
+                            justIcon
+                            color='danger'
+                          >
+                            <Delete />
+                          </Button>
+                        </Tooltip>
+                        <PrintStatementReport id={row ? row.id : null}>
+                          <Tooltip title='Print Statement'>
+                            <Button size='sm' justIcon color='primary'>
+                              <Print />
+                            </Button>
+                          </Tooltip>
+                        </PrintStatementReport>
+                      </React.Fragment>
                     </Authorized>
                   </React.Fragment>
                 )
