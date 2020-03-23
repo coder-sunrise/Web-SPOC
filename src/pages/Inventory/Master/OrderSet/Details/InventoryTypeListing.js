@@ -609,7 +609,12 @@ const InventoryTypeListing = ({
         }))
       }
     }
-    return addedRows
+    return addedRows.map((row) => {
+      return {
+        ...row,
+        subTotal: 0,
+      }
+    })
   }
 
   const handleItemOnChange = (e) => {
@@ -618,7 +623,7 @@ const InventoryTypeListing = ({
     setSelectedItem(option)
     row.quantity = undefined
     row.unitPrice = sellingPrice
-    row.subTotal = undefined
+    row.subTotal = 0
 
     // dispatch({
     //   // force current edit row components to update
@@ -916,7 +921,7 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
+          <Authorized authority='inventorymaster.orderset.medication'>
             <InventoryType
               title='Medication'
               inventoryTypeProps={medicationProps}
@@ -924,9 +929,9 @@ const InventoryTypeListing = ({
               rows={medicationRows}
               editingProps={medicationEditingProps}
             />
-          </AuthorizationWrapper>
+          </Authorized>
 
-          <AuthorizationWrapper authority='inventorymaster.orderset.consumable'>
+          <Authorized authority='inventorymaster.orderset.consumable'>
             <InventoryType
               title='Consumable'
               inventoryTypeProps={consumableProps}
@@ -935,9 +940,9 @@ const InventoryTypeListing = ({
               editingProps={consumableEditingProps}
               style={{ marginTop: 15 }}
             />
-          </AuthorizationWrapper>
+          </Authorized>
 
-          <AuthorizationWrapper authority='inventorymaster.orderset.vaccination'>
+          <Authorized authority='inventorymaster.orderset.vaccination'>
             <InventoryType
               title='Vaccination'
               inventoryTypeProps={vaccinationProps}
@@ -946,7 +951,7 @@ const InventoryTypeListing = ({
               editingProps={vaccinationEditingProps}
               style={{ marginTop: 15 }}
             />
-          </AuthorizationWrapper>
+          </Authorized>
           <Authorized authority='inventorymaster.orderset.service'>
             <InventoryType
               title='Service'
