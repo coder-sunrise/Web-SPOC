@@ -21,7 +21,6 @@ const InventoryType = ({
       rows,
     ],
   )
-  console.log(inventoryTypeProps)
   return (
     <GridItem xs={12} style={{ position: 'relative' }}>
       <h4 style={style}>

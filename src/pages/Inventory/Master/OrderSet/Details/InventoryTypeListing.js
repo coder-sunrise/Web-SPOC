@@ -4,6 +4,7 @@ import Yup from '@/utils/yup'
 import { CardContainer, GridContainer, GridItem } from '@/components'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
 import { getServices } from '@/utils/codetable'
+import Authorized from '@/utils/Authorized'
 
 import InventoryType from './InventoryType'
 import { AuthorizationWrapper } from '@/components/_medisys'
@@ -915,7 +916,7 @@ const InventoryTypeListing = ({
             padding: 10,
           }}
         >
-          {/* <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
+          <AuthorizationWrapper authority='inventorymaster.orderset.medication'>
             <InventoryType
               title='Medication'
               inventoryTypeProps={medicationProps}
@@ -945,9 +946,8 @@ const InventoryTypeListing = ({
               editingProps={vaccinationEditingProps}
               style={{ marginTop: 15 }}
             />
-          </AuthorizationWrapper> */}
-
-          <AuthorizationWrapper authority='inventorymaster.orderset.service'>
+          </AuthorizationWrapper>
+          <Authorized authority='inventorymaster.orderset.service'>
             <InventoryType
               title='Service'
               inventoryTypeProps={serviceProps}
@@ -956,7 +956,7 @@ const InventoryTypeListing = ({
               editingProps={serviceEditingProps}
               style={{ marginTop: 15 }}
             />
-          </AuthorizationWrapper>
+          </Authorized>
         </GridContainer>
       </CardContainer>
     </div>

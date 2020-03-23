@@ -69,7 +69,7 @@ class NumberEditor extends PureComponent {
     if (commonCfg.text) {
       // console.log(commonCfg)
       // if(Object.keys(row).length>1)
-      commonCfg.rightAlign = true
+      // commonCfg.rightAlign = true
       commonCfg.style = {
         display: 'inline-block',
       }

@@ -601,9 +601,9 @@ class EditableTableGrid extends PureComponent {
       extraGetter: [
         // <EditPlugin />,
         <Getter
-          key={`Getter-${uniqueGid}`}
+          // key={`Getter-${uniqueGid}`}
           name='tableColumns'
-          computed={({ tableColumns, ...resetProps }) => {
+          computed={({ tableColumns }) => {
             // console.log(tableColumns, TableEditColumn, resetProps)
             // const col = tableColumns.find(
             //   (c) => c.type === TableEditColumn.COLUMN_TYPE,
@@ -616,7 +616,7 @@ class EditableTableGrid extends PureComponent {
                 (c) => c.type !== TableEditColumn.COLUMN_TYPE,
               ),
               {
-                key: 'Symbol(editCommand)',
+                key: 'editCommand',
                 type: TableEditColumn.COLUMN_TYPE,
                 fixed: 'right',
                 width: 75,
@@ -640,7 +640,6 @@ class EditableTableGrid extends PureComponent {
     const element = (
       <Authorized.Context.Consumer>
         {(matches) => {
-          console.log(matches)
           const sharedCfg = {
             editableGrid: true,
             gridId: this.gridId,
@@ -724,7 +723,7 @@ class EditableTableGrid extends PureComponent {
             <CommonTableGrid
               authorize={matches}
               {...sharedCfg}
-              // {...editableCfg}
+              {...editableCfg}
             />,
             <CommonTableGrid authorize={matches} {...sharedCfg} />,
           )
