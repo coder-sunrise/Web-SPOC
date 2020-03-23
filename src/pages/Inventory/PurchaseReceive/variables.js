@@ -3,6 +3,7 @@ import moment from 'moment'
 import Edit from '@material-ui/icons/Edit'
 import Duplicate from '@material-ui/icons/FileCopy'
 import Print from '@material-ui/icons/Print'
+import Authorized from '@/utils/Authorized'
 
 export const poSubmitAction = {
   SAVE: 1,
@@ -351,3 +352,17 @@ export const fakePodoPaymentData = [
     remarks: 'Paid',
   },
 ]
+
+export const getAccessRight = (
+  authorityUrl = 'purchasingandreceiving.purchasingandreceivingdetails',
+) => {
+  const accessRight = Authorized.check(authorityUrl)
+
+  let allowAccess = false
+
+  if (!accessRight || accessRight.rights === 'hidden') return null
+  if (accessRight.rights === 'readwrite' || accessRight.rights === 'enable')
+    allowAccess = true
+
+  return allowAccess
+}
