@@ -5,6 +5,7 @@ export default {
   'visit.visitRemarks': 'visitRemarks',
   'visit.roomFK': 'roomFK',
   'visit.visitOrderTemplateFK': 'visitOrderTemplateFK',
+  'visit.VisitOrderTemplateTotal': 'visitOrderTemplateTotal',
 
   'vitalsign.temperatureC': 'temperatureC',
   'vitalsign.bpSysMMHG': 'bpSysMMHG',
