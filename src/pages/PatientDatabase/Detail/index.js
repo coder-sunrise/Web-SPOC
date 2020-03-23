@@ -262,19 +262,6 @@ class PatientDetail extends PureComponent {
       },
       {
         id: '5',
-        name: 'Appointment History',
-        access: 'patientdatabase.patientprofiledetails',
-        component: Loadable({
-          loader: () => import('./AppointmentHistory'),
-          render: (loaded, p) => {
-            let Cmpnet = loaded.default
-            return <Cmpnet {...p} />
-          },
-          loading: Loading,
-        }),
-      },
-      {
-        id: '6',
         name: 'Patient History',
         access: 'patientdatabase.patientprofiledetails',
         component: Loadable({
@@ -287,7 +274,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '7',
+        id: '6',
         name: 'Patient Document',
         access: 'patientdatabase.patientprofiledetails',
         component: Loadable({
@@ -300,7 +287,7 @@ class PatientDetail extends PureComponent {
         }),
       },
       {
-        id: '8',
+        id: '7',
         name: 'Admission',
         access: 'demorights', // 'wardmanagement',
         component: Loadable({
@@ -315,17 +302,6 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  // componentDidMount () {
-  //   console.log('PatientDetail componentDidMount')
-  // }
-
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     if (this.props.patient.entity) {
-  //       this.props.resetForm(this.props.patient.entity)
-  //     }
-  //   }, 2000)
-  // }
 
   componentWillUnmount () {
     const { dispatch } = this.props

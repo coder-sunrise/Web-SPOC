@@ -1,8 +1,10 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, useEffect } from 'react'
 
 import { withStyles } from '@material-ui/core'
 
-import PatientHistory from '@/pages/Widgets/PatientHistory'
+
+import { Tabs } from '@/components'
+import { PatientHistoryTabOption } from '@/pages/PatientDatabase/Detail/PatientHistory/variables'
 
 const styles = () => ({
   container: {
@@ -14,6 +16,15 @@ const styles = () => ({
 })
 
 class History extends PureComponent {
+
+  constructor () {
+    super()
+    this.state ={
+      activeTab:'1',
+      mounted:'1',
+    }
+  }
+
   componentDidMount () {
     this.resize()
     window.addEventListener('resize', this.resize.bind(this))
@@ -32,10 +43,16 @@ class History extends PureComponent {
     }
   }
 
+  setActiveTab =(e)=>{
+    this.setState({ activeTab: e })
+  }
+
   render () {
-    // console.log({ props: this.props })
-    // return <PatientHistory {...this.props} showEditPatient />
-    return <PatientHistory mode='integrated' />
+    return (<Tabs
+      activeKey={this.state.activeTab}
+      onChange={(e) => this.setActiveTab(e)}
+      options={PatientHistoryTabOption(this.props)}
+    />)
   }
 }
 
