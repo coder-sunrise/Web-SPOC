@@ -373,7 +373,7 @@ export const getAccessRight = (
 
   let allowAccess = false
 
-  if (!accessRight || accessRight.rights === 'hidden') return null
+  if (!accessRight || accessRight.rights === 'hidden') return allowAccess
   if (accessRight.rights === 'readwrite' || accessRight.rights === 'enable')
     allowAccess = true
 

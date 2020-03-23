@@ -178,9 +178,13 @@ class Index extends Component {
                 message,
               })
             }
-            const { id } = r
 
-            this.getPOdata(id)
+            if (getAccessRight()) {
+              const { id } = r
+              this.getPOdata(id)
+            } else {
+              router.push('/inventory/pr')
+            }
           }
         })
         validation = true
@@ -498,6 +502,20 @@ class Index extends Component {
     return true
   }
 
+  getRights = (type, poStatus, isWriteOff) => {
+    const authorityUrl =
+      type === 'new'
+        ? 'purchasingandreceiving.newpurchasingandreceiving'
+        : 'purchasingandreceiving.purchasingandreceivingdetails'
+
+    if (
+      !getAccessRight(authorityUrl) ||
+      (getAccessRight(authorityUrl) && !this.isEditable(poStatus, isWriteOff))
+    )
+      return 'disable'
+    return 'enable'
+  }
+
   render () {
     const {
       purchaseOrderDetails,
@@ -524,26 +542,17 @@ class Index extends Component {
     const isCompletedOrCancelled = poStatus === 4 || poStatus === 6
     const currentGstValue = isGSTEnabled ? gstValue : undefined
 
-    const authorityUrl =
-      type === 'new'
-        ? 'purchasingandreceiving.newpurchasingandreceiving'
-        : 'purchasingandreceiving.purchasingandreceivingdetails'
     return (
       <AuthorizedContext.Provider
         value={{
-          rights:
-            this.isEditable(poStatus, isWriteOff) ||
-            getAccessRight(authorityUrl)
-              ? 'enable'
-              : 'disable',
+          rights: this.getRights(type, poStatus, isWriteOff),
         }}
       >
         <POForm
-          isReadOnly={!this.isEditable(poStatus, isWriteOff)}
+          isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
           isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
           setFieldValue={setFieldValue}
           isCompletedOrCancelled={isCompletedOrCancelled}
-          type={type}
           {...this.props}
         />
         {/* <AuthorizedContext.Provider
