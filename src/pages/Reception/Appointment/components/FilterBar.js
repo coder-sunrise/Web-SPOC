@@ -30,15 +30,16 @@ const styles = () => ({
   },
 })
 
-const FilterBar = ({
-  loading,
-  classes,
-  onDoctorEventClick,
-  onAddAppointmentClick,
-  handleUpdateFilter,
-  toggleSearchAppointmentModal,
-  values,
-}) => {
+const FilterBar = (props) => {
+  const {
+    loading,
+    classes,
+    onDoctorEventClick,
+    onAddAppointmentClick,
+    handleUpdateFilter,
+    toggleSearchAppointmentModal,
+    values,
+  } = props
   const onFilterClick = () => handleUpdateFilter(values)
 
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
@@ -46,7 +47,7 @@ const FilterBar = ({
   const { filterByDoctor = [], filterByApptType = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
   const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
-
+  const moduleAccess = Authorized.check('reception/appointment')
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -69,21 +70,10 @@ const FilterBar = ({
             render={(args) => (
               <CodeSelect
                 {...args}
-                // allLabel='All Doctors'
                 disableAll
-                // allValue={-99}
-                // allValueOption={{
-                //   clinicianProfile: {
-                //     name: 'All',
-                //     id: -99,
-                //   },
-                // }}
                 allowClear={false}
                 label='Filter by Doctor'
                 mode='multiple'
-                // code='clinicianprofile'
-                // labelField='name'
-                // valueField='id'
                 remoteFilter={{
                   'clinicianProfile.isActive': true,
                 }}
@@ -151,27 +141,31 @@ const FilterBar = ({
         </GridItem>
 
         <GridItem xs md={12}>
-          <Authorized authority='appointment.newappointment'>
-            <Button
-              color='primary'
-              size='sm'
-              onClick={onAddAppointmentClick}
-              disabled={loading}
-            >
-              <AddIcon />
-              Add Appointment
-            </Button>
-          </Authorized>
+          <Authorized.Context.Provider value={moduleAccess}>
+            <div>
+              <Authorized authority='appointment.newappointment'>
+                <Button
+                  color='primary'
+                  size='sm'
+                  onClick={onAddAppointmentClick}
+                  disabled={loading}
+                >
+                  <AddIcon />
+                  Add Appointment
+                </Button>
+              </Authorized>
 
-          <Button
-            color='primary'
-            size='sm'
-            onClick={onDoctorEventClick}
-            disabled={loading}
-          >
-            <AddIcon />
-            Add Doctor Block
-          </Button>
+              <Button
+                color='primary'
+                size='sm'
+                onClick={onDoctorEventClick}
+                disabled={loading}
+              >
+                <AddIcon />
+                Add Doctor Block
+              </Button>
+            </div>
+          </Authorized.Context.Provider>
         </GridItem>
       </GridContainer>
     </React.Fragment>
