@@ -19,9 +19,7 @@ const checkSinglePermission = (
   Exception,
 ) => {
   let match = null
-  if (authority === 'queue.registervisit') {
-    console.log(authority)
-  }
+
   const r = currentAuthority.filter((o) => o.name === authority)
   if (r.length > 0) {
     match = r.find(
