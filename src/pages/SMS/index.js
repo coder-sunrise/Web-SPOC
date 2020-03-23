@@ -79,7 +79,7 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     [classes.blur]: showWarning,
   })
 
-  const accessRight = Authorized.check('communication/sms')
+  const accessRight = Authorized.check('communication')
 
   const defaultSearchQuery = (type) => {
     if (type === 'Appointment') {
