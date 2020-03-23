@@ -39,16 +39,10 @@ const Grid = ({ history, disabled }) => {
     },
     {
       columnName: 'coPayerType',
-      // type: 'codeSelect',
-      // code: 'ctCopayerType',
-      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.copayerTypeFK',
     },
     {
       columnName: 'coPayerName',
-      // type: 'codeSelect',
-      // code: 'ctCopayer',
-      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.displayValue',
     },
     {
@@ -61,18 +55,6 @@ const Grid = ({ history, disabled }) => {
       columnName: 'action',
       align: 'center',
       render: (row) => (
-        /* <Tooltip title='Detail' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={showDetail(row)}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Search />
-            </Button>
-          </Tooltip> */
         <Tooltip title='Edit' placement='bottom'>
           <Button
             size='sm'
@@ -86,26 +68,6 @@ const Grid = ({ history, disabled }) => {
         </Tooltip>
       ),
     },
-    // {
-    //   columnName: 'isActive',
-    //   sortingEnabled: false,
-    //   type: 'select',
-    //   options: status,
-    // },
-    // {
-    //   columnName: 'supplier',
-    //   type: 'select',
-    //   options: suppliers,
-    //   label: 'Supplier',
-    // },
-    // {
-    //   columnName: 'dispUOM',
-    //   align: 'select',
-    //   options: dispUOMs,
-    //   label: 'DispUOM',
-    // },
-    // { columnName: 'payments', type: 'number', currency: true },
-    // { columnName: 'expenseAmount', type: 'number', currency: true },
   ]
 
   return (
