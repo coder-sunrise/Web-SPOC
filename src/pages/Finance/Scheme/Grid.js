@@ -3,7 +3,7 @@ import Edit from '@material-ui/icons/Edit'
 
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
-import { Button, CommonTableGrid, Tooltip } from '@/components'
+import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 
 const Grid = ({ history }) => {
   const [
@@ -22,6 +22,13 @@ const Grid = ({ history }) => {
     leftColumns: [],
   })
   const editRow = (row, e) => {
+    const accessRight = Authorized.check('scheme.schemedetails')
+    if (!accessRight || accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
     history.push(`/finance/scheme/details?id=${row.id}`)
   }
 
