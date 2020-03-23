@@ -45,6 +45,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
           inventoryItemTypeFK: type.id,
           inventoryItemCode: row.code,
           inventoryItemName: row.name,
+          total: row.quantity * row.unitPrice,
           [type.dtoName]: {
             ...row[type.dtoName],
             [type.itemFKName]: row.itemFK,
@@ -63,6 +64,7 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
       visitOrderTemplateItemDtos: itemTypesArray,
       effectiveStartDate: effectiveDates[0],
       effectiveEndDate: effectiveDates[1],
+      total: _.sumBy(itemTypesArray, 'total'),
     }
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',

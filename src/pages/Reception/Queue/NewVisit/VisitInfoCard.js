@@ -23,6 +23,7 @@ import {
 } from '@/components/_medisys'
 import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
+import { visitOrderTemplateItemTypes } from '@/utils/codes'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -138,14 +139,53 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
+            render={(args) => {
+              const { form } = args
+
+              return (
+                <Select
+                  // disabled={isReadOnly}
+                  options={visitOrderTemplateOptions}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.visitOrderTemplate',
+                  })}
+                  {...args}
+                  onChange={(e, opts) => {
+                    if (opts) {
+                      let activeItemTotal = 0
+                      visitOrderTemplateItemTypes.forEach((type) => {
+                        const currentTypeItems = opts.visitOrderTemplateItemDtos.filter(
+                          (itemType) =>
+                            itemType.inventoryItemTypeFK === type.id,
+                        )
+                        currentTypeItems.map((item) => {
+                          if (item[type.dtoName].isActive === true) {
+                            activeItemTotal += item.total || 0
+                          }
+                        })
+                      })
+
+                      form.setFieldValue(
+                        FormField['visit.VisitOrderTemplateTotal'],
+                        activeItemTotal,
+                      )
+                    }
+                  }}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.VisitOrderTemplateTotal']}
             render={(args) => (
-              <Select
-                // disabled={isReadOnly}
-                options={visitOrderTemplateOptions}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitOrderTemplate',
-                })}
+              <NumberInput
                 {...args}
+                currency
+                label={formatMessage({
+                  id: 'reception.queue.visitRegistration.visitOrderTotalCharge',
+                })}
               />
             )}
           />
