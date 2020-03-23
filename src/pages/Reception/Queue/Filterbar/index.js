@@ -34,6 +34,7 @@ const shouldShowSelfOnlyCheckbox = [
 
 const Filterbar = (props) => {
   const {
+    accessRight,
     classes,
     dispatch,
     toggleNewPatient,
@@ -73,36 +74,38 @@ const Filterbar = (props) => {
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={4}>
-        <Authorized authority='queue.registervisit'>
-          <ProgressButton
-            variant='contained'
-            color='primary'
-            icon={
+        <Authorized.Context.Provider value={accessRight}>
+          <Authorized authority='queue.registervisit'>
+            <ProgressButton
+              variant='contained'
+              color='primary'
+              icon={
+                <Hidden mdDown>
+                  <Search />
+                </Hidden>
+              }
+              onClick={handleSubmit}
+              size='sm'
+              submitKey='patientSearch/query'
+            >
+              Create Visit
+            </ProgressButton>
+          </Authorized>
+          <Authorized authority='patientdatabase.newpatient'>
+            <Button
+              icon={null}
+              color='primary'
+              size='sm'
+              onClick={toggleNewPatient}
+              disabled={loading.global}
+            >
               <Hidden mdDown>
-                <Search />
+                <PersonAdd />
               </Hidden>
-            }
-            onClick={handleSubmit}
-            size='sm'
-            submitKey='patientSearch/query'
-          >
-            Create Visit
-          </ProgressButton>
-        </Authorized>
-        <Authorized authority='patientdatabase.newpatient'>
-          <Button
-            icon={null}
-            color='primary'
-            size='sm'
-            onClick={toggleNewPatient}
-            disabled={loading.global}
-          >
-            <Hidden mdDown>
-              <PersonAdd />
-            </Hidden>
-            <FormattedMessage id='reception.queue.createPatient' />
-          </Button>
-        </Authorized>
+              <FormattedMessage id='reception.queue.createPatient' />
+            </Button>
+          </Authorized>
+        </Authorized.Context.Provider>
         {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox
@@ -124,16 +127,7 @@ const Filterbar = (props) => {
         alignItems='center'
         style={{ paddingRight: 0 }}
       >
-        <Authorized.Context.Consumer>
-          {(matches) => {
-            const isReadOnly = matches.rights === 'readonly'
-            return Authorized.generalCheck(
-              matches,
-              props,
-              <StatusFilterButton isReadOnly />,
-            )
-          }}
-        </Authorized.Context.Consumer>
+        <StatusFilterButton />
       </GridItem>
     </GridContainer>
   )

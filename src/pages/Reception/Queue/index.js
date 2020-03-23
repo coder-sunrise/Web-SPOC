@@ -410,25 +410,24 @@ class Queue extends React.Component {
         title={<FormattedMessage id='app.forms.basic.title' />}
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
-        <Authorized.Context.Provider value={accessRight}>
-          <Card>
-            <CardHeader icon>
-              <h3 className={classNames(classes.sessionNo)}>
-                {`Session No.: ${sessionNo}`}
-              </h3>
+        <Card>
+          <CardHeader icon>
+            <h3 className={classNames(classes.sessionNo)}>
+              {`Session No.: ${sessionNo}`}
+            </h3>
 
-              {!isClinicSessionClosed && (
-                <div className={classNames(classes.toolBtns)}>
-                  <ProgressButton
-                    color='info'
-                    size='sm'
-                    onClick={this.onRefreshClick}
-                    submitKey={`${modelKey}refresh`}
-                    icon={<Refresh />}
-                  >
-                    Refresh
-                  </ProgressButton>
-
+            {!isClinicSessionClosed && (
+              <div className={classNames(classes.toolBtns)}>
+                <ProgressButton
+                  color='info'
+                  size='sm'
+                  onClick={this.onRefreshClick}
+                  submitKey={`${modelKey}refresh`}
+                  icon={<Refresh />}
+                >
+                  Refresh
+                </ProgressButton>
+                <Authorized.Context.Provider value={accessRight}>
                   <Authorized authority='queue.endsession'>
                     <ProgressButton
                       icon={<Stop />}
@@ -439,28 +438,31 @@ class Queue extends React.Component {
                       <FormattedMessage id='reception.queue.endSession' />
                     </ProgressButton>
                   </Authorized>
-                </div>
-              )}
-            </CardHeader>
+                </Authorized.Context.Provider>
+              </div>
+            )}
+          </CardHeader>
 
-            <Divider />
-            <CardBody>
-              {isClinicSessionClosed ? (
-                <EmptySession
-                  handleStartSession={this.onStartSession}
-                  sessionInfo={sessionInfo}
-                  loading={loading}
-                  errorState={error}
+          <Divider />
+          <CardBody>
+            {isClinicSessionClosed ? (
+              <EmptySession
+                handleStartSession={this.onStartSession}
+                sessionInfo={sessionInfo}
+                loading={loading}
+                errorState={error}
+              />
+            ) : (
+              <div>
+                <DetailsActionBar
+                  // selfOnly={queueLog.selfOnly}
+                  // onSwitchClick={this.toggleFilterSelfOnly}
+                  accessRight={accessRight}
+                  onRegisterVisitEnterPressed={this.onEnterPressed}
+                  toggleNewPatient={this.toggleRegisterNewPatient}
+                  setSearch={this.setSearch}
                 />
-              ) : (
-                <div>
-                  <DetailsActionBar
-                    // selfOnly={queueLog.selfOnly}
-                    // onSwitchClick={this.toggleFilterSelfOnly}
-                    onRegisterVisitEnterPressed={this.onEnterPressed}
-                    toggleNewPatient={this.toggleRegisterNewPatient}
-                    setSearch={this.setSearch}
-                  />
+                <Authorized.Context.Provider value={accessRight}>
                   <DetailsGrid
                     onViewPatientProfileClick={this.onViewPatientProfileClick}
                     onViewDispenseClick={this.toggleDispense}
@@ -470,34 +472,34 @@ class Queue extends React.Component {
                     history={history}
                     searchQuery={search}
                   />
-                </div>
-              )}
-              <CommonModal
-                open={showPatientSearch}
-                title={formatMessage({ id: 'reception.queue.patientSearch' })}
-                onClose={this.togglePatientSearch}
-                onConfirm={this.togglePatientSearch}
-                maxWidth='md'
-                overrideLoading
-              >
-                <PatientSearchModal
-                  search={this.state.search}
-                  handleRegisterVisitClick={this.showVisitRegistration}
-                  onViewPatientProfileClick={this.onViewPatientProfileClick}
-                />
-              </CommonModal>
-              <CommonModal
-                open={showEndSessionSummary}
-                title='Session Summary'
-                onClose={this.onEndSessionSummaryClose}
-                onConfirm={this.onEndSessionSummaryClose}
-                disableBackdropClick
-              >
-                <EndSessionSummary sessionID={_sessionInfoID} />
-              </CommonModal>
-            </CardBody>
-          </Card>
-        </Authorized.Context.Provider>
+                </Authorized.Context.Provider>
+              </div>
+            )}
+            <CommonModal
+              open={showPatientSearch}
+              title={formatMessage({ id: 'reception.queue.patientSearch' })}
+              onClose={this.togglePatientSearch}
+              onConfirm={this.togglePatientSearch}
+              maxWidth='md'
+              overrideLoading
+            >
+              <PatientSearchModal
+                search={this.state.search}
+                handleRegisterVisitClick={this.showVisitRegistration}
+                onViewPatientProfileClick={this.onViewPatientProfileClick}
+              />
+            </CommonModal>
+            <CommonModal
+              open={showEndSessionSummary}
+              title='Session Summary'
+              onClose={this.onEndSessionSummaryClose}
+              onConfirm={this.onEndSessionSummaryClose}
+              disableBackdropClick
+            >
+              <EndSessionSummary sessionID={_sessionInfoID} />
+            </CommonModal>
+          </CardBody>
+        </Card>
       </PageHeaderWrapper>
     )
   }
