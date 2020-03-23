@@ -24,6 +24,7 @@ import {
   isPOStatusFulfilled,
   isPOStatusFinalizedFulFilledPartialReceived,
   enableSaveButton,
+  getAccessRight,
 } from '../../variables'
 import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
@@ -519,95 +520,103 @@ class Index extends Component {
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
       : false
-    const isEditable = (poItem) => {
-      if ((poItem && poStatus !== 1) || poStatus > 1) return false
-      if (isWriteOff) return false
-      return true
-    }
+
     const isCompletedOrCancelled = poStatus === 4 || poStatus === 6
     const currentGstValue = isGSTEnabled ? gstValue : undefined
+
+    const authorityUrl =
+      type === 'new'
+        ? 'purchasingandreceiving.newpurchasingandreceiving'
+        : 'purchasingandreceiving.purchasingandreceivingdetails'
     return (
-      <React.Fragment>
+      <AuthorizedContext.Provider
+        value={{
+          rights:
+            this.isEditable(poStatus, isWriteOff) ||
+            getAccessRight(authorityUrl)
+              ? 'enable'
+              : 'disable',
+        }}
+      >
         <POForm
           isReadOnly={!this.isEditable(poStatus, isWriteOff)}
           isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
           setFieldValue={setFieldValue}
           isCompletedOrCancelled={isCompletedOrCancelled}
+          type={type}
           {...this.props}
         />
+        {/* <AuthorizedContext.Provider
+          value={{
+            rights: this.isEditable(poStatus, isWriteOff)
+              ? 'enable'
+              : 'disable',
+          }}
+        > */}
+        {errors.rows && <p className={classes.errorMsgStyle}>{errors.rows}</p>}
+        <POGrid
+          calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
+          isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
+          {...this.props}
+        />
+        {/* </AuthorizedContext.Provider>
         <AuthorizedContext.Provider
           value={{
             rights: this.isEditable(poStatus, isWriteOff)
               ? 'enable'
               : 'disable',
           }}
-        >
-          {errors.rows && (
-            <p className={classes.errorMsgStyle}>{errors.rows}</p>
-          )}
-          <POGrid
-            calcPurchaseOrderSummary={this.calcPurchaseOrderSummary}
-            isEditable={this.isEditable(poStatus, isWriteOff, 'poItem')}
-            {...this.props}
-          />
-        </AuthorizedContext.Provider>
-        <AuthorizedContext.Provider
-          value={{
-            rights: this.isEditable(poStatus, isWriteOff)
-              ? 'enable'
-              : 'disable',
-          }}
-        >
-          <GridContainer>
-            <GridItem xs={2} md={9} />
-            <GridItem xs={10} md={3}>
-              <AmountSummary
-                rows={rows}
-                adjustments={purchaseOrderAdjustment}
-                config={{
-                  isGSTInclusive: isGstInclusive,
-                  itemFkField: 'purchaseOrderItemFK',
-                  itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
-                  invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
-                  totalField: 'totalPrice',
-                  adjustedField: 'totalAfterAdjustments',
-                  gstField: 'totalAfterGst',
-                  gstAmtField: 'itemLevelGST',
-                  gstValue: currentGstValue,
-                }}
-                onValueChanged={(v) => {
-                  setFieldValue('purchaseOrder.totalAmount', v.summary.total)
-                  setFieldValue(
-                    'purchaseOrder.totalAfterAdj',
-                    v.summary.totalAfterAdj,
-                  )
-                  setFieldValue(
-                    'purchaseOrder.totalAftGst',
-                    v.summary.totalWithGST,
-                  )
-                  setFieldValue(
-                    'purchaseOrder.gstAmount',
-                    Math.round(v.summary.gst * 100) / 100,
-                  )
+        > */}
+        <GridContainer>
+          <GridItem xs={2} md={9} />
+          <GridItem xs={10} md={3}>
+            <AmountSummary
+              rows={rows}
+              adjustments={purchaseOrderAdjustment}
+              config={{
+                isGSTInclusive: isGstInclusive,
+                itemFkField: 'purchaseOrderItemFK',
+                itemAdjustmentFkField: 'purchaseOrderAdjustmentFK',
+                invoiceItemAdjustmentField: 'purchaseOrderItemAdjustment',
+                totalField: 'totalPrice',
+                adjustedField: 'totalAfterAdjustments',
+                gstField: 'totalAfterGst',
+                gstAmtField: 'itemLevelGST',
+                gstValue: currentGstValue,
+              }}
+              onValueChanged={(v) => {
+                setFieldValue('purchaseOrder.totalAmount', v.summary.total)
+                setFieldValue(
+                  'purchaseOrder.totalAfterAdj',
+                  v.summary.totalAfterAdj,
+                )
+                setFieldValue(
+                  'purchaseOrder.totalAftGst',
+                  v.summary.totalWithGST,
+                )
+                setFieldValue(
+                  'purchaseOrder.gstAmount',
+                  Math.round(v.summary.gst * 100) / 100,
+                )
 
-                  setFieldValue(
-                    'purchaseOrderAdjustment',
-                    v.adjustments.map((a) => {
-                      return {
-                        sequence: a.index + 1,
-                        ...a,
-                      }
-                    }),
-                  )
-                  setFieldValue(
-                    'purchaseOrder.isGstInclusive',
-                    v.summary.isGSTInclusive,
-                  )
-                }}
-              />
-            </GridItem>
-          </GridContainer>
-        </AuthorizedContext.Provider>
+                setFieldValue(
+                  'purchaseOrderAdjustment',
+                  v.adjustments.map((a) => {
+                    return {
+                      sequence: a.index + 1,
+                      ...a,
+                    }
+                  }),
+                )
+                setFieldValue(
+                  'purchaseOrder.isGstInclusive',
+                  v.summary.isGSTInclusive,
+                )
+              }}
+            />
+          </GridItem>
+        </GridContainer>
+        {/* </AuthorizedContext.Provider> */}
 
         <GridContainer
           style={{
@@ -704,7 +713,7 @@ class Index extends Component {
             }}
           />
         </CommonModal>
-      </React.Fragment>
+      </AuthorizedContext.Provider>
     )
   }
 }

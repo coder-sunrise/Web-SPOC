@@ -8,6 +8,7 @@ import Info from '@material-ui/icons/Info'
 import Cross from '@material-ui/icons/HighlightOff'
 // common components
 import {
+  Button,
   GridContainer,
   GridItem,
   Tooltip,
@@ -156,13 +157,25 @@ const PaymentRow = ({
                 visibility: isCancelled === undefined ? 'hidden' : 'visible',
               }}
             >
-              <IconButton
+              {/* <IconButton
+                displayName='IconButton'
                 id={itemID}
                 onClick={() => handleVoidClick(payment)}
                 disabled={isCancelled || readOnly}
               >
                 <Cross />
-              </IconButton>
+              </IconButton> */}
+              <Button
+                justIcon
+                simple
+                size='sm'
+                color='danger'
+                id={itemID}
+                onClick={() => handleVoidClick(payment)}
+                disabled={isCancelled || readOnly}
+              >
+                <Cross />
+              </Button>
             </Tooltip>
           </GridItem>
         </GridItem>

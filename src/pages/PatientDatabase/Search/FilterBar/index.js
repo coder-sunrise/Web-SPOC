@@ -44,104 +44,93 @@ const styles = (theme) => ({
 class FilterBar extends PureComponent {
   render () {
     const { classes, dispatch, disableAdd, simple } = this.props
-
+    const moduleAccessRight = Authorized.check('patientdatabase')
     return (
       <div className={classes.filterBar}>
         <GridContainer>
-          <GridItem md={12} lg={3} style={{ position: 'relative' }}>
-            <FastField
-              name='search'
-              render={(args) => {
-                return (
-                  <TextField
-                    autoFocus={!simple}
-                    label={formatMessage({
-                      id: 'reception.queue.patientSearchPlaceholder',
-                    })}
-                    {...args}
-                  />
-                )
-              }}
-            />
-            {/* <div className={classes.tansactionCheck}>
+          <Authorized authority='patientdatabase/searchpatient'>
+            <GridItem md={12} lg={3} style={{ position: 'relative' }}>
               <FastField
-                name='isExactSearch'
+                name='search'
                 render={(args) => {
                   return (
-                    <Tooltip
-                      title={formatMessage({
-                        id: 'patient.search.exact',
+                    <TextField
+                      autoFocus={!simple}
+                      label={formatMessage({
+                        id: 'reception.queue.patientSearchPlaceholder',
                       })}
-                      placement='bottom'
-                    >
-                      <Checkbox simple {...args} />
-                    </Tooltip>
+                      {...args}
+                    />
                   )
                 }}
               />
-            </div> */}
-          </GridItem>
+            </GridItem>
+          </Authorized>
           <GridItem md={12} lg={5}>
             <div className={classes.filterBtn}>
-              <ProgressButton
-                variant='contained'
-                color='primary'
-                icon={<Search />}
-                onClick={() => {
-                  // console.log(this.props.values)
-                  // this.props.dispatch({
-                  //   type: 'patientSearch/updateFilter',
-                  //   payload: this.props.values,
-                  // })
-                  const { search } = this.props.values
-                  const prefix = this.props.values.isExactSearch
-                    ? 'eql_'
-                    : 'like_'
-                  this.props.dispatch({
-                    type: 'patientSearch/query',
-                    payload: {
-                      // group: [
-                      //   {
-                      //     // [`${prefix}patientReferenceNo`]: search,
-                      //     [`${prefix}name`]: search,
-                      //     [`${prefix}patientAccountNo`]: search,
-                      //     [`${prefix}patientReferenceNo`]: search,
-                      //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
-                      //     combineCondition: 'or',
-                      //   },
-                      // ],
-                      apiCriteria: {
-                        searchValue: search,
-                      },
-                    },
-                  })
-                }}
-              >
-                <FormattedMessage id='form.search' />
-              </ProgressButton>
-              <Authorized authority='patientdatabase.newpatient'>
-                {!disableAdd && (
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={() => {
-                      dispatch({
-                        type: 'patient/updateState',
-                        payload: {
-                          entity: undefined,
-                          version: undefined,
+              <Authorized authority='patientdatabase/searchpatient'>
+                <ProgressButton
+                  variant='contained'
+                  color='primary'
+                  icon={<Search />}
+                  onClick={() => {
+                    // console.log(this.props.values)
+                    // this.props.dispatch({
+                    //   type: 'patientSearch/updateFilter',
+                    //   payload: this.props.values,
+                    // })
+                    const { search } = this.props.values
+                    const prefix = this.props.values.isExactSearch
+                      ? 'eql_'
+                      : 'like_'
+                    this.props.dispatch({
+                      type: 'patientSearch/query',
+                      payload: {
+                        // group: [
+                        //   {
+                        //     // [`${prefix}patientReferenceNo`]: search,
+                        //     [`${prefix}name`]: search,
+                        //     [`${prefix}patientAccountNo`]: search,
+                        //     [`${prefix}patientReferenceNo`]: search,
+                        //     [`${prefix}contactFkNavigation.contactNumber.number`]: search,
+                        //     combineCondition: 'or',
+                        //   },
+                        // ],
+                        apiCriteria: {
+                          searchValue: search,
                         },
-                      })
-                      dispatch({
-                        type: 'patient/openPatientModal',
-                      })
-                    }}
-                  >
-                    <PersonAdd />
-                    <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
-                  </Button>
-                )}
+                      },
+                    })
+                  }}
+                >
+                  <FormattedMessage id='form.search' />
+                </ProgressButton>
               </Authorized>
+              <Authorized.Context.Provider value={moduleAccessRight}>
+                <Authorized authority='patientdatabase.newpatient'>
+                  {!disableAdd && (
+                    <Button
+                      variant='contained'
+                      color='primary'
+                      onClick={() => {
+                        dispatch({
+                          type: 'patient/updateState',
+                          payload: {
+                            entity: undefined,
+                            version: undefined,
+                          },
+                        })
+                        dispatch({
+                          type: 'patient/openPatientModal',
+                        })
+                      }}
+                    >
+                      <PersonAdd />
+                      <FormattedMessage id='reception.queue.patientSearch.registerNewPatient' />
+                    </Button>
+                  )}
+                </Authorized>
+              </Authorized.Context.Provider>
             </div>
           </GridItem>
         </GridContainer>

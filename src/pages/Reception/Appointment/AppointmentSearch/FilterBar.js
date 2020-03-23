@@ -28,6 +28,7 @@ import {
   ReportViewer,
 } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const createPayload = (values) => {
   const {
@@ -273,10 +274,16 @@ const FilterBar = ({
             <Search />
             Search
           </ProgressButton>
-          <Button color='primary' size='sm' onClick={handleAddAppointmentClick}>
-            <Add />
-            Add Appointment
-          </Button>
+          <Authorized authority='appointment.newappointment'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={handleAddAppointmentClick}
+            >
+              <Add />
+              Add Appointment
+            </Button>
+          </Authorized>
           <Button
             color='primary'
             size='sm'

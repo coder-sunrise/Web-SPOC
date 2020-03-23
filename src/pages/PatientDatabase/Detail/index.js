@@ -192,7 +192,12 @@ const mapEntityToValues = (entity) => {
   displayName: 'PatientDetail',
 })
 class PatientDetail extends PureComponent {
-  state = {}
+  state = {
+    moduleAccessRight: {
+      name: 'patientdatabase',
+      rights: 'enable',
+    },
+  }
 
   constructor (props) {
     super(props)
@@ -315,17 +320,10 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  // componentDidMount () {
-  //   console.log('PatientDetail componentDidMount')
-  // }
-
-  // componentDidMount () {
-  //   setTimeout(() => {
-  //     if (this.props.patient.entity) {
-  //       this.props.resetForm(this.props.patient.entity)
-  //     }
-  //   }, 2000)
-  // }
+  componentWillMount () {
+    const moduleAccessRight = Authorized.check('patientdatabase')
+    this.setState({ moduleAccessRight })
+  }
 
   componentWillUnmount () {
     const { dispatch } = this.props
@@ -457,134 +455,136 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={2}>
-          <Card profile>
-            <CardBody profile>
-              <PatientInfoSideBanner entity={entity} {...this.props} />
-              <MenuList>
-                {this.widgets
-                  .filter(
-                    (o) =>
-                      (!!patient.entity && !!patient.entity.id) ||
-                      Number(o.id) <= 4,
-                  )
-                  .map((o) => (
-                    <Authorized authority={o.access}>
-                      <MenuItem
-                        key={o.name}
-                        className={classes.menuItem}
-                        selected={currentMenu.name === o.name}
-                        disabled={
-                          global.disableSave && currentMenu.name !== o.name
-                        }
-                        onClick={(e) => {
-                          onMenuClick(e, o)
-                          // console.log('here', entity, values)
-                          dispatch({
-                            type: 'patient/updateState',
-                            payload: {
-                              entity: entity || undefined,
-                            },
-                          })
-                          this.setState({
-                            selectedMenu: o.id,
-                          })
-                          // this.props.history.push(
-                          //   getAppendUrl({
-                          //     md: 'pt',
-                          //     cmt: o.id,
-                          //   }),
-                          // )
-                        }}
-                      >
-                        <ListItemIcon style={{ minWidth: 25 }}>
-                          <KeyboardArrowRight />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <span
-                              style={{
-                                color: menuErrors[o.id] ? 'red' : 'inherit',
-                              }}
-                            >
-                              {o.name}
-                              {menuErrors[o.id] ? (
-                                <Error
-                                  style={{
-                                    position: 'absolute',
-                                    top: 13,
-                                    right: 8,
-                                  }}
-                                />
-                              ) : null}
-                            </span>
+      <Authorized.Context.Provider value={this.state.moduleAccessRight}>
+        <GridContainer>
+          <GridItem xs={12} sm={12} md={2}>
+            <Card profile>
+              <CardBody profile>
+                <PatientInfoSideBanner entity={entity} {...this.props} />
+                <MenuList>
+                  {this.widgets
+                    .filter(
+                      (o) =>
+                        (!!patient.entity && !!patient.entity.id) ||
+                        Number(o.id) <= 4,
+                    )
+                    .map((o) => (
+                      <Authorized authority={o.access}>
+                        <MenuItem
+                          key={o.name}
+                          className={classes.menuItem}
+                          selected={currentMenu.name === o.name}
+                          disabled={
+                            global.disableSave && currentMenu.name !== o.name
                           }
-                        />
-                      </MenuItem>
-                    </Authorized>
-                  ))}
-              </MenuList>
-              {isCreatingPatient && <Divider light />}
-              {isCreatingPatient && (
-                <Button
-                  color='primary'
-                  style={{ marginTop: theme.spacing(1) }}
-                  onClick={this.registerVisit}
-                >
-                  Register Visit
-                </Button>
-              )}
-            </CardBody>
-          </Card>
-        </GridItem>
-        <GridItem xs={12} sm={12} md={10}>
-          <CardContainer hideHeader title={currentMenu.name}>
-            <div
-              style={
-                height > 0 ? (
-                  {
-                    height: height - 95 - 20,
-                    overflow: 'auto',
-                    padding: 4,
-                    paddingTop: 20,
-                  }
-                ) : (
-                  { padding: 4, paddingTop: 20 }
-                )
-              }
-            >
-              <CurrentComponent {...resetProps} />
-            </div>
-          </CardContainer>
+                          onClick={(e) => {
+                            onMenuClick(e, o)
+                            // console.log('here', entity, values)
+                            dispatch({
+                              type: 'patient/updateState',
+                              payload: {
+                                entity: entity || undefined,
+                              },
+                            })
+                            this.setState({
+                              selectedMenu: o.id,
+                            })
+                            // this.props.history.push(
+                            //   getAppendUrl({
+                            //     md: 'pt',
+                            //     cmt: o.id,
+                            //   }),
+                            // )
+                          }}
+                        >
+                          <ListItemIcon style={{ minWidth: 25 }}>
+                            <KeyboardArrowRight />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <span
+                                style={{
+                                  color: menuErrors[o.id] ? 'red' : 'inherit',
+                                }}
+                              >
+                                {o.name}
+                                {menuErrors[o.id] ? (
+                                  <Error
+                                    style={{
+                                      position: 'absolute',
+                                      top: 13,
+                                      right: 8,
+                                    }}
+                                  />
+                                ) : null}
+                              </span>
+                            }
+                          />
+                        </MenuItem>
+                      </Authorized>
+                    ))}
+                </MenuList>
+                {isCreatingPatient && <Divider light />}
+                {isCreatingPatient && (
+                  <Button
+                    color='primary'
+                    style={{ marginTop: theme.spacing(1) }}
+                    onClick={this.registerVisit}
+                  >
+                    Register Visit
+                  </Button>
+                )}
+              </CardBody>
+            </Card>
+          </GridItem>
+          <GridItem xs={12} sm={12} md={10}>
+            <CardContainer hideHeader title={currentMenu.name}>
+              <div
+                style={
+                  height > 0 ? (
+                    {
+                      height: height - 95 - 20,
+                      overflow: 'auto',
+                      padding: 4,
+                      paddingTop: 20,
+                    }
+                  ) : (
+                    { padding: 4, paddingTop: 20 }
+                  )
+                }
+              >
+                <CurrentComponent {...resetProps} />
+              </div>
+            </CardContainer>
 
-          <div
-            style={{
-              position: 'relative',
-            }}
-          >
-            {footer({
-              align: 'center',
-              // onReset:
-              //   values && values.id
-              //     ? () => {
-              //         resetForm(patient.entity)
-              //       }
-              //     : undefined,
-              onCancel: () => {
-                dispatch({
-                  type: 'patient/closePatientModal',
-                  payload: {
-                    history: this.props.history,
-                  },
-                })
-              },
-              onConfirm: this.validatePatient,
-              confirmBtnText: 'Save',
-            })}
-          </div>
-        </GridItem>
-      </GridContainer>
+            <div
+              style={{
+                position: 'relative',
+              }}
+            >
+              {footer({
+                align: 'center',
+                // onReset:
+                //   values && values.id
+                //     ? () => {
+                //         resetForm(patient.entity)
+                //       }
+                //     : undefined,
+                onCancel: () => {
+                  dispatch({
+                    type: 'patient/closePatientModal',
+                    payload: {
+                      history: this.props.history,
+                    },
+                  })
+                },
+                onConfirm: this.validatePatient,
+                confirmBtnText: 'Save',
+              })}
+            </div>
+          </GridItem>
+        </GridContainer>
+      </Authorized.Context.Provider>
     )
   }
 }

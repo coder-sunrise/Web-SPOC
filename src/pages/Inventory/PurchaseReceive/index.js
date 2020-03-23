@@ -154,6 +154,9 @@ class PurchaseReceive extends Component {
   onNavigate = (type, rowId) => {
     const { history } = this.props
     const { location } = history
+    const accessRight = Authorized.check(
+      'purchasingandreceiving.purchasingandreceivingdetails',
+    )
     switch (type) {
       case 'new':
         history.push(`${location.pathname}/pdodetails?type=${type}`)
@@ -162,6 +165,8 @@ class PurchaseReceive extends Component {
         history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
         break
       case 'edit':
+        if ((accessRight && accessRight.rights === 'hidden') || !accessRight)
+          return
         history.push(`${location.pathname}/pdodetails?id=${rowId}&type=${type}`)
         break
       default:

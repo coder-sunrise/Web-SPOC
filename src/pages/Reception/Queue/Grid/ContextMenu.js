@@ -109,36 +109,41 @@ const ContextMenu = ({ show, row, handleClick, classes }) => {
 
   const contextMenuOptions = useMemo(() =>
     ContextMenuOptions.map((opt) => {
+      const moduleAccessRight = Authorized.check('reception/queue')
+      const isReadOnly = moduleAccessRight.rights === 'readonly'
       switch (opt.id) {
         case 0: // view visit
           return { ...opt, hidden: !isStatusWaiting }
         case 0.1: // edit visit
-          return { ...opt, hidden: isStatusWaiting }
+          return { ...opt, hidden: isStatusWaiting, disabled: isReadOnly }
         case 1: // dispense
           return {
             ...opt,
             disabled: !enableDispense(),
           }
         case 1.1: // billing
-          return { ...opt, disabled: !enableBilling }
+          return {
+            ...opt,
+            disabled: !enableBilling || isReadOnly,
+          }
         case 2: // delete visit
-          return { ...opt, disabled: !isStatusWaiting }
+          return { ...opt, disabled: !isStatusWaiting || isReadOnly }
         case 5: // start consultation
           return {
             ...opt,
-            disabled: isStatusInProgress,
+            disabled: isStatusInProgress || isReadOnly,
             hidden: !isStatusWaiting || isRetailVisit || isBillFirstVisit,
           }
         case 6: // resume consultation
           return {
             ...opt,
-            disabled: !isStatusInProgress,
+            disabled: !isStatusInProgress || isReadOnly,
             hidden: hideResumeButton || isRetailVisit || isBillFirstVisit,
           }
         case 7: // edit consultation
           return {
             ...opt,
-            disabled: !isStatusCompleted,
+            disabled: !isStatusCompleted || isReadOnly,
             hidden: hideEditConsultation,
           }
         default:

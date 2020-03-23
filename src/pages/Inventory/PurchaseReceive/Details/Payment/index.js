@@ -9,6 +9,7 @@ import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
+import { getAccessRight } from '../../variables'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -167,7 +168,10 @@ class index extends PureComponent {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: !isWriteOff ? 'enable' : 'disable',
+          rights:
+            isWriteOff === true || getAccessRight() === false
+              ? 'disable'
+              : 'enable',
         }}
       >
         <GridContainer>
