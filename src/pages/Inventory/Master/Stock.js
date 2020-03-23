@@ -19,6 +19,7 @@ import {
   notification,
   serverDateFormat,
 } from '@/components'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   infoPanl: {
@@ -43,6 +44,7 @@ const Stock = ({
   theme,
   dispatch,
   hasActiveSession,
+  authority,
 }) => {
   const objectType = () => {
     if (vaccinationDetail)
@@ -141,6 +143,13 @@ const Stock = ({
     return stockQuantity
   }
 
+  const checkIsReadOnly = () => {
+    const accessRight = Authorized.check(authority)
+    if (!accessRight || (accessRight && accessRight.rights !== 'readwrite'))
+      return true
+    return false
+  }
+
   const [
     tableParas,
     setTableParas,
@@ -195,7 +204,7 @@ const Stock = ({
             <Radio
               checked={row.isDefault}
               onChange={() => changeIsDefault(row)}
-              disabled={row.isDeleted}
+              disabled={row.isDeleted || checkIsReadOnly()}
             />
           )
         },

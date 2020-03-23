@@ -90,22 +90,26 @@ const PatientInfoInput = ({
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Button
-                color='primary'
-                size='sm'
-                // className={classes.patientNameButton}
-                onClick={onViewPatientProfileClick}
-              >
-                Patient Profile
-              </Button>
-              <Button
-                size='sm'
-                color='primary'
-                disabled={!isEdit || !allowedToActualize}
-                onClick={onRegisterToVisitClick}
-              >
-                Register To Visit
-              </Button>
+              <Authorized authority='patientdatabase.patientprofiledetails'>
+                <Button
+                  color='primary'
+                  size='sm'
+                  // className={classes.patientNameButton}
+                  onClick={onViewPatientProfileClick}
+                >
+                  Patient Profile
+                </Button>
+              </Authorized>
+              <Authorized authority='queue.registervisit'>
+                <Button
+                  size='sm'
+                  color='primary'
+                  disabled={!isEdit || !allowedToActualize}
+                  onClick={onRegisterToVisitClick}
+                >
+                  Register To Visit
+                </Button>
+              </Authorized>
             </React.Fragment>
           )}
         </div>

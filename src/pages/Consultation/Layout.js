@@ -72,14 +72,16 @@ class Layout extends PureComponent {
 
     const { userDefaultLayout, clinicInfo } = props
 
-    const { defaultConsultationTemplate = '[]' } = clinicInfo
+    let { defaultConsultationTemplate = '[]' } = clinicInfo
     // console.log(defaultConsultationTemplate)
-    if (defaultConsultationTemplate === '[]') {
+    if (!defaultConsultationTemplate || defaultConsultationTemplate === '[]') {
       notification.warn({
         message: 'Clinic do not have default template configuration',
       })
+      this.pageDefaultWidgets = []
+    } else {
+      this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
     }
-    this.pageDefaultWidgets = JSON.parse(defaultConsultationTemplate)
 
     let defaultLayout
 

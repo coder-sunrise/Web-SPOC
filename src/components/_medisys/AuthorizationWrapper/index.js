@@ -3,10 +3,17 @@ import Authorized from '@/utils/Authorized'
 
 const AuthorizationWrapper = ({ children, authority }) => {
   const accessRight = Authorized.check(authority)
-  // if (!accessRight || accessRight.rights === 'hidden') return null
-  // console.log(accessRight)
+  if (!accessRight || accessRight.rights === 'hidden') return null
+
   return (
-    <Authorized.Context.Provider value={accessRight}>
+    <Authorized.Context.Provider
+      value={{
+        rights:
+          accessRight.rights === 'readwrite' || accessRight.rights === 'enable'
+            ? 'enable'
+            : 'disable',
+      }}
+    >
       {children}
     </Authorized.Context.Provider>
   )

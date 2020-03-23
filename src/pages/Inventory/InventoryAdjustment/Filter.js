@@ -24,7 +24,7 @@ import {
   Button,
 } from '@/components'
 import { inventoryAdjustmentStatus } from '@/utils/codes'
-import Authorized from '@/utils/Authorized'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 @withFormikExtend({
   mapPropsToValues: ({ inventoryAdjustment }) =>
@@ -158,7 +158,7 @@ class Filter extends PureComponent {
                 <FormattedMessage id='form.search' />
               </ProgressButton>
 
-              <Authorized authority='inventoryadjustment.newinventoryadjustment'>
+              <AuthorizationWrapper authority='inventoryadjustment.newinventoryadjustment'>
                 <Button
                   color='primary'
                   icon={null}
@@ -232,7 +232,7 @@ class Filter extends PureComponent {
                     </Grow>
                   )}
                 </Popper>
-              </Authorized>
+              </AuthorizationWrapper>
             </div>
           </GridItem>
         </GridContainer>
