@@ -335,7 +335,7 @@ const _routes = [
             name: 'inventoryadjustment',
             component: './Inventory/InventoryAdjustment',
             authority: [
-              'inventory/purchasingandreceiving',
+              'inventory/inventoryadjustment',
             ],
             mini: 'IA',
           },
