@@ -100,11 +100,12 @@ const checkSinglePermission = (
     //         })
     //       : 'disabled'
     // }
-    return typeof Exception === 'function' && type !== 'decorator'
-      ? Exception()
-      : Exception
+
+    // return null
   }
-  return null
+  return typeof Exception === 'function' && type !== 'decorator'
+    ? Exception()
+    : Exception
 }
 
 /**
