@@ -362,3 +362,17 @@ export const fakePodoPaymentData = [
     remarks: 'Paid',
   },
 ]
+
+export const getAccessRight = (
+  authorityUrl = 'purchasingandreceiving.purchasingandreceivingdetails',
+) => {
+  const accessRight = Authorized.check(authorityUrl)
+
+  let allowAccess = false
+
+  if (!accessRight || accessRight.rights === 'hidden') return null
+  if (accessRight.rights === 'readwrite' || accessRight.rights === 'enable')
+    allowAccess = true
+
+  return allowAccess
+}

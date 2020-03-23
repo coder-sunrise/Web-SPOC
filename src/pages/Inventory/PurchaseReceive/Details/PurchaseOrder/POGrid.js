@@ -438,13 +438,12 @@ class Grid extends PureComponent {
             schema={purchaseOrderDetailsSchema}
             forceRenderDuration={5000}
             FuncProps={{
-              edit: isEditable,
               pager: false,
             }}
             EditingProps={{
               showAddCommand: isEditable,
-              showEditCommand: isEditable,
-              showDeleteCommand: isEditable,
+              // showEditCommand: isEditable,
+              // showDeleteCommand: isEditable,
               onCommitChanges: this.onCommitChanges(values),
               onAddedRowsChange: this.onAddedRowsChange,
             }}
