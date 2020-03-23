@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage, formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
+import Authorized from '@/utils/Authorized'
 
 import {
   PageHeaderWrapper,
@@ -22,20 +23,23 @@ const styles = () => ({
 class CorporateBilling extends PureComponent {
   render () {
     const { classes } = this.props
+    const accessRight = Authorized.check('finance/corporatebilling')
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
-        <Card>
-          <CardBody>
-            <h4 className={classes.cardIconTitle}>
-              {formatMessage({ id: 'finance.corporate-billing.title' })}
-            </h4>
-            <FilterBar />
-            <CorporateBillingGrid />
-          </CardBody>
-        </Card>
+        <Authorized.Context.Provider value={accessRight}>
+          <Card>
+            <CardBody>
+              <h4 className={classes.cardIconTitle}>
+                {formatMessage({ id: 'finance.corporate-billing.title' })}
+              </h4>
+              <FilterBar />
+              <CorporateBillingGrid />
+            </CardBody>
+          </Card>
+        </Authorized.Context.Provider>
       </PageHeaderWrapper>
     )
   }
