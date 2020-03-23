@@ -21,7 +21,6 @@ class Grid extends React.Component {
     } = this.props
     const showDetail = (row, vmode) => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
-
     const handleDoubleClick = (row) => {
       if (disabled) {
         notification.error({
