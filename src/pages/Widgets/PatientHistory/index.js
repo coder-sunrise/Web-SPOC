@@ -3,7 +3,6 @@ import React, { Component } from 'react'
 import $ from 'jquery'
 import { connect } from 'dva'
 import router from 'umi/router'
-import Loadable from 'react-loadable'
 import classnames from 'classnames'
 // material ui
 import { withStyles, List, ListItem, ListItemText } from '@material-ui/core'
@@ -21,17 +20,11 @@ import {
   Skeleton,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
-
-import Loading from '@/components/PageLoading/index'
 import AuthorizedContext from '@/components/Context/Authorized'
 // utils
 import { findGetParameter } from '@/utils/utils'
-import { VISIT_TYPE_NAME, VISIT_TYPE, CLINIC_TYPE } from '@/utils/constants'
+import {  VISIT_TYPE} from '@/utils/constants'
 import * as WidgetConfig from './config'
-
-// import model from './models'
-
-// window.g_app.replaceModel(model)
 
 const styles = (theme) => ({
   root: {},
@@ -78,9 +71,6 @@ const styles = (theme) => ({
       marginTop: theme.spacing(2),
       fontSize: '1em',
     },
-    // '& h5:not(:first-of-type)': {
-    //   marginTop: theme.spacing(2),
-    // },
   },
   integratedLeftPanel: {
     width: '100%',
@@ -88,29 +78,9 @@ const styles = (theme) => ({
 })
 @withFormikExtend({
   mapPropsToValues: ({ patientHistory }) => {
-    // console.log(patientHistory)
-    // return patientHistory.entity ? patientHistory.entity : patientHistory.default
   },
-  // validationSchema: Yup.object().shape({
-  //   name: Yup.string().required(),
-  //   dob: Yup.date().required(),
-  //   patientAccountNo: Yup.string().required(),
-  //   genderFK: Yup.string().required(),
-  //   dialect: Yup.string().required(),
-  //   contact: Yup.object().shape({
-  //     contactAddress: Yup.array().of(
-  //       Yup.object().shape({
-  //         line1: Yup.string().required(),
-  //         postcode: Yup.number().required(),
-  //         countryFK: Yup.string().required(),
-  //       }),
-  //     ),
-  //   }),
-  // }),
-
-  // handleSubmit: () => {},
-  // displayName: 'PatientHistory',
 })
+
 @connect(({ patientHistory, clinicInfo, clinicSettings, codetable, user }) => ({
   patientHistory,
   clinicSettings,
@@ -118,6 +88,7 @@ const styles = (theme) => ({
   user,
   clinicInfo,
 }))
+
 class PatientHistory extends Component {
   static defaultProps = {
     mode: 'split',
@@ -125,17 +96,7 @@ class PatientHistory extends Component {
 
   constructor (props) {
     super(props)
-    // const { clinicInfo } = props
-    // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-    // // console.log(clinicInfo)
-    // this.widgets = WidgetConfig.gpWidgets(props)
-    // switch (clinicTypeFK) {
-    //   case CLINIC_TYPE.DENTAL:
 
-    //     break
-    //   default:
-    //     break
-    // }
     this.myRef = React.createRef()
 
     this.widgets = WidgetConfig.widgets(props).filter((o) => {
@@ -360,48 +321,6 @@ class PatientHistory extends Component {
     )
   }
 
-  // <GridItem sm={5} style={{ textAlign: 'right' }}>
-  //           <span style={{ whiteSpace: 'nowrap', position: 'relative' }}>
-  //             ( <DatePicker text value={row.visitDate} /> )
-  //           </span>
-  //           <div className={this.props.classes.note}>&nbsp;</div>
-  //         </GridItem>
-
-  // eslint-disable-next-line camelcase
-  // UNSAFE_componentWillReceiveProps (nextProps) {
-  //   // console.log(this.props, nextProps, nextProps.patientHistory.version)
-  //   if (
-  //     nextProps.patientHistory.version &&
-  //     this.props.patientHistory.version !== nextProps.patientHistory.version
-  //   ) {
-  //     nextProps
-  //       .dispatch({
-  //         type: 'patientHistory/query',
-  //         payload: {
-  //           patientProfileFK: nextProps.patientHistory.patientID,
-  //           sorting: [
-  //             {
-  //               columnName: 'VisitDate',
-  //               direction: 'desc',
-  //             },
-  //           ],
-  //           version:
-  //         },
-  //       })
-  //       .then((o) => {
-  //         // this.props.resetForm(o)
-  //         nextProps.dispatch({
-  //           type: 'patientHistory/updateState',
-  //           payload: {
-  //             selected: undefined,
-  //             selectedSubRow: undefined,
-  //             entity: undefined,
-  //           },
-  //         })
-  //       })
-  //   }
-  // }
-
   getDetailPanel = () => {
     const {
       theme,
@@ -619,11 +538,6 @@ class PatientHistory extends Component {
         )
       : ''
 
-    // console.log({
-    //   sortedPatientHistory,
-    //   settings: settings.showConsultationVersioning,
-    // })
-    // console.log(this.myRef)
     return (
       <div {...cfg}>
         <CardContainer

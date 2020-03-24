@@ -1,19 +1,11 @@
 import React, { PureComponent } from 'react'
 import moment from 'moment'
-// dva
 import { connect } from 'dva'
-// material ui
 import { withStyles } from '@material-ui/core'
-// common components
-import {
-  CodeSelect,
-  CommonTableGrid,
-  Tooltip,
-  dateFormatLong,
-} from '@/components'
+import { CardContainer, CommonTableGrid } from '@/components'
 import { APPOINTMENT_STATUS, CANCELLATION_REASON_TYPE } from '@/utils/constants'
-// services
 import { queryList as queryAppointments } from '@/services/calendar'
+import { futureApptTableParams,previousApptTableParams} from './variables'
 
 const styles = (theme) => ({
   gridRow: {
@@ -27,59 +19,6 @@ const styles = (theme) => ({
   },
 })
 
-const commonExt = [
-  {
-    columnName: 'appointmentStatusFk',
-    type: 'codeSelect',
-    code: 'ltappointmentstatus',
-  },
-  {
-    columnName: 'appointmentDate',
-    format: dateFormatLong,
-    type: 'date',
-  },
-  {
-    columnName: 'startTime',
-    type: 'time',
-    sortingEnabled: false,
-  },
-  {
-    columnName: 'doctor',
-    type: 'codeSelect',
-    code: 'clinicianprofile',
-    valueField: 'id',
-    labelField: 'name',
-  },
-  {
-    columnName: 'cancellationReason',
-    render: (row) => {
-      const {
-        appointmentStatusFk,
-        cancellationReasonTypeFK,
-        cancellationReason,
-      } = row
-      const appointmentStatus = parseInt(appointmentStatusFk, 10)
-      const title = cancellationReason || ''
-      if (appointmentStatus === APPOINTMENT_STATUS.CANCELLED) {
-        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.NOSHOW)
-          return (
-            <CodeSelect
-              code='ltcancelreasontype'
-              value={cancellationReasonTypeFK}
-              text
-            />
-          )
-        if (cancellationReasonTypeFK === CANCELLATION_REASON_TYPE.OTHERS)
-          return (
-            <Tooltip title={title}>
-              <span>{title}</span>
-            </Tooltip>
-          )
-      }
-      return ''
-    },
-  },
-]
 
 @connect(({ patient }) => ({
   patient: patient.entity || {},
@@ -90,36 +29,6 @@ class AppointmentHistory extends PureComponent {
     previousAppt: [],
     futureAppt: [],
     patientProfileFK: undefined,
-  }
-
-  previousApptTableParams = {
-    columns: [
-      { name: 'appointmentDate', title: 'Date' },
-      { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
-      { name: 'appointmentStatusFk', title: 'Status' },
-      {
-        name: 'cancellationReason',
-        title: 'Reason',
-      },
-      { name: 'appointmentRemarks', title: 'Remarks' },
-    ],
-    columnExtensions: [
-      ...commonExt,
-    ],
-  }
-
-  futureApptTableParams = {
-    columns: [
-      { name: 'appointmentDate', title: 'Date' },
-      { name: 'startTime', title: 'Time' },
-      { name: 'doctor', title: 'Doctor' },
-      { name: 'appointmentStatusFk', title: 'Status' },
-      { name: 'appointmentRemarks', title: 'Remarks' },
-    ],
-    columnExtensions: [
-      ...commonExt,
-    ],
   }
 
   componentDidMount () {
@@ -234,59 +143,33 @@ class AppointmentHistory extends PureComponent {
   render () {
     const { classes, theme } = this.props
     const { previousAppt, futureAppt } = this.state
-    // this.resize()
     return (
       <div>
-        <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
-
-        <CommonTableGrid
+        <CardContainer
+          hideHeader
           size='sm'
-          rows={previousAppt}
-          {...this.previousApptTableParams}
-        />
-        <h4
-          style={{
-            marginTop: theme.spacing(2),
-          }}
         >
-          Current & Future Appointment
-        </h4>
-        <CommonTableGrid
-          size='sm'
-          rows={futureAppt}
-          {...this.futureApptTableParams}
-        />
+          <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
+
+          <CommonTableGrid
+            size='sm'
+            rows={previousAppt}
+            {...previousApptTableParams}
+          />
+          <h4
+            style={{
+              marginTop: theme.spacing(2),
+            }}
+          >
+            Current & Future Appointment
+          </h4>
+          <CommonTableGrid
+            size='sm'
+            rows={futureAppt}
+            {...futureApptTableParams}
+          />
+        </CardContainer>
       </div>
-
-      // <GridContainer>
-      //   <GridItem xs md={12}>
-      //     <React.Fragment>
-      //       <h4 style={{ marginTop: 20 }}>Previous Appointment</h4>
-
-      //       <CommonTableGrid
-      //         size='sm'
-      //         rows={previousAppt}
-      //         {...this.previousApptTableParams}
-      //       />
-      //     </React.Fragment>
-      //   </GridItem>
-      //   <GridItem xs md={12}>
-      //     <React.Fragment>
-      //       <h4
-      //         style={{
-      //           marginTop: theme.spacing(2),
-      //         }}
-      //       >
-      //         Current & Future Appointment
-      //       </h4>
-      //       <CommonTableGrid
-      //         size='sm'
-      //         rows={futureAppt}
-      //         {...this.futureApptTableParams}
-      //       />
-      //     </React.Fragment>
-      //   </GridItem>
-      // </GridContainer>
     )
   }
 }
