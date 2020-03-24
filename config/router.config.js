@@ -691,6 +691,11 @@ const _routes = [
             component: './Report/InventoryStockCountReport',
           },
           {
+            path: '/report/inventorystockcountreport',
+            name: 'inventorystockcountreport',
+            component: './Report/InventoryStockCountReport',
+          },
+          {
             path: '/report/inventorylistingreport',
             name: 'inventorylistingreport',
             component: './Report/InventoryListingReport',
