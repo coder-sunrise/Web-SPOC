@@ -35,7 +35,9 @@ import {
 } from '@/components'
 import Attachment from './Attachment'
 import Form from './Form'
+import Authorized from '@/utils/Authorized'
 
+@Authorized.Secured('queue.consultation.widgets.eyevisualacuity')
 class EyeVisualAcuity extends React.PureComponent {
   render () {
     return (
