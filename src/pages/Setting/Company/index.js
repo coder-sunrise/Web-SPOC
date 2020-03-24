@@ -64,31 +64,24 @@ class Supplier extends PureComponent {
     }
     const { name } = route
     const companyType = name === 'copayer' ? 'Co-Payer' : 'Supplier'
-    const accessRight = Authorized.check('finance/copayer')
     return (
       <CardContainer hideHeader>
         <Filter {...cfg} {...this.props} />
-        <Authorized.Context.Provider value={accessRight}>
-          <Grid {...cfg} {...this.props} />
+        <Grid {...cfg} {...this.props} />
 
-          <CommonModal
-            open={settingCompany.showModal}
-            observe='CompanyDetail'
-            title={
-              settingCompany.entity ? (
-                `Edit ${companyType}`
-              ) : (
-                `Add ${companyType}`
-              )
-            }
-            maxWidth='md'
-            bodyNoPadding
-            onClose={this.toggleModal}
-            onConfirm={this.toggleModal}
-          >
-            <Detail {...cfg} {...this.props} />
-          </CommonModal>
-        </Authorized.Context.Provider>
+        <CommonModal
+          open={settingCompany.showModal}
+          observe='CompanyDetail'
+          title={
+            settingCompany.entity ? `Edit ${companyType}` : `Add ${companyType}`
+          }
+          maxWidth='md'
+          bodyNoPadding
+          onClose={this.toggleModal}
+          onConfirm={this.toggleModal}
+        >
+          <Detail {...cfg} {...this.props} />
+        </CommonModal>
       </CardContainer>
     )
   }

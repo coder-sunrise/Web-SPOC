@@ -18,7 +18,7 @@ import {
 } from '@/components'
 
 @withFormikExtend({
-  authority: 'finance/scheme',
+  // authority: 'finance/scheme',
   mapPropsToValues: ({ settingCompany }) => settingCompany.filter || {},
   handleSubmit: () => {},
   displayName: 'CompanyFilter',

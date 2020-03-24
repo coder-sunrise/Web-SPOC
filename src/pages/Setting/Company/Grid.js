@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import Edit from '@material-ui/icons/Edit'
-import { CommonTableGrid, Button, Tooltip } from '@/components'
+import { CommonTableGrid, Button, Tooltip, notification } from '@/components'
 import { status, gstEnabled } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
 
@@ -16,6 +16,13 @@ class Grid extends PureComponent {
   }
 
   editRow = (row, e) => {
+    const accessRight = Authorized.check('copayer.copayerdetails')
+    if (accessRight !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
     const { dispatch, settingCompany } = this.props
 
     const { list } = settingCompany
@@ -33,7 +40,6 @@ class Grid extends PureComponent {
     const { settingCompany, route } = this.props
     const { name } = route
     const { companyType } = settingCompany
-    const accessRight = Authorized.check('copayer.copayerdetails')
 
     return (
       <CommonTableGrid
@@ -207,7 +213,7 @@ class Grid extends PureComponent {
             width: 100,
             render: (row) => {
               return (
-                <Authorized.Context.Provider value={accessRight}>
+                <Authorized authority='copayer.copayerdetails'>
                   <Tooltip
                     title={
                       companyType.id === 1 ? 'Edit Co-Payer' : 'Edit Supplier'
@@ -226,7 +232,7 @@ class Grid extends PureComponent {
                       <Edit />
                     </Button>
                   </Tooltip>
-                </Authorized.Context.Provider>
+                </Authorized>
               )
             },
           },
