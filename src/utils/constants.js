@@ -83,6 +83,8 @@ export const INVOICE_ITEM_TYPE = {
   3: 'Vaccination',
   4: 'Service',
   5: 'OrderSet',
+  6: 'Misc',
+  7: 'Treatment',
 }
 
 export const INVOICE_ITEM_TYPE_BY_TEXT = {
@@ -241,8 +243,16 @@ export const ORDER_TYPE_TAB = {
   VACCINATION: '2',
   SERVICE: '3',
   CONSUMABLE: '4',
-  OPENPRECRIPTION: '5',
+  OPENPRESCRIPTION: '5',
   ORDERSET: '6',
+}
+
+
+export const PATIENT_HISTORY_TABS = {
+  VISIT:1,
+  DISPENSE:2,
+  APPOINTMENT:3,
+  INVOICE:4,
 }
 
 export const FILE_STATUS = {

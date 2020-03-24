@@ -7,7 +7,10 @@ import {
   Button,
   dateFormatLong,
   Popconfirm,
+  notification,
 } from '@/components'
+import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 class Grid extends PureComponent {
   configs = {
@@ -25,33 +28,35 @@ class Grid extends PureComponent {
         render: (row) => {
           return (
             <React.Fragment>
-              <Button
-                size='sm'
-                onClick={() => {
-                  this.editRow(row)
-                }}
-                justIcon
-                color='primary'
-              >
-                <Edit />
-              </Button>
-              <Popconfirm
-                title='Are you sure?'
-                onConfirm={() => {
-                  setTimeout(() => {
-                    this.cancelRow(row)
-                  }, 1)
-                }}
-              >
+              <AuthorizationWrapper authority='inventoryadjustment.inventoryadjustmentdetails'>
                 <Button
                   size='sm'
+                  onClick={() => {
+                    this.editRow(row)
+                  }}
                   justIcon
-                  color='danger'
-                  disabled={row.status !== 'Draft'}
+                  color='primary'
                 >
-                  <Delete />
+                  <Edit />
                 </Button>
-              </Popconfirm>
+                <Popconfirm
+                  title='Are you sure?'
+                  onConfirm={() => {
+                    setTimeout(() => {
+                      this.cancelRow(row)
+                    }, 1)
+                  }}
+                >
+                  <Button
+                    size='sm'
+                    justIcon
+                    color='danger'
+                    disabled={row.status !== 'Draft'}
+                  >
+                    <Delete />
+                  </Button>
+                </Popconfirm>
+              </AuthorizationWrapper>
             </React.Fragment>
           )
         },
@@ -79,6 +84,15 @@ class Grid extends PureComponent {
 
   editRow = async (row) => {
     const { dispatch, inventoryAdjustment, toggleModal } = this.props
+    const accessRight = Authorized.check(
+      'inventoryadjustment.inventoryadjustmentdetails',
+    )
+    if (!accessRight || (accessRight && accessRight.rights !== 'enable')) {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
 
     await this.props
       .dispatch({

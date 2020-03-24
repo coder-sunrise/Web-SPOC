@@ -13,11 +13,8 @@ import Item from './Item'
 
 const styles = (theme) => ({
   diagnosisRow: {
-    margin: theme.spacing(1),
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(2),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    padding: theme.spacing(0.5),
   },
 })
 
@@ -150,7 +147,7 @@ class Diagnosis extends PureComponent {
           {(r) => {
             if (r.rights !== 'enable') return null
             return (
-              <div style={{ padding: theme.spacing(1) }}>
+              <div>
                 <Button
                   size='sm'
                   color='primary'

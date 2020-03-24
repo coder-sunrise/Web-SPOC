@@ -25,7 +25,6 @@ import {
 import { Getter } from '@devexpress/dx-react-core'
 import { NumberInput, CommonTableGrid } from '@/components'
 
-import { NumberFormatter } from '@/utils/utils'
 import CommandComponent from './CommandComponent'
 
 const numberOnChangeFormatter = (onChangeEvent) => (value) =>
@@ -50,27 +49,6 @@ const NumberEditor = (props) => {
     />
   ) : (
     <Table.Cell {...props} />
-  )
-}
-
-const NumberTypeProvider = (props) => {
-  // console.log(props)
-  return (
-    <DataTypeProvider
-      formatterComponent={NumberFormatter}
-      editorComponent={NumberEditor}
-      {...props}
-    />
-  )
-}
-
-const EditCell = (props) => {
-  // return <EditingCell {...props} />
-  const { editingEnabled } = props
-  return !editingEnabled ? (
-    <Table.Cell {...props} />
-  ) : (
-    <TableEditRow.Cell {...props} />
   )
 }
 

@@ -9,7 +9,15 @@ const filterDeletedFiles = (item) => {
 }
 
 const mapAttachmentToUploadInput = (
-  { fileIndexFK, fileName, attachmentType, isDeleted, thumbnail, ...rest },
+  {
+    fileIndexFK,
+    fileName,
+    attachmentType,
+    attachmentTypeFK,
+    isDeleted,
+    thumbnail,
+    ...rest
+  },
   index,
 ) =>
   !fileIndexFK
@@ -20,6 +28,7 @@ const mapAttachmentToUploadInput = (
         sortOrder: index,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
         remarks: rest.remarks,
       }
@@ -30,6 +39,7 @@ const mapAttachmentToUploadInput = (
         thumbnailIndexFK: thumbnail ? thumbnail.id : undefined,
         fileName,
         attachmentType,
+        attachmentTypeFK,
         isDeleted,
         sortOrder: index,
       }

@@ -12,7 +12,7 @@ import {
   withFormikExtend,
 } from '@/components'
 import Yup from '@/utils/yup'
-import { getServices } from '@/utils/codes'
+import { getServices } from '@/utils/codetable'
 import { calculateAdjustAmount } from '@/utils/utils'
 
 @connect(({ codetable, global }) => ({ codetable, global }))

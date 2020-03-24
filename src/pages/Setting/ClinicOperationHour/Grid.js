@@ -24,6 +24,7 @@ export default class Grid extends PureComponent {
       <CommonTableGrid
         style={{ margin: 0 }}
         onRowDoubleClick={this.editRow}
+        forceRender
         type='settingClinicOperationHour'
         columns={[
           { name: 'code', title: 'Code' },

@@ -18,7 +18,7 @@ import MoreVert from '@material-ui/icons/MoreVert'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
 import Loading from '@/components/PageLoading/index'
 import { getUniqueId } from '@/utils/utils'
-import VisualAcuity from '@/pages/Widgets/VisualAcuity'
+import EyeVisualAcuity from '@/pages/Widgets/EyeVisualAcuity'
 
 import {
   CardContainer,
@@ -208,7 +208,7 @@ class Masonry extends PureComponent {
 
   render () {
     const { props, state } = this
-    return <VisualAcuity />
+    return <EyeVisualAcuity />
   }
 }
 

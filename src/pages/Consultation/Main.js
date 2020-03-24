@@ -44,7 +44,6 @@ import {
   CheckboxGroup,
   ProgressButton,
   Checkbox,
-  NumberFormatter,
   confirm,
   SizeContainer,
   Popconfirm,
@@ -56,7 +55,6 @@ import {
 import Authorized from '@/utils/Authorized'
 import PatientBanner from '@/pages/PatientDashboard/Banner'
 
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 // import model from '@/pages/Widgets/Orders/models'
 import { convertToConsultation } from './utils'
@@ -807,7 +805,7 @@ class Main extends React.Component {
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
-
+    // console.log(values)
     const matches = {
       rights:
         rights === 'enable' && visit.visitStatus === 'PAUSED'

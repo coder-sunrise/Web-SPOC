@@ -1,13 +1,17 @@
 import React, { PureComponent } from 'react'
-
-import { Table } from '@devexpress/dx-react-grid-material-ui'
-import { withStyles } from '@material-ui/core'
 import moment from 'moment'
+// react dev grid
+import { Table } from '@devexpress/dx-react-grid-material-ui'
+// material ui
+import { withStyles } from '@material-ui/core'
+// common components
 import {
   CommonTableGrid,
   timeFormat,
   timeFormat24HourWithSecond,
 } from '@/components'
+// utils
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   subRow: {
@@ -54,19 +58,24 @@ class Grid extends PureComponent {
       doctor: null,
     }
 
+    const doubleClick = () => {
+      const accessRight = Authorized.check('appointment.appointmentdetails')
+
+      if (!accessRight || (accessRight && accessRight.rights !== 'enable'))
+        return
+
+      handleSelectEvent(selectedData)
+    }
+
     if (row.countNumber === 1) {
       return (
-        <Table.Row {...p} onDoubleClick={() => handleSelectEvent(selectedData)}>
+        <Table.Row {...p} onDoubleClick={doubleClick}>
           {newchildren}
         </Table.Row>
       )
     }
     return (
-      <Table.Row
-        {...p}
-        className={classes.subRow}
-        onDoubleClick={() => handleSelectEvent(selectedData)}
-      >
+      <Table.Row {...p} className={classes.subRow} onDoubleClick={doubleClick}>
         {newchildren}
       </Table.Row>
     )
@@ -118,10 +127,6 @@ class Grid extends PureComponent {
           },
           {
             columnName: 'doctor',
-            type: 'codeSelect',
-            code: 'doctorprofile',
-            labelField: 'clinicianProfile.name',
-            valueField: 'clinicianProfile.id',
             sortingEnabled: false,
           },
           {
@@ -142,7 +147,7 @@ class Grid extends PureComponent {
             columnName: 'appointmentStatusFk',
             type: 'codeSelect',
             code: 'ltappointmentstatus',
-            sortBy: 'appointmentStatusFkNavigation.displayValue',
+            sortBy: 'status',
           },
           {
             columnName: 'bookedByUser',

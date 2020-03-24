@@ -4,7 +4,6 @@ import _ from 'lodash'
 import * as service from '../services/deliveryOrder'
 import { podoOrderType, groupByFKFunc } from '@/utils/codes'
 import { getUniqueId } from '@/utils/utils'
-import { fakeDOQueryDoneData, isPOStatusFinalized } from '../variables'
 
 const InitialPurchaseOrder = {
   purchaseOrder: {
@@ -192,7 +191,7 @@ export default createFormViewModel({
             deliveryOrderDate: moment(),
             remark: '',
             rows: newOSItem.map((o) => ({
-              currentReceivingBonusQty: undefined,
+              currentReceivingBonusQty: 0,
               expiryDate: undefined,
               ...o,
             })),
@@ -303,24 +302,10 @@ export default createFormViewModel({
             }
             return {
               ...o,
-              // [itemFK]: o.inventoryItemFK,
               [itemFK]: o.itemFK,
             }
           })
-          // rows = rows.map((row) => {
-          //   const n =
-          //     row.uid === payload.uid
-          //       ? {
-          //           ...row,
-          //           ...payload,
-          //         }
-          //       : row
-          //   return n
-          // })
         } else if (gridRow) {
-          // const itemFK = podoOrderType.filter(
-          //   (x) => x.value === payload.type,
-          // )[0].itemFKName
           let itemFK
           const item = podoOrderType.filter((x) => x.value === gridRow.type)
           if (item.length > 0) {

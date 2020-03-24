@@ -9,7 +9,13 @@ export default createListViewModel({
   param: {
     service: {},
     state: {
-      default: {},
+      default: {
+        corEyeVisualAcuityTest: {
+          eyeVisualAcuityTestForms: [
+            {},
+          ],
+        },
+      },
     },
     subscriptions: ({ dispatch, history }) => {
       history.listen(async (loct, method) => {

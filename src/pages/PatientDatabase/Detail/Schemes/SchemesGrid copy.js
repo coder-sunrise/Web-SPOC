@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { EditableTableGrid, notification } from '@/components'
 
 import Yup from '@/utils/yup'
-import { getCodes } from '@/utils/codes'
+import { getCodes } from '@/utils/codetable'
 import { getUniqueNumericId } from '@/utils/utils'
 
 let schemeTypes = []

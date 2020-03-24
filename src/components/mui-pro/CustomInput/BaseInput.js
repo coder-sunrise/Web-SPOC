@@ -232,7 +232,7 @@ class BaseInput extends React.PureComponent {
     // if (this.state && this.state.value !== undefined) {
     //   inputProps.value = this.state.value
     // }
-    const { rowsMax, ...resetProps } = inputProps
+    const { rowsMax, onChange, ...resetProps } = inputProps
     const cfg = {
       fullWidth: fullWidth !== undefined ? fullWidth : !text,
       readOnly: readonly,

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { query as queryUsers, queryCurrent } from '@/services/user'
 import { fetchUserProfileByID } from '@/pages/Setting/UserProfile/services'
 import * as serviceQueue from '../services/queue'
@@ -126,16 +127,16 @@ export default {
   },
 
   effects: {
-    *fetch (_, { call, put }) {
+    *fetch (state, { call, put }) {
       const response = yield call(queryUsers)
       yield put({
         type: 'save',
         payload: response,
       })
     },
-    *fetchCurrent (_, { select, call, put }) {
+    *fetchCurrent (state, { select, call, put }) {
       let user = JSON.parse(sessionStorage.getItem('user'))
-      const clinicInfo = yield select((state) => state.clinicInfo)
+      // const clinicInfo = yield select((state) => state.clinicInfo)
       if (!user) {
         const response = yield call(queryCurrent)
         if (!response) {
@@ -163,7 +164,7 @@ export default {
 
           user = {
             data: data.userProfileDetailDto,
-            accessRights,
+            accessRights: _.orderBy(accessRights, (o) => o.name),
           }
           // for AiOT user only
           // if (user && user.data && user.data.id === 46) {
@@ -173,7 +174,7 @@ export default {
         }
         sessionStorage.setItem('user', JSON.stringify(user))
       }
-
+      // console.log({ accessRight: JSON.stringify(user.accessRights) })
       yield put({
         type: 'saveCurrentUser',
         payload: user,
@@ -211,7 +212,7 @@ export default {
   },
 
   reducers: {
-    reset (_) {
+    reset (state) {
       return { ...defaultState }
     },
     save (state, action) {

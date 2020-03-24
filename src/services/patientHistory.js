@@ -14,6 +14,9 @@ module.exports = {
   queryRetailHistory: (params) => {
     return service.query(`${url}/Retail`, params)
   },
+  queryDispenseHistory:(params) =>{
+    return service.query(`${url}/Dispense`, params)
+  },
   // upsert: (params) => {
   //   return service.upsert(url, params)
   // },

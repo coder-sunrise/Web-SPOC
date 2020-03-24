@@ -23,12 +23,14 @@ import {
   CodeSelect,
   SizeContainer,
   DatePicker,
+  CommonModal,
 } from '@/components'
 
 // utils
 import { getBizSession } from '@/services/queue'
 import { navigateDirtyCheck } from '@/utils/utils'
-import { AccessRightConfig } from './const'
+import { AccessRightConfig } from './Const'
+import Prompt from './Prompt'
 
 const styles = (theme) => ({
   container: {
@@ -73,12 +75,18 @@ const styles = (theme) => ({
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
     let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight.map((r) => {
-      const data = filteredAccessRight.filter((m) => {
-        return m.clientAccessRightFK === r.clientAccessRightFK
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .filter(
+        (m) =>
+          !values.clinicRoleFK ||
+          m.clinicRoleBitValue >= 2 ** (values.clinicRoleFK - 1),
+      )
+      .map((r) => {
+        const data = filteredAccessRight.filter((m) => {
+          return m.clientAccessRightFK === r.clientAccessRightFK
+        })
+        return data.length === 0 ? r : data[0]
       })
-      return data.length === 0 ? r : data[0]
-    })
     if (!values.id) {
       restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
@@ -111,6 +119,9 @@ class Main extends React.Component {
     hasUser: true,
     hasActiveSession: true,
     isActive: false,
+    showModal: false,
+    currSelectedValue: undefined,
+    currSelectedRow: undefined,
   }
 
   componentDidMount = () => {
@@ -139,7 +150,7 @@ class Main extends React.Component {
         })
         .then((response) => {
           const result = response.data.filter((m) => {
-            return m.userProfile.role.id === userRole.id
+            return m.userProfile.role.clinicRoleFK === userRole.clinicRoleFK
           })
           this.setState({ hasUser: result.length > 0 })
         })
@@ -164,25 +175,43 @@ class Main extends React.Component {
     }
   }
 
-  handleSearchClick = async () => {
+  handleSearch = async (e) => {
     const { filter } = this.state
     const { module, displayValue } = filter
     const { values } = this.props
     const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
-      const data = filteredAccessRight.filter((m) => {
-        return m.clientAccessRightFK === d.clientAccessRightFK
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .map((d) => {
+        const data = filteredAccessRight.filter((m) => {
+          return m.clientAccessRightFK === d.clientAccessRightFK
+        })
+        return data.length === 0 ? d : data[0]
       })
-      return data.length === 0 ? d : data[0]
-    })
+      .sort(this.compare)
 
     restValues.filteredAccessRight = restValues.roleClientAccessRight
+      .filter(
+        (m) => {
+          if (e) {
+            let index = values.clinicRoleFK
+            if (typeof e === 'number') index = e
+            return !index || m.clinicRoleBitValue >= 2 ** (index - 1)
+          }
+          return true
+        },
+        // typeof e !== 'number' || m.clinicRoleBitValue >= 2 ** (e - 1),
+      )
       .filter((m) => {
         return !module || m.module === module
       })
       .filter((m) => {
         return !displayValue || m.displayValue === displayValue
       })
+      .sort(this.compare)
+
+    if (typeof e === 'number') {
+      restValues.clinicRoleFK = e
+    }
 
     this.props.dispatch({
       type: 'settingUserRole/updateState',
@@ -258,14 +287,106 @@ class Main extends React.Component {
     history.goBack()
   }
 
+  updateSelectedValues = async () => {
+    const { values } = this.props
+    const { currSelectedValue, currSelectedRow } = this.state
+    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .map((r) => {
+        if (r.module === currSelectedRow.module) {
+          if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
+            r.permission = 'Disable'
+          }
+          r.permission = currSelectedValue
+        }
+        return r
+      })
+      .sort(this.compare)
+    restValues.filteredAccessRight = filteredAccessRight
+      .map((r) => {
+        if (r.module === currSelectedRow.module) {
+          if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
+            r.permission = 'Disable'
+          }
+          r.permission = currSelectedValue
+        }
+        return r
+      })
+      .sort(this.compare)
+    await this.props.dispatch({
+      type: 'settingUserRole/updateState',
+      payload: {
+        currentSelectedUserRole: restValues,
+      },
+    })
+
+    this.toggleModal()
+  }
+
+  onConfirmChangeRight = (value, row) => {
+    if (row.type === 'Module' && row.sortOrder === 1 && value !== 'ReadWrite')
+      this.setState({ currSelectedValue: value, currSelectedRow: row }, () => {
+        this.toggleModal()
+      })
+  }
+
+  onCancel = async () => {
+    const { values } = this.props
+    const { currSelectedRow } = this.state
+    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    restValues.roleClientAccessRight = roleClientAccessRight
+      .map((r) => {
+        if (r.id === currSelectedRow.id) {
+          r.permission = currSelectedRow.permission
+        }
+        return r
+      })
+      .sort(this.compare)
+    restValues.filteredAccessRight = filteredAccessRight
+      .map((r) => {
+        if (r.id === currSelectedRow.id) {
+          r.permission = currSelectedRow.permission
+        }
+        return r
+      })
+      .sort(this.compare)
+
+    await this.props.dispatch({
+      type: 'settingUserRole/updateState',
+      payload: {
+        currentSelectedUserRole: restValues,
+      },
+    })
+
+    this.toggleModal()
+  }
+
+  toggleModal = () => {
+    const { showModal } = this.state
+    this.setState({ showModal: !showModal })
+  }
+
+  compare = (a, b) => {
+    const f = a.module.localeCompare(b.module)
+    if (f !== 0) return f
+    return a.sortOrder - b.sortOrder
+  }
+
   render () {
-    const { classes, values } = this.props
-    const { filter, hasUser, hasActiveSession, isActive } = this.state
+    const { classes, values, footer } = this.props
+    const {
+      filter,
+      hasUser,
+      hasActiveSession,
+      isActive,
+      showModal,
+    } = this.state
     const {
       id,
       isUserMaintainable,
       effectiveStartDate,
       effectiveEndDate,
+      filteredAccessRight,
     } = values
 
     const isEdit = !!id
@@ -372,6 +493,7 @@ class Main extends React.Component {
                     label='Clinical Role'
                     code='ltclinicalrole'
                     disabled={isEdit}
+                    onChange={this.handleSearch}
                   />
                 )}
               />
@@ -400,6 +522,7 @@ class Main extends React.Component {
                 value={filter.displayValue}
                 label='Function Access'
                 options={this.displayValueList()}
+                dropdownMatchSelectWidth={false}
                 onChange={this.onSelectDisplayValue}
               />
             </GridItem>
@@ -408,7 +531,7 @@ class Main extends React.Component {
               <ProgressButton
                 icon={<Search />}
                 color='primary'
-                onClick={this.handleSearchClick}
+                onClick={this.handleSearch}
               >
                 <FormattedMessage id='form.search' />
               </ProgressButton>
@@ -416,12 +539,25 @@ class Main extends React.Component {
 
             <SizeContainer size='sm'>
               <CommonTableGrid
-                rows={values.filteredAccessRight}
-                {...AccessRightConfig({ isEdit, isUserMaintainable })}
-                onRowDoubleClick={this.handleDoubleClick}
+                forceRender
+                rows={filteredAccessRight}
+                {...AccessRightConfig({
+                  isEdit,
+                  isUserMaintainable,
+                  onConfirmChangeRight: this.onConfirmChangeRight,
+                })}
                 FuncProps={{ pager: true }}
               />
             </SizeContainer>
+            <CommonModal
+              open={showModal}
+              maxWidth='md'
+              title='Confirm to change access right'
+              onClose={this.onCancel}
+              onConfirm={this.onCancel}
+            >
+              <Prompt updateSelectedValues={this.updateSelectedValues} />
+            </CommonModal>
           </GridContainer>
         </GridContainer>
         <GridItem

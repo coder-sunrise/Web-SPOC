@@ -6,6 +6,7 @@ import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
 import DetailPanel from './Detail'
 import InventoryTypeListing from './InventoryTypeListing'
 import { OrderSetDetailOption } from './variables'
+import { AuthorizationWrapper } from '@/components/_medisys'
 
 import {
   NavPills,
@@ -65,7 +66,7 @@ const Detail = ({
   //           code: x.ctName,
   //         },
   //       }).then((list) => {
-  //         const { inventoryItemList } = getInventoryItemList(list)
+  //         const { inventoryItemList } = inventoryItemList(list)
   //         console.log(x.stateName)
   //         switch (x.stateName) {
   //           case 'ConsumableItemList': {
@@ -211,25 +212,28 @@ const Detail = ({
           },
         ]}
       /> */}
-      <Tabs
-        style={{ marginTop: 20 }}
-        defaultActiveKey='0'
-        options={OrderSetDetailOption(detailProps, typeListingProps)}
-      />
-      <div className={classes.actionDiv}>
-        <Button
-          color='danger'
-          onClick={navigateDirtyCheck({
-            redirectUrl: '/inventory/master?t=3',
-          })}
-        >
-          Close
-        </Button>
-        <ProgressButton
-          submitKey='orderSetDetail/submit'
-          onClick={handleSubmit}
+      <AuthorizationWrapper authority='inventorymaster.orderset'>
+        <Tabs
+          style={{ marginTop: 20 }}
+          defaultActiveKey='0'
+          options={OrderSetDetailOption(detailProps, typeListingProps)}
         />
-      </div>
+        <div className={classes.actionDiv}>
+          <Button
+            color='danger'
+            authority='none'
+            onClick={navigateDirtyCheck({
+              redirectUrl: '/inventory/master?t=3',
+            })}
+          >
+            Close
+          </Button>
+          <ProgressButton
+            submitKey='orderSetDetail/submit'
+            onClick={handleSubmit}
+          />
+        </div>
+      </AuthorizationWrapper>
     </React.Fragment>
   )
 }

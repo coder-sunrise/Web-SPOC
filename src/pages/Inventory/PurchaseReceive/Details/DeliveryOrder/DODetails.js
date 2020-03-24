@@ -14,6 +14,8 @@ import {
 } from '@/components'
 import { podoOrderType, getInventoryItemV2 } from '@/utils/codes'
 import { INVENTORY_TYPE } from '@/utils/constants'
+import AuthorizedContext from '@/components/Context/Authorized'
+
 // let commitCount = 2201 // uniqueNumber
 
 const receivingDetailsSchema = Yup.object().shape({
@@ -181,7 +183,7 @@ class DODetails extends PureComponent {
         [x.stateName]: deliveryOrderDetails[x.stateName],
       })
     })
-    await this.props.refreshDeliveryOrder()
+    // await this.props.refreshDeliveryOrder()
     if (mode === 'Add') {
       await dispatch({
         type: 'deliveryOrderDetails/setAddNewDeliveryOrder',
@@ -323,22 +325,13 @@ class DODetails extends PureComponent {
         type: 'deliveryOrderDetails/deleteRow',
         payload: deleted[0],
       })
-    } else if (changed) {
-      const existUid = Object.keys(changed)[0]
+    } else {
       await dispatch({
         type: 'deliveryOrderDetails/upsertRow',
         payload: {
-          uid: existUid,
-          ...changed[existUid],
+          uid: changed ? Object.keys(changed)[0] : undefined,
           gridRows: rows,
-          remark: values.remark,
-        },
-      })
-    } else if (added) {
-      await dispatch({
-        type: 'deliveryOrderDetails/upsertRow',
-        payload: {
-          gridRow: added[0],
+          gridRow: added ? added[0] : undefined,
           remark: values.remark,
         },
       })
@@ -346,38 +339,6 @@ class DODetails extends PureComponent {
     setFieldValue('isDirty', true) // manually trigger dirty
 
     // return rows
-  }
-
-  onAddedRowsChange = (addedRows) => {
-    let newAddedRows = addedRows
-    if (addedRows.length > 0) {
-      if (!addedRows.isFocused) {
-        const { onClickColumn, selectedItem } = this.state
-
-        if (onClickColumn === 'type') {
-          // Handle type changed
-        } else if (onClickColumn === 'item') {
-          this.setState({ onClickColumn: undefined })
-          return addedRows.map((row) => ({
-            ...row,
-          }))
-        }
-
-        this.setState({ onClickColumn: undefined })
-
-        newAddedRows = addedRows.map((row) => ({
-          ...row,
-        }))
-      } else {
-        // Initialize new generated row
-        this.setState({ onClickColumn: undefined })
-        newAddedRows = addedRows.map((row) => ({
-          ...row,
-          isFocused: true,
-        }))
-      }
-    }
-    return newAddedRows
   }
 
   getItemOptions = (row, filteredStateName, stateName) => {
@@ -455,7 +416,15 @@ class DODetails extends PureComponent {
 
   render () {
     const { props } = this
-    const { footer, values, theme, errors, classes } = props
+    const {
+      footer,
+      values,
+      theme,
+      errors,
+      classes,
+      isEditable,
+      allowAccess,
+    } = props
     const { rows } = values
 
     const tableParas = {
@@ -612,8 +581,14 @@ class DODetails extends PureComponent {
       ],
       onRowDoubleClick: undefined,
     }
+
     return (
-      <React.Fragment>
+      <AuthorizedContext.Provider
+        value={{
+          rights:
+            isEditable === true && allowAccess === true ? 'enable' : 'disable',
+        }}
+      >
         <div style={{ margin: theme.spacing(2) }}>
           <GridContainer>
             <GridItem xs={12} md={5}>
@@ -702,7 +677,6 @@ class DODetails extends PureComponent {
               EditingProps={{
                 showAddCommand: true,
                 onCommitChanges: this.onCommitChanges,
-                onAddedRowsChange: this.onAddedRowsChange,
               }}
               {...tableParas}
             />
@@ -714,7 +688,7 @@ class DODetails extends PureComponent {
               confirmBtnText: 'Save',
             })}
         </div>
-      </React.Fragment>
+      </AuthorizedContext.Provider>
     )
   }
 }

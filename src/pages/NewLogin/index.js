@@ -152,6 +152,10 @@ const submitKey = 'login/getToken'
             type: 'clinicInfo/query',
             payload: { clinicCode },
           })
+
+          await dispatch({
+            type: 'user/fetchCurrent',
+          })
           router.push(loginDestination)
         }
       })

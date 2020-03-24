@@ -40,15 +40,19 @@ const styles = (theme) => ({
       clinicSettings.entity &&
       clinicSettings.entity.showConsultationVersioning
     ) {
-      const { showConsultationVersioning, autoRefresh, defaultVisitType } = clinicSettings.entity
+      const {
+        showConsultationVersioning,
+        autoRefresh,
+        defaultVisitType,
+      } = clinicSettings.entity
 
       return {
         ...clinicSettings.entity,
-        defaultVisitType:{
+        defaultVisitType: {
           ...defaultVisitType,
           settingValue: Number(defaultVisitType.settingValue),
         },
-        autoRefresh:{
+        autoRefresh: {
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
         },
@@ -239,6 +243,7 @@ class GeneralSetting extends PureComponent {
                     {...args}
                     code='ctvisitpurpose'
                     disabled={!!hasActiveSession}
+                    allowClear={false}
                   />
                 )}
               />

@@ -3,8 +3,9 @@ import _ from 'lodash'
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/consultation'
 import { getUniqueId } from '@/utils/utils'
-import { consultationDocumentTypes, orderTypes } from '@/utils/codes'
+import { consultationDocumentTypes } from '@/utils/codes'
 import { sendQueueNotification } from '@/pages/Reception/Queue/utils'
+import { orderTypes } from '@/pages/Consultation/utils'
 
 const getSequence = (sequence, maxSeq) => {
   if (sequence === 0) return sequence
@@ -434,6 +435,14 @@ export default createFormViewModel({
             defaultIsPersist: diagnosis.isPersist,
           }
         })
+
+        // if (data.corEyeVisualAcuityTest)
+        //   yield put({
+        //     type: 'visualAcuity/updateState',
+        //     payload: {
+        //       entity: data.corEyeVisualAcuityTest,
+        //     },
+        //   })
 
         // if (data.corDiagnosis && data.corDiagnosis.length > 0) {
         //   data.corDiagnosis.forEach((cd) => {

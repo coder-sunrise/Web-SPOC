@@ -25,6 +25,7 @@ const checkSinglePermission = (
       (o) =>
         [
           'enable',
+          'enabled',
           'readwrite',
         ].indexOf(o.rights) >= 0,
     )
@@ -44,6 +45,25 @@ const checkSinglePermission = (
         ? target(match)
         : null
     }
+
+    match = r.find(
+      (o) =>
+        [
+          'readonly',
+        ].indexOf(o.rights) >= 0,
+    )
+    if (match) {
+      if (typeof target === 'object') return target
+      // eslint-disable-next-line no-nested-ternary
+      return typeof target === 'function' && type !== 'decorator'
+        ? target(match)
+        : type !== 'decorator'
+          ? React.cloneElement(target, {
+              disabled: true,
+            })
+          : 'disabled'
+    }
+
     match = r.find(
       (o) =>
         [
@@ -58,7 +78,7 @@ const checkSinglePermission = (
           ? React.cloneElement(target, {
               disabled: true,
             })
-          : 'disable'
+          : 'disabled'
     }
 
     return null
@@ -93,7 +113,6 @@ const checkPermissions = (
   // )
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
-
   if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {
     return typeof target === 'function' && type !== 'decorator'
       ? target({
@@ -113,6 +132,7 @@ const checkPermissions = (
           (o) =>
             [
               'enable',
+              'enabled',
               'readwrite',
             ].indexOf(o.rights) >= 0,
         )

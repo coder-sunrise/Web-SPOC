@@ -7,6 +7,7 @@ import moment from 'moment'
 import Yup from '@/utils/yup'
 import {
   Button,
+  CommonModal,
   GridContainer,
   GridItem,
   FastField,
@@ -19,7 +20,7 @@ import {
   DatePicker,
   Select,
   reversedDateFormat,
-  CommonModal,
+  ProgressButton,
 } from '@/components'
 import {
   AppointmentTypeLabel,
@@ -27,6 +28,7 @@ import {
   ReportViewer,
 } from '@/components/_medisys'
 import { appointmentStatusReception } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const createPayload = (values) => {
   const {
@@ -122,6 +124,7 @@ const FilterBar = ({
                 label={formatMessage({
                   id: 'reception.queue.patientSearchPlaceholder',
                 })}
+                autoFocus
               />
             )}
           />
@@ -259,7 +262,8 @@ const FilterBar = ({
           />
         </GridItem>
         <GridItem xs md={12}>
-          <Button
+          <ProgressButton
+            icon={null}
             color='primary'
             size='sm'
             onClick={async () => {
@@ -269,11 +273,17 @@ const FilterBar = ({
           >
             <Search />
             Search
-          </Button>
-          <Button color='primary' size='sm' onClick={handleAddAppointmentClick}>
-            <Add />
-            Add Appointment
-          </Button>
+          </ProgressButton>
+          <Authorized authority='appointment.newappointment'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={handleAddAppointmentClick}
+            >
+              <Add />
+              Add Appointment
+            </Button>
+          </Authorized>
           <Button
             color='primary'
             size='sm'

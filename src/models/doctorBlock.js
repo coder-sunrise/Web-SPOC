@@ -2,7 +2,6 @@ import moment from 'moment'
 import { createListViewModel } from 'medisys-model'
 // common components
 import { notification } from '@/components'
-import { getCodes } from '@/utils/codes'
 import * as service from '@/services/doctorBlock'
 
 export default createListViewModel({

@@ -155,6 +155,9 @@ const customInputStyle = {
     //   color: "#495057",
     // },
   },
+  hiddenOverflow: {
+    overflow: 'hidden',
+  },
   simple: {
     margin: 0,
     '& > *': {
