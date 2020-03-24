@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, Fragment } from 'react'
 import { Table } from '@devexpress/dx-react-grid-material-ui'
 import Edit from '@material-ui/icons/Edit'
 
 import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
 import Authorized from '@/utils/Authorized'
 
-const { Secured } = Authorized
-@Secured('inventorymaster.inventoryitemdetails')
+// const { Secured } = Authorized
+// @Secured('inventorymaster.inventoryitemdetails')
 class Grid extends React.Component {
   render () {
     const {
@@ -22,7 +22,10 @@ class Grid extends React.Component {
     const showDetail = (row, vmode) => () =>
       history.push(`/inventory/master/edit${namespace}?uid=${row.id}`)
     const handleDoubleClick = (row) => {
-      if (disabled) {
+      const accessRight = Authorized.check(
+        'inventorymaster.inventoryitemdetails',
+      )
+      if (disabled || accessRight.rights !== 'enable') {
         notification.error({
           message: 'Current user is not authorized to access',
         })
@@ -41,15 +44,19 @@ class Grid extends React.Component {
                 namespace.slice(1)}`}
               placement='bottom'
             >
-              <Button
-                size='sm'
-                onClick={showDetail(row)}
-                justIcon
-                color='primary'
-                style={{ marginRight: 5 }}
-              >
-                <Edit />
-              </Button>
+              <Authorized authority='inventorymaster.inventoryitemdetails'>
+                <Fragment>
+                  <Button
+                    size='sm'
+                    onClick={showDetail(row)}
+                    justIcon
+                    color='primary'
+                    style={{ marginRight: 5 }}
+                  >
+                    <Edit />
+                  </Button>
+                </Fragment>
+              </Authorized>
             </Tooltip>
           </Table.Cell>
         )
