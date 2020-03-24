@@ -1,8 +1,8 @@
 {
-  "name": "Medicloud",
+  "name": "medicloud",
   "version": "2.1.1",
   "description": "Medicloud System",
-  "private": true,
+  "private": false,
   "scripts": {
     "presite": "node ./scripts/generateMock.js && cd functions && npm install",
     "start": "cross-env APP_TYPE=site umi dev",
