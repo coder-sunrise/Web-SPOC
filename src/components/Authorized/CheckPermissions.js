@@ -31,7 +31,6 @@ const checkSinglePermission = (
         ].indexOf(o.rights) >= 0,
     )
     if (match) {
-      match.rights = 'enable'
       if (type === 'decorator') return match
       if (React.isValidElement(target))
         return (
