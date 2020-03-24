@@ -17,6 +17,7 @@ import { isPOStatusFulfilled, getAccessRight } from '../../variables'
 import AuthorizedContext from '@/components/Context/Authorized'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { podoOrderType, inventoryItemListing } from '@/utils/codes'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -39,6 +40,8 @@ const styles = (theme) => ({
 //     return deliveryOrderDetails
 //   },
 // })
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @connect(({ purchaseOrderDetails, deliveryOrderDetails }) => ({
   purchaseOrderDetails,
   deliveryOrderDetails,
@@ -113,7 +116,7 @@ class index extends Component {
     this.setState({ showDeliveryOrderDetails: false, mode: '' })
 
   render () {
-    const { purchaseOrderDetails, theme } = this.props
+    const { purchaseOrderDetails, theme, rights } = this.props
     const { purchaseOrder } = purchaseOrderDetails
     const poStatus = purchaseOrder ? purchaseOrder.purchaseOrderStatusFK : 1
     const isWriteOff = purchaseOrder
@@ -128,7 +131,7 @@ class index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: isEditable() || getAccessRight() ? 'enable' : 'disable',
+          rights: isEditable() === false ? 'disable' : rights,
           // rights: 'disable',
         }}
       >

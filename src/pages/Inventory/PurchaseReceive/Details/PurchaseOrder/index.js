@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 // import { connect } from 'dva'
 import router from 'umi/router'
 import _ from 'lodash'
@@ -30,6 +30,7 @@ import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -44,6 +45,8 @@ const styles = (theme) => ({
   },
 })
 
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
@@ -523,6 +526,7 @@ class Index extends Component {
       setFieldValue,
       errors,
       classes,
+      rights,
     } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
@@ -545,7 +549,7 @@ class Index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: this.getRights(type, poStatus, isWriteOff),
+          rights: type === 'new' ? 'enable' : rights,
         }}
       >
         <POForm
