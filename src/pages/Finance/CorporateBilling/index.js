@@ -23,13 +23,12 @@ const styles = () => ({
 class CorporateBilling extends PureComponent {
   render () {
     const { classes } = this.props
-    const accessRight = Authorized.check('finance/corporatebilling')
     return (
       <PageHeaderWrapper
         title={<FormattedMessage id='app.forms.basic.title' />}
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
-        <Authorized.Context.Provider value={accessRight}>
+        <Authorized authority='finance/corporatebilling'>
           <Card>
             <CardBody>
               <h4 className={classes.cardIconTitle}>
@@ -39,7 +38,7 @@ class CorporateBilling extends PureComponent {
               <CorporateBillingGrid />
             </CardBody>
           </Card>
-        </Authorized.Context.Provider>
+        </Authorized>
       </PageHeaderWrapper>
     )
   }

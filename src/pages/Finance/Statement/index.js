@@ -15,6 +15,7 @@ import {
   Tooltip,
   dateFormatLong,
   CardContainer,
+  notification,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -93,6 +94,13 @@ class Statement extends PureComponent {
   render () {
     const { history, dispatch } = this.props
     const editRow = (row, e) => {
+      const accessRight = Authorized.check('statement.statementdetails')
+      if (accessRight !== 'enable') {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
       dispatch({
         type: 'statement/updateState',
         payload: {

@@ -79,8 +79,6 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
     [classes.blur]: showWarning,
   })
 
-  const accessRight = Authorized.check('communication')
-
   const defaultSearchQuery = (type) => {
     if (type === 'Appointment') {
       return {
@@ -159,35 +157,33 @@ const SMS = ({ classes, smsAppointment, smsPatient, dispatch, clinicInfo }) => {
   }, [])
   return (
     <div>
-      <Authorized.Context.Provider value={accessRight}>
-        <CardContainer hideHeader>
-          {showWarning && (
-            <React.Fragment>
-              <div className={classes.overlay}> </div>
-              <div className={classes.warningContent}>
-                <CardContainer hideHeader>
-                  <Danger>
-                    <h4>
-                      To configure and use SMS feature, please contact system
-                      administrator for assistant.
-                    </h4>
-                  </Danger>
-                </CardContainer>
-              </div>
-            </React.Fragment>
-          )}
-          <div className={contentClass}>
-            <Tabs
-              defaultActiveKey='0'
-              options={SmsOption(gridProps)}
-              onChange={(e) => setCurrentTab(e)}
-            />
-            <div className={classes.sendBar}>
-              <New {...newMessageProps} />
+      <CardContainer hideHeader>
+        {showWarning && (
+          <React.Fragment>
+            <div className={classes.overlay}> </div>
+            <div className={classes.warningContent}>
+              <CardContainer hideHeader>
+                <Danger>
+                  <h4>
+                    To configure and use SMS feature, please contact system
+                    administrator for assistant.
+                  </h4>
+                </Danger>
+              </CardContainer>
             </div>
+          </React.Fragment>
+        )}
+        <div className={contentClass}>
+          <Tabs
+            defaultActiveKey='0'
+            options={SmsOption(gridProps)}
+            onChange={(e) => setCurrentTab(e)}
+          />
+          <div className={classes.sendBar}>
+            <New {...newMessageProps} />
           </div>
-        </CardContainer>
-      </Authorized.Context.Provider>
+        </div>
+      </CardContainer>
     </div>
   )
 }
