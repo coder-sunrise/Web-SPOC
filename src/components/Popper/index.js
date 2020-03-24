@@ -47,23 +47,19 @@ export default ({
           }
         : null,
   }
-  // const { className, style, ...resetBtnProps } = children.props
+
+  const onOverlayClick = (event) => {
+    if (stopOnClickPropagation) event.stopPropagation()
+  }
 
   const popperContainer = (
     <Paper elevation={2}>
       <ClickAwayListener
         onClickAway={() => {
-          // console.log('onClickAway')
           trigger !== 'hover' ? setAnchorEl(null) : undefined
         }}
       >
-        <div
-          onClick={(event) => {
-            if (stopOnClickPropagation) event.stopPropagation()
-          }}
-        >
-          {overlay}
-        </div>
+        <div onClick={onOverlayClick}>{overlay}</div>
       </ClickAwayListener>
     </Paper>
   )
