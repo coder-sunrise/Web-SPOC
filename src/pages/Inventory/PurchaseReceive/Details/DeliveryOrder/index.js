@@ -131,7 +131,7 @@ class index extends Component {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights: isEditable() ? 'enable' : rights,
+          rights: isEditable() === false ? 'disable' : rights,
           // rights: 'disable',
         }}
       >
