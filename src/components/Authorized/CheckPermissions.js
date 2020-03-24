@@ -33,7 +33,14 @@ const checkSinglePermission = (
     if (match) {
       match.rights = 'enable'
       if (type === 'decorator') return match
-
+      if (React.isValidElement(target))
+        return (
+          <Authorized.Context.Provider value={match}>
+            {React.cloneElement(target, {
+              rights: match.rights,
+            })}
+          </Authorized.Context.Provider>
+        )
       return typeof target === 'function' && type !== 'decorator'
         ? target(match)
         : target
