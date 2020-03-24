@@ -54,7 +54,6 @@ const VisitInfoCard = ({
   visitOrderTemplateOptions,
   ...restProps
 }) => {
-  console.log({ restProps })
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
@@ -80,7 +79,6 @@ const VisitInfoCard = ({
   const validateTotalCharges = (value) => {
     const { values } = restProps
     let totalTempCharge = 0
-    console.log(visitOrderTemplateOptions, values.visitOrderTemplateFK)
     if ((values.visitOrderTemplateFK || 0) > 0) {
       const template = visitOrderTemplateOptions.find(
         (i) => i.id === values.visitOrderTemplateFK,
