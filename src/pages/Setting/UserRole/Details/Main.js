@@ -294,10 +294,10 @@ class Main extends React.Component {
     restValues.roleClientAccessRight = roleClientAccessRight
       .map((r) => {
         if (r.module === currSelectedRow.module) {
+          r.permission = currSelectedValue
           if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
             r.permission = 'Disable'
           }
-          r.permission = currSelectedValue
         }
         return r
       })
@@ -305,10 +305,10 @@ class Main extends React.Component {
     restValues.filteredAccessRight = filteredAccessRight
       .map((r) => {
         if (r.module === currSelectedRow.module) {
+          r.permission = currSelectedValue
           if (currSelectedValue === 'ReadOnly' && r.type === 'Action') {
             r.permission = 'Disable'
           }
-          r.permission = currSelectedValue
         }
         return r
       })
