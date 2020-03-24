@@ -64,7 +64,6 @@ import { visitOrderTemplateItemTypes } from '@/utils/codes'
       visitOrderTemplateItemDtos: itemTypesArray,
       effectiveStartDate: effectiveDates[0],
       effectiveEndDate: effectiveDates[1],
-      total: _.sumBy(itemTypesArray, 'total'),
     }
     dispatch({
       type: 'settingVisitOrderTemplate/upsert',

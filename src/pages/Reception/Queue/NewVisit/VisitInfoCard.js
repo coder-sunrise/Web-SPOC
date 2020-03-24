@@ -169,6 +169,13 @@ const VisitInfoCard = ({
                         FormField['visit.VisitOrderTemplateTotal'],
                         activeItemTotal,
                       )
+                    } else {
+                      setTimeout(() => {
+                        form.setFieldValue(
+                          FormField['visit.VisitOrderTemplateTotal'],
+                          undefined,
+                        )
+                      }, 1)
                     }
                   }}
                 />
@@ -179,15 +186,21 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.VisitOrderTemplateTotal']}
-            render={(args) => (
-              <NumberInput
-                {...args}
-                currency
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitOrderTotalCharge',
-                })}
-              />
-            )}
+            render={(args) => {
+              const { form: fm } = args
+              const readOnly = (fm.values.visitOrderTemplateFK || 0) <= 0
+              return (
+                <NumberInput
+                  {...args}
+                  currency
+                  disabled={readOnly}
+                  label={formatMessage({
+                    id:
+                      'reception.queue.visitRegistration.visitOrderTotalCharge',
+                  })}
+                />
+              )
+            }}
           />
         </GridItem>
         <GridItem xs md={12}>
