@@ -52,11 +52,44 @@ const VisitInfoCard = ({
   existingQNo,
   visitType,
   visitOrderTemplateOptions,
+  ...restProps
 }) => {
+  console.log({ restProps })
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
+    return ''
+  }
+
+  const getVisitOrderTemplateTotal = (template) => {
+    let activeItemTotal = 0
+    visitOrderTemplateItemTypes.forEach((type) => {
+      const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
+        (itemType) => itemType.inventoryItemTypeFK === type.id,
+      )
+      currentTypeItems.map((item) => {
+        if (item[type.dtoName].isActive === true) {
+          activeItemTotal += item.total || 0
+        }
+      })
+    })
+    return activeItemTotal
+  }
+
+  const validateTotalCharges = (value) => {
+    const { values } = restProps
+    let totalTempCharge = 0
+    console.log(visitOrderTemplateOptions, values.visitOrderTemplateFK)
+    if ((values.visitOrderTemplateFK || 0) > 0) {
+      const template = visitOrderTemplateOptions.find(
+        (i) => i.id === values.visitOrderTemplateFK,
+      )
+      totalTempCharge = getVisitOrderTemplateTotal(template)
+    }
+    if ((value || 0) > totalTempCharge) {
+      return `Total Charges can not more than visit template total amount(${totalTempCharge}).`
+    }
     return ''
   }
 
@@ -152,18 +185,7 @@ const VisitInfoCard = ({
                   {...args}
                   onChange={(e, opts) => {
                     if (opts) {
-                      let activeItemTotal = 0
-                      visitOrderTemplateItemTypes.forEach((type) => {
-                        const currentTypeItems = opts.visitOrderTemplateItemDtos.filter(
-                          (itemType) =>
-                            itemType.inventoryItemTypeFK === type.id,
-                        )
-                        currentTypeItems.map((item) => {
-                          if (item[type.dtoName].isActive === true) {
-                            activeItemTotal += item.total || 0
-                          }
-                        })
-                      })
+                      let activeItemTotal = getVisitOrderTemplateTotal(opts)
 
                       form.setFieldValue(
                         FormField['visit.VisitOrderTemplateTotal'],
@@ -186,6 +208,7 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.VisitOrderTemplateTotal']}
+            validate={validateTotalCharges}
             render={(args) => {
               const { form: fm } = args
               const readOnly = (fm.values.visitOrderTemplateFK || 0) <= 0
