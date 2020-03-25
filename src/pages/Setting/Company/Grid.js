@@ -17,7 +17,8 @@ class Grid extends PureComponent {
 
   editRow = (row, e) => {
     const accessRight = Authorized.check('copayer.copayerdetails')
-    if (accessRight !== 'enable') {
+
+    if (accessRight && accessRight.rights !== 'enable') {
       notification.error({
         message: 'Current user is not authorized to access',
       })
