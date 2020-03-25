@@ -1,22 +1,12 @@
 import { createFormViewModel } from 'medisys-model'
-// import * as service from '../services'
 import * as service from '../services/cannedText'
-import {
-  CANNED_TEXT_TYPE_FIELD,
-  DENTAL_CANNED_TEXT_TYPE_FIELD,
-  CLINIC_TYPE,
-} from '@/utils/constants'
-import { CANNEDTEXT_FIELD_KEY } from '../CannedText/utils'
+import { CANNED_TEXT_TYPE_FIELD_NAME } from '../CannedText/utils'
 
 const defaultState = {
-  clinicianNote: [],
-  clinicalNotes: [],
   chiefComplaints: [],
-  complaints: [],
+  note: [],
   plan: [],
-  associatedHistory: [],
-  intraOral: [],
-  extraOral: [],
+  history: [],
   selectedNote: undefined,
   fields: [],
   cannedTextTypes: [],
@@ -32,11 +22,7 @@ export default createFormViewModel({
     state: {
       ...defaultState,
     },
-    subscriptions: ({ dispatch, history }) => {
-      history.listen(async (loct, method) => {
-        const { pathname, search, query = {} } = loct
-      })
-    },
+    subscriptions: {},
     effects: {
       *queryAll (_, { select, call, put, all }) {
         const cannedTextState = yield select((st) => st.cannedText)
@@ -61,35 +47,28 @@ export default createFormViewModel({
     },
     reducers: {
       filterDeleted (state, { payload }) {
-        const { id } = payload
-        const { fields, ...rest } = state
-        const filterDeletedFromAllFields = (_result, field) => ({
-          ..._result,
-          [field]: (state[field] || []).filter((item) => item.id !== id),
-        })
-        const updatedFields = fields.reduce(filterDeletedFromAllFields, {
-          ...rest,
-        })
+        const { id, cannedTextTypeFK } = payload
 
-        return { ...state, ...updatedFields }
+        const fieldName = CANNED_TEXT_TYPE_FIELD_NAME[cannedTextTypeFK]
+        return {
+          ...state,
+          [fieldName]: (state[fieldName] || [])
+            .filter((item) => item.id !== id),
+        }
       },
       queryDone (state, { payload }) {
         const { data } = payload
-        const clinicInfo = JSON.parse(localStorage.getItem('clinicInfo')) || {
-          clinicTypeFK: CLINIC_TYPE.GP,
-        }
-        const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+
         const { fields, selectedNote, ...restState } = state
         const splitByCannedTextType = (_result, cannedText) => {
-          const fkField = CANNEDTEXT_FIELD_KEY[clinicTypeFK]
-
-          const field = fkField[cannedText.cannedTextTypeFK]
-          const currentField = _result[field] || []
+          const fieldName =
+            CANNED_TEXT_TYPE_FIELD_NAME[cannedText.cannedTextTypeFK]
+          const currentField = _result[fieldName] || []
           let rest = {}
 
           return {
             ..._result,
-            [field]: [
+            [fieldName]: [
               ...currentField.filter((item) => item.id !== cannedText.id),
               cannedText,
             ],
