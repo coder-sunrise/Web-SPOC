@@ -324,7 +324,12 @@ class Main extends React.Component {
   }
 
   onConfirmChangeRight = (value, row) => {
-    if (row.type === 'Module' && row.sortOrder === 1 && value !== 'ReadWrite')
+    if (
+      row.type === 'Module' &&
+      row.sortOrder === 1 &&
+      value !== 'ReadWrite' &&
+      row.module !== 'Consultation'
+    )
       this.setState({ currSelectedValue: value, currSelectedRow: row }, () => {
         this.toggleModal()
       })
