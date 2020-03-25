@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 // material ui
@@ -15,6 +15,7 @@ import {
   Tooltip,
   dateFormatLong,
   CardContainer,
+  notification,
 } from '@/components'
 // sub components
 import SearchBar from './SearchBar'
@@ -93,6 +94,13 @@ class Statement extends PureComponent {
   render () {
     const { history, dispatch } = this.props
     const editRow = (row, e) => {
+      const accessRight = Authorized.check('statement.statementdetails')
+      if (accessRight !== 'enable') {
+        notification.error({
+          message: 'Current user is not authorized to access',
+        })
+        return
+      }
       dispatch({
         type: 'statement/updateState',
         payload: {
@@ -170,8 +178,8 @@ class Statement extends PureComponent {
               width: 130,
               render: (row) => {
                 return (
-                  <React.Fragment>
-                    <Authorized authority='statement.statementdetails'>
+                  <Authorized authority='statement.statementdetails'>
+                    <Fragment>
                       <Tooltip title='Edit Statement'>
                         <Button
                           size='sm'
@@ -203,8 +211,8 @@ class Statement extends PureComponent {
                           </Button>
                         </Tooltip>
                       </PrintStatementReport>
-                    </Authorized>
-                  </React.Fragment>
+                    </Fragment>
+                  </Authorized>
                 )
               },
             },

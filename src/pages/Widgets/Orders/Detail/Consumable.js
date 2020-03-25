@@ -330,7 +330,7 @@ class Consumable extends PureComponent {
           </GridItem>
           <GridItem xs={8} className={classes.editor}>
             <FastField
-              name='remarks'
+              name='remark'
               render={(args) => {
                 // return <RichEditor placeholder='Remarks' {...args} />
                 return (

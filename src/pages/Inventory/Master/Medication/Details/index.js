@@ -8,10 +8,13 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { ProgressButton, Button, withFormikExtend, Tabs } from '@/components'
-import { MedicationDetailOption } from './variables'
 import Yup from '@/utils/yup'
 import { getBizSession } from '@/services/queue'
 import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
+import { MedicationDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -153,29 +156,27 @@ const Detail = ({
 
         
       > */}
-      <AuthorizationWrapper authority='inventorymaster.medication'>
-        <Tabs
-          style={{ marginTop: 20 }}
-          defaultActiveKey='0'
-          options={MedicationDetailOption(detailProps, stockProps)}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={MedicationDetailOption(detailProps, stockProps)}
+      />
+      {/* </CardContainer> */}
+      <div className={classes.actionDiv}>
+        <Button
+          authority='none'
+          color='danger'
+          onClick={navigateDirtyCheck({
+            redirectUrl: '/inventory/master?t=0',
+          })}
+        >
+          Close
+        </Button>
+        <ProgressButton
+          submitKey='medicationDetail/submit'
+          onClick={handleSubmit}
         />
-        {/* </CardContainer> */}
-        <div className={classes.actionDiv}>
-          <Button
-            authority='none'
-            color='danger'
-            onClick={navigateDirtyCheck({
-              redirectUrl: '/inventory/master?t=0',
-            })}
-          >
-            Close
-          </Button>
-          <ProgressButton
-            submitKey='medicationDetail/submit'
-            onClick={handleSubmit}
-          />
-        </div>
-      </AuthorizationWrapper>
+      </div>
     </React.Fragment>
   )
 }
@@ -315,4 +316,4 @@ export default compose(
 
     displayName: 'InventoryMedicationDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.medication')(Detail))

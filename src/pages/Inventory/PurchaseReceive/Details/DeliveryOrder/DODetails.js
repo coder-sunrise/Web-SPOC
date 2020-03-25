@@ -583,12 +583,12 @@ class DODetails extends PureComponent {
     }
 
     return (
-      <AuthorizedContext.Provider
-        value={{
-          rights:
-            isEditable === true && allowAccess === true ? 'enable' : 'disable',
-        }}
-      >
+      // <AuthorizedContext.Provider
+      //   value={{
+      //     rights:
+      //       isEditable === true && allowAccess === true ? 'enable' : 'disable',
+      //   }}
+      // >
         <div style={{ margin: theme.spacing(2) }}>
           <GridContainer>
             <GridItem xs={12} md={5}>
@@ -688,7 +688,7 @@ class DODetails extends PureComponent {
               confirmBtnText: 'Save',
             })}
         </div>
-      </AuthorizedContext.Provider>
+      // </AuthorizedContext.Provider>
     )
   }
 }

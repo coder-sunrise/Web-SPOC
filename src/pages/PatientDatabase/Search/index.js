@@ -11,25 +11,19 @@ import Authorized from '@/utils/Authorized'
 
 const styles = () => ({})
 
+const { Secured } = Authorized
 @connect(({ patientSearch }) => ({
   patientSearch,
 }))
 @compare('patientSearch')
+@Secured('patientdatabase/searchpatient')
 class PatientSearch extends PureComponent {
   constructor (props) {
     super(props)
     // console.log(this)
 
     const showPatient = (row) => {
-      const accessRight = Authorized.check(
-        'patientdatabase.patientprofiledetails',
-      )
-      if (accessRight)
-        if (
-          !this.props.history ||
-          (accessRight && accessRight.rights !== 'enable')
-        )
-          return
+      if (!this.props.history || this.props.rights === 'disable') return
       this.props.history.push(
         getAppendUrl({
           md: 'pt',

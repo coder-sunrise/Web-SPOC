@@ -9,12 +9,14 @@ import Grid from './Grid'
 import { INVOICE_STATUS } from '@/utils/constants'
 import { navigateDirtyCheck, roundTo } from '@/utils/utils'
 import AuthorizedContext from '@/components/Context/Authorized'
-import { getAccessRight } from '../../variables'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
 })
 
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @connect(({ podoPayment, purchaseOrderDetails }) => ({
   podoPayment,
   purchaseOrderDetails,
@@ -160,7 +162,7 @@ class index extends PureComponent {
   }
 
   render () {
-    const { purchaseOrderDetails } = this.props
+    const { purchaseOrderDetails, rights } = this.props
     const { purchaseOrder: po } = purchaseOrderDetails
     const isWriteOff = po
       ? po.invoiceStatusFK === INVOICE_STATUS.WRITEOFF
@@ -168,10 +170,7 @@ class index extends PureComponent {
     return (
       <AuthorizedContext.Provider
         value={{
-          rights:
-            isWriteOff === true || getAccessRight() === false
-              ? 'disable'
-              : 'enable',
+          rights: isWriteOff === true ? 'disable' : rights,
         }}
       >
         <GridContainer>

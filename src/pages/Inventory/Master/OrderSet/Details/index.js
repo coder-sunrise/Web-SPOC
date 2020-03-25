@@ -3,10 +3,7 @@ import { connect } from 'dva'
 import { compose } from 'redux'
 import { withStyles } from '@material-ui/core/styles'
 import { getAppendUrl, navigateDirtyCheck } from '@/utils/utils'
-import DetailPanel from './Detail'
-import InventoryTypeListing from './InventoryTypeListing'
-import { OrderSetDetailOption } from './variables'
-import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
 
 import {
   NavPills,
@@ -16,6 +13,11 @@ import {
   Tabs,
 } from '@/components'
 import Yup from '@/utils/yup'
+import { OrderSetDetailOption } from './variables'
+import InventoryTypeListing from './InventoryTypeListing'
+import DetailPanel from './Detail'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -212,28 +214,26 @@ const Detail = ({
           },
         ]}
       /> */}
-      <AuthorizationWrapper authority='inventorymaster.orderset'>
-        <Tabs
-          style={{ marginTop: 20 }}
-          defaultActiveKey='0'
-          options={OrderSetDetailOption(detailProps, typeListingProps)}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={OrderSetDetailOption(detailProps, typeListingProps)}
+      />
+      <div className={classes.actionDiv}>
+        <Button
+          color='danger'
+          authority='none'
+          onClick={navigateDirtyCheck({
+            redirectUrl: '/inventory/master?t=3',
+          })}
+        >
+          Close
+        </Button>
+        <ProgressButton
+          submitKey='orderSetDetail/submit'
+          onClick={handleSubmit}
         />
-        <div className={classes.actionDiv}>
-          <Button
-            color='danger'
-            authority='none'
-            onClick={navigateDirtyCheck({
-              redirectUrl: '/inventory/master?t=3',
-            })}
-          >
-            Close
-          </Button>
-          <ProgressButton
-            submitKey='orderSetDetail/submit'
-            onClick={handleSubmit}
-          />
-        </div>
-      </AuthorizationWrapper>
+      </div>
     </React.Fragment>
   )
 }
@@ -307,4 +307,4 @@ export default compose(
 
     displayName: 'InventoryOrderSetDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.orderset')(Detail))

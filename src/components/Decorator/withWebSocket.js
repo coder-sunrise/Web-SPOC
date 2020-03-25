@@ -60,6 +60,9 @@ const withWebSocket = () => (Component) => {
         pendingJob.length === 1
       ) {
         this.wsConnection.send(pendingJob[0])
+        notification.success({
+          message: `Job sent to the printer.`,
+        })
       }
       this.setState({
         pendingJob: [],
@@ -81,9 +84,6 @@ const withWebSocket = () => (Component) => {
       // console.log({ content })
       // const pdfResult = await getPDF(reportID, payload)
       if (content) {
-        notification.success({
-          message: `Job sent to the printer.`,
-        })
         // const base64Result = arrayBufferToBase64(pdfResult)
         this.prepareJobForWebSocket(content)
       }

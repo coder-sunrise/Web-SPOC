@@ -13,7 +13,6 @@ import {
   withFormikExtend,
   Tabs,
 } from '@/components'
-import { ConsumableDetailOption } from './variables'
 import {
   getAppendUrl,
   errMsgForOutOfRange as errMsg,
@@ -21,7 +20,10 @@ import {
   roundTo,
 } from '@/utils/utils'
 import { getBizSession } from '@/services/queue'
-import { AuthorizationWrapper } from '@/components/_medisys'
+import Authorized from '@/utils/Authorized'
+import { ConsumableDetailOption } from './variables'
+
+const { Secured } = Authorized
 
 const styles = () => ({
   actionDiv: {
@@ -122,28 +124,26 @@ const Detail = ({
           },
         ]}
       /> */}
-      <AuthorizationWrapper authority='inventorymaster.consumable'>
-        <Tabs
-          style={{ marginTop: 20 }}
-          defaultActiveKey='0'
-          options={ConsumableDetailOption(detailProps, stockProps)}
+      <Tabs
+        style={{ marginTop: 20 }}
+        defaultActiveKey='0'
+        options={ConsumableDetailOption(detailProps, stockProps)}
+      />
+      <div className={classes.actionDiv}>
+        <Button
+          color='danger'
+          authority='none'
+          onClick={navigateDirtyCheck({
+            redirectUrl: '/inventory/master?t=1',
+          })}
+        >
+          Close
+        </Button>
+        <ProgressButton
+          submitKey='consumableDetail/submit'
+          onClick={handleSubmit}
         />
-        <div className={classes.actionDiv}>
-          <Button
-            color='danger'
-            authority='none'
-            onClick={navigateDirtyCheck({
-              redirectUrl: '/inventory/master?t=1',
-            })}
-          >
-            Close
-          </Button>
-          <ProgressButton
-            submitKey='consumableDetail/submit'
-            onClick={handleSubmit}
-          />
-        </div>
-      </AuthorizationWrapper>
+      </div>
     </React.Fragment>
   )
 }
@@ -254,4 +254,4 @@ export default compose(
     },
     displayName: 'InventoryConsumableDetail',
   }),
-)(Detail)
+)(Secured('inventorymaster.consumable')(Detail))

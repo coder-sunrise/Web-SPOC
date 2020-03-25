@@ -69,15 +69,15 @@ class InvoiceDetails extends Component {
     const bannerProps = {
       values,
     }
-    const accessRight = Authorized.check('finance/invoicepayment')
+
     return (
       <LoadingWrapper loading={loading} text='Getting invoice details...'>
-        <Authorized.Context.Provider value={accessRight}>
+        <Authorized authority='finance/invoicepayment'>
           <CardContainer hideHeader>
             <InvoiceBanner {...bannerProps} />
             <InvoiceContent {...invoiceContentProps} />
           </CardContainer>
-        </Authorized.Context.Provider>
+        </Authorized>
       </LoadingWrapper>
     )
   }

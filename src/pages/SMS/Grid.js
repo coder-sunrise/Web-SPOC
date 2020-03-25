@@ -10,11 +10,11 @@ import DraftsIcon from '@material-ui/icons/Drafts'
 import MarkunreadIcon from '@material-ui/icons/Markunread'
 // common components
 import { GridContextMenuButton as GridButton } from 'medisys-components'
-import MessageListing from './Reminder/MessageListing'
 
 import { CommonTableGrid, Tooltip, CommonModal } from '@/components'
 // medisys components
 import Authorized from '@/utils/Authorized'
+import MessageListing from './Reminder/MessageListing'
 import FilterBar from './FilterBar'
 
 const styles = (theme) => ({

@@ -310,6 +310,7 @@ const FilterBar = ({
           reportParameters={{
             ...createPayload(values),
           }}
+          defaultScale={1.5}
         />
       </CommonModal>
     </Fragment>
