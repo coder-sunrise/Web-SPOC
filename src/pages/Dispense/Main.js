@@ -10,11 +10,7 @@ import { withFormikExtend, notification, CommonModal } from '@/components'
 import DispenseDetails from './DispenseDetails/WebSocketWrapper'
 import AddOrder from './DispenseDetails/AddOrder'
 // utils
-import {
-  calculateAmount,
-  getAppendUrl,
-  navigateDirtyCheck,
-} from '@/utils/utils'
+import { calculateAmount, navigateDirtyCheck } from '@/utils/utils'
 import Yup from '@/utils/yup'
 import { VISIT_TYPE } from '@/utils/constants'
 import Authorized from '@/utils/Authorized'
@@ -70,8 +66,8 @@ const reloadDispense = (props, effect = 'query') => {
   })
 }
 
-const ConvertBatchNoArrayToText = (array) =>{
-  if(array){
+const ConvertBatchNoArrayToText = (array) => {
+  if (array) {
     return array.map((o) => {
       const item = { ...o }
       if (item.batchNo instanceof Array) {
@@ -198,15 +194,9 @@ class Main extends Component {
     })
 
     if (finalizeResponse === 204) {
-      await dispatch({
-        type: 'dispense/query',
-        payload: {
-          id: dispense.visitID,
-          version: Date.now(),
-        },
-      })
-      router.push(getAppendUrl({}, '/reception/queue/billing'))
+      return true
     }
+    return false
   }
 
   _editOrder = () => {
