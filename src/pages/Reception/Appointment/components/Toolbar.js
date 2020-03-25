@@ -193,7 +193,7 @@ class CalendarToolbar extends React.PureComponent {
                   this.anchorElAccount = node
                 }}
               >
-                Go to
+                Next
                 <ArrowDropDown style={{ margin: 0, marginLeft: 5 }} />
               </Button>
             </Tooltip>
