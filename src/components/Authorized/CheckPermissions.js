@@ -110,6 +110,7 @@ const checkSinglePermission = (
 
     // return null
   }
+  // console.log(authority)
   return typeof Exception === 'function' && type !== 'decorator'
     ? Exception()
     : Exception

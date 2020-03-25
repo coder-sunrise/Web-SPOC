@@ -125,6 +125,8 @@ const authorize = (authority, error) => {
   // console.log('authority', authority)
   return function decideAuthority (target) {
     const error = classError || Exception403
+    // console.log(error, target)
+
     const rights = CheckPermissions(authority, target, error, 'decorator')
     // console.log(rights, target)
     return checkIsInstantiation(rights, target, error)

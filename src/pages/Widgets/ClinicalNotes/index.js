@@ -372,9 +372,10 @@ class ClinicalNotes extends Component {
     const _prefix =
       clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
     const prefix = `${_prefix}`
-    entity[prefix] = [
-      { ...entity[prefix][0], [type]: v },
-    ]
+    if (entity[prefix])
+      entity[prefix] = [
+        { ...entity[prefix][0], [type]: v },
+      ]
 
     this.props.dispatch({
       type: 'consultation/updateState',
