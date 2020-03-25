@@ -3,7 +3,7 @@ import moment from 'moment'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import { CardContainer, CommonTableGrid } from '@/components'
-import { APPOINTMENT_STATUS, CANCELLATION_REASON_TYPE } from '@/utils/constants'
+import { APPOINTMENT_STATUS } from '@/utils/constants'
 import { queryList as queryAppointments } from '@/services/calendar'
 import { futureApptTableParams,previousApptTableParams} from './variables'
 
