@@ -116,7 +116,7 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    console.log({ props })
+
     const { theme, footer, values, settingCompany, route, rights } = props
     const { name } = route
     const type = 'copayer'
