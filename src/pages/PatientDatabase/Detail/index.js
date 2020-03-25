@@ -550,13 +550,15 @@ class PatientDetail extends PureComponent {
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
                 {isCreatingPatient && (
-                  <Button
-                    color='primary'
-                    style={{ marginTop: theme.spacing(1) }}
-                    onClick={this.registerVisit}
-                  >
-                    Register Visit
-                  </Button>
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
                 )}
               </CardBody>
             </Card>
