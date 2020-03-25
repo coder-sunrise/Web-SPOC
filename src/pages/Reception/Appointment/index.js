@@ -270,6 +270,23 @@ class Appointment extends React.PureComponent {
       isEnableRecurrence,
     } = selectedEvent
 
+    const viewApptAccessRight = Authorized.check(
+      'appointment.appointmentdetails',
+    )
+    const viewDoctorBlockAccessRight = Authorized.check(
+      'settings.clinicsetting.doctorblock',
+    )
+
+    if (
+      (viewApptAccessRight &&
+        viewApptAccessRight.rights !== 'enable' &&
+        !doctor) ||
+      (doctor &&
+        viewDoctorBlockAccessRight &&
+        viewDoctorBlockAccessRight.rights !== 'enable')
+    )
+      return
+
     if (doctor) {
       this.props
         .dispatch({
