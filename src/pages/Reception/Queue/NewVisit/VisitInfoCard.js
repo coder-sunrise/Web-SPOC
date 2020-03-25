@@ -23,6 +23,7 @@ import {
 } from '@/components/_medisys'
 import FormField from './formField'
 import { VISIT_TYPE } from '@/utils/constants'
+import { visitOrderTemplateItemTypes } from '@/utils/codes'
 
 const styles = (theme) => ({
   verticalSpacing: {
@@ -51,11 +52,42 @@ const VisitInfoCard = ({
   existingQNo,
   visitType,
   visitOrderTemplateOptions,
+  ...restProps
 }) => {
   const validateQNo = (value) => {
     const qNo = parseFloat(value).toFixed(1)
     if (existingQNo.includes(qNo))
       return 'Queue No. already existed in current queue list'
+    return ''
+  }
+
+  const getVisitOrderTemplateTotal = (template) => {
+    let activeItemTotal = 0
+    visitOrderTemplateItemTypes.forEach((type) => {
+      const currentTypeItems = template.visitOrderTemplateItemDtos.filter(
+        (itemType) => itemType.inventoryItemTypeFK === type.id,
+      )
+      currentTypeItems.map((item) => {
+        if (item[type.dtoName].isActive === true) {
+          activeItemTotal += item.total || 0
+        }
+      })
+    })
+    return activeItemTotal
+  }
+
+  const validateTotalCharges = (value) => {
+    const { values } = restProps
+    let totalTempCharge = 0
+    if ((values.visitOrderTemplateFK || 0) > 0) {
+      const template = visitOrderTemplateOptions.find(
+        (i) => i.id === values.visitOrderTemplateFK,
+      )
+      totalTempCharge = getVisitOrderTemplateTotal(template)
+    }
+    if ((value || 0) > totalTempCharge) {
+      return `Total Charges can not more than visit template total amount(${totalTempCharge}).`
+    }
     return ''
   }
 
@@ -138,16 +170,58 @@ const VisitInfoCard = ({
         <GridItem xs md={4}>
           <Field
             name={FormField['visit.visitOrderTemplateFK']}
-            render={(args) => (
-              <Select
-                // disabled={isReadOnly}
-                options={visitOrderTemplateOptions}
-                label={formatMessage({
-                  id: 'reception.queue.visitRegistration.visitOrderTemplate',
-                })}
-                {...args}
-              />
-            )}
+            render={(args) => {
+              const { form } = args
+
+              return (
+                <Select
+                  // disabled={isReadOnly}
+                  options={visitOrderTemplateOptions}
+                  label={formatMessage({
+                    id: 'reception.queue.visitRegistration.visitOrderTemplate',
+                  })}
+                  {...args}
+                  onChange={(e, opts) => {
+                    if (opts) {
+                      let activeItemTotal = getVisitOrderTemplateTotal(opts)
+
+                      form.setFieldValue(
+                        FormField['visit.VisitOrderTemplateTotal'],
+                        activeItemTotal,
+                      )
+                    } else {
+                      setTimeout(() => {
+                        form.setFieldValue(
+                          FormField['visit.VisitOrderTemplateTotal'],
+                          undefined,
+                        )
+                      }, 1)
+                    }
+                  }}
+                />
+              )
+            }}
+          />
+        </GridItem>
+        <GridItem xs md={4}>
+          <Field
+            name={FormField['visit.VisitOrderTemplateTotal']}
+            validate={validateTotalCharges}
+            render={(args) => {
+              const { form: fm } = args
+              const readOnly = (fm.values.visitOrderTemplateFK || 0) <= 0
+              return (
+                <NumberInput
+                  {...args}
+                  currency
+                  disabled={readOnly}
+                  label={formatMessage({
+                    id:
+                      'reception.queue.visitRegistration.visitOrderTotalCharge',
+                  })}
+                />
+              )
+            }}
           />
         </GridItem>
         <GridItem xs md={12}>

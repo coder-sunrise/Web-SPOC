@@ -47,13 +47,6 @@ export default createListViewModel({
           patientID = visit.patientProfileFK
           yield
         }
-
-        // yield put({
-        //   type: 'patient/query',
-        //   payload: { id: patientID, version },
-        // })
-        // yield take('patient/query/@@end')
-
         yield put({
           type: 'query',
           payload: {
@@ -113,7 +106,19 @@ export default createListViewModel({
           },
         })
       },
-
+      *queryDispenseHistory ({payload},{call,put}){
+        const response = yield call(service.queryDispenseHistory, payload)
+        if (response.status === '200') {
+          yield put({
+            type: 'updateState',
+            payload: {
+              dispenseHistory : response.data,
+            },
+          })
+          return response.data
+        }
+        return false
+      },
       *queryRetailHistory ({ payload }, { call, put }) {
         const response = yield call(service.queryRetailHistory, payload)
 

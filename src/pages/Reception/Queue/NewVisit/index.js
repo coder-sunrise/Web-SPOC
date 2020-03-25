@@ -313,6 +313,7 @@ class NewVisit extends PureComponent {
                           visitType={values.visitPurposeFK}
                           dispatch={dispatch}
                           visitOrderTemplateOptions={visitOrderTemplateOptions}
+                          {...this.props}
                         />
                       </GridItem>
                     </Authorized.Context.Provider>

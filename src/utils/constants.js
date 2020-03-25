@@ -247,6 +247,14 @@ export const ORDER_TYPE_TAB = {
   ORDERSET: '6',
 }
 
+
+export const PATIENT_HISTORY_TABS = {
+  VISIT:1,
+  DISPENSE:2,
+  APPOINTMENT:3,
+  INVOICE:4,
+}
+
 export const FILE_STATUS = {
   UPLOADED: 1,
   CONFIRMED: 2,
