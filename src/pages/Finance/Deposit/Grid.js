@@ -3,7 +3,6 @@ import { Table } from '@devexpress/dx-react-grid-material-ui'
 import numeral from 'numeral'
 import { Tooltip, withStyles } from '@material-ui/core'
 
-import Modal from './Modal'
 import Authorized from '@/utils/Authorized'
 import {
   Button,
@@ -13,6 +12,7 @@ import {
   CustomInput,
 } from '@/components'
 import config from '@/utils/config'
+import Modal from './Modal'
 
 const { currencyFormat, currencySymbol } = config
 
@@ -166,21 +166,23 @@ class Grid extends PureComponent {
   render () {
     const { isDeposit, showDepositRefundModal } = this.state
     return (
-      <React.Fragment>
-        <CommonTableGrid type='deposit' {...this.tableParas} />
-        <CommonModal
-          open={showDepositRefundModal}
-          title={isDeposit ? 'Deposit' : 'Refund'}
-          onClose={this.toggleModal}
-          onConfirm={this.toggleModal}
-          maxWidth='sm'
-          observe='Deposit'
-          showFooter={false}
-          bodyNoPadding
-        >
-          <Modal isDeposit={isDeposit} />
-        </CommonModal>
-      </React.Fragment>
+      <Authorized authority='finance/deposit'>
+        <React.Fragment>
+          <CommonTableGrid type='deposit' {...this.tableParas} />
+          <CommonModal
+            open={showDepositRefundModal}
+            title={isDeposit ? 'Deposit' : 'Refund'}
+            onClose={this.toggleModal}
+            onConfirm={this.toggleModal}
+            maxWidth='sm'
+            observe='Deposit'
+            showFooter={false}
+            bodyNoPadding
+          >
+            <Modal isDeposit={isDeposit} />
+          </CommonModal>
+        </React.Fragment>
+      </Authorized>
     )
   }
 }
