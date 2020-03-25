@@ -149,7 +149,7 @@ const rangeReg = /(\d+)\s?-?\s?(\d*)/gim
     }
     // console.log(entity)
     let { adjType, adjValue = 0, unitPrice } = entity
-    if (!unitPrice || action.id !== entity.treatmentFK) {
+    if (!unitPrice || action.dentalTreatmentFK !== entity.treatmentFK) {
       unitPrice = treatment.sellingPrice
     }
     const totalPrice = unitPrice * quantity || undefined
