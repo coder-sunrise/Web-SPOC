@@ -54,7 +54,6 @@ class PatientList extends PureComponent {
       let countCol = children.find((c) => {
         return c.props.tableColumn.column.name === 'patientReferenceNo'
       })
-      console.log({ countCol })
       if (countCol) {
         const newChildren = [
           {
@@ -82,7 +81,6 @@ class PatientList extends PureComponent {
         },
         integrated: {
           calculator: (type, rows, getValue) => {
-            console.log({ type, rows, getValue })
             let patientIds = []
             if (type === 'patientCount') {
               if (rows && rows.length > 0) {
@@ -105,7 +103,7 @@ class PatientList extends PureComponent {
         },
       },
     }
-    console.log({ reportDatas })
+
     if (reportDatas.PatientListDetails && reportDatas.PatientListDetails.length > 0 && reportDatas.PatientListDetails[0].isGroupByDoctor) {
       FuncProps = {
         ...FuncProps,
@@ -121,7 +119,6 @@ class PatientList extends PureComponent {
           },
           integrated: {
             calculator: (type, rows, getValue) => {
-              console.log({ type, rows, getValue })
               let patientIds = []
               if (type === 'patientCount' || type === 'groupCount') {
                 if (rows && rows.length > 0) {
