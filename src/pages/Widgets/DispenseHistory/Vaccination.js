@@ -18,7 +18,7 @@ export const TableColumnExtensions =
     { columnName: 'totalPrice', type: 'currency'},
     { columnName: 'adjAmt', type: 'currency'},
     { columnName: 'totalAfterItemAdjustment', type: 'currency'},
-    { columnName: 'quantity', type: 'number'},
+    { columnName: 'dispensedQuanity', type: 'number'},
   ]
 
 export default ({ classes, current, fieldName = '' }) => {
