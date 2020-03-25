@@ -186,9 +186,19 @@ const WebSocketWrapper = ({ handlePrint, sendingJob, ...restProps }) => {
     }
   }
 
+  const handleFinalize = () => {
+    const { onFinalizeClick } = restProps
+    onFinalizeClick()
+    let settings = JSON.parse(localStorage.getItem('clinicSettings'))
+    const { autoPrintDrugLabelAfterDispense = false } = settings
+    if (autoPrintDrugLabelAfterDispense === true)
+      handleOnPrint({ type: CONSTANTS.ALL_DRUG_LABEL })
+  }
+
   return (
     <DispenseDetails
       {...restProps}
+      onFinalizeClick={handleFinalize}
       onPrint={handleOnPrint}
       sendingJob={sendingJob}
     />
