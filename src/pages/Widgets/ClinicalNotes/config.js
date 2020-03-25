@@ -11,6 +11,7 @@ export const defaultConfigs = {
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.HISTORY,
       cannedTextTypeFK: CANNED_TEXT_TYPE.HISTORY,
       index: 0,
+      height: 390,
     },
     {
       authority: 'queue.consultation.clinicalnotes.chiefcomplaints',
@@ -20,7 +21,6 @@ export const defaultConfigs = {
       scribbleField: 'chiefComplaintsScribbleArray',
       scribbleNoteTypeFK: SCRIBBLE_NOTE_TYPE.CHIEFCOMPLAINTS,
       cannedTextTypeFK: CANNED_TEXT_TYPE.CHIEFCOMPLAINTS,
-      height: 390,
       index: 1,
     },
     {
