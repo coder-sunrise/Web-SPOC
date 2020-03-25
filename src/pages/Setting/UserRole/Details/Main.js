@@ -74,8 +74,9 @@ const styles = (theme) => ({
   }),
   handleSubmit: (values, { props, resetForm }) => {
     const { dispatch, onConfirm, history } = props
-    let { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight
+    const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
+    let result = _.cloneDeep(restValues)
+    result.roleClientAccessRight = roleClientAccessRight
       .filter(
         (m) =>
           !values.clinicRoleFK ||
@@ -88,18 +89,18 @@ const styles = (theme) => ({
         return data.length === 0 ? r : data[0]
       })
     if (!values.id) {
-      restValues.roleClientAccessRight = roleClientAccessRight.map((d) => {
+      result.roleClientAccessRight = roleClientAccessRight.map((d) => {
         const { id, ...data } = d
         return data
       })
-      const { id, concurrencyToken, ...tempValue } = restValues
-      restValues = tempValue
-      restValues.isUserMaintainable = true
+      const { id, concurrencyToken, ...tempValue } = result
+      result = tempValue
+      result.isUserMaintainable = true
     }
 
     dispatch({
       type: 'settingUserRole/upsert',
-      payload: restValues,
+      payload: result,
     }).then((r) => {
       if (r) {
         resetForm()
@@ -180,7 +181,8 @@ class Main extends React.Component {
     const { module, displayValue } = filter
     const { values } = this.props
     const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight
+    let result = _.cloneDeep(restValues)
+    result.roleClientAccessRight = roleClientAccessRight
       .map((d) => {
         const data = filteredAccessRight.filter((m) => {
           return m.clientAccessRightFK === d.clientAccessRightFK
@@ -189,7 +191,7 @@ class Main extends React.Component {
       })
       .sort(this.compare)
 
-    restValues.filteredAccessRight = restValues.roleClientAccessRight
+    result.filteredAccessRight = result.roleClientAccessRight
       .filter(
         (m) => {
           if (e) {
@@ -210,13 +212,13 @@ class Main extends React.Component {
       .sort(this.compare)
 
     if (typeof e === 'number') {
-      restValues.clinicRoleFK = e
+      result.clinicRoleFK = e
     }
 
     this.props.dispatch({
       type: 'settingUserRole/updateState',
       payload: {
-        currentSelectedUserRole: restValues,
+        currentSelectedUserRole: result,
       },
     })
   }
@@ -291,7 +293,8 @@ class Main extends React.Component {
     const { values } = this.props
     const { currSelectedValue, currSelectedRow } = this.state
     const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight
+    const result = _.cloneDeep(restValues)
+    result.roleClientAccessRight = roleClientAccessRight
       .map((r) => {
         if (r.module === currSelectedRow.module) {
           r.permission = currSelectedValue
@@ -302,7 +305,7 @@ class Main extends React.Component {
         return r
       })
       .sort(this.compare)
-    restValues.filteredAccessRight = filteredAccessRight
+    result.filteredAccessRight = filteredAccessRight
       .map((r) => {
         if (r.module === currSelectedRow.module) {
           r.permission = currSelectedValue
@@ -316,7 +319,7 @@ class Main extends React.Component {
     await this.props.dispatch({
       type: 'settingUserRole/updateState',
       payload: {
-        currentSelectedUserRole: restValues,
+        currentSelectedUserRole: result,
       },
     })
 
@@ -324,7 +327,12 @@ class Main extends React.Component {
   }
 
   onConfirmChangeRight = (value, row) => {
-    if (row.type === 'Module' && row.sortOrder === 1 && value !== 'ReadWrite')
+    if (
+      row.type === 'Module' &&
+      row.sortOrder === 1 &&
+      value !== 'ReadWrite' &&
+      row.module !== 'Consultation'
+    )
       this.setState({ currSelectedValue: value, currSelectedRow: row }, () => {
         this.toggleModal()
       })
@@ -334,7 +342,8 @@ class Main extends React.Component {
     const { values } = this.props
     const { currSelectedRow } = this.state
     const { roleClientAccessRight, filteredAccessRight, ...restValues } = values
-    restValues.roleClientAccessRight = roleClientAccessRight
+    const result = _.cloneDeep(restValues)
+    result.roleClientAccessRight = roleClientAccessRight
       .map((r) => {
         if (r.id === currSelectedRow.id) {
           r.permission = currSelectedRow.permission
@@ -342,7 +351,7 @@ class Main extends React.Component {
         return r
       })
       .sort(this.compare)
-    restValues.filteredAccessRight = filteredAccessRight
+    result.filteredAccessRight = filteredAccessRight
       .map((r) => {
         if (r.id === currSelectedRow.id) {
           r.permission = currSelectedRow.permission
@@ -354,7 +363,7 @@ class Main extends React.Component {
     await this.props.dispatch({
       type: 'settingUserRole/updateState',
       payload: {
-        currentSelectedUserRole: restValues,
+        currentSelectedUserRole: result,
       },
     })
 
