@@ -256,12 +256,8 @@ export const FILE_STATUS = {
 export const SCRIBBLE_NOTE_TYPE = {
   CLINICALNOTES: 1,
   CHIEFCOMPLAINTS: 2,
-  PLAN: 3,
-  DENTALCLINICALNOTES: 4,
-  DENTALCOMPLAINTS: 5,
-  DENTALASSOCIATEHISTORY: 6,
-  DENTALINTRAORAL: 7,
-  DENTALEXTRAORAL: 8,
+  PLAN: 6,
+  HISTORY: 3,
 }
 
 export const SMS_STATUS = {
@@ -294,21 +290,10 @@ export const SMS_STATUS_TEXT = {
 }
 
 export const CANNED_TEXT_TYPE = {
-  CLINICALNOTES: 1,
+  NOTE: 1,
   CHIEFCOMPLAINTS: 2,
-  ASSOCIATEDHISTORY: 3,
-  INTRAORAL: 4,
-  EXTRAORAL: 5,
+  HISTORY: 3,
   PLAN: 6,
-}
-
-export const CANNED_TEXT_TYPE_FIELD = {
-  1: 'clinicianNote',
-  2: 'chiefComplaints',
-  3: 'associatedHistory',
-  4: 'intraOral',
-  5: 'extraOral',
-  6: 'plan',
 }
 
 export const DENTAL_CANNED_TEXT_TYPE_FIELD = {

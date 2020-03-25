@@ -345,7 +345,7 @@ class Main extends React.Component {
     const result = _.cloneDeep(restValues)
     result.roleClientAccessRight = roleClientAccessRight
       .map((r) => {
-        if (r.id === currSelectedRow.id) {
+        if (r.clientAccessRightFK === currSelectedRow.clientAccessRightFK) {
           r.permission = currSelectedRow.permission
         }
         return r
@@ -353,7 +353,7 @@ class Main extends React.Component {
       .sort(this.compare)
     result.filteredAccessRight = filteredAccessRight
       .map((r) => {
-        if (r.id === currSelectedRow.id) {
+        if (r.clientAccessRightFK === currSelectedRow.clientAccessRightFK) {
           r.permission = currSelectedRow.permission
         }
         return r

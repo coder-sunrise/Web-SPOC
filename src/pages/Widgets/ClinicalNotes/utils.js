@@ -1,30 +1,16 @@
 import { CLINIC_TYPE } from '@/utils/constants'
 // import defaultConfigs, { dentalConfigs } from './config'
-import { defaultConfigs, fieldKey, scribbleNoteTypeFieldKey } from './config'
+import { defaultConfigs } from './config'
 
-export const getConfig = (clinicInfo) => {
-  // const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
-  // switch (clinicTypeFK) {
-  //   case CLINIC_TYPE.GP:
-  //     return defaultConfigs
-  //   case CLINIC_TYPE.DENTAL:
-  //     return dentalConfigs
-  //   default:
-  //     return defaultConfigs
-  // }
-  return defaultConfigs
-}
+export const getConfig = () => defaultConfigs
 
-export const getContent = (config, clinicInfo) => {
-  const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
+export const getContent = (config) => {
   const { fields } = config
-  const fieldName = fieldKey[clinicTypeFK]
-  const scrribleNoteTypeFieldKey =
-    scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
+
   return fields.map((field) => ({
     title: field.fieldTitle,
-    name: field[fieldName],
-    categoryIndex: field[scrribleNoteTypeFieldKey],
+    name: field.fieldName,
+    categoryIndex: field.scribbleNoteTypeFK,
     ...field,
   }))
 }
@@ -37,12 +23,7 @@ export const getDefaultActivePanel = (
   panels,
 ) => {
   try {
-    const { clinicTypeFK = CLINIC_TYPE.GP } = clinicInfo
     const { fields } = config
-    const fieldName = fieldKey[clinicTypeFK]
-    const scrribleNoteTypeFieldKey =
-      scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
-
     const { corScribbleNotes = [] } = entity
     const notes = entity[prefix] || []
 
@@ -57,7 +38,7 @@ export const getDefaultActivePanel = (
     if (notes.length > 0) {
       const doctorNote = { ...notes[0] }
       const panelWithData = fields.filter((field) => {
-        if (doctorNote[field[fieldName]]) return true
+        if (doctorNote[field.fieldName]) return true
         return false
       })
 
@@ -70,7 +51,7 @@ export const getDefaultActivePanel = (
     if (corScribbleNotes.length > 0) {
       const panelWithScribble = fields.filter((field) => {
         const data = corScribbleNotes.filter(
-          (sn) => sn.scribbleNoteTypeFK === field[scrribleNoteTypeFieldKey],
+          (sn) => sn.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
         )
         return data.length > 0
       })
