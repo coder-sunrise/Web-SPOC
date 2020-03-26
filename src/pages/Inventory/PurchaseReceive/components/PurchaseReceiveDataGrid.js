@@ -88,17 +88,15 @@ const PurchaseReceiveDataGrid = ({
           align: 'center',
           render: (row) => {
             return (
-              <Authorized authority='purchasingandreceiving.purchasingandreceivingdetails'>
-                <Tooltip title='More Actions'>
-                  <div style={{ display: 'inline-block' }}>
-                    <GridButton
-                      row={row}
-                      onClick={onContextButtonClick}
-                      contextMenuOptions={ContextMenuOptions(row)}
-                    />
-                  </div>
-                </Tooltip>
-              </Authorized>
+              <Tooltip title='More Actions'>
+                <div style={{ display: 'inline-block' }}>
+                  <GridButton
+                    row={row}
+                    onClick={onContextButtonClick}
+                    contextMenuOptions={ContextMenuOptions(row)}
+                  />
+                </div>
+              </Tooltip>
             )
           },
         },
