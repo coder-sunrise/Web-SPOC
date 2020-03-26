@@ -17,7 +17,7 @@ import {
   Tooltip,
   Button,
   notification,
-  serverDateFormat,
+  dateFormatLong,
 } from '@/components'
 import Authorized from '@/utils/Authorized'
 
@@ -189,7 +189,7 @@ const Stock = ({
         render: (row) => (
           <p className={row.isDeleted && classes.isDeleted}>
             {row.expiryDate ? (
-              moment(row.expiryDate).format(serverDateFormat)
+              moment(row.expiryDate).format(dateFormatLong)
             ) : (
               '-'
             )}
