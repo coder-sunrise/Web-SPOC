@@ -40,16 +40,13 @@ class Deposit extends PureComponent {
   render () {
     const { props } = this
     const { classes, ...restProps } = props
-    const accessRight = Authorized.check('finance/deposit')
     return (
       <CardContainer hideHeader>
         <FilterBar
           queryDepositListing={this.queryDepositListing}
           {...restProps}
         />
-        <Authorized.Context.Provider value={accessRight}>
-          <Grid {...restProps} />
-        </Authorized.Context.Provider>
+        <Grid {...restProps} />
       </CardContainer>
     )
   }

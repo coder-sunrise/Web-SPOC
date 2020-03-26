@@ -17,7 +17,6 @@ class InventoryList extends PureComponent {
     const SummaryRow = (p) => {
       const { children } = p
       let countCol = children.find((c) => {
-        if (c.props.tableColumn.column) return false
         return c.props.tableColumn.column.name === 'stock'
       })
       // console.log({ countCol })
@@ -83,7 +82,7 @@ class InventoryList extends PureComponent {
         type: 'number',
         precision: 1,
       },
-      { columnName: 'uom', sortingEnabled: false },
+      { columnName: 'uom', sortingEnabled: false, align: 'right' },
       {
         columnName: 'acp',
         sortingEnabled: false,

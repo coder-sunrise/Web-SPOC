@@ -459,17 +459,15 @@ class Queue extends React.Component {
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
                 />
-                <Authorized authority='reception/queue'>
-                  <DetailsGrid
-                    onViewPatientProfileClick={this.onViewPatientProfileClick}
-                    onViewDispenseClick={this.toggleDispense}
-                    onRegisterPatientClick={this.toggleRegisterNewPatient}
-                    handleEditVisitClick={this.showVisitRegistration}
-                    handleActualizeAppointment={this.handleActualizeAppointment}
-                    history={history}
-                    searchQuery={search}
-                  />
-                </Authorized>
+                <DetailsGrid
+                  onViewPatientProfileClick={this.onViewPatientProfileClick}
+                  onViewDispenseClick={this.toggleDispense}
+                  onRegisterPatientClick={this.toggleRegisterNewPatient}
+                  handleEditVisitClick={this.showVisitRegistration}
+                  handleActualizeAppointment={this.handleActualizeAppointment}
+                  history={history}
+                  searchQuery={search}
+                />
               </div>
             )}
             <CommonModal

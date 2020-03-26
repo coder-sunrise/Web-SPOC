@@ -150,7 +150,7 @@ class NewVisit extends PureComponent {
 
   calculateBMI = () => {
     const { heightCM, weightKG } = this.props.values
-    console.log(heightCM, weightKG)
+
     const { setFieldValue, setFieldTouched } = this.props
     if (heightCM && weightKG) {
       const heightM = heightCM / 100
@@ -268,7 +268,6 @@ class NewVisit extends PureComponent {
     const params = locationQueryParameters()
     const vis = parseInt(params.vis, 10)
     const autoRefreshChas = !(params.md === 'visreg' && vis > 0)
-    // console.log({ rights })
     return (
       <React.Fragment>
         <LoadingWrapper

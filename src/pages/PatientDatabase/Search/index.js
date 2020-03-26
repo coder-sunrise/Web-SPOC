@@ -22,8 +22,22 @@ class PatientSearch extends PureComponent {
     super(props)
     // console.log(this)
 
+    // double click to view patient profile
     const showPatient = (row) => {
-      if (!this.props.history || this.props.rights === 'disable') return
+      const viewPatProfileAccessRight = Authorized.check(
+        'patientdatabase.patientprofiledetails',
+      )
+      const disableRights = [
+        'disable',
+        'hidden',
+      ]
+      if (
+        !this.props.history ||
+        (viewPatProfileAccessRight &&
+          disableRights.includes(viewPatProfileAccessRight.rights))
+      )
+        return
+
       this.props.history.push(
         getAppendUrl({
           md: 'pt',
@@ -36,17 +50,19 @@ class PatientSearch extends PureComponent {
     this.defaultAction = (row) => (
       <Tooltip title='View Patient Profile' placement='bottom'>
         <span>
-          <Button
-            size='sm'
-            onClick={() => showPatient(row)}
-            justIcon
-            authority='none'
-            round
-            color='primary'
-            style={{ marginRight: 5 }}
-          >
-            <AccountCircle />
-          </Button>
+          <Authorized authority='patientdatabase.patientprofiledetails'>
+            <Button
+              size='sm'
+              onClick={() => showPatient(row)}
+              justIcon
+              authority='none'
+              round
+              color='primary'
+              style={{ marginRight: 5 }}
+            >
+              <AccountCircle />
+            </Button>
+          </Authorized>
         </span>
       </Tooltip>
     )

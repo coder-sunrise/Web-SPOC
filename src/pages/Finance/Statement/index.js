@@ -95,7 +95,7 @@ class Statement extends PureComponent {
     const { history, dispatch } = this.props
     const editRow = (row, e) => {
       const accessRight = Authorized.check('statement.statementdetails')
-      if (accessRight !== 'enable') {
+      if (accessRight && accessRight.rights !== 'enable') {
         notification.error({
           message: 'Current user is not authorized to access',
         })
