@@ -388,10 +388,11 @@ class Medication extends PureComponent {
       `corPrescriptionItemInstruction[${index}].drugFrequencyDisplayValue`,
       op.medicationFrequency ? op.medicationFrequency.name : undefined,
     )
-    setFieldValue(
-      `corPrescriptionItemInstruction[${index}].duration`,
-      op.duration || 1,
-    )
+    if (op.duration)
+      setFieldValue(
+        `corPrescriptionItemInstruction[${index}].duration`,
+        op.duration,
+      )
   }
 
   changeMedication = (v, op = {}) => {
