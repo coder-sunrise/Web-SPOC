@@ -83,7 +83,7 @@ class InventoryList extends PureComponent {
         type: 'number',
         precision: 1,
       },
-      { columnName: 'uom', sortingEnabled: false },
+      { columnName: 'uom', sortingEnabled: false, align: 'right' },
       {
         columnName: 'acp',
         sortingEnabled: false,
