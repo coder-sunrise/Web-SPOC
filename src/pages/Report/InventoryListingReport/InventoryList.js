@@ -17,7 +17,7 @@ class InventoryList extends PureComponent {
     const SummaryRow = (p) => {
       const { children } = p
       let countCol = children.find((c) => {
-        if (c.props.tableColumn.column) return false
+        if (!c.props.tableColumn.column) return false
         return c.props.tableColumn.column.name === 'stock'
       })
       // console.log({ countCol })
