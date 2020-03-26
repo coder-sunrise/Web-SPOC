@@ -470,7 +470,7 @@ class EditableTableGrid extends PureComponent {
     // console.log(this.state.errorCells)
     return (
       <Authorized.Context.Consumer>
-        {(matches) => {
+        {(matches = { rights: 'enable' }) => {
           return (
             <React.Fragment>
               {showAddCommand &&
@@ -647,7 +647,7 @@ class EditableTableGrid extends PureComponent {
     // console.log(sharedCfg)
     const element = (
       <Authorized.Context.Consumer>
-        {(matches) => {
+        {(matches = { rights: 'enable' }) => {
           const sharedCfg = {
             editableGrid: true,
             gridId: this.gridId,
