@@ -18,6 +18,9 @@ import LowStockInfo from './LowStockInfo'
 
 @connect(({ global, codetable }) => ({ global, codetable }))
 @withFormikExtend({
+  authority: [
+    'queue.consultation.order.consumable',
+  ],
   mapPropsToValues: ({ orders = {}, type }) =>
     orders.entity || orders.defaultConsumable,
   enableReinitialize: true,
