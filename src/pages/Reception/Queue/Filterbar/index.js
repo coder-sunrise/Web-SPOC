@@ -20,21 +20,14 @@ import {
 // sub component
 import StatusFilterButton from './StatusFilterButton'
 import Authorized from '@/utils/Authorized'
-import { USER_ROLE } from '@/utils/constants'
 
 const styles = () => ({
   actionBar: { marginBottom: '10px' },
   switch: { display: 'inline-block', minWidth: '200px' },
 })
 
-const shouldShowSelfOnlyCheckbox = [
-  USER_ROLE.DOCTOR,
-  USER_ROLE.DOCTOR_OWNER,
-]
-
 const Filterbar = (props) => {
   const {
-    accessRight,
     classes,
     dispatch,
     toggleNewPatient,
@@ -74,38 +67,36 @@ const Filterbar = (props) => {
         />
       </GridItem>
       <GridItem xs={7} sm={7} md={7} lg={4}>
-        <Authorized.Context.Provider value={accessRight}>
-          <Authorized authority='queue.registervisit'>
-            <ProgressButton
-              variant='contained'
-              color='primary'
-              icon={
-                <Hidden mdDown>
-                  <Search />
-                </Hidden>
-              }
-              onClick={handleSubmit}
-              size='sm'
-              submitKey='patientSearch/query'
-            >
-              Create Visit
-            </ProgressButton>
-          </Authorized>
-          <Authorized authority='patientdatabase.newpatient'>
-            <Button
-              icon={null}
-              color='primary'
-              size='sm'
-              onClick={toggleNewPatient}
-              disabled={loading.global}
-            >
+        <Authorized authority='queue.registervisit'>
+          <ProgressButton
+            variant='contained'
+            color='primary'
+            icon={
               <Hidden mdDown>
-                <PersonAdd />
+                <Search />
               </Hidden>
-              <FormattedMessage id='reception.queue.createPatient' />
-            </Button>
-          </Authorized>
-        </Authorized.Context.Provider>
+            }
+            onClick={handleSubmit}
+            size='sm'
+            submitKey='patientSearch/query'
+          >
+            Create Visit
+          </ProgressButton>
+        </Authorized>
+        <Authorized authority='patientdatabase.newpatient'>
+          <Button
+            icon={null}
+            color='primary'
+            size='sm'
+            onClick={toggleNewPatient}
+            disabled={loading.global}
+          >
+            <Hidden mdDown>
+              <PersonAdd />
+            </Hidden>
+            <FormattedMessage id='reception.queue.createPatient' />
+          </Button>
+        </Authorized>
         {user.clinicianProfile.userProfile.role.clinicRoleFK === 1 && (
           <div className={classes.switch}>
             <Checkbox

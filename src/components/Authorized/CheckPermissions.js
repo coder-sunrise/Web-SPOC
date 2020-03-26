@@ -1,6 +1,7 @@
 import React from 'react'
 import PromiseRender from './PromiseRender'
 import { CURRENT } from './renderAuthorize'
+import Authorized from '@/utils/Authorized'
 
 function isPromise (obj) {
   return (
@@ -29,10 +30,21 @@ const checkSinglePermission = (
           'readwrite',
         ].indexOf(o.rights) >= 0,
     )
-    if (match)
+    if (match) {
+      match.rights = 'enable'
+      if (type === 'decorator') return match
+      if (React.isValidElement(target))
+        return (
+          <Authorized.Context.Provider value={match}>
+            {React.cloneElement(target, {
+              rights: match.rights,
+            })}
+          </Authorized.Context.Provider>
+        )
       return typeof target === 'function' && type !== 'decorator'
         ? target(match)
         : target
+    }
 
     match = r.find(
       (o) =>
@@ -41,6 +53,8 @@ const checkSinglePermission = (
         ].indexOf(o.rights) >= 0,
     )
     if (match) {
+      if (type === 'decorator') return match
+
       return typeof target === 'function' && type !== 'decorator'
         ? target(match)
         : null
@@ -50,39 +64,53 @@ const checkSinglePermission = (
       (o) =>
         [
           'readonly',
-        ].indexOf(o.rights) >= 0,
-    )
-    if (match) {
-      if (typeof target === 'object') return target
-      // eslint-disable-next-line no-nested-ternary
-      return typeof target === 'function' && type !== 'decorator'
-        ? target(match)
-        : type !== 'decorator'
-          ? React.cloneElement(target, {
-              disabled: true,
-            })
-          : 'disabled'
-    }
-
-    match = r.find(
-      (o) =>
-        [
           'disable',
         ].indexOf(o.rights) >= 0,
     )
     if (match) {
+      match.rights = 'disable'
+
+      if (type === 'decorator') return match
+
+      // match.rights
+      // console.log(match)
+      if (typeof target === 'object' && !React.isValidElement(target))
+        return target
       // eslint-disable-next-line no-nested-ternary
-      return typeof target === 'function' && type !== 'decorator'
-        ? target(match)
-        : type !== 'decorator'
-          ? React.cloneElement(target, {
-              disabled: true,
-            })
-          : 'disabled'
+      return typeof target === 'function' && type !== 'decorator' ? (
+        target(match)
+      ) : type !== 'decorator' ? (
+        <Authorized.Context.Provider value={match}>
+          {React.cloneElement(target, {
+            disabled: true,
+            rights: match.rights,
+          })}
+        </Authorized.Context.Provider>
+      ) : (
+        'disabled'
+      )
     }
 
-    return null
+    // match = r.find(
+    //   (o) =>
+    //     [
+    //       'disable',
+    //     ].indexOf(o.rights) >= 0,
+    // )
+    // if (match) {
+    //   // eslint-disable-next-line no-nested-ternary
+    //   return typeof target === 'function' && type !== 'decorator'
+    //     ? target(match)
+    //     : type !== 'decorator'
+    //       ? React.cloneElement(target, {
+    //           disabled: true,
+    //         })
+    //       : 'disabled'
+    // }
+
+    // return null
   }
+  // console.log(authority)
   return typeof Exception === 'function' && type !== 'decorator'
     ? Exception()
     : Exception
@@ -111,6 +139,9 @@ const checkPermissions = (
   //   target,
   //   Exception,
   // )
+  if (authority === 'statement.statementdetails') {
+    console.log(11)
+  }
   // 没有判定权限.默认查看所有
   // Retirement authority, return target;
   if (!authority || (Array.isArray(authority) && !authority.join(' ').trim())) {

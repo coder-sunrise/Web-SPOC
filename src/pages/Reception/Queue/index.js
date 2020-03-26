@@ -403,7 +403,6 @@ class Queue extends React.Component {
     } = this.state
     const { sessionInfo, error } = queueLog
     const { sessionNo, isClinicSessionClosed } = sessionInfo
-    const accessRight = Authorized.check('reception/queue')
 
     return (
       <PageHeaderWrapper
@@ -427,18 +426,17 @@ class Queue extends React.Component {
                 >
                   Refresh
                 </ProgressButton>
-                <Authorized.Context.Provider value={accessRight}>
-                  <Authorized authority='queue.endsession'>
-                    <ProgressButton
-                      icon={<Stop />}
-                      color='danger'
-                      size='sm'
-                      onClick={this.onEndSessionClick}
-                    >
-                      <FormattedMessage id='reception.queue.endSession' />
-                    </ProgressButton>
-                  </Authorized>
-                </Authorized.Context.Provider>
+
+                <Authorized authority='queue.endsession'>
+                  <ProgressButton
+                    icon={<Stop />}
+                    color='danger'
+                    size='sm'
+                    onClick={this.onEndSessionClick}
+                  >
+                    <FormattedMessage id='reception.queue.endSession' />
+                  </ProgressButton>
+                </Authorized>
               </div>
             )}
           </CardHeader>
@@ -457,22 +455,19 @@ class Queue extends React.Component {
                 <DetailsActionBar
                   // selfOnly={queueLog.selfOnly}
                   // onSwitchClick={this.toggleFilterSelfOnly}
-                  accessRight={accessRight}
                   onRegisterVisitEnterPressed={this.onEnterPressed}
                   toggleNewPatient={this.toggleRegisterNewPatient}
                   setSearch={this.setSearch}
                 />
-                <Authorized.Context.Provider value={accessRight}>
-                  <DetailsGrid
-                    onViewPatientProfileClick={this.onViewPatientProfileClick}
-                    onViewDispenseClick={this.toggleDispense}
-                    onRegisterPatientClick={this.toggleRegisterNewPatient}
-                    handleEditVisitClick={this.showVisitRegistration}
-                    handleActualizeAppointment={this.handleActualizeAppointment}
-                    history={history}
-                    searchQuery={search}
-                  />
-                </Authorized.Context.Provider>
+                <DetailsGrid
+                  onViewPatientProfileClick={this.onViewPatientProfileClick}
+                  onViewDispenseClick={this.toggleDispense}
+                  onRegisterPatientClick={this.toggleRegisterNewPatient}
+                  handleEditVisitClick={this.showVisitRegistration}
+                  handleActualizeAppointment={this.handleActualizeAppointment}
+                  history={history}
+                  searchQuery={search}
+                />
               </div>
             )}
             <CommonModal

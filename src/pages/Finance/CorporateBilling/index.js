@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { FormattedMessage, formatMessage } from 'umi/locale'
 import { withStyles } from '@material-ui/core/styles'
+import Authorized from '@/utils/Authorized'
 
 import {
   PageHeaderWrapper,
@@ -27,15 +28,17 @@ class CorporateBilling extends PureComponent {
         title={<FormattedMessage id='app.forms.basic.title' />}
         content={<FormattedMessage id='app.forms.basic.description' />}
       >
-        <Card>
-          <CardBody>
-            <h4 className={classes.cardIconTitle}>
-              {formatMessage({ id: 'finance.corporate-billing.title' })}
-            </h4>
-            <FilterBar />
-            <CorporateBillingGrid />
-          </CardBody>
-        </Card>
+        <Authorized authority='finance/corporatebilling'>
+          <Card>
+            <CardBody>
+              <h4 className={classes.cardIconTitle}>
+                {formatMessage({ id: 'finance.corporate-billing.title' })}
+              </h4>
+              <FilterBar />
+              <CorporateBillingGrid />
+            </CardBody>
+          </Card>
+        </Authorized>
       </PageHeaderWrapper>
     )
   }

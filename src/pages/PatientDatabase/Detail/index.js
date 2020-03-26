@@ -84,7 +84,10 @@ const mapEntityToValues = (entity) => {
   global,
 }))
 @withFormikExtend({
-  authority: 'patientdatabase.patientprofiledetails',
+  authority: [
+    'patientdatabase.newpatient',
+    'patientdatabase.patientprofiledetails',
+  ],
   enableReinitialize: false,
   mapPropsToValues: ({ patient }) => {
     // const mappedValues = {
@@ -205,7 +208,10 @@ class PatientDetail extends PureComponent {
       {
         id: '1',
         name: 'Demographic',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.demographic,
         component: Loadable({
           loader: () => import('./Demographics'),
@@ -219,7 +225,10 @@ class PatientDetail extends PureComponent {
       {
         id: '2',
         name: 'Emergency Contact',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.emergencyContact,
         component: Loadable({
           loader: () => import('./EmergencyContact'),
@@ -240,7 +249,10 @@ class PatientDetail extends PureComponent {
       {
         id: '3',
         name: 'Allergies',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.allergies,
         component: Loadable({
           loader: () => import('./Allergies'),
@@ -254,7 +266,10 @@ class PatientDetail extends PureComponent {
       {
         id: '4',
         name: 'Schemes',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         schema: schema.schemes,
         component: Loadable({
           loader: () => import('./Schemes'),
@@ -268,7 +283,10 @@ class PatientDetail extends PureComponent {
       {
         id: '5',
         name: 'Patient History',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientHistory'),
           render: (loaded, p) => {
@@ -281,7 +299,10 @@ class PatientDetail extends PureComponent {
       {
         id: '6',
         name: 'Patient Document',
-        access: 'patientdatabase.patientprofiledetails',
+        access: [
+          'patientdatabase.newpatient',
+          'patientdatabase.patientprofiledetails',
+        ],
         component: Loadable({
           loader: () => import('./PatientDocument'),
           render: (loaded, p) => {
@@ -442,7 +463,12 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <Authorized.Context.Provider value={this.state.moduleAccessRight}>
+      <Authorized
+        authority={[
+          'patientdatabase.patientprofiledetails',
+          'patientdatabase.newpatient',
+        ]}
+      >
         <GridContainer>
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
@@ -513,13 +539,15 @@ class PatientDetail extends PureComponent {
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
                 {isCreatingPatient && (
-                  <Button
-                    color='primary'
-                    style={{ marginTop: theme.spacing(1) }}
-                    onClick={this.registerVisit}
-                  >
-                    Register Visit
-                  </Button>
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
                 )}
               </CardBody>
             </Card>
@@ -571,7 +599,7 @@ class PatientDetail extends PureComponent {
             </div>
           </GridItem>
         </GridContainer>
-      </Authorized.Context.Provider>
+      </Authorized>
     )
   }
 }

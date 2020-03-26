@@ -117,32 +117,21 @@ const VisitStatusTag = (props) => {
   )
 
   return (
-    <Authorized.Context.Consumer>
-      {(matches) => {
-        const { rights } = matches
-        const isReadOnly = rights === 'readonly'
-        return Authorized.generalCheck(
-          matches,
-          props,
-          <div
-            className={classnames({
-              ...cssClass,
-              [classes.readonly]: isReadOnly,
-            })}
-            onClick={statusTagClicked || isReadOnly ? undefined : handleClick}
-            onDoubleClick={!isReadOnly || handleDoubleClick}
-          >
-            <span>
-              {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
-                `${value} (${visitType.displayName})`
-              ) : (
-                value
-              )}
-            </span>
-          </div>,
-        )
-      }}
-    </Authorized.Context.Consumer>
+    <div
+      className={classnames({
+        ...cssClass,
+      })}
+      onClick={statusTagClicked ? undefined : handleClick}
+      onDoubleClick={handleDoubleClick}
+    >
+      <span>
+        {visitType && visitPurposeFK !== VISIT_TYPE.CONS ? (
+          `${value} (${visitType.displayName})`
+        ) : (
+          value
+        )}
+      </span>
+    </div>
   )
 }
 

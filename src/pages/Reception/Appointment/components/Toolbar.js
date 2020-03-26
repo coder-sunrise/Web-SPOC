@@ -178,7 +178,7 @@ class CalendarToolbar extends React.PureComponent {
         <GridContainer className={classnames(classes.container)}>
           <GridItem xs md={1}>
             <Tooltip title='Jump to today' placement='bottom'>
-              <Button color='info' onClick={this.returnToday}>
+              <Button color='info' onClick={this.returnToday} authority='none'>
                 Today
               </Button>
             </Tooltip>
@@ -188,11 +188,12 @@ class CalendarToolbar extends React.PureComponent {
               <Button
                 color='info'
                 onClick={this.handleNextModal}
+                authority='none'
                 buttonRef={(node) => {
                   this.anchorElAccount = node
                 }}
               >
-                Go to
+                Next
                 <ArrowDropDown style={{ margin: 0, marginLeft: 5 }} />
               </Button>
             </Tooltip>
@@ -202,7 +203,7 @@ class CalendarToolbar extends React.PureComponent {
               <Button
                 justIcon
                 color='info'
-                // variant='outlined'
+                authority='none'
                 onClick={this.subtractDate}
               >
                 <ArrowLeft />
@@ -210,8 +211,8 @@ class CalendarToolbar extends React.PureComponent {
             </Tooltip>
             <Button
               color='info'
-              // variant='outlined'
               size='lg'
+              authority='none'
               className={classnames(classes.dateButton)}
               onClick={this.onDateButtonClick}
             >
@@ -221,7 +222,7 @@ class CalendarToolbar extends React.PureComponent {
               <Button
                 justIcon
                 color='info'
-                // variant='outlined'
+                authority='none'
                 onClick={this.addDate}
               >
                 <ArrowRight />
@@ -259,6 +260,7 @@ class CalendarToolbar extends React.PureComponent {
                   color='info'
                   id={cv}
                   onClick={this.handleClick}
+                  authority='none'
                 >
                   {cv}
                 </Button>

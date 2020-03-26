@@ -23,7 +23,6 @@ import cannedTextModel from './models/cannedText'
 import { navigateDirtyCheck } from '@/utils/utils'
 import { getDefaultActivePanel, getConfig, getContent } from './utils'
 import Authorized from '@/utils/Authorized'
-import { fieldKey, scribbleNoteTypeFieldKey } from './config'
 import { CLINIC_TYPE } from '@/utils/constants'
 
 const PREFIX = {
@@ -115,10 +114,14 @@ window.g_app.replaceModel(cannedTextModel)
   }),
 )
 class ClinicalNotes extends Component {
+  static defaultProps = {
+    prefix: 'corDoctorNote',
+  }
+
   constructor (props) {
     super(props)
-    const config = getConfig(this.props.clinicInfo)
-    const contents = getContent(config, this.props.clinicInfo)
+    const config = getConfig()
+    const contents = getContent(config)
     this.state = {
       showCannedText: false,
       runOnce: false,
@@ -133,8 +136,6 @@ class ClinicalNotes extends Component {
   }
 
   componentDidMount () {
-    const { clinicInfo } = this.props
-    const fieldName = fieldKey[clinicInfo.clinicTypeFK]
     const { config } = this.state
     const { fields } = config
     const payload = {
@@ -143,7 +144,7 @@ class ClinicalNotes extends Component {
       ...fields.reduce(
         (_result, field) => ({
           ..._result,
-          [field[fieldName]]: { [field.scribbleField]: [] },
+          [field.fieldName]: { [field.scribbleField]: [] },
         }),
         {},
       ),
@@ -174,13 +175,11 @@ class ClinicalNotes extends Component {
     const { scriblenotes, dispatch } = this.props
     const { category, arrayName, categoryIndex, config } = this.state
     const { fields } = config
-    const { clinicInfo } = this.props
-    const fieldName = fieldKey[clinicInfo.clinicTypeFK]
 
     const scribbleNoteData = fields.reduce(
       (result, field) => ({
         ...result,
-        [field[fieldName]]: scriblenotes[field[fieldName]][field.scribbleField],
+        [field.fieldName]: scriblenotes[field.fieldName][field.scribbleField],
       }),
       {},
     )
@@ -242,15 +241,7 @@ class ClinicalNotes extends Component {
     const { category, arrayName, config } = this.state
     const { fields } = config
     let previousData = this.form.values.corScribbleNotes
-    // const { clinicInfo } = this.props
-    // const fieldName = fieldKey.category // [clinicInfo.clinicTypeFK]
-    // console.log(
-    //   fieldKey[clinicInfo.clinicTypeFK],
-    //   fieldKey,
-    //   fields,
-    //   fieldName,
-    //   scriblenotes,
-    // )
+
     const currentScribbleNoteData = fields.reduce(
       (result, field) => ({
         ...result,
@@ -366,12 +357,9 @@ class ClinicalNotes extends Component {
   }
 
   onEditorChange = (type) => (v) => {
-    const { consultation, clinicInfo } = this.props
+    const { consultation, prefix } = this.props
     const { entity } = consultation
 
-    const _prefix =
-      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
-    const prefix = `${_prefix}`
     entity[prefix] = [
       { ...entity[prefix][0], [type]: v },
     ]
@@ -409,56 +397,43 @@ class ClinicalNotes extends Component {
   handleAddCannedText = (cannedText) => {
     const { cannedTextRow } = this.state
 
-    const { consultation, clinicInfo } = this.props
-    const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-
-    const prefix =
-      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
+    const { consultation, prefix } = this.props
 
     const { entity } = consultation
     const { text } = cannedText
 
     // const { corDoctorNote = [] } = entity
     const note = entity[prefix] || []
-    const prevData = note.length > 0 ? note[0][cannedTextRow[fieldName]] : ''
+    const prevData = note.length > 0 ? note[0][cannedTextRow.fieldName] : ''
 
     const value = `${prevData || ''}${text}`
 
-    this.onEditorChange(cannedTextRow[fieldName])(value)
-    const name = `${prefix}[0][${cannedTextRow[fieldName]}]`
+    this.onEditorChange(cannedTextRow.fieldName)(value)
+    const name = `${prefix}[0][${cannedTextRow.fieldName}]`
     this.form.setFieldValue(name, value)
   }
 
   insertIntoClinicalNote = (dataUrl) => {
     const { selectedData, config } = this.state
     const { fields = [] } = config
-    const { consultation, clinicInfo } = this.props
-    const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-    const scrribleNoteTypeFieldKey =
-      scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
+    const { consultation, prefix } = this.props
 
-    const _prefix =
-      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
-    const prefix = `${_prefix}[0]`
     const { entity } = consultation
     const contents = `<img src=${dataUrl} alt='scribbleNote' />`
 
     // const { corDoctorNote = [] } = entity
     const note = entity[prefix] || []
     const scribbleNoteField = fields.find(
-      (field) =>
-        field[scrribleNoteTypeFieldKey] ===
-        selectedData[scrribleNoteTypeFieldKey],
+      (field) => field.scribbleNoteTypeFK === selectedData.scribbleNoteTypeFK,
     )
 
-    const prevData =
-      note.length > 0 ? note[0][scribbleNoteField[fieldName]] : ''
+    const prevData = note.length > 0 ? note[0][scribbleNoteField.fieldName] : ''
 
     const value = `${prevData} ${contents}`
 
-    this.onEditorChange(scribbleNoteField[fieldName])(value)
+    this.onEditorChange(scribbleNoteField.fieldName)(value)
 
-    this.form.setFieldValue(`${prefix}${scribbleNoteField[fieldName]}`, value)
+    this.form.setFieldValue(`${prefix}[0]${scribbleNoteField.fieldName}`, value)
   }
 
   handleCannedTextButtonClick = (note) => {
@@ -469,7 +444,7 @@ class ClinicalNotes extends Component {
 
   render () {
     const {
-      // prefix = 'corDoctorNote[0].',
+      prefix,
       classes,
       scriblenotes,
       theme,
@@ -477,9 +452,7 @@ class ClinicalNotes extends Component {
       consultation,
       clinicInfo,
     } = this.props
-    const _prefix =
-      clinicInfo.clinicTypeFK === CLINIC_TYPE.DENTAL ? PREFIX.DENTAL : PREFIX.GP
-    const prefix = `${_prefix}[0]`
+
     const { config, contents, showCannedText } = this.state
     const { entity = {} } = consultation
 
@@ -490,10 +463,11 @@ class ClinicalNotes extends Component {
         return false
       return true
     })
+
     const defaultActive = getDefaultActivePanel(
       entity,
       config,
-      _prefix,
+      prefix,
       clinicInfo,
       panels,
     )
@@ -508,16 +482,13 @@ class ClinicalNotes extends Component {
             const { values } = form
 
             if (!values || !values.corScribbleNotes) return null
-            const scrribleNoteTypeFieldKey =
-              scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
 
             const payload = {
               entity: '',
               selectedIndex: '',
               ...fields.reduce((_result, field) => {
                 const scribbles = values.corScribbleNotes.filter(
-                  (o) =>
-                    o.scribbleNoteTypeFK === field[scrribleNoteTypeFieldKey],
+                  (o) => o.scribbleNoteTypeFK === field.scribbleNoteTypeFK,
                 )
 
                 return {
@@ -554,15 +525,12 @@ class ClinicalNotes extends Component {
               this.handleCannedTextButtonClick(item)
             const onSettingClick = () => this.openCannedText(item)
 
-            const fieldName = fieldKey[clinicInfo.clinicTypeFK]
-            const scrribleNoteTypeFieldKey =
-              scribbleNoteTypeFieldKey[clinicInfo.clinicTypeFK]
             return {
               title: item.fieldTitle,
               content: (
                 <div className={classes.editor}>
                   <Field
-                    name={`${prefix}${item[fieldName]}`}
+                    name={`${prefix}[0]${item.fieldName}`}
                     render={(args) => {
                       return (
                         <div>
@@ -581,7 +549,7 @@ class ClinicalNotes extends Component {
                               }
                               category={item.category}
                               arrayName={item.scribbleField}
-                              categoryIndex={item[scrribleNoteTypeFieldKey]}
+                              categoryIndex={item.scribbleNoteTypeFK}
                               scribbleNoteArray={
                                 scriblenotes[item.category][item.scribbleField]
                               }
@@ -600,7 +568,7 @@ class ClinicalNotes extends Component {
                             autoFocus={index === 0}
                             style={{ marginBottom: 0 }}
                             strongLabel
-                            onBlur={this.onEditorChange(item[fieldName])}
+                            onBlur={this.onEditorChange(item.fieldName)}
                             // label='Chief Complaints'
                             height={item.height}
                             {...args}
@@ -651,7 +619,7 @@ class ClinicalNotes extends Component {
           observe='CannedText'
           onClose={this.closeCannedText}
         >
-          <CannedText clinicInfo={clinicInfo} />
+          <CannedText />
         </CommonModal>
 
         <CommonModal

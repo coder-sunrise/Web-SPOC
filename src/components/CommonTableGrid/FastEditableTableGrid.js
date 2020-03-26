@@ -9,6 +9,7 @@ import {
   Table,
   TableEditColumn,
   PagingPanel,
+  TableEditRow,
   TableInlineCellEditing,
 } from '@devexpress/dx-react-grid-material-ui'
 import { Getter } from '@devexpress/dx-react-core'
@@ -188,13 +189,14 @@ class EditableTableGrid extends PureComponent {
     errorRows.forEach((r) => {
       const { _errors } = r
       const rowId = getRowId(r)
-      _errors.forEach((e) => {
-        const { path } = e
-        errorCells.push({
-          rowId,
-          columnName: path,
+      if (rowId)
+        _errors.forEach((e) => {
+          const { path } = e
+          errorCells.push({
+            rowId,
+            columnName: path,
+          })
         })
-      })
     })
     // console.log(errorCells)
     return errorCells
@@ -454,7 +456,7 @@ class EditableTableGrid extends PureComponent {
   }
 
   getAddRowComponent = (selector = '.medisys-table') => {
-    const { theme, FuncProps = {} } = this.props
+    const { theme, FuncProps = {}, disable } = this.props
     const {
       EditingProps: {
         showAddCommand = false,
@@ -467,41 +469,48 @@ class EditableTableGrid extends PureComponent {
     const { containerExtraComponent } = pagerConfig
     // console.log(this.state.errorCells)
     return (
-      <React.Fragment>
-        {showAddCommand && (
-          <Button
-            // hideIfNoEditRights
-            onClick={(e) => {
-              this._onCommitChanges({
-                added: this._onAddedRowsChange([
-                  {},
-                ]),
-              })
-              // setTimeout(() => {
-              //   window.g_app._store.dispatch({
-              //     type: 'global/updateState',
-              //     payload: {
-              //       disableSave: true,
-              //     },
-              //   })
-              // }, 1)
+      <Authorized.Context.Consumer>
+        {(matches) => {
+          return (
+            <React.Fragment>
+              {showAddCommand &&
+              matches.rights !== 'disable' && (
+                <Button
+                  // hideIfNoEditRights
+                  onClick={(e) => {
+                    this._onCommitChanges({
+                      added: this._onAddedRowsChange([
+                        {},
+                      ]),
+                    })
+                    // setTimeout(() => {
+                    //   window.g_app._store.dispatch({
+                    //     type: 'global/updateState',
+                    //     payload: {
+                    //       disableSave: true,
+                    //     },
+                    //   })
+                    // }, 1)
 
-              // $(e.target)
-              //   .parents(selector)
-              //   .find('.medisys-table-add')
-              //   .trigger('click')
-            }}
-            color='primary'
-            link
-            disabled={this.state.errorCells.length > 0}
-            {...addCommandProps}
-          >
-            <Add />
-            {addNewLabelName || 'New'}
-          </Button>
-        )}
-        {containerExtraComponent}
-      </React.Fragment>
+                    // $(e.target)
+                    //   .parents(selector)
+                    //   .find('.medisys-table-add')
+                    //   .trigger('click')
+                  }}
+                  color='primary'
+                  link
+                  disabled={this.state.errorCells.length > 0}
+                  {...addCommandProps}
+                >
+                  <Add />
+                  {addNewLabelName || 'New'}
+                </Button>
+              )}
+              {containerExtraComponent}
+            </React.Fragment>
+          )
+        }}
+      </Authorized.Context.Consumer>
     )
   }
 
@@ -558,7 +567,6 @@ class EditableTableGrid extends PureComponent {
     // console.log('redner',this.gridId)
     const {
       theme,
-      columnExtensions = [],
       EditingProps: {
         availableColumns = [],
         showAddCommand = false,
@@ -574,7 +582,6 @@ class EditableTableGrid extends PureComponent {
         },
         // EditCell = DefaultEditCell,
       } = {},
-      getRowId,
       ...props
     } = this.props
 
@@ -598,82 +605,13 @@ class EditableTableGrid extends PureComponent {
     if (this.containerComponent) {
       cfg.containerComponent = this.containerComponent
     }
-    const sharedCfg = {
-      editableGrid: true,
-      gridId: this.gridId,
-      columnExtensions,
-      editingRowIds,
-      getRowId,
-      extraCellConfig: {
-        commitChanges: this._onCommitChanges,
-        editingCells,
-      },
-      extraState: [
-        <EditingState
-          key={`editingState-${uniqueGid}`}
-          editingRowIds={editingRowIds}
-          deletedRowIds={deletedRowIds}
-          rowChanges={rowChanges}
-          addedRows={addedRows}
-          onAddedRowsChange={this._onAddedRowsChange}
-          onEditingRowIdsChange={this._onEditingRowIdsChange}
-          editingCells={editingCells}
-          onEditingCellsChange={this._onEditingCellsChange}
-          onDeletedRowIdsChange={this._onDeletedRowIdsChange}
-          onRowChangesChange={this._onRowChangesChange}
-          onCommitChanges={this._onCommitChanges}
-          columnExtensions={columnExtensions}
-        />,
-      ],
-      extraRow: [
-        <CustomTableEditRow
-          key={`CustomTableEditRow-${uniqueGid}`}
-          availableColumns={availableColumns}
-        />,
-      ],
-      extraColumn: [
-        <TableEditColumn
-          key={`TableEditColumn-${uniqueGid}`}
-          showAddCommand={this.addable}
-          // showEditCommand={showEditCommand}
-          showDeleteCommand={showDeleteCommand}
-          commandComponent={CommandComponent}
-          cellComponent={(cellProps) => {
-            const { children, ...p } = cellProps
-            return (
-              <Table.Cell {...p}>
-                {children.map((o) => {
-                  if (o) {
-                    return React.cloneElement(o, {
-                      row: p.row,
-                      // editingRowIds,
-                      // key: o.props.id,
-                      // schema: this.props.schema,
-                      // gridId: this.gridId,
-                      onRowDelete,
-                      isDeletable,
-                      // ...o.props,
-                    })
-                  }
-                  return null
-                })}
-              </Table.Cell>
-            )
-          }}
-          messages={messages}
-        />,
-        <TableInlineCellEditing
-          key={`TableInlineCellEditing-${uniqueGid}`}
-          startEditAction='click'
-          selectTextOnEditStart
-        />,
-      ],
+    const editableCfg = {
       extraGetter: [
         // <EditPlugin />,
         <Getter
-          key={`Getter-${uniqueGid}`}
+          // key={`Getter-${uniqueGid}`}
           name='tableColumns'
-          computed={({ tableColumns, ...resetProps }) => {
+          computed={({ tableColumns }) => {
             // console.log(tableColumns, TableEditColumn, resetProps)
             // const col = tableColumns.find(
             //   (c) => c.type === TableEditColumn.COLUMN_TYPE,
@@ -686,7 +624,7 @@ class EditableTableGrid extends PureComponent {
                 (c) => c.type !== TableEditColumn.COLUMN_TYPE,
               ),
               {
-                key: 'Symbol(editCommand)',
+                key: 'editCommand',
                 type: TableEditColumn.COLUMN_TYPE,
                 fixed: 'right',
                 width: 75,
@@ -697,26 +635,114 @@ class EditableTableGrid extends PureComponent {
           }}
         />,
       ],
-      // onRowDoubleClick: this.onRowDoubleClick,
-      ...cfg,
-      ...props,
     }
+
     // console.log(rowChanges, addedRows)
     // console.log({ columnExtensions })
-    // const editableCfg = {
+    // const sharedCfg = {
 
     // }
 
     // console.log('EditableTableGrid')
-    // console.log(editableCfg)
+    // console.log(sharedCfg)
     const element = (
       <Authorized.Context.Consumer>
         {(matches) => {
+          const sharedCfg = {
+            editableGrid: true,
+            gridId: this.gridId,
+            editingRowIds,
+            getRowId: props.props,
+            extraCellConfig: {
+              commitChanges: this._onCommitChanges,
+              editingCells,
+            },
+            extraState: [
+              <EditingState
+                // key={`editingState-${uniqueGid}`}
+                // editingRowIds={editingRowIds}
+                columnEditingEnabled
+                deletedRowIds={deletedRowIds}
+                rowChanges={rowChanges}
+                addedRows={addedRows}
+                onAddedRowsChange={this._onAddedRowsChange}
+                onEditingRowIdsChange={this._onEditingRowIdsChange}
+                editingCells={editingCells}
+                onEditingCellsChange={this._onEditingCellsChange}
+                onDeletedRowIdsChange={this._onDeletedRowIdsChange}
+                onRowChangesChange={this._onRowChangesChange}
+                onCommitChanges={this._onCommitChanges}
+                columnExtensions={props.columnExtensions}
+              />,
+            ],
+            extraRow: [
+              <CustomTableEditRow
+                key={`CustomTableEditRow-${uniqueGid}`}
+                availableColumns={availableColumns}
+              />,
+            ],
+            extraColumn: [
+              <TableEditColumn
+                key={`TableEditColumn-${uniqueGid}`}
+                showAddCommand={this.addable}
+                // showEditCommand={showEditCommand}
+                showDeleteCommand={showDeleteCommand}
+                commandComponent={CommandComponent}
+                width={
+                  [
+                    'readonly',
+                    'disable',
+                  ].includes(matches.rights) ? (
+                    0
+                  ) : (
+                    'auto'
+                  )
+                }
+                cellComponent={(cellProps) => {
+                  const { children, ...p } = cellProps
+                  return (
+                    <Table.Cell {...p}>
+                      {children.map((o) => {
+                        if (o) {
+                          return React.cloneElement(o, {
+                            row: p.row,
+                            // editingRowIds,
+                            // key: o.props.id,
+                            // schema: this.props.schema,
+                            // gridId: this.gridId,
+                            onRowDelete,
+                            isDeletable,
+                            // ...o.props,
+                          })
+                        }
+                        return null
+                      })}
+                    </Table.Cell>
+                  )
+                }}
+                messages={messages}
+              />,
+              <TableInlineCellEditing
+                key={`TableInlineCellEditing-${uniqueGid}`}
+                startEditAction='click'
+                selectTextOnEditStart
+              />,
+            ],
+
+            // onRowDoubleClick: this.onRowDoubleClick,
+            ...cfg,
+            ...props,
+          }
+          // console.log(matches)
           return Authorized.generalCheck(
             matches,
             this.props,
-            <CommonTableGrid {...sharedCfg} />,
-            <CommonTableGrid {...sharedCfg} />,
+            <CommonTableGrid
+              authorize={matches}
+              {...sharedCfg}
+              {...editableCfg}
+            />,
+            <CommonTableGrid authorize={matches} {...sharedCfg} />,
           )
         }}
       </Authorized.Context.Consumer>

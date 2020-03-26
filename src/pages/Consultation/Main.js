@@ -795,6 +795,7 @@ class Main extends React.Component {
       orders = {},
       formik,
       rights,
+      disabled,
       ...resetProps
     } = this.props
     const { entity } = consultation

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 // import { connect } from 'dva'
 import router from 'umi/router'
 import _ from 'lodash'
@@ -30,6 +30,7 @@ import { podoOrderType } from '@/utils/codes'
 import { INVOICE_STATUS, PURCHASE_ORDER_STATUS } from '@/utils/constants'
 import AuthorizedContext from '@/components/Context/Authorized'
 import AmountSummary from '@/pages/Shared/AmountSummary'
+import Authorized from '@/utils/Authorized'
 
 const styles = (theme) => ({
   errorMsgStyle: {
@@ -44,6 +45,8 @@ const styles = (theme) => ({
   },
 })
 
+const { Secured } = Authorized
+@Secured('purchasingandreceiving.purchasingandreceivingdetails')
 @withFormikExtend({
   displayName: 'purchaseOrderDetails',
   enableReinitialize: true,
@@ -178,9 +181,13 @@ class Index extends Component {
                 message,
               })
             }
-            const { id } = r
 
-            this.getPOdata(id)
+            if (getAccessRight()) {
+              const { id } = r
+              this.getPOdata(id)
+            } else {
+              router.push('/inventory/pr')
+            }
           }
         })
         validation = true
@@ -498,6 +505,20 @@ class Index extends Component {
     return true
   }
 
+  getRights = (type, poStatus, isWriteOff) => {
+    const authorityUrl =
+      type === 'new'
+        ? 'purchasingandreceiving.newpurchasingandreceiving'
+        : 'purchasingandreceiving.purchasingandreceivingdetails'
+
+    if (
+      !getAccessRight(authorityUrl) ||
+      (getAccessRight(authorityUrl) && !this.isEditable(poStatus, isWriteOff))
+    )
+      return 'disable'
+    return 'enable'
+  }
+
   render () {
     const {
       purchaseOrderDetails,
@@ -505,6 +526,7 @@ class Index extends Component {
       setFieldValue,
       errors,
       classes,
+      rights,
     } = this.props
     const { purchaseOrder: po, type } = purchaseOrderDetails
     const poStatus = po ? po.purchaseOrderStatusFK : 0
@@ -524,26 +546,17 @@ class Index extends Component {
     const isCompletedOrCancelled = poStatus === 4 || poStatus === 6
     const currentGstValue = isGSTEnabled ? gstValue : undefined
 
-    const authorityUrl =
-      type === 'new'
-        ? 'purchasingandreceiving.newpurchasingandreceiving'
-        : 'purchasingandreceiving.purchasingandreceivingdetails'
     return (
       <AuthorizedContext.Provider
         value={{
-          rights:
-            this.isEditable(poStatus, isWriteOff) ||
-            getAccessRight(authorityUrl)
-              ? 'enable'
-              : 'disable',
+          rights: type === 'new' ? 'enable' : rights,
         }}
       >
         <POForm
-          isReadOnly={!this.isEditable(poStatus, isWriteOff)}
+          isReadOnly={this.getRights(type, poStatus, isWriteOff) === 'disable'}
           isFinalize={isPOStatusFinalizedFulFilledPartialReceived(poStatus)}
           setFieldValue={setFieldValue}
           isCompletedOrCancelled={isCompletedOrCancelled}
-          type={type}
           {...this.props}
         />
         {/* <AuthorizedContext.Provider

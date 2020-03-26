@@ -155,7 +155,7 @@ const Grid = ({
 
   const canAccess = (id) => {
     const menuOpt = ContextMenuOptions.find(
-      (item) => item.id === parseInt(id, 10),
+      (item) => item.id === parseFloat(id, 10),
     )
     const accessRight = Authorized.check(menuOpt.authority)
 

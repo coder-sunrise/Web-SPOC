@@ -44,10 +44,9 @@ const FilterBar = (props) => {
 
   const renderDropdown = (option) => <DoctorLabel doctor={option} />
 
-  const { filterByDoctor = [], filterByApptType = [] } = values
+  const { filterByDoctor = [] } = values
   const maxDoctorTagCount = filterByDoctor.length <= 1 ? 1 : 0
-  const maxAppointmentTagCount = filterByApptType.length <= 1 ? 1 : 0
-  const moduleAccess = Authorized.check('reception/appointment')
+
   return (
     <React.Fragment>
       <GridContainer alignItems='center'>
@@ -141,31 +140,29 @@ const FilterBar = (props) => {
         </GridItem>
 
         <GridItem xs md={12}>
-          <Authorized.Context.Provider value={moduleAccess}>
-            <div>
-              <Authorized authority='appointment.newappointment'>
-                <Button
-                  color='primary'
-                  size='sm'
-                  onClick={onAddAppointmentClick}
-                  disabled={loading}
-                >
-                  <AddIcon />
-                  Add Appointment
-                </Button>
-              </Authorized>
+          <Authorized authority='appointment.newappointment'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onAddAppointmentClick}
+              disabled={loading}
+            >
+              <AddIcon />
+              Add Appointment
+            </Button>
+          </Authorized>
 
-              <Button
-                color='primary'
-                size='sm'
-                onClick={onDoctorEventClick}
-                disabled={loading}
-              >
-                <AddIcon />
-                Add Doctor Block
-              </Button>
-            </div>
-          </Authorized.Context.Provider>
+          <Authorized authority='settings.clinicsetting.doctorblock'>
+            <Button
+              color='primary'
+              size='sm'
+              onClick={onDoctorEventClick}
+              disabled={loading}
+            >
+              <AddIcon />
+              Add Doctor Block
+            </Button>
+          </Authorized>
         </GridItem>
       </GridContainer>
     </React.Fragment>

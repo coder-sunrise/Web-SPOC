@@ -3,7 +3,9 @@ import Edit from '@material-ui/icons/Edit'
 
 import { status } from '@/utils/codes'
 import Authorized from '@/utils/Authorized'
-import { Button, CommonTableGrid, Tooltip } from '@/components'
+import { Button, CommonTableGrid, Tooltip, notification } from '@/components'
+
+const viewSchemDetailAuthority = 'scheme.schemedetails'
 
 const Grid = ({ history }) => {
   const [
@@ -22,6 +24,14 @@ const Grid = ({ history }) => {
     leftColumns: [],
   })
   const editRow = (row, e) => {
+    const accessRight = Authorized.check(viewSchemDetailAuthority)
+    if (!accessRight || accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
+
     history.push(`/finance/scheme/details?id=${row.id}`)
   }
 
@@ -32,16 +42,10 @@ const Grid = ({ history }) => {
     },
     {
       columnName: 'coPayerType',
-      // type: 'codeSelect',
-      // code: 'ctCopayerType',
-      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.copayerTypeFK',
     },
     {
       columnName: 'coPayerName',
-      // type: 'codeSelect',
-      // code: 'ctCopayer',
-      // labelField: 'displayValue',
       sortBy: 'CopayerFKNavigation.displayValue',
     },
     {
@@ -54,19 +58,7 @@ const Grid = ({ history }) => {
       columnName: 'action',
       align: 'center',
       render: (row) => (
-        /* <Tooltip title='Detail' placement='bottom'>
-            <Button
-              size='sm'
-              onClick={showDetail(row)}
-              justIcon
-              round
-              color='primary'
-              style={{ marginRight: 5 }}
-            >
-              <Search />
-            </Button>
-          </Tooltip> */
-        <Authorized authority='scheme.schemedetails'>
+        <Authorized authority={viewSchemDetailAuthority}>
           <Tooltip title='Edit' placement='bottom'>
             <Button
               size='sm'
@@ -81,26 +73,6 @@ const Grid = ({ history }) => {
         </Authorized>
       ),
     },
-    // {
-    //   columnName: 'isActive',
-    //   sortingEnabled: false,
-    //   type: 'select',
-    //   options: status,
-    // },
-    // {
-    //   columnName: 'supplier',
-    //   type: 'select',
-    //   options: suppliers,
-    //   label: 'Supplier',
-    // },
-    // {
-    //   columnName: 'dispUOM',
-    //   align: 'select',
-    //   options: dispUOMs,
-    //   label: 'DispUOM',
-    // },
-    // { columnName: 'payments', type: 'number', currency: true },
-    // { columnName: 'expenseAmount', type: 'number', currency: true },
   ]
 
   return (

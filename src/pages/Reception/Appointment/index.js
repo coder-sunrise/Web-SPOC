@@ -246,6 +246,10 @@ class Appointment extends React.PureComponent {
 
   onSelectSlot = (props) => {
     const { start, end, resourceId } = props
+    const createApptAccessRight = Authorized.check('appointment.newappointment')
+
+    if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
+      return
 
     const selectedSlot = {
       allDay: start - end === 0,
@@ -269,6 +273,23 @@ class Appointment extends React.PureComponent {
       isEditedAsSingleAppointment,
       isEnableRecurrence,
     } = selectedEvent
+
+    const viewApptAccessRight = Authorized.check(
+      'appointment.appointmentdetails',
+    )
+    const viewDoctorBlockAccessRight = Authorized.check(
+      'settings.clinicsetting.doctorblock',
+    )
+
+    if (
+      (viewApptAccessRight &&
+        viewApptAccessRight.rights !== 'enable' &&
+        !doctor) ||
+      (doctor &&
+        viewDoctorBlockAccessRight &&
+        viewDoctorBlockAccessRight.rights !== 'enable')
+    )
+      return
 
     if (doctor) {
       this.props

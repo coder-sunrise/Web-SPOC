@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import Yup from '@/utils/yup'
 import {
   withFormikExtend,
@@ -16,9 +16,14 @@ import {
   CustomInput,
 } from '@/components'
 import AuthorizedContext from '@/components/Context/Authorized'
+import Authorized from '@/utils/Authorized'
 import Contact from './Contact'
 
 @withFormikExtend({
+  authority: [
+    'copayer.copayerdetails',
+    'copayer.newcopayer',
+  ],
   mapPropsToValues: ({ settingCompany }) =>
     settingCompany.entity || settingCompany.default,
   validationSchema: ({ settingCompany }) =>
@@ -111,15 +116,20 @@ class Detail extends PureComponent {
 
   render () {
     const { props } = this
-    const { theme, footer, values, settingCompany, route } = props
+
+    const { theme, footer, values, settingCompany, route, rights } = props
     const { name } = route
     const type = 'copayer'
     const { isUserMaintainable, isGSTEnabled } = values
+
+    let finalRights = isUserMaintainable ? 'enable' : 'disable'
+    if (rights === 'disable') finalRights = 'disable'
+
     return (
       <React.Fragment>
         <AuthorizedContext.Provider
           value={{
-            rights: isUserMaintainable ? 'enable' : 'disable',
+            rights: finalRights,
           }}
         >
           <div style={{ margin: theme.spacing(1) }}>
