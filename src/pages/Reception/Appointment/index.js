@@ -246,6 +246,10 @@ class Appointment extends React.PureComponent {
 
   onSelectSlot = (props) => {
     const { start, end, resourceId } = props
+    const createApptAccessRight = Authorized.check('appointment.newappointment')
+
+    if (createApptAccessRight && createApptAccessRight.rights !== 'enable')
+      return
 
     const selectedSlot = {
       allDay: start - end === 0,

@@ -463,7 +463,12 @@ class PatientDetail extends PureComponent {
     const CurrentComponent = currentMenu.component
 
     return (
-      <Authorized authority='patientdatabase.patientprofiledetails'>
+      <Authorized
+        authority={[
+          'patientdatabase.patientprofiledetails',
+          'patientdatabase.newpatient',
+        ]}
+      >
         <GridContainer>
           <GridItem xs={12} sm={12} md={2}>
             <Card profile>
@@ -534,13 +539,15 @@ class PatientDetail extends PureComponent {
                 </MenuList>
                 {isCreatingPatient && <Divider light />}
                 {isCreatingPatient && (
-                  <Button
-                    color='primary'
-                    style={{ marginTop: theme.spacing(1) }}
-                    onClick={this.registerVisit}
-                  >
-                    Register Visit
-                  </Button>
+                  <Authorized authority='queue.registervisit'>
+                    <Button
+                      color='primary'
+                      style={{ marginTop: theme.spacing(1) }}
+                      onClick={this.registerVisit}
+                    >
+                      Register Visit
+                    </Button>
+                  </Authorized>
                 )}
               </CardBody>
             </Card>
