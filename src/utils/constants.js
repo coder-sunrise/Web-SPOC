@@ -329,6 +329,7 @@ export const FILE_CATEGORY = {
   VISITREG: 1,
   CONSULTATION: 2,
   PATIENT: 3,
+  QUEUEDISPLAY: 4,
 }
 
 export const PURCHASE_ORDER_STATUS = {
@@ -351,9 +352,15 @@ export const NOTIFICATION_TYPE = {
   QUEUE: 1,
   CODETABLE: 2,
   ERROR: 3,
+  QUEUECALL: 4,
 }
 
 export const NOTIFICATION_STATUS = {
   OK: 1,
   ERROR: 2,
+}
+
+export const KEYS = {
+  QUEUEDISPLAYSETUP: 'queueDisplay',
+  QUEUECALLING: 'queueCalling',
 }

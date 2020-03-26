@@ -46,6 +46,7 @@ const AttachmentWithThumbnail = ({
   renderBody = undefined,
   maxFilesAllowUpload,
   restrictFileTypes = [],
+  fileCategory,
 }) => {
   const fileAttachments = attachments.filter(
     (attachment) =>
@@ -162,7 +163,7 @@ const AttachmentWithThumbnail = ({
     const originalFile = {
       fileName: file.name,
       fileSize: file.size,
-      fileCategoryFK: FILE_CATEGORY.VISITREG,
+      fileCategoryFK: fileCategory || FILE_CATEGORY.VISITREG,
       content: base64,
       thumbnail: _thumbnailDto,
       fileExtension,

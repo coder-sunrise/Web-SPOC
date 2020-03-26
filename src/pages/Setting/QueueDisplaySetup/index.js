@@ -2,14 +2,8 @@ import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import basicStyle from 'mui-pro-jss/material-dashboard-pro-react/layouts/basicLayout'
-
 import { getBizSession } from '@/services/queue'
-
-import {
-  currenciesList,
-  currencyRoundingList,
-  currencyRoundingToTheClosestList,
-} from '@/utils/codes'
+import { FILE_CATEGORY, KEYS } from '@/utils/constants'
 
 import {
   withFormikExtend,
@@ -17,20 +11,14 @@ import {
   GridContainer,
   GridItem,
   CardContainer,
-  Select,
   Button,
   Switch,
-  WarningSnackbar,
-  CodeSelect,
   TextField,
-  EditableTableGrid,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
 import {
-  DoctorLabel,
-  DoctorProfileSelect,
-  Attachment,
   AttachmentWithThumbnail,
+  QueueDashboardButton,
 } from '@/components/_medisys'
 
 const styles = (theme) => ({
@@ -47,127 +35,82 @@ const styles = (theme) => ({
   },
 })
 
-const tableParas = {
-  columns: [
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'room', title: 'Room' },
-    { name: 'roomDisplayName', title: 'Room Display Name' },
-  ],
-  columnExtensions: [
-    {
-      columnName: 'doctor',
-      type: 'codeSelect',
-      code: 'doctorprofile',
-      labelField: 'clinicianProfile.name',
-      valueField: 'clinicianProfile.id',
-      remoteFilter: {
-        'clinicianProfile.isActive': false,
-      },
-      renderDropdown: (option) => <DoctorLabel doctor={option} />,
-    },
-    {
-      columnName: 'room',
-      type: 'codeSelect',
-      code: 'ctroom',
-    },
-    {
-      columnName: 'roomDisplayName',
-      maxLength: 10,
-    },
-  ],
-}
-
-@connect(({ clinicSettings }) => ({
-  clinicSettings,
+@connect(({ queueDisplaySetup }) => ({
+  queueDisplaySetup,
 }))
 @withFormikExtend({
   enableReinitialize: true,
 
-  mapPropsToValues: ({ clinicSettings }) => {
-    if (
-      clinicSettings.entity &&
-      clinicSettings.entity.showConsultationVersioning
-    ) {
-      const {
-        showConsultationVersioning,
-        autoRefresh,
-        defaultVisitType,
-      } = clinicSettings.entity
+  mapPropsToValues: ({ queueDisplaySetup }) => {
+    if (!queueDisplaySetup.entity) return {}
+    console.log('asds')
+    const { value } = queueDisplaySetup.entity
 
-      return {
-        ...clinicSettings.entity,
-        defaultVisitType: {
-          ...defaultVisitType,
-          settingValue: Number(defaultVisitType.settingValue),
-        },
-        autoRefresh: {
-          ...autoRefresh,
-          settingValue: autoRefresh.settingValue === 'true',
-        },
-        showConsultationVersioning: {
-          ...showConsultationVersioning,
-          settingValue: showConsultationVersioning.settingValue === 'true',
-        },
-      }
+    // const parsedValue = JSON.parse(value)
+    // console.log({ parsedValue })
+    return {
+      ...queueDisplaySetup.entity,
+      // value: {
+      //   ...parsedValue,
+      // },
     }
-    return clinicSettings.entity
   },
 
   handleSubmit: (values, { props }) => {
-    const {
-      systemCurrency,
-      currencyRounding,
-      currencyRoundingToTheClosest,
-      showConsultationVersioning,
-      autoRefresh,
-      defaultVisitType,
-    } = values
-
-    const payload = [
-      {
-        ...systemCurrency,
-      },
-      {
-        ...currencyRounding,
-      },
-      {
-        ...currencyRoundingToTheClosest,
-      },
-      {
-        ...showConsultationVersioning,
-      },
-      {
-        ...autoRefresh,
-      },
-      {
-        ...defaultVisitType,
-      },
-    ]
+    console.log({ values })
+    const { value, lastUpdateDate, ...restValues } = values
     const { dispatch, history } = props
 
+    const formattedImages = value.images
+      .filter((image) => !image.isDeleted)
+      .map((image) => {
+        const {
+          thumbnail,
+          content,
+          thumbnailIndexFK,
+          ...restImageValues
+        } = image
+        return {
+          ...restImageValues,
+          thumbnailIndexFK: thumbnailIndexFK || thumbnail.id,
+        }
+      })
+
+    const valueObj = {
+      ...value,
+      images: formattedImages,
+    }
+
+    const stringifyValue = JSON.stringify(valueObj)
+
+    const payload = {
+      ...restValues,
+      value: stringifyValue,
+    }
+
+    console.log({ payload })
+
     dispatch({
-      type: 'clinicSettings/upsert',
+      type: 'queueDisplaySetup/upsert',
       payload,
     }).then((r) => {
       if (r) {
         history.push('/setting')
         dispatch({
-          type: 'clinicSettings/query',
+          type: 'queueDisplaySetup/query',
         })
       }
     })
   },
-  displayName: 'clinicSettings',
+  displayName: 'queueDisplaySetup',
 })
 class QueueDisplaySetup extends PureComponent {
-  state = {
-    hasActiveSession: false,
-  }
-
   componentDidMount = () => {
-    this.checkHasActiveSession()
     this.props.dispatch({
-      type: 'clinicSettings/query',
+      type: 'queueDisplaySetup/query',
+      payload: {
+        keys: KEYS.QUEUEDISPLAYSETUP,
+      },
     })
   }
 
@@ -186,9 +129,9 @@ class QueueDisplaySetup extends PureComponent {
   }
 
   handleUpdateAttachments = ({ added, deleted }) => {
-    const { values: { queueDisplayImages = [] }, setFieldValue } = this.props
+    const { values: { value: { images = [] } }, setFieldValue } = this.props
     let updated = [
-      ...queueDisplayImages,
+      ...images,
     ]
 
     if (added)
@@ -213,53 +156,18 @@ class QueueDisplaySetup extends PureComponent {
           { ...item },
         ]
       }, [])
-    console.log({ updated })
-    setFieldValue('queueDisplayImages', updated)
-  }
-
-  onAddedRowsChange = (addedRows) => {
-    return addedRows.map((row) => ({
-      patientAllergyStatusFK: 1,
-      ...row,
-      isConfirmed: true,
-    }))
-  }
-
-  onCommitChanges = ({ rows, added, changed, deleted }) => {
-    this.props.setFieldValue('rows', rows)
+    setFieldValue('value.images', updated)
   }
 
   render () {
-    const {
-      classes,
-      clinicSettings,
-      dispatch,
-      theme,
-      handleSubmit,
-      values,
-      ...restProps
-    } = this.props
-    const { queueDisplayImages = [], rows } = values
-    const { hasActiveSession } = this.state
+    const { classes, handleSubmit, values: { value = {} } } = this.props
     console.log(this.props.values)
+    const activeImages = (value.images || [])
+      .filter((image) => !image.isDeleted)
 
-    const activeQueueDisplayImages = queueDisplayImages.filter(
-      (image) => !image.isDeleted,
-    )
     return (
       <React.Fragment>
-        {/* {hasActiveSession && (
-          <div style={{ paddingTop: 5 }}>
-            <WarningSnackbar
-              variant='warning'
-              className={classes.margin}
-              message='Active Session detected!'
-            />
-          </div>
-        )} */}
-        <Button color='info' className={classes.queueDiplayButton}>
-          Open Queue Display
-        </Button>
+        <QueueDashboardButton />
         <CardContainer hideHeader className={classes.container}>
           <GridContainer>
             <GridItem md={10}>
@@ -267,8 +175,9 @@ class QueueDisplaySetup extends PureComponent {
                 label='Image: (maximum 5)'
                 attachmentType='Visit'
                 handleUpdateAttachments={this.handleUpdateAttachments}
-                attachments={queueDisplayImages}
-                disableUpload={activeQueueDisplayImages.length >= 5}
+                attachments={activeImages}
+                disableUpload={activeImages.length >= 5}
+                fileCategory={FILE_CATEGORY.QUEUEDISPLAY}
                 maxFilesAllowUpload={5}
                 restrictFileTypes={[
                   'image/jpeg',
@@ -282,7 +191,7 @@ class QueueDisplaySetup extends PureComponent {
           <GridContainer>
             <GridItem md={10}>
               <Field
-                name='message'
+                name='value.message'
                 render={(args) => (
                   <TextField
                     label='Message (max 150 characters)'
@@ -298,7 +207,7 @@ class QueueDisplaySetup extends PureComponent {
           <GridContainer>
             <GridItem md={3}>
               <Field
-                name='showDateTime.settingValue'
+                name='value.showDateTime'
                 render={(args) => (
                   <Switch
                     label='Show Date and Time after the message'
@@ -308,24 +217,7 @@ class QueueDisplaySetup extends PureComponent {
               />
             </GridItem>
           </GridContainer>
-          <GridItem md={3} className={classes.tableHeader}>
-            <p>
-              <b>Doctor Room Assignment</b>
-            </p>
-          </GridItem>
-          <EditableTableGrid
-            // schema={schema}
-            rows={rows}
-            FuncProps={{
-              pager: false,
-            }}
-            EditingProps={{
-              showAddCommand: true,
-              onCommitChanges: this.onCommitChanges,
-              onAddedRowsChange: this.onAddedRowsChange,
-            }}
-            {...tableParas}
-          />
+
           <div
             className={classes.actionBtn}
             style={{ display: 'flex', justifyContent: 'center' }}

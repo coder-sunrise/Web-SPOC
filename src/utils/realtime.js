@@ -87,6 +87,7 @@ const initStream = () => {
       sessionStorage.setItem('notifications', JSON.stringify(notifications))
     }
 
+    console.log({ type, response })
     if (connectionObserver[type]) {
       connectionObserver[type](response)
     }
@@ -144,10 +145,11 @@ const sendNotification = (type, data) => {
   data.senderId = user.data.id
   data.timestamp = Date.now()
 
-  if (connection)
+  if (connection) {
     connection.invoke('SendNotification', type, data).catch((err) => {
       return console.error(err)
     })
+  }
 }
 
 const debouncedSendNotification = _.debounce(sendNotification, 500, {
@@ -156,6 +158,7 @@ const debouncedSendNotification = _.debounce(sendNotification, 500, {
 
 const subscribeNotification = (type, payload) => {
   const { callback } = payload
+  console.log({ type, payload })
   connectionObserver[type] = callback
 }
 

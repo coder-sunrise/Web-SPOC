@@ -106,6 +106,7 @@ export default {
   'menu.setting.treatment': 'Treatment',
   'menu.setting.treatmentcategory': 'Treatment Category',
   'menu.setting.room': 'Room',
+  'menu.setting.roomassignment': 'Room Assignment',
   'menu.setting.roomblock': 'Room Block',
   'menu.setting.clinicbreakhour': 'Clinic Break Hour',
   'menu.setting.publicholiday': 'Public Holiday',

@@ -18,6 +18,18 @@ const _routes = [
       },
     ],
   },
+  // Queue Display Dashboard
+  {
+    path: '/queuedisplay',
+    component: '../layouts/BlankLayout',
+    routes: [
+      {
+        path: '/queuedisplay/dashboard',
+        component: './QueueDisplayDashboard',
+        hideInMenu: true,
+      },
+    ],
+  },
   // login
   //
   // Main routes
@@ -722,6 +734,11 @@ const _routes = [
             path: '/setting/room',
             name: 'room',
             component: './Setting/Room',
+          },
+          {
+            path: '/setting/roomassignment',
+            name: 'roomassignment',
+            component: './Setting/RoomAssignment',
           },
           {
             path: '/setting/clinicbreakhour',

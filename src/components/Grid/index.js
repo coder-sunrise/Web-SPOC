@@ -114,6 +114,7 @@ const timeFormat = 'hh:mm A'
 const timeFormatSmallCase = 'hh:mm a'
 const timeFormat24Hour = 'HH:mm'
 const timeFormat24HourWithSecond = 'hh:mm:ss A'
+const dashboardTimeFormat = 'MMM dd, YYYY HH:mm:ss A'
 const additionalShortcutFormats = [
   'DD/MM/YY',
   'DD-MM-YY',
@@ -216,5 +217,6 @@ module.exports = {
   timeFormat24HourWithSecond,
   timeFormat24Hour,
   additionalShortcutFormats,
+  dashboardTimeFormat,
   ...module.exports,
 }

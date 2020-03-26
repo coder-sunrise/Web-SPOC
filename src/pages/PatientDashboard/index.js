@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import { connect } from 'dva'
 import moment from 'moment'
 import PerfectScrollbar from 'perfect-scrollbar'
@@ -42,6 +42,8 @@ import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
 import { VISIT_TYPE } from '@/utils/constants'
+import { CallingQueueButton } from '@/components/_medisys'
+import { VISIT_STATUS } from '@/pages/Reception/Queue/variables'
 
 const styles = (theme) => ({
   ...inputStyle(theme),
@@ -173,26 +175,38 @@ class PatientDashboard extends PureComponent {
     if (!entity) return null
     const { visit = {} } = entity
     const { visitPurposeFK = VISIT_TYPE.CONS } = visit
+    console.log({ visit })
 
     return (
       <div className={classes.root}>
         <Banner
           extraCmt={
             visit.visitStatus === 'WAITING' && (
-              <Authorized authority='patientdashboard.startresumeconsultation'>
-                <div style={{ padding: '30px 0' }}>
-                  <ProgressButton
-                    color='primary'
-                    onClick={this.startConsultation}
-                    disabled={
-                      visitPurposeFK === VISIT_TYPE.RETAIL ||
-                      visitPurposeFK === VISIT_TYPE.BILL_FIRST
-                    }
-                  >
-                    Start Consultation
-                  </ProgressButton>
-                </div>
-              </Authorized>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-evenly',
+                }}
+              >
+                {visit.visitStatus === VISIT_STATUS.WAITING && (
+                  <CallingQueueButton qId={visit.id} />
+                )}
+                <Authorized authority='patientdashboard.startresumeconsultation'>
+                  <div style={{ padding: '30px 0' }}>
+                    <ProgressButton
+                      color='primary'
+                      onClick={this.startConsultation}
+                      disabled={
+                        visitPurposeFK === VISIT_TYPE.RETAIL ||
+                        visitPurposeFK === VISIT_TYPE.BILL_FIRST
+                      }
+                    >
+                      Start Consultation
+                    </ProgressButton>
+                  </div>
+                </Authorized>
+              </div>
             )
           }
           {...this.props}

@@ -23,7 +23,7 @@ import {
   Transition,
   ProgressButton,
 } from '@/components'
-
+import { KEYS } from '@/utils/constants'
 // styles
 // import loginPageStyle from '@/assets/jss/material-dashboard-pro-react/views/loginPageStyle'
 import logo from '@/assets/img/logo/logo_white_with_text.png'
@@ -152,6 +152,24 @@ const submitKey = 'login/getToken'
             type: 'clinicInfo/query',
             payload: { clinicCode },
           })
+
+          await dispatch({
+            type: 'queueDisplaySetup/query',
+            payload: { keys: KEYS.QUEUEDISPLAYSETUP },
+          })
+
+          await dispatch({
+            type: 'queueDisplaySetup/query',
+            payload: { keys: KEYS.QUEUEDISPLAYSETUP },
+          })
+
+          await dispatch({
+            type: 'queueCalling/getExistingQueueCallList',
+            payload: {
+              keys: KEYS.QUEUECALLING,
+            },
+          })
+
           router.push(loginDestination)
         }
       })
