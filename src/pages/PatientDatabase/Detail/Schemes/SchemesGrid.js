@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
 import _ from 'lodash'
-import { EditableTableGrid, notification } from '@/components'
+import { CodeSelect, EditableTableGrid, notification } from '@/components'
 
 import { getCodes } from '@/utils/codetable'
+import { SCHEME_TYPE } from '@/utils/constants'
 
 // let schemeTypes = []
 // getCodes('ctSchemeType').then((codetableData) => {
@@ -149,6 +150,24 @@ class SchemesGrid extends PureComponent {
           // },
           localFilter: (opt) => opt.schemeCategoryName === 'Corporate',
           isDisabled: (row) => !this.isCorporate(row),
+          render: (row) => {
+            const { copaymentscheme = [] } = this.props.codetable
+            const patCoPaymentScheme = copaymentscheme.find(
+              (item) => item.id === row.coPaymentSchemeFK,
+            )
+            if (row.schemeTypeFK === SCHEME_TYPE.CORPORATE) {
+              const isActiveLabel = !patCoPaymentScheme.isActive
+                ? ' (Inactive)'
+                : ''
+              return (
+                <span>
+                  {patCoPaymentScheme.name}
+                  {isActiveLabel}
+                </span>
+              )
+            }
+            return <span>{patCoPaymentScheme.name}</span>
+          },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
             if (!row.id) {
@@ -156,11 +175,13 @@ class SchemesGrid extends PureComponent {
                 row,
               ])
             }
-            const ctSchemeTypes = this.props.codetable[
-              ctSchemeType.toLowerCase()
-            ]
+            const {
+              copaymentscheme = [],
+              ctschemetype: ctSchemeTypes = [],
+            } = this.props.codetable
+
             const st = ctSchemeTypes.find((o) => o.id === row.schemeTypeFK)
-            // console.log(st)
+
             const rs = rows.filter(
               (o) =>
                 !o.isDeleted &&
@@ -168,11 +189,23 @@ class SchemesGrid extends PureComponent {
                 st.code === 'CORPORATE' &&
                 o.id !== row.id,
             )
+
             if (rs.length >= 1) {
               row.coPaymentSchemeFK = undefined
 
               notification.error({
                 message: 'The Schemes record already exists in the system',
+              })
+              return
+            }
+            const patCoPaymentScheme = copaymentscheme.find(
+              (item) => item.id === row.coPaymentSchemeFK,
+            )
+
+            if (!patCoPaymentScheme.isActive) {
+              row.coPaymentSchemeFK = undefined
+              notification.error({
+                message: 'Selected scheme is an inactive schemes',
               })
             }
           },

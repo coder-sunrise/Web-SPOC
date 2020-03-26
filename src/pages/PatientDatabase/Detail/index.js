@@ -344,11 +344,6 @@ class PatientDetail extends PureComponent {
     ]
   }
 
-  componentWillMount () {
-    const moduleAccessRight = Authorized.check('patientdatabase')
-    this.setState({ moduleAccessRight })
-  }
-
   componentWillUnmount () {
     const { dispatch } = this.props
     const menuErrors = {}
