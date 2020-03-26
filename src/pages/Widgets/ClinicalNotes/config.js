@@ -3,7 +3,7 @@ import { SCRIBBLE_NOTE_TYPE, CANNED_TEXT_TYPE } from '@/utils/constants'
 export const defaultConfigs = {
   fields: [
     {
-      authority: 'queue.consultation.clinicalnotes.associatedhistory',
+      authority: 'queue.consultation.clinicalnotes.history',
       category: 'History',
       fieldName: 'history',
       fieldTitle: 'History',
