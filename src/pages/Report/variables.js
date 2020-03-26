@@ -111,6 +111,6 @@ export const menuData = [
     title: 'Other',
     text: 'Diagnosis Trending Report',
     url: '/report/diagnosistrending',
-    authority: 'report.diagnosistrendingreport',
+    authority: 'report.other.diagnosistrending',
   },
 ]
