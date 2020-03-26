@@ -112,21 +112,6 @@ class PatientHistory extends Component {
 
   componentWillMount () {
     const { dispatch, mode } = this.props
-    const codeTableNameArray = [
-      'ctComplication',
-      'ctMedicationUsage',
-      'ctMedicationDosage',
-      'ctMedicationUnitOfMeasurement',
-      'ctMedicationFrequency',
-      'ctVaccinationUsage',
-      'ctVaccinationUnitOfMeasurement',
-    ]
-    dispatch({
-      type: 'codetable/batchFetch',
-      payload: {
-        codes: codeTableNameArray,
-      },
-    })
 
     dispatch({
       type: 'patientHistory/initState',
