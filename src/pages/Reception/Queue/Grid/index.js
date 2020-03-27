@@ -169,6 +169,11 @@ const Grid = ({
 
     const accessRight = Authorized.check(menuOpt.authority)
 
+    // skip for patient dashboard button
+    // user can access patient dashboard regardless of access right
+    // patient dashboard page will have the access right checking explicitly
+    if (id === '4') return true
+
     return (
       accessRight &&
       (accessRight.rights === 'enable' || accessRight.rights === 'readwrite')

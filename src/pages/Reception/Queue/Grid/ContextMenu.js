@@ -167,7 +167,8 @@ const ContextMenu = ({ row, handleClick, classes, rights }) => {
           if (!accessRight) return null
 
           const hideByAccessRight = accessRight.rights === 'hidden'
-          const disabledByAccessRight = accessRight.rights === 'disable'
+          const disabledByAccessRight =
+            accessRight.rights === 'disable' && id !== 4 // skip patient dashboard access right checking
 
           const menu = (
             <Menu.Item
