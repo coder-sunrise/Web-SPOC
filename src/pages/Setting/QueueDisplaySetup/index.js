@@ -42,8 +42,7 @@ const styles = (theme) => ({
   enableReinitialize: true,
 
   mapPropsToValues: ({ queueDisplaySetup }) => {
-    if (!queueDisplaySetup.entity) return {}
-    console.log('asds')
+    if (!queueDisplaySetup.entity) return queueDisplaySetup.default
     const { value } = queueDisplaySetup.entity
 
     // const parsedValue = JSON.parse(value)
@@ -86,6 +85,8 @@ const styles = (theme) => ({
     const payload = {
       ...restValues,
       value: stringifyValue,
+      key: KEYS.QUEUEDISPLAYSETUP,
+      isUserMaintainable: true,
     }
 
     console.log({ payload })

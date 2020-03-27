@@ -1,5 +1,6 @@
 import React from 'react'
 import { compose } from 'redux'
+import moment from 'moment'
 import {
   withFormikExtend,
   GridItem,
@@ -7,18 +8,17 @@ import {
   EditableTableGrid,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
-
 import { DoctorLabel } from '@/components/_medisys'
+import Yup from '@/utils/yup'
 
 const tableParas = {
   columns: [
-    { name: 'doctor', title: 'Doctor' },
-    { name: 'room', title: 'Room' },
-    // { name: 'roomDisplayName', title: 'Room Display Name' },
+    { name: 'clinicianProfileFK', title: 'Doctor' },
+    { name: 'roomFK', title: 'Room' },
   ],
   columnExtensions: [
     {
-      columnName: 'doctor',
+      columnName: 'clinicianProfileFK',
       width: 500,
       type: 'codeSelect',
       code: 'doctorprofile',
@@ -30,16 +30,17 @@ const tableParas = {
       renderDropdown: (option) => <DoctorLabel doctor={option} />,
     },
     {
-      columnName: 'room',
+      columnName: 'roomFK',
       type: 'codeSelect',
       code: 'ctroom',
     },
-    // {
-    //   columnName: 'roomDisplayName',
-    //   maxLength: 10,
-    // },
   ],
 }
+
+const roomAssignSchema = Yup.object().shape({
+  clinicianProfileFK: Yup.number().required(),
+  roomFK: Yup.number().required(),
+})
 
 const Grid = ({
   handleSubmit,
@@ -65,7 +66,7 @@ const Grid = ({
       </GridItem>
       <EditableTableGrid
         style={{ margin: 20 }}
-        // schema={schema}
+        schema={roomAssignSchema}
         rows={roomAssignRows}
         FuncProps={{
           pager: false,
@@ -99,10 +100,26 @@ const Grid = ({
 export default compose(
   withFormikExtend({
     enableReinitialize: true,
-    mapPropsToValues: () => {},
+    mapPropsToValues: ({ settingRoomAssignment }) => {
+      return {
+        roomAssignRows: settingRoomAssignment.list || [],
+      }
+    },
     handleSubmit: (values, { props, resetForm }) => {
+      const { roomAssignRows } = values
       const { dispatch, history } = props
-      const payload = {}
+
+      const newRowAssignRows = roomAssignRows.map((room) => {
+        return {
+          ...room,
+          effectiveEndDate: moment('2099-12-31T23:59:59').formatUTC(false),
+          effectiveStartDate: moment().formatUTC(),
+        }
+      })
+      const payload = [
+        ...newRowAssignRows,
+      ]
+      console.log({ payload })
       dispatch({
         type: 'settingRoomAssignment/upsert',
         payload,

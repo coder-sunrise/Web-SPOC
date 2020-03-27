@@ -87,7 +87,6 @@ const initStream = () => {
       sessionStorage.setItem('notifications', JSON.stringify(notifications))
     }
 
-    console.log({ type, response })
     if (connectionObserver[type]) {
       connectionObserver[type](response)
     }

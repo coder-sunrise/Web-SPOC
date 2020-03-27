@@ -153,22 +153,12 @@ const submitKey = 'login/getToken'
             payload: { clinicCode },
           })
 
-          await dispatch({
-            type: 'queueDisplaySetup/query',
-            payload: { keys: KEYS.QUEUEDISPLAYSETUP },
-          })
-
-          await dispatch({
-            type: 'queueDisplaySetup/query',
-            payload: { keys: KEYS.QUEUEDISPLAYSETUP },
-          })
-
-          await dispatch({
-            type: 'queueCalling/getExistingQueueCallList',
-            payload: {
-              keys: KEYS.QUEUECALLING,
-            },
-          })
+          // await dispatch({
+          //   type: 'queueCalling/getExistingQueueCallList',
+          //   payload: {
+          //     keys: KEYS.QUEUECALLING,
+          //   },
+          // })
 
           router.push(loginDestination)
         }

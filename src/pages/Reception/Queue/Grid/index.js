@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { connect } from 'dva'
 import router from 'umi/router'
 // material ui
@@ -26,7 +26,7 @@ import {
   ApptColumnExtensions,
 } from './variables'
 import Authorized from '@/utils/Authorized'
-import { VISIT_TYPE } from '@/utils/constants'
+import { VISIT_TYPE, KEYS } from '@/utils/constants'
 
 const Grid = ({
   dispatch,
@@ -103,6 +103,15 @@ const Grid = ({
       },
     })
   }
+
+  useEffect(() => {
+    dispatch({
+      type: 'queueCalling/getExistingQueueCallList',
+      payload: {
+        keys: KEYS.QUEUECALLING,
+      },
+    })
+  }, [])
 
   // const calendarData = useMemo(
   //   () => calendarEvents.reduce(flattenAppointmentDateToCalendarEvents, []),

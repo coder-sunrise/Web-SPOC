@@ -11,7 +11,13 @@ export default createFormViewModel({
   param: {
     service,
     state: {
-      ...JSON.parse(localStorage.getItem('queueDisplaySetup') || '{}'),
+      // ...JSON.parse(localStorage.getItem('queueDisplaySetup') || '{}'),
+      default: {
+        value: {
+          images: [],
+          showDateTime: false,
+        },
+      },
     },
     subscriptions: ({ dispatch, history, searchField }) => {},
 
@@ -33,9 +39,7 @@ export default createFormViewModel({
           data.find((o) => o.key === KEYS.QUEUEDISPLAYSETUP) || {}
 
         if (queueDisplaySetup) {
-          const { value } = queueDisplaySetup
-          localStorage.setItem('queueDisplaySetup', value)
-
+          const { value = '{}' } = queueDisplaySetup
           const parsedValue = JSON.parse(value)
           return {
             entity: {

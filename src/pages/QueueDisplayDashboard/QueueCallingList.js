@@ -41,7 +41,6 @@ const QueueCallingList = ({ data, rerender, setRerender }) => {
 
   const renderCurrentPartition = () => {
     const currentPartition = renderList()
-    // console.log({ currentPartition })
 
     const nextParitionStartIndex =
       startIndex + 3 >= data.length ? 0 : startIndex + 3
@@ -62,20 +61,13 @@ const QueueCallingList = ({ data, rerender, setRerender }) => {
     ],
   )
 
-  useEffect(
-    () => {
-      renderCurrentPartition()
-    },
-    [
-      data,
-    ],
-  )
+  useEffect(() => {
+    renderCurrentPartition()
+  }, [])
 
   useEffect(
     () => {
       if (rerender) {
-        // console.log({ rerender })
-
         setStartIndex(() => 0)
         setRerender(false)
         renderCurrentPartition()
@@ -83,6 +75,7 @@ const QueueCallingList = ({ data, rerender, setRerender }) => {
     },
     [
       rerender,
+      data,
     ],
   )
 

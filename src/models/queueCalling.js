@@ -1,7 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import * as service from '../services/queueDisplaySetup'
 import { notification } from '@/components'
-import { KEYS } from '@/utils/constants'
 import { subscribeNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
@@ -21,7 +20,9 @@ export default createFormViewModel({
         callback: (response) => {
           const { qNo, roomNo } = response
           const newCalledQueue = { qNo, roomNo }
-          dispatch({
+          console.log('helloo')
+
+          return dispatch({
             type: 'refreshQueueCallList',
             payload: {
               callingQueue: newCalledQueue,
@@ -44,6 +45,7 @@ export default createFormViewModel({
                 data: data[0],
               },
             })
+            return data[0]
           }
         }
         return false
@@ -62,9 +64,15 @@ export default createFormViewModel({
       *upsertQueueCallList ({ payload }, { call, put }) {
         const r = yield call(service.upsert, payload)
 
-        if (r) {
+        if (r.length > 0) {
           notification.success({ message: 'Called' })
-          return true
+          return r[0]
+          // yield put({
+          //   type: 'setExistingQueueCallList',
+          //   payload: {
+          //     data: r[0],
+          //   },
+          // })
         }
         return r
       },

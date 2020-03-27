@@ -68,30 +68,20 @@ const styles = (theme) => ({
   },
 })
 
-const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
-  const { images, message, showDateTime } = values
+const QueueDisplayDasboard = ({
+  classes,
+  values = {},
+  dispatch,
+  queueCalling,
+}) => {
+  const { images = [], message, showDateTime } = values
   const { calling, qCallList, pendingQCall } = queueCalling
-  // console.log({ images })
-
-  // const images = [
-  //   {
-  //     url:
-  //       'https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1489&q=80',
-  //   },
-  //   {
-  //     url:
-  //       'https://images.unsplash.com/photo-1583947581279-4eec08383c38?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1226&q=80',
-  //   },
-  //   {
-  //     url:
-  //       'https://images.unsplash.com/photo-1583947582886-f40ec95dd752?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80',
-  //   },
-  // ]
 
   const [
     showCurrentCallQueue,
     setShowCurrentCallQueue,
   ] = useState(calling)
+
   const [
     currentImageIndex,
     setCurrentImageIndex,
@@ -108,6 +98,11 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
   ] = useState(qCallList)
 
   const [
+    pendingCallData,
+    setPendingCallData,
+  ] = useState(pendingQCall)
+
+  const [
     imageSources,
     setImageSources,
   ] = useState([])
@@ -119,8 +114,6 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
         keys: KEYS.QUEUECALLING,
       },
     })
-
-    setData(qCallList)
   }
 
   const getImageSources = async () => {
@@ -135,8 +128,6 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
         if (thumbnailId) {
           const response = await getFileByFileID(thumbnailId)
           if (response && response.status === 200) {
-            console.log({ response })
-
             const { data: imageData } = response
             const thumbnailDataInBase64 = arrayBufferToBase64(imageData)
             const base64Prefix = 'data:image/png;base64,'
@@ -149,14 +140,29 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
         return null
       }
     })
-    console.log({ imageArray })
+    // console.log({ imageArray })
 
     setImageSources(imageArray)
   }
 
+  const getQueueDisplaySetup = () => {
+    dispatch({
+      type: 'queueDisplaySetup/query',
+      payload: {
+        keys: KEYS.QUEUEDISPLAYSETUP,
+      },
+    })
+  }
+
   useEffect(() => {
+    getQueueDisplaySetup()
     getExistingQCallingList()
-    getImageSources()
+    dispatch({
+      type: 'queueCalling/updateState',
+      payload: {
+        pendingQCall: [],
+      },
+    })
   }, [])
 
   useEffect(
@@ -170,24 +176,52 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
 
   useEffect(
     () => {
-      // setShowCurrentCallQueue(calling)
-      if (calling) {
-        const newData = [
-          ...data,
-        ]
-        // const calledQIndex = newData.findIndex((q) => q.qNo === data[0].qNo)
-        // const filteredData = newData.filter((o) => o.qNo !== data[0].qNo)
-        // setData([
-        //   newData[calledQIndex],
-        //   ...filteredData,
-        // ])
-        setRerender(true)
+      if (images.length > 0) {
+        getImageSources()
       }
     },
     [
-      calling,
+      images,
     ],
   )
+
+  useEffect(
+    () => {
+      if (calling && pendingQCall.length > 0) {
+        const qIsExist = data.find((q) => q.qNo === pendingQCall[0].qNo)
+
+        let qArray = []
+        if (qIsExist) {
+          const otherQCalls = data.filter((q) => q.qNo !== pendingQCall[0].qNo)
+          qArray = [
+            qIsExist,
+            ...otherQCalls,
+          ]
+        } else {
+          qArray = [
+            pendingQCall[0],
+            ...data,
+          ]
+        }
+
+        setData(qArray)
+        // dispatch({
+        //   type: 'queueCalling/updateState',
+        //   payload: {
+        //     qCallList: qArray,
+        //   },
+        // })
+        setShowCurrentCallQueue(true)
+      }
+      setRerender(true)
+    },
+    [
+      calling,
+      pendingQCall,
+    ],
+  )
+
+  // console.log({ pendingQCall })
 
   return (
     <Fragment>
@@ -203,19 +237,23 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
             lineHeight: '6vw',
           }}
         >
-          <QueueCallingList
-            data={data}
-            rerender={rerender}
-            setRerender={setRerender}
-          />
+          {data.length > 0 && (
+            <QueueCallingList
+              data={data}
+              rerender={rerender}
+              setRerender={setRerender}
+            />
+          )}
         </div>
         <div className={classes.rightContainer}>
-          {calling ? (
+          {showCurrentCallQueue ? (
             <CurrentCallingQueue
               callingQueue={pendingQCall}
               setShowCurrentCallQueue={setShowCurrentCallQueue}
               dispatch={dispatch}
               qCallList={qCallList}
+              setRerender={setRerender}
+              setPendingCallData={setPendingCallData}
             />
           ) : (
             <Carousel
@@ -297,15 +335,16 @@ const QueueDisplayDasboard = ({ classes, values, dispatch, queueCalling }) => {
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ queueCalling, header }) => ({ queueCalling, header })),
+  connect(({ queueCalling, header, queueDisplaySetup }) => ({
+    queueCalling,
+    header,
+    queueDisplaySetup,
+  })),
   withFormikExtend({
-    mapPropsToValues: () => {
-      const parsedValue = JSON.parse(localStorage.getItem('queueDisplaySetup'))
-      console.log({ parsedValue })
-
-      return {
-        ...parsedValue,
-      }
+    enableReinitialize: true,
+    mapPropsToValues: ({ queueDisplaySetup }) => {
+      if (!queueDisplaySetup.entity) return queueDisplaySetup.default
+      return queueDisplaySetup.entity.value
     },
   }),
 )(QueueDisplayDasboard)

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, Fragment } from 'react'
 import { withStyles } from '@material-ui/core'
 import Beep from './state-change_confirm-up.wav'
 
@@ -22,61 +22,40 @@ const CurrentCallingQueue = ({
   setShowCurrentCallQueue,
   dispatch,
   qCallList,
+  setRerender,
+  setPendingCallData,
 }) => {
   const playSound = () => {
     slideAudio.muted = false
     slideAudio.play()
     slideAudio.loop = true
+  }
 
-    if (callingQueue.length > 0) {
-      const qIsExist = qCallList.find(
-        (q) =>
-          q.qNo === callingQueue[0].qNo && q.roomNo === callingQueue[0].roomNo,
-      )
-
-      let qArray = []
-      if (qIsExist) {
-        const otherQCalls = qCallList.filter(
-          (q) =>
-            q.qNo !== callingQueue[0].qNo &&
-            q.roomNo !== callingQueue[0].roomNo,
-        )
-        qArray = [
-          qIsExist,
-          ...otherQCalls,
-        ]
-      } else {
-        qArray = [
-          callingQueue[0],
-          ...qCallList,
-        ]
-      }
-
-      const remainingPendingQCall = callingQueue.filter(
-        (q) =>
-          q.qNo !== callingQueue[0].qNo && q.roomNo !== callingQueue[0].roomNo,
-      )
-
-      dispatch({
-        type: 'queueCalling/updateState',
-        payload: {
-          qCallList: qArray,
-        },
-      })
-
+  useEffect(
+    () => {
+      if (callingQueue.length > 0) setShowCurrentCallQueue(() => true)
+      console.log({ callingQueue })
       setTimeout(() => {
+        const remainingPendingQCall = callingQueue.filter((q, idx) => idx !== 0)
+        console.log({ remainingPendingQCall })
         slideAudio.pause()
         slideAudio.currentTime = 0
+        setPendingCallData(remainingPendingQCall)
+        if (remainingPendingQCall.length === 0) {
+          setShowCurrentCallQueue(() => false)
+        }
         dispatch({
           type: 'queueCalling/updateState',
           payload: {
             pendingQCall: remainingPendingQCall,
-            calling: remainingPendingQCall.length > 0,
           },
         })
       }, 5000)
-    }
-  }
+    },
+    [
+      callingQueue,
+    ],
+  )
 
   useEffect(() => {
     playSound()
@@ -87,8 +66,12 @@ const CurrentCallingQueue = ({
 
   return (
     <div className={classes.callingQueueSection}>
-      <p>{callingQueue[0].roomNo}</p>
-      <p style={{ fontWeight: 'bold' }}>{callingQueue[0].qNo}</p>
+      {callingQueue.length > 0 && (
+        <Fragment>
+          <p>{callingQueue[0].roomNo}</p>
+          <p style={{ fontWeight: 'bold' }}>{callingQueue[0].qNo}</p>
+        </Fragment>
+      )}
     </div>
   )
 }

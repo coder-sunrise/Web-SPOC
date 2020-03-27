@@ -20,12 +20,10 @@ const Carousel = ({ images = [], currentImageIndex, setCurrentImageIndex }) => {
     initialSlide: currentImageIndex,
     afterChange: (current) => setCurrentImageIndex(current),
   }
-  console.log({ images })
-
   return (
     <Slider {...settings}>
-      {images.map((image) => (
-        <div>
+      {images.map((image, idx) => (
+        <div key={idx}>
           <img
             style={{
               height: '90vh',
