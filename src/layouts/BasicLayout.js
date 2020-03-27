@@ -305,6 +305,36 @@ class BasicLayout extends React.PureComponent {
     return this.props.history.push('/not-found')
   }
 
+  initNecessaryCodetable = () => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'doctorprofile',
+        filter: {
+          'clinicianProfile.isActive': true,
+        },
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'clinicianprofile',
+      },
+    })
+
+    dispatch({
+      type: 'codetable/fetchCodes',
+      payload: {
+        code: 'copaymentscheme',
+        filter: {
+          isActive: undefined,
+        },
+      },
+    })
+  }
+
   initUserData = async () => {
     const { dispatch, route: { routes, authority }, location } = this.props
     const shouldProceed = await this.checkShouldProceedRender()
@@ -314,24 +344,7 @@ class BasicLayout extends React.PureComponent {
       window.location.reload(true)
       return
     }
-
-    await Promise.all([
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'doctorprofile',
-          filter: {
-            'clinicianProfile.isActive': true,
-          },
-        },
-      }),
-      dispatch({
-        type: 'codetable/fetchCodes',
-        payload: {
-          code: 'clinicianprofile',
-        },
-      }),
-    ])
+    this.initNecessaryCodetable()
 
     const user = await dispatch({
       type: 'user/fetchCurrent',

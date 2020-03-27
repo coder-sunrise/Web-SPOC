@@ -33,6 +33,10 @@ export const COPAYER_TYPE = {
   GOVERNMENT: 2,
 }
 
+export const SCHEME_TYPE = {
+  CORPORATE: 15,
+}
+
 export const INVOICE_PAYER_TYPE = {
   PATIENT: 1,
   SCHEME: 2,
