@@ -91,25 +91,29 @@ class Statement extends PureComponent {
     })
   }
 
+  editRow = (row, e) => {
+    const { history, dispatch } = this.props
+    const accessRight = Authorized.check('statement.statementdetails')
+
+    if (accessRight && accessRight.rights !== 'enable') {
+      notification.error({
+        message: 'Current user is not authorized to access',
+      })
+      return
+    }
+    dispatch({
+      type: 'statement/updateState',
+      payload: {
+        currentId: row.id,
+      },
+    })
+    history.push(`/finance/statement/details/${row.id}`)
+  }
+
   render () {
     const { history, dispatch } = this.props
-    const editRow = (row, e) => {
-      const accessRight = Authorized.check('statement.statementdetails')
-      if (accessRight && accessRight.rights !== 'enable') {
-        notification.error({
-          message: 'Current user is not authorized to access',
-        })
-        return
-      }
-      dispatch({
-        type: 'statement/updateState',
-        payload: {
-          currentId: row.id,
-        },
-      })
-      history.push(`/finance/statement/details/${row.id}`)
-    }
     const { rows, columns } = this.state
+
     return (
       <CardContainer hideHeader>
         <SearchBar
@@ -124,7 +128,7 @@ class Statement extends PureComponent {
           type='statement'
           // selection={this.state.selectedRows}
           // onSelectionChange={this.handleSelectionChange}
-          onRowDoubleClick={editRow}
+          onRowDoubleClick={this.editRow}
           rows={rows}
           columns={columns}
           // FuncProps={{ selectable: true }}
@@ -184,7 +188,7 @@ class Statement extends PureComponent {
                         <Button
                           size='sm'
                           onClick={() => {
-                            editRow(row)
+                            this.editRow(row)
                           }}
                           justIcon
                           color='primary'
