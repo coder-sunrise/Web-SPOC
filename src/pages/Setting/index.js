@@ -78,7 +78,13 @@ class SystemSetting extends PureComponent {
     const { filterValues } = systemSetting
     const { searchText } = filterValues
     return Object.keys(this.group).map((o) => {
-      const filteredByAccessRight = this.group[o].filter(filterByAccessRight)
+      const filteredByAccessRight = this.group[o]
+        .filter(filterByAccessRight)
+        .filter((m) => {
+          return (
+            m.text.toLocaleLowerCase().indexOf(searchText) >= 0 || !searchText
+          )
+        })
 
       return {
         authority: Authority[o],
@@ -88,38 +94,31 @@ class SystemSetting extends PureComponent {
         itemCount: filteredByAccessRight.length,
         content: (
           <GridContainer style={{ marginTop: theme.spacing(1) }} key={o}>
-            {filteredByAccessRight
-              .filter((m) => {
-                return (
-                  m.text.toLocaleLowerCase().indexOf(searchText) >= 0 ||
-                  !searchText
-                )
-              })
-              .map((item, i) => {
-                return (
-                  <GridItem
-                    key={i}
-                    xs={4}
-                    md={2}
-                    style={{ marginBottom: theme.spacing(2) }}
+            {filteredByAccessRight.map((item, i) => {
+              return (
+                <GridItem
+                  key={i}
+                  xs={4}
+                  md={2}
+                  style={{ marginBottom: theme.spacing(2) }}
+                >
+                  <Button
+                    fullWidth
+                    color='primary'
+                    className={classnames({
+                      [classes.baseBtn]: true,
+                    })}
+                    variant='outlined'
+                    onClick={() => {
+                      this.props.history.push(item.url)
+                    }}
                   >
-                    <Button
-                      fullWidth
-                      color='primary'
-                      className={classnames({
-                        [classes.baseBtn]: true,
-                      })}
-                      variant='outlined'
-                      onClick={() => {
-                        this.props.history.push(item.url)
-                      }}
-                    >
-                      <ListAlt />
-                      <span>{item.text}</span>
-                    </Button>
-                  </GridItem>
-                )
-              })}
+                    <ListAlt />
+                    <span>{item.text}</span>
+                  </Button>
+                </GridItem>
+              )
+            })}
           </GridContainer>
         ),
       }
