@@ -1,43 +1,10 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'dva'
-import moment from 'moment'
-import PerfectScrollbar from 'perfect-scrollbar'
-import Link from 'umi/link'
-import DateRange from '@material-ui/icons/DateRange'
-import {
-  withStyles,
-  MenuItem,
-  MenuList,
-  Divider,
-  Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Typography,
-} from '@material-ui/core'
+import { withStyles } from '@material-ui/core'
 import router from 'umi/router'
-import { unstable_Box as Box } from '@material-ui/core/Box'
-import { Icon, Input, AutoComplete, Form } from 'antd'
-import Loadable from 'react-loadable'
 import inputStyle from 'mui-pro-jss/material-dashboard-pro-react/antd/input'
-import { findGetParameter, getAppendUrl } from '@/utils/utils'
-import {
-  PictureUpload,
-  GridContainer,
-  GridItem,
-  CardContainer,
-  Transition,
-  TextField,
-  AntdInput,
-  Select,
-  Accordion,
-  Button,
-  notification,
-  ProgressButton,
-} from '@/components'
-
-import Loading from '@/components/PageLoading/index'
+import { findGetParameter } from '@/utils/utils'
+import { ProgressButton } from '@/components'
 import Banner from './Banner'
 import PatientHistory from '@/pages/Widgets/PatientHistory'
 import Authorized from '@/utils/Authorized'
@@ -85,6 +52,7 @@ const styles = (theme) => ({
   patientDashboard,
   global,
 }))
+@Authorized.Secured('patientdashboard')
 class PatientDashboard extends PureComponent {
   componentDidMount () {
     if (this.props.patientDashboard.currentId) {

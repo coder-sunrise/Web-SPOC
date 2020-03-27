@@ -102,17 +102,18 @@ class Layout extends PureComponent {
     this.widgetMenu = (
       <Menu>
         {widgets
-          .filter((widget) => {
+          .map((widget) => {
             const widgetAccessRight = Authorized.check(widget.accessRight)
-            if (!widgetAccessRight) return false
-            const shouldShow =
-              widgetAccessRight && widgetAccessRight.rights !== 'hidden'
-
-            return shouldShow
+            const { rights } = widgetAccessRight || { rights: undefined }
+            return { ...widget, rights }
+          })
+          .filter((widget) => {
+            if (!widget.rights) return false
+            return widget.rights !== 'hidden'
           })
           .map((o) => {
             const cfg = defaultLayout.lg.find((m) => m.i === o.id) || {}
-
+            // const disableByAccessRight = o.rights === 'disable'
             return (
               <Menu.Item
                 key={o.id}
@@ -606,6 +607,7 @@ class Layout extends PureComponent {
                 {state.currentLayout.widgets.map((id) => {
                   const w = widgets.find((o) => o.id === id)
                   if (!w) return null
+
                   const onClick = () => this.onAnchorClick(w.id)
                   return (
                     <Button size='sm' color='primary' onClick={onClick}>
@@ -880,14 +882,6 @@ class Layout extends PureComponent {
                       return shouldShow
                     })}
                     onChange={(e, s) => {
-                      // console.log(e)
-                      // dispatch({
-                      //   type: 'consultation/updateState',
-                      //   payload: {
-                      //     selectedWidgets: e.target.value,
-                      //   },
-                      // })
-                      // console.log(e.target.value, s)
                       this.updateWidget(e.target.value, s)
                     }}
                   />
