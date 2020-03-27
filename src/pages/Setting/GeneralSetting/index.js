@@ -24,6 +24,7 @@ import {
   CodeSelect,
 } from '@/components'
 import { navigateDirtyCheck } from '@/utils/utils'
+import { LABEL_PRINTER_OPTIONS } from '@/utils/constants'
 
 const styles = (theme) => ({
   ...basicStyle(theme),
@@ -59,7 +60,8 @@ const styles = (theme) => ({
         },
         autoPrintDrugLabel: {
           ...autoPrintDrugLabel,
-          settingValue: autoPrintDrugLabel.settingValue === 'true',
+          settingValue:
+            autoPrintDrugLabel && autoPrintDrugLabel.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -71,40 +73,8 @@ const styles = (theme) => ({
   },
 
   handleSubmit: (values, { props }) => {
-    const {
-      systemCurrency,
-      currencyRounding,
-      currencyRoundingToTheClosest,
-      showConsultationVersioning,
-      autoRefresh,
-      defaultVisitType,
-      autoPrintDrugLabel,
-    } = values
-
-    const payload = [
-      {
-        ...systemCurrency,
-      },
-      {
-        ...currencyRounding,
-      },
-      {
-        ...currencyRoundingToTheClosest,
-      },
-      {
-        ...showConsultationVersioning,
-      },
-      {
-        ...autoRefresh,
-      },
-      {
-        ...autoPrintDrugLabel,
-      },
-      {
-        ...defaultVisitType,
-      },
-    ]
     const { dispatch, history } = props
+    const payload = Object.keys(values).map((o) => values[o])
 
     dispatch({
       type: 'clinicSettings/upsert',
@@ -265,6 +235,27 @@ class GeneralSetting extends PureComponent {
                     label='Default Visit Type'
                     {...args}
                     code='ctvisitpurpose'
+                    disabled={!!hasActiveSession}
+                    allowClear={false}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='labelPrinterSize.settingValue'
+                render={(args) => (
+                  <Select
+                    label='Label Printer Size'
+                    options={
+                      LABEL_PRINTER_OPTIONS &&
+                      LABEL_PRINTER_OPTIONS.map((o) => {
+                        return { name: o, value: o }
+                      })
+                    }
+                    {...args}
                     disabled={!!hasActiveSession}
                     allowClear={false}
                   />
