@@ -44,6 +44,7 @@ const styles = (theme) => ({
         showConsultationVersioning,
         autoRefresh,
         defaultVisitType,
+        autoPrintDrugLabel,
       } = clinicSettings.entity
 
       return {
@@ -55,6 +56,10 @@ const styles = (theme) => ({
         autoRefresh: {
           ...autoRefresh,
           settingValue: autoRefresh.settingValue === 'true',
+        },
+        autoPrintDrugLabel: {
+          ...autoPrintDrugLabel,
+          settingValue: autoPrintDrugLabel.settingValue === 'true',
         },
         showConsultationVersioning: {
           ...showConsultationVersioning,
@@ -73,6 +78,7 @@ const styles = (theme) => ({
       showConsultationVersioning,
       autoRefresh,
       defaultVisitType,
+      autoPrintDrugLabel,
     } = values
 
     const payload = [
@@ -90,6 +96,9 @@ const styles = (theme) => ({
       },
       {
         ...autoRefresh,
+      },
+      {
+        ...autoPrintDrugLabel,
       },
       {
         ...defaultVisitType,
@@ -226,6 +235,20 @@ class GeneralSetting extends PureComponent {
                 render={(args) => (
                   <Switch
                     label='Queue Listing Auto Refresh'
+                    {...args}
+                    disabled={!!hasActiveSession}
+                  />
+                )}
+              />
+            </GridItem>
+          </GridContainer>
+          <GridContainer>
+            <GridItem md={3}>
+              <Field
+                name='autoPrintDrugLabel.settingValue'
+                render={(args) => (
+                  <Switch
+                    label='Auto Print Drug Label'
                     {...args}
                     disabled={!!hasActiveSession}
                   />
