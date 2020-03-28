@@ -465,14 +465,14 @@ class Main extends React.Component {
     } = this.props
     const { entity: vistEntity = {} } = visitRegistration
     // if (!vistEntity) return null
-    const { visit = {} } = vistEntity
+    const { visit = {}, queueNo } = vistEntity
     const { summary } = orders
     // const { adjustments, total, gst, totalWithGst } = summary
     // console.log('values', values, this.props)
     // console.log(currentLayout)
 
     // console.log(state.currentLayout)
-    console.log({ visit })
+    console.log({ visitRegistration, queueNo })
 
     return (
       <SizeContainer size='sm'>
@@ -598,7 +598,11 @@ class Main extends React.Component {
             </GridItem>
             <GridItem style={{ display: 'flex' }}>
               <div style={{ marginRight: 10 }}>
-                <CallingQueueButton qId={visit.id} />
+                <CallingQueueButton
+                  qId={queueNo}
+                  roomNo={visit.roomFK}
+                  doctor={visit.doctorProfileFK}
+                />
               </div>
               {values.status !== 'PAUSED' && (
                 <ProgressButton

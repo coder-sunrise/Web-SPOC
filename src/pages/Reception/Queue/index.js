@@ -316,20 +316,23 @@ class Queue extends React.Component {
     }).then(async (response) => {
       const { status } = response
       if (response) {
-        await dispatch({
+        dispatch({
           type: 'queueCalling/getExistingQueueCallList',
           payload: {
             keys: KEYS.QUEUECALLING,
           },
+        }).then((res) => {
+          const { value, ...restRespValues } = res
+          dispatch({
+            type: 'queueCalling/upsertQueueCallList',
+            payload: {
+              ...restRespValues,
+              keys: KEYS.QUEUECALLING,
+              value: '[]',
+            },
+          })
         })
-        await dispatch({
-          type: 'queueCalling/upsertQueueCallList',
-          payload: {
-            ...queueCalling,
-            key: KEYS.QUEUECALLING,
-            value: '[]',
-          },
-        })
+
         this.setState(
           {
             showEndSessionSummary: true,
@@ -413,7 +416,7 @@ class Queue extends React.Component {
   }
 
   render () {
-    const { classes, queueLog, loading, history } = this.props
+    const { classes, queueLog, loading, history, dispatch } = this.props
     const {
       showEndSessionSummary,
       showPatientSearch,

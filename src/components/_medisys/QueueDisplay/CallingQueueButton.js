@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { withStyles } from '@material-ui/core'
 import { connect } from 'dva'
 import { compose } from 'redux'
+import { isNumber } from 'util'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, KEYS } from '@/utils/constants'
 import { withFormikExtend } from '@/components'
@@ -44,13 +45,58 @@ const styles = () => ({
 
 const CallingQueueButton = ({
   classes,
-  qId,
+  qId = '0',
   roomNo,
   dispatch,
+  doctor,
+  roomAssignmentList,
+  ctroom,
+  user,
   queueCalling: { qCallList = [], lastUpdateDate, ...restValues },
 }) => {
-  const qNo = qId.replace('.0', '')
-  const callingQueue = { qNo, roomNo }
+  console.log({ qId })
+
+  const qNo = qId.includes('.0') ? qId.replace('.0', '') : qId
+
+  const getRoomAssigned = () => {
+    if (roomNo) {
+      if (isNumber(roomNo)) {
+        const roomAssigned = ctroom.find((room) => room.id === roomNo)
+        return roomAssigned.name
+      }
+      return roomNo
+    }
+
+    let roomAssign = ''
+
+    if (doctor) {
+      let clinicianProfileFK = isNumber(doctor)
+        ? doctor
+        : doctor.clinicianProfile.id
+
+      if (user.clinicianProfile.doctorProfile) {
+        clinicianProfileFK = user.clinicianProfile.doctorProfile.id
+      }
+
+      // console.log({ clinicianProfileFK })
+
+      const roomAssignment = roomAssignmentList.find(
+        (room) => room.clinicianProfileFK === clinicianProfileFK,
+      )
+      // console.log({ roomAssignment })
+      if (roomAssignment) {
+        const roomAssigned = ctroom.find(
+          (room) => room.id === roomAssignment.roomFK,
+        )
+        if (roomAssigned) roomAssign = roomAssigned.name
+      }
+      // console.log({ roomAssign })
+    }
+
+    return roomAssign
+  }
+
+  const callingQueue = { qNo, roomNo: getRoomAssigned() }
 
   const newQList = [
     ...qCallList,
@@ -64,19 +110,10 @@ const CallingQueueButton = ({
   ] = useState(false)
 
   const updateData = (existingQArray, newRestValues = {}) => {
-    const otherQCalls = existingQArray.filter((q) => q.qNo !== qNo)
-    let valueArray = []
-    if (isCalled) {
-      valueArray = [
-        isCalled,
-        ...otherQCalls,
-      ]
-    } else {
-      valueArray = [
-        callingQueue,
-        ...otherQCalls,
-      ]
-    }
+    const valueArray = [
+      callingQueue,
+      ...existingQArray,
+    ]
 
     const stringifyValue = JSON.stringify(valueArray)
 
@@ -86,6 +123,7 @@ const CallingQueueButton = ({
       key: KEYS.QUEUECALLING,
       value: stringifyValue,
       isUserMaintainable: true,
+      lastUpdateDate: null,
     }
 
     dispatch({
@@ -107,6 +145,19 @@ const CallingQueueButton = ({
           status: NOTIFICATION_STATUS.OK,
           message: 'Queue Called',
           ...callingQueue,
+        })
+      } else {
+        dispatch({
+          type: 'queueCalling/getExistingQueueCallList',
+          payload: {
+            keys: KEYS.QUEUECALLING,
+          },
+        }).then((res) => {
+          const { value, ...restRespValues } = res
+
+          const existingQCall = JSON.parse(value)
+
+          updateData(existingQCall, restRespValues)
         })
       }
     })
@@ -162,8 +213,13 @@ const CallingQueueButton = ({
 
 export default compose(
   withStyles(styles, { withTheme: true }),
-  connect(({ queueLog, queueCalling }) => ({
-    qlist: queueLog.list,
-    queueCalling,
-  })),
+  connect(
+    ({ queueLog, queueCalling, settingRoomAssignment, codetable, user }) => ({
+      qlist: queueLog.list,
+      queueCalling,
+      roomAssignmentList: settingRoomAssignment.list,
+      ctroom: codetable.ctroom,
+      user: user.data,
+    }),
+  ),
 )(CallingQueueButton)

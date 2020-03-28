@@ -171,11 +171,11 @@ class PatientDashboard extends PureComponent {
       ...resetProps
     } = this.props
     const { patientDashboard, global, history, visitRegistration } = resetProps
-    const { entity } = visitRegistration
+    const { entity, queueNo } = visitRegistration
     if (!entity) return null
     const { visit = {} } = entity
-    const { visitPurposeFK = VISIT_TYPE.CONS } = visit
-    console.log({ visit })
+    const { visitPurposeFK = VISIT_TYPE.CONS, roomFK, doctorProfileFK } = visit
+    console.log({ entity, roomFK })
 
     return (
       <div className={classes.root}>
@@ -190,7 +190,11 @@ class PatientDashboard extends PureComponent {
                 }}
               >
                 {visit.visitStatus === VISIT_STATUS.WAITING && (
-                  <CallingQueueButton qId={visit.id} />
+                  <CallingQueueButton
+                    qId={queueNo}
+                    roomNo={roomFK}
+                    doctor={doctorProfileFK}
+                  />
                 )}
                 <Authorized authority='patientdashboard.startresumeconsultation'>
                   <div style={{ padding: '30px 0' }}>

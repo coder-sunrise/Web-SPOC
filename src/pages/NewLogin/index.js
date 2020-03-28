@@ -153,13 +153,6 @@ const submitKey = 'login/getToken'
             payload: { clinicCode },
           })
 
-          // await dispatch({
-          //   type: 'queueCalling/getExistingQueueCallList',
-          //   payload: {
-          //     keys: KEYS.QUEUECALLING,
-          //   },
-          // })
-
           router.push(loginDestination)
         }
       })

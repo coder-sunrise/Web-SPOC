@@ -73,14 +73,17 @@ const QueueDisplayDasboard = ({
   values = {},
   dispatch,
   queueCalling,
+  header,
 }) => {
   const { images = [], message, showDateTime } = values
-  const { calling, qCallList, pendingQCall } = queueCalling
-
-  const [
-    showCurrentCallQueue,
-    setShowCurrentCallQueue,
-  ] = useState(calling)
+  const {
+    qCallList,
+    pendingQCall,
+    currentQCall,
+    isSync,
+    lastUpdateDate,
+  } = queueCalling
+  const { signalRConnected } = header
 
   const [
     currentImageIndex,
@@ -91,16 +94,6 @@ const QueueDisplayDasboard = ({
     rerender,
     setRerender,
   ] = useState(false)
-
-  const [
-    data,
-    setData,
-  ] = useState(qCallList)
-
-  const [
-    pendingCallData,
-    setPendingCallData,
-  ] = useState(pendingQCall)
 
   const [
     imageSources,
@@ -167,15 +160,6 @@ const QueueDisplayDasboard = ({
 
   useEffect(
     () => {
-      setData(qCallList)
-    },
-    [
-      qCallList,
-    ],
-  )
-
-  useEffect(
-    () => {
       if (images.length > 0) {
         getImageSources()
       }
@@ -185,43 +169,76 @@ const QueueDisplayDasboard = ({
     ],
   )
 
+  const getLastQueueCallList = (setIsSyncValue) => {
+    dispatch({
+      type: 'queueCalling/getStatus',
+      payload: {
+        keys: KEYS.QUEUECALLING,
+      },
+    }).then((response) => {
+      const { lastUpdateDate: serverLastUpdateDate } = response
+      if (serverLastUpdateDate !== lastUpdateDate) {
+        dispatch({
+          type: 'queueCalling/syncUp',
+          payload: {
+            keys: KEYS.QUEUECALLING,
+            isSync: setIsSyncValue,
+          },
+        })
+      } else {
+        dispatch({
+          type: 'queueCalling/updateisSyncStatus',
+          payload: {
+            isSync: setIsSyncValue,
+          },
+        })
+      }
+    })
+  }
+
   useEffect(
     () => {
-      if (calling && pendingQCall.length > 0) {
-        const qIsExist = data.find((q) => q.qNo === pendingQCall[0].qNo)
+      let getLastestQCallTimer = null
 
-        let qArray = []
-        if (qIsExist) {
-          const otherQCalls = data.filter((q) => q.qNo !== pendingQCall[0].qNo)
-          qArray = [
-            qIsExist,
-            ...otherQCalls,
-          ]
-        } else {
-          qArray = [
-            pendingQCall[0],
-            ...data,
-          ]
-        }
+      if (signalRConnected && !isSync) {
+        console.log('hihi')
 
-        setData(qArray)
-        // dispatch({
-        //   type: 'queueCalling/updateState',
-        //   payload: {
-        //     qCallList: qArray,
-        //   },
-        // })
-        setShowCurrentCallQueue(true)
+        getLastQueueCallList(true)
       }
-      setRerender(true)
+
+      if (!signalRConnected) {
+        getLastestQCallTimer = setInterval(() => {
+          getLastQueueCallList(false)
+        }, 5000)
+      }
+
+      const timer = setInterval(() => {
+        if (pendingQCall.length > 0) {
+          if (!currentQCall) {
+            dispatch({
+              type: 'queueCalling/displayCallQueue',
+            })
+            setRerender(true)
+            setTimeout(() => {
+              dispatch({
+                type: 'queueCalling/clearCurrentQCall',
+              })
+            }, 5000)
+          }
+        }
+      }, 500)
+      return () => {
+        clearInterval(timer)
+        clearInterval(getLastestQCallTimer)
+      }
     },
     [
-      calling,
       pendingQCall,
+      currentQCall,
+      signalRConnected,
+      lastUpdateDate,
     ],
   )
-
-  // console.log({ pendingQCall })
 
   return (
     <Fragment>
@@ -237,24 +254,17 @@ const QueueDisplayDasboard = ({
             lineHeight: '6vw',
           }}
         >
-          {data.length > 0 && (
+          {qCallList.length > 0 && (
             <QueueCallingList
-              data={data}
+              data={qCallList}
               rerender={rerender}
               setRerender={setRerender}
             />
           )}
         </div>
         <div className={classes.rightContainer}>
-          {showCurrentCallQueue ? (
-            <CurrentCallingQueue
-              callingQueue={pendingQCall}
-              setShowCurrentCallQueue={setShowCurrentCallQueue}
-              dispatch={dispatch}
-              qCallList={qCallList}
-              setRerender={setRerender}
-              setPendingCallData={setPendingCallData}
-            />
+          {currentQCall ? (
+            <CurrentCallingQueue callingQueue={currentQCall} />
           ) : (
             <Carousel
               images={imageSources}

@@ -11,32 +11,6 @@ import { navigateDirtyCheck } from '@/utils/utils'
 import { DoctorLabel } from '@/components/_medisys'
 import Yup from '@/utils/yup'
 
-const tableParas = {
-  columns: [
-    { name: 'clinicianProfileFK', title: 'Doctor' },
-    { name: 'roomFK', title: 'Room' },
-  ],
-  columnExtensions: [
-    {
-      columnName: 'clinicianProfileFK',
-      width: 500,
-      type: 'codeSelect',
-      code: 'doctorprofile',
-      labelField: 'clinicianProfile.name',
-      valueField: 'clinicianProfile.id',
-      remoteFilter: {
-        'clinicianProfile.isActive': false,
-      },
-      renderDropdown: (option) => <DoctorLabel doctor={option} />,
-    },
-    {
-      columnName: 'roomFK',
-      type: 'codeSelect',
-      code: 'ctroom',
-    },
-  ],
-}
-
 const roomAssignSchema = Yup.object().shape({
   clinicianProfileFK: Yup.number().required(),
   roomFK: Yup.number().required(),
@@ -45,8 +19,51 @@ const roomAssignSchema = Yup.object().shape({
 const Grid = ({
   handleSubmit,
   setFieldValue,
+  values,
   values: { roomAssignRows = [] },
 }) => {
+  const handleDoctorChange = (v, test) => {
+    const { row } = v
+    const { clinicianProfileFK } = row
+
+    const isDoctorAlrdyAssigned = roomAssignRows.find(
+      (roomAssign) => roomAssign.clinicianProfileFK === clinicianProfileFK,
+    )
+    console.log({ isDoctorAlrdyAssigned, roomAssignRows, clinicianProfileFK })
+
+    if (isDoctorAlrdyAssigned) row.clinicianProfileFK = undefined
+    console.log({ v, test })
+    console.log(values.roomAssignRows)
+  }
+
+  const tableParas = {
+    columns: [
+      { name: 'clinicianProfileFK', title: 'Doctor' },
+      { name: 'roomFK', title: 'Room' },
+    ],
+    columnExtensions: [
+      {
+        columnName: 'clinicianProfileFK',
+        width: 500,
+        type: 'codeSelect',
+        code: 'doctorprofile',
+        labelField: 'clinicianProfile.name',
+        valueField: 'clinicianProfile.id',
+        remoteFilter: {
+          'clinicianProfile.isActive': false,
+        },
+        localFilter: (opt) => console.log({ values }),
+        onChange: (v) => handleDoctorChange(v, roomAssignRows),
+        renderDropdown: (option) => <DoctorLabel doctor={option} />,
+      },
+      {
+        columnName: 'roomFK',
+        type: 'codeSelect',
+        code: 'ctroom',
+      },
+    ],
+  }
+
   const onAddedRowsChange = (addedRows) => {
     return addedRows.map((row) => ({
       patientAllergyStatusFK: 1,
@@ -71,6 +88,7 @@ const Grid = ({
         FuncProps={{
           pager: false,
         }}
+        forceRender
         EditingProps={{
           showAddCommand: true,
           onCommitChanges,
@@ -126,6 +144,9 @@ export default compose(
       }).then((r) => {
         if (r) {
           resetForm()
+          dispatch({
+            type: 'settingRoomAssignment/query',
+          })
           history.push('/setting')
         }
       })

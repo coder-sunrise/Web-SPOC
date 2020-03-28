@@ -30,7 +30,15 @@ const QueueCallingList = ({ data, rerender, setRerender }) => {
     for (let index = 0; index < currentPartition.length; index++) {
       const element = (
         <div style={queueStyle}>
-          <p>{currentPartition[index].roomNo}</p>
+          <p
+            style={{
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentPartition[index].roomNo}
+          </p>
           <p style={{ fontWeight: 'bold' }}>{currentPartition[index].qNo}</p>
         </div>
       )

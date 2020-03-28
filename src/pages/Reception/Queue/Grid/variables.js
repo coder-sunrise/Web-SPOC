@@ -164,6 +164,8 @@ export const QueueColumnExtensions = [
     width: 80,
     compare: compareQueueNo,
     render: (row) => {
+      console.log({ row })
+
       return (
         <Fragment>
           <span
@@ -176,7 +178,11 @@ export const QueueColumnExtensions = [
             {row.queueNo}
             {row.visitStatus === VISIT_STATUS.WAITING && (
               <span>
-                <CallingQueueButton qId={row.queueNo} roomNo={row.roomNo} />
+                <CallingQueueButton
+                  qId={row.queueNo}
+                  roomNo={row.roomNo}
+                  doctor={row.doctor}
+                />
               </span>
             )}
           </span>

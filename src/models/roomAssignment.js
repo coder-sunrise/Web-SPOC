@@ -1,5 +1,5 @@
 import { createListViewModel } from 'medisys-model'
-import * as service from '../services'
+import * as service from '../services/roomAssignment'
 
 export default createListViewModel({
   namespace: 'settingRoomAssignment',
@@ -9,6 +9,7 @@ export default createListViewModel({
       default: {
         isUserMaintainable: true,
         description: '',
+        list: [],
       },
     },
     // subscriptions: ({ dispatch, history }) => {

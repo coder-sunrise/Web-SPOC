@@ -1,4 +1,5 @@
 import { createFormViewModel } from 'medisys-model'
+import _ from 'lodash'
 import * as service from '../services/queueDisplaySetup'
 import { notification } from '@/components'
 import { subscribeNotification } from '@/utils/realtime'
@@ -12,21 +13,18 @@ export default createFormViewModel({
     service,
     state: {
       qCallList: [],
-      calling: false,
       pendingQCall: [],
+      isSync: false,
     },
-    subscriptions: ({ dispatch, history, searchField }) => {
+    subscriptions: ({ dispatch, history, searchField, ...restValues }) => {
       subscribeNotification('QueueCalled', {
         callback: (response) => {
           const { qNo, roomNo } = response
           const newCalledQueue = { qNo, roomNo }
-          console.log('helloo')
-
           return dispatch({
             type: 'refreshQueueCallList',
             payload: {
               callingQueue: newCalledQueue,
-              calling: true,
             },
           })
         },
@@ -76,33 +74,128 @@ export default createFormViewModel({
         }
         return r
       },
+      *syncUp ({ payload }, { call, put }) {
+        const r = yield call(service.query, payload)
+        const { status, data } = r
+
+        if (status === '200') {
+          if (data.length > 0) {
+            yield put({
+              type: 'getLatestQCall',
+              payload: {
+                data: data[0],
+                isSync: payload.isSync,
+              },
+            })
+            return data[0]
+          }
+        }
+        return false
+      },
     },
     reducers: {
       setExistingQueueCallList (st, { payload }) {
         const { value, ...restValues } = payload.data
         const existingQCall = JSON.parse(value)
+        const uniqueQCall = _.uniqBy(existingQCall, 'qNo')
+        console.log({ uniqueQCall })
         return {
           ...st,
-          qCallList: existingQCall,
+          qCallList: uniqueQCall,
+          oriQCallList: existingQCall,
           ...restValues,
         }
       },
       refreshQueueCallList (st, { payload }) {
-        const { callingQueue, calling } = payload
+        const { callingQueue } = payload
+        const { pendingQCall, isSync } = st
+
+        if (isSync) {
+          let pendingCalls = []
+
+          pendingCalls = [
+            ...pendingQCall,
+            callingQueue,
+          ]
+
+          return {
+            ...st,
+            pendingQCall: pendingCalls,
+          }
+        }
+
+        return {
+          ...st,
+        }
+      },
+      displayCallQueue (st, { payload }) {
         const { qCallList, pendingQCall } = st
-        const { qNo, roomNo } = callingQueue
+        const currentCalledQueue = qCallList.find(
+          (q) => q.qNo === pendingQCall[0].qNo,
+        )
 
-        let pendingCalls = []
+        let qArray = []
+        if (currentCalledQueue) {
+          const otherQCalls = qCallList.filter(
+            (q) => q.qNo !== currentCalledQueue.qNo,
+          )
+          qArray = [
+            currentCalledQueue,
+            ...otherQCalls,
+          ]
+        } else {
+          qArray = [
+            pendingQCall[0],
+            ...qCallList,
+          ]
+        }
 
-        pendingCalls = [
+        const remainingPendingQCall = pendingQCall.filter((q, idx) => idx !== 0)
+        return {
+          ...st,
+          qCallList: qArray,
+          currentQCall: {
+            qNo: pendingQCall[0].qNo,
+            roomNo: pendingQCall[0].roomNo,
+          },
+          pendingQCall: remainingPendingQCall,
+        }
+      },
+      clearCurrentQCall (st, { payload }) {
+        return {
+          ...st,
+          currentQCall: null,
+        }
+      },
+      getLatestQCall (st, { payload }) {
+        const { oriQCallList, pendingQCall } = st
+        const { data, isSync } = payload
+        const { value, ...restValues } = data
+        const existingQCall = JSON.parse(value)
+
+        const totalNewQCalled = existingQCall.length - oriQCallList.length
+        const newExistingQCall = [
+          ...existingQCall,
+        ].splice(0, totalNewQCalled)
+
+        const newPendingQCall = [
           ...pendingQCall,
-          callingQueue,
+          ..._.reverse(newExistingQCall),
         ]
 
         return {
           ...st,
-          calling: true,
-          pendingQCall: pendingCalls,
+          pendingQCall: newPendingQCall,
+          oriQCallList: existingQCall,
+          isSync,
+          ...restValues,
+        }
+      },
+      updateisSyncStatus (st, { payload }) {
+        const { isSync } = payload
+        return {
+          ...st,
+          isSync,
         }
       },
     },
