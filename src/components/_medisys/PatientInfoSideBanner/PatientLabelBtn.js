@@ -1,45 +1,84 @@
 import React, { useState, Fragment } from 'react'
+import classNames from 'classnames'
 // material ui
 import Print from '@material-ui/icons/Print'
 import Refresh from '@material-ui/icons/Refresh'
+import {
+  withStyles,
+  MenuList,
+  ClickAwayListener,
+  MenuItem,
+  makeStyles,
+} from '@material-ui/core'
 // ant design
 import { InputNumber } from 'antd'
 // common components
-import { Button, SizeContainer } from '@/components'
+import { Button, SizeContainer, Popper } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // services
 import { getRawData } from '@/services/report'
 
-const PatientLabLabelButton = ({
+const labelTypes = [
+  'PATIENT_LABEL',
+  'PATIENT_LAB_LABEL',
+]
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    marginBottom: 8,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inputStyle: {
+    width: '50px',
+    textAlign: 'right',
+  },
+}))
+
+const PatientLabelButton = ({
   handlePrint,
   patientId,
   clinicSettings,
   sendingJob,
 }) => {
-  const [
-    labLabelCopyNo,
-    setLabLabelCopyNo,
-  ] = useState(1)
+  const classes = useStyles()
 
   const [
-    ptnLabelCopyNo,
-    setPtnLabelCopyNo,
-  ] = useState(1)
+    copyNo,
+    setCopyNo,
+  ] = useState(
+    labelTypes.reduce((a, b) => {
+      return { ...a, [b]: 1 }
+    }, {}),
+  )
 
-  const handleCopyNoChange = (value) => setLabLabelCopyNo(value)
+  const [
+    popperOpen,
+    setPopperOpen,
+  ] = useState(false)
 
-  const handlePtnLabelCopyNoChanges = (value) => setPtnLabelCopyNo(value)
+  const openPopper = () => setPopperOpen(true)
+  const closePopper = () => setPopperOpen(false)
 
-  const handlePrintClick = async () => {
+  const sizeConverter = (sizeCM) => {
+    return sizeCM
+      .split('x')
+      .map((o) =>
+        (10 * parseFloat(o.replace('cm', ''))).toString().concat('MM'),
+      )
+      .join('_')
+  }
+
+  const handleClick = async (labelType) => {
+    if (!Number.isInteger(copyNo[labelType])) return
+
     const { labelPrinterSize } = clinicSettings
-    if (!Number.isInteger(labLabelCopyNo)) return
 
-    let reportID = REPORT_ID.PATIENT_LAB_LABEL_80MM_45MM
+    const reportID =
+      REPORT_ID[labelType.concat('_').concat(sizeConverter(labelPrinterSize))]
 
-    if (labelPrinterSize === '8.9cmx3.6cm') {
-      reportID = REPORT_ID.PATIENT_LAB_LABEL_89MM_36MM
-    }
     const data = await getRawData(reportID, { patientId })
     const payload = [
       {
@@ -50,54 +89,62 @@ const PatientLabLabelButton = ({
       },
     ]
 
-    for (let i = 0; i < labLabelCopyNo; i++) {
+    for (let i = 0; i < copyNo[labelType]; i++) {
       handlePrint(JSON.stringify(payload))
     }
   }
 
-  const handlePatientLabelClick = async () => {
-    const { labelPrinterSize } = clinicSettings
-    let reportID = REPORT_ID.PATIENT_LABEL_80MM_45MM
-
-    if (labelPrinterSize === '8.9cmx3.6cm') {
-      reportID = REPORT_ID.PATIENT_LABEL_89MM_36MM
-    }
-
-    if (!Number.isInteger(ptnLabelCopyNo)) return
-    const data = await getRawData(reportID, { patientId })
-
-    const payload = [
-      {
-        ReportId: reportID,
-        ReportData: JSON.stringify({
-          ...data,
-        }),
-      },
-    ]
-
-    for (let i = 0; i < ptnLabelCopyNo; i++) {
-      handlePrint(JSON.stringify(payload))
-    }
-  }
+  const handleCopyNoChange = (value, labelType) =>
+    setCopyNo({
+      ...copyNo,
+      [labelType]: value,
+    })
 
   return (
-    <div
-      style={{
-        marginBottom: 8,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Button
-        color='primary'
-        onClick={handlePatientLabelClick}
-        disabled={!Number.isInteger(ptnLabelCopyNo)}
+    <div className={classes.root}>
+      <Popper
+        open={popperOpen}
+        transition
+        overlay={
+          <ClickAwayListener onClickAway={closePopper}>
+            <MenuList role='menu'>
+              {labelTypes.length > 0 &&
+                labelTypes.map((o) => {
+                  return (
+                    <MenuItem>
+                      <Button
+                        color='primary'
+                        onClick={() => handleClick(o)}
+                        disabled={!Number.isInteger(copyNo[o]) || sendingJob}
+                      >
+                        {o.includes('_LAB_') ? (
+                          'LAB LABEL'
+                        ) : (
+                          o.replace('_', ' ')
+                        )}
+                      </Button>
+                      <InputNumber
+                        size='small'
+                        min={1}
+                        max={10}
+                        value={copyNo[o]}
+                        onChange={(value) => handleCopyNoChange(value, o)}
+                        className={classes.inputStyle}
+                      />
+                      <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
+                    </MenuItem>
+                  )
+                })}
+            </MenuList>
+          </ClickAwayListener>
+        }
       >
-        <Print />
-      </Button>
+        <Button color='primary' onClick={openPopper}>
+          <Print />
+        </Button>
+      </Popper>
     </div>
   )
 }
 
-export default withWebSocket()(PatientLabLabelButton)
+export default withWebSocket()(PatientLabelButton)
