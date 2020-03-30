@@ -1,5 +1,4 @@
 import moment from 'moment'
-import Grid from './Grid'
 import {
   DateFormatter,
   dateFormatLong,
@@ -8,6 +7,7 @@ import {
   Tooltip,
 } from '@/components'
 import { SMS_STATUS_TEXT } from '@/utils/constants'
+import Grid from './Grid'
 
 const renderSMSStatus = (status) => {
   if (
@@ -136,6 +136,7 @@ const appointmentColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
+        format: 'DD MMM YYYY hh:mm A',
       }),
   },
   {
@@ -186,6 +187,7 @@ const patientColumnsExtensions = [
       DateFormatter({
         value: row.lastSMSSendDate,
         full: true,
+        format: 'DD MMM YYYY hh:mm A',
       }),
   },
   {
