@@ -1,7 +1,6 @@
 import { createFormViewModel } from 'medisys-model'
 import _ from 'lodash'
 import * as service from '../services/queueDisplaySetup'
-import { notification } from '@/components'
 import { subscribeNotification } from '@/utils/realtime'
 
 export default createFormViewModel({
@@ -62,7 +61,6 @@ export default createFormViewModel({
         const r = yield call(service.upsert, payload)
 
         if (r.length > 0) {
-          notification.success({ message: 'Called' })
           return r[0]
           // yield put({
           //   type: 'setExistingQueueCallList',

@@ -174,7 +174,7 @@ export const QueueColumnExtensions = [
             }}
           >
             {row.queueNo}
-            {row.visitStatus === VISIT_STATUS.WAITING && (
+            {row.visitStatus !== VISIT_STATUS.UPCOMING_APPT && (
               <span>
                 <CallingQueueButton
                   qId={row.queueNo}

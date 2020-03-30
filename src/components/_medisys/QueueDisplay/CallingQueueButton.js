@@ -5,6 +5,7 @@ import { compose } from 'redux'
 import { isNumber } from 'util'
 import { sendNotification } from '@/utils/realtime'
 import { NOTIFICATION_TYPE, NOTIFICATION_STATUS, KEYS } from '@/utils/constants'
+import { notification } from '@/components'
 
 const btnStyle = {
   borderRadius: '50%',
@@ -173,6 +174,7 @@ const CallingQueueButton = ({
       payload,
     }).then((response) => {
       if (response) {
+        notification.success({ message: 'Called' })
         const { lastUpdateDate: lastUpdateTime, concurrencyToken } = response
         dispatch({
           type: 'queueCalling/updateState',
@@ -253,15 +255,17 @@ const CallingQueueButton = ({
   )
 }
 
-export default compose(
-  withStyles(styles, { withTheme: true }),
-  connect(
-    ({ queueLog, queueCalling, settingRoomAssignment, codetable, user }) => ({
-      qlist: queueLog.list,
-      queueCalling,
-      roomAssignmentList: settingRoomAssignment.list,
-      ctroom: codetable.ctroom,
-      user: user.data,
-    }),
-  ),
-)(CallingQueueButton)
+export default React.memo(
+  compose(
+    withStyles(styles, { withTheme: true }),
+    connect(
+      ({ queueLog, queueCalling, settingRoomAssignment, codetable, user }) => ({
+        qlist: queueLog.list,
+        queueCalling,
+        roomAssignmentList: settingRoomAssignment.list,
+        ctroom: codetable.ctroom,
+        user: user.data,
+      }),
+    ),
+  )(CallingQueueButton),
+)

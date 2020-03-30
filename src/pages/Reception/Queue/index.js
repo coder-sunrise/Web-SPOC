@@ -21,6 +21,7 @@ import {
   PageHeaderWrapper,
   Button,
   ProgressButton,
+  notification,
 } from '@/components'
 // current page sub components
 import EmptySession from './EmptySession'
@@ -439,6 +440,35 @@ class Queue extends React.Component {
 
             {!isClinicSessionClosed && (
               <div className={classNames(classes.toolBtns)}>
+                {/* for testing calling queue */}
+                <Button
+                  size='sm'
+                  onClick={() => {
+                    dispatch({
+                      type: 'queueCalling/getExistingQueueCallList',
+                      payload: {
+                        keys: KEYS.QUEUECALLING,
+                      },
+                    }).then((res) => {
+                      const { value, ...restRespValues } = res
+                      dispatch({
+                        type: 'queueCalling/upsertQueueCallList',
+                        payload: {
+                          ...restRespValues,
+                          keys: KEYS.QUEUECALLING,
+                          value: '[]',
+                        },
+                      }).then((response) => {
+                        if (response)
+                          notification.success({ message: 'Cleared' })
+                      })
+                    })
+                  }}
+                >
+                  clear
+                </Button>
+                {/* for testing calling queue */}
+
                 <QueueDashboardButton size='sm' />
                 <ProgressButton
                   color='info'
