@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import { connect } from 'dva'
 import { withStyles } from '@material-ui/core'
 import _ from 'lodash'
 import AttachMoney from '@material-ui/icons/AttachMoney'
@@ -31,9 +32,8 @@ const filterOptions = [
   },
 ]
 
-const initMaxTagCount = 4
-
 const DiagnosisSelect = ({
+  dispatch,
   theme,
   classes,
   style,
@@ -43,8 +43,11 @@ const DiagnosisSelect = ({
   ...props
 }) => {
   let selectProps = props
+  const initMaxTagCount =
+    props.field && props.field.value && props.field.value.length === 1 ? 1 : 0
   const [
     maxTagCount,
+    setMaxTagCount,
   ] = useState(
     props.maxTagCount !== undefined ? props.maxTagCount : initMaxTagCount,
   )
@@ -98,8 +101,16 @@ const DiagnosisSelect = ({
 
     // console.log(diagnosisFilter)
     const response = await queryList('/api/codetable/ctsnomeddiagnosis', search)
-    if (response && response.data) setCtDiagnosis(response.data.data)
+    if (response && response.data) {
+      setCtDiagnosis(response.data.data)
 
+      dispatch({
+        type: 'codetable/updateState',
+        payload: {
+          'codetable/ctsnomeddiagnosis': response.data.data,
+        },
+      })
+    }
     return response
   }
   const selected = ctDiagnosis.find(
@@ -145,6 +156,13 @@ const DiagnosisSelect = ({
           if (onDataSouceChange) onDataSouceChange(data)
         }}
         onChange={(values, opts) => {
+          if (
+            props.maxTagCount === undefined &&
+            props.mode &&
+            props.mode === 'multiple'
+          ) {
+            setMaxTagCount(values && values.length === 1 ? 1 : 0)
+          }
           if (props.onChange) {
             props.onChange(values, opts)
           }
@@ -170,4 +188,6 @@ const DiagnosisSelect = ({
   )
 }
 
-export default withStyles(styles, { withTheme: true })(DiagnosisSelect)
+const Connected = connect()(DiagnosisSelect)
+
+export default withStyles(styles, { withTheme: true })(Connected)

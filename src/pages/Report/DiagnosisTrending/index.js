@@ -1,13 +1,10 @@
 import React from 'react'
-import {
-  GridContainer,
-  GridItem,
-} from '@/components'
 import * as Yup from 'yup'
 import moment from 'moment'
 // formik
 import { withFormik } from 'formik'
 // sub components
+import { GridContainer, GridItem } from '@/components'
 import FilterBar from './FilterBar'
 import ReportBase from '../ReportBase'
 import DiagnosisGroupDetails from './DiagnosisGroupDetails'
@@ -16,7 +13,7 @@ import DiagnosisDetails from './DiagnosisDetails'
 const reportId = 6
 const fileName = 'Diagnosis Trending'
 class DiagnosisTrending extends ReportBase {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       ...this.state,
@@ -25,18 +22,24 @@ class DiagnosisTrending extends ReportBase {
     }
   }
 
-  renderFilterBar = (handleSubmit, isSubmitting) => {
-    return <FilterBar handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+  renderFilterBar = (handleSubmit, isSubmitting, formikProps) => {
+    return (
+      <FilterBar
+        handleSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        formikProps={formikProps}
+      />
+    )
   }
 
   renderContent = (reportDatas) => {
     return (
       <GridContainer>
         <GridItem md={12}>
-          <DiagnosisGroupDetails reportDatas={reportDatas}></DiagnosisGroupDetails>
+          <DiagnosisGroupDetails reportDatas={reportDatas} />
         </GridItem>
         <GridItem md={12} style={{ padding: 6 }}>
-          <DiagnosisDetails reportDatas={reportDatas}></DiagnosisDetails>
+          <DiagnosisDetails reportDatas={reportDatas} />
         </GridItem>
       </GridContainer>
     )

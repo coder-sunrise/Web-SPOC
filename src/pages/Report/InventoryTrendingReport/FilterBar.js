@@ -1,6 +1,8 @@
 import React from 'react'
+import { connect } from 'dva'
 // formik
 import { FastField, Field } from 'formik'
+import { Chip } from '@material-ui/core'
 // common components
 import {
   Button,
@@ -14,7 +16,20 @@ import {
 } from '@/components'
 import ReportDateRangePicker from '../ReportDateRangePicker'
 
-const FilterBar = ({ handleSubmit, isSubmitting }) => {
+const FilterBar = ({ handleSubmit, isSubmitting, formikProps, codetable }) => {
+  // inventory${form.values.inventoryType}
+  const { values, setFieldValue } = formikProps
+  const { items = [] } = values
+
+  const ctinventory =
+    codetable[`inventory${values.inventoryType.toLowerCase()}`] || []
+
+  const selectedItems = ctinventory.filter((item) => items.includes(item.id))
+
+  const handleDelete = (id) => {
+    setFieldValue('items', items.filter((item) => item !== id))
+  }
+
   return (
     <SizeContainer size='sm'>
       <React.Fragment>
@@ -53,6 +68,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                   <Select
                     {...args}
                     label='Inventory Type'
+                    allowClear={false}
                     options={[
                       { name: 'Medication', value: 'MEDICATION' },
                       { name: 'Consumable', value: 'CONSUMABLE' },
@@ -106,10 +122,25 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
               Generate Report
             </Button>
           </GridItem>
+          <GridItem md={12}>
+            {selectedItems.map((item) => (
+              <Chip
+                style={{ margin: 8 }}
+                key={item.code}
+                size='small'
+                variant='outlined'
+                label={item.displayValue}
+                color='primary'
+                onDelete={() => handleDelete(item.id)}
+              />
+            ))}
+          </GridItem>
         </GridContainer>
       </React.Fragment>
     </SizeContainer>
   )
 }
 
-export default FilterBar
+const Connected = connect(({ codetable }) => ({ codetable }))(FilterBar)
+
+export default Connected
