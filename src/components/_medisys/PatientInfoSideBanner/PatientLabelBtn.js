@@ -1,10 +1,7 @@
-import React, { useState, Fragment } from 'react'
-import classNames from 'classnames'
+import React, { useState } from 'react'
 // material ui
 import Print from '@material-ui/icons/Print'
-import Refresh from '@material-ui/icons/Refresh'
 import {
-  withStyles,
   MenuList,
   ClickAwayListener,
   MenuItem,
@@ -13,7 +10,7 @@ import {
 // ant design
 import { InputNumber } from 'antd'
 // common components
-import { Button, SizeContainer, Popper } from '@/components'
+import { Button, Popper } from '@/components'
 import { REPORT_ID } from '@/utils/constants'
 import withWebSocket from '@/components/Decorator/withWebSocket'
 // services
@@ -24,7 +21,7 @@ const labelTypes = [
   'PATIENT_LAB_LABEL',
 ]
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     marginBottom: 8,
     display: 'flex',
@@ -34,6 +31,9 @@ const useStyles = makeStyles((theme) => ({
   inputStyle: {
     width: '50px',
     textAlign: 'right',
+  },
+  qtyFont: {
+    fontSize: '0.75rem',
   },
 }))
 
@@ -131,7 +131,7 @@ const PatientLabelButton = ({
                         onChange={(value) => handleCopyNoChange(value, o)}
                         className={classes.inputStyle}
                       />
-                      <span style={{ fontSize: '0.75rem' }}>&nbsp;Qty</span>
+                      <span className={classes.qtyFont}>&nbsp;Qty</span>
                     </MenuItem>
                   )
                 })}
