@@ -65,7 +65,9 @@ const FilterBar = ({ classes, handleSubmit, isSubmitting }) => {
           <GridItem md={4}>
             <FastField
               name='diagnosisIds'
-              render={(args) => <DiagnosisSelect {...args} mode='multiple' />}
+              render={(args) => (
+                <DiagnosisSelect {...args} mode='multiple' maxTagCount={3} />
+              )}
             />
           </GridItem>
           <GridItem md={4}>

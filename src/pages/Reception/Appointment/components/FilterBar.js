@@ -114,7 +114,7 @@ const FilterBar = (props) => {
                   },
                 ]}
                 maxTagCount={0}
-                maxTagPlaceholder='appointment types'
+                maxTagPlaceholder='appt. types'
               />
             )}
           />

@@ -79,6 +79,7 @@ const FilterBar = ({ handleSubmit, isSubmitting }) => {
                     {...args}
                     label='Item List'
                     mode='multiple'
+                    maxTagCount={5}
                     code={`inventory${form.values.inventoryType}`}
                     labelField='displayValue'
                     temp
