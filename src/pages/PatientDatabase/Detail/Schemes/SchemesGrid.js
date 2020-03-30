@@ -161,12 +161,14 @@ class SchemesGrid extends PureComponent {
                 : ''
               return (
                 <span>
-                  {patCoPaymentScheme.name}
+                  {patCoPaymentScheme ? patCoPaymentScheme.name : ''}
                   {isActiveLabel}
                 </span>
               )
             }
-            return <span>{patCoPaymentScheme.name}</span>
+            return (
+              <span>{patCoPaymentScheme ? patCoPaymentScheme.name : ''}</span>
+            )
           },
           onChange: ({ val, option, row, onValueChange }) => {
             let { rows } = this.props
